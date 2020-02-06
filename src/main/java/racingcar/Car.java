@@ -3,6 +3,7 @@ package racingcar;
 import org.apache.logging.log4j.util.Strings;
 
 public class Car {
+    static final int POINT_VARIATION_OF_MOVING = 1;
     private final String name;
     private int position;
 
@@ -18,7 +19,7 @@ public class Car {
 
     void move(final RandomMovingStrategy movingStrategy) {
         if (movingStrategy.movable()) {
-            position++;
+            position += POINT_VARIATION_OF_MOVING;
         }
     }
 
