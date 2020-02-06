@@ -1,14 +1,14 @@
 package kitchenpos.bo;
 
+import java.util.List;
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.model.MenuGroup;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Component
 public class MenuGroupBo {
+
     private final MenuGroupDao menuGroupDao;
 
     public MenuGroupBo(final MenuGroupDao menuGroupDao) {

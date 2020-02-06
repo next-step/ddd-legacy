@@ -1,16 +1,16 @@
 package kitchenpos.bo;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Objects;
 import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Product;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-
 @Component
 public class ProductBo {
+
     private final ProductDao productDao;
 
     public ProductBo(final ProductDao productDao) {

@@ -1,14 +1,15 @@
 package racingcar;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-
 class CarTest {
+
     @DisplayName("자동차를 생성한다.")
     @Test
     void create() {
@@ -21,14 +22,14 @@ class CarTest {
     @ValueSource(strings = {"BMX X1", "SONATA"})
     void exceededName(String name) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new Car(name));
+            .isThrownBy(() -> new Car(name));
     }
 
     @DisplayName("자동차의 이름은 빈 값일 수 없다.")
     @Test
     void emptyName() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new Car(""));
+            .isThrownBy(() -> new Car(""));
     }
 
     @DisplayName("자동차가 움직인다.")

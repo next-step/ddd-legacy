@@ -3,6 +3,7 @@ package racingcar;
 import org.apache.logging.log4j.util.Strings;
 
 public class Car {
+
     private final String name;
     private int position;
 
