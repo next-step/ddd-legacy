@@ -1,6 +1,6 @@
 package racingcar;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -15,13 +15,15 @@ class RandomMovingStrategyTest {
     @DisplayName("무작위 값이 4 보다 작을 경우, 자동차는 움직이지 않는다.")
     @Test
     public void movable_when_random_number_is_3() {
-        assertFalse(new RandomMovingStrategy(mockRandomWillReturn(3)).movable());
+        assertThat(new RandomMovingStrategy(mockRandomWillReturn(3)).movable())
+            .isFalse();
     }
 
     @DisplayName("무작위 값이 4 이상일 경우, 자동차는 움직인다.")
     @Test
     public void movable_when_random_number_is_4() {
-        assertTrue(new RandomMovingStrategy(mockRandomWillReturn(4)).movable());
+        assertThat(new RandomMovingStrategy(mockRandomWillReturn(4)).movable())
+            .isTrue();
     }
 
     private static Random mockRandomWillReturn(int val) {
