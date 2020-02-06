@@ -7,6 +7,7 @@ import org.apache.logging.log4j.util.Strings;
 public class Car {
     static final int DEFAULT_POSITION = 0;
     static final int POINT_VARIATION_OF_MOVING = 1;
+    static final int MAX_LENGTH_OF_NAME = 5;
     private final String name;
     private int position;
 
@@ -20,7 +21,7 @@ public class Car {
         this.position = position;
     }
 
-    void move(final RandomMovingStrategy movingStrategy) {
+    void move(final MovingStrategy movingStrategy) {
         if (movingStrategy.movable()) {
             position += POINT_VARIATION_OF_MOVING;
         }
@@ -35,7 +36,7 @@ public class Car {
     }
 
     private void validate(final String name) {
-        if (Strings.isBlank(name) || name.length() > 5) {
+        if (Strings.isBlank(name) || name.length() > MAX_LENGTH_OF_NAME) {
             throw new IllegalArgumentException();
         }
     }
