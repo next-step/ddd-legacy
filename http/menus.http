@@ -1,0 +1,20 @@
+###
+POST {{host}}/api/menus
+Content-Type: application/json
+
+{
+  "name": "후라이드+후라이드",
+  "price": 19000,
+  "menuGroupId": 1,
+  "menuProducts": [
+    {
+      "productId": 1,
+      "quantity": 2
+    }
+  ]
+}
+
+###
+GET {{host}}/api/menus
+
+###

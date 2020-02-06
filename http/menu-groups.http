@@ -1,0 +1,12 @@
+###
+POST {{host}}/api/menu-groups
+Content-Type: application/json
+
+{
+  "name": "추천메뉴"
+}
+
+###
+GET {{host}}/api/menus-groups
+
+###

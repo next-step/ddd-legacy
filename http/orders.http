@@ -1,0 +1,34 @@
+###
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{
+  "orderTableId": 1,
+  "orderLineItems": [
+    {
+      "menuId": 1,
+      "quantity": 1
+    }
+  ]
+}
+
+###
+GET {{host}}/api/orders
+
+###
+PUT {{host}}/api/orders/1/order-status
+Content-Type: application/json
+
+{
+  "orderStatus": "MEAL"
+}
+
+###
+PUT {{host}}/api/orders/1/order-status
+Content-Type: application/json
+
+{
+  "orderStatus": "COMPLETION"
+}
+
+###
