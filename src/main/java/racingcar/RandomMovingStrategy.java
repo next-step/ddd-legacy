@@ -2,8 +2,10 @@ package racingcar;
 
 import java.util.Random;
 
-public class RandomMovingStrategy {
-    boolean movable() {
+// 전략패턴이래!
+public class RandomMovingStrategy implements MovingStrategy {
+    @Override
+    public boolean movable() {
         return new Random().nextInt(9) >= 4;
     }
 }
