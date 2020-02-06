@@ -3,56 +3,68 @@ package racingcar;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class CarTest {
 
-    private static final int POSITION_ZERO = 0;
-
-    @DisplayName("자동차의 이름이 5글자가 넘으면 IllegalArgumentException 을 던진다.")
-    @Test
-    public void construct_when_name_is_over_5() {
-        assertThatThrownBy(() -> new Car("다섯글자넘음"))
-            .isInstanceOf(IllegalArgumentException.class);
+    @MethodSource("construct_cases")
+    @ParameterizedTest
+    @DisplayName("자동차 이름은 5 글자를 넘을 수 없다.")
+    public void construct_with_invalid_name(final String name,
+                                            final Class<Throwable> expected,
+                                            final String description) {
+        assertThatThrownBy(() -> new Car(name))
+            .as(description)
+            .isInstanceOf(expected);
     }
 
-    @DisplayName("자동차의 이름이 null 이면 IllegalArgumentException 을 던진다.")
-    @Test
-    public void construct_when_name_is_null() {
-        assertThatThrownBy(() -> new Car(null))
-            .isInstanceOf(IllegalArgumentException.class);
+    private static Stream<Arguments> construct_cases() {
+        return Stream.of(Arguments.of("다섯글자넘음",
+                                      IllegalArgumentException.class,
+                                      "자동차의 이름이 5글자가 넘으면 IllegalArgumentException 을 던진다."),
+                         Arguments.of(null,
+                                      IllegalArgumentException.class,
+                                      "자동차의 이름이 null 이면 IllegalArgumentException 을 던진다."),
+                         Arguments.of("   ",
+                                      IllegalArgumentException.class,
+                                      "자동차의 이름이 공백으로만 구성되면 IllegalArgumentException 을 던진다."));
     }
 
-    @DisplayName("자동차가 움직이는 경우, 위치가 1 증가한다.")
-    @Test
-    public void move_when_movingStrategy_is_movable() {
-        Car car = carWith(POSITION_ZERO);
+    @MethodSource("move_cases")
+    @ParameterizedTest
+    @DisplayName("자동차는 " + Car.POINT_VARIATION_OF_MOVING + "만큼 움직인다.")
+    public void move(final int positionFrom,
+                     final boolean movable,
+                     final int positionTo) {
+        Car car = carWith(positionFrom);
 
         car.move(new RandomMovingStrategy() {
             @Override
             boolean movable() {
-                return true;
+                return movable;
             }
         });
 
-        assertThat(car.getPosition())
-            .isEqualTo(POSITION_ZERO + Car.POINT_VARIATION_OF_MOVING);
+        assertThat(car)
+            .as("움직일 조건이 %s 이면, 위치는 %s 에서 %s 가 된다.",
+                movable,
+                positionFrom,
+                positionTo)
+            .isEqualTo(carWith(positionTo));
     }
 
-    @DisplayName("자동차가 움직이는 경우에만 위치가 1 증가한다.")
-    @Test
-    public void move_when_movingStrategy_is_not_movable() {
-        Car car = carWith(POSITION_ZERO);
-
-        car.move(new RandomMovingStrategy() {
-            @Override
-            boolean movable() {
-                return false;
-            }
-        });
-
-        assertThat(car.getPosition()).isEqualTo(POSITION_ZERO);
+    private static Stream<Arguments> move_cases() {
+        return Stream.of(Arguments.of(Car.DEFAULT_POSITION,
+                                      true,
+                                      Car.DEFAULT_POSITION + Car.POINT_VARIATION_OF_MOVING),
+                         Arguments.of(Car.DEFAULT_POSITION,
+                                      false,
+                                      Car.DEFAULT_POSITION));
     }
 
     private static Car carWith(int position) {
