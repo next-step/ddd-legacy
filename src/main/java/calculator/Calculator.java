@@ -4,9 +4,7 @@ import io.micrometer.core.instrument.util.StringUtils;
 
 public class Calculator {
     private String text;
-    private static final String TEXT_SPERATOR_1 = ",";
-    private static final String TEXT_SPERATOR_2 = ":";
-
+    private Spliter spliter;
 
     public Calculator(String text) {
         this.text = text;
@@ -14,12 +12,15 @@ public class Calculator {
 
     public int sum() {
         int sum = 0;
+        spliter = new Spliter();
 
         if(StringUtils.isBlank(this.text)) return sum;
 
-        String[] textArray = this.text.split(String.format("%s|%s", TEXT_SPERATOR_1, TEXT_SPERATOR_2));
+        String[] textArray = spliter.splitText(this.text);
 
         for(String o : textArray) {
+            int number = Integer.parseInt(o);
+            if(number < 0) throw new RuntimeException();
             sum = sum + Integer.parseInt(o);
         }
 

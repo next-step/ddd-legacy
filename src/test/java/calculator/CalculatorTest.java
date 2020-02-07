@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class CalculatorTest {
 
@@ -30,6 +31,16 @@ class CalculatorTest {
         Calculator calculator = new Calculator(text);
         assertThat(calculator.sum()).isEqualTo(6);
 
+    }
+
+    @DisplayName("문자열 계산기에 숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException 예외를 throw 한다.")
+    @Test
+    void minusNumberTest() {
+        Calculator calculator = new Calculator("-1,2,3");
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() ->{
+                    calculator.sum();
+                });
     }
 
 
