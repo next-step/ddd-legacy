@@ -8,11 +8,12 @@ public class StringCalculator {
 
     public int add(String input) {
         if (input.isEmpty()) return 0;
+        List<Integer> numbers = extractNumbers(input);
 
-        return 105;
+        return numbers.stream().reduce(Integer::sum).orElseThrow(RuntimeException::new);
     }
 
-    public List<Integer> extractNumbers(String input) {
+    protected List<Integer> extractNumbers(String input) {
         return Arrays.stream(input.split("[,:]"))
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());

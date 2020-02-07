@@ -34,4 +34,12 @@ class StringCalculatorTests {
         assertThat(numbers.get(0)).isEqualTo(112);
         assertThat(numbers.get(3)).isEqualTo(523);
     }
+
+    @DisplayName("정상적인 문자열이 입력됐을 때 추출된 숫자 콜렉션의 총합을 계산")
+    @ParameterizedTest
+    @ValueSource(strings = {"112:3:5,523:123,1", "112:3:5:523:123:1", "112,3,5,523,123,1"})
+    void addHappyPath(String input) {
+        int result = stringCalculator.add(input);
+        assertThat(result).isEqualTo(767);
+    }
 }
