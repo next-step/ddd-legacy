@@ -2,6 +2,7 @@ package calculator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -23,6 +24,13 @@ class StringCalculatorTests {
     @ValueSource(strings = {""})
     void inputEmptyString(String input) {
         int result = stringCalculator.add(input);
+        assertThat(result).isEqualTo(0);
+    }
+
+    @DisplayName("null을 입력받았을 때 0(int)을 출력")
+    @Test
+    void nullCheck() {
+        int result = stringCalculator.add(null);
         assertThat(result).isEqualTo(0);
     }
 
