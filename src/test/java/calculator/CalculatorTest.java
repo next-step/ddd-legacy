@@ -40,4 +40,12 @@ public class CalculatorTest {
 
         assertThat(calculator.getResult()).isEqualTo(3);
     }
+
+    @Test
+    @DisplayName("구분자 : 를 통해 두 숫자의 합 계산")
+    void operateBySeparatorColonNumbers() {
+        Calculator calculator = new Calculator("4:5");
+
+        assertThat(calculator.getResult()).isEqualTo(9);
+    }
 }

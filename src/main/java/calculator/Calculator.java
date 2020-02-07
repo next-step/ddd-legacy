@@ -8,7 +8,7 @@ public class Calculator {
 
     private static final int ZERO = 0;
     private static final int MIN_EXPRESSION_SIZE = 1;
-    private static final String SEPARATOR = ",";
+    private static final String SEPARATOR = ",|:";
 
     private String expression;
     private int sum;
