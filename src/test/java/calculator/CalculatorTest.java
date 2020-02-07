@@ -43,6 +43,13 @@ class CalculatorTest {
                 });
     }
 
+    @DisplayName("\"//\"와 \"\\n\" 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @Test
+    void customSeperatorTest() {
+        Calculator calculator = new Calculator("//;\n1;2;3");
+        assertThat(calculator.sum()).isEqualTo(6);
+    }
+
 
 
 

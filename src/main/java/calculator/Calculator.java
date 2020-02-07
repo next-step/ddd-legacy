@@ -12,11 +12,11 @@ public class Calculator {
 
     public int sum() {
         int sum = 0;
-        spliter = new Spliter();
+        spliter = new Spliter(this.text);
 
         if(StringUtils.isBlank(this.text)) return sum;
 
-        String[] textArray = spliter.splitText(this.text);
+        String[] textArray = spliter.getSplitText();
 
         for(String o : textArray) {
             int number = Integer.parseInt(o);
