@@ -15,5 +15,13 @@ public class CalculatorTest {
         assertThat(calculator).isEqualTo(calculator2);
     }
 
+    @Test
+    @DisplayName("빈 문자열 또는 null 경우 0 반환")
+    void getZeroByNullOrEmpty() {
+        Calculator calculator = new Calculator("");
+        Calculator calculator1 = new Calculator(null);
 
+        assertThat(calculator.getExpression()).isEqualTo("0");
+        assertThat(calculator1.getExpression()).isEqualTo("0");
+    }
 }
