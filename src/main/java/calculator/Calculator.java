@@ -2,8 +2,8 @@ package calculator;
 
 public class Calculator {
     private String text;
-    private static final String seperator1 = ",";
-    private static final String seperator2 = ":";
+    private static final String TEXT_SPERATOR_1 = ",";
+    private static final String TEXT_SPERATOR_2 = ":";
 
 
     public Calculator(String text) {
@@ -16,7 +16,7 @@ public class Calculator {
         if(this.text == null) return sum;
         if(this.text.isEmpty()) return sum;
 
-        String[] textArray = this.text.split(String.format("%s|%s", seperator1, seperator2));
+        String[] textArray = this.text.split(String.format("%s|%s", TEXT_SPERATOR_1, TEXT_SPERATOR_2));
 
         for(String o : textArray) {
             sum = sum + Integer.parseInt(o);
