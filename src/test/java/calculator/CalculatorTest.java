@@ -48,4 +48,12 @@ public class CalculatorTest {
 
         assertThat(calculator.getResult()).isEqualTo(9);
     }
+
+    @Test
+    @DisplayName("커스텀 구분자를 통해 두 숫자의 합 계산")
+    void operateByCustomSeparator() {
+        Calculator calculator = new Calculator("//;\n1;2;3");
+
+        assertThat(calculator.getResult()).isEqualTo(6);
+    }
 }
