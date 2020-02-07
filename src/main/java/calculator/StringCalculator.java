@@ -8,6 +8,9 @@ import java.util.stream.Collectors;
 
 public class StringCalculator {
 
+    private String pattern = "[,:]";
+    private final String REGEX = "//(.)\n(.*)";
+
     public int add(String input) {
         if (input == null) return 0;
         if (input.isEmpty()) return 0;
@@ -18,8 +21,6 @@ public class StringCalculator {
     }
 
     protected List<Integer> extractNumbers(String input) {
-
-        String pattern = "[,:]";
 
         if (getCustomDivider(input) != null) {
             pattern = "[,:" + getCustomDivider(input) + "]";
@@ -49,7 +50,7 @@ public class StringCalculator {
     }
 
     protected Matcher getRegexMatcher(String input) {
-        Pattern pattern = Pattern.compile("//(.)\n(.*)");
+        Pattern pattern = Pattern.compile(REGEX);
         Matcher matcher = pattern.matcher(input);
 
         if (matcher.find()) {
