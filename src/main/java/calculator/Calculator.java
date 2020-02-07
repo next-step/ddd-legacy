@@ -8,12 +8,14 @@ public class Calculator {
 
     private static final int ZERO = 0;
     private static final int MIN_EXPRESSION_SIZE = 1;
+    private static final String SEPARATOR = ",";
 
     private String expression;
     private int sum;
 
     public Calculator(String expression) {
         this.expression = expression;
+        this.sum = ZERO;
         this.sum = validateByNullOrEmpty();
     }
 
@@ -31,7 +33,19 @@ public class Calculator {
         return operate();
     }
 
-    public int operate() {
+    private int operate() {
+        String[] numbers = separateNumber();
+        for (String number : numbers) {
+            sum += Integer.parseInt(number);
+        }
+        return sum;
+    }
+
+    private String[] separateNumber() {
+        return expression.split(SEPARATOR);
+    }
+
+    public int getResult() {
         return sum;
     }
 

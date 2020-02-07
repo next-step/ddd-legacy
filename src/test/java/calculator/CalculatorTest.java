@@ -21,8 +21,8 @@ public class CalculatorTest {
         Calculator calculator = new Calculator("");
         Calculator calculator1 = new Calculator(null);
 
-        assertThat(calculator.operate()).isEqualTo(0);
-        assertThat(calculator1.operate()).isEqualTo(0);
+        assertThat(calculator.getResult()).isEqualTo(0);
+        assertThat(calculator1.getResult()).isEqualTo(0);
     }
 
     @Test
@@ -30,6 +30,14 @@ public class CalculatorTest {
     void checkInputNumberBySizeOne() {
         Calculator calculator = new Calculator("9");
 
-        assertThat(calculator.operate()).isEqualTo(9);
+        assertThat(calculator.getResult()).isEqualTo(9);
+    }
+
+    @Test
+    @DisplayName("구분자 , 를 통해 두 숫자의 합 계산")
+    void operateBySeparatorNumbers() {
+        Calculator calculator = new Calculator("1,2");
+
+        assertThat(calculator.getResult()).isEqualTo(3);
     }
 }
