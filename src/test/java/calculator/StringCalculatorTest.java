@@ -61,9 +61,17 @@ class StringCalculatorTest {
                 .isThrownBy(() -> calculator.add("-1"));
     }
 
+    @DisplayName(value = "문자열 계산기에 숫자 이외의 값 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"dd:1", "!:44"})
+    void noNumber(String text) {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> calculator.add(text));
+    }
+
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있고, 기본 구분자와 혼용할 수 있다.")
     @ParameterizedTest
-    @ValueSource(strings = {"//!\n1,2:3!4"})
+    @ValueSource(strings = {"//!\n1,2:3!4", "//a\n1a2a3a4"})
     void customAndDefaultDelimiter(final String text) {
         assertThat(calculator.add(text)).isSameAs(10);
     }
