@@ -62,20 +62,4 @@ class StringCalculatorTests {
     void errorOccurWhenContainsNotNumber(String input) {
         assertThatThrownBy(() -> stringCalculator.add(input)).isInstanceOf(RuntimeException.class);
     }
-
-    @DisplayName("일반적인 구분자만 있을 때 DefaultNumberExtractor 선택")
-    @ParameterizedTest
-    @ValueSource(strings = {"112:3:5,523:123,1", "112:3:5:523:123:1", "112,3,5,523,123,1"})
-    void selectDefaultNumberExtractor(String input) {
-        stringCalculator.selectNumberExtractor(input);
-        assertThat(stringCalculator.getNumberExtractor()).isInstanceOf(DefaultNumberExtractor.class);
-    }
-
-    @DisplayName("Custom 구분자가 있을 때 CustomNumberExtractor 선택")
-    @ParameterizedTest
-    @ValueSource(strings = {"//!\n112!3:5,523:123!1"})
-    void selectCustomNumberExtractor(String input) {
-        stringCalculator.selectNumberExtractor(input);
-        assertThat(stringCalculator.getNumberExtractor()).isInstanceOf(CustomNumberExtractor.class);
-    }
 }
