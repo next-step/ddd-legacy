@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class CalculatorTest {
 
@@ -55,5 +56,13 @@ public class CalculatorTest {
         Calculator calculator = new Calculator("//;\n1;2;3");
 
         assertThat(calculator.getResult()).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("음수인 경우 예외")
+    void validateByNegativeNumber() {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> new Calculator("-1"))
+                .withMessageMatching("음수는 허용하지 않습니다.");
     }
 }

@@ -17,8 +17,15 @@ public class Calculator {
 
     public Calculator(String expression) {
         this.expression = expression;
+        validateByNegativeNumber();
         this.sum = ZERO;
         this.sum = validateByNullOrEmpty();
+    }
+
+    private void validateByNegativeNumber() {
+        if (Integer.parseInt(expression) < ZERO) {
+            throw new RuntimeException("음수는 허용하지 않습니다.");
+        }
     }
 
     private int validateByNullOrEmpty() {
