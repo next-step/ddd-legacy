@@ -1,5 +1,6 @@
 package calculator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PositiveNumbers {
@@ -7,7 +8,7 @@ public class PositiveNumbers {
 
     public PositiveNumbers(List<Integer> numbers) {
         validate(numbers);
-        this.positiveNumbers = numbers;
+        this.positiveNumbers = new ArrayList<Integer>(numbers); // 파라미터 리스트를 복사하여 immutable 하도록..
     }
 
     private void validate(List<Integer> numbers) {
