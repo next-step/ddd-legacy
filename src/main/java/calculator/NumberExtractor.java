@@ -24,7 +24,7 @@ public class NumberExtractor {
         checkExtractorMode();
 
         return Arrays.stream(this.input.split(divider))
-                .map(this::stringToInt)
+                .map(stringNumber -> new PositiveIntNumber(stringNumber).getNumber())
                 .collect(Collectors.toList());
     }
 
@@ -33,19 +33,5 @@ public class NumberExtractor {
             this.divider = "[,:" + MATCHER.group(1) + "]";
             this.input = MATCHER.group(2);
         }
-    }
-
-    private int stringToInt(String input) {
-        try {
-            return checkMinus(Integer.parseInt(input));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private int checkMinus(int number) {
-        if (number < 0) throw new RuntimeException();
-
-        return number;
     }
 }
