@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class StringCalculatorTests {
 
-    StringCalculator stringCalculator;
+    private StringCalculator stringCalculator;
 
     @BeforeEach
     void setup() {

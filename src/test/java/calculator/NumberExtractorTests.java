@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class NumberExtractorTests {
 
-    NumberExtractor numberExtractor;
+    private NumberExtractor numberExtractor;
 
     @DisplayName("입력값 중 기본 구분자(:와 쉼표)를 제외한 숫자만 골라낸 콜렉션 출력")
     @ParameterizedTest

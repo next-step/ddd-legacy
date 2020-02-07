@@ -19,7 +19,7 @@ public class StringCalculator {
                 .orElseThrow(RuntimeException::new);
     }
 
-    protected void getNumberExtractor(String input) {
+    private void getNumberExtractor(String input) {
 
         this.numberExtractor = new NumberExtractor(input);
     }

@@ -12,11 +12,11 @@ public class NumberExtractor {
     private String divider = "[,:]";
 
     private final Matcher MATCHER;
+    private final Pattern REGEX_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     public NumberExtractor(String input) {
         this.input = input;
-        Pattern pattern = Pattern.compile("//(.)\n(.*)");
-        this.MATCHER = pattern.matcher(input);
+        this.MATCHER = REGEX_PATTERN.matcher(input);
     }
 
     public List<Integer> extractNumbers() {
@@ -24,22 +24,28 @@ public class NumberExtractor {
         checkExtractorMode();
 
         return Arrays.stream(this.input.split(divider))
-                .map(number -> {
-                    try {
-                        int intNumber = Integer.parseInt(number);
-                        if (intNumber < 0) throw new RuntimeException();
-                        return intNumber;
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+                .map(this::stringToInt)
                 .collect(Collectors.toList());
     }
 
-    protected void checkExtractorMode() {
+    private void checkExtractorMode() {
         if (MATCHER.find()) {
             this.divider = "[,:" + MATCHER.group(1) + "]";
             this.input = MATCHER.group(2);
         }
+    }
+
+    private int stringToInt(String input) {
+        try {
+            return checkMinus(Integer.parseInt(input));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private int checkMinus(int number) {
+        if (number < 0) throw new RuntimeException();
+
+        return number;
     }
 }
