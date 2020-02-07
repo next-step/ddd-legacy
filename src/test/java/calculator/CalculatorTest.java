@@ -21,7 +21,15 @@ public class CalculatorTest {
         Calculator calculator = new Calculator("");
         Calculator calculator1 = new Calculator(null);
 
-        assertThat(calculator.getExpression()).isEqualTo("0");
-        assertThat(calculator1.getExpression()).isEqualTo("0");
+        assertThat(calculator.operate()).isEqualTo(0);
+        assertThat(calculator1.operate()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("숫자 하나만 넣었을 경우")
+    void checkInputNumberBySizeOne() {
+        Calculator calculator = new Calculator("9");
+
+        assertThat(calculator.operate()).isEqualTo(9);
     }
 }

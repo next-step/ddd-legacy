@@ -6,23 +6,33 @@ import java.util.Objects;
 
 public class Calculator {
 
-    private static final String ZERO = "0";
+    private static final int ZERO = 0;
+    private static final int MIN_EXPRESSION_SIZE = 1;
 
     private String expression;
+    private int sum;
 
     public Calculator(String expression) {
-        this.expression = validateByNullOrEmpty(expression);
+        this.expression = expression;
+        this.sum = validateByNullOrEmpty();
     }
 
-    private String validateByNullOrEmpty(String expression) {
+    private int validateByNullOrEmpty() {
         if (Strings.isBlank(expression)) {
             return ZERO;
         }
-        return expression;
+        return validateByExpressionSize();
     }
 
-    public String getExpression() {
-        return expression;
+    private int validateByExpressionSize() {
+        if (expression.length() == MIN_EXPRESSION_SIZE) {
+            return Integer.parseInt(expression);
+        }
+        return operate();
+    }
+
+    public int operate() {
+        return sum;
     }
 
     @Override
