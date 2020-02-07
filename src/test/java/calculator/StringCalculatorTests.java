@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class StringCalculatorTests {
 
@@ -74,5 +75,19 @@ class StringCalculatorTests {
     void addManyCases(String input) {
         int result = stringCalculator.add(input);
         assertThat(result).isEqualTo(767);
+    }
+
+    @DisplayName("음수가 섞인 경우 RuntimeException 발생")
+    @ParameterizedTest
+    @ValueSource(strings = {"-112:3:5,523:123,1"})
+    void errorOccurWhenContainsMinus(String input) {
+        assertThatThrownBy(() -> stringCalculator.add(input)).isInstanceOf(RuntimeException.class);
+    }
+
+    @DisplayName("숫자가 아닌 값이 섞인 경우 RuntimeException 발생")
+    @ParameterizedTest
+    @ValueSource(strings = {"112:hello:5,523:123,1"})
+    void errorOccurWhenContainsNotNumber(String input) {
+        assertThatThrownBy(() -> stringCalculator.add(input)).isInstanceOf(RuntimeException.class);
     }
 }

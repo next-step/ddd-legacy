@@ -28,7 +28,15 @@ public class StringCalculator {
         }
 
         return Arrays.stream(input.split(pattern))
-                .map(Integer::parseInt)
+                .map(number -> {
+                    try {
+                        int intNumber = Integer.parseInt(number);
+                        if (intNumber < 0) throw new RuntimeException();
+                        return intNumber;
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .collect(Collectors.toList());
     }
 
