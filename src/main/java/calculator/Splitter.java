@@ -3,13 +3,13 @@ package calculator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Spliter {
+public class Splitter {
     private String text;
     private String[] textArray;
     private static final String TEXT_SPERATOR_1 = ",";
     private static final String TEXT_SPERATOR_2 = ":";
 
-    public Spliter(String text) {
+    public Splitter(String text) {
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
         if(m.find()) {
             String customDelimiter = m.group(1);
