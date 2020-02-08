@@ -40,6 +40,23 @@ class MenuBoTest {
         menuGroup.setId(1L);
         menuGroup.setName("두마리메뉴");
 
+        List<MenuGroup> menuGroupList = new ArrayList<>();
+        menuGroupList.add(menuGroup);
+
+        when(menuGroupDao.findAll()).thenReturn(menuGroupList);
+
+        List<MenuGroup> result = menuGroupDao.findAll();
+
+        assertThat(result.get(0).getName()).isEqualTo("두마리메뉴");
+    }
+
+    @DisplayName("메뉴그룹 목록을 볼 수 있다.")
+    @Test
+    public void listMenuGroup() {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(1L);
+        menuGroup.setName("두마리메뉴");
+
         when(menuGroupDao.save(menuGroup)).thenReturn(menuGroup);
 
         MenuGroup result = menuGroupDao.save(menuGroup);
