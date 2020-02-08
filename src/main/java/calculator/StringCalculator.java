@@ -8,6 +8,9 @@ public class StringCalculator {
         if (Strings.isBlank(text)) {
             return 0;
         }
+        if (text.length() == 1) {
+            return Integer.parseInt(text);
+        }
         return 0;
     }
 }
