@@ -44,7 +44,7 @@ public class StringCalculator {
 
     private int getPostiveNumber(int number) {
         if (number < 0) {
-            throw new IllegalArgumentException("음수 입력 에러");
+            throw new RuntimeException("음수 입력 에러");
         }
         return number;
     }
