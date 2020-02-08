@@ -6,17 +6,15 @@ import org.apache.logging.log4j.util.Strings;
 
 public class StringCalculator {
 
+    //    TODO : fix private after refactor test
     static final String COMMA_DELIMITER = ",";
+    private static final String COLON_DELIMITER = ":";
+    private static final String DEFAULT_DELIMITER = COMMA_DELIMITER + "|" + COLON_DELIMITER;
 
     public int add(final String text) {
-        if (Strings.isBlank(text)) {
-            return 0;
-        }
-        if (text.length() == 1) {
-            return Integer.parseInt(text);
-        }
-        return Arrays.stream(text.split(COMMA_DELIMITER))
-                     .mapToInt(Integer::parseInt)
-                     .sum();
+        return Strings.isBlank(text) ? 0
+                                     : Arrays.stream(text.split(DEFAULT_DELIMITER))
+                                             .mapToInt(Integer::parseInt)
+                                             .sum();
     }
 }

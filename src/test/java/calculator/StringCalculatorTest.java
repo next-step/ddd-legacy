@@ -53,10 +53,16 @@ class StringCalculatorTest {
     }
 
     @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
+    @MethodSource("add_when_text_is_numbers_delimited_by_comma_or_colon_cases")
     @ParameterizedTest
-    @ValueSource(strings = { "1,2:3" })
-    void colons(final String text) {
-        assertThat(calculator.add(text)).isSameAs(6);
+    void add_when_text_is_numbers_delimited_by_comma_or_colon(final String text,
+                                                              final int expected) {
+        assertThat(calculator.add(text)).isSameAs(expected);
+    }
+
+    private static Stream<Arguments> add_when_text_is_numbers_delimited_by_comma_or_colon_cases() {
+        return Stream.of(Arguments.of("1,2:3", 6),
+                         Arguments.of("10,20:30,40", 100));
     }
 
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
