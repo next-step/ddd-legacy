@@ -5,6 +5,7 @@ import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.dao.MenuProductDao;
 import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Menu;
+import kitchenpos.model.MenuGroup;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,6 +32,20 @@ class MenuBoTest {
     @Mock private MenuProductDao menuProductDao;
     @Mock private MenuGroupDao menuGroupDao;
     @Mock private ProductDao productDao;
+
+    @DisplayName("메뉴그룹을 설정할 수 있다.")
+    @Test
+    public void setMenuGroup() {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(1L);
+        menuGroup.setName("두마리메뉴");
+
+        when(menuGroupDao.save(menuGroup)).thenReturn(menuGroup);
+
+        MenuGroup result = menuGroupDao.save(menuGroup);
+
+        assertThat(result.getName()).isEqualTo("두마리메뉴");
+    }
 
     @DisplayName("각 메뉴에 이름,가격을 설정할 수 있다.")
     @Test
