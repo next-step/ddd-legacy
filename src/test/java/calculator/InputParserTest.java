@@ -1,13 +1,13 @@
 package calculator;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -15,13 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class InputParserTest {
-    @Test
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
     @DisplayName("null 또는 빈 문자열을 전달하는 경우 빈 리스트를 반환")
-    void shouldBeZeroWhenParseEmptyString() {
-        assertThat(InputParser.parseToInts(null))
-                .isEqualTo(Collections.emptyList());
-        assertThat(InputParser.parseToInts(""))
-                .isEqualTo(Collections.emptyList());
+    void shouldBeZeroWhenParseEmptyString(String text) {
+        assertThat(InputParser.parseToInts(text)).isEmpty();
     }
 
     @ParameterizedTest

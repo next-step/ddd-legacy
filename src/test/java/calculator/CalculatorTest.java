@@ -4,8 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.*;
 
 import java.util.stream.Stream;
 
@@ -21,12 +20,14 @@ class CalculatorTest {
         calculator = new Calculator();
     }
 
-    @Test
-    @DisplayName("null 또는 빈 문자열을 전달하는 경우 0을 반환")
-    void shouldBeZeroWhenCalculateEmptyString() {
-        assertThat(calculator.calculate(null)).isEqualTo(Calculator.DEFAULT_RESULT);
-        assertThat(calculator.calculate("")).isEqualTo(Calculator.DEFAULT_RESULT);
+    @ParameterizedTest
+    @NullSource
+    @EmptySource
+    @DisplayName("null 또는 빈 문자열을 전달하는 경우 default value 반환")
+    void shouldBeZeroWhenCalculateEmptyString(String text) {
+        assertThat(calculator.calculate(text)).isEqualTo(Calculator.DEFAULT_RESULT);
     }
+
 
     @Test
     @DisplayName("하나의 숫자만 있는 문자열을 전달하는 경우 해당 숫자를 반환")
