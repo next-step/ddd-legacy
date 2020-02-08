@@ -1,7 +1,6 @@
 package calculator;
 
 import org.apache.logging.log4j.util.Strings;
-
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
