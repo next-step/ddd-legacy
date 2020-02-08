@@ -16,7 +16,7 @@ public class Car {
         this.position = position;
     }
 
-    void move(final RandomMovingStrategy movingStrategy) {
+    void move(final MovingStrategy movingStrategy) {
         if (movingStrategy.movable()) {
             position++;
         }
