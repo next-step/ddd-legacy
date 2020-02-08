@@ -1,14 +1,14 @@
 package calculator;
 
+
+import calculator.exception.NotPositiveNumberException;
+
 public class NumberValidator {
 
-    public void validate(int value){
-        positive(value);
-    }
-
-    private void positive(int value) {
-        if(value < 0){
-            throw new RuntimeException("not positive number");
+    public void validatePositiveNumber(int value) {
+        boolean isPositiveNumber = value >= 0;
+        if(!isPositiveNumber){
+            throw new NotPositiveNumberException("value is " + value);
         }
     }
 }

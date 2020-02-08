@@ -14,7 +14,7 @@ public class StringCalculator {
 
     public int add(String text) {
         List<Integer> numbers = stringParser.split(text);
-        numbers.forEach(integer -> validator.validate(integer));
+        numbers.forEach(integer -> validator.validatePositiveNumber(integer));
         return sum(numbers);
     }
 
