@@ -9,8 +9,8 @@ class Calculator {
         }
 
         return InputParser.parseToInts(text).stream()
-                .map(Number::from)
-                .reduce(Number.from(0), Number::sum)
+                .map(PositiveNumber::from)
+                .reduce(PositiveNumber.from(0), PositiveNumber::sum)
                 .getValue();
     }
 }

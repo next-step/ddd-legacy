@@ -8,29 +8,29 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class NumberTest {
+class PositiveNumberTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"0", "1", "100"})
-    @DisplayName("Number 생성")
+    @DisplayName("PositiveNumber 생성")
     void createNumber(int value) {
-        assertThat(Number.from(value)).isNotNull();
+        assertThat(PositiveNumber.from(value)).isNotNull();
     }
 
     @Test
-    @DisplayName("음수인 경우 Number 생성시 예외 던짐")
+    @DisplayName("음수인 경우 PositiveNumber 생성시 예외 던짐")
     void shouldThrowRuntimeExceptionWhenCreateWithNegativeNumber() {
-        assertThatThrownBy(() -> Number.from(-1))
+        assertThatThrownBy(() -> PositiveNumber.from(-1))
                 .isInstanceOf(RuntimeException.class);
     }
 
     @Test
-    @DisplayName("Number 더하기")
+    @DisplayName("PositiveNumber 더하기")
     void sumNumber() {
-        Number first = Number.from(3);
-        Number second = Number.from(10);
+        PositiveNumber first = PositiveNumber.from(3);
+        PositiveNumber second = PositiveNumber.from(10);
 
-        Number sum = first.sum(second);
+        PositiveNumber sum = first.sum(second);
 
         assertThat(sum.getValue())
                 .isEqualTo(first.getValue() + second.getValue());
