@@ -14,11 +14,15 @@ public class StringCalculator {
 
         Matcher matcher = CUSTOM_DELIMTER_PATTERN.matcher(text);
         if (matcher.find()) {
-            String delimiter = matcher.group(1);
-            String[] split = matcher.group(2).split(delimiter);
+            String[] split = getPatternStringArray(matcher);
             return getTextArraySum(split);
         }
         return getTextArraySum(toSplitArrayList(text));
+    }
+
+    private String[] getPatternStringArray(Matcher matcher) {
+        String delimiter = matcher.group(1);
+        return matcher.group(2).split(delimiter);
     }
 
     private Integer getTextArraySum(String[] text) {
@@ -33,9 +37,16 @@ public class StringCalculator {
 
     private int convertTextToInt(String text) {
         try {
-            return Integer.parseInt(text);
+            return getPostiveNumber(Integer.parseInt(text));
         } catch (Exception e) {
             throw new IllegalArgumentException("숫자가 아닙니다.");
         }
+    }
+
+    private int getPostiveNumber(int number) {
+        if (number < 0) {
+            throw new IllegalArgumentException("음수 입력 에러");
+        }
+        return number;
     }
 }
