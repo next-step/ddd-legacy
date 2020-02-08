@@ -13,35 +13,22 @@ class CarTest {
     @DisplayName("자동차를 생성한다.")
     @Test
     void create() {
-         final Car car = new Car("자동차");
-         assertThat(car).isNotNull();
+        final Car car = new Car("자동차");
+        assertThat(car).isNotNull();
     }
 
     @DisplayName("자동차의 이름이 5글자가 넘으면 IllegalArgumentException을 발생시킨다.")
-    @ParameterizedTest // spock의 where고 ㅏ같은 뇨속
+    @ParameterizedTest
     @ValueSource(strings = {"다섯글자에욤", "와싱기방기하네요"})
-    @Test
     void nameValidation(final String name) {
-        assertThrows(IllegalArgumentException.class, () -> {
-            new Car(name);
-        });
-//        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> new Car(name));
+        assertThrows(IllegalArgumentException.class, () -> new Car(name));
     }
 
-    // 인터페이스를 추축해봅시당!
     @DisplayName("자동차 움직이는 것 테스트 이동 값이 4이상이면 움직인다")
     @Test
     void move() {
         final Car car = new Car("자동차");
-        car.move(() -> true);  // 메서드를 하나만 가지는 인터페이스면 요렇게도 가능 미쳐떠!!
-//        car.move(new TestMovingStrategy());
-//        car.move(new RandomMovingStrategy() {
-//            @Override
-//            public boolean movable() {
-//                return 4 >= 4;
-//            }
-//        });
-
+        car.move(() -> true);
         assertThat(car.getPosition()).isEqualTo(1);
     }
 }
