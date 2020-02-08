@@ -1,6 +1,7 @@
 package kitchenpos.model;
 
 public class MenuGroup {
+
     private Long id;
     private String name;
 

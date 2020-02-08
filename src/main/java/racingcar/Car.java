@@ -3,6 +3,7 @@ package racingcar;
 import org.apache.logging.log4j.util.Strings;
 
 public class Car {
+
     private final String name;
     private int position;
 
@@ -16,7 +17,7 @@ public class Car {
         this.position = position;
     }
 
-    void move(final RandomMovingStrategy movingStrategy) {
+    void move(final MovingStrategy movingStrategy) {
         if (movingStrategy.movable()) {
             position++;
         }

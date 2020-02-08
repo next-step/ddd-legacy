@@ -1,5 +1,7 @@
 package kitchenpos.controller;
 
+import java.net.URI;
+import java.util.List;
 import kitchenpos.bo.MenuBo;
 import kitchenpos.model.Menu;
 import org.springframework.http.ResponseEntity;
@@ -8,11 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.List;
-
 @RestController
 public class MenuRestController {
+
     private final MenuBo menuBo;
 
     public MenuRestController(final MenuBo menuBo) {
@@ -24,14 +24,12 @@ public class MenuRestController {
         final Menu created = menuBo.create(menu);
         final URI uri = URI.create("/api/menus/" + created.getId());
         return ResponseEntity.created(uri)
-                .body(created)
-                ;
+            .body(created);
     }
 
     @GetMapping("/api/menus")
     public ResponseEntity<List<Menu>> list() {
         return ResponseEntity.ok()
-                .body(menuBo.list())
-                ;
+            .body(menuBo.list());
     }
 }
