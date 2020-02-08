@@ -45,19 +45,6 @@ public class StringCalculator {
         }
     }
 
-    private List<String> extractNumberByCustomDelimiter (String text){
-
-        List<String> numbers = new ArrayList<>();
-
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
-        if(m.find()){
-            String customDelimiter = m.group(1);
-            String[] token = m.group(2).split(customDelimiter);
-        }
-
-        return numbers;
-    }
-
     private List<Integer> parseToInteger (String[] stringNumbers){
 
         List<Integer> numbers = new ArrayList<>();
