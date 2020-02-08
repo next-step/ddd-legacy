@@ -4,21 +4,18 @@ import java.util.List;
 
 public class StringCalculator {
 
-    private final NumberValidator validator;
     private final StringParser stringParser;
 
     public StringCalculator() {
-        this.validator = new NumberValidator();
         this.stringParser = new StringParser();
     }
 
     public int add(String text) {
-        List<Integer> numbers = stringParser.split(text);
-        numbers.forEach(integer -> validator.validatePositiveNumber(integer));
+        List<PositiveNumber> numbers = stringParser.split(text);
         return sum(numbers);
     }
 
-    private int sum(List<Integer> numbers) {
-        return numbers.stream().reduce(0, Integer::sum);
+    private int sum(List<PositiveNumber> numbers) {
+        return numbers.stream().map(PositiveNumber::getPrimitiveNumber).reduce(0, Integer::sum);
     }
 }
