@@ -3,9 +3,9 @@ package kitchenpos.model;
 import java.math.BigDecimal;
 
 public class Product {
-    private Long id;
-    private String name;
-    private BigDecimal price;
+    private Long id; // 제품 id
+    private String name; // 제품명
+    private BigDecimal price; // 제품 가격
 
     public Long getId() {
         return id;

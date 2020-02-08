@@ -16,6 +16,12 @@ public class TableRestController {
         this.tableBo = tableBo;
     }
 
+    /**
+     * 테이블 생성 및 수정(테이블그룹, 게스트 수, 공석여부)
+     *
+     * @param orderTable
+     * @return
+     */
     @PutMapping("/api/tables")
     public ResponseEntity<OrderTable> create(@RequestBody final OrderTable orderTable) {
         final OrderTable created = tableBo.create(orderTable);
@@ -25,6 +31,11 @@ public class TableRestController {
                 ;
     }
 
+    /**
+     * 전체 테이블 리스트 조회
+     *
+     * @return
+     */
     @GetMapping("/api/tables")
     public ResponseEntity<List<OrderTable>> list() {
         return ResponseEntity.ok()
@@ -32,6 +43,13 @@ public class TableRestController {
                 ;
     }
 
+    /**
+     * 테이블 공석여부 변경
+     *
+     * @param orderTableId
+     * @param orderTable
+     * @return
+     */
     @PutMapping("/api/tables/{orderTableId}/empty")
     public ResponseEntity<OrderTable> changeEmpty(
             @PathVariable final Long orderTableId,
@@ -42,6 +60,13 @@ public class TableRestController {
                 ;
     }
 
+    /**
+     * 테이블 게스트 수 수정
+     *
+     * @param orderTableId
+     * @param orderTable
+     * @return
+     */
     @PutMapping("/api/tables/{orderTableId}/number-of-guests")
     public ResponseEntity<OrderTable> changeNumberOfGuests(
             @PathVariable final Long orderTableId,

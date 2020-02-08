@@ -31,12 +31,24 @@ public class MenuGroupDao {
         ;
     }
 
+    /**
+     * 메뉴그룹 생성
+     *
+     * @param entity
+     * @return
+     */
     public MenuGroup save(final MenuGroup entity) {
         final SqlParameterSource parameters = new BeanPropertySqlParameterSource(entity);
         final Number key = jdbcInsert.executeAndReturnKey(parameters);
         return select(key.longValue());
     }
 
+    /**
+     * 메뉴그룹 조회
+     *
+     * @param id
+     * @return
+     */
     public Optional<MenuGroup> findById(final Long id) {
         try {
             return Optional.of(select(id));
@@ -45,11 +57,22 @@ public class MenuGroupDao {
         }
     }
 
+    /**
+     * 전체 메뉴그룹 리스트 조회
+     *
+     * @return
+     */
     public List<MenuGroup> findAll() {
         final String sql = "SELECT id, name FROM menu_group";
         return jdbcTemplate.query(sql, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
+    /**
+     * 메뉴그룹 존재여부 조회
+     *
+     * @param id
+     * @return
+     */
     public boolean existsById(final Long id) {
         final String sql = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM menu_group WHERE id = (:id)";
         final SqlParameterSource parameters = new MapSqlParameterSource()

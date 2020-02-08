@@ -32,6 +32,12 @@ public class OrderTableDao {
         ;
     }
 
+    /**
+     * 테이블 생성/수정
+     *
+     * @param entity
+     * @return
+     */
     public OrderTable save(final OrderTable entity) {
         if (Objects.isNull(entity.getId())) {
             final SqlParameterSource parameters = new BeanPropertySqlParameterSource(entity);
@@ -42,6 +48,12 @@ public class OrderTableDao {
         return entity;
     }
 
+    /**
+     * 테이블 조회
+     *
+     * @param id
+     * @return
+     */
     public Optional<OrderTable> findById(final Long id) {
         try {
             return Optional.of(select(id));
@@ -50,11 +62,22 @@ public class OrderTableDao {
         }
     }
 
+    /**
+     * 전체 테이블 조회
+     *
+     * @return
+     */
     public List<OrderTable> findAll() {
         final String sql = "SELECT id, table_group_id, number_of_guests, empty FROM order_table";
         return jdbcTemplate.query(sql, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
+    /**
+     * 테이블 다수 조회
+     *
+     * @param ids
+     * @return
+     */
     public List<OrderTable> findAllByIdIn(final List<Long> ids) {
         final String sql = "SELECT id, table_group_id, number_of_guests, empty FROM order_table WHERE id IN (:ids)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
@@ -62,6 +85,12 @@ public class OrderTableDao {
         return jdbcTemplate.query(sql, parameters, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
+    /**
+     * 테이블 조회 by 테이블그룹 id
+     *
+     * @param tableGroupId
+     * @return
+     */
     public List<OrderTable> findAllByTableGroupId(final Long tableGroupId) {
         final String sql = "SELECT id, table_group_id, number_of_guests, empty" +
                 " FROM order_table WHERE table_group_id = (:tableGroupId)";
@@ -77,6 +106,11 @@ public class OrderTableDao {
         return jdbcTemplate.queryForObject(sql, parameters, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
+    /**
+     * 테이블 수정 (테이블그룹, 게스트 수, 공석여부)
+     *
+     * @param entity
+     */
     private void update(final OrderTable entity) {
         final String sql = "UPDATE order_table SET table_group_id = (:tableGroupId)," +
                 " number_of_guests = (:numberOfGuests), empty = (:empty) WHERE id = (:id)";

@@ -31,12 +31,24 @@ public class MenuDao {
         ;
     }
 
+    /**
+     * 메뉴 생성
+     *
+     * @param entity
+     * @return
+     */
     public Menu save(final Menu entity) {
         final SqlParameterSource parameters = new BeanPropertySqlParameterSource(entity);
         final Number key = jdbcInsert.executeAndReturnKey(parameters);
         return select(key.longValue());
     }
 
+    /**
+     * 메뉴 조회
+     *
+     * @param id
+     * @return
+     */
     public Optional<Menu> findById(final Long id) {
         try {
             return Optional.of(select(id));
@@ -45,11 +57,22 @@ public class MenuDao {
         }
     }
 
+    /**
+     * 전체 메뉴 리스트 조회
+     *
+     * @return
+     */
     public List<Menu> findAll() {
         final String sql = "SELECT id, name, price, menu_group_id FROM menu ";
         return jdbcTemplate.query(sql, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
+    /**
+     * 메뉴 수량 조회 by 메뉴 id
+     *
+     * @param ids
+     * @return
+     */
     public long countByIdIn(final List<Long> ids) {
         final String sql = "SELECT COUNT(*) FROM menu WHERE id IN (:ids)";
         final SqlParameterSource parameters = new MapSqlParameterSource()

@@ -1,10 +1,10 @@
 package kitchenpos.model;
 
 public class MenuProduct {
-    private Long seq;
-    private Long menuId;
-    private Long productId;
-    private long quantity;
+    private Long seq; // 메뉴 내 메뉴제품 순서
+    private Long menuId; // 메뉴 id
+    private Long productId; // 제품 id
+    private long quantity; // 제품 수량
 
     public Long getSeq() {
         return seq;

@@ -1,10 +1,10 @@
 package kitchenpos.model;
 
-public class OrderLineItem {
-    private Long seq;
-    private Long orderId;
-    private Long menuId;
-    private long quantity;
+public class OrderLineItem { // 주문 메뉴 Mapping
+    private Long seq; // 주문메뉴 순서
+    private Long orderId; // 주문 id
+    private Long menuId; // 메뉴 id
+    private long quantity; // 메뉴 수량
 
     public Long getSeq() {
         return seq;

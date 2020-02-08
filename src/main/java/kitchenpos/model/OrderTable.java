@@ -1,10 +1,10 @@
 package kitchenpos.model;
 
-public class OrderTable {
-    private Long id;
-    private Long tableGroupId;
-    private int numberOfGuests;
-    private boolean empty;
+public class OrderTable { // 테이블
+    private Long id; // 테이블 id
+    private Long tableGroupId; // 테이블그룹 id
+    private int numberOfGuests; // 게스트 수
+    private boolean empty; // 공석여부
 
     public Long getId() {
         return id;

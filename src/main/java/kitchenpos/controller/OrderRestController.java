@@ -16,6 +16,12 @@ public class OrderRestController {
         this.orderBo = orderBo;
     }
 
+    /**
+     * 주문 생성
+     *
+     * @param order
+     * @return
+     */
     @PostMapping("/api/orders")
     public ResponseEntity<Order> create(@RequestBody final Order order) {
         final Order created = orderBo.create(order);
@@ -25,6 +31,11 @@ public class OrderRestController {
                 ;
     }
 
+    /**
+     * 전체 주문 리스트 조회
+     *
+     * @return
+     */
     @GetMapping("/api/orders")
     public ResponseEntity<List<Order>> list() {
         return ResponseEntity.ok()
@@ -32,6 +43,13 @@ public class OrderRestController {
                 ;
     }
 
+    /**
+     * 주문상태 수정
+     *
+     * @param orderId
+     * @param order
+     * @return
+     */
     @PutMapping("/api/orders/{orderId}/order-status")
     public ResponseEntity<Order> changeOrderStatus(
             @PathVariable final Long orderId,
