@@ -11,14 +11,14 @@ import java.util.stream.Stream;
 
 class InputParser {
     private static final String DEFAULT_DELIMITERS_REGEX = ",|:";
-    private static final String CUSTOM_DELIMITER_MATCHING_REGEX = "^//(.)\\\\n(.+)$";
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("^//(.)\\\\n(.+)$");
 
     static List<Integer> parseToInts(String text) {
         if (StringUtils.isEmpty(text)) {
             return Collections.emptyList();
         }
 
-        Matcher matcher = Pattern.compile(CUSTOM_DELIMITER_MATCHING_REGEX).matcher(text);
+        Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
         if (matcher.find()) {
             final String customDelimiter = matcher.group(1);
             final String extractedText = matcher.group(2);
