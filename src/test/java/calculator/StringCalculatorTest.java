@@ -1,6 +1,5 @@
 package calculator;
 
-import static calculator.StringCalculator.COMMA_DELIMITER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -43,7 +42,7 @@ class StringCalculatorTest {
     @ParameterizedTest
     void add_when_text_is_two_numbers_delimited_by_comma(final int firstNumber,
                                                          final int secondNumber) {
-        assertThat(calculator.add(firstNumber + COMMA_DELIMITER + secondNumber))
+        assertThat(calculator.add(firstNumber + "," + secondNumber))
             .isSameAs(firstNumber + secondNumber);
     }
 

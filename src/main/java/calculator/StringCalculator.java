@@ -1,33 +1,42 @@
 package calculator;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.util.Strings;
 
 public class StringCalculator {
+    static final Splitter DEFAULT_SPLITTER = new Splitter(",|:");
+    private final Splitter splitter;
 
-    //    TODO : fix private after refactor test
-    static final String COMMA_DELIMITER = ",";
-    private static final String COLON_DELIMITER = ":";
-    private static final String DEFAULT_DELIMITER = COMMA_DELIMITER + "|" + COLON_DELIMITER;
-
-    public int add(final String text) {
-        return Strings.isBlank(text) ? 0
-                                     : Arrays.stream(text.split(DEFAULT_DELIMITER))
-                                             .mapToInt(token -> PositiveNumber.from(token).val)
-                                             .sum();
+    public StringCalculator() {
+        this(DEFAULT_SPLITTER);
     }
 
-    public static class PositiveNumber {
-        public final int val;
+    public StringCalculator(Splitter splitter) {
+        if (splitter == null) { throw new IllegalArgumentException(); }
+        this.splitter = splitter;
+    }
 
-        public static PositiveNumber from(String positiveNumber) {
-            return new PositiveNumber(Integer.parseInt(positiveNumber));
+    public int add(final String text) {
+        return splitter.split(text)
+                       .sum();
+    }
+
+    static class Splitter {
+        private final Pattern pattern;
+
+        public Splitter(String regex) {
+            if (Strings.isBlank(regex)) { throw new IllegalArgumentException(); }
+            this.pattern = Pattern.compile(regex);
         }
 
-        private PositiveNumber(int val) {
-            if (val < 0) { throw new RuntimeException(); }
-            this.val = val;
+        public PositiveNumbers split(String text) {
+            return Strings.isBlank(text) ? PositiveNumbers.EMPTY
+                                         : new PositiveNumbers(Arrays.stream(pattern.split(text))
+                                                                     .map(PositiveNumber::from)
+                                                                     .collect(Collectors.toList()));
         }
     }
 }
