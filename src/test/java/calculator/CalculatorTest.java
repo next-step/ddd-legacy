@@ -24,8 +24,8 @@ class CalculatorTest {
     @Test
     @DisplayName("null 또는 빈 문자열을 전달하는 경우 0을 반환")
     void shouldBeZeroWhenCalculateEmptyString() {
-        assertThat(calculator.calculate(null)).isEqualTo(0);
-        assertThat(calculator.calculate("")).isEqualTo(0);
+        assertThat(calculator.calculate(null)).isEqualTo(Calculator.DEFAULT_RESULT);
+        assertThat(calculator.calculate("")).isEqualTo(Calculator.DEFAULT_RESULT);
     }
 
     @Test
