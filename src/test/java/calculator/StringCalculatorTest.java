@@ -1,12 +1,17 @@
 package calculator;
 
+import static calculator.StringCalculator.COMMA_DELIMITER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -22,22 +27,29 @@ class StringCalculatorTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = "   ")
-    void emptyOrNull(final String text) {
+    void add_when_text_is_empty_or_null(final String text) {
         assertThat(calculator.add(text)).isZero();
     }
 
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
     @ParameterizedTest
-    @ValueSource(strings = { "1", "2" })
-    void oneNumber(final String text) {
+    @ValueSource(strings = { "1", "11" })
+    void add_when_text_is_one_number(final String text) {
         assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
     }
 
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
+    @MethodSource("add_when_text_is_two_numbers_delimited_by_comma_cases")
     @ParameterizedTest
-    @ValueSource(strings = { "1,2" })
-    void twoNumbers(final String text) {
-        assertThat(calculator.add(text)).isSameAs(3);
+    void add_when_text_is_two_numbers_delimited_by_comma(final int firstNumber,
+                                                         final int secondNumber) {
+        assertThat(calculator.add(firstNumber + COMMA_DELIMITER + secondNumber))
+            .isSameAs(firstNumber + secondNumber);
+    }
+
+    private static Stream<Arguments> add_when_text_is_two_numbers_delimited_by_comma_cases() {
+        return Stream.of(Arguments.of(1, 2),
+                         Arguments.of(11, 12));
     }
 
     @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
