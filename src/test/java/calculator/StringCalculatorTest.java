@@ -35,7 +35,7 @@ class StringCalculatorTest {
     @ValueSource(strings = {"1"})
     void add_one(final String inputValue) {
         final int result = stringCalculator.add(inputValue);
-        assertThat(result).isEqualTo(1);
+        assertThat(result).isEqualTo(Integer.parseInt(inputValue));
     }
 
     @DisplayName("구분자가 , ; 가 있는 더하기 테스트")
@@ -60,6 +60,6 @@ class StringCalculatorTest {
     void add_negative(final String inputValue) {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> stringCalculator.add(inputValue));
-
     }
+
 }
