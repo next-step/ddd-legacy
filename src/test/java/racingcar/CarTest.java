@@ -19,8 +19,7 @@ class CarTest {
 
     @DisplayName("5 글자가 넘는 경우, IllegalArgumentException이 발생한다.")
     @ParameterizedTest
-    @ValueSource(strings = {"aaaaaa","bbbbbb"})
-    @Test
+    @ValueSource(strings = {"aaaaaa", "bbbbbb"})
     void name(final String name) {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> {
