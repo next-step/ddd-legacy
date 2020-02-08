@@ -14,7 +14,20 @@ public class StringCalculator {
     public int add(final String text) {
         return Strings.isBlank(text) ? 0
                                      : Arrays.stream(text.split(DEFAULT_DELIMITER))
-                                             .mapToInt(Integer::parseInt)
+                                             .mapToInt(token -> PositiveNumber.from(token).val)
                                              .sum();
+    }
+
+    public static class PositiveNumber {
+        public final int val;
+
+        public static PositiveNumber from(String positiveNumber) {
+            return new PositiveNumber(Integer.parseInt(positiveNumber));
+        }
+
+        private PositiveNumber(int val) {
+            if (val < 0) { throw new RuntimeException(); }
+            this.val = val;
+        }
     }
 }
