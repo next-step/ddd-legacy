@@ -1,7 +1,7 @@
 package calculator;
 
 public class PositiveStringNumber {
-    int number;
+    private int number;
 
     public PositiveStringNumber(String input) {
         int intNumber = parseInt(input);
@@ -13,7 +13,7 @@ public class PositiveStringNumber {
         return number;
     }
 
-    public static int parseInt(String s) throws NumberFormatException {
+    private int parseInt(String s) {
         return Integer.parseInt(s, 10);
     }
 }
