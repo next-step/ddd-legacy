@@ -18,12 +18,18 @@ public class StringCalculator {
         String[] values = str.split(delimiter);
 
         for (String value : values) {
-
+            if (isNegativeValue(value)) {
+                throw new RuntimeException();
+            }
             sum += Integer.valueOf(value);
         }
 
         return sum;
 
+    }
+
+    private boolean isNegativeValue(String value) {
+        return Integer.parseInt(value) < 0;
     }
 
     private String getText(String str) {
