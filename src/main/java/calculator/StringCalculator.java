@@ -9,7 +9,9 @@ public class StringCalculator {
     private static Pattern CUSTOM_DELIMTER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     public int add(String text) {
-        if (Strings.isEmpty(text)) { return 0;}
+        if (Strings.isEmpty(text)) {
+            return 0;
+        }
 
         Matcher matcher = CUSTOM_DELIMTER_PATTERN.matcher(text);
         if (matcher.find()) {
