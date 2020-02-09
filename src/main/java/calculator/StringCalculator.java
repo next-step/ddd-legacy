@@ -6,8 +6,17 @@ public class StringCalculator {
         if (isValidateString(text)) {
             return 0;
         }
+
+        if (isOneLength(text)) {
+            return Integer.parseInt(text);
+        }
+
         return 1;
 
+    }
+
+    private boolean isOneLength(String text) {
+        return text.length() == 1;
     }
 
     private boolean isValidateString(String str) {
