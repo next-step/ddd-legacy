@@ -20,8 +20,7 @@ public class StringCalculator {
             return result;
         }
 
-        String[] splitNumbers = extractNumberByDelimiter(text);
-        List<Integer> numbers = parseToInteger(splitNumbers);
+        List<Integer> numbers = parseToInteger(extractNumberByDelimiter(text));
 
         return numbers.stream()
                 .mapToInt(Integer::intValue)
