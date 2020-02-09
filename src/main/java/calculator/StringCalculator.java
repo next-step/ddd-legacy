@@ -28,7 +28,7 @@ public class StringCalculator {
 
     private Integer getTextArraySum(String[] text) {
         return Arrays.stream(text)
-                .map(this::convertTextToInt)
+                .map(textNumber -> new Number(textNumber).getNumber())
                 .reduce(0, Integer::sum);
     }
 
