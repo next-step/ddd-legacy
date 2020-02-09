@@ -15,8 +15,8 @@ class StringCalculatorTest {
     @DisplayName("null 혹은 빈 문자열은 0을 반환한다.")
     @ParameterizedTest
     @MethodSource("blankStrings")
-    void calculateBlankStrings(final String input) {
-        assertThat(StringCalculator.calculate(input)).isEqualTo(0);
+    void calculateBlankStrings(final String text) {
+        assertThat(StringCalculator.calculate(text)).isEqualTo(0);
     }
 
     private static Stream<String> blankStrings() {
@@ -30,10 +30,17 @@ class StringCalculatorTest {
         assertThat(StringCalculator.calculate(text)).isEqualTo(8);
     }
 
-    @DisplayName("구분자 세미콜론으로 이루어진 문자열을 분리하여 각각의 합을 반환한다.")
+    @DisplayName("구분자 콜론으로 이루어진 문자열을 분리하여 각각의 합을 반환한다.")
     @Test
     void calculateSemicolonString() {
-        String text = "3;5";
+        String text = "3:5";
+        assertThat(StringCalculator.calculate(text)).isEqualTo(8);
+    }
+
+    @DisplayName("구분자 쉼표 및 콜론으로 이루어진 문자열을 분리하여 각각의 합을 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"0,3:5", "0:3,5"})
+    void calculateDefaultDelimiterString(final String text) {
         assertThat(StringCalculator.calculate(text)).isEqualTo(8);
     }
 
@@ -44,7 +51,7 @@ class StringCalculatorTest {
         assertThat(StringCalculator.calculate(text)).isEqualTo(8);
     }
 
-    @DisplayName("숫자가 아닌 문자열이 포함 된 경우 RuntimeException를 발생시킨다.")
+    @DisplayName("숫자가 아닌 문자열이 포함 된 경우 RuntimeException 을 발생시킨다.")
     @Test
     void validateNumericString() {
         String text = "A,5";
@@ -52,7 +59,7 @@ class StringCalculatorTest {
             .isThrownBy(() -> StringCalculator.calculate(text));
     }
 
-    @DisplayName("값이 음수인 문자열이 포함 된 경우 RuntimeException를 발생시킨다.")
+    @DisplayName("값이 음수인 문자열이 포함 된 경우 RuntimeException 을 발생시킨다.")
     @ParameterizedTest
     @ValueSource(strings = {"-1,5", "-1;5", "//s\n-1s5"})
     void validatePositiveNumber(final String text) {

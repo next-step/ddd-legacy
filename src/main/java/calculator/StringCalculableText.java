@@ -1,48 +1,52 @@
 package calculator;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculableText {
 
-    private static final Pattern DEFAULT_DELIMITER_PATTERN = Pattern.compile("[,;]");
+    private static final Pattern DEFAULT_DELIMITER_PATTERN = Pattern.compile("[,:]");
     private static final Pattern CUSTOMIZED_TEXT_PATTERN = Pattern.compile("//(.)\n(.*)");
 
-    private String text;
+    private final String text;
 
-    private StringCalculableText(String text) {
+    public StringCalculableText(String text) {
         this.text = text;
     }
 
-    public static StringCalculableText of(String text) {
-        return new StringCalculableText(text);
-    }
-
     public boolean isNullOrEmpty() {
-        return text == null || text.isEmpty();
+        return Objects.isNull(text) || text.isEmpty();
     }
 
     public int getTotal() {
-        PositiveNumber total;
-        String[] tokens;
+        String[] tokens = splitToTokens();
+        PositiveNumbers positiveNumbers = new PositiveNumbers(tokens);
+        return positiveNumbers.getTotal();
+    }
+
+    private String[] splitToTokens() {
+        if (isCustomized()) {
+            return getCustomizedPatternTokens();
+        }
+        return getDefaultPatternTokens();
+    }
+
+    private String[] getDefaultPatternTokens() {
+        return DEFAULT_DELIMITER_PATTERN.split(text);
+    }
+
+    private String[] getCustomizedPatternTokens() {
         Matcher matcher = CUSTOMIZED_TEXT_PATTERN.matcher(text);
         if (matcher.find()) {
             String customDelimiter = matcher.group(1);
-            tokens = matcher.group(2).split(customDelimiter);
-            total = getTotalPositiveNumbers(tokens);
-            return total.getValue();
+            String text = matcher.group(2);
+            return text.split(customDelimiter);
         }
-
-        tokens = DEFAULT_DELIMITER_PATTERN.split(text);
-        total = getTotalPositiveNumbers(tokens);
-        return total.getValue();
+        throw new IllegalStateException();
     }
 
-    private PositiveNumber getTotalPositiveNumbers(String[] tokens) {
-        PositiveNumber total = PositiveNumber.of(0);
-        for (String token : tokens) {
-            total.sum(PositiveNumber.of(token));
-        }
-        return total;
+    private boolean isCustomized() {
+        return CUSTOMIZED_TEXT_PATTERN.matcher(text).matches();
     }
 }
