@@ -14,7 +14,6 @@ public class StringCalculator {
 
         return Arrays.stream(stringParser.parse(inputText))
                 .map(Number::new)
-                .mapToInt(Number::getValue)
-                .sum();
+                .reduce(new Number("0"), (subtotal, element) -> subtotal.sum(element)).getValue();
     }
 }
