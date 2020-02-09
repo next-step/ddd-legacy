@@ -42,7 +42,7 @@ public class StringSumCalculator {
         try {
             return this.loop(tokens);
         } catch (Exception ex) {
-            throw new RuntimeException();
+            throw new RuntimeException(ex);
         }
     }
 
