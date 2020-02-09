@@ -32,37 +32,6 @@ class MenuBoTest {
     @Mock private MenuGroupDao menuGroupDao;
     @Mock private ProductDao productDao;
 
-    @DisplayName("메뉴그룹을 설정할 수 있다.")
-    @Test
-    public void setMenuGroup() {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(1L);
-        menuGroup.setName("두마리메뉴");
-
-        List<MenuGroup> menuGroupList = new ArrayList<>();
-        menuGroupList.add(menuGroup);
-
-        when(menuGroupDao.findAll()).thenReturn(menuGroupList);
-
-        List<MenuGroup> result = menuGroupDao.findAll();
-
-        assertThat(result.get(0).getName()).isEqualTo("두마리메뉴");
-    }
-
-    @DisplayName("메뉴그룹 목록을 볼 수 있다.")
-    @Test
-    public void listMenuGroup() {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(1L);
-        menuGroup.setName("두마리메뉴");
-
-        when(menuGroupDao.save(menuGroup)).thenReturn(menuGroup);
-
-        MenuGroup result = menuGroupDao.save(menuGroup);
-
-        assertThat(result.getName()).isEqualTo("두마리메뉴");
-    }
-
     @DisplayName("각 메뉴는 반드시 하나 이상의 메뉴그룹에 속한다.")
     @Test
     public void menuGroupIdTest() {
@@ -77,22 +46,22 @@ class MenuBoTest {
 
     }
 
-    @DisplayName("메뉴를 만들 수 있는 상품의 재고를 볼 수 있다.")
-    @Test
-    public void menuProductQuantity() {
-        MenuProduct menuProduct = new MenuProduct();
-        List<MenuProduct> menuProductList = new ArrayList<>();
-
-        menuProduct.setMenuId(1L);
-        menuProduct.setQuantity(1L);
-        menuProductList.add(menuProduct);
-
-        when(menuProductDao.findAllByMenuId(1L)).thenReturn(menuProductList);
-
-        List<MenuProduct> result = menuProductDao.findAllByMenuId(1L);
-
-        assertThat(result.get(0).getQuantity()).isEqualTo(1L);
-    }
+//    @DisplayName("메뉴를 만들 수 있는 상품의 재고를 볼 수 있다.")
+//    @Test
+//    public void menuProductQuantity() {
+//        MenuProduct menuProduct = new MenuProduct();
+//        List<MenuProduct> menuProductList = new ArrayList<>();
+//
+//        menuProduct.setMenuId(1L);
+//        menuProduct.setQuantity(1L);
+//        menuProductList.add(menuProduct);
+//
+//        when(menuProductDao.findAllByMenuId(1L)).thenReturn(menuProductList);
+//
+//        List<MenuProduct> result = menuProductDao.findAllByMenuId(1L);
+//
+//        assertThat(result.get(0).getQuantity()).isEqualTo(1L);
+//    }
 
     @DisplayName("각 메뉴에 이름,가격을 설정할 수 있다.")
     @Test
