@@ -5,6 +5,7 @@ import org.springframework.util.StringUtils;
 import java.util.Arrays;
 
 public class StringCalculator {
+    private static final Number ZERO = new Number("0");
     private StringParser stringParser = new StringParser();
 
     public int add(String inputText) {
@@ -14,6 +15,6 @@ public class StringCalculator {
 
         return Arrays.stream(stringParser.parse(inputText))
                 .map(Number::new)
-                .reduce(new Number("0"), (subtotal, element) -> subtotal.sum(element)).getValue();
+                .reduce(ZERO, Number::sum).getValue();
     }
 }
