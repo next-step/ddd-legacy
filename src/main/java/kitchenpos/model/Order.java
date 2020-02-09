@@ -4,11 +4,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class Order {
-    private Long id;
-    private Long orderTableId;
-    private String orderStatus;
-    private LocalDateTime orderedTime;
-    private List<OrderLineItem> orderLineItems;
+    private Long id; // 주문 id
+    private Long orderTableId; // 테이블 id
+    private String orderStatus; // 주문상태
+    private LocalDateTime orderedTime; // 주문시간
+    private List<OrderLineItem> orderLineItems; // 주문메뉴 리스트
 
     public Long getId() {
         return id;

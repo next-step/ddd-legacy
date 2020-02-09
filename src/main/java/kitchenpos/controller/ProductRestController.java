@@ -19,6 +19,12 @@ public class ProductRestController {
         this.productBo = productBo;
     }
 
+    /**
+     * 제품 생성
+     *
+     * @param product
+     * @return
+     */
     @PostMapping("/api/products")
     public ResponseEntity<Product> create(@RequestBody final Product product) {
         final Product created = productBo.create(product);
@@ -28,6 +34,11 @@ public class ProductRestController {
                 ;
     }
 
+    /**
+     * 전체 제품 리스트 조회
+     *
+     * @return
+     */
     @GetMapping("/api/products")
     public ResponseEntity<List<Product>> list() {
         return ResponseEntity.ok()

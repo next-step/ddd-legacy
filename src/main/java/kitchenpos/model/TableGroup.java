@@ -3,10 +3,10 @@ package kitchenpos.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class TableGroup {
-    private Long id;
-    private LocalDateTime createdDate;
-    private List<OrderTable> orderTables;
+public class TableGroup { // 테이블그룹
+    private Long id; // 테이블그룹 id
+    private LocalDateTime createdDate; // 테이블그룹 생성일자
+    private List<OrderTable> orderTables; // 테이블 리스트
 
     public Long getId() {
         return id;

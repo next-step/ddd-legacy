@@ -19,6 +19,12 @@ public class MenuGroupRestController {
         this.menuGroupBo = menuGroupBo;
     }
 
+    /**
+     * 메뉴그룹 생성
+     *
+     * @param menuGroup
+     * @return
+     */
     @PostMapping("/api/menu-groups")
     public ResponseEntity<MenuGroup> create(@RequestBody final MenuGroup menuGroup) {
         final MenuGroup created = menuGroupBo.create(menuGroup);
@@ -28,6 +34,11 @@ public class MenuGroupRestController {
                 ;
     }
 
+    /**
+     * 전체 메뉴그룹 리스트 조회
+     *
+     * @return
+     */
     @GetMapping("/api/menus-groups")
     public ResponseEntity<List<MenuGroup>> list() {
         return ResponseEntity.ok()

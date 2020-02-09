@@ -33,6 +33,12 @@ public class OrderDao {
         ;
     }
 
+    /**
+     * 주문 생성/수정
+     *
+     * @param entity
+     * @return
+     */
     public Order save(final Order entity) {
         if (Objects.isNull(entity.getId())) {
             final SqlParameterSource parameters = new BeanPropertySqlParameterSource(entity);
@@ -43,6 +49,12 @@ public class OrderDao {
         return entity;
     }
 
+    /**
+     * 주문 조회
+     *
+     * @param id
+     * @return
+     */
     public Optional<Order> findById(final Long id) {
         try {
             return Optional.of(select(id));
@@ -51,11 +63,23 @@ public class OrderDao {
         }
     }
 
+    /**
+     * 전체 주문 조회
+     *
+     * @return
+     */
     public List<Order> findAll() {
         final String sql = "SELECT id, order_table_id, order_status, ordered_time FROM orders";
         return jdbcTemplate.query(sql, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
+    /**
+     * 파라미터 테이블에서 발생한 주문들 중, 주문상태가 파라미터 주문상태 리스트에 포함되는 지 여부 체크
+     *
+     * @param orderTableId
+     * @param orderStatuses
+     * @return
+     */
     public boolean existsByOrderTableIdAndOrderStatusIn(final Long orderTableId, final List<String> orderStatuses) {
         final String sql = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END" +
                 " FROM orders WHERE order_table_id = (:orderTableId) AND order_status IN (:orderStatuses)";
@@ -65,6 +89,13 @@ public class OrderDao {
         return jdbcTemplate.queryForObject(sql, parameters, Boolean.class);
     }
 
+    /**
+     * 파라미터 테이블 리스트에서 발생한 주문들 중, 주문상태가 파라미터 주문상태 리스트에 포함되는 지 여부 체크
+     *
+     * @param orderTableIds
+     * @param orderStatuses
+     * @return
+     */
     public boolean existsByOrderTableIdInAndOrderStatusIn(final List<Long> orderTableIds, final List<String> orderStatuses) {
         final String sql = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END" +
                 " FROM orders WHERE order_table_id IN (:orderTableIds) AND order_status IN (:orderStatuses)";

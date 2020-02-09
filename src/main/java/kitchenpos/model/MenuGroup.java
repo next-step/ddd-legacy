@@ -1,8 +1,8 @@
 package kitchenpos.model;
 
 public class MenuGroup {
-    private Long id;
-    private String name;
+    private Long id; // 메뉴그룹 id
+    private String name; // 메뉴그룹명
 
     public Long getId() {
         return id;

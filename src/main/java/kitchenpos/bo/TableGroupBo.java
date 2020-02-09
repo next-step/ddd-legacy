@@ -28,11 +28,17 @@ public class TableGroupBo {
         this.tableGroupDao = tableGroupDao;
     }
 
+    /**
+     * 테이블그룹 생성
+     *
+     * @param tableGroup
+     * @return
+     */
     @Transactional
     public TableGroup create(final TableGroup tableGroup) {
         final List<OrderTable> orderTables = tableGroup.getOrderTables();
 
-        if (CollectionUtils.isEmpty(orderTables) || orderTables.size() < 2) {
+        if (CollectionUtils.isEmpty(orderTables) || orderTables.size() < 2) { // 테이블그룹 내 테이블은 2개 이상이다.
             throw new IllegalArgumentException();
         }
 
@@ -40,13 +46,14 @@ public class TableGroupBo {
                 .map(OrderTable::getId)
                 .collect(Collectors.toList());
 
-        final List<OrderTable> savedOrderTables = orderTableDao.findAllByIdIn(orderTableIds);
+        final List<OrderTable> savedOrderTables = orderTableDao.findAllByIdIn(orderTableIds); // 테이블 다수 조회
 
-        if (orderTables.size() != savedOrderTables.size()) {
+        if (orderTables.size() != savedOrderTables.size()) { // 테이블 중복 체크
             throw new IllegalArgumentException();
         }
 
         for (final OrderTable savedOrderTable : savedOrderTables) {
+            // 테이블이 공석이 아니거나, 테이블이 이미 다른 테이블그룹에 속하면 에러
             if (!savedOrderTable.isEmpty() || Objects.nonNull(savedOrderTable.getTableGroupId())) {
                 throw new IllegalArgumentException();
             }
@@ -54,35 +61,40 @@ public class TableGroupBo {
 
         tableGroup.setCreatedDate(LocalDateTime.now());
 
-        final TableGroup savedTableGroup = tableGroupDao.save(tableGroup);
+        final TableGroup savedTableGroup = tableGroupDao.save(tableGroup); // 테이블그룹 저장
 
         final Long tableGroupId = savedTableGroup.getId();
         for (final OrderTable savedOrderTable : savedOrderTables) {
-            savedOrderTable.setTableGroupId(tableGroupId);
-            savedOrderTable.setEmpty(false);
-            orderTableDao.save(savedOrderTable);
+            savedOrderTable.setTableGroupId(tableGroupId); // 테이블에 테이블그룹 id 세팅
+            savedOrderTable.setEmpty(false); // 테이블 공석여부 false 세팅
+            orderTableDao.save(savedOrderTable); // 테이블 저장
         }
         savedTableGroup.setOrderTables(savedOrderTables);
 
         return savedTableGroup;
     }
 
+    /**
+     * 테이블그룹 삭제
+     *
+     * @param tableGroupId
+     */
     @Transactional
     public void delete(final Long tableGroupId) {
-        final List<OrderTable> orderTables = orderTableDao.findAllByTableGroupId(tableGroupId);
+        final List<OrderTable> orderTables = orderTableDao.findAllByTableGroupId(tableGroupId); // 해당 테이블그룹 내 테이블 리스트 조회
 
         final List<Long> orderTableIds = orderTables.stream()
                 .map(OrderTable::getId)
                 .collect(Collectors.toList());
 
-        if (orderDao.existsByOrderTableIdInAndOrderStatusIn(
+        if (orderDao.existsByOrderTableIdInAndOrderStatusIn( // 테이블그룹에 포함된 테이블들에서 발생한 모든 주문들의 주문상태가 완료인 경우에만 삭제할 수 있다.
                 orderTableIds, Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))) {
             throw new IllegalArgumentException();
         }
 
         for (final OrderTable orderTable : orderTables) {
             orderTable.setTableGroupId(null);
-            orderTableDao.save(orderTable);
+            orderTableDao.save(orderTable); // 테이블들의 테이블그룹 지정을 해제한다.
         }
     }
 }

@@ -37,11 +37,17 @@ public class OrderBo {
         this.orderTableDao = orderTableDao;
     }
 
+    /**
+     * 주문 생성
+     *
+     * @param order
+     * @return
+     */
     @Transactional
     public Order create(final Order order) {
-        final List<OrderLineItem> orderLineItems = order.getOrderLineItems();
+        final List<OrderLineItem> orderLineItems = order.getOrderLineItems(); // 주문에 포함될 메뉴 리스트
 
-        if (CollectionUtils.isEmpty(orderLineItems)) {
+        if (CollectionUtils.isEmpty(orderLineItems)) { // 주문 시 1개 이상의 메뉴를 시켜야한다.
             throw new IllegalArgumentException();
         }
 
@@ -49,59 +55,71 @@ public class OrderBo {
                 .map(OrderLineItem::getMenuId)
                 .collect(Collectors.toList());
 
-        if (orderLineItems.size() != menuDao.countByIdIn(menuIds)) {
+        if (orderLineItems.size() != menuDao.countByIdIn(menuIds)) { // 주문 내에 동일 메뉴가 들어갔는지 체크
             throw new IllegalArgumentException();
         }
 
         order.setId(null);
 
-        final OrderTable orderTable = orderTableDao.findById(order.getOrderTableId())
+        final OrderTable orderTable = orderTableDao.findById(order.getOrderTableId()) // 테이블 조회
                 .orElseThrow(IllegalArgumentException::new);
 
-        if (orderTable.isEmpty()) {
+        if (orderTable.isEmpty()) { // 테이블이 공석이면 에러.
             throw new IllegalArgumentException();
         }
 
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderStatus(OrderStatus.COOKING.name());
+        order.setOrderTableId(orderTable.getId()); // 테이블 세팅
+        order.setOrderStatus(OrderStatus.COOKING.name()); // 주문 생성 시, 주문상태는 조리중이다.
         order.setOrderedTime(LocalDateTime.now());
 
-        final Order savedOrder = orderDao.save(order);
+        final Order savedOrder = orderDao.save(order); // 주문 저장
 
         final Long orderId = savedOrder.getId();
         final List<OrderLineItem> savedOrderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItem : orderLineItems) {
             orderLineItem.setOrderId(orderId);
-            savedOrderLineItems.add(orderLineItemDao.save(orderLineItem));
+            savedOrderLineItems.add(orderLineItemDao.save(orderLineItem)); // 주문메뉴 저장
         }
         savedOrder.setOrderLineItems(savedOrderLineItems);
 
         return savedOrder;
     }
 
+    /**
+     * 전체 주문 리스트 조회
+     *
+     * @return
+     */
     public List<Order> list() {
         final List<Order> orders = orderDao.findAll();
 
         for (final Order order : orders) {
-            order.setOrderLineItems(orderLineItemDao.findAllByOrderId(order.getId()));
+            order.setOrderLineItems(orderLineItemDao.findAllByOrderId(order.getId())); // 주문메뉴 리스트 조회
         }
 
         return orders;
     }
 
+    /**
+     * 주문 상태 변경
+     *
+     * @param orderId
+     * @param order
+     * @return
+     */
     @Transactional
     public Order changeOrderStatus(final Long orderId, final Order order) {
-        final Order savedOrder = orderDao.findById(orderId)
+        final Order savedOrder = orderDao.findById(orderId) // 주문 조회
                 .orElseThrow(IllegalArgumentException::new);
 
-        if (Objects.equals(OrderStatus.COMPLETION.name(), savedOrder.getOrderStatus())) {
+        if (Objects.equals(OrderStatus.COMPLETION.name(), savedOrder.getOrderStatus())) { // 이미 완료 상태의 주문인지 체크
             throw new IllegalArgumentException();
         }
 
         final OrderStatus orderStatus = OrderStatus.valueOf(order.getOrderStatus());
-        savedOrder.setOrderStatus(orderStatus.name());
+        savedOrder.setOrderStatus(orderStatus.name()); // 새로운 주문상태 세팅
 
-        orderDao.save(savedOrder);
+        orderDao.save(savedOrder); // 주문 수정
 
         savedOrder.setOrderLineItems(orderLineItemDao.findAllByOrderId(orderId));
 

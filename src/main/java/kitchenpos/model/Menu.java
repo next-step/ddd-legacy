@@ -4,11 +4,11 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class Menu {
-    private Long id;
-    private String name;
-    private BigDecimal price;
-    private Long menuGroupId;
-    private List<MenuProduct> menuProducts;
+    private Long id; // 메뉴 id
+    private String name; // 메뉴명
+    private BigDecimal price; // 메뉴 가격
+    private Long menuGroupId; // 메뉴 그룹 id
+    private List<MenuProduct> menuProducts; // 메뉴제품 리스트
 
     public Long getId() {
         return id;
