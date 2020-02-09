@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -99,5 +102,37 @@ public class StringSumCalculatorTest {
 
         final int result4 = calculator.sum(null);
         assertThat(result4).isEqualTo(0);
+    }
+
+    @DisplayName("PositiveIntegers 에 음수가 아닌 문자열 배열을 입력하면 정수 배열을 반환한다.")
+    @Test
+    void positiveIntegers() {
+        List<Integer> expected = Arrays.asList(1, 2, 3);
+        PositiveIntegers integers = new PositiveIntegers(new String[] {"1", "2", "3"});
+        assertThat(integers.getList()).isEqualTo(expected);
+    }
+
+    @DisplayName("PositiveIntegers 에 숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException 예외를 throw 한다.")
+    @Test
+    void positiveIntegersThrowsException() {
+        assertThatThrownBy(() -> {
+            new PositiveIntegers(new String[] {"1", "-2", "-3"});
+        }).isInstanceOf(RuntimeException.class);
+
+        assertThatThrownBy(() -> {
+            new PositiveIntegers(new String[] {"a", "b", "3"});
+        }).isInstanceOf(RuntimeException.class);
+    }
+
+    @DisplayName("PositiveIntegers 는 외부로 주입받은 연산(Sum)을 수행하고 결과를 반환한다.")
+    @Test
+    void positiveIntegersPerformsOperation() {
+        PositiveIntegers integers1 = new PositiveIntegers(new String[] {"1", "2", "3"});
+        int result1 = integers1.operate(Integer::sum);
+        assertThat(result1).isEqualTo(6);
+
+        PositiveIntegers integers2 = new PositiveIntegers(new String[] {});
+        int result2 = integers2.operate(Integer::sum);
+        assertThat(result2).isEqualTo(0);
     }
 }
