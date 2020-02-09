@@ -20,7 +20,7 @@ public class StringCalculator {
         String[] values = str.split(delimiter);
 
         Arrays.stream(values).filter(this::isNegativeValue).findAny()
-                .orElseThrow(() -> new RuntimeException("음수는 올 수 없습니다."));
+                .orElseThrow(() -> new RuntimeException("음수는 올 수 없습니다."))
         ;
 
         for (String value : values) {
