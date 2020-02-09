@@ -8,7 +8,8 @@ import java.util.stream.Collectors;
 
 public class StringSumCalculator {
 
-    private Pattern customDelimiterPattern = Pattern.compile("//(.)\n(.*)");
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
+    private static final String DEFAULT_DELIMITER = ",|:";
 
     public int sum(final String text) {
         if(text == null || text.isEmpty()) {
@@ -22,15 +23,15 @@ public class StringSumCalculator {
     }
 
     private String findDelimiter(final String text) {
-        Matcher matcher = customDelimiterPattern.matcher(text);
+        Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
         if (matcher.find()) {
             return "[" + matcher.group(1) + "]";
         }
-        return ",|:";
+        return DEFAULT_DELIMITER;
     }
 
     private String findRealExpression(final String text) {
-        Matcher matcher = customDelimiterPattern.matcher(text);
+        Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
         if (matcher.find()) {
             return matcher.group(2);
         }
