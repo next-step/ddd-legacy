@@ -2,11 +2,8 @@ package calculator;
 
 import org.springframework.util.StringUtils;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static calculator.Number.*;
 
 /**
  * @author Geonguk Han
@@ -15,6 +12,7 @@ import static calculator.Number.*;
 public class StringCalculator {
 
     private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
+    public static final String DEFAULT_DELIMITER = ",|;";
 
     public int add(final String value) {
         if (StringUtils.isEmpty(value)) {
@@ -28,19 +26,13 @@ public class StringCalculator {
             return calculate(split);
         }
 
-        final String[] split = value.split(",|;");
+        final String[] split = value.split(DEFAULT_DELIMITER);
         return calculate(split);
     }
 
     private int calculate(final String[] numbers) {
-        validNegative(numbers);
-        return calculateSum(numbers);
+        Number number = new Number(numbers);
+        number.validateNumber();
+        return number.sum();
     }
-
-    private int calculateSum(final String[] numbers) {
-        return Arrays.stream(numbers)
-                .mapToInt(Integer::parseInt)
-                .sum();
-    }
-
 }

@@ -61,5 +61,4 @@ class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> stringCalculator.add(inputValue));
     }
-
 }

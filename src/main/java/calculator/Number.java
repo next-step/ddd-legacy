@@ -9,16 +9,27 @@ import java.util.stream.IntStream;
  */
 public class Number {
 
-    protected static void validNegative(final String[] numbers) {
-        if (isNegative(numbers)) {
-            throw new RuntimeException();
+    private String[] numbers;
+
+    public Number(String[] numbers) {
+        this.numbers = numbers;
+    }
+
+    protected void validateNumber() {
+        if (isNegative()) {
+            throw new RuntimeException("There are must be positive numbers");
         }
     }
 
-    private static boolean isNegative(final String[] numbers) {
+    private boolean isNegative() {
         return Arrays.stream(numbers)
                 .mapToInt(Integer::parseInt)
                 .anyMatch(value -> value < 0);
     }
 
+    protected int sum() {
+        return Arrays.stream(numbers)
+                .mapToInt(Integer::parseInt)
+                .sum();
+    }
 }
