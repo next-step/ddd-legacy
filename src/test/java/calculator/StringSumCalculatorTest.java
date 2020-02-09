@@ -10,9 +10,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class StringSumCalculatorTest {
 
-    @DisplayName(
-            value = "쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열을 전달하는 경우 구분자를 기준으로 분리한 각 숫자의 합을 반환한다."
-    )
+    @DisplayName("쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열을 전달하는 경우 구분자를 기준으로 분리한 각 숫자의 합을 반환한다.")
     @Test
     void split() {
         final StringSumCalculator calculator = new StringSumCalculator();
@@ -29,7 +27,7 @@ public class StringSumCalculatorTest {
         assertThat(result3).isEqualTo(14);
     }
 
-    @DisplayName(value = "한 개의 값을 입력받았을 때는 해당 값을 반환한다.")
+    @DisplayName("한 개의 값을 입력받았을 때는 해당 값을 반환한다.")
     @Test
     void singleItem() {
         final StringSumCalculator calculator = new StringSumCalculator();
@@ -38,9 +36,7 @@ public class StringSumCalculatorTest {
         assertThat(result1).isEqualTo(25);
     }
 
-    @DisplayName(
-            value = "문자열 계산기에 숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException 예외를 throw 한다."
-    )
+    @DisplayName("문자열 계산기에 숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException 예외를 throw 한다.")
     @ParameterizedTest
     @ValueSource(strings = {"abc", "a,c", "-1", "-3,-4,1"})
     void exception(final String testCase) {
