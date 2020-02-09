@@ -58,7 +58,7 @@ public class StringCalculator {
         try{
             number = Integer.parseInt(stringNumber);
         }catch (RuntimeException e){
-            e.printStackTrace();
+            throw new RuntimeException();
         }
 
         return validateNaturalNumber(number);
