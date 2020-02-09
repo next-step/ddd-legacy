@@ -4,7 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
-    final Pattern pattern = Pattern.compile("//(.)\n(.*)");
+    private static final Pattern DELIMETER_PATTERN = Pattern.compile("//(.)\n(.*)");
+    private static final String BASIC_DELIMITER = ",|:";
 
     public int add(String text) {
 
@@ -33,7 +34,7 @@ public class StringCalculator {
     }
 
     private String getText(String str) {
-        Matcher m = pattern.matcher(str);
+        Matcher m = DELIMETER_PATTERN.matcher(str);
         if (m.find()) {
             return m.group(2);
         }
@@ -42,13 +43,12 @@ public class StringCalculator {
 
     private String getDelimiter(String str) {
 
-        Matcher m = pattern.matcher(str);
+        Matcher m = DELIMETER_PATTERN.matcher(str);
         if (m.find()) {
             return m.group(1);
         }
-        return ",|:";
+        return BASIC_DELIMITER;
     }
-
 
     private boolean isValidateString(String str) {
         if (str == null) {
