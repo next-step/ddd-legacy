@@ -11,7 +11,13 @@ public class StringCalculator {
             return Integer.parseInt(text);
         }
 
-        return 1;
+        int sum = 0;
+        String[] values = text.split(",");
+        for (String value : values){
+            sum += Integer.valueOf(value);
+        }
+
+        return sum;
 
     }
 
