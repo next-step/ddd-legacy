@@ -1,5 +1,6 @@
 package calculator;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,10 +19,12 @@ public class StringCalculator {
         String str = getText(text);
         String[] values = str.split(delimiter);
 
+        Arrays.stream(values).filter(this::isNegativeValue).findAny()
+                .orElseThrow(() -> new RuntimeException("음수는 올 수 없습니다."));
+        ;
+
         for (String value : values) {
-            if (isNegativeValue(value)) {
-                throw new RuntimeException();
-            }
+
             sum += Integer.valueOf(value);
         }
 
