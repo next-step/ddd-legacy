@@ -7,9 +7,10 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
-    private int result = 0;
     private static final String DELIMITER_REGEX = ",|:";
     private static final String CUSTOMED_DELIMITER_REGEX = "//(.)\n(.*)";
+
+    private int result = 0;
 
     public StringCalculator (){ }
 
