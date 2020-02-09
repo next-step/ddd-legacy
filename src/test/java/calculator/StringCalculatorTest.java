@@ -27,10 +27,9 @@ class StringCalculatorTest {
     }
 
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"1"})
-    void oneNumber(final String text){
-        assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
+    @Test
+    void oneNumber(){
+        assertThat(calculator.add("1")).isSameAs(Integer.parseInt("1"));
     }
 
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
