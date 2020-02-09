@@ -40,7 +40,7 @@ public class StringSumCalculator {
 
     private int calc(final String[] tokens) {
         try {
-            return this.loop(tokens);
+            return this.getSumOfEachToken(tokens);
         } catch (NumberFormatException nfe) {
             throw nfe;
         } catch (Exception ex) {
@@ -48,7 +48,7 @@ public class StringSumCalculator {
         }
     }
 
-    private int loop(final String[] tokens) {
+    private int getSumOfEachToken(final String[] tokens) {
         final List<Integer> list = getIntegers(tokens);
         verifyHasNegativeNumber(list);
         return getResultUsingReduce(list);
