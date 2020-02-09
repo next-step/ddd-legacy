@@ -21,7 +21,7 @@ public class PositiveNumbers {
     private void validateNegativeValue(List<Integer> values) {
         boolean hasNegative = values.stream().anyMatch(this::isNegative);
 
-        if(hasNegative) {
+        if (hasNegative) {
             throw new RuntimeException("음수는 올 수 없습니다.");
         }
     }
