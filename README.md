@@ -53,11 +53,6 @@
 
 | 한글명 | 영문명 | 설명 |
 | --- | --- | --- |
-| 메뉴그룹 | MenuGroup |  |
-| 메뉴 | Menu |  |
-| 제품 | Product |  |
-| 메뉴제품 | MenuProduct |  |
-| 테이블 | Table |  |
-| 테이블그룹 | TableGroup |  |
+|  |  |  |
 
 ## 모델링
