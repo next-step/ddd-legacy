@@ -1,5 +1,7 @@
 package calculator;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,10 +30,7 @@ public class StringCalculator {
     }
 
     private boolean isEmptyOrNull (String text){
-        if(text == null || text.isEmpty()){
-            return true;
-        }
-        return false;
+        return StringUtils.isEmpty(text);
     }
 
     private String[] extractNumberByDelimiter(String text){
