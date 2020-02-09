@@ -3,9 +3,11 @@ package calculator;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class StringCalculator {
 
@@ -45,14 +47,9 @@ public class StringCalculator {
 
     private List<Integer> parseToInteger (String[] stringNumbers){
 
-        List<Integer> numbers = new ArrayList<>();
-
-        for(String stringNumber : stringNumbers){
-            int number = getPositiveNumber(stringNumber);
-            numbers.add(number);
-        }
-
-        return numbers;
+        return Arrays.stream(stringNumbers)
+                .map(strings -> getPositiveNumber(strings))
+                .collect(Collectors.toList());
     }
 
     private int getPositiveNumber(String stringNumber){
