@@ -23,7 +23,7 @@ public class StringCalculator {
 
         return Arrays.stream(tokens)
                 .peek(token -> {
-                    if (isNotNumber(token) || isNegativeNumber(token)) throw new RuntimeException();
+                    if (isNotNumber(token) || isNegativeNumber(token)) throw new RuntimeException("음수 또는 문자열은 계산할 수 없습니다.");
                 })
                 .collect(Collectors.summingInt(Integer::parseInt));
     }
