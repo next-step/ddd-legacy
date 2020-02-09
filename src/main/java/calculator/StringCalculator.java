@@ -39,12 +39,8 @@ public class StringCalculator {
 
         Matcher m = CUSTOM_SPLIT_REGEX.matcher(text);
 
-        if(m.find()){
-            String customDelimiter = m.group(1);
-            return m.group(2).split(customDelimiter);
-        }else{
-            return text.split(DELIMITER_REGEX);
-        }
+        return m.find() ?
+                m.group(2).split(m.group(1)) : text.split(DELIMITER_REGEX);
     }
 
     private List<Integer> parseToInteger (String[] stringNumbers){
