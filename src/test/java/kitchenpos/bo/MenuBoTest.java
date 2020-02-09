@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -88,8 +89,8 @@ class MenuBoTest {
         product.setName("후라이드");
         product.setPrice(new BigDecimal(16000));
 
-        when(menuGroupDao.existsById(menu.getMenuGroupId())).thenReturn(true);
-        when(productDao.findById(menuProduct.getProductId())).thenReturn(optionalProduct.of(product));
+        when(menuGroupDao.existsById(anyLong())).thenReturn(true);
+        when(productDao.findById(anyLong())).thenReturn(optionalProduct.of(product));
         when(menuDao.save(menu)).thenReturn(menu);
         when(menuProductDao.save(menuProduct)).thenReturn(menuProduct);
 
@@ -120,7 +121,7 @@ class MenuBoTest {
         menuList.add(menu);
 
         when(menuDao.findAll()).thenReturn(menuList);
-        when(menuProductDao.findAllByMenuId(menu.getId())).thenReturn(menuProductList);
+        when(menuProductDao.findAllByMenuId(anyLong())).thenReturn(menuProductList);
 
         List<Menu> result = menuBo.list();
         assertThat(result.get(0).getName()).isEqualTo("후라이드치킨");
