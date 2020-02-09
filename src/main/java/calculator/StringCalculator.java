@@ -10,7 +10,7 @@ public class StringCalculator {
 
     public int calculate(String text) {
 
-        if (isValidateString(text)) {
+        if (!isValidateString(text)) {
             return 0;
         }
 
@@ -54,13 +54,10 @@ public class StringCalculator {
     }
 
     private boolean isValidateString(String str) {
-        if (str == null) {
-            return true;
+        if (str == null || str.isEmpty()) {
+            return false;
         }
-        if (str.isEmpty()) {
-            return true;
-        }
-        return false;
+        return true;
 
     }
 }
