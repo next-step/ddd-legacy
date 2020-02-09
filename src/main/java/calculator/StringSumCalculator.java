@@ -41,6 +41,8 @@ public class StringSumCalculator {
     private int calc(final String[] tokens) {
         try {
             return this.loop(tokens);
+        } catch (NumberFormatException nfe) {
+            throw nfe;
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -60,7 +62,7 @@ public class StringSumCalculator {
     private void verifyHasNegativeNumber(final List<Integer> list) {
         final boolean hasNegative = list.stream().anyMatch(item -> item < 0);
         if (hasNegative) {
-            throw new RuntimeException();
+            throw new RuntimeException("입력값으로 음수가 사용됨");
         }
     }
 
