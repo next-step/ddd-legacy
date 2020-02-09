@@ -8,8 +8,6 @@ import kitchenpos.model.Menu;
 import kitchenpos.model.MenuGroup;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,6 +61,37 @@ class MenuBoTest {
         MenuGroup result = menuGroupDao.save(menuGroup);
 
         assertThat(result.getName()).isEqualTo("두마리메뉴");
+    }
+
+    @DisplayName("각 메뉴는 반드시 하나 이상의 메뉴그룹에 속한다.")
+    @Test
+    public void menuGroupIdTest() {
+        Menu menu = new Menu();
+        menu.setPrice(new BigDecimal(16000));
+
+        Throwable thrown = catchThrowable(() ->{
+            menuBo.create(menu);
+        });
+
+        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+
+    }
+
+    @DisplayName("메뉴를 만들 수 있는 상품의 재고를 볼 수 있다.")
+    @Test
+    public void menuProductQuantity() {
+        MenuProduct menuProduct = new MenuProduct();
+        List<MenuProduct> menuProductList = new ArrayList<>();
+
+        menuProduct.setMenuId(1L);
+        menuProduct.setQuantity(1L);
+        menuProductList.add(menuProduct);
+
+        when(menuProductDao.findAllByMenuId(1L)).thenReturn(menuProductList);
+
+        List<MenuProduct> result = menuProductDao.findAllByMenuId(1L);
+
+        assertThat(result.get(0).getQuantity()).isEqualTo(1L);
     }
 
     @DisplayName("각 메뉴에 이름,가격을 설정할 수 있다.")
