@@ -18,14 +18,11 @@ public class StringCalculator {
         String delimiter = getDelimiter(text);
         String str = getText(text);
         String[] values = str.split(delimiter);
+        PositiveNumbers positiveNumbers = new PositiveNumbers(values);
 
-        Arrays.stream(values).filter(this::isNegativeValue).findAny()
-                .orElseThrow(() -> new RuntimeException("음수는 올 수 없습니다."))
-        ;
+        for (Integer value : positiveNumbers.getNumbers()) {
 
-        for (String value : values) {
-
-            sum += Integer.valueOf(value);
+            sum += value;
         }
 
         return sum;
