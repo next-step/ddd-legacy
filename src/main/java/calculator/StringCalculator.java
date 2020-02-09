@@ -13,18 +13,13 @@ public class StringCalculator {
             return 0;
         }
 
-        int sum = 0;
         String delimiter = getDelimiter(text);
         String str = getText(text);
         String[] values = str.split(delimiter);
         PositiveNumbers positiveNumbers = new PositiveNumbers(values);
 
-        for (Integer value : positiveNumbers.getNumbers()) {
 
-            sum += value;
-        }
-
-        return sum;
+        return positiveNumbers.getNumbers().stream().reduce((a, b) -> a + b).get();
 
     }
 
