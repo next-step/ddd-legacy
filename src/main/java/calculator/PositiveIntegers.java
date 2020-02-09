@@ -31,10 +31,6 @@ public class PositiveIntegers {
         return !hasNegative;
     }
 
-    public List<Integer> getList() {
-        return list;
-    }
-
     public int operate(BinaryOperator<Integer> operator) {
         return list.stream()
                 .reduce(0, operator);

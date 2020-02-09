@@ -1,6 +1,5 @@
 package calculator;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,12 +46,8 @@ public class StringSumCalculator {
     }
 
     private int getSumOfEachToken(final String[] tokens) {
-        final List<Integer> list = new PositiveIntegers(tokens).getList();
-        return getResultUsingReduce(list);
-    }
-
-    private Integer getResultUsingReduce(final List<Integer> list) {
-        return list.stream()
-                .reduce(0, Integer::sum);
+        PositiveIntegers integers = new PositiveIntegers(tokens);
+        return integers.operate(Integer::sum);
     }
 }
+
