@@ -1,5 +1,7 @@
 package calculator;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,7 +11,7 @@ public class StringCalculator {
     static final int ZERO = 0;
 
     int add(final String text) {
-        if (text == null || text.isEmpty()) {
+        if (StringUtils.isBlank(text)) {
             return ZERO;
         }
 
