@@ -23,10 +23,6 @@ public class StringCalculator {
 
     }
 
-    private boolean isNegativeValue(String value) {
-        return Integer.parseInt(value) < 0;
-    }
-
     private String getText(String str) {
         Matcher m = DELIMETER_PATTERN.matcher(str);
         if (m.find()) {
