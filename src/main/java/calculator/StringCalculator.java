@@ -10,7 +10,9 @@ import java.util.regex.Pattern;
 public class StringCalculator {
 
     private static final String DELIMITER_REGEX = ",|:";
-    private static final String CUSTOMED_DELIMITER_REGEX = "//(.)\n(.*)";
+    private static final String CUSTOMED_DELIMITER_MATCHING_REGEX = "//(.)\n(.*)";
+    private static final Pattern CUSTOM_SPLIT_REGEX = Pattern.compile(CUSTOMED_DELIMITER_MATCHING_REGEX);
+
 
     private int result = 0;
 
@@ -35,7 +37,8 @@ public class StringCalculator {
 
     private String[] extractNumberByDelimiter(String text){
 
-        Matcher m = Pattern.compile(CUSTOMED_DELIMITER_REGEX).matcher(text);
+        Matcher m = CUSTOM_SPLIT_REGEX.matcher(text);
+
         if(m.find()){
             String customDelimiter = m.group(1);
             return m.group(2).split(customDelimiter);
