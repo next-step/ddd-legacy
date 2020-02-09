@@ -1,8 +1,10 @@
 package calculator;
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -27,11 +29,16 @@ class PositiveNumbersTest {
     }
 
     private static Stream<Arguments> sum_cases() {
-        return Stream.of(Arguments.of(PositiveNumbers.from(), 0),
-                         Arguments.of(PositiveNumbers.from(1), 1),
-                         Arguments.of(PositiveNumbers.from(0, 0), 0),
-                         Arguments.of(PositiveNumbers.from(1, 2, 3), 6));
+        return Stream.of(Arguments.of(positiveNumbersFrom(), 0),
+                         Arguments.of(positiveNumbersFrom(1), 1),
+                         Arguments.of(positiveNumbersFrom(0, 0), 0),
+                         Arguments.of(positiveNumbersFrom(1, 2, 3), 6));
     }
 
+    static PositiveNumbers positiveNumbersFrom(int... numbers) {
+        return new PositiveNumbers(Arrays.stream(numbers)
+                                         .mapToObj(PositiveNumber::new)
+                                         .collect(toList()));
+    }
 
 }

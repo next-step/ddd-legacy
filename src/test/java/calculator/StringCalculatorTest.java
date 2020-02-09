@@ -66,15 +66,15 @@ class StringCalculatorTest {
 
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @ParameterizedTest
-    @ValueSource(strings = { "//;\n1;2;3" })
+    @ValueSource(strings = { "//;\n1;2:3,4" })
     void customDelimiter(final String text) {
-        assertThat(calculator.add(text)).isSameAs(6);
+        assertThat(calculator.add(text)).isSameAs(10);
     }
 
     @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @Test
     void negative() {
         assertThatExceptionOfType(RuntimeException.class)
-            .isThrownBy(() -> calculator.add("-1"));
+            .isThrownBy(() -> calculator.add("1,-2"));
     }
 }

@@ -1,42 +1,38 @@
 package calculator;
 
-import java.util.Arrays;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import org.apache.logging.log4j.util.Strings;
 
 public class StringCalculator {
-    static final Splitter DEFAULT_SPLITTER = new Splitter(",|:");
+    private static final String CUSTOM_DELIMITER_REGEX = "//(.)\n";
+    private static final String CUSTOM_DELIMITER_REGEX_POSTFIX = "(.*)";
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(CUSTOM_DELIMITER_REGEX + CUSTOM_DELIMITER_REGEX_POSTFIX);
     private final Splitter splitter;
 
     public StringCalculator() {
-        this(DEFAULT_SPLITTER);
+        this(Splitter.builder()
+                     .with(new Delimiter(","))
+                     .with(new Delimiter(":"))
+                     .build());
     }
 
-    public StringCalculator(Splitter splitter) {
+    private StringCalculator(Splitter splitter) {
         if (splitter == null) { throw new IllegalArgumentException(); }
         this.splitter = splitter;
     }
 
     public int add(final String text) {
-        return splitter.split(text)
-                       .sum();
+        return text == null ? 0
+                            : extendSplitterWithCustomDelimiter(text).split(text.replaceAll(CUSTOM_DELIMITER_REGEX,
+                                                                                            ""))
+                                                                     .sum();
     }
 
-    static class Splitter {
-        private final Pattern pattern;
-
-        public Splitter(String regex) {
-            if (Strings.isBlank(regex)) { throw new IllegalArgumentException(); }
-            this.pattern = Pattern.compile(regex);
-        }
-
-        public PositiveNumbers split(String text) {
-            return Strings.isBlank(text) ? PositiveNumbers.EMPTY
-                                         : new PositiveNumbers(Arrays.stream(pattern.split(text))
-                                                                     .map(PositiveNumber::from)
-                                                                     .collect(Collectors.toList()));
-        }
+    private Splitter extendSplitterWithCustomDelimiter(final String text) {
+        Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
+        return matcher.find() ? splitter.toBuilder()
+                                        .with(new Delimiter(matcher.group(1)))
+                                        .build()
+                              : splitter;
     }
 }

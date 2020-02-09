@@ -3,27 +3,17 @@ package calculator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class PositiveNumberTest {
 
-    @MethodSource("from_when_text_contain_not_only_positive_number")
+    @ValueSource(strings = { "-1", "1a", "a", })
     @ParameterizedTest
-    void from_when_text_contain_not_only_positive_number(String notOnlyPositiveNumber,
-                                                         Class<Throwable> expected) {
-        assertThatExceptionOfType(expected)
+    void from_when_text_contain_not_only_positive_number(String notOnlyPositiveNumber) {
+        assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> PositiveNumber.from(notOnlyPositiveNumber));
-    }
-
-    private static Stream<Arguments> from_when_text_contain_not_only_positive_number() {
-        return Stream.of(Arguments.of("-1", RuntimeException.class),
-                         Arguments.of("1a", RuntimeException.class),
-                         Arguments.of("a", RuntimeException.class));
     }
 
     @Test
