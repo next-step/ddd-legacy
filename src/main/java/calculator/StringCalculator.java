@@ -8,7 +8,7 @@ public class StringCalculator {
     private static final Pattern DELIMETER_PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final String BASIC_DELIMITER = ",|:";
 
-    public int add(String text) {
+    public int calculate(String text) {
 
         if (isValidateString(text)) {
             return 0;
