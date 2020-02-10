@@ -4,17 +4,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class StringCalculator {
-
-    private static final String DELIMITER_REGEX = ",|:";
-    private static final String CUSTOMED_DELIMITER_MATCHING_REGEX = "//(.)\n(.*)";
-    private static final Pattern CUSTOM_SPLIT_REGEX = Pattern.compile(CUSTOMED_DELIMITER_MATCHING_REGEX);
-
-
     private int result = 0;
 
     public StringCalculator (){ }
@@ -25,7 +17,7 @@ public class StringCalculator {
             return result;
         }
 
-        List<Integer> numbers = parseToInteger(extractNumberByDelimiter(text));
+        List<Integer> numbers = parseToInteger(StringSplitter.extractNumberStringByDelimiter(text));
 
         return numbers.stream()
                 .mapToInt(Integer::intValue)
@@ -34,14 +26,6 @@ public class StringCalculator {
 
     private boolean isEmptyOrNull (String text){
         return StringUtils.isEmpty(text);
-    }
-
-    private String[] extractNumberByDelimiter(String text){
-
-        Matcher m = CUSTOM_SPLIT_REGEX.matcher(text);
-
-        return m.find() ?
-                m.group(2).split(m.group(1)) : text.split(DELIMITER_REGEX);
     }
 
     private List<Integer> parseToInteger (String[] stringNumbers){
