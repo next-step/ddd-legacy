@@ -1,13 +1,14 @@
 package calculator;
 
-import org.springframework.util.StringUtils;
+
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
 
 public class StringCalculator {
 
     public int add(String text) {
-        if (StringUtils.isEmpty(text)) {
+        if (Strings.isBlank(text)) {
             return PositiveNumber.ZERO.getValue();
         }
 
