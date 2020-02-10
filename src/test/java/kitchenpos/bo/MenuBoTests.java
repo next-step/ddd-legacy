@@ -8,6 +8,8 @@ import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,6 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class MenuBoTests {
@@ -69,5 +74,17 @@ class MenuBoTests {
         mockProduct.setId(2L);
         mockProduct.setName("testProduct");
         mockProduct.setPrice(BigDecimal.valueOf(16000));
+    }
+
+    @DisplayName("메뉴 전체 조회 시 메뉴에 맞는 메뉴 상품들을 가져오는지 확인")
+    @Test
+    public void findAllTest() {
+        given(menuDao.findAll()).willReturn(mockMenus);
+        given(menuProductDao.findAllByMenuId(1L)).willReturn(mockMenuProducts);
+
+        List<Menu> menuList = menuBo.list();
+
+        assertThat(menuList.get(0).getId()).isEqualTo(1L);
+        assertThat(menuList.get(0).getMenuProducts().get(0).getMenuId()).isEqualTo(1L);
     }
 }
