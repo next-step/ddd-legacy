@@ -55,6 +55,7 @@ public class MenuBo {
             sum = sum.add(product.getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
         }
 
+        // price > sum -> IllegalArgument
         if (price.compareTo(sum) > 0) {
             throw new IllegalArgumentException();
         }
