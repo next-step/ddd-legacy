@@ -7,46 +7,45 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class StringCalculator {
-    String defaultPattern = ",|:";
-    String delimiterPattern = "//(.*)\n(.*)";
+    private static final String DEFAULT_PATTERN = ",|:";
+    private static final String DELIMITER_PATTERN = "//(.*)\n(.*)";
+    private static final String NUMERIC_PATTERN = "[+]?\\d+";
+    private static final String PATTERN_APPEND_CONNECTION = "|";
 
     public int calculate(String input) {
         List<String> inputs = splitInputs(input);
-        System.out.println(inputs);
-        return getSum(parseInt(inputs));
+        return sum(parseInt(inputs));
     }
 
     public List<String> splitInputs(String input) {
-        Matcher delimiterMatcher = Pattern.compile(delimiterPattern).matcher(input);
-        String delimiter = defaultPattern;
+        Matcher delimiterMatcher = Pattern.compile(DELIMITER_PATTERN).matcher(input);
+        String delimiter = DEFAULT_PATTERN;
         if (delimiterMatcher.find()) {
             input = delimiterMatcher.group(2);
-            delimiter = defaultPattern + "|" + Pattern.quote(delimiterMatcher.group(1));
+            delimiter = DEFAULT_PATTERN + PATTERN_APPEND_CONNECTION + Pattern.quote(delimiterMatcher.group(1));
         }
         return Arrays.stream(input.trim()
                 .split(delimiter))
                 .map(String::trim)
+                .filter(str -> !str.isEmpty())
                 .collect(Collectors.toList());
     }
 
-    public List<Integer> parseInt(List<String> asList) {
+    private List<Integer> parseInt(List<String> asList) {
         return asList.stream()
                 .map(this::parsePositiveInt)
                 .collect(Collectors.toList());
     }
 
     private Integer parsePositiveInt(String string) {
-        if (string.isEmpty()) {
-            return 0;
-        }
-        Matcher isNumeric = Pattern.compile("[+]?\\d+").matcher(string);
+        Matcher isNumeric = Pattern.compile(NUMERIC_PATTERN).matcher(string);
         if (isNumeric.matches()) {
             return Integer.parseInt(string);
         }
         throw new IllegalArgumentException();
     }
 
-    private int getSum(List<Integer> numbers) {
+    private int sum(List<Integer> numbers) {
         return numbers.stream().reduce(Integer::sum).orElse(0);
     }
 }
