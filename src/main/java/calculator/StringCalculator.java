@@ -2,6 +2,7 @@ package calculator;
 
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,7 +13,7 @@ import java.util.regex.Pattern;
 public class StringCalculator {
 
     private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
-    public static final String DEFAULT_DELIMITER = ",|;";
+    private static final String DEFAULT_DELIMITER = ",|;";
 
     public int add(final String value) {
         if (StringUtils.isEmpty(value)) {
@@ -31,7 +32,7 @@ public class StringCalculator {
     }
 
     private int calculate(final String[] numbers) {
-        Number number = new Number(numbers);
+        Numbers number = new Numbers(Arrays.asList(numbers));
         number.validateNumber();
         return number.sum();
     }
