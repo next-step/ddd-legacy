@@ -11,19 +11,18 @@ public class StringCalculator {
     String delimiterPattern = "//(.*)\n(.*)";
 
     public int calculate(String input) {
-        List<String> inputs = separateInputs(input);
+        List<String> inputs = splitInputs(input);
         System.out.println(inputs);
         return getSum(parseInt(inputs));
     }
 
-    public List<String> separateInputs(String input) {
+    public List<String> splitInputs(String input) {
         Matcher delimiterMatcher = Pattern.compile(delimiterPattern).matcher(input);
         String delimiter = defaultPattern;
         if (delimiterMatcher.find()) {
             input = delimiterMatcher.group(2);
             delimiter = defaultPattern + "|" + Pattern.quote(delimiterMatcher.group(1));
         }
-
         return Arrays.stream(input.trim()
                 .split(delimiter))
                 .map(String::trim)
@@ -37,7 +36,10 @@ public class StringCalculator {
     }
 
     private Integer parsePositiveInt(String string) {
-        Matcher isNumeric = Pattern.compile("[+]?\\d+", Pattern.UNIX_LINES).matcher(string);
+        if (string.isEmpty()) {
+            return 0;
+        }
+        Matcher isNumeric = Pattern.compile("[+]?\\d+").matcher(string);
         if (isNumeric.matches()) {
             return Integer.parseInt(string);
         }
