@@ -18,7 +18,6 @@ public class Calculator {
     public Calculator(String expression) {
         this.expression = expression;
         validateByNegativeNumber();
-        this.sum = ZERO;
         this.sum = validateByNullOrEmpty();
     }
 
