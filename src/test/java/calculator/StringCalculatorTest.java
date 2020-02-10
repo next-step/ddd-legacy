@@ -20,7 +20,8 @@ class StringCalculatorTest {
     @Test
     @DisplayName("지정 구분자를 포함한 구분자 정규식을 찾는다")
     void getRegex() {
-        assertThat(calculator.findDelimiter("//$\n1,2,3")).isEqualTo(",|:|$");
+        assertThat(calculator.separateInputs("//$\n1,2$3")).containsExactly("1", "2", "3");
+        assertThat(calculator.separateInputs("//--\n1,2--3")).containsExactly("1", "2", "3");
     }
 
     @Test
@@ -30,5 +31,11 @@ class StringCalculatorTest {
                 () -> calculator.parseInt(Arrays.asList("-11", "2", "3")));
         assertThrows(IllegalArgumentException.class,
                 () -> calculator.parseInt(Arrays.asList("1", "2", "q")));
+    }
+
+    @Test
+    @DisplayName("문자열 계산기의 결과값을 반환한다.")
+    void calculateValues() {
+        assertThat(calculator.calculate("//-\n1,2,3-4:5")).isEqualTo(15);
     }
 }

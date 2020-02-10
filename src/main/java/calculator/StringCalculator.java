@@ -8,21 +8,26 @@ import java.util.stream.Collectors;
 
 public class StringCalculator {
     String defaultPattern = ",|:";
-    String delimiterPattern = "//(.)\n(.*)";
+    String delimiterPattern = "//(.*)\n(.*)";
 
-    public List<String> separateInputs(String input) {
-        return Arrays.stream(input.trim()
-                .split(defaultPattern))
-                .map(String::trim)
-                .collect(Collectors.toList());
+    public int calculate(String input) {
+        List<String> inputs = separateInputs(input);
+        System.out.println(inputs);
+        return getSum(parseInt(inputs));
     }
 
-    public String findDelimiter(String input) {
+    public List<String> separateInputs(String input) {
         Matcher delimiterMatcher = Pattern.compile(delimiterPattern).matcher(input);
+        String delimiter = defaultPattern;
         if (delimiterMatcher.find()) {
-            return defaultPattern + "|" + delimiterMatcher.group(1);
+            input = delimiterMatcher.group(2);
+            delimiter = defaultPattern + "|" + Pattern.quote(delimiterMatcher.group(1));
         }
-        return defaultPattern;
+
+        return Arrays.stream(input.trim()
+                .split(delimiter))
+                .map(String::trim)
+                .collect(Collectors.toList());
     }
 
     public List<Integer> parseInt(List<String> asList) {
@@ -32,10 +37,14 @@ public class StringCalculator {
     }
 
     private Integer parsePositiveInt(String string) {
-        Matcher isNumeric = Pattern.compile("[+]?\\d+").matcher(string);
+        Matcher isNumeric = Pattern.compile("[+]?\\d+", Pattern.UNIX_LINES).matcher(string);
         if (isNumeric.matches()) {
             return Integer.parseInt(string);
         }
         throw new IllegalArgumentException();
+    }
+
+    private int getSum(List<Integer> numbers) {
+        return numbers.stream().reduce(Integer::sum).orElse(0);
     }
 }
