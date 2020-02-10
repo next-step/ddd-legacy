@@ -28,9 +28,19 @@ class MenuGroupBoTest {
     private MenuGroupBo menuGroupBo;
 
     private List<MenuGroup> menuGroups;
+    private MenuGroup newMenuGroup;
 
     @BeforeEach
     void beforeEach() {
+        /**
+         * 새로운 메뉴그룹
+         */
+        newMenuGroup = new MenuGroup();
+        newMenuGroup.setName("저세상메뉴");
+
+        /**
+         * 메뉴그룹 리스트
+         */
         menuGroups = new ArrayList<>();
 
         LongStream.range(0, 100).forEach(i -> {
@@ -46,21 +56,17 @@ class MenuGroupBoTest {
     @Test
     void create() {
         // given
-        final String menuGroupName = "저세상메뉴";
-        MenuGroup newMenuGroup = new MenuGroup();
-        newMenuGroup.setName(menuGroupName);
-
-        MenuGroup createdMenuGroup = new MenuGroup();
-        createdMenuGroup.setId(1L);
-        createdMenuGroup.setName(menuGroupName);
-        given(menuGroupDao.save(any(MenuGroup.class))).willReturn(createdMenuGroup);
+        given(menuGroupDao.save(any(MenuGroup.class))).willAnswer(invocation -> {
+           newMenuGroup.setId(1L);
+           return newMenuGroup;
+        });
 
         // when
         MenuGroup result = menuGroupBo.create(newMenuGroup);
 
         // then
         assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getName()).isEqualTo(menuGroupName);
+        assertThat(result.getName()).isEqualTo(newMenuGroup.getName());
     }
 
     @DisplayName("전체 메뉴그룹 리스트를 조회할 수 있다.")
