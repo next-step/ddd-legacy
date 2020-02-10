@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 public class StringCalculator {
 
-    public int add(String text) {
+    public int sumOfExtractedNumber(String text) {
         if (Strings.isBlank(text)) {
             return PositiveNumber.ZERO.getValue();
         }
