@@ -1,17 +1,19 @@
 package calculator;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.stream.IntStream;
 
 /**
  * @author Geonguk Han
  * @since 2020-02-08
  */
-public class Number {
+public class Numbers {
 
-    private String[] numbers;
+    private List<String> numbers;
 
-    public Number(String[] numbers) {
+    public Numbers(List<String> numbers) {
         this.numbers = numbers;
     }
 
@@ -22,13 +24,13 @@ public class Number {
     }
 
     private boolean isNegative() {
-        return Arrays.stream(numbers)
+        return numbers.stream()
                 .mapToInt(Integer::parseInt)
                 .anyMatch(value -> value < 0);
     }
 
     protected int sum() {
-        return Arrays.stream(numbers)
+        return numbers.stream()
                 .mapToInt(Integer::parseInt)
                 .sum();
     }
