@@ -11,20 +11,16 @@ public class Calculator {
     private static final int ZERO = 0;
     private static final int MIN_EXPRESSION_SIZE = 1;
     private static final String SEPARATOR = ",|:";
+    private static final String CUSTOM_SEPARATOR = "//(.)\n(.*)";
 
     private String expression;
     private int sum;
+    private Pattern pattern;
 
     public Calculator(String expression) {
         this.expression = expression;
-        validateByNegativeNumber();
+        this.pattern = Pattern.compile(CUSTOM_SEPARATOR);
         this.sum = validateByNullOrEmpty();
-    }
-
-    private void validateByNegativeNumber() {
-        if (Integer.parseInt(expression) < ZERO) {
-            throw new RuntimeException("음수는 허용하지 않습니다.");
-        }
     }
 
     private int validateByNullOrEmpty() {
@@ -41,19 +37,26 @@ public class Calculator {
         return operate();
     }
 
+    private void validateByNegativeNumber(String number) {
+        if (Integer.parseInt(number) < ZERO) {
+            throw new RuntimeException("음수는 허용하지 않습니다.");
+        }
+    }
+
     private int operate() {
         String[] numbers = separateNumber();
         for (String number : numbers) {
+            validateByNegativeNumber(number);
             sum += Integer.parseInt(number);
         }
         return sum;
     }
 
     private String[] separateNumber() {
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(expression);
-        if (m.find()) {
-            String customDelimiter = m.group(1);
-            return m.group(2).split(customDelimiter);
+        Matcher matcher = pattern.matcher(expression);
+        if (matcher.find()) {
+            String customDelimiter = matcher.group(1);
+            return matcher.group(2).split(customDelimiter);
         }
         return expression.split(SEPARATOR);
     }
