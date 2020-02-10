@@ -1,8 +1,11 @@
 package calculator;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class StringCalculableText {
 
@@ -21,7 +24,7 @@ public class StringCalculableText {
 
     public int getTotal() {
         String[] tokens = splitToTokens();
-        PositiveNumbers positiveNumbers = new PositiveNumbers(tokens);
+        PositiveNumbers positiveNumbers = new PositiveNumbers(tokensToPositiveNumbers(tokens));
         return positiveNumbers.getTotal();
     }
 
@@ -48,5 +51,11 @@ public class StringCalculableText {
 
     private boolean isCustomized() {
         return CUSTOMIZED_TEXT_PATTERN.matcher(text).matches();
+    }
+
+    private List<PositiveNumber> tokensToPositiveNumbers(String[] tokens) {
+        return Arrays.stream(tokens)
+            .map(PositiveNumber::of)
+            .collect(Collectors.toList());
     }
 }
