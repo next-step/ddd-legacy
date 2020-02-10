@@ -24,4 +24,18 @@ public class StringCalculator {
         }
         return defaultPattern;
     }
+
+    public List<Integer> parseInt(List<String> asList) {
+        return asList.stream()
+                .map(this::parsePositiveInt)
+                .collect(Collectors.toList());
+    }
+
+    private Integer parsePositiveInt(String string) {
+        Matcher isNumeric = Pattern.compile("[+]?\\d+").matcher(string);
+        if (isNumeric.matches()) {
+            return Integer.parseInt(string);
+        }
+        throw new IllegalArgumentException();
+    }
 }

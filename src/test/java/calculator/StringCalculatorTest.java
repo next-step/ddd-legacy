@@ -3,7 +3,10 @@ package calculator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StringCalculatorTest {
     private final StringCalculator calculator = new StringCalculator();
@@ -18,5 +21,14 @@ class StringCalculatorTest {
     @DisplayName("지정 구분자를 포함한 구분자 정규식을 찾는다")
     void getRegex() {
         assertThat(calculator.findDelimiter("//$\n1,2,3")).isEqualTo(",|:|$");
+    }
+
+    @Test
+    @DisplayName("숫자 이외의 값 또는 음수는 RuntimeException을 발생한다.")
+    void ExceptionWithNonNumeric() {
+        assertThrows(IllegalArgumentException.class,
+                () -> calculator.parseInt(Arrays.asList("-11", "2", "3")));
+        assertThrows(IllegalArgumentException.class,
+                () -> calculator.parseInt(Arrays.asList("1", "2", "q")));
     }
 }
