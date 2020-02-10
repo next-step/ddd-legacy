@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PositiveNumbers {
 
-    private List<PositiveNumber> numbers;
+    private final List<PositiveNumber> numbers;
 
     public PositiveNumbers(List<PositiveNumber> numbers) {
         this.numbers = numbers;
