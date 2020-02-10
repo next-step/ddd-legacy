@@ -59,5 +59,4 @@ class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> calculator.sumOfExtractedNumber("-1"));
     }
-
 }
