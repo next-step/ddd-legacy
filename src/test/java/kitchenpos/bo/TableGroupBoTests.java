@@ -3,6 +3,7 @@ package kitchenpos.bo;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.dao.TableGroupDao;
+import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import kitchenpos.model.TableGroup;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,6 +43,7 @@ class TableGroupBoTests {
     private TableGroup mockTableGroup = new TableGroup();
     private OrderTable mockOnePeopleOrderTable = new OrderTable();
     private OrderTable mockTwoPeopleOrderTable = new OrderTable();
+    private List<String> invalidOrderStatuses = Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name());
 
     private List<OrderTable> mockOrderTables = new ArrayList<>();
 
@@ -110,16 +113,24 @@ class TableGroupBoTests {
 
     @DisplayName("정상적으로 테이블 그룹 삭제 완료 시 속해 있던 주문 테이블 그룹화 해제 성공")
     @Test
-    public void deleteTableGroupHappyPath() {
+    public void deleteTableGroupSuccess() {
         mockOnePeopleOrderTable.setTableGroupId(1L);
-        mockTwoPeopleOrderTable.setTableGroupId(2L);
 
         given(orderTableDao.findAllByTableGroupId(1L)).willReturn(mockOrderTables);
-        
+
         tableGroupBo.delete(1L);
 
         assertThat(mockOnePeopleOrderTable.getTableGroupId()).isNull();
-        assertThat(mockTwoPeopleOrderTable.getTableGroupId()).isNull();
+    }
+
+    @DisplayName("조리중이나 식사중인 주문 테이블이 속한 테이블 그룹 삭제 시도 시 실패")
+    @Test
+    public void deleteTableGroupFailWithCookingOrMealStatusOrderTable() {
+        given(orderTableDao.findAllByTableGroupId(1L)).willReturn(mockOrderTables);
+        given(orderDao.existsByOrderTableIdInAndOrderStatusIn(Arrays.asList(1L, 2L), invalidOrderStatuses))
+                .willReturn(true);
+
+        assertThatThrownBy(() -> tableGroupBo.delete(1L)).isInstanceOf(IllegalArgumentException.class);
     }
 
     private void setupTableGroup() {
