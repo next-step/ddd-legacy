@@ -1,5 +1,6 @@
 package calculator;
 
+import calculator.model.PositiveNumber;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Collections;
@@ -12,35 +13,36 @@ import java.util.stream.Stream;
 public class StringSplitter {
 
     private static final String DEFAULT_DELIMITER = ",|:";
-    private static Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
-    public static List<Integer> split(final String input){
-        if(Strings.isEmpty(input)){
+    public static List<PositiveNumber> split(final String input) {
+        if (Strings.isEmpty(input)) {
             return Collections.emptyList();
         }
 
         Matcher m = CUSTOM_DELIMITER_PATTERN.matcher(input);
-        if(m.find()){
+        if (m.find()) {
             String customDelimiter = m.group(1);
             String extractedInput = m.group(2);
 
-            return parseToIntegerList(extractedInput, customDelimiter);
+            return parseToNumberList(extractedInput, customDelimiter);
         }
 
-        return parseToIntegerList(input, DEFAULT_DELIMITER);
+        return parseToNumberList(input, DEFAULT_DELIMITER);
     }
 
 
-    private static List<Integer> parseToIntegerList(String input, String delimiter){
+    private static List<PositiveNumber> parseToNumberList(String input, String delimiter) {
         return Stream.of(input.split(delimiter))
-                .map(StringSplitter::parseToInt)
+                .map(StringSplitter::parseToNumber)
                 .collect(Collectors.toList());
     }
 
-    private static Integer parseToInt(String str){
-        try{
-            return Integer.parseInt(str);
-        }catch(NumberFormatException e){
+    private static PositiveNumber parseToNumber(String str) {
+        try {
+            int parsedInt = Integer.parseInt(str);
+            return new PositiveNumber(parsedInt);
+        } catch (NumberFormatException e) {
             throw new RuntimeException("failed to parse String ", e);
         }
     }
