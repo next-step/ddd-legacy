@@ -145,6 +145,29 @@ class OrderBoTests {
         assertThat(saved.getOrderLineItems().get(0).getOrderId()).isEqualTo(1L);
     }
 
+    @DisplayName("존재하지 않는 주문의 상태 변경 시도 시 실패")
+    @Test
+    public void changeOrderStatusFailToNotExistOrder() {
+
+        assertThatThrownBy(
+                () -> orderBo.changeOrderStatus(1L, new Order()))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("완료 상태인 주문 상태 변경 시도 시 실패")
+    @Test
+    public void changeOrderStatusFailToCompleteOrder() {
+        Order changeOrder = new Order();
+        changeOrder.setOrderStatus(OrderStatus.MEAL.name());
+
+        mockOrder.setOrderStatus(OrderStatus.COMPLETION.name());
+        given(orderDao.findById(1L)).willReturn(Optional.ofNullable(mockOrder));
+
+        assertThatThrownBy(
+                () -> orderBo.changeOrderStatus(1L, changeOrder))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
     private void createMockMenu() {
         mockMenu.setId(1L);
         mockMenu.setName("testMenu");
