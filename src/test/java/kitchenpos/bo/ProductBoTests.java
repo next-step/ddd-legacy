@@ -13,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,7 +33,7 @@ class ProductBoTests {
         mockProduct.setName("testProduct");
     }
 
-    @DisplayName("가격, 이름이 있느 상품 생성 시도 시 성공")
+    @DisplayName("가격, 이름이 있는 상품 생성 시도 시 성공")
     @Test
     public void createProductSuccess() {
         given(productDao.save(mockProduct)).willReturn(mockProduct);
@@ -40,5 +41,21 @@ class ProductBoTests {
         Product product = productBo.create(mockProduct);
 
         assertThat(product.getName()).isEqualTo("testProduct");
+    }
+
+    @DisplayName("가격이 없는 상품 생성 시도 시 실패")
+    @Test
+    public void createProductFailWithoutPrice() {
+        mockProduct.setPrice(null);
+
+        assertThatThrownBy(() -> productBo.create(mockProduct)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("음수 가격으로 상품 생성 시도 시 실패")
+    @Test
+    public void createProductFailWithInvalidPrice() {
+        mockProduct.setPrice(BigDecimal.valueOf(-10000));
+
+        assertThatThrownBy(() -> productBo.create(mockProduct)).isInstanceOf(IllegalArgumentException.class);
     }
 }
