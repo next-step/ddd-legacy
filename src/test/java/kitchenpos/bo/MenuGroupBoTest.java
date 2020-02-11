@@ -57,8 +57,8 @@ class MenuGroupBoTest {
     void create() {
         // given
         given(menuGroupDao.save(any(MenuGroup.class))).willAnswer(invocation -> {
-           newMenuGroup.setId(1L);
-           return newMenuGroup;
+            newMenuGroup.setId(1L);
+            return newMenuGroup;
         });
 
         // when
