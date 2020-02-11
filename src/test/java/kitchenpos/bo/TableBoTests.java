@@ -8,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -117,6 +119,34 @@ class TableBoTests {
         OrderTable orderTable = tableBo.changeNumberOfGuests(1L, sevenPeopleTable);
 
         assertThat(orderTable.getNumberOfGuests()).isEqualTo(7);
+    }
+
+    @DisplayName("존재하지 않는 주문 테이블의 손님 수 변경 시도 시 실패")
+    @Test
+    public void changeOrderTablePeopleFailWithNotExistOrderTable() {
+        assertThatThrownBy(() -> tableBo.changeNumberOfGuests(1L, new OrderTable()))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("주문 테이블의 손님 수를 음수로 변경 시도 시 실패")
+    @ParameterizedTest
+    @ValueSource(ints = {-1, -2})
+    public void changeOrderTablePeopleFailWhenTryToUnderZero(int numberOfPeople) {
+        OrderTable invalidTable = new OrderTable();
+        invalidTable.setNumberOfGuests(numberOfPeople);
+
+        assertThatThrownBy(() -> tableBo.changeNumberOfGuests(1L, invalidTable))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("비어있는 주문 테이블의 손님 수 변경 시도 시 실패")
+    @Test
+    public void changeOrderTablePeopleFailToEmptyOrderTable() {
+        mockOrderTable.setEmpty(true);
+        given(orderTableDao.findById(1L)).willReturn(Optional.ofNullable(mockOrderTable));
+
+        assertThatThrownBy(() -> tableBo.changeNumberOfGuests(1L, new OrderTable()))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     private void setupOrderTable() {
