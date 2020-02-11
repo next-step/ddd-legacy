@@ -211,6 +211,7 @@ class MenuBoTest {
     void list() {
         // given
         given(menuDao.findAll()).willReturn(menus);
+        given(menuProductDao.findAllByMenuId(any(Long.class))).willReturn(new ArrayList<>(Arrays.asList(menuProduct1, menuProduct2)));
 
         // when
         final List<Menu> result = menuBo.list();
@@ -219,5 +220,6 @@ class MenuBoTest {
         assertThat(result.size()).isEqualTo(menus.size());
         assertThat(result.get(0).getId()).isEqualTo(menus.get(0).getId());
         assertThat(result.get(0).getName()).isEqualTo(menus.get(0).getName());
+        assertThat(result.get(0).getMenuProducts()).isNotNull();
     }
 }
