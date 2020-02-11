@@ -129,6 +129,22 @@ class OrderBoTests {
         assertThat(orders.get(0).getOrderLineItems().get(0).getOrderId()).isEqualTo(1L);
     }
 
+    @DisplayName("존재하고 완료 상태가 아닌 주문의 상태 변경 시도 시 성공")
+    @Test
+    public void changeOrderStatusSuccessInHappyPath() {
+        Order changeOrder = new Order();
+        changeOrder.setOrderStatus(OrderStatus.MEAL.name());
+
+        mockOrder.setOrderStatus(OrderStatus.COOKING.name());
+        given(orderDao.findById(1L)).willReturn(Optional.ofNullable(mockOrder));
+        given(orderLineItemDao.findAllByOrderId(1L)).willReturn(mockOrderLineItems);
+
+        Order saved = orderBo.changeOrderStatus(1L, changeOrder);
+
+        assertThat(saved.getOrderStatus()).isEqualTo(OrderStatus.MEAL.name());
+        assertThat(saved.getOrderLineItems().get(0).getOrderId()).isEqualTo(1L);
+    }
+
     private void createMockMenu() {
         mockMenu.setId(1L);
         mockMenu.setName("testMenu");
