@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 
 public class StringCalculator {
-
     private static final int ZERO = 0;
     private Parser parser;
 
@@ -22,5 +21,4 @@ public class StringCalculator {
 
         return Arrays.stream(stringNumbers).map(PositiveNumber::of).map(PositiveNumber::getNumber).reduce(0, Integer::sum);
     }
-
 }
