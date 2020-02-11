@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -80,6 +81,40 @@ class OrderBoTests {
         assertThat(saved.getOrderStatus()).isEqualTo("COOKING");
         assertThat(saved.getOrderedTime().getDayOfMonth()).isEqualTo(LocalDateTime.now().getDayOfMonth());
         assertThat(saved.getOrderLineItems().get(0).getSeq()).isEqualTo(1L);
+    }
+
+    @DisplayName("주문 상품 없이 order 생성 시도 시 실패")
+    @Test
+    public void createOrderFailWithoutOrderLineItems() {
+        mockOrder.setOrderLineItems(null);
+
+        assertThatThrownBy(() -> orderBo.create(mockOrder)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴판에 없는 메뉴로 주문 생성 시도 시 실패")
+    @Test
+    public void createOrderFailWhenNotExistMenu() {
+        given(menuDao.countByIdIn(Collections.singletonList(1L))).willReturn(0L);
+
+        assertThatThrownBy(() -> orderBo.create(mockOrder)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("존재하지 않는 주문 테이블에서 주문 생성 시도 시 실패")
+    @Test
+    public void createOrderFailWithoutOrderTable() {
+        given(menuDao.countByIdIn(Collections.singletonList(1L))).willReturn(1L);
+
+        assertThatThrownBy(() -> orderBo.create(mockOrder)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("주문 테이블이 빈 상태에서 주문 생성 시도 시 실패")
+    @Test
+    public void createOrderFailWithEmptyOrderTable() {
+        mockOrderTable.setEmpty(true);
+        given(menuDao.countByIdIn(Collections.singletonList(1L))).willReturn(1L);
+        given(orderTableDao.findById(3L)).willReturn(Optional.ofNullable(mockOrderTable));
+
+        assertThatThrownBy(() -> orderBo.create(mockOrder)).isInstanceOf(IllegalArgumentException.class);
     }
 
     private void createMockMenu() {
