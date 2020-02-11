@@ -9,7 +9,6 @@ public class StringSplitter {
     private static final Pattern CUSTOM_SPLIT_REGEX = Pattern.compile(CUSTOMED_DELIMITER_MATCHING_REGEX);
 
     public static String[] extractNumberStringByDelimiter(String text){
-
         Matcher m = CUSTOM_SPLIT_REGEX.matcher(text);
 
         if(m.matches()){
@@ -18,8 +17,6 @@ public class StringSplitter {
 
             return numberString.split(delimiter);
         }
-
         return text.split(DELIMITER_REGEX);
     }
-
 }
