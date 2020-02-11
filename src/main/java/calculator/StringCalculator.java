@@ -8,17 +8,16 @@ import java.util.stream.Collectors;
 
 public class StringCalculator {
     private static final String DEFAULT_PATTERN = ",|:";
-    private static final String DELIMITER_PATTERN = "//(.*)\n(.*)";
-    private static final String NUMERIC_PATTERN = "[+]?\\d+";
     private static final String PATTERN_APPEND_CONNECTION = "|";
+    private static final Pattern DELIMITER_PATTERN = Pattern.compile("//(.*)\n(.*)");
 
     public int calculate(String input) {
         List<String> inputs = splitInputs(input);
-        return sum(parseInt(inputs));
+        return StringNumber.sum(inputs);
     }
 
-    public List<String> splitInputs(String input) {
-        Matcher delimiterMatcher = Pattern.compile(DELIMITER_PATTERN).matcher(input);
+    private List<String> splitInputs(String input) {
+        Matcher delimiterMatcher = DELIMITER_PATTERN.matcher(input);
         String delimiter = DEFAULT_PATTERN;
         if (delimiterMatcher.find()) {
             input = delimiterMatcher.group(2);
@@ -29,23 +28,5 @@ public class StringCalculator {
                 .map(String::trim)
                 .filter(str -> !str.isEmpty())
                 .collect(Collectors.toList());
-    }
-
-    private List<Integer> parseInt(List<String> asList) {
-        return asList.stream()
-                .map(this::parsePositiveInt)
-                .collect(Collectors.toList());
-    }
-
-    private Integer parsePositiveInt(String string) {
-        Matcher isNumeric = Pattern.compile(NUMERIC_PATTERN).matcher(string);
-        if (isNumeric.matches()) {
-            return Integer.parseInt(string);
-        }
-        throw new IllegalArgumentException();
-    }
-
-    private int sum(List<Integer> numbers) {
-        return numbers.stream().reduce(Integer::sum).orElse(0);
     }
 }
