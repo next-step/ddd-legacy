@@ -216,4 +216,27 @@ class OrderBoTest {
     private static Stream<OrderStatus> provideOrderStatus() {
         return Stream.of(OrderStatus.COOKING, OrderStatus.MEAL);
     }
+
+    @DisplayName("주문의 주문상태 변경 시, 이미 주문상태가 완료인 경우에는 변경할 수 없다.")
+    @Test
+    void changeOrderStatusThrowErrorWhenCompletion() {
+        // given
+        Order savedOrder = new Order();
+        savedOrder.setId(1L);
+        savedOrder.setOrderTableId(mockOrderTable.getId());
+        savedOrder.setOrderStatus(OrderStatus.COMPLETION.name());
+        savedOrder.setOrderedTime(LocalDateTime.now());
+        savedOrder.setOrderLineItems(new ArrayList<>(Arrays.asList(mockOrderLineItem)));
+
+        Order newOrder = new Order();
+        newOrder.setOrderStatus(OrderStatus.COOKING.name());
+
+        given(orderDao.findById(savedOrder.getId())).willReturn(Optional.of(savedOrder));
+
+        // when
+        // then
+        assertThatThrownBy(() -> {
+            orderBo.changeOrderStatus(savedOrder.getId(), newOrder);
+        }).isInstanceOf(IllegalArgumentException.class);
+    }
 }
