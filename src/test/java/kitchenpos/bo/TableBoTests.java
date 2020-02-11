@@ -105,6 +105,20 @@ class TableBoTests {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("비어있지 않은 주문 테이블의 손님 수 변경 시도 성공")
+    @Test
+    public void changeOrderTablePeopleSuccess() {
+        OrderTable sevenPeopleTable = new OrderTable();
+        sevenPeopleTable.setNumberOfGuests(7);
+
+        given(orderTableDao.findById(1L)).willReturn(Optional.ofNullable(mockOrderTable));
+        given(orderTableDao.save(mockOrderTable)).willReturn(mockOrderTable);
+
+        OrderTable orderTable = tableBo.changeNumberOfGuests(1L, sevenPeopleTable);
+
+        assertThat(orderTable.getNumberOfGuests()).isEqualTo(7);
+    }
+
     private void setupOrderTable() {
         mockOrderTable.setId(1L);
         mockOrderTable.setEmpty(false);
