@@ -8,16 +8,12 @@ public class PositiveNumber {
     }
 
     public static PositiveNumber of(String number) throws RuntimeException {
-        try {
-            return PositiveNumber.of(Integer.parseInt(number));
-        } catch (NumberFormatException e) {
-            throw new RuntimeException();
-        }
+        return PositiveNumber.of(Integer.parseInt(number));
     }
 
-    public static PositiveNumber of(int number) throws RuntimeException {
+    public static PositiveNumber of(int number) throws NumberFormatException {
         if (isNegativeNumber(number)) {
-            throw new RuntimeException();
+            throw new NumberFormatException();
         }
         return new PositiveNumber(number);
     }
