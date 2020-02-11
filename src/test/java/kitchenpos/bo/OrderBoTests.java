@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -91,18 +93,11 @@ class OrderBoTests {
         assertThatThrownBy(() -> orderBo.create(mockOrder)).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴판에 없는 메뉴로 주문 생성 시도 시 실패")
-    @Test
-    public void createOrderFailWhenNotExistMenu() {
-        given(menuDao.countByIdIn(Collections.singletonList(1L))).willReturn(0L);
-
-        assertThatThrownBy(() -> orderBo.create(mockOrder)).isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @DisplayName("존재하지 않는 주문 테이블에서 주문 생성 시도 시 실패")
-    @Test
-    public void createOrderFailWithoutOrderTable() {
-        given(menuDao.countByIdIn(Collections.singletonList(1L))).willReturn(1L);
+    @DisplayName("메뉴판에 없는 메뉴로 주문 생성 시도 혹은 존재하지 않는 주문 테이블에서 주문 생성 시도 시 실패")
+    @ParameterizedTest
+    @ValueSource(longs = {0L, 1L})
+    public void createOrderFailWhenNotExistMenu(long matchedMenuCount) {
+        given(menuDao.countByIdIn(Collections.singletonList(1L))).willReturn(matchedMenuCount);
 
         assertThatThrownBy(() -> orderBo.create(mockOrder)).isInstanceOf(IllegalArgumentException.class);
     }
