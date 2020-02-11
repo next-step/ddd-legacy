@@ -6,6 +6,8 @@ import kitchenpos.dao.OrderLineItemDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,7 +16,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class OrderBoTests {
@@ -41,14 +48,38 @@ class OrderBoTests {
 
     @BeforeEach
     public void setup() {
+        // { id: 1, name: testMenu, price: 16000, groupId: 2, menuProducts: mockMenuProducts }
         createMockMenu();
+
+        // { seq: 1, menuId: 1, productId: 1, quantity: 3 }
         createMockMenuProducts();
-        createMockOrder();
+
+        // { seq: 1, menuId: 1, orderId: 1, quantity: 2 }
         createMockOrderLineItems();
+
+        // { tableId: 3, orderLineItems: mockOrderLineItems }
+        createMockOrder();
+
+        // { id: 3, empty: false, numberOfGuests: 4, tableGroupId: 33 }
         createOrderTable();
 
         mockOrderLineItems.add(mockOrderLineItem);
         mockMenuProducts.add(mockMenuProduct);
+    }
+
+    @DisplayName("정상적인 order 생성 시도 성공")
+    @Test
+    public void createOrderSuccess() {
+        given(menuDao.countByIdIn(Collections.singletonList(1L))).willReturn(1L);
+        given(orderTableDao.findById(3L)).willReturn(Optional.ofNullable(mockOrderTable));
+        given(orderDao.save(mockOrder)).willReturn(mockOrder);
+        given(orderLineItemDao.save(mockOrderLineItem)).willReturn(mockOrderLineItem);
+
+        Order saved = orderBo.create(mockOrder);
+
+        assertThat(saved.getOrderStatus()).isEqualTo("COOKING");
+        assertThat(saved.getOrderedTime().getDayOfMonth()).isEqualTo(LocalDateTime.now().getDayOfMonth());
+        assertThat(saved.getOrderLineItems().get(0).getSeq()).isEqualTo(1L);
     }
 
     private void createMockMenu() {
@@ -60,25 +91,22 @@ class OrderBoTests {
     }
 
     private void createMockMenuProducts() {
-        mockMenuProduct.setQuantity(3);
-        mockMenuProduct.setProductId(1L);
         mockMenuProduct.setSeq(1L);
         mockMenuProduct.setMenuId(1L);
+        mockMenuProduct.setProductId(1L);
+        mockMenuProduct.setQuantity(3);
     }
 
     private void createMockOrder() {
-        mockOrder.setId(1L);
-        mockOrder.setOrderedTime(LocalDateTime.of(2020, 2, 10, 22, 22));
-        mockOrder.setOrderLineItems(mockOrderLineItems);
-        mockOrder.setOrderStatus(String.valueOf(OrderStatus.COOKING));
         mockOrder.setOrderTableId(3L);
+        mockOrder.setOrderLineItems(mockOrderLineItems);
     }
 
     private void createMockOrderLineItems() {
+        mockOrderLineItem.setSeq(1L);
         mockOrderLineItem.setMenuId(1L);
         mockOrderLineItem.setOrderId(1L);
         mockOrderLineItem.setQuantity(2);
-        mockOrderLineItem.setSeq(1L);
     }
 
     private void createOrderTable() {

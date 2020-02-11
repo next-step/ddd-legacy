@@ -49,4 +49,14 @@ public class Order {
     public void setOrderLineItems(final List<OrderLineItem> orderLineItems) {
         this.orderLineItems = orderLineItems;
     }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", orderTableId=" + orderTableId +
+                ", orderStatus='" + orderStatus + '\'' +
+                ", orderedTime=" + orderedTime +
+                '}';
+    }
 }
