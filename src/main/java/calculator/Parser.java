@@ -4,7 +4,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parser {
-
     private static final Pattern CUSTOM_DELIMITER_REGEX = Pattern.compile("//(.*)\n(.*)");
     private static final String DEFAULT_DELIMITER_REGEX = "[,:]";
 
@@ -21,5 +20,4 @@ public class Parser {
     public String[] parseStrings(final String text, final String del) {
         return text.split(del);
     }
-
 }

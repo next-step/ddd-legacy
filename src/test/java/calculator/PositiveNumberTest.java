@@ -17,7 +17,7 @@ class PositiveNumberTest {
     @ParameterizedTest
     @MethodSource("createStringPositiveNumber")
     void stringPositiveNumber(String text, int expectedResult) {
-        int result = PositiveNumber.of(text).getNumber();
+        int result = PositiveNumber.of(text).toInt();
 
         assertThat(result).isEqualTo(expectedResult);
     }
@@ -32,7 +32,7 @@ class PositiveNumberTest {
     @ParameterizedTest
     @MethodSource("createIntPositiveNumber")
     void intPositiveNumber(int number, int expectedResult) {
-        int result = PositiveNumber.of(number).getNumber();
+        int result = PositiveNumber.of(number).toInt();
 
         assertThat(result).isEqualTo(expectedResult);
     }
