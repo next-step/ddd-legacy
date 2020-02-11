@@ -9,7 +9,9 @@ public class StringCalculator {
     private static Pattern CUSTOM_DELIMTER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     public int add(String text) {
-        if (Strings.isEmpty(text)) { return 0;}
+        if (Strings.isEmpty(text)) {
+            return 0;
+        }
 
         Matcher matcher = CUSTOM_DELIMTER_PATTERN.matcher(text);
         if (matcher.find()) {
@@ -26,7 +28,7 @@ public class StringCalculator {
 
     private Integer getTextArraySum(String[] text) {
         return Arrays.stream(text)
-                .map(this::convertTextToInt)
+                .map(textNumber -> new Number(textNumber).getNumber())
                 .reduce(0, Integer::sum);
     }
 
@@ -34,18 +36,4 @@ public class StringCalculator {
         return text.split(",|:");
     }
 
-    private int convertTextToInt(String text) {
-        try {
-            return getPostiveNumber(Integer.parseInt(text));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("숫자가 아닙니다.");
-        }
-    }
-
-    private int getPostiveNumber(int number) {
-        if (number < 0) {
-            throw new RuntimeException("음수 입력 에러");
-        }
-        return number;
-    }
 }
