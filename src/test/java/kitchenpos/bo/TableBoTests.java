@@ -11,6 +11,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
@@ -26,21 +29,34 @@ class TableBoTests {
     private TableBo tableBo;
 
     private OrderTable mockOrderTable = new OrderTable();
+    private final List<OrderTable> mockOrderTables = new ArrayList<>();
 
     @BeforeEach
     public void setup() {
         // { id: 1, empty: false, tableGroupId: 2, numberOfGuests: 3 }
         setupOrderTable();
+
+        mockOrderTables.add(mockOrderTable);
     }
 
-    @DisplayName("테이블 생성 시도 성공")
+    @DisplayName("주문 테이블 생성 시도 성공")
     @Test
-    public void createTableSuccess() {
+    public void createOrderTableSuccess() {
         given(orderTableDao.save(mockOrderTable)).willReturn(mockOrderTable);
 
         OrderTable orderTable = tableBo.create(mockOrderTable);
 
         assertThat(orderTable.getNumberOfGuests()).isEqualTo(3);
+    }
+
+    @DisplayName("주문 테이블 전체 조회 성공")
+    @Test
+    public void getAllOrderTable() {
+        given(orderTableDao.findAll()).willReturn(mockOrderTables);
+
+        List<OrderTable> orderTables = tableBo.list();
+
+        assertThat(orderTables).hasSize(1);
     }
 
     private void setupOrderTable() {
