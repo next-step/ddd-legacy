@@ -84,7 +84,6 @@ class MenuBoTests {
 
         Menu saved = menuBo.create(mockMenu);
 
-        assertThat(saved.getId()).isEqualTo(1L);
         assertThat(saved.getMenuProducts().get(0).getMenuId()).isEqualTo(1L);
     }
 
