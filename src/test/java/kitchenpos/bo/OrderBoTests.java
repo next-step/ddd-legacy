@@ -117,6 +117,18 @@ class OrderBoTests {
         assertThatThrownBy(() -> orderBo.create(mockOrder)).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("주문 전체 조회 시 주문과 관련된 주문 메뉴가 잘 나오는지 확인")
+    @Test
+    public void getOrderListWithCorrectOrderLineItem() {
+        given(orderDao.findAll()).willReturn(Collections.singletonList(mockOrder));
+        given(orderLineItemDao.findAllByOrderId(1L)).willReturn(mockOrderLineItems);
+
+        List<Order> orders = orderBo.list();
+
+        assertThat(orders.get(0).getId()).isNotNull();
+        assertThat(orders.get(0).getOrderLineItems().get(0).getOrderId()).isEqualTo(1L);
+    }
+
     private void createMockMenu() {
         mockMenu.setId(1L);
         mockMenu.setName("testMenu");
@@ -133,6 +145,7 @@ class OrderBoTests {
     }
 
     private void createMockOrder() {
+        mockOrder.setId(1L);
         mockOrder.setOrderTableId(3L);
         mockOrder.setOrderLineItems(mockOrderLineItems);
     }
