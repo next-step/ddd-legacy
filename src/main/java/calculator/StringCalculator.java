@@ -1,28 +1,30 @@
 package calculator;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
+    private final Pattern customDelimiterFindingPattern = Pattern.compile("//(.)\n(.*)");
 
     public int add(String input) {
         if(isNullOrEmpty(input)) {
             return 0;
         }
-        String[] operands =  getOperandsCustomDelimiter(input);
-        if(operands == null) {
-            operands = getOperandsDefaultDelimiter(input);
+        String[] operandStrings =  getOperandsCustomDelimiter(input);
+        if(operandStrings == null) {
+            operandStrings = getOperandsDefaultDelimiter(input);
         }
-        return add(operands);
+        Operands Operands = new Operands(operandStrings);
+        return Operands.sum();
     }
 
     private boolean isNullOrEmpty(String text) {
-        return text == null || text.isEmpty();
+        return Objects.isNull(text) || text.isEmpty();
     }
 
     private String[] getOperandsCustomDelimiter(String input) {
-        Pattern pattern = Pattern.compile("//(.)\n(.*)");
-        Matcher matcher = pattern.matcher(input);
+        Matcher matcher = customDelimiterFindingPattern.matcher(input);
         if(matcher.find()) {
             String delimiter = matcher.group(1);
             return matcher.group(2).split(delimiter);
@@ -35,26 +37,4 @@ public class StringCalculator {
         return input.split(delimiter);
     }
 
-    private int add(String[] operands) throws RuntimeException {
-        int result = 0;
-        for (String operand : operands) {
-            result += transform(operand);
-        }
-        return result;
-    }
-
-    private int transform(String number) {
-        int resultNumber;
-        try {
-            resultNumber = Integer.parseInt(number);
-        }
-        catch (NumberFormatException e) {
-            e.printStackTrace();
-            throw new RuntimeException("operand is not number format");
-        }
-        if(resultNumber < 0) {
-            throw new RuntimeException("operand is negative number");
-        }
-        return resultNumber;
-    }
 }
