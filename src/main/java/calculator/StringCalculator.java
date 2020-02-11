@@ -19,6 +19,6 @@ public class StringCalculator {
 
         String[] stringNumbers = parser.parseStrings(text);
 
-        return Arrays.stream(stringNumbers).map(PositiveNumber::of).map(PositiveNumber::getNumber).reduce(0, Integer::sum);
+        return Arrays.stream(stringNumbers).map(PositiveNumber::of).map(PositiveNumber::toInt).reduce(ZERO, Integer::sum);
     }
 }

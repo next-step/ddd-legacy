@@ -22,7 +22,7 @@ public class PositiveNumber {
         return number < 0;
     }
 
-    public int getNumber() {
+    public int toInt() {
         return number;
     }
 }
