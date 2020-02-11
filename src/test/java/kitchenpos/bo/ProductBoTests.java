@@ -11,6 +11,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -57,5 +59,15 @@ class ProductBoTests {
         mockProduct.setPrice(BigDecimal.valueOf(-10000));
 
         assertThatThrownBy(() -> productBo.create(mockProduct)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품 전체 조회 시 상품 관련 정보 조회 가능")
+    @Test
+    public void getProductListSuccess() {
+        given(productDao.findAll()).willReturn(Collections.singletonList(mockProduct));
+
+        List<Product> products = productBo.list();
+
+        assertThat(products.get(0).getName()).isEqualTo("testProduct");
     }
 }
