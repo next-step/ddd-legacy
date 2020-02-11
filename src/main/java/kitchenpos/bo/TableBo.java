@@ -78,7 +78,7 @@ public class TableBo {
     public OrderTable changeNumberOfGuests(final Long orderTableId, final OrderTable orderTable) {
         final int numberOfGuests = orderTable.getNumberOfGuests();
 
-        if (numberOfGuests < 0) { // 테이블의 게스트 수는 0명 이상이다.
+        if (numberOfGuests < 0) { // 테이블의 게스"트 수는 0명 이상이다.
             throw new IllegalArgumentException();
         }
 
