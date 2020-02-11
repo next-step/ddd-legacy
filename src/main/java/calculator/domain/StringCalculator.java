@@ -23,8 +23,8 @@ public class StringCalculator {
         String[] tokens = getTokens(inputString);
 
         return Arrays.stream(tokens)
-                .map(token -> new CalculatorNumber(token))
-                .collect(Collectors.summingInt(CalculatorNumber::parse));
+                .map(CalculatorNumber::new)
+                .collect(Collectors.summingInt(CalculatorNumber::getNumber));
     }
 
     private String[] getTokens(String inputString) {
