@@ -22,8 +22,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,7 +47,7 @@ class TableGroupBoTests {
     @BeforeEach
     public void setup() {
         setupTableGroup();
-        setupOrderTables();
+        setupOrderTablesNotInTableGroup();
 
         mockOrderTables.add(mockOnePeopleOrderTable);
         mockOrderTables.add(mockTwoPeopleOrderTable);
@@ -109,12 +108,26 @@ class TableGroupBoTests {
         assertThatThrownBy(() -> tableGroupBo.create(mockTableGroup)).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("정상적으로 테이블 그룹 삭제 완료 시 속해 있던 주문 테이블 그룹화 해제 성공")
+    @Test
+    public void deleteTableGroupHappyPath() {
+        mockOnePeopleOrderTable.setTableGroupId(1L);
+        mockTwoPeopleOrderTable.setTableGroupId(2L);
+
+        given(orderTableDao.findAllByTableGroupId(1L)).willReturn(mockOrderTables);
+        
+        tableGroupBo.delete(1L);
+
+        assertThat(mockOnePeopleOrderTable.getTableGroupId()).isNull();
+        assertThat(mockTwoPeopleOrderTable.getTableGroupId()).isNull();
+    }
+
     private void setupTableGroup() {
         mockTableGroup.setId(1L);
         mockTableGroup.setOrderTables(mockOrderTables);
     }
 
-    private void setupOrderTables() {
+    private void setupOrderTablesNotInTableGroup() {
         mockOnePeopleOrderTable.setId(1L);
         mockOnePeopleOrderTable.setNumberOfGuests(1);
         mockOnePeopleOrderTable.setEmpty(true);
