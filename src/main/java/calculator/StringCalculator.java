@@ -1,12 +1,12 @@
 package calculator;
 
-import calculator.model.PositiveNumber;
+import calculator.model.CalcNumber;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
 
 public class StringCalculator {
-    private static final int DEFAULT_INT_VALUE = 0;
+
 
     public StringCalculator() {
     }
@@ -17,16 +17,17 @@ public class StringCalculator {
 
     public int add(String input) {
         if (isEmptyInput(input)) {
-            return DEFAULT_INT_VALUE;
+            return new CalcNumber().value;
         }
 
         List<String> parsedStrings = StringSplitter.split(input);
 
-        PositiveNumber sum = parsedStrings
+        CalcNumber sum = parsedStrings
                 .stream()
-                .map(PositiveNumber::new)
-                .reduce(PositiveNumber::sum)
-                .get();
+                .map(CalcNumber::new)
+                .reduce(CalcNumber::sum)
+                .orElse(new CalcNumber());
+
 
         return sum.getValue();
 
