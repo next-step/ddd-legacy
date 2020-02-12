@@ -1,24 +1,28 @@
 package calculator.model;
 
 public class PositiveNumber {
-    public int num;
+    public int value;
 
-    public PositiveNumber(int num) {
-        this.num = num;
-        this.validate(num);
+    public PositiveNumber(int value) {
+        this.value = value;
+        this.validate(value);
     }
 
-    public PositiveNumber(String str){
+    public PositiveNumber(String str) {
         this(Integer.parseInt(str));
     }
 
-    public int getNum() {
-        return this.num;
+    public int getValue() {
+        return this.value;
     }
 
-    private void validate(int number) {
-        if (number < 0) {
+    private void validate(int value) {
+        if (value < 0) {
             throw new RuntimeException("Number must be positive");
         }
+    }
+
+    public PositiveNumber sum(PositiveNumber num) {
+        return new PositiveNumber(this.getValue() + num.getValue());
     }
 }

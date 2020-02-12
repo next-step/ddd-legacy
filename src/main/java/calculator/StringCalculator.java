@@ -22,10 +22,14 @@ public class StringCalculator {
 
         List<String> parsedStrings = StringSplitter.split(input);
 
-        return parsedStrings.stream()
+        PositiveNumber sum = parsedStrings
+                .stream()
                 .map(PositiveNumber::new)
-                .mapToInt(PositiveNumber::getNum)
-                .sum();
+                .reduce(PositiveNumber::sum)
+                .get();
+
+        return sum.getValue();
+
     }
 
 

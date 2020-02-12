@@ -1,6 +1,5 @@
 package calculator;
 
-import calculator.model.PositiveNumber;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Collections;
