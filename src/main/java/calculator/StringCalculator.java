@@ -28,8 +28,9 @@ public class StringCalculator {
 
     private Integer getTextArraySum(String[] text) {
         return Arrays.stream(text)
-                .map(textNumber -> new Number(textNumber).getNumber())
-                .reduce(0, Integer::sum);
+                .map(Number::new)
+                .mapToInt(Number::convert)
+                .sum();
     }
 
     private String[] toSplitArrayList(String text) {
