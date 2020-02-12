@@ -26,9 +26,8 @@ public class StringCalculator {
                 .stream()
                 .map(CalcNumber::new)
                 .reduce(CalcNumber::sum)
-                .orElse(new CalcNumber());
-
-
+                .orElseGet(CalcNumber::new);
+        
         return sum.getValue();
 
     }
