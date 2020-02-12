@@ -14,14 +14,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
@@ -65,53 +63,34 @@ class OrderBoTest {
 
         optionalMenu = Optional.of(menu);
 
-    }
-
-    @DisplayName("주문을 생성한다.")
-    @Test
-    void create() {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setMenuId(1L);
-        menuProduct.setProductId(1L);
-        menuProduct.setQuantity(1L);
-        menuProduct.setSeq(1L);
-
-        List<MenuProduct> menuProductList = new ArrayList<>();
-        menuProductList.add(menuProduct);
-
-        Menu menu = new Menu();
-        menu.setName("후라이드치킨");
-        menu.setPrice(new BigDecimal(16000));
-        menu.setMenuProducts(menuProductList);
-        menu.setMenuGroupId(2L);
-        menu.setId(1L);
-
-        Optional<Menu> optionalMenu = Optional.of(menu);
-
-        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem = new OrderLineItem();
         orderLineItem.setMenuId(menu.getId());
         orderLineItem.setOrderId(1L);
         orderLineItem.setQuantity(2L);
         orderLineItem.setSeq(1L);
 
-        List<OrderLineItem> orderLineItemList = new ArrayList<>();
+        orderLineItemList = new ArrayList<>();
         orderLineItemList.add(orderLineItem);
 
-        Order order = new Order();
+        order = new Order();
         order.setId(1L);
         order.setOrderedTime(LocalDateTime.now());
         order.setOrderLineItems(orderLineItemList);
         order.setOrderStatus(String.valueOf(OrderStatus.MEAL));
         order.setOrderTableId(1L);
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setEmpty(true);
+        orderTable = new OrderTable();
+        orderTable.setEmpty(false);
         orderTable.setId(1L);
         orderTable.setNumberOfGuests(3);
         orderTable.setTableGroupId(1L);
 
-        Optional<OrderTable> optionalOrderTable = Optional.of(orderTable);
+        optionalOrderTable = Optional.of(orderTable);
+    }
 
+    @DisplayName("주문을 생성한다.")
+    @Test
+    void create() {
         when(menuDao.countByIdIn(anyList()))
                 .thenReturn(Long.valueOf(orderLineItemList.size()));
         when(orderTableDao.findById(anyLong()))
