@@ -27,6 +27,10 @@ class ProductBoTest {
     @InjectMocks
     private ProductBo productBo;
 
+    private static Stream<BigDecimal> prices() {
+        return Stream.of(null, BigDecimal.valueOf(-1));
+    }
+
     @DisplayName("상품을 생성할 수 있다.")
     @Test
     void create() {
@@ -48,10 +52,6 @@ class ProductBoTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> productBo.create(product));
-    }
-
-    private static Stream<BigDecimal> prices() {
-        return Stream.of(null, BigDecimal.valueOf(-1));
     }
 
     @DisplayName("상품 목록을 조회할 수 있다.")

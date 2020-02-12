@@ -50,6 +50,10 @@ class MenuBoTest {
 
     private Menu menu;
 
+    private static Stream<BigDecimal> prices() {
+        return Stream.of(null, BigDecimal.valueOf(-1));
+    }
+
     @BeforeEach
     void setUp() {
         MenuProduct menuProduct = new MenuProduct();
@@ -91,10 +95,6 @@ class MenuBoTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> menuBo.create(menu));
-    }
-
-    private static Stream<BigDecimal> prices() {
-        return Stream.of(null, BigDecimal.valueOf(-1));
     }
 
     @DisplayName("메뉴가 어떤 메뉴그룹에도 속하지 않은 경우, 예외를 발생시킨다.")
