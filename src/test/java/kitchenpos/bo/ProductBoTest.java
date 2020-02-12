@@ -27,25 +27,22 @@ class ProductBoTest {
     @InjectMocks
     private ProductBo productBo;
 
-    @DisplayName("상품을 생성한다.")
+    @DisplayName("상품을 생성할 수 있다.")
     @Test
     void create() {
         Product product = new Product();
-        product.setId(1L);
         product.setName("name");
         product.setPrice(BigDecimal.ONE);
 
         when(productDao.save(product)).thenReturn(product);
-
         assertThat(productBo.create(product)).isEqualTo(product);
     }
 
-    @DisplayName("가격이 책정되지 않았거나 0 미만인 경우 예외를 발생시킨다.")
+    @DisplayName("상품의 가격이 책정되지 않았거나 `0`보다 작은 값인 경우, 예외를 발생시킨다.")
     @ParameterizedTest
     @MethodSource("prices")
     void exceptionWhenCreate(BigDecimal price) {
         Product product = new Product();
-        product.setId(1L);
         product.setName("name");
         product.setPrice(price);
 
@@ -57,10 +54,10 @@ class ProductBoTest {
         return Stream.of(null, BigDecimal.valueOf(-1));
     }
 
-    @DisplayName("상품 목록을 가져온다.")
+    @DisplayName("상품 목록을 조회할 수 있다.")
     @Test
     void list() {
         when(productDao.findAll()).thenReturn(new ArrayList<>());
-        assertThat(productBo.list().isEmpty()).isTrue();
+        assertThat(productBo.list()).isEmpty();
     }
 }
