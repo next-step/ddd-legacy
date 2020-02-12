@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,13 +22,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProductBoTest {
 
     @Autowired
-    ProductBo productBo;
+    private ProductBo productBo;
 
     @Test
     @DisplayName("상품 정상 생성")
     void create() {
         String productName = "간장치킨";
-        Product product = createProduct(productName, new BigDecimal(17000));
+        Product product = createProduct(productName, BigDecimal.valueOf(17000));
 
         Product savedProduct = productBo.create(product);
 
@@ -57,8 +56,8 @@ class ProductBoTest {
     @Test
     @DisplayName("상품 리스트 조회 테스트")
     void list() {
-        Product product1 = createProduct("양념치킨", new BigDecimal(17000));
-        Product product2 = createProduct("후라이드치킨", new BigDecimal(16000));
+        Product product1 = createProduct("양념치킨", BigDecimal.valueOf(17000));
+        Product product2 = createProduct("후라이드치킨", BigDecimal.valueOf(16000));
 
         productBo.create(product1);
         productBo.create(product2);
