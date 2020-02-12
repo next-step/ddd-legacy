@@ -64,7 +64,7 @@ class MenuGroupRestControllerTests {
 
         mockMvc.perform(get("/api/menus-groups"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.*.name", is(Collections.singletonList(menuGroupName))))
+                .andExpect(jsonPath("$.[0].name", is(menuGroupName)))
         ;
     }
 }
