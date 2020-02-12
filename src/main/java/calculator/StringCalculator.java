@@ -1,32 +1,36 @@
 package calculator;
 
+import calculator.model.CalcNumber;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class StringCalculator {
-    private final int DEFAULT_INT_VALUE = 0;
 
-    public StringCalculator(){
+
+    public StringCalculator() {
     }
 
-    public boolean isEmptyInput(String input){
+    public boolean isEmptyInput(String input) {
         return Strings.isEmpty(input);
     }
 
-    public int add(String input){
-
-        if(isEmptyInput(input)) {
-            return DEFAULT_INT_VALUE;
+    public int add(String input) {
+        if (isEmptyInput(input)) {
+            return new CalcNumber().value;
         }
 
-       List<Integer> integers = StringSplitter.split(input);
+        List<String> parsedStrings = StringSplitter.split(input);
 
+        CalcNumber sum = parsedStrings
+                .stream()
+                .map(CalcNumber::new)
+                .reduce(CalcNumber::sum)
+                .orElseGet(CalcNumber::new);
+        
+        return sum.getValue();
 
-        return integers.stream().mapToInt(Integer::intValue).map(NumberValidator::validate).sum();
     }
-
 
 
 }
