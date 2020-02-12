@@ -4,11 +4,13 @@ import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderLineItemDao;
 import kitchenpos.dao.OrderTableDao;
+import kitchenpos.mock.OrderBuilder;
+import kitchenpos.mock.OrderLineItemBuilder;
+import kitchenpos.mock.OrderTableBuilder;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,68 +44,72 @@ class OrderBoTest {
     @InjectMocks
     OrderBo orderBo;
 
-    private OrderLineItem mockOrderLineItem;
-    private OrderTable mockOrderTable;
-
-    @BeforeEach
-    void beforeEach() {
-        mockOrderLineItem = new OrderLineItem();
-        mockOrderLineItem.setSeq(1L);
-        mockOrderLineItem.setOrderId(1L);
-        mockOrderLineItem.setMenuId(1L);
-        mockOrderLineItem.setQuantity(2);
-
-        mockOrderTable = new OrderTable();
-        mockOrderTable.setId(1L);
-        mockOrderTable.setTableGroupId(1L);
-        mockOrderTable.setNumberOfGuests(5);
-        mockOrderTable.setEmpty(false);
-    }
-
     @DisplayName("새로운 주문을 생성할 수 있다.")
     @Test
     void create() {
         // given
-        Order newOrder = new Order();
         // 주문은 테이블에서 받을 수 있다.
         // 테이블에서 다수의 주문을 받을 수 있다.
-        newOrder.setOrderTableId(mockOrderTable.getId());
-        newOrder.setOrderLineItems(new ArrayList<>(Arrays.asList(mockOrderLineItem)));
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(3)
+                .withEmpty(false)
+                .build();
+        OrderLineItem orderLineItem = OrderLineItemBuilder.mock()
+                .withMenuId(1L)
+                .withQuantity(1)
+                .build();
+        Order newOrder = OrderBuilder.mock()
+                .withOrderTableId(orderTable.getId())
+                .withOrderLineItems(Collections.singletonList(orderLineItem))
+                .build();
 
         given(menuDao.countByIdIn(any())).willReturn(1L);
-        given(orderTableDao.findById(mockOrderTable.getId())).willReturn(Optional.of(mockOrderTable));
+        given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
         given(orderDao.save(newOrder)).willAnswer(invocation -> {
             newOrder.setId(1L);
             return newOrder;
         });
-        given(orderLineItemDao.save(any(OrderLineItem.class))).willReturn(mockOrderLineItem);
+        given(orderLineItemDao.save(any(OrderLineItem.class))).willAnswer(invocation -> {
+            orderLineItem.setSeq(1L);
+            orderLineItem.setOrderId(newOrder.getId());
+            return orderLineItem;
+        });
 
         // when
         final Order result = orderBo.create(newOrder);
 
         // then
         assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getOrderTableId()).isEqualTo(mockOrderTable.getId());
+        assertThat(result.getOrderTableId()).isEqualTo(orderTable.getId());
         // 주문 시, 주문상태는 조리중이다.
         // 주문상태는 조리중/식사중/완료가 있다.
         assertThat(result.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name());
         assertThat(result.getOrderedTime()).isNotNull();
         assertThat(result.getOrderLineItems().size()).isEqualTo(1);
-        assertThat(result.getOrderLineItems().get(0).getSeq()).isEqualTo(mockOrderLineItem.getSeq());
+        assertThat(result.getOrderLineItems()).containsExactlyInAnyOrder(orderLineItem);
     }
 
     @DisplayName("새로운 주문 생성 시, 테이블이 공석이면 안된다.")
     @Test
     void tableShouldNotBeEmpty() {
         // given
-        mockOrderTable.setEmpty(true);
-
-        Order newOrder = new Order();
-        newOrder.setOrderTableId(mockOrderTable.getId());
-        newOrder.setOrderLineItems(new ArrayList<>(Arrays.asList(mockOrderLineItem)));
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(3)
+                .withEmpty(true) // 공석
+                .build();
+        OrderLineItem orderLineItem = OrderLineItemBuilder.mock()
+                .withMenuId(1L)
+                .withQuantity(1)
+                .build();
+        Order newOrder = OrderBuilder.mock()
+                .withOrderTableId(orderTable.getId())
+                .withOrderLineItems(Collections.singletonList(orderLineItem))
+                .build();
 
         given(menuDao.countByIdIn(any())).willReturn(1L);
-        given(orderTableDao.findById(mockOrderTable.getId())).willReturn(Optional.of(mockOrderTable));
+        given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
 
         // when
         // then
@@ -119,9 +122,15 @@ class OrderBoTest {
     @Test
     void orderShouldContainAtLeastOneMenu() {
         // given
-        Order newOrder = new Order();
-        newOrder.setOrderTableId(mockOrderTable.getId());
-        newOrder.setOrderLineItems(new ArrayList<>());
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(3)
+                .withEmpty(true) // 공석
+                .build();
+        Order newOrder = OrderBuilder.mock()
+                .withOrderTableId(orderTable.getId())
+                .withOrderLineItems(new ArrayList<>())
+                .build();
 
         // when
         // then
@@ -134,15 +143,28 @@ class OrderBoTest {
     @Test
     void list() {
         // given
-        Order order = new Order();
-        order.setId(1L);
-        order.setOrderTableId(mockOrderTable.getId());
-        order.setOrderStatus(OrderStatus.COMPLETION.name());
-        order.setOrderedTime(LocalDateTime.now());
-        order.setOrderLineItems(new ArrayList<>(Arrays.asList(mockOrderLineItem)));
+        Long orderId = 1L;
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(3)
+                .withEmpty(true) // 공석
+                .build();
+        OrderLineItem orderLineItem = OrderLineItemBuilder.mock()
+                .withSeq(1L)
+                .withOrderId(orderId)
+                .withMenuId(1L)
+                .withQuantity(1)
+                .build();
+        Order order = OrderBuilder.mock()
+                .withId(orderId)
+                .withOrderTableId(orderTable.getId())
+                .withOrderStatus(OrderStatus.COMPLETION.name())
+                .withOrderedTime(LocalDateTime.now())
+                .withOrderLineItems(Collections.singletonList(orderLineItem))
+                .build();
 
         given(orderDao.findAll()).willReturn(new ArrayList<>(Arrays.asList(order)));
-        given(orderLineItemDao.findAllByOrderId(order.getId())).willReturn(new ArrayList<>(Arrays.asList(mockOrderLineItem)));
+        given(orderLineItemDao.findAllByOrderId(order.getId())).willReturn(Collections.singletonList(orderLineItem));
 
         // when
         final List<Order> result = orderBo.list();
@@ -154,7 +176,7 @@ class OrderBoTest {
         assertThat(result.get(0).getOrderStatus()).isEqualTo(order.getOrderStatus());
         assertThat(result.get(0).getOrderedTime()).isEqualTo(order.getOrderedTime());
         assertThat(result.get(0).getOrderLineItems().size()).isEqualTo(order.getOrderLineItems().size());
-        assertThat(result.get(0).getOrderLineItems().get(0).getSeq()).isEqualTo(order.getOrderLineItems().get(0).getSeq());
+        assertThat(result.get(0).getOrderLineItems()).containsExactlyInAnyOrder(orderLineItem);
     }
 
     @DisplayName("주문의 주문상태를 변경할 수 있다.")
@@ -162,29 +184,42 @@ class OrderBoTest {
     @MethodSource(value = "provideOrderStatus")
     void changeOrderStatus(OrderStatus newOrderStatus) {
         // given
-        Order savedOrder = new Order();
-        savedOrder.setId(1L);
-        savedOrder.setOrderTableId(mockOrderTable.getId());
-        savedOrder.setOrderStatus(OrderStatus.COOKING.name());
-        savedOrder.setOrderedTime(LocalDateTime.now());
-        savedOrder.setOrderLineItems(new ArrayList<>(Arrays.asList(mockOrderLineItem)));
+        Long orderId = 1L;
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(3)
+                .withEmpty(true) // 공석
+                .build();
+        OrderLineItem orderLineItem = OrderLineItemBuilder.mock()
+                .withSeq(1L)
+                .withOrderId(orderId)
+                .withMenuId(1L)
+                .withQuantity(1)
+                .build();
+        Order order = OrderBuilder.mock()
+                .withId(orderId)
+                .withOrderTableId(orderTable.getId())
+                .withOrderStatus(OrderStatus.COOKING.name())
+                .withOrderedTime(LocalDateTime.now())
+                .withOrderLineItems(Collections.singletonList(orderLineItem))
+                .build();
 
         Order newOrder = new Order();
         newOrder.setOrderStatus(newOrderStatus.name());
 
-        given(orderDao.findById(savedOrder.getId())).willReturn(Optional.of(savedOrder));
-        given(orderLineItemDao.findAllByOrderId(savedOrder.getId())).willReturn(new ArrayList<>(Arrays.asList(mockOrderLineItem)));
+        given(orderDao.findById(order.getId())).willReturn(Optional.of(order));
+        given(orderLineItemDao.findAllByOrderId(order.getId())).willReturn(new ArrayList<>(Arrays.asList(orderLineItem)));
 
         // when
-        final Order result = orderBo.changeOrderStatus(savedOrder.getId(), newOrder);
+        final Order result = orderBo.changeOrderStatus(order.getId(), OrderBuilder.mock().withOrderStatus(newOrderStatus.name()).build());
 
         // then
-        assertThat(result.getId()).isEqualTo(savedOrder.getId());
-        assertThat(result.getOrderTableId()).isEqualTo(savedOrder.getOrderTableId());
+        assertThat(result.getId()).isEqualTo(order.getId());
+        assertThat(result.getOrderTableId()).isEqualTo(order.getOrderTableId());
         assertThat(result.getOrderStatus()).isEqualTo(newOrderStatus.name());
-        assertThat(result.getOrderedTime()).isEqualTo(savedOrder.getOrderedTime());
-        assertThat(result.getOrderLineItems().size()).isEqualTo(savedOrder.getOrderLineItems().size());
-        assertThat(result.getOrderLineItems().get(0).getSeq()).isEqualTo(savedOrder.getOrderLineItems().get(0).getSeq());
+        assertThat(result.getOrderedTime()).isEqualTo(order.getOrderedTime());
+        assertThat(result.getOrderLineItems().size()).isEqualTo(order.getOrderLineItems().size());
+        assertThat(result.getOrderLineItems()).containsExactlyInAnyOrder(orderLineItem);
     }
 
     private static Stream<OrderStatus> provideOrderStatus() {
@@ -195,22 +230,32 @@ class OrderBoTest {
     @Test
     void changeOrderStatusThrowErrorWhenCompletion() {
         // given
-        Order savedOrder = new Order();
-        savedOrder.setId(1L);
-        savedOrder.setOrderTableId(mockOrderTable.getId());
-        savedOrder.setOrderStatus(OrderStatus.COMPLETION.name());
-        savedOrder.setOrderedTime(LocalDateTime.now());
-        savedOrder.setOrderLineItems(new ArrayList<>(Arrays.asList(mockOrderLineItem)));
+        Long orderId = 1L;
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(3)
+                .withEmpty(true) // 공석
+                .build();
+        OrderLineItem orderLineItem = OrderLineItemBuilder.mock()
+                .withSeq(1L)
+                .withOrderId(orderId)
+                .withMenuId(1L)
+                .withQuantity(1)
+                .build();
+        Order order = OrderBuilder.mock()
+                .withId(orderId)
+                .withOrderTableId(orderTable.getId())
+                .withOrderStatus(OrderStatus.COMPLETION.name())
+                .withOrderedTime(LocalDateTime.now())
+                .withOrderLineItems(Collections.singletonList(orderLineItem))
+                .build();
 
-        Order newOrder = new Order();
-        newOrder.setOrderStatus(OrderStatus.COOKING.name());
-
-        given(orderDao.findById(savedOrder.getId())).willReturn(Optional.of(savedOrder));
+        given(orderDao.findById(order.getId())).willReturn(Optional.of(order));
 
         // when
         // then
         assertThatThrownBy(() -> {
-            orderBo.changeOrderStatus(savedOrder.getId(), newOrder);
+            orderBo.changeOrderStatus(order.getId(), OrderBuilder.mock().withOrderStatus(OrderStatus.COOKING.name()).build());
         }).isInstanceOf(IllegalArgumentException.class);
     }
 }
