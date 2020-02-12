@@ -17,10 +17,10 @@ public class StringCalculator {
             return result;
         }
 
-        List<Integer> numbers = parseToInteger(StringSplitter.extractNumberStringByDelimiter(text));
+        List<PositiveInteger> numbers = parseToInteger(StringSplitter.extractNumberStringByDelimiter(text));
 
         return numbers.stream()
-                .mapToInt(Integer::intValue)
+                .mapToInt(PositiveInteger::valueOf)
                 .sum();
     }
 
@@ -28,14 +28,14 @@ public class StringCalculator {
         return StringUtils.isEmpty(text);
     }
 
-    private List<Integer> parseToInteger (String[] stringNumbers){
+    private List<PositiveInteger> parseToInteger (String[] stringNumbers){
 
         return Arrays.stream(stringNumbers)
                 .map(strings -> getPositiveNumber(strings))
                 .collect(Collectors.toList());
     }
 
-    private int getPositiveNumber(String stringNumber){
+    private PositiveInteger getPositiveNumber(String stringNumber){
         int number = 0;
 
         try{
@@ -43,14 +43,6 @@ public class StringCalculator {
         }catch (RuntimeException e){
             throw new RuntimeException();
         }
-
-        return validateNaturalNumber(number);
-    }
-
-    private int validateNaturalNumber(int number){
-        if(number <= 0){
-            throw new RuntimeException();
-        }
-        return number;
+        return new PositiveInteger(number);
     }
 }
