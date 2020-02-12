@@ -8,6 +8,10 @@ public class PositiveNumber {
         this.validate(num);
     }
 
+    public PositiveNumber(String str){
+        this(Integer.parseInt(str));
+    }
+
     public int getNum() {
         return this.num;
     }

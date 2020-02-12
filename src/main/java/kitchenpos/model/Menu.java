@@ -10,6 +10,7 @@ public class Menu {
     private Long menuGroupId;
     private List<MenuProduct> menuProducts;
 
+    
     public Long getId() {
         return id;
     }

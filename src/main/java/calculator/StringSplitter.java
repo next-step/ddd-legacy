@@ -15,7 +15,7 @@ public class StringSplitter {
     private static final String DEFAULT_DELIMITER = ",|:";
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
-    public static List<PositiveNumber> split(final String input) {
+    public static List<String> split(final String input) {
         if (Strings.isEmpty(input)) {
             return Collections.emptyList();
         }
@@ -25,25 +25,15 @@ public class StringSplitter {
             String customDelimiter = m.group(1);
             String extractedInput = m.group(2);
 
-            return parseToNumberList(extractedInput, customDelimiter);
+            return splitWithDelimiter(extractedInput, customDelimiter);
         }
 
-        return parseToNumberList(input, DEFAULT_DELIMITER);
+        return splitWithDelimiter(input, DEFAULT_DELIMITER);
     }
 
 
-    private static List<PositiveNumber> parseToNumberList(String input, String delimiter) {
+    private static List<String> splitWithDelimiter(String input, String delimiter) {
         return Stream.of(input.split(delimiter))
-                .map(StringSplitter::parseToNumber)
                 .collect(Collectors.toList());
-    }
-
-    private static PositiveNumber parseToNumber(String str) {
-        try {
-            int parsedInt = Integer.parseInt(str);
-            return new PositiveNumber(parsedInt);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("failed to parse String ", e);
-        }
     }
 }

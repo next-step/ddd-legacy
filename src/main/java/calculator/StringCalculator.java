@@ -16,14 +16,14 @@ public class StringCalculator {
     }
 
     public int add(String input) {
-
         if (isEmptyInput(input)) {
             return DEFAULT_INT_VALUE;
         }
 
-        List<PositiveNumber> numbersList = StringSplitter.split(input);
+        List<String> parsedStrings = StringSplitter.split(input);
 
-        return numbersList.stream()
+        return parsedStrings.stream()
+                .map(PositiveNumber::new)
                 .mapToInt(PositiveNumber::getNum)
                 .sum();
     }
