@@ -2,10 +2,9 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
-import kitchenpos.model.MenuGroup;
+import kitchenpos.mock.OrderTableBuilder;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,11 +14,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.LongStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,43 +35,44 @@ class TableBoTest {
     @InjectMocks
     private TableBo tableBo;
 
-    private MenuGroup mockMenuGroup;
-    private OrderTable mockOrderTable;
-    private List<OrderTable> mockOrderTables;
-
-    @BeforeEach
-    void beforeEach() {
-        mockMenuGroup = new MenuGroup();
-        mockMenuGroup.setId(1L);
-        mockMenuGroup.setName("메뉴그룹1");
-
-        mockOrderTable = new OrderTable();
-        mockOrderTable.setId(1L);
-//        mockOrderTable.setTableGroupId(1L);
-        mockOrderTable.setNumberOfGuests(5);
-        mockOrderTable.setEmpty(false);
-
-        mockOrderTables = new ArrayList<>();
-
-        LongStream.range(1, 100).forEach(i -> {
-            OrderTable orderTable = new OrderTable();
-            orderTable.setId(i);
-            orderTable.setTableGroupId(i);
-            orderTable.setNumberOfGuests((int) i);
-            orderTable.setEmpty((int) i % 2 == 0);
-
-            mockOrderTables.add(orderTable);
-        });
-    }
+//    private MenuGroup mockMenuGroup;
+//    private OrderTable mockOrderTable;
+//    private List<OrderTable> mockOrderTables;
+//
+//    @BeforeEach
+//    void beforeEach() {
+//        mockMenuGroup = new MenuGroup();
+//        mockMenuGroup.setId(1L);
+//        mockMenuGroup.setName("메뉴그룹1");
+//
+//        mockOrderTable = new OrderTable();
+//        mockOrderTable.setId(1L);
+////        mockOrderTable.setTableGroupId(1L);
+//        mockOrderTable.setNumberOfGuests(5);
+//        mockOrderTable.setEmpty(false);
+//
+//        mockOrderTables = new ArrayList<>();
+//
+//        LongStream.range(1, 100).forEach(i -> {
+//            OrderTable orderTable = new OrderTable();
+//            orderTable.setId(i);
+//            orderTable.setTableGroupId(i);
+//            orderTable.setNumberOfGuests((int) i);
+//            orderTable.setEmpty((int) i % 2 == 0);
+//
+//            mockOrderTables.add(orderTable);
+//        });
+//    }
 
     @DisplayName("새로운 테이블을 생성할 수 있다.")
     @Test
     void create() {
         // given
-        OrderTable newOrderTable = new OrderTable();
-        newOrderTable.setTableGroupId(mockMenuGroup.getId());
-        newOrderTable.setNumberOfGuests(5);
-        newOrderTable.setEmpty(true);
+        OrderTable newOrderTable = OrderTableBuilder.mock()
+                .withTableGroupId(1L)
+                .withNumberOfGuests(5)
+                .withEmpty(true)
+                .build();
 
         given(orderTableDao.save(newOrderTable)).willAnswer(invocation -> {
             newOrderTable.setId(1L);
@@ -94,39 +93,44 @@ class TableBoTest {
     @Test
     void update() {
         // given
-        OrderTable updateOrderTable = new OrderTable();
-        updateOrderTable.setId(1L);
-        updateOrderTable.setTableGroupId(mockMenuGroup.getId());
-        updateOrderTable.setNumberOfGuests(5);
-        updateOrderTable.setEmpty(true);
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withTableGroupId(1L)
+                .withNumberOfGuests(5)
+                .withEmpty(true)
+                .build();
 
-        given(orderTableDao.save(updateOrderTable)).willReturn(updateOrderTable);
+        given(orderTableDao.save(orderTable)).willReturn(orderTable);
 
         // when
-        OrderTable result = tableBo.create(updateOrderTable);
+        OrderTable result = tableBo.create(orderTable);
 
         // then
-        assertThat(result.getId()).isEqualTo(updateOrderTable.getId());
-        assertThat(result.getTableGroupId()).isEqualTo(updateOrderTable.getTableGroupId());
-        assertThat(result.getNumberOfGuests()).isEqualTo(updateOrderTable.getNumberOfGuests());
-        assertThat(result.isEmpty()).isEqualTo(updateOrderTable.isEmpty());
+        assertThat(result.getId()).isEqualTo(orderTable.getId());
+        assertThat(result.getTableGroupId()).isEqualTo(orderTable.getTableGroupId());
+        assertThat(result.getNumberOfGuests()).isEqualTo(orderTable.getNumberOfGuests());
+        assertThat(result.isEmpty()).isEqualTo(orderTable.isEmpty());
     }
 
     @DisplayName("전체 테이블 리스트를 조회할 수 있다.")
     @Test
     void list() {
         // given
-        given(orderTableDao.findAll()).willReturn(mockOrderTables);
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withTableGroupId(1L)
+                .withNumberOfGuests(5)
+                .withEmpty(true)
+                .build();
+
+        given(orderTableDao.findAll()).willReturn(Collections.singletonList(orderTable));
 
         // when
         List<OrderTable> result = tableBo.list();
 
         // then
-        assertThat(result.size()).isEqualTo(mockOrderTables.size());
-        assertThat(result.get(0).getId()).isEqualTo(mockOrderTables.get(0).getId());
-        assertThat(result.get(0).getTableGroupId()).isEqualTo(mockOrderTables.get(0).getTableGroupId());
-        assertThat(result.get(0).getNumberOfGuests()).isEqualTo(mockOrderTables.get(0).getNumberOfGuests());
-        assertThat(result.get(0).isEmpty()).isEqualTo(mockOrderTables.get(0).isEmpty());
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result).containsExactlyInAnyOrder(orderTable);
     }
 
     @DisplayName("테이블의 공석여부를 변경할 수 있다.")
@@ -134,23 +138,30 @@ class TableBoTest {
     @ValueSource(booleans = {true, false})
     void changeEmpty(boolean empty) {
         // given
-        OrderTable pOrderTable = new OrderTable();
-        pOrderTable.setEmpty(empty);
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(5)
+                .withEmpty(true)
+                .build();
 
-        given(orderTableDao.findById(mockOrderTable.getId())).willReturn(Optional.of(mockOrderTable));
-        given(orderDao.existsByOrderTableIdAndOrderStatusIn(mockOrderTable.getId(), Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willReturn(false);
-        given(orderTableDao.save(mockOrderTable)).willAnswer(invocation -> {
-            mockOrderTable.setEmpty(pOrderTable.isEmpty());
-            return mockOrderTable;
+        OrderTable parameter = OrderTableBuilder.mock()
+                .withEmpty(empty)
+                .build();
+
+        given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+        given(orderDao.existsByOrderTableIdAndOrderStatusIn(orderTable.getId(), Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willReturn(false);
+        given(orderTableDao.save(orderTable)).willAnswer(invocation -> {
+            orderTable.setEmpty(parameter.isEmpty());
+            return orderTable;
         });
 
         // when
-        OrderTable result = tableBo.changeEmpty(mockOrderTable.getId(), pOrderTable);
+        OrderTable result = tableBo.changeEmpty(orderTable.getId(), parameter);
 
         // then
-        assertThat(result.getId()).isEqualTo(mockOrderTable.getId());
-        assertThat(result.getTableGroupId()).isEqualTo(mockOrderTable.getTableGroupId());
-        assertThat(result.getNumberOfGuests()).isEqualTo(mockOrderTable.getNumberOfGuests());
+        assertThat(result.getId()).isEqualTo(orderTable.getId());
+        assertThat(result.getTableGroupId()).isEqualTo(orderTable.getTableGroupId());
+        assertThat(result.getNumberOfGuests()).isEqualTo(orderTable.getNumberOfGuests());
         assertThat(result.isEmpty()).isEqualTo(empty);
     }
 
@@ -159,17 +170,23 @@ class TableBoTest {
     @ValueSource(booleans = {true, false})
     void cannotChangeEmptyWhenIncludedByTableGroup(boolean empty) {
         // given
-        OrderTable pOrderTable = new OrderTable();
-        pOrderTable.setEmpty(empty);
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withTableGroupId(1L)
+                .withNumberOfGuests(5)
+                .withEmpty(true)
+                .build();
 
-        mockOrderTable.setTableGroupId(1L);
+        OrderTable parameter = OrderTableBuilder.mock()
+                .withEmpty(empty)
+                .build();
 
-        given(orderTableDao.findById(mockOrderTable.getId())).willReturn(Optional.of(mockOrderTable));
+        given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
 
         // when
         // then
         assertThatThrownBy(() -> {
-            tableBo.changeEmpty(mockOrderTable.getId(), pOrderTable);
+            tableBo.changeEmpty(orderTable.getId(), parameter);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -178,16 +195,23 @@ class TableBoTest {
     @ValueSource(booleans = {true, false})
     void cannotChangeEmptyWhenOrdersAreNotCompleted(boolean empty) {
         // given
-        OrderTable pOrderTable = new OrderTable();
-        pOrderTable.setEmpty(empty);
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(5)
+                .withEmpty(true)
+                .build();
 
-        given(orderTableDao.findById(mockOrderTable.getId())).willReturn(Optional.of(mockOrderTable));
-        given(orderDao.existsByOrderTableIdAndOrderStatusIn(mockOrderTable.getId(), Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willReturn(true);
+        OrderTable parameter = OrderTableBuilder.mock()
+                .withEmpty(empty)
+                .build();
+
+        given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+        given(orderDao.existsByOrderTableIdAndOrderStatusIn(orderTable.getId(), Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willReturn(true);
 
         // when
         // then
         assertThatThrownBy(() -> {
-            tableBo.changeEmpty(mockOrderTable.getId(), pOrderTable);
+            tableBo.changeEmpty(orderTable.getId(), parameter);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -196,23 +220,30 @@ class TableBoTest {
     @ValueSource(ints = {0, 1, 100, 200})
     void changeNumberOfGuests(int numberOfGuests) {
         // given
-        OrderTable pOrderTable = new OrderTable();
-        pOrderTable.setNumberOfGuests(numberOfGuests);
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(5)
+                .withEmpty(false)
+                .build();
 
-        given(orderTableDao.findById(mockOrderTable.getId())).willReturn(Optional.of(mockOrderTable));
-        given(orderTableDao.save(mockOrderTable)).willAnswer(invocation -> {
-            mockOrderTable.setNumberOfGuests(numberOfGuests);
-            return mockOrderTable;
+        OrderTable parameter = OrderTableBuilder.mock()
+                .withNumberOfGuests(numberOfGuests)
+                .build();
+
+        given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+        given(orderTableDao.save(orderTable)).willAnswer(invocation -> {
+            orderTable.setNumberOfGuests(numberOfGuests);
+            return orderTable;
         });
 
         // when
-        OrderTable result = tableBo.changeNumberOfGuests(mockOrderTable.getId(), pOrderTable);
+        OrderTable result = tableBo.changeNumberOfGuests(orderTable.getId(), parameter);
 
         // then
-        assertThat(result.getId()).isEqualTo(mockOrderTable.getId());
-        assertThat(result.getTableGroupId()).isEqualTo(mockOrderTable.getTableGroupId());
+        assertThat(result.getId()).isEqualTo(orderTable.getId());
+        assertThat(result.getTableGroupId()).isEqualTo(orderTable.getTableGroupId());
         assertThat(result.getNumberOfGuests()).isEqualTo(numberOfGuests);
-        assertThat(result.isEmpty()).isEqualTo(mockOrderTable.isEmpty());
+        assertThat(result.isEmpty()).isEqualTo(orderTable.isEmpty());
     }
 
     @DisplayName("테이블의 게스트 수 수정 시, 게스트 수는 0명 이상이다.")
@@ -220,13 +251,14 @@ class TableBoTest {
     @ValueSource(ints = {-1000, -100, -10, -1})
     void changeNumberOfGuestsOnlyWhenEqualsOrLargerThan0(int numberOfGuests) {
         // given
-        OrderTable pOrderTable = new OrderTable();
-        pOrderTable.setNumberOfGuests(numberOfGuests);
+        OrderTable parameter = OrderTableBuilder.mock()
+                .withNumberOfGuests(numberOfGuests)
+                .build();
 
         // when
         // then
         assertThatThrownBy(() -> {
-            tableBo.changeNumberOfGuests(mockOrderTable.getId(), pOrderTable);
+            tableBo.changeNumberOfGuests(1L, parameter);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -234,17 +266,22 @@ class TableBoTest {
     @Test
     void changeNumberOfGuestsOnlyWhenNotEmpty() {
         // given
-        OrderTable pOrderTable = new OrderTable();
-        pOrderTable.setNumberOfGuests(5);
+        OrderTable orderTable = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(5)
+                .withEmpty(true)
+                .build();
 
-        mockOrderTable.setEmpty(true);
+        OrderTable parameter = OrderTableBuilder.mock()
+                .withNumberOfGuests(5)
+                .build();
 
-        given(orderTableDao.findById(mockOrderTable.getId())).willReturn(Optional.of(mockOrderTable));
+        given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
 
         // when
         // then
         assertThatThrownBy(() -> {
-            tableBo.changeNumberOfGuests(mockOrderTable.getId(), pOrderTable);
+            tableBo.changeNumberOfGuests(orderTable.getId(), parameter);
         }).isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -73,9 +73,9 @@ class ProductBoTest {
 
     private static Stream provideInvalidPrice() {
         return Stream.of(
-            BigDecimal.valueOf(-100),
-            BigDecimal.valueOf(-10),
-            BigDecimal.valueOf(-1)
+                BigDecimal.valueOf(-100),
+                BigDecimal.valueOf(-10),
+                BigDecimal.valueOf(-1)
         );
     }
 
