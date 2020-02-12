@@ -1,6 +1,7 @@
 package kitchenpos.bo;
 
 import kitchenpos.dao.MenuGroupDao;
+import kitchenpos.mock.MenuGroupBuilder;
 import kitchenpos.model.MenuGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.LongStream;
 
@@ -27,34 +29,13 @@ class MenuGroupBoTest {
     @InjectMocks
     private MenuGroupBo menuGroupBo;
 
-    private List<MenuGroup> mockMenuGroups;
-    private MenuGroup newMenuGroup;
-
-    @BeforeEach
-    void beforeEach() {
-        /**
-         * 새로운 메뉴그룹
-         */
-        newMenuGroup = new MenuGroup();
-        newMenuGroup.setName("저세상메뉴");
-
-        /**
-         * 메뉴그룹 리스트
-         */
-        mockMenuGroups = new ArrayList<>();
-
-        LongStream.range(0, 100).forEach(i -> {
-            MenuGroup menuGroup = new MenuGroup();
-            menuGroup.setId(i);
-            menuGroup.setName("메뉴그룹" + i);
-
-            mockMenuGroups.add(menuGroup);
-        });
-    }
-
     @DisplayName("새로운 메뉴그룹을 생성할 수 있다.")
     @Test
     void create() {
+        MenuGroup newMenuGroup = MenuGroupBuilder.mock()
+                .name("저세상메뉴")
+                .build();
+
         // given
         given(menuGroupDao.save(any(MenuGroup.class))).willAnswer(invocation -> {
             newMenuGroup.setId(1L);
@@ -73,14 +54,21 @@ class MenuGroupBoTest {
     @Test
     void list() {
         // given
-        given(menuGroupDao.findAll()).willReturn(mockMenuGroups);
+        MenuGroup menuGroup1 = MenuGroupBuilder.mock()
+                .id(1L)
+                .name("메뉴그룹1")
+                .build();
+        MenuGroup menuGroup2 = MenuGroupBuilder.mock()
+                .id(2L)
+                .name("메뉴그룹2")
+                .build();
+
+        given(menuGroupDao.findAll()).willReturn(Arrays.asList(menuGroup1, menuGroup2));
 
         // when
         final List<MenuGroup> result = menuGroupBo.list();
 
         // then
-        assertThat(result.size()).isEqualTo(mockMenuGroups.size());
-        assertThat(result.get(0).getId()).isEqualTo(mockMenuGroups.get(0).getId());
-        assertThat(result.get(0).getName()).isEqualTo(mockMenuGroups.get(0).getName());
+        assertThat(result).containsExactlyInAnyOrder(menuGroup1, menuGroup2);
     }
 }
