@@ -6,18 +6,21 @@ public class MenuGroupBuilder {
     private Long id;
     private String name;
 
-    private MenuGroupBuilder() {};
+    private MenuGroupBuilder() {
+    }
+
+    ;
 
     public static MenuGroupBuilder mock() {
         return new MenuGroupBuilder();
     }
 
-    public MenuGroupBuilder id(Long id) {
+    public MenuGroupBuilder withId(Long id) {
         this.id = id;
         return this;
     }
 
-    public MenuGroupBuilder name(String name) {
+    public MenuGroupBuilder withName(String name) {
         this.name = name;
         return this;
     }

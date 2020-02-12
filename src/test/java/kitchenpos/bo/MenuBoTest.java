@@ -4,27 +4,23 @@ import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.dao.MenuProductDao;
 import kitchenpos.dao.ProductDao;
+import kitchenpos.mock.MenuBuilder;
+import kitchenpos.mock.MenuProductBuilder;
+import kitchenpos.mock.ProductBuilder;
 import kitchenpos.model.Menu;
-import kitchenpos.model.MenuGroup;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.LongStream;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,78 +43,61 @@ class MenuBoTest {
     @InjectMocks
     private MenuBo menuBo;
 
-    private MenuProduct mockMenuProduct1;
-    private MenuProduct mockMenuProduct2;
-    private Product mockProduct1;
-    private Product mockProduct2;
-    private Menu newMenu;
-    private List<Menu> mockMenus;
-
-    @BeforeEach
-    void beforeEach() {
-        mockMenuProduct1 = new MenuProduct();
-        mockMenuProduct1.setSeq(1L);
-        mockMenuProduct1.setMenuId(1L);
-        mockMenuProduct1.setProductId(1L);
-        mockMenuProduct1.setQuantity(1);
-
-        mockMenuProduct2 = new MenuProduct();
-        mockMenuProduct2.setSeq(2L);
-        mockMenuProduct2.setMenuId(1L);
-        mockMenuProduct2.setProductId(2L);
-        mockMenuProduct2.setQuantity(2);
-
-        mockProduct1 = new Product();
-        mockProduct1.setId(1L);
-        mockProduct1.setName("저세상치킨");
-        mockProduct1.setPrice(BigDecimal.valueOf(1000));
-
-        mockProduct2 = new Product();
-        mockProduct2.setId(2L);
-        mockProduct2.setName("저세상감튀");
-        mockProduct2.setPrice(BigDecimal.valueOf(500));
-
-
-        /**
-         * 새로운 메뉴
-         */
-        newMenu = new Menu();
-        newMenu.setName("저세상세트");
-        newMenu.setPrice(BigDecimal.valueOf(1000)); // 2000원 초과 불가
-        newMenu.setMenuGroupId(1L);
-        newMenu.setMenuProducts(new ArrayList(Arrays.asList(mockMenuProduct1, mockMenuProduct2)));
-
-        /**
-         * 메뉴 리스트
-         */
-        mockMenus = new ArrayList<>();
-
-        LongStream.range(1, 100).forEach(i -> {
-
-            Menu tempMenu = new Menu();
-            tempMenu.setId(i);
-            tempMenu.setName("메뉴" + i);
-            tempMenu.setPrice(BigDecimal.valueOf(1000)); // 2000원 초과 불가
-            tempMenu.setMenuGroupId(1L);
-            tempMenu.setMenuProducts(new ArrayList(Arrays.asList(mockMenuProduct1, mockMenuProduct2)));
-
-            mockMenus.add(tempMenu);
-        });
-    }
-
     @DisplayName("새로운 메뉴를 생성할 수 있다.")
     @Test
     void create() {
+        // given
+
+        Long menuId = 1L;
+        Long product1Id = 1L;
+        Long product2Id = 2L;
+
+        Product product1 = ProductBuilder.mock()
+                .withId(product1Id)
+                .withName("제품1")
+                .withPrice(BigDecimal.valueOf(1000))
+                .build();
+
+        Product product2 = ProductBuilder.mock()
+                .withId(product2Id)
+                .withName("제품2")
+                .withPrice(BigDecimal.valueOf(500))
+                .build();
+
+        MenuProduct menuProduct1 = MenuProductBuilder.mock()
+                .withMenuId(menuId)
+                .withProductId(product1Id)
+                .withQuantity(1)
+                .build();
+
+        MenuProduct menuProduct2 = MenuProductBuilder.mock()
+                .withMenuId(menuId)
+                .withProductId(product2Id)
+                .withQuantity(2)
+                .build();
+
+        Menu newMenu = MenuBuilder.mock()
+                .withName("메뉴1")
+                .withPrice(BigDecimal.valueOf(1000))
+                .withMenuGroupId(1L)
+                .withMenuProducts(new ArrayList(Arrays.asList(menuProduct1, menuProduct2)))
+                .build();
 
         given(menuGroupDao.existsById(any())).willReturn(true);
-        given(productDao.findById(mockProduct1.getId())).willReturn(Optional.of(mockProduct1));
-        given(productDao.findById(mockProduct2.getId())).willReturn(Optional.of(mockProduct2));
+        given(productDao.findById(product1.getId())).willReturn(Optional.of(product1));
+        given(productDao.findById(product2.getId())).willReturn(Optional.of(product2));
         given(menuDao.save(newMenu)).willAnswer((invocation) -> {
             newMenu.setId(1L);
             return newMenu;
         });
-        given(menuProductDao.save(mockMenuProduct1)).willReturn(mockMenuProduct1);
-        given(menuProductDao.save(mockMenuProduct2)).willReturn(mockMenuProduct2);
+        given(menuProductDao.save(menuProduct1)).willAnswer(invocation -> {
+            menuProduct1.setSeq(1L);
+            return menuProduct1;
+        });
+        given(menuProductDao.save(menuProduct2)).willAnswer(invocation -> {
+            menuProduct2.setSeq(2L);
+            return menuProduct2;
+        });
 
         // when
         Menu result = menuBo.create(newMenu);
@@ -128,18 +107,23 @@ class MenuBoTest {
         assertThat(result.getName()).isEqualTo(newMenu.getName());
         assertThat(result.getPrice()).isEqualTo(newMenu.getPrice());
         assertThat(result.getMenuGroupId()).isEqualTo(newMenu.getMenuGroupId());
-        assertThat(result.getMenuProducts().size()).isEqualTo(2);
-        assertThat(result.getMenuProducts().size()).isEqualTo(newMenu.getMenuProducts().size());
-        assertThat(result.getMenuProducts().get(0).getProductId()).isEqualTo(newMenu.getMenuProducts().get(0).getProductId());
+        assertThat(result.getMenuProducts()).containsExactlyInAnyOrder(menuProduct1, menuProduct2);
     }
 
-    // TODO mocking check
-    @DisplayName("메뉴는 1개의 메뉴그룹에 속한다.")
+    @DisplayName("메뉴 생성 시, 메뉴는 1개의 메뉴그룹에 속해야한다.")
     @ParameterizedTest
-    @MethodSource(value = "provideInvalidMenuGroupIds")
+    @MethodSource(value = "provideInvalidMenuGroupId")
     void shouldBeInMenuGroup(Long menuGroupId) {
         // given
-        newMenu.setMenuGroupId(menuGroupId);
+        MenuProductBuilder menuProductBuilder = MenuProductBuilder.mock()
+                .withProductId(1L)
+                .withQuantity(1);
+        Menu newMenu = MenuBuilder.mock()
+                .withName("메뉴1")
+                .withPrice(BigDecimal.valueOf(1000))
+                .withMenuGroupId(menuGroupId)
+                .withMenuProducts(new ArrayList(Arrays.asList(menuProductBuilder.build())))
+                .build();
 
         given(menuGroupDao.existsById(any())).willReturn(false);
 
@@ -150,15 +134,25 @@ class MenuBoTest {
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
-    private static Stream<Long> provideInvalidMenuGroupIds() {
-        return Stream.of(null, 100L);
+    private static Stream provideInvalidMenuGroupId() {
+        return Stream.of(
+                null,
+                100L
+        );
     }
 
     @DisplayName("메뉴는 1개 이상의 제품으로 구성된다.")
-    @Test
-    void shouldIncludeAtLeastOneProduct() {
+    @ParameterizedTest
+    @MethodSource(value = "provideInvalidMenuProducts")
+    void shouldIncludeAtLeastOneProduct(List<MenuProduct> invalidMenuProducts) {
         // given
-        newMenu.setMenuProducts(new ArrayList<>());
+        Menu newMenu = MenuBuilder.mock()
+                .withName("메뉴1")
+                .withPrice(BigDecimal.valueOf(1000))
+                .withMenuGroupId(1L)
+                .withMenuProducts(invalidMenuProducts)
+                .build();
+
         given(menuGroupDao.existsById(any())).willReturn(true);
 
         // when
@@ -166,55 +160,142 @@ class MenuBoTest {
         assertThatThrownBy(() -> {
             menuBo.create(newMenu);
         }).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private static Stream provideInvalidMenuProducts() {
+        return Stream.of(
+                new ArrayList<>(),
+                Collections.singletonList(new MenuProduct())
+        );
     }
 
     @DisplayName("메뉴 가격은 0원 이상이다.")
     @ParameterizedTest
-    @ValueSource(ints = {-100, -10, -1})
-    void priceShouldBeOver0(int price) {
+    @MethodSource(value = "provideInvalidPrice")
+    void priceShouldBeOver0(BigDecimal invalidPrice) {
         // given
-        newMenu.setPrice(BigDecimal.valueOf(price));
+        MenuProductBuilder menuProductBuilder = MenuProductBuilder.mock()
+                .withProductId(1L)
+                .withQuantity(1);
+        Menu newMenu = MenuBuilder.mock()
+                .withName("메뉴1")
+                .withPrice(invalidPrice)
+                .withMenuGroupId(1L)
+                .withMenuProducts(Collections.singletonList(menuProductBuilder.build()))
+                .build();
 
         // when
         // then
         assertThatThrownBy(() -> {
             menuBo.create(newMenu);
         }).isInstanceOf(IllegalArgumentException.class);
+    }
 
+    private static Stream provideInvalidPrice() {
+        return Stream.of(
+                BigDecimal.valueOf(-1000),
+                BigDecimal.valueOf(-100),
+                BigDecimal.valueOf(-10),
+                BigDecimal.valueOf(-1)
+        );
     }
 
     @DisplayName("메뉴 가격은 구성된 메뉴제품들의 가격 총합을 초과할 수 없다.")
     @ParameterizedTest
-    @ValueSource(longs = {2001, 10000})
-    void priceShouldNotOverSumOfProductPrices(Long price) {
+    @MethodSource(value = "provideInvalidTotalPrice")
+    void priceShouldNotOverSumOfProductPrices(BigDecimal invalidPrice) {
         // given
-        newMenu.setPrice(BigDecimal.valueOf(price));
+        Long menuId = 1L;
+        Long product1Id = 1L;
+        Long product2Id = 2L;
+
+        Product product1 = ProductBuilder.mock()
+                .withId(product1Id)
+                .withName("제품1")
+                .withPrice(BigDecimal.valueOf(1000))
+                .build();
+
+        Product product2 = ProductBuilder.mock()
+                .withId(product2Id)
+                .withName("제품2")
+                .withPrice(BigDecimal.valueOf(500))
+                .build();
+
+        MenuProduct menuProduct1 = MenuProductBuilder.mock()
+                .withMenuId(menuId)
+                .withProductId(product1Id)
+                .withQuantity(1)
+                .build();
+
+        MenuProduct menuProduct2 = MenuProductBuilder.mock()
+                .withMenuId(menuId)
+                .withProductId(product2Id)
+                .withQuantity(2)
+                .build();
+
+        Menu newMenu = MenuBuilder.mock()
+                .withName("메뉴1")
+                .withPrice(invalidPrice)
+                .withMenuGroupId(1L)
+                .withMenuProducts(new ArrayList(Arrays.asList(menuProduct1, menuProduct2)))
+                .build();
+
 
         given(menuGroupDao.existsById(any())).willReturn(true);
-        given(productDao.findById(mockProduct1.getId())).willReturn(Optional.of(mockProduct1));
-        given(productDao.findById(mockProduct2.getId())).willReturn(Optional.of(mockProduct2));
+        given(productDao.findById(product1Id)).willReturn(Optional.of(product1));
+        given(productDao.findById(product2Id)).willReturn(Optional.of(product2));
 
         // when
         // then
         assertThatThrownBy(() -> {
             menuBo.create(newMenu);
         }).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private static Stream provideInvalidTotalPrice() {
+        return Stream.of(
+                BigDecimal.valueOf(2001),
+                BigDecimal.valueOf(10000)
+        );
     }
 
     @DisplayName("전체 메뉴 리스트를 조회할 수 있다.")
     @Test
     void list() {
         // given
-        given(menuDao.findAll()).willReturn(mockMenus);
-        given(menuProductDao.findAllByMenuId(any(Long.class))).willReturn(new ArrayList<>(Arrays.asList(mockMenuProduct1, mockMenuProduct2)));
+        Long menuId = 1L;
+        MenuProduct menuProduct1 = MenuProductBuilder.mock()
+                .withSeq(1L)
+                .withMenuId(menuId)
+                .withProductId(1L)
+                .withQuantity(1)
+                .build();
+        MenuProduct menuProduct2 = MenuProductBuilder.mock()
+                .withSeq(2L)
+                .withMenuId(menuId)
+                .withProductId(2L)
+                .withQuantity(2)
+                .build();
+        Menu menu = MenuBuilder.mock()
+                .withId(menuId)
+                .withName("메뉴1")
+                .withPrice(BigDecimal.valueOf(1000))
+                .withMenuGroupId(1L)
+                .withMenuProducts(new ArrayList(Arrays.asList(
+                        menuProduct1, menuProduct2
+                )))
+                .build();
+
+        given(menuDao.findAll()).willReturn(Collections.singletonList(menu));
+        given(menuProductDao.findAllByMenuId(any(Long.class))).willReturn(new ArrayList<>(Arrays.asList(menuProduct1, menuProduct2)));
 
         // when
         final List<Menu> result = menuBo.list();
 
         // then
-        assertThat(result.size()).isEqualTo(mockMenus.size());
-        assertThat(result.get(0).getId()).isEqualTo(mockMenus.get(0).getId());
-        assertThat(result.get(0).getName()).isEqualTo(mockMenus.get(0).getName());
-        assertThat(result.get(0).getMenuProducts()).isNotNull();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getId()).isEqualTo(menu.getId());
+        assertThat(result.get(0).getName()).isEqualTo(menu.getName());
+        assertThat(result.get(0).getMenuProducts()).containsExactlyInAnyOrder(menuProduct1, menuProduct2);
     }
 }
