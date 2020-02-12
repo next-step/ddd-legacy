@@ -47,41 +47,36 @@ class MenuBoTest {
     @InjectMocks
     private MenuBo menuBo;
 
-    private MenuGroup menuGroup1;
-    private MenuProduct menuProduct1;
-    private MenuProduct menuProduct2;
-    private Product product1;
-    private Product product2;
+    private MenuProduct mockMenuProduct1;
+    private MenuProduct mockMenuProduct2;
+    private Product mockProduct1;
+    private Product mockProduct2;
     private Menu newMenu;
-    private List<Menu> menus;
+    private List<Menu> mockMenus;
 
     @BeforeEach
     void beforeEach() {
-        menuGroup1 = new MenuGroup();
-        menuGroup1.setId(1L);
-        menuGroup1.setName("메뉴그룹1");
+        mockMenuProduct1 = new MenuProduct();
+        mockMenuProduct1.setSeq(1L);
+        mockMenuProduct1.setMenuId(1L);
+        mockMenuProduct1.setProductId(1L);
+        mockMenuProduct1.setQuantity(1);
 
-        menuProduct1 = new MenuProduct();
-        menuProduct1.setSeq(1L);
-        menuProduct1.setMenuId(1L);
-        menuProduct1.setProductId(1L);
-        menuProduct1.setQuantity(1);
+        mockMenuProduct2 = new MenuProduct();
+        mockMenuProduct2.setSeq(2L);
+        mockMenuProduct2.setMenuId(1L);
+        mockMenuProduct2.setProductId(2L);
+        mockMenuProduct2.setQuantity(2);
 
-        menuProduct2 = new MenuProduct();
-        menuProduct2.setSeq(2L);
-        menuProduct2.setMenuId(1L);
-        menuProduct2.setProductId(2L);
-        menuProduct2.setQuantity(2);
+        mockProduct1 = new Product();
+        mockProduct1.setId(1L);
+        mockProduct1.setName("저세상치킨");
+        mockProduct1.setPrice(BigDecimal.valueOf(1000));
 
-        product1 = new Product();
-        product1.setId(1L);
-        product1.setName("저세상치킨");
-        product1.setPrice(BigDecimal.valueOf(1000));
-
-        product2 = new Product();
-        product2.setId(2L);
-        product2.setName("저세상감튀");
-        product2.setPrice(BigDecimal.valueOf(500));
+        mockProduct2 = new Product();
+        mockProduct2.setId(2L);
+        mockProduct2.setName("저세상감튀");
+        mockProduct2.setPrice(BigDecimal.valueOf(500));
 
 
         /**
@@ -91,12 +86,12 @@ class MenuBoTest {
         newMenu.setName("저세상세트");
         newMenu.setPrice(BigDecimal.valueOf(1000)); // 2000원 초과 불가
         newMenu.setMenuGroupId(1L);
-        newMenu.setMenuProducts(new ArrayList(Arrays.asList(menuProduct1, menuProduct2)));
+        newMenu.setMenuProducts(new ArrayList(Arrays.asList(mockMenuProduct1, mockMenuProduct2)));
 
         /**
          * 메뉴 리스트
          */
-        menus = new ArrayList<>();
+        mockMenus = new ArrayList<>();
 
         LongStream.range(1, 100).forEach(i -> {
 
@@ -105,9 +100,9 @@ class MenuBoTest {
             tempMenu.setName("메뉴" + i);
             tempMenu.setPrice(BigDecimal.valueOf(1000)); // 2000원 초과 불가
             tempMenu.setMenuGroupId(1L);
-            tempMenu.setMenuProducts(new ArrayList(Arrays.asList(menuProduct1, menuProduct2)));
+            tempMenu.setMenuProducts(new ArrayList(Arrays.asList(mockMenuProduct1, mockMenuProduct2)));
 
-            menus.add(tempMenu);
+            mockMenus.add(tempMenu);
         });
     }
 
@@ -116,14 +111,14 @@ class MenuBoTest {
     void create() {
 
         given(menuGroupDao.existsById(any())).willReturn(true);
-        given(productDao.findById(product1.getId())).willReturn(Optional.of(product1));
-        given(productDao.findById(product2.getId())).willReturn(Optional.of(product2));
+        given(productDao.findById(mockProduct1.getId())).willReturn(Optional.of(mockProduct1));
+        given(productDao.findById(mockProduct2.getId())).willReturn(Optional.of(mockProduct2));
         given(menuDao.save(newMenu)).willAnswer((invocation) -> {
             newMenu.setId(1L);
             return newMenu;
         });
-        given(menuProductDao.save(menuProduct1)).willReturn(menuProduct1);
-        given(menuProductDao.save(menuProduct2)).willReturn(menuProduct2);
+        given(menuProductDao.save(mockMenuProduct1)).willReturn(mockMenuProduct1);
+        given(menuProductDao.save(mockMenuProduct2)).willReturn(mockMenuProduct2);
 
         // when
         Menu result = menuBo.create(newMenu);
@@ -196,8 +191,8 @@ class MenuBoTest {
         newMenu.setPrice(BigDecimal.valueOf(price));
 
         given(menuGroupDao.existsById(any())).willReturn(true);
-        given(productDao.findById(product1.getId())).willReturn(Optional.of(product1));
-        given(productDao.findById(product2.getId())).willReturn(Optional.of(product2));
+        given(productDao.findById(mockProduct1.getId())).willReturn(Optional.of(mockProduct1));
+        given(productDao.findById(mockProduct2.getId())).willReturn(Optional.of(mockProduct2));
 
         // when
         // then
@@ -210,16 +205,16 @@ class MenuBoTest {
     @Test
     void list() {
         // given
-        given(menuDao.findAll()).willReturn(menus);
-        given(menuProductDao.findAllByMenuId(any(Long.class))).willReturn(new ArrayList<>(Arrays.asList(menuProduct1, menuProduct2)));
+        given(menuDao.findAll()).willReturn(mockMenus);
+        given(menuProductDao.findAllByMenuId(any(Long.class))).willReturn(new ArrayList<>(Arrays.asList(mockMenuProduct1, mockMenuProduct2)));
 
         // when
         final List<Menu> result = menuBo.list();
 
         // then
-        assertThat(result.size()).isEqualTo(menus.size());
-        assertThat(result.get(0).getId()).isEqualTo(menus.get(0).getId());
-        assertThat(result.get(0).getName()).isEqualTo(menus.get(0).getName());
+        assertThat(result.size()).isEqualTo(mockMenus.size());
+        assertThat(result.get(0).getId()).isEqualTo(mockMenus.get(0).getId());
+        assertThat(result.get(0).getName()).isEqualTo(mockMenus.get(0).getName());
         assertThat(result.get(0).getMenuProducts()).isNotNull();
     }
 }

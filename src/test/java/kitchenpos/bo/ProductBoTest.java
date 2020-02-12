@@ -31,7 +31,7 @@ class ProductBoTest {
     @InjectMocks
     ProductBo productBo;
 
-    private List<Product> products;
+    private List<Product> mockProducts;
     private Product newProduct;
 
     @BeforeEach
@@ -46,7 +46,7 @@ class ProductBoTest {
         /**
          * 제품 리스트
          */
-        products = new ArrayList<>();
+        mockProducts = new ArrayList<>();
 
         LongStream.range(0, 100).forEach(i -> {
             Product product = new Product();
@@ -54,7 +54,7 @@ class ProductBoTest {
             product.setName("제품" + i);
             product.setPrice(BigDecimal.valueOf(1000).multiply(BigDecimal.valueOf(i)));
 
-            products.add(product);
+            mockProducts.add(product);
         });
     }
 
@@ -94,15 +94,15 @@ class ProductBoTest {
     @Test
     void list() {
         // given
-        given(productDao.findAll()).willReturn(products);
+        given(productDao.findAll()).willReturn(mockProducts);
 
         // when
         final List<Product> result = productBo.list();
 
         // then
-        assertThat(result.size()).isEqualTo(products.size());
-        assertThat(result.get(0).getId()).isEqualTo(products.get(0).getId());
-        assertThat(result.get(0).getName()).isEqualTo(products.get(0).getName());
-        assertThat(result.get(0).getPrice()).isEqualTo(products.get(0).getPrice());
+        assertThat(result.size()).isEqualTo(mockProducts.size());
+        assertThat(result.get(0).getId()).isEqualTo(mockProducts.get(0).getId());
+        assertThat(result.get(0).getName()).isEqualTo(mockProducts.get(0).getName());
+        assertThat(result.get(0).getPrice()).isEqualTo(mockProducts.get(0).getPrice());
     }
 }

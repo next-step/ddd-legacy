@@ -27,7 +27,7 @@ class MenuGroupBoTest {
     @InjectMocks
     private MenuGroupBo menuGroupBo;
 
-    private List<MenuGroup> menuGroups;
+    private List<MenuGroup> mockMenuGroups;
     private MenuGroup newMenuGroup;
 
     @BeforeEach
@@ -41,14 +41,14 @@ class MenuGroupBoTest {
         /**
          * 메뉴그룹 리스트
          */
-        menuGroups = new ArrayList<>();
+        mockMenuGroups = new ArrayList<>();
 
         LongStream.range(0, 100).forEach(i -> {
             MenuGroup menuGroup = new MenuGroup();
             menuGroup.setId(i);
             menuGroup.setName("메뉴그룹" + i);
 
-            menuGroups.add(menuGroup);
+            mockMenuGroups.add(menuGroup);
         });
     }
 
@@ -73,14 +73,14 @@ class MenuGroupBoTest {
     @Test
     void list() {
         // given
-        given(menuGroupDao.findAll()).willReturn(menuGroups);
+        given(menuGroupDao.findAll()).willReturn(mockMenuGroups);
 
         // when
         final List<MenuGroup> result = menuGroupBo.list();
 
         // then
-        assertThat(result.size()).isEqualTo(menuGroups.size());
-        assertThat(result.get(0).getId()).isEqualTo(menuGroups.get(0).getId());
-        assertThat(result.get(0).getName()).isEqualTo(menuGroups.get(0).getName());
+        assertThat(result.size()).isEqualTo(mockMenuGroups.size());
+        assertThat(result.get(0).getId()).isEqualTo(mockMenuGroups.get(0).getId());
+        assertThat(result.get(0).getName()).isEqualTo(mockMenuGroups.get(0).getName());
     }
 }

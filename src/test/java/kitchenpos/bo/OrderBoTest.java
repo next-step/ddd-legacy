@@ -45,30 +45,11 @@ class OrderBoTest {
     @InjectMocks
     OrderBo orderBo;
 
-    //    private MenuGroup mockMenuGroup;
-//    private MenuProduct mockMenuProduct;
-//    private Product mockProduct;
     private OrderLineItem mockOrderLineItem;
     private OrderTable mockOrderTable;
-//    private TableGroup mockTableGroup;
 
     @BeforeEach
     void beforeEach() {
-//        mockMenuGroup = new MenuGroup();
-//        mockMenuGroup.setId(1L);
-//        mockMenuGroup.setName("메뉴그룹1");
-
-//        mockMenuProduct = new MenuProduct();
-//        mockMenuProduct.setSeq(1L);
-//        mockMenuProduct.setMenuId(1L);
-//        mockMenuProduct.setProductId(1L);
-//        mockMenuProduct.setQuantity(1);
-
-//        mockProduct = new Product();
-//        mockProduct.setId(1L);
-//        mockProduct.setName("저세상치킨");
-//        mockProduct.setPrice(BigDecimal.valueOf(1000));
-
         mockOrderLineItem = new OrderLineItem();
         mockOrderLineItem.setSeq(1L);
         mockOrderLineItem.setOrderId(1L);
@@ -80,12 +61,6 @@ class OrderBoTest {
         mockOrderTable.setTableGroupId(1L);
         mockOrderTable.setNumberOfGuests(5);
         mockOrderTable.setEmpty(false);
-
-//        mockTableGroup = new TableGroup();
-//        mockTableGroup.setId(1L);
-//        mockTableGroup.setOrderTables(new ArrayList<>(Arrays.asList(mockOrderTable)));
-//        mockTableGroup.setCreatedDate(LocalDateTime.now());
-
     }
 
     @DisplayName("새로운 주문을 생성할 수 있다.")
