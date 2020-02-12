@@ -3,10 +3,11 @@ package kitchenpos.bo;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.dao.TableGroupDao;
+import kitchenpos.mock.OrderTableBuilder;
+import kitchenpos.mock.TableGroupBuilder;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import kitchenpos.model.TableGroup;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,36 +47,29 @@ class TableGroupBoTest {
     @InjectMocks
     private TableGroupBo tableGroupBo;
 
-    private OrderTable mockOrderTable1;
-    private OrderTable mockOrderTable2;
-
-    @BeforeEach
-    void beforeEach() {
-        mockOrderTable1 = new OrderTable();
-        mockOrderTable1.setId(1L);
-//        mockOrderTable1.setTableGroupId(1L);
-        mockOrderTable1.setNumberOfGuests(5);
-        mockOrderTable1.setEmpty(true);
-
-        mockOrderTable2 = new OrderTable();
-        mockOrderTable2.setId(2L);
-//        mockOrderTable2.setTableGroupId(1L);
-        mockOrderTable2.setNumberOfGuests(10);
-        mockOrderTable2.setEmpty(true);
-    }
-
     @DisplayName("새로운 테이블그룹을 생성할 수 있다.")
     @Test
     void create() {
         // given
-        ArrayList<OrderTable> mockOrderTables = new ArrayList<>(Arrays.asList(mockOrderTable1, mockOrderTable2));
-        TableGroup newTableGroup = new TableGroup();
-        newTableGroup.setOrderTables(mockOrderTables);
+        Long newTableGroupId = 1L;
+        OrderTable orderTable1 = OrderTableBuilder.mock()
+                .withId(1L)
+                .withNumberOfGuests(1)
+                .withEmpty(true)
+                .build();
+        OrderTable orderTable2 = OrderTableBuilder.mock()
+                .withId(2L)
+                .withNumberOfGuests(2)
+                .withEmpty(true)
+                .build();
+        TableGroup newTableGroup = TableGroupBuilder.mock()
+                .withOrderTables(new ArrayList<>(Arrays.asList(orderTable1, orderTable2)))
+                .build();
 
-        given(orderTableDao.findAllByIdIn(new ArrayList<Long>(Arrays.asList(mockOrderTable1.getId(), mockOrderTable2.getId()))))
-                .willReturn(mockOrderTables);
+        given(orderTableDao.findAllByIdIn(new ArrayList<Long>(Arrays.asList(orderTable1.getId(), orderTable2.getId()))))
+                .willReturn(new ArrayList<>(Arrays.asList(orderTable1, orderTable2)));
         given(tableGroupDao.save(newTableGroup)).willAnswer(invocation -> {
-            newTableGroup.setId(1L);
+            newTableGroup.setId(newTableGroupId);
             newTableGroup.setCreatedDate(LocalDateTime.now());
             newTableGroup.getOrderTables().forEach(orderTable -> {
                 orderTable.setEmpty(false);
@@ -88,14 +82,13 @@ class TableGroupBoTest {
         TableGroup result = tableGroupBo.create(newTableGroup);
 
         // then
-        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getId()).isEqualTo(newTableGroupId);
         assertThat(result.getCreatedDate()).isNotNull();
-        assertThat(result.getOrderTables().size()).isEqualTo(newTableGroup.getOrderTables().size());
-        assertThat(result.getOrderTables().get(0).getId()).isEqualTo(newTableGroup.getOrderTables().get(0).getId());
+        assertThat(result.getOrderTables()).containsExactlyInAnyOrder(orderTable1, orderTable2);
 
         ArgumentCaptor<OrderTable> argument = ArgumentCaptor.forClass(OrderTable.class);
-        verify(orderTableDao, times(mockOrderTables.size())).save(argument.capture());
-        assertThat(argument.getValue().getTableGroupId()).isEqualTo(1L);
+        verify(orderTableDao, times(2)).save(argument.capture());
+        assertThat(argument.getValue().getTableGroupId()).isEqualTo(newTableGroupId);
         assertThat(argument.getValue().isEmpty()).isEqualTo(false); // 지정한 테이블의 공석여부를 아님으로 설정한다.
     }
 
@@ -104,8 +97,9 @@ class TableGroupBoTest {
     @MethodSource(value = "provideLessOrderTables")
     void createOnlyWhenTablesAreAtLeast2(List<OrderTable> orderTables) {
         // given
-        TableGroup newTableGroup = new TableGroup();
-        newTableGroup.setOrderTables(orderTables);
+        TableGroup newTableGroup = TableGroupBuilder.mock()
+                .withOrderTables(orderTables)
+                .build();
 
         // when
         // then
@@ -127,8 +121,9 @@ class TableGroupBoTest {
     @MethodSource(value = "provideNotEmptyOrderTables")
     void createOnlyWhenTablesAreEmpty(List<OrderTable> orderTables) {
         // given
-        TableGroup newTableGroup = new TableGroup();
-        newTableGroup.setOrderTables(orderTables);
+        TableGroup newTableGroup = TableGroupBuilder.mock()
+                .withOrderTables(orderTables)
+                .build();
 
         given(orderTableDao.findAllByIdIn(orderTables.stream()
                 .map(OrderTable::getId)
@@ -143,21 +138,18 @@ class TableGroupBoTest {
     }
 
     private static Stream<List> provideNotEmptyOrderTables() {
-        OrderTable emptyOrderTable = new OrderTable();
-        emptyOrderTable.setId(1L);
-        emptyOrderTable.setEmpty(true);
-
-        OrderTable notEmptyOrderTable1 = new OrderTable();
-        notEmptyOrderTable1.setId(2L);
-        notEmptyOrderTable1.setEmpty(false);
-
-        OrderTable notEmptyOrderTable2 = new OrderTable();
-        notEmptyOrderTable2.setId(3L);
-        notEmptyOrderTable2.setEmpty(false);
+        OrderTableBuilder orderTableBuilder = OrderTableBuilder.mock()
+                .withNumberOfGuests(1);
 
         return Stream.of(
-                new ArrayList<>(Arrays.asList(emptyOrderTable, notEmptyOrderTable1)),
-                new ArrayList<>(Arrays.asList(notEmptyOrderTable1, notEmptyOrderTable2))
+                new ArrayList<>(Arrays.asList(
+                        orderTableBuilder.withId(1L).withEmpty(true).build(),
+                        orderTableBuilder.withId(2L).withEmpty(false).build()
+                )),
+                new ArrayList<>(Arrays.asList(
+                        orderTableBuilder.withId(1L).withEmpty(false).build(),
+                        orderTableBuilder.withId(2L).withEmpty(false).build()
+                ))
         );
     }
 
@@ -166,8 +158,9 @@ class TableGroupBoTest {
     @MethodSource(value = "provideNotFreeOrderTables")
     void createOnlyWhenTablesAreNotIncludedInTableGroup(List<OrderTable> orderTables) {
         // given
-        TableGroup newTableGroup = new TableGroup();
-        newTableGroup.setOrderTables(orderTables);
+        TableGroup newTableGroup = TableGroupBuilder.mock()
+                .withOrderTables(orderTables)
+                .build();
 
         given(orderTableDao.findAllByIdIn(orderTables.stream()
                 .map(OrderTable::getId)
@@ -182,23 +175,19 @@ class TableGroupBoTest {
     }
 
     private static Stream<List> provideNotFreeOrderTables() {
-        OrderTable freeOrderTable = new OrderTable();
-        freeOrderTable.setId(1L);
-        freeOrderTable.setEmpty(true);
-
-        OrderTable notFreeOrderTable1 = new OrderTable();
-        notFreeOrderTable1.setId(2L);
-        notFreeOrderTable1.setTableGroupId(1L);
-        notFreeOrderTable1.setEmpty(true);
-
-        OrderTable notFreeOrderTable2 = new OrderTable();
-        notFreeOrderTable2.setId(3L);
-        notFreeOrderTable1.setTableGroupId(2L);
-        notFreeOrderTable2.setEmpty(true);
+        OrderTableBuilder orderTableBuilder = OrderTableBuilder.mock()
+                .withNumberOfGuests(1)
+                .withEmpty(true);
 
         return Stream.of(
-                new ArrayList<>(Arrays.asList(freeOrderTable, notFreeOrderTable1)),
-                new ArrayList<>(Arrays.asList(notFreeOrderTable1, notFreeOrderTable2))
+                new ArrayList<>(Arrays.asList(
+                        orderTableBuilder.withId(1L).build(),
+                        orderTableBuilder.withId(1L).withTableGroupId(1L).build()
+                )),
+                new ArrayList<>(Arrays.asList(
+                        orderTableBuilder.withId(1L).withTableGroupId(1L).build(),
+                        orderTableBuilder.withId(2L).withTableGroupId(2L).build()
+                ))
         );
     }
 
@@ -206,23 +195,34 @@ class TableGroupBoTest {
     @Test
     void delete() {
         // given
-        mockOrderTable1.setTableGroupId(1L);
-        mockOrderTable2.setTableGroupId(1L);
-        ArrayList<OrderTable> mockOrderTables = new ArrayList<>(Arrays.asList(mockOrderTable1, mockOrderTable2));
+        Long tableGroupId = 1L;
+        OrderTable orderTable1 = OrderTableBuilder.mock()
+                .withId(1L)
+                .withTableGroupId(tableGroupId)
+                .withNumberOfGuests(1)
+                .withEmpty(true)
+                .build();
+        OrderTable orderTable2 = OrderTableBuilder.mock()
+                .withId(2L)
+                .withTableGroupId(tableGroupId)
+                .withNumberOfGuests(2)
+                .withEmpty(true)
+                .build();
+        List<OrderTable> orderTables = new ArrayList<>(Arrays.asList(orderTable1, orderTable2));
 
-        given(orderTableDao.findAllByTableGroupId(1L)).willReturn(mockOrderTables);
-        given(orderDao.existsByOrderTableIdInAndOrderStatusIn(mockOrderTables.stream()
+        given(orderTableDao.findAllByTableGroupId(tableGroupId)).willReturn(orderTables);
+        given(orderDao.existsByOrderTableIdInAndOrderStatusIn(orderTables.stream()
                 .map(OrderTable::getId)
                 .collect(Collectors.toList()), Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name())))
                 .willReturn(false);
         given(orderTableDao.save(any(OrderTable.class))).willReturn(null);
 
         // when
-        tableGroupBo.delete(1L);
+        tableGroupBo.delete(tableGroupId);
 
         // then
         ArgumentCaptor<OrderTable> argument = ArgumentCaptor.forClass(OrderTable.class);
-        verify(orderTableDao, times(mockOrderTables.size())).save(argument.capture());
+        verify(orderTableDao, times(orderTables.size())).save(argument.capture());
         assertThat(argument.getValue().getTableGroupId()).isNull(); // 테이블그룹에 지정되었던 테이블들을 지정 해제한다.
     }
 
@@ -230,12 +230,23 @@ class TableGroupBoTest {
     @Test
     void deleteOnlyWhenOrdersAreCompleted() {
         // given
-        mockOrderTable1.setTableGroupId(1L);
-        mockOrderTable2.setTableGroupId(1L);
-        ArrayList<OrderTable> mockOrderTables = new ArrayList<>(Arrays.asList(mockOrderTable1, mockOrderTable2));
+        Long tableGroupId = 1L;
+        OrderTable orderTable1 = OrderTableBuilder.mock()
+                .withId(1L)
+                .withTableGroupId(tableGroupId)
+                .withNumberOfGuests(1)
+                .withEmpty(true)
+                .build();
+        OrderTable orderTable2 = OrderTableBuilder.mock()
+                .withId(2L)
+                .withTableGroupId(tableGroupId)
+                .withNumberOfGuests(2)
+                .withEmpty(true)
+                .build();
+        List<OrderTable> orderTables = new ArrayList<>(Arrays.asList(orderTable1, orderTable2));
 
-        given(orderTableDao.findAllByTableGroupId(1L)).willReturn(mockOrderTables);
-        given(orderDao.existsByOrderTableIdInAndOrderStatusIn(mockOrderTables.stream()
+        given(orderTableDao.findAllByTableGroupId(1L)).willReturn(orderTables);
+        given(orderDao.existsByOrderTableIdInAndOrderStatusIn(orderTables.stream()
                 .map(OrderTable::getId)
                 .collect(Collectors.toList()), Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name())))
                 .willReturn(true);

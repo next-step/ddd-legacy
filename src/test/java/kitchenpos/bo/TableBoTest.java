@@ -35,35 +35,6 @@ class TableBoTest {
     @InjectMocks
     private TableBo tableBo;
 
-//    private MenuGroup mockMenuGroup;
-//    private OrderTable mockOrderTable;
-//    private List<OrderTable> mockOrderTables;
-//
-//    @BeforeEach
-//    void beforeEach() {
-//        mockMenuGroup = new MenuGroup();
-//        mockMenuGroup.setId(1L);
-//        mockMenuGroup.setName("메뉴그룹1");
-//
-//        mockOrderTable = new OrderTable();
-//        mockOrderTable.setId(1L);
-////        mockOrderTable.setTableGroupId(1L);
-//        mockOrderTable.setNumberOfGuests(5);
-//        mockOrderTable.setEmpty(false);
-//
-//        mockOrderTables = new ArrayList<>();
-//
-//        LongStream.range(1, 100).forEach(i -> {
-//            OrderTable orderTable = new OrderTable();
-//            orderTable.setId(i);
-//            orderTable.setTableGroupId(i);
-//            orderTable.setNumberOfGuests((int) i);
-//            orderTable.setEmpty((int) i % 2 == 0);
-//
-//            mockOrderTables.add(orderTable);
-//        });
-//    }
-
     @DisplayName("새로운 테이블을 생성할 수 있다.")
     @Test
     void create() {
