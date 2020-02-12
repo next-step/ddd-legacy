@@ -75,3 +75,7 @@
 |  |  |  |
 
 ## 모델링
+
+## 기타
+
+![legacypos 테이블 관계도](assets/legacypos_tables.jpg)
