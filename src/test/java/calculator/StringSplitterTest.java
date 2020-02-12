@@ -11,7 +11,7 @@ class StringSplitterTest {
 
     @DisplayName("구분자가 없을 때, 입력값을 그대로 반환한다.")
     @Test
-    void withoutDelimiter(){
+    void withoutDelimiter() {
         String input = "123";
         assertThat(StringSplitter.extractNumberStringByDelimiter(input))
                 .containsOnly(input);
@@ -28,7 +28,7 @@ class StringSplitterTest {
     @DisplayName("문자열에 CustomDelimiter가 포함된 경우")
     @ParameterizedTest
     @ValueSource(strings = {"//;\n1;2;3;4", "//a\n1a2a3a4", "//!\n1!2!3!4"})
-    void withCustomedDelimiterRegex(final String input){
+    void withCustomedDelimiterRegex(final String input) {
         String[] expect = {"1", "2", "3", "4"};
 
         assertThat(StringSplitter.extractNumberStringByDelimiter(input))

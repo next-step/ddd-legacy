@@ -19,7 +19,7 @@ public class PositiveIntegerTest {
 
     @DisplayName(value = "Integer 범위를 넘어서는 값을 입력하면 RuntimeException을 생성한다.")
     @Test
-    void overIntegerRange(){
+    void overIntegerRange() {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> new PositiveInteger(Integer.MAX_VALUE + 1));
     }

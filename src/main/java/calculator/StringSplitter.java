@@ -8,10 +8,10 @@ public class StringSplitter {
     private static final String CUSTOMED_DELIMITER_MATCHING_REGEX = "//(.)\n(.*)";
     private static final Pattern CUSTOM_SPLIT_REGEX = Pattern.compile(CUSTOMED_DELIMITER_MATCHING_REGEX);
 
-    public static String[] extractNumberStringByDelimiter(String text){
+    public static String[] extractNumberStringByDelimiter(String text) {
         Matcher m = CUSTOM_SPLIT_REGEX.matcher(text);
 
-        if(m.matches()){
+        if (m.matches()) {
             String delimiter = m.group(1);
             String numberString = m.group(2);
 
