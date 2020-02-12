@@ -12,9 +12,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
+
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -49,6 +52,19 @@ class MenuGroupRestControllerTests {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/menu-groups/" + mockMenuGroup.getId()))
                 .andExpect(jsonPath("$.name", is(menuGroupName)))
+        ;
+    }
+
+    @DisplayName("MenuGroup 전체 GET 요청 시 정보 확인 가능")
+    @ParameterizedTest
+    @ValueSource(strings = {"testMenu, testMenu2"})
+    public void getMenuGroupCollection(String menuGroupName) throws Exception {
+        mockMenuGroup.setName(menuGroupName);
+        given(menuGroupBo.list()).willReturn(Collections.singletonList(mockMenuGroup));
+
+        mockMvc.perform(get("/api/menus-groups"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.*.name", is(Collections.singletonList(menuGroupName))))
         ;
     }
 }
