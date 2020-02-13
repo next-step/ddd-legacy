@@ -1,15 +1,20 @@
 package kitchenpos.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.bo.ProductBo;
 import kitchenpos.model.Product;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,18 +24,28 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ProductRestController.class)
+@ExtendWith(MockitoExtension.class)
 class ProductRestControllerTests {
-    @Autowired
+    @InjectMocks
+    private ProductRestController productRestController;
+
+    @Mock
+    private ProductBo productBo;
+
     private MockMvc mockMvc;
 
-    @MockBean
-    private ProductBo productBo;
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private static Product mockCreated;
     private static List<Product> mockProducts = new ArrayList<>();
+
+    @BeforeEach
+    public void setupMockMvc() {
+        this.mockMvc = MockMvcBuilders.standaloneSetup(productRestController).alwaysDo(print()).build();
+    }
 
     @BeforeAll
     public static void setup() {
@@ -43,14 +58,12 @@ class ProductRestControllerTests {
     @DisplayName("POST 상품 시도 성공(201)")
     @Test
     public void postProductSuccess() throws Exception {
+        Product mockRequestProduct = new Product();
         given(productBo.create(any(Product.class))).willReturn(mockCreated);
 
         mockMvc.perform(post("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\n" +
-                        "  \"name\": \"강정치킨\",\n" +
-                        "  \"price\": 17000\n" +
-                        "}"))
+                .content(objectMapper.writeValueAsBytes(mockRequestProduct)))
                 .andExpect(status().isCreated())
                 .andExpect(header().stringValues("Location", "/api/products/1"))
                 .andExpect(content().string(containsString("\"id\":1")))

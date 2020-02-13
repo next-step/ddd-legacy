@@ -1,6 +1,7 @@
 package kitchenpos.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.bo.MenuGroupBo;
 import kitchenpos.model.MenuGroup;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ class MenuGroupRestControllerTests {
     @Mock
     private MenuGroupBo menuGroupBo;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private MockMvc mockMvc;
 

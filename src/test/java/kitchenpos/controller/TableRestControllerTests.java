@@ -1,15 +1,20 @@
 package kitchenpos.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.bo.TableBo;
 import kitchenpos.model.OrderTable;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,20 +25,30 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(TableRestController.class)
+@ExtendWith(MockitoExtension.class)
 class TableRestControllerTests {
-    @Autowired
+    @InjectMocks
+    private TableRestController tableRestController;
+
+    @Mock
+    private TableBo tableBo;
+
     private MockMvc mockMvc;
 
-    @MockBean
-    private TableBo tableBo;
+    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private static OrderTable mockCreated;
     private static OrderTable mockEmptyTable;
     private static OrderTable mockHundredGuestTable;
     private static List<OrderTable> mockOrderTables = new ArrayList<>();
+
+    @BeforeEach
+    public void setupMockMvc() {
+        this.mockMvc = MockMvcBuilders.standaloneSetup(tableRestController).alwaysDo(print()).build();
+    }
 
     @BeforeAll
     private static void setup() {
@@ -52,15 +67,12 @@ class TableRestControllerTests {
     @DisplayName("PUT 주문 테이블 시도 성공(201)")
     @Test
     public void putOrderTableSuccess() throws Exception {
+        OrderTable mockRequestOrderTable = new OrderTable();
         given(tableBo.create(any(OrderTable.class))).willReturn(mockCreated);
 
         mockMvc.perform(put("/api/tables")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\n" +
-                        "  \"tableGroupId\": 1,\n" +
-                        "  \"numberOfGuests\": 4,\n" +
-                        "  \"empty\": false\n" +
-                        "}"))
+                .content(objectMapper.writeValueAsBytes(mockRequestOrderTable)))
                 .andExpect(status().isCreated())
                 .andExpect(header().stringValues("Location", "/api/tables/1"))
         ;
@@ -80,13 +92,13 @@ class TableRestControllerTests {
     @DisplayName("PUT 주문 테이블 공석으로 변경 시도 성공(200)")
     @Test
     public void changeOrderTableEmptySuccess() throws Exception {
+        OrderTable mockEmptyTable = new OrderTable();
+        mockEmptyTable.setEmpty(true);
         given(tableBo.changeEmpty(eq(1L), any(OrderTable.class))).willReturn(mockEmptyTable);
 
         mockMvc.perform(put("/api/tables/1/empty")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\n" +
-                        "  \"empty\": true\n" +
-                        "}"))
+                .content(objectMapper.writeValueAsBytes(mockEmptyTable)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"empty\":true")))
         ;
@@ -95,13 +107,12 @@ class TableRestControllerTests {
     @DisplayName("PUT 주문 테이블 손님수 변경 시도 성공(200)")
     @Test
     public void changeOrderTableGuestsSuccess() throws Exception {
+        OrderTable mockHundredGuestsTable = new OrderTable();
         given(tableBo.changeEmpty(eq(1L), any(OrderTable.class))).willReturn(mockHundredGuestTable);
 
         mockMvc.perform(put("/api/tables/1/empty")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\n" +
-                        "  \"numberOfGuests\": 100\n" +
-                        "}"))
+                .content(objectMapper.writeValueAsBytes(mockHundredGuestsTable)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("\"numberOfGuests\":100")))
         ;
