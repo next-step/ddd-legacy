@@ -1,6 +1,5 @@
-package kitchenpos;
+package kitchenpos.bo;
 
-import kitchenpos.bo.ProductBo;
 import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Product;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,9 +29,7 @@ public class ProductBoTest {
 
     @BeforeEach
     void setUp() {
-        product = new Product();
-        product.setPrice(BigDecimal.valueOf(1000));
-        product.setName("gogi");
+        product = new Product("gogi", BigDecimal.valueOf(1000));
     }
 
     @Test
@@ -40,12 +38,30 @@ public class ProductBoTest {
         // give
         given(productDao.save(product))
                 .willReturn(product);
-
         // when
         Product createdProduct = productBo.create(product);
-
         // then
         assertThat(createdProduct.getName()).isEqualTo("gogi");
         assertThat(createdProduct.getPrice().longValue()).isEqualTo(1000L);
+    }
+
+    @Test
+    @DisplayName("상품 등록 빈 객체 예외처리")
+    void registerExceptionByEmptyObject() {
+        // give
+        Product productEmpty = new Product();
+        // when
+        assertThatIllegalArgumentException().isThrownBy(() -> productBo.create(productEmpty));
+    }
+
+    @Test
+    @DisplayName("상품 등록 가격이 0 미만 및 null 예외 처리")
+    void registerExceptionByProductPrice() {
+        // give
+        Product productPriceNull = new Product("gogi", null);
+        Product productPriceMinus = new Product("gogi", BigDecimal.valueOf(-1));
+        // when
+        assertThatIllegalArgumentException().isThrownBy(() -> productBo.create(productPriceNull));
+        assertThatIllegalArgumentException().isThrownBy(() -> productBo.create(productPriceMinus));
     }
 }
