@@ -37,7 +37,7 @@ public class ProductBoTest {
 
     @Test
     @DisplayName("상품 등록")
-    void registerProduct() {
+    void createProduct() {
         // give
         given(productDao.save(product))
                 .willReturn(product);
@@ -50,7 +50,7 @@ public class ProductBoTest {
 
     @Test
     @DisplayName("상품 등록 빈 객체 예외처리")
-    void registerExceptionByEmptyObject() {
+    void createExceptionByEmptyObject() {
         // give
         Product productEmpty = new Product();
         // when
@@ -59,7 +59,7 @@ public class ProductBoTest {
 
     @Test
     @DisplayName("상품 등록 가격이 0 미만 및 null 예외 처리")
-    void registerExceptionByProductPrice() {
+    void createExceptionByProductPrice() {
         // give
         Product productPriceNull = new Product("gogi", null);
         Product productPriceMinus = new Product("gogi", BigDecimal.valueOf(-1));
