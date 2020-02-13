@@ -104,12 +104,15 @@ class OrderBoTest {
         when(orderTableDao.findById(anyLong()))
                 .thenReturn(Optional.of(orderTable));
         when(orderDao.save(any(Order.class)))
-                .thenReturn(order);
+                .thenAnswer(invocation -> {
+                    order.setId(1L);
+                    return order;
+                });
         when(orderLineItemDao.save(any(OrderLineItem.class)))
                 .thenReturn(orderLineItem);
 
         Order result = orderBo.create(order);
-        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getOrderStatus()).isEqualTo(String.valueOf(OrderStatus.COOKING));
 
     }
 
