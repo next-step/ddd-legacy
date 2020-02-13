@@ -1,5 +1,6 @@
 package kitchenpos.bo;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.model.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,38 +11,72 @@ import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.util.NestedServletException;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
+@AutoConfigureMockMvc
 class ProductBoTest {
+
+    @Autowired
+    private MockMvc mockMvc;
 
     @Autowired
     private ProductBo productBo;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
     @DisplayName("상품 정상 생성")
-    void create() {
+    void create() throws Exception {
         String productName = "간장치킨";
-        Product product = createProduct(productName, BigDecimal.valueOf(17000));
+        BigDecimal price = BigDecimal.valueOf(17000);
 
-        Product savedProduct = productBo.create(product);
+        Product product = createProduct(productName, price);
 
-        assertThat(savedProduct.getName()).isEqualTo(productName);
+        mockMvc.perform(post("/api/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(product)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(header().exists(HttpHeaders.LOCATION))
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("name").value(productName))
+                .andExpect(jsonPath("price").value("17000.0"))
+                ;
     }
 
     @DisplayName("상품 가격이 0 보다 작을 경우 생성 실패")
     @ParameterizedTest
     @ValueSource(ints = -1000)
-    void createFailByNegative(@ConvertWith(BigdecimalConverter.class) BigDecimal price) {
-        Product product = createProduct("양념치킨", price);
+    void createFailByNegative(@ConvertWith(BigdecimalConverter.class) BigDecimal price) throws Exception {
+        String productName = "양념치킨";
+        Product product = createProduct(productName, price);
 
-        assertThrows(IllegalArgumentException.class, () -> productBo.create(product));
+        assertThrows(NestedServletException.class, () -> {
+            mockMvc.perform(post("/api/products")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(product)))
+                    .andDo(print())
+                    .andExpect(status().is5xxServerError())
+                    ;
+        });
     }
 
     @DisplayName("상품 가격이 Null 일 경우 생성 실패")
@@ -50,21 +85,31 @@ class ProductBoTest {
     void createFailByNull(BigDecimal price) {
         Product product = createProduct("후라이드치킨", price);
 
-        assertThrows(IllegalArgumentException.class, () -> productBo.create(product));
+        assertThrows(NestedServletException.class, () -> {
+            mockMvc.perform(post("/api/products")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(product)))
+                    .andDo(print())
+                    .andExpect(status().is5xxServerError())
+                    ;
+        });
     }
 
     @Test
     @DisplayName("상품 리스트 조회 테스트")
-    void list() {
+    void list() throws Exception {
         Product product1 = createProduct("양념치킨", BigDecimal.valueOf(17000));
         Product product2 = createProduct("후라이드치킨", BigDecimal.valueOf(16000));
 
         productBo.create(product1);
         productBo.create(product2);
 
-        List<Product> list = productBo.list();
+        mockMvc.perform(get("/api/products"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].name").exists())
+                ;
 
-        assertThat(list.size()).isEqualTo(9);
     }
 
     private Product createProduct(String productName, BigDecimal price) {

@@ -1,5 +1,8 @@
 package kitchenpos.bo;
 
+import kitchenpos.builder.OrderBuilder;
+import kitchenpos.builder.OrderLineItemBuilder;
+import kitchenpos.builder.OrderTableBuilder;
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderLineItemDao;
@@ -17,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -53,14 +55,16 @@ class OrderBoTest {
                 .setQuantity(3)
                 .setMenuId(1L)
                 .setSeq(1L)
-                .build();
+                .build()
+                ;
 
         OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
                 .setOrderId(2L)
                 .setQuantity(1)
                 .setMenuId(2L)
                 .setSeq(2L)
-                .build();
+                .build()
+                ;
 
         List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
 
@@ -82,11 +86,13 @@ class OrderBoTest {
                 .setEmpty(false)
                 .setNumberOfGuests(4)
                 .setId(1L)
-                .build();
+                .build()
+                ;
 
         List<Long> menuIds = orderLineItems.stream()
                 .map(OrderLineItem::getMenuId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                ;
 
         given(menuDao.countByIdIn(menuIds)).willReturn(Long.valueOf(orderLineItems.size()));
         given(orderTableDao.findById(requestOrder.getOrderTableId())).willReturn(Optional.of(orderTable));
@@ -117,14 +123,16 @@ class OrderBoTest {
                 .setQuantity(3)
                 .setMenuId(1L)
                 .setSeq(1L)
-                .build();
+                .build()
+                ;
 
         OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
                 .setOrderId(2L)
                 .setQuantity(1)
                 .setMenuId(2L)
                 .setSeq(2L)
-                .build();
+                .build()
+                ;
 
         List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
 
@@ -136,7 +144,8 @@ class OrderBoTest {
 
         List<Long> menuIds = orderLineItems.stream()
                 .map(OrderLineItem::getMenuId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList())
+                ;
 
         given(menuDao.countByIdIn(menuIds)).willReturn(Long.valueOf(orderLineItems.size() - 1));
 
@@ -151,14 +160,16 @@ class OrderBoTest {
                 .setQuantity(3)
                 .setMenuId(1L)
                 .setSeq(1L)
-                .build();
+                .build()
+                ;
 
         OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
                 .setOrderId(2L)
                 .setQuantity(1)
                 .setMenuId(2L)
                 .setSeq(2L)
-                .build();
+                .build()
+                ;
 
         List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
 
@@ -187,14 +198,16 @@ class OrderBoTest {
                 .setQuantity(3)
                 .setMenuId(1L)
                 .setSeq(1L)
-                .build();
+                .build()
+                ;
 
         OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
                 .setOrderId(2L)
                 .setQuantity(1)
                 .setMenuId(2L)
                 .setSeq(2L)
-                .build();
+                .build()
+                ;
 
         List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
 
@@ -229,14 +242,16 @@ class OrderBoTest {
                 .setQuantity(3)
                 .setMenuId(1L)
                 .setSeq(1L)
-                .build();
+                .build()
+                ;
 
         OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
                 .setOrderId(2L)
                 .setQuantity(1)
                 .setMenuId(2L)
                 .setSeq(2L)
-                .build();
+                .build()
+                ;
 
         List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
 
@@ -268,14 +283,16 @@ class OrderBoTest {
                 .setQuantity(3)
                 .setMenuId(1L)
                 .setSeq(1L)
-                .build();
+                .build()
+                ;
 
         OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
                 .setOrderId(2L)
                 .setQuantity(1)
                 .setMenuId(2L)
                 .setSeq(2L)
-                .build();
+                .build()
+                ;
 
         List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
 
@@ -290,126 +307,4 @@ class OrderBoTest {
 
         assertThrows(IllegalArgumentException.class, () -> orderBo.changeOrderStatus(requestOrder.getId(), requestOrder));
     }
-
-    public static class OrderBuilder {
-        private Long id;
-        private Long orderTableId;
-        private String orderStatus;
-        private LocalDateTime orderedTime;
-        private List<OrderLineItem> orderLineItems;
-
-        public OrderBuilder setId(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public OrderBuilder setOrderTableId(Long orderTableId) {
-            this.orderTableId = orderTableId;
-            return this;
-        }
-
-        public OrderBuilder setOrderStatus(String orderStatus) {
-            this.orderStatus = orderStatus;
-            return this;
-        }
-
-        public OrderBuilder setOrderedTime(LocalDateTime orderedTime) {
-            this.orderedTime = orderedTime;
-            return this;
-        }
-
-        public OrderBuilder setOrderLineItems(List<OrderLineItem> orderLineItems) {
-            this.orderLineItems = orderLineItems;
-            return this;
-        }
-
-        public Order build() {
-            Order order = new Order();
-
-            order.setId(id);
-            order.setOrderedTime(orderedTime);
-            order.setOrderLineItems(orderLineItems);
-            order.setOrderStatus(orderStatus);
-            order.setOrderTableId(orderTableId);
-
-            return order;
-        }
-    }
-
-    public static class OrderLineItemBuilder {
-        private Long seq;
-        private Long orderId;
-        private Long menuId;
-        private long quantity;
-
-        public OrderLineItemBuilder setSeq(Long seq) {
-            this.seq = seq;
-            return this;
-        }
-
-        public OrderLineItemBuilder setOrderId(Long orderId) {
-            this.orderId = orderId;
-            return this;
-        }
-
-        public OrderLineItemBuilder setMenuId(Long menuId) {
-            this.menuId = menuId;
-            return this;
-        }
-
-        public OrderLineItemBuilder setQuantity(long quantity) {
-            this.quantity = quantity;
-            return this;
-        }
-
-        public OrderLineItem build() {
-            OrderLineItem orderLineItem = new OrderLineItem();
-
-            orderLineItem.setMenuId(menuId);
-            orderLineItem.setOrderId(orderId);
-            orderLineItem.setQuantity(quantity);
-            orderLineItem.setSeq(seq);
-
-            return orderLineItem;
-        }
-    }
-
-    public static class OrderTableBuilder {
-        private Long id;
-        private Long tableGroupId;
-        private int numberOfGuests;
-        private boolean empty;
-
-        public OrderTableBuilder setId(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public OrderTableBuilder setTableGroupId(Long tableGroupId) {
-            this.tableGroupId = tableGroupId;
-            return this;
-        }
-
-        public OrderTableBuilder setNumberOfGuests(int numberOfGuests) {
-            this.numberOfGuests = numberOfGuests;
-            return this;
-        }
-
-        public OrderTableBuilder setEmpty(boolean empty) {
-            this.empty = empty;
-            return this;
-        }
-
-        public OrderTable build() {
-            OrderTable orderTable = new OrderTable();
-
-            orderTable.setId(id);
-            orderTable.setEmpty(empty);
-            orderTable.setNumberOfGuests(numberOfGuests);
-            orderTable.setTableGroupId(tableGroupId);
-
-            return orderTable;
-        }
-    }
-
 }

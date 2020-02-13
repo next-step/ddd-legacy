@@ -1,5 +1,6 @@
 package kitchenpos.bo;
 
+import kitchenpos.builder.OrderTableBuilder;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.OrderStatus;
@@ -41,14 +42,16 @@ class TableBoTest {
                 .setEmpty(false)
                 .setId(1L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         OrderTable orderTable2 = new OrderTableBuilder()
                 .setTableGroupId(2L)
                 .setEmpty(false)
                 .setId(2L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
 
@@ -68,7 +71,8 @@ class TableBoTest {
                 .setEmpty(false)
                 .setId(1L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         when(orderTableDao.save(orderTable)).thenReturn(orderTable);
 
@@ -83,12 +87,14 @@ class TableBoTest {
     void changeEmpty() {
         OrderTable requestOrderTable = new OrderTableBuilder()
                 .setEmpty(true)
-                .build();
+                .build()
+                ;
 
         OrderTable orderTable = new OrderTableBuilder()
                 .setEmpty(false)
                 .setId(1L)
-                .build();
+                .build()
+                ;
 
         when(orderTableDao.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
         when(orderDao.existsByOrderTableIdAndOrderStatusIn(orderTable.getId(),
@@ -107,7 +113,8 @@ class TableBoTest {
                 .setId(1L)
                 .setTableGroupId(1L)
                 .setEmpty(false)
-                .build();
+                .build()
+                ;
 
         when(orderTableDao.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
 
@@ -120,7 +127,8 @@ class TableBoTest {
         OrderTable orderTable = new OrderTableBuilder()
                 .setId(1L)
                 .setEmpty(false)
-                .build();
+                .build()
+                ;
 
         when(orderTableDao.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
         when(orderDao.existsByOrderTableIdAndOrderStatusIn(orderTable.getId(),
@@ -137,13 +145,15 @@ class TableBoTest {
                 .setId(1L)
                 .setNumberOfGuests(value)
                 .setEmpty(false)
-                .build();
+                .build()
+                ;
 
         OrderTable savedOrderTable = new OrderTableBuilder()
                 .setId(1L)
                 .setNumberOfGuests(value)
                 .setEmpty(false)
-                .build();
+                .build()
+                ;
 
         when(orderTableDao.findById(requestOrderTable.getId())).thenReturn(Optional.of(requestOrderTable));
         when(orderTableDao.save(requestOrderTable)).thenReturn(savedOrderTable);
@@ -162,7 +172,8 @@ class TableBoTest {
                 .setId(1L)
                 .setNumberOfGuests(value)
                 .setEmpty(false)
-                .build();
+                .build()
+                ;
 
         assertThrows(IllegalArgumentException.class, () -> tableBo.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
@@ -174,48 +185,11 @@ class TableBoTest {
                 .setId(1L)
                 .setNumberOfGuests(3)
                 .setEmpty(false)
-                .build();
+                .build()
+                ;
 
         when(orderTableDao.findById(orderTable.getId())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> tableBo.changeNumberOfGuests(orderTable.getId(), orderTable));
-    }
-
-    public static class OrderTableBuilder {
-        private Long id;
-        private Long tableGroupId;
-        private int numberOfGuests;
-        private boolean empty;
-
-        public OrderTableBuilder setId(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public OrderTableBuilder setTableGroupId(Long tableGroupId) {
-            this.tableGroupId = tableGroupId;
-            return this;
-        }
-
-        public OrderTableBuilder setNumberOfGuests(int numberOfGuests) {
-            this.numberOfGuests = numberOfGuests;
-            return this;
-        }
-
-        public OrderTableBuilder setEmpty(boolean empty) {
-            this.empty = empty;
-            return this;
-        }
-
-        public OrderTable build() {
-            OrderTable orderTable = new OrderTable();
-
-            orderTable.setId(id);
-            orderTable.setEmpty(empty);
-            orderTable.setNumberOfGuests(numberOfGuests);
-            orderTable.setTableGroupId(tableGroupId);
-
-            return orderTable;
-        }
     }
 }

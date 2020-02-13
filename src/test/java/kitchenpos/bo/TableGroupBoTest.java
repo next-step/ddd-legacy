@@ -1,5 +1,7 @@
 package kitchenpos.bo;
 
+import kitchenpos.builder.OrderTableBuilder;
+import kitchenpos.builder.TableGroupBuilder;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.dao.TableGroupDao;
@@ -47,13 +49,15 @@ class TableGroupBoTest {
                 .setEmpty(true)
                 .setId(1L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         OrderTable orderTable2 = new OrderTableBuilder()
                 .setEmpty(true)
                 .setId(2L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
 
@@ -61,7 +65,8 @@ class TableGroupBoTest {
                 .setId(1L)
                 .setOrderTables(orderTables)
                 .setCreatedDate(LocalDateTime.now())
-                .build();
+                .build()
+                ;
 
         List<Long> orderTableIds = orderTables.stream()
                 .map(OrderTable::getId)
@@ -83,7 +88,8 @@ class TableGroupBoTest {
                 .setEmpty(true)
                 .setId(1L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         List<OrderTable> orderTables = Arrays.asList(orderTable1);
 
@@ -91,7 +97,8 @@ class TableGroupBoTest {
                 .setId(1L)
                 .setOrderTables(orderTables)
                 .setCreatedDate(LocalDateTime.now())
-                .build();
+                .build()
+                ;
 
         assertThrows(IllegalArgumentException.class, () -> tableGroupBo.create(tableGroup));
     }
@@ -102,7 +109,8 @@ class TableGroupBoTest {
         TableGroup tableGroup = new TableGroupBuilder()
                 .setId(1L)
                 .setCreatedDate(LocalDateTime.now())
-                .build();
+                .build()
+                ;
 
         assertThrows(IllegalArgumentException.class, () -> tableGroupBo.create(tableGroup));
     }
@@ -114,13 +122,15 @@ class TableGroupBoTest {
                 .setEmpty(true)
                 .setId(1L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         OrderTable orderTable2 = new OrderTableBuilder()
                 .setEmpty(true)
                 .setId(2L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
 
@@ -128,7 +138,8 @@ class TableGroupBoTest {
                 .setId(1L)
                 .setOrderTables(orderTables)
                 .setCreatedDate(LocalDateTime.now())
-                .build();
+                .build()
+                ;
 
         List<Long> orderTableIds = orderTables.stream()
                 .map(OrderTable::getId)
@@ -147,13 +158,15 @@ class TableGroupBoTest {
                 .setTableGroupId(2L)
                 .setId(1L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         OrderTable orderTable2 = new OrderTableBuilder()
                 .setEmpty(true)
                 .setId(2L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
 
@@ -161,7 +174,8 @@ class TableGroupBoTest {
                 .setId(1L)
                 .setOrderTables(orderTables)
                 .setCreatedDate(LocalDateTime.now())
-                .build();
+                .build()
+                ;
 
         List<Long> orderTableIds = orderTables.stream()
                 .map(OrderTable::getId)
@@ -179,13 +193,15 @@ class TableGroupBoTest {
                 .setEmpty(true)
                 .setId(1L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         OrderTable orderTable2 = new OrderTableBuilder()
                 .setEmpty(true)
                 .setId(2L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
 
@@ -193,7 +209,8 @@ class TableGroupBoTest {
                 .setId(1L)
                 .setOrderTables(orderTables)
                 .setCreatedDate(LocalDateTime.now())
-                .build();
+                .build()
+                ;
 
         List<Long> orderTableIds = orderTables.stream()
                 .map(OrderTable::getId)
@@ -216,13 +233,15 @@ class TableGroupBoTest {
                 .setEmpty(true)
                 .setId(1L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         OrderTable orderTable2 = new OrderTableBuilder()
                 .setEmpty(true)
                 .setId(2L)
                 .setNumberOfGuests(0)
-                .build();
+                .build()
+                ;
 
         List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
 
@@ -230,7 +249,8 @@ class TableGroupBoTest {
                 .setId(1L)
                 .setOrderTables(orderTables)
                 .setCreatedDate(LocalDateTime.now())
-                .build();
+                .build()
+                ;
 
         List<Long> orderTableIds = orderTables.stream()
                 .map(OrderTable::getId)
@@ -241,76 +261,5 @@ class TableGroupBoTest {
                 orderTableIds, Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> tableGroupBo.delete(tableGroup.getId()));
-    }
-
-
-
-    public static class TableGroupBuilder {
-        private Long id;
-        private LocalDateTime createdDate;
-        private List<OrderTable> orderTables;
-
-        public TableGroupBuilder setId(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public TableGroupBuilder setCreatedDate(LocalDateTime createdDate) {
-            this.createdDate = createdDate;
-            return this;
-        }
-
-        public TableGroupBuilder setOrderTables(List<OrderTable> orderTables) {
-            this.orderTables = orderTables;
-            return this;
-        }
-
-        public TableGroup build() {
-            TableGroup tableGroup = new TableGroup();
-
-            tableGroup.setCreatedDate(createdDate);
-            tableGroup.setId(id);
-            tableGroup.setOrderTables(orderTables);
-
-            return tableGroup;
-        }
-    }
-
-    public static class OrderTableBuilder {
-        private Long id;
-        private Long tableGroupId;
-        private int numberOfGuests;
-        private boolean empty;
-
-        public OrderTableBuilder setId(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public OrderTableBuilder setTableGroupId(Long tableGroupId) {
-            this.tableGroupId = tableGroupId;
-            return this;
-        }
-
-        public OrderTableBuilder setNumberOfGuests(int numberOfGuests) {
-            this.numberOfGuests = numberOfGuests;
-            return this;
-        }
-
-        public OrderTableBuilder setEmpty(boolean empty) {
-            this.empty = empty;
-            return this;
-        }
-
-        public OrderTable build() {
-            OrderTable orderTable = new OrderTable();
-
-            orderTable.setId(id);
-            orderTable.setEmpty(empty);
-            orderTable.setNumberOfGuests(numberOfGuests);
-            orderTable.setTableGroupId(tableGroupId);
-
-            return orderTable;
-        }
     }
 }

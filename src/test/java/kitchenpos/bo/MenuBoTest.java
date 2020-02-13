@@ -1,5 +1,7 @@
 package kitchenpos.bo;
 
+import kitchenpos.builder.MenuBuilder;
+import kitchenpos.builder.MenuProductBuilder;
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.dao.MenuProductDao;
@@ -33,7 +35,7 @@ class MenuBoTest {
     private MenuBo menuBo;
 
     @Mock
-    private MenuProductDao menuProductDao; // TODO
+    private MenuProductDao menuProductDao;
 
     @Mock
     private MenuDao menuDao;
@@ -85,7 +87,6 @@ class MenuBoTest {
         assertThat(list.size()).isEqualTo(2);
     }
 
-
     @Test
     @DisplayName("메뉴 생성 정상 동작")
     void create() {
@@ -94,13 +95,16 @@ class MenuBoTest {
                 .setMenuId(1L)
                 .setSeq(1L)
                 .setQuantity(2)
-                .build();
+                .build()
+                ;
+
         MenuProduct menuProduct2 = new MenuProductBuilder()
                 .setProductId(2L)
                 .setMenuId(1L)
                 .setSeq(1L)
                 .setQuantity(2)
-                .build();
+                .build()
+                ;
 
         Menu menu = new MenuBuilder()
                 .setMenuGroupId(1L)
@@ -108,8 +112,8 @@ class MenuBoTest {
                 .setPrice(BigDecimal.TEN)
                 .setName("간장치킨")
                 .setMenuProducts(Arrays.asList(menuProduct1, menuProduct2))
-                .build();
-
+                .build()
+                ;
 
         menu.getMenuProducts()
                 .forEach(menuProduct -> {
@@ -135,13 +139,16 @@ class MenuBoTest {
                 .setMenuId(1L)
                 .setSeq(1L)
                 .setQuantity(2)
-                .build();
+                .build()
+                ;
+
         MenuProduct menuProduct2 = new MenuProductBuilder()
                 .setProductId(2L)
                 .setMenuId(1L)
                 .setSeq(1L)
                 .setQuantity(2)
-                .build();
+                .build()
+                ;
 
         Menu menu = new MenuBuilder()
                 .setMenuGroupId(1L)
@@ -149,7 +156,8 @@ class MenuBoTest {
                 .setPrice(BigDecimal.valueOf(-1L))
                 .setName("간장치킨")
                 .setMenuProducts(Arrays.asList(menuProduct1, menuProduct2))
-                .build();
+                .build()
+                ;
 
         assertThrows(IllegalArgumentException.class, () -> menuBo.create(menu));
     }
@@ -165,13 +173,16 @@ class MenuBoTest {
                 .setMenuId(1L)
                 .setSeq(1L)
                 .setQuantity(2)
-                .build();
+                .build()
+                ;
+
         MenuProduct menuProduct2 = new MenuProductBuilder()
                 .setProductId(2L)
                 .setMenuId(1L)
                 .setSeq(1L)
                 .setQuantity(2)
-                .build();
+                .build()
+                ;
 
         Menu menu = new MenuBuilder()
                 .setMenuGroupId(value)
@@ -179,7 +190,8 @@ class MenuBoTest {
                 .setPrice(BigDecimal.TEN)
                 .setName("간장치킨")
                 .setMenuProducts(Arrays.asList(menuProduct1, menuProduct2))
-                .build();
+                .build()
+                ;
 
         menu.setMenuGroupId(value);
 
@@ -196,13 +208,16 @@ class MenuBoTest {
                 .setMenuId(1L)
                 .setSeq(1L)
                 .setQuantity(2)
-                .build();
+                .build()
+                ;
+
         MenuProduct menuProduct2 = new MenuProductBuilder()
                 .setProductId(2L)
                 .setMenuId(1L)
                 .setSeq(1L)
                 .setQuantity(2)
-                .build();
+                .build()
+                ;
 
         Menu menu = new MenuBuilder()
                 .setMenuGroupId(1L)
@@ -210,7 +225,8 @@ class MenuBoTest {
                 .setPrice(price)
                 .setName("간장치킨")
                 .setMenuProducts(Arrays.asList(menuProduct1, menuProduct2))
-                .build();
+                .build()
+                ;
 
         assertThrows(IllegalArgumentException.class, () -> menuBo.create(menu));
     }
@@ -224,7 +240,8 @@ class MenuBoTest {
                 .setMenuId(1L)
                 .setSeq(1L)
                 .setQuantity(2)
-                .build();
+                .build()
+                ;
 
         Menu menu = new MenuBuilder()
                 .setMenuGroupId(1L)
@@ -232,7 +249,8 @@ class MenuBoTest {
                 .setPrice(BigDecimal.TEN)
                 .setName("간장치킨")
                 .setMenuProducts(Arrays.asList(menuProduct1))
-                .build();
+                .build()
+                ;
 
         given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
 
@@ -247,7 +265,8 @@ class MenuBoTest {
                 .setMenuId(1L)
                 .setSeq(1L)
                 .setQuantity(2)
-                .build();
+                .build()
+                ;
 
         Menu menu = new MenuBuilder()
                 .setMenuGroupId(1L)
@@ -255,7 +274,8 @@ class MenuBoTest {
                 .setPrice(BigDecimal.TEN)
                 .setName("간장치킨")
                 .setMenuProducts(Arrays.asList(menuProduct1))
-                .build();
+                .build()
+                ;
 
         menu.getMenuProducts()
                 .forEach(menuProduct -> {
@@ -268,84 +288,4 @@ class MenuBoTest {
 
         assertThrows(IllegalArgumentException.class, () -> menuBo.create(menu));
     }
-
-    public static class MenuBuilder {
-        private Long id;
-        private String name;
-        private BigDecimal price;
-        private Long menuGroupId;
-        private List<MenuProduct> menuProducts;
-
-        public MenuBuilder setId(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public MenuBuilder setName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public MenuBuilder setPrice(BigDecimal price) {
-            this.price = price;
-            return this;
-        }
-
-        public MenuBuilder setMenuGroupId(Long menuGroupId) {
-            this.menuGroupId = menuGroupId;
-            return this;
-        }
-
-        public MenuBuilder setMenuProducts(List<MenuProduct> menuProducts) {
-            this.menuProducts = menuProducts;
-            return this;
-        }
-
-        public Menu build() {
-            Menu menu = new Menu();
-            menu.setId(id);
-            menu.setPrice(price);
-            menu.setName(name);
-            menu.setMenuGroupId(menuGroupId);
-            menu.setMenuProducts(menuProducts);
-            return menu;
-        }
-    }
-
-    public static class MenuProductBuilder {
-        private Long seq;
-        private Long menuId;
-        private Long productId;
-        private long quantity;
-
-        public MenuProductBuilder setSeq(Long seq) {
-            this.seq = seq;
-            return this;
-        }
-
-        public MenuProductBuilder setMenuId(Long menuId) {
-            this.menuId = menuId;
-            return this;
-        }
-
-        public MenuProductBuilder setProductId(Long productId) {
-            this.productId = productId;
-            return this;
-        }
-
-        public MenuProductBuilder setQuantity(long quantity) {
-            this.quantity = quantity;
-            return this;
-        }
-
-        public MenuProduct build() {
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(productId);
-            menuProduct.setMenuId(menuId);
-            menuProduct.setQuantity(quantity);
-            menuProduct.setSeq(seq);
-            return menuProduct;
-        }
-    }
 }
-
