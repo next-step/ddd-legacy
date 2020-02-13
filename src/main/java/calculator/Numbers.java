@@ -1,10 +1,7 @@
 package calculator;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * @author Geonguk Han
@@ -12,15 +9,15 @@ import java.util.stream.IntStream;
  */
 public class Numbers {
 
-    private List<Number> numbers;
+    private final List<Number> numbers;
 
-    public Numbers(List<Number> numbers) {
-        this.numbers = numbers;
+    public Numbers(final List<Number> numbers) {
+        this.numbers = new ArrayList<>(numbers);
     }
 
     public int sum() {
         return numbers.stream()
-                .map(number -> number.getValue())
-                .reduce(0, Integer::sum);
+                .reduce(new Number(0), Number::sum)
+                .getValue();
     }
 }

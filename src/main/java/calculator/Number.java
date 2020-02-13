@@ -33,4 +33,8 @@ public class Number {
     private boolean isNegative() {
         return value < 0;
     }
+
+    public Number sum(final Number number) {
+        return new Number(value + number.getValue());
+    }
 }
