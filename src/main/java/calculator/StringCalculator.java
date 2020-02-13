@@ -26,19 +26,19 @@ public class StringCalculator {
         if (matcher.find()) {
             final String delimiter = matcher.group(1);
             final String[] split = matcher.group(2).split(delimiter);
-            Numbers numbers = parseToNumbers(split);
+            final Numbers numbers = parseToNumbers(split);
             return numbers.sum();
         }
 
         final String[] split = input.split(DEFAULT_DELIMITER);
-        Numbers numbers = parseToNumbers(split);
+        final Numbers numbers = parseToNumbers(split);
         return numbers.sum();
     }
 
     private Numbers parseToNumbers(final String[] numbers) {
-        List<Number> collect = Arrays.asList(numbers)
+        final List<Number> collect = Arrays.asList(numbers)
                 .stream()
-                .map(s -> new Number(s))
+                .map(Number::new)
                 .collect(Collectors.toList());
 
         return new Numbers(collect);
