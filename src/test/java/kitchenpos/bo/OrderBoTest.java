@@ -47,9 +47,11 @@ class OrderBoTest {
     @DisplayName("주문은 메뉴들의 집합이다")
     @Test
     void orderHasMenus() {
-        Order order = mock(Order.class);
-        given(order.getOrderLineItems()).willReturn(new ArrayList<>());
+        //given
+        Order order = createOrder();
+        order.setOrderLineItems(new ArrayList<>());
 
+        //when, then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> orderBo.create(order));
     }
@@ -57,9 +59,11 @@ class OrderBoTest {
     @DisplayName("존재하는 메뉴이어야 한다.")
     @Test
     void notExistMenu() {
+        //given
         Order order = createOrder();
         given(menuDao.countByIdIn(anyList())).willReturn(0L);
 
+        //when, then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> orderBo.create(order));
     }
@@ -67,6 +71,7 @@ class OrderBoTest {
     @DisplayName("주문은 테이블에 등록되어야 한다.")
     @Test
     void notExistTable() {
+        //given
         Order order = createOrder();
 
         given(menuDao.countByIdIn(anyList()))
@@ -74,13 +79,15 @@ class OrderBoTest {
         given(orderTableDao.findById(order.getOrderTableId()))
             .willReturn(Optional.ofNullable(null));
 
+        //when, then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> orderBo.create(order));
     }
 
-    @DisplayName("최초 주문시 조리중이다.")
+    @DisplayName("주문후 주문의 상태는 조리중이다.")
     @Test
     void createOrderStatusIsCOOKING() {
+        //given
         Order order = createOrder();
 
         OrderTable orderTable = new OrderTable();
@@ -95,6 +102,7 @@ class OrderBoTest {
             given(orderLineItemDao.save(item)).willReturn(item);
         }
 
+        //when, then
         Assertions.assertThat(orderBo.create(order).getOrderStatus())
             .isEqualTo(OrderStatus.COOKING.name());
     }
@@ -103,24 +111,26 @@ class OrderBoTest {
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class)
     void changeStatus(OrderStatus orderStatus) {
-
-        Order dbOrder = createOrder();
-        dbOrder.setOrderStatus(OrderStatus.MEAL.name());
+        //given
+        Order currentOrder = createOrder();
+        currentOrder.setOrderStatus(OrderStatus.MEAL.name());
 
         Order requestOrder = new Order();
         requestOrder.setOrderStatus(orderStatus.name());
 
-        given(orderDao.findById(dbOrder.getId())).willReturn(Optional.of(dbOrder));
+        given(orderDao.findById(currentOrder.getId())).willReturn(Optional.of(currentOrder));
 
+        //when, then
         Assertions
-            .assertThat(orderBo.changeOrderStatus(dbOrder.getId(), requestOrder).getOrderStatus())
+            .assertThat(orderBo.changeOrderStatus(currentOrder.getId(), requestOrder).getOrderStatus())
             .isEqualTo(orderStatus.name());
     }
 
-    @DisplayName("식사 완료된 주문은 상태를 변경할수 없다")
+    @DisplayName("완료된 주문은 상태를 변경할수 없다")
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class)
     void noneChangeStatus(OrderStatus orderStatus) {
+        //given
         Order dbOrder = createOrder();
         dbOrder.setOrderStatus(OrderStatus.COMPLETION.name());
 
@@ -129,6 +139,7 @@ class OrderBoTest {
 
         given(orderDao.findById(dbOrder.getId())).willReturn(Optional.of(dbOrder));
 
+        //when, then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> orderBo.changeOrderStatus(dbOrder.getId(), requestOrder));
     }
@@ -136,6 +147,7 @@ class OrderBoTest {
     @DisplayName("전체 주문을 조회할수 있다.")
     @Test
     void list() {
+        //given
         Order dbOrder = createOrder();
         List<Order> orders = Arrays.asList(dbOrder);
 
@@ -143,6 +155,7 @@ class OrderBoTest {
         given(orderLineItemDao.findAllByOrderId(dbOrder.getId()))
             .willReturn(dbOrder.getOrderLineItems());
 
+        //when, then
         Assertions.assertThat(orderBo.list()).containsAll(orders);
     }
 

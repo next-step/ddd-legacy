@@ -36,10 +36,18 @@ class TableBoTest {
     @DisplayName("테이블을 단건씩 생성할 수 있다.")
     @Test
     void createOne(){
-        OrderTable orderTable = mock(OrderTable.class);
-        given(orderTableDao.save(orderTable)).willReturn(orderTable);
+        //given
+        OrderTable expected = new OrderTable();
+        expected.setEmpty(true);
+        expected.setNumberOfGuests(0);
 
-        Assertions.assertThat(tableBo.create(orderTable)).isEqualTo(orderTable);
+        given(orderTableDao.save(expected)).willReturn(expected);
+
+        //when
+        OrderTable actual = tableBo.create(expected);
+
+        //then
+        Assertions.assertThat(tableBo.create(expected)).isEqualTo(actual);
     }
 
     @DisplayName("테이블 목록을 조회 할수 있다.")
@@ -56,6 +64,7 @@ class TableBoTest {
     @ValueSource(booleans = {true, false})
     void changeEmpty(boolean requestEmpty) {
 
+        //given
         OrderTable requestOrderTable = new OrderTable();
         requestOrderTable.setEmpty(requestEmpty);
 
@@ -63,14 +72,13 @@ class TableBoTest {
         savedOrderTable.setId(1L);
         savedOrderTable.setTableGroupId(null);
 
-
         given(orderTableDao.findById(savedOrderTable.getId()))
             .willReturn(Optional.ofNullable(savedOrderTable));
         given(orderDao.existsByOrderTableIdAndOrderStatusIn(savedOrderTable.getId(), Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name())))
             .willReturn(false);
         given(orderTableDao.save(savedOrderTable)).willReturn(savedOrderTable);
 
-
+        //when, then
         Assertions.assertThat(tableBo.changeEmpty(savedOrderTable.getId(), requestOrderTable).isEmpty()).isEqualTo(requestEmpty);
     }
 
@@ -85,11 +93,12 @@ class TableBoTest {
             .isThrownBy(()->tableBo.changeNumberOfGuests(1L, requestOrderTable));
     }
 
-    @DisplayName("테이블이 이용중이고 인원을 양수로 변경할수 있다")
+    @DisplayName("테이블이 이용중인 상태에서만 인원을 변경할수 있다")
     @ParameterizedTest
     @ValueSource(ints = {1,2,3,4})
     void changeNumberOfGuests(int numberOfGuests) {
 
+        //given
         Long tableId= 1L;
         OrderTable requestOrderTable = new OrderTable();
         requestOrderTable.setNumberOfGuests(numberOfGuests);
@@ -100,6 +109,8 @@ class TableBoTest {
         given(orderTableDao.findById(tableId)).willReturn(Optional.ofNullable(savedOrderTable));
         given(orderTableDao.save(savedOrderTable)).willReturn(savedOrderTable);
 
-        Assertions.assertThat(tableBo.changeNumberOfGuests(tableId, requestOrderTable).getNumberOfGuests()).isEqualTo(numberOfGuests);
+        //when then
+        Assertions.assertThat(tableBo.changeNumberOfGuests(tableId, requestOrderTable).getNumberOfGuests())
+            .isEqualTo(numberOfGuests);
     }
 }

@@ -2,6 +2,7 @@ package kitchenpos.bo;
 
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
@@ -36,10 +37,12 @@ class TableGroupBoTest {
     @InjectMocks
     private TableGroupBo tableGroupBo;
 
-    @DisplayName("테이블 그룹에 속한 테이블은 2개 이상이다.")
+    @DisplayName("테이블의 묶음은 2개이상이다.")
     @Test
     void min2Table() {
-        List<OrderTable> tables = Arrays.asList(mock(OrderTable.class));
+        OrderTable orderTable = createOrderTable(true, null);
+
+        List<OrderTable> tables = Arrays.asList(orderTable);
         TableGroup tableGroup = new TableGroup();
         tableGroup.setOrderTables(tables);
 
@@ -47,49 +50,74 @@ class TableGroupBoTest {
             .isThrownBy(() -> tableGroupBo.create(tableGroup));
     }
 
-    @DisplayName("존재하는 테이블만 그룹에 포함될수 있다.")
+    @DisplayName("존재하는 테이블만 묶일수 있다.")
     @Test
     void notExistTable() {
+        //given
+        OrderTable orderTable1 = createOrderTable(true, null);
+        OrderTable orderTable2 = createOrderTable(true, null);
 
-        List<OrderTable> tables = Arrays.asList(mock(OrderTable.class), mock(OrderTable.class));
+        List<OrderTable> tables = Arrays.asList(orderTable1, orderTable2);
+
         TableGroup tableGroup = new TableGroup();
         tableGroup.setOrderTables(tables);
 
         given(orderTableDao.findAllByIdIn(anyList())).willReturn(Collections.emptyList());
 
+        //when ,then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> tableGroupBo.create(tableGroup));
     }
 
-    @DisplayName("이용중인 테이블만 한개의 그룹에만 속할수 있다.")
+    @DisplayName("미사용중인 테이블만 묶을수 있다.")
     @Test
     void notEmptyTableHasGroup() {
-        TableGroup tableGroup = createTableGroup();
-        tableGroup.getOrderTables().forEach(orderTable -> orderTable.setEmpty(false));
+        //given
+        OrderTable orderTable1 = createOrderTable(false, null);
+        OrderTable orderTable2 = createOrderTable(false, null);
+
+        List<OrderTable> tables = Arrays.asList(orderTable1, orderTable2);
+
+        TableGroup tableGroup = new TableGroup();
+        tableGroup.setOrderTables(tables);
 
         given(orderTableDao.findAllByIdIn(anyList())).willReturn(tableGroup.getOrderTables());
 
+        //when ,then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> tableGroupBo.create(tableGroup));
     }
 
-    @DisplayName("테이블은 한개의 그룹에만 속할수 있다.")
+    @DisplayName("이미 묶어진 테이블은 다시 묶을수 없다.")
     @Test
     void tableHasOnlyOneGroup() {
-        TableGroup tableGroup = createTableGroup();
+        //given
+        OrderTable orderTable1 = createOrderTable(true, 1L);
+        OrderTable orderTable2 = createOrderTable(true, 1L);
 
-        tableGroup.getOrderTables().forEach(orderTable -> orderTable.setTableGroupId(1L));
+        List<OrderTable> tables = Arrays.asList(orderTable1, orderTable2);
+
+        TableGroup tableGroup = new TableGroup();
+        tableGroup.setOrderTables(tables);
 
         given(orderTableDao.findAllByIdIn(anyList())).willReturn(tableGroup.getOrderTables());
 
+        //when, then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> tableGroupBo.create(tableGroup));
     }
 
-    @DisplayName("테이블이 그룹에 포함되면 이용중인 상태가 된다.")
+    @DisplayName("묶어진 테이블은 이용중인 상태이다.")
     @Test
     void tableEmptyFalse() {
-        TableGroup tableGroup = createTableGroup();
+        //given
+        OrderTable orderTable1 = createOrderTable(true, null);
+        OrderTable orderTable2 = createOrderTable(true, null);
+
+        List<OrderTable> tables = Arrays.asList(orderTable1, orderTable2);
+
+        TableGroup tableGroup = new TableGroup();
+        tableGroup.setOrderTables(tables);
 
         given(orderTableDao.findAllByIdIn(anyList())).willReturn(tableGroup.getOrderTables());
         given(tableGroupDao.save(tableGroup)).willReturn(tableGroup);
@@ -98,13 +126,20 @@ class TableGroupBoTest {
             .forEach(orderTable -> Assertions.assertThat(orderTable.isEmpty()).isEqualTo(false));
     }
 
-    @DisplayName("주문의 상태가 완료일 경우만 테이블 그룹에서 테이블을 제거 할수 있다.")
+
+
+    @DisplayName("주문의 상태가 완료일 경우만 테이블 묶을을 해제할수있다.")
     @Test
     void onlyCompleteStatusCanDelete() {
 
-        List<OrderTable> orderTables = createTableGroup().getOrderTables();
+        //given
+        OrderTable orderTable1 = createOrderTable(true, 1L);
+        OrderTable orderTable2 = createOrderTable(true, 1L);
+        List<OrderTable> tables = Arrays.asList(orderTable1, orderTable2);
+        TableGroup tableGroup = new TableGroup();
+        tableGroup.setOrderTables(tables);
 
-        given(orderTableDao.findAllByTableGroupId(anyLong())).willReturn(orderTables);
+        given(orderTableDao.findAllByTableGroupId(anyLong())).willReturn(tables);
         given(orderDao.existsByOrderTableIdInAndOrderStatusIn(anyList(), anyList()))
             .willReturn(true);
 
@@ -112,33 +147,32 @@ class TableGroupBoTest {
             .isThrownBy(() -> tableGroupBo.delete(1L));
     }
 
-    @DisplayName("테이블 그룹에서 테이블을 제외한다.")
+    @DisplayName("테이블 묶을을 해제 한다.")
     @Test
     void delete() {
-        List<OrderTable> orderTables = createTableGroup().getOrderTables();
+        //given
+        OrderTable orderTable1 = createOrderTable(true, 1L);
+        OrderTable orderTable2 = createOrderTable(true, 1L);
+        List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
 
-        given(orderTableDao.findAllByTableGroupId(anyLong())).willReturn(orderTables);
-        given(orderDao.existsByOrderTableIdInAndOrderStatusIn(anyList(), anyList())).willReturn(false);
+        given(orderTableDao.findAllByTableGroupId(orderTable1.getTableGroupId()))
+            .willReturn(orderTables);
 
-        tableGroupBo.delete(anyLong());
+        given(orderDao.existsByOrderTableIdInAndOrderStatusIn(anyList(), anyList()))
+            .willReturn(false);
 
-        orderTables.forEach(orderTable -> Assertions.assertThat(orderTable.getTableGroupId()).isNull());
+        //when
+        tableGroupBo.delete(orderTable1.getTableGroupId());
+
+        //then
+        orderTables
+            .forEach(orderTable -> Assertions.assertThat(orderTable.getTableGroupId()).isNull());
     }
 
-    private TableGroup createTableGroup() {
-        OrderTable table1 = new OrderTable();
-        table1.setEmpty(true);
-        table1.setTableGroupId(null);
-
-        OrderTable table2 = new OrderTable();
-        table2.setEmpty(true);
-        table2.setTableGroupId(null);
-
-        List<OrderTable> tables = Arrays.asList(table1, table2);
-        TableGroup tableGroup = new TableGroup();
-        tableGroup.setOrderTables(tables);
-
-        return tableGroup;
+    private OrderTable createOrderTable(boolean isEmpty, Long tableGroupId) {
+        OrderTable orderTable1 = new OrderTable();
+        orderTable1.setEmpty(isEmpty);
+        orderTable1.setTableGroupId(tableGroupId);
+        return orderTable1;
     }
-
 }

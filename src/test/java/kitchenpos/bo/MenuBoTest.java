@@ -46,14 +46,14 @@ class MenuBoTest {
     @Test
     void createOneMenu() {
         //given
-        final Menu menu =  createMenu(1L);
+        final Menu menu = createMenu(1L);
         given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
         menu.getMenuProducts().forEach(
             menuProduct -> {
                 Product product = new Product();
                 product.setId(menuProduct.getProductId());
                 product.setPrice(BigDecimal.valueOf(1000L));
-                product.setName("상품_"+menuProduct.getProductId());
+                product.setName("상품_" + menuProduct.getProductId());
 
                 given(productDao.findById(menuProduct.getProductId()))
                     .willReturn(Optional.of(product));
@@ -68,47 +68,64 @@ class MenuBoTest {
 
         //then
         Assertions.assertThat(newMenu).isEqualTo(menu);
-        Assertions.assertThat(newMenu.getMenuProducts().size()).isEqualTo(menu.getMenuProducts().size());
+        Assertions.assertThat(newMenu.getMenuProducts().size())
+            .isEqualTo(menu.getMenuProducts().size());
     }
 
     @DisplayName("메뉴 정보는 이름과 가격(필수)이다.")
     @Test
     void menuRequired() {
-       final Menu menu = spy(createMenu());
+        //given
+        final Menu menu = spy(createMenu());
         given(menu.getPrice()).willReturn(null);
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(menu));
+
+        //when then
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuBo.create(menu));
     }
 
     @DisplayName("메뉴의 가격은 음수일수 없다.")
     @Test
     void priceNoneNegative() {
+        //given
         final Menu menu = spy(createMenu());
         given(menu.getPrice()).willReturn(BigDecimal.valueOf(-1000L));
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(menu));
+
+        //when then
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuBo.create(menu));
     }
 
     @DisplayName("메뉴들은 하나의 그룹에 속해야 한다.")
     @Test
     void inGroup() {
+        //given
         final Menu menu = spy(createMenu());
         given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(false);
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(menu));
+
+        //when then
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuBo.create(menu));
     }
 
     @DisplayName("메뉴의 가격은 각 상품의 가격의 합보다 클수없다.")
     @Test
-    void notFoundProduct(){
+    void notFoundProduct() {
+        //given
         final Menu menu = spy(createMenu());
         given(menu.getPrice()).willReturn(BigDecimal.valueOf(Long.MAX_VALUE));
         given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
         given(productDao.findById(anyLong())).willReturn(Optional.empty());
 
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(menu));
+        //when then
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuBo.create(menu));
     }
 
     @DisplayName("메뉴의 가격은 각 상품의 가격의 합보다 클수없다.")
     @Test
     void pricelessThanProductSum() {
+        //given
         final Menu menu = spy(createMenu());
 
         BigDecimal sum = BigDecimal.ZERO;
@@ -124,22 +141,27 @@ class MenuBoTest {
         }
 
         given(menu.getPrice()).willReturn(sum.add(BigDecimal.ONE));
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(menu));
+
+        //when then
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuBo.create(menu));
     }
 
     @DisplayName("전체 메뉴 목록을 조회 할수있다.")
     @Test
     void allMenu() {
+        //given
         Menu menu = createMenu();
         menu.setId(1L);
         List<Menu> menus = Arrays.asList(menu);
         given(menuDao.findAll()).willReturn(menus);
         given(menuProductDao.findAllByMenuId(menu.getId())).willReturn(menu.getMenuProducts());
 
+        //when then
         Assertions.assertThat(menuBo.list()).containsAll(menus);
     }
 
-    private  Menu createMenu(){
+    private Menu createMenu() {
         Menu menu = new Menu();
         menu.setName("name");
         menu.setPrice(BigDecimal.valueOf(1000L));
@@ -157,7 +179,7 @@ class MenuBoTest {
         return menu;
     }
 
-    private Menu createMenu(Long id){
+    private Menu createMenu(Long id) {
         Menu menu = createMenu();
         menu.setId(id);
         return menu;
