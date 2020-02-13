@@ -11,6 +11,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -63,5 +66,30 @@ public class ProductBoTest {
         // when
         assertThatIllegalArgumentException().isThrownBy(() -> productBo.create(productPriceNull));
         assertThatIllegalArgumentException().isThrownBy(() -> productBo.create(productPriceMinus));
+    }
+
+    @Test
+    @DisplayName("등록되어진 상품들 확인")
+    void getSizeProducts() {
+        // give
+        given(productDao.findAll())
+                .willReturn(Arrays.asList(new Product("a", BigDecimal.valueOf(1)), new Product("b", BigDecimal.valueOf(2))));
+        // when
+        List<Product> products = productBo.list();
+        // then
+        assertThat(products.size()).isEqualTo(2);
+
+    }
+
+    @Test
+    @DisplayName("등록된 상품이 없을때 상품 보기")
+    void getProductsByEmptyList() {
+        // give
+        given(productDao.findAll())
+                .willReturn(Collections.emptyList());
+        // when
+        List<Product> products = productBo.list();
+        // then
+        assertThat(products.isEmpty()).isTrue();
     }
 }
