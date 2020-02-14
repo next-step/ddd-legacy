@@ -4,14 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.bo.MenuBo;
 import kitchenpos.model.Menu;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -27,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MenuRestControllerTests {
 
     @InjectMocks
@@ -40,16 +36,15 @@ class MenuRestControllerTests {
 
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    private static Menu mockCreatedMenu;
-    private static List<Menu> mockMenus = new ArrayList<>();
-
-    @BeforeEach
-    public void setupMockMvc() {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(menuRestController).alwaysDo(print()).build();
-    }
+    private Menu mockCreatedMenu;
+    private List<Menu> mockMenus = new ArrayList<>();
 
     @BeforeAll
-    public static void setup() {
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+
+        this.mockMvc = MockMvcBuilders.standaloneSetup(menuRestController).alwaysDo(print()).build();
+
         mockCreatedMenu = new Menu();
         mockCreatedMenu.setId(1L);
 

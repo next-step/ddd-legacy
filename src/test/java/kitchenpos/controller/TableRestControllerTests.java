@@ -5,13 +5,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.bo.TableBo;
 import kitchenpos.model.OrderTable;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.TestInstance;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -28,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TableRestControllerTests {
     @InjectMocks
     private TableRestController tableRestController;
@@ -40,18 +39,17 @@ class TableRestControllerTests {
 
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    private static OrderTable mockCreated;
-    private static OrderTable mockEmptyTable;
-    private static OrderTable mockHundredGuestTable;
-    private static List<OrderTable> mockOrderTables = new ArrayList<>();
-
-    @BeforeEach
-    public void setupMockMvc() {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(tableRestController).alwaysDo(print()).build();
-    }
+    private OrderTable mockCreated;
+    private OrderTable mockEmptyTable;
+    private OrderTable mockHundredGuestTable;
+    private List<OrderTable> mockOrderTables = new ArrayList<>();
 
     @BeforeAll
-    private static void setup() {
+    private void setup() {
+        MockitoAnnotations.initMocks(this);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(tableRestController).alwaysDo(print()).build();
+
         mockCreated = new OrderTable();
         mockCreated.setId(1L);
 

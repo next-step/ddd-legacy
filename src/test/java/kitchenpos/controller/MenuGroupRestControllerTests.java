@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.bo.MenuGroupBo;
 import kitchenpos.model.MenuGroup;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -21,37 +20,35 @@ import java.util.Collections;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MenuGroupRestControllerTests {
 
     @InjectMocks
-    private static MenuGroupRestController menuGroupRestController;
+    private MenuGroupRestController menuGroupRestController;
 
     @Mock
-    private static MenuGroupBo menuGroupBo = mock(MenuGroupBo.class);
+    private MenuGroupBo menuGroupBo;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    private static MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     private MenuGroup mockMenuGroup;
 
     @BeforeAll
-    public static void setupMvc() {
+    public void setupMockMvc() {
+        MockitoAnnotations.initMocks(this);
+
         mockMvc = MockMvcBuilders
                 .standaloneSetup(menuGroupRestController)
                 .alwaysDo(print())
                 .build();
-    }
 
-    @BeforeEach
-    public void setup() {
         mockMenuGroup = new MenuGroup();
     }
 

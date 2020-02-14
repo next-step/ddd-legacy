@@ -4,14 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.bo.OrderBo;
 import kitchenpos.model.Order;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -27,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class OrderRestControllerTests {
     @InjectMocks
     private OrderRestController orderRestController;
@@ -39,17 +35,16 @@ class OrderRestControllerTests {
 
     private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-    private static Order mockCreated;
-    private static Order mockChanged;
-    private static List<Order> mockOrders = new ArrayList<>();
-
-    @BeforeEach
-    public void setupMockMvc() {
-        this.mockMvc = MockMvcBuilders.standaloneSetup(orderRestController).alwaysDo(print()).build();
-    }
+    private Order mockCreated;
+    private Order mockChanged;
+    private List<Order> mockOrders = new ArrayList<>();
 
     @BeforeAll
-    public static void setup() {
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
+
+        mockMvc = MockMvcBuilders.standaloneSetup(orderRestController).alwaysDo(print()).build();
+
         mockCreated = new Order();
         mockCreated.setId(1L);
         mockChanged = new Order();
