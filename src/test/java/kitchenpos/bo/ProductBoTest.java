@@ -18,8 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
-class ProductBoTest {
+class ProductBoTest extends MockTest{
     @Mock private DefaultProductDao productDao;
     @InjectMocks private ProductBo productBo;
 

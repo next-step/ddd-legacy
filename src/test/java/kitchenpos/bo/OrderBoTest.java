@@ -30,8 +30,7 @@ import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
-class OrderBoTest {
+class OrderBoTest extends MockTest{
     @Mock private MenuDao menuDao;
     @Mock private OrderDao orderDao;
     @Mock private OrderLineItemDao orderLineItemDao;

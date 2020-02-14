@@ -31,8 +31,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@ExtendWith(MockitoExtension.class)
-class TableGroupBoTest {
+class TableGroupBoTest extends MockTest{
     @Mock private OrderDao orderDao;
     @Mock private OrderTableDao orderTableDao;
     @Mock private TableGroupDao tableGroupDao;

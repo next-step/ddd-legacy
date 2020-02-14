@@ -25,8 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
-class TableBoTest {
+class TableBoTest extends MockTest{
     @Mock private OrderDao orderDao;
     @Mock private OrderTableDao orderTableDao;
     @InjectMocks private TableBo tableBo;

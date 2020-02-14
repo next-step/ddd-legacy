@@ -25,8 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
-class MenuBoTest {
+class MenuBoTest extends MockTest{
     @InjectMocks private MenuBo menuBo;
     @Mock private MenuDao menuDao;
     @Mock private MenuProductDao menuProductDao;
