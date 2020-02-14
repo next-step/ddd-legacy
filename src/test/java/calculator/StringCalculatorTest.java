@@ -17,6 +17,7 @@ class StringCalculatorTest {
         return Stream.of(
                 arguments("//-\n1,2,3-4:5", 15),
                 arguments("", 0),
+                arguments(null, 0),
                 arguments("//-\n0,0,1:2", 3),
                 arguments("//-\n1,2-3", 6)
         );

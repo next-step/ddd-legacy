@@ -1,5 +1,7 @@
 package calculator;
 
+import org.apache.logging.log4j.util.Strings;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -12,8 +14,12 @@ public class StringCalculator {
     private static final Pattern DELIMITER_PATTERN = Pattern.compile("//(.*)\n(.*)");
 
     public int calculate(String input) {
+        if (Strings.isEmpty(input)) {
+            return 0;
+        }
         List<String> inputs = splitInputs(input);
-        return StringNumber.sum(inputs);
+        Number number = new Number(inputs);
+        return number.getValue();
     }
 
     private List<String> splitInputs(String input) {
@@ -21,7 +27,8 @@ public class StringCalculator {
         String delimiter = DEFAULT_PATTERN;
         if (delimiterMatcher.find()) {
             input = delimiterMatcher.group(2);
-            delimiter = DEFAULT_PATTERN + PATTERN_APPEND_CONNECTION + Pattern.quote(delimiterMatcher.group(1));
+            delimiter = DEFAULT_PATTERN + PATTERN_APPEND_CONNECTION
+                    + Pattern.quote(delimiterMatcher.group(1));
         }
         return Arrays.stream(input.trim()
                 .split(delimiter))
