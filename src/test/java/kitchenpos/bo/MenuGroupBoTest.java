@@ -14,6 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,21 +42,33 @@ class MenuGroupBoTest {
     @DisplayName("메뉴그룹을 설정할 수 있다.")
     @Test
     public void setMenuGroup() {
-        when(menuGroupDao.save(menuGroup)).thenReturn(menuGroup);
+        //given
+        MenuGroup givenMenuGroup = menuGroup;
+        given(menuGroupDao.save(any(MenuGroup.class)))
+                .willReturn(givenMenuGroup);
 
-        MenuGroup result = menuGroupBo.create(menuGroup);
+        //when
+        MenuGroup actualMenuGroup = menuGroupBo.create(givenMenuGroup);
 
-        assertThat(result.getName()).isEqualTo("두마리메뉴");
+        //then
+        assertThat(actualMenuGroup.getName())
+                .isEqualTo(givenMenuGroup.getName());
     }
 
     @DisplayName("메뉴그룹 목록을 볼 수 있다.")
     @Test
     public void listMenuGroup() {
-        when(menuGroupDao.findAll()).thenReturn(menuGroupList);
+        //given
+        List<MenuGroup> givenMenuGroupList = menuGroupList;
+        given(menuGroupDao.findAll())
+                .willReturn(givenMenuGroupList);
 
-        List<MenuGroup> result = menuGroupBo.list();
+        //when
+        List<MenuGroup> actualMenuGroupList = menuGroupBo.list();
 
-        assertThat(result.get(0).getName()).isEqualTo("두마리메뉴");
+        //then
+        assertThat(actualMenuGroupList.get(0).getName())
+                .isEqualTo(givenMenuGroupList.get(0).getName());
     }
 
     private void setMenuGroupList(List<MenuGroup> menuGroupList) {
