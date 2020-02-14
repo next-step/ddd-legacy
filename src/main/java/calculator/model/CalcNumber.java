@@ -1,16 +1,15 @@
 package calculator.model;
 
-public class CalcNumber {
-    public int value;
-    private static final int DEFAULT_CALC_VALUE = 0;
+import java.util.Objects;
 
-    public CalcNumber(){
-        this.value = DEFAULT_CALC_VALUE;
-    }
+public class CalcNumber {
+
+    public static final CalcNumber DEFAULT_CALC_VALUE = new CalcNumber(0);
+    public int value;
 
     public CalcNumber(int value) {
-        this.value = value;
         this.validate(value);
+        this.value = value;
     }
 
     public CalcNumber(String str) {
@@ -22,6 +21,7 @@ public class CalcNumber {
     }
 
     private void validate(int value) {
+        Objects.requireNonNull(value);
         if (value < 0) {
             throw new RuntimeException("Number must be positive");
         }

@@ -7,7 +7,6 @@ import java.util.List;
 
 public class StringCalculator {
 
-
     public StringCalculator() {
     }
 
@@ -17,7 +16,7 @@ public class StringCalculator {
 
     public int add(String input) {
         if (isEmptyInput(input)) {
-            return new CalcNumber().value;
+            return CalcNumber.DEFAULT_CALC_VALUE.getValue();
         }
 
         List<String> parsedStrings = StringSplitter.split(input);
@@ -26,8 +25,8 @@ public class StringCalculator {
                 .stream()
                 .map(CalcNumber::new)
                 .reduce(CalcNumber::sum)
-                .orElseGet(CalcNumber::new);
-        
+                .orElseGet(() -> CalcNumber.DEFAULT_CALC_VALUE);
+
         return sum.getValue();
 
     }
