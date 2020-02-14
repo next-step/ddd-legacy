@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,8 +44,10 @@ class ProductBoTest {
         Product result = productBo.create(expected);
 
         //then
-        assertThat(result.getName()).isEqualTo(expected.getName());
-        assertThat(result.getPrice()).isEqualTo(expected.getPrice());
+        assertAll(
+                () -> assertThat(result.getName()).isEqualTo(expected.getName()),
+                () -> assertThat(result.getPrice()).isEqualTo(expected.getPrice())
+        );
     }
 
     @DisplayName("상품을 조회할 수 있다")

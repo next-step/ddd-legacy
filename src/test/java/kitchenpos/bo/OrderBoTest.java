@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -81,8 +82,10 @@ class OrderBoTest {
         Order result = orderBo.create(expected);
 
         //then
-        assertThat(result.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name());
-        assertThat(result.getOrderLineItems().size()).isEqualTo(expected.getOrderLineItems().size());
+        assertAll(
+                () -> assertThat(result.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name()),
+                () -> assertThat(result.getOrderLineItems().size()).isEqualTo(expected.getOrderLineItems().size())
+        );
     }
 
     @DisplayName("메뉴가 입력되지 않으면 주문할 수 없다")

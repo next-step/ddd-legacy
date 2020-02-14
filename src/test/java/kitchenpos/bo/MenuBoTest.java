@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -68,10 +69,11 @@ class MenuBoTest {
         Menu result = menuBo.create(expected);
 
         //then
-        assertThat(result.getName()).isEqualTo(expected.getName());
-        assertThat(result.getPrice()).isEqualTo(expected.getPrice());
-        assertThat(result.getMenuGroupId()).isEqualTo(expected.getMenuGroupId());
-        assertThat(result.getMenuProducts()).isEqualTo(expected.getMenuProducts());
+        assertAll(
+                () -> assertThat(result.getPrice()).isEqualTo(expected.getPrice()),
+                () -> assertThat(result.getMenuGroupId()).isEqualTo(expected.getMenuGroupId()),
+                () -> assertThat(result.getMenuProducts()).isEqualTo(expected.getMenuProducts())
+        );
     }
 
     @DisplayName("메뉴를 조회할 수 있다")

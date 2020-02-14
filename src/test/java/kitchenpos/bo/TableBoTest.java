@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,8 +50,10 @@ class TableBoTest {
         OrderTable result = tableBo.create(expected);
 
         //then
-        assertThat(result.getNumberOfGuests()).isEqualTo(expected.getNumberOfGuests());
-        assertThat(result.isEmpty()).isEqualTo(expected.isEmpty());
+        assertAll(
+                () -> assertThat(result.getNumberOfGuests()).isEqualTo(expected.getNumberOfGuests()),
+                () -> assertThat(result.isEmpty()).isEqualTo(expected.isEmpty())
+        );
     }
 
     @DisplayName("테이블을 조회할 수 있다")
