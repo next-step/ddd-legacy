@@ -3,7 +3,7 @@ package kitchenpos.bo;
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.dao.MenuProductDao;
-import kitchenpos.dao.ProductDao;
+import kitchenpos.dao.DefaultProductDao;
 import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,7 +31,7 @@ class MenuBoTest {
     @Mock private MenuDao menuDao;
     @Mock private MenuProductDao menuProductDao;
     @Mock private MenuGroupDao menuGroupDao;
-    @Mock private ProductDao productDao;
+    @Mock private DefaultProductDao productDao;
 
     private MenuProduct menuProduct;
     private Menu menu;
@@ -73,67 +73,84 @@ class MenuBoTest {
     @DisplayName("메뉴를 생성할 때 메뉴의 가격을 반드시 입력해야 한다.")
     @Test
     public void createMenuWithoutPriceTest() {
-        this.menu.setPrice(null);
+        //given
+        Menu givenMenu = menu;
+        givenMenu.setPrice(null);
 
-        Throwable thrown = catchThrowable(() ->{
-            menuBo.create(this.menu);
-        });
-
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+        //when
+        //then
+        assertThatThrownBy(() ->{ menuBo.create(givenMenu); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴를 생성할 때 메뉴의 가격은 반드시 양수를 입력해야 한다.")
     @Test
     public void createMenuWithNegativePriceTest() {
-        this.menu.setPrice(new BigDecimal(-1));
+        //given
+        Menu givenMenu = menu;
+        givenMenu.setPrice(BigDecimal.valueOf(-1));
 
-        Throwable thrown = catchThrowable(() ->{
-            menuBo.create(this.menu);
-        });
-
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+        //when
+        //then
+        assertThatThrownBy(() ->{ menuBo.create(givenMenu); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("각 메뉴는 반드시 하나 이상의 메뉴그룹에 속한다.")
     @Test
     public void menuGroupIdTest() {
-        Throwable thrown = catchThrowable(() ->{
-            menuBo.create(this.menu);
-        });
+        //given
+        Menu givenMenu = menu;
+        givenMenu.setMenuGroupId(null);
 
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+        //when
+        //then
+        assertThatThrownBy(() ->{ menuBo.create(givenMenu); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("매장에서 판매하지 않는 상품을 입력할 수 없다.")
     @Test
     public void menuPriceTest() {
-        this.product.setId(null);
+        //given
+        Menu givenMenu = menu;
+        givenMenu.setMenuProducts(null);
 
-        Throwable thrown = catchThrowable(() ->{
-            menuBo.create(this.menu);
-        });
-
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+        //when
+        //then
+        assertThatThrownBy(() ->{ menuBo.create(givenMenu); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("산정된 메뉴의 가격은 매장에서 판매하는 상품의 가격과 수량을 곱한 금액보다 크거나 같아야 한다.")
     @Test
     public void menuPriceVersusMenuProductPriceTest() {
+        //given
         this.menuProduct.setQuantity(-1L);
-        Throwable thrown = catchThrowable(() ->{
-            menuBo.create(this.menu);
-        });
+        Menu givenMenu = menu;
 
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+        //when
+        //then
+        assertThatThrownBy(() ->{ menuBo.create(givenMenu); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴 목록을 볼 수 있다.")
     @Test
     public void list() {
-        when(menuDao.findAll()).thenReturn(this.menuList);
-        when(menuProductDao.findAllByMenuId(anyLong())).thenReturn(this.menuProductList);
+        //given
+        List<Menu> givenMenuList = menuList;
+        List<MenuProduct> givenMenuProductList = menuProductList;
+        given(menuDao.findAll())
+                .willReturn(givenMenuList);
+        given(menuProductDao.findAllByMenuId(anyLong()))
+                .willReturn(givenMenuProductList);
 
-        List<Menu> result = menuBo.list();
-        assertThat(result.get(0).getName()).isEqualTo("후라이드치킨");
+        //when
+        List<Menu> actualMenuList = menuBo.list();
+
+        //then
+        assertThat(actualMenuList.size())
+                .isEqualTo(givenMenuList.size());
     }
 }
