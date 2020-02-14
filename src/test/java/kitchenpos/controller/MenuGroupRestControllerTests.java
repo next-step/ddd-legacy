@@ -1,9 +1,9 @@
 package kitchenpos.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.bo.MenuGroupBo;
 import kitchenpos.model.MenuGroup;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +21,7 @@ import java.util.Collections;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,23 +31,27 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MenuGroupRestControllerTests {
 
     @InjectMocks
-    private MenuGroupRestController menuGroupRestController;
+    private static MenuGroupRestController menuGroupRestController;
 
     @Mock
-    private MenuGroupBo menuGroupBo;
+    private static MenuGroupBo menuGroupBo = mock(MenuGroupBo.class);
 
-    private ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-    private MockMvc mockMvc;
+    private static MockMvc mockMvc;
 
-    private static MenuGroup mockMenuGroup;
+    private MenuGroup mockMenuGroup;
 
-    @BeforeEach
-    public void setup() {
-        this.mockMvc = MockMvcBuilders
+    @BeforeAll
+    public static void setupMvc() {
+        mockMvc = MockMvcBuilders
                 .standaloneSetup(menuGroupRestController)
                 .alwaysDo(print())
                 .build();
+    }
+
+    @BeforeEach
+    public void setup() {
         mockMenuGroup = new MenuGroup();
     }
 
