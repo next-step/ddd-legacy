@@ -1,6 +1,6 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.ProductDao;
+import kitchenpos.dao.DefaultProductDao;
 import kitchenpos.model.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,13 +14,13 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProductBoTest {
-    @Mock private ProductDao productDao;
+    @Mock private DefaultProductDao productDao;
     @InjectMocks private ProductBo productBo;
 
     private Product product;
@@ -40,33 +40,43 @@ class ProductBoTest {
     @DisplayName("상품을 생성할 때 상품의 가격을 반드시 입력해야 한다.")
     @Test
     void createProductWithoutPriceTest() {
-        this.product.setPrice(null);
-        Throwable thrown = catchThrowable(() ->{
-            productBo.create(this.product);
-        });
+        //given
+        Product givenProduct = product;
+        givenProduct.setPrice(null);
 
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+        //when
+        //then
+        assertThatThrownBy(() ->{ productBo.create(givenProduct); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("상품을 생성할 때 상품의 가격은 반드시 양수를 입력해야 한다.")
     @Test
     void createProductWithNegativePriceTest() {
-        this.product.setPrice(new BigDecimal(-1));
-        Throwable thrown = catchThrowable(() ->{
-            productBo.create(this.product);
-        });
+        //given
+        Product givenProduct = product;
+        givenProduct.setPrice(BigDecimal.valueOf(-1));
 
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+        //when
+        //then
+        assertThatThrownBy(() ->{ productBo.create(givenProduct); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("상품 목록을 볼 수 있다.")
     @Test
     void list() {
-        when(productDao.findAll()).thenReturn(this.productList);
+        //given
+        List<Product> givenProductList = productList;
+        given(productDao.findAll())
+                .willReturn(givenProductList);
 
-        List<Product> result = productBo.list();
+        //when
+        List<Product> actualProductList = productBo.list();
 
-        assertThat(result.get(0).getName()).isEqualTo("후라이드");
+        //then
+        assertThat(actualProductList.size())
+                .isEqualTo(givenProductList.size());
     }
 
 }
