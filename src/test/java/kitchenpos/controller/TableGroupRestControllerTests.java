@@ -21,7 +21,7 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.mockito.BDDMockito.then;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -76,6 +76,6 @@ class TableGroupRestControllerTests {
         mockMvc.perform(delete("/api/table-groups/1"))
                 .andExpect(status().isNoContent());
 
-        verify(tableGroupBo).delete(1L);
+        then(tableGroupBo).should().delete(1L);
     }
 }
