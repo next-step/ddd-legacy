@@ -4,10 +4,8 @@ import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.model.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +13,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
-class MenuGroupBoTest {
+class MenuGroupBoTest extends MockTest {
     @Mock
     private MenuGroupDao menuGroupDao;
 
