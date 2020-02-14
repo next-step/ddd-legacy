@@ -12,8 +12,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,30 +40,14 @@ class OrderBoTest extends MockTest {
     @DisplayName("주문을 할 수 있다")
     @Test
     void createOrder() {
-        Menu menu = new Menu();
-        menu.setId(1L);
-        menu.setName("엄청이득메뉴");
-        menu.setPrice(new BigDecimal(10000));
-        menu.setMenuGroupId(1L);
+        Menu menu = TestFixtures.veryCheapMenu(Collections.emptyList());
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setQuantity(2);
-        ArrayList<OrderLineItem> orderLineItems = new ArrayList<>();
-        orderLineItems.add(orderLineItem);
+        OrderLineItem orderLineItem = TestFixtures.orderLineItem();
+        List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem);
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(1L);
-        orderTable.setNumberOfGuests(4);
-        orderTable.setTableGroupId(1L);
-        orderTable.setEmpty(false);
+        OrderTable orderTable = TestFixtures.orderTable();
 
-        Order expected = new Order();
-        expected.setId(1L);
-        expected.setOrderLineItems(orderLineItems);
-        expected.setOrderedTime(LocalDateTime.now());
-        expected.setOrderTableId(orderTable.getId());
-        expected.setOrderStatus(OrderStatus.COOKING.name());
+        Order expected = TestFixtures.order(orderLineItems, orderTable.getId());
 
         //given
         given(menuDao.countByIdIn(orderLineItems.stream()
@@ -89,12 +71,7 @@ class OrderBoTest extends MockTest {
     @ParameterizedTest
     @MethodSource("createInvalidMenu")
     void createOrder_invalidMenuOrder(List<OrderLineItem> orderLineItems) {
-        Order order = new Order();
-        order.setId(1L);
-        order.setOrderLineItems(orderLineItems);
-        order.setOrderedTime(LocalDateTime.now());
-        order.setOrderTableId(1L);
-        order.setOrderStatus(OrderStatus.COOKING.name());
+        Order order = TestFixtures.order(orderLineItems, 1L);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderBo.create(order));
@@ -109,18 +86,11 @@ class OrderBoTest extends MockTest {
     @Test
     void createOrder_nonExistMenuOrder() {
 
-        OrderLineItem item1 = new OrderLineItem();
-        item1.setMenuId(-1L);
-        OrderLineItem item2 = new OrderLineItem();
-        item2.setMenuId(-2L);
+        OrderLineItem item1 = TestFixtures.orderLineItem();
+        OrderLineItem item2 = TestFixtures.orderLineItem();
         List<OrderLineItem> nonExistOrderLineItems = Arrays.asList(item1, item2);
 
-        Order order = new Order();
-        order.setId(1L);
-        order.setOrderLineItems(nonExistOrderLineItems);
-        order.setOrderedTime(LocalDateTime.now());
-        order.setOrderTableId(1L);
-        order.setOrderStatus(OrderStatus.COOKING.name());
+        Order order = TestFixtures.order(nonExistOrderLineItems, 1L);
 
         //given
         given(menuDao.countByIdIn(nonExistOrderLineItems.stream()
@@ -137,24 +107,13 @@ class OrderBoTest extends MockTest {
     @Test
     void createOrder_nonExistOrderTable() {
 
-        OrderLineItem item1 = new OrderLineItem();
-        item1.setMenuId(-1L);
-        OrderLineItem item2 = new OrderLineItem();
-        item2.setMenuId(-2L);
+        OrderLineItem item1 = TestFixtures.orderLineItem();
+        OrderLineItem item2 = TestFixtures.orderLineItem();
         List<OrderLineItem> orderLineItems = Arrays.asList(item1, item2);
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(1L);
-        orderTable.setNumberOfGuests(4);
-        orderTable.setTableGroupId(1L);
-        orderTable.setEmpty(true);
+        OrderTable orderTable = TestFixtures.customOrderTable(1L, true);
 
-        Order order = new Order();
-        order.setId(1L);
-        order.setOrderLineItems(orderLineItems);
-        order.setOrderedTime(LocalDateTime.now());
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderStatus(OrderStatus.COOKING.name());
+        Order order = TestFixtures.order(orderLineItems, orderTable.getId());
 
         //given
         given(menuDao.countByIdIn(orderLineItems.stream()
@@ -170,17 +129,11 @@ class OrderBoTest extends MockTest {
     @DisplayName("주문을 조회할 수 있다")
     @Test
     void listOrder() {
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(1L);
-        orderLineItem.setQuantity(2);
+        OrderLineItem orderLineItem = TestFixtures.orderLineItem();
         ArrayList<OrderLineItem> orderLineItems = new ArrayList<>();
         orderLineItems.add(orderLineItem);
 
-        Order expected = new Order();
-        expected.setId(1L);
-        expected.setOrderLineItems(orderLineItems);
-        expected.setOrderedTime(LocalDateTime.now());
-        expected.setOrderTableId(1L);
+        Order expected = TestFixtures.order(orderLineItems, 1L);
 
         //given
         given(orderDao.findAll()).willReturn(Arrays.asList(expected));
@@ -196,31 +149,14 @@ class OrderBoTest extends MockTest {
     @DisplayName("주문의 상태를 변경 할 수 있다")
     @Test
     void changeOrderStatus() {
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(1L);
-        orderLineItem.setQuantity(2);
+        OrderLineItem orderLineItem = TestFixtures.orderLineItem();
         ArrayList<OrderLineItem> orderLineItems = new ArrayList<>();
         orderLineItems.add(orderLineItem);
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(1L);
-        orderTable.setNumberOfGuests(4);
-        orderTable.setTableGroupId(1L);
-        orderTable.setEmpty(false);
+        OrderTable orderTable = TestFixtures.orderTable();
 
-        Order expected = new Order();
-        expected.setId(1L);
-        expected.setOrderLineItems(orderLineItems);
-        expected.setOrderedTime(LocalDateTime.now());
-        expected.setOrderTableId(orderTable.getId());
-        expected.setOrderStatus(OrderStatus.MEAL.name());
-
-        Order previousOrder = new Order();
-        previousOrder.setId(expected.getId());
-        previousOrder.setOrderLineItems(orderLineItems);
-        previousOrder.setOrderedTime(LocalDateTime.now());
-        previousOrder.setOrderTableId(orderTable.getId());
-        previousOrder.setOrderStatus(OrderStatus.COOKING.name());
+        Order expected = TestFixtures.customStatusOrderList(OrderStatus.MEAL, orderLineItems, orderTable);
+        Order previousOrder = TestFixtures.customStatusOrderList(OrderStatus.COOKING, orderLineItems, orderTable);
 
         //given
         given(orderDao.findById(previousOrder.getId())).willReturn(Optional.of(previousOrder));
@@ -238,24 +174,13 @@ class OrderBoTest extends MockTest {
     @DisplayName("종료된 주문의 상태는 변경 할 수 없다")
     @Test
     void changeOrderStatus_sameOrderStatus() {
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(1L);
-        orderLineItem.setQuantity(2);
+        OrderLineItem orderLineItem = TestFixtures.orderLineItem();
         ArrayList<OrderLineItem> orderLineItems = new ArrayList<>();
         orderLineItems.add(orderLineItem);
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(1L);
-        orderTable.setNumberOfGuests(4);
-        orderTable.setTableGroupId(1L);
-        orderTable.setEmpty(false);
+        OrderTable orderTable = TestFixtures.orderTable();
 
-        Order previousOrder = new Order();
-        previousOrder.setId(1L);
-        previousOrder.setOrderLineItems(orderLineItems);
-        previousOrder.setOrderedTime(LocalDateTime.now());
-        previousOrder.setOrderTableId(orderTable.getId());
-        previousOrder.setOrderStatus(OrderStatus.COMPLETION.name());
+        Order previousOrder = TestFixtures.customStatusOrderList(OrderStatus.COMPLETION, orderLineItems, orderTable);
 
         //given
         given(orderDao.findById(previousOrder.getId())).willReturn(Optional.of(previousOrder));

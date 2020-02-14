@@ -2,6 +2,7 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Product;
+import kitchenpos.model.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -29,10 +30,7 @@ class ProductBoTest extends MockTest {
     @DisplayName("상품을 등록할 수 있다")
     @Test
     void createProduct() {
-        Product expected = new Product();
-        expected.setId(1L);
-        expected.setName("메뉴1");
-        expected.setPrice(new BigDecimal(10000));
+        Product expected = TestFixtures.customPriceProduct(new BigDecimal(10000));
 
         //given
         given(productDao.save(expected)).willReturn(expected);
@@ -51,10 +49,7 @@ class ProductBoTest extends MockTest {
     @Test
     void listProduct() {
         List<Product> expected = new ArrayList<>();
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("메뉴1");
-        product.setPrice(new BigDecimal(10000));
+        Product product = TestFixtures.customPriceProduct(new BigDecimal(10000));
         expected.add(product);
 
         //given
@@ -71,10 +66,7 @@ class ProductBoTest extends MockTest {
     @ParameterizedTest
     @MethodSource("createInvalidPriceProduct")
     void invalidPriceProduct(BigDecimal price) {
-        Product expected = new Product();
-        expected.setId(1L);
-        expected.setName("메뉴1");
-        expected.setPrice(price);
+        Product expected = TestFixtures.customPriceProduct(price);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productBo.create(expected));

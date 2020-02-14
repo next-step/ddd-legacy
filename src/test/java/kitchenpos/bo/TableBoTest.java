@@ -4,6 +4,7 @@ import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
+import kitchenpos.model.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,11 +35,7 @@ class TableBoTest extends MockTest {
     @DisplayName("테이블을 등록할 수 있다")
     @Test
     void createTable() {
-        OrderTable expected = new OrderTable();
-        expected.setId(1L);
-        expected.setTableGroupId(1L);
-        expected.setNumberOfGuests(4);
-        expected.setEmpty(true);
+        OrderTable expected = TestFixtures.orderTable();
 
         //given
         given(orderTableDao.save(expected)).willReturn(expected);
@@ -57,11 +54,7 @@ class TableBoTest extends MockTest {
     @Test
     void listTable() {
         List<OrderTable> expected = new ArrayList<>();
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(1L);
-        orderTable.setTableGroupId(1L);
-        orderTable.setNumberOfGuests(4);
-        orderTable.setEmpty(true);
+        OrderTable orderTable = TestFixtures.orderTable();
         expected.add(orderTable);
 
         //given
@@ -78,11 +71,7 @@ class TableBoTest extends MockTest {
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void changeEmpty(boolean isEmpty) {
-        OrderTable expected = new OrderTable();
-        expected.setId(1L);
-        expected.setTableGroupId(null);
-        expected.setNumberOfGuests(4);
-        expected.setEmpty(isEmpty);
+        OrderTable expected = TestFixtures.customOrderTable(null, isEmpty);
         List<String> orderStatuses = Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name());
 
         //given
@@ -100,11 +89,7 @@ class TableBoTest extends MockTest {
     @DisplayName("테이블 그룹에 속한 테이블의 상태를 변경 할 수 없다")
     @Test
     void changeEmptyTableInTableGroup() {
-        OrderTable expected = new OrderTable();
-        expected.setId(1L);
-        expected.setTableGroupId(1L);
-        expected.setNumberOfGuests(4);
-        expected.setEmpty(false);
+        OrderTable expected = TestFixtures.customOrderTable(1L, false);
 
         //given
         given(orderTableDao.findById(expected.getId())).willReturn(Optional.of(expected));
@@ -116,11 +101,7 @@ class TableBoTest extends MockTest {
     @DisplayName("식사가 끝나지 않은 테이블의 상태를 변경 할 수 없다")
     @Test
     void changeEmptyTableNotFinished() {
-        OrderTable expected = new OrderTable();
-        expected.setId(1L);
-        expected.setTableGroupId(null);
-        expected.setNumberOfGuests(4);
-        expected.setEmpty(false);
+        OrderTable expected = TestFixtures.customOrderTable(null, false);
         List<String> orderStatuses = Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name());
 
         //given
@@ -135,12 +116,7 @@ class TableBoTest extends MockTest {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 10})
     void changeNumberOfGuests(int numberOfGuest) {
-        OrderTable expected = new OrderTable();
-        expected.setId(1L);
-        expected.setTableGroupId(null);
-        expected.setNumberOfGuests(numberOfGuest);
-        expected.setEmpty(false);
-        List<String> orderStatuses = Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name());
+        OrderTable expected = TestFixtures.customGuestOfNumberTable(numberOfGuest);
 
         //given
         given(orderTableDao.findById(expected.getId())).willReturn(Optional.of(expected));
@@ -157,11 +133,7 @@ class TableBoTest extends MockTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, -10, -100})
     void changeNegativeNumberOfGuests(int numberOfGuest) {
-        OrderTable expected = new OrderTable();
-        expected.setId(1L);
-        expected.setTableGroupId(null);
-        expected.setNumberOfGuests(numberOfGuest);
-        expected.setEmpty(false);
+        OrderTable expected = TestFixtures.customGuestOfNumberTable(numberOfGuest);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> tableBo.changeNumberOfGuests(expected.getId(), expected));
@@ -170,11 +142,7 @@ class TableBoTest extends MockTest {
     @DisplayName("비어있는 테이블의 인원 수를 변경 할 수 없다")
     @Test
     void changeNumberOfGuestsEmptyTable() {
-        OrderTable expected = new OrderTable();
-        expected.setId(1L);
-        expected.setTableGroupId(null);
-        expected.setNumberOfGuests(10);
-        expected.setEmpty(true);
+        OrderTable expected = TestFixtures.customOrderTable(null, true);
 
         //given
         given(orderTableDao.findById(expected.getId())).willReturn(Optional.of(expected));

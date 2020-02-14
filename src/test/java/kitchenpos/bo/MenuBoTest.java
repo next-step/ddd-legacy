@@ -7,6 +7,7 @@ import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
+import kitchenpos.model.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -41,21 +43,9 @@ class MenuBoTest extends MockTest {
     @DisplayName("메뉴를 등록할 수 있다")
     @Test
     void createMenu() {
-        Menu expected = new Menu();
-        expected.setId(1L);
-        expected.setName("엄청이득메뉴");
-        expected.setPrice(new BigDecimal(10000));
-        expected.setMenuGroupId(1L);
-
-        Product product = new Product();
-        product.setId(1L);
-        product.setName("엄청비싼음식");
-        product.setPrice(new BigDecimal(1000000));
-
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(1L);
-        menuProduct.setQuantity(1L);
-        expected.setMenuProducts(Arrays.asList(menuProduct));
+        Product product = TestFixtures.veryExpensiveProduct();
+        MenuProduct menuProduct = TestFixtures.menuProduct(product.getId(), 1L);
+        Menu expected = TestFixtures.veryCheapMenu(Arrays.asList(menuProduct));
 
         //given
         given(menuGroupDao.existsById(1L)).willReturn(true);
@@ -76,21 +66,8 @@ class MenuBoTest extends MockTest {
     @DisplayName("메뉴를 조회할 수 있다")
     @Test
     void listMenu() {
-        Menu expected = new Menu();
-        expected.setId(1L);
-        expected.setName("엄청이득메뉴");
-        expected.setPrice(new BigDecimal(10000));
-        expected.setMenuGroupId(1L);
-
-        Product product = new Product();
-        product.setId(2L);
-        product.setName("엄청비싼음식");
-        product.setPrice(new BigDecimal(10000000));
-
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setMenuId(1L);
-        menuProduct.setProductId(2L);
-        expected.setMenuProducts(Arrays.asList(menuProduct));
+        MenuProduct menuProduct = TestFixtures.menuProduct(1L, 1L);
+        Menu expected = TestFixtures.veryCheapMenu(Arrays.asList(menuProduct));
 
         //given
         given(menuDao.findAll()).willReturn(Arrays.asList(expected));
@@ -107,11 +84,7 @@ class MenuBoTest extends MockTest {
     @ParameterizedTest
     @MethodSource("createInvalidPriceMenu")
     void invalidPriceMenu(BigDecimal price) {
-        Menu expected = new Menu();
-        expected.setId(1L);
-        expected.setName("환상의메뉴");
-        expected.setPrice(price);
-        expected.setMenuGroupId(1L);
+        Menu expected = TestFixtures.customPriceMenu(price);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuBo.create(expected));
@@ -124,11 +97,7 @@ class MenuBoTest extends MockTest {
     @DisplayName("존재하지않는 메뉴그룹을 포함한 메뉴의 등록")
     @Test
     void invalidMenuGroupMenu() {
-        Menu expected = new Menu();
-        expected.setId(1L);
-        expected.setName("엄청이득메뉴");
-        expected.setPrice(new BigDecimal(10000));
-        expected.setMenuGroupId(1L);
+        Menu expected = TestFixtures.veryCheapMenu(Collections.emptyList());
 
         //given
         given(menuGroupDao.existsById(1L)).willReturn(false);
@@ -140,28 +109,12 @@ class MenuBoTest extends MockTest {
     @DisplayName("포함된 상품의 가격 합보다 비싼 메뉴의 등록")
     @Test
     void expensiveMenu() {
-        Menu expected = new Menu();
-        expected.setId(1L);
-        expected.setName("호갱메뉴");
-        expected.setPrice(new BigDecimal(100000));
-        expected.setMenuGroupId(1L);
 
-        Product product1 = new Product();
-        product1.setId(1L);
-        product1.setName("엄청싼음식");
-        product1.setPrice(new BigDecimal(1000));
-        Product product2 = new Product();
-        product2.setId(2L);
-        product2.setName("엄청싼음식");
-        product2.setPrice(new BigDecimal(5500));
-
-        MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProductId(product1.getId());
-        menuProduct1.setQuantity(2L);
-        MenuProduct menuProduct2 = new MenuProduct();
-        menuProduct2.setProductId(product2.getId());
-        menuProduct2.setQuantity(1L);
-        expected.setMenuProducts(Arrays.asList(menuProduct1, menuProduct2));
+        Product product1 = TestFixtures.customPriceProduct(new BigDecimal(1000));
+        Product product2 = TestFixtures.customPriceProduct(new BigDecimal(5500));
+        MenuProduct menuProduct1 = TestFixtures.menuProduct(product1.getId(), 2L);
+        MenuProduct menuProduct2 = TestFixtures.menuProduct(product2.getId(), 1L);
+        Menu expected = TestFixtures.veryExpensiveMenu(Arrays.asList(menuProduct1, menuProduct2));
 
         //given
         given(menuGroupDao.existsById(1L)).willReturn(true);

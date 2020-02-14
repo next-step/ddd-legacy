@@ -6,6 +6,7 @@ import kitchenpos.dao.TableGroupDao;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import kitchenpos.model.TableGroup;
+import kitchenpos.model.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,7 +14,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -40,21 +40,11 @@ class TableGroupBoTest extends MockTest {
     @DisplayName("테이블 그룹을 등록할 수 있다")
     @Test
     void createTableGroup() {
-        OrderTable orderTable1 = new OrderTable();
-        orderTable1.setId(1L);
-        orderTable1.setTableGroupId(null);
-        orderTable1.setNumberOfGuests(4);
-        orderTable1.setEmpty(true);
-        OrderTable orderTable2 = new OrderTable();
-        orderTable2.setId(2L);
-        orderTable2.setTableGroupId(null);
-        orderTable2.setNumberOfGuests(2);
-        orderTable2.setEmpty(true);
+        OrderTable orderTable1 = TestFixtures.customOrderTable(null, true);
+        OrderTable orderTable2 = TestFixtures.customOrderTable(null, true);
+        List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
 
-        TableGroup expected = new TableGroup();
-        expected.setId(1L);
-        expected.setCreatedDate(LocalDateTime.now());
-        expected.setOrderTables(Arrays.asList(orderTable1, orderTable2));
+        TableGroup expected = TestFixtures.tableGroup(orderTables);
 
         //given
         given(orderTableDao.findAllByIdIn(expected.getOrderTables().stream()
@@ -74,46 +64,27 @@ class TableGroupBoTest extends MockTest {
     @ParameterizedTest
     @MethodSource("invalidTable")
     void createInvalidTable(List<OrderTable> orderTables) {
-
-        TableGroup expected = new TableGroup();
-        expected.setId(1L);
-        expected.setCreatedDate(LocalDateTime.now());
-        expected.setOrderTables(orderTables);
+        TableGroup expected = TestFixtures.tableGroup(orderTables);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> tableGroupBo.create(expected));
     }
 
     static Stream<List<OrderTable>> invalidTable() {
-        OrderTable orderTable1 = new OrderTable();
-        orderTable1.setId(1L);
-        orderTable1.setTableGroupId(null);
-        orderTable1.setNumberOfGuests(4);
-        orderTable1.setEmpty(true);
+        OrderTable orderTable1 = TestFixtures.customOrderTable(null, true);
         return Stream.of(new ArrayList<>(), Arrays.asList(orderTable1));
     }
 
     @DisplayName("테이블 그룹을 삭제할 수 있다")
     @Test
     void deleteTableGroup() {
-        OrderTable orderTable1 = new OrderTable();
-        orderTable1.setId(1L);
-        orderTable1.setTableGroupId(null);
-        orderTable1.setNumberOfGuests(4);
-        orderTable1.setEmpty(true);
-        OrderTable orderTable2 = new OrderTable();
-        orderTable2.setId(2L);
-        orderTable2.setTableGroupId(null);
-        orderTable2.setNumberOfGuests(2);
-        orderTable2.setEmpty(true);
-
+        OrderTable orderTable1 = TestFixtures.customOrderTable(null, true);
+        OrderTable orderTable2 = TestFixtures.customOrderTable(null, true);
         List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
+
         List<String> orderStatuses = Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name());
 
-        TableGroup expected = new TableGroup();
-        expected.setId(1L);
-        expected.setCreatedDate(LocalDateTime.now());
-        expected.setOrderTables(orderTables);
+        TableGroup expected = TestFixtures.tableGroup(orderTables);
 
         //given
         given(orderTableDao.findAllByTableGroupId(expected.getId())).willReturn(orderTables);
@@ -131,24 +102,13 @@ class TableGroupBoTest extends MockTest {
     @DisplayName("완료되지 않은 테이블 그룹은 삭제할 수 없다")
     @Test
     void deleteTableGroupNotFinished() {
-        OrderTable orderTable1 = new OrderTable();
-        orderTable1.setId(1L);
-        orderTable1.setTableGroupId(null);
-        orderTable1.setNumberOfGuests(4);
-        orderTable1.setEmpty(true);
-        OrderTable orderTable2 = new OrderTable();
-        orderTable2.setId(2L);
-        orderTable2.setTableGroupId(null);
-        orderTable2.setNumberOfGuests(2);
-        orderTable2.setEmpty(true);
-
+        OrderTable orderTable1 = TestFixtures.customOrderTable(null, true);
+        OrderTable orderTable2 = TestFixtures.customOrderTable(null, true);
         List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
+
         List<String> orderStatuses = Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name());
 
-        TableGroup expected = new TableGroup();
-        expected.setId(1L);
-        expected.setCreatedDate(LocalDateTime.now());
-        expected.setOrderTables(orderTables);
+        TableGroup expected = TestFixtures.tableGroup(orderTables);
 
         //given
         given(orderTableDao.findAllByTableGroupId(expected.getId())).willReturn(orderTables);

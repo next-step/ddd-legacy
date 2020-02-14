@@ -2,6 +2,7 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.model.MenuGroup;
+import kitchenpos.model.TestFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,9 +24,7 @@ class MenuGroupBoTest extends MockTest {
     @DisplayName("메뉴그룹을 등록할 수 있다")
     @Test
     void createMenuGroup() {
-        MenuGroup expected = new MenuGroup();
-        expected.setId(1L);
-        expected.setName("상상도못한조합");
+        MenuGroup expected = TestFixtures.menuGroup();
 
         //given
         given(menuGroupDao.save(expected)).willReturn(expected);
@@ -41,9 +40,7 @@ class MenuGroupBoTest extends MockTest {
     @Test
     void listMenuGroup() {
         List<MenuGroup> expected = new ArrayList<>();
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(1L);
-        menuGroup.setName("상상도못한조합");
+        MenuGroup menuGroup = TestFixtures.menuGroup();
         expected.add(menuGroup);
 
         //given
