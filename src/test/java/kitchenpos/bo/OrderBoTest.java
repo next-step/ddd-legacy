@@ -5,10 +5,15 @@ import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderLineItemDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.*;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,9 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.params.provider.EnumSource.Mode.EXCLUDE;
+import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -95,112 +102,173 @@ class OrderBoTest {
     }
 
     @DisplayName("주문을 생성할 수 있다.")
-    @Test
-    void create() {
-        when(menuDao.countByIdIn(anyList()))
-                .thenReturn(Long.valueOf(orderLineItemList.size()));
-        when(orderTableDao.findById(anyLong()))
-                .thenReturn(Optional.of(orderTable));
-        when(orderDao.save(any(Order.class)))
-                .thenAnswer(invocation -> {
-                    order.setId(1L);
-                    return order;
+    @ParameterizedTest
+    @ValueSource(longs = {1L})
+    void create(Long orderId) {
+        //given
+        List<OrderLineItem> givenOrderLineItemList = orderLineItemList;
+        OrderTable givenOrderTable = orderTable;
+        Order givenOrder = order;
+        OrderLineItem givenOrderLineItem = orderLineItem;
+        given(menuDao.countByIdIn(anyList()))
+                .willReturn(Long.valueOf(givenOrderLineItemList.size()));
+        given(orderTableDao.findById(anyLong()))
+                .willReturn(Optional.of(givenOrderTable));
+        given(orderDao.save(any(Order.class)))
+                .willAnswer(invocation -> {
+                    givenOrder.setId(orderId);
+                    return givenOrder;
                 });
-        when(orderLineItemDao.save(any(OrderLineItem.class)))
-                .thenReturn(orderLineItem);
+        given(orderLineItemDao.save(any(OrderLineItem.class)))
+                .willReturn(givenOrderLineItem);
 
-        Order result = orderBo.create(order);
-        assertThat(result.getOrderStatus()).isEqualTo(String.valueOf(OrderStatus.COOKING));
+        //when
+        Order actualOrder = orderBo.create(givenOrder);
 
+        //then
+        assertThat(actualOrder.getOrderStatus())
+                .isEqualTo(String.valueOf(OrderStatus.COOKING));
     }
 
     @DisplayName("주문메뉴가 반드시 있어야 한다.")
-    @Test
-    void createMustHaveOrderItem() {
-        orderLineItemList = null;
-        Throwable thrown = catchThrowable(() ->{
-            orderBo.create(order);
-        });
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+    @ParameterizedTest
+    @NullSource
+    void createMustHaveOrderItem(List<OrderLineItem> orderLineItemList) {
+        //given
+        Order givenOrder = order;
+        givenOrder.setOrderLineItems(orderLineItemList);
 
+        //when
+        //then
+        assertThatThrownBy(() ->{ orderBo.create(givenOrder); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("매장에서 판매하지 않는 메뉴를 주문할 수 없다.")
     @Test
     void createMustHaveItemsServed() {
-        when(menuDao.countByIdIn(anyList()))
-                .thenReturn(Long.valueOf(orderLineItemList.size() + 1));
-        Throwable thrown = catchThrowable(() ->{
-            orderBo.create(order);
-        });
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+        //given
+        List<OrderLineItem> givenOrderLineItemList = orderLineItemList;
+        Order givenOrder = order;
+        given(menuDao.countByIdIn(anyList()))
+                .willReturn(Long.valueOf(givenOrderLineItemList.size() + 1));
+
+        //when
+        //then
+        assertThatThrownBy(() ->{ orderBo.create(givenOrder); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("주문할 때 테이블을 반드시 지정해야 한다.")
     @Test
     void createMustHaveDesignatedTable() {
-        optionalOrderTable = Optional.empty();
-        Throwable thrown = catchThrowable(() ->{
-            orderBo.create(order);
-        });
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+        //given
+        Order givenOrder = order;
+        List<OrderLineItem> givenOrderLineItemList = orderLineItemList;
+        given(menuDao.countByIdIn(anyList()))
+                .willReturn(Long.valueOf(givenOrderLineItemList.size()));
+        given(orderTableDao.findById(givenOrder.getId()))
+                .willReturn(Optional.empty());
+
+        //when
+        //then
+        assertThatThrownBy(() ->{ orderBo.create(givenOrder); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("주문이 들어오면 주문상태가 조리중(COOKING)으로 된다.")
-    @Test
-    void createThenChangeStatusToCooking() {
-        when(menuDao.countByIdIn(anyList()))
-                .thenReturn(Long.valueOf(orderLineItemList.size()));
-        when(orderTableDao.findById(anyLong()))
-                .thenReturn(Optional.of(orderTable));
-        when(orderDao.save(any(Order.class)))
-                .thenReturn(order);
-        Order result = orderBo.create(order);
-        assertThat(result.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name());
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, mode = INCLUDE, names = {"COOKING"})
+    void createThenChangeStatusToCooking(@NotNull OrderStatus orderStatus) {
+        //given
+        List<OrderLineItem> givenOrderLineItemList = orderLineItemList;
+        OrderTable givenOrderTable = orderTable;
+        Order givenOrder = order;
+        given(menuDao.countByIdIn(anyList()))
+                .willReturn(Long.valueOf(givenOrderLineItemList.size()));
+        given(orderTableDao.findById(anyLong()))
+                .willReturn(Optional.of(givenOrderTable));
+        given(orderDao.save(any(Order.class)))
+                .willReturn(givenOrder);
+
+        //when
+        Order actualOrder = orderBo.create(givenOrder);
+
+        //then
+        assertThat(actualOrder.getOrderStatus())
+                .isEqualTo(orderStatus.name());
     }
 
     @DisplayName("주문 목록을 볼 수 있다.")
     @Test
     void list() {
-        when(orderDao.findAll())
-                .thenReturn(orderList);
-        when(orderLineItemDao.findAllByOrderId(anyLong()))
-                .thenReturn(orderLineItemList);
-        List<Order> result = orderBo.list();
-        assertThat(result.size()).isEqualTo(orderList.size());
+        //given
+        List<Order> givenOrderList = orderList;
+        List<OrderLineItem> givenOrderLineItemList = orderLineItemList;
+        given(orderDao.findAll())
+                .willReturn(givenOrderList);
+        given(orderLineItemDao.findAllByOrderId(anyLong()))
+                .willReturn(givenOrderLineItemList);
+
+        //when
+        List<Order> actualOrderList = orderBo.list();
+
+        //then
+        assertThat(actualOrderList.size())
+                .isEqualTo(givenOrderList.size());
     }
 
     @DisplayName("주문의 상태를 변경할 수 있다.")
-    @Test
-    void changeOrderStatus() {
-        when(orderDao.findById(anyLong()))
-                .thenReturn(optionalOrder);
-        when(orderDao.save(any(Order.class)))
-                .thenReturn(order);
-        when(orderLineItemDao.findAllByOrderId(anyLong()))
-                .thenReturn(orderLineItemList);
-        Order result = orderBo.changeOrderStatus(order.getId(), order);
-        assertThat(result.getOrderStatus()).isNotEqualTo(OrderStatus.COMPLETION);
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, mode = INCLUDE, names = {"COMPLETION"})
+    void changeOrderStatus(@NotNull OrderStatus orderStatus) {
+        //given
+        Optional<Order> givenOptionalOrder = optionalOrder;
+        Order givenOrder = order;
+        List<OrderLineItem> givenOrderLineItemList = orderLineItemList;
+        given(orderDao.findById(anyLong()))
+                .willReturn(givenOptionalOrder);
+        given(orderDao.save(any(Order.class)))
+                .willReturn(givenOrder);
+        given(orderLineItemDao.findAllByOrderId(anyLong()))
+                .willReturn(givenOrderLineItemList);
+
+        //when
+        Order actualOrder = orderBo.changeOrderStatus(givenOrder.getId(), givenOrder);
+
+        //then
+        assertThat(actualOrder.getOrderStatus())
+                .isNotEqualTo(orderStatus.name());
     }
 
     @DisplayName("이미 생성된 주문의 상태만 변경할 수 있다.")
     @Test
     void changeOrderStatusOrderedOne() {
-        optionalOrder = Optional.empty();
-        Throwable thrown = catchThrowable(() ->{
-            orderBo.changeOrderStatus(order.getId(), order);
-        });
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+        //given
+        Order givenOrder = order;
+        given(orderDao.findById(anyLong()))
+                .willReturn(Optional.empty());
+
+        //when
+        //then
+        assertThatThrownBy(() ->{
+            orderBo.changeOrderStatus(givenOrder.getId(), givenOrder); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("식사가 끝나고 결재도 끝난 주문은 상태를 변경할 수 없다.")
-    @Test
-    void changeOrderStatusOfCompletedOrders() {
-        order.setOrderStatus(OrderStatus.COMPLETION.name());
-        Throwable thrown = catchThrowable(() ->{
-            orderBo.changeOrderStatus(order.getId(), order);
-        });
-        assertThat(thrown).isInstanceOf(IllegalArgumentException.class);
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, mode = INCLUDE, names = {"COMPLETION"})
+    void changeOrderStatusOfCompletedOrders(@NotNull OrderStatus orderStatus) {
+        //given
+        Order givenOrder = order;
+        givenOrder.setOrderStatus(orderStatus.name());
+
+        //when
+        //then
+        assertThatThrownBy(() ->{
+            orderBo.changeOrderStatus(givenOrder.getId(), givenOrder); })
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
 
