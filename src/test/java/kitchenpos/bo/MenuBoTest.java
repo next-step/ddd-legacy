@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.BDDMockito.given;
 
@@ -75,5 +76,33 @@ public class MenuBoTest {
         menu.setMenuProducts(Arrays.asList(new MenuProduct()));
         // when then
         assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(menu));
+    }
+
+    @Test
+    @DisplayName("메뉴 가격은 등록된 상품들의 가격 합보다 작아야한다.")
+    void createMenuByValidationMenuPriceOver() {
+        // give
+        given(menuGroupDao.existsById(2L))
+                .willReturn(true);
+        // when then
+        assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(menu));
+    }
+
+    @Test
+    @DisplayName("메뉴 등록")
+    void create() {
+        // give
+        given(menuGroupDao.existsById(2L))
+                .willReturn(true);
+        given(menuDao.save(menu))
+                .willReturn(menu);
+        menu.setPrice(BigDecimal.valueOf(0));
+        Menu menuExpected = menu;
+
+        // when
+        Menu menuActual = menuBo.create(menu);
+        // then
+        assertThat(menuActual.getId()).isEqualTo(menuExpected.getId());
+        assertThat(menuActual.getName()).isEqualTo(menuExpected.getName());
     }
 }
