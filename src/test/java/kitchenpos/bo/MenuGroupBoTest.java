@@ -46,14 +46,14 @@ class MenuGroupBoTest {
     private MenuGroup getMenuGroup() {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(1l);
-        menuGroup.setName("짬짜면 세트");
+        menuGroup.setName("면 요리 세트");
         return menuGroup;
     }
 
     private MenuGroup getMenuGroup2() {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(2l);
-        menuGroup.setName("점심 특선 세트");
+        menuGroup.setName("밥 요리 세트");
         return menuGroup;
     }
 
