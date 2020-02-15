@@ -7,12 +7,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -23,7 +24,7 @@ import static org.mockito.BDDMockito.given;
  * @since 2020-02-13
  */
 @ExtendWith(MockitoExtension.class)
-class ProductBoTest {
+class ProductBoTest extends Fixtures {
 
     @InjectMocks
     private ProductBo productBo;
@@ -38,26 +39,22 @@ class ProductBoTest {
     @Test
     @DisplayName("상품을 등록한다.")
     void productBo_create() {
-        final Product product = new Product();
-        product.setId(1l);
-        product.setName("짜장면");
-        product.setPrice(BigDecimal.valueOf(6000));
 
-        // given
+        final Product product = products.get(0);
+
         given(productDao.save(product)).willReturn(product);
 
-        // when
         final Product result = productBo.create(product);
 
-        // then
         Assertions.assertThat(result.getId()).isEqualTo(product.getId());
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"-1", "-8000"})
     @DisplayName("상품을 등록 경계값 검증")
-    void productBo_create_validation() {
+    void productBo_create_validation(final BigDecimal price) {
         final Product product = new Product();
-        product.setPrice(BigDecimal.valueOf(-1l));
+        product.setPrice(price);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productBo.create(product));
@@ -66,26 +63,10 @@ class ProductBoTest {
     @Test
     @DisplayName("상품 목록 조회")
     public void productBo_list() {
-        // todo: fixture refactoring 대상
-        final Product product = new Product();
-        product.setId(1l);
-        product.setName("짜장면");
-        product.setPrice(BigDecimal.valueOf(6000));
-
-        final Product product1 = new Product();
-        product1.setId(2l);
-        product1.setName("짬봉");
-        product1.setPrice(BigDecimal.valueOf(7000));
-
-        final List<Product> products = Arrays.asList(product, product1);
-
-        // given
         given(productBo.list()).willReturn(products);
 
-        // when
         final List<Product> result = productBo.list();
 
-        // then
         Assertions.assertThat(result.size()).isEqualTo(products.size());
     }
 }

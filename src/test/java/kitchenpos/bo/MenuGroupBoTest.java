@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,7 +19,7 @@ import static org.mockito.BDDMockito.given;
  * @since 2020-02-15
  */
 @ExtendWith(MockitoExtension.class)
-class MenuGroupBoTest {
+class MenuGroupBoTest extends Fixtures {
 
     @Mock
     private MenuGroupDao menuGroupDao;
@@ -32,7 +31,7 @@ class MenuGroupBoTest {
     @Test
     @DisplayName("메뉴 그룹을 등록 할 수 있다.")
     void create() {
-        final MenuGroup menuGroup = getMenuGroup();
+        final MenuGroup menuGroup = menuGroups.get(0);
 
         given(menuGroupDao.save(menuGroup)).willReturn(menuGroup);
 
@@ -43,25 +42,11 @@ class MenuGroupBoTest {
 
     }
 
-    private MenuGroup getMenuGroup() {
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(1l);
-        menuGroup.setName("면 요리 세트");
-        return menuGroup;
-    }
-
-    private MenuGroup getMenuGroup2() {
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(2l);
-        menuGroup.setName("밥 요리 세트");
-        return menuGroup;
-    }
-
     @Test
     @DisplayName("메뉴 그룹 목록을 조회 할 수 있다.")
     void list() {
 
-        final List<MenuGroup> menuGroupList = Arrays.asList(getMenuGroup(), getMenuGroup2());
+        final List<MenuGroup> menuGroupList = menuGroups;
         given(menuGroupDao.findAll()).willReturn(menuGroupList);
 
         final List<MenuGroup> result = menuGroupBo.list();
