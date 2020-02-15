@@ -11,8 +11,8 @@ public class ProductDaoWithConstraint implements ProductDao {
     public static final IllegalArgumentException PRODUCT_CONSTRAINT_EXCEPTION = new IllegalArgumentException() {};
     private final ProductDao delegate;
 
-    public static ProductDaoWithConstraint withCollection() {
-        return new ProductDaoWithConstraint(new ProductDaoWithCollection());
+    public static ProductDaoWithConstraint withCollection(List<Product> entities) {
+        return new ProductDaoWithConstraint(new ProductDaoWithCollection(entities));
     }
 
     public ProductDaoWithConstraint(ProductDao delegate) {

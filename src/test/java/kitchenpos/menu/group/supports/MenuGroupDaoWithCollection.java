@@ -1,26 +1,36 @@
 package kitchenpos.menu.group.supports;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.model.MenuGroup;
 
 public class MenuGroupDaoWithCollection implements MenuGroupDao {
 
-    private Map<Long, MenuGroup> menuGroups = new HashMap<>();
+    private long id = 0;
+    private final Map<Long, MenuGroup> entities;
+
+    public MenuGroupDaoWithCollection(List<MenuGroup> entities) {
+        this.entities = entities.stream()
+                                .peek(e -> e.setId(++id))
+                                .collect(Collectors.toMap(MenuGroup::getId,
+                                                          Function.identity()));
+    }
 
     @Override
     public MenuGroup save(MenuGroup entity) {
-        menuGroups.put(entity.getId(), entity);
+        if (entity.getId() == null) { entity.setId(++id); }
+        entities.put(entity.getId(), entity);
         return entity;
     }
 
     @Override
     public Optional<MenuGroup> findById(Long id) {
-        return Optional.empty();
+        return Optional.ofNullable(entities.get(id));
     }
 
     @Override
@@ -30,6 +40,6 @@ public class MenuGroupDaoWithCollection implements MenuGroupDao {
 
     @Override
     public boolean existsById(Long id) {
-        return false;
+        return entities.containsKey(id);
     }
 }

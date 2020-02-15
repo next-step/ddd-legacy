@@ -11,8 +11,8 @@ public class MenuGroupDaoWithConstraint implements MenuGroupDao {
     public static final IllegalArgumentException MENU_GROUP_CONSTRAINT_EXCEPTION = new IllegalArgumentException() {};
     private final MenuGroupDao delegate;
 
-    public static MenuGroupDaoWithConstraint withCollection() {
-        return new MenuGroupDaoWithConstraint(new MenuGroupDaoWithCollection());
+    public static MenuGroupDaoWithConstraint withCollection(List<MenuGroup> entities) {
+        return new MenuGroupDaoWithConstraint(new MenuGroupDaoWithCollection(entities));
     }
 
     public MenuGroupDaoWithConstraint(MenuGroupDao delegate) {
@@ -28,17 +28,12 @@ public class MenuGroupDaoWithConstraint implements MenuGroupDao {
     }
 
     @Override
-    public Optional<MenuGroup> findById(Long id) {
-        return Optional.empty();
-    }
+    public Optional<MenuGroup> findById(Long id) {return delegate.findById(id);}
 
     @Override
-    public List<MenuGroup> findAll() {
-        return null;
-    }
+    public List<MenuGroup> findAll() {return delegate.findAll();}
 
     @Override
-    public boolean existsById(Long id) {
-        return false;
-    }
+    public boolean existsById(Long id) {return delegate.existsById(id);}
+
 }
