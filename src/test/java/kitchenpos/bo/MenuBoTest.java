@@ -19,8 +19,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,6 +31,8 @@ public class MenuBoTest {
     private MenuGroupDao menuGroupDao;
     @Mock
     private MenuProductDao menuProductDao;
+    @Mock
+    private ProductDao productDao;
 
     @InjectMocks
     private MenuBo menuBo;
@@ -72,12 +73,21 @@ public class MenuBoTest {
     @DisplayName("등록된 상품만 선택이 가능하다.")
     void createMenuByValidationProduct() {
         // give
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setMenuId(1L);
+        menuProduct.setProductId(1L);
+        menuProduct.setQuantity(1L);
+
+        menu.setMenuProducts(Arrays.asList(menuProduct));
+        menu.setPrice(BigDecimal.valueOf(0));
+
         given(menuGroupDao.existsById(2L))
                 .willReturn(true);
-        menu.setPrice(BigDecimal.valueOf(0));
-        menu.setMenuProducts(Arrays.asList(new MenuProduct()));
+
+        given(productDao.findById(1L))
+                .willReturn(null);
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(menu));
+        assertThatNullPointerException().isThrownBy(() -> menuBo.create(menu));
     }
 
     @Test
