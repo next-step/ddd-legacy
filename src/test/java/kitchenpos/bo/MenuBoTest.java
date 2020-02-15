@@ -1,5 +1,6 @@
 package kitchenpos.bo;
 
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.spy;
@@ -14,12 +15,18 @@ import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.dao.MenuProductDao;
 import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Menu;
+import kitchenpos.model.Menu.MenuBuilder;
 import kitchenpos.model.MenuProduct;
+import kitchenpos.model.MenuProduct.MenuProductBuilder;
 import kitchenpos.model.Product;
+import kitchenpos.model.Product.ProductBuilder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -42,23 +49,17 @@ class MenuBoTest {
     @InjectMocks
     private MenuBo menuBo;
 
-    @DisplayName("메뉴는 하나씩 등록할수있다., 하나의 메뉴에 여러 상품을 등록할수있다")
+    @DisplayName("메뉴는 하나씩 등록할수있다. 하나의 메뉴에 여러 상품을 등록할수있다")
     @Test
     void createOneMenu() {
         //given
-        final Menu menu = createMenu(1L);
+        final Menu menu = createMenu();
         given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
         menu.getMenuProducts().forEach(
             menuProduct -> {
-                Product product = new Product();
-                product.setId(menuProduct.getProductId());
-                product.setPrice(BigDecimal.valueOf(1000L));
-                product.setName("상품_" + menuProduct.getProductId());
-
+                Product product = createProduct(menuProduct.getProductId());
                 given(productDao.findById(menuProduct.getProductId()))
                     .willReturn(Optional.of(product));
-
-                menuProduct.setSeq(new Random().nextLong());
                 given(menuProductDao.save(menuProduct)).willReturn(menuProduct);
             });
         given(menuDao.save(menu)).willReturn(menu);
@@ -72,35 +73,25 @@ class MenuBoTest {
             .isEqualTo(menu.getMenuProducts().size());
     }
 
-    @DisplayName("메뉴 정보는 이름과 가격(필수)이다.")
-    @Test
-    void menuRequired() {
+    @DisplayName("메뉴의 가격은 0원 이상이 아닐경우 실패한다.")
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"-1000", "-2000"})
+    void menuPrice(BigDecimal price) {
         //given
-        final Menu menu = spy(createMenu());
-        given(menu.getPrice()).willReturn(null);
+        final Menu menu = createMenu();
+        menu.setPrice(price);
 
         //when then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> menuBo.create(menu));
     }
 
-    @DisplayName("메뉴의 가격은 음수일수 없다.")
-    @Test
-    void priceNoneNegative() {
-        //given
-        final Menu menu = spy(createMenu());
-        given(menu.getPrice()).willReturn(BigDecimal.valueOf(-1000L));
-
-        //when then
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> menuBo.create(menu));
-    }
-
-    @DisplayName("메뉴들은 하나의 그룹에 속해야 한다.")
+    @DisplayName("존재 하지 않는 메뉴 그룹에 메뉴룰 등록할수 없다.")
     @Test
     void inGroup() {
         //given
-        final Menu menu = spy(createMenu());
+        final Menu menu = createMenu();
         given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(false);
 
         //when then
@@ -112,10 +103,14 @@ class MenuBoTest {
     @Test
     void notFoundProduct() {
         //given
-        final Menu menu = spy(createMenu());
-        given(menu.getPrice()).willReturn(BigDecimal.valueOf(Long.MAX_VALUE));
+        Product product = new Product();
+        product.setPrice(BigDecimal.valueOf(10000L));
+
+        final Menu menu = createMenu();
+        menu.setPrice(BigDecimal.valueOf(Long.MAX_VALUE));
+
         given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
-        given(productDao.findById(anyLong())).willReturn(Optional.empty());
+        given(productDao.findById(anyLong())).willReturn(Optional.ofNullable(product));
 
         //when then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
@@ -126,21 +121,17 @@ class MenuBoTest {
     @Test
     void pricelessThanProductSum() {
         //given
-        final Menu menu = spy(createMenu());
-
+        final Menu menu = createMenu();
         BigDecimal sum = BigDecimal.ZERO;
-        given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
         for (MenuProduct menuProduct : menu.getMenuProducts()) {
-            Product product = new Product();
-            product.setName("상품:" + menuProduct.getProductId());
-            product.setId(menuProduct.getProductId());
-            product.setPrice(BigDecimal.valueOf(1000L));
+            Product product = createProduct(menuProduct.getProductId());
             given(productDao.findById(menuProduct.getProductId())).willReturn(Optional.of(product));
-
-            sum = sum.add(product.getPrice());
+            sum = sum
+                .add(product.getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
         }
+        menu.setPrice(sum.add(BigDecimal.TEN));
 
-        given(menu.getPrice()).willReturn(sum.add(BigDecimal.ONE));
+        given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
 
         //when then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
@@ -162,27 +153,27 @@ class MenuBoTest {
     }
 
     private Menu createMenu() {
-        Menu menu = new Menu();
-        menu.setName("name");
-        menu.setPrice(BigDecimal.valueOf(1000L));
-        menu.setMenuGroupId(1L);
-
-        MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProductId(1L);
-        menuProduct1.setQuantity(1);
-
-        MenuProduct menuProduct2 = new MenuProduct();
-        menuProduct2.setProductId(2L);
-        menuProduct2.setQuantity(1);
-
-        menu.setMenuProducts(Arrays.asList(menuProduct1, menuProduct2));
-        return menu;
+        return MenuBuilder.builder()
+            .withName("name")
+            .withMenuGroupId(1L)
+            .withMenuProducts(Arrays.asList(createMenuProduct(1), createMenuProduct(2)))
+            .withPrice(BigDecimal.valueOf(1000L))
+            .build();
     }
 
-    private Menu createMenu(Long id) {
-        Menu menu = createMenu();
-        menu.setId(id);
-        return menu;
+    private MenuProduct createMenuProduct(long productId) {
+        return MenuProductBuilder.builder()
+            .withProductId(productId)
+            .withQuantity(1)
+            .build();
     }
 
+    private Product createProduct(Long productId) {
+        return ProductBuilder.builder()
+            .withId(productId)
+            .withPrice(BigDecimal.valueOf(1000L))
+            .withName("상품_" + productId)
+            .build();
+    }
 }
+

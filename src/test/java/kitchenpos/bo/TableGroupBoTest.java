@@ -37,15 +37,17 @@ class TableGroupBoTest {
     @InjectMocks
     private TableGroupBo tableGroupBo;
 
-    @DisplayName("테이블의 묶음은 2개이상이다.")
+    @DisplayName("테이블의 묶음은 2개이어야 한다.")
     @Test
     void min2Table() {
+        //given
         OrderTable orderTable = createOrderTable(true, null);
 
         List<OrderTable> tables = Arrays.asList(orderTable);
         TableGroup tableGroup = new TableGroup();
         tableGroup.setOrderTables(tables);
 
+        //when, then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> tableGroupBo.create(tableGroup));
     }
@@ -122,6 +124,7 @@ class TableGroupBoTest {
         given(orderTableDao.findAllByIdIn(anyList())).willReturn(tableGroup.getOrderTables());
         given(tableGroupDao.save(tableGroup)).willReturn(tableGroup);
 
+        //when, then
         tableGroupBo.create(tableGroup).getOrderTables()
             .forEach(orderTable -> Assertions.assertThat(orderTable.isEmpty()).isEqualTo(false));
     }
@@ -131,7 +134,6 @@ class TableGroupBoTest {
     @DisplayName("주문의 상태가 완료일 경우만 테이블 묶을을 해제할수있다.")
     @Test
     void onlyCompleteStatusCanDelete() {
-
         //given
         OrderTable orderTable1 = createOrderTable(true, 1L);
         OrderTable orderTable2 = createOrderTable(true, 1L);
@@ -143,6 +145,7 @@ class TableGroupBoTest {
         given(orderDao.existsByOrderTableIdInAndOrderStatusIn(anyList(), anyList()))
             .willReturn(true);
 
+        //when, then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> tableGroupBo.delete(1L));
     }

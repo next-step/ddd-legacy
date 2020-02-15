@@ -59,11 +59,10 @@ class TableBoTest {
         Assertions.assertThat(tableBo.list()).containsAll(orderTables);
     }
 
-    @DisplayName("테이블의 주문이 완료된 상태, 테이블 그룹이 없을때만 이용여부를 변경할수 없다.")
+    @DisplayName("테이블 주문의 상태가 완료일 경우 테이블 이용여부를 변경할수 없다.")
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void changeEmpty(boolean requestEmpty) {
-
         //given
         OrderTable requestOrderTable = new OrderTable();
         requestOrderTable.setEmpty(requestEmpty);
@@ -82,13 +81,15 @@ class TableBoTest {
         Assertions.assertThat(tableBo.changeEmpty(savedOrderTable.getId(), requestOrderTable).isEmpty()).isEqualTo(requestEmpty);
     }
 
-    @DisplayName("테이블에 인원은 0명 이상이다.")
+    @DisplayName("테이블에 인원은 0명 미만일 경우 실패한다.")
     @ParameterizedTest
     @ValueSource(ints = {-1,-2,-3,-4})
     void guestEqualToGreaterThanZero(int numberOfGuests) {
+        //given
         OrderTable requestOrderTable = new OrderTable();
         requestOrderTable.setNumberOfGuests(numberOfGuests);
 
+        //when then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(()->tableBo.changeNumberOfGuests(1L, requestOrderTable));
     }
@@ -97,7 +98,6 @@ class TableBoTest {
     @ParameterizedTest
     @ValueSource(ints = {1,2,3,4})
     void changeNumberOfGuests(int numberOfGuests) {
-
         //given
         Long tableId= 1L;
         OrderTable requestOrderTable = new OrderTable();

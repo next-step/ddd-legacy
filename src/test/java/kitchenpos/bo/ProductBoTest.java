@@ -33,12 +33,14 @@ class ProductBoTest {
     @DisplayName("상품은 하나씩 등록 할 수 있다.")
     @Test
     void createOne() {
+        //given
         Product product = new Product();
         product.setPrice(BigDecimal.TEN);
         product.setName("마이상품");
 
         given(productDao.save(product)).willReturn(product);
 
+        //when, then
         Assertions.assertThat(productBo.create(product)).isEqualTo(product);
     }
 
@@ -47,10 +49,12 @@ class ProductBoTest {
     @NullSource
     @ValueSource(strings = {"-1", "-10000"})
     void create(BigDecimal price) {
+        //given
         Product product = new Product();
         product.setPrice(price);
         product.setName("마이상품");
 
+        //when, then
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> productBo.create(product));
     }
@@ -58,11 +62,13 @@ class ProductBoTest {
     @DisplayName("전체 상품을 목록을 조회 할수 있다.")
     @Test
     void list() {
+        //given
         List<Product> products = new ArrayList<>();
         products.add(new Product());
 
         given(productDao.findAll()).willReturn(products);
 
+        //when, then
         Assertions.assertThat(productBo.list()).containsAll(products);
     }
 }

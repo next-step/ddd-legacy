@@ -44,7 +44,7 @@ class OrderBoTest {
     @InjectMocks
     private OrderBo orderBo;
 
-    @DisplayName("주문은 메뉴들의 집합이다")
+    @DisplayName("메뉴가 없는 주문을 할수 없다.")
     @Test
     void orderHasMenus() {
         //given
@@ -56,7 +56,7 @@ class OrderBoTest {
             .isThrownBy(() -> orderBo.create(order));
     }
 
-    @DisplayName("존재하는 메뉴이어야 한다.")
+    @DisplayName("존재 하지 않는 메뉴로 주문을 할수 없다.")
     @Test
     void notExistMenu() {
         //given
@@ -68,7 +68,7 @@ class OrderBoTest {
             .isThrownBy(() -> orderBo.create(order));
     }
 
-    @DisplayName("주문은 테이블에 등록되어야 한다.")
+    @DisplayName("존재 하지 않는 테이블에는 주문을 할수 없다.")
     @Test
     void notExistTable() {
         //given
@@ -84,7 +84,7 @@ class OrderBoTest {
             .isThrownBy(() -> orderBo.create(order));
     }
 
-    @DisplayName("주문후 주문의 상태는 조리중이다.")
+    @DisplayName("주문 즉시에는 상태는 조리중이다.")
     @Test
     void createOrderStatusIsCOOKING() {
         //given
@@ -107,7 +107,7 @@ class OrderBoTest {
             .isEqualTo(OrderStatus.COOKING.name());
     }
 
-    @DisplayName("주문 현재 상태를 변경할수 있다")
+    @DisplayName("주문 현재 상태를 변경할수 있다.")
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class)
     void changeStatus(OrderStatus orderStatus) {
@@ -126,7 +126,7 @@ class OrderBoTest {
             .isEqualTo(orderStatus.name());
     }
 
-    @DisplayName("완료된 주문은 상태를 변경할수 없다")
+    @DisplayName("완료된 주문은 상태를 변경할수 없다.")
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class)
     void noneChangeStatus(OrderStatus orderStatus) {
