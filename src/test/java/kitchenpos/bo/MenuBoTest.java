@@ -1,6 +1,6 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.DefaultProductDao;
+import kitchenpos.dao.ProductDao;
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.dao.MenuProductDao;
@@ -10,10 +10,8 @@ import kitchenpos.model.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -30,7 +28,7 @@ class MenuBoTest extends MockTest{
     @Mock private MenuDao menuDao;
     @Mock private MenuProductDao menuProductDao;
     @Mock private MenuGroupDao menuGroupDao;
-    @Mock private DefaultProductDao productDao;
+    @Mock private ProductDao productDao;
 
     private MenuProduct menuProduct;
     private Menu menu;
@@ -67,6 +65,29 @@ class MenuBoTest extends MockTest{
         this.product.setPrice(new BigDecimal(16000));
 
         this.optionalProduct = Optional.of(this.product);
+    }
+
+    @DisplayName("메뉴를 생성할 수 있다.")
+    @Test
+    void create() {
+        //given
+        Product givenProduct = product;
+        Menu givenMenu = menu;
+        MenuProduct givenMenuProduct = menuProduct;
+        given(menuGroupDao.existsById(anyLong()))
+                .willReturn(true);
+        given(productDao.findById(givenProduct.getId()))
+                .willReturn(Optional.of(givenProduct));
+        given(menuDao.save(givenMenu))
+                .willReturn(givenMenu);
+        given(menuProductDao.save(givenMenuProduct))
+                .willReturn(givenMenuProduct);
+
+        //when
+        Menu actualMenu = menuBo.create(givenMenu);
+
+        //then
+        assertThat(actualMenu.getName()).isEqualTo(givenMenu.getName());
     }
 
     @DisplayName("메뉴를 생성할 때 메뉴의 가격을 반드시 입력해야 한다.")

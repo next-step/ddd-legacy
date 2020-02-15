@@ -52,6 +52,8 @@ public class MenuBo {
         for (final MenuProduct menuProduct : menuProducts) {
             final Product product = productDao.findById(menuProduct.getProductId())
                     .orElseThrow(IllegalArgumentException::new);
+            System.out.println(product.getPrice());
+            System.out.println(menuProduct.getQuantity());
             sum = sum.add(product.getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
         }
 
