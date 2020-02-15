@@ -1,7 +1,7 @@
 package calculator;
 
 public class Number {
-    private String textNumber;
+    private final String textNumber;
 
     public Number(String textNumber) {
         this.textNumber = textNumber;
