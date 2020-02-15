@@ -76,4 +76,25 @@ class TableGroupBoTest {
         // when then
         assertThatIllegalArgumentException().isThrownBy(() -> tableGroupBo.create(tableGroup));
     }
+
+    @Test
+    @DisplayName("이용하려는 자리들이 비어있지 않다면 자리에 앉을 수 없다.")
+    void createExceptionByNotEmptyTable() {
+        // give
+        List<OrderTable> orderTablesExpected = new ArrayList<>();
+        for (long i = 1; i <= 2; i++) {
+            OrderTable orderTable = new OrderTable();
+            orderTable.setId(i);
+            orderTable.setEmpty(false);
+            orderTablesExpected.add(orderTable);
+        }
+
+        given(orderTableDao.findAllByIdIn(Arrays.asList(1L, 2L)))
+                .willReturn(orderTablesExpected);
+
+        tableGroup.setOrderTables(orderTablesExpected);
+
+        // when then
+        assertThatIllegalArgumentException().isThrownBy(() -> tableGroupBo.create(tableGroup));
+    }
 }
