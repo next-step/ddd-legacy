@@ -2,7 +2,9 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.MenuGroupDao;
+import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Menu;
+import kitchenpos.model.MenuProduct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -24,6 +27,8 @@ public class MenuBoTest {
     private MenuDao menuDao;
     @Mock
     private MenuGroupDao menuGroupDao;
+    @Mock
+    private ProductDao productDao;
 
     @InjectMocks
     private MenuBo menuBo;
@@ -51,13 +56,24 @@ public class MenuBoTest {
     }
 
     @Test
-    @DisplayName("같은 카테고리를 가질 수 없다.")
+    @DisplayName("등록된 메뉴 그룹에만 메뉴를 등록할 수 있다.")
     void createMenuByValidationMenuGroup() {
         // give
         given(menuGroupDao.existsById(2L))
-                .willReturn(true);
+                .willReturn(false);
         // when then
         assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(menu));
     }
 
+    @Test
+    @DisplayName("등록된 상품만 선택이 가능하다.")
+    void createMenuByValidationProduct() {
+        // give
+        given(menuGroupDao.existsById(2L))
+                .willReturn(true);
+        menu.setPrice(BigDecimal.valueOf(0));
+        menu.setMenuProducts(Arrays.asList(new MenuProduct()));
+        // when then
+        assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(menu));
+    }
 }
