@@ -28,8 +28,9 @@ public class ProductBoTest {
     @Test
     void createPriceZero (){
         //given
-        Product newProduct = new Product();
-        newProduct.setPrice(new BigDecimal(-1));
+        Product newProduct = new Product.Builder()
+            .price(new BigDecimal(-1))
+            .build();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productBo.create(newProduct));
@@ -38,8 +39,7 @@ public class ProductBoTest {
     @DisplayName("가격을 설정하지 않으면 IllegalArgumentException() 을 생성한다.")
     @Test
     void createPriceNull (){
-        Product newProduct = new Product();
-        newProduct.setPrice(null);
+        Product newProduct = new Product.Builder().build();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productBo.create(newProduct));
@@ -52,13 +52,15 @@ public class ProductBoTest {
         String name = "뿌링클;";
         BigDecimal price = new BigDecimal(20000);
 
-        Product newProduct = new Product();
-        newProduct.setName(name);
-        newProduct.setPrice(price);
+        Product newProduct = new Product.Builder()
+            .name(name)
+            .price(price)
+            .build();
 
-        Product expected = new Product();
-        expected.setName(name);
-        expected.setPrice(price);
+        Product expected = new Product.Builder()
+            .name(name)
+            .price(price)
+            .build();
 
         given(productDao.save(newProduct)).willReturn(expected);
 

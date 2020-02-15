@@ -18,9 +18,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +48,7 @@ public class MenuBoTest {
 
     @BeforeAll
     static void setup(){
-        for(int i=1; i<=5; i++){
+        for(int i=1; i<=2; i++){
             Product product = new Product.Builder()
                 .id((long)i)
                 .name("치킨" + i)
@@ -56,7 +58,7 @@ public class MenuBoTest {
         }
 
         //expected DataSet
-        for(int i=1 ;i<=5; i++){
+        for(int i=1 ;i<=2; i++){
             MenuProduct menuProduct = new MenuProduct.Builder()
                 .seq((long) i)
                 .menuId(1L)
@@ -78,7 +80,7 @@ public class MenuBoTest {
         expectedMenus.add(expectedMenu);
 
         //Actual DataSet
-        for(int i=1 ;i<=5; i++){
+        for(int i=1 ;i<=2; i++){
             MenuProduct menuProduct = new MenuProduct.Builder()
                 .seq((long) i)
                 .menuId(1L)
@@ -158,13 +160,38 @@ public class MenuBoTest {
 
     @DisplayName("메뉴를 구성하는 제품 가격의 총 합이 메뉴에 입력한 가격보다 크다.")
     @Test
-    void createPriceisGreaterThanAllMenuProduct (){
+    void createAllProductsPriceisGreaterThanPrice (){
 
+        given(productDao.findById(1L)).willReturn(Optional.ofNullable(products.get(0)));
+        given(productDao.findById(2L)).willReturn(Optional.ofNullable(products.get(1)));
+
+        Menu menu = actualMenus.get(0);
+
+        BigDecimal sum = BigDecimal.ZERO;
+        for(final MenuProduct menuProduct : actualMenuProducts){
+            final Product product = productDao.findById(menuProduct.getProductId()).get();
+            sum = sum.add(product.getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
+        }
+
+        assertThat(sum).isGreaterThan(menu.getPrice());
     }
 
-    @DisplayName("MenuProduct의 ProductID를 잘못 설정한 경우, IllegalArgumentException이 발생한다.")
+    @DisplayName("메뉴에 입력한 가격이 메뉴를 구성하는 제품 가격의 총 합보다 크면 Exception이 발생한다.")
     @Test
-    void createMenuWrongMenuProduct (){
+    void createPriceisGreaterThanAllMenuProduct(){
+        when(productDao.findById(1L)).thenReturn(Optional.ofNullable(products.get(0)));
+        when(productDao.findById(2L)).thenReturn(Optional.ofNullable(products.get(1)));
 
+        BigDecimal sum = BigDecimal.ZERO;
+        for(final MenuProduct menuProduct : actualMenuProducts){
+            final Product product = productDao.findById(menuProduct.getProductId()).get();
+            sum = sum.add(product.getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
+        }
+
+        Menu highPriceMenu = new Menu.Builder()
+            .price(sum.add(BigDecimal.valueOf(10000)))
+            .build();
+
+        assertThat(sum).isLessThan(highPriceMenu.getPrice());
     }
 }
