@@ -18,10 +18,6 @@ public class MenuGroupBo {
 
     @Transactional
     public MenuGroup create(final MenuGroup menuGroup) {
-        String name = menuGroup.getName();
-        if (Strings.isBlank(name)) {
-            throw new IllegalArgumentException();
-        }
         return menuGroupDao.save(menuGroup);
     }
 

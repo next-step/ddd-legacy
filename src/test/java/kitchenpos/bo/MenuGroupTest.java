@@ -10,6 +10,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.BDDMockito.given;
@@ -44,11 +47,18 @@ public class MenuGroupTest {
     }
 
     @Test
-    @DisplayName("메뉴 그룹 이름은 빈 값을 허용하지 않는다.")
-    void createMenuGroupException() {
+    @DisplayName("등록되어진 메뉴 그룹을 볼 수 있다.")
+    void getMenuGroup() {
         // give
-        MenuGroup menuGroup = new MenuGroup();
-        // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> menuGroupBo.create(menuGroup));
+        given(menuGroupDao.findAll())
+                .willReturn(
+                        Arrays.asList(
+                                new MenuGroup(1L, "추천 메뉴"),
+                                new MenuGroup(2L, "이번달 메뉴")));
+        // when
+        List<MenuGroup> menuGroupsActual = menuGroupBo.list();
+        // then
+        assertThat(menuGroupsActual.size()).isEqualTo(2);
+        assertThat(menuGroupsActual.contains(new MenuGroup(1L, "추천 메뉴"))).isFalse();
     }
 }
