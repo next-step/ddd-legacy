@@ -12,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,8 +61,8 @@ public class TableBoTest {
         given(orderTableDao.findAll())
                 .willReturn(Arrays.asList(orderTable));
         // when
-         List<OrderTable> orderTablesActual = tableBo.list();
-         // then
+        List<OrderTable> orderTablesActual = tableBo.list();
+        // then
         assertThat(orderTablesActual.get(0).getId()).isEqualTo(orderTable.getId());
     }
 
@@ -77,5 +76,21 @@ public class TableBoTest {
                 .willReturn(true);
         // when then
         assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeEmpty(orderTable.getId(), new OrderTable()));
+    }
+
+    @Test
+    @DisplayName("주문 테이블의 손님 수가 0명 이상이다.")
+    void changeOrderTableGuestNumberByOverZero() {
+        // when then
+        assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeNumberOfGuests(1L, orderTable));
+    }
+
+    @Test
+    @DisplayName("주문 테이블이 비어있는데 손님이 앉아 있을 수 없다.")
+    void changeOrderTableByIsEmpty() {
+        // give
+        given(orderTableDao.findById(1L))
+                .willReturn(Optional.ofNullable(orderTable));
+        assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeNumberOfGuests(1L, new OrderTable()));
     }
 }
