@@ -17,14 +17,14 @@ public class PositiveIntegers {
         return numbers.stream()
                 .mapToInt(PositiveInteger::valueOf)
                 .reduce((a, b) -> a + b)
-                .orElse(-1);
+                .orElseThrow(RuntimeException::new);
     }
 
     public Integer multiply() {
         return numbers.stream()
                 .mapToInt(PositiveInteger::valueOf)
                 .reduce((a, b) -> a * b)
-                .orElse(-1);
+                .orElseThrow(RuntimeException::new);
     }
 
 }
