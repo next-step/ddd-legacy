@@ -9,7 +9,7 @@ import java.util.Optional;
 import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Product;
 
-public class CollectionProductDao implements ProductDao {
+public class ProductDaoWithCollection implements ProductDao {
 
     private Map<Long, Product> products = new HashMap<>();
 

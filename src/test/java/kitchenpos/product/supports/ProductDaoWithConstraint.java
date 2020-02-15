@@ -6,16 +6,16 @@ import java.util.Optional;
 import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Product;
 
-public class ConstraintProductDao implements ProductDao {
+public class ProductDaoWithConstraint implements ProductDao {
 
-    public static final RuntimeException PRODUCT_CONSTRAINT_EXCEPTION = new IllegalArgumentException() {};
+    public static final IllegalArgumentException PRODUCT_CONSTRAINT_EXCEPTION = new IllegalArgumentException() {};
     private final ProductDao delegate;
 
-    public static ConstraintProductDao withCollection() {
-        return new ConstraintProductDao(new CollectionProductDao());
+    public static ProductDaoWithConstraint withCollection() {
+        return new ProductDaoWithConstraint(new ProductDaoWithCollection());
     }
 
-    public ConstraintProductDao(ProductDao delegate) {
+    public ProductDaoWithConstraint(ProductDao delegate) {
         this.delegate = delegate;
     }
 
