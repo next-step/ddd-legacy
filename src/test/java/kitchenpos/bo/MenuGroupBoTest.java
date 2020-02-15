@@ -39,7 +39,6 @@ class MenuGroupBoTest extends Fixtures {
 
         assertThat(savedMenuGroup).isNotNull();
         assertThat(savedMenuGroup.getId()).isEqualTo(menuGroup.getId());
-
     }
 
     @Test
@@ -53,7 +52,6 @@ class MenuGroupBoTest extends Fixtures {
 
         assertThat(menuGroupList).isNotEmpty();
         assertThat(menuGroupList.size()).isEqualTo(result.size());
-
     }
 
 }

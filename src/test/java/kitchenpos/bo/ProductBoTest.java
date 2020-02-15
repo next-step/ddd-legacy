@@ -3,7 +3,6 @@ package kitchenpos.bo;
 import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Product;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,10 +30,6 @@ class ProductBoTest extends Fixtures {
 
     @Mock
     private ProductDao productDao;
-
-    @BeforeEach
-    void init() {
-    }
 
     @Test
     @DisplayName("상품을 등록한다.")

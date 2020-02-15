@@ -72,7 +72,6 @@ class MenuBoTest extends Fixtures {
                 .isThrownBy(() -> menuBo.create(resolvedMenu));
     }
 
-
     @Test
     @DisplayName("메뉴 그룹이 존재 하지 않으면 등록할 수 없다.")
     void create_not_exist_groupId() {

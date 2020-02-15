@@ -216,6 +216,4 @@ class OrderBoTest extends Fixtures {
         assertThat(result).isNotNull();
         assertThat(result.getOrderStatus()).isEqualTo(updatedOrder.getOrderStatus());
     }
-
-
 }

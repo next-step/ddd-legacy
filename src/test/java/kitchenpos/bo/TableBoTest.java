@@ -64,7 +64,6 @@ class TableBoTest extends Fixtures {
     @Test
     @DisplayName("주문 테이블의 상태를 비움으로 업데이트 할 수 있다.")
     void changeEmpty() {
-
         final OrderTable newOrderTable = orderTable;
         newOrderTable.setTableGroupId(null);
 

@@ -25,7 +25,6 @@ public class Fixtures {
     public static List<OrderTable> orderTables = Collections.emptyList();
     public static OrderTable orderTable;
 
-
     @BeforeAll
     public static void setUp() {
         /* 상품 등록 */
@@ -98,6 +97,5 @@ public class Fixtures {
         newOrderTable2.setEmpty(false);
 
         orderTables = Arrays.asList(newOrderTable, newOrderTable1, newOrderTable2);
-
     }
 }
