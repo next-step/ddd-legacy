@@ -2,6 +2,7 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.model.MenuGroup;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,10 @@ public class MenuGroupBo {
 
     @Transactional
     public MenuGroup create(final MenuGroup menuGroup) {
+        String name = menuGroup.getName();
+        if (Strings.isBlank(name)) {
+            throw new IllegalArgumentException();
+        }
         return menuGroupDao.save(menuGroup);
     }
 

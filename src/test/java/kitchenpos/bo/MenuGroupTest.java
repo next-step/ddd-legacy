@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,10 +37,18 @@ public class MenuGroupTest {
         given(menuGroupDao.save(menuGroup))
                 .willReturn(menuGroup);
         // when
-        MenuGroup menuGroupExpected = menuGroupBo.create(menuGroup);
-        MenuGroup menuGroupActual = menuGroup;
+        MenuGroup menuGroupActual = menuGroupBo.create(menuGroup);
+        MenuGroup menuGroupExpected = menuGroup;
         // then
-        assertThat(menuGroupExpected.getId()).isEqualTo(menuGroupActual.getId());
+        assertThat(menuGroupActual.getId()).isEqualTo(menuGroupExpected.getId());
+    }
 
+    @Test
+    @DisplayName("메뉴 그룹 이름은 빈 값을 허용하지 않는다.")
+    void createMenuGroupException() {
+        // give
+        MenuGroup menuGroup = new MenuGroup();
+        // when then
+        assertThatIllegalArgumentException().isThrownBy(() -> menuGroupBo.create(menuGroup));
     }
 }
