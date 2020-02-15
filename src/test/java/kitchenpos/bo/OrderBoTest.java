@@ -124,4 +124,25 @@ class OrderBoTest {
         // when then
         assertThatIllegalArgumentException().isThrownBy(() -> orderBo.changeOrderStatus(1L, order));
     }
+
+    @Test
+    @DisplayName("주문 상태 변화")
+    void changeOrderStatus() {
+        // give
+        given(orderDao.findById(1L))
+                .willReturn(Optional.of(new Order()));
+
+        order.setOrderStatus(OrderStatus.COOKING.name());
+
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setOrderId(1L);
+
+        given(orderLineItemDao.findAllByOrderId(1L))
+                .willReturn(Arrays.asList(orderLineItem));
+
+        Order orderActual = orderBo.changeOrderStatus(1L, order);
+
+        assertThat(orderActual.getOrderStatus()).isEqualTo(order.getOrderStatus());
+        assertThat(orderActual.getOrderStatus()).isNotEqualTo(new Order().getOrderStatus());
+    }
 }
