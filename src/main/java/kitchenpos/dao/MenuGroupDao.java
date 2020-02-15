@@ -65,9 +65,9 @@ public class MenuGroupDao {
     }
 
     private MenuGroup toEntity(final ResultSet resultSet) throws SQLException {
-        final MenuGroup entity = new MenuGroup();
-        entity.setId(resultSet.getLong("id"));
-        entity.setName(resultSet.getString("name"));
-        return entity;
+        return new MenuGroup.Builder()
+            .id(resultSet.getLong("id"))
+            .name(resultSet.getString("name"))
+            .build();
     }
 }

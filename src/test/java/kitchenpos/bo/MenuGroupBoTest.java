@@ -29,12 +29,14 @@ public class MenuGroupBoTest {
 
     @BeforeEach
     void setup (){
-        request = new MenuGroup();
-        request.setName("두마리메뉴");
+        request = new MenuGroup.Builder()
+            .name("두마리메뉴")
+            .build();
 
-        result = new MenuGroup();
-        result.setName("두마리메뉴");
-        result.setId(1L);
+        result = new MenuGroup.Builder()
+            .id(1L)
+            .name("두마리메뉴")
+            .build();
 
     }
 

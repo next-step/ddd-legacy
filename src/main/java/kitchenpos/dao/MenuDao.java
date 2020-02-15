@@ -65,11 +65,11 @@ public class MenuDao {
     }
 
     private Menu toEntity(final ResultSet resultSet) throws SQLException {
-        final Menu entity = new Menu();
-        entity.setId(resultSet.getLong("id"));
-        entity.setName(resultSet.getString("name"));
-        entity.setPrice(resultSet.getBigDecimal("price"));
-        entity.setMenuGroupId(resultSet.getLong("menu_group_id"));
-        return entity;
+        return new Menu.Builder()
+            .id(resultSet.getLong("id"))
+            .name(resultSet.getString("name"))
+            .price(resultSet.getBigDecimal("price"))
+            .menuGroupId(resultSet.getLong("menu_group_id"))
+            .build();
     }
 }

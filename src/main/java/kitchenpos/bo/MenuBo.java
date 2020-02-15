@@ -59,24 +59,35 @@ public class MenuBo {
             throw new IllegalArgumentException();
         }
 
+        //Menu를 DB에 저장한 다음, Id를 가져와 MenuProduct에 MenuId를 설정한다.
         final Menu savedMenu = menuDao.save(menu);
 
         final Long menuId = savedMenu.getId();
+
+        //MenuProduct에 MenuId를 설정한다.
         final List<MenuProduct> savedMenuProducts = new ArrayList<>();
         for (final MenuProduct menuProduct : menuProducts) {
             menuProduct.setMenuId(menuId);
             savedMenuProducts.add(menuProductDao.save(menuProduct));
         }
-        savedMenu.setMenuProducts(savedMenuProducts);
 
+        savedMenu.changeMenuProducts(savedMenuProducts);
         return savedMenu;
     }
 
     public List<Menu> list() {
-        final List<Menu> menus = menuDao.findAll();
+        final List<Menu> findMenus = menuDao.findAll();
+        final List<Menu> menus = new ArrayList<>();
 
-        for (final Menu menu : menus) {
-            menu.setMenuProducts(menuProductDao.findAllByMenuId(menu.getId()));
+        for (final Menu findMenu : findMenus) {
+            Menu menu = new Menu.Builder()
+                .id(findMenu.getId())
+                .name(findMenu.getName())
+                .price(findMenu.getPrice())
+                .menuGroupId(findMenu.getMenuGroupId())
+                .menuProducts(menuProductDao.findAllByMenuId(findMenu.getId()))
+                .build();
+            menus.add(menu);
         }
 
         return menus;
