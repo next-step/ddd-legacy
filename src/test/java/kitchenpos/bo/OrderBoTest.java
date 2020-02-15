@@ -6,6 +6,7 @@ import kitchenpos.dao.OrderLineItemDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
+import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -109,5 +110,18 @@ class OrderBoTest {
         // then
         assertThat(ordersActual.get(0).getId())
                 .isEqualTo(order.getId());
+    }
+
+    @Test
+    @DisplayName("완료 상태일 때 상태 변화 예외처리")
+    void changeOrderStatusExceptionByCompletion() {
+        // given
+        order.setOrderStatus(OrderStatus.COMPLETION.name());
+
+        given(orderDao.findById(1L))
+                .willReturn(Optional.of(order));
+
+        // when then
+        assertThatIllegalArgumentException().isThrownBy(() -> orderBo.changeOrderStatus(1L, order));
     }
 }
