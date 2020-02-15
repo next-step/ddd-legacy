@@ -1,7 +1,8 @@
 package kitchenpos.bo;
 
+import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
-import kitchenpos.dao.TableGroupDao;
+import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import kitchenpos.model.TableGroup;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,7 @@ import static org.mockito.BDDMockito.given;
 class TableGroupBoTest {
 
     @Mock
-    private TableGroupDao tableGroupDao;
+    private OrderDao orderDao;
     @Mock
     private OrderTableDao orderTableDao;
 
@@ -96,5 +97,26 @@ class TableGroupBoTest {
 
         // when then
         assertThatIllegalArgumentException().isThrownBy(() -> tableGroupBo.create(tableGroup));
+    }
+
+    @Test
+    @DisplayName("주문 상태가 요리 중, 먹는 중일 때 주문 테이블을 정리 할 수 없다.")
+    void deleteExceptionByStatus() {
+        // give
+        List<OrderTable> orderTablesExpected = new ArrayList<>();
+        for (long i = 1; i <= 2; i++) {
+            OrderTable orderTable = new OrderTable();
+            orderTable.setId(i);
+            orderTable.setEmpty(false);
+            orderTablesExpected.add(orderTable);
+        }
+
+        given(orderTableDao.findAllByTableGroupId(1L))
+                .willReturn(orderTablesExpected);
+        given(orderDao.existsByOrderTableIdInAndOrderStatusIn(
+                Arrays.asList(1L, 2L),
+                Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willReturn(true);
+
+        assertThatIllegalArgumentException().isThrownBy(() -> tableGroupBo.delete(1L));
     }
 }
