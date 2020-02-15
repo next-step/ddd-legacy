@@ -1,9 +1,6 @@
 package kitchenpos.bo;
 
-import kitchenpos.model.Menu;
-import kitchenpos.model.MenuGroup;
-import kitchenpos.model.MenuProduct;
-import kitchenpos.model.Product;
+import kitchenpos.model.*;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.math.BigDecimal;
@@ -25,6 +22,9 @@ public class Fixtures {
     public static List<MenuGroup> menuGroups = Collections.emptyList();
     public static Menu menu;
     public static List<MenuProduct> menuProducts = Collections.emptyList();
+    public static List<OrderTable> orderTables = Collections.emptyList();
+    public static OrderTable orderTable;
+
 
     @BeforeAll
     public static void setUp() {
@@ -75,5 +75,29 @@ public class Fixtures {
         menuProduct1.setQuantity(QUANTITY_ONE);
 
         menuProducts = Arrays.asList(menuProduct, menuProduct1);
+
+        /* 주문 테이블 등록 */
+        final OrderTable newOrderTable = new OrderTable();
+        newOrderTable.setId(FIRST_ID);
+        newOrderTable.setTableGroupId(FIRST_ID);
+        newOrderTable.setNumberOfGuests(2);
+        newOrderTable.setEmpty(false);
+
+        orderTable = newOrderTable;
+
+        final OrderTable newOrderTable1 = new OrderTable();
+        newOrderTable1.setId(SECOND_ID);
+        newOrderTable1.setTableGroupId(FIRST_ID);
+        newOrderTable1.setNumberOfGuests(4);
+        newOrderTable1.setEmpty(false);
+
+        final OrderTable newOrderTable2 = new OrderTable();
+        newOrderTable2.setId(3l);
+        newOrderTable2.setTableGroupId(FIRST_ID);
+        newOrderTable2.setNumberOfGuests(4);
+        newOrderTable2.setEmpty(false);
+
+        orderTables = Arrays.asList(newOrderTable, newOrderTable1, newOrderTable2);
+
     }
 }

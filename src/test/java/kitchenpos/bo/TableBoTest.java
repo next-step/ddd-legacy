@@ -40,8 +40,6 @@ class TableBoTest extends Fixtures {
     @Test
     @DisplayName("주문 테이블을 등록할 수 있다.")
     void create() {
-        final OrderTable orderTable = getOrderTable();
-
         given(orderTableDao.save(orderTable)).willReturn(orderTable);
 
         final OrderTable savedOrderTable = tableBo.create(orderTable);
@@ -50,25 +48,9 @@ class TableBoTest extends Fixtures {
         assertThat(savedOrderTable.getNumberOfGuests()).isEqualTo(orderTable.getNumberOfGuests());
     }
 
-    private OrderTable getOrderTable() {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(FIRST_ID);
-        orderTable.setTableGroupId(FIRST_ID);
-        orderTable.setNumberOfGuests(2);
-        orderTable.setEmpty(false);
-        return orderTable;
-    }
-
-    private OrderTable getOrderTableWithNullTableGroup() {
-        final OrderTable orderTable = getOrderTable();
-        orderTable.setTableGroupId(null);
-        return orderTable;
-    }
-
     @Test
     @DisplayName("주문 테이블 목록을 조회 할 수 있다.")
     void list() {
-        final OrderTable orderTable = getOrderTable();
         final List<OrderTable> orderTables = Arrays.asList(orderTable);
 
         given(orderTableDao.findAll()).willReturn(orderTables);
@@ -82,8 +64,9 @@ class TableBoTest extends Fixtures {
     @Test
     @DisplayName("주문 테이블의 상태를 비움으로 업데이트 할 수 있다.")
     void changeEmpty() {
-        final OrderTable orderTable = getOrderTableWithNullTableGroup();
-        final OrderTable newOrderTable = getOrderTable();
+
+        final OrderTable newOrderTable = orderTable;
+        newOrderTable.setTableGroupId(null);
 
         given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
         given(orderDao.existsByOrderTableIdAndOrderStatusIn(orderTable.getId(),
@@ -99,7 +82,6 @@ class TableBoTest extends Fixtures {
     @ValueSource(strings = {"-1"})
     @DisplayName("주문 테이블이 정상 값이 아닌 경우")
     void changeEmpty_exist_tableGroupId(final Long orderTableId) {
-        final OrderTable orderTable = getOrderTable();
         orderTable.setId(orderTableId);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -109,21 +91,21 @@ class TableBoTest extends Fixtures {
     @Test
     @DisplayName("반드시 식사가 끝난 경우에 상태를 비움으로 업데이트 할 수 있다.")
     void changeEmpty_check_orderStatus() {
-        final OrderTable orderTable = getOrderTableWithNullTableGroup();
+        final OrderTable resolvedOrderTable = orderTable;
+        resolvedOrderTable.setTableGroupId(null);
 
         given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
-        given(orderDao.existsByOrderTableIdAndOrderStatusIn(orderTable.getId(),
+        given(orderDao.existsByOrderTableIdAndOrderStatusIn(resolvedOrderTable.getId(),
                 Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willThrow(IllegalArgumentException.class);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> tableBo.changeEmpty(FIRST_ID, orderTable));
+                .isThrownBy(() -> tableBo.changeEmpty(orderTable.getId(), orderTable));
     }
 
     @Test
     @DisplayName("특정 테이블의 인원수를 업데이트 한다.")
     void changeNumberOfGuests() {
-        final OrderTable orderTable = getOrderTable();
-        final OrderTable newOrderTable = getOrderTable();
+        final OrderTable newOrderTable = orderTable;
         newOrderTable.setNumberOfGuests(4);
 
         given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
