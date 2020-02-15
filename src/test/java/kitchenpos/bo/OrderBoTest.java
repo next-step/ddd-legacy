@@ -2,6 +2,7 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.OrderDao;
+import kitchenpos.dao.OrderLineItemDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
@@ -16,8 +17,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.BDDMockito.given;
 
@@ -30,6 +33,8 @@ class OrderBoTest {
     private MenuDao menuDao;
     @Mock
     private OrderTableDao orderTableDao;
+    @Mock
+    private OrderLineItemDao orderLineItemDao;
 
     @InjectMocks
     private OrderBo orderBo;
@@ -84,5 +89,25 @@ class OrderBoTest {
 
         // when then
         assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(order));
+    }
+
+    @Test
+    @DisplayName("주문을 조회할 수 있다.")
+    void getOrder() {
+        // give
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setOrderId(1L);
+
+        given(orderDao.findAll())
+                .willReturn(Arrays.asList(order));
+
+        given(orderLineItemDao.findAllByOrderId(1L))
+                .willReturn(Arrays.asList(orderLineItem));
+        // when
+        List<Order> ordersActual = orderBo.list();
+
+        // then
+        assertThat(ordersActual.get(0).getId())
+                .isEqualTo(order.getId());
     }
 }
