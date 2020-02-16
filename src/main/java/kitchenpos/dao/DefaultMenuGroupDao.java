@@ -1,6 +1,7 @@
 package kitchenpos.dao;
 
-import kitchenpos.model.Menu;
+import kitchenpos.dao.Interface.MenuGroupDao;
+import kitchenpos.model.MenuGroup;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -16,14 +17,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class MenuDao {
-    private static final String TABLE_NAME = "menu";
+public class DefaultMenuGroupDao implements MenuGroupDao {
+    private static final String TABLE_NAME = "menu_group";
     private static final String KEY_COLUMN_NAME = "id";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    public MenuDao(final DataSource dataSource) {
+    public DefaultMenuGroupDao(final DataSource dataSource) {
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         jdbcInsert = new SimpleJdbcInsert(dataSource)
                 .withTableName(TABLE_NAME)
@@ -31,13 +32,15 @@ public class MenuDao {
         ;
     }
 
-    public Menu save(final Menu entity) {
+    @Override
+    public MenuGroup save(final MenuGroup entity) {
         final SqlParameterSource parameters = new BeanPropertySqlParameterSource(entity);
         final Number key = jdbcInsert.executeAndReturnKey(parameters);
         return select(key.longValue());
     }
 
-    public Optional<Menu> findById(final Long id) {
+    @Override
+    public Optional<MenuGroup> findById(final Long id) {
         try {
             return Optional.of(select(id));
         } catch (final EmptyResultDataAccessException e) {
@@ -45,31 +48,31 @@ public class MenuDao {
         }
     }
 
-    public List<Menu> findAll() {
-        final String sql = "SELECT id, name, price, menu_group_id FROM menu ";
+    @Override
+    public List<MenuGroup> findAll() {
+        final String sql = "SELECT id, name FROM menu_group";
         return jdbcTemplate.query(sql, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
-    public long countByIdIn(final List<Long> ids) {
-        final String sql = "SELECT COUNT(*) FROM menu WHERE id IN (:ids)";
+    @Override
+    public boolean existsById(final Long id) {
+        final String sql = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM menu_group WHERE id = (:id)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("ids", ids);
-        return jdbcTemplate.queryForObject(sql, parameters, Long.class);
+                .addValue("id", id);
+        return jdbcTemplate.queryForObject(sql, parameters, Boolean.class);
     }
 
-    private Menu select(final Long id) {
-        final String sql = "SELECT id, name, price, menu_group_id FROM menu WHERE id = (:id)";
+    private MenuGroup select(final Long id) {
+        final String sql = "SELECT id, name FROM menu_group WHERE id = (:id)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("id", id);
         return jdbcTemplate.queryForObject(sql, parameters, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
-    private Menu toEntity(final ResultSet resultSet) throws SQLException {
-        final Menu entity = new Menu();
+    private MenuGroup toEntity(final ResultSet resultSet) throws SQLException {
+        final MenuGroup entity = new MenuGroup();
         entity.setId(resultSet.getLong("id"));
         entity.setName(resultSet.getString("name"));
-        entity.setPrice(resultSet.getBigDecimal("price"));
-        entity.setMenuGroupId(resultSet.getLong("menu_group_id"));
         return entity;
     }
 }

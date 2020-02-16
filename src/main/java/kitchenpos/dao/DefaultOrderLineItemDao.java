@@ -1,6 +1,6 @@
 package kitchenpos.dao;
 
-import kitchenpos.model.MenuGroup;
+import kitchenpos.model.OrderLineItem;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class MenuGroupDao {
-    private static final String TABLE_NAME = "menu_group";
-    private static final String KEY_COLUMN_NAME = "id";
+public class DefaultOrderLineItemDao implements kitchenpos.dao.Interface.OrderLineItemDao {
+    private static final String TABLE_NAME = "order_line_item";
+    private static final String KEY_COLUMN_NAME = "seq";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    public MenuGroupDao(final DataSource dataSource) {
+    public DefaultOrderLineItemDao(final DataSource dataSource) {
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         jdbcInsert = new SimpleJdbcInsert(dataSource)
                 .withTableName(TABLE_NAME)
@@ -31,13 +31,15 @@ public class MenuGroupDao {
         ;
     }
 
-    public MenuGroup save(final MenuGroup entity) {
+    @Override
+    public OrderLineItem save(final OrderLineItem entity) {
         final SqlParameterSource parameters = new BeanPropertySqlParameterSource(entity);
         final Number key = jdbcInsert.executeAndReturnKey(parameters);
         return select(key.longValue());
     }
 
-    public Optional<MenuGroup> findById(final Long id) {
+    @Override
+    public Optional<OrderLineItem> findById(final Long id) {
         try {
             return Optional.of(select(id));
         } catch (final EmptyResultDataAccessException e) {
@@ -45,29 +47,33 @@ public class MenuGroupDao {
         }
     }
 
-    public List<MenuGroup> findAll() {
-        final String sql = "SELECT id, name FROM menu_group";
+    @Override
+    public List<OrderLineItem> findAll() {
+        final String sql = "SELECT seq, order_id, menu_id, quantity FROM order_line_item";
         return jdbcTemplate.query(sql, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
-    public boolean existsById(final Long id) {
-        final String sql = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END FROM menu_group WHERE id = (:id)";
+    @Override
+    public List<OrderLineItem> findAllByOrderId(final Long orderId) {
+        final String sql = "SELECT seq, order_id, menu_id, quantity FROM order_line_item WHERE order_id = (:orderId)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("id", id);
-        return jdbcTemplate.queryForObject(sql, parameters, Boolean.class);
+                .addValue("orderId", orderId);
+        return jdbcTemplate.query(sql, parameters, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
-    private MenuGroup select(final Long id) {
-        final String sql = "SELECT id, name FROM menu_group WHERE id = (:id)";
+    private OrderLineItem select(final Long id) {
+        final String sql = "SELECT seq, order_id, menu_id, quantity FROM order_line_item WHERE seq = (:seq)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("id", id);
+                .addValue("seq", id);
         return jdbcTemplate.queryForObject(sql, parameters, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
-    private MenuGroup toEntity(final ResultSet resultSet) throws SQLException {
-        final MenuGroup entity = new MenuGroup();
-        entity.setId(resultSet.getLong("id"));
-        entity.setName(resultSet.getString("name"));
+    private OrderLineItem toEntity(final ResultSet resultSet) throws SQLException {
+        final OrderLineItem entity = new OrderLineItem();
+        entity.setSeq(resultSet.getLong(KEY_COLUMN_NAME));
+        entity.setOrderId(resultSet.getLong("order_id"));
+        entity.setMenuId(resultSet.getLong("menu_id"));
+        entity.setQuantity(resultSet.getLong("quantity"));
         return entity;
     }
 }

@@ -1,6 +1,7 @@
 package kitchenpos.dao;
 
-import kitchenpos.model.Order;
+import kitchenpos.dao.Interface.OrderTableDao;
+import kitchenpos.model.OrderTable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -12,20 +13,19 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 @Repository
-public class OrderDao {
-    private static final String TABLE_NAME = "orders";
+public class DefaultOrderTableDao implements OrderTableDao {
+    private static final String TABLE_NAME = "order_table";
     private static final String KEY_COLUMN_NAME = "id";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    public OrderDao(final DataSource dataSource) {
+    public DefaultOrderTableDao(final DataSource dataSource) {
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         jdbcInsert = new SimpleJdbcInsert(dataSource)
                 .withTableName(TABLE_NAME)
@@ -33,7 +33,8 @@ public class OrderDao {
         ;
     }
 
-    public Order save(final Order entity) {
+    @Override
+    public OrderTable save(final OrderTable entity) {
         if (Objects.isNull(entity.getId())) {
             final SqlParameterSource parameters = new BeanPropertySqlParameterSource(entity);
             final Number key = jdbcInsert.executeAndReturnKey(parameters);
@@ -43,7 +44,8 @@ public class OrderDao {
         return entity;
     }
 
-    public Optional<Order> findById(final Long id) {
+    @Override
+    public Optional<OrderTable> findById(final Long id) {
         try {
             return Optional.of(select(id));
         } catch (final EmptyResultDataAccessException e) {
@@ -51,50 +53,53 @@ public class OrderDao {
         }
     }
 
-    public List<Order> findAll() {
-        final String sql = "SELECT id, order_table_id, order_status, ordered_time FROM orders";
+    @Override
+    public List<OrderTable> findAll() {
+        final String sql = "SELECT id, table_group_id, number_of_guests, empty FROM order_table";
         return jdbcTemplate.query(sql, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
-    public boolean existsByOrderTableIdAndOrderStatusIn(final Long orderTableId, final List<String> orderStatuses) {
-        final String sql = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END" +
-                " FROM orders WHERE order_table_id = (:orderTableId) AND order_status IN (:orderStatuses)";
+    @Override
+    public List<OrderTable> findAllByIdIn(final List<Long> ids) {
+        final String sql = "SELECT id, table_group_id, number_of_guests, empty FROM order_table WHERE id IN (:ids)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("orderTableId", orderTableId)
-                .addValue("orderStatuses", orderStatuses);
-        return jdbcTemplate.queryForObject(sql, parameters, Boolean.class);
+                .addValue("ids", ids);
+        return jdbcTemplate.query(sql, parameters, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
-    public boolean existsByOrderTableIdInAndOrderStatusIn(final List<Long> orderTableIds, final List<String> orderStatuses) {
-        final String sql = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END" +
-                " FROM orders WHERE order_table_id IN (:orderTableIds) AND order_status IN (:orderStatuses)";
+    @Override
+    public List<OrderTable> findAllByTableGroupId(final Long tableGroupId) {
+        final String sql = "SELECT id, table_group_id, number_of_guests, empty" +
+                " FROM order_table WHERE table_group_id = (:tableGroupId)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("orderTableIds", orderTableIds)
-                .addValue("orderStatuses", orderStatuses);
-        return jdbcTemplate.queryForObject(sql, parameters, Boolean.class);
+                .addValue("tableGroupId", tableGroupId);
+        return jdbcTemplate.query(sql, parameters, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
-    private Order select(final Long id) {
-        final String sql = "SELECT id, order_table_id, order_status, ordered_time FROM orders WHERE id = (:id)";
+    private OrderTable select(final Long id) {
+        final String sql = "SELECT id, table_group_id, number_of_guests, empty FROM order_table WHERE id = (:id)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("id", id);
         return jdbcTemplate.queryForObject(sql, parameters, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
-    private void update(final Order entity) {
-        final String sql = "UPDATE orders SET order_status = (:orderStatus) WHERE id = (:id)";
+    private void update(final OrderTable entity) {
+        final String sql = "UPDATE order_table SET table_group_id = (:tableGroupId)," +
+                " number_of_guests = (:numberOfGuests), empty = (:empty) WHERE id = (:id)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("orderStatus", entity.getOrderStatus())
+                .addValue("tableGroupId", entity.getTableGroupId())
+                .addValue("numberOfGuests", entity.getNumberOfGuests())
+                .addValue("empty", entity.isEmpty())
                 .addValue("id", entity.getId());
         jdbcTemplate.update(sql, parameters);
     }
 
-    private Order toEntity(final ResultSet resultSet) throws SQLException {
-        final Order entity = new Order();
+    private OrderTable toEntity(final ResultSet resultSet) throws SQLException {
+        final OrderTable entity = new OrderTable();
         entity.setId(resultSet.getLong(KEY_COLUMN_NAME));
-        entity.setOrderTableId(resultSet.getLong("order_table_id"));
-        entity.setOrderStatus(resultSet.getString("order_status"));
-        entity.setOrderedTime(resultSet.getObject("ordered_time", LocalDateTime.class));
+        entity.setTableGroupId(resultSet.getObject("table_group_id", Long.class));
+        entity.setNumberOfGuests(resultSet.getInt("number_of_guests"));
+        entity.setEmpty(resultSet.getBoolean("empty"));
         return entity;
     }
 }

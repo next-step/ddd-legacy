@@ -1,8 +1,8 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.OrderTableDao;
-import kitchenpos.dao.TableGroupDao;
+import kitchenpos.dao.Interface.OrderDao;
+import kitchenpos.dao.Interface.OrderTableDao;
+import kitchenpos.dao.Interface.TableGroupDao;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import kitchenpos.model.TableGroup;

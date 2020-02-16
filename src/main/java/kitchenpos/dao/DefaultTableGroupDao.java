@@ -1,5 +1,6 @@
 package kitchenpos.dao;
 
+import kitchenpos.dao.Interface.TableGroupDao;
 import kitchenpos.model.TableGroup;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -17,14 +18,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class TableGroupDao {
+public class DefaultTableGroupDao implements TableGroupDao {
     private static final String TABLE_NAME = "table_group";
     private static final String KEY_COLUMN_NAME = "id";
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    public TableGroupDao(final DataSource dataSource) {
+    public DefaultTableGroupDao(final DataSource dataSource) {
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         jdbcInsert = new SimpleJdbcInsert(dataSource)
                 .withTableName(TABLE_NAME)
@@ -32,6 +33,7 @@ public class TableGroupDao {
         ;
     }
 
+    @Override
     public TableGroup save(final TableGroup entity) {
         final SqlParameterSource parameters = new BeanPropertySqlParameterSource(entity);
         final Number key = jdbcInsert.executeAndReturnKey(parameters);
