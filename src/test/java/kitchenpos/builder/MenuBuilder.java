@@ -4,22 +4,45 @@ import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MenuBuilder {
     private long id;
     private String name;
     private BigDecimal price;
-    private long menuGroupId;
+    private Long menuGroupId;
     private List<MenuProduct> menuProducts;
 
     private MenuBuilder() {
     }
 
-    public static MenuBuilder create() {
+    public static MenuBuilder menu() {
         return new MenuBuilder();
+    }
+
+    public MenuBuilder withId(final long id) {
+        this.id = id;
+        return this;
+    }
+
+    public MenuBuilder withName(final String name) {
+        this.name = name;
+        return this;
+    }
+
+    public MenuBuilder withPrice(final BigDecimal price) {
+        this.price = price;
+        return this;
+    }
+
+    public MenuBuilder withMenuGroupId(final Long menuGroupId) {
+        this.menuGroupId = menuGroupId;
+        return this;
+    }
+
+    public MenuBuilder withMenuProducts(final List<MenuProduct> menuProducts) {
+        this.menuProducts = menuProducts;
+        return this;
     }
 
     public Menu build() {
@@ -30,30 +53,5 @@ public class MenuBuilder {
         menu.setMenuGroupId(this.menuGroupId);
         menu.setMenuProducts(this.menuProducts);
         return menu;
-    }
-
-    public MenuBuilder setId(final long id) {
-        this.id = id;
-        return this;
-    }
-
-    public MenuBuilder setName(final String name) {
-        this.name = name;
-        return this;
-    }
-
-    public MenuBuilder setPrice(final BigDecimal price) {
-        this.price = price;
-        return this;
-    }
-
-    public MenuBuilder setMenuGroupId(final long menuGroupId) {
-        this.menuGroupId = menuGroupId;
-        return this;
-    }
-
-    public MenuBuilder setMenuProducts(final List<MenuProduct> menuProducts) {
-        this.menuProducts = menuProducts;
-        return this;
     }
 }
