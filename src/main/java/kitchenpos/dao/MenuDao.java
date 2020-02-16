@@ -14,5 +14,4 @@ public interface MenuDao {
 
     long countByIdIn(List<Long> ids);
 
-    Menu select(Long id);
 }

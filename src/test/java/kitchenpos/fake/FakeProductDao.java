@@ -6,21 +6,21 @@ import kitchenpos.model.Product;
 import java.util.*;
 
 public class FakeProductDao implements ProductDao {
-    private final Map<Long, Product> values = new HashMap<>();
+    private Map<Long, Product> entities = new HashMap<>();
 
     @Override
     public Product save(Product entity) {
-        values.put(entity.getId(), entity);
+        entities.put(entity.getId(), entity);
         return null;
     }
 
     @Override
     public Optional<Product> findById(Long id) {
-        return Optional.ofNullable(values.get(id));
+        return Optional.ofNullable(entities.get(id));
     }
 
     @Override
     public List<Product> findAll() {
-        return new ArrayList<>(values.values());
+        return new ArrayList<>(entities.values());
     }
 }

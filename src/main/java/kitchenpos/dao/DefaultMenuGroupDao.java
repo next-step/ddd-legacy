@@ -61,7 +61,6 @@ public class DefaultMenuGroupDao implements MenuGroupDao{
         return jdbcTemplate.queryForObject(sql, parameters, Boolean.class);
     }
 
-    @Override
     public MenuGroup select(final Long id) {
         final String sql = "SELECT id, name FROM menu_group WHERE id = (:id)";
         final SqlParameterSource parameters = new MapSqlParameterSource()

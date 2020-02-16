@@ -61,7 +61,6 @@ public class DefaultMenuDao implements MenuDao{
         return jdbcTemplate.queryForObject(sql, parameters, Long.class);
     }
 
-    @Override
     public Menu select(final Long id) {
         final String sql = "SELECT id, name, price, menu_group_id FROM menu WHERE id = (:id)";
         final SqlParameterSource parameters = new MapSqlParameterSource()

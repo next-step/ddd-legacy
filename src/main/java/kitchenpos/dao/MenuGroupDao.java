@@ -13,6 +13,4 @@ public interface MenuGroupDao {
     List<MenuGroup> findAll();
 
     boolean existsById(Long id);
-
-    MenuGroup select(Long id);
 }
