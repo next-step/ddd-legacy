@@ -36,6 +36,7 @@ public class MenuBo {
 
     @Transactional
     public Menu create(final Menu menu) {
+
         final BigDecimal price = menu.getPrice();
 
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {

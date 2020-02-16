@@ -46,6 +46,8 @@ public class MenuBoTest {
 
     private static List<Product> products = new ArrayList<>();
 
+    private static BigDecimal totalPrice = BigDecimal.ZERO;
+
     @BeforeAll
     static void setup(){
         for(int i=1; i<=2; i++){
@@ -65,6 +67,8 @@ public class MenuBoTest {
                 .productId(products.get(i-1).getId())
                 .quantity(1)
                 .build();
+
+            totalPrice.add(products.get(i-1).getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
 
             expectedMenuProducts.add(menuProduct);
         }
@@ -158,40 +162,39 @@ public class MenuBoTest {
             .isThrownBy(() -> menuBo.create(menu));
     }
 
-    @DisplayName("메뉴를 구성하는 제품 가격의 총 합이 메뉴에 입력한 가격보다 크다.")
-    @Test
-    void createAllProductsPriceisGreaterThanPrice (){
-
-        given(productDao.findById(1L)).willReturn(Optional.ofNullable(products.get(0)));
-        given(productDao.findById(2L)).willReturn(Optional.ofNullable(products.get(1)));
-
-        Menu menu = actualMenus.get(0);
-
-        BigDecimal sum = BigDecimal.ZERO;
-        for(final MenuProduct menuProduct : actualMenuProducts){
-            final Product product = productDao.findById(menuProduct.getProductId()).get();
-            sum = sum.add(product.getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
-        }
-
-        assertThat(sum).isGreaterThan(menu.getPrice());
-    }
-
     @DisplayName("메뉴에 입력한 가격이 메뉴를 구성하는 제품 가격의 총 합보다 크면 Exception이 발생한다.")
     @Test
     void createPriceisGreaterThanAllMenuProduct(){
-        when(productDao.findById(1L)).thenReturn(Optional.ofNullable(products.get(0)));
-        when(productDao.findById(2L)).thenReturn(Optional.ofNullable(products.get(1)));
-
-        BigDecimal sum = BigDecimal.ZERO;
-        for(final MenuProduct menuProduct : actualMenuProducts){
-            final Product product = productDao.findById(menuProduct.getProductId()).get();
-            sum = sum.add(product.getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
-        }
-
-        Menu highPriceMenu = new Menu.Builder()
-            .price(sum.add(BigDecimal.valueOf(10000)))
+        Menu menu = new Menu.Builder()
+            .id(expectedMenu.getId())
+            .name(expectedMenu.getName())
+            .price(totalPrice.add(BigDecimal.valueOf(100000)))
+            .menuGroupId(expectedMenu.getMenuGroupId())
+            .menuProducts(expectedMenu.getMenuProducts())
             .build();
 
-        assertThat(sum).isLessThan(highPriceMenu.getPrice());
+        given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
+        given(productDao.findById(menu.getMenuProducts().get(0).getProductId()))
+            .willReturn(Optional.ofNullable(products.get(0)));
+        given(productDao.findById(menu.getMenuProducts().get(1).getProductId()))
+            .willReturn(Optional.ofNullable(products.get(1)));
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuBo.create(menu));
+    }
+
+    @DisplayName("입력한 값과 출력한 값이 동일하다.")
+    @Test
+    void create (){
+        given(menuGroupDao.existsById(expectedMenu.getMenuGroupId())).willReturn(true);
+        given(productDao.findById(expectedMenu.getMenuProducts().get(0).getProductId()))
+            .willReturn(Optional.ofNullable(products.get(0)));
+        given(productDao.findById(expectedMenu.getMenuProducts().get(1).getProductId()))
+            .willReturn(Optional.ofNullable(products.get(1)));
+        given(menuDao.save(expectedMenu)).willReturn(actualMenu);
+
+        Menu savedMenu = menuBo.create(expectedMenu);
+
+        assertThat(savedMenu).isEqualToComparingFieldByField(expectedMenu);
     }
 }
