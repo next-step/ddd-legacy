@@ -1,9 +1,9 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.ProductDao;
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.dao.MenuProductDao;
+import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;

@@ -7,6 +7,8 @@ public class OrderTableBuilder {
     private Long tableGroupId;
     private int numberOfGuests;
     private boolean empty;
+
+    private OrderTableBuilder() {}
     
     public static OrderTableBuilder orderTable() {
         return new OrderTableBuilder();

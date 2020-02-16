@@ -10,6 +10,9 @@ public class TableGroupBuilder {
     private Long id;
     private LocalDateTime createdDate;
     private List<OrderTable> orderTables;
+
+    private TableGroupBuilder() {
+    }
     
     public static TableGroupBuilder tableGroup() {
         return new TableGroupBuilder();
