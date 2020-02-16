@@ -1,79 +1,77 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.OrderTableDao;
+import kitchenpos.bo.mock.TestOrderDao;
+import kitchenpos.bo.mock.TestOrderTableDao;
+import kitchenpos.dao.Interface.OrderDao;
+import kitchenpos.dao.Interface.OrderTableDao;
+import kitchenpos.model.Order;
+import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
+import static kitchenpos.Fixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
 class TableBoTest {
 
-    @Mock
-    private OrderDao orderDao;
+    private static final long DEFAULT_TABLE_ID = 1L;
+    private static final long EMPTY_GROUP_TABLE_ID = 3L;
+    private static final long NOT_EXIST_TABLE_ID = 5L;
 
-    @Mock
-    private OrderTableDao orderTableDao;
+    private OrderDao orderDao = new TestOrderDao();
+    private OrderTableDao orderTableDao = new TestOrderTableDao();
 
-    @InjectMocks
-    private TableBo tableBo;
+    private TableBo tableBo = new TableBo(orderDao, orderTableDao);
 
-    private OrderTable input;
-    private OrderTable saved;
+    private OrderTable defaultOrderTable;
+    private OrderTable emptyGroupIdOrderTable;
+    private OrderTable emptyTrueOrderTable;
+    private OrderTable inputOrderTable = new OrderTable();
+    private Order defaultOrder = new Order();
 
     @BeforeEach
     void setUp() {
-        input = new OrderTable();
-        input.setTableGroupId(3L);
-        input.setNumberOfGuests(4);
-        input.setEmpty(false);
+        defaultOrderTable = defaultOrderTable();
+        emptyGroupIdOrderTable = emptyGroupIdOrderTable();
+        emptyTrueOrderTable = emptyTrueOrderTable();
 
-        saved = new OrderTable();
-        saved.setId(1L);
-        saved.setTableGroupId(null);
-        saved.setNumberOfGuests(4);
-        saved.setEmpty(false);
+        orderTableDao.save(defaultOrderTable);
+        orderTableDao.save(emptyGroupIdOrderTable);
+        orderTableDao.save(emptyTrueOrderTable);
+
+        defaultOrder.setId(1L);
+        defaultOrder.setOrderTableId(1L);
+        defaultOrder.setOrderStatus(OrderStatus.COOKING.toString());
+//        defaultOrder.setOrderLineItems(null);
+        orderDao.save(defaultOrder);
     }
 
     @DisplayName("테이블 생성")
     @Test
     void create() {
-        given(orderTableDao.save(input))
-                .willReturn(saved);
+        OrderTable sample = new OrderTable();
+        sample.setId(4L);
+        OrderTable result = tableBo.create(sample);
 
-        OrderTable result = tableBo.create(input);
-
-        assertThat(result.getId()).isEqualTo(1L);
+        assertThat(result.getId()).isEqualTo(4L);
         assertThat(result.getTableGroupId()).isEqualTo(null);
-        assertThat(result.getNumberOfGuests()).isEqualTo(4);
+        assertThat(result.getNumberOfGuests()).isEqualTo(0);
         assertThat(result.isEmpty()).isFalse();
     }
 
     @DisplayName("테이블 목록 조회")
     @Test
     void list() {
-        given(orderTableDao.findAll())
-                .willReturn(Collections.singletonList(saved));
-
         List<OrderTable> result = tableBo.list();
-        assertThat(result.size()).isEqualTo(1);
+
+        assertThat(result.size()).isEqualTo(4);
         assertThat(result.get(0).getId()).isEqualTo(1L);
-        assertThat(result.get(0).getTableGroupId()).isEqualTo(null);
+        assertThat(result.get(0).getTableGroupId()).isEqualTo(1L);
         assertThat(result.get(0).getNumberOfGuests()).isEqualTo(4);
         assertThat(result.get(0).isEmpty()).isFalse();
     }
@@ -81,49 +79,28 @@ class TableBoTest {
     @DisplayName("존재하지 않는 테이블의 상태를 바꾸려고 했을 때 IllegalArgumentException 발생")
     @Test
     void changeEmptyWithException() {
-        given(orderTableDao.findById(anyLong()))
-                .willReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> tableBo.changeEmpty(1L, input));
+        assertThrows(IllegalArgumentException.class, () -> tableBo.changeEmpty(NOT_EXIST_TABLE_ID, inputOrderTable));
     }
 
     @DisplayName("테이블 상태 바꿀 때 그룹 아이디가 있으면 IllegalArgumentException 발생")
     @Test
     void changeEmptyTableGroupId() {
-        saved.setTableGroupId(3L);
-        given(orderTableDao.findById(anyLong()))
-                .willReturn(Optional.of(saved));
-
-        assertThrows(IllegalArgumentException.class, () -> tableBo.changeEmpty(1L, input));
+        assertThrows(IllegalArgumentException.class, () -> tableBo.changeEmpty(DEFAULT_TABLE_ID, inputOrderTable));
     }
 
     @DisplayName("테이블 상태 바꿀 때 주문 상태가 조리중, 식사중이면 IllegalArgumentException 발생")
     @Test
     void changeEmptyOrderStatus() {
-        given(orderTableDao.findById(anyLong()))
-                .willReturn(Optional.of(saved));
-
-        given(orderDao.existsByOrderTableIdAndOrderStatusIn(anyLong(), anyList()))
-                .willReturn(Boolean.TRUE);
-
-        assertThrows(IllegalArgumentException.class, () -> tableBo.changeEmpty(1L, input));
+        assertThrows(IllegalArgumentException.class, () -> tableBo.changeEmpty(NOT_EXIST_TABLE_ID, inputOrderTable));
     }
 
     @DisplayName("테이블 상태 바꾸기 성공")
     @Test
     void changeEmpty() {
-        input.setEmpty(true);
-        given(orderTableDao.findById(anyLong()))
-                .willReturn(Optional.of(saved));
+        inputOrderTable.setEmpty(true);
 
-        given(orderDao.existsByOrderTableIdAndOrderStatusIn(anyLong(), anyList()))
-                .willReturn(Boolean.FALSE);
-
-        given(orderTableDao.save(saved))
-                .willReturn(saved);
-
-        OrderTable result = tableBo.changeEmpty(1L, input);
-        assertThat(result.getId()).isEqualTo(1L);
+        OrderTable result = tableBo.changeEmpty(2L, inputOrderTable);
+        assertThat(result.getId()).isEqualTo(2L);
         assertThat(result.getTableGroupId()).isEqualTo(null);
         assertThat(result.getNumberOfGuests()).isEqualTo(4);
         assertThat(result.isEmpty()).isTrue();
@@ -132,43 +109,31 @@ class TableBoTest {
     @DisplayName("테이블의 손님 수 바꾸기 손님이 0보다 작으면 IllegalArgumentException 발생")
     @Test
     void changeNumberOfGuestsLessThenZero() {
-        input.setNumberOfGuests(-2);
+        inputOrderTable.setNumberOfGuests(-2);
 
-        assertThrows(IllegalArgumentException.class, () -> tableBo.changeNumberOfGuests(1L, input));
+        assertThrows(IllegalArgumentException.class, () -> tableBo.changeNumberOfGuests(DEFAULT_TABLE_ID, inputOrderTable));
     }
 
     @DisplayName("테이블의 손님 수 바꾸기 테이블이 존재하지 않으면 IllegalArgumentException 발생")
     @Test
     void changeNumberOfGuestsNullTable() {
-        given(orderTableDao.findById(anyLong()))
-                .willReturn(Optional.empty());
-
-        assertThrows(IllegalArgumentException.class, () -> tableBo.changeNumberOfGuests(1L, input));
+        assertThrows(IllegalArgumentException.class, () -> tableBo.changeNumberOfGuests(NOT_EXIST_TABLE_ID, inputOrderTable));
     }
 
     @DisplayName("테이블의 손님 수 바꾸기 테이블이 비어있으면 IllegalArgumentException 발생")
     @Test
     void changeNumberOfGuestsEmptyGuests() {
-        saved.setEmpty(true);
-        given(orderTableDao.findById(anyLong()))
-                .willReturn(Optional.of(saved));
-
-        assertThrows(IllegalArgumentException.class, () -> tableBo.changeNumberOfGuests(1L, input));
+        assertThrows(IllegalArgumentException.class, () -> tableBo.changeNumberOfGuests(EMPTY_GROUP_TABLE_ID, inputOrderTable));
     }
 
     @DisplayName("테이블의 손님 수 바꾸기")
     @Test
     void changeNumberOfGuests() {
-        input.setNumberOfGuests(8);
-        given(orderTableDao.findById(anyLong()))
-                .willReturn(Optional.of(saved));
+        inputOrderTable.setNumberOfGuests(8);
 
-        given(orderTableDao.save(saved))
-                .willReturn(saved);
-
-        OrderTable result = tableBo.changeNumberOfGuests(1L, input);
+        OrderTable result = tableBo.changeNumberOfGuests(1L, inputOrderTable);
         assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getTableGroupId()).isEqualTo(null);
+        assertThat(result.getTableGroupId()).isEqualTo(1L);
         assertThat(result.getNumberOfGuests()).isEqualTo(8);
         assertThat(result.isEmpty()).isFalse();
     }

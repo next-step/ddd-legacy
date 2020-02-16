@@ -1,6 +1,6 @@
 package kitchenpos.da;
 
-import kitchenpos.dao.MenuGroupDao;
+import kitchenpos.dao.DefaultMenuGroupDao;
 import kitchenpos.model.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MenuGroupDaoTest {
 
     @Autowired
-    private MenuGroupDao menuGroupDao;
+    private DefaultMenuGroupDao menuGroupDao;
 
     @DisplayName("저장 테스트")
     @Test

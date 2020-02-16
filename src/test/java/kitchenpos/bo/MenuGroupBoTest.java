@@ -1,50 +1,29 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.MenuGroupDao;
+import kitchenpos.bo.mock.TestMenuGroupDao;
+import kitchenpos.dao.Interface.MenuGroupDao;
 import kitchenpos.model.MenuGroup;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.List;
 
+import static kitchenpos.Fixture.defaultMenuGroup;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
 class MenuGroupBoTest {
 
     private static final String MENU_GROUP_NAME = "신메뉴";
 
-    @Mock
-    private MenuGroupDao menuGroupDao;
-
-    @InjectMocks
-    private MenuGroupBo menuGroupBo;
-
-    private MenuGroup input;
-    private MenuGroup saved;
-
-    @BeforeEach
-    void setUp() {
-        input = new MenuGroup();
-        input.setName(MENU_GROUP_NAME);
-
-        saved = new MenuGroup();
-        saved.setName(MENU_GROUP_NAME);
-        saved.setId(1L);
-    }
+    private MenuGroupDao menuGroupDao = new TestMenuGroupDao();
+    private MenuGroupBo menuGroupBo = new MenuGroupBo(menuGroupDao);
 
     @DisplayName("메뉴 그룹 저장")
     @Test
     void create() {
-        given(menuGroupDao.save(input))
-                .willReturn(saved);
+        MenuGroup input = new MenuGroup();
+        input.setId(1L);
+        input.setName(MENU_GROUP_NAME);
 
         MenuGroup result = menuGroupBo.create(input);
 
@@ -55,8 +34,7 @@ class MenuGroupBoTest {
     @DisplayName("메뉴 그룹 조회")
     @Test
     void list() {
-        given(menuGroupDao.findAll())
-                .willReturn(Collections.singletonList(saved));
+        menuGroupDao.save(defaultMenuGroup());
 
         List<MenuGroup> result = menuGroupBo.list();
 
