@@ -2,6 +2,7 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
+import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -78,7 +79,7 @@ public class TableBoTest {
         // give
         given(orderTableDao.findById(1L))
                 .willReturn(Optional.ofNullable(orderTableExpected));
-        given(orderDao.existsByOrderTableIdAndOrderStatusIn(1L, Arrays.asList("COOKING", "MEAL")))
+        given(orderDao.existsByOrderTableIdAndOrderStatusIn(1L, Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name())))
                 .willReturn(true);
         // when then
         assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeEmpty(orderTableExpected.getId(), new OrderTable()));
