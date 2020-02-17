@@ -60,7 +60,7 @@ public class MenuBoTest {
     }
 
     @Test
-    @DisplayName("등록된 메뉴 그룹에만 메뉴를 등록할 수 있다.")
+    @DisplayName("메뉴 그룹에 등록되지 않으면 등록할 수 없다.")
     void createMenuByValidationMenuGroup() {
         // give
         given(menuGroupDao.existsById(2L))
@@ -70,7 +70,7 @@ public class MenuBoTest {
     }
 
     @Test
-    @DisplayName("등록된 상품만 선택이 가능하다.")
+    @DisplayName("등록되지 않은 상품은 메뉴에 등록할 수 없다")
     void createMenuByValidationProduct() {
         // give
         MenuProduct menuProduct = new MenuProduct();

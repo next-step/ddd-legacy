@@ -71,7 +71,7 @@ class OrderBoTest {
     }
 
     @Test
-    @DisplayName("주문 테이블을 가질 때 주문 테이블은 비어있을 수 없다.")
+    @DisplayName("주문할 때 주문된 테이블은 비어있을 수 없다.")
     void createExceptionByEmptyOrderTable() {
         //give
         OrderLineItem orderLineItem = new OrderLineItem();
