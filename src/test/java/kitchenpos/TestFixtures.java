@@ -66,14 +66,6 @@ public class TestFixtures {
         return orderTable;
     }
 
-    public static OrderTable createOrerTableByEmptyIncludeParams(Long index) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(index);
-        orderTable.setEmpty(true);
-        orderTable.setTableGroupId(TABLE_GROUP_ID);
-        return orderTable;
-    }
-
     public static OrderTable createOrderTableByExistCustomer() {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(ORDER_TABLE_ID);
@@ -101,8 +93,17 @@ public class TestFixtures {
     public static List<OrderTable> createOrderTablesByLoopIndex(Long index) {
         List<OrderTable> orderTables = new ArrayList<>();
         for (Long i = 1L; i <= index; i++) {
-            orderTables.add(createOrerTableByEmptyIncludeParams(i));
+            orderTables.add(createOrderTableByEmptyIncludeParams(i));
         }
         return orderTables;
     }
+
+    private static OrderTable createOrderTableByEmptyIncludeParams(Long index) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(index);
+        orderTable.setEmpty(true);
+        orderTable.setTableGroupId(TABLE_GROUP_ID);
+        return orderTable;
+    }
+
 }
