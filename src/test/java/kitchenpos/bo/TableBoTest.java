@@ -60,15 +60,40 @@ public class TableBoTest {
     @DisplayName("주문테이블의 id값이 설정되어있지 않으면 주문테이블을 새로 생성한다.")
     @Test
     void createWithoutID (){
+        OrderTable orderTable = new OrderTable.Builder()
+                .tableGroupId(1L)
+                .numberOfGuests(5)
+                .empty(false)
+                .build();
 
-        OrderTable orderTable;
+        OrderTable indexedOrderTable = new OrderTable.Builder()
+                .id(1L)
+                .tableGroupId(1L)
+                .numberOfGuests(5)
+                .empty(false)
+                .build();
 
+        given(orderTableDao.save(orderTable)).willReturn(indexedOrderTable);
+
+        OrderTable savedOrderTable = tableBo.create(orderTable);
+        assertThat(savedOrderTable.getId()).isEqualTo(savedOrderTable.getId());
     }
 
     @DisplayName("주문테이블의 id값이 이미 주문테이블에 있다면, 주문테이블을 정보를 업데이트한다.")
     @Test
     void createWithID (){
+        OrderTable indexedOrderTable = new OrderTable.Builder()
+                .id(1L)
+                .tableGroupId(1L)
+                .numberOfGuests(5)
+                .empty(false)
+                .build();
 
+        given(orderTableDao.save(indexedOrderTable)).willReturn(indexedOrderTable);
+
+        OrderTable savedOrderTable = tableBo.create(indexedOrderTable);
+
+        assertThat(savedOrderTable).isEqualToComparingFieldByField(indexedOrderTable);
     }
 
     @DisplayName("주문테이블의 ID를 잘 못 설정했을 때, IllegalException이 발생한다.")
