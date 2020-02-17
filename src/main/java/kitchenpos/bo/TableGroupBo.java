@@ -42,14 +42,17 @@ public class TableGroupBo {
 
         final List<OrderTable> savedOrderTables = orderTableDao.findAllByIdIn(orderTableIds);
 
+        //중복 입력이 있는지 확인.
         if (orderTables.size() != savedOrderTables.size()) {
             throw new IllegalArgumentException();
         }
 
         for (final OrderTable savedOrderTable : savedOrderTables) {
+            //비어있지 않거나, tableGroupId 가 null이 아니면
             if (!savedOrderTable.isEmpty() || Objects.nonNull(savedOrderTable.getTableGroupId())) {
                 throw new IllegalArgumentException();
             }
+            //비어있어야하고, tableGroupId 가 null 이어야 함.
         }
 
         tableGroup.setCreatedDate(LocalDateTime.now());
@@ -60,6 +63,7 @@ public class TableGroupBo {
         for (final OrderTable savedOrderTable : savedOrderTables) {
             savedOrderTable.setTableGroupId(tableGroupId);
             savedOrderTable.setEmpty(false);
+            //변경된 정보를 update한다.
             orderTableDao.save(savedOrderTable);
         }
         savedTableGroup.setOrderTables(savedOrderTables);
@@ -75,6 +79,7 @@ public class TableGroupBo {
                 .map(OrderTable::getId)
                 .collect(Collectors.toList());
 
+        //OrderTable 로 설정된 주문들의 상태를 확인하고, COOKING, MEAL 상태면 IllegalArgumentException을 일으킨다.
         if (orderDao.existsByOrderTableIdInAndOrderStatusIn(
                 orderTableIds, Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))) {
             throw new IllegalArgumentException();
