@@ -83,7 +83,6 @@ class MenuBoTest {
     @DisplayName("메뉴를 등록하였다.")
     @Test
     void createMenu() {
-
         //given
         given(menuGroupDao.existsById(anyLong())).willReturn(true);
         given(productDao.findById(anyLong())).willReturn(Optional.of(expectedProduct));
@@ -105,29 +104,24 @@ class MenuBoTest {
     @NullSource
     @ValueSource(strings = {"-1", "-10000"})
     void shouldThrowIllegalArgumentExceptionWhenPriceLessThan0(final BigDecimal price) {
-
         //given
         expectedMenu.setPrice(price);
         //when & then
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(expectedMenu));
     }
 
-
     @DisplayName("존재하지 않는 메뉴 그룹을 메뉴에 추가할수 없다.")
     @Test
     void shouldThrowIllegalArgumentExceptionForNotExistMenuGroup() {
-
         //given
         given(menuGroupDao.existsById(anyLong())).willReturn(false);
         //when & then
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(expectedMenu));
     }
 
-
     @DisplayName("존재하지 않는 상품을 메뉴에 추가할수 없다.")
     @Test
     void shouldThrowIllegalArgumentExceptionForNotExistProduct() {
-
         //given
         given(menuGroupDao.existsById(anyLong())).willReturn(true);
         given(productDao.findById(anyLong())).willReturn(Optional.empty());
@@ -135,33 +129,27 @@ class MenuBoTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(expectedMenu));
     }
 
-
     @DisplayName("메뉴 금액이 메뉴상품의 금액*수량 보다 작아야한다.")
     @Test
     void shouldThrowIllegalArgumentExceptionForDifferentPrice() {
-
         //given
         given(menuGroupDao.existsById(anyLong())).willReturn(true);
         given(productDao.findById(anyLong())).willReturn(Optional.of(expectedProduct));
         expectedMenu.setPrice(BigDecimal.valueOf(4000L));
 
-
         //when & then
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(expectedMenu));
     }
 
-
     @DisplayName("상품 목록을 확인할 수 있다.")
     @Test
     void getMenus() {
-
         //given
         expectedMenu.setId(1L);
         given(menuDao.findAll()).willReturn(Arrays.asList(expectedMenu));
         given(menuProductDao.findAllByMenuId(anyLong())).willReturn(expectedMenuProducts);
         //when
         List<Menu> actual = menuBo.list();
-
 
         //then
         assertThat(actual).isEqualTo(menuDao.findAll());

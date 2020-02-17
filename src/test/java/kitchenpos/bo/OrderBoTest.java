@@ -45,7 +45,6 @@ class OrderBoTest {
 
     private OrderTable orderTable = null;
 
-
     @BeforeEach
     void setUp() {
         expectedOrder = new Order();
@@ -77,11 +76,7 @@ class OrderBoTest {
     void shouldThrowIllegalArgumentExceptionForNoneOrderLineItems() {
         expectedOrder.setOrderLineItems(new ArrayList<>());
 
-
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(expectedOrder));
-
-
-
     }
 
     @DisplayName("주문 아이템의 수와 메뉴의 수가 다를 경우 주문을 받을 수 없다..")
@@ -89,22 +84,16 @@ class OrderBoTest {
     void shouldThrowIllegalArgumentExceptionForDifferentSizeOfOrderLineItems() {
         given(menuDao.countByIdIn(anyList())).willReturn(Long.valueOf(3));
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(expectedOrder));
-
-
     }
-
 
     @DisplayName("존재하지 않는 주문테이블에 주문을 받을수 없다.")
     @Test
     void shouldThrowIllegalArgumentExceptionForNoneOrderTable() {
-
         given(menuDao.countByIdIn(anyList())).willReturn(Long.valueOf(expectedOrderLineItems.size()));
         given(orderTableDao.findById(anyLong())).willReturn(Optional.empty());
+    
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(expectedOrder));
-
-
     }
-
 
     @DisplayName("주문테이블이 비어있다면 주문을 받을 수 없다.")
     @Test
@@ -117,11 +106,9 @@ class OrderBoTest {
 
     }
 
-
     @DisplayName("주문 목록을 조회한다.")
     @Test
     void getOrders() {
-
         //given
         given(orderDao.findAll()).willReturn(Arrays.asList(expectedOrder));
 
@@ -135,29 +122,22 @@ class OrderBoTest {
     @DisplayName("주문의 상태를 변경한다.")
     @Test
     void changeOrderStatus() {
-
         given(orderDao.findById(anyLong())).willReturn(Optional.of(expectedOrder));
         expectedOrder.setOrderStatus(OrderStatus.COOKING.name());
 
         Order actualOrder = orderBo.changeOrderStatus(expectedOrder.getOrderTableId(), expectedOrder);
 
         assertThat(actualOrder.getOrderStatus()).isEqualTo(expectedOrder.getOrderStatus());
-
     }
-
 
     @DisplayName("없는 주문의 상태를 변경하지 못한다.")
     @Test
     void shouldThrowIllegalArgumentExceptionForNoneOrder() {
-
         given(orderDao.findById(anyLong())).willReturn(Optional.empty());
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.changeOrderStatus(expectedOrder.getOrderTableId(), expectedOrder));
 
-
     }
-
-
 
     @DisplayName("주문의 상태가 completion 인경우 주문상태를 변경하지 못한다.")
     @Test
@@ -166,10 +146,6 @@ class OrderBoTest {
         given(orderDao.findById(anyLong())).willReturn(Optional.of(expectedOrder));
         expectedOrder.setOrderStatus(OrderStatus.COMPLETION.name());
 
-
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.changeOrderStatus(expectedOrder.getOrderTableId(), expectedOrder));
-
-
     }
-
 }

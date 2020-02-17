@@ -56,10 +56,8 @@ class TableBoTest {
     @DisplayName("주문 테이블 목록을 불러온다.")
     @Test
     void getOrderTables() {
-
         expectedOrderTable.setId(1L);
         given(orderTableDao.findAll()).willReturn(Arrays.asList(expectedOrderTable));
-
 
         List<OrderTable> actual = tableBo.list();
         assertThat(actual).isEqualTo(orderTableDao.findAll());
@@ -81,7 +79,6 @@ class TableBoTest {
         expectedOrderTable.setTableGroupId(1L);
         given(orderTableDao.findById(anyLong())).willReturn(Optional.of(expectedOrderTable));
 
-
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tableBo.changeEmpty(expectedOrderTable.getId(), expectedOrderTable));
 
     }
@@ -92,9 +89,7 @@ class TableBoTest {
         given(orderTableDao.findById(anyLong())).willReturn(Optional.of(expectedOrderTable));
         given(orderDao.existsByOrderTableIdAndOrderStatusIn(anyLong(), anyList())).willReturn(true);
 
-
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tableBo.changeEmpty(expectedOrderTable.getId(), expectedOrderTable));
-
     }
 
     @DisplayName("주문 테이블을 비운다.")
@@ -104,9 +99,7 @@ class TableBoTest {
         given(orderDao.existsByOrderTableIdAndOrderStatusIn(anyLong(), anyList())).willReturn(false);
         given(orderTableDao.save(any(OrderTable.class))).willReturn(expectedOrderTable);
 
-
         OrderTable actualOrderTable = tableBo.changeEmpty(1L, expectedOrderTable);
-
 
         assertThat(actualOrderTable).isEqualTo(expectedOrderTable);
     }
@@ -118,13 +111,10 @@ class TableBoTest {
         given(orderTableDao.findById(anyLong())).willReturn(Optional.of(expectedOrderTable));
         given(orderTableDao.save(any(OrderTable.class))).willReturn(expectedOrderTable);
 
-
         OrderTable actualOrderTable = tableBo.changeNumberOfGuests(1L, expectedOrderTable);
-
 
         assertThat(actualOrderTable).isEqualTo(expectedOrderTable);
     }
-
 
     @DisplayName("주문테이블의 인원은 0명 이상이여야한다.")
     @Test
@@ -132,18 +122,14 @@ class TableBoTest {
         expectedOrderTable.setNumberOfGuests(0);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tableBo.changeNumberOfGuests(expectedOrderTable.getId(), expectedOrderTable));
-
     }
 
     @DisplayName("없는 테이블의 인원수를 변경할수 없다.")
     @Test
     void shouldThrowIllegalArgumentExceptionForNoneOrderTable() {
-
         given(orderTableDao.findById(anyLong())).willReturn(Optional.empty());
 
-
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tableBo.changeNumberOfGuests(expectedOrderTable.getId(), expectedOrderTable));
-
     }
 
 
@@ -154,6 +140,5 @@ class TableBoTest {
         given(orderTableDao.findById(anyLong())).willReturn(Optional.of(expectedOrderTable));
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tableBo.changeNumberOfGuests(expectedOrderTable.getId(), expectedOrderTable));
-
     }
 }

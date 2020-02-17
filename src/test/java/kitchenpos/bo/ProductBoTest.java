@@ -44,7 +44,6 @@ class ProductBoTest {
     @DisplayName("상품을 등록할수있다.")
     @Test
     void createProduct() {
-
         //given
         given(productDao.save(any(Product.class)))
                 .willReturn(expected);

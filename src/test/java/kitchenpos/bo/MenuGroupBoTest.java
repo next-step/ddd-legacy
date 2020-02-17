@@ -44,11 +44,9 @@ class MenuGroupBoTest {
         assertThat(actual.getName()).isEqualTo(expectedMenuGroup.getName());
     }
 
-
     @DisplayName("메뉴 그룹 목록을 확인한다.")
     @Test
     void getMenuGroups() {
-
         //given
         expectedMenuGroup.setId(1L);
         given(menuGroupDao.findAll()).willReturn(Arrays.asList(expectedMenuGroup));
@@ -58,6 +56,4 @@ class MenuGroupBoTest {
         //then
         assertThat(actual).isEqualTo(menuGroupDao.findAll());
     }
-
-
 }

@@ -33,7 +33,6 @@ class TableGroupBoTest {
     @InjectMocks
     private TableGroupBo tableGroupBo;
 
-
     private TableGroup tableGroup = null;
     private List<OrderTable> orderTables = new ArrayList<>();
 
@@ -51,7 +50,6 @@ class TableGroupBoTest {
         orderTable2.setEmpty(true);
         orderTables.add(orderTable2);
 
-
         OrderTable orderTable3 = new OrderTable();
         orderTable3.setNumberOfGuests(3);
         orderTable3.setEmpty(true);
@@ -63,14 +61,12 @@ class TableGroupBoTest {
     @DisplayName("테이블 그룹을 만들수 있다.")
     @Test
     void createTableGroup() {
-
         given(orderTableDao.findAllByIdIn(anyList())).willReturn(orderTables);
         given(tableGroupDao.save(any(TableGroup.class))).willReturn(tableGroup);
 
         TableGroup actualTableGroup = tableGroupBo.create(tableGroup);
         assertThat(actualTableGroup).isEqualTo(tableGroup);
     }
-
 
     @DisplayName("테이블이 없거나, 테이블 수가 2개 이하이면 테이블 그룹을 만들 수 없다.")
     @Test
@@ -86,9 +82,7 @@ class TableGroupBoTest {
         List<OrderTable> lessOrderProducts = orderTables.subList(0, 2);
         given(orderTableDao.findAllByIdIn(anyList())).willReturn(lessOrderProducts);
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tableGroupBo.create(tableGroup));
-
     }
-
 
     @DisplayName("비어있지 않은 테이블이 있다면, 테이블 그룹을 만들수 없다.")
     @Test
@@ -97,9 +91,7 @@ class TableGroupBoTest {
         given(orderTableDao.findAllByIdIn(anyList())).willReturn(orderTables);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tableGroupBo.create(tableGroup));
-
     }
-
 
     @DisplayName("이미 그룹지어진 테이블이 존재한다면, 테이블 그룹을 만들수 없다.")
     @Test
@@ -108,7 +100,6 @@ class TableGroupBoTest {
         given(orderTableDao.findAllByIdIn(anyList())).willReturn(orderTables);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tableGroupBo.create(tableGroup));
-
     }
 
     @DisplayName("테이블 그룹을 삭제한다.")
@@ -119,7 +110,6 @@ class TableGroupBoTest {
         ).willReturn(
                 orderTables
         );
-
 
         tableGroupBo.delete(tableGroup.getId());
 
@@ -140,8 +130,5 @@ class TableGroupBoTest {
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tableGroupBo.delete(tableGroup.getId()));
 
-
     }
-
-
 }
