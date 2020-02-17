@@ -4,7 +4,6 @@ import kitchenpos.bo.TableBo;
 import kitchenpos.builder.OrderTableBuilder;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
-import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,7 +13,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -55,8 +53,6 @@ public class FakeTableBoTest {
 
         List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
 
-        //when(orderTableDao.findAll()).thenReturn(orderTables);
-
         List<OrderTable> findOrderTables = tableBo.list();
 
         assertThat(findOrderTables).containsAll(orderTables);
@@ -73,8 +69,6 @@ public class FakeTableBoTest {
                 .setNumberOfGuests(0)
                 .build()
                 ;
-
-        //when(orderTableDao.save(orderTable)).thenReturn(orderTable);
 
         OrderTable savedOrderTable = tableBo.create(orderTable);
 
@@ -98,12 +92,6 @@ public class FakeTableBoTest {
                 ;
 
         orderTableDao.save(orderTable);
-        //
-
-        //when(orderTableDao.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
-        //when(orderDao.existsByOrderTableIdAndOrderStatusIn(orderTable.getId(),
-          //      Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).thenReturn(false);
-        //when(orderTableDao.save(orderTable)).thenReturn(orderTable);
 
         OrderTable changedOrderTable = tableBo.changeEmpty(orderTable.getId(), requestOrderTable);
 
@@ -120,8 +108,6 @@ public class FakeTableBoTest {
                 .build()
                 ;
 
-        //when(orderTableDao.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
-
         assertThrows(IllegalArgumentException.class, () -> tableBo.changeEmpty(orderTable.getId(), orderTable));
     }
 
@@ -133,10 +119,6 @@ public class FakeTableBoTest {
                 .setEmpty(false)
                 .build()
                 ;
-
-        //when(orderTableDao.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
-        //when(orderDao.existsByOrderTableIdAndOrderStatusIn(orderTable.getId(),
-                //Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).thenReturn(true);
 
         assertThrows(IllegalArgumentException.class, () -> tableBo.changeEmpty(orderTable.getId(), orderTable));
     }
@@ -160,9 +142,6 @@ public class FakeTableBoTest {
                 ;
 
         orderTableDao.save(requestOrderTable);
-
-       // when(orderTableDao.findById(requestOrderTable.getId())).thenReturn(Optional.of(requestOrderTable));
-        //when(orderTableDao.save(requestOrderTable)).thenReturn(savedOrderTable);
 
         OrderTable changedOrderTable = tableBo.changeNumberOfGuests(requestOrderTable.getId(), requestOrderTable);
 
@@ -193,8 +172,6 @@ public class FakeTableBoTest {
                 .setEmpty(false)
                 .build()
                 ;
-
-        //when(orderTableDao.findById(orderTable.getId())).thenReturn(Optional.empty());
 
         assertThrows(IllegalArgumentException.class, () -> tableBo.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
