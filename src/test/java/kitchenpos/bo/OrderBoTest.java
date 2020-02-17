@@ -1,5 +1,6 @@
 package kitchenpos.bo;
 
+import kitchenpos.TestFixtures;
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderLineItemDao;
@@ -43,17 +44,11 @@ class OrderBoTest {
 
     private Order orderExpected;
 
-    @BeforeEach
-    void setUp() {
-        orderExpected = new Order();
-        orderExpected.setId(1L);
-    }
-
     @Test
     @DisplayName("주문 아이템이 비었을 때")
     void createExceptionByEmptyOrderLineItem() {
         // give
-        orderExpected.setOrderLineItems(Collections.emptyList());
+        orderExpected = TestFixtures.createOrderByItemEmpty();
         // when then
         assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(orderExpected));
     }
@@ -62,9 +57,7 @@ class OrderBoTest {
     @DisplayName("주문한 상품과 메뉴의 상품이 일치하는지 확인 한다.")
     void createExceptionByEqualsMenu() {
         // give
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(1L);
-        orderExpected.setOrderLineItems(Arrays.asList(orderLineItem));
+        orderExpected = TestFixtures.createOrderByCompletion();
         given(menuDao.countByIdIn(Arrays.asList(1L)))
                 .willReturn(2L);
         // when then
@@ -75,14 +68,8 @@ class OrderBoTest {
     @DisplayName("주문할 때 주문된 테이블은 비어있을 수 없다.")
     void createExceptionByEmptyOrderTable() {
         //give
-        OrderLineItem orderLineItemExpected = new OrderLineItem();
-        orderLineItemExpected.setMenuId(1L);
-        orderExpected.setOrderLineItems(Arrays.asList(orderLineItemExpected));
-        orderExpected.setOrderTableId(1L);
-
-        OrderTable orderTableExpected = new OrderTable();
-        orderTableExpected.setId(1L);
-        orderTableExpected.setEmpty(true);
+        OrderTable orderTableExpected = TestFixtures.createOrderTableByEmpty();
+        orderExpected = TestFixtures.createOrderByCompletion();
 
         given(menuDao.countByIdIn(Arrays.asList(1L)))
                 .willReturn(1L);
@@ -97,9 +84,8 @@ class OrderBoTest {
     @DisplayName("주문을 조회할 수 있다.")
     void getOrder() {
         // give
-        OrderLineItem orderLineItemExpected = new OrderLineItem();
-        orderLineItemExpected.setOrderId(1L);
-
+        OrderLineItem orderLineItemExpected = TestFixtures.createOrderLineItem();
+        orderExpected = TestFixtures.createOrderByCooking();
         given(orderDao.findAll())
                 .willReturn(Arrays.asList(orderExpected));
 
@@ -121,7 +107,7 @@ class OrderBoTest {
     @DisplayName("완료 상태일 때 상태 변화 예외처리")
     void changeOrderStatusExceptionByCompletion() {
         // given
-        orderExpected.setOrderStatus(OrderStatus.COMPLETION.name());
+        orderExpected = TestFixtures.createOrderByCompletion();
 
         given(orderDao.findById(1L))
                 .willReturn(Optional.of(orderExpected));
@@ -137,10 +123,8 @@ class OrderBoTest {
         given(orderDao.findById(1L))
                 .willReturn(Optional.of(new Order()));
 
-        orderExpected.setOrderStatus(OrderStatus.COOKING.name());
-
-        OrderLineItem orderLineItemExpected = new OrderLineItem();
-        orderLineItemExpected.setOrderId(1L);
+        orderExpected = TestFixtures.createOrderByCooking();
+        OrderLineItem orderLineItemExpected = TestFixtures.createOrderLineItem();
 
         given(orderLineItemDao.findAllByOrderId(1L))
                 .willReturn(Arrays.asList(orderLineItemExpected));
