@@ -19,6 +19,7 @@ public class TestFixtures {
     private static final int GUEST_NUMBER = 2;
     private static final int EMPTY_GUEST_NUMBER = 0;
     private static final long TABLE_GROUP_ID = 1L;
+    private static final long LOOP_INIT_INDEX = 1L;
 
     public static OrderLineItem createOrderLineItem() {
         OrderLineItem orderLineItem = new OrderLineItem();
@@ -92,7 +93,7 @@ public class TestFixtures {
 
     public static List<OrderTable> createOrderTablesByLoopIndex(Long index) {
         List<OrderTable> orderTables = new ArrayList<>();
-        for (Long i = 1L; i <= index; i++) {
+        for (Long i = LOOP_INIT_INDEX; i <= index; i++) {
             orderTables.add(createOrderTableByEmptyIncludeParams(i));
         }
         return orderTables;
