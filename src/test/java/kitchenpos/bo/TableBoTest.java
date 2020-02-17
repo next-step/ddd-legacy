@@ -31,14 +31,14 @@ public class TableBoTest {
     @InjectMocks
     private TableBo tableBo;
 
-    private OrderTable orderTable;
+    private OrderTable orderTableExpected;
 
     @BeforeEach
     void setUp() {
-        orderTable = new OrderTable();
-        orderTable.setId(1L);
-        orderTable.setEmpty(true);
-        orderTable.setNumberOfGuests(0);
+        orderTableExpected = new OrderTable();
+        orderTableExpected.setId(1L);
+        orderTableExpected.setEmpty(true);
+        orderTableExpected.setNumberOfGuests(0);
     }
 
     @Test
@@ -60,14 +60,14 @@ public class TableBoTest {
     void getOrderTable() {
         // give
         given(orderTableDao.findAll())
-                .willReturn(Arrays.asList(orderTable));
+                .willReturn(Arrays.asList(orderTableExpected));
         // when
         List<OrderTable> orderTablesActual = tableBo.list();
         // then
         assertAll("order table test", () ->
                 assertAll("order table first id test", () -> {
                     int firstIndex = 0;
-                    assertThat(orderTablesActual.get(firstIndex).getId()).isEqualTo(orderTable.getId());
+                    assertThat(orderTablesActual.get(firstIndex).getId()).isEqualTo(orderTableExpected.getId());
                 })
         );
     }
@@ -77,18 +77,18 @@ public class TableBoTest {
     void changeOrderTableStatus() {
         // give
         given(orderTableDao.findById(1L))
-                .willReturn(Optional.ofNullable(orderTable));
+                .willReturn(Optional.ofNullable(orderTableExpected));
         given(orderDao.existsByOrderTableIdAndOrderStatusIn(1L, Arrays.asList("COOKING", "MEAL")))
                 .willReturn(true);
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeEmpty(orderTable.getId(), new OrderTable()));
+        assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeEmpty(orderTableExpected.getId(), new OrderTable()));
     }
 
     @Test
     @DisplayName("주문 테이블의 손님 수가 0명 이상이다.")
     void changeOrderTableGuestNumberByOverZero() {
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeNumberOfGuests(1L, orderTable));
+        assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeNumberOfGuests(1L, orderTableExpected));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class TableBoTest {
     void changeOrderTableByIsEmpty() {
         // give
         given(orderTableDao.findById(1L))
-                .willReturn(Optional.ofNullable(orderTable));
+                .willReturn(Optional.ofNullable(orderTableExpected));
         assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeNumberOfGuests(1L, new OrderTable()));
     }
 }

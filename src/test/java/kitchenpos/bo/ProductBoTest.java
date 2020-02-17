@@ -28,21 +28,21 @@ public class ProductBoTest {
     @InjectMocks
     private ProductBo productBo;
 
-    private Product product;
+    private Product productExpected;
 
     @BeforeEach
     void setUp() {
-        product = new Product("gogi", BigDecimal.valueOf(1000));
+        productExpected = new Product("gogi", BigDecimal.valueOf(1000));
     }
 
     @Test
     @DisplayName("상품 등록")
     void createProduct() {
         // give
-        given(productDao.save(product))
-                .willReturn(product);
+        given(productDao.save(productExpected))
+                .willReturn(productExpected);
         // when
-        Product createdProduct = productBo.create(product);
+        Product createdProduct = productBo.create(productExpected);
         // then
         assertThat(createdProduct.getName()).isEqualTo("gogi");
         assertThat(createdProduct.getPrice().longValue()).isEqualTo(1000L);

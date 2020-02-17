@@ -38,16 +38,16 @@ public class MenuBoTest {
     @InjectMocks
     private MenuBo menuBo;
 
-    private Menu menu;
+    private Menu menuExpected;
 
     @BeforeEach
     void setUp() {
-        menu = new Menu();
-        menu.setId(1L);
-        menu.setName("고기");
-        menu.setPrice(BigDecimal.valueOf(1000));
-        menu.setMenuGroupId(2L);
-        menu.setMenuProducts(Collections.emptyList());
+        menuExpected = new Menu();
+        menuExpected.setId(1L);
+        menuExpected.setName("고기");
+        menuExpected.setPrice(BigDecimal.valueOf(1000));
+        menuExpected.setMenuGroupId(2L);
+        menuExpected.setMenuProducts(Collections.emptyList());
     }
 
     @Test
@@ -67,20 +67,20 @@ public class MenuBoTest {
         given(menuGroupDao.existsById(2L))
                 .willReturn(false);
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(menu));
+        assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(menuExpected));
     }
 
     @Test
     @DisplayName("등록되지 않은 상품은 메뉴에 등록할 수 없다")
     void createMenuByValidationProduct() {
         // give
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setMenuId(1L);
-        menuProduct.setProductId(1L);
-        menuProduct.setQuantity(1L);
+        MenuProduct menuProductExpected = new MenuProduct();
+        menuProductExpected.setMenuId(1L);
+        menuProductExpected.setProductId(1L);
+        menuProductExpected.setQuantity(1L);
 
-        menu.setMenuProducts(Arrays.asList(menuProduct));
-        menu.setPrice(BigDecimal.valueOf(0));
+        menuExpected.setMenuProducts(Arrays.asList(menuProductExpected));
+        menuExpected.setPrice(BigDecimal.valueOf(0));
 
         given(menuGroupDao.existsById(2L))
                 .willReturn(true);
@@ -88,7 +88,7 @@ public class MenuBoTest {
         given(productDao.findById(1L))
                 .willReturn(null);
         // when then
-        assertThatNullPointerException().isThrownBy(() -> menuBo.create(menu));
+        assertThatNullPointerException().isThrownBy(() -> menuBo.create(menuExpected));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class MenuBoTest {
         given(menuGroupDao.existsById(2L))
                 .willReturn(true);
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(menu));
+        assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(menuExpected));
     }
 
     @Test
@@ -107,13 +107,13 @@ public class MenuBoTest {
         // give
         given(menuGroupDao.existsById(2L))
                 .willReturn(true);
-        given(menuDao.save(menu))
-                .willReturn(menu);
-        menu.setPrice(BigDecimal.valueOf(0));
-        Menu menuExpected = menu;
+        given(menuDao.save(menuExpected))
+                .willReturn(menuExpected);
+        menuExpected.setPrice(BigDecimal.valueOf(0));
+        Menu menuExpected = this.menuExpected;
 
         // when
-        Menu menuActual = menuBo.create(menu);
+        Menu menuActual = menuBo.create(this.menuExpected);
         // then
         assertThat(menuActual.getId()).isEqualTo(menuExpected.getId());
         assertThat(menuActual.getName()).isEqualTo(menuExpected.getName());
@@ -123,21 +123,21 @@ public class MenuBoTest {
     @DisplayName("등록된 메뉴들을 조회할 수 있다.")
     void getMenus() {
         // give
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setMenuId(1L);
+        MenuProduct menuProductExpected = new MenuProduct();
+        menuProductExpected.setMenuId(1L);
 
         given(menuDao.findAll())
-                .willReturn(Arrays.asList(menu));
+                .willReturn(Arrays.asList(menuExpected));
 
-        given(menuProductDao.findAllByMenuId(menu.getId()))
-                .willReturn(Arrays.asList(menuProduct));
+        given(menuProductDao.findAllByMenuId(menuExpected.getId()))
+                .willReturn(Arrays.asList(menuProductExpected));
 
-        List<Menu> menusExpected = Arrays.asList(menu);
+        List<Menu> menusExpected = Arrays.asList(menuExpected);
         // when
         List<Menu> menusActual = menuBo.list();
         // then
-        assertAll("menu test", () ->
-                assertAll("first menu name test", () -> {
+        assertAll("menuExpected test", () ->
+                assertAll("first menuExpected name test", () -> {
                     int firstIndex = 0;
                     assertThat(menusActual.get(firstIndex).getName()).isEqualTo(menusExpected.get(firstIndex).getName());
                     assertThat(menusActual.size()).isEqualTo(menusExpected.size());

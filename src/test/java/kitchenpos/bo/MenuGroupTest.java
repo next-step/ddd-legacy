@@ -25,22 +25,21 @@ public class MenuGroupTest {
     @InjectMocks
     private MenuGroupBo menuGroupBo;
 
-    private MenuGroup menuGroup;
+    private MenuGroup menuGroupExpected;
 
     @BeforeEach
     void setUp() {
-        this.menuGroup = new MenuGroup(1L, "추천메뉴");
+        this.menuGroupExpected = new MenuGroup(1L, "추천메뉴");
     }
 
     @Test
     @DisplayName("메뉴 그룹(카테고리) 등록")
     void createMenuGroup() {
         // give
-        given(menuGroupDao.save(menuGroup))
-                .willReturn(menuGroup);
+        given(menuGroupDao.save(menuGroupExpected))
+                .willReturn(menuGroupExpected);
         // when
-        MenuGroup menuGroupActual = menuGroupBo.create(menuGroup);
-        MenuGroup menuGroupExpected = menuGroup;
+        MenuGroup menuGroupActual = menuGroupBo.create(menuGroupExpected);
         // then
         assertThat(menuGroupActual.getId()).isEqualTo(menuGroupExpected.getId());
     }

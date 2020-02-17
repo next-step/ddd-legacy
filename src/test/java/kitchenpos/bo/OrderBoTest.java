@@ -41,21 +41,21 @@ class OrderBoTest {
     @InjectMocks
     private OrderBo orderBo;
 
-    private Order order;
+    private Order orderExpected;
 
     @BeforeEach
     void setUp() {
-        order = new Order();
-        order.setId(1L);
+        orderExpected = new Order();
+        orderExpected.setId(1L);
     }
 
     @Test
     @DisplayName("주문 아이템이 비었을 때")
     void createExceptionByEmptyOrderLineItem() {
         // give
-        order.setOrderLineItems(Collections.emptyList());
+        orderExpected.setOrderLineItems(Collections.emptyList());
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(order));
+        assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(orderExpected));
     }
 
     @Test
@@ -64,56 +64,56 @@ class OrderBoTest {
         // give
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItem.setMenuId(1L);
-        order.setOrderLineItems(Arrays.asList(orderLineItem));
+        orderExpected.setOrderLineItems(Arrays.asList(orderLineItem));
         given(menuDao.countByIdIn(Arrays.asList(1L)))
                 .willReturn(2L);
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(order));
+        assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(orderExpected));
     }
 
     @Test
     @DisplayName("주문할 때 주문된 테이블은 비어있을 수 없다.")
     void createExceptionByEmptyOrderTable() {
         //give
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(1L);
-        order.setOrderLineItems(Arrays.asList(orderLineItem));
-        order.setOrderTableId(1L);
+        OrderLineItem orderLineItemExpected = new OrderLineItem();
+        orderLineItemExpected.setMenuId(1L);
+        orderExpected.setOrderLineItems(Arrays.asList(orderLineItemExpected));
+        orderExpected.setOrderTableId(1L);
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(1L);
-        orderTable.setEmpty(true);
+        OrderTable orderTableExpected = new OrderTable();
+        orderTableExpected.setId(1L);
+        orderTableExpected.setEmpty(true);
 
         given(menuDao.countByIdIn(Arrays.asList(1L)))
                 .willReturn(1L);
         given(orderTableDao.findById(1L))
-                .willReturn(Optional.of(orderTable));
+                .willReturn(Optional.of(orderTableExpected));
 
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(order));
+        assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(orderExpected));
     }
 
     @Test
     @DisplayName("주문을 조회할 수 있다.")
     void getOrder() {
         // give
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setOrderId(1L);
+        OrderLineItem orderLineItemExpected = new OrderLineItem();
+        orderLineItemExpected.setOrderId(1L);
 
         given(orderDao.findAll())
-                .willReturn(Arrays.asList(order));
+                .willReturn(Arrays.asList(orderExpected));
 
         given(orderLineItemDao.findAllByOrderId(1L))
-                .willReturn(Arrays.asList(orderLineItem));
+                .willReturn(Arrays.asList(orderLineItemExpected));
         // when
         List<Order> ordersActual = orderBo.list();
 
         // then
-        assertAll("order test", () ->
-                assertAll("order first id test", () -> {
+        assertAll("orderExpected test", () ->
+                assertAll("orderExpected first id test", () -> {
                     int firstIndex = 0;
                     assertThat(ordersActual.get(firstIndex).getId())
-                            .isEqualTo(order.getId());
+                            .isEqualTo(orderExpected.getId());
                 }));
     }
 
@@ -121,13 +121,13 @@ class OrderBoTest {
     @DisplayName("완료 상태일 때 상태 변화 예외처리")
     void changeOrderStatusExceptionByCompletion() {
         // given
-        order.setOrderStatus(OrderStatus.COMPLETION.name());
+        orderExpected.setOrderStatus(OrderStatus.COMPLETION.name());
 
         given(orderDao.findById(1L))
-                .willReturn(Optional.of(order));
+                .willReturn(Optional.of(orderExpected));
 
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> orderBo.changeOrderStatus(1L, order));
+        assertThatIllegalArgumentException().isThrownBy(() -> orderBo.changeOrderStatus(1L, orderExpected));
     }
 
     @Test
@@ -137,17 +137,17 @@ class OrderBoTest {
         given(orderDao.findById(1L))
                 .willReturn(Optional.of(new Order()));
 
-        order.setOrderStatus(OrderStatus.COOKING.name());
+        orderExpected.setOrderStatus(OrderStatus.COOKING.name());
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setOrderId(1L);
+        OrderLineItem orderLineItemExpected = new OrderLineItem();
+        orderLineItemExpected.setOrderId(1L);
 
         given(orderLineItemDao.findAllByOrderId(1L))
-                .willReturn(Arrays.asList(orderLineItem));
+                .willReturn(Arrays.asList(orderLineItemExpected));
 
-        Order orderActual = orderBo.changeOrderStatus(1L, order);
+        Order orderActual = orderBo.changeOrderStatus(1L, orderExpected);
 
-        assertThat(orderActual.getOrderStatus()).isEqualTo(order.getOrderStatus());
+        assertThat(orderActual.getOrderStatus()).isEqualTo(orderExpected.getOrderStatus());
         assertThat(orderActual.getOrderStatus()).isNotEqualTo(new Order().getOrderStatus());
     }
 }

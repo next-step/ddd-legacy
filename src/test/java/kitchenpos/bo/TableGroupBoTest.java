@@ -32,22 +32,22 @@ class TableGroupBoTest {
     @InjectMocks
     private TableGroupBo tableGroupBo;
 
-    private TableGroup tableGroup;
+    private TableGroup tableGroupExpected;
 
     @BeforeEach
     void setUp() {
-        tableGroup = new TableGroup();
-        tableGroup.setCreatedDate(LocalDateTime.now());
-        tableGroup.setId(1L);
+        tableGroupExpected = new TableGroup();
+        tableGroupExpected.setCreatedDate(LocalDateTime.now());
+        tableGroupExpected.setId(1L);
     }
 
     @Test
     @DisplayName("두 자리 미만의 테이블을 사용할 수 없다.")
     void createExceptionByTableSize() {
         // give
-        tableGroup.setOrderTables(Arrays.asList(new OrderTable()));
+        tableGroupExpected.setOrderTables(Arrays.asList(new OrderTable()));
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> tableGroupBo.create(tableGroup));
+        assertThatIllegalArgumentException().isThrownBy(() -> tableGroupBo.create(tableGroupExpected));
     }
 
     @Test
@@ -72,10 +72,10 @@ class TableGroupBoTest {
             orderTablesExpected.add(orderTable);
         }
 
-        tableGroup.setOrderTables(orderTablesExpected);
+        tableGroupExpected.setOrderTables(orderTablesExpected);
 
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> tableGroupBo.create(tableGroup));
+        assertThatIllegalArgumentException().isThrownBy(() -> tableGroupBo.create(tableGroupExpected));
     }
 
     @Test
@@ -93,10 +93,10 @@ class TableGroupBoTest {
         given(orderTableDao.findAllByIdIn(Arrays.asList(1L, 2L)))
                 .willReturn(orderTablesExpected);
 
-        tableGroup.setOrderTables(orderTablesExpected);
+        tableGroupExpected.setOrderTables(orderTablesExpected);
 
         // when then
-        assertThatIllegalArgumentException().isThrownBy(() -> tableGroupBo.create(tableGroup));
+        assertThatIllegalArgumentException().isThrownBy(() -> tableGroupBo.create(tableGroupExpected));
     }
 
     @Test
