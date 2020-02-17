@@ -3,8 +3,10 @@ package kitchenpos;
 import kitchenpos.model.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 public class TestFixtures {
 
@@ -64,11 +66,43 @@ public class TestFixtures {
         return orderTable;
     }
 
+    public static OrderTable createOrerTableByEmptyIncludeParams(Long index) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(index);
+        orderTable.setEmpty(true);
+        orderTable.setTableGroupId(TABLE_GROUP_ID);
+        return orderTable;
+    }
+
     public static OrderTable createOrderTableByExistCustomer() {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(ORDER_TABLE_ID);
         orderTable.setEmpty(false);
         orderTable.setNumberOfGuests(GUEST_NUMBER);
         return orderTable;
+    }
+
+    public static TableGroup createTableGroupByTableOne() {
+        TableGroup tableGroup = new TableGroup();
+        tableGroup.setId(TABLE_GROUP_ID);
+        tableGroup.setCreatedDate(LocalDateTime.now());
+        tableGroup.setOrderTables(Arrays.asList(createOrderTableByEmpty()));
+        return tableGroup;
+    }
+
+    public static TableGroup createTableGroupSizeTwo() {
+        TableGroup tableGroup = new TableGroup();
+        tableGroup.setId(TABLE_GROUP_ID);
+        tableGroup.setCreatedDate(LocalDateTime.now());
+        tableGroup.setOrderTables(createOrderTablesByLoopIndex(2L));
+        return tableGroup;
+    }
+
+    public static List<OrderTable> createOrderTablesByLoopIndex(Long index) {
+        List<OrderTable> orderTables = new ArrayList<>();
+        for (Long i = 1L; i <= index; i++) {
+            orderTables.add(createOrerTableByEmptyIncludeParams(i));
+        }
+        return orderTables;
     }
 }
