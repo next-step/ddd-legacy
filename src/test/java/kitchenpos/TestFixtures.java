@@ -15,6 +15,7 @@ public class TestFixtures {
     private static final long ORDER_ID = 1L;
     private static final long ORDER_TABLE_ID = 1L;
     private static final int GUEST_NUMBER = 2;
+    private static final int EMPTY_GUEST_NUMBER = 0;
     private static final long TABLE_GROUP_ID = 1L;
 
     public static OrderLineItem createOrderLineItem() {
@@ -58,8 +59,16 @@ public class TestFixtures {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(ORDER_TABLE_ID);
         orderTable.setEmpty(true);
-        orderTable.setNumberOfGuests(GUEST_NUMBER);
+        orderTable.setNumberOfGuests(EMPTY_GUEST_NUMBER);
         orderTable.setTableGroupId(TABLE_GROUP_ID);
+        return orderTable;
+    }
+
+    public static OrderTable createOrderTableByExistCustomer() {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(ORDER_TABLE_ID);
+        orderTable.setEmpty(false);
+        orderTable.setNumberOfGuests(GUEST_NUMBER);
         return orderTable;
     }
 }

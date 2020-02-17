@@ -1,5 +1,6 @@
 package kitchenpos.bo;
 
+import kitchenpos.TestFixtures;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.OrderStatus;
@@ -34,19 +35,11 @@ public class TableBoTest {
 
     private OrderTable orderTableExpected;
 
-    @BeforeEach
-    void setUp() {
-        orderTableExpected = new OrderTable();
-        orderTableExpected.setId(1L);
-        orderTableExpected.setEmpty(true);
-        orderTableExpected.setNumberOfGuests(0);
-    }
-
     @Test
     @DisplayName("주문 테이블 생성")
     void create() {
         // give
-        OrderTable orderTableExpected = new OrderTable();
+        orderTableExpected = TestFixtures.createOrderTableByEmpty();
         given(orderTableDao.save(orderTableExpected))
                 .willReturn(orderTableExpected);
         // when
@@ -60,6 +53,7 @@ public class TableBoTest {
     @DisplayName("주문 테이블은 테이블이 비었는지 안비었는지 알 수 있다.")
     void getOrderTable() {
         // give
+        orderTableExpected = TestFixtures.createOrderTableByEmpty();
         given(orderTableDao.findAll())
                 .willReturn(Arrays.asList(orderTableExpected));
         // when
@@ -77,6 +71,7 @@ public class TableBoTest {
     @DisplayName("주문 테이블에 손님이 있을 때 상태를 변경할 수 없다.")
     void changeOrderTableStatus() {
         // give
+        orderTableExpected = TestFixtures.createOrderTableByExistCustomer();
         given(orderTableDao.findById(1L))
                 .willReturn(Optional.ofNullable(orderTableExpected));
         given(orderDao.existsByOrderTableIdAndOrderStatusIn(1L, Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name())))
@@ -88,6 +83,8 @@ public class TableBoTest {
     @Test
     @DisplayName("주문 테이블의 손님 수가 0명 이상이다.")
     void changeOrderTableGuestNumberByOverZero() {
+        // give
+        orderTableExpected = TestFixtures.createOrderTableByEmpty();
         // when then
         assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeNumberOfGuests(1L, orderTableExpected));
     }
@@ -96,6 +93,7 @@ public class TableBoTest {
     @DisplayName("주문 테이블이 비어있는데 손님이 앉아 있을 수 없다.")
     void changeOrderTableByIsEmpty() {
         // give
+        orderTableExpected = TestFixtures.createOrderTableByEmpty();
         given(orderTableDao.findById(1L))
                 .willReturn(Optional.ofNullable(orderTableExpected));
         assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeNumberOfGuests(1L, new OrderTable()));
