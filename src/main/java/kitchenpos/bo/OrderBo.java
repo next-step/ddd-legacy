@@ -41,23 +41,25 @@ public class OrderBo {
     public Order create(final Order order) {
         final List<OrderLineItem> orderLineItems = order.getOrderLineItems();
 
+        System.out.println("1");
         if (CollectionUtils.isEmpty(orderLineItems)) {
             throw new IllegalArgumentException();
         }
-
         final List<Long> menuIds = orderLineItems.stream()
                 .map(OrderLineItem::getMenuId)
                 .collect(Collectors.toList());
 
+        //메뉴를 중복해서 받을 수 없다?
+        System.out.println("2");
         if (orderLineItems.size() != menuDao.countByIdIn(menuIds)) {
             throw new IllegalArgumentException();
         }
 
         order.setId(null);
-
+        System.out.println("3");
         final OrderTable orderTable = orderTableDao.findById(order.getOrderTableId())
                 .orElseThrow(IllegalArgumentException::new);
-
+        System.out.println("4");
         if (orderTable.isEmpty()) {
             throw new IllegalArgumentException();
         }

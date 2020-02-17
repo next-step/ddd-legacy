@@ -58,6 +58,10 @@ public class Order {
         this.orderLineItems = orderLineItems;
     }
 
+    public void addOrderLineItem (OrderLineItem orderLineItem){
+        this.orderLineItems.add(orderLineItem);
+    }
+
     public static class Builder {
         private Long id;
         private Long orderTableId;
