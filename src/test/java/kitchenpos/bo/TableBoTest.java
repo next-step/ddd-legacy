@@ -17,6 +17,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,7 +64,12 @@ public class TableBoTest {
         // when
         List<OrderTable> orderTablesActual = tableBo.list();
         // then
-        assertThat(orderTablesActual.get(0).getId()).isEqualTo(orderTable.getId());
+        assertAll("order table test", () ->
+                assertAll("order table first id test", () -> {
+                    int firstIndex = 0;
+                    assertThat(orderTablesActual.get(firstIndex).getId()).isEqualTo(orderTable.getId());
+                })
+        );
     }
 
     @Test

@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -135,7 +136,12 @@ public class MenuBoTest {
         // when
         List<Menu> menusActual = menuBo.list();
         // then
-        assertThat(menusActual.get(0).getName())
-                .isEqualTo(menusExpected.get(0).getName());
+        assertAll("menu test", () ->
+                assertAll("first menu name test", () -> {
+                    int firstIndex = 0;
+                    assertThat(menusActual.get(firstIndex).getName()).isEqualTo(menusExpected.get(firstIndex).getName());
+                    assertThat(menusActual.size()).isEqualTo(menusExpected.size());
+                })
+        );
     }
 }
