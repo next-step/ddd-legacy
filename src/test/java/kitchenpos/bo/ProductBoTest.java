@@ -22,7 +22,6 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class ProductBoTest {
-
     @Mock
     private ProductDao productDao;
 
