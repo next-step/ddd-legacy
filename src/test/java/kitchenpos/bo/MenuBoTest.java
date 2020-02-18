@@ -7,6 +7,7 @@ import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
+import kitchenpos.support.MenuBuilder;
 import kitchenpos.support.ProductBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -73,7 +74,7 @@ public class MenuBoTest {
             expectedMenuProducts.add(menuProduct);
         }
 
-        expectedMenu = new Menu.Builder()
+        expectedMenu = new MenuBuilder()
             .id(1L)
             .name("뿌링클")
             .price(new BigDecimal(10000))
@@ -95,7 +96,7 @@ public class MenuBoTest {
             actualMenuProducts.add(menuProduct);
         }
 
-        actualMenu = new Menu.Builder()
+        actualMenu = new MenuBuilder()
             .id(1L)
             .name("뿌링클")
             .price(new BigDecimal(10000))
@@ -120,7 +121,7 @@ public class MenuBoTest {
     @DisplayName("Menu 가격이 정해지지 않으면 IllegalArgumentException 이 발생한다.")
     @Test
     void createPriceIsNull (){
-        Menu menu = new Menu.Builder()
+        Menu menu = new MenuBuilder()
             .id(1L)
             .name("뿌링클")
             .price(null)
@@ -133,7 +134,7 @@ public class MenuBoTest {
     @DisplayName("메뉴가격이 0원 이하이면, IllegalArgumentException이 발생한다.")
     @Test
     void createPriceUnderZero (){
-        Menu menu = new Menu.Builder()
+        Menu menu = new MenuBuilder()
             .id(1L)
             .name("뿌링클")
             .price(new BigDecimal(-1))
@@ -146,7 +147,7 @@ public class MenuBoTest {
     @DisplayName("메뉴에 메뉴그룹 설정을 잘못한 경우, IllegalArgumentException이 발생한다.")
     @Test
     void createMenuWrongMenuGroup(){
-        Menu menu = new Menu.Builder()
+        Menu menu = new MenuBuilder()
             .id(1L)
             .name("뿌링클")
             .price(new BigDecimal(10000))
@@ -162,7 +163,7 @@ public class MenuBoTest {
     @DisplayName("메뉴에 입력한 가격이 메뉴를 구성하는 제품 가격의 총 합보다 크면 Exception이 발생한다.")
     @Test
     void createPriceisGreaterThanAllMenuProduct(){
-        Menu menu = new Menu.Builder()
+        Menu menu = new MenuBuilder()
             .id(expectedMenu.getId())
             .name(expectedMenu.getName())
             .price(totalPrice.add(BigDecimal.valueOf(100000)))
