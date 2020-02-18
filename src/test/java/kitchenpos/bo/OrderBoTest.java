@@ -8,6 +8,8 @@ import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
+import kitchenpos.support.OrderBuilder;
+import kitchenpos.support.OrderLineItemBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +45,7 @@ class OrderBoTest {
     @DisplayName("주문에 주문목록이 없는경우 IllegalArgumenetException이 발생한다.")
     @Test
     void createWithoutOrderLineItems (){
-        Order order = new Order.Builder()
+        Order order = new OrderBuilder()
             .id(1L)
             .orderLineItems(null)
             .build();
@@ -55,18 +57,18 @@ class OrderBoTest {
     @DisplayName("메뉴목록에 중복이 있는경우 IllegalArgumentException이 발생한다.")
     @Test
     void createWithDuplicatedMenu (){
-        Order order = new Order.Builder()
+        Order order = new OrderBuilder()
             .id(1L)
             .orderLineItems(new ArrayList<>())
             .build();
 
-        OrderLineItem orderLineItem1 = new OrderLineItem.Builder()
+        OrderLineItem orderLineItem1 = new OrderLineItemBuilder()
             .seq(1L)
             .menuId(1L)
             .build();
         order.addOrderLineItem(orderLineItem1);
 
-        OrderLineItem orderLineItem2 = new OrderLineItem.Builder()
+        OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
             .seq(2L)
             .menuId(1L)
             .build();
@@ -86,19 +88,19 @@ class OrderBoTest {
     @DisplayName("주문에 입력한 주문테이블이 null 이라, IllegalArgumentException이 발생한다.")
     @Test
     void createWithoutOrderTable(){
-        Order order = new Order.Builder()
+        Order order = new OrderBuilder()
             .id(1L)
             .orderTableId(2L)
             .orderLineItems(new ArrayList<>())
             .build();
 
-        OrderLineItem orderLineItem1 = new OrderLineItem.Builder()
+        OrderLineItem orderLineItem1 = new OrderLineItemBuilder()
             .seq(1L)
             .menuId(1L)
             .build();
         order.addOrderLineItem(orderLineItem1);
 
-        OrderLineItem orderLineItem2 = new OrderLineItem.Builder()
+        OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
             .seq(2L)
             .menuId(1L)
             .build();
@@ -118,19 +120,19 @@ class OrderBoTest {
     @DisplayName("주문에 입력한 주문테이블이 이미 다른 손이 앉아있다면, IllegalArgumentException이 발생한다.")
     @Test
     void createWithOrderTableIsZero(){
-        Order order = new Order.Builder()
+        Order order = new OrderBuilder()
             .id(1L)
             .orderTableId(2L)
             .orderLineItems(new ArrayList<>())
             .build();
 
-        OrderLineItem orderLineItem1 = new OrderLineItem.Builder()
+        OrderLineItem orderLineItem1 = new OrderLineItemBuilder()
             .seq(1L)
             .menuId(1L)
             .build();
         order.addOrderLineItem(orderLineItem1);
 
-        OrderLineItem orderLineItem2 = new OrderLineItem.Builder()
+        OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
             .seq(2L)
             .menuId(1L)
             .build();
@@ -155,7 +157,7 @@ class OrderBoTest {
     @DisplayName("주문번호를 잘못 입력했을 때, IllegalArgumentException 이 발생한다.")
     @Test
     void changeOrderStatusWithWrongOrderId (){
-        Order order = new Order.Builder()
+        Order order = new OrderBuilder()
             .id(5L)
             .build();
 
@@ -168,13 +170,13 @@ class OrderBoTest {
     @DisplayName("주문테이블 상태가 COMPLETION 상태라면, IllegalArgumentException 이 발생한다.")
     @Test
     void changeOrderStatusEmptyTable(){
-        Order savedOrder = new Order.Builder()
+        Order savedOrder = new OrderBuilder()
             .id(1L)
             .orderTableId(1L)
             .orderStatus(OrderStatus.COMPLETION.name())
             .build();
 
-        Order newOrder = new Order.Builder()
+        Order newOrder = new OrderBuilder()
             .id(1L)
             .orderTableId(1L)
             .orderStatus(OrderStatus.COOKING.name())

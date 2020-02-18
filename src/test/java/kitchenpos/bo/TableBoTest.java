@@ -5,6 +5,7 @@ import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
+import kitchenpos.support.OrderBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -49,7 +50,7 @@ public class TableBoTest {
             .empty(false)
             .build();
 
-        order = new Order.Builder()
+        order = new OrderBuilder()
             .id(1L)
             .orderTableId(orderTable.getId())
             .orderStatus(OrderStatus.COOKING.name())
@@ -132,7 +133,7 @@ public class TableBoTest {
             .empty(false)
             .build();
 
-        order = new Order.Builder()
+        order = new OrderBuilder()
             .id(1L)
             .orderTableId(orderTable.getId())
             .orderStatus(status)
@@ -158,7 +159,7 @@ public class TableBoTest {
             .empty(false)
             .build();
 
-        order = new Order.Builder()
+        order = new OrderBuilder()
             .id(1L)
             .orderTableId(orderTable.getId())
             .orderStatus(OrderStatus.COMPLETION.name())
