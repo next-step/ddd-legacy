@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Repository
-public class OrderDao {
+public class OrderDao implements DefaultOrderDao {
     private static final String TABLE_NAME = "orders";
     private static final String KEY_COLUMN_NAME = "id";
 
@@ -33,6 +33,7 @@ public class OrderDao {
         ;
     }
 
+    @Override
     public Order save(final Order entity) {
         if (Objects.isNull(entity.getId())) {
             final SqlParameterSource parameters = new BeanPropertySqlParameterSource(entity);
@@ -43,6 +44,7 @@ public class OrderDao {
         return entity;
     }
 
+    @Override
     public Optional<Order> findById(final Long id) {
         try {
             return Optional.of(select(id));
@@ -51,11 +53,13 @@ public class OrderDao {
         }
     }
 
+    @Override
     public List<Order> findAll() {
         final String sql = "SELECT id, order_table_id, order_status, ordered_time FROM orders";
         return jdbcTemplate.query(sql, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
+    @Override
     public boolean existsByOrderTableIdAndOrderStatusIn(final Long orderTableId, final List<String> orderStatuses) {
         final String sql = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END" +
                 " FROM orders WHERE order_table_id = (:orderTableId) AND order_status IN (:orderStatuses)";
@@ -65,6 +69,7 @@ public class OrderDao {
         return jdbcTemplate.queryForObject(sql, parameters, Boolean.class);
     }
 
+    @Override
     public boolean existsByOrderTableIdInAndOrderStatusIn(final List<Long> orderTableIds, final List<String> orderStatuses) {
         final String sql = "SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END" +
                 " FROM orders WHERE order_table_id IN (:orderTableIds) AND order_status IN (:orderStatuses)";
