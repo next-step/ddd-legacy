@@ -8,6 +8,7 @@ import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
 import kitchenpos.support.MenuBuilder;
+import kitchenpos.support.MenuProductBuilder;
 import kitchenpos.support.ProductBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -62,7 +63,7 @@ public class MenuBoTest {
 
         //expected DataSet
         for(int i=1 ;i<=2; i++){
-            MenuProduct menuProduct = new MenuProduct.Builder()
+            MenuProduct menuProduct = new MenuProductBuilder()
                 .seq((long) i)
                 .menuId(1L)
                 .productId(products.get(i-1).getId())
@@ -86,7 +87,7 @@ public class MenuBoTest {
 
         //Actual DataSet
         for(int i=1 ;i<=2; i++){
-            MenuProduct menuProduct = new MenuProduct.Builder()
+            MenuProduct menuProduct = new MenuProductBuilder()
                 .seq((long) i)
                 .menuId(1L)
                 .productId(products.get(i-1).getId())

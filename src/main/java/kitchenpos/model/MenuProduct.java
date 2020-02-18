@@ -6,24 +6,21 @@ public class MenuProduct {
     private Long seq;
     private Long menuId;
     private Long productId;
-    private int quantity;
-
-    private MenuProduct (Builder builder){
-        this.seq = builder.seq;
-        this.menuId = builder.menuId;
-        this.productId = builder.productId;
-        this.quantity = builder.quantity;
-    }
+    private long quantity;
 
     public Long getSeq() {
         return seq;
+    }
+
+    public void setSeq(Long seq) {
+        this.seq = seq;
     }
 
     public Long getMenuId() {
         return menuId;
     }
 
-    public void setMenuId(Long menuId){
+    public void setMenuId(Long menuId) {
         this.menuId = menuId;
     }
 
@@ -31,8 +28,16 @@ public class MenuProduct {
         return productId;
     }
 
-    public int getQuantity() {
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public long getQuantity() {
         return quantity;
+    }
+
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
     }
 
     @Override
@@ -59,40 +64,5 @@ public class MenuProduct {
             ", productId=" + productId +
             ", quantity=" + quantity +
             '}';
-    }
-
-    public static class Builder {
-        private Long seq = 0L;
-        private Long menuId = 0L;
-        private Long productId = 0L;
-        private int quantity = 0;
-
-        public Builder(){
-
-        }
-
-        public Builder seq (Long seq){
-            this.seq = seq;
-            return this;
-        }
-
-        public Builder menuId (Long menuId){
-            this.menuId = menuId;
-            return this;
-        }
-
-        public Builder productId (Long productId){
-            this.productId = productId;
-            return this;
-        }
-
-        public Builder quantity (int quantity){
-            this.quantity = quantity;
-            return this;
-        }
-
-        public MenuProduct build(){
-            return new MenuProduct(this);
-        }
     }
 }
