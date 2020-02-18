@@ -46,7 +46,6 @@ class TableBoTest {
         orderTable.setId(1L);
         orderTable.setNumberOfGuests(3);
         orderTable.setEmpty(false);
-
         orderStatusList = Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name());
     }
 
@@ -124,7 +123,7 @@ class TableBoTest {
 
     @DisplayName("테이블이 테이블그룹에 속하면 빈테이블로 변경할 수 없다.")
     @Test
-    void shouldThrowIllegalArgumentException() {
+    void tableShouldNotBelongToOtherTableGroup() {
         orderTable.setTableGroupId(1L);
         given(orderTableDao.findById(anyLong()))
                 .willReturn(Optional.of(orderTable));
