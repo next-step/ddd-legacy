@@ -165,8 +165,8 @@ class MenuBoTest {
                 .willReturn(Collections.singletonList(menu));
 
         // when
-        List<Menu> menus = menuBo.list();
-        Menu actual = menus.get(0);
+        List<Menu> menuList = menuBo.list();
+        Menu actual = menuList.get(0);
 
         // then
         assertThat(actual).isNotNull();
