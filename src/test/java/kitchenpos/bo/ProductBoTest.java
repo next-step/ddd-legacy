@@ -41,7 +41,9 @@ public class ProductBoTest {
     @DisplayName("가격을 설정하지 않으면 IllegalArgumentException() 을 생성한다.")
     @Test
     void createPriceNull (){
-        Product newProduct = new ProductBuilder().build();
+        Product newProduct = new ProductBuilder()
+            .price(null)
+            .build();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productBo.create(newProduct));

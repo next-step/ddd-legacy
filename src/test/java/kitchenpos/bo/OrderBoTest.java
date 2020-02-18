@@ -10,6 +10,7 @@ import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import kitchenpos.support.OrderBuilder;
 import kitchenpos.support.OrderLineItemBuilder;
+import kitchenpos.support.OrderTableBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -142,7 +143,7 @@ class OrderBoTest {
         menuIds.add(1L);
         menuIds.add(1L);
 
-        OrderTable orderTable = new OrderTable.Builder()
+        OrderTable orderTable = new OrderTableBuilder()
             .id(1L)
             .empty(true)
             .build();

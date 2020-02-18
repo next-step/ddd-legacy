@@ -6,6 +6,8 @@ import kitchenpos.dao.TableGroupDao;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import kitchenpos.model.TableGroup;
+import kitchenpos.support.OrderTableBuilder;
+import kitchenpos.support.TableGroupBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,13 +44,13 @@ public class TableGroupBoTest {
     @BeforeAll
     static void setup() {
 
-        expectedTableGroup = new TableGroup.Builder()
+        expectedTableGroup = new TableGroupBuilder()
                 .id(1L)
                 .createdDate(LocalDateTime.now())
                 .orderTables(new ArrayList<>())
                 .build();
 
-        OrderTable expectedOrderTable1 = new OrderTable.Builder()
+        OrderTable expectedOrderTable1 = new OrderTableBuilder()
                 .id(1L)
                 .tableGroupId(1L)
                 .numberOfGuests(4)
@@ -56,7 +58,7 @@ public class TableGroupBoTest {
                 .build();
         expectedTableGroup.addOrderTable(expectedOrderTable1);
 
-        OrderTable expectedOrderTable2 = new OrderTable.Builder()
+        OrderTable expectedOrderTable2 = new OrderTableBuilder()
                 .id(2L)
                 .tableGroupId(1L)
                 .numberOfGuests(4)
@@ -69,7 +71,7 @@ public class TableGroupBoTest {
     @DisplayName("TableGroup 에 등록된 주문테이블이 없으면 IllegalArgumentException이 발생한다.")
     @Test
     void createWithEmptyOrderTable() {
-        TableGroup tableGroup = new TableGroup.Builder()
+        TableGroup tableGroup = new TableGroupBuilder()
                 .id(1L)
                 .orderTables(Collections.EMPTY_LIST)
                 .build();
@@ -81,12 +83,12 @@ public class TableGroupBoTest {
     @DisplayName("입력받은 TableGroup에서 orderTable 중복이 발생하면 IllegalArgumentException이 발생한다.")
     @Test
     void createDuplicatedOrderTable() {
-        TableGroup tableGroup = new TableGroup.Builder()
+        TableGroup tableGroup = new TableGroupBuilder()
                 .id(1L)
                 .orderTables(new ArrayList<>())
                 .build();
 
-        OrderTable orderTable1 = new OrderTable.Builder()
+        OrderTable orderTable1 = new OrderTableBuilder()
                 .id(1L)
                 .tableGroupId(null)
                 .numberOfGuests(4)
@@ -110,18 +112,18 @@ public class TableGroupBoTest {
     @DisplayName("주문테이블이 비어있지 않거나, TableGroupId가 설정된 경우 IllegalArgumentException이 발생한다.")
     @Test
     void createAssignedOrderTable() {
-        TableGroup tableGroup = new TableGroup.Builder()
+        TableGroup tableGroup = new TableGroupBuilder()
                 .id(1L)
                 .orderTables(new ArrayList<>())
                 .build();
 
-        OrderTable orderTable1 = new OrderTable.Builder()
+        OrderTable orderTable1 = new OrderTableBuilder()
                 .id(1L)
                 .tableGroupId(1L)
                 .numberOfGuests(4)
                 .empty(true)
                 .build();
-        OrderTable orderTable2 = new OrderTable.Builder()
+        OrderTable orderTable2 = new OrderTableBuilder()
                 .id(2L)
                 .tableGroupId(null)
                 .numberOfGuests(4)
@@ -135,7 +137,7 @@ public class TableGroupBoTest {
         orderTablesFromDb.add(orderTable1);
         orderTablesFromDb.add(orderTable2);
 
-        given(orderTableDao.findAllByIdIn(Arrays.asList(orderTable1.getId(), orderTable1.getId())))
+        given(orderTableDao.findAllByIdIn(Arrays.asList(orderTable1.getId(), orderTable2.getId())))
                 .willReturn(orderTablesFromDb);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -146,17 +148,17 @@ public class TableGroupBoTest {
     @Test
     void create() {
 
-        TableGroup tableGroup = new TableGroup.Builder()
+        TableGroup tableGroup = new TableGroupBuilder()
                 .orderTables(new ArrayList<>())
                 .build();
 
-        OrderTable orderTable1 = new OrderTable.Builder()
+        OrderTable orderTable1 = new OrderTableBuilder()
                 .id(1L)
                 .tableGroupId(null)
                 .numberOfGuests(4)
                 .empty(true)
                 .build();
-        OrderTable orderTable2 = new OrderTable.Builder()
+        OrderTable orderTable2 = new OrderTableBuilder()
                 .id(2L)
                 .tableGroupId(null)
                 .numberOfGuests(4)
@@ -174,7 +176,7 @@ public class TableGroupBoTest {
                 .willReturn(orderTablesFromDb);
 
         //expected
-        TableGroup expectedTableGroup = new TableGroup.Builder()
+        TableGroup expectedTableGroup = new TableGroupBuilder()
                 .id(1L)
                 .createdDate(LocalDateTime.now())
                 .orderTables(new ArrayList<>())
@@ -182,7 +184,7 @@ public class TableGroupBoTest {
 
         given(tableGroupDao.save(tableGroup)).willReturn(expectedTableGroup);
 
-        OrderTable expectedOrderTable1 = new OrderTable.Builder()
+        OrderTable expectedOrderTable1 = new OrderTableBuilder()
                 .id(1L)
                 .tableGroupId(1L)
                 .numberOfGuests(4)
@@ -190,7 +192,7 @@ public class TableGroupBoTest {
                 .build();
         expectedTableGroup.addOrderTable(expectedOrderTable1);
 
-        OrderTable expectedOrderTable2 = new OrderTable.Builder()
+        OrderTable expectedOrderTable2 = new OrderTableBuilder()
                 .id(2L)
                 .tableGroupId(1L)
                 .numberOfGuests(4)
@@ -210,14 +212,14 @@ public class TableGroupBoTest {
 
     @DisplayName("주문테이블의 상태가 COOKING 이거나 MEAL 상태면 그룹테이블 지정을 해지 할 수 없다.")
     @Test
-    public void deleteWithOrderTableStatusIsOccupied(final String orderStatus) {
-        TableGroup tableGroup = new TableGroup.Builder()
+    public void deleteWithOrderTableStatusIsOccupied() {
+        TableGroup tableGroup = new TableGroupBuilder()
                 .id(1L)
                 .orderTables(new ArrayList<>())
                 .createdDate(LocalDateTime.now())
                 .build();
 
-        OrderTable orderTable1 = new OrderTable.Builder()
+        OrderTable orderTable1 = new OrderTableBuilder()
                 .id(1L)
                 .tableGroupId(1L)
                 .numberOfGuests(4)
@@ -225,7 +227,7 @@ public class TableGroupBoTest {
                 .build();
         tableGroup.addOrderTable(orderTable1);
 
-        OrderTable orderTable2 = new OrderTable.Builder()
+        OrderTable orderTable2 = new OrderTableBuilder()
                 .id(2L)
                 .tableGroupId(1L)
                 .numberOfGuests(4)

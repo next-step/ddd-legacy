@@ -6,6 +6,7 @@ import kitchenpos.model.Order;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import kitchenpos.support.OrderBuilder;
+import kitchenpos.support.OrderTableBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ public class TableBoTest {
 
     @BeforeAll
     static void setup(){
-        orderTable = new OrderTable.Builder()
+        orderTable = new OrderTableBuilder()
             .id(1L)
             .tableGroupId(1L)
             .numberOfGuests(5)
@@ -61,13 +62,13 @@ public class TableBoTest {
     @DisplayName("주문테이블의 id값이 설정되어있지 않으면 주문테이블을 새로 생성한다.")
     @Test
     void createWithoutID (){
-        OrderTable orderTable = new OrderTable.Builder()
+        OrderTable orderTable = new OrderTableBuilder()
                 .tableGroupId(1L)
                 .numberOfGuests(5)
                 .empty(false)
                 .build();
 
-        OrderTable indexedOrderTable = new OrderTable.Builder()
+        OrderTable indexedOrderTable = new OrderTableBuilder()
                 .id(1L)
                 .tableGroupId(1L)
                 .numberOfGuests(5)
@@ -83,7 +84,7 @@ public class TableBoTest {
     @DisplayName("주문테이블의 id값이 이미 주문테이블에 있다면, 주문테이블을 정보를 업데이트한다.")
     @Test
     void createWithID (){
-        OrderTable indexedOrderTable = new OrderTable.Builder()
+        OrderTable indexedOrderTable = new OrderTableBuilder()
                 .id(1L)
                 .tableGroupId(1L)
                 .numberOfGuests(5)
@@ -109,7 +110,7 @@ public class TableBoTest {
     @DisplayName("OrderTable에 tableGroupId가 이미 설정되어 있으면 IllegalArgumentException이 발생한다.")
     @Test
     void changeEmptyTableGroupIdAlreadySet (){
-        orderTable = new OrderTable.Builder()
+        orderTable = new OrderTableBuilder()
             .id(1L)
             .tableGroupId(1L)
             .numberOfGuests(5)
@@ -126,7 +127,7 @@ public class TableBoTest {
     @ParameterizedTest
     @ValueSource(strings = {"COOKING", "MEAL"})
     void cannotChangeEmpty(final String status){
-        orderTable = new OrderTable.Builder()
+        orderTable = new OrderTableBuilder()
             .id(1L)
             .tableGroupId(1L)
             .numberOfGuests(5)
@@ -153,7 +154,7 @@ public class TableBoTest {
     @DisplayName("OrderTable의 상태를 Null로 변경한다.")
     @Test
     void changeEmpty(){
-        orderTable = new OrderTable.Builder()
+        orderTable = new OrderTableBuilder()
             .id(1L)
             .numberOfGuests(5)
             .empty(false)
@@ -182,7 +183,7 @@ public class TableBoTest {
     @DisplayName("손님의 수가 0이상이 아니면 IllegalArgumentException이 발생한다.")
     @Test
     void changeNumberOfGuestsNotNaturalNumber (){
-        OrderTable orderTable = new OrderTable.Builder()
+        OrderTable orderTable = new OrderTableBuilder()
             .id(1L)
             .tableGroupId(1L)
             .numberOfGuests(-1)
@@ -207,7 +208,7 @@ public class TableBoTest {
     @DisplayName("테이블이 비어있다면, IllegalArgumentException 이 발생한다.")
     @Test
     void changeNumberOfGeustWhenOrderTableisEmpty (){
-        OrderTable wrongOrderTable = new OrderTable.Builder()
+        OrderTable wrongOrderTable = new OrderTableBuilder()
             .id(1L)
             .tableGroupId(1L)
             .numberOfGuests(5)
@@ -222,7 +223,7 @@ public class TableBoTest {
     @ParameterizedTest
     @ValueSource(ints = {1,2,3,4,5})
     void changeNumberOfGuest(final int numberOfGuest){
-        OrderTable orderTable = new OrderTable.Builder()
+        OrderTable orderTable = new OrderTableBuilder()
             .id(1L)
             .tableGroupId(1L)
             .numberOfGuests(numberOfGuest)
