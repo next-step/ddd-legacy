@@ -1,5 +1,6 @@
 package kitchenpos.bo;
 
+import kitchenpos.dao.DefaultMenuGroupDao;
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.model.MenuGroup;
 import org.springframework.stereotype.Component;
@@ -9,9 +10,9 @@ import java.util.List;
 
 @Component
 public class MenuGroupBo {
-    private final MenuGroupDao menuGroupDao;
+    private final DefaultMenuGroupDao menuGroupDao;
 
-    public MenuGroupBo(final MenuGroupDao menuGroupDao) {
+    public MenuGroupBo(final DefaultMenuGroupDao menuGroupDao) {
         this.menuGroupDao = menuGroupDao;
     }
 

@@ -124,7 +124,7 @@ class MenuBoTest {
 
     @Test
     @DisplayName("모든 메뉴 리스트를 조회할 수 있다.")
-    void readAllOrderListTest() {
+    void readAllMenuListTest() {
         Menu menu = new Menu();
         menu.setId(1L);
         menu.setName("반반세트");
