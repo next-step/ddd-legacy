@@ -7,6 +7,7 @@ import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
+import kitchenpos.support.ProductBuilder;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +24,6 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuBoTest {
@@ -51,7 +51,7 @@ public class MenuBoTest {
     @BeforeAll
     static void setup(){
         for(int i=1; i<=2; i++){
-            Product product = new Product.Builder()
+            Product product = new ProductBuilder()
                 .id((long)i)
                 .name("치킨" + i)
                 .price(new BigDecimal(10000 + (1000*i)))
@@ -109,13 +109,10 @@ public class MenuBoTest {
     @DisplayName("메뉴 리스트를 불러온다.")
     @Test
     void list(){
-        when(menuDao.findAll()).thenReturn(actualMenus);
-        when(menuProductDao.findAllByMenuId(actualMenu.getId())).thenReturn(actualMenuProducts);
+        given(menuDao.findAll()).willReturn(actualMenus);
+        given(menuProductDao.findAllByMenuId(actualMenu.getId())).willReturn(actualMenuProducts);
 
         List<Menu> actual = menuBo.list();
-
-        System.out.println(actual.hashCode());
-        System.out.println(expectedMenus.hashCode());
 
         assertThat(actual).isEqualTo(expectedMenus);
     }
@@ -156,7 +153,7 @@ public class MenuBoTest {
             .menuGroupId(2L)
             .build();
 
-        when(menuGroupDao.existsById(menu.getMenuGroupId())).thenReturn(false);
+        given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(false);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> menuBo.create(menu));
