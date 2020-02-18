@@ -2,6 +2,7 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Product;
+import kitchenpos.support.ProductBuilder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +29,8 @@ public class ProductBoTest {
     @Test
     void createPriceZero (){
         //given
-        Product newProduct = new Product.Builder()
+        Product newProduct = new ProductBuilder()
+            .id(1L)
             .price(new BigDecimal(-1))
             .build();
 
@@ -39,7 +41,7 @@ public class ProductBoTest {
     @DisplayName("가격을 설정하지 않으면 IllegalArgumentException() 을 생성한다.")
     @Test
     void createPriceNull (){
-        Product newProduct = new Product.Builder().build();
+        Product newProduct = new ProductBuilder().build();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productBo.create(newProduct));
@@ -52,12 +54,12 @@ public class ProductBoTest {
         String name = "뿌링클;";
         BigDecimal price = new BigDecimal(20000);
 
-        Product newProduct = new Product.Builder()
+        Product newProduct = new ProductBuilder()
             .name(name)
             .price(price)
             .build();
 
-        Product expected = new Product.Builder()
+        Product expected = new ProductBuilder()
             .name(name)
             .price(price)
             .build();
