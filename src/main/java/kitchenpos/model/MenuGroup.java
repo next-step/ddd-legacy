@@ -1,13 +1,8 @@
 package kitchenpos.model;
 
 public class MenuGroup {
-    private final Long id;
-    private final String name;
-
-    private MenuGroup(Builder builder){
-        this.id = builder.id;
-        this.name = builder.name;
-    }
+    private Long id;
+    private String name;
 
     public Long getId() {
         return id;
@@ -17,22 +12,11 @@ public class MenuGroup {
         return name;
     }
 
-    public static class Builder {
-        private Long id;
-        private String name;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-        public Builder id (Long id){
-            this.id = id;
-            return this;
-        }
-
-        public Builder name (String name){
-            this.name = name;
-            return this;
-        }
-
-        public MenuGroup build(){
-            return new MenuGroup(this);
-        }
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -2,6 +2,7 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.model.MenuGroup;
+import kitchenpos.support.MenuGroupBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,11 +30,11 @@ public class MenuGroupBoTest {
 
     @BeforeEach
     void setup (){
-        request = new MenuGroup.Builder()
+        request = new MenuGroupBuilder()
             .name("두마리메뉴")
             .build();
 
-        result = new MenuGroup.Builder()
+        result = new MenuGroupBuilder()
             .id(1L)
             .name("두마리메뉴")
             .build();
