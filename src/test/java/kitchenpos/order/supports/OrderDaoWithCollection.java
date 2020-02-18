@@ -16,7 +16,6 @@ public class OrderDaoWithCollection implements OrderDao {
     private final Map<Long, Order> entities;
 
     public OrderDaoWithCollection() {
-        this.id = 0;
         this.entities = new HashMap<>();
     }
 
@@ -36,7 +35,7 @@ public class OrderDaoWithCollection implements OrderDao {
 
     @Override
     public Optional<Order> findById(Long id) {
-        return Optional.empty();
+        return Optional.ofNullable(entities.get(id));
     }
 
     @Override

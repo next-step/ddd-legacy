@@ -1,5 +1,6 @@
 package kitchenpos.menu.supports;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,6 +14,10 @@ public class MenuDaoWithCollection implements MenuDao {
 
     private long id = 0;
     private final Map<Long, Menu> entities;
+
+    public MenuDaoWithCollection() {
+        this.entities = new HashMap<>();
+    }
 
     public MenuDaoWithCollection(List<Menu> entities) {
         this.entities = entities.stream()
@@ -40,6 +45,9 @@ public class MenuDaoWithCollection implements MenuDao {
 
     @Override
     public long countByIdIn(List<Long> ids) {
-        return 0;
+        return ids.stream()
+                  .filter(entities::containsKey)
+                  .distinct()
+                  .count();
     }
 }
