@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
@@ -14,8 +13,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.given;
 
-@MockitoSettings(strictness = Strictness.LENIENT)
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 class MenuGroupBoTest {
 
     @Mock
@@ -31,7 +31,7 @@ class MenuGroupBoTest {
         MenuGroup item = new MenuGroup();
         item.setId(1L);
         item.setName("치킨");
-        Mockito.when(menuGroupDao.save(item)).thenReturn(item);
+        given(menuGroupDao.save(item)).willReturn(item);
 
         //when
         MenuGroup expected = menuGroupBo.create(item);
@@ -57,7 +57,7 @@ class MenuGroupBoTest {
         item3.setName("파스타");
 
         List<MenuGroup> menuGroups = Arrays.asList(item1, item2, item3);
-        Mockito.when(menuGroupDao.findAll()).thenReturn(menuGroups);
+        given(menuGroupDao.findAll()).willReturn(menuGroups);
 
         //when
         List<MenuGroup> actual = menuGroupBo.list();
