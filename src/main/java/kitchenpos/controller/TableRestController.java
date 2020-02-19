@@ -21,34 +21,34 @@ public class TableRestController {
         final OrderTable created = tableBo.create(orderTable);
         final URI uri = URI.create("/api/tables/" + created.getId());
         return ResponseEntity.created(uri)
-                .body(created)
-                ;
+            .body(created)
+            ;
     }
 
     @GetMapping("/api/tables")
     public ResponseEntity<List<OrderTable>> list() {
         return ResponseEntity.ok()
-                .body(tableBo.list())
-                ;
+            .body(tableBo.list())
+            ;
     }
 
     @PutMapping("/api/tables/{orderTableId}/empty")
     public ResponseEntity<OrderTable> changeEmpty(
-            @PathVariable final Long orderTableId,
-            @RequestBody final OrderTable orderTable
+        @PathVariable final Long orderTableId,
+        @RequestBody final OrderTable orderTable
     ) {
         return ResponseEntity.ok()
-                .body(tableBo.changeEmpty(orderTableId, orderTable))
-                ;
+            .body(tableBo.changeEmpty(orderTableId, orderTable))
+            ;
     }
 
     @PutMapping("/api/tables/{orderTableId}/number-of-guests")
     public ResponseEntity<OrderTable> changeNumberOfGuests(
-            @PathVariable final Long orderTableId,
-            @RequestBody final OrderTable orderTable
+        @PathVariable final Long orderTableId,
+        @RequestBody final OrderTable orderTable
     ) {
         return ResponseEntity.ok()
-                .body(tableBo.changeNumberOfGuests(orderTableId, orderTable))
-                ;
+            .body(tableBo.changeNumberOfGuests(orderTableId, orderTable))
+            ;
     }
 }

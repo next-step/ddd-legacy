@@ -36,6 +36,7 @@ public class MenuBo {
 
     @Transactional
     public Menu create(final Menu menu) {
+
         final BigDecimal price = menu.getPrice();
 
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
@@ -62,13 +63,14 @@ public class MenuBo {
         final Menu savedMenu = menuDao.save(menu);
 
         final Long menuId = savedMenu.getId();
+
         final List<MenuProduct> savedMenuProducts = new ArrayList<>();
         for (final MenuProduct menuProduct : menuProducts) {
             menuProduct.setMenuId(menuId);
             savedMenuProducts.add(menuProductDao.save(menuProduct));
         }
-        savedMenu.setMenuProducts(savedMenuProducts);
 
+        savedMenu.changeMenuProducts(savedMenuProducts);
         return savedMenu;
     }
 

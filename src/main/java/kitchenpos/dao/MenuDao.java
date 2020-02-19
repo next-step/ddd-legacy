@@ -26,8 +26,8 @@ public class MenuDao {
     public MenuDao(final DataSource dataSource) {
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         jdbcInsert = new SimpleJdbcInsert(dataSource)
-                .withTableName(TABLE_NAME)
-                .usingGeneratedKeyColumns(KEY_COLUMN_NAME)
+            .withTableName(TABLE_NAME)
+            .usingGeneratedKeyColumns(KEY_COLUMN_NAME)
         ;
     }
 
@@ -53,14 +53,14 @@ public class MenuDao {
     public long countByIdIn(final List<Long> ids) {
         final String sql = "SELECT COUNT(*) FROM menu WHERE id IN (:ids)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("ids", ids);
+            .addValue("ids", ids);
         return jdbcTemplate.queryForObject(sql, parameters, Long.class);
     }
 
     private Menu select(final Long id) {
         final String sql = "SELECT id, name, price, menu_group_id FROM menu WHERE id = (:id)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("id", id);
+            .addValue("id", id);
         return jdbcTemplate.queryForObject(sql, parameters, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 

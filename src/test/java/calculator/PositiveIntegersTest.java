@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 
+import static org.assertj.core.api.Assertions.*;
+
 public class PositiveIntegersTest {
 
     private static PositiveIntegers positiveIntegers = new PositiveIntegers(new ArrayList<>());
@@ -30,6 +32,20 @@ public class PositiveIntegersTest {
     void multiplyTest() {
         System.out.println(positiveIntegers.multiply());
         Assertions.assertThat(positiveIntegers.multiply()).isEqualTo(1 * 2 * 3 * 4);
+    }
+
+    @DisplayName("입력한 값이 없으면, RuntimeException이 발생한다.")
+    @Test
+    void sumRuntimeException(){
+        assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> new PositiveIntegers(new ArrayList<>()).sum());
+    }
+
+    @DisplayName("입력한 값이 없으면, RuntimeException이 발생한다.")
+    @Test
+    void multiplyRuntimeException (){
+        assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> new PositiveIntegers(new ArrayList<>()).multiply());
     }
 
 }

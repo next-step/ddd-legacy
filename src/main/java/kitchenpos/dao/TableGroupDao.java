@@ -27,8 +27,8 @@ public class TableGroupDao {
     public TableGroupDao(final DataSource dataSource) {
         jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
         jdbcInsert = new SimpleJdbcInsert(dataSource)
-                .withTableName(TABLE_NAME)
-                .usingGeneratedKeyColumns(KEY_COLUMN_NAME)
+            .withTableName(TABLE_NAME)
+            .usingGeneratedKeyColumns(KEY_COLUMN_NAME)
         ;
     }
 
@@ -54,7 +54,7 @@ public class TableGroupDao {
     private TableGroup select(final Long id) {
         final String sql = "SELECT id, created_date FROM table_group WHERE id = (:id)";
         final SqlParameterSource parameters = new MapSqlParameterSource()
-                .addValue("id", id);
+            .addValue("id", id);
         return jdbcTemplate.queryForObject(sql, parameters, (resultSet, rowNumber) -> toEntity(resultSet));
     }
 
