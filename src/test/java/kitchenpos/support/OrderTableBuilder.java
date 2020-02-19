@@ -8,27 +8,27 @@ public class OrderTableBuilder {
     private int numberOfGuests;
     private boolean empty;
 
-    public OrderTableBuilder id (Long id){
+    public OrderTableBuilder id(Long id) {
         this.id = id;
         return this;
     }
 
-    public OrderTableBuilder tableGroupId (Long tableGroupId){
+    public OrderTableBuilder tableGroupId(Long tableGroupId) {
         this.tableGroupId = tableGroupId;
         return this;
     }
 
-    public OrderTableBuilder numberOfGuests (int numberOfGuests){
+    public OrderTableBuilder numberOfGuests(int numberOfGuests) {
         this.numberOfGuests = numberOfGuests;
         return this;
     }
 
-    public OrderTableBuilder empty (boolean empty){
+    public OrderTableBuilder empty(boolean empty) {
         this.empty = empty;
         return this;
     }
 
-    public OrderTable build(){
+    public OrderTable build() {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(this.id);
         orderTable.setTableGroupId(this.tableGroupId);

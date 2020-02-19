@@ -8,27 +8,27 @@ public class MenuProductBuilder {
     private Long productId;
     private long quantity;
 
-    public MenuProductBuilder seq (Long seq){
+    public MenuProductBuilder seq(Long seq) {
         this.seq = seq;
         return this;
     }
 
-    public MenuProductBuilder menuId (Long menuId){
+    public MenuProductBuilder menuId(Long menuId) {
         this.menuId = menuId;
         return this;
     }
 
-    public MenuProductBuilder productId (Long productId){
+    public MenuProductBuilder productId(Long productId) {
         this.productId = productId;
         return this;
     }
 
-    public MenuProductBuilder quantity (int quantity){
+    public MenuProductBuilder quantity(int quantity) {
         this.quantity = quantity;
         return this;
     }
 
-    public MenuProduct build(){
+    public MenuProduct build() {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setSeq(this.seq);
         menuProduct.setMenuId(this.menuId);

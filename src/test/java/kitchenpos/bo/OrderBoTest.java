@@ -17,8 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class OrderBoTest {
 
     @Mock
@@ -45,7 +42,7 @@ class OrderBoTest {
 
     @DisplayName("주문에 주문목록이 없는경우 IllegalArgumenetException이 발생한다.")
     @Test
-    void createWithoutOrderLineItems (){
+    void createWithoutOrderLineItems() {
         Order order = new OrderBuilder()
             .id(1L)
             .orderLineItems(null)
@@ -57,7 +54,7 @@ class OrderBoTest {
 
     @DisplayName("메뉴목록에 중복이 있는경우 IllegalArgumentException이 발생한다.")
     @Test
-    void createWithDuplicatedMenu (){
+    void createWithDuplicatedMenu() {
         Order order = new OrderBuilder()
             .id(1L)
             .orderLineItems(new ArrayList<>())
@@ -88,7 +85,7 @@ class OrderBoTest {
 
     @DisplayName("주문에 입력한 주문테이블이 null 이라, IllegalArgumentException이 발생한다.")
     @Test
-    void createWithoutOrderTable(){
+    void createWithoutOrderTable() {
         Order order = new OrderBuilder()
             .id(1L)
             .orderTableId(2L)
@@ -120,7 +117,7 @@ class OrderBoTest {
 
     @DisplayName("주문에 입력한 주문테이블이 이미 다른 손이 앉아있다면, IllegalArgumentException이 발생한다.")
     @Test
-    void createWithOrderTableIsZero(){
+    void createWithOrderTableIsZero() {
         Order order = new OrderBuilder()
             .id(1L)
             .orderTableId(2L)
@@ -157,7 +154,7 @@ class OrderBoTest {
 
     @DisplayName("주문번호를 잘못 입력했을 때, IllegalArgumentException 이 발생한다.")
     @Test
-    void changeOrderStatusWithWrongOrderId (){
+    void changeOrderStatusWithWrongOrderId() {
         Order order = new OrderBuilder()
             .id(5L)
             .build();
@@ -170,7 +167,7 @@ class OrderBoTest {
 
     @DisplayName("주문테이블 상태가 COMPLETION 상태라면, IllegalArgumentException 이 발생한다.")
     @Test
-    void changeOrderStatusEmptyTable(){
+    void changeOrderStatusEmptyTable() {
         Order savedOrder = new OrderBuilder()
             .id(1L)
             .orderTableId(1L)
@@ -188,6 +185,4 @@ class OrderBoTest {
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> orderBo.changeOrderStatus(newOrder.getId(), newOrder));
     }
-
-
 }

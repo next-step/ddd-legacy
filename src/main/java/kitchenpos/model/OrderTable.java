@@ -46,9 +46,9 @@ public class OrderTable {
         if (o == null || getClass() != o.getClass()) return false;
         OrderTable that = (OrderTable) o;
         return numberOfGuests == that.numberOfGuests &&
-                empty == that.empty &&
-                Objects.equals(id, that.id) &&
-                Objects.equals(tableGroupId, that.tableGroupId);
+            empty == that.empty &&
+            Objects.equals(id, that.id) &&
+            Objects.equals(tableGroupId, that.tableGroupId);
     }
 
     @Override

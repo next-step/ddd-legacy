@@ -7,17 +7,17 @@ public class MenuGroupBuilder {
     private Long id;
     private String name;
 
-    public MenuGroupBuilder id (Long id){
+    public MenuGroupBuilder id(Long id) {
         this.id = id;
         return this;
     }
 
-    public MenuGroupBuilder name (String name){
+    public MenuGroupBuilder name(String name) {
         this.name = name;
         return this;
     }
 
-    public MenuGroup build(){
+    public MenuGroup build() {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(this.id);
         menuGroup.setName(this.name);

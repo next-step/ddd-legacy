@@ -32,7 +32,7 @@ public class TableGroup {
         this.orderTables = orderTables;
     }
 
-    public void addOrderTable (OrderTable orderTable){
+    public void addOrderTable(OrderTable orderTable) {
         this.orderTables.add(orderTable);
     }
 }

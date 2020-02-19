@@ -30,47 +30,46 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 public class MenuBoTest {
 
-    @Mock private MenuDao menuDao;
-    @Mock private MenuGroupDao menuGroupDao;
-    @Mock private MenuProductDao menuProductDao;
-    @Mock private ProductDao productDao;
-
-    @InjectMocks
-    private MenuBo menuBo;
-
     private static List<MenuProduct> expectedMenuProducts = new ArrayList<>();
     private static List<Menu> expectedMenus = new ArrayList<>();
     private static Menu expectedMenu;
-
     private static List<MenuProduct> actualMenuProducts = new ArrayList<>();
     private static List<Menu> actualMenus = new ArrayList<>();
     private static Menu actualMenu;
-
     private static List<Product> products = new ArrayList<>();
-
     private static BigDecimal totalPrice = BigDecimal.ZERO;
+    @Mock
+    private MenuDao menuDao;
+    @Mock
+    private MenuGroupDao menuGroupDao;
+    @Mock
+    private MenuProductDao menuProductDao;
+    @Mock
+    private ProductDao productDao;
+    @InjectMocks
+    private MenuBo menuBo;
 
     @BeforeAll
-    static void setup(){
-        for(int i=1; i<=2; i++){
+    static void setup() {
+        for (int i = 1; i <= 2; i++) {
             Product product = new ProductBuilder()
-                .id((long)i)
+                .id((long) i)
                 .name("치킨" + i)
-                .price(new BigDecimal(10000 + (1000*i)))
+                .price(new BigDecimal(10000 + (1000 * i)))
                 .build();
             products.add(product);
         }
 
         //expected DataSet
-        for(int i=1 ;i<=2; i++){
+        for (int i = 1; i <= 2; i++) {
             MenuProduct menuProduct = new MenuProductBuilder()
                 .seq((long) i)
                 .menuId(1L)
-                .productId(products.get(i-1).getId())
+                .productId(products.get(i - 1).getId())
                 .quantity(1)
                 .build();
 
-            totalPrice.add(products.get(i-1).getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
+            totalPrice.add(products.get(i - 1).getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
 
             expectedMenuProducts.add(menuProduct);
         }
@@ -86,11 +85,11 @@ public class MenuBoTest {
         expectedMenus.add(expectedMenu);
 
         //Actual DataSet
-        for(int i=1 ;i<=2; i++){
+        for (int i = 1; i <= 2; i++) {
             MenuProduct menuProduct = new MenuProductBuilder()
                 .seq((long) i)
                 .menuId(1L)
-                .productId(products.get(i-1).getId())
+                .productId(products.get(i - 1).getId())
                 .quantity(1)
                 .build();
 
@@ -110,7 +109,7 @@ public class MenuBoTest {
 
     @DisplayName("메뉴 리스트를 불러온다.")
     @Test
-    void list(){
+    void list() {
         given(menuDao.findAll()).willReturn(actualMenus);
         given(menuProductDao.findAllByMenuId(actualMenu.getId())).willReturn(actualMenuProducts);
 
@@ -121,7 +120,7 @@ public class MenuBoTest {
 
     @DisplayName("Menu 가격이 정해지지 않으면 IllegalArgumentException 이 발생한다.")
     @Test
-    void createPriceIsNull (){
+    void createPriceIsNull() {
         Menu menu = new MenuBuilder()
             .id(1L)
             .name("뿌링클")
@@ -134,7 +133,7 @@ public class MenuBoTest {
 
     @DisplayName("메뉴가격이 0원 이하이면, IllegalArgumentException이 발생한다.")
     @Test
-    void createPriceUnderZero (){
+    void createPriceUnderZero() {
         Menu menu = new MenuBuilder()
             .id(1L)
             .name("뿌링클")
@@ -147,7 +146,7 @@ public class MenuBoTest {
 
     @DisplayName("메뉴에 메뉴그룹 설정을 잘못한 경우, IllegalArgumentException이 발생한다.")
     @Test
-    void createMenuWrongMenuGroup(){
+    void createMenuWrongMenuGroup() {
         Menu menu = new MenuBuilder()
             .id(1L)
             .name("뿌링클")
@@ -163,7 +162,7 @@ public class MenuBoTest {
 
     @DisplayName("메뉴에 입력한 가격이 메뉴를 구성하는 제품 가격의 총 합보다 크면 Exception이 발생한다.")
     @Test
-    void createPriceisGreaterThanAllMenuProduct(){
+    void createPriceisGreaterThanAllMenuProduct() {
         Menu menu = new MenuBuilder()
             .id(expectedMenu.getId())
             .name(expectedMenu.getName())
@@ -184,7 +183,7 @@ public class MenuBoTest {
 
     @DisplayName("입력한 값과 출력한 값이 동일하다.")
     @Test
-    void create (){
+    void create() {
         given(menuGroupDao.existsById(expectedMenu.getMenuGroupId())).willReturn(true);
         given(productDao.findById(expectedMenu.getMenuProducts().get(0).getProductId()))
             .willReturn(Optional.ofNullable(products.get(0)));

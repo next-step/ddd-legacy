@@ -13,32 +13,32 @@ public class OrderBuilder {
     private LocalDateTime orderedTime;
     private List<OrderLineItem> orderLineItems;
 
-    public OrderBuilder id (Long id){
+    public OrderBuilder id(Long id) {
         this.id = id;
         return this;
     }
 
-    public OrderBuilder orderTableId(Long orderTableId){
+    public OrderBuilder orderTableId(Long orderTableId) {
         this.orderTableId = orderTableId;
         return this;
     }
 
-    public OrderBuilder orderStatus (String orderStatus){
+    public OrderBuilder orderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
         return this;
     }
 
-    public OrderBuilder orderedTime (LocalDateTime orderedTime){
+    public OrderBuilder orderedTime(LocalDateTime orderedTime) {
         this.orderedTime = orderedTime;
         return this;
     }
 
-    public OrderBuilder orderLineItems (List<OrderLineItem> orderLineItems){
-        this.orderLineItems= orderLineItems;
+    public OrderBuilder orderLineItems(List<OrderLineItem> orderLineItems) {
+        this.orderLineItems = orderLineItems;
         return this;
     }
 
-    public Order build(){
+    public Order build() {
         Order order = new Order();
         order.setId(this.id);
         order.setOrderTableId(this.orderTableId);

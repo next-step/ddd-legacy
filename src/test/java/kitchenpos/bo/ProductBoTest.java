@@ -27,31 +27,30 @@ public class ProductBoTest {
 
     @DisplayName("가격이 0원 이하이면 IllegalArgumentException() 을 생성한다.")
     @Test
-    void createPriceZero (){
-        //given
+    void createPriceZero() {
         Product newProduct = new ProductBuilder()
             .id(1L)
             .price(new BigDecimal(-1))
             .build();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> productBo.create(newProduct));
+            .isThrownBy(() -> productBo.create(newProduct));
     }
 
     @DisplayName("가격을 설정하지 않으면 IllegalArgumentException() 을 생성한다.")
     @Test
-    void createPriceNull (){
+    void createPriceNull() {
         Product newProduct = new ProductBuilder()
             .price(null)
             .build();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> productBo.create(newProduct));
+            .isThrownBy(() -> productBo.create(newProduct));
     }
 
     @DisplayName("제품 등록을 성공하면 name과 price가 동일하다.")
     @Test
-    void create(){
+    void create() {
 
         String name = "뿌링클;";
         BigDecimal price = new BigDecimal(20000);

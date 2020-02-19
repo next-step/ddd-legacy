@@ -11,22 +11,22 @@ public class TableGroupBuilder {
     private LocalDateTime createdDate;
     private List<OrderTable> orderTables;
 
-    public TableGroupBuilder id (Long id){
+    public TableGroupBuilder id(Long id) {
         this.id = id;
         return this;
     }
 
-    public TableGroupBuilder createdDate (LocalDateTime createdDate){
+    public TableGroupBuilder createdDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
         return this;
     }
 
-    public TableGroupBuilder orderTables (List<OrderTable> orderTables){
+    public TableGroupBuilder orderTables(List<OrderTable> orderTables) {
         this.orderTables = orderTables;
         return this;
     }
 
-    public TableGroup build(){
+    public TableGroup build() {
         TableGroup tableGroup = new TableGroup();
         tableGroup.setId(this.id);
         tableGroup.setCreatedDate(this.createdDate);

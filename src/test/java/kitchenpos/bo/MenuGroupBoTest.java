@@ -29,7 +29,7 @@ public class MenuGroupBoTest {
     private MenuGroup request, result;
 
     @BeforeEach
-    void setup (){
+    void setup() {
         request = new MenuGroupBuilder()
             .name("두마리메뉴")
             .build();
@@ -52,7 +52,7 @@ public class MenuGroupBoTest {
 
     @DisplayName("메뉴 그룹을 조회한다.")
     @Test
-    public void list(){
+    public void list() {
         //given
         List<MenuGroup> expected = new ArrayList<>();
         expected.add(result);

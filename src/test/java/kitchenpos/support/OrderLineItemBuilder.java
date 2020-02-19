@@ -8,27 +8,27 @@ public class OrderLineItemBuilder {
     private Long menuId;
     private long quantity;
 
-    public OrderLineItemBuilder seq (Long seq){
+    public OrderLineItemBuilder seq(Long seq) {
         this.seq = seq;
         return this;
     }
 
-    public OrderLineItemBuilder orderId(Long orderId){
+    public OrderLineItemBuilder orderId(Long orderId) {
         this.orderId = orderId;
         return this;
     }
 
-    public OrderLineItemBuilder menuId(Long menuId){
+    public OrderLineItemBuilder menuId(Long menuId) {
         this.menuId = menuId;
         return this;
     }
 
-    public OrderLineItemBuilder quantity(Long quantity){
+    public OrderLineItemBuilder quantity(Long quantity) {
         this.quantity = quantity;
         return this;
     }
 
-    public OrderLineItem build(){
+    public OrderLineItem build() {
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItem.setSeq(this.seq);
         orderLineItem.setOrderId(this.orderId);

@@ -50,7 +50,7 @@ public class Order {
         this.orderLineItems = orderLineItems;
     }
 
-    public void addOrderLineItem (OrderLineItem orderLineItem){
+    public void addOrderLineItem(OrderLineItem orderLineItem) {
         this.orderLineItems.add(orderLineItem);
     }
 }
