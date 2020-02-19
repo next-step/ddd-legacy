@@ -1,7 +1,7 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.OrderTableDao;
+import kitchenpos.dao.DefaultOrderDao;
+import kitchenpos.dao.DefaultOrderTableDao;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import org.springframework.stereotype.Component;
@@ -13,10 +13,10 @@ import java.util.Objects;
 
 @Component
 public class TableBo {
-    private final OrderDao orderDao;
-    private final OrderTableDao orderTableDao;
+    private final DefaultOrderDao orderDao;
+    private final DefaultOrderTableDao orderTableDao;
 
-    public TableBo(final OrderDao orderDao, final OrderTableDao orderTableDao) {
+    public TableBo(final DefaultOrderDao orderDao, final DefaultOrderTableDao orderTableDao) {
         this.orderDao = orderDao;
         this.orderTableDao = orderTableDao;
     }

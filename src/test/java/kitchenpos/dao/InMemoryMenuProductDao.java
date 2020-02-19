@@ -11,7 +11,7 @@ public class InMemoryMenuProductDao implements DefaultMenuProductDao {
     @Override
     public MenuProduct save(MenuProduct entity) {
         data.put(entity.getSeq(), entity);
-        return null;
+        return entity;
     }
 
     @Override
