@@ -112,7 +112,7 @@ class MenuBoTest {
 
     @Test
     @DisplayName("메뉴의 가격은 메뉴에 들어가는 요리의 가격의 합보다 클 수 없다.")
-    void createOverSumOfProductsPriceExceptionTest() {
+    void createWithOverSumOfProductsPriceExceptionTest() {
         Menu menu = new Menu();
         menu.setId(1L);
         menu.setName("반반세트");
