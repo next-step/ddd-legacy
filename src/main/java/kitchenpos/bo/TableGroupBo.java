@@ -1,8 +1,6 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.OrderTableDao;
-import kitchenpos.dao.TableGroupDao;
+import kitchenpos.dao.*;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import kitchenpos.model.TableGroup;
@@ -18,11 +16,11 @@ import java.util.stream.Collectors;
 
 @Component
 public class TableGroupBo {
-    private final OrderDao orderDao;
-    private final OrderTableDao orderTableDao;
-    private final TableGroupDao tableGroupDao;
+    private final DefaultOrderDao orderDao;
+    private final DefaultOrderTableDao orderTableDao;
+    private final DefaultTableGroupDao tableGroupDao;
 
-    public TableGroupBo(final OrderDao orderDao, final OrderTableDao orderTableDao, final TableGroupDao tableGroupDao) {
+    public TableGroupBo(final DefaultOrderDao orderDao, final DefaultOrderTableDao orderTableDao, final DefaultTableGroupDao tableGroupDao) {
         this.orderDao = orderDao;
         this.orderTableDao = orderTableDao;
         this.tableGroupDao = tableGroupDao;

@@ -27,7 +27,7 @@ public class InMemoryOrderLineItemDao implements DefaultOrderLineItemDao {
     @Override
     public List<OrderLineItem> findAllByOrderId(Long orderId) {
         return data.values().stream()
-                .filter(orderLineItem -> orderLineItem.getOrderId().equals(orderId))
+                .filter(orderLineItem -> orderId.equals(orderLineItem.getOrderId()))
                 .collect(Collectors.toList());
     }
 }

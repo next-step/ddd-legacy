@@ -34,7 +34,7 @@ public class InMemoryOrderTableDao implements DefaultOrderTableDao {
     @Override
     public List<OrderTable> findAllByTableGroupId(Long tableGroupId) {
         return data.values().stream()
-                .filter(orderTable -> orderTable.getTableGroupId().equals(tableGroupId))
+                .filter(orderTable -> tableGroupId.equals(orderTable.getTableGroupId()))
                 .collect(Collectors.toList());
     }
 

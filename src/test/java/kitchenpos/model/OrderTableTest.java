@@ -14,7 +14,7 @@ public class OrderTableTest {
         orderTable.setId(2L);
         orderTable.setEmpty(false);
         orderTable.setNumberOfGuests(4);
-        orderTable.setTableGroupId(1L);
+        orderTable.setTableGroupId(2L);
         return orderTable;
     }
 
@@ -23,7 +23,21 @@ public class OrderTableTest {
         orderTable.setId(3L);
         orderTable.setEmpty(false);
         orderTable.setNumberOfGuests(4);
-        orderTable.setTableGroupId(1L);
+        orderTable.setTableGroupId(2L);
+        return orderTable;
+    }
+
+    public static OrderTable ofEmpty() {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(4L);
+        orderTable.setEmpty(true);
+        return orderTable;
+    }
+
+    public static OrderTable ofAnotherEmpty() {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(5L);
+        orderTable.setEmpty(true);
         return orderTable;
     }
 }

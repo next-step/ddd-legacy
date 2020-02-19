@@ -98,7 +98,7 @@ class OrderBoTest {
 
     @Test
     @DisplayName("주문이 생성되면 주문은 요리중 상태를 갖는다.")
-    void createWithCookingStatusTest() {
+    void createOrderHavingCookingStatusTest() {
         Order order = OrderTest.ofOneHalfAndHalfInSingleTable();
         order = orderBo.create(order);
 

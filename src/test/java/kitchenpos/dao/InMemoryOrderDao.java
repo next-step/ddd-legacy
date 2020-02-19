@@ -28,7 +28,7 @@ public class InMemoryOrderDao implements DefaultOrderDao {
         return data.values().stream()
                 .anyMatch(order ->
                         orderStatuses.contains(order.getOrderStatus())
-                                && order.getOrderTableId().equals(orderTableId));
+                                && orderTableId.equals(order.getOrderTableId()));
     }
 
     @Override

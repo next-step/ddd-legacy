@@ -27,7 +27,7 @@ public class InMemoryMenuProductDao implements DefaultMenuProductDao {
     @Override
     public List<MenuProduct> findAllByMenuId(Long menuId) {
         return data.values().stream()
-                .filter(menuProduct -> menuProduct.getMenuId().equals(menuId))
+                .filter(menuProduct -> menuId.equals(menuProduct.getMenuId()))
                 .collect(Collectors.toList());
     }
 }
