@@ -13,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
@@ -24,8 +23,9 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 
-@MockitoSettings(strictness = Strictness.LENIENT)
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 class MenuBoTest {
 
     @Mock
@@ -54,7 +54,6 @@ class MenuBoTest {
     @BeforeEach
     void setUp() {
         prepareFixture();
-        prepareMockito();
     }
 
     void prepareFixture() {
@@ -94,20 +93,14 @@ class MenuBoTest {
         menu2.setPrice(BigDecimal.valueOf(20000));
     }
 
-    void prepareMockito() {
-        Mockito.when(menuGroupDao.existsById(menu1.getMenuGroupId())).thenReturn(true);
-        Mockito.when(menuGroupDao.existsById(menu2.getMenuGroupId())).thenReturn(true);
-        Mockito.when(productDao.findById(product.getId())).thenReturn(Optional.ofNullable(product));
-        Mockito.when(menuDao.save(menu1)).thenReturn(menu1);
-        Mockito.when(menuDao.save(menu2)).thenReturn(menu2);
-        Mockito.when(menuProductDao.save(menuProduct1)).thenReturn(menuProduct1);
-        Mockito.when(menuProductDao.save(menuProduct2)).thenReturn(menuProduct2);
-    }
-
     @DisplayName("사용자는 메뉴를 등록할 수 있고, 등록이 완료되면 등록된 메뉴 정보를 반환받아 확인할 수 있다")
     @Test
     void create() {
         //given
+        given(menuGroupDao.existsById(menu1.getMenuGroupId())).willReturn(true);
+        given(productDao.findById(product.getId())).willReturn(Optional.ofNullable(product));
+        given(menuDao.save(menu1)).willReturn(menu1);
+        given(menuProductDao.save(menuProduct1)).willReturn(menuProduct1);
         //when
         Menu actual = menuBo.create(menu1);
 
@@ -141,10 +134,9 @@ class MenuBoTest {
     @Test
     void create_menu_with_menu_group() {
         //given
-        Mockito.when(menuGroupDao.existsById(menu1.getMenuGroupId())).thenReturn(false);
+        given(menuGroupDao.existsById(menu1.getMenuGroupId())).willReturn(false);
 
-        //when
-        //then
+        //when & then
         assertThatThrownBy(() -> {
             menuBo.create(menu1);
         }).isInstanceOf(IllegalArgumentException.class);
@@ -153,11 +145,7 @@ class MenuBoTest {
     @DisplayName("등록되지 않은 음식을 '메뉴 구성 음식'에 포함시킬 수 없다")
     @Test
     void create_menu_with_menu_products() {
-        //given
-        Mockito.when(productDao.findById(product.getId())).thenReturn(Optional.empty());
-
-        //when
-        //then
+        //when & then
         assertThatThrownBy(() -> {
             menuBo.create(menu1);
         }).isInstanceOf(IllegalArgumentException.class);
@@ -169,8 +157,7 @@ class MenuBoTest {
         //given
         menu1.setPrice(BigDecimal.valueOf(100000));
 
-        //when
-        //then
+        //when & then
         assertThatThrownBy(() -> {
             menuBo.create(menu1);
         }).isInstanceOf(IllegalArgumentException.class);
@@ -180,8 +167,13 @@ class MenuBoTest {
     @Test
     void create_menu_with_menu_product() {
         //given
-        //when
+        given(menuGroupDao.existsById(menu1.getMenuGroupId())).willReturn(true);
+        given(productDao.findById(menu1.getId())).willReturn(Optional.of(product));
+        given(menuDao.save(menu1)).willReturn(menu1);
+        given(menuProductDao.save(menuProduct1)).willReturn(menuProduct1);
         Menu menu = menuBo.create(menu1);
+
+        //when
         List<MenuProduct> actual = menu.getMenuProducts();
 
         //then
@@ -197,7 +189,7 @@ class MenuBoTest {
     @Test
     void list() {
         //given
-        Mockito.when(menuDao.findAll()).thenReturn(Arrays.asList(menu1, menu2));
+        given(menuDao.findAll()).willReturn(Arrays.asList(menu1, menu2));
 
         //when
         List<Menu> actual = menuBo.list();
