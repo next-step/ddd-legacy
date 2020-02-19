@@ -12,8 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MenuGroupBoTest {
 
-    DefaultMenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
-    MenuGroupBo menuGroupBo;
+    private DefaultMenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
+    private MenuGroupBo menuGroupBo;
 
     @BeforeEach
     void setUp() {

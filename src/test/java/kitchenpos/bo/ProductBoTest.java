@@ -14,8 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ProductBoTest {
-    DefaultProductDao productDao = new InMemoryProductDao();
-    ProductBo productBo;
+    private DefaultProductDao productDao = new InMemoryProductDao();
+    private ProductBo productBo;
 
     @BeforeEach
     void setUp() {

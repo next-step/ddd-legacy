@@ -14,27 +14,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MenuBoTest {
 
-    DefaultMenuDao menuDao = new InMemoryMenuDao();
-    DefaultMenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
-    DefaultMenuProductDao menuProductDao = new InMemoryMenuProductDao();
-    DefaultProductDao productDao = new InMemoryProductDao();
+    private DefaultMenuDao menuDao = new InMemoryMenuDao();
+    private DefaultMenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
+    private DefaultMenuProductDao menuProductDao = new InMemoryMenuProductDao();
+    private DefaultProductDao productDao = new InMemoryProductDao();
 
-    MenuBo menuBo;
-    Product halfFried;
-    Product halfChilly;
-    MenuProduct halfFriedProduct;
-    MenuProduct halfChillyProduct;
+    private MenuBo menuBo;
 
     @BeforeEach
     void setUp() {
         menuBo = new MenuBo(menuDao, menuGroupDao, menuProductDao, productDao);
         menuGroupDao.save(MenuGroupTest.ofSet());
 
-        halfFried = productDao.save(ProductTest.ofHalfFried());
-        halfChilly = productDao.save(ProductTest.ofHalfChilly());
+        productDao.save(ProductTest.ofHalfFried());
+        productDao.save(ProductTest.ofHalfChilly());
 
-        halfFriedProduct = menuProductDao.save(MenuProductTest.ofHalfFriedProduct());
-        halfChillyProduct = menuProductDao.save(MenuProductTest.ofHalfChillyProduct());
+        menuProductDao.save(MenuProductTest.ofHalfFriedProduct());
+        menuProductDao.save(MenuProductTest.ofHalfChillyProduct());
     }
 
     @Test

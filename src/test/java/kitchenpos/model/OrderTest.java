@@ -3,14 +3,19 @@ package kitchenpos.model;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
+import static kitchenpos.model.OrderTableTest.FIRST_OF_MULTI_TABLE_ID;
+import static kitchenpos.model.OrderTableTest.SINGLE_TABLE_ID;
+
 public class OrderTest {
+    static final Long SINGLE_TABLE_ORDER_ID = 1L;
+    static final Long TABLE_GROUP_ORDER_ID = 2L;
 
     public static Order ofOneHalfAndHalfInSingleTable() {
         Order order = new Order();
-        order.setId(1L);
+        order.setId(SINGLE_TABLE_ORDER_ID);
         order.setOrderStatus(OrderStatus.COOKING.toString());
         order.setOrderedTime(LocalDateTime.now());
-        order.setOrderTableId(OrderTableTest.ofSingle().getId());
+        order.setOrderTableId(SINGLE_TABLE_ID);
         order.setOrderLineItems(
                 Arrays.asList(OrderLineItemTest.of())
         );
@@ -19,10 +24,10 @@ public class OrderTest {
 
     public static Order ofOneHalfAndHalfInTableGroup() {
         Order order = new Order();
-        order.setId(2L);
+        order.setId(TABLE_GROUP_ORDER_ID);
         order.setOrderStatus(OrderStatus.COOKING.toString());
         order.setOrderedTime(LocalDateTime.now());
-        order.setOrderTableId(OrderTableTest.ofFirstOfMulti().getId());
+        order.setOrderTableId(FIRST_OF_MULTI_TABLE_ID);
         order.setOrderLineItems(
                 Arrays.asList(OrderLineItemTest.of())
         );

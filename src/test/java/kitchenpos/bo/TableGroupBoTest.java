@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TableGroupBoTest {
 
-    DefaultTableGroupDao tableGroupDao = new InMemoryTableGroupDao();
-    DefaultOrderTableDao orderTableDao = new InMemoryOrderTableDao();
-    DefaultOrderDao orderDao = new InMemoryOrderDao();
-    TableGroupBo tableGroupBo;
+    private DefaultTableGroupDao tableGroupDao = new InMemoryTableGroupDao();
+    private DefaultOrderTableDao orderTableDao = new InMemoryOrderTableDao();
+    private DefaultOrderDao orderDao = new InMemoryOrderDao();
+    private TableGroupBo tableGroupBo;
 
     @BeforeEach
     void setUp() {

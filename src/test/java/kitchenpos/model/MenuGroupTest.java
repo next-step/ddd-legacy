@@ -1,9 +1,11 @@
 package kitchenpos.model;
 
 public class MenuGroupTest {
+    static final Long SET_MENU_GROUP_ID = 1L;
+
     public static MenuGroup ofSet() {
         MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(1L);
+        menuGroup.setId(SET_MENU_GROUP_ID);
         menuGroup.setName("세트메뉴");
         return menuGroup;
     }

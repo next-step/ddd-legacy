@@ -13,37 +13,35 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OrderBoTest {
 
-    DefaultMenuDao menuDao = new InMemoryMenuDao();
-    DefaultOrderDao orderDao = new InMemoryOrderDao();
-    DefaultOrderLineItemDao orderLineItemDao = new InMemoryOrderLineItemDao();
-    DefaultOrderTableDao orderTableDao = new InMemoryOrderTableDao();
-    DefaultMenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
-    DefaultMenuProductDao menuProductDao = new InMemoryMenuProductDao();
-    DefaultProductDao productDao = new InMemoryProductDao();
+    private DefaultMenuDao menuDao = new InMemoryMenuDao();
+    private DefaultOrderDao orderDao = new InMemoryOrderDao();
+    private DefaultOrderLineItemDao orderLineItemDao = new InMemoryOrderLineItemDao();
+    private DefaultOrderTableDao orderTableDao = new InMemoryOrderTableDao();
+    private DefaultMenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
+    private DefaultMenuProductDao menuProductDao = new InMemoryMenuProductDao();
+    private DefaultProductDao productDao = new InMemoryProductDao();
 
-    OrderBo orderBo;
-    OrderLineItem orderLineItem;
+    private OrderBo orderBo;
 
-    OrderTable orderTable;
-    Menu menu;
+    private OrderTable orderTable;
 
     @BeforeEach
     void setUp() {
         orderBo = new OrderBo(menuDao, orderDao, orderLineItemDao, orderTableDao);
 
-        MenuGroup menuGroup = menuGroupDao.save(MenuGroupTest.ofSet());
+        menuGroupDao.save(MenuGroupTest.ofSet());
 
-        Product halfFried = productDao.save(ProductTest.ofHalfFried());
-        Product halfChilly = productDao.save(ProductTest.ofHalfChilly());
+        productDao.save(ProductTest.ofHalfFried());
+        productDao.save(ProductTest.ofHalfChilly());
 
-        MenuProduct halfFriedProduct = menuProductDao.save(MenuProductTest.ofHalfFriedProduct());
-        MenuProduct halfChillyProduct = menuProductDao.save(MenuProductTest.ofHalfChillyProduct());
+        menuProductDao.save(MenuProductTest.ofHalfFriedProduct());
+        menuProductDao.save(MenuProductTest.ofHalfChillyProduct());
 
-        menu = menuDao.save(MenuTest.ofHalfAndHalf());
+        menuDao.save(MenuTest.ofHalfAndHalf());
 
         orderTable = orderTableDao.save(OrderTableTest.ofSingle());
 
-        orderLineItem = orderLineItemDao.save(OrderLineItemTest.of());
+        orderLineItemDao.save(OrderLineItemTest.of());
     }
 
     @Test
