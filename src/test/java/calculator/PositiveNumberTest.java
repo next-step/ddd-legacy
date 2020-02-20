@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-class NumberTest {
+class PositiveNumberTest {
     private static final Stream<Arguments> throwWithNonNumericExceptionArguments() {
         return Stream.of(
                 arguments(Arrays.asList("-1", "2", "3")),
@@ -24,6 +24,6 @@ class NumberTest {
     @MethodSource("throwWithNonNumericExceptionArguments")
     @DisplayName("숫자 이외의 값 또는 음수는 RuntimeException을 발생한다.")
     void throwWithNonNumericException(List<String> inputs) {
-        assertThrows(IllegalArgumentException.class, () -> new Number(inputs));
+        assertThrows(IllegalArgumentException.class, () -> new PositiveNumber(inputs));
     }
 }

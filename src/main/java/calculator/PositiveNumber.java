@@ -4,15 +4,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Number {
+public class PositiveNumber {
     private static final Pattern NUMERIC_PATTERN = Pattern.compile("[+]?\\d+");
     private int value;
 
-    Number(List<String> strings) {
+    PositiveNumber(List<String> strings) {
         this.value = sum(strings);
     }
 
-    private Number(String stringNumber) {
+    private PositiveNumber(String stringNumber) {
         this.value = parsePositiveInt(stringNumber);
     }
 
@@ -22,13 +22,13 @@ public class Number {
 
     private int sum(List<String> strings) {
         for (String string : strings) {
-            add(new Number(string));
+            add(new PositiveNumber(string));
         }
         return this.value;
     }
 
-    private void add(Number added) {
-        this.value += added.getValue();
+    private void add(PositiveNumber added) {
+        this.value += added.value;
     }
 
     private Integer parsePositiveInt(String string) {

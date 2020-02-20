@@ -18,8 +18,8 @@ public class StringCalculator {
             return 0;
         }
         List<String> inputs = splitInputs(input);
-        Number number = new Number(inputs);
-        return number.getValue();
+        PositiveNumber positiveNumber = new PositiveNumber(inputs);
+        return positiveNumber.getValue();
     }
 
     private List<String> splitInputs(String input) {
