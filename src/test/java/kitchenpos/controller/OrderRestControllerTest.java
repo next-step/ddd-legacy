@@ -34,7 +34,7 @@ class OrderRestControllerTest {
     private OrderBo orderBo;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @DisplayName("주문을 생성할 수 있어야 한다.")
     @Test

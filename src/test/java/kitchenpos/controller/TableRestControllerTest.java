@@ -34,7 +34,7 @@ class TableRestControllerTest {
     TableBo tableBo;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @DisplayName("테이블을 생성할 수 있어야 한다.")
     @Test

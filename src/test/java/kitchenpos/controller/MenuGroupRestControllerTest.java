@@ -33,7 +33,7 @@ class MenuGroupRestControllerTest {
     private MenuGroupBo menuGroupBo;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @DisplayName("메뉴 그룹을 생성할 수 있어야 한다.")
     @Test

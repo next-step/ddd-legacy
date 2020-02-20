@@ -34,7 +34,7 @@ class ProductRestControllerTest {
     private ProductBo productBo;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @DisplayName("상품을 생성할 수 있어야 한다.")
     @Test

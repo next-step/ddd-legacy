@@ -34,7 +34,7 @@ class TableGroupRestControllerTest {
     private TableGroupBo tableGroupBo;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @DisplayName("테이블 그룹을 생성할 수 있어야 한다.")
     @Test

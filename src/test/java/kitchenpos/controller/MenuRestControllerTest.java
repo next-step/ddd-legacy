@@ -35,7 +35,7 @@ class MenuRestControllerTest {
     private MenuBo menuBo;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     @DisplayName("메뉴 생성할 수 있어야 한다.")
     @Test
