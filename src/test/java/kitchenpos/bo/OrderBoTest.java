@@ -20,9 +20,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
@@ -43,28 +45,50 @@ class OrderBoTest {
 
     private Order defaultOrder;
     private List<OrderLineItem> defaultOrderLineItems;
+    private List<Long> defaultMenuIdsOfOrderLineItems;
+
     @BeforeEach
     public void setUP() {
         defaultOrder = Fixtures.getOrder(1L, LocalDateTime.now(), getDefaultOrderLineItem(), OrderStatus.MEAL.name(), 1L);
         defaultOrderLineItems = getDefaultOrderLineItem();
+        defaultMenuIdsOfOrderLineItems = defaultOrderLineItems.stream()
+                .map(OrderLineItem::getMenuId)
+                .collect(Collectors.toList());
+    }
+
+    @DisplayName("정상적인 값으로 주문이 생성된다.")
+    @Test
+    public void createNormal() {
+
     }
 
     @DisplayName("주문된 메뉴가 1개 이상 있어야 한다.")
     @Test
     public void createNoEmptyOrder() {
         Order order = Fixtures.getOrder(1L, LocalDateTime.now(), new ArrayList<>(), OrderStatus.MEAL.name(), 1L);
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(order));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(order));
     }
 
     @DisplayName("주문된 메뉴는 반드시 팔고 있는 메뉴여야 한다.")
     @Test
     public void createWithMenus() {
-        final List<Long> menuIds = defaultOrderLineItems.stream()
-                .map(OrderLineItem::getMenuId)
-                .collect(Collectors.toList());
+        given(menuDao.countByIdIn(defaultMenuIdsOfOrderLineItems)).willReturn(1L);
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(defaultOrder));
+    }
 
-        given(menuDao.countByIdIn(menuIds)).willReturn(1L);
-        Assertions.assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(defaultOrder));
+    @DisplayName("주문된 테이블이 식당에 존재하는 테이블이어야 한다.")
+    @Test
+    public void createWithTable() {
+        given(menuDao.countByIdIn(defaultMenuIdsOfOrderLineItems))
+                .willReturn(Long.valueOf(defaultMenuIdsOfOrderLineItems.size()));
+        given(orderTableDao.findById(defaultOrder.getOrderTableId())).willReturn(Optional.empty());
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(defaultOrder));
+    }
+
+    @DisplayName("주문 상태가 완료로 변경된 것은 상태를 변경할 수 없다.")
+    @Test
+    public void changeOrderStatus() {
+
     }
 
     private List<OrderLineItem> getDefaultOrderLineItem() {
