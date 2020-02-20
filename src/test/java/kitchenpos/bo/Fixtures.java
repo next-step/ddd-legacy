@@ -14,8 +14,8 @@ import java.util.List;
  */
 public class Fixtures {
 
-    public static final long FIRST_ID = 1l;
-    public static final long SECOND_ID = 2l;
+    public static final long FIRST_ID = 1L;
+    public static final long SECOND_ID = 2L;
     public static final int QUANTITY_ONE = 1;
 
     public static List<Product> products = Collections.emptyList();
@@ -27,7 +27,14 @@ public class Fixtures {
 
     @BeforeAll
     public static void setUp() {
-        /* 상품 등록 */
+        makeProduct();
+        makeMenuGroup();
+        makeMenu();
+        makeMenuProduct();
+        makeOrderTable();
+    }
+
+    private static void makeProduct() {
         final Product product = new Product();
         product.setId(FIRST_ID);
         product.setName("짜장면");
@@ -39,8 +46,9 @@ public class Fixtures {
         product1.setPrice(BigDecimal.valueOf(7000));
 
         products = Arrays.asList(product, product1);
+    }
 
-        /* 메뉴 그룹 등록 */
+    private static void makeMenuGroup() {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(FIRST_ID);
         menuGroup.setName("면 요리 세트");
@@ -50,17 +58,19 @@ public class Fixtures {
         menuGroup1.setName("밥 요리 세트");
 
         menuGroups = Arrays.asList(menuGroup, menuGroup1);
+    }
 
-        /* 메뉴 등록 */
+    private static void makeMenu() {
         final Menu newMenu = new Menu();
         newMenu.setId(FIRST_ID);
         newMenu.setName("메뉴");
-        newMenu.setPrice(product.getPrice().add(product1.getPrice()));
+        newMenu.setPrice(products.get(0).getPrice().add(products.get(1).getPrice()));
         newMenu.setMenuGroupId(menuGroups.get(0).getId());
 
         menu = newMenu;
+    }
 
-        /* 메뉴 상품 등록 */
+    private static void makeMenuProduct() {
         final MenuProduct menuProduct = new MenuProduct();
         menuProduct.setSeq(FIRST_ID);
         menuProduct.setMenuId(FIRST_ID);
@@ -74,8 +84,9 @@ public class Fixtures {
         menuProduct1.setQuantity(QUANTITY_ONE);
 
         menuProducts = Arrays.asList(menuProduct, menuProduct1);
+    }
 
-        /* 주문 테이블 등록 */
+    private static void makeOrderTable() {
         final OrderTable newOrderTable = new OrderTable();
         newOrderTable.setId(FIRST_ID);
         newOrderTable.setTableGroupId(FIRST_ID);

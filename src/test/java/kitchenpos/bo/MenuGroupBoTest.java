@@ -27,7 +27,6 @@ class MenuGroupBoTest extends Fixtures {
     @InjectMocks
     private MenuGroupBo menuGroupBo;
 
-
     @Test
     @DisplayName("메뉴 그룹을 등록 할 수 있다.")
     void create() {
@@ -53,5 +52,4 @@ class MenuGroupBoTest extends Fixtures {
         assertThat(menuGroupList).isNotEmpty();
         assertThat(menuGroupList.size()).isEqualTo(result.size());
     }
-
 }

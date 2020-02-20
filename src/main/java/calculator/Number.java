@@ -16,8 +16,8 @@ public class Number {
 
     public Number(final int value) {
         Objects.requireNonNull(value, "can not be null");
-        this.value = value;
         validateNumber();
+        this.value = value;
     }
 
     public int getValue() {
@@ -35,6 +35,6 @@ public class Number {
     }
 
     public Number sum(final Number number) {
-        return new Number(value + number.getValue());
+        return new Number(value + number.value);
     }
 }
