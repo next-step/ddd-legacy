@@ -1,13 +1,11 @@
-package kitchenpos.bo;
+package kitchenpos.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kitchenpos.bo.ProductBo;
 import kitchenpos.model.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.converter.ArgumentConversionException;
-import org.junit.jupiter.params.converter.ConvertWith;
-import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +14,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.util.NestedServletException;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -31,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class ProductBoTest {
+class ProductRestControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -59,13 +54,13 @@ class ProductBoTest {
                 .andExpect(jsonPath("id").exists())
                 .andExpect(jsonPath("name").value(productName))
                 .andExpect(jsonPath("price").value("17000.0"))
-                ;
+        ;
     }
 
     @DisplayName("상품 가격이 0 보다 작을 경우 생성 실패")
     @ParameterizedTest
-    @ValueSource(ints = -1000)
-    void createFailByNegative(@ConvertWith(BigdecimalConverter.class) BigDecimal price) throws Exception {
+    @ValueSource(strings = "-1000")
+    void createFailByNegative(BigDecimal price) {
         String productName = "양념치킨";
         Product product = createProduct(productName, price);
 
@@ -75,7 +70,7 @@ class ProductBoTest {
                     .content(objectMapper.writeValueAsString(product)))
                     .andDo(print())
                     .andExpect(status().is5xxServerError())
-                    ;
+            ;
         });
     }
 
@@ -91,7 +86,7 @@ class ProductBoTest {
                     .content(objectMapper.writeValueAsString(product)))
                     .andDo(print())
                     .andExpect(status().is5xxServerError())
-                    ;
+            ;
         });
     }
 
@@ -108,7 +103,7 @@ class ProductBoTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[*].name").exists())
-                ;
+        ;
 
     }
 
@@ -119,12 +114,5 @@ class ProductBoTest {
         product.setPrice(price);
 
         return product;
-    }
-
-    static class BigdecimalConverter extends SimpleArgumentConverter {
-        @Override
-        protected Object convert(Object o, Class<?> aClass) throws ArgumentConversionException {
-            return new BigDecimal(Integer.parseInt(o.toString()));
-        }
     }
 }

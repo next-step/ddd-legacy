@@ -1,7 +1,7 @@
 package kitchenpos.fake;
 
+import kitchenpos.TestFixture;
 import kitchenpos.bo.OrderBo;
-import kitchenpos.builder.*;
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderLineItemDao;
@@ -13,11 +13,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FakeOrderBoTest {
@@ -40,61 +40,15 @@ public class FakeOrderBoTest {
     @DisplayName("새로운 주문 등록")
     @Test
     void create() {
-        OrderLineItem orderLineItem1 = new OrderLineItemBuilder()
-                .setOrderId(1L)
-                .setQuantity(3)
-                .setMenuId(1L)
-                .setSeq(1L)
-                .build()
-                ;
+        OrderLineItem orderLineItem1 = TestFixture.generateOrderLineItemOne();
+        OrderLineItem orderLineItem2 = TestFixture.generateOrderLineItemTwo();
 
-        OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
-                .setOrderId(2L)
-                .setQuantity(1)
-                .setMenuId(2L)
-                .setSeq(2L)
-                .build()
-                ;
+        Order requestOrder = TestFixture.generateOrderOne();
 
-        List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
+        Menu menu1 = TestFixture.generateMenuOne();
+        Menu menu2 = TestFixture.generateMenuTwo();
 
-        Order requestOrder = new OrderBuilder()
-                .setId(1L)
-                .setOrderLineItems(orderLineItems)
-                .setOrderTableId(1L)
-                .build()
-                ;
-
-        MenuProduct menuProduct = new MenuProductBuilder()
-                .setMenuId(1L)
-                .setQuantity(2)
-                .setSeq(1L)
-                .setProductId(1L)
-                .build();
-
-        Menu menu1 = new MenuBuilder()
-                .setId(1L)
-                .setMenuGroupId(1L)
-                .setMenuProducts(Arrays.asList(menuProduct))
-                .setPrice(BigDecimal.TEN)
-                .setName("후라이드 치킨")
-                .build()
-                ;
-
-        Menu menu2 = new MenuBuilder()
-                .setId(2L)
-                .setMenuGroupId(1L)
-                .setMenuProducts(Arrays.asList(menuProduct))
-                .setPrice(BigDecimal.TEN)
-                .setName("후라이드 치킨")
-                .build()
-                ;
-
-        OrderTable orderTable = new OrderTableBuilder()
-                .setEmpty(false)
-                .setId(1L)
-                .setNumberOfGuests(4)
-                .build();
+        OrderTable orderTable = TestFixture.generateOrderTableNotEmpty();
 
         orderTableDao.save(orderTable);
 
@@ -106,17 +60,18 @@ public class FakeOrderBoTest {
 
         Order order = orderBo.create(requestOrder);
 
-        assertThat(order.getId()).isEqualTo(requestOrder.getId());
-        assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name());
+        assertAll(
+                () -> assertThat(order.getId()).isEqualTo(order.getId()),
+                () -> assertThat(order.getOrderLineItems()).containsAll(order.getOrderLineItems()),
+                () -> assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name())
+        );
     }
 
     @DisplayName("상세 주문 내역이 존재 하지 않을시 에러")
     @Test
     void createFailByNotExistOrderLineItem() {
-        Order requestOrder = new OrderBuilder()
-                .setOrderTableId(1L)
-                .build()
-                ;
+        Order requestOrder = TestFixture.generateOrderOne();
+        requestOrder.setOrderLineItems(null);
 
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(requestOrder));
     }
@@ -124,52 +79,17 @@ public class FakeOrderBoTest {
     @DisplayName("등록되어 있지 않은 메뉴가 주문 내역에 포함 되어 있을 시 에러")
     @Test
     void createFailByNotInsertedOrderLineItem() {
-        OrderLineItem orderLineItem1 = new OrderLineItemBuilder()
-                .setOrderId(1L)
-                .setQuantity(3)
-                .setMenuId(1L)
-                .setSeq(1L)
-                .build()
-                ;
-
-        OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
-                .setOrderId(2L)
-                .setQuantity(1)
-                .setMenuId(2L)
-                .setSeq(2L)
-                .build()
-                ;
+        OrderLineItem orderLineItem1 = TestFixture.generateOrderLineItemOne();
+        OrderLineItem orderLineItem2 = TestFixture.generateOrderLineItemTwo();
 
         List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
 
-        Order requestOrder = new OrderBuilder()
-                .setOrderLineItems(orderLineItems)
-                .setOrderTableId(1L)
-                .build()
-                ;
+        Order requestOrder = TestFixture.generateOrderOne();
+        requestOrder.setOrderLineItems(orderLineItems);
 
-        MenuProduct menuProduct = new MenuProductBuilder()
-                .setMenuId(1L)
-                .setQuantity(2)
-                .setSeq(1L)
-                .setProductId(1L)
-                .build();
+        Menu menu = TestFixture.generateMenuOne();
 
-        Menu menu1 = new MenuBuilder()
-                .setId(1L)
-                .setMenuGroupId(1L)
-                .setMenuProducts(Arrays.asList(menuProduct))
-                .setPrice(BigDecimal.TEN)
-                .setName("후라이드 치킨")
-                .build()
-                ;
-
-
-        menuDao.save(menu1);
-
-        orderLineItemDao.save(orderLineItem1);
-        orderLineItemDao.save(orderLineItem2);
-
+        menuDao.save(menu);
 
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(requestOrder));
     }
@@ -177,60 +97,15 @@ public class FakeOrderBoTest {
     @DisplayName("존재 하지 않는 테이블이거나 테이블 정보가 없을때 일때 에러")
     @Test
     void createFailByNotExistTable() {
-        OrderLineItem orderLineItem1 = new OrderLineItemBuilder()
-                .setOrderId(1L)
-                .setQuantity(3)
-                .setMenuId(1L)
-                .setSeq(1L)
-                .build()
-                ;
+        OrderLineItem orderLineItem = TestFixture.generateOrderLineItemOne();
 
-        OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
-                .setOrderId(2L)
-                .setQuantity(1)
-                .setMenuId(2L)
-                .setSeq(2L)
-                .build()
-                ;
+        Order requestOrder = TestFixture.generateOrderOne();
 
-        List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
+        Menu menu = TestFixture.generateMenuOne();
 
-        Order requestOrder = new OrderBuilder()
-                .setOrderLineItems(orderLineItems)
-                .setOrderTableId(1L)
-                .build()
-                ;
+        menuDao.save(menu);
 
-        MenuProduct menuProduct = new MenuProductBuilder()
-                .setMenuId(1L)
-                .setQuantity(2)
-                .setSeq(1L)
-                .setProductId(1L)
-                .build();
-
-        Menu menu1 = new MenuBuilder()
-                .setId(1L)
-                .setMenuGroupId(1L)
-                .setMenuProducts(Arrays.asList(menuProduct))
-                .setPrice(BigDecimal.TEN)
-                .setName("후라이드 치킨")
-                .build()
-                ;
-
-        Menu menu2 = new MenuBuilder()
-                .setId(2L)
-                .setMenuGroupId(1L)
-                .setMenuProducts(Arrays.asList(menuProduct))
-                .setPrice(BigDecimal.TEN)
-                .setName("양념 치킨")
-                .build()
-                ;
-
-        menuDao.save(menu1);
-        menuDao.save(menu2);
-
-        orderLineItemDao.save(orderLineItem1);
-        orderLineItemDao.save(orderLineItem2);
+        orderLineItemDao.save(orderLineItem);
 
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(requestOrder));
     }
@@ -238,81 +113,32 @@ public class FakeOrderBoTest {
     @DisplayName("주문받은 음식의 상태 변경")
     @ParameterizedTest
     @ValueSource(strings = {"COOKING", "MEAL"})
-    void changeOrderStatus(String value) {
-        OrderLineItem orderLineItem1 = new OrderLineItemBuilder()
-                .setOrderId(1L)
-                .setQuantity(3)
-                .setMenuId(1L)
-                .setSeq(1L)
-                .build()
-                ;
+    void changeOrderStatus(String orderStatus) {
+        Order requestOrder = TestFixture.generateOrderOne();
+        requestOrder.setOrderStatus(orderStatus);
 
-        OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
-                .setOrderId(2L)
-                .setQuantity(1)
-                .setMenuId(2L)
-                .setSeq(2L)
-                .build()
-                ;
+        Order savedOrder = TestFixture.generateOrderOne();
+        requestOrder.setOrderStatus(OrderStatus.COOKING.name());
 
-        List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
-
-        Order requestOrder = new OrderBuilder()
-                .setId(1L)
-                .setOrderStatus(value)
-                .setOrderLineItems(orderLineItems)
-                .build()
-                ;
-
-        Order savedOrder = new OrderBuilder()
-                .setId(1L)
-                .setOrderLineItems(orderLineItems)
-                .build()
-                ;
-
-        orderDao.save(requestOrder);
+        orderDao.save(savedOrder);
 
         Order changedOrder = orderBo.changeOrderStatus(requestOrder.getId(), requestOrder);
 
-        assertThat(changedOrder.getId()).isEqualTo(savedOrder.getId());
-        assertThat(changedOrder.getOrderStatus()).isEqualTo(requestOrder.getOrderStatus());
+        assertAll(
+                () -> assertThat(changedOrder.getId()).isEqualTo(savedOrder.getId()),
+                () -> assertThat(changedOrder.getOrderStatus()).isEqualTo(requestOrder.getOrderStatus())
+        );
     }
 
     @DisplayName("COMPLETE 상태의 주문 변경시 에러")
     @ParameterizedTest
     @ValueSource(strings = {"COOKING", "MEAL"})
-    void changeOrderStatusFailByComplete(String value) {
-        OrderLineItem orderLineItem1 = new OrderLineItemBuilder()
-                .setOrderId(1L)
-                .setQuantity(3)
-                .setMenuId(1L)
-                .setSeq(1L)
-                .build()
-                ;
+    void changeOrderStatusFailByComplete(String orderStatus) {
+        Order requestOrder = TestFixture.generateOrderOne();
+        requestOrder.setOrderStatus(orderStatus);
 
-        OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
-                .setOrderId(2L)
-                .setQuantity(1)
-                .setMenuId(2L)
-                .setSeq(2L)
-                .build()
-                ;
-
-        List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
-
-        Order requestOrder = new OrderBuilder()
-                .setId(1L)
-                .setOrderStatus(value)
-                .setOrderLineItems(orderLineItems)
-                .build()
-                ;
-
-        Order savedOrder = new OrderBuilder()
-                .setId(1L)
-                .setOrderStatus("COMPLETION")
-                .setOrderLineItems(orderLineItems)
-                .build()
-                ;
+        Order savedOrder = TestFixture.generateOrderOne();
+        savedOrder.setOrderStatus(OrderStatus.COMPLETION.name());
 
         orderDao.save(savedOrder);
 
@@ -322,31 +148,9 @@ public class FakeOrderBoTest {
     @DisplayName("등록되지 않은 주문 상태 변경시 에러")
     @ParameterizedTest
     @ValueSource(strings = {"MEAL"})
-    void changeOrderStatusFailByNotInsert(String value) {
-        OrderLineItem orderLineItem1 = new OrderLineItemBuilder()
-                .setOrderId(1L)
-                .setQuantity(3)
-                .setMenuId(1L)
-                .setSeq(1L)
-                .build()
-                ;
-
-        OrderLineItem orderLineItem2 = new OrderLineItemBuilder()
-                .setOrderId(2L)
-                .setQuantity(1)
-                .setMenuId(2L)
-                .setSeq(2L)
-                .build()
-                ;
-
-        List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
-
-        Order requestOrder = new OrderBuilder()
-                .setId(1L)
-                .setOrderStatus(value)
-                .setOrderLineItems(orderLineItems)
-                .build()
-                ;
+    void changeOrderStatusFailByNotInsert(String orderStatus) {
+        Order requestOrder = TestFixture.generateOrderOne();
+        requestOrder.setOrderStatus(orderStatus);
 
         assertThrows(IllegalArgumentException.class, () -> orderBo.changeOrderStatus(requestOrder.getId(), requestOrder));
     }
