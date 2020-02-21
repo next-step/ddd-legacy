@@ -16,6 +16,8 @@ public class TestFixture {
     public static final int INT_TWO = 2;
     public static final int INT_THREE = 3;
 
+    public static final String MENU_NAME_ONE = "간장치킨";
+
     public static MenuProduct generateMenuProductOne() {
         return new MenuProductBuilder()
                 .setProductId(LONG_ONE)
@@ -41,7 +43,7 @@ public class TestFixture {
                 .setMenuGroupId(LONG_ONE)
                 .setId(LONG_ONE)
                 .setPrice(BigDecimal.TEN)
-                .setName("간장치킨")
+                .setName(MENU_NAME_ONE)
                 .setMenuProducts(Arrays.asList(generateMenuProductOne()))
                 .build()
                 ;
@@ -52,7 +54,7 @@ public class TestFixture {
                 .setMenuGroupId(LONG_TWO)
                 .setId(LONG_TWO)
                 .setPrice(BigDecimal.TEN)
-                .setName("간장치킨")
+                .setName(MENU_NAME_ONE)
                 .setMenuProducts(Arrays.asList(generateMenuProductTwo()))
                 .build()
                 ;
@@ -63,7 +65,7 @@ public class TestFixture {
                 .setMenuGroupId(LONG_ONE)
                 .setId(LONG_ONE)
                 .setPrice(BigDecimal.TEN)
-                .setName("간장치킨")
+                .setName(MENU_NAME_ONE)
                 .setMenuProducts(Arrays.asList(generateMenuProductOne(), generateMenuProductTwo()))
                 .build()
                 ;
