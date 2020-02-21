@@ -3,6 +3,7 @@ package calculator.domain;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -22,9 +23,14 @@ public class StringCalculator {
 
         String[] tokens = getTokens(inputString);
 
-        return Arrays.stream(tokens)
+        List<CalculatorNumber> calculatorNumbers = Arrays.stream(tokens)
                 .map(CalculatorNumber::new)
-                .collect(Collectors.summingInt(CalculatorNumber::getNumber));
+                .collect(Collectors.toList())
+                ;
+
+        CalculatorNumberGroups calculatorNumberGroups = new CalculatorNumberGroups(calculatorNumbers);
+
+        return calculatorNumberGroups.addAllCalculatorNumber();
     }
 
     private String[] getTokens(String inputString) {
