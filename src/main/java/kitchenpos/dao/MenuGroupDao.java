@@ -1,4 +1,4 @@
-package kitchenpos.dao.Interface;
+package kitchenpos.dao;
 
 import kitchenpos.model.MenuGroup;
 

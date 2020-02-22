@@ -1,6 +1,6 @@
 package kitchenpos.bo.mock;
 
-import kitchenpos.dao.Interface.TableGroupDao;
+import kitchenpos.dao.TableGroupDao;
 import kitchenpos.model.TableGroup;
 
 import java.util.HashMap;

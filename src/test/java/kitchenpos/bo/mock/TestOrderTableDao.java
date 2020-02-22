@@ -1,6 +1,6 @@
 package kitchenpos.bo.mock;
 
-import kitchenpos.dao.Interface.OrderTableDao;
+import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.OrderTable;
 
 import java.util.*;

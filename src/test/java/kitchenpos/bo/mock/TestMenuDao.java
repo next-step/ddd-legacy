@@ -1,6 +1,6 @@
 package kitchenpos.bo.mock;
 
-import kitchenpos.dao.Interface.MenuDao;
+import kitchenpos.dao.MenuDao;
 import kitchenpos.model.Menu;
 
 import java.util.*;

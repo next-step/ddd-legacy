@@ -1,6 +1,6 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.Interface.MenuGroupDao;
+import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.model.MenuGroup;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;

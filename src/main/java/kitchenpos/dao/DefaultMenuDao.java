@@ -1,6 +1,5 @@
 package kitchenpos.dao;
 
-import kitchenpos.dao.Interface.MenuDao;
 import kitchenpos.model.Menu;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -32,12 +31,14 @@ public class DefaultMenuDao implements MenuDao {
         ;
     }
 
+    @Override
     public Menu save(final Menu entity) {
         final SqlParameterSource parameters = new BeanPropertySqlParameterSource(entity);
         final Number key = jdbcInsert.executeAndReturnKey(parameters);
         return select(key.longValue());
     }
 
+    @Override
     public Optional<Menu> findById(final Long id) {
         try {
             return Optional.of(select(id));
@@ -46,6 +47,7 @@ public class DefaultMenuDao implements MenuDao {
         }
     }
 
+    @Override
     public List<Menu> findAll() {
         final String sql = "SELECT id, name, price, menu_group_id FROM menu ";
         return jdbcTemplate.query(sql, (resultSet, rowNumber) -> toEntity(resultSet));

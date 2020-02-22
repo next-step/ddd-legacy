@@ -1,6 +1,5 @@
 package kitchenpos.dao;
 
-import kitchenpos.dao.Interface.TableGroupDao;
 import kitchenpos.model.TableGroup;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;

@@ -1,9 +1,9 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.Interface.MenuDao;
-import kitchenpos.dao.Interface.OrderDao;
-import kitchenpos.dao.Interface.OrderLineItemDao;
-import kitchenpos.dao.Interface.OrderTableDao;
+import kitchenpos.dao.MenuDao;
+import kitchenpos.dao.OrderDao;
+import kitchenpos.dao.OrderLineItemDao;
+import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
 import kitchenpos.model.OrderStatus;
