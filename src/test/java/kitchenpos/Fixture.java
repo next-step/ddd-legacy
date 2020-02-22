@@ -76,7 +76,7 @@ public class Fixture {
         return defaultMenu;
     }
 
-    public static MenuProduct defaultMenuProduct() {
+    private static MenuProduct defaultMenuProduct() {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setSeq(1L);
         menuProduct.setMenuId(1L);
