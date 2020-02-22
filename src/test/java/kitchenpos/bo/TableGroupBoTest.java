@@ -3,9 +3,9 @@ package kitchenpos.bo;
 import kitchenpos.bo.mock.TestOrderDao;
 import kitchenpos.bo.mock.TestOrderTableDao;
 import kitchenpos.bo.mock.TestTableGroupDao;
-import kitchenpos.dao.Interface.OrderDao;
-import kitchenpos.dao.Interface.OrderTableDao;
-import kitchenpos.dao.Interface.TableGroupDao;
+import kitchenpos.dao.OrderDao;
+import kitchenpos.dao.OrderTableDao;
+import kitchenpos.dao.TableGroupDao;
 import kitchenpos.model.OrderTable;
 import kitchenpos.model.TableGroup;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +45,7 @@ class TableGroupBoTest {
         input.setId(1L);
     }
 
-    @DisplayName("테이블 그룹 생성 시 테이블이 null 이거나 2개보다 작으면 IllegalArgumentException 발생")
+    @DisplayName("테이블 그룹 생성 시 테이블이 없거나 2개보다 작으면 오류 발생")
     @ParameterizedTest
     @NullAndEmptySource
     @MethodSource("provideOneSizeList")
@@ -55,7 +55,7 @@ class TableGroupBoTest {
         assertThrows(IllegalArgumentException.class, () -> tableGroupBo.create(input));
     }
 
-    @DisplayName("테이블 그룹 생성 시 저장된 테이블 수랑 요청 테이블 수가 다르면 IllegalArgumentException 발생")
+    @DisplayName("테이블 그룹 생성 시 저장된 테이블 수랑 요청 테이블 수가 다르면 오류 발생")
     @Test
     void createLessSize() {
         input.setOrderTables(Arrays.asList(defaultOrderTable(), emptyGroupIdOrderTable(), emptyTrueOrderTable()));
@@ -63,11 +63,10 @@ class TableGroupBoTest {
         assertThrows(IllegalArgumentException.class, () -> tableGroupBo.create(input));
     }
 
-    @DisplayName("테이블 그룹 생성 시 저장된 테이블이 비어있지 않거나 그룹아이디가 이미 있으면 IllegalArgumentException 발생")
-    @ParameterizedTest
-    @MethodSource("provideIllegalOrderTables")
-    void createSavedTable(List<OrderTable> parameter) {
-        input.setOrderTables(parameter);
+    @DisplayName("테이블 그룹 생성 시 그룹아이디가 이미 있으면 오류 발생")
+    @Test
+    void createSavedTable() {
+        input.setOrderTables(Arrays.asList(defaultOrderTable(), defaultOrderTable()));
 
         assertThrows(IllegalArgumentException.class, () -> tableGroupBo.create(input));
     }
@@ -101,16 +100,6 @@ class TableGroupBoTest {
     private static Stream<Arguments> provideOneSizeList() {
         return Stream.of(
                 Arguments.of(Collections.singletonList(new OrderTable()))
-        );
-    }
-
-    private static Stream<Arguments> provideIllegalOrderTables() {
-        OrderTable sample2 = new OrderTable();
-        sample2.setEmpty(true);
-        sample2.setTableGroupId(2L);
-        return Stream.of(
-                Arguments.of(Arrays.asList(defaultOrderTable(), defaultOrderTable())),
-                Arguments.of(Arrays.asList(sample2, sample2))
         );
     }
 }

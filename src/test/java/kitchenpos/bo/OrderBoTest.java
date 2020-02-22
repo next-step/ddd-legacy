@@ -1,9 +1,9 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.Interface.MenuDao;
-import kitchenpos.dao.Interface.OrderDao;
-import kitchenpos.dao.Interface.OrderLineItemDao;
-import kitchenpos.dao.Interface.OrderTableDao;
+import kitchenpos.dao.MenuDao;
+import kitchenpos.dao.OrderDao;
+import kitchenpos.dao.OrderLineItemDao;
+import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
 import kitchenpos.model.OrderStatus;
@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -74,7 +75,7 @@ class OrderBoTest {
         savedOrderTable.setId(1L);
     }
 
-    @DisplayName("주문 생성시 주문내역이 없으면 IllegalArgumentException 발생")
+    @DisplayName("주문 생성시 주문내역이 없으면 오류 발생")
     @ParameterizedTest
     @NullAndEmptySource
     void createNullOrderLines(List<OrderLineItem> parameter) {
@@ -83,7 +84,7 @@ class OrderBoTest {
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(input));
     }
 
-    @DisplayName("주문 생성시 주문내역과 메뉴 size 가 다르면 IllegalArgumentException 발생")
+    @DisplayName("주문 생성시 주문내역과 메뉴의 크기가 다르면 오류 발생")
     @Test
     void createDiffSize() {
         given(menuDao.countByIdIn(anyList()))
@@ -92,7 +93,7 @@ class OrderBoTest {
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(input));
     }
 
-    @DisplayName("주문 생성시 테이블이 없으면 IllegalArgumentException 발생")
+    @DisplayName("주문 생성시 테이블이 없으면 오류 발생")
     @Test
     void createNullTable() {
         given(menuDao.countByIdIn(anyList()))
@@ -104,7 +105,7 @@ class OrderBoTest {
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(input));
     }
 
-    @DisplayName("주문 생성시 테이블이 비어있으면 IllegalArgumentException 발생")
+    @DisplayName("주문 생성시 테이블이 비어있으면 오류 발생")
     @Test
     void createEmptyTable() {
         savedOrderTable.setEmpty(true);
@@ -133,10 +134,13 @@ class OrderBoTest {
                 .willReturn(new OrderLineItem());
 
         Order result = orderBo.create(input);
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getOrderTableId()).isEqualTo(1L);
-        assertThat(result.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name());
-        assertThat(result.getOrderLineItems().get(0)).isEqualTo(new OrderLineItem());
+
+        assertAll(
+                () -> assertThat(result.getId()).isEqualTo(1L),
+                () -> assertThat(result.getOrderTableId()).isEqualTo(1L),
+                () -> assertThat(result.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name()),
+                () -> assertThat(result.getOrderLineItems().get(0)).isEqualTo(new OrderLineItem())
+        );
     }
 
     @DisplayName("주문 목록 조회")
@@ -149,13 +153,16 @@ class OrderBoTest {
                 .willReturn(Collections.singletonList(orderLineItem));
 
         List<Order> result = orderBo.list();
-        assertThat(result.size()).isEqualTo(1);
-        assertThat(result.get(0).getOrderLineItems().size()).isEqualTo(1);
-        assertThat(result.get(0).getOrderStatus()).isEqualTo(OrderStatus.COOKING.name());
-        assertThat(result.get(0).getOrderTableId()).isEqualTo(1L);
+
+        assertAll(
+                () -> assertThat(result.size()).isEqualTo(1),
+                () -> assertThat(result.get(0).getOrderLineItems().size()).isEqualTo(1),
+                () -> assertThat(result.get(0).getOrderStatus()).isEqualTo(OrderStatus.COOKING.name()),
+                () -> assertThat(result.get(0).getOrderTableId()).isEqualTo(1L)
+        );
     }
 
-    @DisplayName("주문 상태 변경 시 주문이 없으면 IllegalArgumentException 발생")
+    @DisplayName("주문 상태 변경 시 주문이 없으면 오류 발생")
     @Test
     void changeOrderStatusNullOrder() {
         given(orderDao.findById(anyLong()))
@@ -164,7 +171,7 @@ class OrderBoTest {
         assertThrows(IllegalArgumentException.class, () -> orderBo.changeOrderStatus(1L, input));
     }
 
-    @DisplayName("주문 상태 변경 시 주문이 완료된 상태면 IllegalArgumentException 발생")
+    @DisplayName("주문 상태 변경 시 주문이 완료된 상태면 오류 발생")
     @Test
     void changeOrderStatusCompletion() {
         saved.setOrderStatus(OrderStatus.COMPLETION.name());
@@ -182,6 +189,7 @@ class OrderBoTest {
                 .willReturn(Optional.of(saved));
 
         Order result = orderBo.changeOrderStatus(1L, input);
+
         assertThat(result.getOrderStatus()).isEqualTo(OrderStatus.MEAL.name());
     }
 }

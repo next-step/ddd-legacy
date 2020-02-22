@@ -1,7 +1,7 @@
 package kitchenpos.bo;
 
 import kitchenpos.bo.mock.TestMenuGroupDao;
-import kitchenpos.dao.Interface.MenuGroupDao;
+import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.model.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
