@@ -8,6 +8,7 @@ import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
 import kitchenpos.model.OrderStatus;
+import kitchenpos.model.OrderTable;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -46,6 +47,7 @@ class OrderBoTest {
     private Order defaultOrder;
     private List<OrderLineItem> defaultOrderLineItems;
     private List<Long> defaultMenuIdsOfOrderLineItems;
+    private OrderTable defaultOrderTable;
 
     @BeforeEach
     public void setUP() {
@@ -54,12 +56,17 @@ class OrderBoTest {
         defaultMenuIdsOfOrderLineItems = defaultOrderLineItems.stream()
                 .map(OrderLineItem::getMenuId)
                 .collect(Collectors.toList());
+        defaultOrderTable = Fixtures.getOrderTable(1L, false, 4);
     }
 
     @DisplayName("정상적인 값으로 주문이 생성된다.")
     @Test
     public void createNormal() {
+        given(menuDao.countByIdIn(defaultMenuIdsOfOrderLineItems)).willReturn(Long.valueOf(defaultOrderLineItems.size()));
+        given(orderTableDao.findById(defaultOrder.getOrderTableId())).willReturn(Optional.ofNullable(defaultOrderTable));
+        given(orderDao.save(defaultOrder)).willReturn(defaultOrder);
 
+        assertThat(orderBo.create(defaultOrder)).isEqualTo(defaultOrder);
     }
 
     @DisplayName("주문된 메뉴가 1개 이상 있어야 한다.")
@@ -85,10 +92,23 @@ class OrderBoTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(defaultOrder));
     }
 
+    @DisplayName("주문된 테이블은 손님이 반드시 있어야 한다.")
+    @Test
+    public void createNoEmpty() {
+        given(menuDao.countByIdIn(defaultMenuIdsOfOrderLineItems))
+                .willReturn(Long.valueOf(defaultMenuIdsOfOrderLineItems.size()));
+        defaultOrderTable.setEmpty(true);
+        given(orderTableDao.findById(defaultOrder.getOrderTableId())).willReturn(Optional.ofNullable(defaultOrderTable));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(defaultOrder));
+    }
+
     @DisplayName("주문 상태가 완료로 변경된 것은 상태를 변경할 수 없다.")
     @Test
     public void changeOrderStatus() {
-
+        defaultOrder.setOrderStatus(OrderStatus.COMPLETION.name());
+        given(orderDao.findById(defaultOrder.getId())).willReturn(Optional.ofNullable(defaultOrder));
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+            orderBo.changeOrderStatus(defaultOrder.getId(), defaultOrder));
     }
 
     private List<OrderLineItem> getDefaultOrderLineItem() {
