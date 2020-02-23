@@ -63,4 +63,17 @@ public class Fixtures {
         orderLineItem.setQuantity(quantity);
         return orderLineItem;
     }
+
+    public static OrderTable getOrderTable(long id, boolean empty, int numberOfGuests) {
+        return getOrderTable(id, empty, numberOfGuests, null);
+    }
+
+    public static OrderTable getOrderTable(long id, boolean empty, int numberOfGuests, Long tableGroupId) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(id);
+        orderTable.setEmpty(empty);
+        orderTable.setNumberOfGuests(numberOfGuests);
+        orderTable.setTableGroupId(tableGroupId);
+        return orderTable;
+    }
 }
