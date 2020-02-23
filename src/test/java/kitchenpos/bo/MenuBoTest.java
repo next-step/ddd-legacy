@@ -64,10 +64,14 @@ class MenuBoTest extends Fixtures {
         assertThat(savedMenu.getPrice()).isEqualTo(menu.getPrice());
         assertThat(savedMenu.getMenuGroupId()).isEqualTo(menu.getMenuGroupId());
         assertThat(savedMenu.getMenuProducts().size()).isEqualTo(menu.getMenuProducts().size());
-        assertThat(savedMenu.getMenuProducts().get(0).getProductId()).isEqualTo(menu.getMenuProducts().get(0).getProductId());
-        assertThat(savedMenu.getMenuProducts().get(0).getQuantity()).isEqualTo(menu.getMenuProducts().get(0).getQuantity());
-        assertThat(savedMenu.getMenuProducts().get(0).getMenuId()).isEqualTo(menu.getMenuProducts().get(0).getMenuId());
-        assertThat(savedMenu.getMenuProducts().get(0).getSeq()).isEqualTo(menu.getMenuProducts().get(0).getSeq());
+        assertThat(savedMenu.getMenuProducts().get(0).getProductId())
+                .isEqualTo(menu.getMenuProducts().get(0).getProductId());
+        assertThat(savedMenu.getMenuProducts().get(0).getQuantity())
+                .isEqualTo(menu.getMenuProducts().get(0).getQuantity());
+        assertThat(savedMenu.getMenuProducts().get(0).getMenuId())
+                .isEqualTo(menu.getMenuProducts().get(0).getMenuId());
+        assertThat(savedMenu.getMenuProducts().get(0).getSeq())
+                .isEqualTo(menu.getMenuProducts().get(0).getSeq());
     }
 
     @ParameterizedTest
@@ -78,7 +82,8 @@ class MenuBoTest extends Fixtures {
         final Menu resolvedMenu = menu;
         resolvedMenu.setPrice(price);
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(resolvedMenu));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuBo.create(resolvedMenu));
     }
 
     @Test
@@ -87,7 +92,8 @@ class MenuBoTest extends Fixtures {
         final Menu resolvedMenu = menu;
         resolvedMenu.setMenuGroupId(null);
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(menu));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuBo.create(menu));
     }
 
     @Test
@@ -104,6 +110,7 @@ class MenuBoTest extends Fixtures {
         given(productDao.findById(menuProducts.get(1).getProductId()))
                 .willReturn(Optional.of(products.get(1)));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuBo.create(menu));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuBo.create(menu));
     }
 }
