@@ -1,6 +1,6 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.DefaultProductDao;
+import kitchenpos.dao.ProductDao;
 import kitchenpos.dao.InMemoryProductDao;
 import kitchenpos.model.Product;
 import kitchenpos.model.ProductTest;
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ProductBoTest {
-    private DefaultProductDao productDao = new InMemoryProductDao();
+    private ProductDao productDao = new InMemoryProductDao();
     private ProductBo productBo;
 
     @BeforeEach

@@ -13,9 +13,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TableGroupBoTest {
 
-    private DefaultTableGroupDao tableGroupDao = new InMemoryTableGroupDao();
-    private DefaultOrderTableDao orderTableDao = new InMemoryOrderTableDao();
-    private DefaultOrderDao orderDao = new InMemoryOrderDao();
+    private TableGroupDao tableGroupDao = new InMemoryTableGroupDao();
+    private OrderTableDao orderTableDao = new InMemoryOrderTableDao();
+    private OrderDao orderDao = new InMemoryOrderDao();
     private TableGroupBo tableGroupBo;
 
     @BeforeEach

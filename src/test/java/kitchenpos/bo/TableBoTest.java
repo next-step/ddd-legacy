@@ -1,7 +1,7 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.DefaultOrderDao;
-import kitchenpos.dao.DefaultOrderTableDao;
+import kitchenpos.dao.OrderDao;
+import kitchenpos.dao.OrderTableDao;
 import kitchenpos.dao.InMemoryOrderDao;
 import kitchenpos.dao.InMemoryOrderTableDao;
 import kitchenpos.model.*;
@@ -14,8 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TableBoTest {
 
-    private DefaultOrderDao orderDao = new InMemoryOrderDao();
-    private DefaultOrderTableDao orderTableDao = new InMemoryOrderTableDao();
+    private OrderDao orderDao = new InMemoryOrderDao();
+    private OrderTableDao orderTableDao = new InMemoryOrderTableDao();
 
     private TableBo tableBo;
 

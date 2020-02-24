@@ -1,9 +1,9 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.DefaultMenuDao;
-import kitchenpos.dao.DefaultOrderDao;
-import kitchenpos.dao.DefaultOrderLineItemDao;
-import kitchenpos.dao.DefaultOrderTableDao;
+import kitchenpos.dao.MenuDao;
+import kitchenpos.dao.OrderDao;
+import kitchenpos.dao.OrderLineItemDao;
+import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
 import kitchenpos.model.OrderStatus;
@@ -20,16 +20,16 @@ import java.util.stream.Collectors;
 
 @Component
 public class OrderBo {
-    private final DefaultMenuDao menuDao;
-    private final DefaultOrderDao orderDao;
-    private final DefaultOrderLineItemDao orderLineItemDao;
-    private final DefaultOrderTableDao orderTableDao;
+    private final MenuDao menuDao;
+    private final OrderDao orderDao;
+    private final OrderLineItemDao orderLineItemDao;
+    private final OrderTableDao orderTableDao;
 
     public OrderBo(
-            final DefaultMenuDao menuDao,
-            final DefaultOrderDao orderDao,
-            final DefaultOrderLineItemDao orderLineItemDao,
-            final DefaultOrderTableDao orderTableDao
+            final MenuDao menuDao,
+            final OrderDao orderDao,
+            final OrderLineItemDao orderLineItemDao,
+            final OrderTableDao orderTableDao
     ) {
         this.menuDao = menuDao;
         this.orderDao = orderDao;

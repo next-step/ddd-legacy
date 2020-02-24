@@ -1,6 +1,6 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.DefaultMenuGroupDao;
+import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.dao.InMemoryMenuGroupDao;
 import kitchenpos.model.MenuGroup;
 import kitchenpos.model.MenuGroupTest;
@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MenuGroupBoTest {
 
-    private DefaultMenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
+    private MenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
     private MenuGroupBo menuGroupBo;
 
     @BeforeEach

@@ -4,7 +4,7 @@ import kitchenpos.model.Product;
 
 import java.util.*;
 
-public class InMemoryProductDao implements DefaultProductDao {
+public class InMemoryProductDao implements ProductDao {
     private Map<Long, Product> data = new HashMap<>();
 
     @Override

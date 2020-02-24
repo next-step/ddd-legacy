@@ -1,9 +1,9 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.DefaultMenuDao;
-import kitchenpos.dao.DefaultMenuGroupDao;
-import kitchenpos.dao.DefaultMenuProductDao;
-import kitchenpos.dao.DefaultProductDao;
+import kitchenpos.dao.MenuDao;
+import kitchenpos.dao.MenuGroupDao;
+import kitchenpos.dao.MenuProductDao;
+import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
@@ -17,16 +17,16 @@ import java.util.Objects;
 
 @Component
 public class MenuBo {
-    private final DefaultMenuDao menuDao;
-    private final DefaultMenuGroupDao menuGroupDao;
-    private final DefaultMenuProductDao menuProductDao;
-    private final DefaultProductDao productDao;
+    private final MenuDao menuDao;
+    private final MenuGroupDao menuGroupDao;
+    private final MenuProductDao menuProductDao;
+    private final ProductDao productDao;
 
     public MenuBo(
-            final DefaultMenuDao menuDao,
-            final DefaultMenuGroupDao menuGroupDao,
-            final DefaultMenuProductDao menuProductDao,
-            final DefaultProductDao productDao
+            final MenuDao menuDao,
+            final MenuGroupDao menuGroupDao,
+            final MenuProductDao menuProductDao,
+            final ProductDao productDao
     ) {
         this.menuDao = menuDao;
         this.menuGroupDao = menuGroupDao;

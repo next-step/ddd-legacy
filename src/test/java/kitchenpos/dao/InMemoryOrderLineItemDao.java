@@ -5,7 +5,7 @@ import kitchenpos.model.OrderLineItem;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class InMemoryOrderLineItemDao implements DefaultOrderLineItemDao {
+public class InMemoryOrderLineItemDao implements OrderLineItemDao {
     private Map<Long, OrderLineItem> data = new HashMap<>();
 
     @Override

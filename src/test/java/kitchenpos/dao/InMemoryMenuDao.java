@@ -4,7 +4,7 @@ import kitchenpos.model.Menu;
 
 import java.util.*;
 
-public class InMemoryMenuDao implements DefaultMenuDao {
+public class InMemoryMenuDao implements MenuDao {
     private Map<Long, Menu> data = new HashMap<>();
 
     @Override

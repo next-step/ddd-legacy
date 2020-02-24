@@ -14,10 +14,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MenuBoTest {
 
-    private DefaultMenuDao menuDao = new InMemoryMenuDao();
-    private DefaultMenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
-    private DefaultMenuProductDao menuProductDao = new InMemoryMenuProductDao();
-    private DefaultProductDao productDao = new InMemoryProductDao();
+    private MenuDao menuDao = new InMemoryMenuDao();
+    private MenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
+    private MenuProductDao menuProductDao = new InMemoryMenuProductDao();
+    private ProductDao productDao = new InMemoryProductDao();
 
     private MenuBo menuBo;
 

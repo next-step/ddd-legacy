@@ -4,7 +4,7 @@ import kitchenpos.model.Order;
 
 import java.util.*;
 
-public class InMemoryOrderDao implements DefaultOrderDao {
+public class InMemoryOrderDao implements OrderDao {
     private Map<Long, Order> data = new HashMap<>();
 
     @Override

@@ -13,13 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OrderBoTest {
 
-    private DefaultMenuDao menuDao = new InMemoryMenuDao();
-    private DefaultOrderDao orderDao = new InMemoryOrderDao();
-    private DefaultOrderLineItemDao orderLineItemDao = new InMemoryOrderLineItemDao();
-    private DefaultOrderTableDao orderTableDao = new InMemoryOrderTableDao();
-    private DefaultMenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
-    private DefaultMenuProductDao menuProductDao = new InMemoryMenuProductDao();
-    private DefaultProductDao productDao = new InMemoryProductDao();
+    private MenuDao menuDao = new InMemoryMenuDao();
+    private OrderDao orderDao = new InMemoryOrderDao();
+    private OrderLineItemDao orderLineItemDao = new InMemoryOrderLineItemDao();
+    private OrderTableDao orderTableDao = new InMemoryOrderTableDao();
+    private MenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
+    private MenuProductDao menuProductDao = new InMemoryMenuProductDao();
+    private ProductDao productDao = new InMemoryProductDao();
 
     private OrderBo orderBo;
 

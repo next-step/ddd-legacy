@@ -5,7 +5,7 @@ import kitchenpos.model.MenuProduct;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class InMemoryMenuProductDao implements DefaultMenuProductDao {
+public class InMemoryMenuProductDao implements MenuProductDao {
     private Map<Long, MenuProduct> data = new HashMap<>();
 
     @Override

@@ -4,7 +4,7 @@ import kitchenpos.model.TableGroup;
 
 import java.util.*;
 
-public class InMemoryTableGroupDao implements DefaultTableGroupDao {
+public class InMemoryTableGroupDao implements TableGroupDao {
     private Map<Long, TableGroup> data = new HashMap<>();
 
     @Override
