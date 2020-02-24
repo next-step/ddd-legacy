@@ -1,9 +1,9 @@
 package kitchenpos.bo;
 
+import kitchenpos.dao.DefaultProductDao;
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.MenuGroupDao;
 import kitchenpos.dao.MenuProductDao;
-import kitchenpos.dao.ProductDao;
 import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
@@ -45,7 +45,7 @@ public class MenuBoTest {
     @Mock
     private MenuProductDao menuProductDao;
     @Mock
-    private ProductDao productDao;
+    private DefaultProductDao productDao;
     @InjectMocks
     private MenuBo menuBo;
 
