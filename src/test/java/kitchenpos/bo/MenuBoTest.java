@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MenuBoTest {
@@ -37,7 +38,15 @@ class MenuBoTest {
     @DisplayName("메뉴는 추가될 수 있다.")
     void createTest() {
         Menu menu = MenuTest.ofHalfAndHalf();
-        assertThat(menuBo.create(menu));
+        Menu menuResult;
+        assertThat(menuResult = menuBo.create(menu));
+        assertAll(
+                () -> assertThat(menuResult.getId()).isEqualTo(menu.getId()),
+                () -> assertThat(menuResult.getMenuGroupId()).isEqualTo(menu.getMenuGroupId()),
+                () -> assertThat(menuResult.getName()).isEqualTo(menu.getName()),
+                () -> assertThat(menuResult.getPrice()).isEqualTo(menu.getPrice()),
+                () -> assertThat(menuResult.getMenuProducts()).containsOnlyElementsOf(menu.getMenuProducts())
+        );
     }
 
     @Test

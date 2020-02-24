@@ -2,9 +2,6 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.*;
 import kitchenpos.model.*;
-import org.assertj.core.api.ListAssert;
-import org.assertj.core.api.ObjectArrayAssert;
-import org.assertj.core.api.ObjectEnumerableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -39,7 +37,7 @@ class TableGroupBoTest {
     void createTableGroupWithSingleTableException() {
         TableGroup tableGroup = TableGroupTest.ofTwoEmptyTable();
         tableGroup.setOrderTables(
-                Arrays.asList(OrderTableTest.ofEmpty())
+                Collections.singletonList(OrderTableTest.ofEmpty())
         );
         assertThrows(IllegalArgumentException.class, () -> tableGroupBo.create(tableGroup));
     }
@@ -89,6 +87,5 @@ class TableGroupBoTest {
 
         assertThrows(IllegalArgumentException.class,
                 () -> tableGroupBo.delete(tableGroup.getId()));
-
     }
 }

@@ -4,7 +4,10 @@ import kitchenpos.dao.InMemoryOrderDao;
 import kitchenpos.dao.InMemoryOrderTableDao;
 import kitchenpos.dao.OrderDao;
 import kitchenpos.dao.OrderTableDao;
-import kitchenpos.model.*;
+import kitchenpos.model.Order;
+import kitchenpos.model.OrderTable;
+import kitchenpos.model.OrderTableTest;
+import kitchenpos.model.OrderTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TableBoTest {
@@ -30,7 +34,14 @@ class TableBoTest {
     @DisplayName("테이블은 추가될 수 있다.")
     void createTest() {
         OrderTable orderTable = new OrderTable();
-        tableBo.create(orderTable);
+        OrderTable orderTableResult;
+
+        assertThat(orderTableResult = tableBo.create(orderTable));
+        assertAll(
+                () -> assertThat(orderTableResult.getId()).isEqualTo(orderTable.getId()),
+                () -> assertThat(orderTableResult.getTableGroupId()).isEqualTo(orderTable.getTableGroupId()),
+                () -> assertThat(orderTableResult.getNumberOfGuests()).isEqualTo(orderTable.getNumberOfGuests())
+        );
     }
 
     @Test

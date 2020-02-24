@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OrderBoTest {
@@ -48,7 +49,15 @@ class OrderBoTest {
     @DisplayName("주문을 생성할 수 있다.")
     void createTest() {
         Order order = OrderTest.ofOneHalfAndHalfInSingleTable();
-        orderBo.create(order);
+        Order orderResult;
+
+        assertThat(orderResult = orderBo.create(order));
+        assertAll(
+                () -> assertThat(orderResult.getId()).isEqualTo(order.getId()),
+                () -> assertThat(orderResult.getOrderStatus()).isEqualTo(order.getOrderStatus()),
+                () -> assertThat(orderResult.getOrderTableId()).isEqualTo(order.getOrderTableId()),
+                () -> assertThat(orderResult.getOrderLineItems()).containsOnlyElementsOf(order.getOrderLineItems())
+        );
     }
 
     @Test

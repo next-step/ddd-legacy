@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ProductBoTest {
@@ -26,7 +27,14 @@ class ProductBoTest {
     @DisplayName("요리는 추가될 수 있다.")
     void createTest() {
         Product product = ProductTest.ofHalfFried();
-        productBo.create(product);
+        Product productResult;
+
+        assertThat(productResult = productBo.create(product));
+        assertAll(
+                () -> assertThat(productResult.getId()).isEqualTo(product.getId()),
+                () -> assertThat(productResult.getName()).isEqualTo(product.getName()),
+                () -> assertThat(productResult.getPrice()).isEqualTo(product.getPrice())
+        );
     }
 
     @Test

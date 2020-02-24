@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MenuGroupBoTest {
 
@@ -24,7 +25,12 @@ class MenuGroupBoTest {
     @DisplayName("메뉴그룹은 추가될 수 있다.")
     void createTest() {
         MenuGroup menuGroup = MenuGroupTest.ofSet();
-        menuGroupBo.create(menuGroup);
+        MenuGroup menuGroupResult;
+        assertThat(menuGroupResult = menuGroupBo.create(menuGroup));
+        assertAll(
+                () -> assertThat(menuGroupResult.getId()).isEqualTo(menuGroup.getId()),
+                () -> assertThat(menuGroupResult.getName()).isEqualTo(menuGroup.getName())
+        );
     }
 
     @Test
