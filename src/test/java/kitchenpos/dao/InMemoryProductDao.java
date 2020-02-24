@@ -1,6 +1,7 @@
 package kitchenpos.dao;
 
 import kitchenpos.model.Product;
+import kitchenpos.support.ProductBuilder;
 
 import java.util.*;
 
@@ -10,7 +11,13 @@ public class InMemoryProductDao implements ProductDao {
 
     @Override
     public Product save(Product entity) {
-        entities.put(entity.getId(), entity);
+        Product savedProduct = new ProductBuilder()
+            .id(entity.getId())
+            .name(entity.getName())
+            .price(entity.getPrice())
+            .build();
+
+        entities.put(entity.getId(), savedProduct);
         return entity;
     }
 
