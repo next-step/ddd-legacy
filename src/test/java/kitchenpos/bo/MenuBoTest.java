@@ -76,7 +76,7 @@ class MenuBoTest {
     @DisplayName("모든 메뉴 리스트를 조회할 수 있다.")
     void readAllMenuListTest() {
         Menu menu = MenuTest.ofHalfAndHalf();
-        menuBo.create(menu);
+        menuDao.save(menu);
         assertThat(menuBo.list()).contains(menu);
     }
 }

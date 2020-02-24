@@ -37,9 +37,4 @@ public class InMemoryOrderTableDao implements OrderTableDao {
                 .filter(orderTable -> tableGroupId.equals(orderTable.getTableGroupId()))
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public OrderTable select(Long id) {
-        return data.get(id);
-    }
 }

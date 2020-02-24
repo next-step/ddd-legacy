@@ -1,13 +1,15 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.OrderTableDao;
 import kitchenpos.dao.InMemoryOrderDao;
 import kitchenpos.dao.InMemoryOrderTableDao;
+import kitchenpos.dao.OrderDao;
+import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -43,22 +45,17 @@ class TableBoTest {
         assertThat(orderTable.isEmpty()).isTrue();
     }
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {"COOKING", "MEAL"})
     @DisplayName("주문의 상태가 요리중이거나 식사중인 테이블은 비울 수 없다.")
-    void updateOrderTableEmptyWithCookingOrMealException() {
+    void updateOrderTableEmptyWithCookingOrMealException(String orderStatus) {
         OrderTable orderTable = OrderTableTest.ofSingle();
         orderTableDao.save(orderTable);
 
         orderTable.setEmpty(true);
 
         Order order = OrderTest.ofOneHalfAndHalfInSingleTable();
-        order.setOrderStatus(OrderStatus.COOKING.toString());
-        orderDao.save(order);
-
-        assertThrows(IllegalArgumentException.class,
-                () -> tableBo.changeEmpty(orderTable.getId(), orderTable));
-
-        order.setOrderStatus(OrderStatus.MEAL.toString());
+        order.setOrderStatus(orderStatus);
         orderDao.save(order);
 
         assertThrows(IllegalArgumentException.class,

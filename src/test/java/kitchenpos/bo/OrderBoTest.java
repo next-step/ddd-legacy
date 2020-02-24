@@ -52,12 +52,16 @@ class OrderBoTest {
     }
 
     @Test
-    @DisplayName("테이블이 할당되지 않거나 비어있는 테이블에는 주문을 생성할 수 없다.")
-    void createOrderExceptionTest() {
+    @DisplayName("테이블이 할당되지 않으면 주문을 생성할 수 없다.")
+    void createOrderWithoutTableException() {
         Order withoutOrderTable = OrderTest.ofOneHalfAndHalfInSingleTable();
         withoutOrderTable.setOrderTableId(null);
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(withoutOrderTable));
+    }
 
+    @Test
+    @DisplayName("비어있는 테이블에는 주문을 생성할 수 없다.")
+    void createOrderWithEmptyTableException() {
         Order withEmptyTable = OrderTest.ofOneHalfAndHalfInSingleTable();
         orderTable.setEmpty(true);
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(withEmptyTable));
@@ -98,7 +102,7 @@ class OrderBoTest {
     @DisplayName("주문이 생성되면 주문은 요리중 상태를 갖는다.")
     void createOrderHavingCookingStatusTest() {
         Order order = OrderTest.ofOneHalfAndHalfInSingleTable();
-        order = orderBo.create(order);
+        order = orderDao.save(order);
 
         assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.COOKING.toString());
     }
