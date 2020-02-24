@@ -2,6 +2,9 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.*;
 import kitchenpos.model.*;
+import org.assertj.core.api.ListAssert;
+import org.assertj.core.api.ObjectArrayAssert;
+import org.assertj.core.api.ObjectEnumerableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,8 +60,8 @@ class TableGroupBoTest {
         TableGroup tableGroup = TableGroupTest.ofTwoEmptyTable();
         tableGroupBo.create(tableGroup);
 
-        tableGroup.getOrderTables()
-                .forEach(orderTable -> assertThat(orderTable.isEmpty()).isFalse());
+        assertThat(tableGroup.getOrderTables())
+                .allSatisfy(orderTable -> assertThat(orderTable.isEmpty()).isFalse());
     }
 
     @Test
@@ -68,8 +71,9 @@ class TableGroupBoTest {
         tableGroup = tableGroupDao.save(tableGroup);
 
         tableGroupBo.delete(tableGroup.getId());
-        tableGroup.getOrderTables()
-                .forEach(orderTable -> assertThat(orderTable.getTableGroupId()).isNull());
+
+        assertThat(tableGroup.getOrderTables())
+                .allSatisfy(orderTable -> assertThat(orderTable.getTableGroupId()).isNull());
     }
 
     @ParameterizedTest()
