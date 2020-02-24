@@ -1,28 +1,25 @@
 package calculator;
 
 public class Number {
-    private final String textNumber;
+    private int number;
 
-    public Number(String textNumber) {
-        this.textNumber = textNumber;
+    public Number(int number) {
+        checkPositiveNumber(number);
+        this.number = number;
     }
 
-    private int getPositiveNumber(int number) {
+    private void checkPositiveNumber(int number) {
         if (number < 0) {
             throw new RuntimeException("음수 입력 에러");
         }
+    }
+
+    public int getNumber() {
         return number;
     }
 
-    public int convert() {
-        return convertTextToInt(textNumber);
+    public Number sum(Number number) {
+        return new Number(this.number + number.number);
     }
 
-    private int convertTextToInt(String textNumber) {
-        try {
-            return getPositiveNumber(Integer.parseInt(textNumber));
-        } catch (Exception e) {
-            throw new IllegalArgumentException("숫자가 아닙니다.");
-        }
-    }
 }

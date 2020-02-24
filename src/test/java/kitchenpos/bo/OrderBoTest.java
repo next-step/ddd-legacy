@@ -2,6 +2,7 @@ package kitchenpos.bo;
 
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.OrderDao;
+import kitchenpos.dao.OrderLineItemDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
@@ -15,10 +16,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -37,6 +36,9 @@ class OrderBoTest {
     @Mock
     private OrderDao orderDao;
 
+    @Mock
+    private OrderLineItemDao orderLineItemDao;
+
     @InjectMocks
     private OrderBo orderBo;
 
@@ -48,17 +50,20 @@ class OrderBoTest {
     @BeforeEach
     void setUp() {
         orderLineItem = new OrderLineItem();
+        orderLineList = new ArrayList<>();
+
         orderLineItem.setMenuId(1L);
         orderLineItem.setOrderId(1L);
-        orderLineItem.setQuantity(1);
-
-        orderLineList = new ArrayList<>();
+        orderLineItem.setQuantity(1L);
         orderLineList.add(orderLineItem);
 
         order = new Order();
+
         order.setId(1L);
         order.setOrderLineItems(orderLineList);
         order.setOrderStatus(OrderStatus.COOKING.name());
+        order.setOrderTableId(1L);
+        order.setOrderedTime(LocalDateTime.now());
 
         orderTable = new OrderTable();
         orderTable.setId(1L);
@@ -70,15 +75,13 @@ class OrderBoTest {
     @DisplayName("주문 리스트를 검색할 수 있다.")
     @Test
     void list() {
-        // given
-        given(orderDao.findAll())
-                .willReturn(Collections.singletonList(order));
+        given(orderDao.findAll()).willReturn(Collections.singletonList(order));
 
-        // when
-        List<Order> actualOrder = orderBo.list();
+        List<Order> orderList = orderBo.list();
+        Order actual = orderList.get(0);
 
-        // then
-        assertThat(actualOrder.get(0).getId()).isEqualTo(order.getId());
+        assertThat(actual).isNotNull();
+        assertThat(actual.getId()).isEqualTo(order.getId());
     }
 
     @DisplayName("주문을 생성할 수 있다.")

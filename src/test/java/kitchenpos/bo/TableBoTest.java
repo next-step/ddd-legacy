@@ -154,12 +154,9 @@ class TableBoTest {
     @ParameterizedTest
     @ValueSource(ints = {0})
     void guestShouldExistChangeTable(int guest) {
-        // given
+        // when
         orderTable.setNumberOfGuests(guest);
 
-        // when
-        given(orderTableDao.save(any(OrderTable.class)))
-                .willReturn(orderTable);
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> tableBo.changeNumberOfGuests(orderTable.getId(), orderTable));
