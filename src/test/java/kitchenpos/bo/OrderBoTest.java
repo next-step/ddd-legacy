@@ -6,7 +6,7 @@ import kitchenpos.model.*;
 import org.junit.jupiter.api.*;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static kitchenpos.bo.Fixture.*;
@@ -23,22 +23,13 @@ public class OrderBoTest {
     private OrderBo orderBo;
 
     private Order order;
-    private OrderLineItem orderLineItem;
-    private OrderTable orderTable;
-    private TableGroup tableGroup;
 
     @BeforeEach
     void setUp() {
-
         orderBo = new OrderBo(menuDao, orderDao, orderLineItemDao, orderTableDao);
-
-        orderLineItem = 주문번호1_치맥주문();
         order = 일번테이블주문();
-        orderTable = 만석인_일번테이블();
-        tableGroup = 단체테이블1();
-
         menuDao.save(치맥셋트());
-        orderTableDao.save(orderTable);
+        orderTableDao.save(만석인_일번테이블());
     }
 
     @Nested
@@ -103,7 +94,7 @@ public class OrderBoTest {
 
             Order unknownMenuOrder = OrderBuilder
                     .anOrder()
-                    .withOrderLineItems(Arrays.asList(unknowndMenuOrderLineItem))
+                    .withOrderLineItems(Collections.singletonList(unknowndMenuOrderLineItem))
                     .withOrderTableId(1L)
                     .withOrderedTime(LocalDateTime.now())
                     .build();
@@ -111,7 +102,6 @@ public class OrderBoTest {
             assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(unknownMenuOrder));
         }
     }
-
 
     @Test
     @DisplayName("전체 주문 리스트를 조회 할 수 있다.")
@@ -155,6 +145,5 @@ public class OrderBoTest {
                 () -> assertThat(expected.getId()).isEqualTo(changedStatusOrder.getId()),
                 () -> assertThat(expected.getOrderStatus()).isEqualTo(changedStatusOrder.getOrderStatus())
         );
-
     }
 }

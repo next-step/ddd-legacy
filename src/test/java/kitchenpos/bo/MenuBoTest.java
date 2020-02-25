@@ -1,13 +1,15 @@
 package kitchenpos.bo;
 
 import kitchenpos.dao.*;
-import kitchenpos.model.*;
+import kitchenpos.model.Menu;
+import kitchenpos.model.MenuBuilder;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static kitchenpos.bo.Fixture.*;
@@ -40,19 +42,20 @@ public class MenuBoTest {
     class create {
         @Test
         @DisplayName("새로운 메뉴를 등록 할 수 있다.")
-        void create() {
+        void create1() {
             //given
-            Menu actual = 치맥셋트();
+            Menu expected = 치맥셋트();
 
             //when
-            Menu expected = menuBo.create(치맥셋트());
+            Menu actual = menuBo.create(expected);
 
             //then
             Assertions.assertAll(
-                    () -> assertThat(expected).isNotNull(),
+                    () -> assertThat(actual).isNotNull(),
                     () -> assertThat(actual.getId()).isEqualTo(expected.getId()),
                     () -> assertThat(actual.getName()).isEqualTo(expected.getName()),
-                    () -> assertThat(actual.getMenuGroupId()).isEqualTo(expected.getMenuGroupId())
+                    () -> assertThat(actual.getMenuGroupId()).isEqualTo(expected.getMenuGroupId()),
+                    () -> assertThat(actual.getMenuProducts()).containsExactlyInAnyOrderElementsOf(expected.getMenuProducts())
             );
         }
 
@@ -61,7 +64,7 @@ public class MenuBoTest {
         @ValueSource(longs = {-1000, -2000})
         void create2(long price) {
             //given
-            Menu actual = MenuBuilder
+            Menu expected = MenuBuilder
                     .aMenu()
                     .withId(3L)
                     .withMenuGroupId(1L)
@@ -70,58 +73,20 @@ public class MenuBoTest {
                     .build();
 
             //when then
-            assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(actual));
-        }
-
-
-        @Test
-        @DisplayName("메뉴 가격은 메뉴 제품의 가격 총합을 초과 할 수 없다.")
-        void create3() {
-            //given
-            Menu actual = 치맥셋트();
-
-            BigDecimal sumOfProductsPrice = actual.getMenuProducts().stream()
-                    .map(i -> {
-                        Product p = productDao.findById(i.getProductId())
-                                .orElseGet(this::getZeroPriceProduct);
-
-                        BigDecimal price = p.getPrice();
-                        BigDecimal quantity = BigDecimal.valueOf(i.getQuantity());
-
-                        return price.multiply(quantity);
-                    }).reduce(BigDecimal.ZERO, BigDecimal::add);
-
-            assertThat(actual.getPrice())
-                    .isLessThan(sumOfProductsPrice);
-        }
-
-        Product getZeroPriceProduct() {
-            return ProductBuilder
-                    .aProduct()
-                    .withPrice(BigDecimal.valueOf(0))
-                    .build();
+            assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(expected));
         }
     }
 
     @Test
-    @DisplayName("전체 메뉴 리스트를 조회 할 수 있다.")
+    @DisplayName("메뉴 리스트를 조회 할 수 있다.")
     void listAll() {
         //given
-        Menu createdMenu = 치맥셋트();
-        List<Menu> actual = Arrays.asList(menuBo.create(치맥셋트()));
+        List<Menu> expected = Collections.singletonList(menuBo.create(치맥셋트()));
 
         //when
-        List<Menu> expected = menuBo.list();
+        List<Menu> actual = menuBo.list();
 
         //then
-        Assertions.assertAll(
-                () -> assertThat(expected).isNotNull(),
-                () -> assertThat(expected.stream().anyMatch(i -> {
-                    Long expectedId = i.getId();
-                    Long actualId = actual.get(0).getId();
-
-                    return expectedId.equals(actualId);
-                }))
-        );
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(expected);
     }
 }

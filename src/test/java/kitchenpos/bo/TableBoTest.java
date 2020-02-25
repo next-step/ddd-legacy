@@ -10,6 +10,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.Collections;
 import java.util.List;
 
 import static kitchenpos.bo.Fixture.만석인_일번테이블;
@@ -23,12 +24,9 @@ public class TableBoTest {
 
     private TableBo tableBo;
 
-    private OrderTable orderTable;
-
     @BeforeEach
     void setUp() {
         tableBo = new TableBo(orderDao, orderTableDao);
-        orderTable = 만석인_일번테이블();
     }
 
     @Nested
@@ -37,15 +35,18 @@ public class TableBoTest {
         @Test
         @DisplayName("주문 테이블을 생성 할 수 있다.")
         void create() {
+            //given
+            OrderTable expected = 만석인_일번테이블();
+
             //given - when
-            OrderTable expected = tableBo.create(orderTable);
+            OrderTable actual = tableBo.create(expected);
 
             //then
             Assertions.assertAll(
-                    () -> assertThat(expected).isNotNull(),
-                    () -> assertThat(expected.getId()).isEqualTo(orderTable.getId()),
-                    () -> assertThat(expected.getTableGroupId()).isEqualTo(orderTable.getTableGroupId()),
-                    () -> assertThat(expected.getNumberOfGuests()).isEqualTo(orderTable.getNumberOfGuests())
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(actual.getId()).isEqualTo(expected.getId()),
+                    () -> assertThat(actual.getTableGroupId()).isEqualTo(expected.getTableGroupId()),
+                    () -> assertThat(actual.getNumberOfGuests()).isEqualTo(expected.getNumberOfGuests())
             );
         }
     }
@@ -54,20 +55,15 @@ public class TableBoTest {
     @DisplayName("전체 테이블 리스트를 조회 할 수 있다.")
     void list() {
         //given
-        OrderTable actual = tableBo.create(orderTable);
+        OrderTable expected = tableBo.create(만석인_일번테이블());
 
         //when
-        List<OrderTable> expected = tableBo.list();
+        List<OrderTable> actual = tableBo.list();
 
         //then
         Assertions.assertAll(
-                () -> assertThat(expected).isNotNull(),
-                () -> assertThat(expected.stream().anyMatch(i -> {
-                    Long expectedId = i.getId();
-                    Long actualId = actual.getId();
-
-                    return expectedId.equals(actualId);
-                }))
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual).containsExactlyInAnyOrderElementsOf(Collections.singletonList(expected))
         );
     }
 
@@ -84,7 +80,8 @@ public class TableBoTest {
 
         OrderTable createdTable = tableBo.create(table);
 
-        OrderTable actual = OrderTableBuilder
+        OrderTable expected;
+        expected = OrderTableBuilder
                 .anOrderTable()
                 .withId(createdTable.getId())
                 .withNumberOfGuests(createdTable.getNumberOfGuests())
@@ -93,15 +90,15 @@ public class TableBoTest {
                 .build();
 
         //when
-        OrderTable expected = tableBo.changeEmpty(actual.getId(), actual);
+        OrderTable actual = tableBo.changeEmpty(expected.getId(), expected);
 
         //then
         Assertions.assertAll(
-                () -> assertThat(expected).isNotNull(),
-                () -> assertThat(expected.isEmpty()).isTrue(),
-                () -> assertThat(expected.getId()).isEqualTo(actual.getId()),
-                () -> assertThat(expected.getNumberOfGuests()).isEqualTo(actual.getNumberOfGuests()),
-                () -> assertThat(expected.getTableGroupId()).isEqualTo(actual.getTableGroupId())
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual.isEmpty()).isTrue(),
+                () -> assertThat(actual.getId()).isEqualTo(expected.getId()),
+                () -> assertThat(actual.getNumberOfGuests()).isEqualTo(expected.getNumberOfGuests()),
+                () -> assertThat(actual.getTableGroupId()).isEqualTo(expected.getTableGroupId())
         );
     }
 
@@ -110,26 +107,26 @@ public class TableBoTest {
     @DisplayName("테이블 게스트의 수를 수정 할 수 있다.")
     void changeNumberOfGuests(int numberOfGuests) {
         //given
-        tableBo.create(orderTable);
+        OrderTable createdOrderTalbe = tableBo.create(만석인_일번테이블());
 
-        OrderTable actual = OrderTableBuilder
+        OrderTable expected = OrderTableBuilder
                 .anOrderTable()
-                .withId(orderTable.getId())
-                .withTableGroupId(orderTable.getTableGroupId())
-                .withEmpty(orderTable.isEmpty())
+                .withId(createdOrderTalbe.getId())
+                .withTableGroupId(createdOrderTalbe.getTableGroupId())
+                .withEmpty(createdOrderTalbe.isEmpty())
                 .withNumberOfGuests(numberOfGuests)
                 .build();
 
         //when
-        OrderTable expected = tableBo.changeNumberOfGuests(orderTable.getId(), actual);
+        OrderTable actual = tableBo.changeNumberOfGuests(expected.getId(), expected);
 
         //then
         Assertions.assertAll(
-                () -> assertThat(expected).isNotNull(),
-                () -> assertThat(expected.isEmpty()).isFalse(),
-                () -> assertThat(expected.getId()).isEqualTo(actual.getId()),
-                () -> assertThat(expected.getNumberOfGuests()).isEqualTo(numberOfGuests),
-                () -> assertThat(expected.getTableGroupId()).isEqualTo(actual.getTableGroupId())
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual.isEmpty()).isFalse(),
+                () -> assertThat(actual.getId()).isEqualTo(expected.getId()),
+                () -> assertThat(actual.getNumberOfGuests()).isEqualTo(numberOfGuests),
+                () -> assertThat(actual.getTableGroupId()).isEqualTo(expected.getTableGroupId())
         );
     }
 
@@ -138,17 +135,17 @@ public class TableBoTest {
     @ValueSource(ints = {-1, -100})
     void changleNumberOfGuestException(int numberOfGuests) {
         //given
-        tableBo.create(orderTable);
+        OrderTable createdOrderTalbe = tableBo.create(만석인_일번테이블());
 
-        OrderTable actual = OrderTableBuilder
+        OrderTable expected = OrderTableBuilder
                 .anOrderTable()
-                .withId(orderTable.getId())
-                .withTableGroupId(orderTable.getTableGroupId())
-                .withEmpty(orderTable.isEmpty())
+                .withId(createdOrderTalbe.getId())
+                .withTableGroupId(createdOrderTalbe.getTableGroupId())
+                .withEmpty(createdOrderTalbe.isEmpty())
                 .withNumberOfGuests(numberOfGuests)
                 .build();
 
         //when then
-        assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeNumberOfGuests(orderTable.getId(), actual));
+        assertThatIllegalArgumentException().isThrownBy(() -> tableBo.changeNumberOfGuests(expected.getId(), expected));
     }
 }

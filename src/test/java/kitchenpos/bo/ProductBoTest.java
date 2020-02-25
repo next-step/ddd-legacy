@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 import static kitchenpos.bo.Fixture.치킨;
@@ -20,11 +21,9 @@ public class ProductBoTest {
     private final ProductDao productDao = new TestProductDao();
 
     private ProductBo productBo;
-    private Product product;
 
     @BeforeEach
     void setUp() {
-        product = 치킨();
         productBo = new ProductBo(productDao);
     }
 
@@ -34,15 +33,18 @@ public class ProductBoTest {
         @Test
         @DisplayName("새로운 제풍을 생성 할 수 있다.")
         void create() {
-            //given - when
-            Product expected = productBo.create(product);
+            //given
+            Product expected = 치킨();
+
+            //when
+            Product actual = productBo.create(expected);
 
             //then
             Assertions.assertAll(
-                    () -> assertThat(expected).isNotNull(),
-                    () -> assertThat(expected.getId()).isEqualTo(product.getId()),
-                    () -> assertThat(expected.getPrice()).isEqualTo(product.getPrice()),
-                    () -> assertThat(expected.getName()).isEqualTo(product.getName())
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(actual.getId()).isEqualTo(expected.getId()),
+                    () -> assertThat(actual.getPrice()).isEqualTo(expected.getPrice()),
+                    () -> assertThat(actual.getName()).isEqualTo(expected.getName())
             );
         }
 
@@ -51,7 +53,7 @@ public class ProductBoTest {
         @DisplayName("제품의 가격은 0 이상의 숫자이다.")
         void creat2(long price) {
             //given
-            Product wrongPriceProduct = ProductBuilder
+            Product actual = ProductBuilder
                     .aProduct()
                     .withPrice(BigDecimal.valueOf(price))
                     .withId(1L)
@@ -59,29 +61,23 @@ public class ProductBoTest {
                     .build();
 
             //when then
-            assertThatIllegalArgumentException().isThrownBy(() -> productBo.create(wrongPriceProduct));
+            assertThatIllegalArgumentException().isThrownBy(() -> productBo.create(actual));
         }
     }
 
     @Test
-    @DisplayName("전체 제품 리스트를 조회 해 볼 수 있다.")
+    @DisplayName("제품 리스트를 조회 해 볼 수 있다.")
     void list() {
         //given
-        Product actual = productBo.create(product);
+        Product expected = productBo.create(치킨());
 
         //when
-        List<Product> expected = productBo.list();
+        List<Product> actual = productBo.list();
 
         //then
         Assertions.assertAll(
-                () -> assertThat(expected).isNotNull(),
-                () -> assertThat(expected.stream().anyMatch(i -> {
-                    Long expectedId = i.getId();
-                    Long actualId = actual.getId();
-
-                    return expectedId.equals(actualId);
-                }))
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual).containsExactlyInAnyOrderElementsOf(Collections.singletonList(expected))
         );
     }
-
 }
