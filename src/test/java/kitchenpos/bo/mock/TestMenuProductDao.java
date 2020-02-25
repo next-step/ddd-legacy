@@ -27,7 +27,7 @@ public class TestMenuProductDao implements MenuProductDao {
     public List<MenuProduct> findAllByMenuId(Long menuId) {
         return data.values()
                 .stream()
-                .filter(test -> test.getMenuId() == menuId)
+                .filter(menuProduct -> menuProduct.getMenuId() == menuId)
                 .collect(Collectors.toList());
     }
 }
