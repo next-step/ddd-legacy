@@ -1,6 +1,5 @@
-package kitchenpos.da;
+package kitchenpos.dao;
 
-import kitchenpos.dao.DefaultMenuGroupDao;
 import kitchenpos.model.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
