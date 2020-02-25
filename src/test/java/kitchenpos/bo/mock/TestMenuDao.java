@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TestMenuDao implements MenuDao {
+
     private static final Map<Long, Menu> data = new HashMap<>();
 
     @Override

@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class TestProductDao implements ProductDao {
+
     private static final Map<Long, Product> data = new HashMap<>();
 
     @Override
