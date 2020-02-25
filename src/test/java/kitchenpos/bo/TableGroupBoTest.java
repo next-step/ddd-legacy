@@ -58,7 +58,9 @@ class TableGroupBoTest {
     @DisplayName("테이블 그룹 생성 시 저장된 테이블 수랑 요청 테이블 수가 다르면 오류 발생")
     @Test
     void createLessSize() {
-        input.setOrderTables(Arrays.asList(defaultOrderTable(), emptyGroupIdOrderTable(), emptyTrueOrderTable()));
+        OrderTable badInput = defaultOrderTable();
+        badInput.setId(100L);
+        input.setOrderTables(Arrays.asList(badInput, emptyTrueOrderTable(), emptyGroupIdOrderTable()));
 
         assertThrows(IllegalArgumentException.class, () -> tableGroupBo.create(input));
     }
