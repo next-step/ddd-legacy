@@ -8,7 +8,7 @@ import java.util.Optional;
 public interface ProductDao {
     Product save(Product entity);
 
-    Optional<Product> findById(Long Id);
+    Optional<Product> findById(Long id);
 
     List<Product> findAll();
 }
