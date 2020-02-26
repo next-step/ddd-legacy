@@ -1,6 +1,7 @@
 package calculator;
 
 public class Number {
+    public static final Number ZERO = new Number(0);
     private static final String NUMBER_REGEX = "^[0-9]+$";
     private int value;
 
