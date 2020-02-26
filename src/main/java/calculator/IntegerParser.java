@@ -4,18 +4,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class NumberParser {
-    private List<Integer> numberArray;
+class IntegerParser {
+    private List<Integer> textToIntArray;
 
-    public NumberParser(String[] text) {
-        numberArray = textToNumber(text);
+    public IntegerParser(String[] text) {
+        textToIntArray = textToIntArray(text);
     }
 
-    public List<Integer> getNumberArray() {
-        return numberArray;
+    public List<Integer> getIntArray() {
+        return textToIntArray;
     }
 
-    public List<Integer> textToNumber(String[] text) {
+    public List<Integer> textToIntArray(String[] text) {
         return Arrays.stream(text).map(this::convertTextToInt).collect(Collectors.toList());
     }
     private int convertTextToInt(String textNumber) {
