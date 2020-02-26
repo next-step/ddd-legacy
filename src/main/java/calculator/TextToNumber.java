@@ -7,11 +7,11 @@ public class TextToNumber {
     private List<Number> numberList;
 
     public TextToNumber(String[] text) {
-        this.numberList = this.parseToNumber(new NumberParser(text).getNumberArray());
+        this.numberList = this.convertNumberArray(new NumberParser(text));
     }
 
-    private List<Number> parseToNumber(List<Integer> values) {
-        return values.stream()
+    private List<Number> convertNumberArray(NumberParser numberParser) {
+        return numberParser.getNumberArray().stream()
                 .map(Number::new)
                 .collect(Collectors.toList());
     }
