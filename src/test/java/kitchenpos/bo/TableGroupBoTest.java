@@ -44,14 +44,14 @@ class TableGroupBoTest extends Fixtures {
     @DisplayName("테이블 그룹을 만들 수 있다.")
     void create() {
         final TableGroup tableGroup = new TableGroup();
-        tableGroup.setId(1l);
+        tableGroup.setId(1L);
 
         final OrderTable orderTable = new OrderTable();
-        orderTable.setId(1l);
+        orderTable.setId(1L);
         orderTable.setEmpty(true);
 
         final OrderTable orderTable1 = new OrderTable();
-        orderTable1.setId(2l);
+        orderTable1.setId(2L);
         orderTable1.setEmpty(true);
 
         final List<OrderTable> orderTables = Arrays.asList(orderTable, orderTable1);
@@ -72,10 +72,10 @@ class TableGroupBoTest extends Fixtures {
     @DisplayName("주문테이블이 1개 이상인 경우에 만들 수 있다.")
     void create_orderTable_validation() {
         final TableGroup tableGroup = new TableGroup();
-        tableGroup.setId(1l);
+        tableGroup.setId(1L);
 
         final OrderTable orderTable = new OrderTable();
-        orderTable.setId(1l);
+        orderTable.setId(1L);
         orderTable.setEmpty(true);
 
         final List<OrderTable> orderTables = Arrays.asList(orderTable);
@@ -89,15 +89,15 @@ class TableGroupBoTest extends Fixtures {
     @DisplayName("주문테이블의 사이즈와 동일해야 만들 수 있다.")
     void create_orderTable_size() {
         final TableGroup tableGroup = new TableGroup();
-        tableGroup.setId(1l);
+        tableGroup.setId(1L);
 
         final OrderTable orderTable = new OrderTable();
-        orderTable.setId(1l);
+        orderTable.setId(1L);
         orderTable.setEmpty(true);
 
 
         final OrderTable orderTable1 = new OrderTable();
-        orderTable1.setId(2l);
+        orderTable1.setId(2L);
         orderTable1.setEmpty(true);
 
         final List<OrderTable> orderTables = Arrays.asList(orderTable, orderTable1);
@@ -115,7 +115,7 @@ class TableGroupBoTest extends Fixtures {
     @DisplayName("테이블 그룹을 삭제 할 수 있다.")
     void delete() {
         final TableGroup tableGroup = new TableGroup();
-        tableGroup.setId(1l);
+        tableGroup.setId(1L);
         tableGroup.setOrderTables(orderTables);
 
         final List<Long> orderTableIds = orderTables.stream().map(OrderTable::getId).collect(Collectors.toList());
@@ -141,7 +141,7 @@ class TableGroupBoTest extends Fixtures {
     @DisplayName("주문 상태가 요리중이거나 먹고있으면 삭제 할 수 없다.")
     void delete_OrderStatus_cooking_or_meal() {
         final TableGroup tableGroup = new TableGroup();
-        tableGroup.setId(1l);
+        tableGroup.setId(1L);
         tableGroup.setOrderTables(orderTables);
 
         final List<Long> orderTableIds = orderTables.stream().map(OrderTable::getId).collect(Collectors.toList());
@@ -151,7 +151,7 @@ class TableGroupBoTest extends Fixtures {
 
         given(orderTableDao.findAllByTableGroupId(tableGroup.getId())).willReturn(Fixtures.orderTables);
         given(orderDao.existsByOrderTableIdInAndOrderStatusIn(orderTableIds,
-                Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willThrow(IllegalArgumentException.class);
+                Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willReturn(true);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> tableGroupBo.delete(tableGroup.getId()));

@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -61,14 +62,14 @@ class OrderBoTest extends Fixtures {
     void create_notEqual_menuItem_size() {
         final Order order = new Order();
         final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(1l);
+        orderLineItem.setMenuId(1L);
 
         final OrderLineItem orderLineItem1 = new OrderLineItem();
-        orderLineItem1.setMenuId(2l);
+        orderLineItem1.setMenuId(2L);
         order.setOrderLineItems(Arrays.asList(orderLineItem, orderLineItem1));
 
         given(menuDao.countByIdIn(Arrays.asList(orderLineItem.getMenuId(),
-                orderLineItem1.getMenuId()))).willReturn(3l);
+                orderLineItem1.getMenuId()))).willReturn(3L);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderBo.create(order));
@@ -79,16 +80,16 @@ class OrderBoTest extends Fixtures {
     void create_notExist_orderTable() {
         final Order order = new Order();
         final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(1l);
+        orderLineItem.setMenuId(1L);
 
         final OrderLineItem orderLineItem1 = new OrderLineItem();
-        orderLineItem1.setMenuId(2l);
-        order.setOrderTableId(1l);
+        orderLineItem1.setMenuId(2L);
+        order.setOrderTableId(1L);
         order.setOrderLineItems(Arrays.asList(orderLineItem, orderLineItem1));
 
         given(menuDao.countByIdIn(Arrays.asList(orderLineItem.getMenuId(),
-                orderLineItem1.getMenuId()))).willReturn(2l);
-        given(orderTableDao.findById(order.getOrderTableId())).willThrow(IllegalArgumentException.class);
+                orderLineItem1.getMenuId()))).willReturn(2L);
+        given(orderTableDao.findById(order.getOrderTableId())).willReturn(Optional.empty());
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderBo.create(order));
@@ -99,18 +100,18 @@ class OrderBoTest extends Fixtures {
     void create_empty_orderTable() {
         final Order order = new Order();
         final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(1l);
+        orderLineItem.setMenuId(1L);
 
         final OrderLineItem orderLineItem1 = new OrderLineItem();
-        orderLineItem1.setMenuId(2l);
-        order.setOrderTableId(1l);
+        orderLineItem1.setMenuId(2L);
+        order.setOrderTableId(1L);
         order.setOrderLineItems(Arrays.asList(orderLineItem, orderLineItem1));
 
         final OrderTable orderTable = Fixtures.orderTable;
         orderTable.setEmpty(true);
 
         given(menuDao.countByIdIn(Arrays.asList(orderLineItem.getMenuId(),
-                orderLineItem1.getMenuId()))).willReturn(2l);
+                orderLineItem1.getMenuId()))).willReturn(2L);
         given(orderTableDao.findById(order.getOrderTableId())).willReturn(Optional.of(orderTable));
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -121,42 +122,48 @@ class OrderBoTest extends Fixtures {
     @DisplayName("주문 테이블이 정상 등록")
     void create_success() {
         final Order order = new Order();
-        order.setOrderTableId(1l);
+        order.setOrderTableId(1L);
 
-        final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(1l);
+        final OrderLineItem friedChicken = new OrderLineItem();
+        friedChicken.setMenuId(1L);
 
-        final OrderLineItem orderLineItem1 = new OrderLineItem();
-        orderLineItem1.setMenuId(2l);
+        final OrderLineItem seasonedChicken = new OrderLineItem();
+        seasonedChicken.setMenuId(2L);
 
-        order.setOrderLineItems(Arrays.asList(orderLineItem, orderLineItem1));
+        order.setOrderLineItems(Arrays.asList(friedChicken, seasonedChicken));
 
         final OrderTable orderTable = Fixtures.orderTable;
         orderTable.setEmpty(false);
 
-        given(menuDao.countByIdIn(Arrays.asList(orderLineItem.getMenuId(),
-                orderLineItem1.getMenuId()))).willReturn(2l);
+        given(menuDao.countByIdIn(Arrays.asList(friedChicken.getMenuId(),
+                seasonedChicken.getMenuId()))).willReturn(2L);
         given(orderTableDao.findById(order.getOrderTableId())).willReturn(Optional.of(orderTable));
         given(orderDao.save(order)).willReturn(order);
-        given(orderLineItemDao.save(orderLineItem)).willReturn(orderLineItem);
-        given(orderLineItemDao.save(orderLineItem1)).willReturn(orderLineItem1);
+        given(orderLineItemDao.save(friedChicken)).willReturn(friedChicken);
+        given(orderLineItemDao.save(seasonedChicken)).willReturn(seasonedChicken);
 
         final Order result = orderBo.create(order);
 
-        assertThat(result).isNotNull();
+        assertAll(
+                () -> assertThat(result).isNotNull(),
+                () -> assertThat(result.getOrderLineItems()).containsExactlyInAnyOrderElementsOf(order.getOrderLineItems()),
+                () -> assertThat(result.getOrderStatus()).isEqualTo(order.getOrderStatus()),
+                () -> assertThat(result.getId()).isEqualTo(order.getId()),
+                () -> assertThat(result.getOrderTableId()).isEqualTo(order.getOrderTableId())
+        );
     }
 
     @Test
     @DisplayName("주문 목록을 조회 할 수 있다.")
     void list() {
         final Order order = new Order();
-        order.setId(1l);
+        order.setId(1L);
 
         final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setOrderId(1l);
+        orderLineItem.setOrderId(1L);
 
         final OrderLineItem orderLineItem1 = new OrderLineItem();
-        orderLineItem1.setOrderId(1l);
+        orderLineItem1.setOrderId(1L);
 
         final List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem, orderLineItem1);
         order.setOrderLineItems(orderLineItems);
@@ -172,12 +179,12 @@ class OrderBoTest extends Fixtures {
     }
 
     @Test
-    @DisplayName("주문이 존재 하지 않는 경우")
+    @DisplayName("주문 상태를 변경하는데, 주문 정보가 존재하지 않는 경우")
     void changeOrderStatus_notExist_order() {
         final Order order = new Order();
-        order.setId(1l);
+        order.setId(1L);
 
-        given(orderDao.findById(order.getId())).willThrow(IllegalArgumentException.class);
+        given(orderDao.findById(order.getId())).willReturn(Optional.empty());
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderBo.changeOrderStatus(order.getId(), order));
@@ -187,7 +194,7 @@ class OrderBoTest extends Fixtures {
     @DisplayName("주문이 완료된 경우")
     void changeOrderStatus_completed_order() {
         final Order order = new Order();
-        order.setId(1l);
+        order.setId(1L);
         order.setOrderStatus(OrderStatus.COMPLETION.name());
 
         given(orderDao.findById(order.getId())).willReturn(Optional.of(order));
@@ -200,11 +207,11 @@ class OrderBoTest extends Fixtures {
     @DisplayName("주문 상태를 변경 하는 경우")
     void changeOrderStatus_success() {
         final Order order = new Order();
-        order.setId(1l);
+        order.setId(1L);
         order.setOrderStatus(OrderStatus.COOKING.name());
 
         final Order updatedOrder = new Order();
-        updatedOrder.setId(1l);
+        updatedOrder.setId(1L);
         updatedOrder.setOrderStatus(OrderStatus.MEAL.name());
 
         given(orderDao.findById(order.getId())).willReturn(Optional.of(order));

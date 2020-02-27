@@ -95,7 +95,7 @@ class TableBoTest extends Fixtures {
 
         given(orderTableDao.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
         given(orderDao.existsByOrderTableIdAndOrderStatusIn(resolvedOrderTable.getId(),
-                Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willThrow(IllegalArgumentException.class);
+                Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))).willReturn(true);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> tableBo.changeEmpty(orderTable.getId(), orderTable));
@@ -113,5 +113,15 @@ class TableBoTest extends Fixtures {
         final OrderTable result = tableBo.changeNumberOfGuests(orderTable.getId(), newOrderTable);
 
         assertThat(result.getNumberOfGuests()).isEqualTo(newOrderTable.getNumberOfGuests());
+    }
+
+    @Test
+    @DisplayName("주문 테이블이 비어있는 상태에서 인원수 업데이트는 불가능하다.")
+    void changeNumberOfGuests_empty_table() {
+        final OrderTable orderTable = Fixtures.orderTable;
+        orderTable.setNumberOfGuests(0);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> tableBo.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
 }

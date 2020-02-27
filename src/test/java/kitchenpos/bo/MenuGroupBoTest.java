@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -36,8 +37,11 @@ class MenuGroupBoTest extends Fixtures {
 
         final MenuGroup savedMenuGroup = menuGroupBo.create(menuGroup);
 
-        assertThat(savedMenuGroup).isNotNull();
-        assertThat(savedMenuGroup.getId()).isEqualTo(menuGroup.getId());
+        assertAll(
+                () -> assertThat(savedMenuGroup).isNotNull(),
+                () -> assertThat(savedMenuGroup.getId()).isEqualTo(menuGroup.getId()),
+                () -> assertThat(savedMenuGroup.getName()).isEqualTo(menuGroup.getName())
+        );
     }
 
     @Test
@@ -51,5 +55,6 @@ class MenuGroupBoTest extends Fixtures {
 
         assertThat(result).isNotEmpty();
         assertThat(result.size()).isEqualTo(menuGroupList.size());
+        assertThat(result).containsExactlyInAnyOrderElementsOf(menuGroupList);
     }
 }
