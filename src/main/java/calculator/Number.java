@@ -16,7 +16,7 @@ public class Number {
 
     public Number(final int value) {
         Objects.requireNonNull(value, "can not be null");
-        validateNumber();
+        validateNumber(value);
         this.value = value;
     }
 
@@ -24,14 +24,10 @@ public class Number {
         return value;
     }
 
-    private void validateNumber() {
-        if (isNegative()) {
+    private void validateNumber(final int value) {
+        if (value < 0) {
             throw new RuntimeException();
         }
-    }
-
-    private boolean isNegative() {
-        return value < 0;
     }
 
     public Number sum(final Number number) {

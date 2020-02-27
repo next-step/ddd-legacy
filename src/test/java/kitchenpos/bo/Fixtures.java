@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class Fixtures {
 
-    public static final int QUANTITY_ONE = 1;
+    private static final int QUANTITY_ONE = 1;
     private static final long PRODUCT_ID = 1L;
     private static final long PRODUCT_ID2 = 2L;
     private static final long MENU_ID = 1L;
