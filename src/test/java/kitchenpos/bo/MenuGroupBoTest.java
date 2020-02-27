@@ -49,7 +49,7 @@ class MenuGroupBoTest extends Fixtures {
 
         final List<MenuGroup> result = menuGroupBo.list();
 
-        assertThat(menuGroupList).isNotEmpty();
-        assertThat(menuGroupList.size()).isEqualTo(result.size());
+        assertThat(result).isNotEmpty();
+        assertThat(result.size()).isEqualTo(menuGroupList.size());
     }
 }

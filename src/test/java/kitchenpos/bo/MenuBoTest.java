@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 /**
@@ -60,20 +61,26 @@ class MenuBoTest extends Fixtures {
 
         final Menu savedMenu = menuBo.create(menu);
 
-        assertThat(savedMenu).isNotNull();
-        assertThat(savedMenu.getId()).isEqualTo(menu.getId());
-        assertThat(savedMenu.getName()).isEqualTo(menu.getName());
-        assertThat(savedMenu.getPrice()).isEqualTo(menu.getPrice());
-        assertThat(savedMenu.getMenuGroupId()).isEqualTo(menu.getMenuGroupId());
-        assertThat(savedMenu.getMenuProducts().size()).isEqualTo(menu.getMenuProducts().size());
-        assertThat(savedMenu.getMenuProducts().get(0).getProductId())
-                .isEqualTo(menu.getMenuProducts().get(0).getProductId());
-        assertThat(savedMenu.getMenuProducts().get(0).getQuantity())
-                .isEqualTo(menu.getMenuProducts().get(0).getQuantity());
-        assertThat(savedMenu.getMenuProducts().get(0).getMenuId())
-                .isEqualTo(menu.getMenuProducts().get(0).getMenuId());
-        assertThat(savedMenu.getMenuProducts().get(0).getSeq())
-                .isEqualTo(menu.getMenuProducts().get(0).getSeq());
+        assertAll(
+                () -> assertThat(savedMenu).isNotNull(),
+                () -> assertThat(savedMenu.getId()).isEqualTo(menu.getId()),
+                () -> assertThat(savedMenu.getName()).isEqualTo(menu.getName()),
+                () -> assertThat(savedMenu.getPrice()).isEqualTo(menu.getPrice()),
+                () -> assertThat(savedMenu.getMenuGroupId())
+                        .isEqualTo(menu.getMenuGroupId()),
+                () -> assertThat(savedMenu.getMenuProducts().size())
+                        .isEqualTo(menu.getMenuProducts().size()),
+                () -> assertThat(savedMenu.getMenuProducts().get(0).getProductId())
+                        .isEqualTo(menu.getMenuProducts().get(0).getProductId()),
+                () -> assertThat(savedMenu.getMenuProducts().get(0).getProductId())
+                        .isEqualTo(menu.getMenuProducts().get(0).getProductId()),
+                () -> assertThat(savedMenu.getMenuProducts().get(0).getQuantity())
+                        .isEqualTo(menu.getMenuProducts().get(0).getQuantity()),
+                () -> assertThat(savedMenu.getMenuProducts().get(0).getMenuId())
+                        .isEqualTo(menu.getMenuProducts().get(0).getMenuId()),
+                () -> assertThat(savedMenu.getMenuProducts().get(0).getSeq())
+                        .isEqualTo(menu.getMenuProducts().get(0).getSeq())
+        );
     }
 
     @ParameterizedTest
@@ -126,11 +133,17 @@ class MenuBoTest extends Fixtures {
 
         final List<Menu> list = menuBo.list();
 
-        assertThat(list).isNotEmpty();
-        assertThat(list.size()).isEqualTo(menus.size());
-        assertThat(list.get(0).getMenuProducts().get(0).getSeq()).isEqualTo(menuProducts.get(0).getSeq());
-        assertThat(list.get(0).getMenuProducts().get(0).getMenuId()).isEqualTo(menuProducts.get(0).getMenuId());
-        assertThat(list.get(0).getMenuProducts().get(0).getQuantity()).isEqualTo(menuProducts.get(0).getQuantity());
-        assertThat(list.get(0).getMenuProducts().get(0).getProductId()).isEqualTo(menuProducts.get(0).getProductId());
+        assertAll(
+                () -> assertThat(list).isNotEmpty(),
+                () -> assertThat(list.size()).isEqualTo(menus.size()),
+                () -> assertThat(list.get(0).getMenuProducts().get(0).getSeq())
+                        .isEqualTo(menuProducts.get(0).getSeq()),
+                () -> assertThat(list.get(0).getMenuProducts().get(0).getMenuId())
+                        .isEqualTo(menuProducts.get(0).getMenuId()),
+                () -> assertThat(list.get(0).getMenuProducts().get(0).getQuantity())
+                        .isEqualTo(menuProducts.get(0).getQuantity()),
+                () -> assertThat(list.get(0).getMenuProducts().get(0).getProductId())
+                        .isEqualTo(menuProducts.get(0).getProductId())
+        );
     }
 }
