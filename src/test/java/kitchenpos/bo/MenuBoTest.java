@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -112,5 +114,23 @@ class MenuBoTest extends Fixtures {
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuBo.create(menu));
+    }
+
+    @Test
+    @DisplayName("메뉴를 조회할 수 있다.")
+    void list() {
+
+        final List<Menu> menus = Arrays.asList(menu);
+        given(menuDao.findAll()).willReturn(menus);
+        given(menuProductDao.findAllByMenuId(menu.getId())).willReturn(menuProducts);
+
+        final List<Menu> list = menuBo.list();
+
+        assertThat(list).isNotEmpty();
+        assertThat(list.size()).isEqualTo(menus.size());
+        assertThat(list.get(0).getMenuProducts().get(0).getSeq()).isEqualTo(menuProducts.get(0).getSeq());
+        assertThat(list.get(0).getMenuProducts().get(0).getMenuId()).isEqualTo(menuProducts.get(0).getMenuId());
+        assertThat(list.get(0).getMenuProducts().get(0).getQuantity()).isEqualTo(menuProducts.get(0).getQuantity());
+        assertThat(list.get(0).getMenuProducts().get(0).getProductId()).isEqualTo(menuProducts.get(0).getProductId());
     }
 }
