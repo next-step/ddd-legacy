@@ -21,6 +21,7 @@ public class StringCalculator {
             return 0;
         }
 
+        int result = 0;
         String[] tokens = getTokens(inputString);
 
         List<CalculatorNumber> calculatorNumbers = Arrays.stream(tokens)
@@ -28,9 +29,11 @@ public class StringCalculator {
                 .collect(Collectors.toList())
                 ;
 
-        CalculatorNumberGroups calculatorNumberGroups = new CalculatorNumberGroups(calculatorNumbers);
+        for (CalculatorNumber calculatorNumber : calculatorNumbers) {
+            result = calculatorNumber.sum(result);
+        }
 
-        return calculatorNumberGroups.addAllCalculatorNumber();
+        return result;
     }
 
     private String[] getTokens(String inputString) {

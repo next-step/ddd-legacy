@@ -18,4 +18,8 @@ public class CalculatorNumber {
     public int getNumber() {
         return this.number;
     }
+
+    public int sum(int number) {
+        return Integer.sum(this.number, number);
+    }
 }
