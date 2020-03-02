@@ -14,8 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class FakeMenuGroupBoTest {
-    public static final long LONG_ONE = 1L;
-    public static final long LONG_TWO = 2L;
+    private static final long MENU_GROUP_ID_ONE = 1L;
+    private static final long MENU_GROUP_ID_TWO = 2L;
 
     private MenuGroupDao menuGroupDao = new FakeMenuGroupDao();
 
@@ -29,8 +29,8 @@ public class FakeMenuGroupBoTest {
     @DisplayName("메뉴 그룹 조회")
     @Test
     void list() {
-        MenuGroup menugroup1 = createMenuGroup(LONG_ONE, "순살 치킨");
-        MenuGroup menugroup2 = createMenuGroup(LONG_TWO, "오븐 치킨");
+        MenuGroup menugroup1 = createMenuGroup(MENU_GROUP_ID_ONE, "순살 치킨");
+        MenuGroup menugroup2 = createMenuGroup(MENU_GROUP_ID_TWO, "오븐 치킨");
 
         menuGroupDao.save(menugroup1);
         menuGroupDao.save(menugroup2);
@@ -48,7 +48,7 @@ public class FakeMenuGroupBoTest {
     @DisplayName("메뉴 그룹 추가")
     @Test
     void create() {
-        MenuGroup menugroup = createMenuGroup(LONG_ONE, "순살 치킨");
+        MenuGroup menugroup = createMenuGroup(MENU_GROUP_ID_ONE, "순살 치킨");
         MenuGroup savedMenuGroup = menuGroupBo.create(menugroup);
 
         assertAll(

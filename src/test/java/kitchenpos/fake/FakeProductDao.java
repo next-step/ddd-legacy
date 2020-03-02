@@ -11,7 +11,7 @@ public class FakeProductDao implements ProductDao {
     @Override
     public Product save(Product entity) {
         entities.put(entity.getId(), entity);
-        return null;
+        return entity;
     }
 
     @Override

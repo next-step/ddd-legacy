@@ -14,14 +14,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FakeTableGroupBoTest {
-    public static final long LONG_ONE = 1L;
-    public static final long LONG_TWO = 2L;
+    private static final long TABLE_GROUP_ID_ONE = 1L;
 
     private TableGroupBo tableGroupBo;
 
@@ -67,7 +68,7 @@ public class FakeTableGroupBoTest {
     @Test
     void createFailByTableNotExist() {
         TableGroup tableGroup = new TableGroupBuilder()
-                .setId(LONG_ONE)
+                .setId(TABLE_GROUP_ID_ONE)
                 .setCreatedDate(LocalDateTime.now())
                 .build();
 
@@ -107,12 +108,13 @@ public class FakeTableGroupBoTest {
     @Test
     void delete() {
         OrderTable orderTable1 = TestFixture.generateOrderTableEmptyOne();
-        orderTable1.setTableGroupId(LONG_TWO);
+        orderTable1.setTableGroupId(TABLE_GROUP_ID_ONE);
 
         OrderTable orderTable2 = TestFixture.generateOrderTableEmptyTWo();
-        orderTable2.setTableGroupId(LONG_TWO);
+        orderTable2.setTableGroupId(TABLE_GROUP_ID_ONE);
 
         TableGroup tableGroup = TestFixture.generateTableGroupOne();
+        tableGroup.setOrderTables(Arrays.asList(orderTable1, orderTable2));
 
         orderTableDao.save(orderTable1);
         orderTableDao.save(orderTable2);
@@ -121,9 +123,14 @@ public class FakeTableGroupBoTest {
 
         tableGroupBo.delete(tableGroup.getId());
 
+        List<OrderTable> findOrderTables = orderTableDao.findAll();
+
         assertAll(
-                () -> assertThat(orderTable1.getTableGroupId()).isNull(),
-                () -> assertThat(orderTable2.getTableGroupId()).isNull()
+                () -> {
+                    findOrderTables.forEach(orderTable -> {
+                        assertThat(orderTable.getTableGroupId()).isNull();
+                    });
+                }
         );
     }
 
@@ -131,10 +138,10 @@ public class FakeTableGroupBoTest {
     @Test
     void deleteFailByStatus() {
         OrderTable orderTable1 = TestFixture.generateOrderTableEmptyOne();
-        orderTable1.setTableGroupId(LONG_TWO);
+        orderTable1.setTableGroupId(TABLE_GROUP_ID_ONE);
 
         OrderTable orderTable2 = TestFixture.generateOrderTableEmptyTWo();
-        orderTable2.setTableGroupId(LONG_TWO);
+        orderTable2.setTableGroupId(TABLE_GROUP_ID_ONE);
 
         TableGroup tableGroup = TestFixture.generateTableGroupOne();
 

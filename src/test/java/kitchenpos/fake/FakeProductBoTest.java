@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class FakeProductBoTest {
-    public static final long LONG_ONE = 1L;
+    private static final long PRODUCT_ID_ONE = 1L;
 
     private ProductDao productDao = new FakeProductDao();
 
@@ -32,7 +32,7 @@ class FakeProductBoTest {
     void create() {
         //given
         Product expected = new Product();
-        expected.setId(LONG_ONE);
+        expected.setId(PRODUCT_ID_ONE);
         expected.setName("치킨");
         expected.setPrice(BigDecimal.valueOf(16_000L));
 
@@ -52,7 +52,7 @@ class FakeProductBoTest {
     void name(BigDecimal price) {
         //given
         Product expected = new Product();
-        expected.setId(LONG_ONE);
+        expected.setId(PRODUCT_ID_ONE);
         expected.setName("치킨");
         expected.setPrice(price);
 

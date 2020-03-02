@@ -29,7 +29,7 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class OrderBoTest {
-    public static final int INT_ONE = 1;
+    private static final int INT_ONE = 1;
 
     @InjectMocks
     private OrderBo orderBo;

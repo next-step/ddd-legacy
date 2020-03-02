@@ -40,9 +40,6 @@ public class FakeOrderBoTest {
     @DisplayName("새로운 주문 등록")
     @Test
     void create() {
-        OrderLineItem orderLineItem1 = TestFixture.generateOrderLineItemOne();
-        OrderLineItem orderLineItem2 = TestFixture.generateOrderLineItemTwo();
-
         Order requestOrder = TestFixture.generateOrderOne();
 
         Menu menu1 = TestFixture.generateMenuOne();
@@ -54,9 +51,6 @@ public class FakeOrderBoTest {
 
         menuDao.save(menu1);
         menuDao.save(menu2);
-
-        orderLineItemDao.save(orderLineItem1);
-        orderLineItemDao.save(orderLineItem2);
 
         Order order = orderBo.create(requestOrder);
 

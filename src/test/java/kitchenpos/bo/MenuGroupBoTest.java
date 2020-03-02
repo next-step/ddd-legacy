@@ -18,8 +18,8 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class MenuGroupBoTest {
-    public static final long LONG_ONE = 1L;
-    public static final long LONG_TWO = 2L;
+    private static final long MENU_GROUP_ID_ONE = 1L;
+    private static final long MENU_GROUP_ID_TWO = 2L;
 
     @Mock
     private MenuGroupDao menuGroupDao;
@@ -30,8 +30,8 @@ class MenuGroupBoTest {
     @DisplayName("메뉴 그룹 조회")
     @Test
     void list() {
-        MenuGroup menugroup1 = createMenuGroup(LONG_ONE, "순살 치킨");
-        MenuGroup menugroup2 = createMenuGroup(LONG_TWO, "오븐 치킨");
+        MenuGroup menugroup1 = createMenuGroup(MENU_GROUP_ID_ONE, "순살 치킨");
+        MenuGroup menugroup2 = createMenuGroup(MENU_GROUP_ID_TWO, "오븐 치킨");
 
         List<MenuGroup> menuGroups = Arrays.asList(menugroup1, menugroup2);
 
@@ -48,15 +48,15 @@ class MenuGroupBoTest {
     @DisplayName("메뉴 그룹 추가")
     @Test
     void create() {
-        MenuGroup menugroup = createMenuGroup(LONG_ONE, "순살 치킨");
+        MenuGroup menugroup = createMenuGroup(MENU_GROUP_ID_ONE, "순살 치킨");
 
         given(menuGroupDao.save(menugroup)).willReturn(menugroup);
 
         MenuGroup savedMenuGroup = menuGroupBo.create(menugroup);
 
         assertAll(
-                () -> assertThat(menugroup.getId()).isEqualTo(savedMenuGroup.getId()),
-                () -> assertThat(menugroup.getName()).isEqualTo(savedMenuGroup.getName())
+                () -> assertThat(savedMenuGroup.getId()).isEqualTo(menugroup.getId()),
+                () -> assertThat(savedMenuGroup.getName()).isEqualTo(menugroup.getName())
         );
     }
 

@@ -8,40 +8,61 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 public class TestFixture {
-    public static final long LONG_ONE = 1L;
-    public static final long LONG_TWO = 2L;
+    private static final long MENU_PRODUCT_ID_ONE = 1L;
+    private static final long MENU_PRODUCT_SEQ_ONE = 1L;
 
-    public static final int INT_ZERO = 0;
-    public static final int INT_ONE = 1;
-    public static final int INT_TWO = 2;
-    public static final int INT_THREE = 3;
+    private static final long MENU_ID_ONE = 1L;
+    private static final long MENU_ID_TWO = 2L;
 
-    public static final String MENU_NAME_ONE = "간장치킨";
+    private static final long MENU_GROUP_ID_ONE = 1L;
+    private static final long MENU_GROUP_ID_TWO = 2L;
+
+    private static final long ORDER_ID_ONE = 1L;
+    private static final long ORDER_ID_TWO = 2L;
+
+    private static final long ORDER_TABLE_ID_ONE = 1L;
+    private static final long ORDER_TABLE_ID_TWO = 2L;
+
+    private static final long ORDER_LINE_SEQ_ONE = 1L;
+    private static final long ORDER_LINE_SEQ_TWO = 2L;
+
+    private static final long TABLE_GROUP_ID_ONE = 1L;
+
+    private static final int MENU_PRODUCT_QUANTITY_TWO = 2;
+
+    private static final int ORDER_LINE_QUANTITY_ONE = 1;
+    private static final int ORDER_LINE_QUANTITY_THREE = 3;
+
+    private static final int ORDER_TABLE_GUEST_ZERO = 0;
+    private static final int ORDER_TABLE_GUEST_THREE = 3;
+
+
+    private static final String MENU_NAME_ONE = "간장치킨";
 
     public static MenuProduct generateMenuProductOne() {
         return new MenuProductBuilder()
-                .setProductId(LONG_ONE)
-                .setMenuId(LONG_ONE)
-                .setSeq(LONG_ONE)
-                .setQuantity(INT_TWO)
+                .setProductId(MENU_PRODUCT_ID_ONE)
+                .setMenuId(MENU_ID_ONE)
+                .setSeq(MENU_PRODUCT_SEQ_ONE)
+                .setQuantity(MENU_PRODUCT_QUANTITY_TWO)
                 .build()
                 ;
     }
 
     public static MenuProduct generateMenuProductTwo() {
         return new MenuProductBuilder()
-                .setProductId(LONG_TWO)
-                .setMenuId(LONG_ONE)
-                .setSeq(LONG_ONE)
-                .setQuantity(INT_TWO)
+                .setProductId(MENU_PRODUCT_ID_ONE)
+                .setMenuId(MENU_ID_ONE)
+                .setSeq(MENU_PRODUCT_SEQ_ONE)
+                .setQuantity(MENU_PRODUCT_QUANTITY_TWO)
                 .build()
                 ;
     }
 
     public static Menu generateMenuOne() {
         return new MenuBuilder()
-                .setMenuGroupId(LONG_ONE)
-                .setId(LONG_ONE)
+                .setMenuGroupId(MENU_GROUP_ID_ONE)
+                .setId(MENU_ID_ONE)
                 .setPrice(BigDecimal.TEN)
                 .setName(MENU_NAME_ONE)
                 .setMenuProducts(Arrays.asList(generateMenuProductOne()))
@@ -51,8 +72,8 @@ public class TestFixture {
 
     public static Menu generateMenuTwo() {
         return new MenuBuilder()
-                .setMenuGroupId(LONG_TWO)
-                .setId(LONG_TWO)
+                .setMenuGroupId(MENU_GROUP_ID_TWO)
+                .setId(MENU_ID_TWO)
                 .setPrice(BigDecimal.TEN)
                 .setName(MENU_NAME_ONE)
                 .setMenuProducts(Arrays.asList(generateMenuProductTwo()))
@@ -62,8 +83,8 @@ public class TestFixture {
 
     public static Menu generateMenuHasTwoProduct() {
         return new MenuBuilder()
-                .setMenuGroupId(LONG_ONE)
-                .setId(LONG_ONE)
+                .setMenuGroupId(MENU_GROUP_ID_ONE)
+                .setId(MENU_ID_ONE)
                 .setPrice(BigDecimal.TEN)
                 .setName(MENU_NAME_ONE)
                 .setMenuProducts(Arrays.asList(generateMenuProductOne(), generateMenuProductTwo()))
@@ -73,49 +94,49 @@ public class TestFixture {
 
     public static OrderLineItem generateOrderLineItemOne() {
         return new OrderLineItemBuilder()
-                .setOrderId(LONG_ONE)
-                .setQuantity(INT_THREE)
-                .setMenuId(LONG_ONE)
-                .setSeq(LONG_ONE)
+                .setOrderId(ORDER_ID_ONE)
+                .setQuantity(ORDER_LINE_QUANTITY_THREE)
+                .setMenuId(MENU_ID_ONE)
+                .setSeq(ORDER_LINE_SEQ_ONE)
                 .build()
                 ;
     }
 
     public static OrderLineItem generateOrderLineItemTwo() {
         return new OrderLineItemBuilder()
-                .setOrderId(LONG_TWO)
-                .setQuantity(INT_ONE)
-                .setMenuId(LONG_TWO)
-                .setSeq(LONG_TWO)
+                .setOrderId(ORDER_ID_TWO)
+                .setQuantity(ORDER_LINE_QUANTITY_ONE)
+                .setMenuId(MENU_ID_TWO)
+                .setSeq(ORDER_LINE_SEQ_TWO)
                 .build()
                 ;
     }
 
     public static Order generateOrderOne() {
         return new OrderBuilder()
-                .setId(LONG_ONE)
+                .setId(ORDER_ID_ONE)
                 .setOrderLineItems(Arrays.asList(generateOrderLineItemOne(), generateOrderLineItemTwo()))
-                .setOrderTableId(LONG_ONE)
+                .setOrderTableId(ORDER_TABLE_ID_ONE)
                 .build()
                 ;
     }
 
     public static Order generateOrderCooking() {
         return new OrderBuilder()
-                .setId(LONG_ONE)
+                .setId(ORDER_ID_ONE)
                 .setOrderStatus(OrderStatus.COOKING.name())
                 .setOrderLineItems(Arrays.asList(generateOrderLineItemOne(), generateOrderLineItemTwo()))
-                .setOrderTableId(LONG_ONE)
+                .setOrderTableId(ORDER_TABLE_ID_ONE)
                 .build()
                 ;
     }
 
     public static Order generateOrderCompletion() {
         return new OrderBuilder()
-                .setId(LONG_ONE)
+                .setId(ORDER_ID_ONE)
                 .setOrderStatus(OrderStatus.COMPLETION.name())
                 .setOrderLineItems(Arrays.asList(generateOrderLineItemOne(), generateOrderLineItemTwo()))
-                .setOrderTableId(LONG_ONE)
+                .setOrderTableId(ORDER_TABLE_ID_ONE)
                 .build()
                 ;
     }
@@ -123,8 +144,8 @@ public class TestFixture {
     public static OrderTable generateOrderTableNotEmpty() {
         return new OrderTableBuilder()
                 .setEmpty(false)
-                .setNumberOfGuests(INT_THREE)
-                .setId(LONG_ONE)
+                .setNumberOfGuests(ORDER_TABLE_GUEST_THREE)
+                .setId(ORDER_ID_ONE)
                 .build()
                 ;
     }
@@ -132,7 +153,7 @@ public class TestFixture {
     public static OrderTable generateOrderTableOne() {
         return new OrderTableBuilder()
                 .setEmpty(true)
-                .setNumberOfGuests(INT_ZERO)
+                .setNumberOfGuests(ORDER_TABLE_GUEST_ZERO)
                 .build()
                 ;
     }
@@ -140,8 +161,8 @@ public class TestFixture {
     public static OrderTable generateOrderTableEmptyOne() {
         return new OrderTableBuilder()
                 .setEmpty(true)
-                .setNumberOfGuests(INT_ZERO)
-                .setId(LONG_ONE)
+                .setNumberOfGuests(ORDER_TABLE_GUEST_ZERO)
+                .setId(ORDER_ID_ONE)
                 .build()
                 ;
     }
@@ -149,15 +170,15 @@ public class TestFixture {
     public static OrderTable generateOrderTableEmptyTWo() {
         return new OrderTableBuilder()
                 .setEmpty(true)
-                .setNumberOfGuests(INT_ZERO)
-                .setId(LONG_TWO)
+                .setNumberOfGuests(ORDER_TABLE_GUEST_ZERO)
+                .setId(ORDER_TABLE_ID_TWO)
                 .build()
                 ;
     }
 
     public static TableGroup generateTableGroupOne() {
         return new TableGroupBuilder()
-                .setId(LONG_ONE)
+                .setId(TABLE_GROUP_ID_ONE)
                 .setOrderTables(Arrays.asList(generateOrderTableEmptyOne(), generateOrderTableEmptyTWo()))
                 .setCreatedDate(LocalDateTime.now())
                 .build()
@@ -166,7 +187,7 @@ public class TestFixture {
 
     public static TableGroup generateTableGroupHasOneOrderTable() {
         return new TableGroupBuilder()
-                .setId(LONG_ONE)
+                .setId(TABLE_GROUP_ID_ONE)
                 .setOrderTables(Arrays.asList(generateOrderTableEmptyOne()))
                 .setCreatedDate(LocalDateTime.now())
                 .build()

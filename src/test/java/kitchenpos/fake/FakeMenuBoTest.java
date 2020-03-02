@@ -18,6 +18,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,11 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class FakeMenuBoTest {
-    public static final long LONG_ONE = 1L;
-    public static final long LONG_TWO = 2L;
+    private static final long MENU_ID_ONE = 1L;
+    private static final long MENU_ID_TWO = 2L;
 
-    public static final int INT_ZERO = 0;
-    public static final int INT_TWO = 2;
+    private static final int INT_ZERO = 0;
+    private static final int INT_TWO = 2;
 
     private MenuBo menuBo;
 
@@ -55,6 +56,8 @@ public class FakeMenuBoTest {
         Menu menu1 = TestFixture.generateMenuOne();
         Menu menu2 = TestFixture.generateMenuTwo();
 
+        List<Menu> menufixtures = Arrays.asList(menu1, menu2);
+
         menuDao.save(menu1);
         menuDao.save(menu2);
         menuProductDao.save(menuProduct1);
@@ -65,8 +68,7 @@ public class FakeMenuBoTest {
         assertAll(
                 () -> assertThat(menus.get(INT_ZERO).getId()).isEqualTo(menu1.getId()),
                 () -> assertThat(menus.size()).isEqualTo(INT_TWO),
-                () -> assertThat(menus).contains(menu1),
-                () -> assertThat(menus).contains(menu2)
+                () -> assertThat(menus).containsExactlyInAnyOrderElementsOf(menufixtures)
         );
     }
 
@@ -76,13 +78,12 @@ public class FakeMenuBoTest {
         Menu menu = TestFixture.generateMenuHasTwoProduct();
 
         MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(LONG_ONE);
+        menuGroup.setId(MENU_ID_ONE);
         menuGroup.setName("간장 메뉴");
 
-        Product product1 = createProduct(LONG_ONE, BigDecimal.TEN);
-        Product product2 = createProduct(LONG_TWO, BigDecimal.ONE);
+        Product product1 = createProduct(MENU_ID_ONE, BigDecimal.TEN);
+        Product product2 = createProduct(MENU_ID_TWO, BigDecimal.ONE);
 
-        menuDao.save(menu);
         menuGroupDao.save(menuGroup);
         productDao.save(product1);
         productDao.save(product2);
@@ -102,15 +103,10 @@ public class FakeMenuBoTest {
     @ValueSource(strings = "-10")
     @NullSource
     void createFailByNegativePrice(BigDecimal price) {
-        MenuProduct menuProduct1 = TestFixture.generateMenuProductOne();
-        MenuProduct menuProduct2 = TestFixture.generateMenuProductTwo();
-
         Menu menu = TestFixture.generateMenuHasTwoProduct();
         menu.setPrice(price);
 
         menuDao.save(menu);
-        menuProductDao.save(menuProduct1);
-        menuProductDao.save(menuProduct2);
 
         assertThrows(IllegalArgumentException.class, () -> menuBo.create(menu));
     }
@@ -121,15 +117,10 @@ public class FakeMenuBoTest {
     @NullSource
     @ValueSource(longs = 9999)
     void createFailByNotExsistMenugroup(Long menugroupId) {
-        MenuProduct menuProduct1 = TestFixture.generateMenuProductOne();
-        MenuProduct menuProduct2 = TestFixture.generateMenuProductTwo();
-
         Menu menu = TestFixture.generateMenuHasTwoProduct();
         menu.setMenuGroupId(menugroupId);
 
         menuDao.save(menu);
-        menuProductDao.save(menuProduct1);
-        menuProductDao.save(menuProduct2);
 
         assertThrows(IllegalArgumentException.class, () -> menuBo.create(menu));
     }

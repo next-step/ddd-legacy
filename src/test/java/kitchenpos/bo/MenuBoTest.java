@@ -30,16 +30,13 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class MenuBoTest {
-    public static final long LONG_ONE = 1L;
+    private static final long MENU_ID_ONE = 1L;
 
-    public static final int INT_TWO = 2;
-    public static final int INT_ZERO = 0;
+    private static final int INT_TWO = 2;
+    private static final int INT_ZERO = 0;
 
     @InjectMocks
     private MenuBo menuBo;
-
-    @Mock
-    private MenuProductDao menuProductDao;
 
     @Mock
     private MenuDao menuDao;
@@ -56,16 +53,17 @@ class MenuBoTest {
         Menu menu1 = TestFixture.generateMenuOne();
         Menu menu2 = TestFixture.generateMenuTwo();
 
+        List<Menu> menufixtures = Arrays.asList(menu1, menu2);
+
         given(menuDao.findAll())
-                .willReturn(Arrays.asList(menu1, menu2));
+                .willReturn(menufixtures);
 
         List<Menu> menus = menuBo.list();
 
         assertAll(
-                () -> assertThat(menus.get(INT_ZERO).getId()).isEqualTo(LONG_ONE),
+                () -> assertThat(menus.get(INT_ZERO).getId()).isEqualTo(MENU_ID_ONE),
                 () -> assertThat(menus.size()).isEqualTo(INT_TWO),
-                () -> assertThat(menus).contains(menu1),
-                () -> assertThat(menus).contains(menu2)
+                () -> assertThat(menus).containsExactlyInAnyOrderElementsOf(menufixtures)
         );
     }
 
