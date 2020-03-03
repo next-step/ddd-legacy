@@ -73,6 +73,7 @@ class OrderBoTest {
     @Test
     public void createNoEmptyOrder() {
         Order order = Fixtures.getOrder(1L, LocalDateTime.now(), new ArrayList<>(), OrderStatus.MEAL.name(), 1L);
+
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(order));
     }
 
@@ -80,6 +81,7 @@ class OrderBoTest {
     @Test
     public void createWithMenus() {
         given(menuDao.countByIdIn(defaultMenuIdsOfOrderLineItems)).willReturn(1L);
+
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(defaultOrder));
     }
 
@@ -89,6 +91,7 @@ class OrderBoTest {
         given(menuDao.countByIdIn(defaultMenuIdsOfOrderLineItems))
                 .willReturn(Long.valueOf(defaultMenuIdsOfOrderLineItems.size()));
         given(orderTableDao.findById(defaultOrder.getOrderTableId())).willReturn(Optional.empty());
+
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(defaultOrder));
     }
 
@@ -99,6 +102,7 @@ class OrderBoTest {
                 .willReturn(Long.valueOf(defaultMenuIdsOfOrderLineItems.size()));
         defaultOrderTable.setEmpty(true);
         given(orderTableDao.findById(defaultOrder.getOrderTableId())).willReturn(Optional.ofNullable(defaultOrderTable));
+
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(defaultOrder));
     }
 
@@ -107,6 +111,7 @@ class OrderBoTest {
     public void changeOrderStatus() {
         defaultOrder.setOrderStatus(OrderStatus.COMPLETION.name());
         given(orderDao.findById(defaultOrder.getId())).willReturn(Optional.ofNullable(defaultOrder));
+
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
             orderBo.changeOrderStatus(defaultOrder.getId(), defaultOrder));
     }

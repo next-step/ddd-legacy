@@ -48,6 +48,7 @@ class ProductBoTest {
     @Test
     public void createNormal() {
         given(productDao.save(defaultProduct)).willReturn(new Product());
+
         assertThat(productBo.create(defaultProduct)).isNotNull();
     }
 
@@ -60,6 +61,7 @@ class ProductBoTest {
     @MethodSource("emptyAndNegativeValue")
     public void createNotEmptyAndNegative(BigDecimal values) {
         defaultProduct.setPrice(values);
+
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
                 () -> productBo.create(defaultProduct));
     }
@@ -68,6 +70,7 @@ class ProductBoTest {
     @Test
     public void list() {
         given(productDao.findAll()).willReturn(defaultProductList);
+
         assertThat(productBo.list()).contains(defaultProductList.toArray(new Product[0]));
     }
 
