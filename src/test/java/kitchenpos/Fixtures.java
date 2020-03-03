@@ -76,4 +76,12 @@ public class Fixtures {
         orderTable.setTableGroupId(tableGroupId);
         return orderTable;
     }
+
+    public static TableGroup getTableGroup(long id, LocalDateTime localDateTime, List<OrderTable> orderTables ) {
+        TableGroup tableGroup = new TableGroup();
+        tableGroup.setId(id);
+        tableGroup.setCreatedDate(localDateTime);
+        tableGroup.setOrderTables(orderTables);
+        return tableGroup;
+    }
 }
