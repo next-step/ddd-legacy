@@ -9,14 +9,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+
+import static kitchenpos.bo.Fixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -32,14 +35,12 @@ class TableGroupBoTest {
     @Mock
     private OrderDao orderDao;
 
-    @InjectMocks
     private TableGroupBo tableGroupBo;
 
     private TableGroup tableGroup;
     private List<OrderTable> orderTableList;
-    OrderTable orderTable1;
-    OrderTable orderTable2;
-    OrderTable orderTable3;
+    private OrderTable orderTable1;
+    private OrderTable orderTable2;
 
     @BeforeEach
     void setUp() {
@@ -61,12 +62,7 @@ class TableGroupBoTest {
         orderTable2.setEmpty(true);
         orderTableList.add(orderTable2);
 
-        orderTable3 = new OrderTable();
-        orderTable3.setId(3L);
-        orderTable3.setNumberOfGuests(1);
-        orderTable3.setEmpty(true);
-        orderTableList.add(orderTable2);
-
+        tableGroupBo = new TableGroupBo(orderDao, orderTableDao, tableGroupDao);
     }
 
     @DisplayName("테이블 그룹을 만들수 있다.")
@@ -86,13 +82,12 @@ class TableGroupBoTest {
     @DisplayName("테이블 그룹은 2개 이상 테이블로 되어있다.")
     @Test
     void tableMoreThanTwo() {
-        // given
-        given(orderTableDao.findAllByIdIn(anyList()))
-                .willThrow(IllegalArgumentException.class);
+        final OrderTable orderTable = emptyTable1();
+        List<OrderTable> tables = Collections.singletonList(orderTable);
+        final TableGroup tableGroup = new TableGroup();
+        tableGroup.setOrderTables(tables);
 
-        // then
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()-> tableGroupBo.create(tableGroup));
+        assertThrows(IllegalArgumentException.class, () -> tableGroupBo.create(tableGroup));
     }
 
     @DisplayName("테이블 그룹 생성시 이미 사용중이면 안된다.")
@@ -111,12 +106,12 @@ class TableGroupBoTest {
     @DisplayName("테이블 그룹 생성시 이미 테이블 그룹에 속해있으면 안된다.")
     @Test
     void createTableGroupWithEmptyTableGroup() {
-        // given
-        orderTableList.get(0).setTableGroupId(2L);
-        given(orderTableDao.findAllByIdIn(anyList())).willReturn(orderTableList);
+        orderTableDao.save(groupedTable1());
+
+        final TableGroup expected = tableGroup();
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> tableGroupBo.create(tableGroup));
+                .isThrownBy(() -> tableGroupBo.create(expected));
     }
 
     @DisplayName("테이블 그룹 생성시 테이블은 사용 상태로 바뀐다.")
@@ -143,8 +138,10 @@ class TableGroupBoTest {
         tableGroupBo.delete(tableGroup.getId());
 
         // then
-        assertThat(tableGroup.getOrderTables().get(0).getTableGroupId()).isNull();
-        assertThat(tableGroup.getOrderTables().get(1).getTableGroupId()).isNull();
+        assertAll(
+                () -> assertThat(tableGroup.getOrderTables().get(0).getTableGroupId()).isNull(),
+                () -> assertThat(tableGroup.getOrderTables().get(1).getTableGroupId()).isNull()
+        );
     }
 
     @DisplayName("테이블 그룹을 삭제시 완료 상태여야 한다.")

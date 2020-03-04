@@ -11,13 +11,20 @@ class IntegerParser {
         textToIntArray = textToIntArray(text);
     }
 
-    public List<Integer> getIntArray() {
+    private List<Integer> getIntArray() {
         return textToIntArray;
     }
 
-    public List<Integer> textToIntArray(String[] text) {
+    private List<Integer> textToIntArray(String[] text) {
         return Arrays.stream(text).map(this::convertTextToInt).collect(Collectors.toList());
     }
+
+    public List<Number> convertNumberArray() {
+        return this.getIntArray().stream()
+                .map(Number::new)
+                .collect(Collectors.toList());
+    }
+
     private int convertTextToInt(String textNumber) {
         try {
             return (Integer.parseInt(textNumber));

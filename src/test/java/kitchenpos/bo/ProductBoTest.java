@@ -9,14 +9,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+
+import static kitchenpos.bo.Fixture.friedChicken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -25,7 +28,6 @@ class ProductBoTest {
     @Mock
     private ProductDao productDao;
 
-    @InjectMocks
     private ProductBo productBo;
 
     private Product expected;
@@ -33,10 +35,7 @@ class ProductBoTest {
     @BeforeEach
     void setUp() {
         productBo = new ProductBo(productDao);
-        expected = new Product();
-        expected.setId(1L);
-        expected.setName("후라이드 치킨");
-        expected.setPrice(BigDecimal.valueOf(16_000L));
+        expected = friedChicken();
     }
 
     @DisplayName("상품을 생성할 수 있다.")
@@ -67,7 +66,7 @@ class ProductBoTest {
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()-> productBo.create(expected));
+                .isThrownBy(() -> productBo.create(expected));
     }
 
     @DisplayName("상품을 검색할 수 있다.")
@@ -82,9 +81,11 @@ class ProductBoTest {
         Product product = productList.get(0);
 
         // then
-        assertThat(product).isNotNull();
-        assertThat(product.getName()).isEqualTo(expected.getName());
-        assertThat(product.getPrice()).isEqualTo(expected.getPrice());
+        assertAll(
+                () -> assertThat(product).isNotNull(),
+                () -> assertThat(product.getName()).isEqualTo(expected.getName()),
+                () -> assertThat(product.getPrice()).isEqualTo(expected.getPrice())
+        );
     }
 
 }

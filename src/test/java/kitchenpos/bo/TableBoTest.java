@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -34,7 +33,6 @@ class TableBoTest {
     @Mock
     private OrderDao orderDao;
 
-    @InjectMocks
     private TableBo tableBo;
 
     private OrderTable orderTable;
@@ -47,6 +45,7 @@ class TableBoTest {
         orderTable.setNumberOfGuests(3);
         orderTable.setEmpty(false);
         orderStatusList = Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name());
+        tableBo = new TableBo(orderDao, orderTableDao);
     }
 
     @DisplayName("테이블을 생성할 수 있다.")
@@ -108,17 +107,17 @@ class TableBoTest {
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(()-> tableBo.changeEmpty(orderTable.getId(), orderTable));
+                .isThrownBy(() -> tableBo.changeEmpty(orderTable.getId(), orderTable));
     }
 
     @DisplayName("테이블을 빈테이블로 변경하려면 테이블이 존재해야한다.")
     @Test
     void changeTableShouldExist() {
         given(orderTableDao.findById(anyLong()))
-                .willThrow(IllegalArgumentException.class);
+                .willReturn(Optional.empty());
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> tableBo.changeEmpty(orderTable.getId(),orderTable));
+                .isThrownBy(() -> tableBo.changeEmpty(orderTable.getId(), orderTable));
     }
 
     @DisplayName("테이블이 테이블그룹에 속하면 빈테이블로 변경할 수 없다.")
@@ -163,14 +162,17 @@ class TableBoTest {
     }
 
     @DisplayName("빈테이블 손님수는 변경할 수 없다.")
-    @Test
-    void changeTableShouldNotEmpty() {
-        // given
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2})
+    void changeNumberOfGuestsInEmptyTable(int guest) {
+//        // given
         given(orderTableDao.findById(anyLong()))
-                .willThrow(IllegalArgumentException.class);
+                .willReturn(Optional.empty());
+
+        orderTable.setNumberOfGuests(guest);
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> tableBo.changeNumberOfGuests(orderTable.getId(),orderTable));
+                .isThrownBy(() -> tableBo.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
 }
