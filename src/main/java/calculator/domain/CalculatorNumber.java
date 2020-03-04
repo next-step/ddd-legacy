@@ -1,7 +1,11 @@
 package calculator.domain;
 
 public class CalculatorNumber {
-    private int number;
+    private final int number;
+
+    public CalculatorNumber() {
+        this.number = 0;
+    }
 
     public CalculatorNumber(String value) {
         this.number = Integer.parseInt(value);
@@ -9,6 +13,10 @@ public class CalculatorNumber {
         if (isNegativeNumber(this.number)) {
             throw new RuntimeException();
         }
+    }
+
+    private CalculatorNumber(int value) {
+        this.number = value;
     }
 
     private boolean isNegativeNumber(int number) {
@@ -19,7 +27,7 @@ public class CalculatorNumber {
         return this.number;
     }
 
-    public int sum(int number) {
-        return Integer.sum(this.number, number);
+    public CalculatorNumber sum(CalculatorNumber number) {
+        return new CalculatorNumber(this.number + number.number);
     }
 }

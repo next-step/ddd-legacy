@@ -21,7 +21,7 @@ public class StringCalculator {
             return 0;
         }
 
-        int result = 0;
+        CalculatorNumber result = new CalculatorNumber();
         String[] tokens = getTokens(inputString);
 
         List<CalculatorNumber> calculatorNumbers = Arrays.stream(tokens)
@@ -33,15 +33,17 @@ public class StringCalculator {
             result = calculatorNumber.sum(result);
         }
 
-        return result;
+        return result.getNumber();
     }
 
     private String[] getTokens(String inputString) {
         Matcher m = CUSTOM_DELIMITER_PATTERN.matcher(inputString);
+
         if (m.find()) {
             addDelimeter(m.group(1));
             return m.group(2).split(delimiter);
         }
+
         return inputString.split(delimiter);
     }
 
