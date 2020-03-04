@@ -82,7 +82,7 @@ class TableGroupBoTest {
     @DisplayName("테이블 그룹은 2개 이상 테이블로 되어있다.")
     @Test
     void tableMoreThanTwo() {
-        final OrderTable orderTable = emptyTable1();
+        final OrderTable orderTable = emptyTable();
         List<OrderTable> tables = Collections.singletonList(orderTable);
         final TableGroup tableGroup = new TableGroup();
         tableGroup.setOrderTables(tables);
@@ -94,9 +94,10 @@ class TableGroupBoTest {
     @Test
     void createTableGroupWithEmptyTable() {
         // given
-        orderTable1.setEmpty(false);
-        orderTableList.add(orderTable1);
-        tableGroup.setOrderTables(orderTableList);
+        List<OrderTable> expectedTables = Arrays.asList(orderTable1(), orderTable2());
+        given(orderTableDao.findAllByIdIn(anyList()))
+                .willReturn(expectedTables);
+        tableGroup.setOrderTables(expectedTables);
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)

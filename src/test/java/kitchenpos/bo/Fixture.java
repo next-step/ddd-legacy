@@ -78,7 +78,7 @@ public class Fixture {
         return tableGroup;
     }
 
-    public static OrderTable emptyTable1() {
+    public static OrderTable emptyTable() {
         final OrderTable orderTable = orderTable1();
         orderTable.setEmpty(true);
         return orderTable;
