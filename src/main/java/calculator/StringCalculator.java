@@ -1,7 +1,7 @@
 package calculator;
 
 import org.apache.logging.log4j.util.Strings;
-import java.util.Arrays;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,9 +27,8 @@ public class StringCalculator {
     }
 
     private Integer getTextArraySum(String[] text) {
-        return Arrays.stream(text)
-                .map(textNumber -> new Number(textNumber).getNumber())
-                .reduce(0, Integer::sum);
+        TextToNumber listNumber = new TextToNumber(text);
+        return listNumber.sum();
     }
 
     private String[] toSplitArrayList(String text) {
