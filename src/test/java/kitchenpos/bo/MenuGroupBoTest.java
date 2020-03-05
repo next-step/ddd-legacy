@@ -34,8 +34,8 @@ public class MenuGroupBoTest {
         MenuGroup actual = menuGroupBo.create(expected);
 
         //then
+        assertThat(actual).isNotNull();
         Assertions.assertAll(
-                () -> assertThat(actual).isNotNull(),
                 () -> assertThat(actual.getId()).isEqualTo(expected.getId()),
                 () -> assertThat(actual.getId()).isEqualTo(expected.getId())
         );

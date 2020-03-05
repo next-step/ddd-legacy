@@ -3,6 +3,7 @@ package kitchenpos.bo;
 import kitchenpos.dao.*;
 import kitchenpos.model.Menu;
 import kitchenpos.model.MenuBuilder;
+import kitchenpos.model.MenuProduct;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -50,8 +51,8 @@ public class MenuBoTest {
             Menu actual = menuBo.create(expected);
 
             //then
+            assertThat(actual).isNotNull();
             Assertions.assertAll(
-                    () -> assertThat(actual).isNotNull(),
                     () -> assertThat(actual.getId()).isEqualTo(expected.getId()),
                     () -> assertThat(actual.getName()).isEqualTo(expected.getName()),
                     () -> assertThat(actual.getMenuGroupId()).isEqualTo(expected.getMenuGroupId()),
@@ -74,6 +75,28 @@ public class MenuBoTest {
 
             //when then
             assertThatIllegalArgumentException().isThrownBy(() -> menuBo.create(expected));
+        }
+
+        @Test
+        @DisplayName("메뉴 가격은 메뉴 제품의 가격 총합을 초과할 수 없다.")
+        void create3(){
+            //given
+            MenuProduct product = 핫치킨();
+            BigDecimal productPrice = productDao.findById(product.getProductId())
+                                        .orElseThrow(IllegalArgumentException::new)
+                                        .getPrice();
+            BigDecimal menuPrice = productPrice.add(BigDecimal.TEN); // 메뉴 가격이 제품의 가격을 초과
+
+            Menu expected = MenuBuilder
+                    .aMenu()
+                    .withId(3L)
+                    .withMenuGroupId(1L)
+                    .withMenuProducts(Collections.singletonList(product))
+                    .withPrice(menuPrice)
+                    .build();
+
+            //when then
+            assertThatIllegalArgumentException().isThrownBy(()-> menuBo.create(expected));
         }
     }
 

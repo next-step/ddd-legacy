@@ -22,12 +22,9 @@ public class OrderBoTest {
 
     private OrderBo orderBo;
 
-    private Order order;
-
     @BeforeEach
     void setUp() {
         orderBo = new OrderBo(menuDao, orderDao, orderLineItemDao, orderTableDao);
-        order = 일번테이블주문();
         menuDao.save(치맥셋트());
         orderTableDao.save(만석인_일번테이블());
     }
@@ -38,53 +35,55 @@ public class OrderBoTest {
         @Test
         @DisplayName("새로운 주문을 생성 할 수 있다.")
         void create() {
-            //given - when
-            Order expected = orderBo.create(order);
+            //given
+            Order expected = 일번테이블주문();
+
+            //when
+            Order actual = orderBo.create(expected);
 
             //then
+            assertThat(actual).isNotNull();
             Assertions.assertAll(
-                    () -> assertThat(expected).isNotNull(),
-                    () -> assertThat(expected.getOrderTableId()).isEqualTo(order.getOrderTableId()),
-                    () -> assertThat(expected.getOrderedTime()).isEqualTo(order.getOrderedTime())
+                    () -> assertThat(actual.getOrderTableId()).isEqualTo(expected.getOrderTableId()),
+                    () -> assertThat(actual.getOrderedTime()).isEqualTo(expected.getOrderedTime())
             );
         }
 
         @Test
         @DisplayName("주문 시 최초 조리 상태는 '조리중(COOKING)' 으로 설정된다")
         void create2() {
-            //given - when
-            Order expected = orderBo.create(order);
+            //given
+            Order expected = 일번테이블주문();
+
+            Order actual = orderBo.create(expected);
 
             //then
-            Assertions.assertAll(
-                    () -> assertThat(expected).isNotNull(),
-                    () -> assertThat(expected.getOrderStatus()).isEqualTo("COOKING")
-            );
+            assertThat(actual).isNotNull();
+            assertThat(actual.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name());
         }
 
         @Test
         @DisplayName("주문한 테이블이 비어 있으면 주문이 불가 하다")
         void crate3() {
             //given
+            Order expected = 일번테이블주문();
             OrderTable emptyOrderTable = OrderTableBuilder
-                    .anOrderTable()
-                    .withId(1L)
-                    .withTableGroupId(1L)
-                    .withNumberOfGuests(5)
-                    .withEmpty(true)
-                    .build();
+                                            .anOrderTable()
+                                            .withId(expected.getOrderTableId())
+                                            .withEmpty(true)
+                                            .build();
 
             orderTableDao.save(emptyOrderTable);
 
             //when then
-            assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(order));
+            assertThatIllegalArgumentException().isThrownBy(() -> orderBo.create(expected));
         }
 
         @Test
         @DisplayName("최소 1개 이상의 메뉴를 주문 가능 하다.")
         void create4() {
             //given
-            OrderLineItem unknowndMenuOrderLineItem = OrderLineItemBuilder
+            OrderLineItem unknownMenuOrderLineItem = OrderLineItemBuilder
                     .anOrderLineItem()
                     .withSeq(1L)
                     .withOrderId(1L)
@@ -94,7 +93,7 @@ public class OrderBoTest {
 
             Order unknownMenuOrder = OrderBuilder
                     .anOrder()
-                    .withOrderLineItems(Collections.singletonList(unknowndMenuOrderLineItem))
+                    .withOrderLineItems(Collections.singletonList(unknownMenuOrderLineItem))
                     .withOrderTableId(1L)
                     .withOrderedTime(LocalDateTime.now())
                     .build();
@@ -107,43 +106,36 @@ public class OrderBoTest {
     @DisplayName("전체 주문 리스트를 조회 할 수 있다.")
     void list() {
         //given
-        Order actual = orderBo.create(order);
+        Order expected = orderBo.create(일번테이블주문());
 
         //when
-        List<Order> expected = orderBo.list();
+        List<Order> actual = orderBo.list();
 
         //then
-        Assertions.assertAll(
-                () -> assertThat(expected).isNotNull(),
-                () -> assertThat(expected.stream().anyMatch(i -> {
-                    Long expectedId = i.getId();
-                    Long actualId = actual.getId();
-
-                    return expectedId.equals(actualId);
-                }))
-        );
+        assertThat(actual).isNotNull();
+        assertThat(actual).containsAnyOf(expected);
     }
 
     @Test
     @DisplayName("주문 상태를 수정 할 수 있다.")
     void changeOrderStatus() {
         //given
-        Order registerdOrder = orderBo.create(order);
-        Order changedStatusOrder = OrderBuilder
+        Order registeredOrder = orderBo.create(일번테이블주문());
+
+        Order expected = OrderBuilder
                 .anOrder()
-                .withId(registerdOrder.getId())
-                .withOrderTableId(registerdOrder.getOrderTableId())
-                .withOrderLineItems(registerdOrder.getOrderLineItems())
-                .withOrderedTime(registerdOrder.getOrderedTime())
+                .withId(registeredOrder.getId())
+                .withOrderTableId(registeredOrder.getOrderTableId())
+                .withOrderLineItems(registeredOrder.getOrderLineItems())
+                .withOrderedTime(registeredOrder.getOrderedTime())
                 .withOrderStatus("MEAL")
                 .build();
 
-        Order expected = orderBo.changeOrderStatus(registerdOrder.getId(), changedStatusOrder);
+        //when
+        Order actual = orderBo.changeOrderStatus(registeredOrder.getId(), expected);
 
-        Assertions.assertAll(
-                () -> assertThat(expected).isNotNull(),
-                () -> assertThat(expected.getId()).isEqualTo(changedStatusOrder.getId()),
-                () -> assertThat(expected.getOrderStatus()).isEqualTo(changedStatusOrder.getOrderStatus())
-        );
+        //then
+        assertThat(actual).isNotNull();
+        assertThat(actual).isEqualToComparingFieldByField(expected);
     }
 }

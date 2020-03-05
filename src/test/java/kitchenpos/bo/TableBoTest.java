@@ -61,10 +61,8 @@ public class TableBoTest {
         List<OrderTable> actual = tableBo.list();
 
         //then
-        Assertions.assertAll(
-                () -> assertThat(actual).isNotNull(),
-                () -> assertThat(actual).containsExactlyInAnyOrderElementsOf(Collections.singletonList(expected))
-        );
+        assertThat(actual).isNotNull();
+        assertThat(actual).containsExactlyInAnyOrderElementsOf(Collections.singletonList(expected));
     }
 
     @Test
@@ -93,8 +91,8 @@ public class TableBoTest {
         OrderTable actual = tableBo.changeEmpty(expected.getId(), expected);
 
         //then
+        assertThat(actual).isNotNull();
         Assertions.assertAll(
-                () -> assertThat(actual).isNotNull(),
                 () -> assertThat(actual.isEmpty()).isTrue(),
                 () -> assertThat(actual.getId()).isEqualTo(expected.getId()),
                 () -> assertThat(actual.getNumberOfGuests()).isEqualTo(expected.getNumberOfGuests()),
@@ -121,8 +119,8 @@ public class TableBoTest {
         OrderTable actual = tableBo.changeNumberOfGuests(expected.getId(), expected);
 
         //then
+        assertThat(actual).isNotNull();
         Assertions.assertAll(
-                () -> assertThat(actual).isNotNull(),
                 () -> assertThat(actual.isEmpty()).isFalse(),
                 () -> assertThat(actual.getId()).isEqualTo(expected.getId()),
                 () -> assertThat(actual.getNumberOfGuests()).isEqualTo(numberOfGuests),
@@ -135,13 +133,13 @@ public class TableBoTest {
     @ValueSource(ints = {-1, -100})
     void changleNumberOfGuestException(int numberOfGuests) {
         //given
-        OrderTable createdOrderTalbe = tableBo.create(만석인_일번테이블());
+        OrderTable createdOrderTable = tableBo.create(만석인_일번테이블());
 
         OrderTable expected = OrderTableBuilder
                 .anOrderTable()
-                .withId(createdOrderTalbe.getId())
-                .withTableGroupId(createdOrderTalbe.getTableGroupId())
-                .withEmpty(createdOrderTalbe.isEmpty())
+                .withId(createdOrderTable.getId())
+                .withTableGroupId(createdOrderTable.getTableGroupId())
+                .withEmpty(createdOrderTable.isEmpty())
                 .withNumberOfGuests(numberOfGuests)
                 .build();
 

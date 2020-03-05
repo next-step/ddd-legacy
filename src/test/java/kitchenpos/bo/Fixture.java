@@ -7,20 +7,19 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 public class Fixture {
-    static final long MENU_GROUP_ID_야식 = 1L;
-    static final long MENU_ID_치맥셋트 = 1L;
-    static final long PRODUCT_ID_치킨 = 1L;
-    static final long PRODUCT_ID_맥주 = 2L;
-    static final long MENU_PRODUCT_SEQ_핫치킨 = 1L;
-    static final long MENU_PRODUCT_SEQ_시원한생맥주 = 2L;
-    static final long ORDER_TABLE_ID_일번테이블 = 1L;
-    static final long ORDER_TABLE_ID_이번테이블 = 2L;
-    static final long ORDER_TABLE_ID_삼번테이블 = 3L;
-    static final long ORDER_TABLE_ID_사번테이블 = 4L;
-    static final long TABLE_GROUP_ID_단체1 = 1L;
-    static final long TABLE_GROUP_ID_단체2 = 2L;
-    static final long ORDER_ID_일번테이블주문 = 1L;
-    static final long ORDER_LINE_SEQ_주문번호1 = 1L;
+    private static final long MENU_GROUP_ID_야식 = 1L;
+    private static final long MENU_ID_치맥셋트 = 1L;
+    private static final long PRODUCT_ID_치킨 = 1L;
+    private static final long PRODUCT_ID_맥주 = 2L;
+    private static final long MENU_PRODUCT_SEQ_핫치킨 = 1L;
+    private static final long MENU_PRODUCT_SEQ_시원한생맥주 = 2L;
+    private static final long ORDER_TABLE_ID_일번테이블 = 1L;
+    private static final long ORDER_TABLE_ID_이번테이블 = 2L;
+    private static final long ORDER_TABLE_ID_삼번테이블 = 3L;
+    private static final long ORDER_TABLE_ID_사번테이블 = 4L;
+    private static final long TABLE_GROUP_ID_단체1 = 1L;
+    private static final long ORDER_ID_일번테이블주문 = 1L;
+    private static final long ORDER_LINE_SEQ_주문번호1 = 1L;
 
     static MenuGroup 야식() {
         return MenuGroupBuilder.aMenuGroup()
@@ -67,7 +66,6 @@ public class Fixture {
                 .withPrice(BigDecimal.valueOf(17000))
                 .build();
     }
-
 
     static Product 맥주() {
         return ProductBuilder
@@ -144,14 +142,4 @@ public class Fixture {
                 .withCreatedDate(LocalDateTime.now())
                 .build();
     }
-
-    static TableGroup 단체테이블2() {
-        return TableGroupBuilder
-                .aTableGroup()
-                .withId(TABLE_GROUP_ID_단체2)
-                .withOrderTables(Arrays.asList(비어있는_삼번테이블(), 비어있는_사번테이블()))
-                .withCreatedDate(LocalDateTime.now())
-                .build();
-    }
-
 }
