@@ -32,12 +32,12 @@ public class OrderLineItemBuilder {
     }
 
     public OrderLineItem build() {
-        final OrderLineItem oderLineItem = new OrderLineItem();
-        oderLineItem.setSeq(this.seq);
-        oderLineItem.setOrderId(this.orderId);
-        oderLineItem.setMenuId(this.menuId);
-        oderLineItem.setQuantity(this.quantity);
-        return oderLineItem;
+        final OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setSeq(this.seq);
+        orderLineItem.setOrderId(this.orderId);
+        orderLineItem.setMenuId(this.menuId);
+        orderLineItem.setQuantity(this.quantity);
+        return orderLineItem;
     }
 
 }

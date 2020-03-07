@@ -39,15 +39,12 @@ class ProductBoTest {
         newProduct.setName("후라이드");
         newProduct.setPrice(BigDecimal.valueOf(16000));
 
-        Product savedProduct = new Product();
-        savedProduct.setId(1L);
-        savedProduct.setName("후라이드");
-        savedProduct.setPrice(BigDecimal.valueOf(16000));
-
         given(productDao.save(newProduct))
-                .willReturn(savedProduct);
+                .willReturn(newProduct);
 
-        assertThat(productBo.create(newProduct))
+        Product savedProduct = productBo.create(newProduct);
+
+        assertThat(savedProduct)
                 .isEqualToComparingFieldByField(savedProduct);
     }
 
@@ -91,7 +88,9 @@ class ProductBoTest {
         given(productDao.findAll())
                 .willReturn(productList);
 
-        assertThat(productBo.list())
+        List<Product> expectedProductList = productBo.list();
+
+        assertThat(expectedProductList)
                 .hasSameSizeAs(productList)
                 .isEqualTo(productList);
     }

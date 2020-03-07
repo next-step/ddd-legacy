@@ -13,7 +13,6 @@ import kitchenpos.model.MenuGroup;
 
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,18 +50,10 @@ class MenuBoTest {
     @InjectMocks
     private MenuBo menuBo;
 
-    private MenuGroupBuilder menuGroupBuilder;
-    private ProductBuilder productBuilder;
-    private MenuBuilder menuBuilder;
-    private MenuProductBuilder menuProductBuilder;
-
-    @BeforeEach
-    void setUp() {
-        productBuilder = new ProductBuilder();
-        menuGroupBuilder = new MenuGroupBuilder();
-        menuBuilder = new MenuBuilder();
-        menuProductBuilder = new MenuProductBuilder();
-    }
+    private MenuGroupBuilder menuGroupBuilder = new MenuGroupBuilder();
+    private ProductBuilder productBuilder = new ProductBuilder();
+    private MenuBuilder menuBuilder = new MenuBuilder();
+    private MenuProductBuilder menuProductBuilder = new MenuProductBuilder();
 
     @Test
     @DisplayName("메뉴를 새로 생성활 수 있다")
@@ -92,10 +83,10 @@ class MenuBoTest {
                 ))
                 .build();
 
-        given(menuGroupDao.existsById(anyLong()))
+        given(menuGroupDao.existsById(menuGroup.getId()))
                 .willReturn(Boolean.TRUE);
 
-        given(productDao.findById(anyLong()))
+        given(productDao.findById(product.getId()))
                 .willReturn(Optional.of(product));
 
         given(menuDao.save(any(Menu.class)))
@@ -104,8 +95,10 @@ class MenuBoTest {
         given(menuProductDao.save(any(MenuProduct.class)))
                 .willReturn(newMenu.getMenuProducts().get(0));
 
-        assertThat(menuBo.create(newMenu)).isEqualTo(newMenu);
-        assertThat(menuBo.create(newMenu).getMenuProducts()).isEqualTo(newMenu.getMenuProducts());
+        Menu savedMenu = menuBo.create(newMenu);
+
+        assertThat(savedMenu).isEqualTo(newMenu);
+        assertThat(savedMenu.getMenuProducts()).isEqualTo(newMenu.getMenuProducts());
     }
 
     @Test
@@ -277,7 +270,9 @@ class MenuBoTest {
         given(menuProductDao.findAllByMenuId(anyLong()))
                 .willReturn(null);
 
-        assertThat(menuBo.list())
+        List<Menu> exceptedMenus = menuBo.list();
+
+        assertThat(exceptedMenus)
                 .hasSameSizeAs(menus)
                 .isEqualTo(menus);
 

@@ -32,16 +32,14 @@ class MenuGroupBoTest {
                 .id(1L)
                 .name("두마리메뉴")
                 .build();
-        MenuGroup savedMenuGroup = new MenuGroupBuilder()
-                .id(1L)
-                .name("두마리메뉴")
-                .build();
 
         given(menuGroupDao.save(any(MenuGroup.class)))
                 .willReturn(newMenuGroup);
 
-        assertThat(menuGroupBo.create(newMenuGroup))
-                .isEqualToComparingFieldByField(savedMenuGroup);
+        MenuGroup savedMenuGroup = menuGroupBo.create(newMenuGroup);
+
+        assertThat(savedMenuGroup)
+                .isEqualToComparingFieldByField(newMenuGroup);
     }
 
     @Test
@@ -61,7 +59,9 @@ class MenuGroupBoTest {
         given(menuGroupDao.findAll())
                 .willReturn(menuGroupList);
 
-        assertThat(menuGroupBo.list())
+        List<MenuGroup> expectedGroupList = menuGroupBo.list();
+
+        assertThat(expectedGroupList)
                 .isEqualTo(menuGroupList);
     }
 }
