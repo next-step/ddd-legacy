@@ -42,6 +42,9 @@ class MenuBoTest {
     private MenuDao menuDao;
 
     @Mock
+    private MenuProductDao menuProductDao;
+
+    @Mock
     private MenuGroupDao menuGroupDao;
 
     @Mock
