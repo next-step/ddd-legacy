@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
@@ -21,6 +20,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
 class TableGroupBoTest {
@@ -44,7 +44,6 @@ class TableGroupBoTest {
     @BeforeEach
     void setUp() {
         prepareFixtures();
-        prepareMocks();
     }
 
     void prepareFixtures() {
@@ -67,21 +66,17 @@ class TableGroupBoTest {
         tableGroup2.setId(2L);
     }
 
-    void prepareMocks() {
-        Mockito.when(
-                orderTableDao.findAllByIdIn(Arrays.asList(table1.getId(), table2.getId()))
-        ).thenReturn(Arrays.asList(table1, table2));
-
-        Mockito.when(tableGroupDao.save(tableGroup1)).thenReturn(tableGroup1);
-
-        Mockito.when(orderTableDao.save(table1)).thenReturn(table1);
-        Mockito.when(orderTableDao.save(table2)).thenReturn(table2);
-    }
-
     @DisplayName("사용자는 테이블 그룹을 등록할 수 있고, 등록이 완료되면 등록된 테이블 그룹 정보를 반환받아 확인할 수 있다")
     @Test
     void create() {
         //given
+        given(
+                orderTableDao.findAllByIdIn(Arrays.asList(table1.getId(), table2.getId()))
+        ).willReturn(Arrays.asList(table1, table2));
+        given(tableGroupDao.save(tableGroup1)).willReturn(tableGroup1);
+        given(orderTableDao.save(table1)).willReturn(table1);
+        given(orderTableDao.save(table2)).willReturn(table2);
+
         tableGroup1.setOrderTables(Arrays.asList(table1, table2));
 
         //when
@@ -124,9 +119,9 @@ class TableGroupBoTest {
         //given
         tableGroup1.setOrderTables(Arrays.asList(table1, table2));
 
-        Mockito.when(
+        given(
                 orderTableDao.findAllByIdIn(Arrays.asList(table1.getId(), table2.getId()))
-        ).thenReturn(Collections.singletonList(table1));
+        ).willReturn(Collections.singletonList(table1));
 
         //when
         //then
@@ -139,6 +134,13 @@ class TableGroupBoTest {
     @Test
     void create_tableGroup_has_createDate() {
         //given
+        given(
+                orderTableDao.findAllByIdIn(Arrays.asList(table1.getId(), table2.getId()))
+        ).willReturn(Arrays.asList(table1, table2));
+        given(tableGroupDao.save(tableGroup1)).willReturn(tableGroup1);
+        given(orderTableDao.save(table1)).willReturn(table1);
+        given(orderTableDao.save(table2)).willReturn(table2);
+
         tableGroup1.setOrderTables(Arrays.asList(table1, table2));
         tableGroup1.setCreatedDate(null);
 
@@ -153,6 +155,13 @@ class TableGroupBoTest {
     @Test
     void create_already_not_empty() {
         //given
+        given(
+                orderTableDao.findAllByIdIn(Arrays.asList(table1.getId(), table2.getId()))
+        ).willReturn(Arrays.asList(table1, table2));
+        given(tableGroupDao.save(tableGroup1)).willReturn(tableGroup1);
+        given(orderTableDao.save(table1)).willReturn(table1);
+        given(orderTableDao.save(table2)).willReturn(table2);
+
         table1.setEmpty(false);
         table2.setEmpty(false);
         tableGroup1.setOrderTables(Arrays.asList(table1, table2));
@@ -183,6 +192,12 @@ class TableGroupBoTest {
     @Test
     void create_tables_in_table_group_are_empty() {
         //given
+        given(
+                orderTableDao.findAllByIdIn(Arrays.asList(table1.getId(), table2.getId()))
+        ).willReturn(Arrays.asList(table1, table2));
+        given(tableGroupDao.save(tableGroup1)).willReturn(tableGroup1);
+        given(orderTableDao.save(table1)).willReturn(table1);
+        given(orderTableDao.save(table2)).willReturn(table2);
         tableGroup1.setOrderTables(Arrays.asList(table1, table2));
         //when
         TableGroup actual = tableGroupBo.create(tableGroup1);
@@ -195,15 +210,22 @@ class TableGroupBoTest {
     @Test
     void delete() {
         //given
+        given(
+                orderTableDao.findAllByIdIn(Arrays.asList(table1.getId(), table2.getId()))
+        ).willReturn(Arrays.asList(table1, table2));
+        given(tableGroupDao.save(tableGroup1)).willReturn(tableGroup1);
+        given(orderTableDao.save(table1)).willReturn(table1);
+        given(orderTableDao.save(table2)).willReturn(table2);
+
         tableGroup1.setOrderTables(Arrays.asList(table1, table2));
         TableGroup preparedTableGroup = tableGroupBo.create(tableGroup1);
 
-        Mockito.when(orderTableDao.findAllByTableGroupId(preparedTableGroup.getId()))
-                .thenReturn(Arrays.asList(table1, table2));
-        Mockito.when(orderDao.existsByOrderTableIdInAndOrderStatusIn(
+        given(orderTableDao.findAllByTableGroupId(preparedTableGroup.getId()))
+                .willReturn(Arrays.asList(table1, table2));
+        given(orderDao.existsByOrderTableIdInAndOrderStatusIn(
                 Arrays.asList(table1.getId(), table2.getId()),
                 Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name())
-        )).thenReturn(false);
+        )).willReturn(false);
 
         //when
         //then
@@ -214,15 +236,21 @@ class TableGroupBoTest {
     @Test
     void delete_completed_table() {
         //given
+        given(
+                orderTableDao.findAllByIdIn(Arrays.asList(table1.getId(), table2.getId()))
+        ).willReturn(Arrays.asList(table1, table2));
+        given(tableGroupDao.save(tableGroup1)).willReturn(tableGroup1);
+        given(orderTableDao.save(table1)).willReturn(table1);
+        given(orderTableDao.save(table2)).willReturn(table2);
         tableGroup1.setOrderTables(Arrays.asList(table1, table2));
         TableGroup preparedTableGroup = tableGroupBo.create(tableGroup1);
 
-        Mockito.when(orderTableDao.findAllByTableGroupId(preparedTableGroup.getId()))
-                .thenReturn(Arrays.asList(table1, table2));
-        Mockito.when(orderDao.existsByOrderTableIdInAndOrderStatusIn(
+        given(orderTableDao.findAllByTableGroupId(preparedTableGroup.getId()))
+                .willReturn(Arrays.asList(table1, table2));
+        given(orderDao.existsByOrderTableIdInAndOrderStatusIn(
                 Arrays.asList(table1.getId(), table2.getId()),
                 Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name())
-        )).thenReturn(true);
+        )).willReturn(true);
 
         //when
         //then
