@@ -230,6 +230,8 @@ class TableGroupBoTest {
         //when
         //then
         tableGroupBo.delete(preparedTableGroup.getId());
+        assertThat(table1.getTableGroupId()).isNull();
+        assertThat(table2.getTableGroupId()).isNull();
     }
 
     @DisplayName("테이블의 주문상태가 모두 '식사완료'인 경우에만 테이블 그룹을 삭제할 수 있다.")

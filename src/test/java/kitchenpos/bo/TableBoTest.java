@@ -101,7 +101,7 @@ class TableBoTest {
         assertThat(actual.isEmpty()).isEqualTo(orderTable.isEmpty());
     }
 
-    @DisplayName("등록된 테이블의 착석 여부를 변경할 수 있다")
+    @DisplayName("등록되지 않은 테이블은 착석 여부를 변경할 수 없다")
     @Test
     void changeEmpty_with_registered_table() {
         //given
