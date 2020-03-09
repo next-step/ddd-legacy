@@ -9,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
@@ -19,6 +18,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
 class TableBoTest {
@@ -37,19 +37,6 @@ class TableBoTest {
     @BeforeEach
     void setUp() {
         prepareFixtures();
-        prepareMockito();
-    }
-
-    private void prepareMockito() {
-        Mockito.when(orderTableDao.findById(orderTable.getId()))
-                .thenReturn(Optional.of(orderTable));
-
-        Mockito.when(orderDao.existsByOrderTableIdAndOrderStatusIn(
-                orderTable.getId(), Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name())))
-                .thenReturn(false);
-
-        Mockito.when(orderTableDao.save(orderTable))
-                .thenReturn(orderTable);
     }
 
     private void prepareFixtures() {
@@ -70,6 +57,8 @@ class TableBoTest {
     @Test
     void create() {
         //given
+        given(orderTableDao.save(orderTable)).willReturn(orderTable);
+
         //when
         OrderTable actual = tableBo.create(orderTable);
 
@@ -81,6 +70,8 @@ class TableBoTest {
     @Test
     void update() {
         //given
+        given(orderTableDao.save(orderTable)).willReturn(orderTable);
+
         //when
         OrderTable table = tableBo.create(orderTable);
         table.setTableGroupId(1L);
@@ -96,6 +87,13 @@ class TableBoTest {
     @Test
     void changeEmpty() {
         //given
+        given(orderTableDao.findById(orderTable.getId()))
+                .willReturn(Optional.of(orderTable));
+        given(orderDao.existsByOrderTableIdAndOrderStatusIn(
+                orderTable.getId(), Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name())))
+                .willReturn(false);
+        given(orderTableDao.save(orderTable)).willReturn(orderTable);
+
         //when
         OrderTable actual = tableBo.changeEmpty(orderTable.getId(), orderTable);
 
@@ -107,8 +105,8 @@ class TableBoTest {
     @Test
     void changeEmpty_with_registered_table() {
         //given
-        Mockito.when(orderTableDao.findById(orderTable.getId()))
-                .thenReturn(Optional.empty());
+        given(orderTableDao.findById(orderTable.getId()))
+                .willReturn(Optional.empty());
 
         //when
         //then
@@ -134,9 +132,9 @@ class TableBoTest {
     @Test
     void changeEmpty_with_order_status() {
         //given
-        Mockito.when(orderDao.existsByOrderTableIdAndOrderStatusIn(
+        given(orderDao.existsByOrderTableIdAndOrderStatusIn(
                 orderTable.getId(), Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name())))
-                .thenReturn(true);
+                .willReturn(true);
 
         //when
         //then
@@ -149,6 +147,11 @@ class TableBoTest {
     @Test
     void changeNumberOfGuests() {
         //given
+        given(orderTableDao.findById(orderTable.getId()))
+                .willReturn(Optional.of(orderTable));
+        given(orderTableDao.save(orderTable))
+                .willReturn(orderTable);
+
         orderTable.setNumberOfGuests(4);
 
         //when
@@ -175,8 +178,8 @@ class TableBoTest {
     @Test
     void changeNumberOfGuests_with_registered_table() {
         //given
-        Mockito.when(orderTableDao.findById(orderTable.getId()))
-                .thenReturn(Optional.empty());
+        given(orderTableDao.findById(orderTable.getId()))
+                .willReturn(Optional.empty());
 
         //when
         //then
@@ -202,7 +205,7 @@ class TableBoTest {
     @Test
     void list() {
         //given
-        Mockito.when(orderTableDao.findAll()).thenReturn(Arrays.asList(orderTable, orderTable2));
+        given(orderTableDao.findAll()).willReturn(Arrays.asList(orderTable, orderTable2));
 
         //when
         List<OrderTable> actual = tableBo.list();
@@ -210,6 +213,4 @@ class TableBoTest {
         //then
         assertThat(actual).containsExactlyInAnyOrder(orderTable, orderTable2);
     }
-
-
 }
