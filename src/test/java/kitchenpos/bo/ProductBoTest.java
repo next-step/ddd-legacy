@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
@@ -16,6 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ProductBoTest {
@@ -34,8 +34,7 @@ class ProductBoTest {
         item.setId(1L);
         item.setName("후라이드치킨");
         item.setPrice(BigDecimal.valueOf(13000));
-
-        Mockito.when(productDao.save(item)).thenReturn(item);
+        given(productDao.save(item)).willReturn(item);
 
         //when
         Product actual = productBo.create(item);
@@ -79,7 +78,7 @@ class ProductBoTest {
         item3.setPrice(BigDecimal.valueOf(10000));
 
         List<Product> products = Arrays.asList(item1, item2, item3);
-        Mockito.when(productDao.findAll()).thenReturn(products);
+        given(productDao.findAll()).willReturn(products);
 
         //when
         List<Product> actual = productBo.list();
