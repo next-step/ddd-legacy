@@ -1,9 +1,6 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.MenuDao;
-import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.OrderLineItemDao;
-import kitchenpos.dao.OrderTableDao;
+import kitchenpos.dao.*;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
 import kitchenpos.model.OrderStatus;
@@ -44,6 +41,7 @@ public class OrderBo {
         if (CollectionUtils.isEmpty(orderLineItems)) {
             throw new IllegalArgumentException();
         }
+
         final List<Long> menuIds = orderLineItems.stream()
             .map(OrderLineItem::getMenuId)
             .collect(Collectors.toList());
@@ -51,7 +49,6 @@ public class OrderBo {
         if (orderLineItems.size() != menuDao.countByIdIn(menuIds)) {
             throw new IllegalArgumentException();
         }
-
         order.setId(null);
 
         final OrderTable orderTable = orderTableDao.findById(order.getOrderTableId())

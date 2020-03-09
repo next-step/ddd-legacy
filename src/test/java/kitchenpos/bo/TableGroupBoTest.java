@@ -1,8 +1,8 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.OrderTableDao;
-import kitchenpos.dao.TableGroupDao;
+import kitchenpos.dao.DefaultOrderDao;
+import kitchenpos.dao.DefaultOrderTableDao;
+import kitchenpos.dao.DefaultTableGroupDao;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
 import kitchenpos.model.TableGroup;
@@ -31,11 +31,11 @@ public class TableGroupBoTest {
 
     private static TableGroup expectedTableGroup;
     @Mock
-    private OrderDao orderDao;
+    private DefaultOrderDao orderDao;
     @Mock
-    private OrderTableDao orderTableDao;
+    private DefaultOrderTableDao orderTableDao;
     @Mock
-    private TableGroupDao tableGroupDao;
+    private DefaultTableGroupDao tableGroupDao;
     @InjectMocks
     private TableGroupBo tableGroupBo;
 

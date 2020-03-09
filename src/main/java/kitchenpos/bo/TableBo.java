@@ -37,12 +37,10 @@ public class TableBo {
         if (Objects.nonNull(savedOrderTable.getTableGroupId())) {
             throw new IllegalArgumentException();
         }
-
         if (orderDao.existsByOrderTableIdAndOrderStatusIn(
             orderTableId, Arrays.asList(OrderStatus.COOKING.name(), OrderStatus.MEAL.name()))) {
             throw new IllegalArgumentException();
         }
-
         savedOrderTable.setEmpty(orderTable.isEmpty());
         return orderTableDao.save(savedOrderTable);
     }

@@ -1,9 +1,9 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.MenuDao;
-import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.OrderLineItemDao;
-import kitchenpos.dao.OrderTableDao;
+import kitchenpos.dao.DefaultMenuDao;
+import kitchenpos.dao.DefaultOrderDao;
+import kitchenpos.dao.DefaultOrderLineItemDao;
+import kitchenpos.dao.DefaultOrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
 import kitchenpos.model.OrderStatus;
@@ -29,13 +29,13 @@ import static org.mockito.BDDMockito.given;
 class OrderBoTest {
 
     @Mock
-    private MenuDao menuDao;
+    private DefaultMenuDao menuDao;
     @Mock
-    private OrderDao orderDao;
+    private DefaultOrderDao orderDao;
     @Mock
-    private OrderLineItemDao orderLineItemDao;
+    private DefaultOrderLineItemDao orderLineItemDao;
     @Mock
-    private OrderTableDao orderTableDao;
+    private DefaultOrderTableDao orderTableDao;
 
     @InjectMocks
     private OrderBo orderBo;

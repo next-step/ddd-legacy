@@ -23,7 +23,7 @@ public class MenuProductBuilder {
         return this;
     }
 
-    public MenuProductBuilder quantity(int quantity) {
+    public MenuProductBuilder quantity(long quantity) {
         this.quantity = quantity;
         return this;
     }
