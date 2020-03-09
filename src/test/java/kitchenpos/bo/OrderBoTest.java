@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.junit.jupiter.api.Assertions;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -212,11 +213,13 @@ class OrderBoTest {
         order.setOrderLineItems(Arrays.asList(orderLineItem1, orderLineItem2));
         Order actual = orderBo.create(order);
 
-        assertThat(actual.getOrderTableId()).isEqualTo(1L);
-        assertThat(actual.getOrderedTime()).isNotNull();
-        assertThat(actual.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name());
-        assertThat(actual.getOrderLineItems().get(0)).isEqualTo(orderLineItem1);
-        assertThat(actual.getOrderLineItems().get(1)).isEqualTo(orderLineItem2);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(actual.getOrderTableId(), 1L),
+                () -> Assertions.assertNotNull(actual.getOrderedTime()),
+                () -> Assertions.assertEquals(actual.getOrderStatus(), OrderStatus.COOKING.name()),
+                () -> Assertions.assertEquals(actual.getOrderLineItems().get(0), orderLineItem1),
+                () -> Assertions.assertEquals(actual.getOrderLineItems().get(1), orderLineItem2)
+        );
     }
 
     @DisplayName("각 주문 상세 항목은 주문 번호, 메뉴 번호, 주문한 메뉴 수량을 포함한다")
@@ -243,15 +246,18 @@ class OrderBoTest {
         OrderLineItem actualItem1 = actual.get(0);
         OrderLineItem actualItem2 = actual.get(1);
 
-        assertThat(orderLineItem1.getMenuId()).isEqualTo(actualItem1.getMenuId());
-        assertThat(orderLineItem1.getOrderId()).isEqualTo(actualItem1.getOrderId());
-        assertThat(orderLineItem1.getQuantity()).isEqualTo(actualItem1.getQuantity());
-        assertThat(orderLineItem1.getSeq()).isEqualTo(actualItem1.getSeq());
-
-        assertThat(orderLineItem2.getMenuId()).isEqualTo(actualItem2.getMenuId());
-        assertThat(orderLineItem2.getOrderId()).isEqualTo(actualItem2.getOrderId());
-        assertThat(orderLineItem2.getQuantity()).isEqualTo(actualItem2.getQuantity());
-        assertThat(orderLineItem2.getSeq()).isEqualTo(actualItem2.getSeq());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(orderLineItem1.getMenuId(), actualItem1.getMenuId()),
+                () -> Assertions.assertEquals(orderLineItem1.getOrderId(), actualItem1.getOrderId()),
+                () -> Assertions.assertEquals(orderLineItem1.getQuantity(), actualItem1.getQuantity()),
+                () -> Assertions.assertEquals(orderLineItem1.getSeq(), actualItem1.getSeq())
+        );
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(orderLineItem2.getMenuId(), actualItem2.getMenuId()),
+                () -> Assertions.assertEquals(orderLineItem2.getOrderId(), actualItem2.getOrderId()),
+                () -> Assertions.assertEquals(orderLineItem2.getQuantity(), actualItem2.getQuantity()),
+                () -> Assertions.assertEquals(orderLineItem2.getSeq(), actualItem2.getSeq())
+        );
     }
 
     @DisplayName("사용자는 주문의 상태를 변경할 수 있다")
