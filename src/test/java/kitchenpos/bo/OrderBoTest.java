@@ -13,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
@@ -23,8 +22,9 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 
-@MockitoSettings(strictness = Strictness.LENIENT)
+@MockitoSettings(strictness = Strictness.STRICT_STUBS)
 class OrderBoTest {
 
     @Mock
@@ -53,7 +53,6 @@ class OrderBoTest {
     @BeforeEach
     void setUp() {
         prepareFixtures();
-        prepareMockito();
     }
 
     void prepareFixtures() {
@@ -96,30 +95,19 @@ class OrderBoTest {
         orderClone1.setOrderLineItems(Arrays.asList(orderLineItem1, orderLineItem2));
     }
 
-    void prepareMockito() {
-        Mockito.when(menuDao.countByIdIn(
-                Arrays.asList(orderLineItem1.getMenuId(), orderLineItem2.getMenuId()))
-        ).thenReturn(2L);
-
-        Mockito.when(orderDao.findById(order.getId()))
-                .thenReturn(Optional.of(orderClone1));
-
-        Mockito.when(orderDao.save(order)).thenReturn(orderClone1);
-
-        Mockito.when(orderTableDao.findById(order.getOrderTableId()))
-                .thenReturn(Optional.of(orderTable));
-
-        Mockito.when(orderLineItemDao.findAllByOrderId(order.getId()))
-                .thenReturn(Arrays.asList(orderLineItem1, orderLineItem2));
-
-        Mockito.when(orderLineItemDao.save(orderLineItem1)).thenReturn(orderLineItem1);
-        Mockito.when(orderLineItemDao.save(orderLineItem2)).thenReturn(orderLineItem2);
-    }
-
     @DisplayName("사용자는 주문 정보를 등록할 수 있다")
     @Test
     void create() {
         //given
+        given(menuDao.countByIdIn(Arrays.asList(orderLineItem1.getMenuId(), orderLineItem2.getMenuId())))
+                .willReturn(2L);
+        given(orderTableDao.findById(order.getOrderTableId()))
+                .willReturn(Optional.of(orderTable));
+        given(orderDao.save(order)).willReturn(orderClone1);
+        given(orderDao.save(order)).willReturn(orderClone1);
+        given(orderLineItemDao.save(orderLineItem1)).willReturn(orderLineItem1);
+        given(orderLineItemDao.save(orderLineItem2)).willReturn(orderLineItem2);
+
         //when
         Order actual = orderBo.create(order);
 
@@ -140,13 +128,10 @@ class OrderBoTest {
         List<Long> orderLineItems1Ids = orderLineItems1.stream()
                 .map(OrderLineItem::getMenuId)
                 .collect(Collectors.toList());
-        Mockito.when(menuDao.countByIdIn(orderLineItems1Ids))
-                .thenReturn(Long.valueOf(orderLineItems1.size()));
 
         order2.setOrderLineItems(null);
 
-        //when
-        //then
+        //when & then
         assertThatThrownBy(() -> {
             orderBo.create(order);
         }).isInstanceOf(IllegalArgumentException.class);
@@ -159,10 +144,12 @@ class OrderBoTest {
     @DisplayName("등록되지 않은 메뉴는 주문할 수 없다")
     @Test
     void create_unregistered_menu() {
-        Mockito.when(menuDao.countByIdIn(
+        //given
+        given(menuDao.countByIdIn(
                 Arrays.asList(orderLineItem1.getMenuId(), orderLineItem2.getMenuId())))
-                .thenReturn(0L);
+                .willReturn(0L);
 
+        //when & then
         assertThatThrownBy(() -> {
             orderBo.create(order);
         }).isInstanceOf(IllegalArgumentException.class);
@@ -172,9 +159,14 @@ class OrderBoTest {
     @Test
     void create_unregistered_table() {
         //given
-        Mockito.when(orderTableDao.findById(order.getOrderTableId()))
-                .thenReturn(Optional.empty());
+        given(menuDao.countByIdIn(
+                Arrays.asList(orderLineItem1.getMenuId(), orderLineItem2.getMenuId())))
+                .willReturn(2L);
 
+        given(orderTableDao.findById(order.getOrderTableId()))
+                .willReturn(Optional.empty());
+
+        //when & then
         assertThatThrownBy(() -> {
             orderBo.create(order);
         }).isInstanceOf(IllegalArgumentException.class);
@@ -184,7 +176,19 @@ class OrderBoTest {
     @Test
     void create_order_with_empty_table() {
         //given
+        List<OrderLineItem> orderLineItems1 = Arrays.asList(orderLineItem1, orderLineItem2);
+        order.setOrderLineItems(orderLineItems1);
+        List<Long> orderLineItems1Ids = orderLineItems1.stream()
+                .map(OrderLineItem::getMenuId)
+                .collect(Collectors.toList());
         orderTable.setEmpty(true);
+
+        given(menuDao.countByIdIn(orderLineItems1Ids))
+                .willReturn(Long.valueOf(orderLineItems1.size()));
+        orderTable.setEmpty(true);
+
+        given(orderTableDao.findById(order.getOrderTableId()))
+                .willReturn(Optional.of(orderTable));
 
         assertThatThrownBy(() -> {
             orderBo.create(order);
@@ -194,6 +198,15 @@ class OrderBoTest {
     @DisplayName("주문 정보에는 테이블 번호, 주문일시, 주문 상세 항목이 포함되며 주문상태는 '요리중'이 된다")
     @Test
     void create_order_info() {
+        given(menuDao.countByIdIn(Arrays.asList(orderLineItem1.getMenuId(), orderLineItem2.getMenuId())))
+                .willReturn(2L);
+        given(orderTableDao.findById(order.getOrderTableId()))
+                .willReturn(Optional.of(orderTable));
+        given(orderDao.save(order)).willReturn(orderClone1);
+        given(orderDao.save(order)).willReturn(orderClone1);
+        given(orderLineItemDao.save(orderLineItem1)).willReturn(orderLineItem1);
+        given(orderLineItemDao.save(orderLineItem2)).willReturn(orderLineItem2);
+
         order.setOrderedTime(null);
         order.setOrderStatus(OrderStatus.COMPLETION.name());
         order.setOrderLineItems(Arrays.asList(orderLineItem1, orderLineItem2));
@@ -210,6 +223,15 @@ class OrderBoTest {
     @Test
     void create_order_line_items() {
         //given
+        given(menuDao.countByIdIn(Arrays.asList(orderLineItem1.getMenuId(), orderLineItem2.getMenuId())))
+                .willReturn(2L);
+        given(orderTableDao.findById(order.getOrderTableId()))
+                .willReturn(Optional.of(orderTable));
+        given(orderDao.save(order)).willReturn(orderClone1);
+        given(orderDao.save(order)).willReturn(orderClone1);
+        given(orderLineItemDao.save(orderLineItem1)).willReturn(orderLineItem1);
+        given(orderLineItemDao.save(orderLineItem2)).willReturn(orderLineItem2);
+
         order.setOrderLineItems(Arrays.asList(orderLineItem1, orderLineItem2));
 
         //when
@@ -235,6 +257,14 @@ class OrderBoTest {
     @DisplayName("사용자는 주문의 상태를 변경할 수 있다")
     @Test
     void changeOrderStatus() {
+        given(orderDao.findById(order.getId()))
+                .willReturn(Optional.of(orderClone1));
+
+        given(orderDao.save(orderClone1)).willReturn(orderClone1);
+
+        given(orderLineItemDao.findAllByOrderId(order.getId()))
+                .willReturn(Arrays.asList(orderLineItem1, orderLineItem2));
+
         order.setOrderStatus(OrderStatus.COOKING.name());
         Order actual = orderBo.changeOrderStatus(order.getId(), order);
         assertThat(actual.getOrderStatus()).isEqualTo(OrderStatus.COOKING.name());
@@ -252,8 +282,8 @@ class OrderBoTest {
     @Test
     void changeOrderStatus_unregistered_order() {
         //given
-        Mockito.when(orderDao.findById(order.getId()))
-                .thenReturn(Optional.empty());
+        given(orderDao.findById(order.getId()))
+                .willReturn(Optional.empty());
 
         //when
         //then
@@ -268,8 +298,8 @@ class OrderBoTest {
         //given
         orderClone1.setOrderStatus(OrderStatus.COMPLETION.name());
 
-        Mockito.when(orderDao.findById(order.getId()))
-                .thenReturn(Optional.of(orderClone1));
+        given(orderDao.findById(order.getId()))
+                .willReturn(Optional.of(orderClone1));
 
         //when
         //then
@@ -282,18 +312,17 @@ class OrderBoTest {
     @Test
     void list() {
         //given
-        Mockito.when(orderDao.findAll())
-                .thenReturn(Arrays.asList(orderClone1, orderClone2));
+        given(orderDao.findAll())
+                .willReturn(Arrays.asList(orderClone1, orderClone2));
 
-        Mockito.when(orderLineItemDao.findAllByOrderId(orderClone1.getId()))
-                .thenReturn(Collections.singletonList(orderLineItem1));
+        given(orderLineItemDao.findAllByOrderId(orderClone1.getId()))
+                .willReturn(Collections.singletonList(orderLineItem1));
 
-        Mockito.when(orderLineItemDao.findAllByOrderId(orderClone2.getId()))
-                .thenReturn(Collections.singletonList(orderLineItem2));
+        given(orderLineItemDao.findAllByOrderId(orderClone2.getId()))
+                .willReturn(Collections.singletonList(orderLineItem2));
 
         //when
         List<Order> actual = orderBo.list();
-
         assertThat(actual.size()).isEqualTo(2);
         assertThat(actual).containsExactlyInAnyOrder(orderClone1, orderClone2);
         assertThat(actual.get(0).getOrderLineItems()).containsExactlyInAnyOrder(orderLineItem1);
