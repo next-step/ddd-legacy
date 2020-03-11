@@ -1,6 +1,6 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.MenuGroupDao;
+import kitchenpos.dao.DefaultMenuGroupDao;
 import kitchenpos.model.MenuGroup;
 import kitchenpos.support.MenuGroupBuilder;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.given;
 public class MenuGroupBoTest {
 
     @Mock
-    private MenuGroupDao menuGroupDao;
+    private DefaultMenuGroupDao menuGroupDao;
 
     @InjectMocks
     private MenuGroupBo menuGroupBo;

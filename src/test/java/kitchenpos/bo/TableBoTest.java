@@ -1,7 +1,7 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.OrderTableDao;
+import kitchenpos.dao.DefaultOrderDao;
+import kitchenpos.dao.DefaultOrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
@@ -35,9 +35,9 @@ public class TableBoTest {
     private static Order order;
     private static OrderTable orderTable;
     @Mock
-    private OrderDao orderDao;
+    private DefaultOrderDao orderDao;
     @Mock
-    private OrderTableDao orderTableDao;
+    private DefaultOrderTableDao orderTableDao;
     @InjectMocks
     private TableBo tableBo;
 

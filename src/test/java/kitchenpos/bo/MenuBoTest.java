@@ -1,9 +1,9 @@
 package kitchenpos.bo;
 
-import kitchenpos.dao.MenuDao;
-import kitchenpos.dao.MenuGroupDao;
-import kitchenpos.dao.MenuProductDao;
-import kitchenpos.dao.ProductDao;
+import kitchenpos.dao.DefaultProductDao;
+import kitchenpos.dao.DefaultMenuDao;
+import kitchenpos.dao.DefaultMenuGroupDao;
+import kitchenpos.dao.DefaultMenuProductDao;
 import kitchenpos.model.Menu;
 import kitchenpos.model.MenuProduct;
 import kitchenpos.model.Product;
@@ -39,13 +39,13 @@ public class MenuBoTest {
     private static List<Product> products = new ArrayList<>();
     private static BigDecimal totalPrice = BigDecimal.ZERO;
     @Mock
-    private MenuDao menuDao;
+    private DefaultMenuDao menuDao;
     @Mock
-    private MenuGroupDao menuGroupDao;
+    private DefaultMenuGroupDao menuGroupDao;
     @Mock
-    private MenuProductDao menuProductDao;
+    private DefaultMenuProductDao menuProductDao;
     @Mock
-    private ProductDao productDao;
+    private DefaultProductDao productDao;
     @InjectMocks
     private MenuBo menuBo;
 
