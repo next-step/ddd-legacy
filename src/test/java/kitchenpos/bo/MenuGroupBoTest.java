@@ -25,8 +25,7 @@ class MenuGroupBoTest {
     @DisplayName("메뉴그룹은 추가될 수 있다.")
     void createTest() {
         MenuGroup menuGroup = MenuGroupTest.ofSet();
-        MenuGroup menuGroupResult;
-        assertThat(menuGroupResult = menuGroupBo.create(menuGroup));
+        MenuGroup menuGroupResult = menuGroupBo.create(menuGroup);
         assertAll(
                 () -> assertThat(menuGroupResult.getId()).isEqualTo(menuGroup.getId()),
                 () -> assertThat(menuGroupResult.getName()).isEqualTo(menuGroup.getName())
@@ -37,7 +36,8 @@ class MenuGroupBoTest {
     @DisplayName("메뉴그룹 리스트를 조회할 수 있다.")
     void readAllMenuGroupListTest() {
         MenuGroup menuGroup = MenuGroupTest.ofSet();
-        menuGroupDao.save(menuGroup);
+        menuGroup = menuGroupDao.save(menuGroup);
+
         assertThat(menuGroupBo.list()).contains(menuGroup);
     }
 }

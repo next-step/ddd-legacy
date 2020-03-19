@@ -38,8 +38,7 @@ class MenuBoTest {
     @DisplayName("메뉴는 추가될 수 있다.")
     void createTest() {
         Menu menu = MenuTest.ofHalfAndHalf();
-        Menu menuResult;
-        assertThat(menuResult = menuBo.create(menu));
+        Menu menuResult = menuBo.create(menu);
         assertAll(
                 () -> assertThat(menuResult.getId()).isEqualTo(menu.getId()),
                 () -> assertThat(menuResult.getMenuGroupId()).isEqualTo(menu.getMenuGroupId()),
@@ -58,7 +57,7 @@ class MenuBoTest {
     }
 
     @Test
-    @DisplayName("메뉴는 0개 이상의 항목를 포함한다.")
+    @DisplayName("메뉴는 0개 이상의 항목을 포함한다.")
     void createWithEmptyProductExceptionTest() {
         Menu menu = MenuTest.ofHalfAndHalf();
         menu.setMenuProducts(new ArrayList<>());
@@ -85,7 +84,7 @@ class MenuBoTest {
     @DisplayName("모든 메뉴 리스트를 조회할 수 있다.")
     void readAllMenuListTest() {
         Menu menu = MenuTest.ofHalfAndHalf();
-        menuDao.save(menu);
+        menu = menuDao.save(menu);
         assertThat(menuBo.list()).contains(menu);
     }
 }

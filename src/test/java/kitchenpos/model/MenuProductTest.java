@@ -5,22 +5,24 @@ import static kitchenpos.model.ProductTest.HALF_CHILLY_ID;
 import static kitchenpos.model.ProductTest.HALF_FRIED_ID;
 
 public class MenuProductTest {
+    static final Long SINGLE_HALF_FRIED_ID = 1L;
+    static final Long SINGLE_HALF_CHILLY_ID = 21L;
 
     public static MenuProduct ofHalfFriedProduct() {
-        MenuProduct menuProduct = new MenuProduct();
+        final MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq(SINGLE_HALF_FRIED_ID);
         menuProduct.setMenuId(HALF_AND_HALF_SET_MENU_ID);
         menuProduct.setProductId(HALF_FRIED_ID);
         menuProduct.setQuantity(1);
-        menuProduct.setSeq(1L);
         return menuProduct;
     }
 
     public static MenuProduct ofHalfChillyProduct() {
-        MenuProduct menuProduct = new MenuProduct();
+        final MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq(SINGLE_HALF_CHILLY_ID);
         menuProduct.setMenuId(HALF_AND_HALF_SET_MENU_ID);
         menuProduct.setProductId(HALF_CHILLY_ID);
         menuProduct.setQuantity(1);
-        menuProduct.setSeq(2L);
         return menuProduct;
     }
 }

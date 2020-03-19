@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class InMemoryOrderTableDao implements OrderTableDao {
-    private Map<Long, OrderTable> data = new HashMap<>();
+    private final Map<Long, OrderTable> data = new HashMap<>();
 
     @Override
     public OrderTable save(OrderTable entity) {

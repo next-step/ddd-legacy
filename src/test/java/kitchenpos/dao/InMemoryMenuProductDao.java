@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class InMemoryMenuProductDao implements MenuProductDao {
-    private Map<Long, MenuProduct> data = new HashMap<>();
+    private final Map<Long, MenuProduct> data = new HashMap<>();
 
     @Override
     public MenuProduct save(MenuProduct entity) {

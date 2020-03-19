@@ -3,26 +3,15 @@ package kitchenpos.model;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
-public class TableGroupTest {
-    static final Long EMPTY_TABLE_GROUP_ID = 1L;
-    static final Long TABLE_GROUP_ID = 2L;
+public final class TableGroupTest {
+    static final Long TABLE_GROUP_ID = 1L;
 
-    public static TableGroup ofTwoEmptyTable() {
+    public static TableGroup of() {
         TableGroup tableGroup = new TableGroup();
-        tableGroup.setCreatedDate(LocalDateTime.now());
-        tableGroup.setId(EMPTY_TABLE_GROUP_ID);
-        tableGroup.setOrderTables(
-                Arrays.asList(OrderTableTest.ofEmpty(), OrderTableTest.ofAnotherEmpty())
-        );
-        return tableGroup;
-    }
-
-    public static TableGroup ofTwoMultiTable() {
-        TableGroup tableGroup = new TableGroup();
-        tableGroup.setCreatedDate(LocalDateTime.now());
+        tableGroup.setCreatedDate(LocalDateTime.of(2020, 1, 1, 12, 0));
         tableGroup.setId(TABLE_GROUP_ID);
         tableGroup.setOrderTables(
-                Arrays.asList(OrderTableTest.ofFirstOfMulti(), OrderTableTest.ofSecondOfMulti())
+                Arrays.asList(OrderTableTest.ofFirstInTableGroup(), OrderTableTest.ofSecondInTableGroup())
         );
         return tableGroup;
     }

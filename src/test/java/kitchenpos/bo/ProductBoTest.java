@@ -27,9 +27,7 @@ class ProductBoTest {
     @DisplayName("요리는 추가될 수 있다.")
     void createTest() {
         Product product = ProductTest.ofHalfFried();
-        Product productResult;
-
-        assertThat(productResult = productBo.create(product));
+        Product productResult = productBo.create(product);
         assertAll(
                 () -> assertThat(productResult.getId()).isEqualTo(product.getId()),
                 () -> assertThat(productResult.getName()).isEqualTo(product.getName()),

@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class InMemoryOrderLineItemDao implements OrderLineItemDao {
-    private Map<Long, OrderLineItem> data = new HashMap<>();
+    private final Map<Long, OrderLineItem> data = new HashMap<>();
 
     @Override
     public OrderLineItem save(OrderLineItem entity) {

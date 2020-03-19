@@ -5,7 +5,7 @@ import kitchenpos.model.MenuGroup;
 import java.util.*;
 
 public class InMemoryMenuGroupDao implements MenuGroupDao {
-    private Map<Long, MenuGroup> data = new HashMap<>();
+    private final Map<Long, MenuGroup> data = new HashMap<>();
 
     @Override
     public MenuGroup save(MenuGroup entity) {

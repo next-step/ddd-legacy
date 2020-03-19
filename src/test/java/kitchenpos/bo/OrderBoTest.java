@@ -22,14 +22,12 @@ class OrderBoTest {
     private MenuProductDao menuProductDao = new InMemoryMenuProductDao();
     private ProductDao productDao = new InMemoryProductDao();
 
-    private OrderBo orderBo;
+    private OrderBo orderBo = new OrderBo(menuDao, orderDao, orderLineItemDao, orderTableDao);
 
     private OrderTable orderTable;
 
     @BeforeEach
     void setUp() {
-        orderBo = new OrderBo(menuDao, orderDao, orderLineItemDao, orderTableDao);
-
         menuGroupDao.save(MenuGroupTest.ofSet());
 
         productDao.save(ProductTest.ofHalfFried());
@@ -40,18 +38,17 @@ class OrderBoTest {
 
         menuDao.save(MenuTest.ofHalfAndHalf());
 
-        orderTable = orderTableDao.save(OrderTableTest.ofSingle());
+        orderTable = OrderTableTest.of();
+        orderTable = orderTableDao.save(orderTable);
 
-        orderLineItemDao.save(OrderLineItemTest.of());
+        orderLineItemDao.save(OrderLineItemTest.ofSingle());
     }
 
     @Test
     @DisplayName("주문을 생성할 수 있다.")
     void createTest() {
-        Order order = OrderTest.ofOneHalfAndHalfInSingleTable();
-        Order orderResult;
-
-        assertThat(orderResult = orderBo.create(order));
+        Order order = OrderTest.of();
+        Order orderResult = orderBo.create(order);
         assertAll(
                 () -> assertThat(orderResult.getId()).isEqualTo(order.getId()),
                 () -> assertThat(orderResult.getOrderStatus()).isEqualTo(order.getOrderStatus()),
@@ -63,7 +60,7 @@ class OrderBoTest {
     @Test
     @DisplayName("테이블이 할당되지 않으면 주문을 생성할 수 없다.")
     void createOrderWithoutTableException() {
-        Order withoutOrderTable = OrderTest.ofOneHalfAndHalfInSingleTable();
+        Order withoutOrderTable = OrderTest.of();
         withoutOrderTable.setOrderTableId(null);
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(withoutOrderTable));
     }
@@ -71,18 +68,22 @@ class OrderBoTest {
     @Test
     @DisplayName("비어있는 테이블에는 주문을 생성할 수 없다.")
     void createOrderWithEmptyTableException() {
-        Order withEmptyTable = OrderTest.ofOneHalfAndHalfInSingleTable();
+        OrderTable orderTable = OrderTableTest.ofEmpty();
         orderTable.setEmpty(true);
-        assertThrows(IllegalArgumentException.class, () -> orderBo.create(withEmptyTable));
+        orderTable = orderTableDao.save(orderTable);
+
+        Order withEmptyTable = OrderTest.of();
+        withEmptyTable.setOrderTableId(orderTable.getId());
+
+        assertThrows(IllegalArgumentException.class, () -> orderBo.create(orderDao.save(withEmptyTable)));
     }
 
     @Test
     @DisplayName("주문의 상태는 변경할 수 있다.")
     void updateOrderStatusTest() {
-        Order order = OrderTest.ofOneHalfAndHalfInSingleTable();
-        order = orderDao.save(order);
-
+        Order order = orderDao.save(OrderTest.of());
         order.setOrderStatus(OrderStatus.MEAL.toString());
+
         order = orderBo.changeOrderStatus(order.getId(), order);
         assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.MEAL.toString());
     }
@@ -90,17 +91,19 @@ class OrderBoTest {
     @Test
     @DisplayName("완료된 주문의 상태는 변경할 수 없다.")
     void updateCompletionOrderException() {
-        Order order = OrderTest.ofOneHalfAndHalfInSingleTable();
-        order.setOrderStatus(OrderStatus.COMPLETION.toString());
+        Order order = orderDao.save(OrderTest.ofCompleted());
+
+        Order cookingOrder = OrderTest.ofCompleted();
+        cookingOrder.setOrderStatus(OrderStatus.COOKING.toString());
 
         assertThrows(IllegalArgumentException.class,
-                () -> orderBo.changeOrderStatus(order.getId(), order));
+                () -> orderBo.changeOrderStatus(order.getId(), cookingOrder));
     }
 
     @Test
     @DisplayName("주문은 하나 이상의 항목을 갖는다.")
     void createWithoutAnyMenuProductException() {
-        Order order = OrderTest.ofOneHalfAndHalfInSingleTable();
+        Order order = OrderTest.of();
         order.setOrderLineItems(new ArrayList<>());
 
         assertThrows(IllegalArgumentException.class,
@@ -110,8 +113,9 @@ class OrderBoTest {
     @Test
     @DisplayName("주문이 생성되면 주문은 요리중 상태를 갖는다.")
     void createOrderHavingCookingStatusTest() {
-        Order order = OrderTest.ofOneHalfAndHalfInSingleTable();
-        order = orderDao.save(order);
+        Order order = OrderTest.of();
+        order.setOrderStatus(null);
+        order = orderBo.create(order);
 
         assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.COOKING.toString());
     }
@@ -119,7 +123,7 @@ class OrderBoTest {
     @Test
     @DisplayName("전체 주문 목록을 조회할 수 있다.")
     void readAllOrderListTest() {
-        Order order = OrderTest.ofOneHalfAndHalfInSingleTable();
+        Order order = OrderTest.of();
         order = orderDao.save(order);
 
         assertThat(orderBo.list()).contains(order);
