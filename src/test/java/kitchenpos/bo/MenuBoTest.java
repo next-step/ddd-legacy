@@ -14,17 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MenuBoTest {
+    private final MenuDao menuDao = new InMemoryMenuDao();
+    private final MenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
+    private final MenuProductDao menuProductDao = new InMemoryMenuProductDao();
+    private final ProductDao productDao = new InMemoryProductDao();
 
-    private MenuDao menuDao = new InMemoryMenuDao();
-    private MenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
-    private MenuProductDao menuProductDao = new InMemoryMenuProductDao();
-    private ProductDao productDao = new InMemoryProductDao();
-
-    private MenuBo menuBo;
+    private final MenuBo menuBo = new MenuBo(menuDao, menuGroupDao, menuProductDao, productDao);
 
     @BeforeEach
     void setUp() {
-        menuBo = new MenuBo(menuDao, menuGroupDao, menuProductDao, productDao);
         menuGroupDao.save(MenuGroupTest.ofSet());
 
         productDao.save(ProductTest.ofHalfFried());
@@ -37,8 +35,8 @@ class MenuBoTest {
     @Test
     @DisplayName("메뉴는 추가될 수 있다.")
     void createTest() {
-        Menu menu = MenuTest.ofHalfAndHalf();
-        Menu menuResult = menuBo.create(menu);
+        final Menu menu = MenuTest.ofHalfAndHalf();
+        final Menu menuResult = menuBo.create(menu);
         assertAll(
                 () -> assertThat(menuResult.getId()).isEqualTo(menu.getId()),
                 () -> assertThat(menuResult.getMenuGroupId()).isEqualTo(menu.getMenuGroupId()),
@@ -51,7 +49,7 @@ class MenuBoTest {
     @Test
     @DisplayName("메뉴의 가격은 0원 이상이다")
     void createWithPriceExceptionTest() {
-        Menu menu = MenuTest.ofHalfAndHalf();
+        final Menu menu = MenuTest.ofHalfAndHalf();
         menu.setPrice(BigDecimal.valueOf(-1000));
         assertThrows(IllegalArgumentException.class, () -> menuBo.create(menu));
     }
@@ -59,7 +57,7 @@ class MenuBoTest {
     @Test
     @DisplayName("메뉴는 0개 이상의 항목을 포함한다.")
     void createWithEmptyProductExceptionTest() {
-        Menu menu = MenuTest.ofHalfAndHalf();
+        final Menu menu = MenuTest.ofHalfAndHalf();
         menu.setMenuProducts(new ArrayList<>());
         assertThrows(IllegalArgumentException.class, () -> menuBo.create(menu));
     }
@@ -67,7 +65,7 @@ class MenuBoTest {
     @Test
     @DisplayName("메뉴는 한 가지 메뉴그룹에 속해 있어야 한다.")
     void createWithoutMenuGroupExceptionTest() {
-        Menu menu = MenuTest.ofHalfAndHalf();
+        final Menu menu = MenuTest.ofHalfAndHalf();
         menu.setMenuGroupId(null);
         assertThrows(IllegalArgumentException.class, () -> menuBo.create(menu));
     }
@@ -75,7 +73,7 @@ class MenuBoTest {
     @Test
     @DisplayName("메뉴의 가격은 메뉴에 들어가는 요리의 가격의 합보다 클 수 없다.")
     void createWithOverSumOfProductsPriceExceptionTest() {
-        Menu menu = MenuTest.ofHalfAndHalf();
+        final Menu menu = MenuTest.ofHalfAndHalf();
         menu.setPrice(BigDecimal.valueOf(20000L));
         assertThrows(IllegalArgumentException.class, () -> menuBo.create(menu));
     }
@@ -83,8 +81,8 @@ class MenuBoTest {
     @Test
     @DisplayName("모든 메뉴 리스트를 조회할 수 있다.")
     void readAllMenuListTest() {
-        Menu menu = MenuTest.ofHalfAndHalf();
-        menu = menuDao.save(menu);
-        assertThat(menuBo.list()).contains(menu);
+        final Menu menu = MenuTest.ofHalfAndHalf();
+        final Menu menuResult = menuDao.save(menu);
+        assertThat(menuBo.list()).contains(menuResult);
     }
 }

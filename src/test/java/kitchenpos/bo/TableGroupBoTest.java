@@ -15,18 +15,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TableGroupBoTest {
-
     private final TableGroupDao tableGroupDao = new InMemoryTableGroupDao();
     private final OrderTableDao orderTableDao = new InMemoryOrderTableDao();
     private final OrderDao orderDao = new InMemoryOrderDao();
     private final TableGroupBo tableGroupBo = new TableGroupBo(orderDao, orderTableDao, tableGroupDao);
 
-    private OrderTable firstTable = OrderTableTest.ofFirstInTableGroup();
-    private OrderTable secondTable = OrderTableTest.ofSecondInTableGroup();
+    private final OrderTable firstTable = OrderTableTest.ofFirstInTableGroup();
+    private final OrderTable secondTable = OrderTableTest.ofSecondInTableGroup();
 
     @BeforeEach
     void setUp() {
-
         orderTableDao.save(firstTable);
         orderTableDao.save(secondTable);
     }
@@ -34,7 +32,7 @@ class TableGroupBoTest {
     @Test
     @DisplayName("테이블 그룹은 2개 이상의 테이블로 생성된다.")
     void createTableGroupWithSingleTableException() {
-        TableGroup tableGroup = TableGroupTest.of();
+        final TableGroup tableGroup = TableGroupTest.of();
         tableGroup.setOrderTables(
                 Collections.singletonList(OrderTableTest.ofEmpty())
         );
@@ -44,7 +42,7 @@ class TableGroupBoTest {
     @Test
     @DisplayName("테이블 그룹은 빈 테이블로 생성된다.")
     void createTableGroupWithNotEmptyTableException() {
-        TableGroup tableGroup = TableGroupTest.of();
+        final TableGroup tableGroup = TableGroupTest.of();
 
         firstTable.setEmpty(false);
         secondTable.setEmpty(false);
@@ -56,7 +54,7 @@ class TableGroupBoTest {
     @Test
     @DisplayName("테이블 그룹이 생성되면 테이블은 비어있지 않은 상태로 변경된다.")
     void createTableHavingNotEmptyStatus() {
-        TableGroup tableGroup = tableGroupBo.create(TableGroupTest.of());
+        final TableGroup tableGroup = tableGroupBo.create(TableGroupTest.of());
 
         assertThat(tableGroup.getOrderTables())
                 .allSatisfy(orderTable -> assertThat(orderTable.isEmpty()).isFalse());
@@ -65,16 +63,17 @@ class TableGroupBoTest {
     @Test
     @DisplayName("테이블 그룹은 없앨 수 있다.")
     void deleteTableGroup() {
-        TableGroup tableGroup = TableGroupTest.of();
+        final TableGroup tableGroup = TableGroupTest.of();
 
         firstTable.setTableGroupId(tableGroup.getId());
         secondTable.setTableGroupId(tableGroup.getId());
         tableGroup.setOrderTables(Arrays.asList(firstTable, secondTable));
-        tableGroup = tableGroupDao.save(TableGroupTest.of());
 
-        tableGroupBo.delete(tableGroup.getId());
+        final TableGroup tableGroupResult = tableGroupDao.save(TableGroupTest.of());
 
-        assertThat(tableGroup.getOrderTables())
+        tableGroupBo.delete(tableGroupResult.getId());
+
+        assertThat(tableGroupResult.getOrderTables())
                 .allSatisfy(orderTable -> assertThat(orderTable.getTableGroupId()).isNull());
     }
 
@@ -82,8 +81,6 @@ class TableGroupBoTest {
     @ValueSource(strings = {"COOKING", "MEAL"})
     @DisplayName("요리중이거나 식사중인 테이블그룹은 없앨 수 없다.")
     void deleteWithCookingOrMealTableException(String orderStatus) {
-        TableGroup tableGroup = tableGroupDao.save(TableGroupTest.of());
-
         Order orderForFirstTable = OrderTest.ofFirstInTableGroup();
         orderForFirstTable.setOrderStatus(orderStatus);
         orderDao.save(orderForFirstTable);
@@ -92,6 +89,7 @@ class TableGroupBoTest {
         orderForSecondTable.setOrderStatus(orderStatus);
         orderDao.save(orderForSecondTable);
 
+        final TableGroup tableGroup = tableGroupDao.save(TableGroupTest.of());
         firstTable.setTableGroupId(tableGroup.getId());
         secondTable.setTableGroupId(tableGroup.getId());
         tableGroup.setOrderTables(Arrays.asList(firstTable, secondTable));

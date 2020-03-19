@@ -13,16 +13,15 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class OrderBoTest {
+    private final MenuDao menuDao = new InMemoryMenuDao();
+    private final OrderDao orderDao = new InMemoryOrderDao();
+    private final OrderLineItemDao orderLineItemDao = new InMemoryOrderLineItemDao();
+    private final OrderTableDao orderTableDao = new InMemoryOrderTableDao();
+    private final MenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
+    private final MenuProductDao menuProductDao = new InMemoryMenuProductDao();
+    private final ProductDao productDao = new InMemoryProductDao();
 
-    private MenuDao menuDao = new InMemoryMenuDao();
-    private OrderDao orderDao = new InMemoryOrderDao();
-    private OrderLineItemDao orderLineItemDao = new InMemoryOrderLineItemDao();
-    private OrderTableDao orderTableDao = new InMemoryOrderTableDao();
-    private MenuGroupDao menuGroupDao = new InMemoryMenuGroupDao();
-    private MenuProductDao menuProductDao = new InMemoryMenuProductDao();
-    private ProductDao productDao = new InMemoryProductDao();
-
-    private OrderBo orderBo = new OrderBo(menuDao, orderDao, orderLineItemDao, orderTableDao);
+    private final OrderBo orderBo = new OrderBo(menuDao, orderDao, orderLineItemDao, orderTableDao);
 
     private OrderTable orderTable;
 
@@ -47,8 +46,8 @@ class OrderBoTest {
     @Test
     @DisplayName("주문을 생성할 수 있다.")
     void createTest() {
-        Order order = OrderTest.of();
-        Order orderResult = orderBo.create(order);
+        final Order order = OrderTest.of();
+        final Order orderResult = orderBo.create(order);
         assertAll(
                 () -> assertThat(orderResult.getId()).isEqualTo(order.getId()),
                 () -> assertThat(orderResult.getOrderStatus()).isEqualTo(order.getOrderStatus()),
@@ -60,7 +59,7 @@ class OrderBoTest {
     @Test
     @DisplayName("테이블이 할당되지 않으면 주문을 생성할 수 없다.")
     void createOrderWithoutTableException() {
-        Order withoutOrderTable = OrderTest.of();
+        final Order withoutOrderTable = OrderTest.of();
         withoutOrderTable.setOrderTableId(null);
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(withoutOrderTable));
     }
@@ -68,12 +67,12 @@ class OrderBoTest {
     @Test
     @DisplayName("비어있는 테이블에는 주문을 생성할 수 없다.")
     void createOrderWithEmptyTableException() {
-        OrderTable orderTable = OrderTableTest.ofEmpty();
+        final OrderTable orderTable = OrderTableTest.ofEmpty();
         orderTable.setEmpty(true);
-        orderTable = orderTableDao.save(orderTable);
+        final OrderTable orderTableResult = orderTableDao.save(orderTable);
 
-        Order withEmptyTable = OrderTest.of();
-        withEmptyTable.setOrderTableId(orderTable.getId());
+        final Order withEmptyTable = OrderTest.of();
+        withEmptyTable.setOrderTableId(orderTableResult.getId());
 
         assertThrows(IllegalArgumentException.class, () -> orderBo.create(orderDao.save(withEmptyTable)));
     }
@@ -81,19 +80,19 @@ class OrderBoTest {
     @Test
     @DisplayName("주문의 상태는 변경할 수 있다.")
     void updateOrderStatusTest() {
-        Order order = orderDao.save(OrderTest.of());
+        final Order order = orderDao.save(OrderTest.of());
         order.setOrderStatus(OrderStatus.MEAL.toString());
 
-        order = orderBo.changeOrderStatus(order.getId(), order);
-        assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.MEAL.toString());
+        final Order orderResult = orderBo.changeOrderStatus(order.getId(), order);
+        assertThat(orderResult.getOrderStatus()).isEqualTo(OrderStatus.MEAL.toString());
     }
 
     @Test
     @DisplayName("완료된 주문의 상태는 변경할 수 없다.")
     void updateCompletionOrderException() {
-        Order order = orderDao.save(OrderTest.ofCompleted());
+        final Order order = orderDao.save(OrderTest.ofCompleted());
 
-        Order cookingOrder = OrderTest.ofCompleted();
+        final Order cookingOrder = OrderTest.ofCompleted();
         cookingOrder.setOrderStatus(OrderStatus.COOKING.toString());
 
         assertThrows(IllegalArgumentException.class,
@@ -103,7 +102,7 @@ class OrderBoTest {
     @Test
     @DisplayName("주문은 하나 이상의 항목을 갖는다.")
     void createWithoutAnyMenuProductException() {
-        Order order = OrderTest.of();
+        final Order order = OrderTest.of();
         order.setOrderLineItems(new ArrayList<>());
 
         assertThrows(IllegalArgumentException.class,
@@ -113,19 +112,19 @@ class OrderBoTest {
     @Test
     @DisplayName("주문이 생성되면 주문은 요리중 상태를 갖는다.")
     void createOrderHavingCookingStatusTest() {
-        Order order = OrderTest.of();
+        final Order order = OrderTest.of();
         order.setOrderStatus(null);
-        order = orderBo.create(order);
+        final Order orderResult = orderBo.create(order);
 
-        assertThat(order.getOrderStatus()).isEqualTo(OrderStatus.COOKING.toString());
+        assertThat(orderResult.getOrderStatus()).isEqualTo(OrderStatus.COOKING.toString());
     }
 
     @Test
     @DisplayName("전체 주문 목록을 조회할 수 있다.")
     void readAllOrderListTest() {
-        Order order = OrderTest.of();
-        order = orderDao.save(order);
+        final Order order = OrderTest.of();
+        final Order orderResult = orderDao.save(order);
 
-        assertThat(orderBo.list()).contains(order);
+        assertThat(orderBo.list()).contains(orderResult);
     }
 }

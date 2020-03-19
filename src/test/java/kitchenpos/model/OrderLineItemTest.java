@@ -4,9 +4,9 @@ import static kitchenpos.model.MenuTest.HALF_AND_HALF_SET_MENU_ID;
 import static kitchenpos.model.OrderTest.*;
 
 public class OrderLineItemTest {
-    static final Long SINGLE_TABLE_ORDER_LINE_ITEM_ID = 1L;
-    static final Long FIRST_TABLE_GROUP_ORDER_LINE_ITEM_ID = 2L;
-    static final Long SECOND_TABLE_GROUP_ORDER_LINE_ITEM_ID = 3L;
+    private static final Long SINGLE_TABLE_ORDER_LINE_ITEM_ID = 1L;
+    private static final Long FIRST_TABLE_GROUP_ORDER_LINE_ITEM_ID = 2L;
+    private static final Long SECOND_TABLE_GROUP_ORDER_LINE_ITEM_ID = 3L;
 
     public static OrderLineItem ofSingle() {
         final OrderLineItem orderLineItem = new OrderLineItem();

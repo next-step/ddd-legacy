@@ -5,8 +5,8 @@ import static kitchenpos.model.ProductTest.HALF_CHILLY_ID;
 import static kitchenpos.model.ProductTest.HALF_FRIED_ID;
 
 public class MenuProductTest {
-    static final Long SINGLE_HALF_FRIED_ID = 1L;
-    static final Long SINGLE_HALF_CHILLY_ID = 21L;
+    private static final Long SINGLE_HALF_FRIED_ID = 1L;
+    private static final Long SINGLE_HALF_CHILLY_ID = 21L;
 
     public static MenuProduct ofHalfFriedProduct() {
         final MenuProduct menuProduct = new MenuProduct();

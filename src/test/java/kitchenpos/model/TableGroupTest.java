@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 
 public final class TableGroupTest {
-    static final Long TABLE_GROUP_ID = 1L;
+    private static final Long TABLE_GROUP_ID = 1L;
 
     public static TableGroup of() {
         TableGroup tableGroup = new TableGroup();
