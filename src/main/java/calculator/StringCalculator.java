@@ -3,6 +3,7 @@ package calculator;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +19,7 @@ public class StringCalculator {
             return 0;
         }
         List<String> inputs = splitInputs(input);
-        Number number = new Number(inputs);
+        Number number = Number.sumOf(Collections.unmodifiableList(inputs));
         return number.getValue();
     }
 

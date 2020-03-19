@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -24,6 +25,8 @@ class NumberTest {
     @MethodSource("throwWithNonNumericExceptionArguments")
     @DisplayName("숫자 이외의 값 또는 음수는 RuntimeException을 발생한다.")
     void throwWithNonNumericException(List<String> inputs) {
-        assertThrows(IllegalArgumentException.class, () -> new Number(inputs));
+        assertThrows(IllegalArgumentException.class,
+                () -> Number.sumOf(Collections.unmodifiableList(inputs))
+        );
     }
 }
