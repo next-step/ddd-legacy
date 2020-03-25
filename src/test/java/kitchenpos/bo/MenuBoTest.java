@@ -56,13 +56,32 @@ class MenuBoTest {
         defaultMenu = Fixtures.getMenu(1L, BigDecimal.valueOf(1000L), defaultMenuGroup.getId(), defaultMenuProducts);
     }
 
-    @DisplayName("메뉴 가격이 0 이상일 때만 생성이 된다.")
+    @DisplayName("메뉴 가격이 0 미만이면 메뉴가 생성되지 않는다.")
     @Test
     public void createMenuWithNegativePrice() {
         Menu negativePriceMenu = Fixtures.getMenu(1L, BigDecimal.valueOf(-1000L), defaultMenuGroup.getId(), defaultMenuProducts);
 
         Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuBo.create(negativePriceMenu));
+    }
+
+    @DisplayName("메뉴 가격이 0 이상이면 메뉴가 정상적으로 생성된다.")
+    @Test
+    public void createMenuAboveZero() {
+        // given
+        Menu positivePriceMenu = Fixtures.getMenu(1L, BigDecimal.valueOf(1000L), defaultMenuGroup.getId(), defaultMenuProducts);
+        MenuProduct defaultMenuProduct = defaultMenuProducts.get(0);
+
+        given(menuGroupDao.existsById(positivePriceMenu.getMenuGroupId())).willReturn(true);
+        given(productDao.findById(defaultMenuProduct.getProductId())).willReturn(Optional.ofNullable(defaultProduct));
+        given(menuDao.save(positivePriceMenu)).willReturn(positivePriceMenu);
+        given(menuProductDao.save(defaultMenuProduct)).willReturn(defaultMenuProduct);
+
+        // when
+        Menu menuCreated = menuBo.create(positivePriceMenu);
+
+        // then
+        assertThat(menuCreated).isEqualTo(positivePriceMenu);
     }
 
     @DisplayName("메뉴는 메뉴 그룹에 포함되어 있어야 한다.")
