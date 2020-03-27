@@ -39,6 +39,7 @@ class MenuGroupBoTest {
     @Test
     public void createNormal() {
         given(menuGroupDao.save(defaultMenuGroup)).willReturn(defaultMenuGroup);
+
         MenuGroup menuGroupCreated = menuGroupBo.create(defaultMenuGroup);
 
         assertThat(menuGroupCreated).isEqualTo(defaultMenuGroup);

@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,14 +52,19 @@ class TableBoTest {
     public void createNormal() {
         given(orderTableDao.save(defaultOrderTable)).willReturn(defaultOrderTable);
 
-        assertThat(tableBo.create(defaultOrderTable)).isNotNull();
+        OrderTable createdOrderTable = tableBo.create(defaultOrderTable);
+
+        assertThat(createdOrderTable).isNotNull();
     }
 
     @DisplayName("테이블을 목록을 조회할 수 있다.")
     @Test
     public void list() {
         given(orderTableDao.findAll()).willReturn(defaultOrderTableList);
-        assertThat(tableBo.list()).contains(defaultOrderTableList.toArray(new OrderTable[0]));
+
+        List<OrderTable> orderTableList = tableBo.list();
+
+        assertThat(orderTableList).contains(defaultOrderTableList.toArray(new OrderTable[0]));
     }
 
     @DisplayName("테이블이 요리중이거나 식사 상태라면 테이블을 빈상태로 변경할 수 없다.")
@@ -86,14 +92,29 @@ class TableBoTest {
                 -> tableBo.changeEmpty(1L, defaultOrderTable));
     }
 
-    @DisplayName("손님의 수가 0 이상일 때 손님의 수를 변경 가능하다.")
+    @DisplayName("변경하려는 손님의 수가 0 미만이면 손님 수를 변경 불가능하다.")
     @ParameterizedTest
-    @ValueSource(ints = {0, -1})
-    public void changeNumberOfGuestsOnlyPositiveGuest(int numberOfGuest) {
+    @ValueSource(ints = {-1, -2})
+    public void changeNumberOfGuestsNegativeGuest(int numberOfGuest) {
         defaultOrderTable.setNumberOfGuests(numberOfGuest);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
                 () -> tableBo.changeNumberOfGuests(1L, defaultOrderTable));
+    }
+
+
+    @DisplayName("변경하려는 손님의 수가 0 이상이면 손님의 수를 변경 가능하다.")
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1})
+    public void changeNumberOfGuestsOnlyPositiveGuest(int numberOfGuest) {
+        defaultOrderTable.setNumberOfGuests(numberOfGuest);
+        OrderTable savedOrderTable = Fixtures.getOrderTable(1L, false,2);
+        given(orderTableDao.findById(anyLong())).willReturn(java.util.Optional.of(savedOrderTable));
+        given(orderTableDao.save(savedOrderTable)).willReturn(defaultOrderTable);
+
+        OrderTable changedOrderTable = tableBo.changeNumberOfGuests(savedOrderTable.getId(), defaultOrderTable);
+
+        assertThat(changedOrderTable.getNumberOfGuests()).isEqualTo(defaultOrderTable.getNumberOfGuests());
     }
 
     @DisplayName("테이블이 비어 있을 경우 손님의 수 변경이 불가하다.")

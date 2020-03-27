@@ -69,7 +69,6 @@ class TableGroupBoTest {
         if(savedOrderTables.size() > 0) {
             savedOrderTables.remove(savedOrderTables.size() - 1);
         }
-
         given(orderTableDao.findAllByIdIn(defaultOrderTableIds)).willReturn(savedOrderTables);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
@@ -83,7 +82,6 @@ class TableGroupBoTest {
         List<OrderTable> savedOrderTables = new ArrayList<>();
         savedOrderTables.add(Fixtures.getOrderTable(1L, false, 4));
         savedOrderTables.add(Fixtures.getOrderTable(1L, false, 3));
-
         given(orderTableDao.findAllByIdIn(defaultOrderTableIds)).willReturn(savedOrderTables);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
@@ -97,7 +95,6 @@ class TableGroupBoTest {
         List<OrderTable> savedOrderTables = new ArrayList<>();
         savedOrderTables.add(Fixtures.getOrderTable(1L, true, 0, 2L));
         savedOrderTables.add(Fixtures.getOrderTable(1L, true, 0, 2L));
-
         given(orderTableDao.findAllByIdIn(defaultOrderTableIds)).willReturn(savedOrderTables);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(

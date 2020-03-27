@@ -3,13 +3,11 @@ package kitchenpos.bo;
 import kitchenpos.Fixtures;
 import kitchenpos.dao.MenuDao;
 import kitchenpos.dao.OrderDao;
-import kitchenpos.dao.OrderLineItemDao;
 import kitchenpos.dao.OrderTableDao;
 import kitchenpos.model.Order;
 import kitchenpos.model.OrderLineItem;
 import kitchenpos.model.OrderStatus;
 import kitchenpos.model.OrderTable;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +24,6 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,8 +33,6 @@ class OrderBoTest {
     private MenuDao menuDao;
     @Mock
     private OrderDao orderDao;
-    @Mock
-    private OrderLineItemDao orderLineItemDao;
     @Mock
     private OrderTableDao orderTableDao;
 
@@ -66,7 +61,9 @@ class OrderBoTest {
         given(orderTableDao.findById(defaultOrder.getOrderTableId())).willReturn(Optional.ofNullable(defaultOrderTable));
         given(orderDao.save(defaultOrder)).willReturn(defaultOrder);
 
-        assertThat(orderBo.create(defaultOrder)).isEqualTo(defaultOrder);
+        Order createdOrder = orderBo.create(defaultOrder);
+
+        assertThat(createdOrder).isEqualTo(defaultOrder);
     }
 
     @DisplayName("주문된 메뉴가 1개 이상 있어야 한다.")
@@ -95,7 +92,7 @@ class OrderBoTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(defaultOrder));
     }
 
-    @DisplayName("주문된 테이블은 손님이 반드시 있어야 한다.")
+    @DisplayName("주문된 테이블에 손님이 없으면 주문이 생성되지 않는다.")
     @Test
     public void createNoEmpty() {
         given(menuDao.countByIdIn(defaultMenuIdsOfOrderLineItems))
@@ -106,7 +103,7 @@ class OrderBoTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderBo.create(defaultOrder));
     }
 
-    @DisplayName("주문 상태가 완료로 변경된 것은 상태를 변경할 수 없다.")
+    @DisplayName("주문 상태가 완료로 변경된 것은 주문 상태를 변경할 수 없다.")
     @Test
     public void changeOrderStatus() {
         defaultOrder.setOrderStatus(OrderStatus.COMPLETION.name());

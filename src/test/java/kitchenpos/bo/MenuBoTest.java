@@ -68,20 +68,28 @@ class MenuBoTest {
     @DisplayName("메뉴 가격이 0 이상이면 메뉴가 정상적으로 생성된다.")
     @Test
     public void createMenuAboveZero() {
-        // given
-        Menu positivePriceMenu = Fixtures.getMenu(1L, BigDecimal.valueOf(1000L), defaultMenuGroup.getId(), defaultMenuProducts);
-        MenuProduct defaultMenuProduct = defaultMenuProducts.get(0);
 
-        given(menuGroupDao.existsById(positivePriceMenu.getMenuGroupId())).willReturn(true);
+        List<Menu> menus = new ArrayList<>();
+        menus.add(Fixtures.getMenu(1L, BigDecimal.valueOf(1000L), defaultMenuGroup.getId(), defaultMenuProducts));
+        menus.add(Fixtures.getMenu(2L, BigDecimal.valueOf(0L), defaultMenuGroup.getId(), defaultMenuProducts));
+
+        for(Menu menu : menus) {
+            // given
+            givenSettingCreateMenuAboveZero(menu, defaultMenuProducts.get(0));
+
+            // when
+            Menu menuCreated = menuBo.create(menu);
+
+            // then
+            assertThat(menuCreated).isEqualTo(menu);
+        }
+    }
+
+    private void givenSettingCreateMenuAboveZero(Menu menu, MenuProduct defaultMenuProduct) {
+        given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
         given(productDao.findById(defaultMenuProduct.getProductId())).willReturn(Optional.ofNullable(defaultProduct));
-        given(menuDao.save(positivePriceMenu)).willReturn(positivePriceMenu);
+        given(menuDao.save(menu)).willReturn(menu);
         given(menuProductDao.save(defaultMenuProduct)).willReturn(defaultMenuProduct);
-
-        // when
-        Menu menuCreated = menuBo.create(positivePriceMenu);
-
-        // then
-        assertThat(menuCreated).isEqualTo(positivePriceMenu);
     }
 
     @DisplayName("메뉴는 메뉴 그룹에 포함되어 있어야 한다.")
@@ -130,10 +138,11 @@ class MenuBoTest {
         menus.add(Fixtures.getMenu(1L, BigDecimal.valueOf(1000L), defaultMenuGroup.getId(), new ArrayList<>()));
         menus.add(Fixtures.getMenu(2L, BigDecimal.valueOf(1000L), defaultMenuGroup.getId(), new ArrayList<>()));
         menus.add(Fixtures.getMenu(3L, BigDecimal.valueOf(1000L), defaultMenuGroup.getId(), new ArrayList<>()));
-
         given(menuProductDao.findAllByMenuId(anyLong())).willReturn(defaultMenuProducts);
         given(menuDao.findAll()).willReturn(menus);
 
-        assertThat(menuBo.list()).contains(menus.toArray(new Menu[0]));
+        List<Menu> menuList = menuBo.list();
+
+        assertThat(menuList).contains(menus.toArray(new Menu[0]));
     }
 }

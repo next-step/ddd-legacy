@@ -49,7 +49,9 @@ class ProductBoTest {
     public void createNormal() {
         given(productDao.save(defaultProduct)).willReturn(new Product());
 
-        assertThat(productBo.create(defaultProduct)).isNotNull();
+        Product createdProduct = productBo.create(defaultProduct);
+
+        assertThat(createdProduct).isNotNull();
     }
 
     static Stream<BigDecimal> emptyAndNegativeValue() {
@@ -71,7 +73,9 @@ class ProductBoTest {
     public void list() {
         given(productDao.findAll()).willReturn(defaultProductList);
 
-        assertThat(productBo.list()).contains(defaultProductList.toArray(new Product[0]));
+        List<Product> productList = productBo.list();
+
+        assertThat(productList).contains(defaultProductList.toArray(new Product[0]));
     }
 
 }
