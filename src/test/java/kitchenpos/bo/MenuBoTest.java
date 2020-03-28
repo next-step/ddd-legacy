@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -66,30 +68,32 @@ class MenuBoTest {
     }
 
     @DisplayName("메뉴 가격이 0 이상이면 메뉴가 정상적으로 생성된다.")
-    @Test
-    public void createMenuAboveZero() {
-
-        List<Menu> menus = new ArrayList<>();
-        menus.add(Fixtures.getMenu(1L, BigDecimal.valueOf(1000L), defaultMenuGroup.getId(), defaultMenuProducts));
-        menus.add(Fixtures.getMenu(2L, BigDecimal.valueOf(0L), defaultMenuGroup.getId(), defaultMenuProducts));
-
-        for(Menu menu : menus) {
+    @ParameterizedTest
+    @MethodSource("provideMenusForCreateMenuAboveZero")
+    public void createMenuAboveZero(Menu menu) {
             // given
-            givenSettingCreateMenuAboveZero(menu, defaultMenuProducts.get(0));
+            MenuProduct menuProduct = menu.getMenuProducts().get(0);
+            given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
+            given(productDao.findById(menuProduct.getProductId())).willReturn(Optional.ofNullable(defaultProduct));
+            given(menuDao.save(menu)).willReturn(menu);
+            given(menuProductDao.save(menuProduct)).willReturn(menuProduct);
 
             // when
             Menu menuCreated = menuBo.create(menu);
 
             // then
             assertThat(menuCreated).isEqualTo(menu);
-        }
     }
 
-    private void givenSettingCreateMenuAboveZero(Menu menu, MenuProduct defaultMenuProduct) {
-        given(menuGroupDao.existsById(menu.getMenuGroupId())).willReturn(true);
-        given(productDao.findById(defaultMenuProduct.getProductId())).willReturn(Optional.ofNullable(defaultProduct));
-        given(menuDao.save(menu)).willReturn(menu);
-        given(menuProductDao.save(defaultMenuProduct)).willReturn(defaultMenuProduct);
+    private static List<Menu> provideMenusForCreateMenuAboveZero() {
+        MenuGroup defaultMenuGroup = Fixtures.getMenuGroup(1L, "테스트 메뉴 그룹");
+        Product defaultProduct = Fixtures.getProduct(1L, "테스트 제품", BigDecimal.valueOf(1000L));
+        List<MenuProduct> defaultMenuProducts = Collections.singletonList(Fixtures.getMenuProduct(1L, defaultProduct.getId(), 1L, 1L));
+
+        List<Menu> menus = new ArrayList<>();
+        menus.add(Fixtures.getMenu(1L, BigDecimal.valueOf(1000L), defaultMenuGroup.getId(), defaultMenuProducts));
+        menus.add(Fixtures.getMenu(2L, BigDecimal.valueOf(0L), defaultMenuGroup.getId(), defaultMenuProducts));
+        return menus;
     }
 
     @DisplayName("메뉴는 메뉴 그룹에 포함되어 있어야 한다.")
