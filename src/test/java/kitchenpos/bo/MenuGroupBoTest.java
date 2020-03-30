@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,7 +52,17 @@ class MenuGroupBoTest {
     public void list() {
         given(menuGroupDao.findAll()).willReturn(defaultMenuGroups);
 
-        assertThat(menuGroupBo.list()).contains(defaultMenuGroups.toArray(new MenuGroup[0]));
+        List<MenuGroup> menuGroupList = menuGroupBo.list();
+
+        assertAll(
+            () -> assertEquals(menuGroupList.size(), defaultMenuGroups.size()),
+            ()-> {
+                for(int i = 0 ; i < menuGroupList.size() ; i++) {
+                    assertEquals(menuGroupList.get(i).getId(), defaultMenuGroups.get(i).getId());
+                    assertEquals(menuGroupList.get(i).getName(), defaultMenuGroups.get(i).getName());
+                }
+            }
+        );
     }
 
     private List<MenuGroup> getDefaultMenuGroups() {

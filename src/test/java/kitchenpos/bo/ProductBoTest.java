@@ -20,6 +20,8 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -75,7 +77,15 @@ class ProductBoTest {
 
         List<Product> productList = productBo.list();
 
-        assertThat(productList).contains(defaultProductList.toArray(new Product[0]));
+        assertAll(
+                () -> assertEquals(productList.size(), defaultProductList.size()),
+                () -> {
+                    for(int i = 0 ; i < productList.size() ; i++) {
+                        assertEquals(productList.get(i).getId(), defaultProductList.get(i).getId());
+                        assertEquals(productList.get(i).getName(), defaultProductList.get(i).getName());
+                        assertEquals(productList.get(i).getPrice(), defaultProductList.get(i).getPrice());
+                    }
+                }
+        );
     }
-
 }
