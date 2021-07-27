@@ -38,10 +38,6 @@ public class StringAdditionCalculatorTest {
             .isThrownBy(() -> calculator.calculate("l"));
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> calculator.calculate("일"));
-        // ','와 ':'이 들어오는 경우 어떻게 처리해야할 지 논의 필요
-        // 우선 유효한 동작이 아니므로 똑같이 RuntimeException 처리
-        assertThatExceptionOfType(RuntimeException.class)
-            .isThrownBy(() -> calculator.calculate(","));
     }
 
     @DisplayName("숫자 두개를 컴마(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
@@ -54,6 +50,8 @@ public class StringAdditionCalculatorTest {
     @DisplayName("문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @Test
     void throw_RuntimeException_if_negative_number_included() {
+        assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> calculator.calculate("-1"));
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> calculator.calculate("1,-1"));
     }

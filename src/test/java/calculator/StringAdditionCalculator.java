@@ -7,9 +7,6 @@ public class StringAdditionCalculator {
         if (text == null || text.isBlank()) {
             return 0;
         }
-        if (text.length() == 1) {
-            return parseInt(text);
-        }
         return Arrays.stream(text.split("[,:]"))
             .mapToInt(this::parseInt)
             .peek(this::checkNegative)
