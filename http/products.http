@@ -8,6 +8,12 @@ Content-Type: application/json
 }
 
 ###
-GET {{host}}/api/products
+PUT {{host}}/api/products/d5c45b35-0b5e-4633-9f83-ac650b1bbd54/price
+Content-Type: application/json
+
+{
+  "price": 18000
+}
 
 ###
+GET {{host}}/api/products

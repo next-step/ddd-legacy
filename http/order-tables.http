@@ -1,0 +1,24 @@
+###
+POST {{host}}/api/order-tables
+Content-Type: application/json
+
+{
+  "name": "1번"
+}
+
+###
+PUT {{host}}/api/order-tables/6aa22981-197f-4170-988f-c1c4cb6b2640/sit
+
+###
+PUT {{host}}/api/order-tables/6aa22981-197f-4170-988f-c1c4cb6b2640/clear
+
+###
+PUT {{host}}/api/menus/6aa22981-197f-4170-988f-c1c4cb6b2640/number-of-guests
+Content-Type: application/json
+
+{
+  "numberOfGuests": 4
+}
+
+###
+GET {{host}}/api/order-tables

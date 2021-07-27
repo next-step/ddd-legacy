@@ -7,6 +7,4 @@ Content-Type: application/json
 }
 
 ###
-GET {{host}}/api/menus-groups
-
-###
+GET {{host}}/api/menu-groups
