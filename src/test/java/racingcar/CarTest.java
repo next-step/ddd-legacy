@@ -31,8 +31,7 @@ class CarTest {
     @Test
     void movable() {
         Car car = new Car("");
-        MovingStrategy movingStrategy = () -> true;
-        car.move(movingStrategy.isMovable());
+        car.move(() -> true);
         int movedPosition = 1;
         assertThat(car.getPosition())
                 .isEqualTo(movedPosition);
@@ -42,8 +41,7 @@ class CarTest {
     @Test
     void unMovable() {
         Car car = new Car("");
-        MovingStrategy movingStrategy = () -> false;
-        car.move(movingStrategy.isMovable());
+        car.move(() -> false);
         int unMovedPosition = 0;
         assertThat(car.getPosition())
                 .isEqualTo(unMovedPosition);
