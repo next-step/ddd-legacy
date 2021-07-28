@@ -33,4 +33,10 @@ class StringCalculatorTest {
         Assertions.assertThat(sut.sum("1,2,3")).isEqualTo(6);
         Assertions.assertThat(sut.sum("1,2:3")).isEqualTo(6);
     }
+
+    @DisplayName("앞의 기본 구분자(쉼표, 콜론) 외에 커스텀 구분자를 지정할 수 있다.")
+    @Test
+    void customDelimiter() {
+        Assertions.assertThat(sut.sum("//;\n1;2;3")).isEqualTo(6);
+    }
 }
