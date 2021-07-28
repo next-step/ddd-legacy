@@ -12,12 +12,14 @@ public class StringCalculator {
         String[] numbers = split(text);
         return Stream.of(numbers)
                 .mapToInt(Integer::parseInt)
-                .peek(n -> {
-                    if (n < 0) {
-                        throw new RuntimeException();
-                    }
-                })
+                .peek(this::isNegative)
                 .sum();
+    }
+
+    private void isNegative(int n) {
+        if (n < 0) {
+            throw new RuntimeException();
+        }
     }
 
     private String[] split(String text) {

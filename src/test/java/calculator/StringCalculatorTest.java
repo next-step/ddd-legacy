@@ -53,6 +53,8 @@ class StringCalculatorTest {
     void nagative() {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> calculator.add("-1"));
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> calculator.add("2,-1"));
     }
 
     @Test
@@ -66,7 +68,6 @@ class StringCalculatorTest {
         String text = "//;\n1;2;3";
         Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
         matcher.find();
-        System.out.println(matcher.group(1));
         assertThat(matcher.group(1)).isEqualTo(";");
     }
 }
