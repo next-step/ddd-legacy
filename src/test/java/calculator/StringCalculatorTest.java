@@ -37,4 +37,11 @@ public class StringCalculatorTest {
         assertThat(expect).isEqualTo(3);
     }
 
+    @DisplayName("구분자를 컴마(,) 이외에 콜론(:)을 사용할 수 있다")
+    @Test
+    void colonTest() {
+        final int expect = calculator.calculate("1,2:3");
+        assertThat(expect).isEqualTo(6);
+    }
+
 }
