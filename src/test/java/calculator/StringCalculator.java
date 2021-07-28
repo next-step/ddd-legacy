@@ -10,7 +10,14 @@ public class StringCalculator {
             return 0;
         }
         String[] numbers = split(text);
-        return Stream.of(numbers).mapToInt(Integer::parseInt).sum();
+        return Stream.of(numbers)
+                .mapToInt(Integer::parseInt)
+                .peek(n -> {
+                    if (n < 0) {
+                        throw new RuntimeException();
+                    }
+                })
+                .sum();
     }
 
     private String[] split(String text) {

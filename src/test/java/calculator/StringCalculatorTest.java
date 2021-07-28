@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class StringCalculatorTest {
     private StringCalculator calculator;
@@ -45,6 +46,13 @@ class StringCalculatorTest {
     @Test
     void customDelimiter() {
         assertThat(calculator.add("//;\n1;2;3")).isEqualTo(6);
+    }
+
+    @DisplayName("문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @Test
+    void nagative() {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> calculator.add("-1"));
     }
 
     @Test
