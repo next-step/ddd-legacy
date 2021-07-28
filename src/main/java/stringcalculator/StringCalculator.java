@@ -13,10 +13,6 @@ public class StringCalculator {
             return 0;
         }
 
-        if (isLessTwoLength(text)) {
-            return stringToInt(text);
-        }
-
         return Stream.of(textToTokens(text))
                 .mapToInt(this::stringToInt)
                 .sum();
@@ -39,10 +35,6 @@ public class StringCalculator {
         }
 
         return result;
-    }
-
-    private boolean isLessTwoLength(String text) {
-        return text.length() <= TWO_LENGTH;
     }
 
     private boolean isEmpty(String text) {
