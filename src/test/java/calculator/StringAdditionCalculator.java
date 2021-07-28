@@ -1,21 +1,14 @@
 package calculator;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StringAdditionCalculator {
     public Integer calculate(String text) {
         if (text == null || text.isBlank()) {
             return 0;
         }
-        String separators = ",:";
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
-        if (m.find()) {
-            separators += m.group(1);
-            text = m.group(2);
-        }
-        return Arrays.stream(text.split("[" + separators + "]"))
+        StringAdditionCalculatorDelimiterParser delimiterParser = new StringAdditionCalculatorDelimiterParser(text);
+        return Arrays.stream(delimiterParser.getNumbers().split("[" + delimiterParser.getDelimiters() + "]"))
             .mapToInt(this::parseInt)
             .peek(this::checkNegative)
             .sum();

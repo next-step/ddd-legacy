@@ -58,7 +58,7 @@ public class StringAdditionCalculatorTest {
 
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @Test
-    void return_summed_int_if_using_custom_separator() {
+    void return_summed_int_if_using_custom_delimiter() {
         assertThat(calculator.calculate("//;\n1;2;3")).isEqualTo(6);
     }
 }
