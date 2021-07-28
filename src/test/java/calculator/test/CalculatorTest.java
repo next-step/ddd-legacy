@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class CalculatorTest {
@@ -37,5 +38,13 @@ public class CalculatorTest {
     void add_customSeparator() {
         String text = "//;\n1;2;3";
         assertThat(calculator.add(text)).isEqualTo(6);
+    }
+
+    @DisplayName("숫자가 아니거나 음수일때 오류 발생")
+    @ParameterizedTest
+    @CsvSource(value = {"-1:2", "a:3"})
+    void add_isNotNumberAndIsNotAmniotic(String text) {
+        assertThatThrownBy(() -> calculator.add(text))
+                .isInstanceOf(RuntimeException.class);
     }
 }

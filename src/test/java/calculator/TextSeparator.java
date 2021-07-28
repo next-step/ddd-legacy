@@ -3,6 +3,8 @@ package calculator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TextSeparator {
     private static final String DEFAULT_SEPARATOR = ",|:";
@@ -11,12 +13,12 @@ public class TextSeparator {
     private static final Pattern PATTERN = Pattern.compile("//(.)\\n(.*)");
 
     private final String separator;
-    private final List<String> numbers;
+    private final List<Number> numbers;
 
     public TextSeparator(String text) {
         Matcher matcher = PATTERN.matcher(text);
         this.separator = findSeparator(matcher);
-        this.numbers = List.of(findNumberText(matcher, text).split(this.separator));
+        this.numbers = splitNumbers(findNumberText(matcher, text));
     }
 
     private String findSeparator(Matcher matcher) {
@@ -25,6 +27,12 @@ public class TextSeparator {
             return matcher.group(CUSTOM_SEPARATOR_INDEX);
         }
         return DEFAULT_SEPARATOR;
+    }
+
+    private List<Number> splitNumbers(String numberText) {
+        return Stream.of(numberText.split(this.separator))
+                .map(Number::new)
+                .collect(Collectors.toList());
     }
 
     private String findNumberText(Matcher matcher, String defaultValue) {
@@ -39,7 +47,9 @@ public class TextSeparator {
         return separator;
     }
 
-    public List<String> getNumbers() {
-        return numbers;
+    public List<Integer> getNumbers() {
+        return numbers.stream()
+                .map(Number::intValue)
+                .collect(Collectors.toList());
     }
 }
