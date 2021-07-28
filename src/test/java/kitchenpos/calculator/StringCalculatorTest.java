@@ -10,7 +10,7 @@ class StringCalculatorTest {
 
     @BeforeEach
     void setUp() {
-        sut = new StringCalculator();
+        sut = new StringCalculator(new GreaterThanOrEqualZeroValidationStrategy());
     }
 
     @DisplayName("빈 값을 입력할 경우 0을 반환한다.")
@@ -38,5 +38,12 @@ class StringCalculatorTest {
     @Test
     void customDelimiter() {
         Assertions.assertThat(sut.sum("//;\n1;2;3")).isEqualTo(6);
+    }
+
+    @DisplayName("문자열 계산기에 숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException 예외를 throw 한다.")
+    @Test
+    void notNumberOrNegative() {
+        Assertions.assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> sut.sum("1,2,z"));
+        Assertions.assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> sut.sum("1,-1"));
     }
 }
