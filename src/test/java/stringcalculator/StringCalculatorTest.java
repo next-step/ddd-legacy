@@ -26,7 +26,7 @@ public class StringCalculatorTest {
 
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
     @ParameterizedTest
-    @ValueSource(strings = {"1","2","8","9"})
+    @ValueSource(strings = {"0","1","2","8","9"})
     void oneNumber(final String text) {
         assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
     }
