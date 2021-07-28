@@ -10,10 +10,10 @@ public class StringCalculator {
     public static final String DELIMITER = ",|:";
     public static final String SEPARATOR = "|";
     public static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
-    public static final char NEGATIVE_CHAR = '-';
     public static final int ZERO = 0;
     public static final int ONE = 1;
     public static final int TWO = 2;
+    public static final String NEGATIVE_EXCEPTION_MESSAGE = "음수는 계산할 수 없습니다";
 
     public int calculate(final String stringNumber) {
         if (StringUtils.isEmpty(stringNumber)) {
@@ -29,11 +29,15 @@ public class StringCalculator {
     }
 
     private int calculate(final String stringNumber, final String delimiter) {
-        if (stringNumber.charAt(ZERO) == NEGATIVE_CHAR) {
-            throw new RuntimeException("음수는 계산할 수 없습니다");
-        }
         return Arrays.stream(stringNumber.split(delimiter))
             .mapToInt(Integer::parseInt)
+            .peek(this::negativeCheck)
             .sum();
+    }
+
+    private void negativeCheck(final int number) {
+        if (number < ZERO) {
+            throw new RuntimeException(NEGATIVE_EXCEPTION_MESSAGE);
+        }
     }
 }
