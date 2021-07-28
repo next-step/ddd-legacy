@@ -1,6 +1,5 @@
 package stringcalculator;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -18,8 +17,7 @@ public class StringCalculator {
             return stringToInt(text);
         }
 
-        String[] tokens = textToTokens(text);
-        return Stream.of(tokens)
+        return Stream.of(textToTokens(text))
                 .mapToInt(this::stringToInt)
                 .sum();
     }
@@ -44,7 +42,7 @@ public class StringCalculator {
     }
 
     private boolean isLessTwoLength(String text) {
-        return text.length() <= 2;
+        return text.length() <= TWO_LENGTH;
     }
 
     private boolean isEmpty(String text) {
