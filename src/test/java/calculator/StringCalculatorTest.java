@@ -44,4 +44,18 @@ public class StringCalculatorTest {
         assertThat(expect).isEqualTo(6);
     }
 
+    @DisplayName("//와 \\n문자 사이에 커스텀 구분자를 지정할 수 있다")
+    @Test
+    void customDelimiterTest() {
+        final int expect = calculator.calculate("//;\n1;2;3");
+        assertThat(expect).isEqualTo(6);
+    }
+
+    @DisplayName("커스텀 구분자와 기존 구분자를 함께 사용할 수 있다")
+    @Test
+    void withCustomDelimiterTest() {
+        final int expect = calculator.calculate("//;\n1,2:3;4");
+        assertThat(expect).isEqualTo(10);
+    }
+
 }
