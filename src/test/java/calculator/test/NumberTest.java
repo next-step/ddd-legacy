@@ -1,7 +1,6 @@
 package calculator.test;
 
 import calculator.Number;
-import calculator.TextSeparator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,14 +18,14 @@ public class NumberTest {
     @DisplayName("text 가 음수일때 오류 발생")
     @Test
     void constructor_isNotAmniotic() {
-        assertThatThrownBy(() -> new TextSeparator("-1"))
+        assertThatThrownBy(() -> new Number("-1"))
                 .isInstanceOf(RuntimeException.class);
     }
 
     @DisplayName("text 가 숫자가 아닐때 오류 발생")
     @Test
     void constructor_isNotNumberAnd() {
-        assertThatThrownBy(() -> new TextSeparator("a"))
+        assertThatThrownBy(() -> new Number("a"))
                 .isInstanceOf(RuntimeException.class);
     }
 }

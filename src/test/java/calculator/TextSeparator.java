@@ -6,19 +6,21 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class TextSeparator {
+public class TextSeparator implements Separator {
     private static final String DEFAULT_SEPARATOR = ",|:";
     private static final int CUSTOM_SEPARATOR_INDEX = 1;
     private static final int NUMBER_INDEX = 2;
     private static final Pattern PATTERN = Pattern.compile("//(.)\\n(.*)");
 
-    private final String separator;
-    private final List<Number> numbers;
-
-    public TextSeparator(String text) {
+    @Override
+    public List<Integer> separate(String text) {
         Matcher matcher = PATTERN.matcher(text);
-        this.separator = findSeparator(matcher);
-        this.numbers = splitNumbers(findNumberText(matcher, text));
+        String separator = findSeparator(matcher);
+        List<Number> numbers = splitNumbers(findNumberText(matcher, text), separator);
+
+        return numbers.stream()
+                .map(Number::intValue)
+                .collect(Collectors.toList());
     }
 
     private String findSeparator(Matcher matcher) {
@@ -29,8 +31,8 @@ public class TextSeparator {
         return DEFAULT_SEPARATOR;
     }
 
-    private List<Number> splitNumbers(String numberText) {
-        return Stream.of(numberText.split(this.separator))
+    private List<Number> splitNumbers(String numberText, String separator) {
+        return Stream.of(numberText.split(separator))
                 .map(Number::new)
                 .collect(Collectors.toList());
     }
@@ -41,15 +43,5 @@ public class TextSeparator {
             return matcher.group(NUMBER_INDEX);
         }
         return defaultValue;
-    }
-
-    public String getSeparator() {
-        return separator;
-    }
-
-    public List<Integer> getNumbers() {
-        return numbers.stream()
-                .map(Number::intValue)
-                .collect(Collectors.toList());
     }
 }
