@@ -16,7 +16,7 @@ public class StringCalculator {
             return stringToInt(text);
         }
 
-        String[] numbers = text.split(",");
+        String[] numbers = text.split(",|:");
         return Stream.of(numbers)
                 .mapToInt(this::stringToInt)
                 .sum();
