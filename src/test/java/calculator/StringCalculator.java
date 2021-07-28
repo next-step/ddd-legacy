@@ -24,7 +24,14 @@ public class StringCalculator {
     }
 
     private int calculate(final String stringNumber, final String delimiter) {
-        return Arrays.stream(stringNumber.split(delimiter))
+        final String[] tokens = stringNumber.split(delimiter);
+        if (tokens.length == 1) {
+            final int number = Integer.parseInt(tokens[0]);
+            if (number < 0) {
+                throw new RuntimeException("음수는 계산할 수 없습니다");
+            }
+        }
+        return Arrays.stream(tokens)
             .mapToInt(Integer::parseInt)
             .sum();
     }

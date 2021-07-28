@@ -1,6 +1,8 @@
 package calculator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,6 +58,17 @@ public class StringCalculatorTest {
     void withCustomDelimiterTest() {
         final int expect = calculator.calculate("//;\n1,2:3;4");
         assertThat(expect).isEqualTo(10);
+    }
+
+    @DisplayName("음수를 전달하는 경우 RuntimeException 예외 처리를 한다")
+    @Test
+    void negativeNumberTest() {
+        assertThatThrownBy(
+            () -> calculator.calculate("-1")
+        ).isInstanceOf(RuntimeException.class);
+
+        assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> calculator.calculate("-1"));
     }
 
 }
