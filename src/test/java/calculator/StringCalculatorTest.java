@@ -4,10 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.stream.Stream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class StringCalculatorTest {
     private StringCalculator calculator;
@@ -41,9 +41,24 @@ class StringCalculatorTest {
         assertThat(calculator.add("1,2:3")).isEqualTo(6);
     }
 
+    @DisplayName("//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @Test
+    void customDelimiter() {
+        assertThat(calculator.add("//;\n1;2;3")).isEqualTo(6);
+    }
+
     @Test
     void temp() {
         String[] split = "1".split(",");
         assertThat(split).isEqualTo(new String[]{"1"});
+    }
+
+    @Test
+    void matcher() {
+        String text = "//;\n1;2;3";
+        Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
+        matcher.find();
+        System.out.println(matcher.group(1));
+        assertThat(matcher.group(1)).isEqualTo(";");
     }
 }
