@@ -20,4 +20,10 @@ class StringCalculatorTest {
     void nullOrEmpty() {
         assertThat(calculator.add(null)).isZero();
     }
+
+    @DisplayName("숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
+    @Test
+    void oneNumber() {
+        assertThat(calculator.add("1")).isEqualTo(1);
+    }
 }
