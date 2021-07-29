@@ -11,7 +11,7 @@ public class StringCalculator {
             return 0;
         }
 
-        String[] numbers = text.split(",|:");
+        String[] numbers = this.parsingDelimiter(text);
 
         int sum = 0;
         for (String number : numbers) {
@@ -19,5 +19,15 @@ public class StringCalculator {
         }
 
         return sum;
+    }
+    
+    private String[] parsingDelimiter(final String text) {
+        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+
+        if (m.find()) {
+            String customDelimiter = m.group(1);
+            return m.group(2).split(customDelimiter);
+        }
+        return text.split("[,:]");
     }
 }
