@@ -12,27 +12,6 @@ public class Text {
         this.text = text;
     }
 
-    public boolean isNullOrEmpty() {
-        return text == null
-                || text.isEmpty();
-    }
-
-    public boolean hasComma() {
-        return text.contains(COMMA_DELIMITER);
-    }
-
-    public boolean hasColon() {
-        return text.contains(COLON_DELIMITER);
-    }
-
-    public boolean hasCommaOrColon() {
-        return hasComma() || hasColon();
-    }
-
-    public String[] spitCommaOrColon() {
-        return text.split(COMMA_OR_COLON_DELIMITER);
-    }
-
     public Numbers getNumbers() {
         if (isNullOrEmpty()) {
             return Numbers.ZERO;
@@ -42,5 +21,26 @@ public class Text {
             return new Numbers(tokens);
         }
         return new Numbers(text);
+    }
+
+    private boolean isNullOrEmpty() {
+        return text == null
+                || text.isEmpty();
+    }
+
+    private boolean hasComma() {
+        return text.contains(COMMA_DELIMITER);
+    }
+
+    private boolean hasColon() {
+        return text.contains(COLON_DELIMITER);
+    }
+
+    private boolean hasCommaOrColon() {
+        return hasComma() || hasColon();
+    }
+
+    private String[] spitCommaOrColon() {
+        return text.split(COMMA_OR_COLON_DELIMITER);
     }
 }
