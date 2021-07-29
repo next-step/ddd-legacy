@@ -20,7 +20,7 @@ public class StringCalculator {
 
         return sum;
     }
-    
+
     private String[] parsingDelimiter(final String text) {
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
 
