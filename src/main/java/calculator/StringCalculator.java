@@ -7,7 +7,9 @@ public class StringCalculator {
         if (text == null || text.isEmpty()) {
             return ZERO;
         }
-        final Numbers numbers = Numbers.of(text);
-        return numbers.sum();
+        return Numbers.of(text)
+                .toIntList().stream()
+                .mapToInt(Integer::valueOf)
+                .sum();
     }
 }

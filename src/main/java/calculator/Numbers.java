@@ -26,9 +26,9 @@ public class Numbers {
                 .collect(Collectors.toList()));
     }
 
-    public int sum() {
+    public List<Integer> toIntList() {
         return numbers.stream()
-                .mapToInt(Number::toInteger)
-                .sum();
+                .map(Number::toInteger)
+                .collect(Collectors.toList());
     }
 }

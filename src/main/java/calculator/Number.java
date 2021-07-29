@@ -11,7 +11,7 @@ public class Number {
         try {
             Integer.parseInt(numberText);
         } catch (final NumberFormatException e) {
-            throw new RuntimeException("숫자가 아닌 텍스트를 더할 수는 없습니다.");
+            throw new RuntimeException("숫자가 아닌 텍스트는 Number 가 될 수 없습니다.");
         }
         final int number = Integer.parseInt(numberText);
         if (number < 0) {
