@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum TextCalculateType {
-    NullOrEmpty(text -> 0),
+    NullOrEmpty(text -> Constants.EMPTY_OR_NULL_NUMBER),
     SingleNumber(
             text -> {
                 ParsedNumber parsedNumber = new ParsedNumber(text);
@@ -49,6 +49,7 @@ public enum TextCalculateType {
         public static final String CUSTOM_DELIMITER_REGEX = "//(.)\n(.*)";
         public static final String COMMA_AND_COLON_REGEX = ",|:";
         private static final int EMPTY_NUMBER = 0;
+        private static final int EMPTY_OR_NULL_NUMBER = 0;
     }
 
     public static TextCalculateType of(final String text) {
