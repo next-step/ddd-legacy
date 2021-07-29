@@ -1,5 +1,7 @@
 package calculator;
 
+import calculator.calculate.CalculateStrategy;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,9 +19,9 @@ public class Numbers {
                 .collect(Collectors.toList());
     }
 
-    public int add() {
+    public int calculate(CalculateStrategy strategy) {
         return this.numbers.stream()
-                .reduce((first, second) -> first + second)
+                .reduce(strategy::calculate)
                 .orElse(ZERO);
     }
 }
