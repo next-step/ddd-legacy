@@ -44,47 +44,4 @@ class TextCalculateTypesTest {
     void notFound(final String text) {
         assertThat(TextCalculateTypes.of(text)).isEqualTo(TextCalculateTypes.NotFound);
     }
-
-    @DisplayName(value = "NullOrEmpty인 경우 계산시 0을 반환 한다.")
-    @ParameterizedTest
-    @NullAndEmptySource
-    void emptyOrNull_value(final String text) {
-        assertThat(TextCalculateTypes.NullOrEmpty.calculate(text)).isEqualTo(0);
-    }
-
-    @DisplayName(value = "SingleNumber인 경우 해당 값을 반환한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"1"})
-    void oneNumber_value(final String text) {
-        assertThat(TextCalculateTypes.SingleNumber.calculate(text)).isEqualTo(1);
-    }
-
-    @DisplayName(value = "SingleComma인 경우의 값을 반환한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"1,2"})
-    void twoNumbers_value(final String text) {
-        assertThat(TextCalculateTypes.SingleComma.calculate(text)).isEqualTo(3);
-    }
-
-    @DisplayName(value = "CommaAndColon인 경우의 값을 반환한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"1,2:3"})
-    void colons_value(final String text) {
-        assertThat(TextCalculateTypes.CommaAndColon.calculate(text)).isEqualTo(6);
-    }
-
-    @DisplayName(value = "CustomDelimiter인 경우의 값을 반환한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"//;\n1;2;3"})
-    void customDelimiter_value(final String text) {
-        assertThat(TextCalculateTypes.CustomDelimiter.calculate(text)).isEqualTo(6);
-    }
-
-    @DisplayName(value = "NotFound인 경우 IllegalArgumentException을 반환한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"/**;\n1(2)3"})
-    void notFound_value(final String text) {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> TextCalculateTypes.NotFound.calculate(text));
-    }
 }

@@ -4,61 +4,50 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum TextCalculateTypes implements CalculateFunction {
-    NullOrEmpty {
-        @Override
-        public int calculate(String text) {
-            return 0;
-        }
-    },
-    SingleNumber {
-        @Override
-        public int calculate(String text) {
-            ParsedNumber parsedNumber = new ParsedNumber(text);
-            return parsedNumber.getNumber();
-        }
-    },
-    SingleComma {
-        @Override
-        public int calculate(String text) {
-            return Arrays.stream(text.split(","))
-                    .map(ParsedNumber::new)
-                    .map(ParsedNumber::getNumber)
-                    .reduce(0, Integer::sum);
-        }
-    },
-    CommaAndColon {
-        @Override
-        public int calculate(String text) {
-            return Arrays.stream(text.split(",|:"))
-                    .map(ParsedNumber::new)
-                    .map(ParsedNumber::getNumber)
-                    .reduce(0, Integer::sum);
-        }
-    },
-    CustomDelimiter {
-        @Override
-        public int calculate(String text) {
-            Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
-            if (m.find()) {
-                String customDelimiter = m.group(1);
-                String[] tokens = m.group(2).split(customDelimiter);
-                return Arrays.stream(tokens)
-                        .map(ParsedNumber::new)
-                        .map(ParsedNumber::getNumber)
-                        .reduce(0, Integer::sum);
+public enum TextCalculateTypes {
+    NullOrEmpty(text -> 0),
+    SingleNumber(
+            text -> {
+                ParsedNumber parsedNumber = new ParsedNumber(text);
+                return parsedNumber.getNumber();
             }
+    ),
+    CommaAndColon(
+            text -> Arrays.stream(text.split(",|:"))
+                    .map(ParsedNumber::new)
+                    .map(ParsedNumber::getNumber)
+                    .reduce(0, Integer::sum)
+    ),
+    CustomDelimiter(
+            text -> {
+                Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+                if (m.find()) {
+                    String customDelimiter = m.group(1);
+                    String[] tokens = m.group(2).split(customDelimiter);
+                    return Arrays.stream(tokens)
+                            .map(ParsedNumber::new)
+                            .map(ParsedNumber::getNumber)
+                            .reduce(0, Integer::sum);
+                }
 
-            throw new IllegalArgumentException();
+                throw new IllegalArgumentException();
+            }
+    ),
+    NotFound(
+            text -> {
+                throw new IllegalArgumentException();
+            }
+    );
 
-        }
-    },
-    NotFound {
-        @Override
-        public int calculate(String text) throws RuntimeException {
-            throw new IllegalArgumentException();
-        }
-    };
+    private final CalculateFormula calculateFormula;
+
+    public CalculateFormula getCalculateFormula() {
+        return calculateFormula;
+    }
+
+    TextCalculateTypes(CalculateFormula calculateFormula) {
+        this.calculateFormula = calculateFormula;
+    }
 
     public static TextCalculateTypes of(final String text) {
         if (text == null || text.isBlank()) {
