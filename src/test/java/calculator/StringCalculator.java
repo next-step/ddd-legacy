@@ -9,7 +9,7 @@ public class StringCalculator {
         this(new TextSeparator());
     }
 
-    public StringCalculator(Separator separator) {
+    private StringCalculator(Separator separator) {
         this.separator = separator;
     }
 
