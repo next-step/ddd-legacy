@@ -38,4 +38,11 @@ public class StringCalculatorTest {
     void twoNumbers(final String text) {
         assertThat(calculator.add(text)).isSameAs(3);
     }
+
+    @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
+    @ParameterizedTest(name = "{0} 더하기")
+    @ValueSource(strings = {"1,2:3"})
+    void colons(final String text) {
+        assertThat(calculator.add(text)).isSameAs(6);
+    }
 }
