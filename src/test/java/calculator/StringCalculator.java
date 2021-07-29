@@ -7,19 +7,17 @@ public class StringCalculator {
     private static final int ZERO = 0;
 
     public int add(final String text) {
-        if (isNullOrEmpty(text)) {
+        Text input = new Text(text);
+
+        if (input.isNullOrEmpty()) {
             return ZERO;
         }
-        if (text.contains(",")) {
-            String[] tokens = text.split(",");
+        if (input.isContainComma()) {
+            String[] tokens = input.spitComma();
             return Arrays.stream(tokens)
                     .mapToInt(Integer::parseInt)
                     .sum();
         }
         return Integer.parseInt(text);
-    }
-
-    private boolean isNullOrEmpty(final String text) {
-        return text == null || text.isEmpty();
     }
 }
