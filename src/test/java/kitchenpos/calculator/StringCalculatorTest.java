@@ -13,7 +13,7 @@ class StringCalculatorTest {
 
     @BeforeEach
     void setUp() {
-        sut = new StringCalculator(new GreaterThanOrEqualZeroValidationStrategy());
+        sut = new StringCalculator();
     }
 
     @DisplayName("빈 값을 입력할 경우 0을 반환한다.")

@@ -2,20 +2,15 @@ package kitchenpos.calculator;
 
 import org.springframework.util.StringUtils;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Arrays;
 
 public class StringCalculator {
-    private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
-    private static final Integer CUSTOM_DELIMITER_GROUP = 1;
-    private static final Integer CUSTOM_TEXT_GROUP = 2;
-    private static final String DEFAULT_DELIMITERS = "[,:]";
     private static final Integer DEFAULT_VALUE = 0;
 
-    private final ValidationStrategy validationStrategy;
+    private final StringSplitter stringSplitter;
 
-    public StringCalculator(ValidationStrategy validationStrategy) {
-        this.validationStrategy = validationStrategy;
+    public StringCalculator() {
+        this.stringSplitter = new StringSplitter();
     }
 
     public int sum(String text) {
@@ -23,46 +18,12 @@ public class StringCalculator {
             return DEFAULT_VALUE;
         }
 
-        String[] strings = split(text);
-        int[] ints = toInts(strings);
-        validate(ints);
-        return sum(ints);
-    }
+        String[] tokens = stringSplitter.split(text);
+        NaturalNumber sum = Arrays.stream(tokens)
+                .map(NaturalNumber::new)
+                .reduce(NaturalNumber::add)
+                .get();
 
-    private String[] split(String text) {
-        Matcher m = CUSTOM_PATTERN.matcher(text);
-        if (m.find()) {
-            String customDelimiter = m.group(CUSTOM_DELIMITER_GROUP);
-            return m.group(CUSTOM_TEXT_GROUP).split(customDelimiter);
-        }
-        return text.split(DEFAULT_DELIMITERS);
-    }
-
-    private int[] toInts(String[] strings) {
-        int[] ints = new int[strings.length];
-        for (int i = 0; i < strings.length; i++) {
-            ints[i] = Integer.parseInt(strings[i]);
-        }
-        return ints;
-    }
-
-    private int sum(int[] ints) {
-        int sum = 0;
-        for (int i : ints) {
-            sum += i;
-        }
-        return sum;
-    }
-
-    private void validate(int[] ints) {
-        for (int i : ints) {
-            throwOnInvalid(i);
-        }
-    }
-
-    private void throwOnInvalid(int num) {
-        if (!validationStrategy.isValid(num)) {
-            throw new RuntimeException();
-        }
+        return sum.getValue();
     }
 }
