@@ -15,7 +15,7 @@ public class StringCalculator {
 
         int sum = 0;
         for (String number : numbers) {
-            sum += Integer.parseInt(number);
+            sum += stringToInt(number);
         }
 
         return sum;
@@ -29,5 +29,14 @@ public class StringCalculator {
             return m.group(2).split(customDelimiter);
         }
         return text.split("[,:]");
+    }
+
+    private int stringToInt(final String text) {
+        int number = Integer.parseInt(text);
+
+        if (number < 0) {
+            throw new RuntimeException();
+        }
+        return number;
     }
 }
