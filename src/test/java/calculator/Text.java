@@ -17,12 +17,16 @@ public class Text {
                 || text.isEmpty();
     }
 
-    public boolean isContainComma() {
+    public boolean hasComma() {
         return text.contains(COMMA_DELIMITER);
     }
 
-    public boolean isContainColon() {
+    public boolean hasColon() {
         return text.contains(COLON_DELIMITER);
+    }
+
+    public boolean hasCommaOrColon() {
+        return hasComma() || hasColon();
     }
 
     public String[] spitCommaOrColon() {
@@ -33,7 +37,7 @@ public class Text {
         if (isNullOrEmpty()) {
             return Numbers.ZERO;
         }
-        if (isContainComma() || isContainColon()) {
+        if (hasCommaOrColon()) {
             String[] tokens = spitCommaOrColon();
             return new Numbers(tokens);
         }
