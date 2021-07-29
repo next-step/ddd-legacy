@@ -1,5 +1,6 @@
 package calculator.test;
 
+import calculator.Numbers;
 import calculator.Separator;
 import calculator.TextSeparator;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,14 +27,16 @@ public class TextSeparatorTest {
     @Test
     void separate() {
         String text = "//;\n6";
-        assertThat(separator.separate(text).equals(Collections.singletonList(6))).isTrue();
+        Numbers expected = new Numbers(new String[]{"6"});
+        assertThat(separator.separate(text).equals(expected)).isTrue();
     }
 
     @DisplayName("커스텀 구분자 없으면 , or : 를 이용해 분리")
     @Test
     void separate_no_custom_separator() {
         String text = "1,2:3";
-        assertThat(separator.separate(text).equals(List.of(1, 2, 3))).isTrue();
+        Numbers expected = new Numbers(new String[]{"1", "2", "3"});
+        assertThat(separator.separate(text).equals(expected)).isTrue();
     }
 
     @DisplayName("숫자가 아니거나 음수일때 오류 발생")

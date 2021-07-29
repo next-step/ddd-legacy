@@ -18,8 +18,7 @@ public class StringCalculator {
             return DEFAULT_RESULT;
         }
 
-        return separator.separate(text).stream()
-                .mapToInt(Integer::valueOf)
+        return separator.separate(text)
                 .sum();
     }
 
