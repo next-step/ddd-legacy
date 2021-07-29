@@ -3,7 +3,7 @@ package calculator;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.thymeleaf.util.StringUtils;
+import org.springframework.util.StringUtils;
 
 public class StringCalculator {
 
@@ -16,9 +16,10 @@ public class StringCalculator {
     public static final String NEGATIVE_EXCEPTION_MESSAGE = "음수는 계산할 수 없습니다";
 
     public int calculate(final String stringNumber) {
-        if (StringUtils.isEmpty(stringNumber)) {
+        if (!StringUtils.hasText(stringNumber)) {
             return ZERO;
         }
+
         final Matcher matcher = pattern.matcher(stringNumber);
         if (matcher.find()) {
             final String customDelimiter = matcher.group(ONE);

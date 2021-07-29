@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.thymeleaf.util.StringUtils;
 
 public class StringCalculatorTest {
 
@@ -66,6 +68,17 @@ public class StringCalculatorTest {
     void negativeNumber(final String text) {
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> calculator.calculate(text));
+    }
+
+    @Test
+    void whiteSpace() {
+        assertThat(StringUtils.isEmpty(null)).isTrue();
+        assertThat(StringUtils.isEmpty("")).isTrue();
+        assertThat(StringUtils.isEmpty(" ")).isFalse();
+
+        assertThat(org.springframework.util.StringUtils.hasText(null)).isFalse();
+        assertThat(org.springframework.util.StringUtils.hasText("")).isFalse();
+        assertThat(org.springframework.util.StringUtils.hasText(" ")).isFalse();
     }
 
 }
