@@ -31,18 +31,13 @@ public class StringCalculator {
 
     private int calculate(final String stringNumber, final String delimiter) {
         return Arrays.stream(stringNumber.split(delimiter))
-            .mapToInt(Integer::parseInt)
-//            .peek(this::checkNegativenumber)
+            .map(PositiveNumber::new)
+            .map(PositiveNumber::getValue)
+            .mapToInt(i -> i)
             .sum();
     }
 
     private boolean isBlank(final String stringNumber) {
         return !StringUtils.hasText(stringNumber);
     }
-
-//    private void checkNegativenumber(final int number) {
-//        if (number < ZERO) {
-//            throw new RuntimeException(NEGATIVE_EXCEPTION_MESSAGE);
-//        }
-//    }
 }
