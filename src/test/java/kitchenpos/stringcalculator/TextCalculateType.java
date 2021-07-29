@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public enum TextCalculateTypes {
+public enum TextCalculateType {
     NullOrEmpty(text -> 0),
     SingleNumber(
             text -> {
@@ -13,14 +13,14 @@ public enum TextCalculateTypes {
             }
     ),
     CommaAndColon(
-            text -> Arrays.stream(text.split(",|:"))
+            text -> Arrays.stream(text.split(Constants.COMMA_AND_COLON_REGEX))
                     .map(ParsedNumber::new)
                     .map(ParsedNumber::getNumber)
                     .reduce(0, Integer::sum)
     ),
     CustomDelimiter(
             text -> {
-                Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+                Matcher m = Pattern.compile(Constants.CUSTOM_DELIMITER_REGEX).matcher(text);
                 if (m.find()) {
                     String customDelimiter = m.group(1);
                     String[] tokens = m.group(2).split(customDelimiter);
@@ -39,23 +39,35 @@ public enum TextCalculateTypes {
             }
     );
 
+
     private final CalculateFormula calculateFormula;
 
-    public CalculateFormula getCalculateFormula() {
-        return calculateFormula;
-    }
-
-    TextCalculateTypes(CalculateFormula calculateFormula) {
+    TextCalculateType(CalculateFormula calculateFormula) {
         this.calculateFormula = calculateFormula;
     }
+    private static class Constants {
+        public static final String CUSTOM_DELIMITER_REGEX = "//(.)\n(.*)";
+        public static final String COMMA_AND_COLON_REGEX = ",|:";
+        private static final int EMPTY_NUMBER = 0;
+    }
 
-    public static TextCalculateTypes of(final String text) {
+    public static TextCalculateType of(final String text) {
         if (text == null || text.isBlank()) {
             return NullOrEmpty;
         }
+
+        return parseType(text);
+    }
+
+    private static TextCalculateType parseType(final String text) {
         if (isSingleNumber(text)) {
             return SingleNumber;
         }
+
+        return parseTypeByRegex(text);
+    }
+
+    private static TextCalculateType parseTypeByRegex(final String text) {
         if (isCommaAndColonType(text)) {
             return CommaAndColon;
         }
@@ -76,9 +88,9 @@ public enum TextCalculateTypes {
     }
 
     private static boolean isCommaAndColonType(final String text) {
-        String[] tokens = text.split(",|:");
+        String[] tokens = text.split(Constants.COMMA_AND_COLON_REGEX);
 
-        if (tokens.length == 0) {
+        if (tokens.length == Constants.EMPTY_NUMBER) {
             return false;
         }
 
@@ -91,7 +103,13 @@ public enum TextCalculateTypes {
     }
 
     private static boolean isCustomDelimiter(final String text) {
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+        Matcher m = Pattern.compile(Constants.CUSTOM_DELIMITER_REGEX).matcher(text);
         return m.find();
     }
+
+    public CalculateFormula getCalculateFormula() {
+        return calculateFormula;
+    }
+
+
 }

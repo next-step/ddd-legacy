@@ -3,12 +3,13 @@ package kitchenpos.stringcalculator;
 public class StringCalculator {
 
     public int add(final String text) {
-        final TextCalculateTypes textCalculateTypes = TextCalculateTypes.of(text);
+        final TextCalculateType textCalculateType = TextCalculateType.of(text);
 
-        return calculate(textCalculateTypes, text);
+        return calculate(textCalculateType, text);
     }
-    private int calculate(TextCalculateTypes textCalculateTypes, String text) {
-        return textCalculateTypes.getCalculateFormula().operate(text);
+
+    private int calculate(TextCalculateType textCalculateType, String text) {
+        return textCalculateType.getCalculateFormula().operate(text);
     }
 
 }
