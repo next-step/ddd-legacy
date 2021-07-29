@@ -1,4 +1,4 @@
-package kitchenpos.calculator;
+package calculator;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class StringCalculatorTest {
-    private  StringCalculator sut;
+    private StringCalculator sut;
 
     @BeforeEach
     void setUp() {

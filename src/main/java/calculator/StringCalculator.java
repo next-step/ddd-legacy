@@ -1,4 +1,4 @@
-package kitchenpos.calculator;
+package calculator;
 
 import org.springframework.util.StringUtils;
 

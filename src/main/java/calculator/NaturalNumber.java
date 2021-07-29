@@ -1,4 +1,4 @@
-package kitchenpos.calculator;
+package calculator;
 
 public class NaturalNumber {
     private final int value;
