@@ -17,4 +17,13 @@ public class PositiveNumberTest {
         ).isInstanceOf(RuntimeException.class);
     }
 
+    @DisplayName("숫자 이외의 값을 전달 하는 경우 RuntimeException 예외 처리를 한다")
+    @ParameterizedTest
+    @ValueSource(strings = {"abc"})
+    void notNumber(final String text) {
+        assertThatThrownBy(
+            () -> new PositiveNumber(text)
+        ).isInstanceOf(RuntimeException.class);
+    }
+
 }
