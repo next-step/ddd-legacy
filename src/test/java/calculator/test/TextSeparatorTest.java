@@ -40,7 +40,7 @@ public class TextSeparatorTest {
     @ParameterizedTest
     @CsvSource(value = {"-1:2", "a:3"})
     void separate_isNotNumberAndIsNotAmniotic(String text) {
-        assertThatThrownBy(() -> new TextSeparator().separate(text))
+        assertThatThrownBy(() -> separator.separate(text))
                 .isInstanceOf(RuntimeException.class);
     }
 }
