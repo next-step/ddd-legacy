@@ -20,10 +20,10 @@ public class StringCalculator {
 			return DEFAULT_NUMBER;
 		}
 
-		return summation(text);
+		return summation(text).value();
 	}
 
-	private int summation(final String text) {
+	private static PositiveNumber summation(final String text) {
 		Matcher m = CUSTOM_DELIM_PATTERN.matcher(text);
 		if (m.find()) {
 			String customDelimiter = m.group(1);
@@ -34,19 +34,10 @@ public class StringCalculator {
 		return summation(text.split(DEFAULT_DELIM_REGEX));
 	}
 
-	private static int summation(final String[] tokens) {
+	private static PositiveNumber summation(final String[] tokens) {
 		return Arrays.stream(tokens)
-			.map(StringCalculator::convert)
-			.reduce(Integer::sum)
+			.map(PositiveNumber::valueOf)
+			.reduce(PositiveNumber::add)
 			.orElseThrow(RuntimeException::new);
-	}
-
-	private static int convert(String token) {
-		final int number = Integer.parseInt(token);
-		if (number < 0) {
-			throw new RuntimeException();
-		}
-
-		return number;
 	}
 }

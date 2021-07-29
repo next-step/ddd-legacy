@@ -6,8 +6,8 @@ public class PositiveNumber {
 
     private final int value;
 
-    public PositiveNumber(final String value) {
-        this(Integer.parseInt(value));
+    public static PositiveNumber valueOf(final String value) {
+        return new PositiveNumber(Integer.parseInt(value));
     }
 
     private PositiveNumber(final int value) {
@@ -23,6 +23,10 @@ public class PositiveNumber {
 
     public PositiveNumber add(final PositiveNumber number) {
         return new PositiveNumber(value + number.value);
+    }
+
+    public int value() {
+        return value;
     }
 
     @Override
