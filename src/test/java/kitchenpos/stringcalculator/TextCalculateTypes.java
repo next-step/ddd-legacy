@@ -67,9 +67,6 @@ public enum TextCalculateTypes implements CalculateFunction {
         if (isSingleNumber(text)) {
             return SingleNumber;
         }
-        if (isSingleCommaType(text)) {
-            return SingleComma;
-        }
         if (isCommaAndColonType(text)) {
             return CommaAndColon;
         }
@@ -83,21 +80,6 @@ public enum TextCalculateTypes implements CalculateFunction {
     private static boolean isSingleNumber(final String text) {
         try {
             Integer.parseInt(text);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private static boolean isSingleCommaType(final String text) {
-        final String[] tokens = text.split(",");
-
-        if (tokens.length == 0) {
-            return false;
-        }
-
-        try {
-            Arrays.stream(tokens).forEach(Integer::parseInt);
             return true;
         } catch (Exception e) {
             return false;

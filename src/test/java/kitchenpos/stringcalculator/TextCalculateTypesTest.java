@@ -24,13 +24,6 @@ class TextCalculateTypesTest {
         assertThat(TextCalculateTypes.of(text)).isEqualTo(TextCalculateTypes.SingleNumber);
     }
 
-    @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 SingleComma을 반환한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"1,2"})
-    void twoNumbers(final String text) {
-        assertThat(TextCalculateTypes.of(text)).isEqualTo(TextCalculateTypes.SingleComma);
-    }
-
     @DisplayName(value = "구분자를 쉼표(,) 콜론(:)을 사용할 경우 CommaAndColon을 반환한다.")
     @ParameterizedTest
     @ValueSource(strings = {"1,2:3"})
