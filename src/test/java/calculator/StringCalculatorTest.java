@@ -58,4 +58,12 @@ class StringCalculatorTest {
     void customDelimiter(final String text) {
         assertThat(calculator.add(text)).isSameAs(6);
     }
+
+    @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"-1", "1,-1,2"})
+    void negative(final String text) {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> calculator.add(text));
+    }
 }
