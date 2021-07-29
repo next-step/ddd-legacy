@@ -3,7 +3,10 @@ package calculator;
 public class StringCalculator {
 
     public int add(final String text) {
-        Text input = new Text(text);
+        TokenizerFactory tokenizerFactory = new TokenizerFactory(text);
+        Tokenizer tokenizer = tokenizerFactory.createTokenizer();
+        Text input = new Text(text, tokenizer);
+
         Numbers numbers = input.getNumbers();
         return numbers.add();
     }
