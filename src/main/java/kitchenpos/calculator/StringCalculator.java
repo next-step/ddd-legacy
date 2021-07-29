@@ -4,8 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
+    private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final String DEFAULT_DELIMITERS = "[,:]";
-    private static final String CUSTOM_DELIMITER_REGEX = "//(.)\n(.*)";
 
     private final ValidationStrategy validationStrategy;
 
@@ -25,7 +25,7 @@ public class StringCalculator {
     }
 
     private String[] split(String text) {
-        Matcher m = Pattern.compile(CUSTOM_DELIMITER_REGEX).matcher(text);
+        Matcher m = CUSTOM_PATTERN.matcher(text);
         if (m.find()) {
             String customDelimiter = m.group(1);
             return m.group(2).split(customDelimiter);
