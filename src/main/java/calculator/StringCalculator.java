@@ -11,14 +11,7 @@ public class StringCalculator {
             return 0;
         }
 
-        String[] numbers = this.parsingDelimiter(text);
-
-        int sum = 0;
-        for (String number : numbers) {
-            sum += stringToInt(number);
-        }
-
-        return sum;
+        return this.calculate(this.parsingDelimiter(text));
     }
 
     private String[] parsingDelimiter(final String text) {
@@ -29,6 +22,17 @@ public class StringCalculator {
             return m.group(2).split(customDelimiter);
         }
         return text.split("[,:]");
+    }
+
+    private int calculate(final String[] numbers) {
+        if (numbers.length == 1) {
+            return this.stringToInt(numbers[0]);
+        }
+        int sum = 0;
+        for (String number : numbers) {
+            sum += stringToInt(number);
+        }
+        return sum;
     }
 
     private int stringToInt(final String text) {
