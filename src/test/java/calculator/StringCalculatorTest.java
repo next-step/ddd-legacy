@@ -22,6 +22,14 @@ public class StringCalculatorTest {
         assertThat(expect).isZero();
     }
 
+    @DisplayName("blank 문자열을 입력하는 경우 0을 반환한다")
+    @ParameterizedTest
+    @ValueSource(strings = {" ", "  ", "   "})
+    void blank(final String text) {
+        final int expect = calculator.calculate(text);
+        assertThat(expect).isZero();
+    }
+
     @DisplayName("숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다")
     @ParameterizedTest
     @ValueSource(strings = {"1", "2", "3"})
