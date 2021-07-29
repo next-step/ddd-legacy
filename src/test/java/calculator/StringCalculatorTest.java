@@ -70,13 +70,13 @@ public class StringCalculatorTest {
         assertThat(expect).isEqualTo(10);
     }
 
-    @DisplayName("음수를 전달하는 경우 RuntimeException 예외 처리를 한다")
-    @ParameterizedTest
-    @ValueSource(strings = {"2:3:-1"})
-    void negativeNumber(final String text) {
-        assertThatExceptionOfType(RuntimeException.class)
-            .isThrownBy(() -> calculator.calculate(text));
-    }
+//    @DisplayName("음수를 전달하는 경우 RuntimeException 예외 처리를 한다")
+//    @ParameterizedTest
+//    @ValueSource(strings = {"2:3:-1"})
+//    void negativeNumber(final String text) {
+//        assertThatExceptionOfType(RuntimeException.class)
+//            .isThrownBy(() -> calculator.calculate(text));
+//    }
 
     @DisplayName("숫자 이외의 값이 전달 되는 경우 RuntimeException 예외 처리를 한다")
     @ParameterizedTest
