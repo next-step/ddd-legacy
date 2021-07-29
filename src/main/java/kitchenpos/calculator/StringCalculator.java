@@ -1,11 +1,14 @@
 package kitchenpos.calculator;
 
+import org.springframework.util.StringUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
     private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final String DEFAULT_DELIMITERS = "[,:]";
+    private static final Integer DEFAULT_VALUE = 0;
 
     private final ValidationStrategy validationStrategy;
 
@@ -14,8 +17,8 @@ public class StringCalculator {
     }
 
     public int sum(String text) {
-        if (text == null || text.isEmpty()) {
-            return 0;
+        if (!StringUtils.hasText(text)) {
+            return DEFAULT_VALUE;
         }
 
         String[] strings = split(text);
