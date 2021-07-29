@@ -14,16 +14,16 @@ public enum TextCalculateTypes implements CalculateFunction {
     SingleNumber {
         @Override
         public int calculate(String text) {
-            int number = Integer.parseInt(text);
-            return CalculateFunction.getValidatedNumber(number);
+            ParsedNumber parsedNumber = new ParsedNumber(text);
+            return parsedNumber.getNumber();
         }
     },
     SingleComma {
         @Override
         public int calculate(String text) {
             return Arrays.stream(text.split(","))
-                    .map(Integer::parseInt)
-                    .map(CalculateFunction::getValidatedNumber)
+                    .map(ParsedNumber::new)
+                    .map(ParsedNumber::getNumber)
                     .reduce(0, Integer::sum);
         }
     },
@@ -31,8 +31,8 @@ public enum TextCalculateTypes implements CalculateFunction {
         @Override
         public int calculate(String text) {
             return Arrays.stream(text.split(",|:"))
-                    .map(Integer::parseInt)
-                    .map(CalculateFunction::getValidatedNumber)
+                    .map(ParsedNumber::new)
+                    .map(ParsedNumber::getNumber)
                     .reduce(0, Integer::sum);
         }
     },
@@ -40,12 +40,12 @@ public enum TextCalculateTypes implements CalculateFunction {
         @Override
         public int calculate(String text) {
             Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
-            if(m.find()) {
+            if (m.find()) {
                 String customDelimiter = m.group(1);
                 String[] tokens = m.group(2).split(customDelimiter);
                 return Arrays.stream(tokens)
-                        .map(Integer::parseInt)
-                        .map(CalculateFunction::getValidatedNumber)
+                        .map(ParsedNumber::new)
+                        .map(ParsedNumber::getNumber)
                         .reduce(0, Integer::sum);
             }
 
@@ -121,12 +121,6 @@ public enum TextCalculateTypes implements CalculateFunction {
 
     private static boolean isCustomDelimiter(final String text) {
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
-        if (m.find()) {
-            return true;
-        }
-
-        return false;
+        return m.find();
     }
-
-
 }
