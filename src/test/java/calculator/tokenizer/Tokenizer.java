@@ -1,4 +1,4 @@
-package calculator;
+package calculator.tokenizer;
 
 public interface Tokenizer {
 

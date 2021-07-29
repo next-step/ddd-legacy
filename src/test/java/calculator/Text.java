@@ -1,5 +1,7 @@
 package calculator;
 
+import calculator.tokenizer.Tokenizer;
+
 public class Text {
 
     private String text;
