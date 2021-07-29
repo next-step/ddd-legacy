@@ -15,8 +15,10 @@ public class TokenizerFactory {
     }
 
     public Tokenizer createTokenizer() {
+        if (isNullOrEmpty()) {
+            return new EmptyTokenizer();
+        }
         Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
-
         if (hasCommaOrColon()) {
             return new DefaultTokenizer(text);
         }
@@ -36,5 +38,10 @@ public class TokenizerFactory {
 
     private boolean hasCommaOrColon() {
         return hasComma() || hasColon();
+    }
+
+    private boolean isNullOrEmpty() {
+        return text == null
+                || text.isEmpty();
     }
 }

@@ -6,13 +6,9 @@ import java.util.stream.Collectors;
 
 public class Numbers {
 
-    public static final Numbers ZERO = new Numbers(0);
+    public static final int ZERO = 0;
 
     private List<Integer> numbers;
-
-    public Numbers(Integer... number) {
-        this.numbers = Arrays.asList(number);
-    }
 
     public Numbers(String... tokens) {
         this.numbers = Arrays.stream(tokens)
@@ -24,6 +20,6 @@ public class Numbers {
     public int add() {
         return this.numbers.stream()
                 .reduce((first, second) -> first + second)
-                .get();
+                .orElse(ZERO);
     }
 }
