@@ -17,7 +17,7 @@ public class PositiveNumber {
 
     private void checkPositive(final int value) {
         if (value < 0) {
-            throw new RuntimeException();
+            throw new RuntimeException("음수 값은 허용되지 않습니다.");
         }
     }
 
