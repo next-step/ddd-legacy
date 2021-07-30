@@ -7,7 +7,7 @@ public class StringCalculator {
             return 0;
         }
 
-        return Operations.sum(Numbers.textToNumbers(text));
+        return Operations.sum(Numbers.toNumbers(Delimiter.textToTokens(text)));
     }
 
     private boolean isEmpty(String text) {
