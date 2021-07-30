@@ -11,7 +11,6 @@ public class OperandTest {
     @Test
     @DisplayName("integer 타입으로 피연산자를 생성할 수 있다.")
     void createByInt() {
-        assertThat(new Operand(3)).isEqualTo(3);
         assertThat(new Operand(3)).isEqualTo(new Operand(3));
     }
 
@@ -41,7 +40,6 @@ public class OperandTest {
     void operate() {
         Operand operand1 = new Operand(3);
         Operand operand2 = new Operand(2);
-        operand1.equals(3);
         assertThat(operand1.operate(operand2, (a,b) -> a+b)).isEqualTo(new Operand(5));
     }
 

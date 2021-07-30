@@ -18,23 +18,23 @@ public class StringSplitterTest {
         splitter = new StringSplitter(DEFAULT_DELIMITER);
     }
 
-    @Test
     @DisplayName("구분자에 따라 문자를 분리할 수 있다.")
+    @Test
     void split() {
         assertThat(splitter.split("1,2:3")).containsAll(Arrays.asList("1", "2","3"));
     }
 
-    @Test
     @DisplayName("구분자를 추가하여 문자를 분리할 수 있다.")
+    @Test
     void addDelimiter_and_split() {
-        StringSplitter newSplitter = splitter.addDelimiter("3");
-        assertThat(newSplitter.split("1?2:34")).containsAll(Arrays.asList("1?2", "4"));
+        StringSplitter newSplitter = splitter.matchCustom("//3\n1?2:34");
+        assertThat(newSplitter.split("//3\n1?2:34")).containsAll(Arrays.asList("1?2", "4"));
     }
 
-    @Test
     @DisplayName("특별한 구분자(?, |, ., $)에 대해서도 문자를 구분할 수 있다.")
+    @Test
     void addSpecial_and_split() {
-        StringSplitter newSplitter = splitter.addDelimiter("?");
-        assertThat(newSplitter.split("1?2:34")).containsAll(Arrays.asList("1", "2", "34"));
+        StringSplitter newSplitter = splitter.matchCustom("//?\n1?2:34");
+        assertThat(newSplitter.split("//?\n1?2:34")).containsAll(Arrays.asList("1", "2", "34"));
     }
 }

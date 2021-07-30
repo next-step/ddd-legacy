@@ -5,6 +5,7 @@ import java.util.function.BinaryOperator;
 
 public class Operand {
     private static final int BOUND = 0;
+    private static final int DEFAULT_VALUE = 0;
     private final int number;
 
     public Operand(String number) {
@@ -12,7 +13,7 @@ public class Operand {
     }
 
     public Operand() {
-        this(0);
+        this(DEFAULT_VALUE);
     }
 
     public Operand(int number) {
@@ -24,7 +25,7 @@ public class Operand {
         return new Operand(operator.apply(number, operand.number));
     }
 
-    public int result() {
+    public int getValue() {
         return number;
     }
 
