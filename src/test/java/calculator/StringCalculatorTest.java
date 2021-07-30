@@ -63,18 +63,4 @@ class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> calculator.add(input));
     }
-
-    @Test
-    void temp() {
-        String[] split = "1".split(",");
-        assertThat(split).isEqualTo(new String[]{"1"});
-    }
-
-    @Test
-    void matcher() {
-        String text = "//;\n1;2;3";
-        Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
-        matcher.find();
-        assertThat(matcher.group(1)).isEqualTo(";");
-    }
 }
