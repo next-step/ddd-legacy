@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import static java.util.stream.Collectors.toList;
 
 public class StringSplitter {
+    private static final List<String> DEFAULT_DELIMITER = Arrays.asList(",", ":");
     private static final String DELIMTER = "|";
     private static final String MATCH_SPECIAL = "\\?|\\.|\\$|\\|";
     private static final String ADD_SPECIAL_DELIMITER = "\\";
@@ -16,21 +17,18 @@ public class StringSplitter {
 
     private List<String> delimiters;
 
+    public StringSplitter() {
+        this(new ArrayList<>(DEFAULT_DELIMITER));
+    }
+
     public StringSplitter(List<String> delimiters) {
         this.delimiters = delimiters;
     }
 
-    public StringSplitter matchCustom(String text) {
-        Matcher m = CUSTOM_PATTERN.matcher(text);
-        if(m.find()) {
-            return addDelimiter(m.group(1));
-        }
-        return this;
-    }
-
     public List<String> split(String text) {
+        String checkedText = matchCustom(text);
         String delimiter = String.join(DELIMTER, delimiters);
-        return Arrays.stream(matchText(text).split(delimiter)).collect(toList());
+        return Arrays.stream(checkedText.split(delimiter)).collect(toList());
     }
 
     private String matchSpecial(String delimiter) {
@@ -40,19 +38,12 @@ public class StringSplitter {
         return delimiter;
     }
 
-    private String matchText(String text) {
+    private String matchCustom(String text) {
         Matcher m = CUSTOM_PATTERN.matcher(text);
         if(m.find()) {
+            delimiters.add(matchSpecial(m.group(1)));
             return m.group(2);
         }
         return text;
     }
-
-    private StringSplitter addDelimiter(String delimiter) {
-        List<String> newDelimiters = new ArrayList<>(delimiters);
-        newDelimiters.add(matchSpecial(delimiter));
-        return new StringSplitter(newDelimiters);
-    }
-
-
 }
