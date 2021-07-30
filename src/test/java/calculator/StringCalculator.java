@@ -18,8 +18,7 @@ public class StringCalculator {
             throw new RuntimeException();
         }
     }
-
-
+    
     private boolean isBlank(String text) {
         return text == null || text.isEmpty();
     }
