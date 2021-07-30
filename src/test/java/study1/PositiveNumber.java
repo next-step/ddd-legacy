@@ -6,13 +6,13 @@ public class PositiveNumber {
 
     private final int value;
 
-    public static PositiveNumber valueOf(final String value) {
-        return new PositiveNumber(Integer.parseInt(value));
-    }
-
     private PositiveNumber(final int value) {
         checkPositive(value);
         this.value = value;
+    }
+
+    public static PositiveNumber valueOf(final String value) {
+        return new PositiveNumber(Integer.parseInt(value));
     }
 
     private void checkPositive(final int value) {

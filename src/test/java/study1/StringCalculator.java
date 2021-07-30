@@ -5,28 +5,28 @@ import org.springframework.util.StringUtils;
 
 public class StringCalculator {
 
-	private static final int DEFAULT_NUMBER = 0;
+    private static final int DEFAULT_NUMBER = 0;
 
-	public int add(final String text) {
-		if (!StringUtils.hasText(text)) {
-			return DEFAULT_NUMBER;
-		}
+    private static PositiveNumber summation(final String text) {
+        if (CustomSplitStrategy.applicable(text)) {
+            return summation(text, new CustomSplitStrategy());
+        }
 
-		return summation(text).value();
-	}
+        return summation(text, new DefaultSplitStrategy());
+    }
 
-	private static PositiveNumber summation(final String text) {
-		if (CustomSplitStrategy.applicable(text)) {
-			return summation(text, new CustomSplitStrategy());
-		}
+    private static PositiveNumber summation(final String text, final SplitStrategy strategy) {
+        return Arrays.stream(strategy.split(text))
+            .map(PositiveNumber::valueOf)
+            .reduce(PositiveNumber::add)
+            .orElseThrow(RuntimeException::new);
+    }
 
-		return summation(text, new DefaultSplitStrategy());
-	}
+    public int add(final String text) {
+        if (!StringUtils.hasText(text)) {
+            return DEFAULT_NUMBER;
+        }
 
-	private static PositiveNumber summation(final String text, final SplitStrategy strategy) {
-		return Arrays.stream(strategy.split(text))
-			.map(PositiveNumber::valueOf)
-			.reduce(PositiveNumber::add)
-			.orElseThrow(RuntimeException::new);
-	}
+        return summation(text).value();
+    }
 }
