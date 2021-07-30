@@ -11,6 +11,10 @@ public class Operand {
         this(Integer.parseInt(number));
     }
 
+    public Operand() {
+        this(0);
+    }
+
     public Operand(int number) {
         validNegative(number);
         this.number = number;
