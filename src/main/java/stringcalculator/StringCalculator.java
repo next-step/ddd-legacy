@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BinaryOperator;
 
-import static java.util.stream.Collectors.toList;
-
 public class StringCalculator {
     private static final List<String> DEFAULT_DELIMITER = Arrays.asList(",", ":");
 
@@ -19,8 +17,8 @@ public class StringCalculator {
         if (isEmpty(text)) {
             return new Operand().getValue();
         }
-        List<Operand> operands = splitToOperand(text, makeSplitter(text));
-        return calculate(operands).getValue();
+        Operands operands = Operands.of(makeSplitter(text).split(text));
+        return operands.calculate(addOperator);
     }
 
     private boolean isEmpty(String text) {
@@ -31,19 +29,4 @@ public class StringCalculator {
         StringSplitter splitter = new StringSplitter(DEFAULT_DELIMITER);
         return splitter.matchCustom(text);
     }
-
-    private List<Operand> splitToOperand(String text, StringSplitter splitter) {
-        return splitter.split(text).stream()
-                .map(Operand::new)
-                .collect(toList());
-    }
-
-    private Operand calculate(List<Operand> operands) {
-        Operand result = new Operand();
-        for (Operand operand : operands) {
-            result = result.operate(operand, addOperator);
-        }
-        return result;
-    }
-
 }
