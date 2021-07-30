@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class NumbersTest {
 
     @ParameterizedTest
-    @DisplayName(value = "구분자를 , 혹은 : 문자열을 전달하면 int[] 로 반환된다.")
+    @DisplayName(value = "구분자 , 혹은 : 문자열을 전달하면 int[] 로 반환된다.")
     @ValueSource(strings = {"1,2:3", "1,2,3", "1:2:3"})
     void defaultDelimiterSplit(String text) {
         int[] check = {1,2,3};
@@ -20,7 +20,7 @@ class NumbersTest {
         assertArrayEquals(result, check);
     }
 
-    @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자 문자열을 전달하면 int[] 로 반환된다.")
     @ParameterizedTest
     @ValueSource(strings = {"//;\n1;2;3", "//!\n1!2!3", "//@\n1@2@3"})
     void customDelimiterSplit(String text) {

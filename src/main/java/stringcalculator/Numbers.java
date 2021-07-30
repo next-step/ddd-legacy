@@ -8,6 +8,7 @@ public class Numbers {
     private static final String ERROR_MINUS_NUMBER_MESSAGE = "마이너스 숫자는 불가능합니다.";
     private static final String DEFAULT_PATTERN = ",|:";
     private static final String CUSTOM_PATTERN = "//(.)\n(.*)";
+    private static final int MINIMUM_RANGE = 0;
     private static final int PATTERN_GROUP = 1;
     private static final int TEXT_GROUP = 2;
 
@@ -29,7 +30,7 @@ public class Numbers {
     private static int stringToInt(String text) {
         int result = Integer.parseInt(text);
 
-        if (result < 0) {
+        if (result < MINIMUM_RANGE) {
             throw new IllegalArgumentException(ERROR_MINUS_NUMBER_MESSAGE);
         }
 
