@@ -1,15 +1,16 @@
 package kitchenpos.stringcalculator;
 
+import java.util.List;
+
 public class StringCalculator {
 
     public int add(final String text) {
-        final TextCalculateType textCalculateType = TextCalculateType.of(text);
-
-        return calculate(textCalculateType, text);
+        final List<ParsedNumber> parsedNumbers = NumberParser.parse(text);
+        return calculate(OperationType.ADD, parsedNumbers);
     }
 
-    private int calculate(TextCalculateType textCalculateType, String text) {
-        return textCalculateType.getCalculateFormula().operate(text);
+    private int calculate(final OperationType operationType, final List<ParsedNumber> parsedNumbers) {
+        return operationType.getOperation().operate(parsedNumbers);
     }
 
 }

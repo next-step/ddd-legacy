@@ -4,8 +4,13 @@ public class ParsedNumber {
     private final int number;
     private static final int ZERO = 0;
 
-    public ParsedNumber(String text) {
-        this.number = Integer.parseInt(text);
+    public ParsedNumber(int number) {
+        this.number = number;
+        validate();
+    }
+
+    public ParsedNumber(String textNumber) {
+        this.number = Integer.parseInt(textNumber);
         validate();
     }
 
