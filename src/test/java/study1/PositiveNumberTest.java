@@ -24,7 +24,7 @@ class PositiveNumberTest {
 
     @Test
     @DisplayName("문자열 덧셈 결과 확인")
-    void success_add() {
+    void add() {
         // given
         PositiveNumber number1 = PositiveNumber.valueOf("12");
         PositiveNumber number2 = PositiveNumber.valueOf("20");
