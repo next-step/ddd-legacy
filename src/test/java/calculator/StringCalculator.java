@@ -1,44 +1,44 @@
 package calculator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StringCalculator {
-    public int add(final String text) {
+    private static final int DEFAULT_RETURN_VALUE = 0;
+    private static final String VALID_TOKEN_REGEX = "^[0-9]+$";
+    private static final String INVALID_TOKEN_ERROR_MESSAGE = "숫자 이외의 값 또는 음수는 전달할 수 없습니다: \"%s\"";
+    private static final String ERROR_TOKEN_MESSAGE_DELIMITER = "\", \"";
+
+    public int add(final String text) throws RuntimeException {
         if (text == null) {
-            return 0;
+            return DEFAULT_RETURN_VALUE;
         }
 
-        if (text.isEmpty()) {
-            return 0;
+        StringTokenizer stringTokenizer = StringTokenizer.of(text);
+
+        if (stringTokenizer.isEmpty()) {
+            return DEFAULT_RETURN_VALUE;
         }
 
-        final List<String> defaultDelimiters = Arrays.asList(",", ":");
-        final List<String> delimiters = new ArrayList<>(defaultDelimiters);
-        final Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
+        final String[] tokens = stringTokenizer.tokenize();
+        validateTokens(tokens);
+        return calculate(tokens);
+    }
 
-        String targetText = text;
-        if (matcher.find()) {
-            delimiters.add(matcher.group(1));
-            targetText = matcher.group(2);
-        }
-
-        final String delimiterRegex = String.join("|", delimiters);
-        final String[] tokens = targetText.split(delimiterRegex);
-
+    private void validateTokens(String[] tokens) throws RuntimeException {
         final String[] exceptTokens = Arrays.stream(tokens)
-                .filter(token -> !token.matches("^[0-9]+$"))
+                .filter(token -> !token.matches(VALID_TOKEN_REGEX))
                 .toArray(String[]::new);
+
         if (exceptTokens.length > 0) {
-            String errorMessage = "숫자 이외의 값 또는 음수는 전달할 수 없습니다: \""
-                    + String.join("\", \"", exceptTokens)
-                    + "\"";
+            String errorMessage = String.format(
+                    INVALID_TOKEN_ERROR_MESSAGE,
+                    String.join(ERROR_TOKEN_MESSAGE_DELIMITER, exceptTokens)
+            );
             throw new RuntimeException(errorMessage);
         }
+    }
 
+    private int calculate(String[] tokens) {
         return Arrays.stream(tokens)
                 .mapToInt(Integer::parseInt)
                 .sum();
