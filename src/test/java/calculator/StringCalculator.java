@@ -1,12 +1,17 @@
 package calculator;
 
 import java.util.Objects;
+import java.util.function.IntBinaryOperator;
 
 public class StringCalculator {
     private static final int DEFAULT_RETURN_VALUE = 0;
     private static final StringTokenizer stringTokenizer = new StringTokenizer();
 
     public int add(final String text) {
+        return calculate(text, Integer::sum);
+    }
+
+    private int calculate(final String text, IntBinaryOperator intBinaryOperator) {
         if (Objects.isNull(text)) {
             return DEFAULT_RETURN_VALUE;
         }
@@ -16,12 +21,8 @@ public class StringCalculator {
             return DEFAULT_RETURN_VALUE;
         }
 
-        return calculate(stringOperands);
-    }
-
-    private int calculate(final StringOperands stringOperands) {
         return stringOperands.stream()
                 .mapToInt(StringOperand::parseInt)
-                .sum();
+                .reduce(DEFAULT_RETURN_VALUE, intBinaryOperator);
     }
 }
