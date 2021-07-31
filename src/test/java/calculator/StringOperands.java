@@ -1,35 +1,38 @@
 package calculator;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class StringOperands {
-    private static final int EMPTY_STANDARD_SIZE = 1;
-    private static final int FIRST_INDEX = 0;
+    private static final int EMPTY_SIZE = 0;
 
-    private final List<String> operands;
+    private final List<StringOperand> operands = new ArrayList<>();
 
-    private StringOperands(String operandsText, String delimiterRegex) {
-        this.operands = Arrays.asList(operandsText.split(delimiterRegex));
+    private StringOperands(final String operandsText, final String delimiterRegex) {
+        if (!operandsText.isEmpty()) {
+            Arrays.stream(operandsText.split(delimiterRegex))
+                    .map(StringOperand::of)
+                    .forEach(operands::add);
+        }
     }
 
-    public static StringOperands of(String operandsText, String delimiterRegex) {
+    public static StringOperands of(final String operandsText, final String delimiterRegex) {
         return new StringOperands(operandsText, delimiterRegex);
     }
 
     public boolean isEmpty() {
-        int size = operands.size();
-        return size < EMPTY_STANDARD_SIZE || size == EMPTY_STANDARD_SIZE && operands.get(FIRST_INDEX).isEmpty();
+        return operands.size() == EMPTY_SIZE;
     }
 
-    public Stream<String> stream() {
+    public Stream<StringOperand> stream() {
         return operands.stream();
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) {
             return true;
         }
@@ -39,11 +42,12 @@ public class StringOperands {
         }
 
         StringOperands that = (StringOperands) o;
-        return Objects.equals(operands, that.operands);
+
+        return operands.equals(that.operands);
     }
 
     @Override
     public int hashCode() {
-        return Objects.isNull(operands) ? 0 : operands.hashCode();
+        return operands.hashCode();
     }
 }
