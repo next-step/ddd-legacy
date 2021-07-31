@@ -13,11 +13,18 @@ public class Numbers {
     private List<Integer> numbers;
 
     public Numbers(String[] tokens) {
+        checkNegative(tokens);
+
         this.numbers = Arrays.stream(tokens)
                 .mapToInt(Integer::parseInt)
-                .peek(number -> validateNegative(number))
                 .boxed()
                 .collect(Collectors.toList());
+    }
+
+    private void checkNegative(String[] tokens) {
+        Arrays.stream(tokens)
+                .mapToInt(Integer::parseInt)
+                .forEach(this::validateNegative);
     }
 
     public int calculate(CalculateStrategy strategy) {
