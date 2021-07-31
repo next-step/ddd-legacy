@@ -15,7 +15,7 @@ public class Numbers {
     public Numbers(String[] tokens) {
         this.numbers = Arrays.stream(tokens)
                 .mapToInt(Integer::parseInt)
-                .peek(number -> hasNegative(number))
+                .peek(number -> validateNegative(number))
                 .boxed()
                 .collect(Collectors.toList());
     }
@@ -26,7 +26,7 @@ public class Numbers {
                 .orElse(ZERO);
     }
 
-    public void hasNegative(int number) {
+    public void validateNegative(int number) {
         if (number < ZERO) {
             throw new RuntimeException("음수는 사용할 수 없습니다");
         }
