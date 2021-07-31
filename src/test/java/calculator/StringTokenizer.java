@@ -33,11 +33,12 @@ public class StringTokenizer {
         return new StringTokenizer(text);
     }
 
-    public String[] tokenize() {
-        return tokens;
+    public boolean isEmpty() {
+        final int count = this.tokens.length;
+        return count < 1 || count == 1 && this.tokens[0].isEmpty();
     }
 
-    public boolean isEmpty() {
-        return tokens.length == 1 && tokens[0].isEmpty();
+    public String[] tokenize() {
+        return this.tokens;
     }
 }
