@@ -19,10 +19,6 @@ public class MenuGroupService {
 
     @Transactional
     public MenuGroup create(final MenuGroup request) {
-        final UUID id = request.getId();
-        if (Objects.nonNull(id) && menuGroupRepository.existsById(id)) {
-            throw new IllegalArgumentException();
-        }
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
             throw new IllegalArgumentException();

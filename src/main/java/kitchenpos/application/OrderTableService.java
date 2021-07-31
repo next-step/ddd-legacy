@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import org.springframework.stereotype.Service;
@@ -13,20 +15,22 @@ import java.util.UUID;
 @Service
 public class OrderTableService {
     private final OrderTableRepository orderTableRepository;
+    private final OrderRepository orderRepository;
 
-    public OrderTableService(final OrderTableRepository orderTableRepository) {
+    public OrderTableService(final OrderTableRepository orderTableRepository, final OrderRepository orderRepository) {
         this.orderTableRepository = orderTableRepository;
+        this.orderRepository = orderRepository;
     }
 
     @Transactional
     public OrderTable create(final OrderTable request) {
-        final UUID id = request.getId();
-        if (Objects.nonNull(id) || orderTableRepository.existsById(id)) {
+        final String name = request.getName();
+        if (Objects.isNull(name) || name.isEmpty()) {
             throw new IllegalArgumentException();
         }
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
-        orderTable.setName(request.getName());
+        orderTable.setName(name);
         orderTable.setNumberOfGuests(0);
         orderTable.setEmpty(true);
         return orderTableRepository.save(orderTable);
@@ -44,6 +48,9 @@ public class OrderTableService {
     public OrderTable clear(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
+        if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
+            throw new IllegalStateException();
+        }
         orderTable.setNumberOfGuests(0);
         orderTable.setEmpty(true);
         return orderTable;
@@ -58,7 +65,7 @@ public class OrderTableService {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (orderTable.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalStateException();
         }
         orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;

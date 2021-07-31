@@ -3,17 +3,17 @@ POST {{host}}/api/order-tables
 Content-Type: application/json
 
 {
-  "name": "1번"
+  "name": "9번"
 }
 
 ###
-PUT {{host}}/api/order-tables/6aa22981-197f-4170-988f-c1c4cb6b2640/sit
+PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/sit
 
 ###
-PUT {{host}}/api/order-tables/6aa22981-197f-4170-988f-c1c4cb6b2640/clear
+PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/clear
 
 ###
-PUT {{host}}/api/menus/6aa22981-197f-4170-988f-c1c4cb6b2640/number-of-guests
+PUT {{host}}/api/menus/8d710043-29b6-420e-8452-233f5a035520/number-of-guests
 Content-Type: application/json
 
 {

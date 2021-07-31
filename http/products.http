@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ###
-PUT {{host}}/api/products/d5c45b35-0b5e-4633-9f83-ac650b1bbd54/price
+PUT {{host}}/api/products/3b528244-34f7-406b-bb7e-690912f66b10/price
 Content-Type: application/json
 
 {

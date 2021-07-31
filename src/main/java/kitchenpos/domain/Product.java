@@ -10,7 +10,7 @@ import java.util.UUID;
 @Table(name = "product")
 @Entity
 public class Product {
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "varbinary(16)")
     @Id
     private UUID id;
 

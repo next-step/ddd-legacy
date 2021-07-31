@@ -9,7 +9,7 @@ import java.util.UUID;
 @Table(name = "order_table")
 @Entity
 public class OrderTable {
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "varbinary(16)")
     @Id
     private UUID id;
 

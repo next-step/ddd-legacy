@@ -30,10 +30,6 @@ public class MenuService {
 
     @Transactional
     public Menu create(final Menu request) {
-        final UUID id = request.getId();
-        if (Objects.nonNull(id) && menuRepository.existsById(id)) {
-            throw new IllegalArgumentException();
-        }
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException();
@@ -114,7 +110,7 @@ public class MenuService {
                 .getPrice()
                 .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
             if (menu.getPrice().compareTo(sum) > 0) {
-                throw new IllegalArgumentException();
+                throw new IllegalStateException();
             }
         }
         menu.setDisplayed(true);

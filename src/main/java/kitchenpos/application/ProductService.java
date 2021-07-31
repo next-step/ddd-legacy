@@ -29,10 +29,6 @@ public class ProductService {
 
     @Transactional
     public Product create(final Product request) {
-        final UUID id = request.getId();
-        if (Objects.nonNull(id) && productRepository.existsById(id)) {
-            throw new IllegalArgumentException();
-        }
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException();

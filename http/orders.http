@@ -1,0 +1,33 @@
+###
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{
+  "type": "EAT_IN",
+  "orderTableId": "8d710043-29b6-420e-8452-233f5a035520",
+  "orderLineItems": [
+    {
+      "menuId": "f59b1e1c-b145-440a-aa6f-6095a0e2d63b",
+      "price": 16000,
+      "quantity": 3
+    }
+  ]
+}
+
+###
+PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/accept
+
+###
+PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/serve
+
+###
+PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/start-delivery
+
+###
+PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/complete-delivery
+
+###
+PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/complete
+
+###
+GET {{host}}/api/orders

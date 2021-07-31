@@ -8,7 +8,7 @@ import java.util.UUID;
 @Table(name = "menu")
 @Entity
 public class Menu {
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "varbinary(16)")
     @Id
     private UUID id;
 
@@ -19,14 +19,23 @@ public class Menu {
     private BigDecimal price;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "menu_group_id")
+    @JoinColumn(
+        name = "menu_group_id",
+        columnDefinition = "varbinary(16)",
+        foreignKey = @ForeignKey(name = "fk_menu_to_menu_group")
+    )
     private MenuGroup menuGroup;
 
     @Column(name = "displayed", nullable = false)
     private boolean displayed;
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "menu_id")
+    @JoinColumn(
+        name = "menu_id",
+        nullable = false,
+        columnDefinition = "varbinary(16)",
+        foreignKey = @ForeignKey(name = "fk_menu_product_to_menu")
+    )
     private List<MenuProduct> menuProducts;
 
     @Transient
