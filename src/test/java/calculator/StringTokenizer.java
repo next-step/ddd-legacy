@@ -13,9 +13,7 @@ public class StringTokenizer {
     private static final int TEXT_MATCHING_GROUP = 2;
     private static final String DELIMITER_SEPARATOR = "|";
 
-    private final String[] tokens;
-
-    private StringTokenizer(final String text) {
+    public String[] tokenize(final String text) {
         final List<String> delimiters = new ArrayList<>(DEFAULT_DELIMITERS);
         final Matcher matcher = CUSTOM_DELIMITER_REGEX_PATTERN.matcher(text);
 
@@ -26,19 +24,6 @@ public class StringTokenizer {
         }
 
         final String delimiterRegex = String.join(DELIMITER_SEPARATOR, delimiters);
-        this.tokens = operandText.split(delimiterRegex);
-    }
-
-    public static StringTokenizer of(final String text) {
-        return new StringTokenizer(text);
-    }
-
-    public boolean isEmpty() {
-        final int count = this.tokens.length;
-        return count < 1 || count == 1 && this.tokens[0].isEmpty();
-    }
-
-    public String[] tokenize() {
-        return this.tokens;
+        return operandText.split(delimiterRegex);
     }
 }

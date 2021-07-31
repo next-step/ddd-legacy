@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public class StringCalculator {
     private static final int DEFAULT_RETURN_VALUE = 0;
+    private static final StringTokenizer stringTokenizer = new StringTokenizer();
     private static final String VALID_TOKEN_REGEX = "^[0-9]+$";
     private static final String INVALID_TOKEN_ERROR_MESSAGE = "숫자 이외의 값 또는 음수는 전달할 수 없습니다: \"%s\"";
     private static final String ERROR_TOKEN_MESSAGE_DELIMITER = "\", \"";
@@ -13,13 +14,13 @@ public class StringCalculator {
             return DEFAULT_RETURN_VALUE;
         }
 
-        StringTokenizer stringTokenizer = StringTokenizer.of(text);
+        final String[] tokens = stringTokenizer.tokenize(text);
 
-        if (stringTokenizer.isEmpty()) {
+        final int count = tokens.length;
+        if (count < 1 || count == 1 && tokens[0].isEmpty()) {
             return DEFAULT_RETURN_VALUE;
         }
 
-        final String[] tokens = stringTokenizer.tokenize();
         validateTokens(tokens);
         return calculate(tokens);
     }
