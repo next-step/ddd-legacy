@@ -21,19 +21,19 @@ public class Numbers {
                 .collect(Collectors.toList());
     }
 
-    private void checkNegative(String[] tokens) {
-        Arrays.stream(tokens)
-                .mapToInt(Integer::parseInt)
-                .forEach(this::validateNegative);
-    }
-
     public int calculate(CalculateStrategy strategy) {
         return this.numbers.stream()
                 .reduce(strategy::calculate)
                 .orElse(ZERO);
     }
 
-    public void validateNegative(int number) {
+    private void checkNegative(String[] tokens) {
+        Arrays.stream(tokens)
+                .mapToInt(Integer::parseInt)
+                .forEach(this::validateNegative);
+    }
+
+    private void validateNegative(int number) {
         if (number < ZERO) {
             throw new RuntimeException("음수는 사용할 수 없습니다");
         }
