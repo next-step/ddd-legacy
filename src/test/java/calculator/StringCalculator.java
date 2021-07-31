@@ -1,6 +1,7 @@
 package calculator;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public class StringCalculator {
     private static final int DEFAULT_RETURN_VALUE = 0;
@@ -10,7 +11,7 @@ public class StringCalculator {
     private static final String ERROR_TOKEN_MESSAGE_DELIMITER = "\", \"";
 
     public int add(final String text) throws RuntimeException {
-        if (text == null) {
+        if (Objects.isNull(text)) {
             return DEFAULT_RETURN_VALUE;
         }
 
