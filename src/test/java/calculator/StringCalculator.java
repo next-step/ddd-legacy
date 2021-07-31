@@ -11,9 +11,7 @@ public class StringCalculator {
         TokenizerFactory tokenizerFactory = new TokenizerFactory(text);
         Tokenizer tokenizer = tokenizerFactory.createTokenizer();
 
-        Text input = new Text(text, tokenizer);
-
-        Numbers numbers = input.getNumbers();
+        Numbers numbers = new Numbers(tokenizer.split());
         CalculateStrategy addStrategy = new AddCalculateStrategy();
 
         return numbers.calculate(addStrategy);
