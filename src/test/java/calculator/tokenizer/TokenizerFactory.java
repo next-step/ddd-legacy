@@ -7,6 +7,7 @@ public class TokenizerFactory {
 
     private static final String COMMA_DELIMITER = ",";
     private static final String COLON_DELIMITER = ":";
+    private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     private final String text;
 
@@ -18,13 +19,16 @@ public class TokenizerFactory {
         if (isNullOrEmpty()) {
             return new EmptyTokenizer();
         }
-        Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
+
         if (hasCommaOrColon()) {
             return new DefaultTokenizer(text);
         }
+
+        Matcher matcher = CUSTOM_PATTERN.matcher(text);
         if (matcher.find()) {
             return new CustomTokenizer(matcher);
         }
+
         return new NoneTokenizer(text);
     }
 
