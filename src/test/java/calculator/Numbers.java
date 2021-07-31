@@ -10,7 +10,7 @@ public class Numbers {
 
     public static final int ZERO = 0;
 
-    private List<Integer> numbers;
+    private final List<Integer> numbers;
 
     public Numbers(String[] tokens) {
         checkNegative(tokens);
