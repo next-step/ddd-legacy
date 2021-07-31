@@ -42,7 +42,6 @@ public class StringOperands {
         }
 
         StringOperands that = (StringOperands) o;
-
         return operands.equals(that.operands);
     }
 
