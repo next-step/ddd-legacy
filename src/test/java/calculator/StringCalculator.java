@@ -1,6 +1,5 @@
 package calculator;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class StringCalculator {
@@ -15,20 +14,18 @@ public class StringCalculator {
             return DEFAULT_RETURN_VALUE;
         }
 
-        final String[] tokens = stringTokenizer.tokenize(text);
-
-        final int count = tokens.length;
-        if (count < 1 || count == 1 && tokens[0].isEmpty()) {
+        final StringOperands stringOperands = stringTokenizer.tokenize(text);
+        if (stringOperands.isEmpty()) {
             return DEFAULT_RETURN_VALUE;
         }
 
-        validateTokens(tokens);
-        return calculate(tokens);
+        validateTokens(stringOperands);
+        return calculate(stringOperands);
     }
 
-    private void validateTokens(String[] tokens) throws RuntimeException {
-        final String[] exceptTokens = Arrays.stream(tokens)
-                .filter(token -> !token.matches(VALID_TOKEN_REGEX))
+    private void validateTokens(StringOperands stringOperands) throws RuntimeException {
+        final String[] exceptTokens = stringOperands.stream()
+                .filter(operand -> !operand.matches(VALID_TOKEN_REGEX))
                 .toArray(String[]::new);
 
         if (exceptTokens.length > 0) {
@@ -40,8 +37,8 @@ public class StringCalculator {
         }
     }
 
-    private int calculate(String[] tokens) {
-        return Arrays.stream(tokens)
+    private int calculate(StringOperands stringOperands) {
+        return stringOperands.stream()
                 .mapToInt(Integer::parseInt)
                 .sum();
     }

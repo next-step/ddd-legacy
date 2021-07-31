@@ -6,8 +6,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,39 +21,39 @@ public class StringTokenizerTest {
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자 토큰을 반환한다.")
     @ParameterizedTest
     @MethodSource("provideTwoNumbers")
-    void twoNumbers(final String text, final List<String> tokens) {
-        assertThat(tokenizer.tokenize(text)).containsAll(tokens);
+    void twoNumbers(final String text, final StringOperands expected) {
+        assertThat(tokenizer.tokenize(text)).isEqualTo(expected);
     }
 
     private static Stream<Arguments> provideTwoNumbers() {
         return Stream.of(
-                Arguments.of("1,2", Arrays.asList("1", "2"))
+                Arguments.of("1,2", StringOperands.of("1,2", ",|:"))
         );
     }
 
     @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용해 토큰화 할 수 있다.")
     @ParameterizedTest
     @MethodSource("provideColons")
-    void colons(final String text) {
-        assertThat(tokenizer.tokenize(text));
+    void colons(final String text, final StringOperands expected) {
+        assertThat(tokenizer.tokenize(text)).isEqualTo(expected);
     }
 
     private static Stream<Arguments> provideColons() {
         return Stream.of(
-                Arguments.of("1,2:3", Arrays.asList("1", "2", "3"))
+                Arguments.of("1,2:3", StringOperands.of("1,2:3", ",|:"))
         );
     }
 
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정해 토큰화 할 수 있다.")
     @ParameterizedTest
     @MethodSource("provideCustomDelimiter")
-    void customDelimiter(final String text) {
-        assertThat(tokenizer.tokenize(text));
+    void customDelimiter(final String text, final StringOperands expected) {
+        assertThat(tokenizer.tokenize(text)).isEqualTo(expected);
     }
 
     private static Stream<Arguments> provideCustomDelimiter() {
         return Stream.of(
-                Arguments.of("//;\n1;2;3", Arrays.asList("1", "2", "3"))
+                Arguments.of("//;\n1;2;3", StringOperands.of("1;2;3", ",|:|;"))
         );
     }
 }

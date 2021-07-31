@@ -13,17 +13,17 @@ public class StringTokenizer {
     private static final int TEXT_MATCHING_GROUP = 2;
     private static final String DELIMITER_SEPARATOR = "|";
 
-    public String[] tokenize(final String text) {
+    public StringOperands tokenize(final String text) {
         final List<String> delimiters = new ArrayList<>(DEFAULT_DELIMITERS);
         final Matcher matcher = CUSTOM_DELIMITER_REGEX_PATTERN.matcher(text);
 
-        String operandText = text;
+        String operandsText = text;
         if (matcher.find()) {
             delimiters.add(matcher.group(DELIMITER_MATCHING_GROUP));
-            operandText = matcher.group(TEXT_MATCHING_GROUP);
+            operandsText = matcher.group(TEXT_MATCHING_GROUP);
         }
 
         final String delimiterRegex = String.join(DELIMITER_SEPARATOR, delimiters);
-        return operandText.split(delimiterRegex);
+        return StringOperands.of(operandsText, delimiterRegex);
     }
 }
