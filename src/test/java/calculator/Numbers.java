@@ -12,7 +12,7 @@ public class Numbers {
 
     private List<Integer> numbers;
 
-    public Numbers(String... tokens) {
+    public Numbers(String[] tokens) {
         this.numbers = Arrays.stream(tokens)
                 .mapToInt(Integer::parseInt)
                 .peek(number -> hasNegative(number))
