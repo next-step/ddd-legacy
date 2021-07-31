@@ -10,10 +10,12 @@ public class StringCalculator {
     public int add(final String text) {
         TokenizerFactory tokenizerFactory = new TokenizerFactory(text);
         Tokenizer tokenizer = tokenizerFactory.createTokenizer();
-        CalculateStrategy addStrategy = new AddCalculateStrategy();
+
         Text input = new Text(text, tokenizer);
 
         Numbers numbers = input.getNumbers();
+        CalculateStrategy addStrategy = new AddCalculateStrategy();
+
         return numbers.calculate(addStrategy);
     }
 }
