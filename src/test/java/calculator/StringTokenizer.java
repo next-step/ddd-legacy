@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class StringTokenizer {
     private static final List<String> DEFAULT_DELIMITERS = Arrays.asList(",", ":");
-    private static final String CUSTOM_DELIMITER_REGEX = "//(.)\n(.*)";
+    private static final Pattern CUSTOM_DELIMITER_REGEX_PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final int DELIMITER_MATCHING_GROUP = 1;
     private static final int TEXT_MATCHING_GROUP = 2;
     private static final String DELIMITER_SEPARATOR = "|";
@@ -17,7 +17,7 @@ public class StringTokenizer {
 
     private StringTokenizer(final String text) {
         final List<String> delimiters = new ArrayList<>(DEFAULT_DELIMITERS);
-        final Matcher matcher = Pattern.compile(CUSTOM_DELIMITER_REGEX).matcher(text);
+        final Matcher matcher = CUSTOM_DELIMITER_REGEX_PATTERN.matcher(text);
 
         String operandText = text;
         if (matcher.find()) {
