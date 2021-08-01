@@ -13,10 +13,14 @@ public class StringOperands {
 
     private StringOperands(final String operandsText, final String delimiterRegex) {
         if (!operandsText.isEmpty()) {
-            Arrays.stream(operandsText.split(delimiterRegex))
-                    .map(StringOperand::of)
-                    .forEach(operands::add);
+            addStringOperandsToList(operandsText, delimiterRegex);
         }
+    }
+
+    private void addStringOperandsToList(final String operandsText, final String delimiterRegex) {
+        Arrays.stream(operandsText.split(delimiterRegex))
+                .map(StringOperand::of)
+                .forEach(operands::add);
     }
 
     public static StringOperands of(final String operandsText, final String delimiterRegex) {
