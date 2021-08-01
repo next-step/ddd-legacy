@@ -10,16 +10,14 @@ public class StringCalculatorTest {
     @DisplayName("입력된 문자열이 null일 경우 0을 리턴한다.")
     @Test
     void inputNullTest() {
-        StringCalculator calculator = new StringCalculator();
-        int result = calculator.calculate(null);
+        int result = StringCalculator.calculate(null);
         assertThat(result).isZero();
     }
 
     @DisplayName("입력된 문자열이 공백일 경우 0을 리턴한다.")
     @Test
     void inputEmptyTest() {
-        StringCalculator calculator = new StringCalculator();
-        int result = calculator.calculate("");
+        int result = StringCalculator.calculate("");
         assertThat(result).isZero();
     }
 
@@ -27,8 +25,7 @@ public class StringCalculatorTest {
     @Test
     void runtimeExceptionTest() {
         String text = "A,2,1";
-        StringCalculator calculator = new StringCalculator();
-        assertThatThrownBy(() -> calculator.calculate(text))
+        assertThatThrownBy(() -> StringCalculator.calculate(text))
                 .isInstanceOf(RuntimeException.class);
     }
 
@@ -36,8 +33,7 @@ public class StringCalculatorTest {
     @Test
     void calculateTest() {
         String text = "1,2:3";
-        StringCalculator calculator = new StringCalculator();
-        int result = calculator.calculate(text);
+        int result = StringCalculator.calculate(text);
         assertThat(result).isEqualTo(6);
     }
 
@@ -45,8 +41,7 @@ public class StringCalculatorTest {
     @Test
     void calculateWithCustomTest() {
         String text = "//;\n1;2;3";
-        StringCalculator calculator = new StringCalculator();
-        int result = calculator.calculate(text);
+        int result = StringCalculator.calculate(text);
         assertThat(result).isEqualTo(6);
     }
 }

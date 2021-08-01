@@ -7,13 +7,14 @@ public class StringCalculator {
     public static final String DEFAULT_SEPARATOR = "[,:]";
     public static final String PATTERN_ONLY_NUMBER = "^[0-9]*$";
     public static final String PATTERN_CUSTOM = "//(.)\n(.*)";
-    private int result = 0;
+    private static final Pattern pattern = Pattern.compile(PATTERN_CUSTOM);
+    private static int result = 0;
 
-    public int calculate(String text) throws RuntimeException {
+    public static int calculate(String text) throws RuntimeException {
         if (text == null || text.isEmpty()) {
             return 0;
         }
-        Pattern pattern = Pattern.compile(PATTERN_CUSTOM);
+
         Matcher matcher = pattern.matcher(text);
         String separator = DEFAULT_SEPARATOR;
         if (matcher.find()) {
@@ -30,14 +31,14 @@ public class StringCalculator {
         return result;
     }
 
-    private void checkOnlyNumber(String[] numbers) {
+    private static void checkOnlyNumber(String[] numbers) {
         boolean regex = Pattern.matches(PATTERN_ONLY_NUMBER, String.join("", numbers));
         if (!regex) {
             throw new RuntimeException("Not Numbers");
         }
     }
 
-    private void add(String number) {
+    private static void add(String number) {
         result += Integer.parseInt(number);
     }
 }
