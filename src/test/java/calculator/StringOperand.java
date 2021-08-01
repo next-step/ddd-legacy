@@ -50,6 +50,6 @@ public class StringOperand {
 
     @Override
     public int hashCode() {
-        return operand != null ? operand.hashCode() : 0;
+        return Objects.isNull(operand) ? 0 : operand.hashCode();
     }
 }
