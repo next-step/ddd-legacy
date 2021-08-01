@@ -1,4 +1,4 @@
-package calculator;
+package calculator.number;
 
 import calculator.calculate.CalculateStrategy;
 

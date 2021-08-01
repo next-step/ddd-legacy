@@ -1,6 +1,6 @@
 package calculator.calculate;
 
-import calculator.Number;
+import calculator.number.Number;
 
 public class AddCalculateStrategy implements CalculateStrategy {
 

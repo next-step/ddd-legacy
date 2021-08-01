@@ -2,6 +2,8 @@ package calculator;
 
 import calculator.calculate.AddCalculateStrategy;
 import calculator.calculate.CalculateStrategy;
+import calculator.number.Numbers;
+import calculator.number.PositiveNumbers;
 import calculator.tokenizer.Tokenizer;
 import calculator.tokenizer.TokenizerFactory;
 

@@ -1,4 +1,4 @@
-package calculator;
+package calculator.number;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

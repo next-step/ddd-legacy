@@ -1,4 +1,4 @@
-package calculator;
+package calculator.tokenizer;
 
 import calculator.tokenizer.*;
 import org.junit.jupiter.api.DisplayName;
