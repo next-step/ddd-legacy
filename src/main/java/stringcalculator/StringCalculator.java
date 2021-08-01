@@ -10,7 +10,7 @@ public class StringCalculator {
 			return 0;
 		}
 
-		String[] numbers = inputNumber.split(",");
+		String[] numbers = inputNumber.split(",|:");
 
 		if (numbers.length > 1) {
 			return Arrays.stream(numbers).mapToInt(i -> Integer.parseInt(i)).sum();
