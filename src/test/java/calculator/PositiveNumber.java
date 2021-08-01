@@ -9,13 +9,25 @@ public class PositiveNumber {
     public static final String NOT_NUMBER_EXCEPTION_MESSAGE = "0 이상의 숫자를 넣어주세요";
     private final int value;
 
-    public PositiveNumber(final String value) {
-        final int number = parseToInt(value);
+    private PositiveNumber(final int number) {
         checkNegativenumber(number);
         this.value = number;
     }
 
-    private int parseToInt(final String value) {
+    public static PositiveNumber of(final String value) {
+        final int number = parseToInt(value);
+        return of(number);
+    }
+
+    public static PositiveNumber of(final int number) {
+        return new PositiveNumber(number);
+    }
+
+    public static PositiveNumber sum(final PositiveNumber positiveNumber1, final PositiveNumber positiveNumber2) {
+        return PositiveNumber.of(positiveNumber1.getValue() + positiveNumber2.getValue());
+    }
+
+    private static int parseToInt(final String value) {
         try {
             return Integer.parseInt(value);
         } catch (final Exception e) {
