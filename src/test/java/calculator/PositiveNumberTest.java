@@ -31,7 +31,8 @@ public class PositiveNumberTest {
     @ParameterizedTest
     @ValueSource(strings = {"0", "1", "2", "100", "1000", "2100000000"})
     void positiveNumber(final String text) {
-        assertThat(PositiveNumber.of(text).getValue())
+        assertThat(PositiveNumber.of(text)
+            .getValue())
             .isEqualTo(Integer.parseInt(text));
     }
 

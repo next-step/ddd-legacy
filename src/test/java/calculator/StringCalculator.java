@@ -1,6 +1,5 @@
 package calculator;
 
-import java.util.Arrays;
 import org.springframework.util.StringUtils;
 
 public class StringCalculator {
@@ -15,11 +14,7 @@ public class StringCalculator {
     }
 
     private int calculate(final Seperator seperator) {
-        return Arrays.stream(seperator.getTargetNumber()
-            .split(seperator.getDelimiter()))
-            .map(PositiveNumber::of)
-            .map(PositiveNumber::getValue)
-            .mapToInt(i -> i)
+        return PositiveNumbers.of(seperator)
             .sum();
     }
 
