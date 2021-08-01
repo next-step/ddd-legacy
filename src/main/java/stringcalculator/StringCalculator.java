@@ -16,25 +16,13 @@ public class StringCalculator {
 		if (m.find()) {
 			String customDelimiter = m.group(1);
 			String[] tokens= m.group(2).split(customDelimiter);
-			return Arrays.stream(tokens).mapToInt(i -> {
-				int number = Integer.parseInt(i);
-				if (number < 0) {
-					throw new RuntimeException();
-				}
-				return number;
-			}).sum();
+			return getSum(tokens);
 		}
 
 		String[] numbers = inputNumber.split(",|:");
 
 		if (numbers.length > 1) {
-			return Arrays.stream(numbers).mapToInt(i -> {
-				int number = Integer.parseInt(i);
-				if (number < 0) {
-					throw new RuntimeException();
-				}
-				return number;
-			}).sum();
+			return getSum(numbers);
 		}
 
 		if (Integer.parseInt(inputNumber) < 0) {
@@ -42,5 +30,15 @@ public class StringCalculator {
 		}
 
 		return Integer.parseInt(inputNumber);
+	}
+
+	private int getSum(String[] tokens) {
+		return Arrays.stream(tokens).mapToInt(i -> {
+			int number = Integer.parseInt(i);
+			if (number < 0) {
+				throw new RuntimeException();
+			}
+			return number;
+		}).sum();
 	}
 }
