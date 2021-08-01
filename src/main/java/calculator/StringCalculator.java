@@ -1,9 +1,5 @@
 package calculator;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 public class StringCalculator {
 
     public static final int DEFAULT_VALUE = 0;
@@ -13,23 +9,15 @@ public class StringCalculator {
             return DEFAULT_VALUE;
         }
 
-        StringDelimiter delimiter = new StringDelimiter();
-        List<Number> numbers = Stream.of(delimiter.parse(text))
-                                    .map(Number::new)
-                                    .collect(Collectors.toList());
+        Delimiter delimiter = new StringDelimiter();
+        CalculateStrategy sum = new SumCalculateStrategy();
 
-        return this.calculate(numbers);
+        String[] textArray = delimiter.parse(text);
+
+        return sum.calculate(textArray);
     }
 
     private boolean isEmpty(final String text) {
         return text == null || text.isEmpty();
-    }
-
-    private int calculate(final List<Number> numbers) {
-        int sum = 0;
-        for (Number number : numbers) {
-            sum += number.getValue();
-        }
-        return sum;
     }
 }
