@@ -89,13 +89,6 @@ public class StringCalculatorTest {
 
     @Test
     void whiteSpace() {
-        assertThat(StringUtils.isEmpty(null)).isTrue();
-        assertThat(StringUtils.isEmpty("")).isTrue();
-        assertThat(StringUtils.isEmpty(" ")).isFalse();
-
-        assertThat(org.springframework.util.StringUtils.hasText(null)).isFalse();
-        assertThat(org.springframework.util.StringUtils.hasText("")).isFalse();
-        assertThat(org.springframework.util.StringUtils.hasText(" ")).isFalse();
         assertAll(
             () -> assertThat(StringUtils.isEmpty(null)).isTrue(),
             () -> assertThat(StringUtils.isEmpty("")).isTrue(),
