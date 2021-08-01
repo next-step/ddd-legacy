@@ -7,7 +7,7 @@ import java.util.Objects;
 public class StringOperand {
     private static final String VALID_TOKEN_REGEX = "^[0-9]+$";
     private static final String INVALID_TOKEN_ERROR_MESSAGE = "숫자 이외의 값 또는 음수는 전달할 수 없습니다: \"%s\"";
-    private static final Map<String, StringOperand> STRING_OPERAND_MAP = new HashMap<>();
+    private static final Map<String, StringOperand> INSTANCE_MAP = new HashMap<>();
 
     private final String operand;
 
@@ -18,10 +18,10 @@ public class StringOperand {
     public static StringOperand of(final String operand) {
         validateOperand(operand);
 
-        if (!STRING_OPERAND_MAP.containsKey(operand)) {
-            STRING_OPERAND_MAP.put(operand, new StringOperand(operand));
+        if (!INSTANCE_MAP.containsKey(operand)) {
+            INSTANCE_MAP.put(operand, new StringOperand(operand));
         }
-        return STRING_OPERAND_MAP.get(operand);
+        return INSTANCE_MAP.get(operand);
     }
 
     private static void validateOperand(final String operand) throws RuntimeException {
