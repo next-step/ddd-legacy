@@ -5,7 +5,8 @@ import java.util.function.IntBinaryOperator;
 
 public class StringCalculator {
     private static final int DEFAULT_RETURN_VALUE = 0;
-    private static final StringTokenizer stringTokenizer = new StringTokenizer();
+
+    private final StringTokenizer stringTokenizer = new StringTokenizer();
 
     public int add(final String text) {
         return calculate(text, Integer::sum);
