@@ -1,18 +1,19 @@
 package calculator.tokenizer;
 
-import java.util.regex.Matcher;
-
 public class CustomTokenizer implements Tokenizer {
 
-    private Matcher matcher;
+    private static final int FIRST = 1;
+    private static final int SECOND = 2;
 
-    public CustomTokenizer(Matcher matcher) {
-        this.matcher = matcher;
+    private CustomPattern pattern;
+
+    public CustomTokenizer(CustomPattern pattern) {
+        this.pattern = pattern;
     }
 
     @Override
     public String[] split() {
-        String customDelimiter = matcher.group(1);
-        return matcher.group(2).split(customDelimiter);
+        String customDelimiter = pattern.group(FIRST);
+        return pattern.group(SECOND).split(customDelimiter);
     }
 }

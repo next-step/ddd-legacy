@@ -8,15 +8,16 @@ public class TokenizerFactory {
     private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     private final String text;
+    private final CustomPattern customPattern;
 
-    public TokenizerFactory(String text) {
+    public TokenizerFactory(final String text) {
         this.text = text;
+        this.customPattern = new CustomPattern(text);
     }
 
     public Tokenizer createTokenizer() {
-        Matcher matcher = CUSTOM_PATTERN.matcher(text);
-        if (matcher.find()) {
-            return new CustomTokenizer(matcher);
+        if (customPattern.find()) {
+            return new CustomTokenizer(customPattern);
         }
         return new DefaultTokenizer(text);
     }

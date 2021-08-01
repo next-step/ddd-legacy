@@ -44,11 +44,10 @@ public class TokenizerTest {
     @ParameterizedTest(name = "{0} 문자열 분리")
     @ValueSource(strings = {"//;\n1;2;3"})
     void customTokenizer(final String text) {
-        Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
-        if (matcher.find()) {
-            Tokenizer tokenizer = new CustomTokenizer(matcher);
+        CustomPattern pattern = new CustomPattern(text);
+        if (pattern.find()) {
+            Tokenizer tokenizer = new CustomTokenizer(pattern);
             assertThat(tokenizer.split()).contains("1","2","3");
         }
     }
-
 }
