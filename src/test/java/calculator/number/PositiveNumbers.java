@@ -30,10 +30,6 @@ public class PositiveNumbers implements Numbers{
     }
 
     public static Numbers of(final String text) {
-        if (isEmptyOrNull(text)) {
-            return PositiveNumbers.ZERO;
-        }
-
         final TokenizerFactory tokenizerFactory = new TokenizerFactory(text);
         final Tokenizer tokenizer = tokenizerFactory.createTokenizer();
         return PositiveNumbers.of(tokenizer);
@@ -42,9 +38,5 @@ public class PositiveNumbers implements Numbers{
     public Number calculate(final CalculateStrategy strategy) {
         return this.numbers.stream()
                 .reduce(PositiveNumber.ZERO, strategy::calculate);
-    }
-
-    private static boolean isEmptyOrNull(final String text) {
-        return text == null || text.isEmpty();
     }
 }

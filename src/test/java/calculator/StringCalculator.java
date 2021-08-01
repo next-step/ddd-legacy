@@ -1,19 +1,22 @@
 package calculator;
 
 import calculator.calculate.AddCalculateStrategy;
-import calculator.calculate.CalculateStrategy;
-import calculator.number.Numbers;
+import calculator.number.PositiveNumber;
 import calculator.number.PositiveNumbers;
-import calculator.tokenizer.Tokenizer;
-import calculator.tokenizer.TokenizerFactory;
 
 public class StringCalculator {
 
     public int add(final String text) {
-        final Numbers numbers = PositiveNumbers.of(text);
+        if (isNullOrEmpty(text)) {
+            return PositiveNumber.ZERO.getNumber();
+        }
 
-        return numbers
+        return PositiveNumbers.of(text)
                 .calculate(new AddCalculateStrategy())
                 .getNumber();
+    }
+
+    private boolean isNullOrEmpty(String text) {
+        return text == null || text.isEmpty();
     }
 }
