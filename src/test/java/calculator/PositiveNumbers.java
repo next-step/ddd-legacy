@@ -27,8 +27,8 @@ public class PositiveNumbers {
 
     public int sum() {
         return numbers.stream()
-            .reduce(PositiveNumber.of(ZERO), PositiveNumber::sum)
-            .getValue();
+            .mapToInt(PositiveNumber::getValue)
+            .sum();
     }
 
     @Override

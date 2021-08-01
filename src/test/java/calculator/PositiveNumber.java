@@ -24,10 +24,6 @@ public class PositiveNumber {
         return new PositiveNumber(number);
     }
 
-    public static PositiveNumber sum(final PositiveNumber positiveNumber1, final PositiveNumber positiveNumber2) {
-        return PositiveNumber.of(positiveNumber1.getValue() + positiveNumber2.getValue());
-    }
-
     private static int parseToInt(final String value) {
         try {
             return Integer.parseInt(value);
