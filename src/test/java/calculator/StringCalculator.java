@@ -13,7 +13,7 @@ public class StringCalculator {
         TokenizerFactory tokenizerFactory = new TokenizerFactory(text);
         Tokenizer tokenizer = tokenizerFactory.createTokenizer();
 
-        Numbers numbers = new PositiveNumbers(tokenizer.split());
+        Numbers numbers = PositiveNumbers.of(text, tokenizer);
         CalculateStrategy addStrategy = new AddCalculateStrategy();
 
         return numbers.calculate(addStrategy).getNumber();
