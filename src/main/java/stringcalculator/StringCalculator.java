@@ -25,14 +25,14 @@ public class StringCalculator {
 			return getSum(numbers);
 		}
 
-		return ConvertNumberToInteger(inputNumber);
+		return convertNumberToInteger(inputNumber);
 	}
 
 	private int getSum(String[] tokens) {
-		return Arrays.stream(tokens).mapToInt(i -> ConvertNumberToInteger(i)).sum();
+		return Arrays.stream(tokens).mapToInt(i -> convertNumberToInteger(i)).sum();
 	}
 
-	private Integer ConvertNumberToInteger(String inputNumber) {
+	private Integer convertNumberToInteger(String inputNumber) {
 		if (Integer.parseInt(inputNumber) < 0) {
 			throw new RuntimeException();
 		}
