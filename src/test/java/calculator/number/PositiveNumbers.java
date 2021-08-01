@@ -2,6 +2,7 @@ package calculator.number;
 
 import calculator.calculate.CalculateStrategy;
 import calculator.tokenizer.Tokenizer;
+import calculator.tokenizer.TokenizerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,20 +19,23 @@ public class PositiveNumbers implements Numbers{
         this.numbers = Collections.emptyList();
     }
 
-    public PositiveNumbers(String[] tokens) {
+    public PositiveNumbers(final String[] tokens) {
         this.numbers = Arrays.stream(tokens)
                 .map(PositiveNumber::new)
                 .collect(Collectors.toList());
     }
 
-    public static Numbers of(Tokenizer tokenizer) {
+    public static Numbers of(final Tokenizer tokenizer) {
         return new PositiveNumbers(tokenizer.split());
     }
 
-    public static Numbers of(final String text, final Tokenizer tokenizer) {
+    public static Numbers of(final String text) {
         if (isEmptyOfNull(text)) {
             return PositiveNumbers.ZERO;
         }
+
+        final TokenizerFactory tokenizerFactory = new TokenizerFactory(text);
+        final Tokenizer tokenizer = tokenizerFactory.createTokenizer();
         return PositiveNumbers.of(tokenizer);
     }
 

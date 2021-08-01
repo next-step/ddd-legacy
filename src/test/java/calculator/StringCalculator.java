@@ -10,12 +10,10 @@ import calculator.tokenizer.TokenizerFactory;
 public class StringCalculator {
 
     public int add(final String text) {
-        TokenizerFactory tokenizerFactory = new TokenizerFactory(text);
-        Tokenizer tokenizer = tokenizerFactory.createTokenizer();
+        Numbers numbers = PositiveNumbers.of(text);
 
-        Numbers numbers = PositiveNumbers.of(text, tokenizer);
-        CalculateStrategy addStrategy = new AddCalculateStrategy();
-
-        return numbers.calculate(addStrategy).getNumber();
+        return numbers
+                .calculate(new AddCalculateStrategy())
+                .getNumber();
     }
 }

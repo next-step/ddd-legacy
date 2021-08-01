@@ -32,24 +32,6 @@ public class TokenizerTest {
         assertThat(tokenizer).isInstanceOf(CustomTokenizer.class);
     }
 
-    @DisplayName("문자가 null이나 비어있으면 EmptyTokenizer를 반환한다.")
-    @ParameterizedTest(name = "{0}인 경우, EmptyTokenizer 반환")
-    @NullAndEmptySource
-    void tokenizerFactoryEmtpy(final String text) {
-        TokenizerFactory factory = new TokenizerFactory(text);
-        Tokenizer tokenizer = factory.createTokenizer();
-        assertThat(tokenizer).isInstanceOf(EmptyTokenizer.class);
-    }
-
-    @DisplayName("일반 숫자형 문자인 경우 NonTokenizer를 반환한다.")
-    @ParameterizedTest(name = "{0}인 경우, NonTokenizer 반환")
-    @ValueSource(strings = {"1","2"})
-    void tokenizerFactoryNone(final String text) {
-        TokenizerFactory factory = new TokenizerFactory(text);
-        Tokenizer tokenizer = factory.createTokenizer();
-        assertThat(tokenizer).isInstanceOf(NoneTokenizer.class);
-    }
-
     @DisplayName("DefaultTokenizer로 ,혹은 :를 구분자로 문자를 분리한다.")
     @ParameterizedTest(name = "{0} 문자열 분리")
     @ValueSource(strings = {"1,2","1:2"})
