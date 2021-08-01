@@ -25,9 +25,7 @@ public class StringCalculator {
 			return getSum(numbers);
 		}
 
-		if (Integer.parseInt(inputNumber) < 0) {
-			throw new RuntimeException();
-		}
+		ValidateNegativeNumber(inputNumber);
 
 		return Integer.parseInt(inputNumber);
 	}
@@ -40,5 +38,11 @@ public class StringCalculator {
 			}
 			return number;
 		}).sum();
+	}
+
+	private void ValidateNegativeNumber(String inputNumber) {
+		if (Integer.parseInt(inputNumber) < 0) {
+			throw new RuntimeException();
+		}
 	}
 }
