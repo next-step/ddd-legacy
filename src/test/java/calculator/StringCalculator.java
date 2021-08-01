@@ -10,7 +10,7 @@ import calculator.tokenizer.TokenizerFactory;
 public class StringCalculator {
 
     public int add(final String text) {
-        Numbers numbers = PositiveNumbers.of(text);
+        final Numbers numbers = PositiveNumbers.of(text);
 
         return numbers
                 .calculate(new AddCalculateStrategy())

@@ -30,7 +30,7 @@ public class PositiveNumbers implements Numbers{
     }
 
     public static Numbers of(final String text) {
-        if (isEmptyOfNull(text)) {
+        if (isEmptyOrNull(text)) {
             return PositiveNumbers.ZERO;
         }
 
@@ -44,7 +44,7 @@ public class PositiveNumbers implements Numbers{
                 .reduce(PositiveNumber.ZERO, strategy::calculate);
     }
 
-    private static boolean isEmptyOfNull(String text) {
+    private static boolean isEmptyOrNull(final String text) {
         return text == null || text.isEmpty();
     }
 }

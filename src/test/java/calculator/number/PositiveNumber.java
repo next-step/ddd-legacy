@@ -8,7 +8,7 @@ public class PositiveNumber implements Number {
 
     public static final Number ZERO = new PositiveNumber(VALUE_ZERO);
 
-    private int number;
+    private final int number;
 
     public PositiveNumber(final String value) {
         final int number = parseInt(value);
@@ -22,7 +22,7 @@ public class PositiveNumber implements Number {
     }
 
     @Override
-    public Number sum(Number value) {
+    public Number sum(final Number value) {
         return new PositiveNumber(number + value.getNumber());
     }
 

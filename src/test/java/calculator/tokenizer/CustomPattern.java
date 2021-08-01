@@ -9,7 +9,7 @@ public class CustomPattern {
 
     private final Matcher matcher;
 
-    public CustomPattern(String text) {
+    public CustomPattern(final String text) {
         matcher = CUSTOM_PATTERN.matcher(text);
     }
 
@@ -17,7 +17,7 @@ public class CustomPattern {
         return matcher.find();
     }
 
-    public String group(int number) {
+    public String group(final int number) {
         return matcher.group(number);
     }
 }
