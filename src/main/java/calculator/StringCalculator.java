@@ -1,8 +1,6 @@
 package calculator;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -11,26 +9,20 @@ public class StringCalculator {
     public static final int DEFAULT_VALUE = 0;
 
     public int add(final String text) {
-        if (text == null || text.isEmpty()) {
+        if (this.isEmpty(text)) {
             return DEFAULT_VALUE;
         }
 
-        String[] textArr = this.parsingDelimiter(text);
-        List<Number> numbers = Stream.of(textArr)
+        StringDelimiter delimiter = new StringDelimiter();
+        List<Number> numbers = Stream.of(delimiter.parse(text))
                                     .map(Number::new)
                                     .collect(Collectors.toList());
 
         return this.calculate(numbers);
     }
 
-    private String[] parsingDelimiter(final String text) {
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
-
-        if (m.find()) {
-            String customDelimiter = m.group(1);
-            return m.group(2).split(customDelimiter);
-        }
-        return text.split("[,:]");
+    private boolean isEmpty(final String text) {
+        return text == null || text.isEmpty();
     }
 
     private int calculate(final List<Number> numbers) {
