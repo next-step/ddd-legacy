@@ -1,9 +1,11 @@
 package calculator.calculate;
 
+import calculator.Number;
+
 public class AddCalculateStrategy implements CalculateStrategy {
 
     @Override
-    public int calculate(int first, int second) {
-        return first + second;
+    public Number calculate(Number first, Number second) {
+        return first.sum(second);
     }
 }

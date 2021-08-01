@@ -14,6 +14,6 @@ public class StringCalculator {
         Numbers numbers = new Numbers(tokenizer.split());
         CalculateStrategy addStrategy = new AddCalculateStrategy();
 
-        return numbers.calculate(addStrategy);
+        return numbers.calculate(addStrategy).getNumber();
     }
 }

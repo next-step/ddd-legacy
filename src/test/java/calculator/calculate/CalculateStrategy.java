@@ -1,6 +1,8 @@
 package calculator.calculate;
 
+import calculator.Number;
+
 public interface CalculateStrategy {
 
-    int calculate(int first, int second);
+    Number calculate(Number first, Number second);
 }

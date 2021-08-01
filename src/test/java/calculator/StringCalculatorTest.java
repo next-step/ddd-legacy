@@ -65,7 +65,7 @@ public class StringCalculatorTest {
     @DisplayName(value = "문자열 계산기에 문자를 전달하는 경우 NumberFormatException 예외 처리를 한다.")
     @Test
     void text() {
-        assertThatExceptionOfType(NumberFormatException.class)
+        assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> calculator.add("a"));
     }
 }
