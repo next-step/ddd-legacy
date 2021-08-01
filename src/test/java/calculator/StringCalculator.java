@@ -5,7 +5,7 @@ import org.springframework.util.StringUtils;
 
 public class StringCalculator {
 
-    public static final int ZERO = 0;
+    private static final int ZERO = 0;
 
     public int calculate(final String stringNumber) {
         if (isBlank(stringNumber)) {

@@ -4,9 +4,10 @@ import java.util.Objects;
 
 public class PositiveNumber {
 
-    public static final int ZERO = 0;
-    public static final String NEGATIVE_EXCEPTION_MESSAGE = "0 이상의 값을 넣어주세요";
-    public static final String NOT_NUMBER_EXCEPTION_MESSAGE = "0 이상의 숫자를 넣어주세요";
+    private static final int ZERO = 0;
+    private static final String NEGATIVE_EXCEPTION_MESSAGE = "0 이상의 값을 넣어주세요";
+    private static final String NOT_NUMBER_EXCEPTION_MESSAGE = "0 이상의 숫자를 넣어주세요";
+
     private final int value;
 
     private PositiveNumber(final int number) {

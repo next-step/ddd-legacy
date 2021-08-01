@@ -5,11 +5,11 @@ import java.util.regex.Pattern;
 
 public class Seperator {
 
-    public static final String DEFAULT_DELIMITER = ",|:";
-    public static final String SEPARATOR = "|";
-    public static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
-    public static final int ONE = 1;
-    public static final int TWO = 2;
+    static final String DEFAULT_DELIMITER = ",|:";
+    static final String SEPARATOR = "|";
+    static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
+    static final int ONE = 1;
+    static final int TWO = 2;
 
     private final String targetNumber;
     private final String delimiter;
