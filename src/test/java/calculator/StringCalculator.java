@@ -18,9 +18,7 @@ public class StringCalculator {
             return DEFAULT_RETURN_VALUE;
         }
 
-        return stringOperands.stream()
-                .mapToInt(StringOperand::parseInt)
-                .reduce(DEFAULT_RETURN_VALUE, intBinaryOperator);
+        return stringOperands.reduce(DEFAULT_RETURN_VALUE, intBinaryOperator);
     }
 
     public int add(final String text) {

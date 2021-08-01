@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.function.IntBinaryOperator;
 
 public class StringOperands {
     private static final int EMPTY_SIZE = 0;
@@ -27,8 +27,10 @@ public class StringOperands {
         return operands.size() == EMPTY_SIZE;
     }
 
-    public Stream<StringOperand> stream() {
-        return operands.stream();
+    public int reduce(int defaultValue, IntBinaryOperator intBinaryOperator) {
+        return operands.stream()
+                .mapToInt(StringOperand::parseInt)
+                .reduce(defaultValue, intBinaryOperator);
     }
 
     @Override
