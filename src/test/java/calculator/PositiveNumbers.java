@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 public class PositiveNumbers {
 
-    private static final int ZERO = 0;
     private final List<PositiveNumber> numbers;
 
     private PositiveNumbers(final List<PositiveNumber> numbers) {
