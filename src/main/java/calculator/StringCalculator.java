@@ -1,16 +1,26 @@
 package calculator;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StringCalculator {
 
+    public static final int DEFAULT_VALUE = 0;
+
     public int add(final String text) {
         if (text == null || text.isEmpty()) {
-            return 0;
+            return DEFAULT_VALUE;
         }
 
-        return this.calculate(this.parsingDelimiter(text));
+        String[] textArr = this.parsingDelimiter(text);
+        List<Number> numbers = Stream.of(textArr)
+                                    .map(Number::new)
+                                    .collect(Collectors.toList());
+
+        return this.calculate(numbers);
     }
 
     private String[] parsingDelimiter(final String text) {
@@ -23,23 +33,11 @@ public class StringCalculator {
         return text.split("[,:]");
     }
 
-    private int calculate(final String[] numbers) {
-        if (numbers.length == 1) {
-            return this.stringToInt(numbers[0]);
-        }
+    private int calculate(final List<Number> numbers) {
         int sum = 0;
-        for (String number : numbers) {
-            sum += stringToInt(number);
+        for (Number number : numbers) {
+            sum += number.getValue();
         }
         return sum;
-    }
-
-    private int stringToInt(final String text) {
-        int number = Integer.parseInt(text);
-
-        if (number < 0) {
-            throw new RuntimeException();
-        }
-        return number;
     }
 }
