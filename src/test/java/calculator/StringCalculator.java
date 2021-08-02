@@ -1,11 +1,10 @@
 package calculator;
 
-import java.util.Arrays;
 import org.springframework.util.StringUtils;
 
 public class StringCalculator {
 
-    public static final int ZERO = 0;
+    private static final int ZERO = 0;
 
     public int calculate(final String stringNumber) {
         if (isBlank(stringNumber)) {
@@ -15,11 +14,7 @@ public class StringCalculator {
     }
 
     private int calculate(final Seperator seperator) {
-        return Arrays.stream(seperator.getTargetNumber()
-            .split(seperator.getDelimiter()))
-            .map(PositiveNumber::new)
-            .map(PositiveNumber::getValue)
-            .mapToInt(i -> i)
+        return PositiveNumbers.of(seperator)
             .sum();
     }
 

@@ -4,18 +4,27 @@ import java.util.Objects;
 
 public class PositiveNumber {
 
-    public static final int ZERO = 0;
-    public static final String NEGATIVE_EXCEPTION_MESSAGE = "0 이상의 값을 넣어주세요";
-    public static final String NOT_NUMBER_EXCEPTION_MESSAGE = "0 이상의 숫자를 넣어주세요";
+    private static final int ZERO = 0;
+    private static final String NEGATIVE_EXCEPTION_MESSAGE = "0 이상의 값을 넣어주세요";
+    private static final String NOT_NUMBER_EXCEPTION_MESSAGE = "0 이상의 숫자를 넣어주세요";
+
     private final int value;
 
-    public PositiveNumber(final String value) {
-        final int number = parseToInt(value);
+    private PositiveNumber(final int number) {
         checkNegativenumber(number);
         this.value = number;
     }
 
-    private int parseToInt(final String value) {
+    public static PositiveNumber of(final String value) {
+        final int number = parseToInt(value);
+        return of(number);
+    }
+
+    public static PositiveNumber of(final int number) {
+        return new PositiveNumber(number);
+    }
+
+    private static int parseToInt(final String value) {
         try {
             return Integer.parseInt(value);
         } catch (final Exception e) {
