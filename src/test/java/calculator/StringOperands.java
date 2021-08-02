@@ -31,7 +31,7 @@ public class StringOperands {
         return operands.size() == EMPTY_SIZE;
     }
 
-    public int reduce(int defaultValue, IntBinaryOperator intBinaryOperator) {
+    public int reduce(int defaultValue, final IntBinaryOperator intBinaryOperator) {
         return operands.stream()
                 .mapToInt(StringOperand::parseInt)
                 .reduce(defaultValue, intBinaryOperator);
