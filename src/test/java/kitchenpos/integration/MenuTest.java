@@ -8,10 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -38,7 +35,7 @@ public class MenuTest extends IntegrationTestRunner {
     @Test
     public void create_with_null_price() {
         //given
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setName("후라이드 치킨");
         request.setDisplayed(true);
         request.setMenuGroupId(MENU_GROUP_ID);
@@ -53,9 +50,9 @@ public class MenuTest extends IntegrationTestRunner {
     @Test
     public void create_with_minus_price() {
         //given
-        BigDecimal minusPrice = BigDecimal.valueOf(-1L);
+        final BigDecimal minusPrice = BigDecimal.valueOf(-1L);
 
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(minusPrice);
         request.setName("후라이드 치킨");
         request.setDisplayed(true);
@@ -71,7 +68,7 @@ public class MenuTest extends IntegrationTestRunner {
     @Test
     public void create_with_not_persisted_menu_group() {
         //given
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(10000));
         request.setName("후라이드 치킨");
         request.setDisplayed(true);
@@ -87,12 +84,12 @@ public class MenuTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_null_menu_product() {
         //given
-        MenuGroup menuGroup = new MenuGroup();
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(MENU_GROUP_ID);
         menuGroup.setName("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(10000));
         request.setName("후라이드 치킨");
         request.setDisplayed(true);
@@ -107,14 +104,14 @@ public class MenuTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_empty_menu_product() {
         //given
-        List<MenuProduct> emptyProducts = Collections.emptyList();
+        final List<MenuProduct> emptyProducts = Collections.emptyList();
 
-        MenuGroup menuGroup = new MenuGroup();
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(MENU_GROUP_ID);
         menuGroup.setName("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(10000));
         request.setName("후라이드 치킨");
         request.setDisplayed(true);
@@ -130,18 +127,19 @@ public class MenuTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_not_persisted_product() {
         //given
-        MenuGroup menuGroup = new MenuGroup();
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(MENU_GROUP_ID);
         menuGroup.setName("메인 메뉴");
+
         menuGroupRepository.save(menuGroup);
 
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(10000));
         request.setName("후라이드 치킨");
         request.setDisplayed(true);
         request.setMenuGroupId(MENU_GROUP_ID);
 
-        MenuProduct menuProduct = new MenuProduct();
+        final MenuProduct menuProduct = new MenuProduct();
         menuProduct.setProductId(PRODUCT_ID);
         request.setMenuProducts(List.of(menuProduct));
 
@@ -154,28 +152,29 @@ public class MenuTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_not_equal_persisted_product_count() {
         //given
-        MenuGroup menuGroup = new MenuGroup();
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(MENU_GROUP_ID);
         menuGroup.setName("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(10000));
         request.setName("후라이드 한마리");
         request.setDisplayed(true);
         request.setMenuGroupId(MENU_GROUP_ID);
 
-        MenuProduct menuProduct_1 = new MenuProduct();
+        final MenuProduct menuProduct_1 = new MenuProduct();
         menuProduct_1.setProductId(PRODUCT_ID);
         MenuProduct menuProduct_2 = new MenuProduct();
         menuProduct_2.setProductId(UUID.randomUUID());
 
         request.setMenuProducts(List.of(menuProduct_1, menuProduct_2));
 
-        Product product_1 = new Product();
+        final Product product_1 = new Product();
         product_1.setId(PRODUCT_ID);
         product_1.setName("후라이드 치킨");
         product_1.setPrice(BigDecimal.valueOf(10000L));
+
         productRepository.save(product_1);
 
         //when, then
@@ -187,26 +186,26 @@ public class MenuTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_minus_product_quantity() {
         //give
-        long minusQuantity = -1L;
+        final long minusQuantity = -1L;
 
-        MenuGroup menuGroup = new MenuGroup();
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(MENU_GROUP_ID);
         menuGroup.setName("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(10000));
         request.setName("후라이드 한마리");
         request.setDisplayed(true);
         request.setMenuGroupId(MENU_GROUP_ID);
 
-        MenuProduct menuProduct_1 = new MenuProduct();
+        final MenuProduct menuProduct_1 = new MenuProduct();
         menuProduct_1.setProductId(PRODUCT_ID);
         menuProduct_1.setQuantity(minusQuantity);
 
         request.setMenuProducts(List.of(menuProduct_1));
 
-        Product product_1 = new Product();
+        final Product product_1 = new Product();
         product_1.setId(PRODUCT_ID);
         product_1.setName("후라이드 치킨");
         product_1.setPrice(BigDecimal.valueOf(10000L));
@@ -224,24 +223,24 @@ public class MenuTest extends IntegrationTestRunner {
         int biggerPrice = 40000;
         int lowerPrice = 15000;
 
-        MenuGroup menuGroup = new MenuGroup();
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(MENU_GROUP_ID);
         menuGroup.setName("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(biggerPrice));
         request.setName("후라이드 한마리");
         request.setDisplayed(true);
         request.setMenuGroupId(MENU_GROUP_ID);
 
-        MenuProduct menuProduct_1 = new MenuProduct();
+        final MenuProduct menuProduct_1 = new MenuProduct();
         menuProduct_1.setProductId(PRODUCT_ID);
         menuProduct_1.setQuantity(2L);
 
         request.setMenuProducts(List.of(menuProduct_1));
 
-        Product product_1 = new Product();
+        final Product product_1 = new Product();
         product_1.setId(PRODUCT_ID);
         product_1.setName("후라이드 치킨");
         product_1.setPrice(BigDecimal.valueOf(lowerPrice));
@@ -256,23 +255,23 @@ public class MenuTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_null_name() {
         //give
-        MenuGroup menuGroup = new MenuGroup();
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(MENU_GROUP_ID);
         menuGroup.setName("메인 메뉴");
         menuGroupRepository.save(menuGroup);
 
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(20000));
         request.setDisplayed(true);
         request.setMenuGroupId(MENU_GROUP_ID);
 
-        MenuProduct menuProduct_1 = new MenuProduct();
+        final MenuProduct menuProduct_1 = new MenuProduct();
         menuProduct_1.setProductId(PRODUCT_ID);
         menuProduct_1.setQuantity(2L);
 
         request.setMenuProducts(List.of(menuProduct_1));
 
-        Product product_1 = new Product();
+        final Product product_1 = new Product();
         product_1.setId(PRODUCT_ID);
         product_1.setName("후라이드 치킨");
         product_1.setPrice(BigDecimal.valueOf(15000L));
@@ -289,27 +288,29 @@ public class MenuTest extends IntegrationTestRunner {
         //give
         String profanityName = "Bitch";
 
-        MenuGroup menuGroup = new MenuGroup();
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(MENU_GROUP_ID);
         menuGroup.setName("메인 메뉴");
+
         menuGroupRepository.save(menuGroup);
 
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(20000));
         request.setDisplayed(true);
         request.setName(profanityName);
         request.setMenuGroupId(MENU_GROUP_ID);
 
-        MenuProduct menuProduct_1 = new MenuProduct();
+        final MenuProduct menuProduct_1 = new MenuProduct();
         menuProduct_1.setProductId(PRODUCT_ID);
         menuProduct_1.setQuantity(2L);
 
         request.setMenuProducts(List.of(menuProduct_1));
 
-        Product product_1 = new Product();
+        final Product product_1 = new Product();
         product_1.setId(PRODUCT_ID);
         product_1.setName("후라이드 치킨");
         product_1.setPrice(BigDecimal.valueOf(15000L));
+
         productRepository.save(product_1);
 
         //when, then
@@ -325,33 +326,33 @@ public class MenuTest extends IntegrationTestRunner {
         final String menuName = "후라이드 한마리";
         final BigDecimal menuPrice = BigDecimal.valueOf(19000);
 
-        MenuGroup menuGroup = new MenuGroup();
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(MENU_GROUP_ID);
         menuGroup.setName("메인 메뉴");
 
         menuGroupRepository.save(menuGroup);
 
-        Menu request = new Menu();
+        final Menu request = new Menu();
         request.setPrice(menuPrice);
         request.setDisplayed(true);
         request.setName(menuName);
         request.setMenuGroupId(MENU_GROUP_ID);
 
-        MenuProduct menuProduct_1 = new MenuProduct();
+        final MenuProduct menuProduct_1 = new MenuProduct();
         menuProduct_1.setProductId(PRODUCT_ID);
         menuProduct_1.setQuantity(1L);
-        MenuProduct menuProduct_2 = new MenuProduct();
+        final MenuProduct menuProduct_2 = new MenuProduct();
         menuProduct_2.setProductId(colaUuid);
         menuProduct_2.setQuantity(1L);
 
         request.setMenuProducts(List.of(menuProduct_1, menuProduct_2));
 
-        Product product_1 = new Product();
+        final Product product_1 = new Product();
         product_1.setId(PRODUCT_ID);
         product_1.setName("후라이드 치킨");
         product_1.setPrice(BigDecimal.valueOf(15000L));
 
-        Product product_2 = new Product();
+        final Product product_2 = new Product();
         product_2.setId(colaUuid);
         product_2.setName("콜라");
         product_2.setPrice(BigDecimal.valueOf(5000L));
@@ -363,10 +364,10 @@ public class MenuTest extends IntegrationTestRunner {
 
         //then
         final List<Menu> menus = menuRepository.findAll();
-        Menu findMenu = menus.get(0);
+        final Menu findMenu = menus.get(0);
         final List<MenuProduct> menuProducts = findMenu.getMenuProducts();
-        MenuProduct findMenuProduct_1 = menuProducts.get(0);
-        MenuProduct findMenuProduct_2 = menuProducts.get(1);
+        final MenuProduct findMenuProduct_1 = menuProducts.get(0);
+        final MenuProduct findMenuProduct_2 = menuProducts.get(1);
 
         assertThat(findMenu.getName()).isEqualTo(menuName);
         assertThat(findMenu.getPrice()).isEqualTo(menuPrice);
@@ -379,4 +380,126 @@ public class MenuTest extends IntegrationTestRunner {
         assertThat(findMenuProduct_2.getProduct().getPrice()).isEqualTo(product_2.getPrice());
 
     }
+
+    @DisplayName("메뉴의 가격을 변경한다. ( 변경 가격은 `null` 일 수 없다. )")
+    @TestAndRollback
+    public void change_price_with_null_price() {
+        //given
+        final Menu request = new Menu();
+        request.setName("후라이드 한마리");
+
+        //when, then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.changePrice(MENU_ID, request));
+    }
+
+    @DisplayName("메뉴의 가격을 변경한다. ( 변경 가격은 `0` 보다 작을 수 없다. )")
+    @TestAndRollback
+    public void change_price_with_minus_price() {
+        //given
+        final BigDecimal minusPrice = BigDecimal.valueOf(-1);
+
+        final Menu request = new Menu();
+        request.setName("후라이드 한마리");
+        request.setPrice(minusPrice);
+
+        //when, then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.changePrice(MENU_ID, request));
+    }
+
+    @DisplayName("메뉴의 가격을 변경한다. ( 변경 요청된 메뉴는 영속화 되어 있어야 한다. )")
+    @TestAndRollback
+    public void change_price_with_not_persisted_menu() {
+        //given
+        final Menu request = new Menu();
+        request.setName("후라이드 한마리");
+        request.setPrice(BigDecimal.valueOf(10000L));
+
+        //when, then
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> menuService.changePrice(MENU_ID, request));
+    }
+
+    @DisplayName("메뉴의 가격을 변경한다. ( 변경 요청된 가격은 메뉴에 구성된 제품의 합보다 클 수 없다. )")
+    @TestAndRollback
+    public void change_price_with_not_equals_products_price_sum() {
+        //given
+        final MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(MENU_GROUP_ID);
+        menuGroup.setName("메인 메뉴");
+
+        menuGroupRepository.save(menuGroup);
+
+        final Product product_1 = new Product();
+        product_1.setId(PRODUCT_ID);
+        product_1.setName("후라이드 치킨");
+        product_1.setPrice(BigDecimal.valueOf(15000L));
+
+        productRepository.save(product_1);
+
+        final MenuProduct menuProduct_1 = new MenuProduct();
+        menuProduct_1.setProductId(PRODUCT_ID);
+        menuProduct_1.setQuantity(1L);
+        menuProduct_1.setProduct(product_1);
+
+        final Menu request = new Menu();
+        request.setId(MENU_ID);
+        request.setName("후라이드 한마리");
+        request.setDisplayed(true);
+        request.setPrice(BigDecimal.valueOf(20000L));
+        request.setMenuProducts(List.of(menuProduct_1));
+        request.setMenuGroup(menuGroup);
+
+        menuRepository.save(request);
+
+        //when, then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.changePrice(MENU_ID, request));
+    }
+
+    @DisplayName("메뉴의 가격을 변경한다.")
+    @TestAndRollback
+    public void change_price() {
+        //given
+        BigDecimal changePrice = BigDecimal.valueOf(10000);
+
+        final MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(MENU_GROUP_ID);
+        menuGroup.setName("메인 메뉴");
+
+        menuGroupRepository.save(menuGroup);
+
+        final Product product_1 = new Product();
+        product_1.setId(PRODUCT_ID);
+        product_1.setName("후라이드 치킨");
+        product_1.setPrice(BigDecimal.valueOf(15000L));
+
+        productRepository.save(product_1);
+
+        final MenuProduct menuProduct_1 = new MenuProduct();
+        menuProduct_1.setProductId(PRODUCT_ID);
+        menuProduct_1.setQuantity(1L);
+        menuProduct_1.setProduct(product_1);
+
+        final Menu request = new Menu();
+        request.setId(MENU_ID);
+        request.setName("후라이드 한마리");
+        request.setDisplayed(true);
+        request.setPrice(changePrice);
+        request.setMenuProducts(List.of(menuProduct_1));
+        request.setMenuGroup(menuGroup);
+
+        menuRepository.save(request);
+
+        //when
+        menuService.changePrice(MENU_ID, request);
+
+        //then
+        final Menu findMenu = menuRepository.findById(MENU_ID).get();
+        assertThat(findMenu.getPrice()).isEqualTo(changePrice);
+    }
+
+
+
 }
