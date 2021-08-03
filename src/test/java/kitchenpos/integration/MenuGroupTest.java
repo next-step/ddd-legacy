@@ -61,6 +61,26 @@ public class MenuGroupTest extends IntegrationTestRunner {
         assertThat(findMenuGroup.getId()).isNotNull();
     }
 
+    @DisplayName("메뉴 그룹을 생성한다 ( 같은 이름의 메뉴 그룹을 생성 할 수 있다. )")
+    @TestAndRollback
+    public void create_with_same_name() {
+        //given
+        final String menuGroupName = "추천 메뉴";
+        MenuGroup request = new MenuGroup();
+        request.setName(menuGroupName);
+
+        //when
+        final MenuGroup menuGroup_1 = menuGroupService.create(request);
+        final MenuGroup menuGroup_2 = menuGroupService.create(request);
+        final MenuGroup findMenuGroup_1 = menuGroupRepository.findById(menuGroup_1.getId()).get();
+        final MenuGroup findMenuGroup_2 = menuGroupRepository.findById(menuGroup_2.getId()).get();
+
+        //then
+        assertThat(findMenuGroup_1.getName()).isEqualTo(menuGroupName);
+        assertThat(findMenuGroup_2.getName()).isEqualTo(menuGroupName);
+        assertThat(findMenuGroup_1.getId()).isNotEqualTo(findMenuGroup_2.getId());
+    }
+
     @TestAndRollback
     @DisplayName("모든 메뉴 그룹을 조회 한다.")
     public void findAll() {
