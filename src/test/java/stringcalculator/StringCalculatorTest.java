@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class StringCalculatorTest {
+
     private StringCalculator calculator;
 
     @BeforeEach
@@ -50,5 +50,12 @@ class StringCalculatorTest {
     @ValueSource(strings = {"1,2,3:4:5"})
     void fiveNumbers(final String text) {
         assertThat(calculator.add(text)).isSameAs(15);
+    }
+
+    @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"//;\n1;2;3"})
+    void customDelimiter(final String text) {
+        assertThat(calculator.add(text)).isSameAs(6);
     }
 }
