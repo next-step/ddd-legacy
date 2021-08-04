@@ -8,10 +8,13 @@ public class StringCalculator {
 
 	private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
 
+	private final int ZERO_NUMBER = 0;
+	private final int LENGTH_OF_NUMBER_FOR_SUM = 2;
+
 	public int add(String inputNumber) {
 
 		if (inputNumber == null || inputNumber.trim().isEmpty()) {
-			return 0;
+			return ZERO_NUMBER;
 		}
 
 		Matcher m = pattern.matcher(inputNumber);
@@ -24,7 +27,7 @@ public class StringCalculator {
 
 		String[] numbers = inputNumber.split(",|:");
 
-		if (numbers.length > 1) {
+		if (numbers.length >= LENGTH_OF_NUMBER_FOR_SUM) {
 			return getSum(numbers);
 		}
 
@@ -36,7 +39,7 @@ public class StringCalculator {
 	}
 
 	private Integer convertNumberToInteger(String inputNumber) {
-		if (Integer.parseInt(inputNumber) < 0) {
+		if (Integer.parseInt(inputNumber) < ZERO_NUMBER) {
 			throw new RuntimeException();
 		}
 		return Integer.parseInt(inputNumber);
