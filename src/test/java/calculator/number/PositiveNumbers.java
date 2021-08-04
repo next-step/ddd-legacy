@@ -19,14 +19,8 @@ public class PositiveNumbers implements Numbers{
                 .collect(Collectors.toList());
     }
 
-    public static Numbers of(final String text) {
-        final TokenizerFactory tokenizerFactory = new TokenizerFactory(text);
-        final Tokenizer tokenizer = tokenizerFactory.createTokenizer();
-        return PositiveNumbers.of(tokenizer);
-    }
-
-    private static Numbers of(final Tokenizer tokenizer) {
-        return new PositiveNumbers(tokenizer.split());
+    public static PositiveNumbers of(final String[] tokens) {
+        return new PositiveNumbers(tokens);
     }
 
     public Number calculate(final CalculateStrategy strategy) {
