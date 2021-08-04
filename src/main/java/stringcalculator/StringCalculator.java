@@ -6,13 +6,16 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
+	private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
+
 	public int add(String inputNumber) {
 
 		if (inputNumber == null || inputNumber.trim().isEmpty()) {
 			return 0;
 		}
 
-		Matcher m = Pattern.compile("//(.)\n(.*)").matcher(inputNumber);
+		Matcher m = pattern.matcher(inputNumber);
+
 		if (m.find()) {
 			String customDelimiter = m.group(1);
 			String[] tokens= m.group(2).split(customDelimiter);
