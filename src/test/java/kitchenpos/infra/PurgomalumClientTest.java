@@ -17,13 +17,12 @@ class PurgomalumClientTest {
 
     private final RestTemplateBuilder restTemplateBuilder;
     private final ObjectMapper objectMapper;
+    private PurgomalumClient purgomalumClient;
 
     public PurgomalumClientTest(final RestTemplateBuilder restTemplateBuilder, final ObjectMapper objectMapper) {
         this.restTemplateBuilder = restTemplateBuilder;
         this.objectMapper = objectMapper;
     }
-
-    private PurgomalumClient purgomalumClient;
 
     @BeforeEach
     void setUp() {
