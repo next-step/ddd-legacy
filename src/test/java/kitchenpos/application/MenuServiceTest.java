@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -480,6 +481,25 @@ class MenuServiceTest extends MockTest {
         assertThatThrownBy(
             () -> menuService.hide(createdMenu.getId())
         ).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("메뉴리스트를 조회할 수 있다")
+    @Test
+    void menuList() {
+        //given
+        final Menu menu1 = createMenu("후라이드", 19000L);
+        final Menu menu2 = createMenu("양념", 20000L);
+
+        given(menuRepository.findAll()).willReturn(Arrays.asList(menu1, menu2));
+
+        //when
+        final List<Menu> menus = menuService.findAll();
+
+        //then
+        assertAll(
+            () -> assertThat(menus.get(0)).isEqualTo(menu1),
+            () -> assertThat(menus.get(1)).isEqualTo(menu2)
+        );
     }
 
 }
