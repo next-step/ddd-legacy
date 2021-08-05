@@ -371,4 +371,71 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴가 노출되도록 변경할 수 있다")
+    @Test
+    void display() {
+        //given
+        final Menu menu = createMenu("후라이드", 19000L);
+        menu.setDisplayed(false);
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllById(any())).willReturn(products);
+        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(menuRepository.save(any())).willReturn(menu);
+
+        final Menu createdMenu = menuService.create(menu);
+
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+        //when
+        final Menu sut = menuService.display(createdMenu.getId());
+
+        //then
+        assertThat(sut.isDisplayed()).isTrue();
+    }
+
+    @DisplayName("메뉴가 존재하지 않으면 예외가 발생한다")
+    @Test
+    void displayNotExistMenu() {
+        //given
+        final Menu menu = createMenu("후라이드", 19000L);
+        menu.setDisplayed(false);
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllById(any())).willReturn(products);
+        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(menuRepository.save(any())).willReturn(menu);
+
+        final Menu createdMenu = menuService.create(menu);
+
+        given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
+
+        //when, then
+        assertThatThrownBy(
+            () -> menuService.display(createdMenu.getId())
+        ).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
+    @Test
+    void displayMenuPrice() {
+        //given
+        final Menu menu = createMenu("후라이드", 19000L);
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllById(any())).willReturn(products);
+        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(menuRepository.save(any())).willReturn(menu);
+
+        final Menu createdMenu = menuService.create(menu);
+
+        createdMenu.setPrice(BigDecimal.valueOf(20000000L));
+        given(menuRepository.findById(any())).willReturn(Optional.of(createdMenu));
+
+        //when, then
+        assertThatThrownBy(
+            () -> menuService.display(createdMenu.getId())
+        ).isInstanceOf(NoSuchElementException.class);
+    }
+
 }
