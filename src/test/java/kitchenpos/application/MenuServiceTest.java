@@ -32,6 +32,14 @@ import org.mockito.Mock;
 
 class MenuServiceTest extends MockTest {
 
+    public static final int ZERO = 0;
+    public static final String MENU_NAME = "후라이드";
+    public static final String MENU_NAME2 = "양념";
+    public static final long PRICE = 20000L;
+    public static final long PRICE2 = 30000L;
+    public static final long NEGATIVE_PRICE = -19000L;
+    public static final long EXPENSIVE_PRICE = 20000000L;
+
     @Mock
     private MenuRepository menuRepository;
 
@@ -51,8 +59,6 @@ class MenuServiceTest extends MockTest {
     private Product product1;
     private Product product2;
     private List<Product> products;
-    private MenuProduct menuProduct1;
-    private MenuProduct menuProduct2;
     private List<MenuProduct> menuProducts;
 
     @BeforeEach
@@ -67,8 +73,8 @@ class MenuServiceTest extends MockTest {
         product2 = makeProduct("상품2", 20000L);
         products = Arrays.asList(product1, product2);
 
-        menuProduct1 = makeMenuProduct(product1, 2L);
-        menuProduct2 = makeMenuProduct(product2, 3L);
+        final MenuProduct menuProduct1 = makeMenuProduct(product1, 2L);
+        final MenuProduct menuProduct2 = makeMenuProduct(product2, 3L);
 
         menuProducts = Arrays.asList(menuProduct1, menuProduct2);
     }
@@ -93,7 +99,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void createOK() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
@@ -111,7 +117,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void menuGroupNotExist() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
 
         given(menuGroupRepository.findById(any())).willThrow(NoSuchElementException.class);
 
@@ -125,7 +131,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void noPrice() {
         //given
-        final Menu menu = createMenu("후라이드", 0L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
         menu.setPrice(null);
 
         //when, then
@@ -138,7 +144,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void negativePrice() {
         //given
-        final Menu menu = createMenu("후라이드", -19000L);
+        final Menu menu = createMenu(MENU_NAME, NEGATIVE_PRICE);
 
         //when, then
         assertThatThrownBy(
@@ -150,7 +156,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void noMenuProduct() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
 
         menuProducts = Collections.emptyList();
         menu.setMenuProducts(menuProducts);
@@ -167,7 +173,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void productNotExist() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
@@ -184,7 +190,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void productsNegativeQuentity() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
 
         menu.getMenuProducts()
             .get(1)
@@ -206,7 +212,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void menuValidPrice() {
         //given
-        final Menu menu = createMenu("후라이드", 2000000L);
+        final Menu menu = createMenu(MENU_NAME, EXPENSIVE_PRICE);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
@@ -223,7 +229,7 @@ class MenuServiceTest extends MockTest {
     @NullAndEmptySource
     void nullAndEmpty(final String value) {
         //given
-        final Menu menu = createMenu(value, 20000L);
+        final Menu menu = createMenu(value, PRICE);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
@@ -240,8 +246,8 @@ class MenuServiceTest extends MockTest {
     @ValueSource(strings = {"name1", "name2"})
     void duplicateName(final String name) {
         //given
-        final Menu menu1 = createMenu(name, 20000L);
-        final Menu menu2 = createMenu(name, 30000L);
+        final Menu menu1 = createMenu(name, PRICE);
+        final Menu menu2 = createMenu(name, PRICE2);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
@@ -262,11 +268,12 @@ class MenuServiceTest extends MockTest {
     @ValueSource(strings = {"fuck", "bitch", "Damn"})
     void profanityName(final String profanityName) {
         //given
-        final Menu menu = createMenu(profanityName, 20000L);
+        final Menu menu = createMenu(profanityName, PRICE);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
         given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(purgomalumClient.containsProfanity(any())).willReturn(true);
 
         //when, then
         assertThatThrownBy(
@@ -279,7 +286,7 @@ class MenuServiceTest extends MockTest {
     @ValueSource(longs = {0L, 1L, 10000L, 20000L})
     void change(final long price) {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -296,7 +303,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void changeWithNoPrice() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
         menu.setPrice(null);
 
         //when, then
@@ -309,7 +316,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void changeWithNegativePrice() {
         //given
-        final Menu menu = createMenu("후라이드", -19000L);
+        final Menu menu = createMenu(MENU_NAME, NEGATIVE_PRICE);
 
         assertThatThrownBy(
             () -> menuService.changePrice(menu.getId(), menu)
@@ -320,7 +327,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void changeValidPrice() {
         //given
-        final Menu menu = createMenu("후라이드", 20000000L);
+        final Menu menu = createMenu(MENU_NAME, EXPENSIVE_PRICE);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -334,7 +341,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void display() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
         menu.setDisplayed(false);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -350,7 +357,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void displayNotExistMenu() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
         menu.setDisplayed(false);
 
         given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
@@ -365,7 +372,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void displayMenuPrice() {
         //given
-        final Menu menu = createMenu("후라이드", 20000000L);
+        final Menu menu = createMenu(MENU_NAME, EXPENSIVE_PRICE);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -379,7 +386,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void hide() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -394,7 +401,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void hideNotExistMenu() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu(MENU_NAME, PRICE);
 
         given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
 
@@ -408,8 +415,8 @@ class MenuServiceTest extends MockTest {
     @Test
     void menuList() {
         //given
-        final Menu menu1 = createMenu("후라이드", 19000L);
-        final Menu menu2 = createMenu("양념", 20000L);
+        final Menu menu1 = createMenu(MENU_NAME, PRICE);
+        final Menu menu2 = createMenu(MENU_NAME2, PRICE2);
 
         given(menuRepository.findAll()).willReturn(Arrays.asList(menu1, menu2));
 
@@ -418,7 +425,7 @@ class MenuServiceTest extends MockTest {
 
         //then
         assertAll(
-            () -> assertThat(menus.get(0)).isEqualTo(menu1),
+            () -> assertThat(menus.get(ZERO)).isEqualTo(menu1),
             () -> assertThat(menus.get(1)).isEqualTo(menu2)
         );
     }
