@@ -438,4 +438,48 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(NoSuchElementException.class);
     }
 
+    @DisplayName("메뉴가 노출되지 않도록 변경할 수 있다")
+    @Test
+    void hide() {
+        //given
+        final Menu menu = createMenu("후라이드", 19000L);
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllById(any())).willReturn(products);
+        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(menuRepository.save(any())).willReturn(menu);
+
+        final Menu createdMenu = menuService.create(menu);
+
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+        //when
+        final Menu sut = menuService.hide(createdMenu.getId());
+
+        //then
+        assertThat(sut.isDisplayed()).isFalse();
+    }
+
+    @DisplayName("메뉴가 존재하지 않으면 예외가 발생한다")
+    @Test
+    void hideNotExistMenu() {
+        //given
+        final Menu menu = createMenu("후라이드", 19000L);
+        menu.setDisplayed(false);
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllById(any())).willReturn(products);
+        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(menuRepository.save(any())).willReturn(menu);
+
+        final Menu createdMenu = menuService.create(menu);
+
+        given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
+
+        //when, then
+        assertThatThrownBy(
+            () -> menuService.hide(createdMenu.getId())
+        ).isInstanceOf(NoSuchElementException.class);
+    }
+
 }
