@@ -67,7 +67,7 @@ class MenuServiceTest extends MockTest {
         products = Arrays.asList(product1, product2);
 
         menuProduct1 = makeMenuProduct(product1, 2L);
-        menuProduct2= makeMenuProduct(product2, 3L);
+        menuProduct2 = makeMenuProduct(product2, 3L);
 
         menuProducts = Arrays.asList(menuProduct1, menuProduct2);
     }
@@ -92,7 +92,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void createOK() {
         //given
-        final Menu menu = createMenu( "후라이드", 19000L);
+        final Menu menu = createMenu("후라이드", 19000L);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
@@ -121,7 +121,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void menuGroupNotExist() {
         //given
-        final Menu menu = createMenu( "후라이드", 19000L);
+        final Menu menu = createMenu("후라이드", 19000L);
 
         given(menuGroupRepository.findById(any())).willThrow(NoSuchElementException.class);
 
@@ -135,7 +135,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void noPrice() {
         //given
-        final Menu menu = createMenu("후라이드",  0L);
+        final Menu menu = createMenu("후라이드", 0L);
         menu.setPrice(null);
 
         //when, then
@@ -144,7 +144,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("가격이 0미만이라면 예외가 발생한다")
+    @DisplayName("가격이 음수이라면 예외가 발생한다")
     @Test
     void negativePrice() {
         //given
@@ -190,13 +190,14 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(NoSuchElementException.class);
     }
 
-    @DisplayName("메뉴 상품의 상품수량이 하나라도 0미만인 것이 있으면 예외가 발생한다")
+    @DisplayName("메뉴 상품의 상품수량이 하나라도 음수인 것이 있으면 예외가 발생한다")
     @Test
     void productsNegativeQuentity() {
         //given
         final Menu menu = createMenu("후라이드", 19000L);
 
-        menu.getMenuProducts().get(1)
+        menu.getMenuProducts()
+            .get(1)
             .setQuantity(-1);
 
         menu.setMenuProducts(menuProducts);
@@ -213,7 +214,7 @@ class MenuServiceTest extends MockTest {
 
     @DisplayName("메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
     @Test
-    void menuPrice() {
+    void menuValidPrice() {
         //given
         final Menu menu = createMenu("후라이드", 2000000L);
 
@@ -232,7 +233,7 @@ class MenuServiceTest extends MockTest {
     @NullAndEmptySource
     void nullAndEmpty(final String value) {
         //given
-        final Menu menu = createMenu( value, 20000L);
+        final Menu menu = createMenu(value, 20000L);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
@@ -249,8 +250,8 @@ class MenuServiceTest extends MockTest {
     @ValueSource(strings = {"name1", "name2"})
     void duplicateName(final String name) {
         //given
-        final Menu menu1 = createMenu( name, 20000L);
-        final Menu menu2 = createMenu( name, 30000L);
+        final Menu menu1 = createMenu(name, 20000L);
+        final Menu menu2 = createMenu(name, 30000L);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
@@ -280,6 +281,93 @@ class MenuServiceTest extends MockTest {
         //when, then
         assertThatThrownBy(
             () -> menuService.create(menu)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴의 가격을 수정할 수 있다")
+    @ParameterizedTest()
+    @ValueSource(longs = {0L, 1L, 10000L, 20000L})
+    void change(final long price) {
+        //given
+        final Menu menu = createMenu("후라이드", 19000L);
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllById(any())).willReturn(products);
+        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(menuRepository.save(any())).willReturn(menu);
+
+        final Menu createdMenu = menuService.create(menu);
+
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+        //when
+        menu.setPrice(BigDecimal.valueOf(price));
+        final Menu changedMenu = menuService.changePrice(createdMenu.getId(), menu);
+
+        //then
+        assertThat(changedMenu).isInstanceOf(Menu.class);
+        assertThat(changedMenu.getPrice()).isEqualTo(BigDecimal.valueOf(price));
+    }
+
+    @DisplayName("메뉴 가격이 없으면 예외가 발생한다")
+    @Test
+    void changeWithNoPrice() {
+        //given
+        final Menu menu = createMenu("후라이드", 19000L);
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllById(any())).willReturn(products);
+        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(menuRepository.save(any())).willReturn(menu);
+
+        final Menu createdMenu = menuService.create(menu);
+
+        //when, then
+        menu.setPrice(null);
+        assertThatThrownBy(
+            () -> menuService.changePrice(createdMenu.getId(), menu)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴 가격이 음수라면 예외가 발생한다")
+    @Test
+    void changeWithNegativePrice() {
+        //given
+        final Menu menu = createMenu("후라이드", 19000L);
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllById(any())).willReturn(products);
+        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(menuRepository.save(any())).willReturn(menu);
+
+        final Menu createdMenu = menuService.create(menu);
+
+        //when, then
+        menu.setPrice(BigDecimal.valueOf(-19000L));
+        assertThatThrownBy(
+            () -> menuService.changePrice(createdMenu.getId(), menu)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
+    @Test
+    void changeValidPrice() {
+        //given
+        final Menu menu = createMenu("후라이드", 19000L);
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllById(any())).willReturn(products);
+        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(menuRepository.save(any())).willReturn(menu);
+
+        final Menu createdMenu = menuService.create(menu);
+
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+        //when, then
+        menu.setPrice(BigDecimal.valueOf(20000000L));
+        assertThatThrownBy(
+            () -> menuService.changePrice(createdMenu.getId(), menu)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
