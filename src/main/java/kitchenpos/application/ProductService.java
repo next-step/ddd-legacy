@@ -34,7 +34,7 @@ public class ProductService {
             throw new IllegalArgumentException();
         }
         final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
+        if (Objects.isNull(name) || name.isEmpty() || purgomalumClient.containsProfanity(name)) {
             throw new IllegalArgumentException();
         }
         final Product product = new Product();
@@ -57,9 +57,9 @@ public class ProductService {
         for (final Menu menu : menus) {
             BigDecimal sum = BigDecimal.ZERO;
             for (final MenuProduct menuProduct : menu.getMenuProducts()) {
-                sum = menuProduct.getProduct()
+                sum = sum.add(menuProduct.getProduct()
                     .getPrice()
-                    .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
+                    .multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
             }
             if (menu.getPrice().compareTo(sum) > 0) {
                 menu.setDisplayed(false);
