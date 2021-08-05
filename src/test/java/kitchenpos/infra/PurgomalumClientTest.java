@@ -3,7 +3,6 @@ package kitchenpos.infra;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kitchenpos.application.MockTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,7 +13,7 @@ import org.springframework.test.context.TestConstructor;
 
 @SpringBootTest
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class PurgomalumClientTest extends MockTest {
+class PurgomalumClientTest {
 
     private final RestTemplateBuilder restTemplateBuilder;
     private final ObjectMapper objectMapper;
