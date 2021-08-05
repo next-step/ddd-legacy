@@ -3,6 +3,7 @@ package kitchenpos.domain;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "orders")
@@ -111,5 +112,18 @@ public class Order {
 
     public void setOrderTableId(final UUID orderTableId) {
         this.orderTableId = orderTableId;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order)) return false;
+        final Order order = (Order) o;
+        return Objects.equals(id, order.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
