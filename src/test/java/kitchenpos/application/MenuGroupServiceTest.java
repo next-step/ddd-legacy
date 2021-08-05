@@ -40,7 +40,7 @@ class MenuGroupServiceTest extends MockTest {
         menuGroup2.setName(menuGroup.getName());
     }
 
-    @DisplayName("메뉴 그룹을 추가할 수 있다")
+    @DisplayName("create - 메뉴 그룹을 추가할 수 있다")
     @Test
     void createOK() {
         //given
@@ -53,7 +53,7 @@ class MenuGroupServiceTest extends MockTest {
         assertThat(createdMenuGroup.getId()).isEqualTo(menuGroup.getId());
     }
 
-    @DisplayName("메뉴 그룹 이름이 한글자 이상이 아니라면 예외를 던진다")
+    @DisplayName("create - 메뉴 그룹 이름이 한글자 이상이 아니라면 예외를 던진다")
     @ParameterizedTest
     @NullAndEmptySource
     void createWithEmptyName(final String value) {
@@ -66,7 +66,7 @@ class MenuGroupServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 그룹 이름은 중복될 수 있다")
+    @DisplayName("create - 메뉴 그룹 이름은 중복될 수 있다")
     @Test
     void createWithDuplicateName() {
         //given
@@ -81,9 +81,9 @@ class MenuGroupServiceTest extends MockTest {
         assertThat(createdMenuGroup.getName()).isEqualTo(createdMenuGroup2.getName());
     }
 
-    @DisplayName("메뉴 그룹 리스트를 조회할 수 있다")
+    @DisplayName("findAll - 메뉴 그룹 리스트를 조회할 수 있다")
     @Test
-    void service() {
+    void findAll() {
         //given
         given(menuGroupRepository.findAll()).willReturn(Arrays.asList(menuGroup, menuGroup2));
 

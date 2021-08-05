@@ -95,7 +95,7 @@ class MenuServiceTest extends MockTest {
         return menuProduct;
     }
 
-    @DisplayName("메뉴를 추가할 수 있다")
+    @DisplayName("create - 메뉴를 추가할 수 있다")
     @Test
     void createOK() {
         //given
@@ -113,7 +113,7 @@ class MenuServiceTest extends MockTest {
         assertThat(sut).isInstanceOf(Menu.class);
     }
 
-    @DisplayName("메뉴 그룹이 존재하지 않으면 예외가 발생한다")
+    @DisplayName("create - 메뉴 그룹이 존재하지 않으면 예외가 발생한다")
     @Test
     void menuGroupNotExist() {
         //given
@@ -127,7 +127,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(NoSuchElementException.class);
     }
 
-    @DisplayName("가격이 없으면 예외가 발생한다")
+    @DisplayName("create - 가격이 없으면 예외가 발생한다")
     @Test
     void noPrice() {
         //given
@@ -140,7 +140,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("가격이 음수이라면 예외가 발생한다")
+    @DisplayName("create - 가격이 음수이라면 예외가 발생한다")
     @Test
     void negativePrice() {
         //given
@@ -152,7 +152,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴상품을 요청하지 않으면 예외가 발생한다")
+    @DisplayName("create - 메뉴상품을 요청하지 않으면 예외가 발생한다")
     @Test
     void noMenuProduct() {
         //given
@@ -169,7 +169,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 상품의 상품들 중 하나라도 존재하지 않으면 예외가 발생한다")
+    @DisplayName("create - 메뉴 상품의 상품들 중 하나라도 존재하지 않으면 예외가 발생한다")
     @Test
     void productNotExist() {
         //given
@@ -186,7 +186,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(NoSuchElementException.class);
     }
 
-    @DisplayName("메뉴 상품의 상품수량이 하나라도 음수인 것이 있으면 예외가 발생한다")
+    @DisplayName("create - 메뉴 상품의 상품수량이 하나라도 음수인 것이 있으면 예외가 발생한다")
     @Test
     void productsNegativeQuentity() {
         //given
@@ -208,7 +208,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
+    @DisplayName("create - 메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
     @Test
     void menuValidPrice() {
         //given
@@ -224,7 +224,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 이름이 한글자 미만이라면 예외가 발생한다")
+    @DisplayName("create - 메뉴 이름이 한글자 미만이라면 예외가 발생한다")
     @ParameterizedTest
     @NullAndEmptySource
     void nullAndEmpty(final String value) {
@@ -241,7 +241,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 이름은 중복될 수 있다")
+    @DisplayName("create - 메뉴 이름은 중복될 수 있다")
     @ParameterizedTest
     @ValueSource(strings = {"name1", "name2"})
     void duplicateName(final String name) {
@@ -263,7 +263,7 @@ class MenuServiceTest extends MockTest {
         assertThat(createdMenu2).isInstanceOf(Menu.class);
     }
 
-    @DisplayName("메뉴 이름에 비속어가 포함되어 있다면 예외가 발생한다")
+    @DisplayName("create - 메뉴 이름에 비속어가 포함되어 있다면 예외가 발생한다")
     @ParameterizedTest
     @ValueSource(strings = {"fuck", "bitch", "Damn"})
     void profanityName(final String profanityName) {
@@ -281,7 +281,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴의 가격을 수정할 수 있다")
+    @DisplayName("changePrice - 메뉴의 가격을 수정할 수 있다")
     @ParameterizedTest()
     @ValueSource(longs = {0L, 1L, 10000L, 20000L})
     void change(final long price) {
@@ -299,7 +299,7 @@ class MenuServiceTest extends MockTest {
         assertThat(changedMenu.getPrice()).isEqualTo(BigDecimal.valueOf(price));
     }
 
-    @DisplayName("메뉴 가격이 없으면 예외가 발생한다")
+    @DisplayName("changePrice - 메뉴 가격이 없으면 예외가 발생한다")
     @Test
     void changeWithNoPrice() {
         //given
@@ -312,7 +312,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 가격이 음수라면 예외가 발생한다")
+    @DisplayName("changePrice - 메뉴 가격이 음수라면 예외가 발생한다")
     @Test
     void changeWithNegativePrice() {
         //given
@@ -323,7 +323,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
+    @DisplayName("changePrice - 메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
     @Test
     void changeValidPrice() {
         //given
@@ -337,7 +337,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴가 노출되도록 변경할 수 있다")
+    @DisplayName("display - 메뉴가 노출되도록 변경할 수 있다")
     @Test
     void display() {
         //given
@@ -353,7 +353,7 @@ class MenuServiceTest extends MockTest {
         assertThat(sut.isDisplayed()).isTrue();
     }
 
-    @DisplayName("메뉴가 존재하지 않으면 예외가 발생한다")
+    @DisplayName("display - 메뉴가 존재하지 않으면 예외가 발생한다")
     @Test
     void displayNotExistMenu() {
         //given
@@ -368,7 +368,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(NoSuchElementException.class);
     }
 
-    @DisplayName("메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
+    @DisplayName("display - 메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
     @Test
     void displayMenuPrice() {
         //given
@@ -382,7 +382,7 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴가 노출되지 않도록 변경할 수 있다")
+    @DisplayName("hide - 메뉴가 노출되지 않도록 변경할 수 있다")
     @Test
     void hide() {
         //given
@@ -397,7 +397,7 @@ class MenuServiceTest extends MockTest {
         assertThat(sut.isDisplayed()).isFalse();
     }
 
-    @DisplayName("메뉴가 존재하지 않으면 예외가 발생한다")
+    @DisplayName("hide - 메뉴가 존재하지 않으면 예외가 발생한다")
     @Test
     void hideNotExistMenu() {
         //given
@@ -411,9 +411,9 @@ class MenuServiceTest extends MockTest {
         ).isInstanceOf(NoSuchElementException.class);
     }
 
-    @DisplayName("메뉴리스트를 조회할 수 있다")
+    @DisplayName("findAll - 메뉴리스트를 조회할 수 있다")
     @Test
-    void menuList() {
+    void findAll() {
         //given
         final Menu menu1 = createMenu(MENU_NAME, PRICE);
         final Menu menu2 = createMenu(MENU_NAME2, PRICE2);
