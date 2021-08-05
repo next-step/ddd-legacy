@@ -12,8 +12,8 @@ public class SplitTexts {
         this.texts = texts;
     }
 
-    public SplitTexts(String[] numbers) {
-        this(Arrays.asList(numbers));
+    public SplitTexts(String[] texts) {
+        this(Arrays.asList(texts));
     }
 
     public SplitTexts() {

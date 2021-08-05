@@ -11,8 +11,8 @@ public class Numbers {
         this.numbers = numbers;
     }
 
-    public Numbers(Number number) {
-        this.numbers = Collections.singletonList(number);
+    public Numbers() {
+        this.numbers = Collections.emptyList();
     }
 
     public int sum() {
