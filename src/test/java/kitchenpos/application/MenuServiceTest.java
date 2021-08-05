@@ -436,7 +436,7 @@ class MenuServiceTest extends MockTest {
         //when, then
         assertThatThrownBy(
             () -> menuService.display(createdMenu.getId())
-        ).isInstanceOf(NoSuchElementException.class);
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴가 노출되지 않도록 변경할 수 있다")

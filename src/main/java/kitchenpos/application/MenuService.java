@@ -122,7 +122,7 @@ public class MenuService {
                 .multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
         }
         if (menu.getPrice().compareTo(sum) > 0) {
-            throw new IllegalStateException();
+            throw new IllegalArgumentException();
         }
         menu.setDisplayed(true);
         return menu;
