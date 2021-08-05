@@ -107,17 +107,6 @@ class MenuServiceTest extends MockTest {
         assertThat(sut).isInstanceOf(Menu.class);
     }
 
-    private Menu createMenu(final String name, final Long price) {
-        final Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName(name);
-        menu.setPrice(BigDecimal.valueOf(price));
-        menu.setMenuGroupId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setMenuProducts(menuProducts);
-        return menu;
-    }
-
     @DisplayName("메뉴 그룹이 존재하지 않으면 예외가 발생한다")
     @Test
     void menuGroupNotExist() {
@@ -292,18 +281,11 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = createMenu("후라이드", 19000L);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
-        given(productRepository.findAllById(any())).willReturn(products);
-        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
-        given(menuRepository.save(any())).willReturn(menu);
-
-        final Menu createdMenu = menuService.create(menu);
-
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
         //when
         menu.setPrice(BigDecimal.valueOf(price));
-        final Menu changedMenu = menuService.changePrice(createdMenu.getId(), menu);
+        final Menu changedMenu = menuService.changePrice(menu.getId(), menu);
 
         //then
         assertThat(changedMenu).isInstanceOf(Menu.class);
@@ -315,18 +297,11 @@ class MenuServiceTest extends MockTest {
     void changeWithNoPrice() {
         //given
         final Menu menu = createMenu("후라이드", 19000L);
-
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
-        given(productRepository.findAllById(any())).willReturn(products);
-        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
-        given(menuRepository.save(any())).willReturn(menu);
-
-        final Menu createdMenu = menuService.create(menu);
+        menu.setPrice(null);
 
         //when, then
-        menu.setPrice(null);
         assertThatThrownBy(
-            () -> menuService.changePrice(createdMenu.getId(), menu)
+            () -> menuService.changePrice(menu.getId(), menu)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -334,19 +309,10 @@ class MenuServiceTest extends MockTest {
     @Test
     void changeWithNegativePrice() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu("후라이드", -19000L);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
-        given(productRepository.findAllById(any())).willReturn(products);
-        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
-        given(menuRepository.save(any())).willReturn(menu);
-
-        final Menu createdMenu = menuService.create(menu);
-
-        //when, then
-        menu.setPrice(BigDecimal.valueOf(-19000L));
         assertThatThrownBy(
-            () -> menuService.changePrice(createdMenu.getId(), menu)
+            () -> menuService.changePrice(menu.getId(), menu)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -354,21 +320,13 @@ class MenuServiceTest extends MockTest {
     @Test
     void changeValidPrice() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
-
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
-        given(productRepository.findAllById(any())).willReturn(products);
-        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
-        given(menuRepository.save(any())).willReturn(menu);
-
-        final Menu createdMenu = menuService.create(menu);
+        final Menu menu = createMenu("후라이드", 20000000L);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
         //when, then
-        menu.setPrice(BigDecimal.valueOf(20000000L));
         assertThatThrownBy(
-            () -> menuService.changePrice(createdMenu.getId(), menu)
+            () -> menuService.changePrice(menu.getId(), menu)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -379,17 +337,10 @@ class MenuServiceTest extends MockTest {
         final Menu menu = createMenu("후라이드", 19000L);
         menu.setDisplayed(false);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
-        given(productRepository.findAllById(any())).willReturn(products);
-        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
-        given(menuRepository.save(any())).willReturn(menu);
-
-        final Menu createdMenu = menuService.create(menu);
-
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
         //when
-        final Menu sut = menuService.display(createdMenu.getId());
+        final Menu sut = menuService.display(menu.getId());
 
         //then
         assertThat(sut.isDisplayed()).isTrue();
@@ -402,18 +353,11 @@ class MenuServiceTest extends MockTest {
         final Menu menu = createMenu("후라이드", 19000L);
         menu.setDisplayed(false);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
-        given(productRepository.findAllById(any())).willReturn(products);
-        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
-        given(menuRepository.save(any())).willReturn(menu);
-
-        final Menu createdMenu = menuService.create(menu);
-
         given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
         assertThatThrownBy(
-            () -> menuService.display(createdMenu.getId())
+            () -> menuService.display(menu.getId())
         ).isInstanceOf(NoSuchElementException.class);
     }
 
@@ -421,21 +365,13 @@ class MenuServiceTest extends MockTest {
     @Test
     void displayMenuPrice() {
         //given
-        final Menu menu = createMenu("후라이드", 19000L);
+        final Menu menu = createMenu("후라이드", 20000000L);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
-        given(productRepository.findAllById(any())).willReturn(products);
-        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
-        given(menuRepository.save(any())).willReturn(menu);
-
-        final Menu createdMenu = menuService.create(menu);
-
-        createdMenu.setPrice(BigDecimal.valueOf(20000000L));
-        given(menuRepository.findById(any())).willReturn(Optional.of(createdMenu));
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
         //when, then
         assertThatThrownBy(
-            () -> menuService.display(createdMenu.getId())
+            () -> menuService.display(menu.getId())
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -445,17 +381,10 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = createMenu("후라이드", 19000L);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
-        given(productRepository.findAllById(any())).willReturn(products);
-        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
-        given(menuRepository.save(any())).willReturn(menu);
-
-        final Menu createdMenu = menuService.create(menu);
-
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
         //when
-        final Menu sut = menuService.hide(createdMenu.getId());
+        final Menu sut = menuService.hide(menu.getId());
 
         //then
         assertThat(sut.isDisplayed()).isFalse();
@@ -466,20 +395,12 @@ class MenuServiceTest extends MockTest {
     void hideNotExistMenu() {
         //given
         final Menu menu = createMenu("후라이드", 19000L);
-        menu.setDisplayed(false);
-
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
-        given(productRepository.findAllById(any())).willReturn(products);
-        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
-        given(menuRepository.save(any())).willReturn(menu);
-
-        final Menu createdMenu = menuService.create(menu);
 
         given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
         assertThatThrownBy(
-            () -> menuService.hide(createdMenu.getId())
+            () -> menuService.hide(menu.getId())
         ).isInstanceOf(NoSuchElementException.class);
     }
 
@@ -500,6 +421,17 @@ class MenuServiceTest extends MockTest {
             () -> assertThat(menus.get(0)).isEqualTo(menu1),
             () -> assertThat(menus.get(1)).isEqualTo(menu2)
         );
+    }
+
+    private Menu createMenu(final String name, final Long price) {
+        final Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName(name);
+        menu.setPrice(BigDecimal.valueOf(price));
+        menu.setMenuGroupId(UUID.randomUUID());
+        menu.setDisplayed(true);
+        menu.setMenuProducts(menuProducts);
+        return menu;
     }
 
 }
