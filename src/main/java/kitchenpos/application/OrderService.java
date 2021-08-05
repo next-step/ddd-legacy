@@ -50,10 +50,13 @@ public class OrderService {
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
-            if (type != OrderType.EAT_IN) {
-                if (quantity < 0) {
-                    throw new IllegalArgumentException();
-                }
+//            if (type != OrderType.EAT_IN) {
+//                if (quantity < 0) {
+//                    throw new IllegalArgumentException();
+//                }
+//            }
+            if (quantity < 0) {
+                throw new IllegalArgumentException();
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
@@ -82,6 +85,9 @@ public class OrderService {
             order.setDeliveryAddress(deliveryAddress);
         }
         if (type == OrderType.EAT_IN) {
+            if (Objects.isNull(request.getOrderTableId())) {
+                throw new IllegalArgumentException();
+            }
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
             if (orderTable.isEmpty()) {
@@ -119,6 +125,7 @@ public class OrderService {
         if (order.getStatus() != OrderStatus.ACCEPTED) {
             throw new IllegalStateException();
         }
+
         order.setStatus(OrderStatus.SERVED);
         return order;
     }
