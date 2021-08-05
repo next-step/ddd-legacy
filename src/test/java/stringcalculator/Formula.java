@@ -7,6 +7,7 @@ public class Formula {
     private String formula;
     private final Operator operator;
     private final Operand operand;
+    private final Pattern pattern = Pattern.compile("//(.)\n(.*)");
 
     public Formula(String formula) {
         this.formula = formula;
@@ -21,7 +22,7 @@ public class Formula {
     }
 
     private void checkAndAddCustomOperator() {
-        Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(this.formula);
+        Matcher matcher = pattern.matcher(this.formula);
         if (matcher.find()) {
             this.operator.addCustomOperator(matcher.group(1));
             this.formula = matcher.group(2);
