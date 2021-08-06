@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -15,28 +16,30 @@ class MenuGroupServiceIntegrationTest extends IntegrationTest {
 	@Autowired
 	private MenuGroupService menuGroupService;
 
+	@DisplayName("메뉴 그룹 생성")
 	@Test
 	void 메뉴_그룹_생성() {
 		// given
-		MenuGroup given = new MenuGroup();
-		given.setName("추천메뉴");
+		MenuGroup givenRequest = new MenuGroup();
+		givenRequest.setName("추천메뉴");
 
 		// when
-		MenuGroup actual = menuGroupService.create(given);
+		MenuGroup actualMenuGroup = menuGroupService.create(givenRequest);
 
 		// then
-		assertThat(actual.getId()).isNotNull();
-		assertThat(actual.getName()).isEqualTo("추천메뉴");
+		assertThat(actualMenuGroup.getId()).isNotNull();
+		assertThat(actualMenuGroup.getName()).isEqualTo("추천메뉴");
 	}
 
+	@DisplayName("메뉴 그룹 생성 실패 : 이름 빈값")
 	@Test
-	void 메뉴_그룹_생성_실패() {
+	void 메뉴_그룹_생성_실패_1() {
 		// given
-		MenuGroup given = new MenuGroup();
-		given.setName("");
+		MenuGroup givenRequest = new MenuGroup();
+		givenRequest.setName("");
 
 		// when
-		ThrowableAssert.ThrowingCallable throwingCallable = () -> menuGroupService.create(given);
+		ThrowableAssert.ThrowingCallable throwingCallable = () -> menuGroupService.create(givenRequest);
 
 		// then
 		Assertions.assertThatIllegalArgumentException().isThrownBy(throwingCallable);
