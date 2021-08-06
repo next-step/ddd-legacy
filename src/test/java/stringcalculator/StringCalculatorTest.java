@@ -67,4 +67,12 @@ class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> calculator.add(text));
     }
+
+    @DisplayName(value = "문자열 계산기에 문자열만 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "a,b", "a,b:c", "//;\na;b;c"})
+    void string(final String text) {
+        assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> calculator.add(text));
+    }
 }
