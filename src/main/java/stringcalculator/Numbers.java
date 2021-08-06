@@ -16,6 +16,8 @@ public class Numbers {
     }
 
     public int sum() {
-        return numbers.stream().mapToInt(Number::getValue).sum();
+        return numbers.stream()
+            .mapToInt(Number::getValue)
+            .sum();
     }
 }

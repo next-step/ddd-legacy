@@ -14,7 +14,10 @@ public class NumberParser {
         }
 
         return new Numbers(
-            texts.getValues().stream().map(Number::new).collect(Collectors.toList())
+            texts.getValues()
+                .stream()
+                .map(Number::new)
+                .collect(Collectors.toList())
         );
     }
 }
