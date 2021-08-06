@@ -2,6 +2,9 @@ package stringcalculator;
 
 public class Number {
 
+    private static final int LOWER_BOUND = 0;
+    private static final String NEGATIVE_NOT_ALLOWED_MESSAGE = "음수를 입력할 수 없습니다.";
+
     private final int number;
 
     public Number(int number) {
@@ -14,8 +17,8 @@ public class Number {
     }
 
     private void numberShouldNotBeNegative(final int number) {
-        if (number < 0) {
-            throw new IllegalArgumentException("음수를 입력할 수 없습니다.");
+        if (number < LOWER_BOUND) {
+            throw new IllegalArgumentException(NEGATIVE_NOT_ALLOWED_MESSAGE);
         }
     }
 
