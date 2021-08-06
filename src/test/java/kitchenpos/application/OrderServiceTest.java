@@ -555,11 +555,15 @@ class OrderServiceTest extends MockTest {
         //then
         assertAll(
             () -> assertThat(sut.get(0)).isEqualTo(order1),
-            () -> assertThat(sut.get(0).getType()).isEqualTo(OrderType.EAT_IN),
-            () -> assertThat(sut.get(0).getStatus()).isEqualTo(OrderStatus.SERVED),
+            () -> assertThat(sut.get(0)
+                .getType()).isEqualTo(OrderType.EAT_IN),
+            () -> assertThat(sut.get(0)
+                .getStatus()).isEqualTo(OrderStatus.SERVED),
             () -> assertThat(sut.get(1)).isEqualTo(order2),
-            () -> assertThat(sut.get(1).getType()).isEqualTo(OrderType.DELIVERY),
-            () -> assertThat(sut.get(1).getStatus()).isEqualTo(OrderStatus.COMPLETED)
+            () -> assertThat(sut.get(1)
+                .getType()).isEqualTo(OrderType.DELIVERY),
+            () -> assertThat(sut.get(1)
+                .getStatus()).isEqualTo(OrderStatus.COMPLETED)
         );
     }
 
