@@ -56,7 +56,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_테이블_착석() {
 		// given
-		OrderTable given = orderTableRepository.save(OrderTableFixture.empty());
+		OrderTable given = orderTableRepository.save(OrderTableFixture.orderTable());
 
 		// when
 		OrderTable actual = orderTableService.sit(given.getId());
@@ -64,6 +64,21 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		// then
 		assertThat(actual.getId()).isEqualTo(given.getId());
 		assertThat(actual.isEmpty()).isEqualTo(false);
+	}
+
+	@DisplayName("주문 테이블 비우기")
+	@Test
+	void 주문_테이블_비우기() {
+		// given
+		OrderTable given = orderTableRepository.save(OrderTableFixture.orderTable());
+
+		// when
+		OrderTable actual = orderTableService.clear(given.getId());
+
+		// then
+		assertThat(actual.getId()).isEqualTo(given.getId());
+		assertThat(actual.getNumberOfGuests()).isEqualTo(0);
+		assertThat(actual.isEmpty()).isEqualTo(true);
 	}
 
 	@DisplayName("주문 테이블 손님 수 변경")
@@ -101,7 +116,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_테이블_손님_수_변경_실패_2() {
 		// given
-		OrderTable given = orderTableRepository.save(OrderTableFixture.empty());
+		OrderTable given = orderTableRepository.save(OrderTableFixture.orderTable());
 		OrderTable request = new OrderTable();
 		request.setNumberOfGuests(-1);
 
@@ -117,7 +132,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_주문_조회() {
 		// given
-		orderTableRepository.save(OrderTableFixture.empty());
+		orderTableRepository.save(OrderTableFixture.orderTable());
 
 		// when
 		List<OrderTable> actual = orderTableService.findAll();

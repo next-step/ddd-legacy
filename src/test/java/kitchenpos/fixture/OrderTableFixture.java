@@ -5,7 +5,7 @@ import java.util.UUID;
 import kitchenpos.domain.OrderTable;
 
 public class OrderTableFixture {
-	public static OrderTable empty() {
+	public static OrderTable orderTable() {
 		OrderTable orderTable = new OrderTable();
 		orderTable.setId(UUID.randomUUID());
 		orderTable.setName("9번");
