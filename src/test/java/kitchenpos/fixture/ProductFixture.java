@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import kitchenpos.domain.Product;
 
-public class Fixture {
+public class ProductFixture {
 	public static Product product() {
 		Product product = new Product();
 		product.setId(UUID.randomUUID());

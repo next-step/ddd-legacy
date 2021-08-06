@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import kitchenpos.IntegrationTest;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.fixture.Fixture;
+import kitchenpos.fixture.ProductFixture;
 
 class ProductServiceIntegrationTest extends IntegrationTest {
 	@Autowired
@@ -88,7 +88,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 상품_가격_변경() {
 		// given
-		Product givenProduct = Fixture.product();
+		Product givenProduct = ProductFixture.product();
 		productRepository.save(givenProduct);
 
 		Product givenRequest = new Product();
@@ -105,14 +105,15 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 상품_가격_변경_실패_1() {
 		// given
-		Product givenProduct = Fixture.product();
+		Product givenProduct = ProductFixture.product();
 		productRepository.save(givenProduct);
 
 		Product givenRequest = new Product();
 		givenRequest.setPrice(new BigDecimal(-10000));
 
 		// when
-		ThrowableAssert.ThrowingCallable throwingCallable = () -> productService.changePrice(givenProduct.getId(), givenRequest);
+		ThrowableAssert.ThrowingCallable throwingCallable =
+			() -> productService.changePrice(givenProduct.getId(), givenRequest);
 
 		// then
 		Assertions.assertThatIllegalArgumentException().isThrownBy(throwingCallable);
@@ -122,7 +123,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_상품_조회() {
 		// given
-		productRepository.save(Fixture.product());
+		productRepository.save(ProductFixture.product());
 
 		// when
 		List<Product> actual = productService.findAll();
