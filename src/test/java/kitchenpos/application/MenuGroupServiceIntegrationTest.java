@@ -1,7 +1,8 @@
 package kitchenpos.application;
 
-
 import static org.assertj.core.api.Assertions.*;
+
+import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
@@ -11,10 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.IntegrationTest;
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.fixture.MenuGroupFixture;
 
 class MenuGroupServiceIntegrationTest extends IntegrationTest {
 	@Autowired
 	private MenuGroupService menuGroupService;
+	@Autowired
+	private MenuGroupRepository menuGroupRepository;
 
 	@DisplayName("메뉴 그룹 생성")
 	@Test
@@ -43,5 +48,18 @@ class MenuGroupServiceIntegrationTest extends IntegrationTest {
 
 		// then
 		Assertions.assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+	}
+
+	@DisplayName("전체 주문 조회")
+	@Test
+	void 전체_주문_조회() {
+		// given
+		menuGroupRepository.save(MenuGroupFixture.menuGroup());
+
+		// when
+		List<MenuGroup> actual = menuGroupService.findAll();
+
+		// then
+		assertThat(actual).isNotEmpty();
 	}
 }
