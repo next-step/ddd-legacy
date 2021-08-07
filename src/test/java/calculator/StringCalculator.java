@@ -8,7 +8,7 @@ public class StringCalculator {
 
     private final StringTokenizer stringTokenizer = new StringTokenizer();
 
-    private int calculate(final String text, IntBinaryOperator intBinaryOperator) {
+    private int calculate(final String text, final IntBinaryOperator intBinaryOperator) {
         if (Objects.isNull(text)) {
             return DEFAULT_RETURN_VALUE;
         }
@@ -18,9 +18,7 @@ public class StringCalculator {
             return DEFAULT_RETURN_VALUE;
         }
 
-        return stringOperands.stream()
-                .mapToInt(StringOperand::parseInt)
-                .reduce(DEFAULT_RETURN_VALUE, intBinaryOperator);
+        return stringOperands.reduce(DEFAULT_RETURN_VALUE, intBinaryOperator);
     }
 
     public int add(final String text) {
