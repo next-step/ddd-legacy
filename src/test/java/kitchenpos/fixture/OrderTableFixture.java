@@ -14,7 +14,7 @@ public class OrderTableFixture {
 		return orderTable;
 	}
 
-	public static OrderTable sit() {
+	public static OrderTable sat() {
 		OrderTable orderTable = new OrderTable();
 		orderTable.setId(UUID.randomUUID());
 		orderTable.setName("9번");

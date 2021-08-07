@@ -85,7 +85,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_테이블_손님_수_변경() {
 		// given
-		OrderTable given = orderTableRepository.save(OrderTableFixture.sit());
+		OrderTable given = orderTableRepository.save(OrderTableFixture.sat());
 		OrderTable request = new OrderTable();
 		request.setNumberOfGuests(4);
 
@@ -100,7 +100,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_테이블_손님_수_변경_실패_1() {
 		// given
-		OrderTable given = orderTableRepository.save(OrderTableFixture.sit());
+		OrderTable given = orderTableRepository.save(OrderTableFixture.sat());
 		OrderTable request = new OrderTable();
 		request.setNumberOfGuests(-1);
 
