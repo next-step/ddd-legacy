@@ -14,6 +14,8 @@ public class StringSplitter {
     private static final String MATCH_SPECIAL = "\\?|\\.|\\$|\\|";
     private static final String ADD_SPECIAL_DELIMITER = "\\";
     private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
+    private static final int MATCH_CUSTOM_DELIMITER = 1;
+    private static final int MATCH_CUSTOM_NUMBER = 2;
 
     private List<String> delimiters;
 
@@ -28,7 +30,15 @@ public class StringSplitter {
     public List<String> split(String text) {
         String checkedText = matchCustom(text);
         String delimiter = String.join(DELIMTER, delimiters);
-        return Arrays.stream(checkedText.split(delimiter)).collect(toList());
+        return Arrays.asList(checkedText.split(delimiter));
+    }
+    private String matchCustom(String text) {
+        Matcher matched = CUSTOM_PATTERN.matcher(text);
+        if(matched.find()) {
+            delimiters.add(matchSpecial(matched.group(MATCH_CUSTOM_DELIMITER)));
+            return matched.group(MATCH_CUSTOM_NUMBER);
+        }
+        return text;
     }
 
     private String matchSpecial(String delimiter) {
@@ -38,12 +48,4 @@ public class StringSplitter {
         return delimiter;
     }
 
-    private String matchCustom(String text) {
-        Matcher m = CUSTOM_PATTERN.matcher(text);
-        if(m.find()) {
-            delimiters.add(matchSpecial(m.group(1)));
-            return m.group(2);
-        }
-        return text;
-    }
 }
