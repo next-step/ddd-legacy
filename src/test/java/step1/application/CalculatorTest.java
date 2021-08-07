@@ -30,7 +30,7 @@ class CalculatorTest {
     // \n 으로 인해서 @CsvSource 방식으로 테스트 불가능
     @DisplayName("입력값 내 커스텀 연산자 추출")
     @Test
-    void parseCustomOperator() {
+    void parseOperatorsByCustomOperator() {
         Map<String, String> source = new HashMap<>();
         source.put("//;\n1;2;3", ";");
         source.put("//&\n1&2&3", "&");
@@ -54,6 +54,23 @@ class CalculatorTest {
         assertEquals(numberCount, numbers.size());
     }
 
+    // \n 으로 인해서 @CsvSource 방식으로 테스트 불가능
+    @DisplayName("입력값 내 연산에 사용될 숫자 추출(custom 연산자)")
+    @Test
+    void parseNumbersByCustomOperator() {
+        Map<String, Integer> source = new HashMap<>();
+        source.put("//;\n1;2", 2);
+        source.put("//&\n1&2&3", 3);
+        source.put("//#\n1#2#3#4", 4);
+
+        for (Map.Entry<String, Integer> entry : source.entrySet()) {
+            Calculator calculator = new CalculatorImpl(entry.getKey());
+            List<Number> numbers = calculator.parseNumbers(entry.getKey());
+            assertEquals(entry.getValue(), numbers.size());
+        }
+
+    }
+
     @DisplayName("입력값에 대한 합계 연산")
     @ParameterizedTest
     @CsvSource(value = {"1,2:3* 6", "1,2:3,4* 10", "1:2:3,4:5* 15", "5* 5", "1,3* 4"}, delimiter = '*')
@@ -61,6 +78,23 @@ class CalculatorTest {
         Calculator calculator = new CalculatorImpl(expression);
         int sum = calculator.sum(expression);
         assertEquals(result, sum);
+    }
+
+    // \n 으로 인해서 @CsvSource 방식으로 테스트 불가능
+    @DisplayName("입력값에 대한 합계 연산(custom 연산자)")
+    @Test
+    void sumByCustomOperator() {
+        Map<String, Integer> source = new HashMap<>();
+        source.put("//;\n1;2;3", 6);
+        source.put("//&\n3&4&5", 12);
+        source.put("//#\n4#5#6", 15);
+
+        for (Map.Entry<String, Integer> entry : source.entrySet()) {
+            Calculator calculator = new CalculatorImpl(entry.getKey());
+            int sum = calculator.sum(entry.getKey());
+            assertEquals(entry.getValue(), sum);
+        }
+
     }
 
     @DisplayName("마이너스 입력값에 대한 합계 연산시 Exception 타입 검증")
@@ -78,7 +112,7 @@ class CalculatorTest {
         Map<String, String> source = new HashMap<>();
         source.put("//;\n-1;2;3", ";");
         source.put("//&\n1&-2&3", "&");
-        source.put("//$\n1$2$-3", "$");
+        source.put("//#\n1#2#-3", "#");
 
         for (Map.Entry<String, String> entry : source.entrySet()) {
             Calculator calculator = new CalculatorImpl(entry.getKey());

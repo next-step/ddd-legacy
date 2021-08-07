@@ -57,6 +57,7 @@ public class CalculatorImpl implements Calculator {
     private void collectNumbers(String expression, List<step1.domain.Number> numbers, ArrayList<String> operators) {
         if (operators.size() == 1) {
             this.collectNumbersByCustomOperator(numbers);
+            return;
         }
 
         String splitExpression = getSplitExpression(operators);
@@ -85,7 +86,9 @@ public class CalculatorImpl implements Calculator {
 
     private void collectNumbersByCustomOperator(List<Number> numbers) {
         String customOperator = matcher.group(1);
-        for (String value : matcher.group(2).split(customOperator)) {
+        String expression = matcher.group(2);
+
+        for (String value : expression.split(customOperator)) {
             numbers.add(new Number(value));
         }
     }
