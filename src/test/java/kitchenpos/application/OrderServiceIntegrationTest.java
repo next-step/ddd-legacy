@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -459,5 +460,21 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 
 		// then
 		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
+	}
+
+	@DisplayName("전체 주문 조회")
+	@Test
+	void 전체_주문_조회() {
+		// given
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		orderRepository.save(OrderFixture.acceptedTakeout(givenMenu));
+
+		// when
+		List<Order> actual = orderService.findAll();
+
+		// then
+		Assertions.assertThat(actual).isNotEmpty();
 	}
 }
