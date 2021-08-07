@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.assertj.core.api.Assertions;
@@ -11,15 +12,34 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.IntegrationTest;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.MenuGroupFixture;
+import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
+import kitchenpos.fixture.ProductFixture;
 
 public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Autowired
 	private OrderTableService orderTableService;
 	@Autowired
+	private MenuRepository menuRepository;
+	@Autowired
+	private MenuGroupRepository menuGroupRepository;
+	@Autowired
+	private ProductRepository productRepository;
+	@Autowired
 	private OrderTableRepository orderTableRepository;
+	@Autowired
+	private OrderRepository orderRepository;
 
 	@DisplayName("주문 테이블 생성")
 	@Test
@@ -79,6 +99,23 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		assertThat(actual.getId()).isEqualTo(given.getId());
 		assertThat(actual.getNumberOfGuests()).isEqualTo(0);
 		assertThat(actual.isEmpty()).isEqualTo(true);
+	}
+
+	@DisplayName("주문 테이블 비우기 실패 : 주문 상태가 완료가 아님")
+	@Test
+	void 주문_테이블_비우기_실패_1() {
+		// given
+		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.orderTable());
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		orderRepository.save(OrderFixture.servedEatIn(givenMenu, givenOrderTable));
+
+		// when
+		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderTableService.clear(givenOrderTable.getId());
+
+		// then
+		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
 	}
 
 	@DisplayName("주문 테이블 손님 수 변경")
