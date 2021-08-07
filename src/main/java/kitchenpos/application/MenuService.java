@@ -41,6 +41,9 @@ public class MenuService {
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException(PRICE_ILLEGAL_ARGUMENT);
         }
+        if (request.getMenuGroup() == null) {
+            throw new IllegalArgumentException(MENU_GROUP_ILLEGAL_ARGUMENT);
+        }
         final MenuGroup menuGroup = menuGroupRepository.findById(request.getMenuGroupId())
             .orElseThrow(() -> new NoSuchElementException(MENU_GROUP_ILLEGAL_ARGUMENT));
         final List<MenuProduct> menuProductRequests = request.getMenuProducts();
