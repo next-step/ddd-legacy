@@ -18,6 +18,7 @@ import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
@@ -26,6 +27,7 @@ import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
+import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.fixture.ProductFixture;
 
@@ -40,6 +42,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	private ProductRepository productRepository;
 	@Autowired
 	private OrderTableRepository orderTableRepository;
+	@Autowired
+	private OrderRepository orderRepository;
 
 	@DisplayName("주문")
 	@Test
@@ -240,6 +244,38 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(givenRequest);
+
+		// then
+		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
+	}
+
+	@DisplayName("주문 수락")
+	@Test
+	void 주문_수락() {
+		// given
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.waitingDelivery(givenMenu));
+
+		// when
+		Order actualOrder = orderService.accept(givenOrder.getId());
+
+		// then
+		Assertions.assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+	}
+
+	@DisplayName("주문 수락 실패 : 대기중이 아님")
+	@Test
+	void 주문_수락_실패_1() {
+		// given
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.acceptedTakeout(givenMenu)); // not waiting
+
+		// when
+		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.accept(givenOrder.getId());
 
 		// then
 		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
