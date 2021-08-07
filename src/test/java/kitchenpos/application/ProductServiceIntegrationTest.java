@@ -12,15 +12,25 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.IntegrationTest;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.ProductFixture;
 
 class ProductServiceIntegrationTest extends IntegrationTest {
 	@Autowired
 	private ProductService productService;
 	@Autowired
+	private MenuGroupRepository menuGroupRepository;
+	@Autowired
 	private ProductRepository productRepository;
+	@Autowired
+	private MenuRepository menuRepository;
 
 	@DisplayName("상품 생성")
 	@Test
@@ -99,6 +109,25 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 
 		// then
 		assertThat(actualProduct.getPrice()).isEqualTo(new BigDecimal(18000));
+	}
+
+	@DisplayName("상품 가격 비노출 : 메뉴의 가격 > 메뉴 상품들의 (가격 * 수량) 일 경우, 메뉴를 비노출한다.")
+	@Test
+	void 상품_가격_변경_비노출() {
+		// given
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(100000000), givenMenuGroup, givenProduct));
+
+		Product givenRequest = new Product();
+		givenRequest.setPrice(new BigDecimal(18000));
+
+		// when
+		productService.changePrice(givenProduct.getId(), givenRequest);
+
+		// then
+		Menu retrievedMenu = menuRepository.findById(givenMenu.getId()).get();
+		Assertions.assertThat(retrievedMenu.isDisplayed()).isEqualTo(false);
 	}
 
 	@DisplayName("상품 가격 변경 실패 : 가격 음수")
