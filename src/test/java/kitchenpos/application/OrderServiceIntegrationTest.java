@@ -280,4 +280,36 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// then
 		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
 	}
+
+	@DisplayName("주문 서빙")
+	@Test
+	void 주문_서빙() {
+		// given
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.acceptedTakeout(givenMenu));
+
+		// when
+		Order actualOrder = orderService.serve(givenOrder.getId());
+
+		// then
+		Assertions.assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+	}
+
+	@DisplayName("주문 서빙 실패 : 수락됨이 아님")
+	@Test
+	void 주문_서빙_실패_1() {
+		// given
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.waitingDelivery(givenMenu)); // not accepted
+
+		// when
+		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.serve(givenOrder.getId());
+
+		// then
+		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
+	}
 }
