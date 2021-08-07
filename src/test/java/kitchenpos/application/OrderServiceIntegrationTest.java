@@ -408,4 +408,56 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// then
 		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
 	}
+
+	@DisplayName("주문 완료")
+	@Test
+	void 주문_완료() {
+		// given
+		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.orderTable());
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.servedEatIn(givenMenu, givenOrderTable));
+
+		// when
+		Order actualOrder = orderService.complete(givenOrder.getId());
+		OrderTable actualOrderTable = orderTableRepository.findById(givenOrderTable.getId()).get();
+
+		// then
+		Assertions.assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+		Assertions.assertThat(actualOrderTable.getNumberOfGuests()).isEqualTo(0);
+		Assertions.assertThat(actualOrderTable.isEmpty()).isEqualTo(true);
+	}
+
+	@DisplayName("주문 완료 실패 : 주문 종류가 배달인데, 주문 상태가 배달됨이 아님")
+	@Test
+	void 주문_완료_실패_1() {
+		// given
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.servedDelivery(givenMenu)); // not delivered
+
+		// when
+		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.complete(givenOrder.getId());
+
+		// then
+		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
+	}
+
+	@DisplayName("주문 완료 실패 : 주문 종류가 테이크아웃이거나 매장에서 식사인데, 주문 상태가 서빙됨이 아님")
+	@Test
+	void 주문_완료_실패_2() {
+		// given
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.acceptedTakeout(givenMenu)); // not served
+
+		// when
+		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.complete(givenOrder.getId());
+
+		// then
+		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
+	}
 }
