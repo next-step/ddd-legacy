@@ -99,4 +99,11 @@ public class Menu {
     public void setMenuGroupId(final UUID menuGroupId) {
         this.menuGroupId = menuGroupId;
     }
+
+    public BigDecimal totalPriceOfProducts() {
+        return menuProducts.stream()
+                .map(MenuProduct::getProduct)
+                .map(Product::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 }
