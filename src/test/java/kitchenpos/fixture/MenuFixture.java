@@ -10,11 +10,11 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 public class MenuFixture {
-	public static Menu menu(MenuGroup menuGroup, Product product) {
+	public static Menu menu(BigDecimal price, MenuGroup menuGroup, Product product) {
 		Menu menu = new Menu();
 		menu.setId(UUID.randomUUID());
 		menu.setName("후라이드+후라이드");
-		menu.setPrice(new BigDecimal(19000));
+		menu.setPrice(price);
 		menu.setMenuGroup(menuGroup);
 		menu.setDisplayed(true);
 		menu.setMenuProducts(Collections.singletonList(menuProduct(product)));

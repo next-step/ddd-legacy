@@ -88,7 +88,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 상품_가격_변경() {
 		// given
-		Product givenProduct = ProductFixture.product();
+		Product givenProduct = ProductFixture.product(new BigDecimal(17000));
 		productRepository.save(givenProduct);
 
 		Product givenRequest = new Product();
@@ -105,7 +105,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 상품_가격_변경_실패_1() {
 		// given
-		Product givenProduct = ProductFixture.product();
+		Product givenProduct = ProductFixture.product(new BigDecimal(17000));
 		productRepository.save(givenProduct);
 
 		Product givenRequest = new Product();
@@ -123,7 +123,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_상품_조회() {
 		// given
-		productRepository.save(ProductFixture.product());
+		productRepository.save(ProductFixture.product(new BigDecimal(17000)));
 
 		// when
 		List<Product> actual = productService.findAll();
