@@ -360,4 +360,52 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// then
 		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
 	}
+
+	@DisplayName("주문 배달 완료")
+	@Test
+	void 주문_배달_완료() {
+		// given
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.deliveringDelivery(givenMenu));
+
+		// when
+		Order actualOrder = orderService.completeDelivery(givenOrder.getId());
+
+		// then
+		Assertions.assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+	}
+
+	@DisplayName("주문 배달 완료 실패 : 주문 종류가 배달이 아님")
+	@Test
+	void 주문_배달_완료_실패_1() {
+		// given
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.acceptedTakeout(givenMenu)); // not delivery
+
+		// when
+		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.completeDelivery(givenOrder.getId());
+
+		// then
+		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
+	}
+
+	@DisplayName("주문 배달 완료 실패 : 주문 상태가 배달중이 아님")
+	@Test
+	void 주문_배달_완료_실패_2() {
+		// given
+		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.servedDelivery(givenMenu)); // not delivering
+
+		// when
+		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.completeDelivery(givenOrder.getId());
+
+		// then
+		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
+	}
 }

@@ -44,6 +44,17 @@ public class OrderFixture {
 		return order;
 	}
 
+	public static Order deliveringDelivery(Menu menu) {
+		Order order = new Order();
+		order.setId(UUID.randomUUID());
+		order.setType(OrderType.DELIVERY);
+		order.setStatus(OrderStatus.DELIVERING);
+		order.setOrderDateTime(LocalDateTime.of(2021, Month.AUGUST, 7, 0, 0, 0, 0));
+		order.setOrderLineItems(Collections.singletonList(orderLineItem(menu)));
+		order.setDeliveryAddress("강남구");
+		return order;
+	}
+
 	public static Order servedTakeout(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
