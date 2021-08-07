@@ -16,8 +16,10 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.ProductFixture;
 
@@ -28,6 +30,8 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	private MenuGroupRepository menuGroupRepository;
 	@Autowired
 	private ProductRepository productRepository;
+	@Autowired
+	private MenuRepository menuRepository;
 
 	@DisplayName("메뉴 생성")
 	@Test
@@ -211,6 +215,62 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(givenRequest);
+
+		// then
+		Assertions.assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+	}
+
+	@DisplayName("메뉴 가격 변경")
+	@Test
+	void 메뉴_가격_변경() {
+		// given
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Product givenProduct = productRepository.save(ProductFixture.product());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(givenMenuGroup, givenProduct));
+
+		Menu givenRequest = new Menu();
+		givenRequest.setPrice(new BigDecimal(15000));
+
+		// when
+		Menu actualMenu = menuService.changePrice(givenMenu.getId(), givenRequest);
+
+		// then
+		Assertions.assertThat(actualMenu.getPrice()).isEqualTo(new BigDecimal(15000));
+	}
+
+	@DisplayName("메뉴 가격 변경 실패 : 가격 음수")
+	@Test
+	void 메뉴_가격_변경_실패_1() {
+		// given
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Product givenProduct = productRepository.save(ProductFixture.product());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(givenMenuGroup, givenProduct));
+
+		Menu givenRequest = new Menu();
+		givenRequest.setPrice(new BigDecimal(-10000)); // negative
+
+		// when
+		ThrowableAssert.ThrowingCallable throwingCallable =
+			() -> menuService.changePrice(givenMenu.getId(), givenRequest);
+
+		// then
+		Assertions.assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+	}
+
+	@DisplayName("메뉴 가격 변경 실패 : 메뉴의 가격 > 메뉴 상품들의 (가격 * 수량)")
+	@Test
+	void 메뉴_가격_변경_실패_2() {
+		// given
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		Product givenProduct = productRepository.save(ProductFixture.product());
+		Menu givenMenu = menuRepository.save(MenuFixture.menu(givenMenuGroup, givenProduct));
+
+		Menu givenRequest = new Menu();
+		givenRequest.setPrice(new BigDecimal(100000000)); // high
+
+		// when
+		ThrowableAssert.ThrowingCallable throwingCallable =
+			() -> menuService.changePrice(givenMenu.getId(), givenRequest);
 
 		// then
 		Assertions.assertThatIllegalArgumentException().isThrownBy(throwingCallable);
