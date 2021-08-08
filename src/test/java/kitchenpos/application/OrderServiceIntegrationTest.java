@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,7 +46,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	private static final BigDecimal ORDER_LINE_ITEM_PRICE = new BigDecimal(19000);
 	private static final BigDecimal ORDER_LINE_ITEM_PRICE_NOT_EQUAL_TO_MENU = new BigDecimal(100);
 	private static final long ORDER_LINE_ITEM_QUANTITY = 3;
-	private static final long ORDER_LINE_ITEM_QUANTITY_NEGATIVE = -1;;
+	private static final long ORDER_LINE_ITEM_QUANTITY_NEGATIVE = -1;
+	;
 
 	@Autowired
 	private OrderService orderService;
@@ -60,12 +62,19 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Autowired
 	private OrderRepository orderRepository;
 
+	private Product givenProduct;
+	private MenuGroup givenMenuGroup;
+
+	@BeforeEach
+	void setUp() {
+		givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
+		givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
+	}
+
 	@DisplayName("주문")
 	@Test
 	void 주문() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.SAT_ORDER_TABLE());
 
@@ -135,8 +144,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT"})
 	void 주문_실패_3(OrderType orderType) {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
@@ -159,8 +166,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_실패_4() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.HIDDEN_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
@@ -183,8 +188,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_실패_5() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
@@ -208,8 +211,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@NullAndEmptySource
 	void 주문_실패_6(String deliveryAddress) {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
@@ -233,8 +234,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_실패_7() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
@@ -258,8 +257,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_실패_8() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 
@@ -284,8 +281,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_수락() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY(givenMenu));
 
@@ -300,8 +295,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_수락_실패_1() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu)); // not waiting
 
@@ -316,8 +309,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_서빙() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu));
 
@@ -332,8 +323,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_서빙_실패_1() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY(givenMenu)); // not accepted
 
@@ -348,8 +337,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_배달() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY(givenMenu));
 
@@ -364,8 +351,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_배달_실패_1() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.SERVED_TAKEOUT(givenMenu)); // not delivery
 
@@ -380,8 +365,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_배달_실패_2() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY(givenMenu)); // not served
 
@@ -396,8 +379,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_배달_완료() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.DELIVERING_DELIVERY(givenMenu));
 
@@ -412,8 +393,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_배달_완료_실패_1() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu)); // not delivery
 
@@ -428,8 +407,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_배달_완료_실패_2() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY(givenMenu)); // not delivering
 
@@ -445,8 +422,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_완료() {
 		// given
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.SERVED_EAT_IN(givenMenu, givenOrderTable));
 
@@ -466,8 +441,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_완료_실패_1() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY(givenMenu)); // not delivered
 
@@ -482,8 +455,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_완료_실패_2() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu)); // not served
 
@@ -498,8 +469,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_주문_조회() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu));
 
