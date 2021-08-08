@@ -9,9 +9,12 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.IntegrationTest;
+import kitchenpos.argument.NullAndNegativeBigDecimalArgumentsProvider;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -49,13 +52,14 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 		assertThat(actualProduct.getPrice()).isEqualTo(new BigDecimal(17000));
 	}
 
-	@DisplayName("상품 생성 실패 : 가격 음수")
-	@Test
-	void 상품_생성_실패_1() {
+	@DisplayName("상품 생성 실패 : 가격이 널 또는 음수")
+	@ParameterizedTest
+	@ArgumentsSource(NullAndNegativeBigDecimalArgumentsProvider.class)
+	void 상품_생성_실패_1(BigDecimal price) {
 		// given
 		Product givenRequest = new Product();
 		givenRequest.setName("강정치킨");
-		givenRequest.setPrice(new BigDecimal(-10000));
+		givenRequest.setPrice(price); // null or negative
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> productService.create(givenRequest);
@@ -130,15 +134,16 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 		Assertions.assertThat(retrievedMenu.isDisplayed()).isEqualTo(false);
 	}
 
-	@DisplayName("상품 가격 변경 실패 : 가격 음수")
-	@Test
-	void 상품_가격_변경_실패_1() {
+	@DisplayName("상품 가격 변경 실패 : 가격이 널 또는 음수")
+	@ParameterizedTest
+	@ArgumentsSource(NullAndNegativeBigDecimalArgumentsProvider.class)
+	void 상품_가격_변경_실패_1(BigDecimal price) {
 		// given
 		Product givenProduct = ProductFixture.product(new BigDecimal(17000));
 		productRepository.save(givenProduct);
 
 		Product givenRequest = new Product();
-		givenRequest.setPrice(new BigDecimal(-10000));
+		givenRequest.setPrice(price); // null or negative
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable =

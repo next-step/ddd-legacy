@@ -10,6 +10,9 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.IntegrationTest;
@@ -88,12 +91,13 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	}
 
 	@DisplayName("주문 실패 : 주문 항목 없음")
-	@Test
-	void 주문_실패_2() {
+	@ParameterizedTest
+	@NullAndEmptySource
+	void 주문_실패_2(List<OrderLineItem> orderLineItems) {
 		// given
 		Order givenRequest = new Order();
 		givenRequest.setType(OrderType.EAT_IN);
-		givenRequest.setOrderLineItems(Collections.emptyList()); // empty
+		givenRequest.setOrderLineItems(orderLineItems); // null or empty
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(givenRequest);
@@ -103,8 +107,9 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	}
 
 	@DisplayName("주문 실패 : 매장에서 식사가 아닌데, 주문 항목의 수량은 0 보다 작음")
-	@Test
-	void 주문_실패_3() {
+	@ParameterizedTest
+	@EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT"})
+	void 주문_실패_3(OrderType orderType) {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
@@ -116,7 +121,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		orderLineItemRequest.setQuantity(-1);
 
 		Order givenRequest = new Order();
-		givenRequest.setType(OrderType.DELIVERY);
+		givenRequest.setType(orderType); // delivery or takeout
 		givenRequest.setOrderLineItems(Collections.singletonList(orderLineItemRequest));
 
 		// when
@@ -175,8 +180,9 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	}
 
 	@DisplayName("주문 실패 : 배달인데, 배달 주소가 빈 값")
-	@Test
-	void 주문_실패_6() {
+	@ParameterizedTest
+	@NullAndEmptySource
+	void 주문_실패_6(String deliveryAddress) {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
@@ -190,7 +196,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		Order givenRequest = new Order();
 		givenRequest.setType(OrderType.DELIVERY);
 		givenRequest.setOrderLineItems(Collections.singletonList(orderLineItemRequest));
-		givenRequest.setDeliveryAddress(""); // empty
+		givenRequest.setDeliveryAddress(deliveryAddress); // null or empty
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(givenRequest);

@@ -8,6 +8,8 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.IntegrationTest;
@@ -37,11 +39,12 @@ class MenuGroupServiceIntegrationTest extends IntegrationTest {
 	}
 
 	@DisplayName("메뉴 그룹 생성 실패 : 이름 빈값")
-	@Test
-	void 메뉴_그룹_생성_실패_1() {
+	@ParameterizedTest
+	@NullAndEmptySource
+	void 메뉴_그룹_생성_실패_1(String name) {
 		// given
 		MenuGroup givenRequest = new MenuGroup();
-		givenRequest.setName("");
+		givenRequest.setName(name);
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> menuGroupService.create(givenRequest);

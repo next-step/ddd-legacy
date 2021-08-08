@@ -10,9 +10,13 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ArgumentsSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.IntegrationTest;
+import kitchenpos.argument.NullAndNegativeBigDecimalArgumentsProvider;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -59,12 +63,13 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 		Assertions.assertThat(actualMenu.getId()).isNotNull();
 	}
 
-	@DisplayName("메뉴 생성 실패 : 가격 음수")
-	@Test
-	void 메뉴_생성_실패_1() {
+	@DisplayName("메뉴 생성 실패 : 가격이 널 또는 음수")
+	@ParameterizedTest
+	@ArgumentsSource(NullAndNegativeBigDecimalArgumentsProvider.class)
+	void 메뉴_생성_실패_1(BigDecimal price) {
 		// given
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(-10000)); // negative
+		givenRequest.setPrice(price); // null or negative
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(givenRequest);
@@ -89,15 +94,16 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	}
 
 	@DisplayName("메뉴 생성 실패 : 메뉴 상품 없음")
-	@Test
-	void 메뉴_생성_실패_3() {
+	@ParameterizedTest
+	@NullAndEmptySource
+	void 메뉴_생성_실패_3(List<MenuProduct> menuProductsRequest) {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
 
 		Menu givenRequest = new Menu();
 		givenRequest.setPrice(new BigDecimal(19000));
 		givenRequest.setMenuGroupId(givenMenuGroup.getId());
-		givenRequest.setMenuProducts(null); // empty
+		givenRequest.setMenuProducts(menuProductsRequest); // null or empty
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(givenRequest);
@@ -239,16 +245,17 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 		Assertions.assertThat(actualMenu.getPrice()).isEqualTo(new BigDecimal(15000));
 	}
 
-	@DisplayName("메뉴 가격 변경 실패 : 가격 음수")
-	@Test
-	void 메뉴_가격_변경_실패_1() {
+	@DisplayName("메뉴 가격 변경 실패 : 가격이 널 또는 음수")
+	@ParameterizedTest
+	@ArgumentsSource(NullAndNegativeBigDecimalArgumentsProvider.class)
+	void 메뉴_가격_변경_실패_1(BigDecimal price) {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
 		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
 		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
 
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(-10000)); // negative
+		givenRequest.setPrice(price); // null or negative
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable =

@@ -9,6 +9,8 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.IntegrationTest;
@@ -59,11 +61,12 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	}
 
 	@DisplayName("주문 테이블 생성 실패 : 이름 없음")
-	@Test
-	void 주문_테이블_생성_실패_1() {
+	@ParameterizedTest
+	@NullAndEmptySource
+	void 주문_테이블_생성_실패_1(String name) {
 		// given
 		OrderTable request = new OrderTable();
-		request.setName("");
+		request.setName(name); // null or empty
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderTableService.create(request);
