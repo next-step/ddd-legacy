@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static kitchenpos.application.fixture.MenuFixture.EXPENSIVE_MENU;
+import static kitchenpos.application.fixture.MenuFixture.HIDED_MENU;
 import static kitchenpos.application.fixture.MenuFixture.MENU1;
 import static kitchenpos.application.fixture.MenuFixture.MENU2;
 import static kitchenpos.application.fixture.MenuFixture.MENUS;
@@ -77,7 +78,11 @@ class MenuServiceTest extends MockTest {
         final Menu sut = menuService.create(MENU1());
 
         //then
-        assertThat(sut).isInstanceOf(Menu.class);
+        assertAll(
+            () -> assertThat(sut.getId()).isEqualTo(MENU1().getId()),
+            () -> assertThat(sut.getPrice()).isEqualTo(MENU1().getPrice()),
+            () -> assertThat(sut.getName()).isEqualTo(MENU1().getName())
+        );
     }
 
     @DisplayName("create - 메뉴 그룹이 존재하지 않으면 예외가 발생한다")
@@ -207,12 +212,11 @@ class MenuServiceTest extends MockTest {
         given(menuRepository.save(any())).willReturn(menu1, menu2);
 
         //when
-        final Menu createdMenu1 = menuService.create(menu1);
-        final Menu createdMenu2 = menuService.create(menu2);
+        final Menu sut1 = menuService.create(menu1);
+        final Menu sut2 = menuService.create(menu2);
 
         //then
-        assertThat(createdMenu1).isInstanceOf(Menu.class);
-        assertThat(createdMenu2).isInstanceOf(Menu.class);
+        assertThat(sut1.getName()).isEqualTo(sut2.getName());
     }
 
     @DisplayName("create - 메뉴 이름에 비속어가 포함되어 있다면 예외가 발생한다")
@@ -247,7 +251,6 @@ class MenuServiceTest extends MockTest {
         final Menu changedMenu = menuService.changePrice(menu.getId(), menu);
 
         //then
-        assertThat(changedMenu).isInstanceOf(Menu.class);
         assertThat(changedMenu.getPrice()).isEqualTo(BigDecimal.valueOf(price));
     }
 
@@ -289,7 +292,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void display() {
         //given
-        final Menu menu = MenuFixture.HIDED_MENU();
+        final Menu menu = HIDED_MENU();
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
