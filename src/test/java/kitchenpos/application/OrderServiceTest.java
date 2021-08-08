@@ -154,7 +154,7 @@ class OrderServiceTest extends MockTest {
 
         given(menuRepository.findAllById(any())).willReturn(menus);
         given(menuRepository.findById(any())).willReturn(Optional.of(menu1))
-            .willThrow(NoSuchElementException.class);
+            .willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -269,7 +269,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
 
-        given(orderRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(orderRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -311,7 +311,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.EAT_IN, OrderStatus.ACCEPTED);
 
-        given(orderRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(orderRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -353,7 +353,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.DELIVERY, OrderStatus.SERVED);
 
-        given(orderRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(orderRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -409,7 +409,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
 
-        given(orderRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(orderRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)

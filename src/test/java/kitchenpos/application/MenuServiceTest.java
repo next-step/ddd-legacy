@@ -103,7 +103,8 @@ class MenuServiceTest extends MockTest {
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
-        given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
+        given(productRepository.findById(any())).willReturn(Optional.of(product1))
+            .willReturn(Optional.of(product2));
         given(menuRepository.save(any())).willReturn(menu);
 
         //when
@@ -119,7 +120,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = createMenu(MENU_NAME, PRICE);
 
-        given(menuGroupRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -174,7 +175,7 @@ class MenuServiceTest extends MockTest {
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         given(productRepository.findAllById(any())).willReturn(products);
         given(productRepository.findById(any())).willReturn(Optional.of(product1))
-            .willThrow(NoSuchElementException.class);
+            .willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -348,7 +349,7 @@ class MenuServiceTest extends MockTest {
         final Menu menu = createMenu(MENU_NAME, PRICE);
         menu.setDisplayed(false);
 
-        given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(menuRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -389,7 +390,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = createMenu(MENU_NAME, PRICE);
 
-        given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(menuRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)

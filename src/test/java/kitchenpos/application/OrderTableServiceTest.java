@@ -106,7 +106,7 @@ class OrderTableServiceTest extends MockTest {
         //given
         final OrderTable orderTable = makeOrderTable("테이블1", 0, true);
 
-        given(orderTableRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -134,7 +134,7 @@ class OrderTableServiceTest extends MockTest {
         //given
         final OrderTable orderTable = makeOrderTable("테이블1", 0, true);
 
-        given(orderTableRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -150,10 +150,10 @@ class OrderTableServiceTest extends MockTest {
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
         given(
             orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)
-        ).willThrow(IllegalArgumentException.class);
+        ).willReturn(true);
 
         //when, then
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        assertThatExceptionOfType(IllegalStateException.class)
             .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
     }
 
@@ -193,7 +193,7 @@ class OrderTableServiceTest extends MockTest {
         //given
         final OrderTable orderTable = makeOrderTable("테이블1", 0, false);
 
-        given(orderTableRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)

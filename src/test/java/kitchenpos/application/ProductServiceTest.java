@@ -163,7 +163,7 @@ class ProductServiceTest extends MockTest {
         //given
         final Product product = createProduct(PRODUCT_NAME, 1000L);
 
-        given(productRepository.findById(any())).willThrow(NoSuchElementException.class);
+        given(productRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
