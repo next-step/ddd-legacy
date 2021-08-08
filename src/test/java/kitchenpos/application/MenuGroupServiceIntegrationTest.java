@@ -21,6 +21,8 @@ import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.fixture.MenuGroupFixture;
 
 class MenuGroupServiceIntegrationTest extends IntegrationTest {
+	private static final String NAME = "추천메뉴";
+
 	@Autowired
 	private MenuGroupService menuGroupService;
 	@Autowired
@@ -31,14 +33,14 @@ class MenuGroupServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_그룹_생성() {
 		// given
 		MenuGroup givenRequest = new MenuGroup();
-		givenRequest.setName("추천메뉴");
+		givenRequest.setName(NAME);
 
 		// when
 		MenuGroup actualMenuGroup = menuGroupService.create(givenRequest);
 
 		// then
 		assertThat(actualMenuGroup.getId()).isNotNull();
-		assertThat(actualMenuGroup.getName()).isEqualTo("추천메뉴");
+		assertThat(actualMenuGroup.getName()).isEqualTo(NAME);
 	}
 
 	@DisplayName("메뉴 그룹 생성 실패 : 이름 빈값")

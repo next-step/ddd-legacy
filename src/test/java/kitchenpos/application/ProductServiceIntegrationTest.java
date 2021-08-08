@@ -29,6 +29,12 @@ import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.ProductFixture;
 
 class ProductServiceIntegrationTest extends IntegrationTest {
+	private static final String PRODUCT_NAME = "강정치킨";
+	private static final BigDecimal PRODUCT_PRICE = new BigDecimal(17000);
+	private static final BigDecimal CHANGED_PRODUCT_SIZE = new BigDecimal(18000);
+	private static final BigDecimal MENU_HIGH_PRICE = new BigDecimal(100000000);
+	private static final String PROFANITY = "fuck";
+
 	@Autowired
 	private ProductService productService;
 	@Autowired
@@ -43,8 +49,8 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	void 상품_생성() {
 		// given
 		Product givenRequest = new Product();
-		givenRequest.setName("강정치킨");
-		givenRequest.setPrice(new BigDecimal(17000));
+		givenRequest.setName(PRODUCT_NAME);
+		givenRequest.setPrice(PRODUCT_PRICE);
 
 		// when
 		Product actualProduct = productService.create(givenRequest);
@@ -52,8 +58,8 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 		// then
 		assertAll(
 			() -> assertThat(actualProduct.getId()).isNotNull(),
-			() -> assertThat(actualProduct.getName()).isEqualTo("강정치킨"),
-			() -> assertThat(actualProduct.getPrice()).isEqualTo(new BigDecimal(17000))
+			() -> assertThat(actualProduct.getName()).isEqualTo(PRODUCT_NAME),
+			() -> assertThat(actualProduct.getPrice()).isEqualTo(PRODUCT_PRICE)
 		);
 	}
 
@@ -63,7 +69,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	void 상품_생성_실패_1(BigDecimal price) {
 		// given
 		Product givenRequest = new Product();
-		givenRequest.setName("강정치킨");
+		givenRequest.setName(PRODUCT_NAME);
 		givenRequest.setPrice(price); // null or negative
 
 		// when
@@ -79,7 +85,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenRequest = new Product();
 		givenRequest.setName(null);
-		givenRequest.setPrice(new BigDecimal(17000));
+		givenRequest.setPrice(PRODUCT_PRICE);
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> productService.create(givenRequest);
@@ -93,8 +99,8 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	void 상품_생성_실패_3() {
 		// given
 		Product givenRequest = new Product();
-		givenRequest.setName("fuck");
-		givenRequest.setPrice(new BigDecimal(17000));
+		givenRequest.setName(PROFANITY);
+		givenRequest.setPrice(PRODUCT_PRICE);
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> productService.create(givenRequest);
@@ -107,30 +113,29 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 상품_가격_변경() {
 		// given
-		Product givenProduct = ProductFixture.PRODUCT(new BigDecimal(17000));
+		Product givenProduct = ProductFixture.PRODUCT(PRODUCT_PRICE);
 		productRepository.save(givenProduct);
 
 		Product givenRequest = new Product();
-		givenRequest.setPrice(new BigDecimal(18000));
+		givenRequest.setPrice(CHANGED_PRODUCT_SIZE);
 
 		// when
 		Product actualProduct = productService.changePrice(givenProduct.getId(), givenRequest);
 
 		// then
-		assertThat(actualProduct.getPrice()).isEqualTo(new BigDecimal(18000));
+		assertThat(actualProduct.getPrice()).isEqualTo(CHANGED_PRODUCT_SIZE);
 	}
 
-	@DisplayName("상품 가격 비노출 : 메뉴의 가격 > 메뉴 상품들의 (가격 * 수량) 일 경우, 메뉴를 비노출한다.")
+	@DisplayName("상품 가격 변경 비노출 : 메뉴의 가격 > 메뉴 상품들의 (가격 * 수량) 일 경우, 메뉴를 비노출한다.")
 	@Test
 	void 상품_가격_변경_비노출() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
-		Menu givenMenu = menuRepository.save(
-			MenuFixture.DISPLAYED_MENU(new BigDecimal(100000000), givenMenuGroup, givenProduct));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_HIGH_PRICE, givenMenuGroup, givenProduct));
 
 		Product givenRequest = new Product();
-		givenRequest.setPrice(new BigDecimal(18000));
+		givenRequest.setPrice(CHANGED_PRODUCT_SIZE);
 
 		// when
 		productService.changePrice(givenProduct.getId(), givenRequest);
@@ -145,7 +150,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@ArgumentsSource(NullAndNegativeBigDecimalArgumentsProvider.class)
 	void 상품_가격_변경_실패_1(BigDecimal price) {
 		// given
-		Product givenProduct = ProductFixture.PRODUCT(new BigDecimal(17000));
+		Product givenProduct = ProductFixture.PRODUCT(PRODUCT_PRICE);
 		productRepository.save(givenProduct);
 
 		Product givenRequest = new Product();
@@ -163,7 +168,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_상품_조회() {
 		// given
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
 
 		// when
 		List<Product> actual = productService.findAll();

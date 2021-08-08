@@ -33,6 +33,15 @@ import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.ProductFixture;
 
 public class MenuServiceIntegrationTest extends IntegrationTest {
+	private static final String MENU_NAME = "후라이드+후라이드";
+	private static final BigDecimal MENU_PRICE = new BigDecimal(19000);
+	private static final BigDecimal MENU_LOW_PRICE = new BigDecimal(15000);
+	private static final BigDecimal MENU_HIGH_PRICE = new BigDecimal(100000000);
+	private static final BigDecimal PRODUCT_PRICE = new BigDecimal(17000);
+	private static final long PRODUCT_QUANTITY = 2;
+	private static final long PRODUCT_NEGATIVE_QUANTITY = -2;
+	private static final String PROFANITY = "fuck";
+
 	@Autowired
 	private MenuService menuService;
 	@Autowired
@@ -47,15 +56,15 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_생성() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
 
 		MenuProduct givenMenuProductRequest = new MenuProduct();
 		givenMenuProductRequest.setProductId(givenProduct.getId());
-		givenMenuProductRequest.setQuantity(2);
+		givenMenuProductRequest.setQuantity(PRODUCT_QUANTITY);
 
 		Menu givenRequest = new Menu();
-		givenRequest.setName("후라이드+후라이드");
-		givenRequest.setPrice(new BigDecimal(19000));
+		givenRequest.setName(MENU_NAME);
+		givenRequest.setPrice(MENU_PRICE);
 		givenRequest.setMenuGroupId(givenMenuGroup.getId());
 		givenRequest.setDisplayed(true);
 		givenRequest.setMenuProducts(Collections.singletonList(givenMenuProductRequest));
@@ -102,7 +111,7 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_생성_실패_2() {
 		// given
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(19000));
+		givenRequest.setPrice(MENU_PRICE);
 		givenRequest.setMenuGroupId(UUID.randomUUID()); // unknown
 
 		// when
@@ -120,7 +129,7 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(19000));
+		givenRequest.setPrice(MENU_PRICE);
 		givenRequest.setMenuGroupId(givenMenuGroup.getId());
 		givenRequest.setMenuProducts(menuProductsRequest); // null or empty
 
@@ -141,7 +150,7 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 		givenMenuProductRequest.setProductId(UUID.randomUUID()); // unknown id
 
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(19000));
+		givenRequest.setPrice(MENU_PRICE);
 		givenRequest.setMenuGroupId(givenMenuGroup.getId());
 		givenRequest.setMenuProducts(Collections.singletonList(givenMenuProductRequest));
 
@@ -157,14 +166,14 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_생성_실패_5() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
 
 		MenuProduct givenMenuProductRequest = new MenuProduct();
 		givenMenuProductRequest.setProductId(givenProduct.getId());
-		givenMenuProductRequest.setQuantity(-2); // negative
+		givenMenuProductRequest.setQuantity(PRODUCT_NEGATIVE_QUANTITY); // negative
 
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(19000));
+		givenRequest.setPrice(MENU_PRICE);
 		givenRequest.setMenuGroupId(givenMenuGroup.getId());
 		givenRequest.setMenuProducts(Collections.singletonList(givenMenuProductRequest));
 
@@ -180,14 +189,14 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_생성_실패_6() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
 
 		MenuProduct givenMenuProductRequest = new MenuProduct();
 		givenMenuProductRequest.setProductId(givenProduct.getId());
-		givenMenuProductRequest.setQuantity(2);
+		givenMenuProductRequest.setQuantity(PRODUCT_QUANTITY);
 
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(100000000)); // high
+		givenRequest.setPrice(MENU_HIGH_PRICE); // high
 		givenRequest.setMenuGroupId(givenMenuGroup.getId());
 		givenRequest.setMenuProducts(Collections.singletonList(givenMenuProductRequest));
 
@@ -203,14 +212,14 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_생성_실패_7() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
 
 		MenuProduct givenMenuProductRequest = new MenuProduct();
 		givenMenuProductRequest.setProductId(givenProduct.getId());
-		givenMenuProductRequest.setQuantity(2);
+		givenMenuProductRequest.setQuantity(PRODUCT_QUANTITY);
 
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(19000));
+		givenRequest.setPrice(MENU_PRICE);
 		givenRequest.setMenuGroupId(givenMenuGroup.getId());
 		givenRequest.setMenuProducts(Collections.singletonList(givenMenuProductRequest));
 		givenRequest.setName(null); // empty
@@ -227,17 +236,17 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_생성_실패_8() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
 
 		MenuProduct givenMenuProductRequest = new MenuProduct();
 		givenMenuProductRequest.setProductId(givenProduct.getId());
-		givenMenuProductRequest.setQuantity(2);
+		givenMenuProductRequest.setQuantity(PRODUCT_QUANTITY);
 
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(19000));
+		givenRequest.setPrice(MENU_PRICE);
 		givenRequest.setMenuGroupId(givenMenuGroup.getId());
 		givenRequest.setMenuProducts(Collections.singletonList(givenMenuProductRequest));
-		givenRequest.setName("fuck"); // profanity
+		givenRequest.setName(PROFANITY); // profanity
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(givenRequest);
@@ -251,18 +260,17 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_가격_변경() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
-		Menu givenMenu = menuRepository.save(
-			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(15000));
+		givenRequest.setPrice(MENU_LOW_PRICE);
 
 		// when
 		Menu actualMenu = menuService.changePrice(givenMenu.getId(), givenRequest);
 
 		// then
-		assertThat(actualMenu.getPrice()).isEqualTo(new BigDecimal(15000));
+		assertThat(actualMenu.getPrice()).isEqualTo(MENU_LOW_PRICE);
 	}
 
 	@DisplayName("메뉴 가격 변경 실패 : 가격이 널 또는 음수")
@@ -271,9 +279,8 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_가격_변경_실패_1(BigDecimal price) {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
-		Menu givenMenu = menuRepository.save(
-			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		Menu givenRequest = new Menu();
 		givenRequest.setPrice(price); // null or negative
@@ -291,12 +298,11 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_가격_변경_실패_2() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
-		Menu givenMenu = menuRepository.save(
-			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		Menu givenRequest = new Menu();
-		givenRequest.setPrice(new BigDecimal(100000000)); // high
+		givenRequest.setPrice(MENU_HIGH_PRICE); // high
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable =
@@ -311,9 +317,8 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_전시() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
-		Menu givenMenu = menuRepository.save(
-			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		// when
 		Menu actualMenu = menuService.display(givenMenu.getId());
@@ -327,9 +332,8 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_전시_실패() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
-		Menu givenMenu = menuRepository.save(
-			MenuFixture.DISPLAYED_MENU(new BigDecimal(100000000), givenMenuGroup, givenProduct));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_HIGH_PRICE, givenMenuGroup, givenProduct));
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.display(givenMenu.getId());
@@ -343,9 +347,8 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 메뉴_숨김() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
-		Menu givenMenu = menuRepository.save(
-			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		// when
 		Menu actualMenu = menuService.hide(givenMenu.getId());
@@ -359,9 +362,8 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 	void 전체_메뉴_조회() {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
-		Menu givenMenu = menuRepository.save(
-			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 
 		// when
 		List<Menu> actual = menuService.findAll();

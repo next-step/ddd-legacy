@@ -33,6 +33,13 @@ import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.fixture.ProductFixture;
 
 public class OrderTableServiceIntegrationTest extends IntegrationTest {
+	private static final String ORDER_TABLE_NAME = "9번";
+	private static final int NUMBER_OF_GUESTS_ZERO = 0;
+	private static final int NUMBER_OF_GUESTS_FOUR = 4;
+	private static final int NUMBER_OF_GUESTS_NEGATIVE = -1;
+	private static final BigDecimal MENU_PRICE = new BigDecimal(19000);
+	private static final BigDecimal PRODUCT_PRICE = new BigDecimal(17000);
+
 	@Autowired
 	private OrderTableService orderTableService;
 	@Autowired
@@ -51,7 +58,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	void 주문_테이블_생성() {
 		// given
 		OrderTable request = new OrderTable();
-		request.setName("9번");
+		request.setName(ORDER_TABLE_NAME);
 
 		// when
 		OrderTable orderTable = orderTableService.create(request);
@@ -59,8 +66,8 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		// then
 		assertAll(
 			() -> assertThat(orderTable.getId()).isNotNull(),
-			() -> assertThat(orderTable.getName()).isEqualTo("9번"),
-			() -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(0),
+			() -> assertThat(orderTable.getName()).isEqualTo(ORDER_TABLE_NAME),
+			() -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(NUMBER_OF_GUESTS_ZERO),
 			() -> assertThat(orderTable.isEmpty()).isTrue()
 		);
 	}
@@ -105,7 +112,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 
 		// then
 		assertThat(actual.getId()).isEqualTo(given.getId());
-		assertThat(actual.getNumberOfGuests()).isEqualTo(0);
+		assertThat(actual.getNumberOfGuests()).isEqualTo(NUMBER_OF_GUESTS_ZERO);
 		assertThat(actual.isEmpty()).isTrue();
 	}
 
@@ -114,10 +121,9 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	void 주문_테이블_비우기_실패_1() {
 		// given
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
-		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(
-			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		orderRepository.save(OrderFixture.SERVED_EAT_IN(givenMenu, givenOrderTable));
 
 		// when
@@ -133,7 +139,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		// given
 		OrderTable given = orderTableRepository.save(OrderTableFixture.SAT_ORDER_TABLE());
 		OrderTable request = new OrderTable();
-		request.setNumberOfGuests(4);
+		request.setNumberOfGuests(NUMBER_OF_GUESTS_FOUR);
 
 		// when
 		OrderTable actual = orderTableService.changeNumberOfGuests(given.getId(), request);
@@ -148,7 +154,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		// given
 		OrderTable given = orderTableRepository.save(OrderTableFixture.SAT_ORDER_TABLE());
 		OrderTable request = new OrderTable();
-		request.setNumberOfGuests(-1);
+		request.setNumberOfGuests(NUMBER_OF_GUESTS_NEGATIVE);
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable =
@@ -164,7 +170,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		// given
 		OrderTable given = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 		OrderTable request = new OrderTable();
-		request.setNumberOfGuests(4);
+		request.setNumberOfGuests(NUMBER_OF_GUESTS_FOUR);
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable =
