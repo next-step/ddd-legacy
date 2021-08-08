@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -63,9 +63,8 @@ class OrderTableServiceTest extends MockTest {
         final OrderTable orderTable = makeOrderTable(name, 0, true);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderTableService.create(orderTable)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> orderTableService.create(orderTable));
     }
 
     @DisplayName("create - 주문 테이블 이름은 중복될 수 있다")
@@ -110,9 +109,8 @@ class OrderTableServiceTest extends MockTest {
         given(orderTableRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderTableService.sit(orderTable.getId())
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> orderTableService.sit(orderTable.getId()));
     }
 
     @DisplayName("clear - 주문 테이블을 치울 수 있다")
@@ -139,9 +137,8 @@ class OrderTableServiceTest extends MockTest {
         given(orderTableRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderTableService.clear(orderTable.getId())
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
     }
 
     @DisplayName("clear - 테이블의 주문 상태가 모두 완료가 아닐 경우 예외를 반환한다")
@@ -156,9 +153,8 @@ class OrderTableServiceTest extends MockTest {
         ).willThrow(IllegalArgumentException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderTableService.clear(orderTable.getId())
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
     }
 
     @DisplayName("changeGuestNumber - 테이블의 앉은 손님의 수를 변경할 수 있다")
@@ -187,9 +183,8 @@ class OrderTableServiceTest extends MockTest {
         orderTable.setNumberOfGuests(-1);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
 
     @DisplayName("changeGuestNumber - 존재하는 테이블이 아니라면 예외를 반환한다")
@@ -201,9 +196,8 @@ class OrderTableServiceTest extends MockTest {
         given(orderTableRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable)
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
 
     @DisplayName("changeGuestNumberStatus - 테이블이 비어있는 경우 예외를 반환한다")
@@ -215,9 +209,8 @@ class OrderTableServiceTest extends MockTest {
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable)
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
 
     @DisplayName("findAll - 테이블 리스트를 조회할 수 있다")

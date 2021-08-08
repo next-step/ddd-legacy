@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -61,9 +61,8 @@ class MenuGroupServiceTest extends MockTest {
         menuGroup.setName(value);
 
         //when, then
-        assertThatThrownBy(
-            () -> menuGroupService.create(menuGroup)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuGroupService.create(menuGroup));
     }
 
     @DisplayName("create - 메뉴 그룹 이름은 중복될 수 있다")

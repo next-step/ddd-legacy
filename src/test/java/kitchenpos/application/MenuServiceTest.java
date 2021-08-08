@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -122,9 +122,8 @@ class MenuServiceTest extends MockTest {
         given(menuGroupRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.create(menu)
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> menuService.create(menu));
     }
 
     @DisplayName("create - 가격이 없으면 예외가 발생한다")
@@ -135,9 +134,8 @@ class MenuServiceTest extends MockTest {
         menu.setPrice(null);
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.create(menu)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.create(menu));
     }
 
     @DisplayName("create - 가격이 음수이라면 예외가 발생한다")
@@ -147,9 +145,8 @@ class MenuServiceTest extends MockTest {
         final Menu menu = createMenu(MENU_NAME, NEGATIVE_PRICE);
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.create(menu)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.create(menu));
     }
 
     @DisplayName("create - 메뉴상품을 요청하지 않으면 예외가 발생한다")
@@ -164,9 +161,8 @@ class MenuServiceTest extends MockTest {
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.create(menu)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.create(menu));
     }
 
     @DisplayName("create - 메뉴 상품의 상품들 중 하나라도 존재하지 않으면 예외가 발생한다")
@@ -181,9 +177,8 @@ class MenuServiceTest extends MockTest {
             .willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.create(menu)
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> menuService.create(menu));
     }
 
     @DisplayName("create - 메뉴 상품의 상품수량이 하나라도 음수인 것이 있으면 예외가 발생한다")
@@ -203,9 +198,8 @@ class MenuServiceTest extends MockTest {
         given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.create(menu)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.create(menu));
     }
 
     @DisplayName("create - 메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
@@ -219,9 +213,8 @@ class MenuServiceTest extends MockTest {
         given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.create(menu)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.create(menu));
     }
 
     @DisplayName("create - 메뉴 이름이 한글자 미만이라면 예외가 발생한다")
@@ -236,9 +229,8 @@ class MenuServiceTest extends MockTest {
         given(productRepository.findById(any())).willReturn(Optional.of(product1), Optional.of(product2));
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.create(menu)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.create(menu));
     }
 
     @DisplayName("create - 메뉴 이름은 중복될 수 있다")
@@ -276,9 +268,8 @@ class MenuServiceTest extends MockTest {
         given(purgomalumClient.containsProfanity(any())).willReturn(true);
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.create(menu)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.create(menu));
     }
 
     @DisplayName("changePrice - 메뉴의 가격을 수정할 수 있다")
@@ -307,9 +298,8 @@ class MenuServiceTest extends MockTest {
         menu.setPrice(null);
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.changePrice(menu.getId(), menu)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.changePrice(menu.getId(), menu));
     }
 
     @DisplayName("changePrice - 메뉴 가격이 음수라면 예외가 발생한다")
@@ -318,9 +308,8 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = createMenu(MENU_NAME, NEGATIVE_PRICE);
 
-        assertThatThrownBy(
-            () -> menuService.changePrice(menu.getId(), menu)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.changePrice(menu.getId(), menu));
     }
 
     @DisplayName("changePrice - 메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
@@ -332,9 +321,8 @@ class MenuServiceTest extends MockTest {
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.changePrice(menu.getId(), menu)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.changePrice(menu.getId(), menu));
     }
 
     @DisplayName("display - 메뉴가 노출되도록 변경할 수 있다")
@@ -363,9 +351,8 @@ class MenuServiceTest extends MockTest {
         given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.display(menu.getId())
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> menuService.display(menu.getId()));
     }
 
     @DisplayName("display - 메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
@@ -377,9 +364,8 @@ class MenuServiceTest extends MockTest {
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.display(menu.getId())
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.display(menu.getId()));
     }
 
     @DisplayName("hide - 메뉴가 노출되지 않도록 변경할 수 있다")
@@ -406,9 +392,8 @@ class MenuServiceTest extends MockTest {
         given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> menuService.hide(menu.getId())
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> menuService.hide(menu.getId()));
     }
 
     @DisplayName("findAll - 메뉴리스트를 조회할 수 있다")

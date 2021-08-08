@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -112,9 +112,8 @@ class OrderServiceTest extends MockTest {
         order.setType(null);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.create(order)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> orderService.create(order));
     }
 
     @DisplayName("create - 주문상품(orderLineItems)이 없으면 예외를 반환한다")
@@ -125,9 +124,8 @@ class OrderServiceTest extends MockTest {
         order.setOrderLineItems(null);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.create(order)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> orderService.create(order));
     }
 
     @DisplayName("create - 주문 타입이 배달, 포장인 경우 주문 상품 수량이 하나라도 음수면 예외를 반환한다")
@@ -144,9 +142,8 @@ class OrderServiceTest extends MockTest {
         given(menuRepository.findAllById(any())).willReturn(menus);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.create(order)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> orderService.create(order));
     }
 
     @DisplayName("create - 주문 상품의 메뉴가 하나라도 존재하지 않으면 예외를 반환한다")
@@ -160,9 +157,8 @@ class OrderServiceTest extends MockTest {
             .willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.create(order)
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> orderService.create(order));
     }
 
     @DisplayName("create - 주문 상품의 메뉴가 하나라도 노출된 상태가 아니면 예외를 반환한다")
@@ -180,9 +176,8 @@ class OrderServiceTest extends MockTest {
             .setDisplayed(false);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.create(order)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> orderService.create(order));
     }
 
     @DisplayName("create - 주문 상품의 메뉴 가격과 실제 메뉴 가격이 같지 않으면 예외를 반환한다")
@@ -200,9 +195,8 @@ class OrderServiceTest extends MockTest {
             .setPrice(BigDecimal.valueOf(2000L));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.create(order)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> orderService.create(order));
     }
 
     @DisplayName("create - 주문 타입이 배달인데 배달 주소가 없을 경우 예외를 반환한다")
@@ -217,9 +211,8 @@ class OrderServiceTest extends MockTest {
         order.setDeliveryAddress(null);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.create(order)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> orderService.create(order));
     }
 
     @DisplayName("create - 주문 타입이 매장 내 식사인경우 주문 테이블이 존재하지 않으면 예외를 반환한다")
@@ -234,9 +227,8 @@ class OrderServiceTest extends MockTest {
         order.setOrderTable(null);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.create(order)
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> orderService.create(order));
     }
 
     @DisplayName("create - 주문 타입이 매장 내 식사인경우 주문 테이블에 손님이 앉은 상태가 아니라면 예외를 반환한다")
@@ -252,9 +244,8 @@ class OrderServiceTest extends MockTest {
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.create(order)
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderService.create(order));
     }
 
     @DisplayName("accept - 주문을 승인할 수 있다. 성공시 주문 상태 승인")
@@ -281,9 +272,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.accept(order.getId())
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> orderService.accept(order.getId()));
     }
 
     @DisplayName("accept - 주문상태가 대기가 아니면 예외를 반환한다")
@@ -296,9 +286,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.accept(order.getId())
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderService.accept(order.getId()));
     }
 
     @DisplayName("serve - 서빙할 수 있다. 성공시 상태 서빙완료")
@@ -325,9 +314,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.serve(order.getId())
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> orderService.serve(order.getId()));
     }
 
     @DisplayName("serve - 주문상태가 승인이 아니면 예외를 반환한다")
@@ -340,9 +328,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.serve(order.getId())
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderService.serve(order.getId()));
     }
 
     @DisplayName("startDelivery - 배달을 시작할 수 있다. 성공시 상태 배송중")
@@ -369,9 +356,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.startDelivery(order.getId())
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> orderService.startDelivery(order.getId()));
     }
 
     @DisplayName("startDelivery - 주문 타입이 배달이 아니면 예외를 반환한다")
@@ -384,9 +370,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.startDelivery(order.getId())
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderService.startDelivery(order.getId()));
     }
 
     @DisplayName("startDelivery - 주문 상태가 서빙완료가 아니면 예외를 반환한다")
@@ -399,9 +384,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.startDelivery(order.getId())
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderService.startDelivery(order.getId()));
     }
 
     @DisplayName("completeDelivery - 배달을 완료할 수 있다. 성공시 상태 배송완료")
@@ -428,9 +412,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.completeDelivery(order.getId())
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> orderService.completeDelivery(order.getId()));
     }
 
     @DisplayName("completeDelivery - 주문 타입이 배달이 아니면 예외를 반환한다")
@@ -443,9 +426,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.completeDelivery(order.getId())
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderService.completeDelivery(order.getId()));
     }
 
     @DisplayName("completeDelivery - 주문 상태가 배송중이 아니면 예외를 반환한다")
@@ -458,9 +440,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.completeDelivery(order.getId())
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderService.completeDelivery(order.getId()));
     }
 
     @DisplayName("complete - 결제 완료할 수 있다. 성공시 상태 완료")
@@ -489,9 +470,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.complete(order.getId())
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderService.complete(order.getId()));
     }
 
     @DisplayName("complete - 주문 타입이 포장인데 서빙완료 상태가 아니라면 예외가 발생한다")
@@ -504,9 +484,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.complete(order.getId())
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderService.complete(order.getId()));
     }
 
     @DisplayName("complete - 주문 타입이 매장 내 식사인데 서빙완료 상태가 아니라면 예외가 발생한다")
@@ -519,9 +498,8 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         //when, then
-        assertThatThrownBy(
-            () -> orderService.complete(order.getId())
-        ).isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(() -> orderService.complete(order.getId()));
     }
 
     @DisplayName("complete - 주문 타입이 매장 내 식사라면 주문 테이블이 치워진 상태여야 한다")

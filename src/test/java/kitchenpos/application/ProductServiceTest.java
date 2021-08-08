@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -73,9 +73,8 @@ class ProductServiceTest extends MockTest {
         product.setPrice(null);
 
         //when, then
-        assertThatThrownBy(
-            () -> productService.create(product)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> productService.create(product));
     }
 
     @DisplayName("create - 상품가격이 음수면 예외를 반환한다")
@@ -85,9 +84,8 @@ class ProductServiceTest extends MockTest {
         final Product product = createProduct(PRODUCT_NAME, -1000L);
 
         //when, then
-        assertThatThrownBy(
-            () -> productService.create(product)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> productService.create(product));
     }
 
     @DisplayName("create - 상품 이름이 한글자 미만이면 예외를 반환한다")
@@ -98,9 +96,8 @@ class ProductServiceTest extends MockTest {
         final Product product = createProduct(value, 1000L);
 
         //when, then
-        assertThatThrownBy(
-            () -> productService.create(product)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> productService.create(product));
     }
 
     @DisplayName("create - 상품 이름에 비속어가 포함되어 있으면 예외를 반환한다")
@@ -113,9 +110,8 @@ class ProductServiceTest extends MockTest {
         given(purgomalumClient.containsProfanity(profanityWord)).willReturn(true);
 
         //when, then
-        assertThatThrownBy(
-            () -> productService.create(product)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> productService.create(product));
     }
 
     @DisplayName("changePrice - 상품의 가격을 수정할 수 있다")
@@ -146,9 +142,8 @@ class ProductServiceTest extends MockTest {
         product.setPrice(null);
 
         //when, then
-        assertThatThrownBy(
-            () -> productService.changePrice(product.getId(), product)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> productService.changePrice(product.getId(), product));
     }
 
     @DisplayName("changePrice - 상품가격이 음수면 예외를 반환한다")
@@ -158,9 +153,8 @@ class ProductServiceTest extends MockTest {
         final Product product = createProduct(PRODUCT_NAME, -1000L);
 
         //when, then
-        assertThatThrownBy(
-            () -> productService.changePrice(product.getId(), product)
-        ).isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> productService.changePrice(product.getId(), product));
     }
 
     @DisplayName("changePrice - 존재하는 상품이 아니라면 예외를 반환한다")
@@ -172,9 +166,8 @@ class ProductServiceTest extends MockTest {
         given(productRepository.findById(any())).willThrow(NoSuchElementException.class);
 
         //when, then
-        assertThatThrownBy(
-            () -> productService.changePrice(product.getId(), product)
-        ).isInstanceOf(NoSuchElementException.class);
+        assertThatExceptionOfType(NoSuchElementException.class)
+            .isThrownBy(() -> productService.changePrice(product.getId(), product));
     }
 
     @DisplayName("changePrice - 상품가격 수정으로 인해 메뉴가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 같거나 비싸진다면 해당 메뉴를 노출시키지 말아야 한다")
