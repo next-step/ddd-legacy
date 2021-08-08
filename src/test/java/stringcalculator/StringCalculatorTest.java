@@ -22,21 +22,21 @@ public class StringCalculatorTest {
 	@ParameterizedTest
 	@NullAndEmptySource
 	void emptyOrNull(final String text) {
-		assertThat(calculator.add(text)).isZero();
+		assertThat(calculator.add(text)).isEqualTo(0);
 	}
 
 	@DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
 	@ParameterizedTest
 	@ValueSource(strings = {"1"})
 	void oneNumber(final String text) {
-		assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
+		assertThat(calculator.add(text)).isSameAs(1);
 	}
 
 	@DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
 	@ParameterizedTest
 	@ValueSource(strings = {"1,2"})
 	void twoNumbers(final String text) {
-		assertThat(calculator.add(text)).isSameAs(3);
+		assertThat(calculator.add(text)).isEqualTo(3);
 	}
 
 	@DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
