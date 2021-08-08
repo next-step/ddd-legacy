@@ -89,7 +89,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 
 		// then
 		assertThat(actual.getId()).isEqualTo(given.getId());
-		assertThat(actual.isEmpty()).isEqualTo(false);
+		assertThat(actual.isEmpty()).isFalse();
 	}
 
 	@DisplayName("주문 테이블 비우기")
@@ -104,7 +104,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		// then
 		assertThat(actual.getId()).isEqualTo(given.getId());
 		assertThat(actual.getNumberOfGuests()).isEqualTo(0);
-		assertThat(actual.isEmpty()).isEqualTo(true);
+		assertThat(actual.isEmpty()).isTrue();
 	}
 
 	@DisplayName("주문 테이블 비우기 실패 : 주문 상태가 완료가 아님")

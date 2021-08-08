@@ -296,7 +296,7 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 		Menu actualMenu = menuService.display(givenMenu.getId());
 
 		// then
-		Assertions.assertThat(actualMenu.isDisplayed()).isEqualTo(true);
+		Assertions.assertThat(actualMenu.isDisplayed()).isTrue();
 	}
 
 	@DisplayName("메뉴 전시 실패 : 메뉴의 가격 > 메뉴 상품들의 (가격 * 수량)")
@@ -326,7 +326,7 @@ public class MenuServiceIntegrationTest extends IntegrationTest {
 		Menu actualMenu = menuService.hide(givenMenu.getId());
 
 		// then
-		Assertions.assertThat(actualMenu.isDisplayed()).isEqualTo(false);
+		Assertions.assertThat(actualMenu.isDisplayed()).isFalse();
 	}
 
 	@DisplayName("전체 메뉴 조회")

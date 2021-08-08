@@ -134,7 +134,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 
 		// then
 		Menu retrievedMenu = menuRepository.findById(givenMenu.getId()).get();
-		Assertions.assertThat(retrievedMenu.isDisplayed()).isEqualTo(false);
+		Assertions.assertThat(retrievedMenu.isDisplayed()).isFalse();
 	}
 
 	@DisplayName("상품 가격 변경 실패 : 가격이 널 또는 음수")
