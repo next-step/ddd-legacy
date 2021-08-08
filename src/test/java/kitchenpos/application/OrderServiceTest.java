@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE;
+import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT2;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,12 +87,10 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
 
-        final OrderTable orderTable = createOrderTable("테이블1", 0, false);
-
         given(menuRepository.findAllById(any())).willReturn(menus);
         given(menuRepository.findById(any())).willReturn(Optional.of(menu1))
             .willReturn(Optional.of(menu2));
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(NOT_EMPTY_TABLE()));
         given(orderRepository.save(any())).willReturn(order);
 
         //when
@@ -234,7 +234,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
 
-        final OrderTable orderTable = createOrderTable("테이블1", 0, true);
+        final OrderTable orderTable = ORDER_TABLE1();
 
         given(menuRepository.findAllById(any())).willReturn(menus);
         given(menuRepository.findById(any())).willReturn(Optional.of(menu1), Optional.of(menu2));
@@ -542,15 +542,6 @@ class OrderServiceTest extends MockTest {
         );
     }
 
-    private OrderTable createOrderTable(final String name, final int numberOfGuests, final boolean isEmpty) {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName(name);
-        orderTable.setNumberOfGuests(numberOfGuests);
-        orderTable.setEmpty(isEmpty);
-        return orderTable;
-    }
-
     private Order createOrder(final OrderType type, final OrderStatus orderStatus) {
         final Order order = new Order();
         order.setId(UUID.randomUUID());
@@ -559,9 +550,7 @@ class OrderServiceTest extends MockTest {
         final UUID orderTableId = UUID.randomUUID();
         order.setOrderTableId(orderTableId);
 
-        final OrderTable orderTable = createOrderTable("테이블1", 0, true);
-
-        order.setOrderTable(orderTable);
+        order.setOrderTable(ORDER_TABLE1());
 
         final List<OrderLineItem> orderLineItems = Arrays.asList(orderLineItem1, orderLineItem2);
 
