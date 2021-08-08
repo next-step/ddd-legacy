@@ -8,9 +8,14 @@ public class Number {
 
 	public Number(String number) {
 
-		if (Integer.parseInt(number) < 0) {
+		try {
+			if (Integer.parseInt(number) < 0) {
+				throw new RuntimeException();
+			}
+		} catch (NumberFormatException ex) {
 			throw new RuntimeException();
 		}
+
 
 		this.number = number;
 	}
