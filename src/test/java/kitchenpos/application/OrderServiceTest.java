@@ -43,8 +43,9 @@ import org.mockito.Mock;
 
 class OrderServiceTest extends MockTest {
 
-    public static final int ZERO = 0;
-    public static final int ONE = 1;
+    private static final int ZERO = 0;
+    private static final int ONE = 1;
+
     @Mock
     private OrderRepository orderRepository;
 

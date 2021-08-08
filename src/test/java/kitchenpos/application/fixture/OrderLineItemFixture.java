@@ -12,12 +12,12 @@ import kitchenpos.domain.OrderLineItem;
 
 public class OrderLineItemFixture {
 
-    public static final UUID UUID1 = UUID.randomUUID();
-    public static final UUID UUID2 = UUID.randomUUID();
-    public static final long QUANTITY1 = 2L;
-    public static final long QUANTITY2 = 3L;
-    public static final long NEGATIVE_QUANTITY = -2L;
-    public static final long WRONG_PRICE = 12345L;
+    private static final UUID UUID1 = UUID.randomUUID();
+    private static final UUID UUID2 = UUID.randomUUID();
+    private static final long QUANTITY1 = 2L;
+    private static final long QUANTITY2 = 3L;
+    private static final long NEGATIVE_QUANTITY = -2L;
+    private static final long WRONG_PRICE = 12345L;
 
     public static OrderLineItem ORDER_LINE_ITEM1() {
         final OrderLineItem orderLineItem = new OrderLineItem();
