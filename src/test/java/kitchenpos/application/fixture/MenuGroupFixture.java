@@ -16,7 +16,7 @@ public class MenuGroupFixture {
         return menuGroup;
     }
 
-    public static MenuGroup MENU_GROUP2() {
+    public static MenuGroup MENU_GROUP2_SAME_NAME() {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(FIXED_UUID2);
         menuGroup.setName(MENU_GROUP_NAME_1);

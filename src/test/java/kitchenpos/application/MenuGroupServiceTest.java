@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP1;
-import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP2;
+import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP2_SAME_NAME;
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP_WITH_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -36,10 +36,10 @@ class MenuGroupServiceTest extends MockTest {
         given(menuGroupRepository.save(any())).willReturn(MENU_GROUP1());
 
         //when
-        final MenuGroup createdMenuGroup = menuGroupService.create(MENU_GROUP1());
+        final MenuGroup sut = menuGroupService.create(MENU_GROUP1());
 
         //then
-        assertThat(createdMenuGroup.getId()).isEqualTo(MENU_GROUP1().getId());
+        assertThat(sut.getId()).isEqualTo(MENU_GROUP1().getId());
     }
 
     @DisplayName("create - 메뉴 그룹 이름이 한글자 이상이 아니라면 예외를 던진다")
@@ -59,21 +59,21 @@ class MenuGroupServiceTest extends MockTest {
     void createWithDuplicateName() {
         //given
         given(menuGroupRepository.save(any())).willReturn(MENU_GROUP1());
-        given(menuGroupRepository.save(any())).willReturn(MENU_GROUP2());
+        given(menuGroupRepository.save(any())).willReturn(MENU_GROUP2_SAME_NAME());
 
         //when
-        final MenuGroup createdMenuGroup = menuGroupService.create(MENU_GROUP1());
-        final MenuGroup createdMenuGroup2 = menuGroupService.create(MENU_GROUP2());
+        final MenuGroup sut1 = menuGroupService.create(MENU_GROUP1());
+        final MenuGroup sut2 = menuGroupService.create(MENU_GROUP2_SAME_NAME());
 
         //then
-        assertThat(createdMenuGroup.getName()).isEqualTo(createdMenuGroup2.getName());
+        assertThat(sut1.getName()).isEqualTo(sut2.getName());
     }
 
     @DisplayName("findAll - 메뉴 그룹 리스트를 조회할 수 있다")
     @Test
     void findAll() {
         //given
-        given(menuGroupRepository.findAll()).willReturn(Arrays.asList(MENU_GROUP1(), MENU_GROUP2()));
+        given(menuGroupRepository.findAll()).willReturn(Arrays.asList(MENU_GROUP1(), MENU_GROUP2_SAME_NAME()));
 
         //when
         final List<MenuGroup> menuGroups = menuGroupService.findAll();
