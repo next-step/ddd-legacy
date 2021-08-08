@@ -1,5 +1,8 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.fixture.MenuFixture.MENU1;
+import static kitchenpos.application.fixture.MenuFixture.MENU2;
+import static kitchenpos.application.fixture.MenuFixture.MENUS;
 import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
@@ -54,10 +57,6 @@ class OrderServiceTest extends MockTest {
     @InjectMocks
     private OrderService orderService;
 
-    private Menu menu1;
-    private Menu menu2;
-    private List<Menu> menus;
-
     private OrderLineItem orderLineItem1;
     private OrderLineItem orderLineItem2;
 
@@ -68,14 +67,10 @@ class OrderServiceTest extends MockTest {
     void setUp() {
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
 
-        menu1 = createMenu("메뉴1", 80001L);
-        menu2 = createMenu("메뉴2", 80000L);
-        menus = Arrays.asList(menu1, menu2);
-
-        orderLineItem1 = createOrderLineItem(menu1.getPrice()
-            .intValue(), 2, menu1);
-        orderLineItem2 = createOrderLineItem(menu2.getPrice()
-            .intValue(), 3, menu2);
+        orderLineItem1 = createOrderLineItem(MENU1().getPrice()
+            .intValue(), 2, MENU1());
+        orderLineItem2 = createOrderLineItem(MENU2().getPrice()
+            .intValue(), 3, MENU2());
 
         menuProduct1 = makeMenuProduct(PRODUCT1(), 2L);
         menuProduct2 = makeMenuProduct(PRODUCT2(), 3L);
@@ -87,9 +82,9 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
 
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu1))
-            .willReturn(Optional.of(menu2));
+        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
+            .willReturn(Optional.of(MENU2()));
         given(orderTableRepository.findById(any())).willReturn(Optional.of(NOT_EMPTY_TABLE()));
         given(orderRepository.save(any())).willReturn(order);
 
@@ -136,7 +131,7 @@ class OrderServiceTest extends MockTest {
             .get(0)
             .setQuantity(-1);
 
-        given(menuRepository.findAllById(any())).willReturn(menus);
+        given(menuRepository.findAllById(any())).willReturn(MENUS());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -149,8 +144,8 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
 
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu1))
+        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
             .willReturn(Optional.empty());
 
         //when, then
@@ -164,8 +159,9 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
 
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu1), Optional.of(menu2));
+        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
+            .willReturn(Optional.of(MENU2()));
 
         order.getOrderLineItems()
             .get(0)
@@ -183,8 +179,9 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
 
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu1), Optional.of(menu2));
+        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
+            .willReturn(Optional.of(MENU2()));
 
         order.getOrderLineItems()
             .get(0)
@@ -202,8 +199,9 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
 
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu1), Optional.of(menu2));
+        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
+            .willReturn(Optional.of(MENU2()));
 
         order.setDeliveryAddress(null);
 
@@ -218,8 +216,9 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
 
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu1), Optional.of(menu2));
+        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
+            .willReturn(Optional.of(MENU2()));
 
         order.setOrderTable(null);
 
@@ -236,8 +235,9 @@ class OrderServiceTest extends MockTest {
 
         final OrderTable orderTable = ORDER_TABLE1();
 
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu1), Optional.of(menu2));
+        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
+            .willReturn(Optional.of(MENU2()));
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         //when, then
