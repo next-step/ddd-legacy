@@ -11,10 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import java.math.BigDecimal;
+import static kitchenpos.step.ProductStep.createProduct;
+import static kitchenpos.step.ProductStep.createProductRequest;
 
 @DisplayName("Product 인수 테스트")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -32,17 +31,10 @@ public class ProductAcceptanceTest {
     @Test
     void create() {
         // given
-        Product product = new Product();
-        ReflectionTestUtils.setField(product, "name", "강정치킨");
-        ReflectionTestUtils.setField(product, "price", BigDecimal.valueOf(17000));
+        Product product = createProduct("강정치킨", 17000);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(product)
-                .when().post("/api/products")
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = createProductRequest(product);
 
         // then
         Assertions.assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
