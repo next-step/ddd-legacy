@@ -1,5 +1,8 @@
 package kitchenpos.application.fixture;
 
+import static kitchenpos.application.fixture.MenuProductFixture.MENU_PRODUCTS;
+import static kitchenpos.application.fixture.MenuProductFixture.QUANTITY_NAGATIVE_MENU_PRODUCTS;
+
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
@@ -13,6 +16,7 @@ public class MenuFixture {
     private static final String MENU_NAME2 = "양념";
     private static final long PRICE1 = 20000L;
     private static final long PRICE2 = 30000L;
+    private static final long EXPENSIVE_PRICE = 2000000L;
     private static final long NEGATIVE_PRICE = -10000L;
     private static final UUID UUID1 = UUID.randomUUID();
     private static final UUID UUID2 = UUID.randomUUID();
@@ -26,7 +30,7 @@ public class MenuFixture {
         menu.setPrice(BigDecimal.valueOf(PRICE1));
         menu.setMenuGroupId(MENU_GROUP_ID1);
         menu.setDisplayed(true);
-//        menu.setMenuProducts(menuProducts);
+        menu.setMenuProducts(MENU_PRODUCTS());
         return menu;
     }
 
@@ -37,7 +41,7 @@ public class MenuFixture {
         menu.setPrice(BigDecimal.valueOf(PRICE2));
         menu.setMenuGroupId(MENU_GROUP_ID2);
         menu.setDisplayed(true);
-//        menu.setMenuProducts(menuProducts);
+        menu.setMenuProducts(MENU_PRODUCTS());
         return menu;
     }
 
@@ -48,7 +52,7 @@ public class MenuFixture {
         menu.setPrice(BigDecimal.valueOf(PRICE2));
         menu.setMenuGroupId(MENU_GROUP_ID2);
         menu.setDisplayed(true);
-//        menu.setMenuProducts(menuProducts);
+        menu.setMenuProducts(MENU_PRODUCTS());
         return menu;
     }
 
@@ -59,7 +63,7 @@ public class MenuFixture {
         menu.setPrice(BigDecimal.valueOf(price));
         menu.setMenuGroupId(MENU_GROUP_ID2);
         menu.setDisplayed(true);
-//        menu.setMenuProducts(menuProducts);
+        menu.setMenuProducts(MENU_PRODUCTS());
         return menu;
     }
 
@@ -70,7 +74,7 @@ public class MenuFixture {
         menu.setPrice(null);
         menu.setMenuGroupId(MENU_GROUP_ID2);
         menu.setDisplayed(true);
-//        menu.setMenuProducts(menuProducts);
+        menu.setMenuProducts(MENU_PRODUCTS());
         return menu;
     }
 
@@ -81,7 +85,7 @@ public class MenuFixture {
         menu.setPrice(BigDecimal.valueOf(NEGATIVE_PRICE));
         menu.setMenuGroupId(MENU_GROUP_ID2);
         menu.setDisplayed(true);
-//        menu.setMenuProducts(menuProducts);
+        menu.setMenuProducts(MENU_PRODUCTS());
         return menu;
     }
 
@@ -89,7 +93,7 @@ public class MenuFixture {
         final Menu menu = new Menu();
         menu.setId(UUID2);
         menu.setName(MENU_NAME1);
-        menu.setPrice(BigDecimal.valueOf(NEGATIVE_PRICE));
+        menu.setPrice(BigDecimal.valueOf(PRICE1));
         menu.setMenuGroupId(MENU_GROUP_ID2);
         menu.setDisplayed(true);
         menu.setMenuProducts(Collections.emptyList());
@@ -97,22 +101,24 @@ public class MenuFixture {
     }
 
     public static Menu QUANTITY_NAGATIVE_MENU() {
-        /*
-        menu.getMenuProducts()
-            .get(1)
-            .setQuantity(-1);
-         */
-        return null;
+        final Menu menu = new Menu();
+        menu.setId(UUID1);
+        menu.setName(MENU_NAME1);
+        menu.setPrice(BigDecimal.valueOf(EXPENSIVE_PRICE));
+        menu.setMenuGroupId(MENU_GROUP_ID1);
+        menu.setDisplayed(true);
+        menu.setMenuProducts(QUANTITY_NAGATIVE_MENU_PRODUCTS());
+        return menu;
     }
 
     public static Menu EXPENSIVE_MENU() {
         final Menu menu = new Menu();
         menu.setId(UUID1);
         menu.setName(MENU_NAME1);
-        menu.setPrice(BigDecimal.valueOf(PRICE1));
+        menu.setPrice(BigDecimal.valueOf(EXPENSIVE_PRICE));
         menu.setMenuGroupId(MENU_GROUP_ID1);
         menu.setDisplayed(true);
-//        menu.setMenuProducts(menuProducts);
+        menu.setMenuProducts(MENU_PRODUCTS());
         return menu;
     }
 
@@ -123,7 +129,7 @@ public class MenuFixture {
         menu.setPrice(BigDecimal.valueOf(PRICE1));
         menu.setMenuGroupId(MENU_GROUP_ID1);
         menu.setDisplayed(false);
-//        menu.setMenuProducts(menuProducts);
+        menu.setMenuProducts(MENU_PRODUCTS());
         return menu;
     }
 

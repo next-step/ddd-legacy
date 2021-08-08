@@ -5,8 +5,6 @@ import static kitchenpos.application.fixture.MenuFixture.MENU2;
 import static kitchenpos.application.fixture.MenuFixture.MENUS;
 import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1;
-import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
-import static kitchenpos.application.fixture.ProductFixture.PRODUCT2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -20,7 +18,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
@@ -29,7 +26,6 @@ import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
-import kitchenpos.domain.Product;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -60,9 +56,6 @@ class OrderServiceTest extends MockTest {
     private OrderLineItem orderLineItem1;
     private OrderLineItem orderLineItem2;
 
-    private MenuProduct menuProduct1;
-    private MenuProduct menuProduct2;
-
     @BeforeEach
     void setUp() {
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
@@ -71,9 +64,6 @@ class OrderServiceTest extends MockTest {
             .intValue(), 2, MENU1());
         orderLineItem2 = createOrderLineItem(MENU2().getPrice()
             .intValue(), 3, MENU2());
-
-        menuProduct1 = makeMenuProduct(PRODUCT1(), 2L);
-        menuProduct2 = makeMenuProduct(PRODUCT2(), 3L);
     }
 
     @DisplayName("create - 주문할 수 있다. 성공시 주문 상태는 대기")
@@ -567,28 +557,6 @@ class OrderServiceTest extends MockTest {
         orderLineItem.setQuantity(quantity);
         orderLineItem.setMenu(menu);
         return orderLineItem;
-    }
-
-    private Menu createMenu(final String name, final Long price) {
-        final Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName(name);
-        menu.setPrice(BigDecimal.valueOf(price));
-        menu.setMenuGroupId(UUID.randomUUID());
-        menu.setDisplayed(true);
-
-        final List<MenuProduct> menuProducts = Arrays.asList(menuProduct1, menuProduct2);
-
-        menu.setMenuProducts(menuProducts);
-        return menu;
-    }
-
-    private MenuProduct makeMenuProduct(final Product product, final long quantity) {
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setProductId(product.getId());
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
     }
 
 }

@@ -20,16 +20,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import kitchenpos.application.fixture.MenuFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +41,7 @@ import org.mockito.Mock;
 class MenuServiceTest extends MockTest {
 
     private static final int ZERO = 0;
+    private static final int ONE = 1;
 
     @Mock
     private MenuRepository menuRepository;
@@ -60,24 +58,9 @@ class MenuServiceTest extends MockTest {
     @InjectMocks
     private MenuService menuService;
 
-    private List<MenuProduct> menuProducts;
-
     @BeforeEach
     void setUp() {
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
-
-        final MenuProduct menuProduct1 = makeMenuProduct(PRODUCT1(), 2L);
-        final MenuProduct menuProduct2 = makeMenuProduct(PRODUCT2(), 3L);
-
-        menuProducts = Arrays.asList(menuProduct1, menuProduct2);
-    }
-
-    private MenuProduct makeMenuProduct(final Product product, final long quantity) {
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setProductId(product.getId());
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
     }
 
     @DisplayName("create - 메뉴를 추가할 수 있다")
@@ -375,9 +358,6 @@ class MenuServiceTest extends MockTest {
     @Test
     void findAll() {
         //given
-        final Menu menu1 = MENU1();
-        final Menu menu2 = MENU2();
-
         given(menuRepository.findAll()).willReturn(MENUS());
 
         //when
@@ -386,8 +366,8 @@ class MenuServiceTest extends MockTest {
         //then
         assertAll(
             () -> assertThat(menus.size()).isEqualTo(MENUS().size()),
-            () -> assertThat(menus.get(ZERO)).isEqualTo(menu1),
-            () -> assertThat(menus.get(1)).isEqualTo(menu2)
+            () -> assertThat(menus.get(ZERO).getId()).isEqualTo(MENU1().getId()),
+            () -> assertThat(menus.get(ONE).getId()).isEqualTo(MENU2().getId())
         );
     }
 
