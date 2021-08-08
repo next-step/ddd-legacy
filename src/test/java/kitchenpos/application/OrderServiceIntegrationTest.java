@@ -175,7 +175,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		Assertions.assertThatIllegalArgumentException().isThrownBy(throwingCallable);
 	}
 
-	@DisplayName("주문 실패 : 주문 항목에 해당하는 메뉴가 모두 전시 상태가 아님")
+	@DisplayName("주문 실패 : 주문 항목의 가격과 해당하는 메뉴의 가격이 같지 않음")
 	@Test
 	void 주문_실패_5() {
 		// given
