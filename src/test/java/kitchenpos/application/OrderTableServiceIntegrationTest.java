@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
@@ -114,7 +116,8 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		orderRepository.save(OrderFixture.SERVED_EAT_IN(givenMenu, givenOrderTable));
 
 		// when
@@ -175,12 +178,17 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_주문_조회() {
 		// given
-		orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
+		OrderTable given = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 
 		// when
 		List<OrderTable> actual = orderTableService.findAll();
 
 		// then
-		assertThat(actual).isNotEmpty();
+		List<UUID> actualIds = actual.stream().map(OrderTable::getId).collect(Collectors.toList());
+
+		assertAll(
+			() -> Assertions.assertThat(actual).isNotEmpty(),
+			() -> Assertions.assertThat(actualIds).contains(given.getId())
+		);
 	}
 }

@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
@@ -124,7 +126,8 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 		// given
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(100000000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(100000000), givenMenuGroup, givenProduct));
 
 		Product givenRequest = new Product();
 		givenRequest.setPrice(new BigDecimal(18000));
@@ -160,12 +163,17 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_상품_조회() {
 		// given
-		productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 
 		// when
 		List<Product> actual = productService.findAll();
 
 		// then
-		Assertions.assertThat(actual).isNotEmpty();
+		List<UUID> actualIds = actual.stream().map(Product::getId).collect(Collectors.toList());
+
+		assertAll(
+			() -> Assertions.assertThat(actual).isNotEmpty(),
+			() -> Assertions.assertThat(actualIds).contains(givenProduct.getId())
+		);
 	}
 }

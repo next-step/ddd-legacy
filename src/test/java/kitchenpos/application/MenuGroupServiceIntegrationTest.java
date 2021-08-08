@@ -1,8 +1,11 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
@@ -57,12 +60,17 @@ class MenuGroupServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_주문_조회() {
 		// given
-		menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
+		MenuGroup given = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 
 		// when
 		List<MenuGroup> actual = menuGroupService.findAll();
 
 		// then
-		assertThat(actual).isNotEmpty();
+		List<UUID> actualIds = actual.stream().map(MenuGroup::getId).collect(Collectors.toList());
+
+		assertAll(
+			() -> assertThat(actual).isNotEmpty(),
+			() -> assertThat(actualIds).contains(given.getId())
+		);
 	}
 }

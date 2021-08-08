@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
@@ -57,7 +58,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.SAT_ORDER_TABLE());
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
@@ -128,7 +130,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
 		orderLineItemRequest.setMenuId(givenMenu.getId());
@@ -152,7 +155,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.HIDDEN_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.HIDDEN_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
 		orderLineItemRequest.setMenuId(givenMenu.getId());
@@ -176,7 +180,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
 		orderLineItemRequest.setMenuId(givenMenu.getId());
@@ -201,7 +206,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
 		orderLineItemRequest.setMenuId(givenMenu.getId());
@@ -226,7 +232,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
 		orderLineItemRequest.setMenuId(givenMenu.getId());
@@ -251,7 +258,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem();
@@ -277,7 +285,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY(givenMenu));
 
 		// when
@@ -293,7 +302,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu)); // not waiting
 
 		// when
@@ -309,7 +319,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu));
 
 		// when
@@ -325,7 +336,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY(givenMenu)); // not accepted
 
 		// when
@@ -341,7 +353,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY(givenMenu));
 
 		// when
@@ -357,7 +370,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.SERVED_TAKEOUT(givenMenu)); // not delivery
 
 		// when
@@ -373,7 +387,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY(givenMenu)); // not served
 
 		// when
@@ -389,7 +404,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.DELIVERING_DELIVERY(givenMenu));
 
 		// when
@@ -405,7 +421,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu)); // not delivery
 
 		// when
@@ -421,7 +438,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY(givenMenu)); // not delivering
 
 		// when
@@ -438,7 +456,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.SERVED_EAT_IN(givenMenu, givenOrderTable));
 
 		// when
@@ -459,7 +478,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY(givenMenu)); // not delivered
 
 		// when
@@ -475,7 +495,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
 		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu)); // not served
 
 		// when
@@ -491,13 +512,19 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
-		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
-		orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu));
+		Menu givenMenu = menuRepository.save(
+			MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu));
 
 		// when
 		List<Order> actual = orderService.findAll();
 
 		// then
-		Assertions.assertThat(actual).isNotEmpty();
+		List<UUID> actualIds = actual.stream().map(Order::getId).collect(Collectors.toList());
+
+		assertAll(
+			() -> Assertions.assertThat(actual).isNotEmpty(),
+			() -> Assertions.assertThat(actualIds).contains(givenOrder.getId())
+		);
 	}
 }
