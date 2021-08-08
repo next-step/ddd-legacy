@@ -164,14 +164,14 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		// given
 		OrderTable given = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 		OrderTable request = new OrderTable();
-		request.setNumberOfGuests(-1);
+		request.setNumberOfGuests(4);
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable =
 			() -> orderTableService.changeNumberOfGuests(given.getId(), request);
 
 		// then
-		Assertions.assertThatIllegalArgumentException().isThrownBy(throwingCallable);
+		Assertions.assertThatIllegalStateException().isThrownBy(throwingCallable);
 	}
 
 	@DisplayName("전체 주문 테이블 조회")
