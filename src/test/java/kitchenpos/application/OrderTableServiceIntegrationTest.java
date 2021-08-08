@@ -82,7 +82,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_테이블_착석() {
 		// given
-		OrderTable given = orderTableRepository.save(OrderTableFixture.orderTable());
+		OrderTable given = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 
 		// when
 		OrderTable actual = orderTableService.sit(given.getId());
@@ -96,7 +96,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_테이블_비우기() {
 		// given
-		OrderTable given = orderTableRepository.save(OrderTableFixture.orderTable());
+		OrderTable given = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 
 		// when
 		OrderTable actual = orderTableService.clear(given.getId());
@@ -111,11 +111,11 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_테이블_비우기_실패_1() {
 		// given
-		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.orderTable());
-		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
-		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(19000), givenMenuGroup, givenProduct));
-		orderRepository.save(OrderFixture.servedEatIn(givenMenu, givenOrderTable));
+		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(19000), givenMenuGroup, givenProduct));
+		orderRepository.save(OrderFixture.SERVED_EAT_IN(givenMenu, givenOrderTable));
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderTableService.clear(givenOrderTable.getId());
@@ -128,7 +128,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_테이블_손님_수_변경() {
 		// given
-		OrderTable given = orderTableRepository.save(OrderTableFixture.sat());
+		OrderTable given = orderTableRepository.save(OrderTableFixture.SAT_ORDER_TABLE());
 		OrderTable request = new OrderTable();
 		request.setNumberOfGuests(4);
 
@@ -143,7 +143,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_테이블_손님_수_변경_실패_1() {
 		// given
-		OrderTable given = orderTableRepository.save(OrderTableFixture.sat());
+		OrderTable given = orderTableRepository.save(OrderTableFixture.SAT_ORDER_TABLE());
 		OrderTable request = new OrderTable();
 		request.setNumberOfGuests(-1);
 
@@ -159,7 +159,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 주문_테이블_손님_수_변경_실패_2() {
 		// given
-		OrderTable given = orderTableRepository.save(OrderTableFixture.orderTable());
+		OrderTable given = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 		OrderTable request = new OrderTable();
 		request.setNumberOfGuests(-1);
 
@@ -175,7 +175,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_주문_조회() {
 		// given
-		orderTableRepository.save(OrderTableFixture.orderTable());
+		orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 
 		// when
 		List<OrderTable> actual = orderTableService.findAll();

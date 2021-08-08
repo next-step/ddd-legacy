@@ -10,7 +10,7 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 public class MenuFixture {
-	public static Menu menu(BigDecimal price, MenuGroup menuGroup, Product product) {
+	public static Menu DISPLAYED_MENU(BigDecimal price, MenuGroup menuGroup, Product product) {
 		Menu menu = new Menu();
 		menu.setId(UUID.randomUUID());
 		menu.setName("후라이드+후라이드");
@@ -21,7 +21,7 @@ public class MenuFixture {
 		return menu;
 	}
 
-	public static Menu hidden(BigDecimal price, MenuGroup menuGroup, Product product) {
+	public static Menu HIDDEN_MENU(BigDecimal price, MenuGroup menuGroup, Product product) {
 		Menu menu = new Menu();
 		menu.setId(UUID.randomUUID());
 		menu.setName("후라이드+후라이드");

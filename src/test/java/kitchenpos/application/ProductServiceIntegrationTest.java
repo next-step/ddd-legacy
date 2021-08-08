@@ -105,7 +105,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 상품_가격_변경() {
 		// given
-		Product givenProduct = ProductFixture.product(new BigDecimal(17000));
+		Product givenProduct = ProductFixture.PRODUCT(new BigDecimal(17000));
 		productRepository.save(givenProduct);
 
 		Product givenRequest = new Product();
@@ -122,9 +122,9 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 상품_가격_변경_비노출() {
 		// given
-		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup());
-		Product givenProduct = productRepository.save(ProductFixture.product(new BigDecimal(17000)));
-		Menu givenMenu = menuRepository.save(MenuFixture.menu(new BigDecimal(100000000), givenMenuGroup, givenProduct));
+		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
+		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
+		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(new BigDecimal(100000000), givenMenuGroup, givenProduct));
 
 		Product givenRequest = new Product();
 		givenRequest.setPrice(new BigDecimal(18000));
@@ -142,7 +142,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@ArgumentsSource(NullAndNegativeBigDecimalArgumentsProvider.class)
 	void 상품_가격_변경_실패_1(BigDecimal price) {
 		// given
-		Product givenProduct = ProductFixture.product(new BigDecimal(17000));
+		Product givenProduct = ProductFixture.PRODUCT(new BigDecimal(17000));
 		productRepository.save(givenProduct);
 
 		Product givenRequest = new Product();
@@ -160,7 +160,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_상품_조회() {
 		// given
-		productRepository.save(ProductFixture.product(new BigDecimal(17000)));
+		productRepository.save(ProductFixture.PRODUCT(new BigDecimal(17000)));
 
 		// when
 		List<Product> actual = productService.findAll();

@@ -13,7 +13,7 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
 
 public class OrderFixture {
-	public static Order waitingDelivery(Menu menu) {
+	public static Order WAITING_DELIVERY(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.DELIVERY);
@@ -24,7 +24,7 @@ public class OrderFixture {
 		return order;
 	}
 
-	public static Order acceptedTakeout(Menu menu) {
+	public static Order ACCEPTED_TAKEOUT(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.TAKEOUT);
@@ -34,7 +34,7 @@ public class OrderFixture {
 		return order;
 	}
 
-	public static Order servedDelivery(Menu menu) {
+	public static Order SERVED_DELIVERY(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.DELIVERY);
@@ -45,7 +45,7 @@ public class OrderFixture {
 		return order;
 	}
 
-	public static Order deliveringDelivery(Menu menu) {
+	public static Order DELIVERING_DELIVERY(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.DELIVERY);
@@ -56,7 +56,7 @@ public class OrderFixture {
 		return order;
 	}
 
-	public static Order servedTakeout(Menu menu) {
+	public static Order SERVED_TAKEOUT(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.TAKEOUT);
@@ -66,7 +66,7 @@ public class OrderFixture {
 		return order;
 	}
 
-	public static Order servedEatIn(Menu menu, OrderTable orderTable) {
+	public static Order SERVED_EAT_IN(Menu menu, OrderTable orderTable) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.EAT_IN);

@@ -57,7 +57,7 @@ class MenuGroupServiceIntegrationTest extends IntegrationTest {
 	@Test
 	void 전체_주문_조회() {
 		// given
-		menuGroupRepository.save(MenuGroupFixture.menuGroup());
+		menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 
 		// when
 		List<MenuGroup> actual = menuGroupService.findAll();
