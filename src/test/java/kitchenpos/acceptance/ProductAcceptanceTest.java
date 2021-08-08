@@ -1,31 +1,19 @@
 package kitchenpos.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import kitchenpos.AcceptanceTest;
 import kitchenpos.domain.Product;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 import static kitchenpos.step.ProductStep.createProduct;
 import static kitchenpos.step.ProductStep.createProductRequest;
 
 @DisplayName("Product 인수 테스트")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class ProductAcceptanceTest {
-
-    @LocalServerPort
-    private int port;
-
-    @BeforeEach
-    void setUp() {
-        RestAssured.port = port;
-    }
+public class ProductAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("상품을 등록한다")
     @Test
