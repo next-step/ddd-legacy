@@ -5,6 +5,7 @@ import static kitchenpos.application.fixture.ProductFixture.PRICE_NEGATIVE_PRODU
 import static kitchenpos.application.fixture.ProductFixture.PRICE_NULL_PRODUCT;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT2;
+import static kitchenpos.application.fixture.ProductFixture.PRODUCTS;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT_WITH_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -12,7 +13,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -31,6 +31,8 @@ import org.mockito.Mock;
 
 class ProductServiceTest extends MockTest {
 
+    public static final int ZERO = 0;
+    public static final int ONE = 1;
     @Mock
     private ProductRepository productRepository;
 
@@ -176,7 +178,7 @@ class ProductServiceTest extends MockTest {
         //given
         final Product product = PRODUCT1();
 
-        given(productRepository.findById(any())).willReturn(Optional.of(product));
+        given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()));
         given(menuRepository.findAllByProductId(any())).willReturn(MENUS());
 
         //when
@@ -184,9 +186,9 @@ class ProductServiceTest extends MockTest {
 
         //then
         assertAll(
-            () -> assertThat(MENUS().get(0)
+            () -> assertThat(MENUS().get(ZERO)
                 .isDisplayed()).isFalse(),
-            () -> assertThat(MENUS().get(1)
+            () -> assertThat(MENUS().get(ONE)
                 .isDisplayed()).isTrue()
         );
     }
@@ -195,16 +197,15 @@ class ProductServiceTest extends MockTest {
     @Test
     void findAll() {
         //given
-        final Product product1 = PRODUCT1();
-        final Product product2 = PRODUCT2();
-
-        given(productRepository.findAll()).willReturn(Arrays.asList(product1, product2));
+        given(productRepository.findAll()).willReturn(PRODUCTS());
 
         final List<Product> products = productService.findAll();
 
         assertAll(
-            () -> assertThat(products.get(0)).isEqualTo(product1),
-            () -> assertThat(products.get(1)).isEqualTo(product2)
+            () -> assertThat(products.get(ZERO).getId()).isEqualTo(PRODUCT1().getId()),
+            () -> assertThat(products.get(ZERO).getName()).isEqualTo(PRODUCT1().getName()),
+            () -> assertThat(products.get(ONE).getId()).isEqualTo(PRODUCT2().getId()),
+            () -> assertThat(products.get(ONE).getName()).isEqualTo(PRODUCT2().getName())
         );
     }
 
