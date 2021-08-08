@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -54,10 +55,12 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		OrderTable orderTable = orderTableService.create(request);
 
 		// then
-		assertThat(orderTable.getId()).isNotNull();
-		assertThat(orderTable.getName()).isEqualTo("9번");
-		assertThat(orderTable.getNumberOfGuests()).isEqualTo(0);
-		assertThat(orderTable.isEmpty()).isEqualTo(true);
+		assertAll(
+			() -> assertNotNull(orderTable.getId()),
+			() -> assertEquals("9번", orderTable.getName()),
+			() -> assertEquals(0, orderTable.getNumberOfGuests()),
+			() -> assertTrue(orderTable.isEmpty())
+		);
 	}
 
 	@DisplayName("주문 테이블 생성 실패 : 이름 없음")

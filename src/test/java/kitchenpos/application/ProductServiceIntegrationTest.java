@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -47,9 +48,11 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 		Product actualProduct = productService.create(givenRequest);
 
 		// then
-		assertThat(actualProduct.getId()).isNotNull();
-		assertThat(actualProduct.getName()).isEqualTo("강정치킨");
-		assertThat(actualProduct.getPrice()).isEqualTo(new BigDecimal(17000));
+		assertAll(
+			() -> assertNotNull(actualProduct.getId()),
+			() -> assertEquals("강정치킨", actualProduct.getName()),
+			() -> assertEquals(new BigDecimal(17000), actualProduct.getPrice())
+		);
 	}
 
 	@DisplayName("상품 생성 실패 : 가격이 널 또는 음수")

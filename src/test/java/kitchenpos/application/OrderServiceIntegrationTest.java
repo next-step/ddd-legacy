@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
@@ -69,11 +71,24 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		givenRequest.setOrderTableId(givenOrderTable.getId());
 
 		// when
-		Order givenOrder = orderService.create(givenRequest);
+		Order actualOrder = orderService.create(givenRequest);
 
 		// then
-		Assertions.assertThat(givenOrder.getId()).isNotNull();
-		Assertions.assertThat(givenOrder.getStatus()).isEqualTo(OrderStatus.WAITING);
+		assertAll(
+			() -> assertNotNull(actualOrder.getId()),
+			() -> assertEquals(givenRequest.getType(), actualOrder.getType()),
+			() -> assertEquals(OrderStatus.WAITING, actualOrder.getStatus()),
+			() -> assertEquals(givenRequest.getOrderTableId(), actualOrder.getOrderTable().getId()),
+			() -> {
+				List<OrderLineItem> actualOrderLineItems = actualOrder.getOrderLineItems();
+				OrderLineItem actualOrderLineItem = actualOrderLineItems.get(0);
+				assertAll(
+					() -> assertNotNull(actualOrderLineItem.getSeq()),
+					() -> assertEquals(orderLineItemRequest.getMenuId(), actualOrderLineItem.getMenu().getId()),
+					() -> assertEquals(orderLineItemRequest.getQuantity(), actualOrderLineItem.getQuantity())
+				);
+			}
+		);
 	}
 
 	@DisplayName("주문 실패 : 종류 없음")
@@ -431,9 +446,11 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		OrderTable actualOrderTable = orderTableRepository.findById(givenOrderTable.getId()).get();
 
 		// then
-		Assertions.assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-		Assertions.assertThat(actualOrderTable.getNumberOfGuests()).isEqualTo(0);
-		Assertions.assertThat(actualOrderTable.isEmpty()).isEqualTo(true);
+		assertAll(
+			() -> assertEquals(OrderStatus.COMPLETED, actualOrder.getStatus()),
+			() -> assertEquals(0, actualOrderTable.getNumberOfGuests()),
+			() -> assertTrue(actualOrderTable.isEmpty())
+		);
 	}
 
 	@DisplayName("주문 완료 실패 : 주문 종류가 배달인데, 주문 상태가 배달됨이 아님")
