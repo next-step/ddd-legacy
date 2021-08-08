@@ -9,6 +9,7 @@ public class StringCalculator {
     public static final String PATTERN_CUSTOM = "//(.)\n(.*)";
     private static final Pattern pattern = Pattern.compile(PATTERN_CUSTOM);
     private static int result = 0;
+    private static String separator = DEFAULT_SEPARATOR;
 
     public static int calculate(String text) throws RuntimeException {
         if (text == null || text.isEmpty()) {
@@ -16,11 +17,7 @@ public class StringCalculator {
         }
 
         Matcher matcher = pattern.matcher(text);
-        String separator = DEFAULT_SEPARATOR;
-        if (matcher.find()) {
-            separator = matcher.group(1);
-            text = matcher.group(2);
-        }
+        text = getCustomText(text, matcher);
 
         String[] numbers = text.split(separator);
         checkOnlyNumber(numbers);
@@ -29,6 +26,14 @@ public class StringCalculator {
             add(number);
         }
         return result;
+    }
+
+    private static String getCustomText(String text, Matcher matcher) {
+        if (matcher.find()) {
+            separator = matcher.group(1);
+            text = matcher.group(2);
+        }
+        return text;
     }
 
     private static void checkOnlyNumber(String[] numbers) {
