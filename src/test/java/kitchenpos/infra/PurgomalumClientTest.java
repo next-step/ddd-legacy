@@ -34,7 +34,6 @@ class PurgomalumClientTest {
     @ValueSource(strings = {"fuck", "shit", "nigga"})
     void containsProfanity(final String profanityWord) {
         final boolean sut = purgomalumClient.containsProfanity(profanityWord);
-        System.out.println(sut);
         assertThat(sut).isTrue();
     }
 
@@ -43,7 +42,6 @@ class PurgomalumClientTest {
     @ValueSource(strings = {"후라이드", "양념", "치킨"})
     void noProfanity(final String normalWord) {
         final boolean sut = purgomalumClient.containsProfanity(normalWord);
-        System.out.println(sut);
         assertThat(sut).isFalse();
     }
 
@@ -52,7 +50,6 @@ class PurgomalumClientTest {
     @ValueSource(strings = {"개새끼", "씨발"})
     void profanityKorean(final String profanitykoreanWord) {
         final boolean sut = purgomalumClient.containsProfanity(profanitykoreanWord);
-        System.out.println(sut);
         assertThat(sut).isFalse();
     }
 

@@ -31,10 +31,10 @@ class PurgomalumRestClientTest {
             .andRespond(withSuccess(expectResult, MediaType.TEXT_PLAIN));
 
         //when
-        final boolean result = this.service.containsProfanity(profanityWord);
+        final boolean sut = this.service.containsProfanity(profanityWord);
 
         //then
-        assertThat(result).isTrue();
+        assertThat(sut).isTrue();
     }
 
     @DisplayName("정상 단어는 필터링되지 않는다")
@@ -47,10 +47,10 @@ class PurgomalumRestClientTest {
             .andRespond(withSuccess(expectResult, MediaType.TEXT_PLAIN));
 
         //when
-        final boolean result = this.service.containsProfanity(normalWord);
+        final boolean sut = this.service.containsProfanity(normalWord);
 
         //then
-        assertThat(result).isFalse();
+        assertThat(sut).isFalse();
     }
 
     @DisplayName("한글 욕은 필터링되지 않는다")
@@ -63,10 +63,10 @@ class PurgomalumRestClientTest {
             .andRespond(withSuccess(expectResult, MediaType.TEXT_PLAIN));
 
         //when
-        final boolean result = this.service.containsProfanity(profanitykoreanWord);
+        final boolean sut = this.service.containsProfanity(profanitykoreanWord);
 
         //then
-        assertThat(result).isFalse();
+        assertThat(sut).isFalse();
     }
 
 }
