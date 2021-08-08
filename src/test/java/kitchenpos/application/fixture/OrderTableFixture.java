@@ -1,5 +1,7 @@
 package kitchenpos.application.fixture;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.OrderTable;
 
@@ -46,6 +48,10 @@ public class OrderTableFixture {
         orderTable.setNumberOfGuests(ZERO);
         orderTable.setEmpty(false);
         return orderTable;
+    }
+
+    public static List<OrderTable> ORDER_TABLES() {
+        return Arrays.asList(ORDER_TABLE1(), ORDER_TABLE2());
     }
 
 }

@@ -3,6 +3,7 @@ package kitchenpos.application;
 import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE2;
+import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLES;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE_WITH_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
@@ -10,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -55,7 +55,12 @@ class OrderTableServiceTest extends MockTest {
         final OrderTable sut = orderTableService.create(ORDER_TABLE1());
 
         //then
-        assertThat(sut).isInstanceOf(OrderTable.class);
+        assertAll(
+            () -> assertThat(sut.getId()).isEqualTo(ORDER_TABLE1().getId()),
+            () -> assertThat(sut.getName()).isEqualTo(ORDER_TABLE1().getName()),
+            () -> assertThat(sut.getNumberOfGuests()).isEqualTo(ORDER_TABLE1().getNumberOfGuests()),
+            () -> assertThat(sut.isEmpty()).isEqualTo(ORDER_TABLE1().isEmpty())
+        );
     }
 
     @DisplayName("create - 주문 테이블 이름이 한글자 미만이라면 예외를 반환한다")
@@ -205,20 +210,18 @@ class OrderTableServiceTest extends MockTest {
     @Test
     void findAll() {
         //given
-        final OrderTable orderTable1 = ORDER_TABLE1();
-        final OrderTable orderTable2 = ORDER_TABLE2();
-
-        final List<OrderTable> orderTables = Arrays.asList(orderTable1, orderTable2);
-        given(orderTableRepository.findAll()).willReturn(orderTables);
+        given(orderTableRepository.findAll()).willReturn(ORDER_TABLES());
 
         //when
         final List<OrderTable> sut = orderTableService.findAll();
 
         //then
         assertAll(
-            () -> assertThat(sut.size()).isEqualTo(orderTables.size()),
-            () -> assertThat(sut.get(ZERO)).isEqualTo(orderTable1),
-            () -> assertThat(sut.get(ONE)).isEqualTo(orderTable2)
+            () -> assertThat(sut.size()).isEqualTo(ORDER_TABLES().size()),
+            () -> assertThat(sut.get(ZERO).getId()).isEqualTo(ORDER_TABLE1().getId()),
+            () -> assertThat(sut.get(ZERO).getName()).isEqualTo(ORDER_TABLE1().getName()),
+            () -> assertThat(sut.get(ONE).getId()).isEqualTo(ORDER_TABLE2().getId()),
+            () -> assertThat(sut.get(ONE).getName()).isEqualTo(ORDER_TABLE2().getName())
         );
     }
 
