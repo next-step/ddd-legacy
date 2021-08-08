@@ -56,9 +56,9 @@ class MenuGroupServiceIntegrationTest extends IntegrationTest {
 		Assertions.assertThatIllegalArgumentException().isThrownBy(throwingCallable);
 	}
 
-	@DisplayName("전체 주문 조회")
+	@DisplayName("전체 메뉴 그룹 조회")
 	@Test
-	void 전체_주문_조회() {
+	void 전체_메뉴_그룹_조회() {
 		// given
 		MenuGroup given = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 
