@@ -1,5 +1,6 @@
 package kitchenpos.fixture;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.Collections;
@@ -13,7 +14,7 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
 
 public class OrderFixture {
-	public static Order WAITING_DELIVERY(Menu menu) {
+	public static Order WAITING_DELIVERY_ORDER(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.DELIVERY);
@@ -24,7 +25,7 @@ public class OrderFixture {
 		return order;
 	}
 
-	public static Order ACCEPTED_TAKEOUT(Menu menu) {
+	public static Order ACCEPTED_TAKEOUT_ORDER(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.TAKEOUT);
@@ -34,7 +35,7 @@ public class OrderFixture {
 		return order;
 	}
 
-	public static Order SERVED_DELIVERY(Menu menu) {
+	public static Order SERVED_DELIVERY_ORDER(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.DELIVERY);
@@ -45,7 +46,7 @@ public class OrderFixture {
 		return order;
 	}
 
-	public static Order DELIVERING_DELIVERY(Menu menu) {
+	public static Order DELIVERING_DELIVERY_ORDER(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.DELIVERY);
@@ -56,7 +57,7 @@ public class OrderFixture {
 		return order;
 	}
 
-	public static Order SERVED_TAKEOUT(Menu menu) {
+	public static Order SERVED_TAKEOUT_ORDER(Menu menu) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.TAKEOUT);
@@ -66,7 +67,7 @@ public class OrderFixture {
 		return order;
 	}
 
-	public static Order SERVED_EAT_IN(Menu menu, OrderTable orderTable) {
+	public static Order SERVED_EAT_IN_ORDER(Menu menu, OrderTable orderTable) {
 		Order order = new Order();
 		order.setId(UUID.randomUUID());
 		order.setType(OrderType.EAT_IN);
@@ -75,6 +76,14 @@ public class OrderFixture {
 		order.setOrderLineItems(Collections.singletonList(orderLineItem(menu)));
 		order.setOrderTable(orderTable);
 		return order;
+	}
+
+	public static OrderLineItem ORDER_LINE_ITEM_REQUEST(Menu menu, BigDecimal price, long quantity) {
+		OrderLineItem orderLineItemRequest = new OrderLineItem();
+		orderLineItemRequest.setMenuId(menu.getId());
+		orderLineItemRequest.setPrice(price);
+		orderLineItemRequest.setQuantity(quantity);
+		return orderLineItemRequest;
 	}
 
 	private static OrderLineItem orderLineItem(Menu menu) {

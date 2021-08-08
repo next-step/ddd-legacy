@@ -47,7 +47,6 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	private static final BigDecimal ORDER_LINE_ITEM_PRICE_NOT_EQUAL_TO_MENU = new BigDecimal(100);
 	private static final long ORDER_LINE_ITEM_QUANTITY = 3;
 	private static final long ORDER_LINE_ITEM_QUANTITY_NEGATIVE = -1;
-	;
 
 	@Autowired
 	private OrderService orderService;
@@ -77,11 +76,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.SAT_ORDER_TABLE());
-
-		OrderLineItem orderLineItemRequest = new OrderLineItem();
-		orderLineItemRequest.setMenuId(givenMenu.getId());
-		orderLineItemRequest.setPrice(ORDER_LINE_ITEM_PRICE);
-		orderLineItemRequest.setQuantity(ORDER_LINE_ITEM_QUANTITY);
+		OrderLineItem orderLineItemRequest = OrderFixture.ORDER_LINE_ITEM_REQUEST(givenMenu, ORDER_LINE_ITEM_PRICE, ORDER_LINE_ITEM_QUANTITY);
 
 		Order givenRequest = new Order();
 		givenRequest.setType(OrderType.EAT_IN);
@@ -145,11 +140,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_실패_3(OrderType orderType) {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-
-		OrderLineItem orderLineItemRequest = new OrderLineItem();
-		orderLineItemRequest.setMenuId(givenMenu.getId());
-		orderLineItemRequest.setPrice(ORDER_LINE_ITEM_PRICE);
-		orderLineItemRequest.setQuantity(ORDER_LINE_ITEM_QUANTITY_NEGATIVE);
+		OrderLineItem orderLineItemRequest = OrderFixture.ORDER_LINE_ITEM_REQUEST(givenMenu, ORDER_LINE_ITEM_PRICE, ORDER_LINE_ITEM_QUANTITY_NEGATIVE);
 
 		Order givenRequest = new Order();
 		givenRequest.setType(orderType); // delivery or takeout
@@ -167,11 +158,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_실패_4() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.HIDDEN_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-
-		OrderLineItem orderLineItemRequest = new OrderLineItem();
-		orderLineItemRequest.setMenuId(givenMenu.getId());
-		orderLineItemRequest.setPrice(ORDER_LINE_ITEM_PRICE);
-		orderLineItemRequest.setQuantity(ORDER_LINE_ITEM_QUANTITY);
+		OrderLineItem orderLineItemRequest = OrderFixture.ORDER_LINE_ITEM_REQUEST(givenMenu, ORDER_LINE_ITEM_PRICE, ORDER_LINE_ITEM_QUANTITY);
 
 		Order givenRequest = new Order();
 		givenRequest.setType(OrderType.EAT_IN);
@@ -189,11 +176,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_실패_5() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-
-		OrderLineItem orderLineItemRequest = new OrderLineItem();
-		orderLineItemRequest.setMenuId(givenMenu.getId());
-		orderLineItemRequest.setPrice(ORDER_LINE_ITEM_PRICE_NOT_EQUAL_TO_MENU); // not equal to menu's price
-		orderLineItemRequest.setQuantity(ORDER_LINE_ITEM_QUANTITY);
+		OrderLineItem orderLineItemRequest = OrderFixture.ORDER_LINE_ITEM_REQUEST(givenMenu, ORDER_LINE_ITEM_PRICE_NOT_EQUAL_TO_MENU, ORDER_LINE_ITEM_QUANTITY);
 
 		Order givenRequest = new Order();
 		givenRequest.setType(OrderType.EAT_IN);
@@ -212,11 +195,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_실패_6(String deliveryAddress) {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-
-		OrderLineItem orderLineItemRequest = new OrderLineItem();
-		orderLineItemRequest.setMenuId(givenMenu.getId());
-		orderLineItemRequest.setPrice(ORDER_LINE_ITEM_PRICE);
-		orderLineItemRequest.setQuantity(ORDER_LINE_ITEM_QUANTITY);
+		OrderLineItem orderLineItemRequest = OrderFixture.ORDER_LINE_ITEM_REQUEST(givenMenu, ORDER_LINE_ITEM_PRICE, ORDER_LINE_ITEM_QUANTITY);
 
 		Order givenRequest = new Order();
 		givenRequest.setType(OrderType.DELIVERY);
@@ -235,11 +214,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_실패_7() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-
-		OrderLineItem orderLineItemRequest = new OrderLineItem();
-		orderLineItemRequest.setMenuId(givenMenu.getId());
-		orderLineItemRequest.setPrice(ORDER_LINE_ITEM_PRICE);
-		orderLineItemRequest.setQuantity(ORDER_LINE_ITEM_QUANTITY);
+		OrderLineItem orderLineItemRequest = OrderFixture.ORDER_LINE_ITEM_REQUEST(givenMenu, ORDER_LINE_ITEM_PRICE, ORDER_LINE_ITEM_QUANTITY);
 
 		Order givenRequest = new Order();
 		givenRequest.setType(OrderType.EAT_IN);
@@ -259,11 +234,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
-
-		OrderLineItem orderLineItemRequest = new OrderLineItem();
-		orderLineItemRequest.setMenuId(givenMenu.getId());
-		orderLineItemRequest.setPrice(ORDER_LINE_ITEM_PRICE);
-		orderLineItemRequest.setQuantity(ORDER_LINE_ITEM_QUANTITY);
+		OrderLineItem orderLineItemRequest = OrderFixture.ORDER_LINE_ITEM_REQUEST(givenMenu, ORDER_LINE_ITEM_PRICE, ORDER_LINE_ITEM_QUANTITY);
 
 		Order givenRequest = new Order();
 		givenRequest.setType(OrderType.EAT_IN);
@@ -282,7 +253,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_수락() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY(givenMenu));
+		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY_ORDER(givenMenu));
 
 		// when
 		Order actualOrder = orderService.accept(givenOrder.getId());
@@ -296,7 +267,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_수락_실패_1() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu)); // not waiting
+		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT_ORDER(givenMenu)); // not waiting
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.accept(givenOrder.getId());
@@ -310,7 +281,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_서빙() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu));
+		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT_ORDER(givenMenu));
 
 		// when
 		Order actualOrder = orderService.serve(givenOrder.getId());
@@ -324,7 +295,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_서빙_실패_1() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY(givenMenu)); // not accepted
+		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY_ORDER(givenMenu)); // not accepted
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.serve(givenOrder.getId());
@@ -338,7 +309,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_배달() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY(givenMenu));
+		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY_ORDER(givenMenu));
 
 		// when
 		Order actualOrder = orderService.startDelivery(givenOrder.getId());
@@ -352,7 +323,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_배달_실패_1() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.SERVED_TAKEOUT(givenMenu)); // not delivery
+		Order givenOrder = orderRepository.save(OrderFixture.SERVED_TAKEOUT_ORDER(givenMenu)); // not delivery
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.startDelivery(givenOrder.getId());
@@ -366,7 +337,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_배달_실패_2() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY(givenMenu)); // not served
+		Order givenOrder = orderRepository.save(OrderFixture.WAITING_DELIVERY_ORDER(givenMenu)); // not served
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.startDelivery(givenOrder.getId());
@@ -380,7 +351,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_배달_완료() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.DELIVERING_DELIVERY(givenMenu));
+		Order givenOrder = orderRepository.save(OrderFixture.DELIVERING_DELIVERY_ORDER(givenMenu));
 
 		// when
 		Order actualOrder = orderService.completeDelivery(givenOrder.getId());
@@ -394,7 +365,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_배달_완료_실패_1() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu)); // not delivery
+		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT_ORDER(givenMenu)); // not delivery
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.completeDelivery(givenOrder.getId());
@@ -408,7 +379,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_배달_완료_실패_2() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY(givenMenu)); // not delivering
+		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY_ORDER(givenMenu)); // not delivering
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.completeDelivery(givenOrder.getId());
@@ -423,7 +394,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		// given
 		OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.EMPTY_ORDER_TABLE());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.SERVED_EAT_IN(givenMenu, givenOrderTable));
+		Order givenOrder = orderRepository.save(OrderFixture.SERVED_EAT_IN_ORDER(givenMenu, givenOrderTable));
 
 		// when
 		Order actualOrder = orderService.complete(givenOrder.getId());
@@ -442,7 +413,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_완료_실패_1() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY(givenMenu)); // not delivered
+		Order givenOrder = orderRepository.save(OrderFixture.SERVED_DELIVERY_ORDER(givenMenu)); // not delivered
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.complete(givenOrder.getId());
@@ -456,7 +427,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 주문_완료_실패_2() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu)); // not served
+		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT_ORDER(givenMenu)); // not served
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.complete(givenOrder.getId());
@@ -470,7 +441,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 	void 전체_주문_조회() {
 		// given
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT(givenMenu));
+		Order givenOrder = orderRepository.save(OrderFixture.ACCEPTED_TAKEOUT_ORDER(givenMenu));
 
 		// when
 		List<Order> actual = orderService.findAll();

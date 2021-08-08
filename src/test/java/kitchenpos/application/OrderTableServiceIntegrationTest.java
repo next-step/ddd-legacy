@@ -124,7 +124,7 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 		Product givenProduct = productRepository.save(ProductFixture.PRODUCT(PRODUCT_PRICE));
 		MenuGroup givenMenuGroup = menuGroupRepository.save(MenuGroupFixture.MENU_GROUP());
 		Menu givenMenu = menuRepository.save(MenuFixture.DISPLAYED_MENU(MENU_PRICE, givenMenuGroup, givenProduct));
-		orderRepository.save(OrderFixture.SERVED_EAT_IN(givenMenu, givenOrderTable));
+		orderRepository.save(OrderFixture.SERVED_EAT_IN_ORDER(givenMenu, givenOrderTable));
 
 		// when
 		ThrowableAssert.ThrowingCallable throwingCallable = () -> orderTableService.clear(givenOrderTable.getId());
