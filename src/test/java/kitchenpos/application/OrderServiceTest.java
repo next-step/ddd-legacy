@@ -8,8 +8,10 @@ import static kitchenpos.application.fixture.OrderFixture.EAT_IN_NULL_ORDER_TABL
 import static kitchenpos.application.fixture.OrderFixture.HIDED_MENU_ORDER;
 import static kitchenpos.application.fixture.OrderFixture.NEGATIVE_QUANTITY_ORDER_LINE_ITEMS_ORDER;
 import static kitchenpos.application.fixture.OrderFixture.NORMAL_ORDER;
+import static kitchenpos.application.fixture.OrderFixture.NORMAL_ORDER2;
 import static kitchenpos.application.fixture.OrderFixture.NULL_ORDER_LINE_ITEMS_ORDER;
 import static kitchenpos.application.fixture.OrderFixture.NULL_TYPE_ORDER;
+import static kitchenpos.application.fixture.OrderFixture.ORDERS;
 import static kitchenpos.application.fixture.OrderFixture.ORDER_WITH_TYPE_AND_STATUS;
 import static kitchenpos.application.fixture.OrderFixture.WRONG_PRICE_MENU_ORDER;
 import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE;
@@ -20,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -80,8 +81,12 @@ class OrderServiceTest extends MockTest {
         final Order sut = orderService.create(order);
 
         //then
-        assertThat(sut).isInstanceOf(Order.class);
-        assertThat(sut.getStatus()).isEqualTo(OrderStatus.WAITING);
+        assertAll(
+            () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.WAITING),
+            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
+            () -> assertThat(sut.getType()).isEqualTo(OrderType.EAT_IN)
+        );
+
     }
 
     @DisplayName("create - 주문타입이 없으면 예외를 반환한다")
@@ -223,7 +228,10 @@ class OrderServiceTest extends MockTest {
         final Order sut = orderService.accept(order.getId());
 
         //then
-        assertThat(sut.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        assertAll(
+            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
+            () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
+        );
     }
 
     @DisplayName("accept - 주문이 존재하지 않으면 예외를 반환한다")
@@ -265,7 +273,10 @@ class OrderServiceTest extends MockTest {
         final Order sut = orderService.serve(order.getId());
 
         //then
-        assertThat(sut.getStatus()).isEqualTo(OrderStatus.SERVED);
+        assertAll(
+            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
+            () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.SERVED)
+        );
     }
 
     @DisplayName("serve - 주문이 존재하지 않으면 예외를 반환한다")
@@ -307,7 +318,10 @@ class OrderServiceTest extends MockTest {
         final Order sut = orderService.startDelivery(order.getId());
 
         //then
-        assertThat(sut.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        assertAll(
+            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
+            () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.DELIVERING)
+        );
     }
 
     @DisplayName("startDelivery - 주문이 존재하지 않으면 예외를 반환한다")
@@ -363,7 +377,10 @@ class OrderServiceTest extends MockTest {
         final Order sut = orderService.completeDelivery(order.getId());
 
         //then
-        assertThat(sut.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+        assertAll(
+            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
+            () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.DELIVERED)
+        );
     }
 
     @DisplayName("completeDelivery - 주문이 존재하지 않으면 예외를 반환한다")
@@ -420,7 +437,10 @@ class OrderServiceTest extends MockTest {
         final Order sut = orderService.complete(order.getId());
 
         //then
-        assertThat(sut.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertAll(
+            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
+            () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.COMPLETED)
+        );
     }
 
     @DisplayName("complete - 주문 타입이 배달인데 배송완료 상태가 아니라면 예외가 발생한다")
@@ -485,26 +505,21 @@ class OrderServiceTest extends MockTest {
     @Test
     void findAll() {
         //given
-        final Order order1 = ORDER_WITH_TYPE_AND_STATUS(OrderType.EAT_IN, OrderStatus.SERVED);
-        final Order order2 = ORDER_WITH_TYPE_AND_STATUS(OrderType.DELIVERY, OrderStatus.COMPLETED);
-
-        given(orderRepository.findAll()).willReturn(Arrays.asList(order1, order2));
+        given(orderRepository.findAll()).willReturn(ORDERS());
 
         //when
         final List<Order> sut = orderService.findAll();
 
         //then
         assertAll(
-            () -> assertThat(sut.get(ZERO)).isEqualTo(order1),
             () -> assertThat(sut.get(ZERO)
-                .getType()).isEqualTo(OrderType.EAT_IN),
+                .getType()).isEqualTo(NORMAL_ORDER().getType()),
             () -> assertThat(sut.get(ZERO)
-                .getStatus()).isEqualTo(OrderStatus.SERVED),
-            () -> assertThat(sut.get(ONE)).isEqualTo(order2),
+                .getStatus()).isEqualTo(NORMAL_ORDER().getStatus()),
             () -> assertThat(sut.get(ONE)
-                .getType()).isEqualTo(OrderType.DELIVERY),
+                .getType()).isEqualTo(NORMAL_ORDER2().getType()),
             () -> assertThat(sut.get(ONE)
-                .getStatus()).isEqualTo(OrderStatus.COMPLETED)
+                .getStatus()).isEqualTo(NORMAL_ORDER2().getStatus())
         );
     }
 
