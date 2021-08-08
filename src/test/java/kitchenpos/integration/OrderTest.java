@@ -674,7 +674,7 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderTableId = UUID.randomUUID();
         final OrderTable orderTable = new OrderTable();
-        final boolean emptyStatus = true;
+        final boolean emptyStatus = false;
         orderTable.setName("1번 테이블");
         orderTable.setId(orderTableId);
         orderTable.setEmpty(emptyStatus);
@@ -735,7 +735,7 @@ public class OrderTest extends IntegrationTestRunner {
         final OrderTable orderTable = new OrderTable();
         orderTable.setName("1번 테이블");
         orderTable.setId(orderTableId);
-        orderTable.setEmpty(false);
+        orderTable.setEmpty(true);
         orderTable.setNumberOfGuests(1);
 
         orderTableRepository.save(orderTable);
