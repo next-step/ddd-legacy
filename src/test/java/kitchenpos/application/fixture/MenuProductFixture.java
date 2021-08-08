@@ -40,6 +40,7 @@ public class MenuProductFixture {
     public static List<MenuProduct> MENU_PRODUCTS() {
         return Arrays.asList(MENU_PRODUCT1(), MENU_PRODUCT2());
     }
+
     public static List<MenuProduct> QUANTITY_NAGATIVE_MENU_PRODUCTS() {
         return Arrays.asList(MENU_PRODUCT1(), NEGATIVE_QUANTITY_MENU_PRODUCT());
     }

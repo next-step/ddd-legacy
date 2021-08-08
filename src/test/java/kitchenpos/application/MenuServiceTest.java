@@ -366,8 +366,10 @@ class MenuServiceTest extends MockTest {
         //then
         assertAll(
             () -> assertThat(menus.size()).isEqualTo(MENUS().size()),
-            () -> assertThat(menus.get(ZERO).getId()).isEqualTo(MENU1().getId()),
-            () -> assertThat(menus.get(ONE).getId()).isEqualTo(MENU2().getId())
+            () -> assertThat(menus.get(ZERO)
+                .getId()).isEqualTo(MENU1().getId()),
+            () -> assertThat(menus.get(ONE)
+                .getId()).isEqualTo(MENU2().getId())
         );
     }
 
