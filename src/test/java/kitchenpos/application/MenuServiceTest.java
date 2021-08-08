@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP1;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT2;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCTS;
@@ -17,7 +18,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
@@ -58,16 +58,11 @@ class MenuServiceTest extends MockTest {
     @InjectMocks
     private MenuService menuService;
 
-    private MenuGroup menuGroup;
     private List<MenuProduct> menuProducts;
 
     @BeforeEach
     void setUp() {
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
-
-        menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("메뉴그룹1");
 
         final MenuProduct menuProduct1 = makeMenuProduct(PRODUCT1(), 2L);
         final MenuProduct menuProduct2 = makeMenuProduct(PRODUCT2(), 3L);
@@ -89,7 +84,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = createMenu(MENU_NAME, PRICE);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
         given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
             .willReturn(Optional.of(PRODUCT2()));
@@ -147,7 +142,7 @@ class MenuServiceTest extends MockTest {
         menuProducts = Collections.emptyList();
         menu.setMenuProducts(menuProducts);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -160,7 +155,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = createMenu(MENU_NAME, PRICE);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
         given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
             .willReturn(Optional.empty());
@@ -182,7 +177,7 @@ class MenuServiceTest extends MockTest {
 
         menu.setMenuProducts(menuProducts);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
         given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
             .willReturn(Optional.of(PRODUCT2()));
@@ -198,7 +193,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = createMenu(MENU_NAME, EXPENSIVE_PRICE);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
         given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
             .willReturn(Optional.of(PRODUCT2()));
@@ -215,7 +210,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = createMenu(value, PRICE);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
         given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
             .willReturn(Optional.of(PRODUCT2()));
@@ -233,7 +228,7 @@ class MenuServiceTest extends MockTest {
         final Menu menu1 = createMenu(name, PRICE);
         final Menu menu2 = createMenu(name, PRICE2);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
         given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
             .willReturn(Optional.of(PRODUCT2()));
@@ -255,7 +250,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = createMenu(profanityName, PRICE);
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
         given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
             .willReturn(Optional.of(PRODUCT2()));
