@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
+import static kitchenpos.application.fixture.ProductFixture.PRODUCT2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -54,9 +56,6 @@ class OrderServiceTest extends MockTest {
     private Menu menu2;
     private List<Menu> menus;
 
-    private Product product1;
-    private Product product2;
-
     private OrderLineItem orderLineItem1;
     private OrderLineItem orderLineItem2;
 
@@ -71,16 +70,13 @@ class OrderServiceTest extends MockTest {
         menu2 = createMenu("메뉴2", 80000L);
         menus = Arrays.asList(menu1, menu2);
 
-        product1 = makeProduct("상품1", 10000L);
-        product2 = makeProduct("상품2", 20000L);
-
         orderLineItem1 = createOrderLineItem(menu1.getPrice()
             .intValue(), 2, menu1);
         orderLineItem2 = createOrderLineItem(menu2.getPrice()
             .intValue(), 3, menu2);
 
-        menuProduct1 = makeMenuProduct(product1, 2L);
-        menuProduct2 = makeMenuProduct(product2, 3L);
+        menuProduct1 = makeMenuProduct(PRODUCT1(), 2L);
+        menuProduct2 = makeMenuProduct(PRODUCT2(), 3L);
     }
 
     @DisplayName("create - 주문할 수 있다. 성공시 주문 상태는 대기")
@@ -92,7 +88,8 @@ class OrderServiceTest extends MockTest {
         final OrderTable orderTable = createOrderTable("테이블1", 0, false);
 
         given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu1), Optional.of(menu2));
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu1))
+            .willReturn(Optional.of(menu2));
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
         given(orderRepository.save(any())).willReturn(order);
 
@@ -595,14 +592,6 @@ class OrderServiceTest extends MockTest {
 
         menu.setMenuProducts(menuProducts);
         return menu;
-    }
-
-    private Product makeProduct(final String name, final long price) {
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setPrice(BigDecimal.valueOf(price));
-        product.setName(name);
-        return product;
     }
 
     private MenuProduct makeMenuProduct(final Product product, final long quantity) {

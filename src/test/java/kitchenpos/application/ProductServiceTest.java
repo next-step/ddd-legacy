@@ -1,5 +1,10 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.fixture.ProductFixture.PRICE_NEGATIVE_PRODUCT;
+import static kitchenpos.application.fixture.ProductFixture.PRICE_NULL_PRODUCT;
+import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
+import static kitchenpos.application.fixture.ProductFixture.PRODUCT2;
+import static kitchenpos.application.fixture.ProductFixture.PRODUCT_WITH_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -29,9 +34,8 @@ import org.mockito.Mock;
 
 class ProductServiceTest extends MockTest {
 
-    public static final String PRODUCT_NAME = "상품1";
-    public static final long OVER_PRICE = 80001L;
-    public static final long NORMAL_PRICE = 80000L;
+    private static final long OVER_PRICE = 80001L;
+    private static final long NORMAL_PRICE = 80000L;
 
     @Mock
     private ProductRepository productRepository;
@@ -54,7 +58,7 @@ class ProductServiceTest extends MockTest {
     @Test
     void create() {
         //given
-        final Product product = createProduct(PRODUCT_NAME, 1000L);
+        final Product product = PRODUCT1();
 
         given(productRepository.save(any())).willReturn(product);
 
@@ -69,8 +73,7 @@ class ProductServiceTest extends MockTest {
     @Test
     void createEmptyPrice() {
         //given
-        final Product product = createProduct(PRODUCT_NAME, 1000L);
-        product.setPrice(null);
+        final Product product = PRICE_NULL_PRODUCT();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -81,7 +84,7 @@ class ProductServiceTest extends MockTest {
     @Test
     void createNegativePrice() {
         //given
-        final Product product = createProduct(PRODUCT_NAME, -1000L);
+        final Product product = PRICE_NEGATIVE_PRODUCT();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -91,9 +94,9 @@ class ProductServiceTest extends MockTest {
     @DisplayName("create - 상품 이름이 한글자 미만이면 예외를 반환한다")
     @ParameterizedTest
     @NullAndEmptySource
-    void createNegativePrice(final String value) {
+    void createNegativePrice(final String name) {
         //given
-        final Product product = createProduct(value, 1000L);
+        final Product product = PRODUCT_WITH_NAME(name);
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -105,7 +108,7 @@ class ProductServiceTest extends MockTest {
     @ValueSource(strings = {"fuck", "damn", "bitch"})
     void createProfanity(final String profanityWord) {
         //given
-        final Product product = createProduct(profanityWord, 1000L);
+        final Product product = PRODUCT_WITH_NAME(profanityWord);
 
         given(purgomalumClient.containsProfanity(profanityWord)).willReturn(true);
 
@@ -118,7 +121,7 @@ class ProductServiceTest extends MockTest {
     @Test
     void changePrice() {
         //given
-        final Product product = createProduct(PRODUCT_NAME, 1000L);
+        final Product product = PRODUCT1();
 
         final Menu menu1 = createMenu("메뉴1", 80001L);
         final Menu menu2 = createMenu("메뉴2", 80000L);
@@ -138,8 +141,7 @@ class ProductServiceTest extends MockTest {
     @Test
     void changePriceNoPrice() {
         //given
-        final Product product = createProduct(PRODUCT_NAME, 1000L);
-        product.setPrice(null);
+        final Product product = PRICE_NULL_PRODUCT();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -150,7 +152,7 @@ class ProductServiceTest extends MockTest {
     @Test
     void changePriceNegativePrice() {
         //given
-        final Product product = createProduct(PRODUCT_NAME, -1000L);
+        final Product product = PRICE_NEGATIVE_PRODUCT();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -161,7 +163,7 @@ class ProductServiceTest extends MockTest {
     @Test
     void changePriceExist() {
         //given
-        final Product product = createProduct(PRODUCT_NAME, 1000L);
+        final Product product = PRODUCT1();
 
         given(productRepository.findById(any())).willReturn(Optional.empty());
 
@@ -174,7 +176,7 @@ class ProductServiceTest extends MockTest {
     @Test
     void changePriceMenuDisplay() {
         //given
-        final Product product = createProduct(PRODUCT_NAME, OVER_PRICE);
+        final Product product = PRODUCT1();
 
         final Menu menu1 = createMenu("메뉴1", OVER_PRICE);
         final Menu menu2 = createMenu("메뉴2", NORMAL_PRICE);
@@ -199,8 +201,8 @@ class ProductServiceTest extends MockTest {
     @Test
     void findAll() {
         //given
-        final Product product1 = createProduct(PRODUCT_NAME, 1000L);
-        final Product product2 = createProduct("상품2", 2000L);
+        final Product product1 = PRODUCT1();
+        final Product product2 = PRODUCT2();
 
         given(productRepository.findAll()).willReturn(Arrays.asList(product1, product2));
 
@@ -212,14 +214,6 @@ class ProductServiceTest extends MockTest {
         );
     }
 
-    private Product createProduct(final String name, final long price) {
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName(name);
-        product.setPrice(BigDecimal.valueOf(price));
-        return product;
-    }
-
     private Menu createMenu(final String name, final Long price) {
         final Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
@@ -228,8 +222,8 @@ class ProductServiceTest extends MockTest {
         menu.setMenuGroupId(UUID.randomUUID());
         menu.setDisplayed(true);
 
-        final Product product1 = makeProduct(PRODUCT_NAME, 10000L);
-        final Product product2 = makeProduct("상품2", 20000L);
+        final Product product1 = PRODUCT1();
+        final Product product2 = PRODUCT2();
 
         final MenuProduct menuProduct1 = makeMenuProduct(product1, 2L);
         final MenuProduct menuProduct2 = makeMenuProduct(product2, 3L);
@@ -237,14 +231,6 @@ class ProductServiceTest extends MockTest {
 
         menu.setMenuProducts(menuProducts);
         return menu;
-    }
-
-    private Product makeProduct(final String name, final long price) {
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setPrice(BigDecimal.valueOf(price));
-        product.setName(name);
-        return product;
     }
 
     private MenuProduct makeMenuProduct(final Product product, final long quantity) {

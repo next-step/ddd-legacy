@@ -21,7 +21,7 @@ import org.mockito.Mock;
 
 class MenuGroupServiceTest extends MockTest {
 
-    public static final int ZERO = 0;
+    private static final int ZERO = 0;
 
     @Mock
     private MenuGroupRepository menuGroupRepository;

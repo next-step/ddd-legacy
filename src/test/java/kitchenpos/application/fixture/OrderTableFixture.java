@@ -5,12 +5,12 @@ import kitchenpos.domain.OrderTable;
 
 public class OrderTableFixture {
 
-    public static final UUID UUID1 = UUID.randomUUID();
-    public static final UUID UUID2 = UUID.randomUUID();
-    public static final UUID UUID3 = UUID.randomUUID();
-    public static final String TABLE_NAME1 = "테이블1";
-    public static final String TABLE_NAME2 = "테이블2";
-    public static final int ZERO = 0;
+    private static final UUID UUID1 = UUID.randomUUID();
+    private static final UUID UUID2 = UUID.randomUUID();
+    private static final UUID UUID3 = UUID.randomUUID();
+    private static final String TABLE_NAME1 = "테이블1";
+    private static final String TABLE_NAME2 = "테이블2";
+    private static final int ZERO = 0;
 
     public static OrderTable ORDER_TABLE1() {
         final OrderTable orderTable = new OrderTable();
@@ -41,7 +41,7 @@ public class OrderTableFixture {
 
     public static OrderTable NOT_EMPTY_TABLE() {
         final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID1);
+        orderTable.setId(UUID3);
         orderTable.setName(TABLE_NAME1);
         orderTable.setNumberOfGuests(ZERO);
         orderTable.setEmpty(false);
