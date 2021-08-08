@@ -60,7 +60,11 @@ class ProductServiceTest extends MockTest {
         final Product sut = productService.create(product);
 
         //then
-        assertThat(sut).isInstanceOf(Product.class);
+        assertAll(
+            () -> assertThat(sut.getId()).isEqualTo(product.getId()),
+            () -> assertThat(sut.getPrice()).isEqualTo(product.getPrice()),
+            () -> assertThat(sut.getName()).isEqualTo(product.getName())
+        );
     }
 
     @DisplayName("create - 상품가격이 없으면 예외를 반환한다")
@@ -124,7 +128,11 @@ class ProductServiceTest extends MockTest {
         final Product sut = productService.changePrice(product.getId(), product);
 
         //then
-        assertThat(sut).isInstanceOf(Product.class);
+        assertAll(
+            () -> assertThat(sut.getId()).isEqualTo(product.getId()),
+            () -> assertThat(sut.getPrice()).isEqualTo(product.getPrice()),
+            () -> assertThat(sut.getName()).isEqualTo(product.getName())
+        );
     }
 
     @DisplayName("changePrice - 상품가격이 없으면 예외를 반환한다")
