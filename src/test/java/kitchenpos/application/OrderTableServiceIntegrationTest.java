@@ -58,10 +58,10 @@ public class OrderTableServiceIntegrationTest extends IntegrationTest {
 
 		// then
 		assertAll(
-			() -> assertNotNull(orderTable.getId()),
-			() -> assertEquals("9번", orderTable.getName()),
-			() -> assertEquals(0, orderTable.getNumberOfGuests()),
-			() -> assertTrue(orderTable.isEmpty())
+			() -> assertThat(orderTable.getId()).isNotNull(),
+			() -> assertThat(orderTable.getName()).isEqualTo("9번"),
+			() -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(0),
+			() -> assertThat(orderTable.isEmpty()).isTrue()
 		);
 	}
 

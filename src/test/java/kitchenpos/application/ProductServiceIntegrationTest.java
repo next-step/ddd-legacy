@@ -51,9 +51,9 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 
 		// then
 		assertAll(
-			() -> assertNotNull(actualProduct.getId()),
-			() -> assertEquals("강정치킨", actualProduct.getName()),
-			() -> assertEquals(new BigDecimal(17000), actualProduct.getPrice())
+			() -> assertThat(actualProduct.getId()).isNotNull(),
+			() -> assertThat(actualProduct.getName()).isEqualTo("강정치킨"),
+			() -> assertThat(actualProduct.getPrice()).isEqualTo(new BigDecimal(17000))
 		);
 	}
 

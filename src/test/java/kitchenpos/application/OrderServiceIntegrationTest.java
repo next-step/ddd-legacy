@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
@@ -77,17 +78,17 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 
 		// then
 		assertAll(
-			() -> assertNotNull(actualOrder.getId()),
-			() -> assertEquals(givenRequest.getType(), actualOrder.getType()),
-			() -> assertEquals(OrderStatus.WAITING, actualOrder.getStatus()),
-			() -> assertEquals(givenRequest.getOrderTableId(), actualOrder.getOrderTable().getId()),
+			() -> assertThat(actualOrder.getId()).isNotNull(),
+			() -> assertThat(actualOrder.getType()).isEqualTo(givenRequest.getType()),
+			() -> assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.WAITING),
+			() -> assertThat(actualOrder.getOrderTable().getId()).isEqualTo(givenRequest.getOrderTableId()),
 			() -> {
 				List<OrderLineItem> actualOrderLineItems = actualOrder.getOrderLineItems();
 				OrderLineItem actualOrderLineItem = actualOrderLineItems.get(0);
 				assertAll(
-					() -> assertNotNull(actualOrderLineItem.getSeq()),
-					() -> assertEquals(orderLineItemRequest.getMenuId(), actualOrderLineItem.getMenu().getId()),
-					() -> assertEquals(orderLineItemRequest.getQuantity(), actualOrderLineItem.getQuantity())
+					() -> assertThat(actualOrderLineItem.getSeq()).isNotNull(),
+					() -> assertThat(actualOrderLineItem.getMenu().getId()).isEqualTo(orderLineItemRequest.getMenuId()),
+					() -> assertThat(actualOrderLineItem.getQuantity()).isEqualTo(orderLineItemRequest.getQuantity())
 				);
 			}
 		);
@@ -293,7 +294,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		Order actualOrder = orderService.accept(givenOrder.getId());
 
 		// then
-		Assertions.assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+		assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
 	}
 
 	@DisplayName("주문 수락 실패 : 대기중이 아님")
@@ -327,7 +328,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		Order actualOrder = orderService.serve(givenOrder.getId());
 
 		// then
-		Assertions.assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+		assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
 	}
 
 	@DisplayName("주문 서빙 실패 : 수락됨이 아님")
@@ -361,7 +362,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		Order actualOrder = orderService.startDelivery(givenOrder.getId());
 
 		// then
-		Assertions.assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+		assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
 	}
 
 	@DisplayName("주문 배달 실패 : 주문 종류가 배달이 아님")
@@ -412,7 +413,7 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		Order actualOrder = orderService.completeDelivery(givenOrder.getId());
 
 		// then
-		Assertions.assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+		assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
 	}
 
 	@DisplayName("주문 배달 완료 실패 : 주문 종류가 배달이 아님")
@@ -466,9 +467,9 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 
 		// then
 		assertAll(
-			() -> assertEquals(OrderStatus.COMPLETED, actualOrder.getStatus()),
-			() -> assertEquals(0, actualOrderTable.getNumberOfGuests()),
-			() -> assertTrue(actualOrderTable.isEmpty())
+			() -> assertThat(actualOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+			() -> assertThat(actualOrderTable.getNumberOfGuests()).isEqualTo(0),
+			() -> assertThat(actualOrderTable.isEmpty()).isTrue()
 		);
 	}
 
@@ -523,8 +524,8 @@ public class OrderServiceIntegrationTest extends IntegrationTest {
 		List<UUID> actualIds = actual.stream().map(Order::getId).collect(Collectors.toList());
 
 		assertAll(
-			() -> Assertions.assertThat(actual).isNotEmpty(),
-			() -> Assertions.assertThat(actualIds).contains(givenOrder.getId())
+			() -> assertThat(actual).isNotEmpty(),
+			() -> assertThat(actualIds).contains(givenOrder.getId())
 		);
 	}
 }
