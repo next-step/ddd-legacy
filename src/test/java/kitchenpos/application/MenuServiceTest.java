@@ -242,16 +242,16 @@ class MenuServiceTest extends MockTest {
     @ValueSource(longs = {0L, 1L, 10000L, 20000L})
     void change(final long price) {
         //given
-        final Menu menu = MENU_WITH_PRICE(price);
+        final Menu menu = MENU1();
+        final Menu menuRequest = MENU_WITH_PRICE(price);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
         //when
-        menu.setPrice(BigDecimal.valueOf(price));
-        final Menu changedMenu = menuService.changePrice(menu.getId(), menu);
+        final Menu sut = menuService.changePrice(menu.getId(), menuRequest);
 
         //then
-        assertThat(changedMenu.getPrice()).isEqualTo(BigDecimal.valueOf(price));
+        assertThat(sut.getPrice()).isEqualTo(BigDecimal.valueOf(price));
     }
 
     @DisplayName("changePrice - 메뉴 가격이 없으면 예외가 발생한다")
