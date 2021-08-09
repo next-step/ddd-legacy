@@ -15,10 +15,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class OrderTableTest extends UnitTestRunner{
+public class OrderTableTest extends UnitTestRunner {
 
     @InjectMocks
     private OrderTableService orderTableService;
@@ -49,10 +50,12 @@ public class OrderTableTest extends UnitTestRunner{
         final OrderTable savedOrderTable = orderTableService.create(request);
 
         //then
-        assertThat(savedOrderTable.getName()).isEqualTo(orderTableName);
-        assertThat(savedOrderTable.getId()).isNotNull();
-        assertThat(savedOrderTable.getNumberOfGuests()).isZero();
-        assertThat(savedOrderTable.isEmpty()).isTrue();
+        assertAll(
+                () -> assertThat(savedOrderTable.getName()).isEqualTo(orderTableName),
+                () -> assertThat(savedOrderTable.getId()).isNotNull(),
+                () -> assertThat(savedOrderTable.getNumberOfGuests()).isZero(),
+                () -> assertThat(savedOrderTable.isEmpty()).isTrue()
+        );
     }
 
     @DisplayName("주문 테이블 착석")
@@ -97,8 +100,10 @@ public class OrderTableTest extends UnitTestRunner{
         final OrderTable orderTable = orderTableService.clear(orderTableId);
 
         //then
-        assertThat(orderTable.getNumberOfGuests()).isZero();
-        assertThat(orderTable.isEmpty()).isTrue();
+        assertAll(
+                () -> assertThat(orderTable.getNumberOfGuests()).isZero(),
+                () -> assertThat(orderTable.isEmpty()).isTrue()
+        );
     }
 
     @DisplayName("주문 테이블 인원수 변경")
@@ -155,10 +160,12 @@ public class OrderTableTest extends UnitTestRunner{
         final List<OrderTable> orderTables = orderTableService.findAll();
 
         //then
-        assertThat(orderTables.size()).isEqualTo(3);
-        assertThat(orderTables.get(0)).isEqualTo(stubbedOrderTable_1);
-        assertThat(orderTables.get(1)).isEqualTo(stubbedOrderTable_2);
-        assertThat(orderTables.get(2)).isEqualTo(stubbedOrderTable_3);
+        assertAll(
+                () -> assertThat(orderTables.size()).isEqualTo(3),
+                () -> assertThat(orderTables.get(0)).isEqualTo(stubbedOrderTable_1),
+                () -> assertThat(orderTables.get(1)).isEqualTo(stubbedOrderTable_2),
+                () -> assertThat(orderTables.get(2)).isEqualTo(stubbedOrderTable_3)
+        );
     }
 
 }

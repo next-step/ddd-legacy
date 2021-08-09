@@ -8,10 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class OrderTest extends IntegrationTestRunner {
 
@@ -37,23 +41,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_null_type() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -111,23 +108,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_minus_orderLineItem_quantity() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -161,23 +151,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_not_persisted_orderLineItem_menu() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -201,23 +184,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_orderLineItem_menu_display_false() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -250,23 +226,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_not_equals_orderLineItem_price_and_menu_price() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -301,23 +270,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_type_takeout() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -347,36 +309,32 @@ public class OrderTest extends IntegrationTestRunner {
         final Order order = orderService.create(request);
 
         //then
-        assertThat(order.getId()).isNotNull();
-        assertThat(order.getType()).isEqualTo(request.getType());
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
-        assertThat(order.getOrderDateTime()).isNotNull();
-        assertThat(order.getOrderLineItems().get(0).getMenu()).isEqualTo(menu);
-        assertThat(order.getOrderLineItems().get(0).getMenu().getId()).isEqualTo(menu.getId());
-        assertThat(order.getOrderLineItems().get(0).getQuantity()).isEqualTo(1L);
+        assertAll(
+                () -> assertThat(order.getId()).isNotNull(),
+                () -> assertThat(order.getType()).isEqualTo(request.getType()),
+                () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(order.getOrderDateTime()).isNotNull(),
+                () -> assertThat(order.getOrderLineItems().get(0).getMenu()).isEqualTo(menu),
+                () -> assertThat(order.getOrderLineItems().get(0).getMenu().getId()).isEqualTo(menu.getId()),
+                () -> assertThat(order.getOrderLineItems().get(0).getQuantity()).isEqualTo(1L)
+        );
+
     }
 
     @DisplayName("주문 생성 ( OrderType이 'DELIVERY' 면 주문 요청 주소는 'null' 일 수 없다. )")
     @TestAndRollback
     public void create_with_delivery_null_address() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -412,23 +370,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_delivery_empty_address() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -466,23 +417,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_type_delivery() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -514,37 +458,33 @@ public class OrderTest extends IntegrationTestRunner {
         final Order order = orderService.create(request);
 
         //then
-        assertThat(order.getId()).isNotNull();
-        assertThat(order.getType()).isEqualTo(request.getType());
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
-        assertThat(order.getOrderDateTime()).isNotNull();
-        assertThat(order.getDeliveryAddress()).isEqualTo(deliveryAddress);
-        assertThat(order.getOrderLineItems().get(0).getMenu()).isEqualTo(menu);
-        assertThat(order.getOrderLineItems().get(0).getMenu().getId()).isEqualTo(menu.getId());
-        assertThat(order.getOrderLineItems().get(0).getQuantity()).isEqualTo(1L);
+        assertAll(
+                () -> assertThat(order.getId()).isNotNull(),
+                () -> assertThat(order.getType()).isEqualTo(request.getType()),
+                () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(order.getOrderDateTime()).isNotNull(),
+                () -> assertThat(order.getDeliveryAddress()).isEqualTo(deliveryAddress),
+                () -> assertThat(order.getOrderLineItems().get(0).getMenu()).isEqualTo(menu),
+                () -> assertThat(order.getOrderLineItems().get(0).getMenu().getId()).isEqualTo(menu.getId()),
+                () -> assertThat(order.getOrderLineItems().get(0).getQuantity()).isEqualTo(1L)
+        );
+
     }
 
     @DisplayName("주문 생성 ( OrderType이 'EAT_IN' 면 테이블 ID는 'null' 일 수 없다. )")
     @TestAndRollback
     public void create_with_eat_in_null_tableId() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -580,23 +520,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_eat_in_non_persisted_orderTable() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -634,23 +567,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_eat_in_empty_orderTable() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -699,23 +625,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void create_with_eat_in() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -756,38 +675,32 @@ public class OrderTest extends IntegrationTestRunner {
         final Order order = orderService.create(request);
 
         //then
-        assertThat(order.getId()).isNotNull();
-        assertThat(order.getType()).isEqualTo(request.getType());
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
-        assertThat(order.getOrderDateTime()).isNotNull();
-        assertThat(order.getOrderTable()).isEqualTo(orderTable);
-        assertThat(order.getOrderLineItems().get(0).getMenu()).isEqualTo(menu);
-        assertThat(order.getOrderLineItems().get(0).getMenu().getId()).isEqualTo(menu.getId());
-        assertThat(order.getOrderLineItems().get(0).getQuantity()).isEqualTo(1L);
-
+        assertAll(
+                () -> assertThat(order.getId()).isNotNull(),
+                () -> assertThat(order.getType()).isEqualTo(request.getType()),
+                () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(order.getOrderDateTime()).isNotNull(),
+                () -> assertThat(order.getOrderTable()).isEqualTo(orderTable),
+                () -> assertThat(order.getOrderLineItems().get(0).getMenu()).isEqualTo(menu),
+                () -> assertThat(order.getOrderLineItems().get(0).getMenu().getId()).isEqualTo(menu.getId()),
+                () -> assertThat(order.getOrderLineItems().get(0).getQuantity()).isEqualTo(1L)
+        );
     }
 
     @DisplayName("주문 수락 ( 주문 수락 요청시 해당 주문은 영속화 되어 있어야 한다. )")
     @TestAndRollback
     public void accept_with_not_persisted_order() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -820,7 +733,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.EAT_IN);
         order.setOrderTableId(orderTableId);
@@ -836,23 +748,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void accept_with_not_status_waiting() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -885,7 +790,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.EAT_IN);
         order.setOrderTableId(orderTableId);
@@ -906,23 +810,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void accept_type_eat_in() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -955,7 +852,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.EAT_IN);
         order.setOrderTableId(orderTableId);
@@ -978,23 +874,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void accept_type_delivery() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1018,7 +907,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.DELIVERY);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1039,23 +927,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void serve_with_not_persisted_order() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1079,7 +960,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.DELIVERY);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1096,23 +976,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void serve_with_order_status_not_accepted() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1145,7 +1018,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.EAT_IN);
         order.setOrderTableId(orderTableId);
@@ -1166,23 +1038,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void serve_with_eat_in() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1215,7 +1080,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.EAT_IN);
         order.setOrderTableId(orderTableId);
@@ -1237,23 +1101,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void start_delivery_with_not_persisted_order() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1277,7 +1134,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.DELIVERY);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1294,23 +1150,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void start_delivery_with_not_type_delivery() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1334,7 +1183,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.EAT_IN);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1353,23 +1201,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void start_delivery_with_status_not_served() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1393,7 +1234,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.DELIVERY);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1412,23 +1252,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void start_delivery_() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1452,7 +1285,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.DELIVERY);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1473,23 +1305,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void complete_delivery_with_not_persisted_order() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1513,7 +1338,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.DELIVERY);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1530,23 +1354,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void complete_delivery_with_type_not_delivery() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1579,7 +1396,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.EAT_IN);
         order.setOrderTableId(orderTableId);
@@ -1600,23 +1416,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void complete_delivery_with_status_not_delivering() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1640,7 +1449,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.DELIVERY);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1659,23 +1467,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void complete_delivery() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1698,7 +1499,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.DELIVERY);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1718,23 +1518,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void complete_with_not_persisted_order() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1758,7 +1551,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.DELIVERY);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1775,23 +1567,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void complete_with_type_delivery_status_not_delivered() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1815,7 +1600,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.DELIVERY);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1834,23 +1618,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void complete_with_type_takeout_status_not_served() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1874,7 +1651,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.TAKEOUT);
         order.setOrderDateTime(LocalDateTime.now());
@@ -1893,23 +1669,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void complete_type_takeout() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -1942,7 +1711,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.TAKEOUT);
         order.setOrderTableId(orderTableId);
@@ -1965,23 +1733,16 @@ public class OrderTest extends IntegrationTestRunner {
     @TestAndRollback
     public void complete_type_eat_in() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -2014,7 +1775,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId = UUID.randomUUID();
         final Order order = new Order();
-        order.setOrderTableId(orderId);
         order.setOrderLineItems(List.of(orderLineItem_1));
         order.setType(OrderType.EAT_IN);
         order.setOrderTableId(orderTableId);
@@ -2030,33 +1790,27 @@ public class OrderTest extends IntegrationTestRunner {
         final OrderTable emptyTable = orderTableRepository.findById(orderTableId).get();
 
         //then
-        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-        assertThat(emptyTable.getNumberOfGuests()).isEqualTo(0);
-        assertThat(emptyTable.isEmpty()).isTrue();
-
+        assertAll(
+                () -> assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                () -> assertThat(emptyTable.getNumberOfGuests()).isEqualTo(0),
+                () -> assertThat(emptyTable.isEmpty()).isTrue()
+        );
     }
 
     @DisplayName("모든 Order 조회")
     @TestAndRollback
     public void findAll() {
         //given
-        final UUID menuGroupId = UUID.randomUUID();
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
-        final UUID productId = UUID.randomUUID();
-        final Product product_1 = new Product();
-        product_1.setId(productId);
-        product_1.setName("후라이드 치킨");
-        product_1.setPrice(BigDecimal.valueOf(15000));
+        final Product product_1 = getFixtureProduct();
 
         productRepository.save(product_1);
 
         final MenuProduct menuProduct_1 = new MenuProduct();
-        menuProduct_1.setProductId(productId);
+        menuProduct_1.setProductId(product_1.getId());
         menuProduct_1.setQuantity(1L);
         menuProduct_1.setProduct(product_1);
 
@@ -2089,10 +1843,9 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId_1 = UUID.randomUUID();
         final Order order_1 = new Order();
-        order_1.setOrderTableId(orderId_1);
         order_1.setOrderLineItems(List.of(orderLineItem_1));
         order_1.setType(OrderType.EAT_IN);
-        order_1.setOrderTableId(orderTableId);
+        order_1.setOrderTableId(orderTable.getId());
         order_1.setOrderDateTime(LocalDateTime.now());
         order_1.setStatus(OrderStatus.SERVED);
         order_1.setId(orderId_1);
@@ -2100,7 +1853,6 @@ public class OrderTest extends IntegrationTestRunner {
 
         final UUID orderId_2 = UUID.randomUUID();
         final Order order_2 = new Order();
-        order_2.setOrderTableId(orderId_2);
         order_2.setOrderLineItems(List.of(orderLineItem_1));
         order_2.setType(OrderType.DELIVERY);
         order_2.setOrderTableId(orderTableId);
@@ -2110,13 +1862,32 @@ public class OrderTest extends IntegrationTestRunner {
         order_2.setOrderTable(orderTable);
 
         orderRepository.saveAll(List.of(order_1, order_2));
-        
+
         //when
         final List<Order> orders = orderService.findAll();
 
         //then
-        assertThat(orders.size()).isEqualTo(2);
-        assertThat(orders.get(0)).isEqualTo(order_1);
-        assertThat(orders.get(1)).isEqualTo(order_2);
+        assertAll(
+                () -> assertThat(orders.size()).isEqualTo(2),
+                () -> assertThat(orders.get(0)).isEqualTo(order_1),
+                () -> assertThat(orders.get(1)).isEqualTo(order_2)
+        );
+    }
+
+    private Product getFixtureProduct() {
+        final UUID productId = UUID.randomUUID();
+        final Product product_1 = new Product();
+        product_1.setId(productId);
+        product_1.setName("후라이드 치킨");
+        product_1.setPrice(BigDecimal.valueOf(15000));
+        return product_1;
+    }
+
+    private MenuGroup getFixtureMenuGroup() {
+        final UUID menuGroupId = UUID.randomUUID();
+        final MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(menuGroupId);
+        menuGroup.setName("메인 메뉴");
+        return menuGroup;
     }
 }

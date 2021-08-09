@@ -3,7 +3,6 @@ package kitchenpos.integration;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.*;
 import kitchenpos.integration.annotation.TestAndRollback;
-import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.DisplayName;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,6 +13,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class ProductTest extends IntegrationTestRunner {
 
@@ -97,9 +97,11 @@ public class ProductTest extends IntegrationTestRunner {
         final Product product = productService.create(request);
 
         //then
-        assertThat(product.getPrice()).isEqualTo(price);
-        assertThat(product.getName()).isEqualTo(productName);
-        assertThat(product.getId()).isNotNull();
+        assertAll(
+                () -> assertThat(product.getPrice()).isEqualTo(price),
+                () -> assertThat(product.getName()).isEqualTo(productName),
+                () -> assertThat(product.getId()).isNotNull()
+        );
     }
 
     @DisplayName("제품 가격 변경 ( 변경 가격은 'null' 일 수 없다. )")
@@ -171,7 +173,6 @@ public class ProductTest extends IntegrationTestRunner {
     public void changePrice_with_bigger_menu_price() {
         //given
         final UUID menuUuId = UUID.randomUUID();
-        final UUID menuGroupUuId = UUID.randomUUID();
         final String productName = "후라이드 치킨";
         final UUID productUuid = UUID.randomUUID();
         final BigDecimal lowerPrice = BigDecimal.valueOf(12000);
@@ -181,9 +182,7 @@ public class ProductTest extends IntegrationTestRunner {
         product.setName(productName);
         product.setPrice(BigDecimal.valueOf(15000));
 
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupUuId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
@@ -217,8 +216,10 @@ public class ProductTest extends IntegrationTestRunner {
         final Menu hideMenu = menuRepository.getById(menuUuId);
 
         //then
-        assertThat(changeProduct.getPrice()).isEqualTo(lowerPrice);
-        assertThat(hideMenu.isDisplayed()).isFalse();
+        assertAll(
+                () -> assertThat(changeProduct.getPrice()).isEqualTo(lowerPrice),
+                () -> assertThat(hideMenu.isDisplayed()).isFalse()
+        );
     }
 
     @DisplayName("제품 가격 변경")
@@ -226,7 +227,6 @@ public class ProductTest extends IntegrationTestRunner {
     public void changePrice() {
         //given
         final UUID menuUuId = UUID.randomUUID();
-        final UUID menuGroupUuId = UUID.randomUUID();
         final String productName = "후라이드 치킨";
         final UUID productUuid = UUID.randomUUID();
         final BigDecimal changePrice = BigDecimal.valueOf(17000);
@@ -236,9 +236,7 @@ public class ProductTest extends IntegrationTestRunner {
         product.setName(productName);
         product.setPrice(BigDecimal.valueOf(15000));
 
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(menuGroupUuId);
-        menuGroup.setName("메인 메뉴");
+        final MenuGroup menuGroup = getFixtureMenuGroup();
 
         menuGroupRepository.save(menuGroup);
 
@@ -272,8 +270,10 @@ public class ProductTest extends IntegrationTestRunner {
         final Menu hideMenu = menuRepository.getById(menuUuId);
 
         //then
-        assertThat(changeProduct.getPrice()).isEqualTo(changePrice);
-        assertThat(hideMenu.isDisplayed()).isTrue();
+        assertAll(
+                () -> assertThat(changeProduct.getPrice()).isEqualTo(changePrice),
+                () -> assertThat(hideMenu.isDisplayed()).isTrue()
+        );
     }
 
     @DisplayName("모든 제품 조회")
@@ -301,10 +301,21 @@ public class ProductTest extends IntegrationTestRunner {
         final List<Product> products = productService.findAll();
 
         //then
-        assertThat(products.size()).isEqualTo(3);
-        assertThat(products.get(0)).isEqualTo(product_1);
-        assertThat(products.get(1)).isEqualTo(product_2);
-        assertThat(products.get(2)).isEqualTo(product_3);
+        assertAll(
+                () -> assertThat(products.size()).isEqualTo(3),
+                () -> assertThat(products.get(0)).isEqualTo(product_1),
+                () -> assertThat(products.get(1)).isEqualTo(product_2),
+                () -> assertThat(products.get(2)).isEqualTo(product_3)
+        );
     }
+
+    private MenuGroup getFixtureMenuGroup() {
+        final UUID menuGroupId = UUID.randomUUID();
+        final MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(menuGroupId);
+        menuGroup.setName("메인 메뉴");
+        return menuGroup;
+    }
+
 
 }

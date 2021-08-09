@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -83,12 +84,14 @@ public class OrderTest extends UnitTestRunner {
         final Order createOrder = orderService.create(request);
 
         //then
-        assertThat(createOrder.getId()).isNotNull();
-        assertThat(createOrder.getType()).isEqualTo(OrderType.EAT_IN);
-        assertThat(createOrder.getOrderDateTime()).isNotNull();
-        assertThat(createOrder.getStatus()).isEqualTo(OrderStatus.WAITING);
-        assertThat(createOrder.getOrderLineItems().get(0)).isEqualTo(orderLineItem);
-        assertThat(createOrder.getOrderTable()).isEqualTo(stubbedOrderTable);
+        assertAll(
+                () -> assertThat(createOrder.getId()).isNotNull(),
+                () -> assertThat(createOrder.getType()).isEqualTo(OrderType.EAT_IN),
+                () -> assertThat(createOrder.getOrderDateTime()).isNotNull(),
+                () -> assertThat(createOrder.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(createOrder.getOrderLineItems().get(0)).isEqualTo(orderLineItem),
+                () -> assertThat(createOrder.getOrderTable()).isEqualTo(stubbedOrderTable)
+        );
     }
 
     @DisplayName("주문 생성 ( OrderType 'DELIVERY' )")
@@ -131,11 +134,13 @@ public class OrderTest extends UnitTestRunner {
         final Order createOrder = orderService.create(request);
 
         //then
-        assertThat(createOrder.getId()).isNotNull();
-        assertThat(createOrder.getType()).isEqualTo(OrderType.DELIVERY);
-        assertThat(createOrder.getOrderDateTime()).isNotNull();
-        assertThat(createOrder.getStatus()).isEqualTo(OrderStatus.WAITING);
-        assertThat(createOrder.getOrderLineItems().get(0)).isEqualTo(orderLineItem);
+        assertAll(
+                () -> assertThat(createOrder.getId()).isNotNull(),
+                () -> assertThat(createOrder.getType()).isEqualTo(OrderType.DELIVERY),
+                () -> assertThat(createOrder.getOrderDateTime()).isNotNull(),
+                () -> assertThat(createOrder.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(createOrder.getOrderLineItems().get(0)).isEqualTo(orderLineItem)
+        );
     }
 
     @DisplayName("주문 수락 ( 'DELIVERY' )")
@@ -438,10 +443,12 @@ public class OrderTest extends UnitTestRunner {
         final List<Order> orders = orderService.findAll();
 
         //then
-        assertThat(orders.size()).isEqualTo(3);
-        assertThat(orders.get(0)).isEqualTo(stubbedOrder_1);
-        assertThat(orders.get(1)).isEqualTo(stubbedOrder_2);
-        assertThat(orders.get(2)).isEqualTo(stubbedOrder_3);
+        assertAll(
+                () -> assertThat(orders.size()).isEqualTo(3),
+                () -> assertThat(orders.get(0)).isEqualTo(stubbedOrder_1),
+                () -> assertThat(orders.get(1)).isEqualTo(stubbedOrder_2),
+                () -> assertThat(orders.get(2)).isEqualTo(stubbedOrder_3)
+        );
 
     }
 

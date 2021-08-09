@@ -1,6 +1,5 @@
 package kitchenpos.unit;
 
-import io.micrometer.core.annotation.TimedSet;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
@@ -15,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -129,9 +129,11 @@ public class ProductTest extends UnitTestRunner {
         final List<Product> products = productService.findAll();
 
         //then
-        assertThat(products.size()).isEqualTo(3);
-        assertThat(products.get(0)).isEqualTo(stubbedProduct_1);
-        assertThat(products.get(1)).isEqualTo(stubbedProduct_2);
-        assertThat(products.get(2)).isEqualTo(stubbedProduct_3);
+        assertAll(
+                () -> assertThat(products.size()).isEqualTo(3),
+                () -> assertThat(products.get(0)).isEqualTo(stubbedProduct_1),
+                () -> assertThat(products.get(1)).isEqualTo(stubbedProduct_2),
+                () -> assertThat(products.get(2)).isEqualTo(stubbedProduct_3)
+        );
     }
 }

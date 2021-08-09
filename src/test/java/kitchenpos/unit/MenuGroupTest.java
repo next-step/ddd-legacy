@@ -3,17 +3,16 @@ package kitchenpos.unit;
 import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -43,8 +42,10 @@ public class MenuGroupTest extends UnitTestRunner {
         final MenuGroup menuGroup = menuGroupService.create(request);
 
         //then
-        assertThat(menuGroup.getId()).isNotNull();
-        assertThat(menuGroup.getName()).isEqualTo(menuName);
+        assertAll(
+                () -> assertThat(menuGroup.getId()).isNotNull(),
+                () -> assertThat(menuGroup.getName()).isEqualTo(menuName)
+        );
 
     }
 
@@ -74,11 +75,12 @@ public class MenuGroupTest extends UnitTestRunner {
         final List<MenuGroup> menuGroups = menuGroupService.findAll();
 
         //then
-        assertThat(menuGroups.size()).isEqualTo(3);
-        assertThat(menuGroups.get(0)).isEqualTo(stubbedMenuGroup_1);
-        assertThat(menuGroups.get(1)).isEqualTo(stubbedMenuGroup_2);
-        assertThat(menuGroups.get(2)).isEqualTo(stubbedMenuGroup_3);
-
+        assertAll(
+                () -> assertThat(menuGroups.size()).isEqualTo(3),
+                () -> assertThat(menuGroups.get(0)).isEqualTo(stubbedMenuGroup_1),
+                () -> assertThat(menuGroups.get(1)).isEqualTo(stubbedMenuGroup_2),
+                () -> assertThat(menuGroups.get(2)).isEqualTo(stubbedMenuGroup_3)
+        );
 
     }
 }

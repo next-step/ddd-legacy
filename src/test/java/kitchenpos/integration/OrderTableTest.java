@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class OrderTableTest extends IntegrationTestRunner {
 
@@ -61,10 +62,12 @@ public class OrderTableTest extends IntegrationTestRunner {
         final OrderTable orderTable = orderTableService.create(request);
 
         //then
-        assertThat(orderTable.getName()).isEqualTo(orderTableName);
-        assertThat(orderTable.getId()).isNotNull();
-        assertThat(orderTable.getNumberOfGuests()).isZero();
-        assertThat(orderTable.isEmpty()).isTrue();
+        assertAll(
+                () -> assertThat(orderTable.getName()).isEqualTo(orderTableName),
+                () -> assertThat(orderTable.getId()).isNotNull(),
+                () -> assertThat(orderTable.getNumberOfGuests()).isZero(),
+                () -> assertThat(orderTable.isEmpty()).isTrue()
+        );
     }
 
     @DisplayName("주문 테이블 착석 ( 요청 주문 테이블이 영속화 되어 있어야 한다. )")
@@ -121,14 +124,7 @@ public class OrderTableTest extends IntegrationTestRunner {
 
         orderTableRepository.save(orderTable);
 
-        final UUID orderUuid = UUID.randomUUID();
-        final Order order = new Order();
-        order.setOrderTable(orderTable);
-        order.setType(OrderType.EAT_IN);
-        order.setOrderTableId(orderTableUuid);
-        order.setId(orderUuid);
-        order.setOrderDateTime(LocalDateTime.now());
-        order.setStatus(OrderStatus.SERVED);
+        final Order order = getFixtureOrder(orderTableUuid, orderTable, OrderStatus.SERVED);
 
         orderRepository.save(order);
 
@@ -149,14 +145,7 @@ public class OrderTableTest extends IntegrationTestRunner {
 
         orderTableRepository.save(orderTable);
 
-        final UUID orderUuid = UUID.randomUUID();
-        final Order order = new Order();
-        order.setOrderTable(orderTable);
-        order.setType(OrderType.EAT_IN);
-        order.setOrderTableId(orderTableUuid);
-        order.setId(orderUuid);
-        order.setOrderDateTime(LocalDateTime.now());
-        order.setStatus(OrderStatus.COMPLETED);
+        final Order order = getFixtureOrder(orderTableUuid, orderTable, OrderStatus.COMPLETED);
 
         orderRepository.save(order);
 
@@ -164,9 +153,13 @@ public class OrderTableTest extends IntegrationTestRunner {
         final OrderTable clearTable = orderTableService.clear(orderTableUuid);
 
         //then
-        assertThat(clearTable.getNumberOfGuests()).isZero();
-        assertThat(clearTable.isEmpty()).isTrue();
+        assertAll(
+                () -> assertThat(clearTable.getNumberOfGuests()).isZero(),
+                () -> assertThat(clearTable.isEmpty()).isTrue()
+
+        );
     }
+
 
     @DisplayName("주문 테이블 인원수 변경 ( 요청 인원수는 `0`보다 작을 수 없다. )")
     @TestAndRollback
@@ -278,9 +271,24 @@ public class OrderTableTest extends IntegrationTestRunner {
         final List<OrderTable> orderTables = orderTableService.findAll();
 
         //then
-        assertThat(orderTables.size()).isEqualTo(3);
-        assertThat(orderTables.get(0)).isEqualTo(orderTable_1);
-        assertThat(orderTables.get(1)).isEqualTo(orderTable_2);
-        assertThat(orderTables.get(2)).isEqualTo(orderTable_3);
+        assertAll(
+                () -> assertThat(orderTables.size()).isEqualTo(3),
+                () -> assertThat(orderTables.get(0)).isEqualTo(orderTable_1),
+                () -> assertThat(orderTables.get(1)).isEqualTo(orderTable_2),
+                () -> assertThat(orderTables.get(2)).isEqualTo(orderTable_3)
+        );
+
+    }
+
+    private Order getFixtureOrder(final UUID orderTableUuid, final OrderTable orderTable, final OrderStatus completed) {
+        final UUID orderUuid = UUID.randomUUID();
+        final Order order = new Order();
+        order.setOrderTable(orderTable);
+        order.setType(OrderType.EAT_IN);
+        order.setOrderTableId(orderTableUuid);
+        order.setId(orderUuid);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setStatus(completed);
+        return order;
     }
 }

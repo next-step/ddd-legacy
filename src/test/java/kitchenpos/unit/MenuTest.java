@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -84,12 +85,14 @@ public class MenuTest extends UnitTestRunner {
         final Menu createMenu = menuService.create(request);
 
         //then
-        assertThat(createMenu.getId()).isEqualTo(menuId);
-        assertThat(createMenu.getName()).isEqualTo(menuName);
-        assertThat(createMenu.getPrice()).isEqualTo(menuPrice);
-        assertThat(createMenu.isDisplayed()).isEqualTo(true);
-        assertThat(createMenu.getMenuProducts().get(0)).isEqualTo(menuProduct);
-        verify(purgomalumClient, times(1)).containsProfanity(menuName);
+        assertAll(
+                () -> assertThat(createMenu.getId()).isEqualTo(menuId),
+                () -> assertThat(createMenu.getName()).isEqualTo(menuName),
+                () -> assertThat(createMenu.getPrice()).isEqualTo(menuPrice),
+                () -> assertThat(createMenu.isDisplayed()).isEqualTo(true),
+                () -> assertThat(createMenu.getMenuProducts().get(0)).isEqualTo(menuProduct),
+                () -> verify(purgomalumClient, times(1)).containsProfanity(menuName)
+        );
     }
 
     @DisplayName("해당 메뉴의 가격을 변경한다.")
@@ -207,10 +210,12 @@ public class MenuTest extends UnitTestRunner {
         final List<Menu> menus = menuService.findAll();
 
         //then
-        assertThat(menus.size()).isEqualTo(3);
-        assertThat(menus.get(0)).isEqualTo(stubbedMenu_1);
-        assertThat(menus.get(1)).isEqualTo(stubbedMenu_2);
-        assertThat(menus.get(2)).isEqualTo(stubbedMenu_3);
+        assertAll(
+                () -> assertThat(menus.size()).isEqualTo(3),
+                () -> assertThat(menus.get(0)).isEqualTo(stubbedMenu_1),
+                () -> assertThat(menus.get(1)).isEqualTo(stubbedMenu_2),
+                () -> assertThat(menus.get(2)).isEqualTo(stubbedMenu_3)
+        );
 
     }
 

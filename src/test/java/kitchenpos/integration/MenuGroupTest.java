@@ -12,6 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MenuGroupTest extends IntegrationTestRunner {
 
@@ -57,8 +58,10 @@ public class MenuGroupTest extends IntegrationTestRunner {
         final MenuGroup findMenuGroup = menuGroupRepository.findById(menuGroup.getId()).get();
 
         //then
-        assertThat(findMenuGroup.getName()).isEqualTo(menuGroupName);
-        assertThat(findMenuGroup.getId()).isNotNull();
+        assertAll(
+                () -> assertThat(findMenuGroup.getName()).isEqualTo(menuGroupName),
+                () -> assertThat(findMenuGroup.getId()).isNotNull()
+        );
     }
 
     @DisplayName("메뉴 그룹을 생성한다 ( 같은 이름의 메뉴 그룹을 생성 할 수 있다. )")
@@ -76,9 +79,11 @@ public class MenuGroupTest extends IntegrationTestRunner {
         final MenuGroup findMenuGroup_2 = menuGroupRepository.findById(menuGroup_2.getId()).get();
 
         //then
-        assertThat(findMenuGroup_1.getName()).isEqualTo(menuGroupName);
-        assertThat(findMenuGroup_2.getName()).isEqualTo(menuGroupName);
-        assertThat(findMenuGroup_1.getId()).isNotEqualTo(findMenuGroup_2.getId());
+        assertAll(
+                () -> assertThat(findMenuGroup_1.getName()).isEqualTo(menuGroupName),
+                () -> assertThat(findMenuGroup_2.getName()).isEqualTo(menuGroupName),
+                () -> assertThat(findMenuGroup_1.getId()).isNotEqualTo(findMenuGroup_2.getId())
+        );
     }
 
     @TestAndRollback
@@ -105,10 +110,11 @@ public class MenuGroupTest extends IntegrationTestRunner {
         final List<MenuGroup> menuGroups = menuGroupService.findAll();
 
         //then
-        assertThat(menuGroups.size()).isEqualTo(3);
-        assertThat(menuGroups.get(0).getName()).isEqualTo(menuGroupName_1);
-        assertThat(menuGroups.get(1).getName()).isEqualTo(menuGroupName_2);
-        assertThat(menuGroups.get(2).getName()).isEqualTo(menuGroupName_3);
+        assertAll(
+                () -> assertThat(menuGroups.size()).isEqualTo(3),
+                () -> assertThat(menuGroups.get(1).getName()).isEqualTo(menuGroupName_2),
+                () -> assertThat(menuGroups.get(2).getName()).isEqualTo(menuGroupName_3)
+        );
     }
 
 }
