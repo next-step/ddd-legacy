@@ -5,6 +5,7 @@ import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP2_SAME_N
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP_WITH_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -39,7 +40,10 @@ class MenuGroupServiceTest extends MockTest {
         final MenuGroup sut = menuGroupService.create(MENU_GROUP1());
 
         //then
-        assertThat(sut.getId()).isEqualTo(MENU_GROUP1().getId());
+        assertAll(
+            () -> assertThat(sut.getId()).isEqualTo(MENU_GROUP1().getId()),
+            () -> assertThat(sut.getName()).isEqualTo(MENU_GROUP1().getName())
+        );
     }
 
     @DisplayName("create - 메뉴 그룹 이름이 한글자 이상이 아니라면 예외를 던진다")
