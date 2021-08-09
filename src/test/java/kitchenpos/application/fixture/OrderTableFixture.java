@@ -50,6 +50,15 @@ public class OrderTableFixture {
         return orderTable;
     }
 
+    public static OrderTable NOT_EMPTY_TABLE_WITH_GUESTS(final int numberOfGuests) {
+        final OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID3);
+        orderTable.setName(TABLE_NAME1);
+        orderTable.setNumberOfGuests(numberOfGuests);
+        orderTable.setEmpty(false);
+        return orderTable;
+    }
+
     public static List<OrderTable> ORDER_TABLES() {
         return Arrays.asList(ORDER_TABLE1(), ORDER_TABLE2());
     }

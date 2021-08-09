@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE;
+import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE_WITH_GUESTS;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE2;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLES;
@@ -152,22 +153,21 @@ class OrderTableServiceTest extends MockTest {
             .isThrownBy(() -> orderTableService.clear(ORDER_TABLE1().getId()));
     }
 
-    @DisplayName("changeGuestNumber - 테이블의 앉은 손님의 수를 변경할 수 있다")
+    @DisplayName("changeGuestNumber - 테이블에 앉은 손님의 수를 변경할 수 있다")
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2, 3, 4, 5, 100, 1000, Integer.MAX_VALUE})
-    void changeGuestNumber(final int numberOfGuest) {
+    void changeGuestNumber(final int numberOfGuests) {
         //given
         final OrderTable orderTable = NOT_EMPTY_TABLE();
+        final OrderTable orderTableRequest = NOT_EMPTY_TABLE_WITH_GUESTS(numberOfGuests);
 
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
-        orderTable.setNumberOfGuests(numberOfGuest);
-
         //when
-        final OrderTable sut = orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
+        final OrderTable sut = orderTableService.changeNumberOfGuests(orderTable.getId(), orderTableRequest);
 
         //then
-        assertThat(sut.getNumberOfGuests()).isEqualTo(numberOfGuest);
+        assertThat(sut.getNumberOfGuests()).isEqualTo(numberOfGuests);
     }
 
     @DisplayName("changeGuestNumber - 변경할 손님의 수가 음수라면 예외를 반환한다")
