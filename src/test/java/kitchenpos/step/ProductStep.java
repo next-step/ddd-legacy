@@ -26,4 +26,8 @@ public class ProductStep {
                 .when().post("/api/products")
                 .then().log().all().extract();
     }
+
+    public static Product createProductRequested(final Product product) {
+        return createProductRequest(product).as(Product.class);
+    }
 }
