@@ -31,13 +31,13 @@ class MenuGroupServiceTest {
     @Test
     void createMenuGroupSuccess() {
         // Give
-        MenuGroup request = new MenuGroup();
+        final MenuGroup request = new MenuGroup();
         request.setName("오늘 추천 메뉴");
         // When
-        MenuGroup result = menuGroupService.create(request);
+        final MenuGroup result = menuGroupService.create(request);
 
         // Then
-        MenuGroup data  = menuGroupRepository.findById(result.getId())
+        final MenuGroup data  = menuGroupRepository.findById(result.getId())
                 .orElseThrow(NoSuchElementException::new);
 
         assertThat(data.getId()).isEqualTo(result.getId());
@@ -47,9 +47,9 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     @NullSource
     @EmptySource
-    void createMenuGroupFail(String name) {
+    void createMenuGroupFail(final String name) {
         // Give
-        MenuGroup request = new MenuGroup();
+        final MenuGroup request = new MenuGroup();
         request.setName(name);
 
         // When, Then
@@ -61,17 +61,17 @@ class MenuGroupServiceTest {
     @Test
     void findAllMenuGroup() {
         // Give
-        MenuGroup request1 = new MenuGroup();
+        final MenuGroup request1 = new MenuGroup();
         request1.setName("오후 2시 잘팔리는 메뉴");
 
-        MenuGroup request2 = new MenuGroup();
+        final MenuGroup request2 = new MenuGroup();
         request2.setName("추천 메뉴");
 
         menuGroupService.create(request1);
         menuGroupService.create(request2);
 
         // When
-        List<MenuGroup> resultList = menuGroupService.findAll();
+        final List<MenuGroup> resultList = menuGroupService.findAll();
 
         // Then
         assertThat(resultList).hasSize(6);
