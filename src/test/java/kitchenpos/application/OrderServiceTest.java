@@ -57,8 +57,6 @@ class OrderServiceTest {
 
     private Order eatInOrderStatusCompleted;
 
-    private Order deliveryOrderStatusCompleted;
-
     @BeforeEach
     void setUp() {
         orderLineItems = new ArrayList<>();
@@ -161,14 +159,6 @@ class OrderServiceTest {
         dummyOrderCompleted.setOrderDateTime(LocalDateTime.now());
         dummyOrderCompleted.setOrderLineItems(Arrays.asList(orderLineItemTest));
         eatInOrderStatusCompleted = orderRepository.save(dummyOrderCompleted);
-
-        final Order dummyDeliveryOrderStatusCompleted = new Order();
-        dummyDeliveryOrderStatusCompleted.setId(UUID.randomUUID());
-        dummyDeliveryOrderStatusCompleted.setType(OrderType.DELIVERY);
-        dummyDeliveryOrderStatusCompleted.setStatus(OrderStatus.COMPLETED);
-        dummyDeliveryOrderStatusCompleted.setOrderDateTime(LocalDateTime.now());
-        dummyDeliveryOrderStatusCompleted.setOrderLineItems(Arrays.asList(orderLineItemTest));
-        deliveryOrderStatusCompleted = orderRepository.save(dummyDeliveryOrderStatusCompleted);
     }
 
     @DisplayName("주문 등록 성공")
