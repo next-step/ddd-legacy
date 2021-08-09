@@ -133,6 +133,10 @@ public class MenuFixture {
         return menu;
     }
 
+    public static List<Menu> HIDED_MENUS() {
+        return Arrays.asList(HIDED_MENU(), HIDED_MENU());
+    }
+
     public static List<Menu> MENUS() {
         return Arrays.asList(MENU1(), MENU2());
     }

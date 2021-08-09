@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.fixture.MenuFixture.HIDED_MENU;
+import static kitchenpos.application.fixture.MenuFixture.HIDED_MENUS;
 import static kitchenpos.application.fixture.MenuFixture.MENU1;
 import static kitchenpos.application.fixture.MenuFixture.MENU2;
 import static kitchenpos.application.fixture.MenuFixture.MENUS;
@@ -147,9 +149,9 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = HIDED_MENU_ORDER();
 
-        given(menuRepository.findAllById(any())).willReturn(MENUS());
-        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
-            .willReturn(Optional.of(MENU2()));
+        given(menuRepository.findAllById(any())).willReturn(HIDED_MENUS());
+        given(menuRepository.findById(any())).willReturn(Optional.of(HIDED_MENU()))
+            .willReturn(Optional.of(HIDED_MENU()));
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
