@@ -46,7 +46,7 @@ public class ProductStep {
                 .then().log().all().extract();
     }
 
-    public static Product completeChangePrice(final Product product) {
+    public static Product completeCreateProduct(final Product product) {
         return requestCreateProduct(product).as(Product.class);
     }
 
