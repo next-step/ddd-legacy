@@ -12,7 +12,7 @@ public class ProductFixture {
     private static final UUID UUID2 = java.util.UUID.randomUUID();
     private static final long PRICE1 = 10000L;
     private static final long PRICE2 = 20000L;
-    private static final long EXPENSIVE_PRICE = 200000000L;
+    private static final long CHEAP_PRICE = 1000L;
     private static final long NAGATIVE_PRICE = -10000L;
     private static final String NAME1 = "상품1";
     private static final String NAME2 = "상품2";
@@ -33,10 +33,10 @@ public class ProductFixture {
         return product;
     }
 
-    public static Product EXPENSIVE_PRODUCT() {
+    public static Product CHEAP_PRODUCT() {
         final Product product = new Product();
         product.setId(UUID2);
-        product.setPrice(BigDecimal.valueOf(EXPENSIVE_PRICE));
+        product.setPrice(BigDecimal.valueOf(CHEAP_PRICE));
         product.setName(NAME2);
         return product;
     }

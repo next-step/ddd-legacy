@@ -1,8 +1,8 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.fixture.MenuFixture.EXPENSIVE_MENUS;
+import static kitchenpos.application.fixture.MenuFixture.CHEAP_PRODUCT_MENUS;
 import static kitchenpos.application.fixture.MenuFixture.MENUS;
-import static kitchenpos.application.fixture.ProductFixture.EXPENSIVE_PRODUCT;
+import static kitchenpos.application.fixture.ProductFixture.CHEAP_PRODUCT;
 import static kitchenpos.application.fixture.ProductFixture.PRICE_NEGATIVE_PRODUCT;
 import static kitchenpos.application.fixture.ProductFixture.PRICE_NULL_PRODUCT;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
@@ -181,20 +181,20 @@ class ProductServiceTest extends MockTest {
     void changePriceMenuDisplay() {
         //given
         final Product product = PRODUCT1();
-        final Product productRequest = EXPENSIVE_PRODUCT();
-        final List<Menu> expensiveMenus = EXPENSIVE_MENUS();
+        final Product productRequest = CHEAP_PRODUCT();
+        final List<Menu> menus = CHEAP_PRODUCT_MENUS();
 
-        given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()));
-        given(menuRepository.findAllByProductId(any())).willReturn(expensiveMenus);
+        given(productRepository.findById(any())).willReturn(Optional.of(product));
+        given(menuRepository.findAllByProductId(any())).willReturn(menus);
 
         //when
         productService.changePrice(product.getId(), productRequest);
 
         //then
         assertAll(
-            () -> assertThat(expensiveMenus.get(ZERO)
+            () -> assertThat(menus.get(ZERO)
                 .isDisplayed()).isFalse(),
-            () -> assertThat(expensiveMenus.get(ONE)
+            () -> assertThat(menus.get(ONE)
                 .isDisplayed()).isFalse()
         );
     }

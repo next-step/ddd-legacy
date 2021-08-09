@@ -1,5 +1,6 @@
 package kitchenpos.application.fixture;
 
+import static kitchenpos.application.fixture.MenuProductFixture.CHEAP_MENU_PRODUCTS;
 import static kitchenpos.application.fixture.MenuProductFixture.MENU_PRODUCTS;
 import static kitchenpos.application.fixture.MenuProductFixture.QUANTITY_NAGATIVE_MENU_PRODUCTS;
 
@@ -133,6 +134,17 @@ public class MenuFixture {
         return menu;
     }
 
+    public static Menu CHEAP_PRODUCT_MENU() {
+        final Menu menu = new Menu();
+        menu.setId(UUID1);
+        menu.setName(MENU_NAME1);
+        menu.setPrice(BigDecimal.valueOf(PRICE1));
+        menu.setMenuGroupId(MENU_GROUP_ID1);
+        menu.setDisplayed(true);
+        menu.setMenuProducts(CHEAP_MENU_PRODUCTS());
+        return menu;
+    }
+
     public static List<Menu> HIDED_MENUS() {
         return Arrays.asList(HIDED_MENU(), HIDED_MENU());
     }
@@ -141,8 +153,8 @@ public class MenuFixture {
         return Arrays.asList(MENU1(), MENU2());
     }
 
-    public static List<Menu> EXPENSIVE_MENUS() {
-        return Arrays.asList(EXPENSIVE_MENU(), EXPENSIVE_MENU());
+    public static List<Menu> CHEAP_PRODUCT_MENUS() {
+        return Arrays.asList(CHEAP_PRODUCT_MENU(), CHEAP_PRODUCT_MENU());
     }
 
 }
