@@ -1,16 +1,16 @@
 package step1.domain;
 
-import step1.common.CalculatorConstant;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Number {
 
+    public final static String NUMBER_PATTERN = "^[0-9]";
+    private final static Pattern numberPattern = Pattern.compile(NUMBER_PATTERN);
     private final int value;
 
     public Number(String value) {
-        Matcher numberMatcher = Pattern.compile(CalculatorConstant.NUMBER_PATTERN).matcher(value);
+        Matcher numberMatcher = numberPattern.matcher(value);
         if (!numberMatcher.find()) {
             throw new RuntimeException();
         }
