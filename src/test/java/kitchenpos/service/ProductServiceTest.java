@@ -12,6 +12,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.UUID;
+
 import static kitchenpos.step.ProductStep.createProduct;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
@@ -34,7 +36,7 @@ public class ProductServiceTest {
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
-    @DisplayName("상품의 가격은 0 이상 이어야 한다")
+    @DisplayName("상품 가격은 0 이상 이어야 한다")
     @Test
     void createWithNegativePrice() {
         // given
@@ -54,6 +56,17 @@ public class ProductServiceTest {
 
         // when, then
         assertThatThrownBy(() -> productService.create(product))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("변경될 상품 가격은 0이상 이어야 한다")
+    @Test
+    public void changePriceWithNegativePrice() {
+        // given
+        Product product = createProduct("강정치킨", -1);
+
+        // when, then
+        assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), product))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
