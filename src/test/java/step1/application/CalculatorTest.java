@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import step1.common.CalculatorConstant;
 import step1.domain.Number;
 
 import java.util.List;
@@ -22,7 +21,7 @@ class CalculatorTest {
     void parseOperators(String expression) {
         Calculator calculator = new StringCalculator(expression);
         List<String> operators = calculator.parseOperators(expression);
-        Assertions.assertThat(operators.contains(CalculatorConstant.COMMA) || operators.contains(CalculatorConstant.COLON))
+        Assertions.assertThat(operators.contains(StringCalculator.COMMA) || operators.contains(StringCalculator.COLON))
                 .isEqualTo(true);
     }
 
