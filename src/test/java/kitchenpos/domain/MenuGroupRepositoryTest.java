@@ -1,12 +1,9 @@
 package kitchenpos.domain;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -58,6 +55,8 @@ class MenuGroupRepositoryTest {
 
         List<MenuGroup> findAll = menuGroupRepository.findAll();
 
-        assertThat(menuGroupList).isEqualTo(findAll);
+        verify(menuGroupRepository).findAll();
+        verify(menuGroupRepository, times(1)).findAll();
+        assertThat(menuGroupList.containsAll(findAll)).isTrue();
     }
 }
