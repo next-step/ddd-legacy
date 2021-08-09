@@ -61,14 +61,14 @@ class MenuGroupServiceTest {
     @Test
     void findAllMenuGroup() {
         // Give
-        final MenuGroup request1 = new MenuGroup();
-        request1.setName("오후 2시 잘팔리는 메뉴");
+        final MenuGroup requestOne = new MenuGroup();
+        requestOne.setName("오후 2시 잘 팔리는 메뉴");
 
-        final MenuGroup request2 = new MenuGroup();
-        request2.setName("추천 메뉴");
+        final MenuGroup requestTwo = new MenuGroup();
+        requestTwo.setName("추천 메뉴");
 
-        menuGroupService.create(request1);
-        menuGroupService.create(request2);
+        menuGroupService.create(requestOne);
+        menuGroupService.create(requestTwo);
 
         // When
         final List<MenuGroup> resultList = menuGroupService.findAll();
