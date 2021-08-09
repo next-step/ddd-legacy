@@ -7,6 +7,7 @@ import static kitchenpos.application.fixture.OrderLineItemFixture.WRONG_PRICE_ME
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.Order;
@@ -66,6 +67,17 @@ public class OrderFixture {
         order.setOrderTableId(ORDER_TABLE1().getId());
         order.setOrderTable(ORDER_TABLE1());
         order.setOrderLineItems(null);
+        order.setStatus(OrderStatus.WAITING);
+        return order;
+    }
+
+    public static Order EMPTY_ORDER_LINE_ITEMS_ORDER() {
+        final Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.EAT_IN);
+        order.setOrderTableId(ORDER_TABLE1().getId());
+        order.setOrderTable(ORDER_TABLE1());
+        order.setOrderLineItems(Collections.emptyList());
         order.setStatus(OrderStatus.WAITING);
         return order;
     }

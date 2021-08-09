@@ -7,6 +7,7 @@ import static kitchenpos.application.fixture.MenuFixture.MENU2;
 import static kitchenpos.application.fixture.MenuFixture.MENUS;
 import static kitchenpos.application.fixture.OrderFixture.DELIVERY_NULL_ADDRESS_ORDER;
 import static kitchenpos.application.fixture.OrderFixture.EAT_IN_NULL_ORDER_TABLE_ORDER;
+import static kitchenpos.application.fixture.OrderFixture.EMPTY_ORDER_LINE_ITEMS_ORDER;
 import static kitchenpos.application.fixture.OrderFixture.HIDED_MENU_ORDER;
 import static kitchenpos.application.fixture.OrderFixture.NEGATIVE_QUANTITY_ORDER_LINE_ITEMS_ORDER;
 import static kitchenpos.application.fixture.OrderFixture.NORMAL_ORDER;
@@ -103,11 +104,22 @@ class OrderServiceTest extends MockTest {
             .isThrownBy(() -> orderService.create(order));
     }
 
-    @DisplayName("create - 주문상품(orderLineItems)이 없으면 예외를 반환한다")
+    @DisplayName("create - 주문상품(orderLineItems)이 null이면 예외를 반환한다")
     @Test
-    void createNoProduct() {
+    void createNullOrderLineItems() {
         //given
         final Order order = NULL_ORDER_LINE_ITEMS_ORDER();
+
+        //when, then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("create - 주문상품(orderLineItems)이 EmptyList 이면 예외를 반환한다")
+    @Test
+    void createEmptyOrderLineItems() {
+        //given
+        final Order order = EMPTY_ORDER_LINE_ITEMS_ORDER();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
