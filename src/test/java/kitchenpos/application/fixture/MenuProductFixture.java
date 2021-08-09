@@ -45,5 +45,4 @@ public class MenuProductFixture {
         return Arrays.asList(MENU_PRODUCT1(), NEGATIVE_QUANTITY_MENU_PRODUCT());
     }
 
-
 }

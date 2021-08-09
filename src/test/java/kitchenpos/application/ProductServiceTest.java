@@ -1,6 +1,8 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.fixture.MenuFixture.EXPENSIVE_MENUS;
 import static kitchenpos.application.fixture.MenuFixture.MENUS;
+import static kitchenpos.application.fixture.ProductFixture.EXPENSIVE_PRODUCT;
 import static kitchenpos.application.fixture.ProductFixture.PRICE_NEGATIVE_PRODUCT;
 import static kitchenpos.application.fixture.ProductFixture.PRICE_NULL_PRODUCT;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
@@ -16,6 +18,7 @@ import static org.mockito.BDDMockito.given;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -173,24 +176,26 @@ class ProductServiceTest extends MockTest {
             .isThrownBy(() -> productService.changePrice(product.getId(), product));
     }
 
-    @DisplayName("changePrice - 상품가격 수정으로 인해 메뉴가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 같거나 비싸진다면 해당 메뉴를 노출시키지 말아야 한다")
+    @DisplayName("changePrice - 상품가격 수정으로 인해 메뉴가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸진다면 해당 메뉴를 노출시키지 말아야 한다")
     @Test
     void changePriceMenuDisplay() {
         //given
         final Product product = PRODUCT1();
+        final Product productRequest = EXPENSIVE_PRODUCT();
+        final List<Menu> expensiveMenus = EXPENSIVE_MENUS();
 
         given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()));
-        given(menuRepository.findAllByProductId(any())).willReturn(MENUS());
+        given(menuRepository.findAllByProductId(any())).willReturn(expensiveMenus);
 
         //when
-        productService.changePrice(product.getId(), product);
+        productService.changePrice(product.getId(), productRequest);
 
         //then
         assertAll(
-            () -> assertThat(MENUS().get(ZERO)
+            () -> assertThat(expensiveMenus.get(ZERO)
                 .isDisplayed()).isFalse(),
-            () -> assertThat(MENUS().get(ONE)
-                .isDisplayed()).isTrue()
+            () -> assertThat(expensiveMenus.get(ONE)
+                .isDisplayed()).isFalse()
         );
     }
 
@@ -203,10 +208,14 @@ class ProductServiceTest extends MockTest {
         final List<Product> products = productService.findAll();
 
         assertAll(
-            () -> assertThat(products.get(ZERO).getId()).isEqualTo(PRODUCT1().getId()),
-            () -> assertThat(products.get(ZERO).getName()).isEqualTo(PRODUCT1().getName()),
-            () -> assertThat(products.get(ONE).getId()).isEqualTo(PRODUCT2().getId()),
-            () -> assertThat(products.get(ONE).getName()).isEqualTo(PRODUCT2().getName())
+            () -> assertThat(products.get(ZERO)
+                .getId()).isEqualTo(PRODUCT1().getId()),
+            () -> assertThat(products.get(ZERO)
+                .getName()).isEqualTo(PRODUCT1().getName()),
+            () -> assertThat(products.get(ONE)
+                .getId()).isEqualTo(PRODUCT2().getId()),
+            () -> assertThat(products.get(ONE)
+                .getName()).isEqualTo(PRODUCT2().getName())
         );
     }
 

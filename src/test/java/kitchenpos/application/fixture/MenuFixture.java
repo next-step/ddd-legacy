@@ -141,4 +141,8 @@ public class MenuFixture {
         return Arrays.asList(MENU1(), MENU2());
     }
 
+    public static List<Menu> EXPENSIVE_MENUS() {
+        return Arrays.asList(EXPENSIVE_MENU(), EXPENSIVE_MENU());
+    }
+
 }
