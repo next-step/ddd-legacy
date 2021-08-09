@@ -453,7 +453,7 @@ class OrderServiceTest {
         // Given
 
         // When
-        List<Order> list = orderService.findAll();
+        final List<Order> list = orderService.findAll();
 
         // Then
         assertThat(list).isNotEmpty();
