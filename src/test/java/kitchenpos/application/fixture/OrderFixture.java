@@ -115,7 +115,7 @@ public class OrderFixture {
         return order;
     }
 
-    public static Order DELIVERY_NULL_ADDRESS_ORDER() {
+    public static Order DELIVERY_ORDER_WITH_ADDRESS(final String address) {
         final Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(OrderType.DELIVERY);
@@ -123,7 +123,7 @@ public class OrderFixture {
         order.setOrderTable(ORDER_TABLE1());
         order.setOrderLineItems(ORDER_LINE_ITEMS());
         order.setStatus(OrderStatus.WAITING);
-        order.setDeliveryAddress(null);
+        order.setDeliveryAddress(address);
         return order;
     }
 

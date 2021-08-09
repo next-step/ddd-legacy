@@ -5,7 +5,7 @@ import static kitchenpos.application.fixture.MenuFixture.HIDED_MENUS;
 import static kitchenpos.application.fixture.MenuFixture.MENU1;
 import static kitchenpos.application.fixture.MenuFixture.MENU2;
 import static kitchenpos.application.fixture.MenuFixture.MENUS;
-import static kitchenpos.application.fixture.OrderFixture.DELIVERY_NULL_ADDRESS_ORDER;
+import static kitchenpos.application.fixture.OrderFixture.DELIVERY_ORDER_WITH_ADDRESS;
 import static kitchenpos.application.fixture.OrderFixture.EAT_IN_NULL_ORDER_TABLE_ORDER;
 import static kitchenpos.application.fixture.OrderFixture.EMPTY_ORDER_LINE_ITEMS_ORDER;
 import static kitchenpos.application.fixture.OrderFixture.HIDED_MENU_ORDER;
@@ -41,6 +41,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -186,10 +187,11 @@ class OrderServiceTest extends MockTest {
     }
 
     @DisplayName("create - 주문 타입이 배달인데 배달 주소가 없을 경우 예외를 반환한다")
-    @Test
-    void createDeliveryAddress() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    void createDeliveryAddress(final String address) {
         //given
-        final Order order = DELIVERY_NULL_ADDRESS_ORDER();
+        final Order order = DELIVERY_ORDER_WITH_ADDRESS(address);
 
         given(menuRepository.findAllById(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
