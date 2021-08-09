@@ -1,6 +1,5 @@
 package kitchenpos.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import kitchenpos.AcceptanceTest;
@@ -8,7 +7,6 @@ import kitchenpos.domain.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 
 import java.math.BigDecimal;
 
@@ -25,7 +23,7 @@ public class ProductAcceptanceTest extends AcceptanceTest {
         Product product = createProduct("강정치킨", 17000);
 
         // when
-        ExtractableResponse<Response> response = createProductRequest(product);
+        ExtractableResponse<Response> response = requestCreateProduct(product);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -36,19 +34,19 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     public void changePrice()
     {
         // given
-        Product createdProduct = createProductRequested(createProduct("강정치킨", 17000));
+        Product createdProduct = completeChangePrice(createProduct("강정치킨", 17000));
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(createProduct("강정치킨", 18000))
-                .when().put("/api/products/{productId}/price", createdProduct.getId())
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = requestChangePrice(
+                createProduct("강정치킨", 18000),
+                createdProduct.getId());
 
         // then
+        assertChangeProduct(response);
+    }
+
+    private void assertChangeProduct(final ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.as(Product.class).getPrice()).isEqualTo(new BigDecimal(18000));
     }
-
 }
