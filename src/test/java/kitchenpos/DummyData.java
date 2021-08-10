@@ -1,9 +1,6 @@
 package kitchenpos;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.Product;
+import kitchenpos.domain.*;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -19,6 +16,7 @@ public class DummyData {
     protected List<Product> products = new ArrayList<>();
     protected List<Menu> menus = new ArrayList<>();
     protected List<MenuProduct> menuProducts = new ArrayList<>();
+    protected List<OrderTable> orderTables = new ArrayList<>();
 
     protected static final UUID FIRST_ID = UUID.randomUUID();
     protected static final UUID SECOND_ID = UUID.randomUUID();
@@ -26,12 +24,16 @@ public class DummyData {
     protected static final Boolean MENU_HIDE = false;
     protected static final Boolean MENU_SHOW = true;
 
+    protected static final Boolean TABLE_EMPTY = true;
+    protected static final int TABLE_DEFAULT_NUMBER_OF_GUEST = 0;
+
     @BeforeEach
     void setUp() {
         setMenuGroups();
         setProducts();
         setMenuProducts();
         setMenus();
+        setOrderTables();
     }
 
     private void setMenuGroups() {
@@ -96,6 +98,23 @@ public class DummyData {
 
         menus.add(menu);
         menus.add(menu2);
+    }
+
+    private void setOrderTables() {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setName("1번");
+        orderTable.setId(FIRST_ID);
+        orderTable.setEmpty(TABLE_EMPTY);
+        orderTable.setNumberOfGuests(TABLE_DEFAULT_NUMBER_OF_GUEST);
+
+        OrderTable orderTable2 = new OrderTable();
+        orderTable2.setName("2번");
+        orderTable2.setId(SECOND_ID);
+        orderTable2.setEmpty(TABLE_EMPTY);
+        orderTable2.setNumberOfGuests(TABLE_DEFAULT_NUMBER_OF_GUEST);
+
+        orderTables.add(orderTable);
+        orderTables.add(orderTable2);
     }
 
     protected BigDecimal ofPrice(int price) {
