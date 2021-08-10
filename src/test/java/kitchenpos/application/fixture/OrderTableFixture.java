@@ -14,53 +14,41 @@ public class OrderTableFixture {
     private static final String TABLE_NAME2 = "테이블2";
     private static final int ZERO = 0;
 
-    public static OrderTable ORDER_TABLE1() {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID1);
-        orderTable.setName(TABLE_NAME1);
-        orderTable.setNumberOfGuests(ZERO);
-        orderTable.setEmpty(true);
-        return orderTable;
+    public static OrderTable ORDER_TABLE1_REQUEST() {
+        return createOrderTable(null, TABLE_NAME1, ZERO, true);
     }
 
-    public static OrderTable ORDER_TABLE2() {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID2);
-        orderTable.setName(TABLE_NAME2);
-        orderTable.setNumberOfGuests(ZERO);
-        orderTable.setEmpty(true);
-        return orderTable;
+    public static OrderTable ORDER_TABLE_WITH_NAME_REQUEST(final String name) {
+        return createOrderTable(null, name, ZERO, true);
     }
 
-    public static OrderTable ORDER_TABLE_WITH_NAME(final String name) {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID2);
-        orderTable.setName(name);
-        orderTable.setNumberOfGuests(ZERO);
-        orderTable.setEmpty(true);
-        return orderTable;
+    public static OrderTable NOT_EMPTY_TABLE_WITH_GUESTS_REQUEST(final int numberOfGuests) {
+        return createOrderTable(null, TABLE_NAME1, numberOfGuests, false);
     }
 
     public static OrderTable NOT_EMPTY_TABLE() {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID3);
-        orderTable.setName(TABLE_NAME1);
-        orderTable.setNumberOfGuests(ZERO);
-        orderTable.setEmpty(false);
-        return orderTable;
+        return createOrderTable(UUID3, TABLE_NAME1, ZERO, false);
     }
 
-    public static OrderTable NOT_EMPTY_TABLE_WITH_GUESTS(final int numberOfGuests) {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID3);
-        orderTable.setName(TABLE_NAME1);
-        orderTable.setNumberOfGuests(numberOfGuests);
-        orderTable.setEmpty(false);
-        return orderTable;
+    public static OrderTable ORDER_TABLE1() {
+        return createOrderTable(UUID1, TABLE_NAME1, ZERO, true);
+    }
+
+    public static OrderTable ORDER_TABLE2() {
+        return createOrderTable(UUID2, TABLE_NAME2, ZERO, true);
     }
 
     public static List<OrderTable> ORDER_TABLES() {
         return Arrays.asList(ORDER_TABLE1(), ORDER_TABLE2());
+    }
+
+    private static OrderTable createOrderTable(final UUID id, final String tableName, final int numberOfGuests, final boolean isEmpty) {
+        final OrderTable orderTable = new OrderTable();
+        orderTable.setId(id);
+        orderTable.setName(tableName);
+        orderTable.setNumberOfGuests(numberOfGuests);
+        orderTable.setEmpty(isEmpty);
+        return orderTable;
     }
 
 }

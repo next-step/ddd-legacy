@@ -1,11 +1,12 @@
 package kitchenpos.application;
 
 import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE;
-import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE_WITH_GUESTS;
+import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE_WITH_GUESTS_REQUEST;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1;
+import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1_REQUEST;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE2;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLES;
-import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE_WITH_NAME;
+import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE_WITH_NAME_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -24,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 class OrderTableServiceTest extends MockTest {
@@ -38,7 +38,6 @@ class OrderTableServiceTest extends MockTest {
     @Mock
     private OrderRepository orderRepository;
 
-    @InjectMocks
     private OrderTableService orderTableService;
 
     @BeforeEach
@@ -50,17 +49,19 @@ class OrderTableServiceTest extends MockTest {
     @Test
     void create() {
         //given
+        final OrderTable orderTableRequest = ORDER_TABLE1_REQUEST();
+
         given(orderTableRepository.save(any())).willReturn(ORDER_TABLE1());
 
         //when
-        final OrderTable sut = orderTableService.create(ORDER_TABLE1());
+        final OrderTable sut = orderTableService.create(orderTableRequest);
 
         //then
         assertAll(
-            () -> assertThat(sut.getId()).isEqualTo(ORDER_TABLE1().getId()),
-            () -> assertThat(sut.getName()).isEqualTo(ORDER_TABLE1().getName()),
-            () -> assertThat(sut.getNumberOfGuests()).isEqualTo(ORDER_TABLE1().getNumberOfGuests()),
-            () -> assertThat(sut.isEmpty()).isEqualTo(ORDER_TABLE1().isEmpty())
+            () -> assertThat(sut.getId()).isNotNull(),
+            () -> assertThat(sut.getName()).isEqualTo(orderTableRequest.getName()),
+            () -> assertThat(sut.getNumberOfGuests()).isEqualTo(orderTableRequest.getNumberOfGuests()),
+            () -> assertThat(sut.isEmpty()).isEqualTo(orderTableRequest.isEmpty())
         );
     }
 
@@ -69,25 +70,25 @@ class OrderTableServiceTest extends MockTest {
     @NullAndEmptySource
     void cteateWithEmptyName(final String name) {
         //given
-        final OrderTable orderTable = ORDER_TABLE_WITH_NAME(name);
+        final OrderTable orderTableRequest = ORDER_TABLE_WITH_NAME_REQUEST(name);
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> orderTableService.create(orderTable));
+            .isThrownBy(() -> orderTableService.create(orderTableRequest));
     }
 
     @DisplayName("create - 주문 테이블 이름은 중복될 수 있다")
     @Test
     void cteateWithDuplicateName() {
         //given
-        final OrderTable orderTable1 = ORDER_TABLE1();
-        final OrderTable orderTable2 = ORDER_TABLE1();
+        final OrderTable orderTableRequest1 = ORDER_TABLE1_REQUEST();
+        final OrderTable orderTableRequest2 = ORDER_TABLE1_REQUEST();
 
-        given(orderTableRepository.save(any())).willReturn(orderTable1, orderTable2);
+        given(orderTableRepository.save(any())).willReturn(ORDER_TABLE1(), ORDER_TABLE1());
 
         //when
-        final OrderTable createdOrderTable1 = orderTableService.create(orderTable1);
-        final OrderTable createdOrderTable2 = orderTableService.create(orderTable2);
+        final OrderTable createdOrderTable1 = orderTableService.create(orderTableRequest1);
+        final OrderTable createdOrderTable2 = orderTableService.create(orderTableRequest2);
 
         //then
         assertThat(createdOrderTable1.getName()).isEqualTo(createdOrderTable2.getName());
@@ -97,10 +98,12 @@ class OrderTableServiceTest extends MockTest {
     @Test
     void sit() {
         //given
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(ORDER_TABLE1()));
+        final OrderTable orderTable = ORDER_TABLE1();
+
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         //when
-        final OrderTable sut = orderTableService.sit(ORDER_TABLE1().getId());
+        final OrderTable sut = orderTableService.sit(orderTable.getId());
 
         //then
         assertThat(sut.isEmpty()).isFalse();
@@ -121,10 +124,12 @@ class OrderTableServiceTest extends MockTest {
     @Test
     void clear() {
         //given
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(ORDER_TABLE1()));
+        final OrderTable orderTable = ORDER_TABLE1();
+
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         //when
-        final OrderTable sut = orderTableService.clear(ORDER_TABLE1().getId());
+        final OrderTable sut = orderTableService.clear(orderTable.getId());
 
         //then
         assertThat(sut.isEmpty()).isTrue();
@@ -159,7 +164,7 @@ class OrderTableServiceTest extends MockTest {
     void changeGuestNumber(final int numberOfGuests) {
         //given
         final OrderTable orderTable = NOT_EMPTY_TABLE();
-        final OrderTable orderTableRequest = NOT_EMPTY_TABLE_WITH_GUESTS(numberOfGuests);
+        final OrderTable orderTableRequest = NOT_EMPTY_TABLE_WITH_GUESTS_REQUEST(numberOfGuests);
 
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
@@ -176,34 +181,41 @@ class OrderTableServiceTest extends MockTest {
     void changeGuestNumberNegativeNumber(final int negativeNumber) {
         //given
         final OrderTable orderTable = ORDER_TABLE1();
-
-        orderTable.setNumberOfGuests(negativeNumber);
+        final OrderTable orderTableRequest = NOT_EMPTY_TABLE_WITH_GUESTS_REQUEST(negativeNumber);
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
+            .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTableRequest));
     }
 
     @DisplayName("changeGuestNumber - 존재하는 테이블이 아니라면 예외를 반환한다")
     @Test
     void changeGuestNumberNotExistTable() {
         //given
+        final OrderTable orderTable = ORDER_TABLE1();
+        final OrderTable orderTableRequest = ORDER_TABLE1_REQUEST();
+
         given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
-            .isThrownBy(() -> orderTableService.changeNumberOfGuests(ORDER_TABLE1().getId(), ORDER_TABLE1()));
+            .isThrownBy(() -> {
+                orderTableService.changeNumberOfGuests(orderTable.getId(), orderTableRequest);
+            });
     }
 
     @DisplayName("changeGuestNumberStatus - 테이블이 비어있는 경우 예외를 반환한다")
     @Test
     void changeGuestNumberStatus() {
         //given
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(ORDER_TABLE1()));
+        final OrderTable orderTable = ORDER_TABLE1();
+        final OrderTable orderTableRequest = ORDER_TABLE1_REQUEST();
+
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
-            .isThrownBy(() -> orderTableService.changeNumberOfGuests(ORDER_TABLE1().getId(), ORDER_TABLE1()));
+            .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTableRequest));
     }
 
     @DisplayName("findAll - 테이블 리스트를 조회할 수 있다")
@@ -216,12 +228,15 @@ class OrderTableServiceTest extends MockTest {
         final List<OrderTable> sut = orderTableService.findAll();
 
         //then
+        final OrderTable orderTable1 = ORDER_TABLE1();
+        final OrderTable orderTable2 = ORDER_TABLE2();
+
         assertAll(
             () -> assertThat(sut.size()).isEqualTo(ORDER_TABLES().size()),
-            () -> assertThat(sut.get(ZERO).getId()).isEqualTo(ORDER_TABLE1().getId()),
-            () -> assertThat(sut.get(ZERO).getName()).isEqualTo(ORDER_TABLE1().getName()),
-            () -> assertThat(sut.get(ONE).getId()).isEqualTo(ORDER_TABLE2().getId()),
-            () -> assertThat(sut.get(ONE).getName()).isEqualTo(ORDER_TABLE2().getName())
+            () -> assertThat(sut.get(ZERO).getId()).isEqualTo(orderTable1.getId()),
+            () -> assertThat(sut.get(ZERO).getName()).isEqualTo(orderTable1.getName()),
+            () -> assertThat(sut.get(ONE).getId()).isEqualTo(orderTable2.getId()),
+            () -> assertThat(sut.get(ONE).getName()).isEqualTo(orderTable2.getName())
         );
     }
 
