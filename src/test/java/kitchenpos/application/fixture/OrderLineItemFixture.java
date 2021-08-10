@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.OrderLineItem;
 
 public class OrderLineItemFixture {
@@ -20,48 +21,23 @@ public class OrderLineItemFixture {
     private static final long WRONG_PRICE = 12345L;
 
     public static OrderLineItem ORDER_LINE_ITEM1() {
-        final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(UUID1);
-        orderLineItem.setPrice(MENU1().getPrice());
-        orderLineItem.setQuantity(QUANTITY1);
-        orderLineItem.setMenu(MENU1());
-        return orderLineItem;
+        return createOrderLineItem(UUID1, MENU1().getPrice(), QUANTITY1, MENU1());
     }
 
     public static OrderLineItem ORDER_LINE_ITEM2() {
-        final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(UUID2);
-        orderLineItem.setPrice(MENU2().getPrice());
-        orderLineItem.setQuantity(QUANTITY2);
-        orderLineItem.setMenu(MENU1());
-        return orderLineItem;
+        return createOrderLineItem(UUID2, MENU2().getPrice(), QUANTITY2, MENU1());
     }
 
     public static OrderLineItem HIDED_MENU_ORDER_LINE_ITEM() {
-        final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(UUID2);
-        orderLineItem.setPrice(MENU2().getPrice());
-        orderLineItem.setQuantity(QUANTITY2);
-        orderLineItem.setMenu(HIDED_MENU());
-        return orderLineItem;
+        return createOrderLineItem(UUID2, MENU2().getPrice(), QUANTITY2, HIDED_MENU());
     }
 
     public static OrderLineItem NEGATIVE_QUANTITY_ORDER_LINE_ITEM() {
-        final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(UUID1);
-        orderLineItem.setPrice(MENU1().getPrice());
-        orderLineItem.setQuantity(NEGATIVE_QUANTITY);
-        orderLineItem.setMenu(MENU1());
-        return orderLineItem;
+        return createOrderLineItem(UUID1, MENU1().getPrice(), NEGATIVE_QUANTITY, MENU1());
     }
 
     public static OrderLineItem WRONG_PRICE_MENU_ORDER_LINE_ITEM() {
-        final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(UUID1);
-        orderLineItem.setPrice(BigDecimal.valueOf(WRONG_PRICE));
-        orderLineItem.setQuantity(NEGATIVE_QUANTITY);
-        orderLineItem.setMenu(MENU1());
-        return orderLineItem;
+        return createOrderLineItem(UUID1, WRONG_PRICE, NEGATIVE_QUANTITY, MENU1());
     }
 
     public static List<OrderLineItem> ORDER_LINE_ITEMS() {
@@ -78,6 +54,19 @@ public class OrderLineItemFixture {
 
     public static List<OrderLineItem> WRONG_PRICE_MENU_ORDER_LINE_ITEMS() {
         return Arrays.asList(WRONG_PRICE_MENU_ORDER_LINE_ITEM(), WRONG_PRICE_MENU_ORDER_LINE_ITEM());
+    }
+
+    private static OrderLineItem createOrderLineItem(final UUID uuid, final long price, final long quantity, final Menu menu) {
+        return createOrderLineItem(uuid, BigDecimal.valueOf(price), quantity, menu);
+    }
+
+    private static OrderLineItem createOrderLineItem(final UUID uuid, final BigDecimal price, final long quantity, final Menu menu) {
+        final OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setMenuId(uuid);
+        orderLineItem.setPrice(price);
+        orderLineItem.setQuantity(quantity);
+        orderLineItem.setMenu(menu);
+        return orderLineItem;
     }
 
 }

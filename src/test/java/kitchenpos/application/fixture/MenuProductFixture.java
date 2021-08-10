@@ -6,6 +6,7 @@ import static kitchenpos.application.fixture.ProductFixture.PRODUCT2;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
@@ -16,36 +17,20 @@ public class MenuProductFixture {
     private static final long NEGATIVE_QUANTITY = -3L;
 
     public static MenuProduct MENU_PRODUCT1() {
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(PRODUCT1());
-        menuProduct.setProductId(PRODUCT1().getId());
-        menuProduct.setQuantity(TWO);
-        return menuProduct;
+        return createMenuProduct(PRODUCT1(), PRODUCT1().getId(), TWO);
     }
 
     public static MenuProduct MENU_PRODUCT2() {
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(PRODUCT2());
-        menuProduct.setProductId(PRODUCT2().getId());
-        menuProduct.setQuantity(THREE);
-        return menuProduct;
+        return createMenuProduct(PRODUCT2(), PRODUCT2().getId(), THREE);
     }
 
     private static MenuProduct NEGATIVE_QUANTITY_MENU_PRODUCT() {
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(PRODUCT2());
-        menuProduct.setProductId(PRODUCT2().getId());
-        menuProduct.setQuantity(NEGATIVE_QUANTITY);
-        return menuProduct;
+        return createMenuProduct(PRODUCT2(), PRODUCT2().getId(), NEGATIVE_QUANTITY);
     }
 
     public static MenuProduct CHEAP_MENU_PRODUCT() {
-        final MenuProduct menuProduct = new MenuProduct();
         final Product cheapProduct = CHEAP_PRODUCT();
-        menuProduct.setProduct(cheapProduct);
-        menuProduct.setProductId(cheapProduct.getId());
-        menuProduct.setQuantity(TWO);
-        return menuProduct;
+        return createMenuProduct(cheapProduct, cheapProduct.getId(), TWO);
     }
 
     public static List<MenuProduct> MENU_PRODUCTS() {
@@ -58,6 +43,14 @@ public class MenuProductFixture {
 
     public static List<MenuProduct> QUANTITY_NAGATIVE_MENU_PRODUCTS() {
         return Arrays.asList(MENU_PRODUCT1(), NEGATIVE_QUANTITY_MENU_PRODUCT());
+    }
+
+    private static MenuProduct createMenuProduct(final Product product, final UUID productId, final long quantity) {
+        final MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(product);
+        menuProduct.setProductId(productId);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
     }
 
 }
