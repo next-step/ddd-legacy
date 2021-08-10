@@ -31,20 +31,22 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     @Autowired
     private MenuRepository menuRepository;
 
+    private Product 강정치킨;
+    private Product 후라이드;
+
     @BeforeEach
     void setUp() {
         menuRepository.deleteAll();
         productRepository.deleteAll();
+        강정치킨 = createProduct("강정치킨", 17000);
+        후라이드 = createProduct("후라이드", 18000);
     }
 
     @DisplayName("상품을 등록한다")
     @Test
     void create() throws SQLException {
-        // given
-        Product product = createProduct("강정치킨", 17000);
-
         // when
-        ExtractableResponse<Response> response = requestCreateProduct(product);
+        ExtractableResponse<Response> response = requestCreateProduct(강정치킨);
 
         // then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -54,7 +56,7 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     @Test
     public void changePrice() {
         // given
-        Product createdProduct = completeCreateProduct(createProduct("강정치킨", 17000));
+        Product createdProduct = completeCreateProduct(강정치킨);
 
         // when
         ExtractableResponse<Response> response = requestChangePrice(
@@ -69,8 +71,8 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     @Test
     public void findAll() {
         // given
-        Product product1 = completeCreateProduct(createProduct("닭강정", 17000));
-        Product product2 = completeCreateProduct(createProduct("후라이드", 18000));
+        Product product1 = completeCreateProduct(강정치킨);
+        Product product2 = completeCreateProduct(후라이드);
         productRepository.saveAll(Arrays.asList(product1, product2));
 
         // when
@@ -80,6 +82,10 @@ public class ProductAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
 
         // then
+        assertFindAll(response);
+    }
+
+    private void assertFindAll(final ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.as(new TypeRef<List<Product>>() {}).size()).isEqualTo(2);
     }
