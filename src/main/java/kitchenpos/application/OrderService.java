@@ -39,7 +39,7 @@ public class OrderService {
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
             throw new IllegalArgumentException();
         }
-        final List<Menu> menus = menuRepository.findAllById(
+        final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
                 .map(OrderLineItem::getMenuId)
                 .collect(Collectors.toList())
@@ -58,7 +58,7 @@ public class OrderService {
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
-                throw new IllegalArgumentException();
+                throw new IllegalStateException();
             }
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
                 throw new IllegalArgumentException();
@@ -141,9 +141,6 @@ public class OrderService {
     public Order completeDelivery(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
             .orElseThrow(NoSuchElementException::new);
-        if (order.getType() != OrderType.DELIVERY) {
-            throw new IllegalStateException();
-        }
         if (order.getStatus() != OrderStatus.DELIVERING) {
             throw new IllegalStateException();
         }

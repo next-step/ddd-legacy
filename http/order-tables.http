@@ -13,7 +13,7 @@ PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/sit
 PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/clear
 
 ###
-PUT {{host}}/api/menus/8d710043-29b6-420e-8452-233f5a035520/number-of-guests
+PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/number-of-guests
 Content-Type: application/json
 
 {

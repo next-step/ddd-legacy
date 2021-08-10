@@ -40,7 +40,7 @@ public class MenuService {
         if (Objects.isNull(menuProductRequests) || menuProductRequests.isEmpty()) {
             throw new IllegalArgumentException();
         }
-        final List<Product> products = productRepository.findAllById(
+        final List<Product> products = productRepository.findAllByIdIn(
             menuProductRequests.stream()
                 .map(MenuProduct::getProductId)
                 .collect(Collectors.toList())
@@ -57,8 +57,10 @@ public class MenuService {
             }
             final Product product = productRepository.findById(menuProductRequest.getProductId())
                 .orElseThrow(NoSuchElementException::new);
-            sum = product.getPrice()
-                .multiply(BigDecimal.valueOf(quantity));
+            sum = sum.add(
+                product.getPrice()
+                    .multiply(BigDecimal.valueOf(quantity))
+            );
             final MenuProduct menuProduct = new MenuProduct();
             menuProduct.setProduct(product);
             menuProduct.setQuantity(quantity);
