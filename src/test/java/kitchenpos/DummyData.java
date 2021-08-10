@@ -4,6 +4,8 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
+import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,10 +15,10 @@ import java.util.UUID;
 
 public class DummyData {
 
-    protected static List<MenuGroup> menuGroups = new ArrayList<>();
-    protected static List<Product> products = new ArrayList<>();
-    protected static List<Menu> menus = new ArrayList<>();
-    protected static List<MenuProduct> menuProducts = new ArrayList<>();
+    protected List<MenuGroup> menuGroups = new ArrayList<>();
+    protected List<Product> products = new ArrayList<>();
+    protected List<Menu> menus = new ArrayList<>();
+    protected List<MenuProduct> menuProducts = new ArrayList<>();
 
     protected static final UUID FIRST_ID = UUID.randomUUID();
     protected static final UUID SECOND_ID = UUID.randomUUID();
@@ -24,7 +26,8 @@ public class DummyData {
     protected static final Boolean MENU_HIDE = false;
     protected static final Boolean MENU_SHOW = true;
 
-    public DummyData() {
+    @BeforeEach
+    void setUp() {
         setMenuGroups();
         setProducts();
         setMenuProducts();
