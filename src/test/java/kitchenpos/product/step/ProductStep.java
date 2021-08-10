@@ -15,6 +15,8 @@ import java.util.UUID;
 
 public class ProductStep {
 
+    private static final String PRODUCT_URL = "/api/products";
+
     public static Product createProduct(String name, int price) {
         Product product = new Product();
         ReflectionTestUtils.setField(product, "name", name);
@@ -42,7 +44,7 @@ public class ProductStep {
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(product)
-                .when().post("/api/products")
+                .when().post(PRODUCT_URL)
                 .then().log().all().extract();
     }
 
@@ -55,7 +57,7 @@ public class ProductStep {
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(product)
-                .when().put("/api/products/{productId}/price", id)
+                .when().put(PRODUCT_URL + "/{productId}/price", id)
                 .then().log().all().extract();
     }
 }

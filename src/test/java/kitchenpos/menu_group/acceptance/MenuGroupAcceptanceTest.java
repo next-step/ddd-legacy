@@ -1,6 +1,5 @@
 package kitchenpos.menu_group.acceptance;
 
-import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -52,12 +51,13 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
         completeCreateMenuGroup(두마리메뉴);
 
         // when
-        ExtractableResponse<Response> response = RestAssured
-                .given().log().all()
-                .when().get("/api/menu-groups")
-                .then().log().all().extract();
+        ExtractableResponse<Response> response = requestFindAllMenuGroup();
 
         // then
+        assertFindAllMenuGroup(response);
+    }
+
+    private void assertFindAllMenuGroup(final ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(response.as(new TypeRef<List<MenuGroup>>() {}).size()).isEqualTo(2);
     }

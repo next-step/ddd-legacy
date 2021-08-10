@@ -9,12 +9,22 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 public class MenuGroupStep {
 
+    private static final String MENU_GROUP_URL = "/api/menu-groups";
+
     public static ExtractableResponse<Response> requestCreateMenuGroup(final MenuGroup menuGroup) {
+
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(menuGroup)
-                .when().post("/api/menu-groups")
+                .when().post(MENU_GROUP_URL)
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> requestFindAllMenuGroup() {
+        return RestAssured
+                .given().log().all()
+                .when().get(MENU_GROUP_URL)
                 .then().log().all().extract();
     }
 
