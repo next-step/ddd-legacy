@@ -1,4 +1,4 @@
-package kitchenpos.acceptance;
+package kitchenpos.product.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.common.mapper.TypeRef;
@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import static kitchenpos.step.ProductStep.*;
+import static kitchenpos.product.step.ProductStep.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Product 인수 테스트")

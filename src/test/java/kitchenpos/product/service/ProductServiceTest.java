@@ -1,4 +1,4 @@
-package kitchenpos.service;
+package kitchenpos.product.service;
 
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.Menu;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.step.ProductStep.*;
+import static kitchenpos.product.step.ProductStep.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
