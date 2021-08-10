@@ -5,18 +5,20 @@ import static kitchenpos.application.fixture.MenuFixture.HIDED_MENUS;
 import static kitchenpos.application.fixture.MenuFixture.MENU1;
 import static kitchenpos.application.fixture.MenuFixture.MENU2;
 import static kitchenpos.application.fixture.MenuFixture.MENUS;
-import static kitchenpos.application.fixture.OrderFixture.DELIVERY_ORDER_WITH_ADDRESS;
-import static kitchenpos.application.fixture.OrderFixture.EAT_IN_NULL_ORDER_TABLE_ORDER;
-import static kitchenpos.application.fixture.OrderFixture.EMPTY_ORDER_LINE_ITEMS_ORDER;
-import static kitchenpos.application.fixture.OrderFixture.HIDED_MENU_ORDER;
-import static kitchenpos.application.fixture.OrderFixture.NEGATIVE_QUANTITY_ORDER_LINE_ITEMS_ORDER;
+import static kitchenpos.application.fixture.OrderFixture.DELIVERY_ORDER_WITH_ADDRESS_REQUEST;
+import static kitchenpos.application.fixture.OrderFixture.EAT_IN_NULL_ORDER_TABLE_ORDER_REQUEST;
+import static kitchenpos.application.fixture.OrderFixture.EMPTY_ORDER_LINE_ITEMS_ORDER_REQUEST;
+import static kitchenpos.application.fixture.OrderFixture.HIDED_MENU_ORDER_REQUEST;
+import static kitchenpos.application.fixture.OrderFixture.NEGATIVE_QUANTITY_ORDER_LINE_ITEMS_ORDER_REQUEST;
 import static kitchenpos.application.fixture.OrderFixture.NORMAL_ORDER;
 import static kitchenpos.application.fixture.OrderFixture.NORMAL_ORDER2;
-import static kitchenpos.application.fixture.OrderFixture.NULL_ORDER_LINE_ITEMS_ORDER;
-import static kitchenpos.application.fixture.OrderFixture.NULL_TYPE_ORDER;
+import static kitchenpos.application.fixture.OrderFixture.NORMAL_ORDER_REQUEST;
+import static kitchenpos.application.fixture.OrderFixture.NULL_ORDER_LINE_ITEMS_ORDER_REQUEST;
+import static kitchenpos.application.fixture.OrderFixture.NULL_TYPE_ORDER_REQUEST;
 import static kitchenpos.application.fixture.OrderFixture.ORDERS;
 import static kitchenpos.application.fixture.OrderFixture.ORDER_WITH_TYPE_AND_STATUS;
-import static kitchenpos.application.fixture.OrderFixture.WRONG_PRICE_MENU_ORDER;
+import static kitchenpos.application.fixture.OrderFixture.ORDER_WITH_TYPE_AND_STATUS_REQUEST;
+import static kitchenpos.application.fixture.OrderFixture.WRONG_PRICE_MENU_ORDER_REQUEST;
 import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +44,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 class OrderServiceTest extends MockTest {
@@ -62,7 +63,6 @@ class OrderServiceTest extends MockTest {
     @Mock
     private KitchenridersClient kitchenridersClient;
 
-    @InjectMocks
     private OrderService orderService;
 
     @BeforeEach
@@ -75,6 +75,7 @@ class OrderServiceTest extends MockTest {
     void create() {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.EAT_IN, OrderStatus.WAITING);
+        final Order orderRequest = ORDER_WITH_TYPE_AND_STATUS_REQUEST(OrderType.EAT_IN, OrderStatus.WAITING);
 
         given(menuRepository.findAllById(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
@@ -83,48 +84,47 @@ class OrderServiceTest extends MockTest {
         given(orderRepository.save(any())).willReturn(order);
 
         //when
-        final Order sut = orderService.create(order);
+        final Order sut = orderService.create(orderRequest);
 
         //then
         assertAll(
+            () -> assertThat(sut.getId()).isNotNull(),
             () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.WAITING),
-            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
             () -> assertThat(sut.getType()).isEqualTo(OrderType.EAT_IN)
         );
-
     }
 
     @DisplayName("create - 주문타입이 없으면 예외를 반환한다")
     @Test
     void createNoType() {
         //given
-        final Order order = NULL_TYPE_ORDER();
+        final Order orderRequest = NULL_TYPE_ORDER_REQUEST();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(orderRequest));
     }
 
     @DisplayName("create - 주문상품(orderLineItems)이 null이면 예외를 반환한다")
     @Test
     void createNullOrderLineItems() {
         //given
-        final Order order = NULL_ORDER_LINE_ITEMS_ORDER();
+        final Order orderRequest = NULL_ORDER_LINE_ITEMS_ORDER_REQUEST();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(orderRequest));
     }
 
     @DisplayName("create - 주문상품(orderLineItems)이 EmptyList 이면 예외를 반환한다")
     @Test
     void createEmptyOrderLineItems() {
         //given
-        final Order order = EMPTY_ORDER_LINE_ITEMS_ORDER();
+        final Order orderRequest = EMPTY_ORDER_LINE_ITEMS_ORDER_REQUEST();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(orderRequest));
     }
 
     @DisplayName("create - 주문 타입이 배달, 포장인 경우 주문 상품 수량이 하나라도 음수면 예외를 반환한다")
@@ -132,20 +132,20 @@ class OrderServiceTest extends MockTest {
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT"})
     void createNegativeQuantity(final OrderType orderType) {
         //given
-        final Order order = NEGATIVE_QUANTITY_ORDER_LINE_ITEMS_ORDER(orderType);
+        final Order orderRequest = NEGATIVE_QUANTITY_ORDER_LINE_ITEMS_ORDER_REQUEST(orderType);
 
         given(menuRepository.findAllById(any())).willReturn(MENUS());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(orderRequest));
     }
 
     @DisplayName("create - 주문 상품의 메뉴가 하나라도 존재하지 않으면 예외를 반환한다")
     @Test
     void createNotExistMenu() {
         //given
-        final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.DELIVERY, OrderStatus.WAITING);
+        final Order orderRequest = ORDER_WITH_TYPE_AND_STATUS_REQUEST(OrderType.DELIVERY, OrderStatus.WAITING);
 
         given(menuRepository.findAllById(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
@@ -153,14 +153,14 @@ class OrderServiceTest extends MockTest {
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(orderRequest));
     }
 
     @DisplayName("create - 주문 상품의 메뉴가 하나라도 노출된 상태가 아니면 예외를 반환한다")
     @Test
     void createHideMenu() {
         //given
-        final Order order = HIDED_MENU_ORDER();
+        final Order orderRequest = HIDED_MENU_ORDER_REQUEST();
 
         given(menuRepository.findAllById(any())).willReturn(HIDED_MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(HIDED_MENU()))
@@ -168,14 +168,14 @@ class OrderServiceTest extends MockTest {
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(orderRequest));
     }
 
     @DisplayName("create - 주문 상품의 메뉴 가격과 실제 메뉴 가격이 같지 않으면 예외를 반환한다")
     @Test
     void createSamePrice() {
         //given
-        final Order order = WRONG_PRICE_MENU_ORDER();
+        final Order orderRequest = WRONG_PRICE_MENU_ORDER_REQUEST();
 
         given(menuRepository.findAllById(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
@@ -183,7 +183,7 @@ class OrderServiceTest extends MockTest {
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(orderRequest));
     }
 
     @DisplayName("create - 주문 타입이 배달인데 배달 주소가 없을 경우 예외를 반환한다")
@@ -191,7 +191,7 @@ class OrderServiceTest extends MockTest {
     @NullAndEmptySource
     void createDeliveryAddress(final String address) {
         //given
-        final Order order = DELIVERY_ORDER_WITH_ADDRESS(address);
+        final Order orderRequest = DELIVERY_ORDER_WITH_ADDRESS_REQUEST(address);
 
         given(menuRepository.findAllById(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
@@ -199,14 +199,14 @@ class OrderServiceTest extends MockTest {
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(orderRequest));
     }
 
     @DisplayName("create - 주문 타입이 매장 내 식사인경우 주문 테이블이 존재하지 않으면 예외를 반환한다")
     @Test
     void createNotExistTable() {
         //given
-        final Order order = EAT_IN_NULL_ORDER_TABLE_ORDER();
+        final Order orderRequest = EAT_IN_NULL_ORDER_TABLE_ORDER_REQUEST();
 
         given(menuRepository.findAllById(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
@@ -214,14 +214,14 @@ class OrderServiceTest extends MockTest {
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(orderRequest));
     }
 
     @DisplayName("create - 주문 타입이 매장 내 식사인경우 주문 테이블에 손님이 앉은 상태가 아니라면 예외를 반환한다")
     @Test
     void createTableStatus() {
         //given
-        final Order order = NORMAL_ORDER();
+        final Order order = NORMAL_ORDER_REQUEST();
 
         given(menuRepository.findAllById(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
@@ -245,10 +245,7 @@ class OrderServiceTest extends MockTest {
         final Order sut = orderService.accept(order.getId());
 
         //then
-        assertAll(
-            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
-            () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
-        );
+        assertThat(sut.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
     @DisplayName("accept - 주문이 존재하지 않으면 예외를 반환한다")
@@ -290,10 +287,7 @@ class OrderServiceTest extends MockTest {
         final Order sut = orderService.serve(order.getId());
 
         //then
-        assertAll(
-            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
-            () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.SERVED)
-        );
+        assertThat(sut.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
     @DisplayName("serve - 주문이 존재하지 않으면 예외를 반환한다")
@@ -394,10 +388,7 @@ class OrderServiceTest extends MockTest {
         final Order sut = orderService.completeDelivery(order.getId());
 
         //then
-        assertAll(
-            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
-            () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.DELIVERED)
-        );
+        assertThat(sut.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
     @DisplayName("completeDelivery - 주문이 존재하지 않으면 예외를 반환한다")
@@ -454,10 +445,7 @@ class OrderServiceTest extends MockTest {
         final Order sut = orderService.complete(order.getId());
 
         //then
-        assertAll(
-            () -> assertThat(sut.getId()).isEqualTo(order.getId()),
-            () -> assertThat(sut.getStatus()).isEqualTo(OrderStatus.COMPLETED)
-        );
+        assertThat(sut.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName("complete - 주문 타입이 배달인데 배송완료 상태가 아니라면 예외가 발생한다")
@@ -529,6 +517,7 @@ class OrderServiceTest extends MockTest {
 
         //then
         assertAll(
+            () -> assertThat(sut.size()).isEqualTo(ORDERS().size()),
             () -> assertThat(sut.get(ZERO)
                 .getType()).isEqualTo(NORMAL_ORDER().getType()),
             () -> assertThat(sut.get(ZERO)
