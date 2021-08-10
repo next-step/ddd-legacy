@@ -10,7 +10,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -22,8 +21,6 @@ class ProductRepositoryTest extends DummyData {
     @Mock
     private ProductRepository productRepository;
 
-    private static final UUID PRODUCT_ID = UUID.randomUUID();
-
     @DisplayName("상품 생성")
     @Test
     void createProduct() {
@@ -33,11 +30,7 @@ class ProductRepositoryTest extends DummyData {
 
         Product create = productRepository.save(product);
 
-        assertAll(
-            () -> assertThat(product.getId()).isEqualTo(create.getId()),
-            () -> assertThat(product.getPrice()).isEqualTo(create.getPrice()),
-            () -> assertThat(product.getName()).isEqualTo(create.getName())
-        );
+        assertThat(product).isEqualTo(create);
     }
 
     @DisplayName("상품 가격 변경")
@@ -47,19 +40,16 @@ class ProductRepositoryTest extends DummyData {
 
         Product product = products.get(0);
 
-        given(productRepository.findById(PRODUCT_ID)).willReturn(Optional.of(product));
+        given(productRepository.findById(FIRST_ID)).willReturn(Optional.of(product));
 
-        Product findProduct = productRepository.findById(PRODUCT_ID).get();
+        Product findProduct = productRepository.findById(FIRST_ID).get();
         findProduct.setPrice(changePrice);
 
         given(productRepository.save(findProduct)).willReturn(findProduct);
 
         Product changeProduct = productRepository.save(findProduct);
 
-        assertAll(
-            () -> assertThat(changeProduct.getPrice()).isEqualTo(findProduct.getPrice()),
-            () -> assertThat(changeProduct.getId()).isEqualTo(findProduct.getId())
-        );
+        assertThat(findProduct).isEqualTo(changeProduct);
     }
 
     @DisplayName("상품 내역 확인")
