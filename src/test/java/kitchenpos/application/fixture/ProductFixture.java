@@ -17,56 +17,60 @@ public class ProductFixture {
     private static final String NAME1 = "상품1";
     private static final String NAME2 = "상품2";
 
-    public static Product PRODUCT1() {
-        final Product product = new Product();
-        product.setId(UUID1);
-        product.setPrice(BigDecimal.valueOf(PRICE1));
-        product.setName(NAME1);
-        return product;
+    public static Product PRODUCT1_REQUEST() {
+        return createProduct(null, NAME1, PRICE1);
     }
 
-    public static Product PRODUCT2() {
-        final Product product = new Product();
-        product.setId(UUID2);
-        product.setPrice(BigDecimal.valueOf(PRICE2));
-        product.setName(NAME2);
-        return product;
-    }
-
-    public static Product CHEAP_PRODUCT() {
-        final Product product = new Product();
-        product.setId(UUID2);
-        product.setPrice(BigDecimal.valueOf(CHEAP_PRICE));
-        product.setName(NAME2);
-        return product;
+    public static Product PRICE_NULL_PRODUCT_REQUEST() {
+        return createProduct(null, NAME1, null);
     }
 
     public static Product PRICE_NULL_PRODUCT() {
-        final Product product = new Product();
-        product.setId(UUID1);
-        product.setPrice(null);
-        product.setName(NAME1);
-        return product;
+        return createProduct(UUID1, NAME1, null);
+    }
+
+    public static Product PRODUCT1() {
+        return createProduct(UUID1, NAME1, PRICE1);
+    }
+
+    public static Product PRODUCT2() {
+        return createProduct(UUID2, NAME2, PRICE2);
+    }
+
+    public static Product CHEAP_PRODUCT() {
+        return createProduct(UUID2, NAME2, CHEAP_PRICE);
+    }
+
+    public static Product CHEAP_PRODUCT_REQUEST() {
+        return createProduct(null, NAME2, CHEAP_PRICE);
+    }
+
+    public static Product PRICE_NEGATIVE_PRODUCT_REQUEST() {
+        return createProduct(null, NAME1, NAGATIVE_PRICE);
     }
 
     public static Product PRICE_NEGATIVE_PRODUCT() {
-        final Product product = new Product();
-        product.setId(UUID1);
-        product.setPrice(BigDecimal.valueOf(NAGATIVE_PRICE));
-        product.setName(NAME1);
-        return product;
+        return createProduct(UUID1, NAME1, NAGATIVE_PRICE);
     }
 
-    public static Product PRODUCT_WITH_NAME(final String name) {
-        final Product product = new Product();
-        product.setId(UUID1);
-        product.setPrice(BigDecimal.valueOf(PRICE1));
-        product.setName(name);
-        return product;
+    public static Product PRODUCT_WITH_NAME_REQUEST(final String name) {
+        return createProduct(null, name, PRICE1);
     }
 
     public static List<Product> PRODUCTS() {
         return Arrays.asList(PRODUCT1(), PRODUCT2());
+    }
+
+    private static Product createProduct(final UUID id, final String name, final BigDecimal price) {
+        final Product product = new Product();
+        product.setId(id);
+        product.setPrice(price);
+        product.setName(name);
+        return product;
+    }
+
+    private static Product createProduct(final UUID id, final String name, final long price) {
+        return createProduct(id, name, BigDecimal.valueOf(price));
     }
 
 }
