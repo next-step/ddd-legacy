@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP1;
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP1_REQUEST;
+import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP2;
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP2_REQUEST_SAME_NAME;
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP2_SAME_NAME;
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP_WITH_NAME_REQUEST;
@@ -41,15 +42,18 @@ class MenuGroupServiceTest extends MockTest {
     @Test
     void createOK() {
         //given
-        given(menuGroupRepository.save(any())).willReturn(MENU_GROUP1());
+        final MenuGroup menuGroup = MENU_GROUP1();
+        final MenuGroup menuGroupRequest = MENU_GROUP1_REQUEST();
+
+        given(menuGroupRepository.save(any())).willReturn(menuGroup);
 
         //when
-        final MenuGroup sut = menuGroupService.create(MENU_GROUP1_REQUEST());
+        final MenuGroup sut = menuGroupService.create(menuGroupRequest);
 
         //then
         assertAll(
             () -> assertThat(sut.getId()).isNotNull(),
-            () -> assertThat(sut.getName()).isEqualTo(MENU_GROUP1().getName())
+            () -> assertThat(sut.getName()).isEqualTo(menuGroupRequest.getName())
         );
     }
 
@@ -58,23 +62,29 @@ class MenuGroupServiceTest extends MockTest {
     @NullAndEmptySource
     void createWithEmptyName(final String value) {
         //given
-        final MenuGroup menuGroup = MENU_GROUP_WITH_NAME_REQUEST(value);
+        final MenuGroup menuGroupRequest = MENU_GROUP_WITH_NAME_REQUEST(value);
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> menuGroupService.create(menuGroup));
+            .isThrownBy(() -> menuGroupService.create(menuGroupRequest));
     }
 
     @DisplayName("create - 메뉴 그룹 이름은 중복될 수 있다")
     @Test
     void createWithDuplicateName() {
         //given
-        given(menuGroupRepository.save(any())).willReturn(MENU_GROUP1())
-            .willReturn(MENU_GROUP2_SAME_NAME());
+        final MenuGroup menuGroup1 = MENU_GROUP1();
+        final MenuGroup menuGroup2SameName = MENU_GROUP2_SAME_NAME();
+
+        final MenuGroup menuGroup1Request = MENU_GROUP1_REQUEST();
+        final MenuGroup menuGroup2RequestSameName = MENU_GROUP2_REQUEST_SAME_NAME();
+
+        given(menuGroupRepository.save(any())).willReturn(menuGroup1)
+            .willReturn(menuGroup2SameName);
 
         //when
-        final MenuGroup sut1 = menuGroupService.create(MENU_GROUP1_REQUEST());
-        final MenuGroup sut2 = menuGroupService.create(MENU_GROUP2_REQUEST_SAME_NAME());
+        final MenuGroup sut1 = menuGroupService.create(menuGroup1Request);
+        final MenuGroup sut2 = menuGroupService.create(menuGroup2RequestSameName);
 
         //then
         assertAll(
@@ -87,7 +97,10 @@ class MenuGroupServiceTest extends MockTest {
     @Test
     void findAll() {
         //given
-        given(menuGroupRepository.findAll()).willReturn(Arrays.asList(MENU_GROUP1(), MENU_GROUP2_SAME_NAME()));
+        final MenuGroup menuGroup1 = MENU_GROUP1();
+        final MenuGroup menuGroup2 = MENU_GROUP2();
+
+        given(menuGroupRepository.findAll()).willReturn(Arrays.asList(menuGroup1, menuGroup2));
 
         //when
         final List<MenuGroup> menuGroups = menuGroupService.findAll();
@@ -95,8 +108,8 @@ class MenuGroupServiceTest extends MockTest {
         //then
         assertAll(
             () -> assertThat(menuGroups.get(ZERO).getId()).isNotEqualTo(menuGroups.get(ONE).getId()),
-            () -> assertThat(MENU_GROUP1().getId()).isEqualTo(menuGroups.get(ZERO).getId()),
-            () -> assertThat(MENU_GROUP2_SAME_NAME().getId()).isEqualTo(menuGroups.get(ONE).getId())
+            () -> assertThat(menuGroup1.getName()).isEqualTo(menuGroups.get(ZERO).getName()),
+            () -> assertThat(menuGroup2.getName()).isEqualTo(menuGroups.get(ONE).getName())
         );
     }
 
