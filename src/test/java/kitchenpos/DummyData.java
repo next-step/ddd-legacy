@@ -1,7 +1,6 @@
 package kitchenpos;
 
 import kitchenpos.domain.*;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.math.BigDecimal;
@@ -24,7 +23,8 @@ public class DummyData {
     protected static final Boolean MENU_HIDE = false;
     protected static final Boolean MENU_SHOW = true;
 
-    protected static final Boolean TABLE_EMPTY = true;
+    protected static final Boolean TABLE_CLEAR = true;
+    protected static final Boolean TABLE_SIT = false;
     protected static final int TABLE_DEFAULT_NUMBER_OF_GUEST = 0;
 
     @BeforeEach
@@ -104,13 +104,13 @@ public class DummyData {
         OrderTable orderTable = new OrderTable();
         orderTable.setName("1번");
         orderTable.setId(FIRST_ID);
-        orderTable.setEmpty(TABLE_EMPTY);
+        orderTable.setEmpty(TABLE_CLEAR);
         orderTable.setNumberOfGuests(TABLE_DEFAULT_NUMBER_OF_GUEST);
 
         OrderTable orderTable2 = new OrderTable();
         orderTable2.setName("2번");
         orderTable2.setId(SECOND_ID);
-        orderTable2.setEmpty(TABLE_EMPTY);
+        orderTable2.setEmpty(TABLE_CLEAR);
         orderTable2.setNumberOfGuests(TABLE_DEFAULT_NUMBER_OF_GUEST);
 
         orderTables.add(orderTable);
