@@ -1,15 +1,17 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.fixture.MenuFixture.EXPENSIVE_MENU;
+import static kitchenpos.application.fixture.MenuFixture.EMPTY_MENUPRODUCTS_MENU_REQUEST;
+import static kitchenpos.application.fixture.MenuFixture.EXPENSIVE_MENU_REQUEST;
 import static kitchenpos.application.fixture.MenuFixture.HIDED_MENU;
 import static kitchenpos.application.fixture.MenuFixture.MENU1;
+import static kitchenpos.application.fixture.MenuFixture.MENU1_REQUEST;
 import static kitchenpos.application.fixture.MenuFixture.MENU2;
 import static kitchenpos.application.fixture.MenuFixture.MENUS;
-import static kitchenpos.application.fixture.MenuFixture.MENU_WITH_NAME;
-import static kitchenpos.application.fixture.MenuFixture.MENU_WITH_PRICE;
-import static kitchenpos.application.fixture.MenuFixture.PRICE_NEGATIVE_MENU;
-import static kitchenpos.application.fixture.MenuFixture.PRICE_NULL_MENU;
-import static kitchenpos.application.fixture.MenuFixture.QUANTITY_NAGATIVE_MENU;
+import static kitchenpos.application.fixture.MenuFixture.MENU_WITH_NAME_REQUEST;
+import static kitchenpos.application.fixture.MenuFixture.MENU_WITH_PRICE_REQUEST;
+import static kitchenpos.application.fixture.MenuFixture.PRICE_NEGATIVE_MENU_REQUEST;
+import static kitchenpos.application.fixture.MenuFixture.PRICE_NULL_MENU_REQUEST;
+import static kitchenpos.application.fixture.MenuFixture.QUANTITY_NAGATIVE_MENU_REQUEST;
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP1;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT2;
@@ -24,7 +26,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import kitchenpos.application.fixture.MenuFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
@@ -36,7 +37,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 class MenuServiceTest extends MockTest {
@@ -56,7 +56,6 @@ class MenuServiceTest extends MockTest {
     @Mock
     private PurgomalumClient purgomalumClient;
 
-    @InjectMocks
     private MenuService menuService;
 
     @BeforeEach
@@ -75,7 +74,7 @@ class MenuServiceTest extends MockTest {
         given(menuRepository.save(any())).willReturn(MENU1());
 
         //when
-        final Menu sut = menuService.create(MENU1());
+        final Menu sut = menuService.create(MENU1_REQUEST());
 
         //then
         assertAll(
@@ -89,7 +88,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void menuGroupNotExist() {
         //given
-        final Menu menu = MENU1();
+        final Menu menu = MENU1_REQUEST();
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
 
@@ -102,7 +101,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void noPrice() {
         //given
-        final Menu menu = PRICE_NULL_MENU();
+        final Menu menu = PRICE_NULL_MENU_REQUEST();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -113,7 +112,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void negativePrice() {
         //given
-        final Menu menu = PRICE_NEGATIVE_MENU();
+        final Menu menu = PRICE_NEGATIVE_MENU_REQUEST();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -124,7 +123,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void noMenuProduct() {
         //given
-        final Menu menu = MenuFixture.EMPTY_MENUPRODUCTS_MENU();
+        final Menu menu = EMPTY_MENUPRODUCTS_MENU_REQUEST();
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
 
@@ -137,7 +136,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void productNotExist() {
         //given
-        final Menu menu = MENU1();
+        final Menu menu = MENU1_REQUEST();
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
@@ -153,7 +152,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void productsNegativeQuentity() {
         //given
-        final Menu menu = QUANTITY_NAGATIVE_MENU();
+        final Menu menu = QUANTITY_NAGATIVE_MENU_REQUEST();
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
@@ -169,7 +168,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void menuValidPrice() {
         //given
-        final Menu menu = EXPENSIVE_MENU();
+        final Menu menu = EXPENSIVE_MENU_REQUEST();
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
@@ -186,7 +185,7 @@ class MenuServiceTest extends MockTest {
     @NullAndEmptySource
     void nullAndEmpty(final String name) {
         //given
-        final Menu menu = MENU_WITH_NAME(name);
+        final Menu menu = MENU_WITH_NAME_REQUEST(name);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
@@ -224,7 +223,7 @@ class MenuServiceTest extends MockTest {
     @ValueSource(strings = {"fuck", "bitch", "Damn"})
     void profanityName(final String profanityName) {
         //given
-        final Menu menu = MENU_WITH_NAME(profanityName);
+        final Menu menu = MENU_WITH_NAME_REQUEST(profanityName);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
         given(productRepository.findAllById(any())).willReturn(PRODUCTS());
@@ -243,7 +242,7 @@ class MenuServiceTest extends MockTest {
     void change(final long price) {
         //given
         final Menu menu = MENU1();
-        final Menu menuRequest = MENU_WITH_PRICE(price);
+        final Menu menuRequest = MENU_WITH_PRICE_REQUEST(price);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -251,14 +250,17 @@ class MenuServiceTest extends MockTest {
         final Menu sut = menuService.changePrice(menu.getId(), menuRequest);
 
         //then
-        assertThat(sut.getPrice()).isEqualTo(BigDecimal.valueOf(price));
+        assertAll(
+            () -> assertThat(sut.getId()).isNotNull(),
+            () -> assertThat(sut.getPrice()).isEqualTo(BigDecimal.valueOf(price))
+        );
     }
 
     @DisplayName("changePrice - 메뉴 가격이 없으면 예외가 발생한다")
     @Test
     void changeWithNoPrice() {
         //given
-        final Menu menu = PRICE_NULL_MENU();
+        final Menu menu = PRICE_NULL_MENU_REQUEST();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -269,7 +271,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void changeWithNegativePrice() {
         //given
-        final Menu menu = PRICE_NEGATIVE_MENU();
+        final Menu menu = PRICE_NEGATIVE_MENU_REQUEST();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> menuService.changePrice(menu.getId(), menu));
@@ -279,7 +281,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void changeValidPrice() {
         //given
-        final Menu menu = EXPENSIVE_MENU();
+        final Menu menu = EXPENSIVE_MENU_REQUEST();
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -320,7 +322,7 @@ class MenuServiceTest extends MockTest {
     @Test
     void displayMenuPrice() {
         //given
-        final Menu menu = EXPENSIVE_MENU();
+        final Menu menu = EXPENSIVE_MENU_REQUEST();
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
