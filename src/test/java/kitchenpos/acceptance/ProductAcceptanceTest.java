@@ -6,7 +6,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import kitchenpos.AcceptanceTest;
 import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.OrderLineItemRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,14 +29,10 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     private ProductRepository productRepository;
 
     @Autowired
-    private OrderLineItemRepository orderLineItemRepository;
-
-    @Autowired
     private MenuRepository menuRepository;
 
     @BeforeEach
     void setUp() {
-        orderLineItemRepository.deleteAll();
         menuRepository.deleteAll();
         productRepository.deleteAll();
     }
