@@ -4,6 +4,7 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.Product;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +38,18 @@ public class DummyData {
     }
 
     private void setProducts() {
+        Product product = new Product();
+        product.setId(FIRST_ID);
+        product.setPrice(BigDecimal.valueOf(1000));
+        product.setName("후라이드");
 
+        Product product2 = new Product();
+        product.setId(SECOND_ID);
+        product.setPrice(BigDecimal.valueOf(1100));
+        product.setName("양념");
+
+        products.add(product);
+        products.add(product2);
     }
 
     private void setMenus() {
