@@ -18,6 +18,10 @@ public class MenuGroupStep {
                 .then().log().all().extract();
     }
 
+    public static MenuGroup completeCreateMenuGroup(final MenuGroup menuGroup) {
+        return requestCreateMenuGroup(menuGroup).as(MenuGroup.class);
+    }
+
     public static MenuGroup createMenuGroup(String name) {
         MenuGroup menuGroup = new MenuGroup();
         ReflectionTestUtils.setField(menuGroup, "name", name);
