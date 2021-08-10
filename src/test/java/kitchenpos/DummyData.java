@@ -82,7 +82,7 @@ public class DummyData {
         menu.setId(FIRST_ID);
         menu.setMenuGroup(menuGroups.get(0));
         menu.setName("점심 한정");
-        menu.setPrice(ofPrice(5000));
+        menu.setPrice(ofPrice(900));
         menu.setDisplayed(MENU_SHOW);
         menu.setMenuProducts(Arrays.asList(menuProducts.get(0)));
 
@@ -90,7 +90,7 @@ public class DummyData {
         menu2.setId(SECOND_ID);
         menu2.setMenuGroup(menuGroups.get(1));
         menu2.setName("저녁 한정");
-        menu2.setPrice(ofPrice(10000));
+        menu2.setPrice(ofPrice(1000));
         menu2.setDisplayed(MENU_SHOW);
         menu2.setMenuProducts(Arrays.asList(menuProducts.get(1)));
 
@@ -98,7 +98,7 @@ public class DummyData {
         menus.add(menu2);
     }
 
-    private BigDecimal ofPrice(int price) {
+    protected BigDecimal ofPrice(int price) {
         return BigDecimal.valueOf(price);
     }
 }
