@@ -6,6 +6,7 @@ import io.restassured.response.Response;
 import kitchenpos.AcceptanceTest;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.menu_group.step.MenuGroupSaveRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,16 +21,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DisplayName("MenuGroup 인수 테스트")
 public class MenuGroupAcceptanceTest extends AcceptanceTest {
 
-    private MenuGroup 한마리메뉴;
-    private MenuGroup 두마리메뉴;
+    private MenuGroupSaveRequest 한마리메뉴;
+    private MenuGroupSaveRequest 두마리메뉴;
 
     @Autowired
     MenuGroupRepository menuGroupRepository;
 
     @BeforeEach
     void setUp() {
-        한마리메뉴 = createMenuGroup("한마리메뉴");
-        두마리메뉴 = createMenuGroup("두마리메뉴");
+        한마리메뉴 = createMenuGroupSaveRequest("한마리메뉴");
+        두마리메뉴 = createMenuGroupSaveRequest("두마리메뉴");
         menuGroupRepository.deleteAll();
     }
 

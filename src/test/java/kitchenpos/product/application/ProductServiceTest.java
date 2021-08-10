@@ -18,7 +18,9 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.product.step.ProductStep.*;
+import static kitchenpos.menu.step.MenuStep.createMenu;
+import static kitchenpos.product.step.ProductStep.createMenuProduct;
+import static kitchenpos.product.step.ProductStep.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;

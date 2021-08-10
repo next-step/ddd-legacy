@@ -11,8 +11,7 @@ public class MenuGroupStep {
 
     private static final String MENU_GROUP_URL = "/api/menu-groups";
 
-    public static ExtractableResponse<Response> requestCreateMenuGroup(final MenuGroup menuGroup) {
-
+    public static ExtractableResponse<Response> requestCreateMenuGroup(final MenuGroupSaveRequest menuGroup) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -28,8 +27,12 @@ public class MenuGroupStep {
                 .then().log().all().extract();
     }
 
-    public static MenuGroup completeCreateMenuGroup(final MenuGroup menuGroup) {
+    public static MenuGroup completeCreateMenuGroup(final MenuGroupSaveRequest menuGroup) {
         return requestCreateMenuGroup(menuGroup).as(MenuGroup.class);
+    }
+
+    public static MenuGroupSaveRequest createMenuGroupSaveRequest(final String name) {
+        return new MenuGroupSaveRequest(name);
     }
 
     public static MenuGroup createMenuGroup(String name) {

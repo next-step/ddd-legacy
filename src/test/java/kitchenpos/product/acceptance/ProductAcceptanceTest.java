@@ -8,6 +8,8 @@ import kitchenpos.AcceptanceTest;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.product.step.ProductChangePriceRequest;
+import kitchenpos.product.step.ProductSaveRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,15 +33,15 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     @Autowired
     private MenuRepository menuRepository;
 
-    private Product 강정치킨;
-    private Product 후라이드;
+    private ProductSaveRequest 강정치킨;
+    private ProductSaveRequest 후라이드;
 
     @BeforeEach
     void setUp() {
         menuRepository.deleteAll();
         productRepository.deleteAll();
-        강정치킨 = createProduct("강정치킨", 17000);
-        후라이드 = createProduct("후라이드", 18000);
+        강정치킨 = createProductSaveRequest("강정치킨", 17000);
+        후라이드 = createProductSaveRequest("후라이드", 18000);
     }
 
     @DisplayName("상품을 등록한다")
@@ -60,7 +62,7 @@ public class ProductAcceptanceTest extends AcceptanceTest {
 
         // when
         ExtractableResponse<Response> response = requestChangePrice(
-                createProduct("강정치킨", 18000),
+                new ProductChangePriceRequest(18000),
                 createdProduct.getId());
 
         // then

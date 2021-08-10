@@ -3,33 +3,27 @@ package kitchenpos.product.step;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 public class ProductStep {
 
     private static final String PRODUCT_URL = "/api/products";
 
+    public static ProductSaveRequest createProductSaveRequest(final String name, final int price) {
+        return new ProductSaveRequest(name, price);
+    }
+
     public static Product createProduct(String name, int price) {
         Product product = new Product();
         ReflectionTestUtils.setField(product, "name", name);
         ReflectionTestUtils.setField(product, "price", BigDecimal.valueOf(price));
         return product;
-    }
-
-    public static Menu createMenu(String name, int price, List<MenuProduct> menuProducts) {
-        Menu menu = new Menu();
-        ReflectionTestUtils.setField(menu, "name", name);
-        ReflectionTestUtils.setField(menu, "price", new BigDecimal(price));
-        ReflectionTestUtils.setField(menu, "menuProducts", menuProducts);
-        return menu;
     }
 
     public static MenuProduct createMenuProduct(final Product product, int quantity) {
@@ -39,7 +33,7 @@ public class ProductStep {
         return menuProduct1;
     }
 
-    public static ExtractableResponse<Response> requestCreateProduct(final Product product) {
+    public static ExtractableResponse<Response> requestCreateProduct(final ProductSaveRequest product) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -48,15 +42,15 @@ public class ProductStep {
                 .then().log().all().extract();
     }
 
-    public static Product completeCreateProduct(final Product product) {
+    public static Product completeCreateProduct(final ProductSaveRequest product) {
         return requestCreateProduct(product).as(Product.class);
     }
 
-    public static ExtractableResponse<Response> requestChangePrice(Product product, UUID id) {
+    public static ExtractableResponse<Response> requestChangePrice(ProductChangePriceRequest request, UUID id) {
         return RestAssured
                 .given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(product)
+                .body(request)
                 .when().put(PRODUCT_URL + "/{productId}/price", id)
                 .then().log().all().extract();
     }
