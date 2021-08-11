@@ -73,6 +73,10 @@ public class MenuFixture {
         return createMenu(UUID1, MENU_NAME1, PRICE1, MENU_GROUP_ID1, true, CHEAP_MENU_PRODUCTS());
     }
 
+    public static Menu CHEAP_PRODUCT_MENU2() {
+        return createMenu(UUID2, MENU_NAME2, PRICE2, MENU_GROUP_ID2, true, CHEAP_MENU_PRODUCTS());
+    }
+
     public static List<Menu> HIDED_MENUS() {
         return Arrays.asList(HIDED_MENU(), HIDED_MENU());
     }
@@ -82,7 +86,7 @@ public class MenuFixture {
     }
 
     public static List<Menu> CHEAP_PRODUCT_MENUS() {
-        return Arrays.asList(CHEAP_PRODUCT_MENU(), CHEAP_PRODUCT_MENU());
+        return Arrays.asList(CHEAP_PRODUCT_MENU(), CHEAP_PRODUCT_MENU2());
     }
 
     private static Menu createMenu(final UUID uuid, final String menuName, final long price, final UUID menuGroupId, final boolean isDisplay, final List<MenuProduct> menuProducts) {
