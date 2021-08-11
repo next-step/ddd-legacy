@@ -74,11 +74,13 @@ public class OrderFixture {
         return Arrays.asList(NORMAL_ORDER(), NORMAL_ORDER2());
     }
 
-    private static Order createOrder(final UUID id, final OrderType type, final UUID orderTableId, final OrderTable orderTable, final List<OrderLineItem> orderLineItems, final OrderStatus orderStatus) {
+    private static Order createOrder(final UUID id, final OrderType type, final UUID orderTableId, final OrderTable orderTable, final List<OrderLineItem> orderLineItems,
+        final OrderStatus orderStatus) {
         return createOrder(id, type, orderTableId, orderTable, orderLineItems, orderStatus, null);
     }
 
-    private static Order createOrder(final UUID id, final OrderType type, final UUID orderTableId, final OrderTable orderTable, final List<OrderLineItem> orderLineItems, final OrderStatus orderStatus, final String address) {
+    private static Order createOrder(final UUID id, final OrderType type, final UUID orderTableId, final OrderTable orderTable, final List<OrderLineItem> orderLineItems, final OrderStatus orderStatus,
+        final String address) {
         final Order order = new Order();
         order.setId(id);
         order.setType(type);

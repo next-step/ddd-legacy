@@ -107,9 +107,13 @@ class MenuGroupServiceTest extends MockTest {
 
         //then
         assertAll(
-            () -> assertThat(menuGroups.get(ZERO).getId()).isNotEqualTo(menuGroups.get(ONE).getId()),
-            () -> assertThat(menuGroup1.getName()).isEqualTo(menuGroups.get(ZERO).getName()),
-            () -> assertThat(menuGroup2.getName()).isEqualTo(menuGroups.get(ONE).getName())
+            () -> assertThat(menuGroups.get(ZERO)
+                .getId()).isNotEqualTo(menuGroups.get(ONE)
+                .getId()),
+            () -> assertThat(menuGroup1.getName()).isEqualTo(menuGroups.get(ZERO)
+                .getName()),
+            () -> assertThat(menuGroup2.getName()).isEqualTo(menuGroups.get(ONE)
+                .getName())
         );
     }
 

@@ -233,10 +233,14 @@ class OrderTableServiceTest extends MockTest {
 
         assertAll(
             () -> assertThat(sut.size()).isEqualTo(ORDER_TABLES().size()),
-            () -> assertThat(sut.get(ZERO).getId()).isEqualTo(orderTable1.getId()),
-            () -> assertThat(sut.get(ZERO).getName()).isEqualTo(orderTable1.getName()),
-            () -> assertThat(sut.get(ONE).getId()).isEqualTo(orderTable2.getId()),
-            () -> assertThat(sut.get(ONE).getName()).isEqualTo(orderTable2.getName())
+            () -> assertThat(sut.get(ZERO)
+                .getId()).isEqualTo(orderTable1.getId()),
+            () -> assertThat(sut.get(ZERO)
+                .getName()).isEqualTo(orderTable1.getName()),
+            () -> assertThat(sut.get(ONE)
+                .getId()).isEqualTo(orderTable2.getId()),
+            () -> assertThat(sut.get(ONE)
+                .getName()).isEqualTo(orderTable2.getName())
         );
     }
 

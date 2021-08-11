@@ -30,23 +30,23 @@ public class MenuFixture {
     }
 
     public static Menu PRICE_NULL_MENU_REQUEST() {
-        return createMenu(null,  MENU_NAME1, null, MENU_GROUP_ID2, true, MENU_PRODUCTS());
+        return createMenu(null, MENU_NAME1, null, MENU_GROUP_ID2, true, MENU_PRODUCTS());
     }
 
     public static Menu PRICE_NEGATIVE_MENU_REQUEST() {
-        return createMenu(null,  MENU_NAME1, NEGATIVE_PRICE, MENU_GROUP_ID2, true, MENU_PRODUCTS());
+        return createMenu(null, MENU_NAME1, NEGATIVE_PRICE, MENU_GROUP_ID2, true, MENU_PRODUCTS());
     }
 
     public static Menu EMPTY_MENUPRODUCTS_MENU_REQUEST() {
-        return createMenu(null,  MENU_NAME1, PRICE1, MENU_GROUP_ID2, true, Collections.emptyList());
+        return createMenu(null, MENU_NAME1, PRICE1, MENU_GROUP_ID2, true, Collections.emptyList());
     }
 
     public static Menu QUANTITY_NAGATIVE_MENU_REQUEST() {
-        return createMenu(null,  MENU_NAME1, EXPENSIVE_PRICE, MENU_GROUP_ID1, true, QUANTITY_NAGATIVE_MENU_PRODUCTS());
+        return createMenu(null, MENU_NAME1, EXPENSIVE_PRICE, MENU_GROUP_ID1, true, QUANTITY_NAGATIVE_MENU_PRODUCTS());
     }
 
     public static Menu EXPENSIVE_MENU_REQUEST() {
-        return createMenu(null,  MENU_NAME1, EXPENSIVE_PRICE, MENU_GROUP_ID1, true, MENU_PRODUCTS());
+        return createMenu(null, MENU_NAME1, EXPENSIVE_PRICE, MENU_GROUP_ID1, true, MENU_PRODUCTS());
     }
 
     public static Menu MENU_WITH_NAME_REQUEST(final String name) {
@@ -58,11 +58,11 @@ public class MenuFixture {
     }
 
     public static Menu MENU1() {
-        return createMenu(UUID1,  MENU_NAME1, PRICE1, MENU_GROUP_ID1, true, MENU_PRODUCTS());
+        return createMenu(UUID1, MENU_NAME1, PRICE1, MENU_GROUP_ID1, true, MENU_PRODUCTS());
     }
 
     public static Menu MENU2() {
-        return createMenu(UUID2,  MENU_NAME2, PRICE2, MENU_GROUP_ID2, true, MENU_PRODUCTS());
+        return createMenu(UUID2, MENU_NAME2, PRICE2, MENU_GROUP_ID2, true, MENU_PRODUCTS());
     }
 
     public static Menu HIDED_MENU() {

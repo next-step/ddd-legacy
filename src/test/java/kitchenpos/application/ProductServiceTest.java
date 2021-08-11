@@ -213,10 +213,14 @@ class ProductServiceTest extends MockTest {
         final Product product2 = PRODUCT2();
 
         assertAll(
-            () -> assertThat(products.get(ZERO).getName()).isEqualTo(product1.getName()),
-            () -> assertThat(products.get(ZERO).getPrice()).isEqualTo(product1.getPrice()),
-            () -> assertThat(products.get(ONE).getName()).isEqualTo(product2.getName()),
-            () -> assertThat(products.get(ONE).getPrice()).isEqualTo(product2.getPrice())
+            () -> assertThat(products.get(ZERO)
+                .getName()).isEqualTo(product1.getName()),
+            () -> assertThat(products.get(ZERO)
+                .getPrice()).isEqualTo(product1.getPrice()),
+            () -> assertThat(products.get(ONE)
+                .getName()).isEqualTo(product2.getName()),
+            () -> assertThat(products.get(ONE)
+                .getPrice()).isEqualTo(product2.getPrice())
         );
     }
 
