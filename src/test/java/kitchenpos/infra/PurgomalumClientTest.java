@@ -26,7 +26,7 @@ class PurgomalumClientTest {
 
     @BeforeEach
     void setUp() {
-        purgomalumClient = new PurgomalumClient(restTemplateBuilder, objectMapper);
+        purgomalumClient = new DefaultPurgomalumClient(restTemplateBuilder, objectMapper);
     }
 
     @DisplayName("영어 욕을 필터링한다")
