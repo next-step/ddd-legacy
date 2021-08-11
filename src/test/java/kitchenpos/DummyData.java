@@ -4,6 +4,7 @@ import kitchenpos.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +17,8 @@ public class DummyData {
     protected List<Menu> menus = new ArrayList<>();
     protected List<MenuProduct> menuProducts = new ArrayList<>();
     protected List<OrderTable> orderTables = new ArrayList<>();
+    protected List<OrderLineItem> orderLineItems = new ArrayList<>();
+    protected List<Order> orders = new ArrayList<>();
 
     protected static final UUID FIRST_ID = UUID.randomUUID();
     protected static final UUID SECOND_ID = UUID.randomUUID();
@@ -34,6 +37,8 @@ public class DummyData {
         setMenuProducts();
         setMenus();
         setOrderTables();
+        setOrders();
+        setOrderLineItems();
     }
 
     private void setMenuGroups() {
@@ -116,6 +121,38 @@ public class DummyData {
         orderTables.add(orderTable);
         orderTables.add(orderTable2);
     }
+
+    private void setOrderLineItems() {
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setMenu(menus.get(0));
+        orderLineItem.setQuantity(1);
+        orderLineItem.setPrice(menus.get(0).getPrice());
+
+        orderLineItems.add(orderLineItem);
+    };
+
+    private void setOrders() {
+        Order order = new Order();
+        order.setId(FIRST_ID);
+        order.setType(OrderType.EAT_IN);
+        order.setStatus(OrderStatus.WAITING);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderLineItems(orderLineItems);
+        order.setOrderTable(orderTables.get(0));
+
+        Order order2 = new Order();
+        order2.setId(SECOND_ID);
+        order2.setType(OrderType.DELIVERY);
+        order2.setStatus(OrderStatus.WAITING);
+        order2.setOrderDateTime(LocalDateTime.now());
+        order2.setOrderLineItems(orderLineItems);
+        order2.setDeliveryAddress("대한민국 어딘가");
+
+        orders.add(order);
+        orders.add(order2);
+    }
+
+
 
     protected BigDecimal ofPrice(int price) {
         return BigDecimal.valueOf(price);
