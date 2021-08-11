@@ -77,7 +77,7 @@ class OrderServiceTest extends MockTest {
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.EAT_IN, OrderStatus.WAITING);
         final Order orderRequest = ORDER_WITH_TYPE_AND_STATUS_REQUEST(OrderType.EAT_IN, OrderStatus.WAITING);
 
-        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
             .willReturn(Optional.of(MENU2()));
         given(orderTableRepository.findById(any())).willReturn(Optional.of(NOT_EMPTY_TABLE()));
@@ -134,7 +134,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = NEGATIVE_QUANTITY_ORDER_LINE_ITEMS_ORDER_REQUEST(orderType);
 
-        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -147,7 +147,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = ORDER_WITH_TYPE_AND_STATUS_REQUEST(OrderType.DELIVERY, OrderStatus.WAITING);
 
-        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
             .willReturn(Optional.empty());
 
@@ -162,7 +162,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = HIDED_MENU_ORDER_REQUEST();
 
-        given(menuRepository.findAllById(any())).willReturn(HIDED_MENUS());
+        given(menuRepository.findAllByIdIn(any())).willReturn(HIDED_MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(HIDED_MENU()))
             .willReturn(Optional.of(HIDED_MENU()));
 
@@ -177,7 +177,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = WRONG_PRICE_MENU_ORDER_REQUEST();
 
-        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
             .willReturn(Optional.of(MENU2()));
 
@@ -193,7 +193,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = DELIVERY_ORDER_WITH_ADDRESS_REQUEST(address);
 
-        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
             .willReturn(Optional.of(MENU2()));
 
@@ -208,7 +208,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = EAT_IN_NULL_ORDER_TABLE_ORDER_REQUEST();
 
-        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
             .willReturn(Optional.of(MENU2()));
 
@@ -223,7 +223,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = NORMAL_ORDER_REQUEST();
 
-        given(menuRepository.findAllById(any())).willReturn(MENUS());
+        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
         given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
             .willReturn(Optional.of(MENU2()));
         given(orderTableRepository.findById(any())).willReturn(Optional.of(ORDER_TABLE1()));
