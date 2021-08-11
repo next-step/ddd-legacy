@@ -3,7 +3,7 @@ package kitchenpos.domain;
 import java.util.*;
 
 public class FakeMenuGroupRepository implements MenuGroupRepository {
-    Map<UUID, MenuGroup> menuGroupMap = new HashMap<>();
+    Map<UUID, MenuGroup> menuGroupMap = new LinkedHashMap<>();
 
     @Override
     public MenuGroup save(final MenuGroup menuGroup) {

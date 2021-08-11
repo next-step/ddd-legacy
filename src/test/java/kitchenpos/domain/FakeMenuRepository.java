@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FakeMenuRepository implements MenuRepository {
-    private final Map<UUID, Menu> menuMap = new HashMap<>();
+    private final Map<UUID, Menu> menuMap = new LinkedHashMap<>();
 
     @Override
     public Menu save(final Menu menu) {

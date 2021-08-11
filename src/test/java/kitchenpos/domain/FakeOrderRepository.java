@@ -3,7 +3,7 @@ package kitchenpos.domain;
 import java.util.*;
 
 public class FakeOrderRepository implements OrderRepository {
-    Map<UUID, Order> orderMap = new HashMap<>();
+    Map<UUID, Order> orderMap = new LinkedHashMap<>();
 
     @Override
     public Order save(final Order order) {

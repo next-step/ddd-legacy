@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FakeProductRepository implements ProductRepository {
-    private final Map<UUID, Product> productMap = new HashMap<>();
+    private final Map<UUID, Product> productMap = new LinkedHashMap<>();
 
     @Override
     public Product save(final Product product) {
