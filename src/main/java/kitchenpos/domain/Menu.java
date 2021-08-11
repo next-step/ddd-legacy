@@ -3,6 +3,7 @@ package kitchenpos.domain;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "menu")
@@ -98,5 +99,18 @@ public class Menu {
 
     public void setMenuGroupId(final UUID menuGroupId) {
         this.menuGroupId = menuGroupId;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Menu)) return false;
+        final Menu menu = (Menu) o;
+        return Objects.equals(id, menu.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
