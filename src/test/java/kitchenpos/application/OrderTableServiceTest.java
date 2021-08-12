@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.fixture.OrderFixture.ORDER_WITH_TYPE_AND_STATUS_AND_TABLE;
 import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE;
 import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_TABLE_WITH_GUESTS_REQUEST;
 import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1;
@@ -10,32 +11,28 @@ import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE_WITH_
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.OrderType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
 
 class OrderTableServiceTest extends MockTest {
 
     private static final int ZERO = 0;
     private static final int ONE = 1;
 
-    @Mock
-    private OrderTableRepository orderTableRepository;
-
-    private OrderRepository orderRepository;
+    private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
+    private final OrderRepository orderRepository = new InMemoryOrderRepository();
 
     private OrderTableService orderTableService;
 
@@ -49,8 +46,6 @@ class OrderTableServiceTest extends MockTest {
     void create() {
         //given
         final OrderTable orderTableRequest = ORDER_TABLE1_REQUEST();
-
-        given(orderTableRepository.save(any())).willReturn(ORDER_TABLE1());
 
         //when
         final OrderTable sut = orderTableService.create(orderTableRequest);
@@ -83,8 +78,6 @@ class OrderTableServiceTest extends MockTest {
         final OrderTable orderTableRequest1 = ORDER_TABLE1_REQUEST();
         final OrderTable orderTableRequest2 = ORDER_TABLE1_REQUEST();
 
-        given(orderTableRepository.save(any())).willReturn(ORDER_TABLE1(), ORDER_TABLE1());
-
         //when
         final OrderTable createdOrderTable1 = orderTableService.create(orderTableRequest1);
         final OrderTable createdOrderTable2 = orderTableService.create(orderTableRequest2);
@@ -99,7 +92,7 @@ class OrderTableServiceTest extends MockTest {
         //given
         final OrderTable orderTable = ORDER_TABLE1();
 
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+        orderTableRepository.save(orderTable);
 
         //when
         final OrderTable sut = orderTableService.sit(orderTable.getId());
@@ -111,9 +104,6 @@ class OrderTableServiceTest extends MockTest {
     @DisplayName("sit - 테이블이 존재하지 않는다면 예외를 반환한다")
     @Test
     void sitWIthNotExistTable() {
-        //given
-        given(orderTableRepository.findById(any())).willReturn(Optional.empty());
-
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
             .isThrownBy(() -> orderTableService.sit(ORDER_TABLE1().getId()));
@@ -125,7 +115,7 @@ class OrderTableServiceTest extends MockTest {
         //given
         final OrderTable orderTable = ORDER_TABLE1();
 
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+        orderTableRepository.save(orderTable);
 
         //when
         final OrderTable sut = orderTableService.clear(orderTable.getId());
@@ -137,9 +127,6 @@ class OrderTableServiceTest extends MockTest {
     @DisplayName("clear - 테이블이 존재하지 않는다면 예외를 반환한다")
     @Test
     void clearWIthNotExistTable() {
-        //given
-        given(orderTableRepository.findById(any())).willReturn(Optional.empty());
-
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
             .isThrownBy(() -> orderTableService.clear(ORDER_TABLE1().getId()));
@@ -149,12 +136,15 @@ class OrderTableServiceTest extends MockTest {
     @Test
     void clearStatus() {
         //given
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(ORDER_TABLE1()));
-        given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
+        final OrderTable orderTable = ORDER_TABLE1();
+        orderTableRepository.save(orderTable);
+
+        orderRepository.save(ORDER_WITH_TYPE_AND_STATUS_AND_TABLE(OrderType.EAT_IN, OrderStatus.COMPLETED, orderTable));
+        orderRepository.save(ORDER_WITH_TYPE_AND_STATUS_AND_TABLE(OrderType.DELIVERY, OrderStatus.SERVED, orderTable));
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
-            .isThrownBy(() -> orderTableService.clear(ORDER_TABLE1().getId()));
+            .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
     }
 
     @DisplayName("changeGuestNumber - 테이블에 앉은 손님의 수를 변경할 수 있다")
@@ -165,7 +155,7 @@ class OrderTableServiceTest extends MockTest {
         final OrderTable orderTable = NOT_EMPTY_TABLE();
         final OrderTable orderTableRequest = NOT_EMPTY_TABLE_WITH_GUESTS_REQUEST(numberOfGuests);
 
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+        orderTableRepository.save(orderTable);
 
         //when
         final OrderTable sut = orderTableService.changeNumberOfGuests(orderTable.getId(), orderTableRequest);
@@ -194,13 +184,9 @@ class OrderTableServiceTest extends MockTest {
         final OrderTable orderTable = ORDER_TABLE1();
         final OrderTable orderTableRequest = ORDER_TABLE1_REQUEST();
 
-        given(orderTableRepository.findById(any())).willReturn(Optional.empty());
-
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
-            .isThrownBy(() -> {
-                orderTableService.changeNumberOfGuests(orderTable.getId(), orderTableRequest);
-            });
+            .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTableRequest));
     }
 
     @DisplayName("changeGuestNumberStatus - 테이블이 비어있는 경우 예외를 반환한다")
@@ -210,7 +196,7 @@ class OrderTableServiceTest extends MockTest {
         final OrderTable orderTable = ORDER_TABLE1();
         final OrderTable orderTableRequest = ORDER_TABLE1_REQUEST();
 
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+        orderTableRepository.save(orderTable);
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -221,15 +207,16 @@ class OrderTableServiceTest extends MockTest {
     @Test
     void findAll() {
         //given
-        given(orderTableRepository.findAll()).willReturn(ORDER_TABLES());
+        final OrderTable orderTable1 = ORDER_TABLE1();
+        final OrderTable orderTable2 = ORDER_TABLE2();
+
+        orderTableRepository.save(orderTable1);
+        orderTableRepository.save(orderTable2);
 
         //when
         final List<OrderTable> sut = orderTableService.findAll();
 
         //then
-        final OrderTable orderTable1 = ORDER_TABLE1();
-        final OrderTable orderTable2 = ORDER_TABLE2();
-
         assertAll(
             () -> assertThat(sut.size()).isEqualTo(ORDER_TABLES().size()),
             () -> assertThat(sut.get(ZERO)

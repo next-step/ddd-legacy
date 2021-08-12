@@ -32,10 +32,13 @@ public class InMemoryOrderRepository implements OrderRepository {
         return new ArrayList<>(orders.values());
     }
 
+    //해당 테이블의 주문상태가 하나라도 status면 true
     @Override
     public boolean existsByOrderTableAndStatusNot(final OrderTable orderTable, final OrderStatus status) {
         return orders.values()
             .stream()
-            .anyMatch(order -> orders.containsKey(orderTable.getId()) && !Objects.equals(order.getStatus(), status));
+            .filter(order -> order.getOrderTableId()
+                .equals(orderTable.getId()))
+            .anyMatch(order -> Objects.equals(order.getStatus(), status));
     }
 }

@@ -70,6 +70,10 @@ public class OrderFixture {
         return createOrder(UUID.randomUUID(), type, ORDER_TABLE1().getId(), ORDER_TABLE1(), ORDER_LINE_ITEMS(), orderStatus);
     }
 
+    public static Order ORDER_WITH_TYPE_AND_STATUS_AND_TABLE(final OrderType type, final OrderStatus orderStatus, final OrderTable table) {
+        return createOrder(UUID.randomUUID(), type, table.getId(), table, ORDER_LINE_ITEMS(), orderStatus);
+    }
+
     public static List<Order> ORDERS() {
         return Arrays.asList(NORMAL_ORDER(), NORMAL_ORDER2());
     }
