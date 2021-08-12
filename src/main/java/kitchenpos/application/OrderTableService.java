@@ -16,6 +16,8 @@ import java.util.UUID;
 public class OrderTableService {
     private final OrderTableRepository orderTableRepository;
     private final OrderRepository orderRepository;
+    private static final String NUMBER_OF_GUESTS_ILLEGAL_ARGUMENT = "인원 수는 0명 이상이어야 합니다.";
+    private static final String EMPTY_TABLE_ILLEGAL_STATE = "테이블이 비어있습니다.";
 
     public OrderTableService(final OrderTableRepository orderTableRepository, final OrderRepository orderRepository) {
         this.orderTableRepository = orderTableRepository;
@@ -60,12 +62,12 @@ public class OrderTableService {
     public OrderTable changeNumberOfGuests(final UUID orderTableId, final OrderTable request) {
         final int numberOfGuests = request.getNumberOfGuests();
         if (numberOfGuests < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(NUMBER_OF_GUESTS_ILLEGAL_ARGUMENT);
         }
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (orderTable.isEmpty()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(EMPTY_TABLE_ILLEGAL_STATE);
         }
         orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;
