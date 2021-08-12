@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import kitchenpos.infra.PurgomalumClient;
 
 public class FakePurgomalumClient implements PurgomalumClient {
@@ -15,6 +16,6 @@ public class FakePurgomalumClient implements PurgomalumClient {
     @Override
     public boolean containsProfanity(final String text) {
         return profanities.stream()
-            .anyMatch(text::contains);
+            .anyMatch(text.toLowerCase(Locale.ROOT)::contains);
     }
 }

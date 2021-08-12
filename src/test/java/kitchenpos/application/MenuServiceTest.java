@@ -5,6 +5,7 @@ import static kitchenpos.application.fixture.MenuFixture.EXPENSIVE_MENU_REQUEST;
 import static kitchenpos.application.fixture.MenuFixture.HIDED_MENU;
 import static kitchenpos.application.fixture.MenuFixture.MENU1;
 import static kitchenpos.application.fixture.MenuFixture.MENU1_REQUEST;
+import static kitchenpos.application.fixture.MenuFixture.MENU1_REQUEST_WRONG_PRODUCTS;
 import static kitchenpos.application.fixture.MenuFixture.MENU2;
 import static kitchenpos.application.fixture.MenuFixture.MENUS;
 import static kitchenpos.application.fixture.MenuFixture.MENU_WITH_NAME_REQUEST;
@@ -15,18 +16,15 @@ import static kitchenpos.application.fixture.MenuFixture.QUANTITY_NAGATIVE_MENU_
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP1;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT1;
 import static kitchenpos.application.fixture.ProductFixture.PRODUCT2;
-import static kitchenpos.application.fixture.ProductFixture.PRODUCTS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.ProductRepository;
@@ -37,24 +35,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
 
 class MenuServiceTest extends MockTest {
 
     private static final int ZERO = 0;
     private static final int ONE = 1;
 
-    @Mock
     private final MenuRepository menuRepository = new InmemoryMenuRepository();
-
-    @Mock
-    private MenuGroupRepository menuGroupRepository;
-
-    @Mock
-    private ProductRepository productRepository;
-
-    @Mock
-    private PurgomalumClient purgomalumClient;
+    private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+    private final ProductRepository productRepository = new InmemoryProductRepository();
+    private final PurgomalumClient purgomalumClient = new FakePurgomalumClient();
 
     private MenuService menuService;
 
@@ -67,18 +57,19 @@ class MenuServiceTest extends MockTest {
     @Test
     void createOK() {
         //given
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
-        given(productRepository.findAllByIdIn(any())).willReturn(PRODUCTS());
-        given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
-            .willReturn(Optional.of(PRODUCT2()));
-        given(menuRepository.save(any())).willReturn(MENU1());
+        final MenuGroup menuGroup = menuGroupRepository.save(MENU_GROUP1());
+
+        productRepository.save(PRODUCT1());
+        productRepository.save(PRODUCT2());
+
+        final Menu menuRequest = MENU1_REQUEST(menuGroup.getId());
 
         //when
-        final Menu sut = menuService.create(MENU1_REQUEST());
+        final Menu sut = menuService.create(menuRequest);
 
         //then
         assertAll(
-            () -> assertThat(sut.getId()).isEqualTo(MENU1().getId()),
+            () -> assertThat(sut.getId()).isNotNull(),
             () -> assertThat(sut.getPrice()).isEqualTo(MENU1().getPrice()),
             () -> assertThat(sut.getName()).isEqualTo(MENU1().getName())
         );
@@ -88,96 +79,94 @@ class MenuServiceTest extends MockTest {
     @Test
     void menuGroupNotExist() {
         //given
-        final Menu menu = MENU1_REQUEST();
-
-        given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
+        final Menu menuRequest = MENU1_REQUEST();
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
-            .isThrownBy(() -> menuService.create(menu));
+            .isThrownBy(() -> menuService.create(menuRequest));
     }
 
     @DisplayName("create - 가격이 없으면 예외가 발생한다")
     @Test
     void noPrice() {
         //given
-        final Menu menu = PRICE_NULL_MENU_REQUEST();
+        final Menu menuRequest = PRICE_NULL_MENU_REQUEST();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> menuService.create(menu));
+            .isThrownBy(() -> menuService.create(menuRequest));
     }
 
     @DisplayName("create - 가격이 음수이라면 예외가 발생한다")
     @Test
     void negativePrice() {
         //given
-        final Menu menu = PRICE_NEGATIVE_MENU_REQUEST();
+        final Menu menuRequest = PRICE_NEGATIVE_MENU_REQUEST();
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> menuService.create(menu));
+            .isThrownBy(() -> menuService.create(menuRequest));
     }
 
     @DisplayName("create - 메뉴상품을 요청하지 않으면 예외가 발생한다")
     @Test
     void noMenuProduct() {
         //given
-        final Menu menu = EMPTY_MENUPRODUCTS_MENU_REQUEST();
+        final MenuGroup menuGroup = menuGroupRepository.save(MENU_GROUP1());
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
+        final Menu menuRequest = EMPTY_MENUPRODUCTS_MENU_REQUEST(menuGroup.getId());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> menuService.create(menu));
+            .isThrownBy(() -> menuService.create(menuRequest));
     }
 
     @DisplayName("create - 메뉴 상품의 상품들 중 하나라도 존재하지 않으면 예외가 발생한다")
     @Test
     void productNotExist() {
         //given
-        final Menu menu = MENU1_REQUEST();
+        final MenuGroup menuGroup = menuGroupRepository.save(MENU_GROUP1());
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
-        given(productRepository.findAllByIdIn(any())).willReturn(PRODUCTS());
-        given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
-            .willReturn(Optional.empty());
+        productRepository.save(PRODUCT1());
+        productRepository.save(PRODUCT2());
+
+        final Menu menuRequest = MENU1_REQUEST_WRONG_PRODUCTS(menuGroup.getId());
 
         //when, then
-        assertThatExceptionOfType(NoSuchElementException.class)
-            .isThrownBy(() -> menuService.create(menu));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuService.create(menuRequest));
     }
 
     @DisplayName("create - 메뉴 상품의 상품수량이 하나라도 음수인 것이 있으면 예외가 발생한다")
     @Test
     void productsNegativeQuentity() {
         //given
-        final Menu menu = QUANTITY_NAGATIVE_MENU_REQUEST();
+        final MenuGroup menuGroup = menuGroupRepository.save(MENU_GROUP1());
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
-        given(productRepository.findAllByIdIn(any())).willReturn(PRODUCTS());
-        given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
-            .willReturn(Optional.of(PRODUCT2()));
+        productRepository.save(PRODUCT1());
+        productRepository.save(PRODUCT2());
+
+        final Menu menuRequest = QUANTITY_NAGATIVE_MENU_REQUEST(menuGroup.getId());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> menuService.create(menu));
+            .isThrownBy(() -> menuService.create(menuRequest));
     }
 
     @DisplayName("create - 메뉴 가격이 메뉴에 포함된 상품가격과 갯수를 곱해 모두 더한 가격보다 비싸다면 예외가 발생한다")
     @Test
     void menuValidPrice() {
         //given
-        final Menu menu = EXPENSIVE_MENU_REQUEST();
+        final MenuGroup menuGroup = menuGroupRepository.save(MENU_GROUP1());
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
-        given(productRepository.findAllByIdIn(any())).willReturn(PRODUCTS());
-        given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
-            .willReturn(Optional.of(PRODUCT2()));
+        productRepository.save(PRODUCT1());
+        productRepository.save(PRODUCT2());
+
+        final Menu menuRequest = EXPENSIVE_MENU_REQUEST(menuGroup.getId());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> menuService.create(menu));
+            .isThrownBy(() -> menuService.create(menuRequest));
     }
 
     @DisplayName("create - 메뉴 이름이 한글자 미만이라면 예외가 발생한다")
@@ -185,34 +174,33 @@ class MenuServiceTest extends MockTest {
     @NullAndEmptySource
     void nullAndEmpty(final String name) {
         //given
-        final Menu menu = MENU_WITH_NAME_REQUEST(name);
+        final MenuGroup menuGroup = menuGroupRepository.save(MENU_GROUP1());
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
-        given(productRepository.findAllByIdIn(any())).willReturn(PRODUCTS());
-        given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
-            .willReturn(Optional.of(PRODUCT2()));
+        productRepository.save(PRODUCT1());
+        productRepository.save(PRODUCT2());
+
+        final Menu menuRequest = MENU_WITH_NAME_REQUEST(name, menuGroup.getId());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> menuService.create(menu));
+            .isThrownBy(() -> menuService.create(menuRequest));
     }
 
     @DisplayName("create - 메뉴 이름은 중복될 수 있다")
     @Test
     void duplicateName() {
         //given
-        final Menu menu1 = MENU1();
-        final Menu menu2 = MENU1();
+        final MenuGroup menuGroup = menuGroupRepository.save(MENU_GROUP1());
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
-        given(productRepository.findAllByIdIn(any())).willReturn(PRODUCTS());
-        given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
-            .willReturn(Optional.of(PRODUCT2()));
-        given(menuRepository.save(any())).willReturn(menu1, menu2);
+        productRepository.save(PRODUCT1());
+        productRepository.save(PRODUCT2());
+
+        final Menu menuRequest1 = MENU1_REQUEST(menuGroup.getId());
+        final Menu menuRequest2 = MENU1_REQUEST(menuGroup.getId());
 
         //when
-        final Menu sut1 = menuService.create(menu1);
-        final Menu sut2 = menuService.create(menu2);
+        final Menu sut1 = menuService.create(menuRequest1);
+        final Menu sut2 = menuService.create(menuRequest2);
 
         //then
         assertThat(sut1.getName()).isEqualTo(sut2.getName());
@@ -223,17 +211,16 @@ class MenuServiceTest extends MockTest {
     @ValueSource(strings = {"fuck", "bitch", "Damn"})
     void profanityName(final String profanityName) {
         //given
-        final Menu menu = MENU_WITH_NAME_REQUEST(profanityName);
+        final MenuGroup menuGroup = menuGroupRepository.save(MENU_GROUP1());
 
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(MENU_GROUP1()));
-        given(productRepository.findAllByIdIn(any())).willReturn(PRODUCTS());
-        given(productRepository.findById(any())).willReturn(Optional.of(PRODUCT1()))
-            .willReturn(Optional.of(PRODUCT2()));
-        given(purgomalumClient.containsProfanity(any())).willReturn(true);
+        productRepository.save(PRODUCT1());
+        productRepository.save(PRODUCT2());
+
+        final Menu menuRequest = MENU_WITH_NAME_REQUEST(profanityName, menuGroup.getId());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> menuService.create(menu));
+            .isThrownBy(() -> menuService.create(menuRequest));
     }
 
     @DisplayName("changePrice - 메뉴의 가격을 수정할 수 있다")
@@ -242,9 +229,10 @@ class MenuServiceTest extends MockTest {
     void change(final long price) {
         //given
         final Menu menu = MENU1();
-        final Menu menuRequest = MENU_WITH_PRICE_REQUEST(price);
 
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+        menuRepository.save(menu);
+
+        final Menu menuRequest = MENU_WITH_PRICE_REQUEST(price);
 
         //when
         final Menu sut = menuService.changePrice(menu.getId(), menuRequest);
@@ -262,6 +250,8 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = PRICE_NULL_MENU_REQUEST();
 
+        menuRepository.save(menu);
+
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> menuService.changePrice(menu.getId(), menu));
@@ -273,6 +263,9 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = PRICE_NEGATIVE_MENU_REQUEST();
 
+        menuRepository.save(menu);
+
+        //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> menuService.changePrice(menu.getId(), menu));
     }
@@ -283,7 +276,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = EXPENSIVE_MENU_REQUEST();
 
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+        menuRepository.save(menu);
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -296,7 +289,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = HIDED_MENU();
 
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+        menuRepository.save(menu);
 
         //when
         final Menu sut = menuService.display(menu.getId());
@@ -311,8 +304,6 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = MENU1();
 
-        given(menuRepository.findById(any())).willReturn(Optional.empty());
-
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
             .isThrownBy(() -> menuService.display(menu.getId()));
@@ -324,7 +315,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = EXPENSIVE_MENU_REQUEST();
 
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+        menuRepository.save(menu);
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -337,7 +328,7 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = MENU1();
 
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+        menuRepository.save(menu);
 
         //when
         final Menu sut = menuService.hide(menu.getId());
@@ -352,8 +343,6 @@ class MenuServiceTest extends MockTest {
         //given
         final Menu menu = MENU1();
 
-        given(menuRepository.findById(any())).willReturn(Optional.empty());
-
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
             .isThrownBy(() -> menuService.hide(menu.getId()));
@@ -363,7 +352,11 @@ class MenuServiceTest extends MockTest {
     @Test
     void findAll() {
         //given
-        given(menuRepository.findAll()).willReturn(MENUS());
+        final Menu menu1 = MENU1();
+        final Menu menu2 = MENU2();
+
+        menuRepository.save(menu1);
+        menuRepository.save(menu2);
 
         //when
         final List<Menu> menus = menuService.findAll();
@@ -372,9 +365,9 @@ class MenuServiceTest extends MockTest {
         assertAll(
             () -> assertThat(menus.size()).isEqualTo(MENUS().size()),
             () -> assertThat(menus.get(ZERO)
-                .getId()).isEqualTo(MENU1().getId()),
+                .getId()).isEqualTo(menu1.getId()),
             () -> assertThat(menus.get(ONE)
-                .getId()).isEqualTo(MENU2().getId())
+                .getId()).isEqualTo(menu2.getId())
         );
     }
 

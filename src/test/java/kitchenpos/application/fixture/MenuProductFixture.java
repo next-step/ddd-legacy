@@ -24,6 +24,10 @@ public class MenuProductFixture {
         return createMenuProduct(PRODUCT2(), PRODUCT2().getId(), THREE);
     }
 
+    public static MenuProduct WRONG_PRODUCT() {
+        return createMenuProduct(PRODUCT2(), UUID.randomUUID(), THREE);
+    }
+
     private static MenuProduct NEGATIVE_QUANTITY_MENU_PRODUCT() {
         return createMenuProduct(PRODUCT2(), PRODUCT2().getId(), NEGATIVE_QUANTITY);
     }
@@ -35,6 +39,10 @@ public class MenuProductFixture {
 
     public static List<MenuProduct> MENU_PRODUCTS() {
         return Arrays.asList(MENU_PRODUCT1(), MENU_PRODUCT2());
+    }
+
+    public static List<MenuProduct> WRONG_PRODUCTS() {
+        return Arrays.asList(MENU_PRODUCT1(), WRONG_PRODUCT());
     }
 
     public static List<MenuProduct> CHEAP_MENU_PRODUCTS() {

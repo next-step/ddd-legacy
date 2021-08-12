@@ -3,6 +3,7 @@ package kitchenpos.application.fixture;
 import static kitchenpos.application.fixture.MenuProductFixture.CHEAP_MENU_PRODUCTS;
 import static kitchenpos.application.fixture.MenuProductFixture.MENU_PRODUCTS;
 import static kitchenpos.application.fixture.MenuProductFixture.QUANTITY_NAGATIVE_MENU_PRODUCTS;
+import static kitchenpos.application.fixture.MenuProductFixture.WRONG_PRODUCTS;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -29,6 +30,14 @@ public class MenuFixture {
         return createMenu(null, MENU_NAME1, PRICE1, MENU_GROUP_ID1, true, MENU_PRODUCTS());
     }
 
+    public static Menu MENU1_REQUEST(final UUID menuGroupId) {
+        return createMenu(null, MENU_NAME1, PRICE1, menuGroupId, true, MENU_PRODUCTS());
+    }
+
+    public static Menu MENU1_REQUEST_WRONG_PRODUCTS(final UUID menuGroupId) {
+        return createMenu(null, MENU_NAME1, PRICE1, menuGroupId, true, WRONG_PRODUCTS());
+    }
+
     public static Menu PRICE_NULL_MENU_REQUEST() {
         return createMenu(null, MENU_NAME1, null, MENU_GROUP_ID2, true, MENU_PRODUCTS());
     }
@@ -37,8 +46,12 @@ public class MenuFixture {
         return createMenu(null, MENU_NAME1, NEGATIVE_PRICE, MENU_GROUP_ID2, true, MENU_PRODUCTS());
     }
 
-    public static Menu EMPTY_MENUPRODUCTS_MENU_REQUEST() {
-        return createMenu(null, MENU_NAME1, PRICE1, MENU_GROUP_ID2, true, Collections.emptyList());
+    public static Menu EMPTY_MENUPRODUCTS_MENU_REQUEST(final UUID menuGroupId) {
+        return createMenu(null, MENU_NAME1, PRICE1, menuGroupId, true, Collections.emptyList());
+    }
+
+    public static Menu QUANTITY_NAGATIVE_MENU_REQUEST(final UUID menuGroupId) {
+        return createMenu(null, MENU_NAME1, EXPENSIVE_PRICE, menuGroupId, true, QUANTITY_NAGATIVE_MENU_PRODUCTS());
     }
 
     public static Menu QUANTITY_NAGATIVE_MENU_REQUEST() {
@@ -49,12 +62,24 @@ public class MenuFixture {
         return createMenu(null, MENU_NAME1, EXPENSIVE_PRICE, MENU_GROUP_ID1, true, MENU_PRODUCTS());
     }
 
+    public static Menu EXPENSIVE_MENU_REQUEST(final UUID menuGroupId) {
+        return createMenu(null, MENU_NAME1, EXPENSIVE_PRICE, menuGroupId, true, MENU_PRODUCTS());
+    }
+
     public static Menu MENU_WITH_NAME_REQUEST(final String name) {
         return createMenu(null, name, PRICE2, MENU_GROUP_ID2, true, MENU_PRODUCTS());
     }
 
+    public static Menu MENU_WITH_NAME_REQUEST(final String name, final UUID menuGroupId) {
+        return createMenu(null, name, PRICE2, menuGroupId, true, MENU_PRODUCTS());
+    }
+
     public static Menu MENU_WITH_PRICE_REQUEST(final long price) {
         return createMenu(null, MENU_NAME2, price, MENU_GROUP_ID2, true, MENU_PRODUCTS());
+    }
+
+    public static Menu MENU_WITH_PRICE_REQUEST(final long price, final UUID menuGroupId) {
+        return createMenu(null, MENU_NAME2, price, menuGroupId, true, MENU_PRODUCTS());
     }
 
     public static Menu MENU1() {
