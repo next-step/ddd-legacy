@@ -47,12 +47,14 @@
 
 * 주문 테이블
   * [ ] 주문 테이블을 추가한다. `POST /api/order-tables`
+    * [ ] 주문 테이블 이름은 반드시 지정되어야 한다.
     * [ ] 새로 추가되는 주문 테이블은 비어있으며, 손님은 0명이다.
   * [ ] 주문 테이블에 손님이 앉는다. (sit) `PUT /api/order-tables/{orderTableId}/sit`
     * [ ] 존재하는 테이블이어야 한다.
     * [ ] 테이블이 비어있는 상태가 아님을 표시한다.
   * [ ] 주문 테이블을 정리한다. (clear) `PUT /api/order-tables/{orderTableId}/clear`
     * [ ] 존재하는 테이블이어야 한다.
+    * [ ] 주문 처리가 완료된 상태여야 한다.
     * [ ] 테이블이 비어있는 상태임을 표시한다.
     * [ ] 손님이 0명인 상태임을 표시한다.
   * [ ] 테이블에 앉은 손님의 수를 변경한다. `PUT /api/order-tables/{orderTableId}/number-of-guests`
@@ -64,6 +66,7 @@
 * 주문
 
   * [ ] 주문 타입은 `DELIVERY`, `TAKEOUT`,` EAT_IN` 가 있다.
+  * [ ] 주문 상태는 `WAITING`, `ACCEPTED`, `SERVED`, `DELIVERING`, `DELIVERED`, `COMPLETED` 가 있다.
 
   * [ ] 주문한다. `POST /api/orders`
     * [ ] 주문 타입이 지정되어있어야 한다.
