@@ -29,7 +29,7 @@ public class Menu {
     @Column(name = "displayed", nullable = false)
     private boolean displayed;
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(
         name = "menu_id",
         nullable = false,
