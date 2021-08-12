@@ -12,8 +12,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
-import static kitchenpos.menu.step.MenuStep.*;
-import static kitchenpos.product.step.ProductStep.createProduct;
+import static kitchenpos.menu.fixture.MenuFixture.*;
+import static kitchenpos.product.fixture.ProductionFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;

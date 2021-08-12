@@ -4,8 +4,8 @@ import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.menu_group.fixture.MenuGroupSaveRequest;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 
 public class MenuGroupStep {
 
@@ -33,11 +33,5 @@ public class MenuGroupStep {
 
     public static MenuGroupSaveRequest createMenuGroupSaveRequest(final String name) {
         return new MenuGroupSaveRequest(name);
-    }
-
-    public static MenuGroup createMenuGroup(String name) {
-        MenuGroup menuGroup = new MenuGroup();
-        ReflectionTestUtils.setField(menuGroup, "name", name);
-        return menuGroup;
     }
 }

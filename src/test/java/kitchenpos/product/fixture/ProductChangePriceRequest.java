@@ -1,4 +1,4 @@
-package kitchenpos.product.step;
+package kitchenpos.product.fixture;
 
 public class ProductChangePriceRequest {
 

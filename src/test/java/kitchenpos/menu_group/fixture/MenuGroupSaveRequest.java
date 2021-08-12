@@ -1,4 +1,4 @@
-package kitchenpos.menu_group.step;
+package kitchenpos.menu_group.fixture;
 
 public class MenuGroupSaveRequest {
 

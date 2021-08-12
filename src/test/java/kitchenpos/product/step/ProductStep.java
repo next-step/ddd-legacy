@@ -3,35 +3,16 @@ package kitchenpos.product.step;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
+import kitchenpos.product.fixture.ProductChangePriceRequest;
+import kitchenpos.product.fixture.ProductSaveRequest;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 public class ProductStep {
 
     private static final String PRODUCT_URL = "/api/products";
-
-    public static ProductSaveRequest createProductSaveRequest(final String name, final int price) {
-        return new ProductSaveRequest(name, price);
-    }
-
-    public static Product createProduct(String name, int price) {
-        Product product = new Product();
-        ReflectionTestUtils.setField(product, "name", name);
-        ReflectionTestUtils.setField(product, "price", BigDecimal.valueOf(price));
-        return product;
-    }
-
-    public static MenuProduct createMenuProduct(final Product product, int quantity) {
-        MenuProduct menuProduct1 = new MenuProduct();
-        ReflectionTestUtils.setField(menuProduct1, "quantity", quantity);
-        ReflectionTestUtils.setField(menuProduct1, "product", product);
-        return menuProduct1;
-    }
 
     public static ExtractableResponse<Response> requestCreateProduct(final ProductSaveRequest product) {
         return RestAssured

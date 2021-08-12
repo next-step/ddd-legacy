@@ -8,8 +8,8 @@ import kitchenpos.AcceptanceTest;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.product.step.ProductChangePriceRequest;
-import kitchenpos.product.step.ProductSaveRequest;
+import kitchenpos.product.fixture.ProductChangePriceRequest;
+import kitchenpos.product.fixture.ProductSaveRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +21,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+import static kitchenpos.product.fixture.ProductionFixture.createProductSaveRequest;
 import static kitchenpos.product.step.ProductStep.*;
 import static org.assertj.core.api.Assertions.assertThat;
 

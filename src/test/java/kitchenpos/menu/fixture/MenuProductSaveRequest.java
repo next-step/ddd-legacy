@@ -1,4 +1,4 @@
-package kitchenpos.menu.step;
+package kitchenpos.menu.fixture;
 
 import java.util.UUID;
 
