@@ -92,7 +92,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품의 수량은 0 이상이다")
+    @DisplayName("상품 가격이 음수 일 경우 IllegalArgumentException을 던진다.")
     @Test
     public void createWithValidQuantity() {
         // given
@@ -108,7 +108,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴의 가격은 메뉴 상품들의 (가격 * 수량) 합을 넘을 수 없다")
+    @DisplayName("메뉴의 가격은 메뉴 상품들의 가격 * 수량 합을 넘을 경우 IllegalArgumentException을 던진다.")
     @Test
     public void createWithLowerPriceThanSumOfMenuProduct() {
         // given
@@ -126,7 +126,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 이름은 욕설을 포함하지 않는다")
+    @DisplayName("메뉴 이름은 욕설을 포함하는 경우 IllegalArgumentException을 던진다. ")
     @Test
     public void createWithoutBadWord() {
         // given

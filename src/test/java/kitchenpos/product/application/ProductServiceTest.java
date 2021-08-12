@@ -44,7 +44,7 @@ public class ProductServiceTest {
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
-    @DisplayName("상품 가격은 0 이상 이어야 한다")
+    @DisplayName("상품 가격이 음수거나 null인 경우 IllegalArgumentException을 던진다.")
     @Test
     void createWithNegativePrice() {
         // given
@@ -55,7 +55,7 @@ public class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품 이름에 욕설을 허용하지 않는다")
+    @DisplayName("상품 이름에 욕설을 포함된 경우 IllegalArgumentException을 던진다.")
     @Test
     void createWithoutBadWords() {
         // given
@@ -67,7 +67,7 @@ public class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("변경될 상품 가격은 0이상 이어야 한다")
+    @DisplayName("변경될 상품 가격 음수거나 null인 경우 IllegalArgumentException을 던진다.")
     @Test
     public void changePriceWithNegativePrice() {
         // given

@@ -19,7 +19,7 @@ class MenuGroupServiceTest {
     @Mock
     MenuGroupRepository menuGroupRepository;
 
-    @DisplayName("메뉴 그룹 이름은 한글자 이상이다")
+    @DisplayName("메뉴 그룹 이름이 null이거나 빈 경우 IllegalArgumentException을 던진다.")
     @Test
     public void createWithName() {
         // given
