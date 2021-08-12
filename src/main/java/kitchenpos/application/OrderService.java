@@ -17,6 +17,17 @@ public class OrderService {
     private final OrderTableRepository orderTableRepository;
     private final KitchenridersClient kitchenridersClient;
 
+    private static final String ORDER_TYPE_IS_NULL = "주문 타입이 지정되어야 합니다.";
+    private static final String ORDER_LINE_ITEMS_IS_NULL_OR_EMPTY = "주문 상품이 없습니다.";
+    private static final String NON_EXISTENCE_MENU = "존재하지 않는 메뉴는 주문할 수 없습니다.";
+    private static final String HIDDEN_MENU = "숨겨진 메뉴는 주문할 수 없습니다.";
+    private static final String INCORRECT_PRICE = "가격 정보가 올바르지 않습니다.";
+    private static final String DELIVERY_ADDRESS_ILLEGAL = "배달지 정보가 없습니다.";
+    private static final String EMPTY_ORDER_TABLE = "주문 테이블이 비어있습니다.";
+    private static final String INVALID_ORDER_LIST_ITEM_QUANTITY = "주문 상품 수량이 올바르지 않습니다.";
+    private static final String ORDER_STATUS_IS_DELIVERED = "배달이 완료된 상태여야 합니다.";
+    private static final String ORDER_STATUS_IS_SERVED = "서빙이 완료된 상태여야 합니다.";
+
     public OrderService(
         final OrderRepository orderRepository,
         final MenuRepository menuRepository,
@@ -33,11 +44,11 @@ public class OrderService {
     public Order create(final Order request) {
         final OrderType type = request.getType();
         if (Objects.isNull(type)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(ORDER_TYPE_IS_NULL);
         }
         final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(ORDER_LINE_ITEMS_IS_NULL_OR_EMPTY);
         }
         final List<Menu> menus = menuRepository.findAllById(
             orderLineItemRequests.stream()
@@ -45,23 +56,23 @@ public class OrderService {
                 .collect(Collectors.toList())
         );
         if (menus.size() != orderLineItemRequests.size()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(NON_EXISTENCE_MENU);
         }
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
             if (type != OrderType.EAT_IN) {
                 if (quantity < 0) {
-                    throw new IllegalArgumentException();
+                    throw new IllegalArgumentException(INVALID_ORDER_LIST_ITEM_QUANTITY);
                 }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(HIDDEN_MENU);
             }
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(INCORRECT_PRICE);
             }
             final OrderLineItem orderLineItem = new OrderLineItem();
             orderLineItem.setMenu(menu);
@@ -77,7 +88,7 @@ public class OrderService {
         if (type == OrderType.DELIVERY) {
             final String deliveryAddress = request.getDeliveryAddress();
             if (Objects.isNull(deliveryAddress) || deliveryAddress.isEmpty()) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(DELIVERY_ADDRESS_ILLEGAL);
             }
             order.setDeliveryAddress(deliveryAddress);
         }
@@ -85,7 +96,7 @@ public class OrderService {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
             if (orderTable.isEmpty()) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(EMPTY_ORDER_TABLE);
             }
             order.setOrderTable(orderTable);
         }
@@ -159,12 +170,12 @@ public class OrderService {
         final OrderStatus status = order.getStatus();
         if (type == OrderType.DELIVERY) {
             if (status != OrderStatus.DELIVERED) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(ORDER_STATUS_IS_DELIVERED);
             }
         }
         if (type == OrderType.TAKEOUT || type == OrderType.EAT_IN) {
             if (status != OrderStatus.SERVED) {
-                throw new IllegalStateException();
+                throw new IllegalStateException(ORDER_STATUS_IS_SERVED);
             }
         }
         order.setStatus(OrderStatus.COMPLETED);

@@ -13,7 +13,12 @@ import java.util.UUID;
 public class MenuFixture {
     public static Menu generateMenu(MenuGroup menuGroup, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
-        menu.setName("양념 & 후라이드");
+        String name = menuProducts.stream()
+                .map(MenuProduct::getProduct)
+                .map(Product::getName)
+                .reduce((name01, name02) -> name01 + " & " + name02)
+                .get();
+        menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(20000));
         menu.setDisplayed(true);
         menu.setMenuGroup(menuGroup);
