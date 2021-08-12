@@ -51,6 +51,7 @@
     * [ ] 새로 추가되는 주문 테이블은 비어있으며, 손님은 0명이다.
   * [ ] 주문 테이블에 손님이 앉는다. (sit) `PUT /api/order-tables/{orderTableId}/sit`
     * [ ] 존재하는 테이블이어야 한다.
+    * [ ] 비어있는 테이블이어야 한다. (추가)
     * [ ] 테이블이 비어있는 상태가 아님을 표시한다.
   * [ ] 주문 테이블을 정리한다. (clear) `PUT /api/order-tables/{orderTableId}/clear`
     * [ ] 존재하는 테이블이어야 한다.
