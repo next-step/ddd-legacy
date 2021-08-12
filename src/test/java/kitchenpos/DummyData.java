@@ -47,8 +47,8 @@ public class DummyData {
         menuGroup.setName("추천메뉴");
 
         MenuGroup menuGroup2 = new MenuGroup();
-        menuGroup.setId(SECOND_ID);
-        menuGroup.setName("중식");
+        menuGroup2.setId(SECOND_ID);
+        menuGroup2.setName("중식");
 
         menuGroups.add(menuGroup);
         menuGroups.add(menuGroup2);
@@ -61,9 +61,9 @@ public class DummyData {
         product.setName("후라이드");
 
         Product product2 = new Product();
-        product.setId(SECOND_ID);
-        product.setPrice(ofPrice(1100));
-        product.setName("양념");
+        product2.setId(SECOND_ID);
+        product2.setPrice(ofPrice(1100));
+        product2.setName("양념");
 
         products.add(product);
         products.add(product2);
