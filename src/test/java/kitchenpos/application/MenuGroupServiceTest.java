@@ -4,15 +4,11 @@ import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP1;
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP1_REQUEST;
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP2;
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP2_REQUEST_SAME_NAME;
-import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP2_SAME_NAME;
 import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP_WITH_NAME_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
-import java.util.Arrays;
 import java.util.List;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -21,15 +17,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.Mock;
 
 class MenuGroupServiceTest extends MockTest {
 
     private static final int ZERO = 0;
     private static final int ONE = 1;
+    private static final int TWO = 2;
 
-    @Mock
-    private MenuGroupRepository menuGroupRepository;
+    private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
 
     private MenuGroupService menuGroupService;
 
@@ -42,10 +37,7 @@ class MenuGroupServiceTest extends MockTest {
     @Test
     void createOK() {
         //given
-        final MenuGroup menuGroup = MENU_GROUP1();
         final MenuGroup menuGroupRequest = MENU_GROUP1_REQUEST();
-
-        given(menuGroupRepository.save(any())).willReturn(menuGroup);
 
         //when
         final MenuGroup sut = menuGroupService.create(menuGroupRequest);
@@ -73,14 +65,8 @@ class MenuGroupServiceTest extends MockTest {
     @Test
     void createWithDuplicateName() {
         //given
-        final MenuGroup menuGroup1 = MENU_GROUP1();
-        final MenuGroup menuGroup2SameName = MENU_GROUP2_SAME_NAME();
-
         final MenuGroup menuGroup1Request = MENU_GROUP1_REQUEST();
         final MenuGroup menuGroup2RequestSameName = MENU_GROUP2_REQUEST_SAME_NAME();
-
-        given(menuGroupRepository.save(any())).willReturn(menuGroup1)
-            .willReturn(menuGroup2SameName);
 
         //when
         final MenuGroup sut1 = menuGroupService.create(menuGroup1Request);
@@ -100,13 +86,15 @@ class MenuGroupServiceTest extends MockTest {
         final MenuGroup menuGroup1 = MENU_GROUP1();
         final MenuGroup menuGroup2 = MENU_GROUP2();
 
-        given(menuGroupRepository.findAll()).willReturn(Arrays.asList(menuGroup1, menuGroup2));
+        menuGroupRepository.save(menuGroup1);
+        menuGroupRepository.save(menuGroup2);
 
         //when
         final List<MenuGroup> menuGroups = menuGroupService.findAll();
 
         //then
         assertAll(
+            () -> assertThat(menuGroups).hasSize(TWO),
             () -> assertThat(menuGroups.get(ZERO)
                 .getId()).isNotEqualTo(menuGroups.get(ONE)
                 .getId()),

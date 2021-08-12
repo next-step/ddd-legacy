@@ -34,6 +34,7 @@ class ProductServiceTest {
 
     private static final int ZERO = 0;
     private static final int ONE = 1;
+    private static final int TWO = 2;
 
     private final ProductRepository productRepository = new InmemoryProductRepository();
     private final MenuRepository menuRepository = new InmemoryMenuRepository();
@@ -195,6 +196,7 @@ class ProductServiceTest {
 
         //then
         assertAll(
+            () -> assertThat(products).hasSize(TWO),
             () -> assertThat(products.get(ZERO)
                 .getName()).isEqualTo(product1.getName()),
             () -> assertThat(products.get(ZERO)

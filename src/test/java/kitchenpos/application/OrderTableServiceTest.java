@@ -35,7 +35,6 @@ class OrderTableServiceTest extends MockTest {
     @Mock
     private OrderTableRepository orderTableRepository;
 
-    @Mock
     private OrderRepository orderRepository;
 
     private OrderTableService orderTableService;
