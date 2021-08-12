@@ -4,7 +4,6 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,43 +13,41 @@ public class MenuFixture {
 
     public static Menu createMenu(int price) {
         Menu menu = new Menu();
-        ReflectionTestUtils.setField(menu, "price", new BigDecimal(price));
+        menu.setPrice(new BigDecimal(price));
         return menu;
     }
 
     public static Menu createMenu(int price, List<MenuProduct> menuProducts) {
         Menu menu = createMenu(price);
-        ReflectionTestUtils.setField(menu, "menuProducts", menuProducts);
+        menu.setMenuProducts(menuProducts);
         return menu;
     }
 
     public static Menu createMenu(String name, int price, List<MenuProduct> menuProducts) {
-        Menu menu = new Menu();
-        ReflectionTestUtils.setField(menu, "name", name);
-        ReflectionTestUtils.setField(menu, "price", new BigDecimal(price));
-        ReflectionTestUtils.setField(menu, "menuProducts", menuProducts);
+        Menu menu = createMenu(price, menuProducts);
+        menu.setName(name);
         return menu;
     }
 
     public static Menu createMenu(String name, int price, boolean displayed, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
         Menu menu = createMenu(name, price, menuProducts);
-        ReflectionTestUtils.setField(menu, "displayed", displayed);
-        ReflectionTestUtils.setField(menu, "menuGroup", menuGroup);
+        menu.setDisplayed(displayed);
+        menu.setMenuGroup(menuGroup);
         return menu;
     }
 
     public static MenuGroup createMenuGroup(UUID id, String name) {
         MenuGroup menuGroup = new MenuGroup();
-        ReflectionTestUtils.setField(menuGroup, "id", id);
-        ReflectionTestUtils.setField(menuGroup, "name", name);
+        menuGroup.setId(id);
+        menuGroup.setName(name);
         return menuGroup;
     }
 
     public static MenuProduct createMenuProduct(Product product, Long quantity, UUID productId) {
         MenuProduct menuProduct = new MenuProduct();
-        ReflectionTestUtils.setField(menuProduct, "product", product);
-        ReflectionTestUtils.setField(menuProduct, "quantity", quantity);
-        ReflectionTestUtils.setField(menuProduct, "productId", productId);
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        menuProduct.setProductId(productId);
         return menuProduct;
     }
 }
