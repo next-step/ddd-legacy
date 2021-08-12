@@ -1,5 +1,6 @@
 package kitchenpos;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -29,6 +30,8 @@ public class DummyData {
     protected static final Boolean TABLE_CLEAR = true;
     protected static final Boolean TABLE_SIT = false;
     protected static final int TABLE_DEFAULT_NUMBER_OF_GUEST = 0;
+
+    protected static final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setUp() {

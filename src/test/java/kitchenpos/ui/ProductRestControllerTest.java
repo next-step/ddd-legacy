@@ -1,6 +1,5 @@
 package kitchenpos.ui;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.DummyData;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.Product;
@@ -32,8 +31,6 @@ class ProductRestControllerTest extends DummyData {
 
     @MockBean
     private ProductService productService;
-
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void utf8Filter() {
@@ -69,9 +66,11 @@ class ProductRestControllerTest extends DummyData {
     @DisplayName("가격 변경")
     @Test
     void changePrice() throws Exception {
-        Product product = products.get(0);
         Product changePrice = new Product();
         changePrice.setPrice(ofPrice(2000));
+
+        Product product = products.get(0);
+        product.setPrice(changePrice.getPrice());
 
         given(productService.changePrice(any(), any())).willReturn(product);
 

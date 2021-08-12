@@ -4,6 +4,7 @@ import kitchenpos.DummyData;
 import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,7 +15,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
-import static org.hamcrest.Matchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -40,8 +40,9 @@ class MenuGroupRestControllerTest extends DummyData {
                 .build();
     }
 
+    @DisplayName("메뉴그룹 생성하기")
     @Test
-    void create() throws Exception {
+    void createMenuGroup() throws Exception {
         MenuGroup menuGroup = menuGroups.get(0);
 
         given(menuGroupService.create(any())).willReturn(menuGroup);
@@ -55,11 +56,11 @@ class MenuGroupRestControllerTest extends DummyData {
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
-                .andExpect(jsonPath("$.id").value(menuGroup.getId().toString()))
-                .andExpect(jsonPath("$.name").value(menuGroup.getName()))
-                .andExpect(redirectedUrl("/api/menu-groups/" + menuGroup.getId()));
+                .andExpect(jsonPath("$.id").isNotEmpty())
+                .andExpect(jsonPath("$.name").value(menuGroup.getName()));
     }
 
+    @DisplayName("메뉴그룹 전체조회")
     @Test
     void findAll() throws Exception {
         given(menuGroupService.findAll()).willReturn(menuGroups);
