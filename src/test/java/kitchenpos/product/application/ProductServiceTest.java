@@ -23,6 +23,7 @@ import static kitchenpos.product.fixture.ProductionFixture.createMenuProduct;
 import static kitchenpos.product.fixture.ProductionFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -92,7 +93,8 @@ public class ProductServiceTest {
         Product expectedProduct = productService.changePrice(UUID.randomUUID(), product);
 
         // then
-        assertThat(expectedProduct.getPrice()).isEqualTo(new BigDecimal(16000));
-        assertThat(menu.isDisplayed()).isFalse();
+        assertAll(
+                () -> assertThat(expectedProduct.getPrice()).isEqualTo(new BigDecimal(16000)),
+                () -> assertThat(menu.isDisplayed()).isFalse());
     }
 }

@@ -17,6 +17,7 @@ import java.util.List;
 
 import static kitchenpos.menu_group.step.MenuGroupStep.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("MenuGroup 인수 테스트")
 public class MenuGroupAcceptanceTest extends AcceptanceTest {
@@ -59,13 +60,15 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     }
 
     private void assertFindAllMenuGroup(final ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.as(new TypeRef<List<MenuGroup>>() {}).size()).isEqualTo(2);
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.as(new TypeRef<List<MenuGroup>>() {}).size()).isEqualTo(2));
     }
 
     private void assertCreateMenuGroup(final ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.as(MenuGroup.class).getId()).isNotNull();
-        assertThat(response.as(MenuGroup.class).getName()).isEqualTo("두마리메뉴");
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.as(MenuGroup.class).getId()).isNotNull(),
+                () -> assertThat(response.as(MenuGroup.class).getName()).isEqualTo("두마리메뉴"));
     }
 }

@@ -23,6 +23,7 @@ import static kitchenpos.menu_group.step.MenuGroupStep.createMenuGroupSaveReques
 import static kitchenpos.product.fixture.ProductionFixture.createProductSaveRequest;
 import static kitchenpos.product.step.ProductStep.completeCreateProduct;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("Menu 인수 테스트")
 public class MenuAcceptanceTest extends AcceptanceTest {
@@ -48,8 +49,9 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                 .then().log().all().extract();
 
         // then
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.as(Menu.class).getName()).isEqualTo("후라이드치킨");
-        assertThat(response.as(Menu.class).getPrice()).isEqualTo(new BigDecimal(15000));
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.as(Menu.class).getName()).isEqualTo("후라이드치킨"),
+                () -> assertThat(response.as(Menu.class).getPrice()).isEqualTo(new BigDecimal(15000)));
     }
 }

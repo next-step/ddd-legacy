@@ -24,6 +24,7 @@ import java.util.List;
 import static kitchenpos.product.fixture.ProductionFixture.createProductSaveRequest;
 import static kitchenpos.product.step.ProductStep.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("Product 인수 테스트")
 public class ProductAcceptanceTest extends AcceptanceTest {
@@ -89,12 +90,15 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     }
 
     private void assertFindAll(final ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.as(new TypeRef<List<Product>>() {}).size()).isEqualTo(2);
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.as(new TypeRef<List<Product>>() {}).size()).isEqualTo(2));
     }
 
     private void assertChangeProduct(final ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(response.as(Product.class).getPrice()).isEqualTo(new BigDecimal(18000));
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.as(Product.class).getPrice()).isEqualTo(new BigDecimal(18000)));
+
     }
 }
