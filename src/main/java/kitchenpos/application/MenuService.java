@@ -12,13 +12,13 @@ import java.util.stream.Collectors;
 @Service
 public class MenuService {
     private final MenuRepository menuRepository;
-    private final MenuGroupRepository menuGroupRepository;
+    private final MenuGroupJpaRepository menuGroupRepository;
     private final ProductRepository productRepository;
     private final PurgomalumClient purgomalumClient;
 
     public MenuService(
         final MenuRepository menuRepository,
-        final MenuGroupRepository menuGroupRepository,
+        final MenuGroupJpaRepository menuGroupRepository,
         final ProductRepository productRepository,
         final PurgomalumClient purgomalumClient
     ) {
