@@ -41,7 +41,7 @@ public class MenuServiceTest {
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
 
-    @DisplayName("메뉴 가격은 0 이상이다")
+    @DisplayName("메뉴 가격이 음수인 경우 IllegalArgumentException을 던진다.")
     @ParameterizedTest
     @ValueSource(ints = {-10,-100})
     public void createWithValidPrice(int price) {
@@ -53,7 +53,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴는 등록되어 있는 메뉴 그룹에 포함된다")
+    @DisplayName("메뉴는 등록되어 있는 메뉴 그룹에 포함되지 않을 경우 IllegalArgumentException을 던진다.")
     @Test
     public void createWithinRegisteredMenuGroup() {
         // given
@@ -65,7 +65,7 @@ public class MenuServiceTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
-    @DisplayName("메뉴는 메뉴 상품을 가져야 한다")
+    @DisplayName("메뉴는 메뉴 상품을 가지지 않는 경우 IllegalArgumentException을 던진다.")
     @Test
     public void createMenuProductToBeRegisteredAsProduct() {
         // given
@@ -79,7 +79,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 상품은 모두 상품으로 등록되어 있어야 한다")
+    @DisplayName("메뉴 상품이 모두 상품으로 등록되지 않는 경우 IllegalArgumentException을 던진다.")
     @Test
     public void createWithValidNumberOfMenuProduct() {
         // given
