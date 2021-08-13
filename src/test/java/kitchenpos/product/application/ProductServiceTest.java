@@ -8,12 +8,13 @@ import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,10 +47,11 @@ public class ProductServiceTest {
     }
 
     @DisplayName("상품 가격이 음수거나 null인 경우 IllegalArgumentException을 던진다.")
-    @Test
-    void createWithNegativePrice() {
+    @ParameterizedTest
+    @ValueSource(ints = {-100})
+    void createWithNegativePrice(int price) {
         // given
-        Product product = createProduct("강정치킨", -1);
+        Product product = createProduct("강정치킨", price);
 
         // when, then
         assertThatThrownBy(() -> productService.create(product))
@@ -57,10 +59,11 @@ public class ProductServiceTest {
     }
 
     @DisplayName("상품 이름에 욕설을 포함된 경우 IllegalArgumentException을 던진다.")
-    @Test
-    void createWithoutBadWords() {
+    @ParameterizedTest
+    @ValueSource(strings = {"fuck","shit"})
+    void createWithoutBadWords(String name) {
         // given
-        Product product = createProduct("fuck", 17000);
+        Product product = createProduct(name, 17000);
         when(purgomalumClient.containsProfanity(product.getName())).thenReturn(true);
 
         // when, then
@@ -69,10 +72,11 @@ public class ProductServiceTest {
     }
 
     @DisplayName("변경될 상품 가격 음수거나 null인 경우 IllegalArgumentException을 던진다.")
-    @Test
-    public void changePriceWithNegativePrice() {
+    @ParameterizedTest
+    @ValueSource(ints = {-10, -100})
+    public void changePriceWithNegativePrice(int price) {
         // given
-        Product product = createProduct("강정치킨", -1);
+        Product product = createProduct("강정치킨", price);
 
         // when, then
         assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), product))
@@ -80,11 +84,12 @@ public class ProductServiceTest {
     }
 
     @DisplayName("상품이 속한 각 메뉴의 가격이 메뉴상품들의 가격의 합보다 크면 숨김 처리한다")
-    @Test
-    public void changePriceNotDisplay() {
+    @ParameterizedTest
+    @CsvSource({"16000,33000","12000,48000"})
+    public void changePriceNotDisplay(int menuPrice, int menuProductPrice) {
         // given
-        Product product = createProduct("후라이드", 16000);
-        Menu menu = createMenu("후라이드+후라이드", 33000, Arrays.asList(
+        Product product = createProduct("후라이드", menuProductPrice);
+        Menu menu = createMenu("후라이드+후라이드", menuPrice, Arrays.asList(
                 createMenuProduct(product, 1),
                 createMenuProduct(product, 1)));
         when(productRepository.findById(any())).thenReturn(Optional.of(createProduct("후라이드", 15000)));
@@ -94,7 +99,6 @@ public class ProductServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(expectedProduct.getPrice()).isEqualTo(new BigDecimal(16000)),
                 () -> assertThat(menu.isDisplayed()).isFalse());
     }
 }

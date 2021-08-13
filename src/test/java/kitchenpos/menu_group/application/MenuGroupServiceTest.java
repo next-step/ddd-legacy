@@ -4,8 +4,9 @@ import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -20,11 +21,12 @@ class MenuGroupServiceTest {
     MenuGroupRepository menuGroupRepository;
 
     @DisplayName("메뉴 그룹 이름이 null이거나 빈 경우 IllegalArgumentException을 던진다.")
-    @Test
-    public void createWithName() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    public void createWithName(String name) {
         // given
         MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
-        MenuGroup 두마리메뉴 = createMenuGroup(null);
+        MenuGroup 두마리메뉴 = createMenuGroup(name);
 
         // when, then
         assertThatThrownBy(() -> menuGroupService.create(두마리메뉴))

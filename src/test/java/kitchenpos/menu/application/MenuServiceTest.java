@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -40,10 +42,11 @@ public class MenuServiceTest {
     }
 
     @DisplayName("메뉴 가격은 0 이상이다")
-    @Test
-    public void createWithValidPrice() {
+    @ParameterizedTest
+    @ValueSource(ints = {-10,-100})
+    public void createWithValidPrice(int price) {
         // given
-        Menu menu = createMenu(-1);
+        Menu menu = createMenu(price);
 
         // when, then
         assertThatThrownBy(() -> menuService.create(menu))
@@ -92,11 +95,12 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품 가격이 음수 일 경우 IllegalArgumentException을 던진다.")
-    @Test
-    public void createWithValidQuantity() {
+    @DisplayName("상품 개수가 음수 일 경우 IllegalArgumentException을 던진다.")
+    @ParameterizedTest
+    @ValueSource(longs = {-10l,-100l})
+    public void createWithValidQuantity(long quantity) {
         // given
-        MenuProduct 후라이드 = createMenuProduct(createProduct("후라이드", 16000), -1L, null);
+        MenuProduct 후라이드 = createMenuProduct(createProduct("후라이드", 16000), quantity, null);
         Menu menu = createMenu(17000, Arrays.asList(후라이드));
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "두마리메뉴");
 
@@ -127,12 +131,13 @@ public class MenuServiceTest {
     }
 
     @DisplayName("메뉴 이름은 욕설을 포함하는 경우 IllegalArgumentException을 던진다. ")
-    @Test
-    public void createWithoutBadWord() {
+    @ParameterizedTest
+    @ValueSource(strings = {"fuck", "shit"})
+    public void createWithoutBadWord(String name) {
         // given
         Product 후라이드 = createProduct("후라이드", 16000);
         MenuProduct menuProduct = createMenuProduct(후라이드, 2L, null);
-        Menu menu = createMenu("fuck",17000, Arrays.asList(menuProduct));
+        Menu menu = createMenu(name,17000, Arrays.asList(menuProduct));
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "두마리메뉴");
 
         when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
