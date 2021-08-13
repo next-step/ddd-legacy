@@ -26,10 +26,6 @@ public class MenuGroupFixture {
         return createMenuGroup(UUID2, MENU_GROUP_NAME_2);
     }
 
-    public static MenuGroup MENU_GROUP2_SAME_NAME() {
-        return createMenuGroup(UUID2, MENU_GROUP_NAME_1);
-    }
-
     public static MenuGroup MENU_GROUP_WITH_NAME_REQUEST(final String name) {
         return createMenuGroup(null, name);
     }

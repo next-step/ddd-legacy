@@ -13,8 +13,6 @@ import kitchenpos.domain.OrderLineItem;
 
 public class OrderLineItemFixture {
 
-    private static final UUID UUID1 = UUID.randomUUID();
-    private static final UUID UUID2 = UUID.randomUUID();
     private static final long QUANTITY1 = 2L;
     private static final long QUANTITY2 = 3L;
     private static final long NEGATIVE_QUANTITY = -2L;

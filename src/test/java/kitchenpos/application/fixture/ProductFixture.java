@@ -1,8 +1,6 @@
 package kitchenpos.application.fixture;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.Product;
 
@@ -55,10 +53,6 @@ public class ProductFixture {
 
     public static Product PRODUCT_WITH_NAME_REQUEST(final String name) {
         return createProduct(null, name, PRICE1);
-    }
-
-    public static List<Product> PRODUCTS() {
-        return Arrays.asList(PRODUCT1(), PRODUCT2());
     }
 
     private static Product createProduct(final UUID id, final String name, final BigDecimal price) {
