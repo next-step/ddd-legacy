@@ -218,7 +218,7 @@ class OrderTableServiceTest {
 
         //then
         assertAll(
-            () -> assertThat(sut.size()).isEqualTo(ORDER_TABLES().size()),
+            () -> assertThat(sut).hasSize(ORDER_TABLES().size()),
             () -> assertThat(sut.get(ZERO)
                 .getId()).isEqualTo(orderTable1.getId()),
             () -> assertThat(sut.get(ZERO)

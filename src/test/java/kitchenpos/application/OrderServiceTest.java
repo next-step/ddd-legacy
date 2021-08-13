@@ -486,7 +486,7 @@ class OrderServiceTest {
 
         //then
         assertAll(
-            () -> assertThat(sut.size()).isEqualTo(ORDERS().size()),
+            () -> assertThat(sut).hasSize(ORDERS().size()),
             () -> assertThat(sut.get(ZERO)
                 .getType()).isEqualTo(NORMAL_ORDER().getType()),
             () -> assertThat(sut.get(ZERO)

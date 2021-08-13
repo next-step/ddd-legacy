@@ -363,7 +363,7 @@ class MenuServiceTest {
 
         //then
         assertAll(
-            () -> assertThat(menus.size()).isEqualTo(MENUS().size()),
+            () -> assertThat(menus).hasSize(MENUS().size()),
             () -> assertThat(menus.get(ZERO)
                 .getId()).isEqualTo(menu1.getId()),
             () -> assertThat(menus.get(ONE)
