@@ -19,6 +19,7 @@ import static kitchenpos.product.fixture.ProductionFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Menu 서비스 테스트")
@@ -130,7 +131,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 이름은 욕설을 포함하는 경우 IllegalArgumentException을 던진다. ")
+    @DisplayName("메뉴 이름은 욕설을 포함하는 경우 IllegalArgumentException을 던진다.")
     @ParameterizedTest
     @ValueSource(strings = {"fuck", "shit"})
     public void createWithoutBadWord(String name) {
@@ -147,6 +148,35 @@ public class MenuServiceTest {
 
         // when, then
         assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("변경되는 메뉴 가격이 음수인 경우 IllegalArgumentException을 던진다.")
+    @ParameterizedTest
+    @ValueSource(ints = {-10, -100})
+    public void changePriceWithValidPrice(int price) {
+        // given
+        Menu menu = createMenu(price);
+        UUID id = UUID.randomUUID();
+
+        // when, then
+        assertThatThrownBy(() -> menuService.changePrice(id, menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("변경되는 메뉴 가격은 메뉴 상품들의 (가격 * 수량) 합을 넘을 경우 IllegalArgumentException을 던진다.")
+    @Test
+    public void changePriceWithLowerPriceThanSumOfMenuProduct() {
+        // given
+        Menu menu = createMenu(33000);
+        UUID id = UUID.randomUUID();
+
+        Product 후라이드 = createProduct("후라이드", 16000);
+        MenuProduct menuProduct = createMenuProduct(후라이드, 2L, null);
+        given(menuRepository.findById(id)).willReturn(Optional.of(createMenu(17000, Arrays.asList(menuProduct))));
+
+        // when, then
+        assertThatThrownBy(() -> menuService.changePrice(id, menu))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 }
