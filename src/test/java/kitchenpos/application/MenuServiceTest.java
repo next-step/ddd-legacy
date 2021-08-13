@@ -268,8 +268,8 @@ class MenuServiceTest {
         System.out.println("price ===> " + findMenu.getPrice());
 
         //when & then
-        assertThatThrownBy(() -> menuService.changePrice(findMenu.getId(), findMenu))
-                .isInstanceOf(IllegalArgumentException.class)
+        assertThatThrownBy(() -> menuService.display(findMenu.getId()))
+                .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("가격");
     }
 

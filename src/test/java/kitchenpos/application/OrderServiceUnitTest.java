@@ -87,6 +87,29 @@ class OrderServiceUnitTest {
         );
     }
 
+    @DisplayName("주문한다. - 주문 타입 : 배달")
+    @Test
+    void create_order_type_delivery() {
+        //given
+        Order order = OrderFixture.generateOrder(OrderType.DELIVERY);
+
+        Menu menu = order.getOrderLineItems().get(0).getMenu();
+        doReturn(Optional.of(menu)).when(menuRepository).findById(any());
+
+        List<Menu> menus = order.getOrderLineItems().stream()
+                .map(OrderLineItem::getMenu)
+                .collect(Collectors.toList());
+        doReturn(menus).when(menuRepository).findAllById(any());
+//        doReturn(Optional.of(order.getOrderTable())).when(orderTableRepository).findById(order.getOrderTableId());
+        when(orderRepository.save(any(Order.class))).then(AdditionalAnswers.returnsFirstArg());
+
+        //when
+        Order createdOrder = orderService.create(order);
+
+        //then
+        assertThat(createdOrder.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress());
+    }
+
     @DisplayName("주문 실패 - 주문 타입 미지정")
     @Test
     void create_fail_empty_orderType() {
