@@ -27,8 +27,9 @@ public final class MenuBuilder {
         menuProducts = Collections.singletonList(MenuProductBuilder.aMenuProduct()
                 .build()
         );
-        menuGroup = null;
-        menuGroupId = null;
+        menuGroup = MenuGroupBuilder.aMenuGroup()
+                .build();
+        menuGroupId = menuGroup.getId();
     }
 
     public static MenuBuilder aMenu() {
