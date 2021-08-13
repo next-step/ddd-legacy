@@ -40,7 +40,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-class OrderServiceTest extends MockTest {
+class OrderServiceTest {
 
     private static final int ZERO = 0;
     private static final int ONE = 1;

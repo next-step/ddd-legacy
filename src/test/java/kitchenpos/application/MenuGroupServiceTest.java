@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-class MenuGroupServiceTest extends MockTest {
+class MenuGroupServiceTest {
 
     private static final int ZERO = 0;
     private static final int ONE = 1;

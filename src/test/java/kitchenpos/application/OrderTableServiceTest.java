@@ -26,7 +26,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class OrderTableServiceTest extends MockTest {
+class OrderTableServiceTest {
 
     private static final int ZERO = 0;
     private static final int ONE = 1;
