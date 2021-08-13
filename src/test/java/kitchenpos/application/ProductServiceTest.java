@@ -1,8 +1,9 @@
 package kitchenpos.application;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ProductServiceTest extends DummyData {
+class ProductServiceTest extends FixtureData {
 
     @Mock
     private ProductRepository productRepository;
@@ -36,6 +37,11 @@ class ProductServiceTest extends DummyData {
 
     @InjectMocks
     private ProductService productService;
+
+    @BeforeEach
+    void setUp() {
+        fixtureProducts();
+    }
 
     @DisplayName("상품 생성")
     @Test

@@ -1,7 +1,9 @@
 package kitchenpos.application;
 
+import kitchenpos.FixtureData;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class MenuGroupServiceTest {
+public class MenuGroupServiceTest extends FixtureData {
 
     @Mock
     private MenuGroupRepository menuGroupRepository;
@@ -24,11 +26,15 @@ public class MenuGroupServiceTest {
     @InjectMocks
     private MenuGroupService menuGroupService;
 
+    @BeforeEach
+    void setUp() {
+        fixtureMenuGroups();
+    }
+
     @Test
     @DisplayName("메뉴 그룹 생성")
     void createMenuGroup() {
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName("추천메뉴");
+        final MenuGroup menuGroup = menuGroups.get(0);
 
         given(menuGroupRepository.save(any())).willReturn(menuGroup);
 

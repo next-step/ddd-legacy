@@ -1,6 +1,6 @@
 package kitchenpos.ui;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderStatus;
@@ -25,23 +25,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(OrderRestController.class)
-class OrderRestControllerTest extends DummyData {
+class OrderRestControllerTest extends FixtureData {
 
     @Autowired
     private MockMvc webMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @MockBean
     private OrderService orderService;
 
     @BeforeEach
-    void utf8Filter() {
-        this.webMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilters(new CharacterEncodingFilter("UTF-8", true))  // 필터 추가
-                .alwaysDo(print())
-                .build();
+    void setUp() {
+        fixtureOrders();
+
+        this.webMvc = ofUtf8MockMvc();
     }
 
     @DisplayName("주문 생성")

@@ -1,6 +1,7 @@
 package kitchenpos.domain;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,10 +18,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class MenuRepositoryTest extends DummyData {
+public class MenuRepositoryTest extends FixtureData {
 
     @Mock
     private MenuRepository menuRepository;
+
+    @BeforeEach
+    void setUp() {
+        fixtureMenus();
+    }
 
     @DisplayName("메뉴 생성")
     @Test

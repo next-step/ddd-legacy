@@ -1,6 +1,6 @@
 package kitchenpos.ui;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.OrderTable;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,23 +23,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(OrderTableRestController.class)
-class OrderTableRestControllerTest extends DummyData {
+class OrderTableRestControllerTest extends FixtureData {
 
     @Autowired
     private MockMvc webMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @MockBean
     private OrderTableService orderTableService;
 
     @BeforeEach
-    void utf8Filter() {
-        this.webMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilters(new CharacterEncodingFilter("UTF-8", true))  // 필터 추가
-                .alwaysDo(print())
-                .build();
+    void setUp() {
+        fixtureOrderTables();
+
+        this.webMvc = ofUtf8MockMvc();
     }
 
     @DisplayName("주문 테이블 생성")

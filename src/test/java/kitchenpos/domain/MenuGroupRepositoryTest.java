@@ -1,6 +1,7 @@
 package kitchenpos.domain;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,10 +14,15 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class MenuGroupRepositoryTest extends DummyData {
+class MenuGroupRepositoryTest extends FixtureData {
 
     @Mock
     private MenuGroupRepository menuGroupRepository;
+
+    @BeforeEach
+    void setUp() {
+        fixtureMenuGroups();
+    }
 
     @DisplayName("메뉴그룹 저장")
     @Test

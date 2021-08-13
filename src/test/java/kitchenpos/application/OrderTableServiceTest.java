@@ -1,9 +1,10 @@
 package kitchenpos.application;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class OrderTableServiceTest extends DummyData {
+class OrderTableServiceTest extends FixtureData {
 
     @Mock
     private OrderTableRepository orderTableRepository;
@@ -32,6 +33,11 @@ class OrderTableServiceTest extends DummyData {
 
     @InjectMocks
     private OrderTableService orderTableService;
+
+    @BeforeEach
+    void setUp() {
+        fixtureOrderTables();
+    }
 
     @DisplayName("테이블 생성")
     @Test

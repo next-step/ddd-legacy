@@ -1,21 +1,16 @@
 package kitchenpos.application;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EmptySource;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -28,7 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class MenuServiceTest extends DummyData {
+public class MenuServiceTest extends FixtureData {
 
     @Mock
     private MenuRepository menuRepository;
@@ -44,6 +39,11 @@ public class MenuServiceTest extends DummyData {
 
     @InjectMocks
     private MenuService menuService;
+
+    @BeforeEach
+    void setUp() {
+        fixtureMenus();
+    }
 
     @DisplayName("메뉴 생성")
     @Test

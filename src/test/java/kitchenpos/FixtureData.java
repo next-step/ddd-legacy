@@ -3,6 +3,11 @@ package kitchenpos;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.domain.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -11,7 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class DummyData {
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
+public class FixtureData {
+
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     protected List<MenuGroup> menuGroups = new ArrayList<>();
     protected List<Product> products = new ArrayList<>();
@@ -33,15 +43,36 @@ public class DummyData {
 
     protected static final ObjectMapper objectMapper = new ObjectMapper();
 
-    @BeforeEach
-    void setUp() {
+    protected void fixtureMenuGroups() {
+        setMenuGroups();
+    }
+
+    protected void fixtureProducts() {
+        setMenuGroups();
+        setProducts();
+        setMenuProducts();
+        setMenus();
+    }
+
+    protected void fixtureMenus() {
+        setMenuGroups();
+        setProducts();
+        setMenuProducts();
+        setMenus();
+    }
+
+    protected void fixtureOrderTables() {
+        setOrderTables();
+    }
+
+    protected void fixtureOrders() {
         setMenuGroups();
         setProducts();
         setMenuProducts();
         setMenus();
         setOrderTables();
-        setOrders();
         setOrderLineItems();
+        setOrders();
     }
 
     private void setMenuGroups() {
@@ -155,9 +186,14 @@ public class DummyData {
         orders.add(order2);
     }
 
-
-
     protected BigDecimal ofPrice(int price) {
         return BigDecimal.valueOf(price);
+    }
+
+    protected MockMvc ofUtf8MockMvc() {
+        return MockMvcBuilders.webAppContextSetup(webApplicationContext)
+                .addFilters(new CharacterEncodingFilter("UTF-8", true))  // 필터 추가
+                .alwaysDo(print())
+                .build();
     }
 }

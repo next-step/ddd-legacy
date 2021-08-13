@@ -1,6 +1,7 @@
 package kitchenpos.domain;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,10 +17,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class ProductRepositoryTest extends DummyData {
+class ProductRepositoryTest extends FixtureData {
 
     @Mock
     private ProductRepository productRepository;
+
+    @BeforeEach
+    void setUp() {
+        fixtureProducts();
+    }
 
     @DisplayName("상품 생성")
     @Test

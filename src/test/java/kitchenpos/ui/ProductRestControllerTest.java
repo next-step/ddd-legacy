@@ -1,6 +1,6 @@
 package kitchenpos.ui;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.Product;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
 import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -21,23 +19,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductRestController.class)
-class ProductRestControllerTest extends DummyData {
+class ProductRestControllerTest extends FixtureData {
 
     @Autowired
     private MockMvc webMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @MockBean
     private ProductService productService;
 
     @BeforeEach
-    void utf8Filter() {
-        this.webMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilters(new CharacterEncodingFilter("UTF-8", true))  // 필터 추가
-                .alwaysDo(print())
-                .build();
+    void setUp() {
+        fixtureProducts();
+
+        this.webMvc = ofUtf8MockMvc();
     }
 
     @DisplayName("상품 생성하기")

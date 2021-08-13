@@ -1,8 +1,9 @@
 package kitchenpos.application;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class OrderServiceTest extends DummyData {
+class OrderServiceTest extends FixtureData {
 
     @Mock
     private OrderRepository orderRepository;
@@ -37,6 +38,11 @@ class OrderServiceTest extends DummyData {
 
     @InjectMocks
     private OrderService orderService;
+
+    @BeforeEach
+    void setUp() {
+        fixtureOrders();
+    }
 
     @DisplayName("매장&포장 주문 생성")
     @Test
@@ -348,6 +354,7 @@ class OrderServiceTest extends DummyData {
     @EnumSource(value = OrderType.class, names = {"TAKEOUT", "EAT_IN"})
     void takeOutAndEatInComplete(OrderType type) {
         Order order = orders.get(0);
+        order.setStatus(OrderStatus.SERVED);
         order.setType(type);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));

@@ -1,6 +1,6 @@
 package kitchenpos.ui;
 
-import kitchenpos.DummyData;
+import kitchenpos.FixtureData;
 import kitchenpos.application.MenuService;
 import kitchenpos.domain.Menu;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,9 +11,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
@@ -23,23 +20,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MenuRestController.class)
-class MenuRestControllerTest extends DummyData {
+class MenuRestControllerTest extends FixtureData {
 
     @Autowired
     private MockMvc webMvc;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @MockBean
     private MenuService menuService;
 
     @BeforeEach
-    void utf8Filter() {
-        this.webMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilters(new CharacterEncodingFilter("UTF-8", true))  // 필터 추가
-                .alwaysDo(print())
-                .build();
+    void setUp() {
+        fixtureMenus();
+
+        this.webMvc = ofUtf8MockMvc();
     }
 
     @DisplayName("메뉴 생성하기")
