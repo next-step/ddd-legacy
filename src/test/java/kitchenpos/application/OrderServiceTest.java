@@ -1,10 +1,8 @@
 package kitchenpos.application;
 
 import static kitchenpos.application.fixture.MenuFixture.HIDED_MENU;
-import static kitchenpos.application.fixture.MenuFixture.HIDED_MENUS;
 import static kitchenpos.application.fixture.MenuFixture.MENU1;
 import static kitchenpos.application.fixture.MenuFixture.MENU2;
-import static kitchenpos.application.fixture.MenuFixture.MENUS;
 import static kitchenpos.application.fixture.OrderFixture.DELIVERY_ORDER_WITH_ADDRESS_REQUEST;
 import static kitchenpos.application.fixture.OrderFixture.EAT_IN_NULL_ORDER_TABLE_ORDER_REQUEST;
 import static kitchenpos.application.fixture.OrderFixture.EMPTY_ORDER_LINE_ITEMS_ORDER_REQUEST;
@@ -24,12 +22,9 @@ import static kitchenpos.application.fixture.OrderTableFixture.ORDER_TABLE1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderRepository;
@@ -44,24 +39,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.Mock;
 
 class OrderServiceTest extends MockTest {
 
     private static final int ZERO = 0;
     private static final int ONE = 1;
 
-    @Mock
-    private OrderRepository orderRepository;
-
-    @Mock
-    private MenuRepository menuRepository;
-
-    @Mock
-    private OrderTableRepository orderTableRepository;
-
-    @Mock
-    private KitchenridersClient kitchenridersClient;
+    private final OrderRepository orderRepository = new InMemoryOrderRepository();
+    private final MenuRepository menuRepository = new InmemoryMenuRepository();
+    private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
+    private final KitchenridersClient kitchenridersClient = new KitchenridersClient();
 
     private OrderService orderService;
 
@@ -74,14 +61,11 @@ class OrderServiceTest extends MockTest {
     @Test
     void create() {
         //given
-        final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.EAT_IN, OrderStatus.WAITING);
         final Order orderRequest = ORDER_WITH_TYPE_AND_STATUS_REQUEST(OrderType.EAT_IN, OrderStatus.WAITING);
 
-        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
-        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
-            .willReturn(Optional.of(MENU2()));
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(NOT_EMPTY_TABLE()));
-        given(orderRepository.save(any())).willReturn(order);
+        menuRepository.save(MENU1());
+        menuRepository.save(MENU2());
+        orderTableRepository.save(NOT_EMPTY_TABLE());
 
         //when
         final Order sut = orderService.create(orderRequest);
@@ -134,7 +118,8 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = NEGATIVE_QUANTITY_ORDER_LINE_ITEMS_ORDER_REQUEST(orderType);
 
-        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
+        menuRepository.save(MENU1());
+        menuRepository.save(MENU2());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -147,12 +132,8 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = ORDER_WITH_TYPE_AND_STATUS_REQUEST(OrderType.DELIVERY, OrderStatus.WAITING);
 
-        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
-        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
-            .willReturn(Optional.empty());
-
         //when, then
-        assertThatExceptionOfType(NoSuchElementException.class)
+        assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> orderService.create(orderRequest));
     }
 
@@ -162,9 +143,8 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = HIDED_MENU_ORDER_REQUEST();
 
-        given(menuRepository.findAllByIdIn(any())).willReturn(HIDED_MENUS());
-        given(menuRepository.findById(any())).willReturn(Optional.of(HIDED_MENU()))
-            .willReturn(Optional.of(HIDED_MENU()));
+        menuRepository.save(MENU1());
+        menuRepository.save(HIDED_MENU());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -177,9 +157,8 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = WRONG_PRICE_MENU_ORDER_REQUEST();
 
-        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
-        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
-            .willReturn(Optional.of(MENU2()));
+        menuRepository.save(MENU1());
+        menuRepository.save(MENU2());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -193,9 +172,8 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = DELIVERY_ORDER_WITH_ADDRESS_REQUEST(address);
 
-        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
-        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
-            .willReturn(Optional.of(MENU2()));
+        menuRepository.save(MENU1());
+        menuRepository.save(MENU2());
 
         //when, then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -208,9 +186,8 @@ class OrderServiceTest extends MockTest {
         //given
         final Order orderRequest = EAT_IN_NULL_ORDER_TABLE_ORDER_REQUEST();
 
-        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
-        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
-            .willReturn(Optional.of(MENU2()));
+        menuRepository.save(MENU1());
+        menuRepository.save(MENU2());
 
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -223,10 +200,9 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = NORMAL_ORDER_REQUEST();
 
-        given(menuRepository.findAllByIdIn(any())).willReturn(MENUS());
-        given(menuRepository.findById(any())).willReturn(Optional.of(MENU1()))
-            .willReturn(Optional.of(MENU2()));
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(ORDER_TABLE1()));
+        menuRepository.save(MENU1());
+        menuRepository.save(MENU2());
+        orderTableRepository.save(ORDER_TABLE1());
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -239,7 +215,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = NORMAL_ORDER();
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when
         final Order sut = orderService.accept(order.getId());
@@ -254,8 +230,6 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = NORMAL_ORDER();
 
-        given(orderRepository.findById(any())).willReturn(Optional.empty());
-
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
             .isThrownBy(() -> orderService.accept(order.getId()));
@@ -268,7 +242,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.EAT_IN, orderStatus);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -281,7 +255,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.EAT_IN, OrderStatus.ACCEPTED);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when
         final Order sut = orderService.serve(order.getId());
@@ -296,8 +270,6 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.EAT_IN, OrderStatus.ACCEPTED);
 
-        given(orderRepository.findById(any())).willReturn(Optional.empty());
-
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
             .isThrownBy(() -> orderService.serve(order.getId()));
@@ -310,7 +282,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.EAT_IN, orderStatus);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -323,7 +295,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.DELIVERY, OrderStatus.SERVED);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when
         final Order sut = orderService.startDelivery(order.getId());
@@ -341,8 +313,6 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.DELIVERY, OrderStatus.SERVED);
 
-        given(orderRepository.findById(any())).willReturn(Optional.empty());
-
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
             .isThrownBy(() -> orderService.startDelivery(order.getId()));
@@ -355,7 +325,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(orderType, OrderStatus.SERVED);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -369,7 +339,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.DELIVERY, orderStatus);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -382,7 +352,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.DELIVERY, OrderStatus.DELIVERING);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when
         final Order sut = orderService.completeDelivery(order.getId());
@@ -397,8 +367,6 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.DELIVERY, OrderStatus.DELIVERING);
 
-        given(orderRepository.findById(any())).willReturn(Optional.empty());
-
         //when, then
         assertThatExceptionOfType(NoSuchElementException.class)
             .isThrownBy(() -> orderService.completeDelivery(order.getId()));
@@ -411,7 +379,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(orderType, OrderStatus.DELIVERING);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -425,7 +393,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.DELIVERY, orderStatus);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -439,7 +407,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.valueOf(typeValue), OrderStatus.valueOf(statusValue));
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when
         final Order sut = orderService.complete(order.getId());
@@ -455,7 +423,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.DELIVERY, orderStatus);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -469,7 +437,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.TAKEOUT, orderStatus);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -483,7 +451,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.EAT_IN, orderStatus);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when, then
         assertThatExceptionOfType(IllegalStateException.class)
@@ -496,7 +464,7 @@ class OrderServiceTest extends MockTest {
         //given
         final Order order = ORDER_WITH_TYPE_AND_STATUS(OrderType.EAT_IN, OrderStatus.SERVED);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         //when
         final Order sut = orderService.complete(order.getId());
@@ -510,7 +478,8 @@ class OrderServiceTest extends MockTest {
     @Test
     void findAll() {
         //given
-        given(orderRepository.findAll()).willReturn(ORDERS());
+        orderRepository.save(NORMAL_ORDER());
+        orderRepository.save(NORMAL_ORDER2());
 
         //when
         final List<Order> sut = orderService.findAll();

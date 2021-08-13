@@ -23,6 +23,7 @@ public class MenuFixture {
     private static final long NEGATIVE_PRICE = -10000L;
     private static final UUID UUID1 = UUID.randomUUID();
     private static final UUID UUID2 = UUID.randomUUID();
+    private static final UUID HIDED_UUID1 = UUID.randomUUID();
     private static final UUID MENU_GROUP_ID1 = UUID.randomUUID();
     private static final UUID MENU_GROUP_ID2 = UUID.randomUUID();
 
@@ -91,7 +92,7 @@ public class MenuFixture {
     }
 
     public static Menu HIDED_MENU() {
-        return createMenu(UUID1, MENU_NAME1, PRICE1, MENU_GROUP_ID1, false, MENU_PRODUCTS());
+        return createMenu(HIDED_UUID1, MENU_NAME1, PRICE1, MENU_GROUP_ID1, false, MENU_PRODUCTS());
     }
 
     public static Menu CHEAP_PRODUCT_MENU() {
