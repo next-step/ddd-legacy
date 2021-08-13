@@ -77,6 +77,7 @@ class MenuGroupServiceTest {
         //then
         Optional<MenuGroup> findMenuGroup = menuGroupRepository.findById(savedMenuGroup.getId());
         assertThat(findMenuGroup).isPresent();
+        assertThat(findMenuGroup.get()).isEqualTo(savedMenuGroup);
         assertThat(findMenuGroup.get().getName()).isEqualTo(savedMenuGroup.getName());
         assertThat(findMenuGroup.get().getId()).isEqualTo(savedMenuGroup.getId());
     }
