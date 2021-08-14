@@ -13,7 +13,7 @@ public class TestMenuRepository implements MenuRepository {
     public List<Menu> findAllByProductId(UUID productId) {
         return menus.stream()
                 .filter(menu -> menu.getMenuProducts().stream()
-                        .anyMatch(menuProduct -> menuProduct.getProduct().getId().equals(productId))
+                        .anyMatch(menuProduct -> menuProduct.getProductId().equals(productId))
                 ).collect(Collectors.toList());
     }
 
