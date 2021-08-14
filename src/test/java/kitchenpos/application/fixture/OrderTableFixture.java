@@ -22,7 +22,7 @@ public class OrderTableFixture {
     }
 
     public static OrderTable NOT_EMPTY_ORDER_TABLE_REQUEST() {
-        return createOrderTable(NOT_EMPTY_ORDER_TABLE_UUID, TABLE_NAME_A, ONE, NOT_EMPTY);
+        return createOrderTable(NOT_EMPTY_ORDER_TABLE_UUID, TABLE_NAME_B, ONE, NOT_EMPTY);
     }
 
     private static OrderTable createOrderTable(final UUID id, final String name, final int numberOfGuests, final boolean empty) {

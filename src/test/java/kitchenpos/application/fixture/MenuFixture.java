@@ -16,22 +16,15 @@ public class MenuFixture {
     private static final UUID UUID1 = UUID.randomUUID();
 
     private static final UUID UUID2 = UUID.randomUUID();
-    private static final UUID MENU_GROUP_ID_ONE = UUID.randomUUID();
 
     private static final long MENU_PRICE_ONE = 15000L;
 
     public static Menu HIDE_MENU_REQUEST() {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(MENU_GROUP_ONE_REQUEST().getId());
-        menuGroup.setName(MENU_GROUP_ONE_REQUEST().getName());
-        return createMenu(UUID1, MENU_NAME_ONE, MENU_PRICE_ONE, menuGroup, false, MENU_PRODUCTS());
+        return createMenu(UUID1, MENU_NAME_ONE, MENU_PRICE_ONE, MENU_GROUP_ONE_REQUEST(), false, MENU_PRODUCTS());
     }
 
     public static Menu SHOW_MENU_REQUEST() {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(MENU_GROUP_ONE_REQUEST().getId());
-        menuGroup.setName(MENU_GROUP_ONE_REQUEST().getName());
-        return createMenu(UUID2, MENU_NAME_ONE, MENU_PRICE_ONE, menuGroup, true, MENU_PRODUCTS());
+        return createMenu(UUID2, MENU_NAME_ONE, MENU_PRICE_ONE, MENU_GROUP_ONE_REQUEST(), true, MENU_PRODUCTS());
     }
 
     private static Menu createMenu(final UUID uuid, final String menuName, final long price, final MenuGroup menuGroup, final boolean isDisplay, final List<MenuProduct> menuProducts) {

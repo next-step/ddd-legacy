@@ -15,10 +15,6 @@ public class MenuGroupFixture {
         return createMenuGroup(UUID1, MENU_GROUP_NAME_ONE);
     }
 
-    public static MenuGroup MENU_GROUP_TWO_REQUEST() {
-        return createMenuGroup(UUID2, MENU_GROUP_NAME_TWO);
-    }
-
     private static MenuGroup createMenuGroup(final UUID uuid, final String menuGroupName) {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(uuid);
