@@ -40,7 +40,7 @@ public class MenuService {
         if (Objects.isNull(menuProductRequests) || menuProductRequests.isEmpty()) {
             throw new IllegalArgumentException();
         }
-        final List<Product> products = productRepository.findAllById(
+        final List<Product> products = productRepository.findAllByIdIn(
             menuProductRequests.stream()
                 .map(MenuProduct::getProductId)
                 .collect(Collectors.toList())
