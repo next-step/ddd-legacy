@@ -1,8 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,6 +16,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import static kitchenpos.application.fixture.MenuFixture.HIDE_MENU_REQUEST;
+import static kitchenpos.application.fixture.MenuFixture.SHOW_MENU_REQUEST;
+import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP_ONE_REQUEST;
+import static kitchenpos.application.fixture.ProductFixture.PRODUCT_ONE_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -29,24 +31,30 @@ class MenuServiceTest {
     private MenuService menuService;
 
     @Autowired
+    private MenuGroupRepository menuGroupRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
     private MenuRepository menuRepository;
 
     @DisplayName("메뉴 등록 성공")
     @Test
     void createMenuSuccess() {
         // Given
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        final MenuGroup menuGroup = menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
         final BigDecimal price = BigDecimal.valueOf(15000);
-        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
+        final Product product = productRepository.save(PRODUCT_ONE_REQUEST());
         final long productQuantity = 1;
 
         final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(productId);
+        menuProduct.setProductId(product.getId());
         menuProduct.setQuantity(productQuantity);
 
         final Menu menu = new Menu();
         menu.setName("맛있는 순살 치킨");
-        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuGroupId(menuGroup.getId());
         menu.setPrice(price);
         menu.setDisplayed(true);
         menu.setMenuProducts(Arrays.asList(menuProduct));
@@ -65,12 +73,12 @@ class MenuServiceTest {
     @Test
     void createMenuFailMinusPrice() {
         // Given
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
         final BigDecimal price = BigDecimal.valueOf(-1);
 
         final Menu request = new Menu();
         request.setName("맛있는 뼈치킨");
-        request.setMenuGroupId(menuGroupId);
+        request.setMenuGroupId(MENU_GROUP_ONE_REQUEST().getId());
         request.setPrice(price);
 
         // When, Then
@@ -82,7 +90,6 @@ class MenuServiceTest {
     @Test
     void createMenuFailNonExistentMenuGroupId() {
         // Given
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
         final BigDecimal price = BigDecimal.valueOf(-1);
 
         final Menu request = new Menu();
@@ -99,7 +106,7 @@ class MenuServiceTest {
     @Test
     void createMenuNonExistentProductId() {
         // Given
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
         final BigDecimal price = BigDecimal.valueOf(15000);
         final long productQuantity = 1;
 
@@ -109,7 +116,7 @@ class MenuServiceTest {
 
         final Menu menu = new Menu();
         menu.setName("맛있는 순살 치킨");
-        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuGroupId(MENU_GROUP_ONE_REQUEST().getId());
         menu.setPrice(price);
         menu.setDisplayed(true);
         menu.setMenuProducts(Arrays.asList(menuProduct));
@@ -123,18 +130,18 @@ class MenuServiceTest {
     @Test
     void createMenuFailMinusMenuProductQuantity() {
         // Given
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
         final BigDecimal price = BigDecimal.valueOf(15000);
-        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
         final long productQuantity = -1;
 
         final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(productId);
+        menuProduct.setProductId(PRODUCT_ONE_REQUEST().getId());
         menuProduct.setQuantity(productQuantity);
 
         final Menu menu = new Menu();
         menu.setName("맛있는 순살 치킨");
-        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuGroupId(MENU_GROUP_ONE_REQUEST().getId());
         menu.setPrice(price);
         menu.setDisplayed(true);
         menu.setMenuProducts(Arrays.asList(menuProduct));
@@ -148,18 +155,19 @@ class MenuServiceTest {
     @Test
     void createMenuFailPrice() {
         // Given
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+
         final BigDecimal price = BigDecimal.valueOf(17000);
-        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
         final long productQuantity = 1;
 
         final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(productId);
+        menuProduct.setProductId(PRODUCT_ONE_REQUEST().getId());
         menuProduct.setQuantity(productQuantity);
 
         final Menu menu = new Menu();
         menu.setName("맛있는 순살 치킨");
-        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuGroupId(MENU_GROUP_ONE_REQUEST().getId());
         menu.setPrice(price);
         menu.setDisplayed(true);
         menu.setMenuProducts(Arrays.asList(menuProduct));
@@ -175,18 +183,19 @@ class MenuServiceTest {
     @ValueSource(strings = {"fuck"})
     void createMenuFileNameNullOrVulgarism(final String name) {
         // Given
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+
         final BigDecimal price = BigDecimal.valueOf(15000);
-        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
         final long productQuantity = 1;
 
         final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(productId);
+        menuProduct.setProductId(PRODUCT_ONE_REQUEST().getId());
         menuProduct.setQuantity(productQuantity);
 
         final Menu menu = new Menu();
         menu.setName(name);
-        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuGroupId(MENU_GROUP_ONE_REQUEST().getId());
         menu.setPrice(price);
         menu.setDisplayed(true);
         menu.setMenuProducts(Arrays.asList(menuProduct));
@@ -200,18 +209,19 @@ class MenuServiceTest {
     @Test
     void changePriceSuccess() {
         // Given
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+
         final BigDecimal price = BigDecimal.valueOf(15000);
-        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
         final long productQuantity = 1;
 
         final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(productId);
+        menuProduct.setProductId(PRODUCT_ONE_REQUEST().getId());
         menuProduct.setQuantity(productQuantity);
 
         final Menu menu = new Menu();
         menu.setName("맛있는 순살 치킨");
-        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuGroupId(MENU_GROUP_ONE_REQUEST().getId());
         menu.setPrice(price);
         menu.setDisplayed(true);
         menu.setMenuProducts(Arrays.asList(menuProduct));
@@ -222,11 +232,13 @@ class MenuServiceTest {
         // When
         Menu result = menuService.create(menu);
         menuService.changePrice(result.getId(), changeMenu);
-
-        // Then
         Menu changeMenuData = menuRepository.findById(result.getId())
                 .orElseThrow(NoSuchElementException::new);
-        assertThat(changeMenuData.getPrice()).isEqualTo(changeMenu.getPrice());
+        BigDecimal expectedPrice = changeMenu.getPrice();
+        BigDecimal actualPrice = changeMenuData.getPrice();
+
+        // Then
+        assertThat(actualPrice).isEqualTo(expectedPrice);
     }
 
     @DisplayName("메뉴 가격 변경 실패 - 등록되지 않은 메뉴 ID")
@@ -249,70 +261,46 @@ class MenuServiceTest {
     @ValueSource(longs = {-1, 17000})
     void changePriceFailInvalidPrice(final long price) {
         // Given
-        final UUID menuGroupId = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
 
         final Menu changeMenu = new Menu();
         changeMenu.setPrice(BigDecimal.valueOf(price));
 
         // When, Then
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.changePrice(menuGroupId, changeMenu));
+                .isThrownBy(() -> menuService.changePrice(SHOW_MENU_REQUEST().getId(), changeMenu));
     }
 
     @DisplayName("메뉴 노출 처리")
     @Test
     void displayMenu() {
         // Given
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
-        final BigDecimal price = BigDecimal.valueOf(15000);
-        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
-        final long productQuantity = 1;
-
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(productId);
-        menuProduct.setQuantity(productQuantity);
-
-        final Menu menu = new Menu();
-        menu.setName("맛있는 순살 치킨");
-        menu.setMenuGroupId(menuGroupId);
-        menu.setPrice(price);
-        menu.setDisplayed(false);
-        menu.setMenuProducts(Arrays.asList(menuProduct));
-        Menu result = menuService.create(menu);
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(HIDE_MENU_REQUEST());
 
         // When
-        Menu data = menuService.display(result.getId());
+        Menu data = menuService.display(HIDE_MENU_REQUEST().getId());
 
         // Then
-        assertThat(data.isDisplayed()).isEqualTo(true);
+        assertThat(data.isDisplayed()).isTrue();
     }
 
     @DisplayName("메뉴 숨김 처리")
     @Test
     void hideMenu() {
         // Given
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
-        final BigDecimal price = BigDecimal.valueOf(15000);
-        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
-        final long productQuantity = 1;
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
 
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(productId);
-        menuProduct.setQuantity(productQuantity);
-
-        final Menu menu = new Menu();
-        menu.setName("맛있는 순살 치킨");
-        menu.setMenuGroupId(menuGroupId);
-        menu.setPrice(price);
-        menu.setDisplayed(true);
-        menu.setMenuProducts(Arrays.asList(menuProduct));
-        Menu result = menuService.create(menu);
-        
         // When
-        Menu data = menuService.hide(result.getId());
+        Menu data = menuService.hide(SHOW_MENU_REQUEST().getId());
 
         // Then
-        assertThat(data.isDisplayed()).isEqualTo(false);
+        assertThat(data.isDisplayed()).isFalse();
     }
 
     @DisplayName("전체 메뉴 조회")
