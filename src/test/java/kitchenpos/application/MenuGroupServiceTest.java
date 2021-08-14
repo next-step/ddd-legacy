@@ -16,6 +16,7 @@ import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 @Transactional
@@ -33,6 +34,7 @@ class MenuGroupServiceTest {
         // Give
         final MenuGroup request = new MenuGroup();
         request.setName("오늘 추천 메뉴");
+
         // When
         final MenuGroup result = menuGroupService.create(request);
 
@@ -74,6 +76,12 @@ class MenuGroupServiceTest {
         final List<MenuGroup> resultList = menuGroupService.findAll();
 
         // Then
-        assertThat(resultList).hasSize(6);
+        assertAll(
+            () -> assertThat(resultList).hasSize(6),
+            () -> assertThat(resultList.stream().filter(x ->
+                    (requestOne.getName().equals(x.getName()) || requestTwo.getName().equals(x.getName())))
+                    .count()).isEqualTo(2)
+        );
+
     }
 }
