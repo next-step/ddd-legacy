@@ -8,12 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
+import static kitchenpos.application.fixture.MenuFixture.*;
+import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP_ONE_REQUEST;
+import static kitchenpos.application.fixture.OrderFixture.*;
+import static kitchenpos.application.fixture.OrderLineItemFixture.ORDER_LINE_ITEMS;
+import static kitchenpos.application.fixture.OrderTableFixture.EMPTY_ORDER_TABLE_REQUEST;
+import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_ORDER_TABLE_REQUEST;
+import static kitchenpos.application.fixture.ProductFixture.PRODUCT_ONE_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 @Transactional
@@ -37,138 +46,19 @@ class OrderServiceTest {
     @Autowired
     ProductRepository productRepository;
 
-    private List<OrderLineItem> orderLineItems;
-
-    private OrderTable emptyOrderTable;
-
-    private OrderTable notEmptyOrderTable;
-
-    private Menu hideMenu;
-
-    private Order orderStatusWaiting;
-
-    private Order orderStatusAccepted;
-
-    private Order orderStatusServed;
-
-    private Order orderStatusDelivering;
-
-    private Order orderStatusDelivered;
-
-    private Order eatInOrderStatusCompleted;
-
-    @BeforeEach
-    void setUp() {
-        orderLineItems = new ArrayList<>();
-        final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b"));
-        orderLineItem.setPrice(BigDecimal.valueOf(16000));
-        orderLineItem.setQuantity(3);
-        orderLineItems.add(orderLineItem);
-
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName("100번");
-        orderTable.setEmpty(false);
-        orderTable.setNumberOfGuests(0);
-        emptyOrderTable = orderTableRepository.save(orderTable);
-
-        final OrderTable orderTable2 = new OrderTable();
-        orderTable2.setId(UUID.randomUUID());
-        orderTable2.setName("101번");
-        orderTable2.setEmpty(true);
-        orderTable2.setNumberOfGuests(0);
-        notEmptyOrderTable = orderTableRepository.save(orderTable2);
-
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("추천 메뉴");
-        MenuGroup saveMenuGroup = menuGroupRepository.save(menuGroup);
-
-        final Product product = productRepository.findById(UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10"))
-                .orElseThrow(NoSuchElementException::new);
-
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-
-        final Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName("치킨");
-        menu.setPrice(BigDecimal.valueOf(15000));
-        menu.setDisplayed(false);
-        menu.setMenuGroup(saveMenuGroup);
-        menu.setMenuProducts(Arrays.asList(menuProduct));
-
-        hideMenu = menuRepository.save(menu);
-
-        menu.setDisplayed(true);
-        Menu displyedMenu = menuRepository.save(menu);
-
-        final OrderLineItem orderLineItemTest = new OrderLineItem();
-        orderLineItemTest.setMenu(displyedMenu);
-        orderLineItemTest.setQuantity(1);
-
-        final Order dummyOrderWaiting = new Order();
-        dummyOrderWaiting.setId(UUID.randomUUID());
-        dummyOrderWaiting.setType(OrderType.EAT_IN);
-        dummyOrderWaiting.setStatus(OrderStatus.WAITING);
-        dummyOrderWaiting.setOrderDateTime(LocalDateTime.now());
-        dummyOrderWaiting.setOrderLineItems(Arrays.asList(orderLineItemTest));
-        orderStatusWaiting = orderRepository.save(dummyOrderWaiting);
-
-        final Order dummyOrderAccepted = new Order();
-        dummyOrderAccepted.setId(UUID.randomUUID());
-        dummyOrderAccepted.setType(OrderType.EAT_IN);
-        dummyOrderAccepted.setStatus(OrderStatus.ACCEPTED);
-        dummyOrderAccepted.setOrderDateTime(LocalDateTime.now());
-        dummyOrderAccepted.setOrderLineItems(Arrays.asList(orderLineItemTest));
-        orderStatusAccepted = orderRepository.save(dummyOrderAccepted);
-
-
-        final Order dummyOrderServed = new Order();
-        dummyOrderServed.setId(UUID.randomUUID());
-        dummyOrderServed.setType(OrderType.DELIVERY);
-        dummyOrderServed.setStatus(OrderStatus.SERVED);
-        dummyOrderServed.setOrderDateTime(LocalDateTime.now());
-        dummyOrderServed.setOrderLineItems(Arrays.asList(orderLineItemTest));
-        dummyOrderServed.setDeliveryAddress("제주자치도 첨단로 1");
-        orderStatusServed = orderRepository.save(dummyOrderServed);
-
-        final Order dummyOrderDelivering = new Order();
-        dummyOrderDelivering.setId(UUID.randomUUID());
-        dummyOrderDelivering.setType(OrderType.DELIVERY);
-        dummyOrderDelivering.setStatus(OrderStatus.DELIVERING);
-        dummyOrderDelivering.setOrderDateTime(LocalDateTime.now());
-        dummyOrderDelivering.setOrderLineItems(Arrays.asList(orderLineItemTest));
-        dummyOrderServed.setDeliveryAddress("제주자치도 첨단로 1");
-        orderStatusDelivering = orderRepository.save(dummyOrderDelivering);
-
-        final Order dummyOrderDelivered = new Order();
-        dummyOrderDelivered.setId(UUID.randomUUID());
-        dummyOrderDelivered.setType(OrderType.DELIVERY);
-        dummyOrderDelivered.setStatus(OrderStatus.DELIVERED);
-        dummyOrderDelivered.setOrderDateTime(LocalDateTime.now());
-        dummyOrderDelivered.setOrderLineItems(Arrays.asList(orderLineItemTest));
-        dummyOrderServed.setDeliveryAddress("제주자치도 첨단로 1");
-        orderStatusDelivered = orderRepository.save(dummyOrderDelivered);
-
-        final Order dummyOrderCompleted = new Order();
-        dummyOrderCompleted.setId(UUID.randomUUID());
-        dummyOrderCompleted.setType(OrderType.EAT_IN);
-        dummyOrderCompleted.setStatus(OrderStatus.SERVED);
-        dummyOrderCompleted.setOrderDateTime(LocalDateTime.now());
-        dummyOrderCompleted.setOrderLineItems(Arrays.asList(orderLineItemTest));
-        eatInOrderStatusCompleted = orderRepository.save(dummyOrderCompleted);
-    }
-
     @DisplayName("주문 등록 성공")
     @Test
     void createOrderSuccess() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(NOT_EMPTY_ORDER_TABLE_REQUEST());
+
         final Order request = new Order();
         request.setType(OrderType.EAT_IN);
-        request.setOrderTableId(emptyOrderTable.getId());
-        request.setOrderLineItems(orderLineItems);
+        request.setOrderTableId(NOT_EMPTY_ORDER_TABLE_REQUEST().getId());
+        request.setOrderLineItems(ORDER_LINE_ITEMS());
 
         // When
         final Order result = orderService.create(request);
@@ -185,8 +75,9 @@ class OrderServiceTest {
     void createOrderFailTypeIsNull() {
         // Given
         final Order request = new Order();
-        request.setOrderTableId(emptyOrderTable.getId());
-        request.setOrderLineItems(orderLineItems);
+        request.setType(null);
+        request.setOrderTableId(NOT_EMPTY_ORDER_TABLE_REQUEST().getId());
+        request.setOrderLineItems(ORDER_LINE_ITEMS());
 
         // When, Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -197,11 +88,9 @@ class OrderServiceTest {
     @Test
     void createOrderFailOrderLineItemsIsNull() {
         // Given
-        final UUID orderTableId = UUID.fromString("8d710043-29b6-420e-8452-233f5a035520");
-
         final Order request = new Order();
         request.setType(OrderType.EAT_IN);
-        request.setOrderTableId(emptyOrderTable.getId());
+        request.setOrderTableId(NOT_EMPTY_ORDER_TABLE_REQUEST().getId());
 
         // When, Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -212,15 +101,13 @@ class OrderServiceTest {
     @Test
     void createOrderFailNonExistentMenu() {
         // Given
-        final UUID orderTableId = UUID.fromString("8d710043-29b6-420e-8452-233f5a035520");
         final OrderLineItem noneExistMenu = new OrderLineItem();
         noneExistMenu.setMenuId(UUID.randomUUID());
-        orderLineItems.add(noneExistMenu);
 
         final Order request = new Order();
         request.setType(OrderType.EAT_IN);
-        request.setOrderTableId(orderTableId);
-        request.setOrderLineItems(orderLineItems);
+        request.setOrderTableId(NOT_EMPTY_ORDER_TABLE_REQUEST().getId());
+        request.setOrderLineItems(Arrays.asList(noneExistMenu));
 
         // When, Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -232,35 +119,37 @@ class OrderServiceTest {
     void createOrderFailOrderLineItemMinusQuantity() {
         // Given
         final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(UUID.fromString("e1254913-8608-46aa-b23a-a07c1dcbc648"));
-        orderLineItem.setPrice(BigDecimal.valueOf(16000));
+        orderLineItem.setMenuId(SHOW_MENU_REQUEST().getId());
+        orderLineItem.setPrice(SHOW_MENU_REQUEST().getPrice());
         orderLineItem.setQuantity(-1);
-        orderLineItems.add(orderLineItem);
 
         final Order request = new Order();
         request.setType(OrderType.DELIVERY);
-        request.setOrderTableId(notEmptyOrderTable.getId());
-        request.setOrderLineItems(orderLineItems);
+        request.setOrderTableId(NOT_EMPTY_ORDER_TABLE_REQUEST().getId());
+        request.setOrderLineItems(Arrays.asList(orderLineItem));
 
         // When, Then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderService.create(request));
     }
 
-    @DisplayName("주문 등록 실패 - 매장식사가 아닌데 주문목록의 수량이 음수인 경우")
+    @DisplayName("주문 등록 실패 - 숨겨진 메뉴를 주문할 경우")
     @Test
     void createOrderFailOrderLineItemHideMenu() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(HIDE_MENU_REQUEST());
+
         final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(hideMenu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(16000));
+        orderLineItem.setMenuId(HIDE_MENU_REQUEST().getId());
+        orderLineItem.setPrice(HIDE_MENU_REQUEST().getPrice());
         orderLineItem.setQuantity(1);
-        orderLineItems.add(orderLineItem);
 
         final Order request = new Order();
         request.setType(OrderType.DELIVERY);
-        request.setOrderTableId(notEmptyOrderTable.getId());
-        request.setOrderLineItems(orderLineItems);
+        request.setOrderTableId(NOT_EMPTY_ORDER_TABLE_REQUEST().getId());
+        request.setOrderLineItems(Arrays.asList(orderLineItem));
 
         // When, Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -273,8 +162,8 @@ class OrderServiceTest {
         // Given
         final Order request = new Order();
         request.setType(OrderType.DELIVERY);
-        request.setOrderTableId(emptyOrderTable.getId());
-        request.setOrderLineItems(orderLineItems);
+        request.setOrderTableId(EMPTY_ORDER_TABLE_REQUEST().getId());
+        request.setOrderLineItems(ORDER_LINE_ITEMS());
 
         // When, Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -285,156 +174,240 @@ class OrderServiceTest {
     @Test
     void changeOrderAcceptSuccess() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(NORMAL_ORDER_REQUEST());
 
         // When
-        final Order result = orderService.accept(orderStatusWaiting.getId());
+        final Order result = orderService.accept(request.getId());
 
         // Then
         final Order order = orderRepository.findById(result.getId())
                 .orElseThrow(NoSuchElementException::new);
 
-        assertThat(result.getId()).isEqualTo(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        assertAll(
+            () -> assertThat(result.getId()).isEqualTo(order.getId()),
+            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
+        );
     }
 
     @DisplayName("주문 상태 변경 대기 -> 수락 실패")
     @Test
     void changeOrderAcceptFail() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(EAT_IN_ORDER_STATUS_COMPLETED_REQUEST());
 
         // When, Then
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderService.accept(eatInOrderStatusCompleted.getId()));
+                .isThrownBy(() -> orderService.accept(request.getId()));
     }
 
     @DisplayName("주문 상태 변경 수락 -> 제공 성공")
     @Test
     void changeOrderServeSuccess() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(EAT_IN_ORDER_STATUS_ACCEPTED_REQUEST());
 
         // When
-        final Order result = orderService.serve(orderStatusAccepted.getId());
+        final Order result = orderService.serve(request.getId());
 
         // Then
         final Order order = orderRepository.findById(result.getId())
                 .orElseThrow(NoSuchElementException::new);
 
-        assertThat(result.getId()).isEqualTo(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED);
+        assertAll(
+            () -> assertThat(result.getId()).isEqualTo(order.getId()),
+            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED)
+        );
     }
 
     @DisplayName("주문 상태 변경 수락 -> 제공 실패")
     @Test
     void changeOrderServeFail() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(EAT_IN_ORDER_STATUS_SERVE_REQUEST());
 
         // When, Then
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderService.serve(eatInOrderStatusCompleted.getId()));
+                .isThrownBy(() -> orderService.serve(request.getId()));
     }
 
-    @DisplayName("배달주문 상태변경 주문제공 -> 배달중 성공")
+    @DisplayName("배달주문 상태변경 주문제공 -> 배달중 변경 성공")
     @Test
     void changeOrderStartDeliverySuccess() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(DELIVERY_ORDER_STATUS_SERVE_REQUEST());
 
         // When
-        final Order result = orderService.startDelivery(orderStatusServed.getId());
+        final Order result = orderService.startDelivery(request.getId());
 
         // Then
         final Order order = orderRepository.findById(result.getId())
                 .orElseThrow(NoSuchElementException::new);
 
-        assertThat(result.getId()).isEqualTo(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        assertAll(
+            () -> assertThat(result.getId()).isEqualTo(order.getId()),
+            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING)
+        );
     }
 
-    @DisplayName("배달주문 상태변경 주문제공 -> 배달중 실패, 배달주문이 아닌 경우")
+    @DisplayName("배달주문 상태변경 주문제공 -> 배달중 변경 실패, 배달주문이 아닌 경우")
     @Test
     void changeOrderStartDeliveryFailNotDeliveryOrder() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(EAT_IN_ORDER_STATUS_COMPLETED_REQUEST());
 
         // When, Then
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderService.startDelivery(eatInOrderStatusCompleted.getId()));
+                .isThrownBy(() -> orderService.startDelivery(request.getId()));
     }
 
-    @DisplayName("배달주문 상태변경 배달중 -> 배달 완료 성공")
+    @DisplayName("배달주문 상태변경 배달중 -> 배달완료 변경 성공")
     @Test
     void changeOrderCompleteDeliverySuccess() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(DELIVERY_ORDER_STATUS_DELIVERING_REQUEST());
 
         // When
-        final Order result = orderService.completeDelivery(orderStatusDelivering.getId());
+        final Order result = orderService.completeDelivery(request.getId());
 
         // Then
         final Order order = orderRepository.findById(result.getId())
                 .orElseThrow(NoSuchElementException::new);
 
-        assertThat(result.getId()).isEqualTo(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+        assertAll(
+            () -> assertThat(result.getId()).isEqualTo(order.getId()),
+            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED)
+        );
     }
 
-    @DisplayName("배달주문 상태변경 배달중 -> 배달 완료 실패, 배달중이 아닌 주문")
+    @DisplayName("배달주문 상태변경 배달중 -> 배달완료 변경 실패, 배달중이 아닌 주문")
     @Test
     void changeOrderCompleteDeliveryFailNotDeliveryOrder() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(DELIVERY_ORDER_STATUS_DELIVERED_REQUEST());
 
         // When, Then
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderService.completeDelivery(orderStatusDelivered.getId()));
+                .isThrownBy(() -> orderService.completeDelivery(request.getId()));
     }
 
     @DisplayName("매장주문 상태변경 주문제공 -> 주문완료 성공")
     @Test
     void changeEatInOrderCompleteSuccess() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(EAT_IN_ORDER_STATUS_SERVE_REQUEST());
 
         // When
-        final Order result = orderService.complete(eatInOrderStatusCompleted.getId());
+        final Order result = orderService.complete(request.getId());
 
         // Then
         final Order order = orderRepository.findById(result.getId())
                 .orElseThrow(NoSuchElementException::new);
 
-        assertThat(result.getId()).isEqualTo(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertAll(
+            () -> assertThat(result.getId()).isEqualTo(order.getId()),
+            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED)
+        );
     }
 
     @DisplayName("배달주문 상태변경 주문제공 -> 주문완료 성공")
     @Test
     void changeDeliveryOrderCompleteSuccess() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(DELIVERY_ORDER_STATUS_DELIVERED_REQUEST());
 
         // When
-        final Order result = orderService.complete(orderStatusDelivered.getId());
+        final Order result = orderService.complete(request.getId());
 
         // Then
         final Order order = orderRepository.findById(result.getId())
                 .orElseThrow(NoSuchElementException::new);
 
-        assertThat(result.getId()).isEqualTo(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertAll(
+            () -> assertThat(result.getId()).isEqualTo(order.getId()),
+            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED)
+        );
     }
 
-    @DisplayName("배달주문 상태변경 주문제공 -> 주문완료 샐패, 배달주문의 주문상태가 배달완료가 아닌 경우")
+    @DisplayName("배달주문 상태변경 주문제공 -> 주문완료 변경 실패, 배달주문의 주문상태가 배달완료가 아닌 경우")
     @Test
     void changeDeliveryOrderCompleteFailOrderStateNotDelivered() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(DELIVERY_ORDER_STATUS_DELIVERING_REQUEST());
 
         // When, Then
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderService.complete(orderStatusDelivering.getId()));
+                .isThrownBy(() -> orderService.complete(request.getId()));
     }
 
-    @DisplayName("매장주 상태변경 주문제공 -> 주문완료 샐패, 배달주문의 주문상태가 배달완료가 아닌 경우")
+    @DisplayName("매장주문 상태변경 주문제공 -> 주문완료 변경 실패, 매장주문의 상태가 주문제공 아닌 경우")
     @Test
     void changeEatInOrderCompleteFailOrderStateNotServed() {
         // Given
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+
+        Order request = orderRepository.save(EAT_IN_ORDER_STATUS_ACCEPTED_REQUEST());
 
         // When, Then
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderService.startDelivery(eatInOrderStatusCompleted.getId()));
+                .isThrownBy(() -> orderService.startDelivery(request.getId()));
     }
 
     @DisplayName("전체 주문 조회")
