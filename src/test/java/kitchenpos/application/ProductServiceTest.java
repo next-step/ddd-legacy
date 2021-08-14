@@ -17,6 +17,9 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import static kitchenpos.application.fixture.MenuFixture.SHOW_MENU_REQUEST;
+import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP_ONE_REQUEST;
+import static kitchenpos.application.fixture.ProductFixture.PRODUCT_ONE_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -91,26 +94,15 @@ class ProductServiceTest {
                 .isThrownBy(() -> productService.create(request));
     }
 
-    @DisplayName("상품 등록 실패 - 가격 null")
-    @Test
-    void createProductFailPriceNull() {
-        // Given
-        final Product request = new Product();
-        request.setName("라면");
-        request.setPrice(null);
-
-        // When, Then
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> productService.create(request));
-    }
-
     @DisplayName("상품 등록 실패 - 가격 음수")
-    @Test
-    void createProductFailPriceMinus() {
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"-1"})
+    void createProductFailPriceMinus(final BigDecimal price) {
         // Given
         final Product request = new Product();
         request.setName("라면");
-        request.setPrice(BigDecimal.valueOf(-1));
+        request.setPrice(price);
 
         // When, Then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -121,49 +113,39 @@ class ProductServiceTest {
     @Test
     void changeProductPrice() {
         // Given
-        dummyProduct.setPrice(BigDecimal.valueOf(16000));
-        final Product product = productRepository.save(dummyProduct);
+        final Product product = productRepository.save(PRODUCT_ONE_REQUEST());
+        final BigDecimal expectedPrice = BigDecimal.valueOf(18000);
 
         final Product request = new Product();
-        request.setPrice(BigDecimal.valueOf(18000));
+        request.setPrice(expectedPrice);
 
         // When
         Product actual = productService.changePrice(product.getId(), request);
 
         // Then
-        assertThat(actual.getPrice()).isEqualTo(request.getPrice());
+        assertThat(actual.getPrice()).isEqualTo(expectedPrice);
     }
 
     @DisplayName("상품 가격 변경 - 메뉴의 가격 > 상품의 수량 * 가격, 메뉴 비노출")
     @Test
     void changeProductPriceAndChangeMenuDisplayed() {
         // Given
-        dummyProduct.setPrice(BigDecimal.valueOf(16000));
-        final Product product = productRepository.save(dummyProduct);
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
 
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-
-        MenuGroup menuGroup = menuGroupRepository.save(dummyMenuGroup);
-
-        dummyMenu.setMenuGroup(menuGroup);
-        dummyMenu.setMenuProducts(Arrays.asList(menuProduct));
-
-        dummyMenu.setPrice(BigDecimal.valueOf(15000));
-        dummyMenu.setDisplayed(true);
-        final Menu menu = menuRepository.save(dummyMenu);
-
+        final BigDecimal expectedPrice = BigDecimal.valueOf(14000);
         final Product request = new Product();
-        request.setPrice(BigDecimal.valueOf(18000));
+        request.setPrice(expectedPrice);
 
         // When
-        final Product actual = productService.changePrice(dummyMenu.getId(), request);
+        final Product actual = productService.changePrice(PRODUCT_ONE_REQUEST().getId(), request);
 
         // Then
-        final Menu result = menuRepository.findById(menu.getId())
+        final Menu result = menuRepository.findById(SHOW_MENU_REQUEST().getId())
                 .orElseThrow(NoSuchElementException::new);
 
         assertThat(result.isDisplayed()).isFalse();
-
+        assertThat(actual.getPrice()).isEqualTo(expectedPrice);
     }
 }
