@@ -1,7 +1,6 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.infra.PurgomalumClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,13 +11,13 @@ import java.util.stream.Collectors;
 @Service
 public class MenuService {
     private final MenuRepository menuRepository;
-    private final MenuGroupJpaRepository menuGroupRepository;
+    private final MenuGroupRepository menuGroupRepository;
     private final ProductRepository productRepository;
     private final PurgomalumClient purgomalumClient;
 
     public MenuService(
         final MenuRepository menuRepository,
-        final MenuGroupJpaRepository menuGroupRepository,
+        final MenuGroupRepository menuGroupRepository,
         final ProductRepository productRepository,
         final PurgomalumClient purgomalumClient
     ) {

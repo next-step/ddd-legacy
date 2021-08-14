@@ -1,11 +1,9 @@
-package kitchenpos.application.repository;
+package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class TestMenuGroupRepository implements MenuGroupRepository {
     private final List<MenuGroup> menuGroups = new ArrayList<>();
@@ -19,6 +17,13 @@ public class TestMenuGroupRepository implements MenuGroupRepository {
 
     @Override
     public List<MenuGroup> findAll() {
-        return menuGroups;
+        return Collections.unmodifiableList(menuGroups);
+    }
+
+    @Override
+    public Optional<MenuGroup> findById(UUID menuGroupId) {
+        return menuGroups.stream()
+                .filter(menuGroup -> menuGroup.getId().equals(menuGroupId))
+                .findAny();
     }
 }
