@@ -6,18 +6,20 @@ import kitchenpos.domain.MenuGroupRepository;
 import java.util.*;
 
 public class TestMenuGroupRepository implements MenuGroupRepository {
-    private final List<MenuGroup> menuGroups = new ArrayList<>();
+    private final Set<MenuGroup> menuGroups = new HashSet<>();
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
-        menuGroup.setId(UUID.randomUUID());
+        if (menuGroup.getId() == null) {
+            menuGroup.setId(UUID.randomUUID());
+        }
         menuGroups.add(menuGroup);
         return menuGroup;
     }
 
     @Override
     public List<MenuGroup> findAll() {
-        return Collections.unmodifiableList(menuGroups);
+        return new ArrayList<>(menuGroups);
     }
 
     @Override

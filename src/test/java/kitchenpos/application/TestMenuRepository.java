@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TestMenuRepository implements MenuRepository {
-    private final List<Menu> menus = new ArrayList<>();
+    private final Set<Menu> menus = new HashSet<>();
 
     @Override
     public List<Menu> findAllByProductId(UUID productId) {
@@ -19,7 +19,9 @@ public class TestMenuRepository implements MenuRepository {
 
     @Override
     public Menu save(Menu menu) {
-        menu.setId(UUID.randomUUID());
+        if (menu.getId() == null) {
+            menu.setId(UUID.randomUUID());
+        }
         menus.add(menu);
         return menu;
     }
@@ -33,7 +35,7 @@ public class TestMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAll() {
-        return Collections.unmodifiableList(menus);
+        return new ArrayList<>(menus);
     }
 
     @Override
