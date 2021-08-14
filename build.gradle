@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.5.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
+    id 'jacoco'
 }
 
 group = 'camp.nextstep.edu'
@@ -11,6 +12,24 @@ description = 'Kitchenpos project with domain-driven design'
 
 repositories {
     mavenCentral()
+}
+
+jacoco {
+    // JaCoCo 버전
+    toolVersion = "0.8.5"
+
+//  테스트결과 리포트를 저장할 경로 변경
+//  default는 "${project.reporting.baseDir}/jacoco"
+    reportsDir = file("$buildDir/customJacocoReportDir")
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+        csv.enabled true
+        xml.enabled true
+        html.destination file("${buildDir}/jacocoHtml")
+    }
 }
 
 dependencies {
@@ -29,4 +48,7 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    jacoco {
+        destinationFile = file("$buildDir/jacoco/jacoco.exec")
+    }
 }
