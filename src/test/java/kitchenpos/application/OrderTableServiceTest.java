@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,15 +11,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import static kitchenpos.application.fixture.MenuFixture.SHOW_MENU_REQUEST;
+import static kitchenpos.application.fixture.MenuGroupFixture.MENU_GROUP_ONE_REQUEST;
+import static kitchenpos.application.fixture.OrderFixture.EAT_IN_ORDER_STATUS_COMPLETED_REQUEST;
+import static kitchenpos.application.fixture.OrderFixture.EAT_IN_ORDER_STATUS_SERVE_REQUEST;
+import static kitchenpos.application.fixture.OrderTableFixture.EMPTY_ORDER_TABLE_REQUEST;
+import static kitchenpos.application.fixture.OrderTableFixture.NOT_EMPTY_ORDER_TABLE_REQUEST;
+import static kitchenpos.application.fixture.ProductFixture.PRODUCT_ONE_REQUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 @Transactional
@@ -44,50 +48,6 @@ class OrderTableServiceTest {
     @Autowired
     private OrderRepository orderRepository;
 
-    private OrderTable dummyOrderTable;
-
-    private Product dummyproduct;
-
-    private Menu dummymenu;
-
-    private MenuProduct dummyMenuProduct;
-
-    private MenuGroup dummyMenuGroup;
-
-    private Order dummyOrder;
-
-    @BeforeEach
-    void setUp() {
-        dummyOrderTable = new OrderTable();
-        dummyOrderTable.setId(UUID.randomUUID());
-        dummyOrderTable.setName("100번");
-        dummyOrderTable.setNumberOfGuests(0);
-
-        dummyproduct = productRepository.findById(UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10"))
-                .orElseThrow(NoSuchElementException::new);
-
-        dummyMenuProduct = new MenuProduct();
-        dummyMenuProduct.setProduct(dummyproduct);
-
-        dummyMenuGroup = new MenuGroup();
-        dummyMenuGroup.setId(UUID.randomUUID());
-        dummyMenuGroup.setName("추천 메뉴");
-
-        dummymenu = new Menu();
-        dummymenu.setId(UUID.randomUUID());
-        dummymenu.setName("치킨");
-        dummymenu.setPrice(BigDecimal.valueOf(15000));
-        dummymenu.setDisplayed(false);
-        dummymenu.setMenuGroup(dummyMenuGroup);
-        dummymenu.setMenuProducts(Arrays.asList(dummyMenuProduct));
-
-        dummyOrder = new Order();
-        dummyOrder.setId(UUID.randomUUID());
-        dummyOrder.setType(OrderType.EAT_IN);
-        dummyOrder.setOrderDateTime(LocalDateTime.now());
-
-    }
-
     @DisplayName("주문 테이블 등록 - 성공")
     @Test
     void createOrderTableSuccess() {
@@ -102,8 +62,10 @@ class OrderTableServiceTest {
         final OrderTable orderTable = orderTableRepository.findById(data.getId())
                 .orElseThrow(NoSuchElementException::new);
 
-        assertThat(orderTable.getId()).isEqualTo(data.getId());
-        assertThat(orderTable.getName()).isEqualTo(data.getName());
+        assertAll(
+            () -> assertThat(orderTable.getId()).isEqualTo(data.getId()),
+            () -> assertThat(orderTable.getName()).isEqualTo(data.getName())
+        );
     }
 
     @DisplayName("주문 테이블 등록 - 등록 실패")
@@ -124,88 +86,70 @@ class OrderTableServiceTest {
     @Test
     void orderTableSit() {
         // Given
-        dummyOrderTable.setEmpty(true);
-        final OrderTable data = orderTableRepository.save(dummyOrderTable);
+        final OrderTable request = orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
 
         // When
-        final OrderTable result = orderTableService.sit(data.getId());
+        final OrderTable result = orderTableService.sit(request.getId());
 
         // Then
-        assertThat(result.getId()).isEqualTo(data.getId());
-        assertThat(result.isEmpty()).isFalse();
+        assertAll(
+            () -> assertThat(result.getId()).isEqualTo(request.getId()),
+            () -> assertThat(result.isEmpty()).isFalse()
+        );
     }
 
     @DisplayName("주문 테이블 - 테이블 정리 성공")
     @Test
     void orderTableClearSuccess() {
         // Given
-        final MenuGroup menuGroup = menuGroupRepository.save(dummyMenuGroup);
-        dummymenu.setMenuGroup(menuGroup);
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+        orderRepository.save(EAT_IN_ORDER_STATUS_COMPLETED_REQUEST());
 
-        final Menu menu = menuRepository.save(dummymenu);
-
-        final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenu(menu);
-        orderLineItem.setQuantity(1);
-
-        dummyOrderTable.setEmpty(false);
-        dummyOrderTable.setNumberOfGuests(10);
-        final OrderTable data = orderTableRepository.save(dummyOrderTable);
-
-        dummyOrder.setStatus(OrderStatus.COMPLETED);
-        dummyOrder.setOrderLineItems(Arrays.asList(orderLineItem));
-        dummyOrder.setOrderTable(data);
-
-        final Order order = orderRepository.save(dummyOrder);
-
+        UUID expectedId = EMPTY_ORDER_TABLE_REQUEST().getId();
 
         // When
-        final OrderTable actual = orderTableService.clear(data.getId());
+        final OrderTable actual = orderTableService.clear(expectedId);
 
         // Then
-        assertThat(actual.getId()).isEqualTo(data.getId());
-        assertThat(actual.isEmpty()).isTrue();
-        assertThat(actual.getNumberOfGuests()).isZero();
+        assertAll(
+            () -> assertThat(actual.getId()).isEqualTo(expectedId),
+            () -> assertThat(actual.isEmpty()).isTrue(),
+            () -> assertThat(actual.getNumberOfGuests()).isZero()
+        );
     }
 
     @DisplayName("주문 테이블 - 테이블 정리 실패, 주문 상태가 주문 완료가 아님")
     @Test
     void orderTableClearFail() {
         // Given
-        final MenuGroup menuGroup = menuGroupRepository.save(dummyMenuGroup);
-        dummymenu.setMenuGroup(menuGroup);
-
-        final Menu menu = menuRepository.save(dummymenu);
-
-        final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenu(menu);
-        orderLineItem.setQuantity(1);
-
-        dummyOrderTable.setEmpty(false);
-        dummyOrderTable.setNumberOfGuests(10);
-        final OrderTable data = orderTableRepository.save(dummyOrderTable);
-
-        dummyOrder.setStatus(OrderStatus.SERVED);
-        dummyOrder.setOrderLineItems(Arrays.asList(orderLineItem));
-        dummyOrder.setOrderTable(data);
-
-        final Order order = orderRepository.save(dummyOrder);
+        menuGroupRepository.save(MENU_GROUP_ONE_REQUEST());
+        productRepository.save(PRODUCT_ONE_REQUEST());
+        menuRepository.save(SHOW_MENU_REQUEST());
+        orderTableRepository.save(EMPTY_ORDER_TABLE_REQUEST());
+        orderRepository.save(EAT_IN_ORDER_STATUS_SERVE_REQUEST());
 
         // When, Then
         Assertions.assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderTableService.clear(data.getId()));
+                .isThrownBy(() -> orderTableService.clear(EMPTY_ORDER_TABLE_REQUEST().getId()));
     }
 
     @DisplayName("주문 테이블 전체 조회")
     @Test
     void findAll() {
         // Given
-        orderTableRepository.save(dummyOrderTable);
+        orderTableRepository.save(NOT_EMPTY_ORDER_TABLE_REQUEST());
 
         // When
         final List<OrderTable> list = orderTableService.findAll();
+        final String actualTableName = NOT_EMPTY_ORDER_TABLE_REQUEST().getName();
 
         // Then
-        assertThat(list).isNotEmpty();
+        assertAll(
+            () -> assertThat(list).isNotEmpty(),
+            () -> assertThat(list.stream().filter(x -> (actualTableName.equals(x.getName()))).count()).isEqualTo(1)
+        );
     }
 }
