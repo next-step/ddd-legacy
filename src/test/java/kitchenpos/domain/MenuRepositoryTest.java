@@ -31,18 +31,22 @@ public class MenuRepositoryTest extends FixtureData {
     @DisplayName("메뉴 생성")
     @Test
     void createMenu() {
+        // given
         Menu menu = menus.get(0);
 
         given(menuRepository.save(menu)).willReturn(menu);
 
+        // when
         Menu createMenu = menuRepository.save(menu);
 
+        // then
         assertThat(createMenu).isEqualTo(menu);
     }
 
     @DisplayName("메뉴 노출 변경")
     @Test
     void changeDisplay() {
+        // given
         given(menuRepository.findById(FIRST_ID)).willReturn(Optional.of(menus.get(0)));
 
         Menu findMenu = menuRepository.findById(FIRST_ID).get();
@@ -50,18 +54,23 @@ public class MenuRepositoryTest extends FixtureData {
 
         given(menuRepository.save(findMenu)).willReturn(findMenu);
 
+        // when
         Menu changeMenu = menuRepository.save(findMenu);
 
+        // then
         assertThat(changeMenu.isDisplayed()).isEqualTo(MENU_HIDE);
     }
 
     @DisplayName("메뉴 내역 조회")
     @Test
     void findAll() {
+        // given
         given(menuRepository.findAll()).willReturn(menus);
 
+        // then
         List<Menu> findAll = menuRepository.findAll();
 
+        // when
         verify(menuRepository).findAll();
         verify(menuRepository, times(1)).findAll();
         assertAll(

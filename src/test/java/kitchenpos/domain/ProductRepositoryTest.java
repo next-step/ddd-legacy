@@ -30,22 +30,25 @@ class ProductRepositoryTest extends FixtureData {
     @DisplayName("상품 생성")
     @Test
     void createProduct() {
+        // given
         Product product = products.get(0);
 
         given(productRepository.save(product)).willReturn(product);
 
+        // when
         Product create = productRepository.save(product);
 
+        // then
         assertThat(product).isEqualTo(create);
     }
 
     @DisplayName("상품 가격 변경")
     @Test
     void changeProductPrice() {
+        // given
         BigDecimal changePrice = BigDecimal.valueOf(10000);
-
         Product product = products.get(0);
-
+        
         given(productRepository.findById(FIRST_ID)).willReturn(Optional.of(product));
 
         Product findProduct = productRepository.findById(FIRST_ID).get();
@@ -53,18 +56,23 @@ class ProductRepositoryTest extends FixtureData {
 
         given(productRepository.save(findProduct)).willReturn(findProduct);
 
+        // when
         Product changeProduct = productRepository.save(findProduct);
 
+        // then
         assertThat(findProduct).isEqualTo(changeProduct);
     }
 
     @DisplayName("상품 내역 확인")
     @Test
     void findAll() {
+        // given
         given(productRepository.findAll()).willReturn(products);
 
+        // when
         List<Product> findAll = productRepository.findAll();
 
+        // then
         verify(productRepository).findAll();
         verify(productRepository, times(1)).findAll();
         assertAll(

@@ -1,6 +1,7 @@
 package kitchenpos.ui;
 
 import kitchenpos.FixtureData;
+import kitchenpos.MockMvcSupport;
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.OrderTable;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(OrderTableRestController.class)
-class OrderTableRestControllerTest extends FixtureData {
+class OrderTableRestControllerTest extends MockMvcSupport {
 
     @Autowired
     private MockMvc webMvc;
@@ -41,6 +42,7 @@ class OrderTableRestControllerTest extends FixtureData {
     @DisplayName("주문 테이블 생성")
     @Test
     void createOrderTable() throws Exception {
+        // given
         OrderTable orderTable = new OrderTable();
         orderTable.setName("10번");
 
@@ -49,12 +51,14 @@ class OrderTableRestControllerTest extends FixtureData {
 
         given(orderTableService.create(any())).willReturn(create);
 
+        // when
         ResultActions perform = webMvc.perform(
                 post("/api/order-tables")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(orderTable))
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful());
@@ -63,15 +67,18 @@ class OrderTableRestControllerTest extends FixtureData {
     @DisplayName("테이블 활성화")
     @Test
     void sit() throws Exception {
+        // given
         OrderTable sitTable = orderTables.get(0);
         sitTable.setEmpty(TABLE_SIT);
 
         given(orderTableService.sit(any())).willReturn(sitTable);
 
+        // when
         ResultActions perform = webMvc.perform(
                 put("/api/order-tables/{orderTableId}/sit", sitTable.getId())
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
@@ -81,15 +88,18 @@ class OrderTableRestControllerTest extends FixtureData {
     @DisplayName("테이블 정리")
     @Test
     void clear() throws Exception {
+        // given
         OrderTable clearTable = orderTables.get(0);
         clearTable.setEmpty(TABLE_CLEAR);
 
         given(orderTableService.clear(any())).willReturn(clearTable);
 
+        // when
         ResultActions perform = webMvc.perform(
                 put("/api/order-tables/{orderTableId}/clear", clearTable.getId())
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
@@ -99,18 +109,21 @@ class OrderTableRestControllerTest extends FixtureData {
     @DisplayName("테이블 손님 수 변경")
     @Test
     void changeNumberOfGuests() throws Exception {
+        // given
         OrderTable changeTable = orderTables.get(0);
         changeTable.setEmpty(TABLE_SIT);
         changeTable.setNumberOfGuests(2);
 
         given(orderTableService.changeNumberOfGuests(any(), any())).willReturn(changeTable);
 
+        // when
         ResultActions perform = webMvc.perform(
                 put("/api/order-tables/{orderTableId}/number-of-guests", changeTable.getId())
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(changeTable))
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
@@ -120,12 +133,15 @@ class OrderTableRestControllerTest extends FixtureData {
     @DisplayName("테이블 현황")
     @Test
     void findAll() throws Exception {
+        // given
         given(orderTableService.findAll()).willReturn(orderTables);
 
+        // when
         ResultActions perform = webMvc.perform(
                 get("/api/order-tables/")
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().isOk());

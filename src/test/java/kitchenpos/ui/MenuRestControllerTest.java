@@ -1,6 +1,7 @@
 package kitchenpos.ui;
 
 import kitchenpos.FixtureData;
+import kitchenpos.MockMvcSupport;
 import kitchenpos.application.MenuService;
 import kitchenpos.domain.Menu;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MenuRestController.class)
-class MenuRestControllerTest extends FixtureData {
+class MenuRestControllerTest extends MockMvcSupport {
 
     @Autowired
     private MockMvc webMvc;
@@ -38,16 +39,19 @@ class MenuRestControllerTest extends FixtureData {
     @DisplayName("메뉴 생성하기")
     @Test
     void createMenu() throws Exception {
+        // given
         Menu menu = menus.get(0);
 
         given(menuService.create(any())).willReturn(menu);
 
+        // when
         ResultActions perform = webMvc.perform(
                 post("/api/menus")
                 .content(objectMapper.writeValueAsString(menu))
                 .contentType("application/json")
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
@@ -63,6 +67,7 @@ class MenuRestControllerTest extends FixtureData {
     @DisplayName("메뉴 가격 변경")
     @Test
     void changeMenuPrice() throws Exception {
+        // given
         Menu changeMenu = new Menu();
         changeMenu.setPrice(ofPrice(1000));
 
@@ -71,12 +76,14 @@ class MenuRestControllerTest extends FixtureData {
 
         given(menuService.changePrice(any(), any())).willReturn(menu);
 
+        // when
         ResultActions perform = webMvc.perform(
                 put("/api/menus/{menuId}/price", menu.getId())
                         .content(objectMapper.writeValueAsString(changeMenu))
                         .contentType("application/json")
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
@@ -92,14 +99,17 @@ class MenuRestControllerTest extends FixtureData {
     @DisplayName("메뉴 공개")
     @Test
     void menuDisplay() throws Exception {
+        // given
         Menu menu = menus.get(0);
 
         given(menuService.display(any())).willReturn(menu);
 
+        // when
         ResultActions perform = webMvc.perform(
                 put("/api/menus/{menuId}/display", menu.getId())
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -115,15 +125,18 @@ class MenuRestControllerTest extends FixtureData {
     @DisplayName("메뉴 비공개")
     @Test
     void menuHide() throws Exception {
+        // given
         Menu menu = menus.get(0);
         menu.setDisplayed(MENU_HIDE);
 
         given(menuService.hide(any())).willReturn(menu);
 
+        // when
         ResultActions perform = webMvc.perform(
                 put("/api/menus/{menuId}/hide", menu.getId())
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())

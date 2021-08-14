@@ -47,6 +47,7 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("매장&포장 주문 생성")
     @Test
     void createOrder() {
+        // given
         Order order = orders.get(0);
         OrderTable orderTable = order.getOrderTable();
         orderTable.setEmpty(TABLE_SIT);
@@ -58,8 +59,10 @@ class OrderServiceTest extends FixtureData {
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
         given(orderRepository.save(any())).willReturn(order);
 
+        // when
         Order createOrder = orderService.create(order);
 
+        // then
         assertAll(
                 () -> assertThat(createOrder).isNotNull(),
                 () -> assertThat(createOrder.getOrderDateTime()).isNotNull()
@@ -69,6 +72,7 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("배송 주문 생성")
     @Test
     void createDeliveryOrder() {
+        // given
         Order deliveryOrder = orders.get(1);
         List<OrderLineItem> orderLineItem = deliveryOrder.getOrderLineItems();
         Menu menu = orderLineItem.get(0).getMenu();
@@ -77,8 +81,10 @@ class OrderServiceTest extends FixtureData {
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
         given(orderRepository.save(any())).willReturn(deliveryOrder);
 
+        // when
         Order createOrder = orderService.create(deliveryOrder);
 
+        // then
         assertAll(
                 () -> assertThat(createOrder).isNotNull(),
                 () -> assertThat(createOrder.getOrderDateTime()).isNotNull()
@@ -109,6 +115,7 @@ class OrderServiceTest extends FixtureData {
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT"})
     void negativeDeliveryAndTakeOutQuantity(OrderType type) {
+        // given
         Order order = orders.get(0);
         order.setType(type);
         OrderLineItem orderLineItem = order.getOrderLineItems().get(0);
@@ -116,6 +123,7 @@ class OrderServiceTest extends FixtureData {
 
         given(menuRepository.findAllById(any())).willReturn(Arrays.asList(orderLineItem.getMenu()));
 
+        // when, then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> orderService.create(order));
     }
@@ -123,6 +131,7 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("주문 메뉴 비공개면 에러 처리")
     @Test
     void negativeMenuDisplay() {
+        // given
         Order order = orders.get(0);
         OrderLineItem orderLineItem = order.getOrderLineItems().get(0);
         Menu menu = orderLineItem.getMenu();
@@ -131,6 +140,7 @@ class OrderServiceTest extends FixtureData {
         given(menuRepository.findAllById(any())).willReturn(Arrays.asList(orderLineItem.getMenu()));
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
+        // when, then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> orderService.create(order));
     }
@@ -138,6 +148,7 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("주문 아이템 가격이 메뉴보다 비싸면 에러 처리")
     @Test
     void orderLineItemPriceHigherThenmenuPrice() {
+        // given
         Order order = orders.get(0);
         OrderLineItem orderLineItem = order.getOrderLineItems().get(0);
         orderLineItem.setPrice(ofPrice(100000));
@@ -146,6 +157,7 @@ class OrderServiceTest extends FixtureData {
         given(menuRepository.findAllById(any())).willReturn(Arrays.asList(orderLineItem.getMenu()));
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
+        // when, then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> orderService.create(order));
     }
@@ -153,6 +165,7 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("배송 주문은 배송지 없으면 에러")
     @Test
     void negativeDeliveryAddress() {
+        // given
         Order order = orders.get(1);
         List<OrderLineItem> orderLineItem = order.getOrderLineItems();
         Menu menu = orderLineItem.get(0).getMenu();
@@ -162,6 +175,7 @@ class OrderServiceTest extends FixtureData {
         given(menuRepository.findAllById(any())).willReturn(Arrays.asList(menu));
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
+        // when, then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> orderService.create(order));
     }
@@ -169,6 +183,7 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("테이블이 비어있으면 예외처리")
     @Test
     void negativeOrderTableEmpty() {
+        // given
         Order order = orders.get(0);
         OrderTable orderTable = order.getOrderTable();
         orderTable.setEmpty(TABLE_CLEAR);
@@ -179,6 +194,7 @@ class OrderServiceTest extends FixtureData {
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
+        // when, then
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderService.create(order));
     }
@@ -197,24 +213,30 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("주문 접수")
     @Test
     void orderAccept() {
+        // given
         Order order = orders.get(0);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when
         Order accept = orderService.accept(order.getId());
 
+        // then
         assertThat(accept.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
     @DisplayName("배송 주문 접수하면 배달라이더에게 주문 정보 전달 ")
     @Test
     void orderAcceptKitchenriders() {
+        // given
         Order order = orders.get(1);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when
         Order accept = orderService.accept(order.getId());
 
+        // then
         verify(kitchenridersClient, times(1)).requestDelivery(any(), any(), any());
         assertThat(accept.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
@@ -223,11 +245,13 @@ class OrderServiceTest extends FixtureData {
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void negativeAccept(OrderStatus status) {
+        // given
         Order order = orders.get(0);
         order.setStatus(status);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when, then
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderService.accept(order.getId()));
     }
@@ -235,13 +259,16 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("주문 제공")
     @Test
     void serve() {
+        // given
         Order order = orders.get(0);
         order.setStatus(OrderStatus.ACCEPTED);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when
         Order serve = orderService.serve(order.getId());
 
+        // then
         assertThat(serve.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
@@ -249,11 +276,13 @@ class OrderServiceTest extends FixtureData {
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void negativeServe(OrderStatus status) {
+        // given
         Order order = orders.get(0);
         order.setStatus(status);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when, then
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderService.serve(order.getId()));
     }
@@ -261,13 +290,16 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("배송 시작")
     @Test
     void startDelivery() {
+        // given
         Order order = orders.get(1);
         order.setStatus(OrderStatus.SERVED);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when
         Order startDelivery = orderService.startDelivery(order.getId());
 
+        // then
         assertThat(startDelivery.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     }
 
@@ -275,11 +307,13 @@ class OrderServiceTest extends FixtureData {
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
     void negativeStartDeliveryOrderType(OrderType type) {
+        // given
         Order order = orders.get(1);
         order.setType(type);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when, then
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderService.startDelivery(order.getId()));
     }
@@ -288,11 +322,13 @@ class OrderServiceTest extends FixtureData {
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void negativeStartDeliveryServe(OrderStatus status) {
+        // given
         Order order = orders.get(1);
         order.setStatus(status);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when, then
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderService.startDelivery(order.getId()));
     }
@@ -300,13 +336,16 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("배송 완료")
     @Test
     void completeDelivery() {
+        // given
         Order order = orders.get(1);
         order.setStatus(OrderStatus.DELIVERING);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when
         Order completeDelivery = orderService.completeDelivery(order.getId());
 
+        // then
         assertThat(completeDelivery.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
@@ -314,11 +353,13 @@ class OrderServiceTest extends FixtureData {
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
     void negativeCompleteDelivery(OrderStatus status) {
+        // given
         Order order = orders.get(1);
         order.setStatus(status);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when, then
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderService.completeDelivery(order.getId()));
     }
@@ -326,13 +367,16 @@ class OrderServiceTest extends FixtureData {
     @DisplayName("배달 주문 완료")
     @Test
     void deliveryComplete() {
+        // given
         Order order = orders.get(1);
         order.setStatus(OrderStatus.DELIVERED);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when
         Order complete = orderService.complete(order.getId());
 
+        // then
         assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
@@ -353,14 +397,17 @@ class OrderServiceTest extends FixtureData {
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"TAKEOUT", "EAT_IN"})
     void takeOutAndEatInComplete(OrderType type) {
+        // given
         Order order = orders.get(0);
         order.setStatus(OrderStatus.SERVED);
         order.setType(type);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when
         Order complete = orderService.complete(order.getId());
 
+        // then
         assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
@@ -368,12 +415,14 @@ class OrderServiceTest extends FixtureData {
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void negativeTakeOutComplete(OrderStatus status) {
+        // given
         Order order = orders.get(0);
         order.setType(OrderType.TAKEOUT);
         order.setStatus(status);
 
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when, then
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderService.complete(order.getId()));
     }
@@ -382,11 +431,14 @@ class OrderServiceTest extends FixtureData {
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void negativeEatInComplete(OrderStatus status) {
+        // given
         Order order = orders.get(0);
         order.setStatus(status);
 
+        // when
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
+        // when, then
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderService.complete(order.getId()));
     }
@@ -396,8 +448,10 @@ class OrderServiceTest extends FixtureData {
     void findAll() {
         given(orderRepository.findAll()).willReturn(orders);
 
+        // when
         List<Order> findAll = orderRepository.findAll();
 
+        // then
         verify(orderRepository).findAll();
         verify(orderRepository, times(1)).findAll();
         assertAll(

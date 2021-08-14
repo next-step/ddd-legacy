@@ -1,6 +1,7 @@
 package kitchenpos.ui;
 
 import kitchenpos.FixtureData;
+import kitchenpos.MockMvcSupport;
 import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MenuGroupRestController.class)
-class MenuGroupRestControllerTest extends FixtureData {
+class MenuGroupRestControllerTest extends MockMvcSupport {
 
     @Autowired
     private MockMvc webMvc;
@@ -36,16 +37,19 @@ class MenuGroupRestControllerTest extends FixtureData {
     @DisplayName("메뉴그룹 생성하기")
     @Test
     void createMenuGroup() throws Exception {
+        // given
         MenuGroup menuGroup = menuGroups.get(0);
 
         given(menuGroupService.create(any())).willReturn(menuGroup);
 
+        // when
         ResultActions perform = webMvc.perform(
                 post("/api/menu-groups")
                 .content("{\"name\":\"추천메뉴\"}")
                 .contentType("application/json")
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())

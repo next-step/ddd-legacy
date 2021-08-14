@@ -34,12 +34,14 @@ public class MenuGroupServiceTest extends FixtureData {
     @Test
     @DisplayName("메뉴 그룹 생성")
     void createMenuGroup() {
+        // given
         final MenuGroup menuGroup = menuGroups.get(0);
-
         given(menuGroupRepository.save(any())).willReturn(menuGroup);
 
+        // when
         final MenuGroup create = menuGroupService.create(menuGroup);
 
+        // then
         assertThat(menuGroup.getName()).isEqualTo(create.getName());
     }
 
@@ -47,13 +49,16 @@ public class MenuGroupServiceTest extends FixtureData {
     @DisplayName("메뉴 그룹명은 한글자 이상")
     @ValueSource(strings = {"죽", "치킨", "탕수육"})
     public void nameMinimumOne(String name) {
+        // given
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName(name);
 
         given(menuGroupRepository.save(any())).willReturn(menuGroup);
 
+        // when
         MenuGroup createMenuGroup = menuGroupService.create(menuGroup);
 
+        // then
         assertThat(createMenuGroup.getName()).isEqualTo(name);
     }
 
@@ -68,6 +73,7 @@ public class MenuGroupServiceTest extends FixtureData {
     @ParameterizedTest
     @ValueSource(strings = {"죽", "치킨", "탕수육"})
     public void duplicationMenuGroupNameCreate(String name) {
+        // given
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName(name);
 
@@ -76,9 +82,11 @@ public class MenuGroupServiceTest extends FixtureData {
 
         given(menuGroupRepository.save(any())).willReturn(menuGroup).willReturn(menuGroup2);
 
+        // when
         MenuGroup create = menuGroupService.create(menuGroup);
         MenuGroup create2 = menuGroupService.create(menuGroup2);
 
+        // then
         assertThat(create.getName()).isEqualTo(create2.getName());
     }
 }

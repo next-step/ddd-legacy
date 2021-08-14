@@ -1,6 +1,7 @@
 package kitchenpos.ui;
 
 import kitchenpos.FixtureData;
+import kitchenpos.MockMvcSupport;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.Product;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ProductRestController.class)
-class ProductRestControllerTest extends FixtureData {
+class ProductRestControllerTest extends MockMvcSupport {
 
     @Autowired
     private MockMvc webMvc;
@@ -37,18 +38,21 @@ class ProductRestControllerTest extends FixtureData {
     @DisplayName("상품 생성하기")
     @Test
     void createProduct() throws Exception {
+        // given
         Product product = new Product();
         product.setName(products.get(0).getName());
         product.setPrice(products.get(0).getPrice());
 
         given(productService.create(any())).willReturn(products.get(0));
 
+        // when
         ResultActions perform = webMvc.perform(
                 post("/api/products")
                         .content(objectMapper.writeValueAsString(product))
                         .contentType("application/json")
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())
@@ -60,6 +64,7 @@ class ProductRestControllerTest extends FixtureData {
     @DisplayName("가격 변경")
     @Test
     void changePrice() throws Exception {
+        // given
         Product changePrice = new Product();
         changePrice.setPrice(ofPrice(2000));
 
@@ -68,12 +73,14 @@ class ProductRestControllerTest extends FixtureData {
 
         given(productService.changePrice(any(), any())).willReturn(product);
 
+        // when
         ResultActions perform = webMvc.perform(
                 put("/api/products/{productId}/price", product.getId())
                         .content(objectMapper.writeValueAsString(changePrice))
                         .contentType("application/json")
         );
 
+        // then
         perform
                 .andDo(print())
                 .andExpect(status().is2xxSuccessful())

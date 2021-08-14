@@ -43,7 +43,6 @@ class OrderTableServiceTest extends FixtureData {
     @Test
     void create() {
         OrderTable orderTable = orderTables.get(0);
-
         given(orderTableRepository.save(any())).willReturn(orderTable);
 
         OrderTable createOrderTable = orderTableService.create(orderTable);
@@ -62,7 +61,6 @@ class OrderTableServiceTest extends FixtureData {
     @Test
     void sit() {
         OrderTable orderTable = orderTables.get(0);
-
         given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
 
         OrderTable sit = orderTableService.sit(orderTable.getId());
@@ -73,25 +71,30 @@ class OrderTableServiceTest extends FixtureData {
     @DisplayName("테이블 비활성화")
     @Test
     void clear() {
+        // given
         OrderTable orderTable = orderTables.get(0);
         orderTable.setEmpty(TABLE_SIT);
 
         given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
 
+        // when
         OrderTable sit = orderTableService.clear(orderTable.getId());
 
+        // then
         assertThat(sit.isEmpty()).isTrue();
     }
 
     @DisplayName("주문이 완료안된 테이블은 비활성화 불가")
     @Test
     void negativeClear() {
+        // given
         OrderTable orderTable = orderTables.get(0);
         orderTable.setEmpty(TABLE_SIT);
 
         given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
         given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
 
+        // when, then
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
     }
@@ -110,24 +113,29 @@ class OrderTableServiceTest extends FixtureData {
     @ParameterizedTest
     @ValueSource(ints = {0, 1, 2, 3})
     void changeNumberOfGuests(int guestCount) {
+        // given
         OrderTable orderTable = orderTables.get(0);
         orderTable.setEmpty(TABLE_SIT);
         orderTable.setNumberOfGuests(guestCount);
 
         given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
 
+        // when
         OrderTable changeOrderTable = orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
 
+        // then
         assertThat(changeOrderTable.getNumberOfGuests()).isEqualTo(guestCount);
     }
 
     @DisplayName("테이블 고객 수 0 미만 예외 처리")
     @Test
     void negativeNumberOfGuests() {
+        // given
         OrderTable orderTable = orderTables.get(0);
         orderTable.setEmpty(TABLE_SIT);
         orderTable.setNumberOfGuests(-1);
 
+        // when, then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
@@ -135,12 +143,14 @@ class OrderTableServiceTest extends FixtureData {
     @DisplayName("비활성화 테이블은 고객 수 변경 불가 ")
     @Test
     void negativeChangeNumberOfGuests() {
+        // given
         OrderTable orderTable = orderTables.get(0);
         orderTable.setEmpty(TABLE_CLEAR);
         orderTable.setNumberOfGuests(1);
 
         given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
 
+        // when, then
         assertThatIllegalStateException()
                 .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
@@ -148,10 +158,13 @@ class OrderTableServiceTest extends FixtureData {
     @DisplayName("테이블 내역 조회")
     @Test
     void findAll() {
+        // given
         given(orderTableRepository.findAll()).willReturn(orderTables);
 
+        // when
         List<OrderTable> findAll = orderTableService.findAll();
 
+        // then
         verify(orderTableRepository).findAll();
         verify(orderTableRepository, times(1)).findAll();
         assertAll(

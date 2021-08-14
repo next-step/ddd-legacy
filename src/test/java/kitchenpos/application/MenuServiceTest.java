@@ -48,6 +48,7 @@ public class MenuServiceTest extends FixtureData {
     @DisplayName("메뉴 생성")
     @Test
     void createMenu() {
+        // given
         Menu menu = menus.get(0);
 
         given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menu.getMenuGroup()));
@@ -55,8 +56,10 @@ public class MenuServiceTest extends FixtureData {
         given(productRepository.findById(any())).willReturn(Optional.of(products.get(0)));
         given(menuRepository.save(any())).willReturn(menu);
 
+        // when
         Menu createMenu = menuService.create(menu);
 
+        // then
         assertThat(createMenu).isNotNull();
     }
 
@@ -84,6 +87,7 @@ public class MenuServiceTest extends FixtureData {
     @DisplayName("메뉴에 상품 수량은 0 이하 예외 처리")
     @Test
     void negativeMenuProductQuantity() {
+        // given
         Menu menu = menus.get(0);
         MenuProduct menuProduct = menu.getMenuProducts().get(0);
         menuProduct.setQuantity(0);
@@ -92,6 +96,7 @@ public class MenuServiceTest extends FixtureData {
         given(productRepository.findAllById(any())).willReturn(Arrays.asList(menu.getMenuProducts().get(0).getProduct()));
         given(productRepository.findById(any())).willReturn(Optional.of(products.get(0)));
 
+        // when, then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> menuService.create(menu));
     }
@@ -99,6 +104,7 @@ public class MenuServiceTest extends FixtureData {
     @DisplayName("메뉴 가격이 메뉴의 상품 가격이 보다 높으면 예외처리")
     @Test
     void negativeMenuProductPrice() {
+        // given
         Menu menu = menus.get(0);
         Product product = menu.getMenuProducts().get(0).getProduct();
         menu.setPrice(ofPrice(1).add(product.getPrice()));
@@ -107,6 +113,7 @@ public class MenuServiceTest extends FixtureData {
         given(productRepository.findAllById(any())).willReturn(Arrays.asList(product));
         given(productRepository.findById(any())).willReturn(Optional.of(products.get(0)));
 
+        // when, then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> menuService.create(menu));
     }
@@ -114,11 +121,13 @@ public class MenuServiceTest extends FixtureData {
     @DisplayName("메뉴 가격은 변경 가능")
     @Test
     void changeMenuPrice() {
+        // given
         Menu menu = menus.get(0);
         menu.setPrice(ofPrice(100));
 
         given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
 
+        // when
         Menu changeMenu = menuService.changePrice(menu.getId(), menu);
 
         assertThat(changeMenu.getPrice()).isEqualTo(menu.getPrice());
@@ -158,12 +167,15 @@ public class MenuServiceTest extends FixtureData {
     @DisplayName("메뉴 노출")
     @Test
     void menuDisplay() {
+        // given
         Menu menu = menus.get(0);
 
         given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
 
+        // when
         Menu displayMenu = menuService.display(menu.getId());
 
+        // then
         assertThat(displayMenu.isDisplayed()).isTrue();
     }
 
@@ -182,10 +194,13 @@ public class MenuServiceTest extends FixtureData {
     @DisplayName("메뉴 조회")
     @Test
     void findAll() {
+        // given
         given(menuRepository.findAll()).willReturn(menus);
 
+        // when
         List<Menu> findAll = menuService.findAll();
 
+        // then
         verify(menuRepository).findAll();
         verify(menuRepository, times(1)).findAll();
         assertAll(

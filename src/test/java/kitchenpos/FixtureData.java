@@ -2,12 +2,6 @@ package kitchenpos;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.domain.*;
-import org.junit.jupiter.api.BeforeEach;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -16,12 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-
 public class FixtureData {
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     protected List<MenuGroup> menuGroups = new ArrayList<>();
     protected List<Product> products = new ArrayList<>();
@@ -188,12 +177,5 @@ public class FixtureData {
 
     protected BigDecimal ofPrice(int price) {
         return BigDecimal.valueOf(price);
-    }
-
-    protected MockMvc ofUtf8MockMvc() {
-        return MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .addFilters(new CharacterEncodingFilter("UTF-8", true))  // 필터 추가
-                .alwaysDo(print())
-                .build();
     }
 }
