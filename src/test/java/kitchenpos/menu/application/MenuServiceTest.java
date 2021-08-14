@@ -15,12 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.*;
 
 import static kitchenpos.menu.fixture.MenuFixture.*;
-import static kitchenpos.product.fixture.ProductionFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 @DisplayName("Menu 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -37,9 +35,18 @@ public class MenuServiceTest {
 
     private MenuService menuService;
 
+    private MenuGroup 기본_한마리_메뉴_그룹;
+    private Product 기본_후라이드_상품;
+    private Menu 기본_후라이드_치킨_메뉴;
+    private UUID id;
+
     @BeforeEach
     void setUp() {
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+        기본_한마리_메뉴_그룹 = 한마리_메뉴_그룹();
+        기본_후라이드_상품 = 후라이드_상품();
+        기본_후라이드_치킨_메뉴 = 후라이드_치킨_메뉴();
+        id = UUID.randomUUID();
     }
 
     @DisplayName("메뉴 가격이 음수인 경우 IllegalArgumentException을 던진다.")
@@ -47,10 +54,10 @@ public class MenuServiceTest {
     @ValueSource(ints = {-10,-100})
     public void createWithValidPrice(int price) {
         // given
-        Menu menu = createMenu(price);
+        Menu 음수_가격_후라이드_치킨_메뉴 = 후라이드_치킨_메뉴(price);
 
         // when, then
-        assertThatThrownBy(() -> menuService.create(menu))
+        assertThatThrownBy(() -> menuService.create(음수_가격_후라이드_치킨_메뉴))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -58,11 +65,10 @@ public class MenuServiceTest {
     @Test
     public void createWithinRegisteredMenuGroup() {
         // given
-        Menu menu = createMenu(17000);
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.empty());
+        given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
 
         // when, then
-        assertThatThrownBy(() -> menuService.create(menu))
+        assertThatThrownBy(() -> menuService.create(기본_후라이드_치킨_메뉴))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -70,13 +76,13 @@ public class MenuServiceTest {
     @Test
     public void createMenuProductToBeRegisteredAsProduct() {
         // given
-        Menu menu = createMenu(17000, Collections.emptyList());
-        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "두마리메뉴");
+        Menu 메뉴상품_없는_후라이드_치킨_메뉴 = 후라이드_치킨_메뉴(Collections.emptyList());
 
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
+        given(menuGroupRepository.findById(any()))
+                .willReturn(Optional.of(기본_한마리_메뉴_그룹));
 
         // when, then
-        assertThatThrownBy(() -> menuService.create(menu))
+        assertThatThrownBy(() -> menuService.create(메뉴상품_없는_후라이드_치킨_메뉴))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -84,15 +90,16 @@ public class MenuServiceTest {
     @Test
     public void createWithValidNumberOfMenuProduct() {
         // given
-        MenuProduct 후라이드 = createMenuProduct(createProduct("후라이드", 16000), 2L, null);
-        Menu menu = createMenu(17000, Arrays.asList(후라이드));
-        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "두마리메뉴");
+        Menu 후라이드_치킨_메뉴 = 후라이드_치킨_메뉴(Arrays.asList(
+                후라이드_메뉴_상품( 1L)));
 
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllById(any())).thenReturn(Collections.emptyList());
+        given(menuGroupRepository.findById(any()))
+                .willReturn(Optional.of(기본_한마리_메뉴_그룹));
+        given(productRepository.findAllById(any()))
+                .willReturn(Collections.emptyList());
 
         // when, then
-        assertThatThrownBy(() -> menuService.create(menu))
+        assertThatThrownBy(() -> menuService.create(후라이드_치킨_메뉴))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -101,15 +108,16 @@ public class MenuServiceTest {
     @ValueSource(longs = {-10l,-100l})
     public void createWithValidQuantity(long quantity) {
         // given
-        MenuProduct 후라이드 = createMenuProduct(createProduct("후라이드", 16000), quantity, null);
-        Menu menu = createMenu(17000, Arrays.asList(후라이드));
-        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "두마리메뉴");
+        Menu 후라이드_치킨_메뉴 = 후라이드_치킨_메뉴(Arrays.asList(
+                후라이드_메뉴_상품(quantity)));
 
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllById(any())).thenReturn(Collections.emptyList());
+        given(menuGroupRepository.findById(any()))
+                .willReturn(Optional.of(기본_한마리_메뉴_그룹));
+        given(productRepository.findAllById(any()))
+                .willReturn(Collections.emptyList());
 
         // when, then
-        assertThatThrownBy(() -> menuService.create(menu))
+        assertThatThrownBy(() -> menuService.create(후라이드_치킨_메뉴))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -117,17 +125,16 @@ public class MenuServiceTest {
     @Test
     public void createWithLowerPriceThanSumOfMenuProduct() {
         // given
-        Product 후라이드 = createProduct("후라이드", 16000);
-        MenuProduct menuProduct = createMenuProduct(후라이드, 1L, null);
-        Menu menu = createMenu(17000, Arrays.asList(menuProduct));
-        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "두마리메뉴");
+        int menuPrice = 17000;
+        Menu 후라이드_치킨_메뉴 = 후라이드_치킨_메뉴(menuPrice, Arrays.asList(
+                후라이드_메뉴_상품(1L)));
 
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllById(any())).thenReturn(Arrays.asList(후라이드));
-        when(productRepository.findById(any())).thenReturn(Optional.of(후라이드));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(기본_한마리_메뉴_그룹));
+        given(productRepository.findAllById(any())).willReturn(Arrays.asList(기본_후라이드_상품));
+        given(productRepository.findById(any())).willReturn(Optional.of(기본_후라이드_상품));
 
         // when, then
-        assertThatThrownBy(() -> menuService.create(menu))
+        assertThatThrownBy(() -> menuService.create(후라이드_치킨_메뉴))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -136,18 +143,16 @@ public class MenuServiceTest {
     @ValueSource(strings = {"fuck", "shit"})
     public void createWithoutBadWord(String name) {
         // given
-        Product 후라이드 = createProduct("후라이드", 16000);
-        MenuProduct menuProduct = createMenuProduct(후라이드, 2L, null);
-        Menu menu = createMenu(name,17000, Arrays.asList(menuProduct));
-        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "두마리메뉴");
+        given(productRepository.findAllById(any())).willReturn(Arrays.asList(기본_후라이드_상품));
+        given(productRepository.findById(any())).willReturn(Optional.of(기본_후라이드_상품));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(기본_한마리_메뉴_그룹));
 
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllById(any())).thenReturn(Arrays.asList(후라이드));
-        when(productRepository.findById(any())).thenReturn(Optional.of(후라이드));
-        when(purgomalumClient.containsProfanity(anyString())).thenReturn(true);
+        Menu 욕설_이름_메뉴 = 메뉴(name, 기본_후라이드_가격, Arrays.asList(
+                후라이드_메뉴_상품(1L)));
+        given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
 
         // when, then
-        assertThatThrownBy(() -> menuService.create(menu))
+        assertThatThrownBy(() -> menuService.create(욕설_이름_메뉴))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -156,27 +161,64 @@ public class MenuServiceTest {
     @ValueSource(ints = {-10, -100})
     public void changePriceWithValidPrice(int price) {
         // given
-        Menu menu = createMenu(price);
-        UUID id = UUID.randomUUID();
+        Menu 후라이드_치킨_메뉴 = 후라이드_치킨_메뉴(price);
 
         // when, then
-        assertThatThrownBy(() -> menuService.changePrice(id, menu))
+        assertThatThrownBy(() -> menuService.changePrice(id, 후라이드_치킨_메뉴))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("변경되는 메뉴 가격은 메뉴 상품들의 (가격 * 수량) 합을 넘을 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("변경되는 메뉴 가격은 메뉴 상품들의 (가격 * 수량) 합을 넘을 경우 " +
+            "IllegalArgumentException을 던진다.")
     @Test
     public void changePriceWithLowerPriceThanSumOfMenuProduct() {
         // given
-        Menu menu = createMenu(33000);
-        UUID id = UUID.randomUUID();
-
-        Product 후라이드 = createProduct("후라이드", 16000);
-        MenuProduct menuProduct = createMenuProduct(후라이드, 2L, null);
-        given(menuRepository.findById(id)).willReturn(Optional.of(createMenu(17000, Arrays.asList(menuProduct))));
+        int menuPrice = 18000;
+        Menu 변경될_후라이드_치킨_메뉴 = 후라이드_치킨_메뉴(menuPrice, Arrays.asList(
+                후라이드_메뉴_상품( 1l)));
+        given(menuRepository.findById(id)).willReturn(Optional.of(기본_후라이드_치킨_메뉴));
 
         // when, then
-        assertThatThrownBy(() -> menuService.changePrice(id, menu))
+        assertThatThrownBy(() -> menuService.changePrice(id, 변경될_후라이드_치킨_메뉴))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("등록되지 않은 메뉴인 경우 NoSuchElementException을 던진다.")
+    @Test
+    public void displayWithOnlyRegisteredMenu() {
+        // given
+        given(menuRepository.findById(id)).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> menuService.display(id))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+
+    @DisplayName("노출하려는 메뉴의 가격은 메뉴에 등록된 메뉴 상품의 가격의 합보다 크지 않은 경우 IllegalArgumentException을 던진다.")
+    @Test
+    public void displayMenuThatLessThanSumOfMenuProductPrice() {
+        // given
+        int menuPrice = 18000;
+        int menuProductPrice = 17000;
+        Menu 후라이드_치킨_메뉴 = 후라이드_치킨_메뉴(menuPrice,Arrays.asList(
+                후라이드_메뉴_상품(menuProductPrice, 1l)));
+
+        given(menuRepository.findById(id)).willReturn(Optional.of(후라이드_치킨_메뉴));
+
+        // when, then
+        assertThatThrownBy(() -> menuService.display(id))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("등록되지 않은 메뉴인 경우 IllegalArgumentException을 던진다.")
+    @Test
+    public void hideWithRegisteredMenu() {
+        // given
+        given(menuRepository.findById(id)).willReturn(Optional.empty());
+
+        // when, then
+        assertThatThrownBy(() -> menuService.hide(id))
+                .isInstanceOf(NoSuchElementException.class);
     }
 }
