@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kitchenpos.order_table.fixture.OrderTableFixture.주문_테이블;
+import static kitchenpos.order_table.fixture.OrderTableFixture.주문_테이블_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -164,26 +166,5 @@ public class OrderTableServiceTest {
 
         // then
         assertThat(orderTables.size()).isEqualTo(2);
-    }
-
-    private OrderTable 주문_테이블_요청(final int numberOfGuests) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setNumberOfGuests(numberOfGuests);
-        return orderTable;
-    }
-
-    private OrderTable 주문_테이블_요청(final String name) {
-        OrderTable request = new OrderTable();
-        request.setName(name);
-        return request;
-    }
-
-    private OrderTable 주문_테이블(final UUID id, final String name, final boolean isEmpty, final int numberOfGuests) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(id);
-        orderTable.setName(name);
-        orderTable.setEmpty(isEmpty);
-        orderTable.setNumberOfGuests(numberOfGuests);
-        return orderTable;
     }
 }
