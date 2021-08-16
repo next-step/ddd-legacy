@@ -1,12 +1,14 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -16,20 +18,17 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class ProductServiceTest {
 
     private final String name = "순살치킨";
     private final BigDecimal price = BigDecimal.valueOf(20000L);
+
     private SoftAssertions softAssertions;
 
     @Autowired
     private ProductService productService;
-
-    @Autowired
-    private ProductRepository productRepository;
 
     @BeforeEach
     void initSoftAssertions() {
@@ -45,30 +44,32 @@ class ProductServiceTest {
     @Test
     void create() {
         Product product = productService.create(new Product(name, price));
-        assertThat(product).isNotNull();
-        assertThat(product.getName()).isEqualTo(name);
-        assertThat(product.getPrice()).isEqualTo(price);
-        softAssertions.assertAll();
+        softAssertions.assertThat(product).isNotNull();
+        softAssertions.assertThat(product.getName()).isEqualTo(name);
+        softAssertions.assertThat(product.getPrice()).isEqualTo(price);
     }
 
-    @DisplayName("단품 생성 Validation")
+    @DisplayName("단품 생성시 price validation")
     @Test
-    void createValidation() {
+    void createValidationPrice() {
 
         // negative price
-        assertThatThrownBy(() -> productService.create(new Product(name, BigDecimal.valueOf(-20000L))))
+        softAssertions.assertThatThrownBy(() -> productService.create(new Product(name, BigDecimal.valueOf(-20000L))))
                 .isInstanceOf(IllegalArgumentException.class);
 
         // null price
-        assertThatThrownBy(() -> productService.create(new Product(name, null)))
+        softAssertions.assertThatThrownBy(() -> productService.create(new Product(name, null)))
                 .isInstanceOf(IllegalArgumentException.class);
 
-        // contains profanity name
-        assertThatThrownBy(() -> productService.create(new Product("shit", price)))
-                .isInstanceOf(IllegalArgumentException.class);
+    }
 
-        // null name
-        assertThatThrownBy(() -> productService.create(new Product(null, price)))
+    @DisplayName("단품 생성시 name validation (null, 부적합 단어)")
+    @ValueSource(strings = "shit")
+    @NullSource
+    @ParameterizedTest
+    void createNameValidationName(String name) {
+
+        softAssertions.assertThatThrownBy(() -> productService.create(new Product(name, price)))
                 .isInstanceOf(IllegalArgumentException.class);
 
     }
@@ -86,20 +87,20 @@ class ProductServiceTest {
     @Test
     void changePriceValidation() {
         Product product = productService.create(new Product(name, price));
-        Product normalRequest = new Product(name, price.subtract(BigDecimal.valueOf(10000L)));
-        Product negativePriceRequest = new Product(name, BigDecimal.valueOf(-20000L));
-        Product nullPriceRequest = new Product(name, null);
 
         // negative price
-        assertThatThrownBy(() -> productService.changePrice(product.getId(), negativePriceRequest))
+        Product negativePriceRequest = new Product(name, BigDecimal.valueOf(-20000L));
+        softAssertions.assertThatThrownBy(() -> productService.changePrice(product.getId(), negativePriceRequest))
                 .isInstanceOf(IllegalArgumentException.class);
 
         // null price
-        assertThatThrownBy(() -> productService.changePrice(product.getId(), nullPriceRequest))
+        Product nullPriceRequest = new Product(name, null);
+        softAssertions.assertThatThrownBy(() -> productService.changePrice(product.getId(), nullPriceRequest))
                 .isInstanceOf(IllegalArgumentException.class);
 
         // wrong target product
-        assertThatThrownBy(() -> productService.changePrice(getNewUUID(), normalRequest))
+        Product normalRequest = new Product(name, price.subtract(BigDecimal.valueOf(10000L)));
+        softAssertions.assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), normalRequest))
                 .isInstanceOf(NoSuchElementException.class);
 
         // TODO("단품 가격 변경시 해당 단품이 속한 메뉴의 가격이 각각의 단품의 총합보다 넘는지 validation 하는 로직에 대한 검증")
@@ -115,21 +116,4 @@ class ProductServiceTest {
         assertThat(productService.findAll().size()).isEqualTo(products.size());
     }
 
-    private UUID getNewUUID() {
-        UUID uuid;
-        do {
-            uuid = UUID.randomUUID();
-        } while (isExistsUUID(uuid));
-
-        return uuid;
-    }
-
-    private boolean isExistsUUID(UUID uuid) {
-        if (productRepository.existsById(uuid)) {
-            return true;
-        }
-
-        return false;
-    }
 }
-

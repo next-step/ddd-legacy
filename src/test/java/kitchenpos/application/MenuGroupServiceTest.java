@@ -2,11 +2,10 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
-import org.assertj.core.api.SoftAssertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -18,25 +17,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 class MenuGroupServiceTest {
 
-    private final String menuGroupName = "두마리세트";
+    private final String menuGroupName = "세트류";
 
     @Autowired
     private MenuGroupService menuGroupService;
 
     @Autowired
     private MenuGroupRepository menuGroupRepository;
-
-    private SoftAssertions softAssertions;
-
-    @BeforeEach
-    void initSoftAssertions() {
-        softAssertions = new SoftAssertions();
-    }
-
-    @AfterEach
-    void checkAssertions() {
-        softAssertions.assertAll();
-    }
 
     @DisplayName("메뉴그룹 생성")
     @Test
@@ -46,15 +33,12 @@ class MenuGroupServiceTest {
         assertThat(menuGroup).isNotNull();
     }
 
-    @DisplayName("메뉴그룹 생성")
-    @Test
-    void createValidation() {
-        MenuGroup nameNullRequest = new MenuGroup(null);
-        assertThatThrownBy(() -> menuGroupService.create(nameNullRequest))
-                .isInstanceOf(IllegalArgumentException.class);
-
-        MenuGroup emptyNameRequest = new MenuGroup("");
-        assertThatThrownBy(() -> menuGroupService.create(emptyNameRequest))
+    @DisplayName("메뉴그룹 생성시 메뉴그룹 이름 null, empty validation")
+    @NullAndEmptySource
+    @ParameterizedTest
+    void createValidationMenuName(String name) {
+        MenuGroup request = new MenuGroup(name);
+        assertThatThrownBy(() -> menuGroupService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
