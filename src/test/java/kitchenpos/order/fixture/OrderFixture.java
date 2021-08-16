@@ -23,29 +23,32 @@ public class OrderFixture {
         return orderTable;
     }
 
-    public static OrderLineItem 주문_상품(final int quantity, final int price) {
+    public static OrderLineItem 주문_상품(final int quantity, final int price, Menu menu) {
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItem.setQuantity(quantity);
         orderLineItem.setPrice(new BigDecimal(price));
         orderLineItem.setMenuId(UUID.randomUUID());
+        orderLineItem.setMenu(menu);
         return orderLineItem;
     }
 
-    public static Order 주문(final OrderType type, final String address, final List<OrderLineItem> orderLineItems) {
+    public static Order 주문(final OrderType type, final String address, OrderStatus orderStatus, final List<OrderLineItem> orderLineItems, OrderTable orderTable) {
         Order order = new Order();
         order.setType(type);
         order.setOrderTableId(UUID.randomUUID());
         order.setOrderLineItems(orderLineItems);
         order.setDeliveryAddress(address);
+        order.setStatus(orderStatus);
+        order.setOrderTable(orderTable);
         return order;
     }
 
-    public static Order 배달_주문(final List<OrderLineItem> orderLineItems) {
-        return 주문(DELIVERY, 서울_주소, orderLineItems);
+    public static Order 배달_주문(final OrderStatus orderStatus, final List<OrderLineItem> orderLineItems) {
+        return 주문(DELIVERY, 서울_주소, orderStatus, orderLineItems, null);
     }
 
-    public static Order 매장_주문(final List<OrderLineItem> orderLineItems) {
-        return 주문(EAT_IN, null, orderLineItems);
+    public static Order 매장_주문(final OrderStatus orderStatus, final List<OrderLineItem> orderLineItems) {
+        return 주문(EAT_IN, null, orderStatus, orderLineItems, null);
     }
 
     public static Product 후라이드_상품(int price) {
