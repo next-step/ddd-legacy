@@ -111,9 +111,6 @@ class MenuServiceTest {
                 .setMenuGroup(menuGroup)
                 .build();
 
-        if (!Objects.isNull(menuProducts))
-            System.out.println("test: " + expected.getMenuProducts().isEmpty());
-
         assertThatThrownBy(() -> menuService.create(expected))
                 .isInstanceOf(IllegalArgumentException.class);
     }
