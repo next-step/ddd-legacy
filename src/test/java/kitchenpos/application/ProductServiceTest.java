@@ -17,6 +17,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ProductServiceTest {
     private ProductRepository productRepository;
@@ -25,6 +27,9 @@ class ProductServiceTest {
 
     private String name;
     private BigDecimal price;
+    private Product product;
+    private UUID productId;
+    private Menu menu;
 
     @BeforeEach
     void setUp() {
@@ -38,6 +43,9 @@ class ProductServiceTest {
 
         name = "상품";
         price = BigDecimal.valueOf(500L);
+        product = saveProduct();
+        productId = product.getId();
+        menu = menuRepository.save(createMenu(getMenuProduct(product)));
     }
 
     @Test
@@ -45,8 +53,10 @@ class ProductServiceTest {
     void create() {
         Product product = saveProduct();
 
-        assertThat(product.getName()).isEqualTo(name);
-        assertThat(product.getPrice()).isEqualTo(price);
+        assertAll(
+                () -> assertEquals(product.getName(), name),
+                () -> assertEquals(product.getPrice(), price)
+        );
     }
 
     @NullSource
@@ -74,14 +84,15 @@ class ProductServiceTest {
     @Test
     @DisplayName("상품 가격을 변경한다.")
     void changePrice() {
-        UUID productId = saveProduct().getId();
         BigDecimal price = BigDecimal.valueOf(100L);
         Product request = createChangePriceRequest(price);
 
         Product product = productService.changePrice(productId, request);
 
-        assertThat(product.getId()).isEqualTo(productId);
-        assertThat(product.getPrice()).isEqualTo(price);
+        assertAll(
+                () -> assertEquals(product.getId(), productId),
+                () -> assertEquals(product.getPrice(), price)
+        );
     }
 
     @NullSource
@@ -89,7 +100,6 @@ class ProductServiceTest {
     @ParameterizedTest
     @DisplayName("상품 가격 변경시 가격은 0 이상이어야 한다.")
     void changePrice_valid_price(BigDecimal price) {
-        UUID productId = saveProduct().getId();
         Product request = createChangePriceRequest(price);
 
         assertThatThrownBy(() -> productService.changePrice(productId, request))
@@ -100,13 +110,24 @@ class ProductServiceTest {
     @ParameterizedTest
     @DisplayName("변경 가격에 따라 메뉴 노출 상태 변경")
     void changePrice_menu_display_change(BigDecimal price, boolean isDisplayed) {
-        Product product = saveProduct();
-        Menu menu = saveMenu(getMenuProduct(product));
         Product request = createChangePriceRequest(price);
 
         productService.changePrice(product.getId(), request);
 
         assertThat(menu.isDisplayed()).isEqualTo(isDisplayed);
+    }
+
+    @Test
+    @DisplayName("상품을 전체 조회한다.")
+    void findAll() {
+        List<Product> products = productService.findAll();
+
+        AssertionsForInterfaceTypes.assertThat(products).hasSize(1);
+    }
+
+    private Product saveProduct() {
+        Product request = createRequest(name, price);
+        return productService.create(request);
     }
 
     private List<MenuProduct> getMenuProduct(Product product) {
@@ -117,25 +138,14 @@ class ProductServiceTest {
         return Collections.singletonList(menuProduct);
     }
 
-    private Menu saveMenu(List<MenuProduct> menuProducts) {
+    private Menu createMenu(List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setName("메뉴");
         menu.setPrice(BigDecimal.valueOf(1000L));
         menu.setMenuGroupId(UUID.randomUUID());
         menu.setMenuProducts(menuProducts);
         menu.setDisplayed(true);
-        return menuRepository.save(menu);
-    }
-
-    @Test
-    @DisplayName("상품을 전체 조회한다.")
-    void findAll() {
-        saveProduct();
-        saveProduct();
-
-        List<Product> products = productService.findAll();
-
-        AssertionsForInterfaceTypes.assertThat(products).hasSize(2);
+        return menu;
     }
 
     private Product createRequest(String name, BigDecimal price) {
@@ -149,10 +159,5 @@ class ProductServiceTest {
         Product request = new Product();
         request.setPrice(price);
         return request;
-    }
-
-    private Product saveProduct() {
-        Product request = createRequest(name, price);
-        return productService.create(request);
     }
 }

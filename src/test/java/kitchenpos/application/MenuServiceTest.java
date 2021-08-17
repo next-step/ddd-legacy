@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MenuServiceTest {
     private MenuGroupRepository menuGroupRepository;
@@ -30,8 +31,11 @@ public class MenuServiceTest {
     private String menuName;
     private BigDecimal menuPrice;
     private UUID menuGroupId;
+    private Product product;
     private List<MenuProduct> menuProducts;
     private BigDecimal changeMenuPrice;
+    private Menu menu;
+    private UUID menuId;
 
     @BeforeEach
     void setUp() {
@@ -49,8 +53,12 @@ public class MenuServiceTest {
         menuName = "메뉴1";
         menuPrice = BigDecimal.valueOf(1000L);
         menuGroupId = createMenuGroup().getId();
-        menuProducts = createMenuProducts();
+        product = createProduct();
+        productRepository.save(product);
+        menuProducts = createMenuProducts(Collections.singletonList(product));
         changeMenuPrice = BigDecimal.valueOf(500L);
+        menu = saveMenu();
+        menuId = menu.getId();
     }
 
     @Test
@@ -58,9 +66,11 @@ public class MenuServiceTest {
     void create() {
         Menu menu = saveMenu();
 
-        assertThat(menu.getId()).isNotNull();
-        assertThat(menu.getName()).isEqualTo(menuName);
-        assertThat(menu.getPrice()).isEqualTo(menuPrice);
+        assertAll(
+                () -> assertNotNull(menu.getId()),
+                () -> assertEquals(menu.getName(), menuName),
+                () -> assertEquals(menu.getPrice(), menuPrice)
+        );
     }
 
     @NullSource
@@ -138,14 +148,15 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴가격을 변경한다.")
     void changePrice() {
-        UUID menuId = saveMenu().getId();
         BigDecimal price = BigDecimal.valueOf(500L);
         Menu request = createChangeMenuRequest(price);
 
         Menu menu = menuService.changePrice(menuId, request);
 
-        assertThat(menu.getId()).isEqualTo(menuId);
-        assertThat(menu.getPrice()).isEqualTo(price);
+        assertAll(
+                () -> assertEquals(menu.getId(), menuId),
+                () -> assertEquals(menu.getPrice(), price)
+        );
     }
 
     @NullSource
@@ -153,7 +164,6 @@ public class MenuServiceTest {
     @ParameterizedTest
     @DisplayName("메뉴가격 변경시 가격은 0 이상이어야 한다.")
     void changePrice_valid_price(BigDecimal price) {
-        UUID menuId = saveMenu().getId();
         Menu request = createChangeMenuRequest(price);
 
         assertThatThrownBy(() -> menuService.changePrice(menuId, request))
@@ -163,7 +173,6 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴가격 변경시 가격은 메뉴에 포함된 각 상품 수량의 합보다 클 수 없다.")
     void changePrice_valid_priceSize() {
-        UUID menuId = saveMenu().getId();
         Menu request = createChangeMenuRequest(BigDecimal.valueOf(20000L));
 
         assertThatThrownBy(() -> menuService.changePrice(menuId, request))
@@ -182,8 +191,6 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴 노출한다.")
     void display() {
-        UUID menuId = saveMenu().getId();
-
         Menu menu = menuService.display(menuId);
 
         assertThat(menu.isDisplayed()).isTrue();
@@ -199,9 +206,6 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴 노출 시 해당 메뉴의 가격은 메뉴에 포함된 각 상품 수량의 합보다 클 수 없다.")
     void display_valid_priceSize() {
-        Product product = createProduct();
-        productRepository.save(product);
-        List<MenuProduct> menuProducts = createMenuProducts(Collections.singletonList(product));
         UUID menuId = saveMenu(menuProducts).getId();
 
         product.setPrice(BigDecimal.ZERO);
@@ -214,8 +218,6 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴를 숨긴다.")
     void hide() {
-        UUID menuId = saveMenu().getId();
-
         Menu menu = menuService.hide(menuId);
 
         assertThat(menu.getId()).isEqualTo(menuId);
@@ -232,12 +234,9 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴를 전체 조회한다.")
     void findAll() {
-        saveMenu();
-        saveMenu();
-
         List<Menu> menus = menuService.findAll();
 
-        AssertionsForInterfaceTypes.assertThat(menus).hasSize(2);
+        AssertionsForInterfaceTypes.assertThat(menus).hasSize(1);
     }
 
     private Menu saveMenu() {
@@ -247,6 +246,12 @@ public class MenuServiceTest {
     private Menu saveMenu(List<MenuProduct> menuProducts) {
         Menu request = createRequest(menuName, menuPrice, menuGroupId, menuProducts);
         return menuService.create(request);
+    }
+
+    private MenuGroup createMenuGroup() {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(UUID.randomUUID());
+        return menuGroupRepository.save(menuGroup);
     }
 
     private Menu createRequest(String name, BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProducts) {
@@ -262,18 +267,6 @@ public class MenuServiceTest {
         Menu request = new Menu();
         request.setPrice(price);
         return request;
-    }
-
-    private MenuGroup createMenuGroup() {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        return menuGroupRepository.save(menuGroup);
-    }
-
-    private List<MenuProduct> createMenuProducts() {
-        Product product = createProduct();
-        productRepository.save(product);
-        return createMenuProducts(Collections.singletonList(product));
     }
 
     private List<MenuProduct> createMenuProducts(List<Product> products) {

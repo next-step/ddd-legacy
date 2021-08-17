@@ -1,23 +1,35 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MenuGroupServiceTest {
+    private MenuGroupRepository menuGroupRepository;
     private MenuGroupService menuGroupService;
 
     @BeforeEach
     void setUp() {
-        menuGroupService = new MenuGroupService(new TestMenuGroupRepository());
+        menuGroupRepository = new TestMenuGroupRepository();
+        menuGroupService = new MenuGroupService(menuGroupRepository);
+
+        saveInitialData();
+    }
+
+    private void saveInitialData() {
+        Arrays.asList("메뉴1", "메뉴2")
+                .forEach(menuName -> menuGroupRepository.save(createMenuGroup(menuName)));
     }
 
     @Test
@@ -28,8 +40,10 @@ public class MenuGroupServiceTest {
 
         MenuGroup menuGroup = menuGroupService.create(request);
 
-        assertThat(menuGroup.getId()).isNotNull();
-        assertThat(menuGroup.getName()).isEqualTo(name);
+        assertAll(
+                () -> assertNotNull(menuGroup.getId()),
+                () -> assertEquals(menuGroup.getName(), name)
+        );
     }
 
     @ParameterizedTest
@@ -45,9 +59,6 @@ public class MenuGroupServiceTest {
     @Test
     @DisplayName("메뉴그룹을 전체 조회한다.")
     void findAll() {
-        menuGroupService.create(createMenuGroup("메뉴1"));
-        menuGroupService.create(createMenuGroup("메뉴2"));
-
         List<MenuGroup> menuGroups = menuGroupService.findAll();
 
         assertThat(menuGroups).hasSize(2);

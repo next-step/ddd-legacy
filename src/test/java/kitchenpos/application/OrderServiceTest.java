@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -48,6 +49,7 @@ class OrderServiceTest {
     private long menuPrice;
     private Menu menu;
     private UUID orderTableId;
+    private Order createRequest;
     private static String deliveryAddress = "주문주소";
 
     @BeforeEach
@@ -58,6 +60,7 @@ class OrderServiceTest {
         menus = getMenus(menu);
         orderLineItems = getOrderLineItems(menus);
         orderTableId = UUID.randomUUID();
+        createRequest = createRequest(OrderType.TAKEOUT, null, null, orderLineItems);
     }
 
     @MethodSource(value = "getOrderValues")
@@ -65,16 +68,17 @@ class OrderServiceTest {
     @DisplayName("주문을 생성한다.")
     void create(OrderType orderType, String deliveryAddress, UUID orderTableId) {
         Order request = createRequest(orderType, deliveryAddress, orderTableId, orderLineItems);
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(getOrderTable(false)));
+        givenToCreate(menus, menu, getOrderTable(false));
         given(orderRepository.save(any())).willAnswer(returnsFirstArg());
+
 
         Order order = orderService.create(request);
 
-        assertThat(order.getId()).isNotNull();
-        assertThat(order.getType()).isEqualTo(orderType);
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
+        assertAll(
+                () -> assertNotNull(order.getId()),
+                () -> assertEquals(order.getType(), orderType),
+                () -> assertEquals(order.getStatus(), OrderStatus.WAITING)
+        );
     }
 
     @NullSource
@@ -100,21 +104,18 @@ class OrderServiceTest {
     @Test
     @DisplayName("주문 생성시 요청한 메뉴와 조회한 메뉴의 수가 같아야 한다.")
     void create_valid_menuSize() {
-        Order request = createRequest(OrderType.TAKEOUT, null, null, orderLineItems);
-        given(menuRepository.findAllById(any())).willReturn(Collections.emptyList());
+        givenToCreate(Collections.emptyList(), menu, getOrderTable(false));
 
-        assertThatThrownBy(() -> orderService.create(request))
+        assertThatThrownBy(() -> orderService.create(createRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("주문 생성시 요청한 메뉴는 기등록된 메뉴여야한다.")
     void create_exit_menu() {
-        Order request = createRequest(OrderType.TAKEOUT, null, null, orderLineItems);
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.empty());
+        givenToCreate(menus, null, getOrderTable(false));
 
-        assertThatThrownBy(() -> orderService.create(request))
+        assertThatThrownBy(() -> orderService.create(createRequest))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -123,7 +124,7 @@ class OrderServiceTest {
     void create_valid_eatIn_quantity() {
         List<OrderLineItem> orderLineItems = getOrderLineItems(menus, -1);
         Order request = createRequest(OrderType.TAKEOUT, null, null, orderLineItems);
-        given(menuRepository.findAllById(any())).willReturn(menus);
+        givenToCreate(menus, null, null);
 
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -132,22 +133,18 @@ class OrderServiceTest {
     @Test
     @DisplayName("주문 생성시 노출된 메뉴만 주문 가능하다.")
     void create_valid_menu_isDisplayed() {
-        Order request = createRequest(OrderType.TAKEOUT, null, null, orderLineItems);
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(getMenu(false, menuPrice)));
+        givenToCreate(menus, getMenu(false, menuPrice), null);
 
-        assertThatThrownBy(() -> orderService.create(request))
+        assertThatThrownBy(() -> orderService.create(createRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("주문 생성시 요청한 메뉴 가격과 실제 메뉴 가격이 일치해야한다.")
     void create_valid_menu_price() {
-        Order request = createRequest(OrderType.TAKEOUT, null, null, orderLineItems);
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(getMenu(false, 100L)));
+        givenToCreate(menus, getMenu(false, 100L), null);
 
-        assertThatThrownBy(() -> orderService.create(request))
+        assertThatThrownBy(() -> orderService.create(createRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -156,8 +153,7 @@ class OrderServiceTest {
     @DisplayName("배달 타입 주문시 배송정보는 필수이다.")
     void create_valid_deliveryType(String deliveryAddress) {
         Order request = createRequest(OrderType.DELIVERY, deliveryAddress, null, orderLineItems);
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+        givenToCreate(menus, menu, null);
 
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -167,9 +163,7 @@ class OrderServiceTest {
     @DisplayName("매장 내 식사 타입 주문시 테이블 정보는 필수이다.")
     void create_valid_eatInType() {
         Order request = createRequest(OrderType.EAT_IN, null, orderTableId, orderLineItems);
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-        given(orderTableRepository.findById(any())).willReturn(Optional.empty());
+        givenToCreate(menus, menu, null);
 
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(NoSuchElementException.class);
@@ -179,9 +173,7 @@ class OrderServiceTest {
     @DisplayName("매장 내 식사 타입 주문시 주문테이블은 착석처리 되어있어야 한다.")
     void create_valid_eatInType_table_isEmpty() {
         Order request = createRequest(OrderType.EAT_IN, null, orderTableId, orderLineItems);
-        given(menuRepository.findAllById(any())).willReturn(menus);
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(getOrderTable(true)));
+        givenToCreate(menus, menu, getOrderTable(true));
 
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalStateException.class);
@@ -444,8 +436,16 @@ class OrderServiceTest {
         orderService.complete(completeOrder.getId());
 
         OrderTable orderTable = completeOrder.getOrderTable();
-        assertThat(orderTable.isEmpty()).isTrue();
-        assertThat(orderTable.getNumberOfGuests()).isZero();
+        assertAll(
+                () -> assertTrue(orderTable.isEmpty()),
+                () -> assertEquals(orderTable.getNumberOfGuests(), 0)
+        );
+    }
+
+    private void givenToCreate(List<Menu> menus, Menu menu, OrderTable orderTable) {
+        given(menuRepository.findAllById(any())).willReturn(menus);
+        given(menuRepository.findById(any())).willReturn(Optional.ofNullable(menu));
+        given(orderTableRepository.findById(any())).willReturn(Optional.ofNullable(orderTable));
     }
 
     public Stream<Arguments> getOrderValues() {
@@ -463,7 +463,6 @@ class OrderServiceTest {
                 Arguments.of(OrderType.TAKEOUT, null, null, OrderStatus.SERVED)
         );
     }
-
 
     private Order completeOrder(OrderType orderType, String deliveryAddress, UUID orderTableId, OrderStatus orderStatus) {
         Order order = createOrder(orderType, deliveryAddress, orderTableId, orderStatus);

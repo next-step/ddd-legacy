@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -44,6 +45,7 @@ class OrderTableServiceTest {
         id = UUID.randomUUID();
         changedNumberOfGuest = 3;
         defaultOrderTable = defaultOrderTable(id, name);
+        saveOrderTable();
     }
 
     @Test
@@ -67,7 +69,6 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("테이블 착석처리 한다.")
     void sit() {
-        saveOrderTable();
         given(orderTableRepository.findById(any())).willReturn(Optional.of(defaultOrderTable));
 
         OrderTable orderTable = orderTableService.sit(id);
@@ -92,8 +93,10 @@ class OrderTableServiceTest {
 
         OrderTable orderTable = orderTableService.clear(id);
 
-        assertThat(orderTable.getNumberOfGuests()).isZero();
-        assertThat(orderTable.isEmpty()).isTrue();
+        assertAll(
+                () -> assertEquals(orderTable.getNumberOfGuests(), 0),
+                () -> assertTrue(orderTable.isEmpty())
+        );
     }
 
     @Test
@@ -119,21 +122,21 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("테이블 착석 인원수를 변경한다.")
     void changeNumberOfGuests() {
-        OrderTable request = new OrderTable();
-        request.setNumberOfGuests(changedNumberOfGuest);
+        OrderTable request = getChangeNumberOfGuestsRequest(changedNumberOfGuest);
         given(orderTableRepository.findById(any())).willReturn(Optional.of(getExitTable()));
 
         OrderTable orderTable = orderTableService.changeNumberOfGuests(id, request);
 
-        assertThat(orderTable.getId()).isEqualTo(id);
-        assertThat(orderTable.getNumberOfGuests()).isEqualTo(changedNumberOfGuest);
+        assertAll(
+                () -> assertEquals(orderTable.getId(), id),
+                () -> assertEquals(orderTable.getNumberOfGuests(), changedNumberOfGuest)
+        );
     }
 
     @Test
     @DisplayName("테이블 착석 인원수는 0 이상이다.")
     void changeNumberOfGuests_valid_numberOfGuests() {
-        OrderTable request = new OrderTable();
-        request.setNumberOfGuests(-1);
+        OrderTable request = getChangeNumberOfGuestsRequest(-1);
         given(orderTableRepository.findById(any())).willReturn(Optional.of(getExitTable()));
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(id, request))
@@ -143,8 +146,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("존재하는 테이블만 인원수 변경 가능하다.")
     void changeNumberOfGuests_exit_orderTable() {
-        OrderTable request = new OrderTable();
-        request.setNumberOfGuests(changedNumberOfGuest);
+        OrderTable request = getChangeNumberOfGuestsRequest(changedNumberOfGuest);
         given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(id, request))
@@ -154,12 +156,18 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("착삭된 테이블만 인원수 변경 가능하다.")
     void changeNumberOfGuests_valid_empty() {
-        OrderTable request = new OrderTable();
-        request.setNumberOfGuests(changedNumberOfGuest);
+        OrderTable request = getChangeNumberOfGuestsRequest(changedNumberOfGuest);
         given(orderTableRepository.findById(any())).willReturn(Optional.of(defaultOrderTable));
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(id, request))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    private OrderTable saveOrderTable() {
+        OrderTable request = createRequest(name);
+        given(orderTableRepository.save(any())).willReturn(defaultOrderTable);
+
+        return orderTableService.create(request);
     }
 
     private OrderTable getExitTable() {
@@ -169,11 +177,10 @@ class OrderTableServiceTest {
         return exitTable;
     }
 
-    private OrderTable saveOrderTable() {
-        OrderTable request = createRequest(name);
-        given(orderTableRepository.save(any())).willReturn(defaultOrderTable);
-
-        return orderTableService.create(request);
+    private OrderTable getChangeNumberOfGuestsRequest(int numberOfGuest) {
+        OrderTable request = new OrderTable();
+        request.setNumberOfGuests(numberOfGuest);
+        return request;
     }
 
     private OrderTable createRequest(String name) {
