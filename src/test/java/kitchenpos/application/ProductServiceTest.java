@@ -11,7 +11,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +19,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ProductServiceTest {
+class ProductServiceTest extends ObjectCreator {
     private ProductRepository productRepository;
     private MenuRepository menuRepository;
     private ProductService productService;
@@ -45,7 +44,7 @@ class ProductServiceTest {
         price = BigDecimal.valueOf(500L);
         product = saveProduct();
         productId = product.getId();
-        menu = menuRepository.save(createMenu(getMenuProduct(product)));
+        menu = menuRepository.save(createMenu(createMenuProduct(product)));
     }
 
     @Test
@@ -64,7 +63,7 @@ class ProductServiceTest {
     @ParameterizedTest
     @DisplayName("상품 가격은 0 이상이어야 한다.")
     void create_valid_price(BigDecimal price) {
-        Product request = createRequest(name, price);
+        Product request = createProductRequest(name, price);
 
         assertThatThrownBy(() -> productService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -75,7 +74,7 @@ class ProductServiceTest {
     @ParameterizedTest
     @DisplayName("상품명에 비속어가 포함되면 안된다.")
     void create_valid_name(String name) {
-        Product request = createRequest(name, price);
+        Product request = createProductRequest(name, price);
 
         assertThatThrownBy(() -> productService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -126,38 +125,7 @@ class ProductServiceTest {
     }
 
     private Product saveProduct() {
-        Product request = createRequest(name, price);
+        Product request = createProductRequest(name, price);
         return productService.create(request);
-    }
-
-    private List<MenuProduct> getMenuProduct(Product product) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(product.getId());
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(2L);
-        return Collections.singletonList(menuProduct);
-    }
-
-    private Menu createMenu(List<MenuProduct> menuProducts) {
-        Menu menu = new Menu();
-        menu.setName("메뉴");
-        menu.setPrice(BigDecimal.valueOf(1000L));
-        menu.setMenuGroupId(UUID.randomUUID());
-        menu.setMenuProducts(menuProducts);
-        menu.setDisplayed(true);
-        return menu;
-    }
-
-    private Product createRequest(String name, BigDecimal price) {
-        Product request = new Product();
-        request.setName(name);
-        request.setPrice(price);
-        return request;
-    }
-
-    private Product createChangePriceRequest(BigDecimal price) {
-        Product request = new Product();
-        request.setPrice(price);
-        return request;
     }
 }

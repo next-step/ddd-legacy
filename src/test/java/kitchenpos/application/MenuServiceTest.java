@@ -15,13 +15,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MenuServiceTest {
+public class MenuServiceTest extends ObjectCreator {
     private MenuGroupRepository menuGroupRepository;
     private ProductRepository productRepository;
     private MenuService menuService;
@@ -53,9 +52,9 @@ public class MenuServiceTest {
         menuName = "메뉴1";
         menuPrice = BigDecimal.valueOf(1000L);
         menuGroupId = createMenuGroup().getId();
-        product = createProduct();
+        product = createProduct(productPrice);
         productRepository.save(product);
-        menuProducts = createMenuProducts(Collections.singletonList(product));
+        menuProducts = createMenuProducts(Collections.singletonList(product), productQuantity);
         changeMenuPrice = BigDecimal.valueOf(500L);
         menu = saveMenu();
         menuId = menu.getId();
@@ -107,7 +106,8 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴를 생성시 상품은 기등록된 상품이어야 한다")
     void create_valid_exist_products() {
-        List<MenuProduct> menuProducts = createMenuProducts(Collections.singletonList(createProduct()));
+        Product notSaveProduct = createProduct(productPrice);
+        List<MenuProduct> menuProducts = createMenuProducts(Collections.singletonList(notSaveProduct), productQuantity);
         Menu request = createRequest(menuName, menuPrice, menuGroupId, menuProducts);
 
         assertThatThrownBy(() -> menuService.create(request))
@@ -117,7 +117,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴를 생성시 각 상품 수량은 0 이상이어야 한다.")
     void create_valid_product_quantity() {
-        List<MenuProduct> menuProducts = createMenuProducts(Collections.singletonList(createProduct()), -1L);
+        List<MenuProduct> menuProducts = createMenuProducts(Collections.singletonList(product), -1L);
         Menu request = createRequest(menuName, menuPrice, menuGroupId, menuProducts);
 
         assertThatThrownBy(() -> menuService.create(request))
@@ -252,49 +252,5 @@ public class MenuServiceTest {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
         return menuGroupRepository.save(menuGroup);
-    }
-
-    private Menu createRequest(String name, BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProducts) {
-        Menu request = new Menu();
-        request.setName(name);
-        request.setPrice(price);
-        request.setMenuGroupId(menuGroupId);
-        request.setMenuProducts(menuProducts);
-        return request;
-    }
-
-    private Menu createChangeMenuRequest(BigDecimal price) {
-        Menu request = new Menu();
-        request.setPrice(price);
-        return request;
-    }
-
-    private List<MenuProduct> createMenuProducts(List<Product> products) {
-        return products.stream()
-                .map(this::getMenuProduct)
-                .collect(Collectors.toList());
-    }
-
-    private List<MenuProduct> createMenuProducts(List<Product> products, long quantity) {
-        return products.stream()
-                .map(product -> getMenuProduct(product, quantity))
-                .collect(Collectors.toList());
-    }
-
-    private MenuProduct getMenuProduct(Product product) {
-        return getMenuProduct(product, productQuantity);
-    }
-
-    private MenuProduct getMenuProduct(Product product, long quantity) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(product.getId());
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
-    }
-
-    private Product createProduct() {
-        Product product = new Product();
-        product.setPrice(BigDecimal.valueOf(productPrice));
-        return product;
     }
 }

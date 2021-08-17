@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -31,7 +29,7 @@ import static org.mockito.Mockito.verify;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = {OrderService.class})
-class OrderServiceTest {
+class OrderServiceTest extends ObjectCreator {
     @MockBean
     private OrderRepository orderRepository;
     @MockBean
@@ -48,6 +46,7 @@ class OrderServiceTest {
     private List<OrderLineItem> orderLineItems;
     private long menuPrice;
     private Menu menu;
+    private OrderTable orderTable;
     private UUID orderTableId;
     private Order createRequest;
     private static String deliveryAddress = "주문주소";
@@ -56,19 +55,20 @@ class OrderServiceTest {
     void setUp() {
         id = UUID.randomUUID();
         menuPrice = 1000L;
-        menu = getMenu(true, menuPrice);
+        menu = createMenu(true, menuPrice);
         menus = getMenus(menu);
         orderLineItems = getOrderLineItems(menus);
+        orderTable = getOrderTable(orderTableId, false);
         orderTableId = UUID.randomUUID();
-        createRequest = createRequest(OrderType.TAKEOUT, null, null, orderLineItems);
+        createRequest = createOrderRequest(OrderType.TAKEOUT, null, null, orderLineItems);
     }
 
     @MethodSource(value = "getOrderValues")
     @ParameterizedTest
     @DisplayName("주문을 생성한다.")
     void create(OrderType orderType, String deliveryAddress, UUID orderTableId) {
-        Order request = createRequest(orderType, deliveryAddress, orderTableId, orderLineItems);
-        givenToCreate(menus, menu, getOrderTable(false));
+        Order request = createOrderRequest(orderType, deliveryAddress, orderTableId, orderLineItems);
+        givenToCreate(menus, menu, orderTable);
         given(orderRepository.save(any())).willAnswer(returnsFirstArg());
 
 
@@ -85,7 +85,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @DisplayName("주문 생성시 타입은 필수다.")
     void create_valid_type(OrderType type) {
-        Order request = createRequest(type, null, null, null);
+        Order request = createOrderRequest(type, null, null, null);
 
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -95,7 +95,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @DisplayName("주문 생성시 메뉴 정보는 필수이다.")
     void create_valid_orderLineItem(List<OrderLineItem> orderLineItems) {
-        Order request = createRequest(OrderType.TAKEOUT, null, null, orderLineItems);
+        Order request = createOrderRequest(OrderType.TAKEOUT, null, null, orderLineItems);
 
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -104,7 +104,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("주문 생성시 요청한 메뉴와 조회한 메뉴의 수가 같아야 한다.")
     void create_valid_menuSize() {
-        givenToCreate(Collections.emptyList(), menu, getOrderTable(false));
+        givenToCreate(Collections.emptyList(), menu, orderTable);
 
         assertThatThrownBy(() -> orderService.create(createRequest))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -113,7 +113,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("주문 생성시 요청한 메뉴는 기등록된 메뉴여야한다.")
     void create_exit_menu() {
-        givenToCreate(menus, null, getOrderTable(false));
+        givenToCreate(menus, null, orderTable);
 
         assertThatThrownBy(() -> orderService.create(createRequest))
                 .isInstanceOf(NoSuchElementException.class);
@@ -123,7 +123,7 @@ class OrderServiceTest {
     @DisplayName("주문 생성시 매장 내 식사시 주문 수량은 0 이상이어야 한다.")
     void create_valid_eatIn_quantity() {
         List<OrderLineItem> orderLineItems = getOrderLineItems(menus, -1);
-        Order request = createRequest(OrderType.TAKEOUT, null, null, orderLineItems);
+        Order request = createOrderRequest(OrderType.TAKEOUT, null, null, orderLineItems);
         givenToCreate(menus, null, null);
 
         assertThatThrownBy(() -> orderService.create(request))
@@ -133,7 +133,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("주문 생성시 노출된 메뉴만 주문 가능하다.")
     void create_valid_menu_isDisplayed() {
-        givenToCreate(menus, getMenu(false, menuPrice), null);
+        givenToCreate(menus, createMenu(false, menuPrice), null);
 
         assertThatThrownBy(() -> orderService.create(createRequest))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -142,7 +142,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("주문 생성시 요청한 메뉴 가격과 실제 메뉴 가격이 일치해야한다.")
     void create_valid_menu_price() {
-        givenToCreate(menus, getMenu(false, 100L), null);
+        givenToCreate(menus, createMenu(false, 100L), null);
 
         assertThatThrownBy(() -> orderService.create(createRequest))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -152,7 +152,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @DisplayName("배달 타입 주문시 배송정보는 필수이다.")
     void create_valid_deliveryType(String deliveryAddress) {
-        Order request = createRequest(OrderType.DELIVERY, deliveryAddress, null, orderLineItems);
+        Order request = createOrderRequest(OrderType.DELIVERY, deliveryAddress, null, orderLineItems);
         givenToCreate(menus, menu, null);
 
         assertThatThrownBy(() -> orderService.create(request))
@@ -162,7 +162,7 @@ class OrderServiceTest {
     @Test
     @DisplayName("매장 내 식사 타입 주문시 테이블 정보는 필수이다.")
     void create_valid_eatInType() {
-        Order request = createRequest(OrderType.EAT_IN, null, orderTableId, orderLineItems);
+        Order request = createOrderRequest(OrderType.EAT_IN, null, orderTableId, orderLineItems);
         givenToCreate(menus, menu, null);
 
         assertThatThrownBy(() -> orderService.create(request))
@@ -172,8 +172,8 @@ class OrderServiceTest {
     @Test
     @DisplayName("매장 내 식사 타입 주문시 주문테이블은 착석처리 되어있어야 한다.")
     void create_valid_eatInType_table_isEmpty() {
-        Order request = createRequest(OrderType.EAT_IN, null, orderTableId, orderLineItems);
-        givenToCreate(menus, menu, getOrderTable(true));
+        Order request = createOrderRequest(OrderType.EAT_IN, null, orderTableId, orderLineItems);
+        givenToCreate(menus, menu, getOrderTable(orderTableId, true));
 
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalStateException.class);
@@ -464,64 +464,11 @@ class OrderServiceTest {
         );
     }
 
-    private Order completeOrder(OrderType orderType, String deliveryAddress, UUID orderTableId, OrderStatus orderStatus) {
-        Order order = createOrder(orderType, deliveryAddress, orderTableId, orderStatus);
-        order.setOrderTable(getOrderTable(false));
-        return order;
+    public Order createOrder(OrderType orderType, String deliveryAddress, UUID orderTableId, OrderStatus orderStatus) {
+        return super.createOrder(id, orderType, deliveryAddress, orderTableId, orderStatus, orderLineItems);
     }
 
-    private Order createOrder(OrderType orderType, String deliveryAddress, UUID orderTableId, OrderStatus orderStatus) {
-        Order order = new Order();
-        order.setId(id);
-        order.setType(orderType);
-        order.setDeliveryAddress(deliveryAddress);
-        order.setOrderTableId(orderTableId);
-        order.setStatus(orderStatus);
-        order.setOrderLineItems(orderLineItems);
-        return order;
-    }
-
-    private Order createRequest(OrderType orderType, String deliveryAddress, UUID orderTableId, List<OrderLineItem> orderLineItems) {
-        Order request = new Order();
-        request.setType(orderType);
-        request.setOrderLineItems(orderLineItems);
-        request.setDeliveryAddress(deliveryAddress);
-        request.setOrderTableId(orderTableId);
-        return request;
-    }
-
-    private List<OrderLineItem> getOrderLineItems(List<Menu> menus) {
-        return getOrderLineItems(menus, 1);
-    }
-
-    private List<OrderLineItem> getOrderLineItems(List<Menu> menus, long quantity) {
-        return menus.stream()
-                .map(menu -> {
-                    OrderLineItem orderLineItem = new OrderLineItem();
-                    orderLineItem.setMenu(menu);
-                    orderLineItem.setPrice(menu.getPrice());
-                    orderLineItem.setQuantity(quantity);
-                    return orderLineItem;
-                }).collect(Collectors.toList());
-    }
-
-    private List<Menu> getMenus(Menu... menus) {
-        return Arrays.asList(menus);
-    }
-
-    private Menu getMenu(boolean isDisPlayed, long price) {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(isDisPlayed);
-        menu.setPrice(BigDecimal.valueOf(price));
-        return menu;
-    }
-
-    private OrderTable getOrderTable(boolean isEmpty) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(orderTableId);
-        orderTable.setNumberOfGuests(3);
-        orderTable.setEmpty(isEmpty);
-        return orderTable;
+    public Order completeOrder(OrderType orderType, String deliveryAddress, UUID orderTableId, OrderStatus orderStatus) {
+        return super.completeOrder(id, orderType, deliveryAddress, orderTableId, orderStatus, orderLineItems);
     }
 }

@@ -15,7 +15,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class MenuGroupServiceTest {
+public class MenuGroupServiceTest extends ObjectCreator {
     private MenuGroupRepository menuGroupRepository;
     private MenuGroupService menuGroupService;
 
@@ -62,11 +62,5 @@ public class MenuGroupServiceTest {
         List<MenuGroup> menuGroups = menuGroupService.findAll();
 
         assertThat(menuGroups).hasSize(2);
-    }
-
-    private MenuGroup createMenuGroup(String name) {
-        MenuGroup request = new MenuGroup();
-        request.setName(name);
-        return request;
     }
 }

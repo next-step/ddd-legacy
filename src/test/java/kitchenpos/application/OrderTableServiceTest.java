@@ -26,7 +26,7 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest(classes = {OrderTableService.class})
-class OrderTableServiceTest {
+class OrderTableServiceTest extends ObjectCreator {
     @MockBean
     private OrderTableRepository orderTableRepository;
     @MockBean
@@ -163,38 +163,14 @@ class OrderTableServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    private OrderTable saveOrderTable() {
+    public OrderTable saveOrderTable() {
         OrderTable request = createRequest(name);
         given(orderTableRepository.save(any())).willReturn(defaultOrderTable);
 
         return orderTableService.create(request);
     }
 
-    private OrderTable getExitTable() {
-        OrderTable exitTable = defaultOrderTable;
-        exitTable.setNumberOfGuests(3);
-        exitTable.setEmpty(false);
-        return exitTable;
-    }
-
-    private OrderTable getChangeNumberOfGuestsRequest(int numberOfGuest) {
-        OrderTable request = new OrderTable();
-        request.setNumberOfGuests(numberOfGuest);
-        return request;
-    }
-
-    private OrderTable createRequest(String name) {
-        OrderTable request = new OrderTable();
-        request.setName(name);
-        return request;
-    }
-
-    private OrderTable defaultOrderTable(UUID id, String name) {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(id);
-        orderTable.setName(name);
-        orderTable.setNumberOfGuests(0);
-        orderTable.setEmpty(true);
-        return orderTable;
+    public OrderTable getExitTable() {
+        return getExitTable(defaultOrderTable);
     }
 }
