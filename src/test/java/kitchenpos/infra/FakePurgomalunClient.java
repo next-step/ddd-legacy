@@ -1,8 +1,7 @@
-package kitchenpos.application;
+package kitchenpos.infra;
 
 import java.util.Arrays;
 import java.util.List;
-import kitchenpos.infra.PurgomalumClient;
 
 public class FakePurgomalunClient implements PurgomalumClient {
 
