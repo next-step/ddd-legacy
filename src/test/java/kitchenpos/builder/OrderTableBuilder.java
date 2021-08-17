@@ -18,7 +18,7 @@ public final class OrderTableBuilder {
         empty = true;
     }
 
-    public static OrderTableBuilder anOrderTable() {
+    public static OrderTableBuilder newInstance() {
         return new OrderTableBuilder();
     }
 

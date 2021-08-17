@@ -14,13 +14,13 @@ public final class MenuProductBuilder {
 
     private MenuProductBuilder() {
         seq = new Random().nextLong();
-        product = ProductBuilder.aProduct()
+        product = ProductBuilder.newInstance()
                 .build();
         quantity = 1L;
         productId = product.getId();
     }
 
-    public static MenuProductBuilder aMenuProduct() {
+    public static MenuProductBuilder newInstance() {
         return new MenuProductBuilder();
     }
 

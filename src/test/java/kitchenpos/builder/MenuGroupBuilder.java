@@ -13,7 +13,7 @@ public final class MenuGroupBuilder {
         name = "추천메뉴";
     }
 
-    public static MenuGroupBuilder aMenuGroup() {
+    public static MenuGroupBuilder newInstance() {
         return new MenuGroupBuilder();
     }
 

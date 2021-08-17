@@ -16,13 +16,13 @@ public final class OrderLineItemBuilder {
 
     private OrderLineItemBuilder() {
         seq = new Random().nextLong();
-        menu = MenuBuilder.aMenu().build();
+        menu = MenuBuilder.newInstance().build();
         quantity = 1L;
         menuId = menu.getId();
         price = BigDecimal.valueOf(16_000L);
     }
 
-    public static OrderLineItemBuilder anOrderLineItem() {
+    public static OrderLineItemBuilder newInstance() {
         return new OrderLineItemBuilder();
     }
 

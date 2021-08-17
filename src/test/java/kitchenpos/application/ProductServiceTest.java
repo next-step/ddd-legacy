@@ -42,7 +42,7 @@ public class ProductServiceTest {
     @DisplayName("이름과 가격으로 제품을 추가한다")
     @Test
     void create() {
-        final Product expected = ProductBuilder.aProduct()
+        final Product expected = ProductBuilder.newInstance()
                 .build();
 
         final Product actual = productService.create(expected);
@@ -60,7 +60,7 @@ public class ProductServiceTest {
     @NullSource
     @ValueSource(strings = "-16000")
     void create(final BigDecimal price) {
-        final Product expected = ProductBuilder.aProduct()
+        final Product expected = ProductBuilder.newInstance()
                 .setPrice(price)
                 .build();
 
@@ -73,7 +73,7 @@ public class ProductServiceTest {
     @NullSource
     @ValueSource(strings = {"비속어", "욕설이 포함된 이름"})
     void create(final String name) {
-        final Product expected = ProductBuilder.aProduct()
+        final Product expected = ProductBuilder.newInstance()
                 .setName(name)
                 .build();
 
@@ -84,11 +84,11 @@ public class ProductServiceTest {
     @DisplayName("특정 제품의 식별자와 바꿀 가격으로 제품의 가격을 바꾼다")
     @Test
     void changePrice() {
-        Product product = productRepository.save(ProductBuilder.aProduct()
+        Product product = productRepository.save(ProductBuilder.newInstance()
                 .setPrice(16_000L)
                 .build()
         );
-        Product expected = ProductBuilder.aProduct()
+        Product expected = ProductBuilder.newInstance()
                 .setPrice(17_000L)
                 .build();
 
@@ -102,10 +102,10 @@ public class ProductServiceTest {
     @NullSource
     @ValueSource(strings = "-16000")
     void changePrice(final BigDecimal price) {
-        Product product = productRepository.save(ProductBuilder.aProduct()
+        Product product = productRepository.save(ProductBuilder.newInstance()
                 .build()
         );
-        Product expected = ProductBuilder.aProduct()
+        Product expected = ProductBuilder.newInstance()
                 .setPrice(price)
                 .build();
 
@@ -117,7 +117,7 @@ public class ProductServiceTest {
     @ParameterizedTest
     @NullSource
     void changePrice(final UUID productId) {
-        Product expected = ProductBuilder.aProduct()
+        Product expected = ProductBuilder.newInstance()
                 .build();
 
         assertThatThrownBy(() -> productService.changePrice(productId, expected))
@@ -128,12 +128,12 @@ public class ProductServiceTest {
     @ParameterizedTest
     @CsvSource({"14000,false", "15000,true"})
     void changePrice(BigDecimal changePrice, boolean expected) {
-        Product product = productRepository.save(ProductBuilder.aProduct()
+        Product product = productRepository.save(ProductBuilder.newInstance()
                 .setPrice(16_000L)
                 .build()
         );
-        Menu actual = menuRepository.save(MenuBuilder.aMenu()
-                .setMenuProducts(MenuProductBuilder.aMenuProduct()
+        Menu actual = menuRepository.save(MenuBuilder.newInstance()
+                .setMenuProducts(MenuProductBuilder.newInstance()
                         .setProduct(product)
                         .setQuantity(2L)
                         .build()
@@ -143,7 +143,7 @@ public class ProductServiceTest {
                 .build()
         );
 
-        productService.changePrice(product.getId(), ProductBuilder.aProduct()
+        productService.changePrice(product.getId(), ProductBuilder.newInstance()
                 .setPrice(changePrice)
                 .build()
         );
@@ -160,7 +160,7 @@ public class ProductServiceTest {
         final int expected = 2;
 
         IntStream.range(0, expected)
-                .mapToObj(index -> ProductBuilder.aProduct().build())
+                .mapToObj(index -> ProductBuilder.newInstance().build())
                 .forEach(productRepository::save);
 
         assertThat(productService.findAll()).hasSize(expected);

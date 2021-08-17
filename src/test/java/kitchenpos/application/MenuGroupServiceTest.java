@@ -29,7 +29,7 @@ class MenuGroupServiceTest {
     @DisplayName("이름으로 메뉴 그룹을 추가한다")
     @Test
     void create() {
-        final MenuGroup expected = MenuGroupBuilder.aMenuGroup()
+        final MenuGroup expected = MenuGroupBuilder.newInstance()
                 .build();
 
         final MenuGroup actual = menuGroupService.create(expected);
@@ -47,7 +47,7 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void create(final String name) {
-        final MenuGroup expected = MenuGroupBuilder.aMenuGroup()
+        final MenuGroup expected = MenuGroupBuilder.newInstance()
                 .setName(name)
                 .build();
 
@@ -61,7 +61,7 @@ class MenuGroupServiceTest {
         final int expected = 2;
 
         IntStream.range(0, expected)
-                .mapToObj(index -> MenuGroupBuilder.aMenuGroup().build())
+                .mapToObj(index -> MenuGroupBuilder.newInstance().build())
                 .forEach(menuGroupRepository::save);
 
         assertThat(menuGroupService.findAll()).hasSize(expected);

@@ -24,15 +24,15 @@ public final class MenuBuilder {
         name = "후라이드치킨";
         price = BigDecimal.valueOf(16_000L);
         displayed = true;
-        menuProducts = Collections.singletonList(MenuProductBuilder.aMenuProduct()
+        menuProducts = Collections.singletonList(MenuProductBuilder.newInstance()
                 .build()
         );
-        menuGroup = MenuGroupBuilder.aMenuGroup()
+        menuGroup = MenuGroupBuilder.newInstance()
                 .build();
         menuGroupId = menuGroup.getId();
     }
 
-    public static MenuBuilder aMenu() {
+    public static MenuBuilder newInstance() {
         return new MenuBuilder();
     }
 

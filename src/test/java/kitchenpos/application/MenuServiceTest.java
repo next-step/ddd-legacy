@@ -21,7 +21,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -48,10 +47,10 @@ class MenuServiceTest {
     @DisplayName("이름, 가격, 포함될 메뉴 그룹의 식별자, 메뉴 공개여부 및 포함할 제품 정보(식별자, 수량) 목록으로 메뉴를 추가한다")
     @Test
     void create() {
-        final Product product = productRepository.save(ProductBuilder.aProduct().build());
-        final MenuProduct menuProduct = MenuProductBuilder.aMenuProduct().setProduct(product).build();
-        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.aMenuGroup().build());
-        final Menu expected = MenuBuilder.aMenu()
+        final Product product = productRepository.save(ProductBuilder.newInstance().build());
+        final MenuProduct menuProduct = MenuProductBuilder.newInstance().setProduct(product).build();
+        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.newInstance().build());
+        final Menu expected = MenuBuilder.newInstance()
                 .setMenuProducts(menuProduct)
                 .setMenuGroup(menuGroup)
                 .build();
@@ -73,10 +72,10 @@ class MenuServiceTest {
     @NullSource
     @ValueSource(strings = "-16000")
     void create(final BigDecimal price) {
-        final Product product = productRepository.save(ProductBuilder.aProduct().build());
-        final MenuProduct menuProduct = MenuProductBuilder.aMenuProduct().setProduct(product).build();
-        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.aMenuGroup().build());
-        final Menu expected = MenuBuilder.aMenu()
+        final Product product = productRepository.save(ProductBuilder.newInstance().build());
+        final MenuProduct menuProduct = MenuProductBuilder.newInstance().setProduct(product).build();
+        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.newInstance().build());
+        final Menu expected = MenuBuilder.newInstance()
                 .setPrice(price)
                 .setMenuProducts(menuProduct)
                 .setMenuGroup(menuGroup)
@@ -89,10 +88,10 @@ class MenuServiceTest {
     @DisplayName("포함될 메뉴 그룹의 식별자로 특정 메뉴 그룹을 조회할 수 있어야 한다")
     @Test
     void createNoSuchMenuGroup() {
-        final Product product = productRepository.save(ProductBuilder.aProduct().build());
-        final MenuProduct menuProduct = MenuProductBuilder.aMenuProduct().setProduct(product).build();
-        final MenuGroup menuGroup = MenuGroupBuilder.aMenuGroup().build();
-        final Menu expected = MenuBuilder.aMenu()
+        final Product product = productRepository.save(ProductBuilder.newInstance().build());
+        final MenuProduct menuProduct = MenuProductBuilder.newInstance().setProduct(product).build();
+        final MenuGroup menuGroup = MenuGroupBuilder.newInstance().build();
+        final Menu expected = MenuBuilder.newInstance()
                 .setMenuProducts(menuProduct)
                 .setMenuGroup(menuGroup)
                 .build();
@@ -105,8 +104,8 @@ class MenuServiceTest {
     @ParameterizedTest
     @NullSource
     void create(final List<MenuProduct> menuProducts) {
-        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.aMenuGroup().build());
-        final Menu expected = MenuBuilder.aMenu()
+        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.newInstance().build());
+        final Menu expected = MenuBuilder.newInstance()
                 .setMenuProducts(menuProducts)
                 .setMenuGroup(menuGroup)
                 .build();
@@ -118,8 +117,8 @@ class MenuServiceTest {
     @DisplayName("포함할 제품 정보 목록에는 하나 이상의 제품 정보가 있어야 한다")
     @Test
     void createEmptyMenuProducts() {
-        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.aMenuGroup().build());
-        final Menu expected = MenuBuilder.aMenu()
+        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.newInstance().build());
+        final Menu expected = MenuBuilder.newInstance()
                 .setMenuProducts(Collections.emptyList())
                 .setMenuGroup(menuGroup)
                 .build();
@@ -132,10 +131,10 @@ class MenuServiceTest {
     @ParameterizedTest
     @NullSource
     void create(final UUID productId) {
-        final Product product = ProductBuilder.aProduct().setId(productId).build();
-        final MenuProduct menuProduct = MenuProductBuilder.aMenuProduct().setProduct(product).build();
-        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.aMenuGroup().build());
-        final Menu expected = MenuBuilder.aMenu()
+        final Product product = ProductBuilder.newInstance().setId(productId).build();
+        final MenuProduct menuProduct = MenuProductBuilder.newInstance().setProduct(product).build();
+        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.newInstance().build());
+        final Menu expected = MenuBuilder.newInstance()
                 .setMenuProducts(menuProduct)
                 .setMenuGroup(menuGroup)
                 .build();
@@ -148,13 +147,13 @@ class MenuServiceTest {
     @ParameterizedTest
     @ValueSource(longs = -1L)
     void create(final Long quantity) {
-        final Product product = productRepository.save(ProductBuilder.aProduct().build());
-        final MenuProduct menuProduct = MenuProductBuilder.aMenuProduct()
+        final Product product = productRepository.save(ProductBuilder.newInstance().build());
+        final MenuProduct menuProduct = MenuProductBuilder.newInstance()
                 .setProduct(product)
                 .setQuantity(quantity)
                 .build();
-        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.aMenuGroup().build());
-        final Menu expected = MenuBuilder.aMenu()
+        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.newInstance().build());
+        final Menu expected = MenuBuilder.newInstance()
                 .setMenuProducts(menuProduct)
                 .setMenuGroup(menuGroup)
                 .build();
@@ -166,14 +165,14 @@ class MenuServiceTest {
     @DisplayName("메뉴의 가격이 포함할 제품의 (가격 * 수량)의 합 이하여야 한다")
     @Test
     void createIllegalMenuPrice() {
-        final Product product = productRepository.save(ProductBuilder.aProduct()
+        final Product product = productRepository.save(ProductBuilder.newInstance()
                 .setPrice(16_000L)
                 .build());
-        final MenuProduct menuProduct = MenuProductBuilder.aMenuProduct()
+        final MenuProduct menuProduct = MenuProductBuilder.newInstance()
                 .setProduct(product)
                 .build();
-        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.aMenuGroup().build());
-        final Menu expected = MenuBuilder.aMenu()
+        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.newInstance().build());
+        final Menu expected = MenuBuilder.newInstance()
                 .setPrice(20_000L)
                 .setMenuProducts(menuProduct)
                 .setMenuGroup(menuGroup)
@@ -188,10 +187,10 @@ class MenuServiceTest {
     @NullSource
     @ValueSource(strings = {"비속어", "욕설이 포함된 이름"})
     void create(final String name) {
-        final Product product = productRepository.save(ProductBuilder.aProduct().build());
-        final MenuProduct menuProduct = MenuProductBuilder.aMenuProduct().setProduct(product).build();
-        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.aMenuGroup().build());
-        final Menu expected = MenuBuilder.aMenu()
+        final Product product = productRepository.save(ProductBuilder.newInstance().build());
+        final MenuProduct menuProduct = MenuProductBuilder.newInstance().setProduct(product).build();
+        final MenuGroup menuGroup = menuGroupRepository.save(MenuGroupBuilder.newInstance().build());
+        final Menu expected = MenuBuilder.newInstance()
                 .setName(name)
                 .setMenuProducts(menuProduct)
                 .setMenuGroup(menuGroup)
@@ -204,8 +203,8 @@ class MenuServiceTest {
     @DisplayName("특정 메뉴의 식별자와 바꿀 가격으로 메뉴의 가격을 바꾼다")
     @Test
     void changePrice() {
-        final Menu menu = menuRepository.save(MenuBuilder.aMenu().setPrice(16_000L).build());
-        final Menu expected = MenuBuilder.aMenu().setPrice(15_000L).build();
+        final Menu menu = menuRepository.save(MenuBuilder.newInstance().setPrice(16_000L).build());
+        final Menu expected = MenuBuilder.newInstance().setPrice(15_000L).build();
 
         final Menu actual = menuService.changePrice(menu.getId(), expected);
 
@@ -217,8 +216,8 @@ class MenuServiceTest {
     @NullSource
     @ValueSource(strings = "-16000")
     void changePrice(final BigDecimal price) {
-        final Menu menu = menuRepository.save(MenuBuilder.aMenu().build());
-        final Menu expected = MenuBuilder.aMenu().setPrice(price).build();
+        final Menu menu = menuRepository.save(MenuBuilder.newInstance().build());
+        final Menu expected = MenuBuilder.newInstance().setPrice(price).build();
 
         assertThatThrownBy(() -> menuService.changePrice(menu.getId(), expected))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -228,7 +227,7 @@ class MenuServiceTest {
     @ParameterizedTest
     @NullSource
     void changePrice(UUID menuId) {
-        final Menu expected = MenuBuilder.aMenu().setPrice(16_000L).build();
+        final Menu expected = MenuBuilder.newInstance().setPrice(16_000L).build();
 
         assertThatThrownBy(() -> menuService.changePrice(menuId, expected))
                 .isInstanceOf(NoSuchElementException.class);
@@ -237,8 +236,8 @@ class MenuServiceTest {
     @DisplayName("바꿀 가격이 특정 메뉴가 포함한 모든 제품의 (가격 * 수량)의 합 이하여야 한다")
     @Test
     void changePriceIllegalSum() {
-        final Menu menu = menuRepository.save(MenuBuilder.aMenu().setPrice(16_000L).build());
-        final Menu expected = MenuBuilder.aMenu().setPrice(17_000L).build();
+        final Menu menu = menuRepository.save(MenuBuilder.newInstance().setPrice(16_000L).build());
+        final Menu expected = MenuBuilder.newInstance().setPrice(17_000L).build();
 
         assertThatThrownBy(() -> menuService.changePrice(menu.getId(), expected))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -247,7 +246,7 @@ class MenuServiceTest {
     @DisplayName("특정 메뉴의 식별자로 메뉴를 공개한다")
     @Test
     void display() {
-        final Menu expected = menuRepository.save(MenuBuilder.aMenu()
+        final Menu expected = menuRepository.save(MenuBuilder.newInstance()
                 .setDisplayed(false)
                 .build()
         );
@@ -271,9 +270,9 @@ class MenuServiceTest {
     @DisplayName("메뉴의 가격이 메뉴가 포함한 모든 제품의 (가격 * 수량)의 합 이하여야 한다")
     @Test
     void displayIllegalSum() {
-        final Menu expected = menuRepository.save(MenuBuilder.aMenu()
-                .setMenuProducts(MenuProductBuilder.aMenuProduct()
-                        .setProduct(productRepository.save(ProductBuilder.aProduct().setPrice(16_000L).build()))
+        final Menu expected = menuRepository.save(MenuBuilder.newInstance()
+                .setMenuProducts(MenuProductBuilder.newInstance()
+                        .setProduct(productRepository.save(ProductBuilder.newInstance().setPrice(16_000L).build()))
                         .setQuantity(2L)
                         .build())
                 .setPrice(33_000L)
@@ -287,7 +286,7 @@ class MenuServiceTest {
     @DisplayName("특정 메뉴의 식별자로 메뉴를 숨긴다")
     @Test
     void hide() {
-        final Menu expected = menuRepository.save(MenuBuilder.aMenu().setDisplayed(true).build());
+        final Menu expected = menuRepository.save(MenuBuilder.newInstance().setDisplayed(true).build());
 
         menuService.hide(expected.getId());
 
@@ -311,7 +310,7 @@ class MenuServiceTest {
         final int expected = 2;
 
         IntStream.range(0, expected)
-                .mapToObj(index -> MenuBuilder.aMenu().build())
+                .mapToObj(index -> MenuBuilder.newInstance().build())
                 .forEach(menuRepository::save);
 
         assertThat(menuService.findAll()).hasSize(expected);

@@ -16,7 +16,7 @@ public final class ProductBuilder {
         price = BigDecimal.valueOf(16_000L);
     }
 
-    public static ProductBuilder aProduct() {
+    public static ProductBuilder newInstance() {
         return new ProductBuilder();
     }
 

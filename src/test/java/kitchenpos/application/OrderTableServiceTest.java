@@ -36,7 +36,7 @@ class OrderTableServiceTest {
     @DisplayName("이름으로 주문 테이블을 추가 후, 접객 인원을 0으로 초기화하고 공석으로 비운다.")
     @Test
     void create() {
-        final OrderTable expected = OrderTableBuilder.anOrderTable().setName("1번 테이블").build();
+        final OrderTable expected = OrderTableBuilder.newInstance().setName("1번 테이블").build();
 
         final OrderTable actual = orderTableService.create(expected);
 
@@ -53,7 +53,7 @@ class OrderTableServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void create(final String name) {
-        final OrderTable expected = OrderTableBuilder.anOrderTable().setName(name).build();
+        final OrderTable expected = OrderTableBuilder.newInstance().setName(name).build();
 
         assertThatThrownBy(() -> orderTableService.create(expected))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -62,7 +62,7 @@ class OrderTableServiceTest {
     @DisplayName("특정 주문 테이블의 식별자로 주문 테이블을 공석이 아니도록 채운다")
     @Test
     void sit() {
-        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.anOrderTable().setEmpty(true).build());
+        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.newInstance().setEmpty(true).build());
 
         final OrderTable actual = orderTableService.sit(orderTable.getId());
 
@@ -80,11 +80,11 @@ class OrderTableServiceTest {
     @DisplayName("특정 주문 테이블의 식별자로 주문 테이블을 공석으로 비운고, 접객 인원을 0으로 바꾼다")
     @Test
     void clear() {
-        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.anOrderTable()
+        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.newInstance()
                 .setNumberOfGuests(1)
                 .setEmpty(false)
                 .build());
-        orderRepository.save(OrderBuilder.anOrder()
+        orderRepository.save(OrderBuilder.newInstance()
                 .setOrderTable(orderTable)
                 .setType(OrderType.EAT_IN)
                 .setStatus(OrderStatus.COMPLETED)
@@ -109,11 +109,11 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블에서 받은 주문이 있다면 해당 주문이 완료 상태여야 한다")
     @Test
     void clearNotCompleteStatusOrder() {
-        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.anOrderTable()
+        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.newInstance()
                 .setNumberOfGuests(1)
                 .setEmpty(false)
                 .build());
-        orderRepository.save(OrderBuilder.anOrder()
+        orderRepository.save(OrderBuilder.newInstance()
                 .setOrderTable(orderTable)
                 .setType(OrderType.EAT_IN)
                 .setStatus(OrderStatus.WAITING)
@@ -126,11 +126,11 @@ class OrderTableServiceTest {
     @DisplayName("특정 주문 테이블의 식별자와 바꿀 접객 인원으로 접객 인원을 바꾼다")
     @Test
     void changeNumberOfGuests() {
-        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.anOrderTable()
+        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.newInstance()
                 .setNumberOfGuests(1)
                 .setEmpty(false)
                 .build());
-        final OrderTable expected = OrderTableBuilder.anOrderTable().setNumberOfGuests(2).build();
+        final OrderTable expected = OrderTableBuilder.newInstance().setNumberOfGuests(2).build();
 
         final OrderTable actual = orderTableService.changeNumberOfGuests(orderTable.getId(), expected);
 
@@ -141,10 +141,10 @@ class OrderTableServiceTest {
     @ParameterizedTest
     @ValueSource(ints = -1)
     void changeNumberOfGuests(final int numberOfGuests) {
-        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.anOrderTable()
+        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.newInstance()
                 .setEmpty(false)
                 .build());
-        final OrderTable expected = OrderTableBuilder.anOrderTable().setNumberOfGuests(numberOfGuests).build();
+        final OrderTable expected = OrderTableBuilder.newInstance().setNumberOfGuests(numberOfGuests).build();
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), expected))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -154,7 +154,7 @@ class OrderTableServiceTest {
     @ParameterizedTest
     @NullSource
     void changeNumberOfGuests(final UUID orderTableId) {
-        final OrderTable expected = OrderTableBuilder.anOrderTable().setNumberOfGuests(2).build();
+        final OrderTable expected = OrderTableBuilder.newInstance().setNumberOfGuests(2).build();
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, expected))
                 .isInstanceOf(NoSuchElementException.class);
@@ -164,10 +164,10 @@ class OrderTableServiceTest {
     @ParameterizedTest
     @ValueSource(booleans = true)
     void changeNumberOfGuests(final boolean empty) {
-        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.anOrderTable()
+        final OrderTable orderTable = orderTableRepository.save(OrderTableBuilder.newInstance()
                 .setEmpty(empty)
                 .build());
-        final OrderTable expected = OrderTableBuilder.anOrderTable().setNumberOfGuests(2).build();
+        final OrderTable expected = OrderTableBuilder.newInstance().setNumberOfGuests(2).build();
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), expected))
                 .isInstanceOf(IllegalStateException.class);
@@ -179,7 +179,7 @@ class OrderTableServiceTest {
         final int expected = 2;
 
         IntStream.range(0, expected)
-                .forEach(index -> orderTableRepository.save(OrderTableBuilder.anOrderTable().build()));
+                .forEach(index -> orderTableRepository.save(OrderTableBuilder.newInstance().build()));
 
         assertThat(orderTableService.findAll()).hasSize(expected);
     }

@@ -23,13 +23,13 @@ public final class OrderBuilder {
         type = OrderType.DELIVERY;
         status = OrderStatus.WAITING;
         orderDateTime = LocalDateTime.now();
-        orderLineItems = Collections.singletonList(OrderLineItemBuilder.anOrderLineItem().build());
+        orderLineItems = Collections.singletonList(OrderLineItemBuilder.newInstance().build());
         deliveryAddress = "우리집";
         orderTable = null;
         orderTableId = null;
     }
 
-    public static OrderBuilder anOrder() {
+    public static OrderBuilder newInstance() {
         return new OrderBuilder();
     }
 
