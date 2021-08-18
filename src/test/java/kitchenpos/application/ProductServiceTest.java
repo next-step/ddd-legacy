@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,12 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
+    private static final String PRODUCT_NAME = "상품 이름";
+
+    private static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(1);
+
+    private Product product;
+
     @Mock
     private ProductRepository productRepository;
 
@@ -34,13 +41,15 @@ class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
+    @BeforeEach
+    void setUp() {
+        product = createProduct();
+    }
+
     @DisplayName("새로운 상품을 추가할 수 있다.")
     @Test
     void create() {
         // given
-        final String expectedName = "상품 이름";
-        final BigDecimal expectedPrice = BigDecimal.valueOf(1);
-        final Product product = createProduct(expectedName, expectedPrice);
         given(productRepository.save(any(Product.class)))
                 .willReturn(product);
 
@@ -50,9 +59,9 @@ class ProductServiceTest {
         // then
         assertAll(
                 () -> assertThat(actual.getName())
-                        .isEqualTo(expectedName),
+                        .isEqualTo(PRODUCT_NAME),
                 () -> assertThat(actual.getPrice())
-                        .isEqualTo(expectedPrice)
+                        .isEqualTo(PRODUCT_PRICE)
         );
     }
 
@@ -60,7 +69,7 @@ class ProductServiceTest {
     @Test
     void createEmptyPrice() {
         // given
-        final Product product = createProduct("상품 이름", null);
+        product.setPrice(null);
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -71,7 +80,7 @@ class ProductServiceTest {
     @Test
     void createNegativePrice() {
         // given
-        final Product product = createProduct("상품 이름", BigDecimal.valueOf(-1));
+        product.setPrice(BigDecimal.valueOf(-1));
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -82,7 +91,7 @@ class ProductServiceTest {
     @Test
     void createEmptyName() {
         // given
-        final Product product = createProduct(null, BigDecimal.valueOf(1));
+        product.setName(null);
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -93,7 +102,6 @@ class ProductServiceTest {
     @Test
     void createProfanityName() {
         // given
-        final Product product = createProduct("상품 이름", BigDecimal.valueOf(1));
         given(purgomalumClient.containsProfanity(any(String.class)))
                 .willReturn(true);
 
@@ -107,7 +115,6 @@ class ProductServiceTest {
     @Test
     void changePrice() {
         // given
-        final Product product = createProduct("상품 이름", BigDecimal.valueOf(1));
         final ProductRepository productRepository = new FakeProductRepository();
         productRepository.save(product);
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
@@ -126,7 +133,7 @@ class ProductServiceTest {
     @Test
     void changeEmptyPrice() {
         // given
-        final Product product = createProduct("상품 이름", null);
+        product.setPrice(null);
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -137,7 +144,7 @@ class ProductServiceTest {
     @Test
     void changeNegativePrice() {
         // given
-        final Product product = createProduct("상품 이름", BigDecimal.valueOf(-1));
+        product.setPrice(BigDecimal.valueOf(-1));
 
         // then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -148,7 +155,6 @@ class ProductServiceTest {
     @Test
     void changeNonExistProduct() {
         // given
-        final Product product = createProduct("상품 이름", BigDecimal.valueOf(1));
         given(productRepository.findById(any(UUID.class)))
                 .willReturn(Optional.empty());
 
@@ -213,6 +219,10 @@ class ProductServiceTest {
         product.setName(name);
         product.setPrice(price);
         return product;
+    }
+
+    private Product createProduct() {
+        return createProduct(PRODUCT_NAME, PRODUCT_PRICE);
     }
 
     private Menu createMenu(final String name, final BigDecimal price, final List<Product> products) {
