@@ -14,6 +14,9 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static kitchenpos.domain.MenuFixture.createMenuRepository;
+import static kitchenpos.domain.MenuGroupFixture.createMenuGroupRepository;
+import static kitchenpos.domain.ProductFixture.createProductRepository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -167,33 +170,22 @@ class ProductServiceTest {
     @Test
     void changePriceExpensiveMenu() {
         // given
-        final Product product1 = createProduct("상품1", BigDecimal.valueOf(1_100));
-        final Product product2 = createProduct("상품2", BigDecimal.valueOf(2_200));
-        final Menu menu1 = createMenu("메뉴1", BigDecimal.valueOf(1_000), Arrays.asList(product1));
-        final Menu menu2 = createMenu("메뉴2", BigDecimal.valueOf(2_000), Arrays.asList(product2));
-        final Menu menu3 = createMenu("메뉴3", BigDecimal.valueOf(3_000), Arrays.asList(product1, product2));
-
-        final ProductRepository productRepository = new FakeProductRepository();
-        final MenuRepository menuRepository = new FakeMenuRepository();
-
-        productRepository.save(product1);
-        productRepository.save(product2);
-        menuRepository.save(menu1);
-        menuRepository.save(menu2);
-        menuRepository.save(menu3);
-
+        final MenuGroupRepository menuGroupRepository = createMenuGroupRepository();
+        final ProductRepository productRepository = createProductRepository();
+        final MenuRepository menuRepository = createMenuRepository(menuGroupRepository, productRepository);
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
 
         // when
-        final Product changedProduct1 = createProduct(product1.getName(), BigDecimal.valueOf(100));
-        final Product actual = productService.changePrice(product1.getId(), changedProduct1);
+        final Product product = productRepository.findAll().get(0);
+        final Product changedProduct = createProduct(product.getName(), BigDecimal.valueOf(1));
+        productService.changePrice(product.getId(), changedProduct);
         final List<Menu> displayedMenus = menuRepository.findAll().stream()
                 .filter(Menu::isDisplayed)
                 .collect(Collectors.toList());
 
         // then
-        assertThat(displayedMenus)
-                .isEqualTo(Arrays.asList(menu2));
+        assertThat(displayedMenus.size())
+                .isEqualTo(1);
     }
 
     @DisplayName("상품의 목록을 조회할 수 있다.")
