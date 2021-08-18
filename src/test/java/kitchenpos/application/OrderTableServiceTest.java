@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class OrderTableServiceTest {
+    private static final String TABLE_NAME = "테이블 이름";
 
     private OrderTableRepository orderTableRepository;
 
@@ -25,15 +26,18 @@ class OrderTableServiceTest {
 
     private OrderTableService orderTableService;
 
+    private OrderTable orderTable;
+
     @BeforeEach
     void setUp() {
         orderTableRepository = new FakeOrderTableRepository();
         orderRepository = new FakeOrderRepository();
         orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+        orderTable = createOrderTable();
     }
 
     @DisplayName("새로운 주문 테이블을 추가할 수 있다.")
-    @ValueSource(strings = {"주문 테이블 이름"})
+    @ValueSource(strings = {"첫번째 이름", "두번째 이름", "세번째 이름"})
     @ParameterizedTest
     void create(final String expectedName) {
         // given
@@ -56,7 +60,6 @@ class OrderTableServiceTest {
     @Test
     void sit() {
         // given
-        final OrderTable orderTable = createOrderTable("테이블 이름");
         orderTable.setEmpty(true);
         orderTableRepository.save(orderTable);
 
@@ -79,7 +82,6 @@ class OrderTableServiceTest {
     @Test
     void clear() {
         // given
-        final OrderTable orderTable = createOrderTable("테이블 이름");
         orderTable.setEmpty(false);
         orderTable.setNumberOfGuests(123);
         orderTableRepository.save(orderTable);
@@ -106,14 +108,13 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests() {
         // given
-        final OrderTable orderTable = createOrderTable("테이블 이름");
         orderTable.setEmpty(false);
         orderTable.setNumberOfGuests(123);
         orderTableRepository.save(orderTable);
 
         // when
         final int changedNumberOfGuests = 7;
-        final OrderTable changedOrderTable = createOrderTable(orderTable.getName());
+        final OrderTable changedOrderTable = createOrderTable();
         changedOrderTable.setNumberOfGuests(changedNumberOfGuests);
         orderTableService.changeNumberOfGuests(orderTable.getId(), changedOrderTable);
 
@@ -129,14 +130,13 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests_negative() {
         // given
-        final OrderTable orderTable = createOrderTable("테이블 이름");
         orderTable.setEmpty(false);
         orderTable.setNumberOfGuests(123);
         orderTableRepository.save(orderTable);
 
         // when
         final int changedNumberOfGuests = -1;
-        final OrderTable changedOrderTable = createOrderTable(orderTable.getName());
+        final OrderTable changedOrderTable = createOrderTable();
         changedOrderTable.setNumberOfGuests(changedNumberOfGuests);
 
         // then
@@ -147,10 +147,6 @@ class OrderTableServiceTest {
     @DisplayName("존재하지 않는 주문 테이블에 앉아있는 손님의 숫자를 변경할 수 없다.")
     @Test
     void changeNumberOfGuests_nonExist() {
-        // given
-        final OrderTable orderTable = createOrderTable("테이블 이름");
-
-        // then
         assertThatExceptionOfType(NoSuchElementException.class)
                 .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
@@ -159,13 +155,12 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests_empty() {
         // given
-        final OrderTable orderTable = createOrderTable("테이블 이름");
         orderTable.setEmpty(true);
         orderTableRepository.save(orderTable);
 
         // when
         final int changedNumberOfGuests = 123;
-        final OrderTable changedOrderTable = createOrderTable(orderTable.getName());
+        final OrderTable changedOrderTable = createOrderTable();
         changedOrderTable.setNumberOfGuests(changedNumberOfGuests);
 
         // then
@@ -197,5 +192,9 @@ class OrderTableServiceTest {
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(name);
         return orderTable;
+    }
+
+    private OrderTable createOrderTable() {
+        return createOrderTable(TABLE_NAME);
     }
 }
