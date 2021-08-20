@@ -12,14 +12,12 @@ import org.junit.jupiter.params.provider.*;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static kitchenpos.domain.OrderStatus.*;
 import static kitchenpos.domain.OrderType.DELIVERY;
 import static kitchenpos.domain.OrderType.EAT_IN;
+import static kitchenpos.menu.fixture.MenuFixture.메뉴;
 import static kitchenpos.order.fixture.OrderFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -56,16 +54,48 @@ public class OrderServiceTest {
                 kitchenridersClient);
     }
 
+    @DisplayName("주문한다")
+    @Test
+    public void create() {
+        // given
+        int 메뉴_가격 = 16000;
+
+        Order 주문_생성_요청 = 주문_생성_요청(EAT_IN, Arrays.asList(주문_상품_생성_요청(메뉴_가격, 1L)));
+
+        Menu 메뉴 = 메뉴("후라이드", 메뉴_가격, true, null, null);
+        given(menuRepository.findAllById(anyList())).willReturn(Arrays.asList(메뉴));
+        given(menuRepository.findById(any())).willReturn(Optional.of(메뉴));
+
+        OrderTable 채워진_주문_테이블 = 주문_테이블("1번", 5,false);
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(채워진_주문_테이블));
+
+        Order 매장_주문 = 주문(EAT_IN, null, WAITING, 채워진_주문_테이블, Arrays.asList(
+                주문_상품(주문_수량, 가격, 메뉴)));
+        given(orderRepository.save(any())).willReturn(매장_주문);
+
+        // when
+        Order order = orderService.create(주문_생성_요청);
+
+        // then
+        assertAll(
+                () -> assertThat(order.getStatus()).isEqualTo(WAITING),
+                () -> assertThat(order.getType()).isEqualTo(EAT_IN),
+                () -> assertThat(order.getOrderTable().isEmpty()).isFalse(),
+                () -> assertThat(order.getOrderTable().getName()).isEqualTo("1번"),
+                () -> assertThat(order.getOrderLineItems().size()).isEqualTo(1)
+        );
+    }
+
     @DisplayName("주문은 배달, 포장, 매장식사 셋 중에 하나가 아닐 경우 IllegalArgumentException을 던진다")
     @ParameterizedTest
     @NullSource
     public void createWithValidStatus(OrderType type) {
         // given
-        Order 주문 = 주문(type, 서울_주소, WAITING, Arrays.asList(
-                주문_상품(주문_수량, 가격, null)), null);
+        Order 주문_생성_요청 = 주문_생성_요청(type, Arrays.asList(
+                주문_상품_생성_요청(주문_수량, 가격)));
 
         // when, then
-        assertThatThrownBy(() -> orderService.create(주문))
+        assertThatThrownBy(() -> orderService.create(주문_생성_요청))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -74,10 +104,10 @@ public class OrderServiceTest {
     @NullAndEmptySource
     public void createWithoutOrderLineItem(List<OrderLineItem> orderLineItems) {
         // given
-        Order 매장_주문 = 매장_주문(WAITING, orderLineItems);
+        Order 주문_생성_요청 = 주문_생성_요청(EAT_IN, orderLineItems);
 
         // when, then
-        assertThatThrownBy(() -> orderService.create(매장_주문))
+        assertThatThrownBy(() -> orderService.create(주문_생성_요청))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -85,16 +115,16 @@ public class OrderServiceTest {
     @Test
     public void createWithNotRegisteredMenu() {
         // given
-        Order 매장_주문 = 매장_주문(WAITING, Arrays.asList(
-                주문_상품(주문_수량, 가격, null),
-                주문_상품(주문_수량, 가격, null)));
+        Order 주문_생성_요청 = 주문_생성_요청(EAT_IN, Arrays.asList(
+                주문_상품_생성_요청(주문_수량, 가격),
+                주문_상품_생성_요청(주문_수량, 가격)));
 
         Menu 후라이드_한마리_메뉴 = 후라이드_한마리_메뉴(가격, false);
 
         given(menuRepository.findAllById(anyList())).willReturn(Arrays.asList(후라이드_한마리_메뉴));
 
         // when, then
-        assertThatThrownBy(() -> orderService.create(매장_주문))
+        assertThatThrownBy(() -> orderService.create(주문_생성_요청))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -104,16 +134,15 @@ public class OrderServiceTest {
     public void createShouldOrderAtLeastOneIfOrderTypeIsNotEatIn(OrderType notEatIn) {
         // given
         int quantity = -1;
-
         Menu 후라이드_한마리_메뉴 = 후라이드_한마리_메뉴(가격, false);
         given(menuRepository.findAllById(anyList())).willReturn(Arrays.asList(후라이드_한마리_메뉴));
 
-        Order 매장_식사_아닌_주문 = 주문(notEatIn, 서울_주소, WAITING, Arrays.asList(
-                주문_상품(quantity, 가격, null)), null);
+        Order 매장_식사_아닌_주문_요청 = 주문_생성_요청(notEatIn, Arrays.asList(
+                주문_상품_생성_요청(quantity, 가격)));
 
         // when, then
-        assertThatThrownBy(() -> orderService.create(매장_식사_아닌_주문))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> orderService.create(매장_식사_아닌_주문_요청))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @DisplayName("메뉴가 숨겨진 경우 IllegalArgumentException을 던진다.")
@@ -125,8 +154,8 @@ public class OrderServiceTest {
         given(menuRepository.findAllById(anyList())).willReturn(Arrays.asList(숨겨진_메뉴));
         given(menuRepository.findById(any())).willReturn(Optional.of(숨겨진_메뉴));
 
-        Order 배달_주문 = 배달_주문(WAITING, Arrays.asList(
-                주문_상품(주문_수량, 가격, null)));
+        Order 배달_주문 = 주문_생성_요청(DELIVERY, Arrays.asList(
+                주문_상품_생성_요청(주문_수량, 가격)));
 
         // when, then
         assertThatThrownBy(() -> orderService.create(배달_주문))
@@ -142,10 +171,11 @@ public class OrderServiceTest {
         given(menuRepository.findAllById(anyList())).willReturn(Arrays.asList(후라이드_한마리_메뉴));
         given(menuRepository.findById(any())).willReturn(Optional.of(후라이드_한마리_메뉴));
 
-        Order 주문 = 배달_주문(WAITING, Arrays.asList(주문_상품(주문_수량, orderLineItemPrice, null)));
+        Order 배달_주문_요청 = 주문_생성_요청(DELIVERY, Arrays.asList(
+                주문_상품_생성_요청(주문_수량, orderLineItemPrice)));
 
         // when, then
-        assertThatThrownBy(() -> orderService.create(주문))
+        assertThatThrownBy(() -> orderService.create(배달_주문_요청))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -160,20 +190,20 @@ public class OrderServiceTest {
         given(menuRepository.findAllById(anyList())).willReturn(Arrays.asList(menu));
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
-        Order 배달_주문 = 주문(delivery, deliveryAddress, WAITING, Arrays.asList(
-                주문_상품(주문_수량, 가격, null)), null);
+        Order 배달_주문_요청 = 주문_생성_요청(delivery, Arrays.asList(
+                주문_상품_생성_요청(주문_수량, 가격)));
 
         // when, then
-        assertThatThrownBy(() -> orderService.create(배달_주문))
+        assertThatThrownBy(() -> orderService.create(배달_주문_요청))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("매장 식사의 경우, 주문 테이블이 빈 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("매장 식사의 경우, 주문 테이블이 빈 경우 IllegalStateException을 던진다.")
     @ParameterizedTest
     @ValueSource(booleans = true)
     public void createWithEmptyTableIfEatIn(boolean isEmptyTable) {
         // given
-        OrderType eatIn = EAT_IN;
+        OrderType 매장_식사 = EAT_IN;
 
         Menu 메뉴 = 후라이드_한마리_메뉴(가격, true);
         given(menuRepository.findAllById(anyList())).willReturn(Arrays.asList(메뉴));
@@ -182,11 +212,11 @@ public class OrderServiceTest {
         OrderTable 빈_주문_테이블 = 주문_1번_테이블(isEmptyTable);
         given(orderTableRepository.findById(any())).willReturn(Optional.of(빈_주문_테이블));
 
-        Order 매장_주문 = 주문(eatIn, null, WAITING, Arrays.asList(
-                주문_상품(주문_수량, 가격, null)), null);
+        Order 매장_주문_요청 = 주문_생성_요청(매장_식사, Arrays.asList(
+                주문_상품_생성_요청(가격, 주문_수량)));
 
         // when, then
-        assertThatThrownBy(() -> orderService.create(매장_주문))
+        assertThatThrownBy(() -> orderService.create(매장_주문_요청))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -402,7 +432,7 @@ public class OrderServiceTest {
     public void completeEmptyTableAndZeroCustomerIfEatIn() {
         // given
         OrderTable 주문_테이블 = 주문_1번_테이블(false);
-        Order 서빙_완료된_주문 = 주문(EAT_IN, null, SERVED, null, 주문_테이블);
+        Order 서빙_완료된_주문 = 주문(EAT_IN, null, SERVED, 주문_테이블, null);
 
         given(orderRepository.findById(any()))
                 .willReturn(Optional.of(서빙_완료된_주문));

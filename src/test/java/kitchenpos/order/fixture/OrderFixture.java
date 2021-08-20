@@ -14,12 +14,38 @@ public class OrderFixture {
 
     public static final String 서울_주소 = "서울시 송파구 위례성대로 2";
 
+
+    public static OrderLineItem 주문_상품_생성_요청(final int price, final long quantity) {
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setMenuId(UUID.randomUUID());
+        orderLineItem.setPrice(new BigDecimal(price));
+        orderLineItem.setQuantity(quantity);
+        return orderLineItem;
+    }
+
+    public static Order 주문_생성_요청(final OrderType orderType, List<OrderLineItem> orderLineItems) {
+        Order order = new Order();
+        order.setType(orderType);
+        order.setOrderTableId(UUID.randomUUID());
+        order.setOrderLineItems(orderLineItems);
+        return order;
+    }
+
     public static OrderTable 주문_1번_테이블(final boolean isEmptyTable) {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName("1번");
         orderTable.setEmpty(isEmptyTable);
         orderTable.setNumberOfGuests(0);
+        return orderTable;
+    }
+
+    public static OrderTable 주문_테이블(final String name, final int numberOfGuests, final boolean isEmptyTable) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName(name);
+        orderTable.setEmpty(isEmptyTable);
+        orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;
     }
 
@@ -32,7 +58,7 @@ public class OrderFixture {
         return orderLineItem;
     }
 
-    public static Order 주문(final OrderType type, final String address, OrderStatus orderStatus, final List<OrderLineItem> orderLineItems, OrderTable orderTable) {
+    public static Order 주문(final OrderType type, final String address, OrderStatus orderStatus, OrderTable orderTable, final List<OrderLineItem> orderLineItems) {
         Order order = new Order();
         order.setType(type);
         order.setOrderTableId(UUID.randomUUID());
@@ -44,11 +70,11 @@ public class OrderFixture {
     }
 
     public static Order 배달_주문(final OrderStatus orderStatus, final List<OrderLineItem> orderLineItems) {
-        return 주문(DELIVERY, 서울_주소, orderStatus, orderLineItems, null);
+        return 주문(DELIVERY, 서울_주소, orderStatus, null, orderLineItems);
     }
 
     public static Order 매장_주문(final OrderStatus orderStatus, final List<OrderLineItem> orderLineItems) {
-        return 주문(EAT_IN, null, orderStatus, orderLineItems, null);
+        return 주문(EAT_IN, null, orderStatus, null, orderLineItems);
     }
 
     public static Product 후라이드_상품(int price) {
