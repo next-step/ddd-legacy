@@ -4,15 +4,27 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class ProductionFixture {
 
-    public static ProductSaveRequest createProductSaveRequest(final String name, final int price) {
-        return new ProductSaveRequest(name, price);
-    }
-
     public static Product createProduct(String name, int price) {
         Product product = new Product();
+        product.setName(name);
+        product.setPrice(BigDecimal.valueOf(price));
+        return product;
+    }
+
+    public static Product 상품_요청(String name, int price) {
+        Product product = new Product();
+        product.setName(name);
+        product.setPrice(BigDecimal.valueOf(price));
+        return product;
+    }
+
+    public static Product 상품(String name, int price) {
+        Product product = new Product();
+        product.setId(UUID.randomUUID());
         product.setName(name);
         product.setPrice(BigDecimal.valueOf(price));
         return product;
