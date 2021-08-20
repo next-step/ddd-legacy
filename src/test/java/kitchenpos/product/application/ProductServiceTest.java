@@ -70,7 +70,7 @@ public class ProductServiceTest {
         );
     }
 
-    @DisplayName("상품 가격이 음수거나 null인 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("상품 등록 시 상품 가격이 음수거나 null인 경우 IllegalArgumentException을 던진다.")
     @ParameterizedTest
     @ValueSource(ints = {-100})
     void createWithNegativePrice(int price) {
@@ -82,7 +82,7 @@ public class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품 이름에 욕설을 포함된 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("상품 등록 시 상품 이름에 욕설을 포함된 경우 IllegalArgumentException을 던진다.")
     @ParameterizedTest
     @ValueSource(strings = {"fuck","shit"})
     void createWithoutBadWords(String name) {
@@ -120,7 +120,7 @@ public class ProductServiceTest {
         );
     }
 
-    @DisplayName("변경될 상품 가격 음수거나 null인 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("상품 가격 변경 시 변경될 상품 가격 음수거나 null인 경우 IllegalArgumentException을 던진다.")
     @ParameterizedTest
     @ValueSource(ints = {-10, -100})
     public void changePriceWithNegativePrice(int price) {
@@ -132,7 +132,7 @@ public class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품이 속한 각 메뉴의 가격이 메뉴 상품들의 가격의 합보다 크면 숨김 처리한다")
+    @DisplayName("상품 가격 변경 시 상품이 속한 각 메뉴의 가격이 메뉴 상품들의 가격의 합보다 크면 숨김 처리한다")
     @ParameterizedTest
     @CsvSource({"33000,16000","48000,12000"})
     public void changePriceNotDisplay(int menuPrice, int menuProductPrice) {

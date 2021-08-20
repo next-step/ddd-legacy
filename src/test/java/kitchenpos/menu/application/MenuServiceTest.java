@@ -94,7 +94,7 @@ public class MenuServiceTest {
         );
     }
 
-    @DisplayName("메뉴 가격이 음수인 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("메뉴 등록 시 메뉴 가격이 음수인 경우 IllegalArgumentException을 던진다.")
     @ParameterizedTest
     @ValueSource(ints = {-10,-100})
     public void createWithValidPrice(int price) {
@@ -106,7 +106,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴는 등록되어 있는 메뉴 그룹에 포함되지 않을 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("메뉴 등록 시 등록되어 있는 메뉴 그룹에 포함되지 않을 경우 IllegalArgumentException을 던진다.")
     @Test
     public void createWithinRegisteredMenuGroup() {
         // given
@@ -117,7 +117,7 @@ public class MenuServiceTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
-    @DisplayName("메뉴는 메뉴 상품을 가지지 않는 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("메뉴 등록 시 메뉴 상품을 가지지 않는 경우 IllegalArgumentException을 던진다.")
     @Test
     public void createMenuProductToBeRegisteredAsProduct() {
         // given
@@ -132,7 +132,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 상품이 모두 상품으로 등록되지 않는 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("메뉴 등록 시 메뉴 상품이 모두 상품으로 등록되지 않는 경우 IllegalArgumentException을 던진다.")
     @Test
     public void createWithValidNumberOfMenuProduct() {
         // given
@@ -148,7 +148,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("상품 개수가 음수 일 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("메뉴 등록 시 상품 개수가 음수 일 경우 IllegalArgumentException을 던진다.")
     @ParameterizedTest
     @ValueSource(longs = {-10l,-100l})
     public void createWithValidQuantity(long quantity) {
@@ -166,7 +166,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴의 가격은 메뉴 상품들의 가격 * 수량 합을 넘을 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("메뉴 등록 시 메뉴 가격이 메뉴 상품들의 가격 * 수량 합을 넘을 경우 IllegalArgumentException을 던진다.")
     @Test
     public void createWithLowerPriceThanSumOfMenuProduct() {
         // given
@@ -182,7 +182,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 이름은 욕설을 포함하는 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("메뉴 등록 시 메뉴 이름은 욕설을 포함하는 경우 IllegalArgumentException을 던진다.")
     @ParameterizedTest
     @ValueSource(strings = {"fuck", "shit"})
     public void createWithoutBadWord(String name) {
@@ -207,8 +207,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("변경되는 메뉴 가격은 메뉴 상품들의 (가격 * 수량) 합을 넘을 경우 " +
-            "IllegalArgumentException을 던진다.")
+    @DisplayName("변경되는 메뉴 가격은 메뉴 상품들의 (가격 * 수량) 합을 넘을 경우 IllegalArgumentException을 던진다.")
     @Test
     public void changePriceWithLowerPriceThanSumOfMenuProduct() {
         // given
@@ -221,7 +220,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("등록되지 않은 메뉴인 경우 NoSuchElementException을 던진다.")
+    @DisplayName("메뉴 노출 시 등록되지 않은 메뉴인 경우 NoSuchElementException을 던진다.")
     @Test
     public void displayWithOnlyRegisteredMenu() {
         // given
@@ -231,7 +230,6 @@ public class MenuServiceTest {
         assertThatThrownBy(() -> menuService.display(id))
                 .isInstanceOf(NoSuchElementException.class);
     }
-
 
     @DisplayName("노출하려는 메뉴의 가격은 메뉴에 등록된 메뉴 상품의 가격의 합보다 크지 않은 경우 IllegalStateException을 던진다.")
     @Test
@@ -249,7 +247,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("등록되지 않은 메뉴인 경우 NoSuchElementException을 던진다.")
+    @DisplayName("메뉴를 숨길 시 등록되지 않은 메뉴인 경우 NoSuchElementException을 던진다.")
     @Test
     public void hideWithRegisteredMenu() {
         // given

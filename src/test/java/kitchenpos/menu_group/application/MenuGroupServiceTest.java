@@ -58,7 +58,7 @@ class MenuGroupServiceTest {
         );
     }
 
-    @DisplayName("메뉴 그룹 이름이 null이거나 빈 경우 IllegalArgumentException을 던진다.")
+    @DisplayName("메뉴 그룹 등록 시 메뉴 그룹 이름이 null이거나 빈 경우 IllegalArgumentException을 던진다.")
     @ParameterizedTest
     @NullAndEmptySource
     public void createWithName(String name) {
