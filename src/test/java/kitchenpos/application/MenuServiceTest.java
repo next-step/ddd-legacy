@@ -114,15 +114,97 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 가격을 변경할 수 있다.")
+    @Test
+    void changePrice() {
+        final Menu saved = 메뉴등록(menu);
+        final Menu request = new Menu();
+        request.setPrice(BigDecimal.valueOf(8_000L));
+        final Menu expected = 메뉴가격변경(saved.getId(), request);
+
+        assertAll(
+                () -> assertThat(expected.getPrice()).isEqualTo(request.getPrice()),
+                () -> assertThat(expected.getId()).isEqualTo(saved.getId()),
+                () -> assertThat(expected.getName()).isEqualTo(saved.getName())
+        );
+    }
+
+    @DisplayName("메뉴의 가격을 변경할 땐 0보다 큰 메뉴상품의 총합을 넘지 않는 값이어야한다.")
+    @ValueSource(strings = {"-1000", "1000000"})
+    @NullSource
+    @ParameterizedTest
+    void changePrice(BigDecimal price) {
+        final Menu saved = 메뉴등록(menu);
+        final Menu request = new Menu();
+        request.setPrice(price);
+
+        assertThatThrownBy(() -> 메뉴가격변경(saved.getId(), request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴를 노출할 수 있다.")
+    @Test
+    void display() {
+        menu.setDisplayed(false);
+        final Menu saved = 메뉴등록(menu);
+        assertThat(saved.isDisplayed()).isFalse();
+
+        final Menu expected = 메뉴노출(saved.getId());
+        assertThat(expected.isDisplayed()).isTrue();
+    }
+
+    @DisplayName("메뉴를 노출할땐 가격이 메뉴상품의 가격합보다 커서는 안된다.")
+    @Test
+    void display_price() {
+        menu.setId(UUID.randomUUID());
+        menu.setDisplayed(false);
+        menu.setPrice(BigDecimal.valueOf(12_000L));
+        final Menu saved = menuRepository.save(menu);
+
+        assertThatThrownBy(() -> 메뉴노출(saved.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("메뉴를 숨길 수 있다.")
+    @Test
+    void hide() {
+        final Menu saved = 메뉴등록(menu);
+
+        final Menu expected = menuService.hide(saved.getId());
+        assertThat(expected.isDisplayed()).isFalse();
+    }
+
+    @DisplayName("메뉴를 전체조회할 수 있다.")
+    @Test
+    void findAll(){
+        final Menu saved1 = 메뉴만들기(menuRepository, menuGroupRepository, productRepository);
+        final Menu saved2 = 메뉴만들기(menuRepository, menuGroupRepository, productRepository);
+
+        assertThat(메뉴전체조회()).containsOnly(saved1, saved2);
+    }
+
 
     Menu 메뉴등록(Menu menu) {
         return menuService.create(menu);
+    }
+
+    Menu 메뉴가격변경(UUID id, Menu menu) {
+        return menuService.changePrice(id, menu);
+    }
+
+    Menu 메뉴노출(UUID id) {
+        return menuService.display(id);
+    }
+
+    List<Menu> 메뉴전체조회() {
+        return menuService.findAll();
     }
 
     public static Menu 메뉴만들기(MenuRepository menuRepository, MenuGroupRepository menuGroupRepository, ProductRepository productRepository) {
         MenuGroup menuGroup = 메뉴그룹만들기(menuGroupRepository);
         List<MenuProduct> menuProducts = 메뉴상품들만들기(productRepository);
         Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
         menu.setName("메뉴");
         menu.setPrice(BigDecimal.valueOf(10_000L));
         menu.setMenuGroup(menuGroup);
