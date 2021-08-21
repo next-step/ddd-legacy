@@ -130,4 +130,13 @@ public class ProductServiceTest {
     List<Product> 상품전체조회() {
         return productService.findAll();
     }
+
+
+    public static Product 상품만들기(ProductRepository productRepository) {
+        final Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setName("상품 이름");
+        product.setPrice(BigDecimal.valueOf(10_000L));
+        return productRepository.save(product);
+    }
 }
