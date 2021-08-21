@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -105,11 +106,28 @@ public class ProductServiceTest {
         final Menu menu = new Menu();
     }
 
-    public Product 상품등록(final Product product) {
+    @Test
+    void findAll() {
+        final Product other = new Product();
+        other.setName("다른 상품");
+        other.setPrice(BigDecimal.valueOf(3000));
+        final Product saved1 = 상품등록(product);
+        final Product saved2 = 상품등록(other);
+
+        List<Product> expected = 상품전체조회();
+
+        assertThat(expected).containsOnly(saved1, saved2);
+    }
+
+    Product 상품등록(final Product product) {
         return productService.create(product);
     }
 
-    public Product 상품가격수정(final UUID productId, final Product product) {
+    Product 상품가격수정(final UUID productId, final Product product) {
         return productService.changePrice(productId, product);
+    }
+
+    List<Product> 상품전체조회() {
+        return productService.findAll();
     }
 }
