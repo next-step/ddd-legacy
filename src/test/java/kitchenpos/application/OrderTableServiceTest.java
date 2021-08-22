@@ -1,8 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.*;
 import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.application.OrderServiceTest.주문만들기;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -81,7 +80,14 @@ public class OrderTableServiceTest {
     @DisplayName("해당 테이블에 식사가 완료되지 않은 주문이 있다면 테이블을 비울 수 없다.")
     @Test
     void clear_order() {
+        final OrderTable table = 주문테이블등록(orderTable);
+        final Order order = new Order();
+        order.setType(OrderType.EAT_IN);
+        order.setOrderTable(table);
+        주문만들기(orderRepository, order);
 
+        assertThatThrownBy(() -> 주문테이블비우기(table.getId()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("테이블에 앉은 인원수를 변경할 수 있다.")
