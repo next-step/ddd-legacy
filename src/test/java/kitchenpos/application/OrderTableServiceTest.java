@@ -3,11 +3,16 @@ package kitchenpos.application;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -29,7 +34,7 @@ public class OrderTableServiceTest {
     @DisplayName("주문 테이블을 등록할 수 있다.")
     @Test
     void create() {
-        OrderTable saved = 주문테이블등록(orderTable);
+        final OrderTable saved = 주문테이블등록(orderTable);
 
         assertAll(
                 () -> assertThat(saved.getId()).isNotNull(),
@@ -49,8 +54,108 @@ public class OrderTableServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("비어있는 주문 테이블에 앉을 수 있다.")
+    @Test
+    void sit() {
+        final OrderTable saved = 주문테이블등록(orderTable);
 
-    OrderTable 주문테이블등록(OrderTable orderTable) {
+        final OrderTable expected = 주문테이블에앉기(saved.getId());
+
+        assertThat(expected.isEmpty()).isFalse();
+    }
+
+    @DisplayName("테이블을 비울 수 있다.")
+    @Test
+    void clear() {
+        final OrderTable saved = 주문테이블등록(orderTable);
+        final OrderTable seated = 주문테이블에앉기(saved.getId());
+
+        final OrderTable expected = 주문테이블비우기(seated.getId());
+
+        assertAll(
+                () -> assertThat(expected.getNumberOfGuests()).isEqualTo(0),
+                () -> assertThat(expected.isEmpty()).isTrue()
+        );
+    }
+
+    @DisplayName("해당 테이블에 식사가 완료되지 않은 주문이 있다면 테이블을 비울 수 없다.")
+    @Test
+    void clear_order() {
+
+    }
+
+    @DisplayName("테이블에 앉은 인원수를 변경할 수 있다.")
+    @Test
+    void changeNumberOfGuests() {
+        final OrderTable saved = 주문테이블등록(orderTable);
+        final OrderTable seated = 주문테이블에앉기(saved.getId());
+        final OrderTable request = new OrderTable();
+        request.setNumberOfGuests(5);
+
+        final OrderTable expected = 주문테이블인원수변경(seated.getId(), request);
+
+        assertThat(expected.getNumberOfGuests()).isEqualTo(request.getNumberOfGuests());
+    }
+
+    @DisplayName("테이블에 앉을 인원수는 0이상이어야 한다.")
+    @ValueSource(strings = "-1")
+    @ParameterizedTest
+    void changeNumberOfGuests(int numberOfGuests) {
+        final OrderTable saved = 주문테이블등록(orderTable);
+        final OrderTable seated = 주문테이블에앉기(saved.getId());
+        final OrderTable request = new OrderTable();
+        request.setNumberOfGuests(numberOfGuests);
+
+        assertThatThrownBy(() -> 주문테이블인원수변경(seated.getId(), request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("테이블의 인원수를 변경하려면 테이블에 이미 앉아있어야한다")
+    @Test
+    void changeNumberOfGuests_sit() {
+        final OrderTable saved = 주문테이블등록(orderTable);
+        final OrderTable request = new OrderTable();
+        request.setNumberOfGuests(5);
+
+        assertThatThrownBy(() -> 주문테이블인원수변경(saved.getId(), request))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("테이블을 전체조회할 수 있다.")
+    @Test
+    void findAll() {
+        final OrderTable saved1 = 주문테이블만들기(orderTableRepository);
+        final OrderTable saved2 = 주문테이블만들기(orderTableRepository);
+
+        List<OrderTable> expected = 주문테이블전체조회();
+
+        assertThat(expected).containsOnly(saved1, saved2);
+    }
+
+    OrderTable 주문테이블등록(final OrderTable orderTable) {
         return orderTableService.create(orderTable);
+    }
+
+    OrderTable 주문테이블에앉기(final UUID orderTableId) {
+        return orderTableService.sit(orderTableId);
+    }
+
+    OrderTable 주문테이블비우기(final UUID orderTableId) {
+        return orderTableService.clear(orderTableId);
+    }
+
+    OrderTable 주문테이블인원수변경(final UUID orderTableId, OrderTable request) {
+        return orderTableService.changeNumberOfGuests(orderTableId, request);
+    }
+
+    List<OrderTable> 주문테이블전체조회() {
+        return orderTableService.findAll();
+    }
+
+    public static OrderTable 주문테이블만들기(OrderTableRepository orderTableRepository) {
+        final OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName("주문테이블");
+        return orderTableRepository.save(orderTable);
     }
 }

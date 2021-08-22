@@ -5,30 +5,35 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class InMemoryOrderRepository implements OrderRepository {
 
+    private ConcurrentMap<UUID, Order> orders = new ConcurrentHashMap<>();
 
     @Override
     public boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status) {
-        return false;
+        return orders.values().stream()
+                .anyMatch(order ->
+                        Objects.equals(order.getOrderTable().getId(), orderTable.getId())
+                                && !Objects.equals(order.getStatus(), status));
     }
 
     @Override
     public Order save(Order order) {
-        return null;
+        orders.put(order.getId(), order);
+        return order;
     }
 
     @Override
     public Optional<Order> findById(UUID orderId) {
-        return Optional.empty();
+        return Optional.ofNullable(orders.get(orderId));
     }
 
     @Override
     public List<Order> findAll() {
-        return null;
+        return new ArrayList<>(orders.values());
     }
 }
