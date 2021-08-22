@@ -210,6 +210,7 @@ public class MenuServiceTest {
         menu.setMenuGroup(menuGroup);
         menu.setMenuGroupId(menuGroup.getId());
         menu.setMenuProducts(menuProducts);
+        menu.setDisplayed(true);
         return menuRepository.save(menu);
     }
 
