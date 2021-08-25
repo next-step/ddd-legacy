@@ -1,5 +1,6 @@
-package kitchenpos.application;
+package kitchenpos.application.old;
 
+import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
-class MenuGroupServiceTest {
+class OldMenuGroupServiceTest {
 
     private final String menuGroupName = "세트류";
 

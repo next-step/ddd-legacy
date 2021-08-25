@@ -1,5 +1,8 @@
-package kitchenpos.application;
+package kitchenpos.application.old;
 
+import kitchenpos.application.MenuGroupService;
+import kitchenpos.application.MenuService;
+import kitchenpos.application.ProductService;
 import kitchenpos.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,21 +26,21 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ExtendWith(MockitoExtension.class)
 @SpringBootTest
-class MenuServiceTest {
+class OldMenuServiceTest {
 
     private final BigDecimal menuPrice = BigDecimal.valueOf(39000L);
-
-    @Autowired
-    ProductRepository productRepository;
-
-    @Autowired
-    MenuGroupRepository menuGroupRepository;
 
     @Autowired
     MenuRepository menuRepository;
 
     @Autowired
-    private MenuService menuService;
+    MenuGroupRepository menuGroupRepository;
+
+    @Autowired
+    ProductRepository productRepository;
+
+    @Autowired
+    MenuService menuService;
 
     @Autowired
     private ProductService productService;
@@ -75,7 +78,7 @@ class MenuServiceTest {
     @Test
     void createValidationMenuGroup() {
 
-        // no exists menuGroup
+        // not exists menuGroup
         Menu noExistsMenuGroupRequest = getMenuRequest(menuPrice);
         noExistsMenuGroupRequest.setMenuGroupId(UUID.randomUUID());
         assertThatThrownBy(() -> menuService.create(noExistsMenuGroupRequest))
@@ -143,11 +146,22 @@ class MenuServiceTest {
 
     }
 
-    @DisplayName("메뉴 생성시 메뉴이름 validation")
+    @DisplayName("메뉴 생성시 메뉴이름 validation (null)")
+    @NullSource
+    @ParameterizedTest
+    void createValidationMenuNameNull(String name) {
+        Menu menuRequest = getMenuRequest(menuPrice);
+        menuRequest.setName(name);
+
+        assertThatThrownBy(() -> menuService.create(menuRequest))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴 생성시 메뉴이름 validation (부정적 단어)")
     @ValueSource(strings = "shit")
     @NullSource
     @ParameterizedTest
-    void createValidationMenuName(String name) {
+    void createValidationMenuNameProfanity(String name) {
         Menu menuRequest = getMenuRequest(menuPrice);
         menuRequest.setName(name);
 
@@ -235,7 +249,7 @@ class MenuServiceTest {
 
     @DisplayName("메뉴 숨김시 미존재 메뉴 validation")
     @Test
-    void hideValidationNoExistsMenu() {
+    void hideValidationNotExistsMenu() {
         assertThatThrownBy(() -> menuService.hide(UUID.randomUUID()))
                 .isInstanceOf(NoSuchElementException.class);
     }

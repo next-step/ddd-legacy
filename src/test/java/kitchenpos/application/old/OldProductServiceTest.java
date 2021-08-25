@@ -1,14 +1,17 @@
-package kitchenpos.application;
+package kitchenpos.application.old;
 
+import kitchenpos.application.ProductService;
 import kitchenpos.domain.Product;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -19,8 +22,9 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MockitoExtension.class)
 @SpringBootTest
-class ProductServiceTest {
+class OldProductServiceTest {
 
     private final String name = "순살치킨";
     private final BigDecimal price = BigDecimal.valueOf(20000L);

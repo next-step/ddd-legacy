@@ -50,7 +50,7 @@ public class MenuGroupTest {
     }
 
 
-    @DisplayName("모든 메뉴그룹을 조회할 수 있다")
+    @DisplayName("메뉴그룹 조회")
     @Test
     void findAll() {
         menuGroupRepository.save(new MenuGroup("testName1"));
