@@ -1,6 +1,7 @@
 package kitchenpos.domain;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryProductRepository implements ProductRepository {
 
@@ -26,4 +27,13 @@ public class InMemoryProductRepository implements ProductRepository {
     public List<Product> findAll() {
         return new ArrayList<>(products.values());
     }
+
+    @Override
+    public List<Product> findAllById(List<UUID> uuids) {
+        return products.keySet().stream()
+                .filter(uuids::contains)
+                .map(uuid -> products.get(uuid))
+                .collect(Collectors.toList());
+    }
+
 }
