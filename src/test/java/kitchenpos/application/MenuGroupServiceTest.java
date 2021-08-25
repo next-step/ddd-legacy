@@ -41,15 +41,22 @@ class MenuGroupServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void emptyMenuGroupNameTest(String menuGroupName) {
+        // given
         menuGroup.setName(menuGroupName);
+
+        // when
         assertThatThrownBy(() -> menuGroupService.create(menuGroup))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴그룹을 등록한다.")
     @Test
     void createTest() {
+        // given
+        // when
         MenuGroup actual = menuGroupService.create(menuGroup);
+        // then
         assertThat(actual).isNotNull();
         assertThat(actual.getName()).isEqualTo("메뉴그룹1");
     }
@@ -57,7 +64,10 @@ class MenuGroupServiceTest {
     @DisplayName("메뉴그룹 목록을 조회한다.")
     @Test
     void findAllTest() {
+        // given
+        // when
         List<MenuGroup> menuGroups = menuGroupService.findAll();
+        // then
         assertThat(menuGroups.size()).isEqualTo(12);
     }
 }

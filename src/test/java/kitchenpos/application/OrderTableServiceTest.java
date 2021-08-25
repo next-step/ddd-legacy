@@ -43,7 +43,10 @@ class OrderTableServiceTest {
     @DisplayName("주문테이블을 등록한다.")
     @Test
     void createTest() {
+        // given
+        // when
         OrderTable actual = orderTableService.create(orderTable);
+        // then
         assertThat(actual).isNotNull();
         assertThat(actual.getName()).isEqualTo("주문테이블10");
     }
@@ -52,22 +55,31 @@ class OrderTableServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void createWithoutNameTest(String name) {
+        // given
         orderTable.setName(name);
+        // when
         assertThatThrownBy(() -> orderTableService.create(orderTable))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("테이블 상태(사용중)에 대해 수정할 수 있다.")
     @Test
     void orderTableSitTest() {
+        // given
+        // when
         OrderTable actual = orderTableService.sit(UUID.fromString("8d710043-29b6-420e-8452-233f5a035520"));
+        // then
         assertThat(actual.isEmpty()).isFalse();
     }
 
     @DisplayName("테이블 상태(사용안함)에 대해 수정할 수 있다. ")
     @Test
     void orderTableClearTest() {
+        // given
+        // when
         OrderTable actual = orderTableService.clear(UUID.fromString("8d710043-29b6-420e-8452-233f5a035520"));
+        // then
         assertThat(actual.isEmpty()).isTrue();
         assertThat(actual.getNumberOfGuests()).isEqualTo(0);
     }
@@ -76,23 +88,29 @@ class OrderTableServiceTest {
     @ValueSource(ints = {-1, -5})
     @ParameterizedTest
     void changeNumberOfGuestsExceptionTest(int numberOfGuests) {
+        // given
         OrderTable actual = orderTableRepository.findById(UUID.fromString("8d710043-29b6-420e-8452-233f5a035520"))
                 .orElse(null);
         assertThat(actual).isNotNull();
         actual.setNumberOfGuests(numberOfGuests);
+        // when
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(actual.getId(), actual))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("비어있는 테이블의 손님 수는 수정할 수 없다.")
     @Test
     void emptyOrderTableChangeNumberOfGuestsTest() {
+        // given
         OrderTable table = orderTableRepository.findById(UUID.fromString("8d710043-29b6-420e-8452-233f5a035520"))
                 .orElse(null);
         assertThat(table).isNotNull();
         table.setEmpty(true);
         table.setNumberOfGuests(4);
+        // when
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(table.getId(), table))
+                // then
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -100,19 +118,25 @@ class OrderTableServiceTest {
     @ValueSource(ints = {0, 3, 5})
     @ParameterizedTest
     void changeNumberOfGuests(int numberOfGuests) {
+        // given
         OrderTable table = orderTableRepository.findById(UUID.fromString("8d710043-29b6-420e-8452-233f5a035520"))
                 .orElse(null);
         assertThat(table).isNotNull();
         table.setEmpty(false);
         table.setNumberOfGuests(numberOfGuests);
+        // when
         OrderTable actual = orderTableService.changeNumberOfGuests(table.getId(), table);
+        // then
         assertThat(actual.getNumberOfGuests()).isEqualTo(numberOfGuests);
     }
 
     @DisplayName("테이블 목록을 조회할 수 있다.")
     @Test
     void findAllTest() {
+        // given
+        // when
         List<OrderTable> orderTables = orderTableService.findAll();
+        // then
         assertThat(orderTables.size()).isEqualTo(8);
     }
 }

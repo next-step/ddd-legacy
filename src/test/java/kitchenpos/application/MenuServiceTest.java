@@ -61,8 +61,11 @@ class MenuServiceTest {
     @ValueSource(strings = {"-1", "-1000"})
     @ParameterizedTest
     void menuPriceNullOrEmptyTest(BigDecimal price) {
+        // given
         menu.setPrice(price);
+        // when
         assertThatThrownBy(() -> menuService.create(menu))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -70,17 +73,23 @@ class MenuServiceTest {
     @MethodSource("provideNameAndPriceIsNullOrEmpty")
     @ParameterizedTest
     void menuNameAndPriceNullOrEmptyTest(String name, BigDecimal price) {
+        // given
         menu.setName(name);
         menu.setPrice(null);
+        // when
         assertThatThrownBy(() -> menuService.create(menu))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴명에는 비속어는 사용할 수 없다.")
     @Test
     void menuCreateWithProfanity() {
+        // given
         menu.setName("fuck");
+        // when
         assertThatThrownBy(() -> menuService.create(menu))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -88,8 +97,11 @@ class MenuServiceTest {
     @ValueSource(strings = {"f59b1e1c-b145-440a-aa6f-6095a0e2d63b", "e1254913-8608-46aa-b23a-a07c1dcbc648"})
     @ParameterizedTest
     void invalidMenuGroupInfoTest(String menuGroupId) {
+        // given
         menu.setMenuGroupId(UUID.fromString(menuGroupId));
+        // when
         assertThatThrownBy(() -> menuService.create(menu))
+                // then
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -97,15 +109,21 @@ class MenuServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void nullAndEmptyMenuProductTest(List<MenuProduct> menuProducts) {
+        // given
         menu.setMenuProducts(menuProducts);
+        // when
         assertThatThrownBy(() -> menuService.create(menu))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴를 등록한다.")
     @Test
     void menuCreateTest() {
+        // given
+        // when
         Menu actual = menuService.create(menu);
+        // then
         assertThat(actual.getName()).isEqualTo("메뉴1");
         assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(12000));
     }
@@ -114,11 +132,14 @@ class MenuServiceTest {
     @ValueSource(strings = {"-1", "-10000"})
     @ParameterizedTest
     void minusMenuPriceChangeTest(BigDecimal price) {
+        // given
         Menu request = menuRepository.findById(UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b"))
                 .orElseThrow(null);
         request.setPrice(price);
         assertThat(request).isNotNull();
+        // when
         assertThatThrownBy(() -> menuService.changePrice(request.getId(), request))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -126,38 +147,50 @@ class MenuServiceTest {
     @Test
     void totalMenuPriceTest() {
         // 후라이드치킨, 16000원
+        // given
         Menu request = menuRepository.findById(UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b"))
                 .orElseThrow(null);
         assertThat(request).isNotNull();
         request.setPrice(BigDecimal.valueOf(20000));
+        // when
         assertThatThrownBy(() -> menuService.changePrice(request.getId(), request))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴를 숨긴다.")
     @Test
     void hideTest() {
+        // given
         Menu request = menuRepository.findById(UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b"))
                 .orElseThrow(null);
         assertThat(request).isNotNull();
+        // when
         Menu actual = menuService.hide(request.getId());
+        // then
         assertThat(actual.isDisplayed()).isFalse();
     }
 
     @DisplayName("메뉴를 노출시킨다.")
     @Test
     void displayTest() {
+        // given
         Menu request = menuRepository.findById(UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b"))
                 .orElseThrow(null);
         assertThat(request).isNotNull();
+        // when
         Menu actual = menuService.display(request.getId());
+        // then
         assertThat(actual.isDisplayed()).isTrue();
     }
 
     @DisplayName("메뉴목록을 조회한다.")
     @Test
     void findAllTest() {
+        // given
+        // when
         List<Menu> menus = menuService.findAll();
+        // then
         assertThat(menus.size()).isEqualTo(13);
     }
 

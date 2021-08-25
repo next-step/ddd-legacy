@@ -48,7 +48,10 @@ class ProductServiceTest {
     @DisplayName("상품을 등록한다.")
     @Test
     void productCreateTest() {
+        // given
+        // when
         Product product = productService.create(request);
+        // then
         assertThat(product).isNotNull();
         assertThat(product.getName()).isEqualTo("김치볶음밥");
         assertThat(product.getPrice()).isEqualTo(BigDecimal.valueOf(7000));
@@ -57,8 +60,11 @@ class ProductServiceTest {
     @DisplayName("상품등록시 상품명에 비속어를 사용할 수 없다.")
     @Test
     void 상품명_비속어_등록테스트() {
+        // given
         request.setName("shit");
+        // when
         assertThatThrownBy(() -> productService.create(request))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -66,17 +72,23 @@ class ProductServiceTest {
     @ValueSource(longs = {-1, -1000})
     @ParameterizedTest
     void 상품가격테스트(long price) {
+        // given
         request.setPrice(BigDecimal.valueOf(price));
+        // when
         assertThatThrownBy(() -> productService.create(request))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("상품의 가격을 변경한다.")
     @Test
     void changePrice() {
+        // given
         productRepository.save(request);
         request.setPrice(BigDecimal.valueOf(9_000));
+        // when
         Product actual = productService.changePrice(request.getId(), request);
+        // then
         assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(9_000));
     }
 
@@ -84,23 +96,38 @@ class ProductServiceTest {
     @ValueSource(longs = {-1, -1000})
     @ParameterizedTest
     void ZERO_보다작은_상품가격_수정_테스트(long price) {
+        // given
         productRepository.save(request);
         request.setPrice(BigDecimal.valueOf(price));
+        // when
         assertThatThrownBy(() -> productService.changePrice(request.getId(), request))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("상품가격 변경시 해당 상품이 포함된 메뉴의 가격보다 크다면 해당 메뉴는 노출되지 않는다.")
     @Test
     void 메뉴가격보다_비싼_상품가격_수정_테스트() {
+        // given
         Menu menu = createMenu();
 
         request.setPrice(BigDecimal.valueOf(5_000));
+        // when
         productService.changePrice(request.getId(), request);
 
+        // then
         Menu actual = menuRepository.findById(menu.getId()).orElse(null);
         assertThat(actual).isNotNull();
         assertThat(actual.isDisplayed()).isEqualTo(false);
+    }
+
+    @Test
+    void findAll() {
+        // given
+        // when
+        List<Product> products = productService.findAll();
+        // then
+        assertThat(products.size()).isEqualTo(25);
     }
 
     private Menu createMenu() {
@@ -126,11 +153,5 @@ class ProductServiceTest {
         menu.setMenuProducts(Collections.singletonList(menuProduct));
         menuRepository.save(menu);
         return menu;
-    }
-
-    @Test
-    void findAll() {
-        List<Product> products = productService.findAll();
-        assertThat(products.size()).isEqualTo(25);
     }
 }

@@ -85,7 +85,10 @@ class OrderServiceTest {
     @DisplayName("매장주문을 등록한다.")
     @Test
     void inOrderCreateTest() {
+        // given
+        // when
         Order actual = orderService.create(inOrder);
+        // then
         assertThat(actual).isNotNull();
         assertThat(actual.getType()).isEqualTo(OrderType.EAT_IN);
         assertThat(actual.getOrderTable()).isNotNull();
@@ -94,7 +97,10 @@ class OrderServiceTest {
     @DisplayName("배달주문을 등록한다.")
     @Test
     void deliveryOrderCreateTest() {
+        // given
+        // when
         Order actual = orderService.create(deliveryOrder);
+        // then
         assertThat(actual).isNotNull();
         assertThat(actual.getType()).isEqualTo(OrderType.DELIVERY);
         assertThat(actual.getDeliveryAddress()).isEqualTo("서울시 강남구");
@@ -103,19 +109,25 @@ class OrderServiceTest {
     @DisplayName("노출되는 메뉴만 주문가능하다.")
     @Test
     void hideMenuOrderTest() {
+        // given
         inOrder.getOrderLineItems()
                 .get(0)
                 .getMenu()
                 .setDisplayed(false);
+        // when
         assertThatThrownBy(() -> orderService.create(inOrder))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("주문등록시 주문타입을 입력해야한다.")
     @Test
     void orderTypeNullTest() {
+        // given
         inOrder.setType(null);
+        // when
         assertThatThrownBy(() -> orderService.create(inOrder))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -123,19 +135,25 @@ class OrderServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void deliveryAddressEmptyTest(String address) {
+        // given
         deliveryOrder.setDeliveryAddress(address);
+        // when
         assertThatThrownBy(() -> orderService.create(deliveryOrder))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("매장주문등록시 주문테이블은 사용중이어야 한다.")
     @Test
     void inOrderOrderTableEmptyTest() {
+        // given
         orderTable.setEmpty(true);
         OrderTable emptyTable = orderTableRepository.save(orderTable);
         inOrder.setOrderTable(emptyTable);
         inOrder.setOrderTableId(emptyTable.getId());
+        // when
         assertThatThrownBy(() -> orderService.create(inOrder))
+                // then
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -143,38 +161,50 @@ class OrderServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void nullAndEmptyOrderLineItemTest(List<OrderLineItem> orderLineItems) {
+        // given
         inOrder.setOrderLineItems(orderLineItems);
+        // when
         assertThatThrownBy(() -> orderService.create(inOrder))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("주문등록시 메뉴등록이 되어있지 않은 메뉴는 주문내역(orderLineItem)에 포함될 수 없다.")
     @Test
     void invalidMenuInOrderLineItemTest() {
+        // given
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         orderLineItem.setMenu(menu);
         orderLineItem.setMenuId(menu.getId());
         inOrder.setOrderLineItems(Collections.singletonList(orderLineItem));
+        // when
         assertThatThrownBy(() -> orderService.create(inOrder))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("배달주문시 주문내역(orderLineItem)의 수량은 0보다 작을수 없다.")
     @Test
     void deliveryOrderLineItemMinusQuantityTest() {
+        // given
         deliveryOrder.getOrderLineItems()
                 .forEach(item -> item.setQuantity(-1));
+        // when
         assertThatThrownBy(() -> orderService.create(deliveryOrder))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("포장주문시 주문내역(orderLineItem)의 수량은 0보다 작을수 없다.")
     @Test
     void takeoutOrderLineItemMinusQuantityTest() {
+        // given
         takeoutOrder.getOrderLineItems()
                 .forEach(item -> item.setQuantity(-1));
+        // when
         assertThatThrownBy(() -> orderService.create(takeoutOrder))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -182,103 +212,136 @@ class OrderServiceTest {
     @Test
     void menuPriceAndOrderLineItemPriceTest() {
         // inOrder의 menu의 가격은 16000원
+        // given
         orderLineItem.setPrice(BigDecimal.valueOf(10000));
+        // when
         assertThatThrownBy(() -> orderService.create(inOrder))
+                // then
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("주문의 상태를 접수(accept)상태로 변경한다.")
     @Test
     void acceptTest() {
+        // given
         Order waitingOrder = orderRepository.findById(UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8"))
                 .orElse(null);
         assertThat(waitingOrder).isNotNull();
+        // when
         Order actual = orderService.accept(waitingOrder.getId());
+        // then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
     @DisplayName("대기상태가 아닌 주문을 접수상태로 변경할 수 없다.")
     @Test
     void acceptStatusAcceptTest() {
+        // given
         Order waitingOrder = orderRepository.findById(UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8"))
                 .orElse(null);
         assertThat(waitingOrder).isNotNull();
         UUID orderId = waitingOrder.getId();
         waitingOrder.setStatus(OrderStatus.ACCEPTED);
+        // when
         assertThatThrownBy(() -> orderService.accept(orderId))
+                // then
                 .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("접수상태의 주문을 제공(serve)상태로 변경한다.")
     @Test
     void serveTest() {
+        // given
         Order waitingOrder = orderRepository.findById(UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8"))
                 .orElse(null);
         assertThat(waitingOrder).isNotNull();
         waitingOrder.setStatus(OrderStatus.ACCEPTED);
+        // when
         Order actual = orderService.serve(waitingOrder.getId());
+        // then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
     @DisplayName("배달주문의 상태를 배달시작으로 변경한다.")
     @Test
     void deliveryOrderStartDeliveryTest() {
+        // given
         Order order = orderRepository.save(deliveryOrder);
         order.setStatus(OrderStatus.SERVED);
+        // when
         Order actual = orderService.startDelivery(order.getId());
+        // then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     }
 
     @DisplayName("매장주문은 배달시작상태로 변경할 수 없다.")
     @Test
     void inOrderStartDeliveryTest() {
+        // given
         Order order = orderRepository.save(inOrder);
         order.setStatus(OrderStatus.SERVED);
         UUID orderId = order.getId();
+        // when
         assertThatThrownBy(() -> orderService.startDelivery(orderId))
+                // then
                 .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("배달주문의 상태를 배달완료로 변경한다.")
     @Test
     void completeDeliveryTest() {
+        // given
         Order order = orderRepository.save(deliveryOrder);
         order.setStatus(OrderStatus.DELIVERING);
+        // when
         Order actual = orderService.completeDelivery(order.getId());
+        // then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
     @DisplayName("배달주문의 상태를 완료로 변경한다.")
     @Test
     void deliveryOrderCompleteTest() {
+        // given
         Order order = orderRepository.save(deliveryOrder);
         order.setStatus(OrderStatus.DELIVERED);
+        // when
         Order actual = orderService.complete(order.getId());
+        // then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName("매장주문의 상태를 완료로 변경한다.")
     @Test
     void inOrderCompleteTest() {
+        // given
         Order order = orderRepository.save(inOrder);
         order.setStatus(OrderStatus.SERVED);
+        // when
         Order actual = orderService.complete(order.getId());
+        // then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName("포장주문의 상태를 완료로 변경한다.")
     @Test
     void takeoutOrderCompleteTest() {
+        // given
         Order order = orderRepository.save(takeoutOrder);
         order.setStatus(OrderStatus.SERVED);
+        // when
         Order actual = orderService.complete(order.getId());
+        // then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName("주문목록을 조회한다.")
     @Test
     void findAllTest() {
+        // given
+        // when
         List<Order> orders = orderService.findAll();
+        // then
         assertThat(orders.size()).isEqualTo(3);
     }
 }
