@@ -22,8 +22,9 @@ public class IntegrationTest {
     private Flyway flyway;
 
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         flyway.clean();
         flyway.migrate();
+        KitchenposTestFixture.set();
     }
 }
