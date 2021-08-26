@@ -1,12 +1,12 @@
 package kitchenpos;
 
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Collections.singletonList;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
@@ -56,14 +56,17 @@ public class KitchenposTestFixture {
     public static OrderTable 테이블6번 = new OrderTable();
     public static OrderTable 테이블7번 = new OrderTable();
     public static OrderTable 테이블8번 = new OrderTable();
+    public static OrderTable 테이블9번_먹는중 = new OrderTable();
 
     public static Order 주문1번 = new Order();
     public static Order 주문2번 = new Order();
     public static Order 주문3번 = new Order();
+    public static Order 주문4번_먹는중 = new Order();
 
     public static OrderLineItem 주문1번_상세1 = new OrderLineItem();
     public static OrderLineItem 주문2번_상세1 = new OrderLineItem();
     public static OrderLineItem 주문3번_상세1 = new OrderLineItem();
+    public static OrderLineItem 주문4번_상세1 = new OrderLineItem();
 
     public static void set() {
         initProduct();
@@ -94,6 +97,7 @@ public class KitchenposTestFixture {
         주문1번.setType(OrderType.DELIVERY);
         주문1번.setOrderTable(null);
         주문1번.setOrderTableId(null);
+        주문1번.setOrderLineItems(singletonList(주문1번_상세1));
 
         주문2번.setId(uuidOf("98da3d3859e04dacbbaeebf6560a43bd"));
         주문2번.setDeliveryAddress(null);
@@ -102,6 +106,7 @@ public class KitchenposTestFixture {
         주문2번.setType(OrderType.EAT_IN);
         주문2번.setOrderTable(테이블1번);
         주문2번.setOrderTableId(테이블1번.getId());
+        주문2번.setOrderLineItems(singletonList(주문2번_상세1));
 
         주문3번.setId(uuidOf("d7cc15b3e32c4bc8b440d3067b35522e"));
         주문3번.setDeliveryAddress(null);
@@ -110,6 +115,16 @@ public class KitchenposTestFixture {
         주문3번.setType(OrderType.EAT_IN);
         주문3번.setOrderTable(테이블1번);
         주문3번.setOrderTableId(테이블1번.getId());
+        주문3번.setOrderLineItems(singletonList(주문3번_상세1));
+
+        주문4번_먹는중.setId(uuidOf("c1f3591cabe54ac990b08f3b97435ca7"));
+        주문4번_먹는중.setDeliveryAddress(null);
+        주문4번_먹는중.setOrderDateTime(dateTimeOf("2021-07-27"));
+        주문4번_먹는중.setStatus(OrderStatus.SERVED);
+        주문4번_먹는중.setType(OrderType.EAT_IN);
+        주문4번_먹는중.setOrderTable(테이블9번_먹는중);
+        주문4번_먹는중.setOrderTableId(테이블9번_먹는중.getId());
+        주문4번_먹는중.setOrderLineItems(singletonList(주문4번_상세1));
     }
 
     private static void initOrderLineItem() {
@@ -130,6 +145,12 @@ public class KitchenposTestFixture {
         주문3번_상세1.setMenu(후라이드치킨_Menu);
         주문3번_상세1.setMenuId(후라이드치킨_Menu.getId());
         주문3번_상세1.setPrice(후라이드치킨_Menu.getPrice());
+
+        주문4번_상세1.setSeq(4L);
+        주문4번_상세1.setQuantity(1L);
+        주문4번_상세1.setMenu(후라이드치킨_Menu);
+        주문4번_상세1.setMenuId(후라이드치킨_Menu.getId());
+        주문4번_상세1.setPrice(후라이드치킨_Menu.getPrice());
     }
 
     private static void initOrderTable() {
@@ -172,6 +193,11 @@ public class KitchenposTestFixture {
         테이블8번.setEmpty(true);
         테이블8번.setName("8번");
         테이블8번.setNumberOfGuests(0);
+
+        테이블9번_먹는중.setId(uuidOf("7cb011e0c1d14cf1b217d2272d8f2545"));
+        테이블9번_먹는중.setEmpty(false);
+        테이블9번_먹는중.setName("9번");
+        테이블9번_먹는중.setNumberOfGuests(2);
     }
 
     private static void initMenu() {
@@ -181,7 +207,7 @@ public class KitchenposTestFixture {
         후라이드치킨_Menu.setPrice(BigDecimal.valueOf(16000L));
         후라이드치킨_Menu.setMenuGroup(한마리메뉴);
         후라이드치킨_Menu.setMenuGroupId(한마리메뉴.getId());
-        후라이드치킨_Menu.setMenuProducts(Collections.singletonList(후라이드치킨_후라이드));
+        후라이드치킨_Menu.setMenuProducts(singletonList(후라이드치킨_후라이드));
 
         양념치킨_Menu.setId(uuidOf("e1254913860846aab23aa07c1dcbc648"));
         양념치킨_Menu.setDisplayed(true);
@@ -189,7 +215,7 @@ public class KitchenposTestFixture {
         양념치킨_Menu.setPrice(BigDecimal.valueOf(16000L));
         양념치킨_Menu.setMenuGroup(한마리메뉴);
         양념치킨_Menu.setMenuGroupId(한마리메뉴.getId());
-        양념치킨_Menu.setMenuProducts(Collections.singletonList(양념치킨_양념치킨));
+        양념치킨_Menu.setMenuProducts(singletonList(양념치킨_양념치킨));
 
         반반치킨_Menu.setId(uuidOf("191fa247b5f34b51b175e65db523f754"));
         반반치킨_Menu.setDisplayed(true);
@@ -197,7 +223,7 @@ public class KitchenposTestFixture {
         반반치킨_Menu.setPrice(BigDecimal.valueOf(16000L));
         반반치킨_Menu.setMenuGroup(한마리메뉴);
         반반치킨_Menu.setMenuGroupId(한마리메뉴.getId());
-        반반치킨_Menu.setMenuProducts(Collections.singletonList(반반치킨_반반치킨));
+        반반치킨_Menu.setMenuProducts(singletonList(반반치킨_반반치킨));
 
         통구이_Menu.setId(uuidOf("33e558df7d934622b50efcc4282cd184"));
         통구이_Menu.setDisplayed(true);
@@ -205,7 +231,7 @@ public class KitchenposTestFixture {
         통구이_Menu.setPrice(BigDecimal.valueOf(16000L));
         통구이_Menu.setMenuGroup(한마리메뉴);
         통구이_Menu.setMenuGroupId(한마리메뉴.getId());
-        통구이_Menu.setMenuProducts(Collections.singletonList(통구이_통구이));
+        통구이_Menu.setMenuProducts(singletonList(통구이_통구이));
 
         간장치킨_Menu.setId(uuidOf("b9c670b04ef5409083496868df1c7d62"));
         간장치킨_Menu.setDisplayed(true);
@@ -213,7 +239,7 @@ public class KitchenposTestFixture {
         간장치킨_Menu.setPrice(BigDecimal.valueOf(17000L));
         간장치킨_Menu.setMenuGroup(한마리메뉴);
         간장치킨_Menu.setMenuGroupId(한마리메뉴.getId());
-        간장치킨_Menu.setMenuProducts(Collections.singletonList(간장치킨_간장치킨));
+        간장치킨_Menu.setMenuProducts(singletonList(간장치킨_간장치킨));
 
         순살치킨_Menu.setId(uuidOf("a64af6cac34d4cd882fe454abf512d1f"));
         순살치킨_Menu.setDisplayed(true);
@@ -221,7 +247,7 @@ public class KitchenposTestFixture {
         순살치킨_Menu.setPrice(BigDecimal.valueOf(17000L));
         순살치킨_Menu.setMenuGroup(한마리메뉴);
         순살치킨_Menu.setMenuGroupId(한마리메뉴.getId());
-        순살치킨_Menu.setMenuProducts(Collections.singletonList(순살치킨_순살치킨));
+        순살치킨_Menu.setMenuProducts(singletonList(순살치킨_순살치킨));
 
         비싼후라이드치킨.setId(uuidOf("f76c720e8c1346739a24cf385654159d"));
         비싼후라이드치킨.setDisplayed(false);
@@ -229,7 +255,7 @@ public class KitchenposTestFixture {
         비싼후라이드치킨.setPrice(BigDecimal.valueOf(16001L));
         비싼후라이드치킨.setMenuGroup(한마리메뉴);
         비싼후라이드치킨.setMenuGroupId(한마리메뉴.getId());
-        비싼후라이드치킨.setMenuProducts(Collections.singletonList(후라이드치킨_후라이드));
+        비싼후라이드치킨.setMenuProducts(singletonList(후라이드치킨_후라이드));
     }
 
     private static void initMenuProduct() {
