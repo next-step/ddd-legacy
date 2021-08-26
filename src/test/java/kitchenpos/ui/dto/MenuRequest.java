@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
 
 public class MenuRequest {
 
@@ -14,7 +13,7 @@ public class MenuRequest {
     private BigDecimal price;
     private MenuGroup menuGroup;
     private boolean displayed;
-    private List<MenuProduct> menuProducts;
+    private List<MenuProductRequest> menuProducts;
 
     private UUID menuGroupId;
 
@@ -26,7 +25,7 @@ public class MenuRequest {
     }
 
     public MenuRequest(final String name, final long price, final boolean displayed,
-        final MenuGroup menuGroup, final MenuProduct... menuProducts) {
+        final MenuGroup menuGroup, final MenuProductRequest... menuProducts) {
         this.name = name;
         this.price = BigDecimal.valueOf(price);
         this.displayed = displayed;
@@ -80,11 +79,11 @@ public class MenuRequest {
         this.displayed = displayed;
     }
 
-    public List<MenuProduct> getMenuProducts() {
+    public List<MenuProductRequest> getMenuProducts() {
         return menuProducts;
     }
 
-    public void setMenuProducts(final List<MenuProduct> menuProducts) {
+    public void setMenuProducts(final List<MenuProductRequest> menuProducts) {
         this.menuProducts = menuProducts;
     }
 
