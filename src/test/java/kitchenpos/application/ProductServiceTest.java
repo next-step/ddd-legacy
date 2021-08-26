@@ -17,8 +17,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class ProductServiceTest {
@@ -56,8 +55,8 @@ public class ProductServiceTest {
     void create(BigDecimal price) {
         product.setPrice(price);
 
-        assertThatThrownBy(() -> 상품등록(product))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> 상품등록(product));
     }
 
     @DisplayName("상품의 이름은 빈 값이거나 비속어가 아니어야한다.")
@@ -67,8 +66,8 @@ public class ProductServiceTest {
     void create(String name) {
         product.setName(name);
 
-        assertThatThrownBy(() -> 상품등록(product))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> 상품등록(product));
     }
 
     @DisplayName("상품의 가격을 변경할 수 있다.")
@@ -96,8 +95,8 @@ public class ProductServiceTest {
         final Product request = new Product();
         request.setPrice(price);
 
-        assertThatThrownBy(() -> 상품가격수정(saved.getId(), request))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() ->상품가격수정(saved.getId(), request));
     }
 
     @DisplayName("상품의 가격을 변경할 때 상품에 속한 메뉴의 가격이 메뉴 상품 가격의 총합과 다를 경우 메뉴를 노출하지 않는다.")

@@ -18,8 +18,7 @@ import java.util.UUID;
 
 import static java.util.Collections.emptyList;
 import static kitchenpos.application.ProductServiceTest.상품만들기;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MenuServiceTest {
@@ -161,8 +160,8 @@ public class MenuServiceTest {
         menu.setPrice(BigDecimal.valueOf(12_000L));
         final Menu saved = menuRepository.save(menu);
 
-        assertThatThrownBy(() -> 메뉴노출(saved.getId()))
-                .isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> 메뉴노출(saved.getId()));
     }
 
     @DisplayName("메뉴를 숨길 수 있다.")

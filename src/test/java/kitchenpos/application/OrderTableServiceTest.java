@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static kitchenpos.application.OrderServiceTest.주문만들기;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class OrderTableServiceTest {
@@ -112,8 +111,8 @@ public class OrderTableServiceTest {
         final OrderTable request = new OrderTable();
         request.setNumberOfGuests(numberOfGuests);
 
-        assertThatThrownBy(() -> 주문테이블인원수변경(seated.getId(), request))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> 주문테이블인원수변경(seated.getId(), request));
     }
 
     @DisplayName("테이블의 인원수를 변경하려면 테이블에 이미 앉아있어야한다")
@@ -123,8 +122,8 @@ public class OrderTableServiceTest {
         final OrderTable request = new OrderTable();
         request.setNumberOfGuests(5);
 
-        assertThatThrownBy(() -> 주문테이블인원수변경(saved.getId(), request))
-                .isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> 주문테이블인원수변경(saved.getId(), request));
     }
 
     @DisplayName("테이블을 전체조회할 수 있다.")

@@ -10,8 +10,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MenuGroupServiceTest {
@@ -44,8 +43,8 @@ public class MenuGroupServiceTest {
     void create(String name) {
         menuGroup.setName(name);
 
-        assertThatThrownBy(() -> 메뉴그룹등록(menuGroup))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> 메뉴그룹등록(menuGroup));
     }
 
     @DisplayName("메뉴 그룹을 조회할 수 있다.")

@@ -14,8 +14,7 @@ import java.util.*;
 import static java.util.Collections.emptyList;
 import static kitchenpos.application.MenuServiceTest.메뉴만들기;
 import static kitchenpos.application.OrderTableServiceTest.주문테이블만들기;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class OrderServiceTest {
@@ -70,8 +69,8 @@ public class OrderServiceTest {
     void delivery_create_address() {
         deliveryOrder.setDeliveryAddress(null);
 
-        assertThatThrownBy(() -> 주문등록(deliveryOrder))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> 주문등록(deliveryOrder));
     }
 
     @DisplayName("포장주문을 생성할 수 있다.")
@@ -109,8 +108,8 @@ public class OrderServiceTest {
         orderTableRepository.save(newTable);
         eatInOrder.setOrderTableId(newTable.getId());
 
-        assertThatThrownBy(() -> 주문등록(eatInOrder))
-                .isInstanceOf(IllegalStateException.class);
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> 주문등록(eatInOrder));
     }
 
     @DisplayName("주문 방법을 선택하지 않으면 주문할 수 없다.")
@@ -121,12 +120,12 @@ public class OrderServiceTest {
         eatInOrder.setType(null);
 
         assertAll(
-                () -> assertThatThrownBy(() -> 주문등록(deliveryOrder))
-                        .isInstanceOf(IllegalArgumentException.class),
-                () -> assertThatThrownBy(() -> 주문등록(takeOutOrder))
-                        .isInstanceOf(IllegalArgumentException.class),
-                () -> assertThatThrownBy(() -> 주문등록(eatInOrder))
-                        .isInstanceOf(IllegalArgumentException.class)
+                () -> assertThatExceptionOfType(IllegalArgumentException.class)
+                        .isThrownBy(() -> 주문등록(deliveryOrder)),
+                () -> assertThatExceptionOfType(IllegalArgumentException.class)
+                        .isThrownBy(() -> 주문등록(takeOutOrder)),
+                () -> assertThatExceptionOfType(IllegalArgumentException.class)
+                        .isThrownBy(() -> 주문등록(eatInOrder))
         );
     }
 
@@ -135,8 +134,8 @@ public class OrderServiceTest {
     void create_orderLineItem() {
         deliveryOrder.setOrderLineItems(emptyList());
 
-        assertThatThrownBy(() -> 주문등록(deliveryOrder))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> 주문등록(deliveryOrder));
     }
 
     @DisplayName("매장 식사주문은 수량이 0보다 적을 수 있다.")
@@ -154,11 +153,10 @@ public class OrderServiceTest {
     void deliveryAndTakeOut_create(int quantity) {
         orderLineItems.get(0).setQuantity(quantity);
 
-        assertThatThrownBy(() -> 주문등록(deliveryOrder))
-            .isInstanceOf(IllegalArgumentException.class);
-
-        assertThatThrownBy(() -> 주문등록(takeOutOrder))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> 주문등록(deliveryOrder));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> 주문등록(takeOutOrder));
     }
 
     @DisplayName("주문항목은 메뉴와 가격이 동일해야한다.")
@@ -168,12 +166,12 @@ public class OrderServiceTest {
         orderLineItems.get(0).setPrice(price);
 
         assertAll(
-                () -> assertThatThrownBy(() -> 주문등록(deliveryOrder))
-                        .isInstanceOf(IllegalArgumentException.class),
-                () -> assertThatThrownBy(() -> 주문등록(takeOutOrder))
-                        .isInstanceOf(IllegalArgumentException.class),
-                () -> assertThatThrownBy(() -> 주문등록(eatInOrder))
-                        .isInstanceOf(IllegalArgumentException.class)
+                () -> assertThatExceptionOfType(IllegalArgumentException.class)
+                        .isThrownBy(() -> 주문등록(deliveryOrder)),
+                () -> assertThatExceptionOfType(IllegalArgumentException.class)
+                        .isThrownBy(() -> 주문등록(takeOutOrder)),
+                () -> assertThatExceptionOfType(IllegalArgumentException.class)
+                        .isThrownBy(() -> 주문등록(eatInOrder))
         );
     }
 
@@ -220,10 +218,12 @@ public class OrderServiceTest {
 
         assertThat(delivery.getStatus()).isEqualTo(OrderStatus.DELIVERING);
 
-        assertThatThrownBy(() -> 배달시작(주문만들기(orderRepository, takeOutOrder)))
-                .isInstanceOf(IllegalStateException.class);
-        assertThatThrownBy(() -> 배달시작(주문만들기(orderRepository, eatInOrder)))
-                .isInstanceOf(IllegalStateException.class);
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> 배달시작(주문만들기(orderRepository, takeOutOrder)));
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> 배달시작(주문만들기(orderRepository, eatInOrder)));
     }
 
     @DisplayName("배달 중인 배달 주문만 배달 완료할 수 있다.")
@@ -237,10 +237,12 @@ public class OrderServiceTest {
 
         assertThat(delivery.getStatus()).isEqualTo(OrderStatus.DELIVERED);
 
-        assertThatThrownBy(() -> 배달완료(주문만들기(orderRepository, takeOutOrder)))
-                .isInstanceOf(IllegalStateException.class);
-        assertThatThrownBy(() -> 배달완료(주문만들기(orderRepository, eatInOrder)))
-                .isInstanceOf(IllegalStateException.class);
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> 배달완료(주문만들기(orderRepository, takeOutOrder)));
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> 배달완료(주문만들기(orderRepository, eatInOrder)));
     }
 
     @DisplayName("주문을 해결할 수 있다.")
