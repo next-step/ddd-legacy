@@ -56,6 +56,10 @@ public class MenuRequest {
         return price;
     }
 
+    public long price() {
+        return price.longValue();
+    }
+
     public void setPrice(final BigDecimal price) {
         this.price = price;
     }

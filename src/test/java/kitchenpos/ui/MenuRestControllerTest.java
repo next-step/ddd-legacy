@@ -30,6 +30,7 @@ class MenuRestControllerTest extends IntegrationTest {
 
     MenuRequest 후라이드특가;
 
+    @Override
     @BeforeEach
     protected void setUp() {
         super.setUp();
@@ -171,7 +172,7 @@ class MenuRestControllerTest extends IntegrationTest {
             .content(objectMapper.writeValueAsString(request)))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.price").value(10000L));
+            .andExpect(jsonPath("$.price").value(request.price()));
     }
 
     @DisplayName("메뉴가격 수정 실패 - 메뉴가격이 반드시 전달되어야 한다")
