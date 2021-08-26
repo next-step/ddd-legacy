@@ -46,7 +46,7 @@ public class KitchenposTestFixture {
     public static Menu 간장치킨_Menu = new Menu();
     public static Menu 순살치킨_Menu = new Menu();
 
-    public static Menu 비싼후라이드치킨 = new Menu();
+    public static Menu 숨겨진비싼후라이드치킨 = new Menu();
 
     public static OrderTable 테이블1번 = new OrderTable();
     public static OrderTable 테이블2번 = new OrderTable();
@@ -249,13 +249,13 @@ public class KitchenposTestFixture {
         순살치킨_Menu.setMenuGroupId(한마리메뉴.getId());
         순살치킨_Menu.setMenuProducts(singletonList(순살치킨_순살치킨));
 
-        비싼후라이드치킨.setId(uuidOf("f76c720e8c1346739a24cf385654159d"));
-        비싼후라이드치킨.setDisplayed(false);
-        비싼후라이드치킨.setName("비싼후라이드치킨");
-        비싼후라이드치킨.setPrice(BigDecimal.valueOf(16001L));
-        비싼후라이드치킨.setMenuGroup(한마리메뉴);
-        비싼후라이드치킨.setMenuGroupId(한마리메뉴.getId());
-        비싼후라이드치킨.setMenuProducts(singletonList(후라이드치킨_후라이드));
+        숨겨진비싼후라이드치킨.setId(uuidOf("f76c720e8c1346739a24cf385654159d"));
+        숨겨진비싼후라이드치킨.setDisplayed(false);
+        숨겨진비싼후라이드치킨.setName("비싼후라이드치킨");
+        숨겨진비싼후라이드치킨.setPrice(BigDecimal.valueOf(16001L));
+        숨겨진비싼후라이드치킨.setMenuGroup(한마리메뉴);
+        숨겨진비싼후라이드치킨.setMenuGroupId(한마리메뉴.getId());
+        숨겨진비싼후라이드치킨.setMenuProducts(singletonList(후라이드치킨_후라이드));
     }
 
     private static void initMenuProduct() {

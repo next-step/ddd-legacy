@@ -1,7 +1,7 @@
 package kitchenpos.ui;
 
 import static java.util.Collections.emptyList;
-import static kitchenpos.KitchenposTestFixture.비싼후라이드치킨;
+import static kitchenpos.KitchenposTestFixture.숨겨진비싼후라이드치킨;
 import static kitchenpos.KitchenposTestFixture.양념치킨_Menu;
 import static kitchenpos.KitchenposTestFixture.테이블1번;
 import static kitchenpos.KitchenposTestFixture.테이블9번_먹는중;
@@ -119,8 +119,8 @@ class OrderRestControllerTest extends IntegrationTest {
     @DisplayName("생성 실패 - 숨겨져 있는 메뉴는 주문할 수 없다")
     @Test
     void createFailedByHiddenMenuOrdered() throws Exception {
-        테이블주문_상세1.setMenu(비싼후라이드치킨);
-        테이블주문_상세1.setMenuId(비싼후라이드치킨.getId());
+        테이블주문_상세1.setMenu(숨겨진비싼후라이드치킨);
+        테이블주문_상세1.setMenuId(숨겨진비싼후라이드치킨.getId());
         mockMvc.perform(post("/api/orders")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(테이블주문)))

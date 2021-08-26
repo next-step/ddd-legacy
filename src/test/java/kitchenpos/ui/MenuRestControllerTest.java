@@ -3,7 +3,7 @@ package kitchenpos.ui;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static kitchenpos.KitchenposTestFixture.비싼후라이드치킨;
+import static kitchenpos.KitchenposTestFixture.숨겨진비싼후라이드치킨;
 import static kitchenpos.KitchenposTestFixture.한마리메뉴;
 import static kitchenpos.KitchenposTestFixture.후라이드치킨_Menu;
 import static kitchenpos.KitchenposTestFixture.후라이드치킨_후라이드;
@@ -239,7 +239,7 @@ class MenuRestControllerTest extends IntegrationTest {
     @DisplayName("메뉴 노출 실패 - 메뉴가격이 단품가격의 총 합보다 크면 안된다")
     @Test
     void displayFailedByExceedingTotalPrice() throws Exception {
-        mockMvc.perform(put("/api/menus/{menuId}/display", 비싼후라이드치킨.getId()))
+        mockMvc.perform(put("/api/menus/{menuId}/display", 숨겨진비싼후라이드치킨.getId()))
             .andDo(print())
             .andExpect(status().isConflict());
     }
