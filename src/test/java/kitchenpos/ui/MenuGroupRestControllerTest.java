@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import kitchenpos.IntegrationTest;
-import kitchenpos.domain.MenuGroup;
+import kitchenpos.ui.dto.MenuGroupRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,14 +16,13 @@ import org.springframework.http.MediaType;
 
 class MenuGroupRestControllerTest extends IntegrationTest {
 
-    MenuGroup 독특한메뉴;
+    MenuGroupRequest 독특한메뉴;
 
     @Override
     @BeforeEach
     protected void setUp() {
         super.setUp();
-        독특한메뉴 = new MenuGroup();
-        독특한메뉴.setName("독특한메뉴");
+        독특한메뉴 = new MenuGroupRequest("독특한메뉴");
     }
 
     @DisplayName("메뉴 그룹을 생성한다")
@@ -37,7 +36,7 @@ class MenuGroupRestControllerTest extends IntegrationTest {
             .andExpect(jsonPath("$.id").exists());
     }
 
-    @DisplayName("메뉴 그룹 생성이 실패한다")
+    @DisplayName("메뉴 그룹 생성 실패 - 메뉴 그룹명이 반드시 전달되어야 한다")
     @Test
     void createFailedByEmptyName() throws Exception {
         독특한메뉴.setName("");
