@@ -62,11 +62,13 @@ public class KitchenposTestFixture {
     public static Order 주문2번 = new Order();
     public static Order 주문3번 = new Order();
     public static Order 주문4번_먹는중 = new Order();
+    public static Order 주문5번_방금주문 = new Order();
 
     public static OrderLineItem 주문1번_상세1 = new OrderLineItem();
     public static OrderLineItem 주문2번_상세1 = new OrderLineItem();
     public static OrderLineItem 주문3번_상세1 = new OrderLineItem();
     public static OrderLineItem 주문4번_상세1 = new OrderLineItem();
+    public static OrderLineItem 주문5번_상세1 = new OrderLineItem();
 
     public static void set() {
         initProduct();
@@ -125,6 +127,15 @@ public class KitchenposTestFixture {
         주문4번_먹는중.setOrderTable(테이블9번_먹는중);
         주문4번_먹는중.setOrderTableId(테이블9번_먹는중.getId());
         주문4번_먹는중.setOrderLineItems(singletonList(주문4번_상세1));
+
+        주문5번_방금주문.setId(uuidOf("2a802c284278423a82c427a4ea3591b4"));
+        주문5번_방금주문.setDeliveryAddress(null);
+        주문5번_방금주문.setOrderDateTime(dateTimeOf("2021-07-27"));
+        주문5번_방금주문.setStatus(OrderStatus.WAITING);
+        주문5번_방금주문.setType(OrderType.EAT_IN);
+        주문5번_방금주문.setOrderTable(테이블9번_먹는중);
+        주문5번_방금주문.setOrderTableId(테이블9번_먹는중.getId());
+        주문5번_방금주문.setOrderLineItems(singletonList(주문5번_상세1));
     }
 
     private static void initOrderLineItem() {
@@ -151,6 +162,12 @@ public class KitchenposTestFixture {
         주문4번_상세1.setMenu(후라이드치킨_Menu);
         주문4번_상세1.setMenuId(후라이드치킨_Menu.getId());
         주문4번_상세1.setPrice(후라이드치킨_Menu.getPrice());
+
+        주문5번_상세1.setSeq(5L);
+        주문5번_상세1.setQuantity(1L);
+        주문5번_상세1.setMenu(양념치킨_Menu);
+        주문5번_상세1.setMenuId(양념치킨_Menu.getId());
+        주문5번_상세1.setPrice(양념치킨_Menu.getPrice());
     }
 
     private static void initOrderTable() {
