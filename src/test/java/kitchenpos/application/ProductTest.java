@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -23,9 +24,11 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 public class ProductTest {
 
-    private ProductService productService;
     private final ProductRepository productRepository = new InMemoryProductRepository();
     private final MenuRepository menuRepository = new InMemoryMenuRepository();
+
+    @InjectMocks
+    private ProductService productService;
 
     @Mock
     private final PurgomalumClient purgomalumClient = new MockPurgomalumClient();
