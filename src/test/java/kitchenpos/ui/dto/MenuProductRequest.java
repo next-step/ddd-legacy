@@ -1,19 +1,24 @@
 package kitchenpos.ui.dto;
 
 import java.util.UUID;
+import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 public class MenuProductRequest {
 
     private Long seq;
-    private Product product;
+    private ProductRequest product;
     private long quantity;
 
     private UUID productId;
 
+    public MenuProductRequest(final MenuProduct menuProduct) {
+        this(menuProduct.getQuantity(), menuProduct.getProduct());
+    }
+
     public MenuProductRequest(final long quantity, final Product product) {
         this.quantity = quantity;
-        this.product = product;
+        this.product = new ProductRequest(product);
 
         this.productId = product.getId();
     }
@@ -26,12 +31,16 @@ public class MenuProductRequest {
         this.seq = seq;
     }
 
-    public Product getProduct() {
+    public ProductRequest getProduct() {
         return product;
     }
 
-    public void setProduct(final Product product) {
+    public void setProduct(final ProductRequest product) {
         this.product = product;
+    }
+
+    public void setProduct(final Product product) {
+        this.product = new ProductRequest(product);
     }
 
     public long getQuantity() {

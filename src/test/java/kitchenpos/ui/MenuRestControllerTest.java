@@ -1,12 +1,10 @@
 package kitchenpos.ui;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static kitchenpos.KitchenposTestFixture.숨겨진비싼후라이드치킨;
 import static kitchenpos.KitchenposTestFixture.한마리메뉴;
-import static kitchenpos.KitchenposTestFixture.후라이드;
 import static kitchenpos.KitchenposTestFixture.후라이드치킨_Menu;
+import static kitchenpos.KitchenposTestFixture.후라이드치킨_후라이드;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -20,7 +18,6 @@ import java.util.UUID;
 import kitchenpos.IntegrationTest;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.Product;
-import kitchenpos.ui.dto.MenuProductRequest;
 import kitchenpos.ui.dto.MenuRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,16 +26,14 @@ import org.springframework.http.MediaType;
 
 class MenuRestControllerTest extends IntegrationTest {
 
-    MenuProductRequest 후라이드특가_후라이드;
     MenuRequest 후라이드특가;
 
     @Override
     @BeforeEach
     protected void setUp() {
         super.setUp();
-        후라이드특가_후라이드 = new MenuProductRequest(1L, 후라이드);
         후라이드특가 = new MenuRequest(
-            "후라이드특가", 15000L, true, 한마리메뉴, 후라이드특가_후라이드);
+            "후라이드특가", 15000L, true, 한마리메뉴, 후라이드치킨_후라이드);
     }
 
     @DisplayName("메뉴를 생성한다")
@@ -100,7 +95,7 @@ class MenuRestControllerTest extends IntegrationTest {
     @DisplayName("메뉴 생성 실패 - 메뉴제품목록에는 중복이 허용되지 않는다")
     @Test
     void createFailedByDuplicateMenuProducts() throws Exception {
-        후라이드특가.setMenuProducts(asList(후라이드특가_후라이드, 후라이드특가_후라이드));
+        후라이드특가.setMenuProducts(후라이드치킨_후라이드, 후라이드치킨_후라이드);
         mockMvc.perform(post("/api/menus")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(후라이드특가)))
@@ -111,8 +106,8 @@ class MenuRestControllerTest extends IntegrationTest {
     @DisplayName("메뉴 생성 실패 - 메뉴제품의 제품수량은 음수가 될 수 없다")
     @Test
     void createFailedByNegativeMenuProductQuantity() throws Exception {
-        후라이드특가_후라이드.setQuantity(-1L);
-        후라이드특가.setMenuProducts(singletonList(후라이드특가_후라이드));
+        후라이드치킨_후라이드.setQuantity(-1L);
+        후라이드특가.setMenuProducts(후라이드치킨_후라이드);
         mockMvc.perform(post("/api/menus")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(후라이드특가)))
@@ -123,9 +118,9 @@ class MenuRestControllerTest extends IntegrationTest {
     @DisplayName("메뉴 생성 실패 - 메뉴제품으로는 실제 존재하는 제품만 등록된다")
     @Test
     void createFailedByNoSuchProduct() throws Exception {
-        후라이드특가_후라이드.setProduct(new Product());
-        후라이드특가_후라이드.setProductId(UUID.randomUUID());
-        후라이드특가.setMenuProducts(singletonList(후라이드특가_후라이드));
+        후라이드치킨_후라이드.setProduct(new Product());
+        후라이드치킨_후라이드.setProductId(UUID.randomUUID());
+        후라이드특가.setMenuProducts(후라이드치킨_후라이드);
         mockMvc.perform(post("/api/menus")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(후라이드특가)))

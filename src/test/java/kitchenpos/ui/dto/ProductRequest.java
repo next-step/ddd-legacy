@@ -2,6 +2,7 @@ package kitchenpos.ui.dto;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import kitchenpos.domain.Product;
 
 public class ProductRequest {
 
@@ -12,13 +13,18 @@ public class ProductRequest {
     public ProductRequest() {
     }
 
+    public ProductRequest(final long price) {
+        this.price = BigDecimal.valueOf(price);
+    }
+
     public ProductRequest(final String name, final long price) {
         this.name = name;
         this.price = BigDecimal.valueOf(price);
     }
 
-    public ProductRequest(final long price) {
-        this.price = BigDecimal.valueOf(price);
+    public ProductRequest(final Product product) {
+        this.name = product.getName();
+        this.price = product.getPrice();
     }
 
     public UUID getId() {
@@ -41,11 +47,11 @@ public class ProductRequest {
         return price;
     }
 
-    public long price() {
-        return price.longValue();
-    }
-
     public void setPrice(final BigDecimal price) {
         this.price = price;
+    }
+
+    public long price() {
+        return price.longValue();
     }
 }

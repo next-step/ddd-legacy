@@ -1,8 +1,10 @@
 package kitchenpos.ui.dto;
 
 import java.util.UUID;
+import kitchenpos.domain.MenuGroup;
 
 public class MenuGroupRequest {
+
     private UUID id;
     private String name;
 
@@ -11,6 +13,10 @@ public class MenuGroupRequest {
 
     public MenuGroupRequest(final String name) {
         this.name = name;
+    }
+
+    public MenuGroupRequest(final MenuGroup menuGroup) {
+        this.name = menuGroup.getName();
     }
 
     public UUID getId() {

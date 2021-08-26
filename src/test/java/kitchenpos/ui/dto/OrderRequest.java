@@ -19,14 +19,14 @@ public class OrderRequest {
 
     private String deliveryAddress;
 
-    private OrderTable orderTable;
+    private OrderTableRequest orderTable;
 
     private UUID orderTableId;
 
     public OrderRequest(final OrderType type, final OrderTable orderTable,
         final OrderLineItemRequest... orderLineItems) {
         this.type = type;
-        this.orderTable = orderTable;
+        this.orderTable = new OrderTableRequest(orderTable);
         this.orderLineItems = Arrays.asList(orderLineItems);
 
         this.orderTableId = orderTable.getId();
@@ -87,12 +87,16 @@ public class OrderRequest {
         this.deliveryAddress = deliveryAddress;
     }
 
-    public OrderTable getOrderTable() {
+    public OrderTableRequest getOrderTable() {
         return orderTable;
     }
 
-    public void setOrderTable(final OrderTable orderTable) {
+    public void setOrderTable(final OrderTableRequest orderTable) {
         this.orderTable = orderTable;
+    }
+
+    public void setOrderTable(final OrderTable orderTable) {
+        this.orderTable = new OrderTableRequest(orderTable);
     }
 
     public UUID getOrderTableId() {

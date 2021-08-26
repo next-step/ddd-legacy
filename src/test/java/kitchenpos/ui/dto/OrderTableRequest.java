@@ -1,6 +1,7 @@
 package kitchenpos.ui.dto;
 
 import java.util.UUID;
+import kitchenpos.domain.OrderTable;
 
 public class OrderTableRequest {
 
@@ -14,6 +15,12 @@ public class OrderTableRequest {
 
     public OrderTableRequest(final String name) {
         this.name = name;
+    }
+
+    public OrderTableRequest(final OrderTable orderTable) {
+        this.name = orderTable.getName();
+        this.numberOfGuests = orderTable.getNumberOfGuests();
+        this.empty = orderTable.isEmpty();
     }
 
     public OrderTableRequest(final int numberOfGuests) {

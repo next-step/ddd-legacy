@@ -21,7 +21,6 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.UUID;
 import kitchenpos.IntegrationTest;
-import kitchenpos.domain.Menu;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
@@ -116,7 +115,6 @@ class OrderRestControllerTest extends IntegrationTest {
     @DisplayName("생성 실패 - 실제 존재하는 메뉴만 주문할 수 있다")
     @Test
     void createFailedByNoSuchMenu() throws Exception {
-        테이블주문_상세1.setMenu(new Menu());
         테이블주문_상세1.setMenuId(UUID.randomUUID());
         mockMvc.perform(post("/api/orders")
             .contentType(MediaType.APPLICATION_JSON)

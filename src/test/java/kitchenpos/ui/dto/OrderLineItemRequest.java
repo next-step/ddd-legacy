@@ -7,7 +7,7 @@ import kitchenpos.domain.Menu;
 public class OrderLineItemRequest {
 
     private Long seq;
-    private Menu menu;
+    private MenuRequest menu;
     private long quantity;
     private BigDecimal price;
 
@@ -15,9 +15,9 @@ public class OrderLineItemRequest {
 
     public OrderLineItemRequest(final long quantity, final Menu menu) {
         this.quantity = quantity;
-        this.menu = menu;
-
+        this.menu = new MenuRequest(menu);
         this.price = menu.getPrice();
+
         this.menuId = menu.getId();
     }
 
@@ -29,12 +29,16 @@ public class OrderLineItemRequest {
         this.seq = seq;
     }
 
-    public Menu getMenu() {
+    public MenuRequest getMenu() {
         return menu;
     }
 
-    public void setMenu(final Menu menu) {
+    public void setMenu(final MenuRequest menu) {
         this.menu = menu;
+    }
+
+    public void setMenu(final Menu menu) {
+        this.menu = new MenuRequest(menu);
     }
 
     public long getQuantity() {
