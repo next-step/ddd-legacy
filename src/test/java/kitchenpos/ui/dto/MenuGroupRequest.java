@@ -6,6 +6,9 @@ public class MenuGroupRequest {
     private UUID id;
     private String name;
 
+    public MenuGroupRequest() {
+    }
+
     public MenuGroupRequest(final String name) {
         this.name = name;
     }

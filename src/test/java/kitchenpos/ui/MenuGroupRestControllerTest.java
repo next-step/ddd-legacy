@@ -9,28 +9,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import kitchenpos.IntegrationTest;
 import kitchenpos.ui.dto.MenuGroupRequest;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
 class MenuGroupRestControllerTest extends IntegrationTest {
 
-    MenuGroupRequest 독특한메뉴;
-
-    @Override
-    @BeforeEach
-    protected void setUp() {
-        super.setUp();
-        독특한메뉴 = new MenuGroupRequest("독특한메뉴");
-    }
-
     @DisplayName("메뉴 그룹을 생성한다")
     @Test
     void create() throws Exception {
+        MenuGroupRequest request = new MenuGroupRequest("독특한메뉴");
         mockMvc.perform(post("/api/menu-groups")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(독특한메뉴)))
+            .content(objectMapper.writeValueAsString(request)))
             .andDo(print())
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.id").exists());
@@ -39,10 +30,10 @@ class MenuGroupRestControllerTest extends IntegrationTest {
     @DisplayName("메뉴 그룹 생성 실패 - 메뉴 그룹명이 반드시 전달되어야 한다")
     @Test
     void createFailedByEmptyName() throws Exception {
-        독특한메뉴.setName("");
+        MenuGroupRequest request = new MenuGroupRequest();
         mockMvc.perform(post("/api/menu-groups")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(독특한메뉴)))
+            .content(objectMapper.writeValueAsString(request)))
             .andDo(print())
             .andExpect(status().isBadRequest());
     }
