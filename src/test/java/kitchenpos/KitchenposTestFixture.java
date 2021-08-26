@@ -46,6 +46,8 @@ public class KitchenposTestFixture {
     public static Menu 간장치킨_Menu = new Menu();
     public static Menu 순살치킨_Menu = new Menu();
 
+    public static Menu 비싼후라이드치킨 = new Menu();
+
     public static OrderTable 테이블1번 = new OrderTable();
     public static OrderTable 테이블2번 = new OrderTable();
     public static OrderTable 테이블3번 = new OrderTable();
@@ -220,6 +222,14 @@ public class KitchenposTestFixture {
         순살치킨_Menu.setMenuGroup(한마리메뉴);
         순살치킨_Menu.setMenuGroupId(한마리메뉴.getId());
         순살치킨_Menu.setMenuProducts(Collections.singletonList(순살치킨_순살치킨));
+
+        비싼후라이드치킨.setId(uuidOf("f76c720e8c1346739a24cf385654159d"));
+        비싼후라이드치킨.setDisplayed(false);
+        비싼후라이드치킨.setName("비싼후라이드치킨");
+        비싼후라이드치킨.setPrice(BigDecimal.valueOf(16001L));
+        비싼후라이드치킨.setMenuGroup(한마리메뉴);
+        비싼후라이드치킨.setMenuGroupId(한마리메뉴.getId());
+        비싼후라이드치킨.setMenuProducts(Collections.singletonList(후라이드치킨_후라이드));
     }
 
     private static void initMenuProduct() {
