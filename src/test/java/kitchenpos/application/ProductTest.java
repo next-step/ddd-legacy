@@ -49,7 +49,7 @@ public class ProductTest {
         );
     }
 
-    @DisplayName("단품 생성 - null 또는 음수값을 생성될 메뉴의 가격으로 정할 수 없다.")
+    @DisplayName("단품 생성 - null 또는 음수값을 생성될 단품의 가격으로 정할 수 없다.")
     @ValueSource(longs = -1L)
     @NullSource
     @ParameterizedTest
@@ -66,7 +66,7 @@ public class ProductTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("단품 생성 - null 또는 비속어를 생성될 메뉴의 이름으로 정할 수 없다.")
+    @DisplayName("단품 생성 - null 또는 비속어를 생성될 단품의 이름으로 정할 수 없다.")
     @ValueSource(strings = "비속어")
     @NullSource
     @ParameterizedTest
