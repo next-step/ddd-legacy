@@ -13,9 +13,9 @@ public class MenuProduct {
 
     @ManyToOne(optional = false)
     @JoinColumn(
-        name = "product_id",
-        columnDefinition = "varbinary(16)",
-        foreignKey = @ForeignKey(name = "fk_menu_product_to_product")
+            name = "product_id",
+            columnDefinition = "varbinary(16)",
+            foreignKey = @ForeignKey(name = "fk_menu_product_to_product")
     )
     private Product product;
 
@@ -26,6 +26,12 @@ public class MenuProduct {
     private UUID productId;
 
     public MenuProduct() {
+    }
+
+    public MenuProduct(Product product, long quantity) {
+        this.product = product;
+        this.quantity = quantity;
+        this.productId = product.getId();
     }
 
     public Long getSeq() {
