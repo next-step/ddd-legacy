@@ -183,19 +183,19 @@ public class MenuServiceTest {
     }
 
 
-    Menu 메뉴등록(Menu menu) {
+    private Menu 메뉴등록(Menu menu) {
         return menuService.create(menu);
     }
 
-    Menu 메뉴가격변경(UUID id, Menu menu) {
+    private Menu 메뉴가격변경(UUID id, Menu menu) {
         return menuService.changePrice(id, menu);
     }
 
-    Menu 메뉴노출(UUID id) {
+    private Menu 메뉴노출(UUID id) {
         return menuService.display(id);
     }
 
-    List<Menu> 메뉴전체조회() {
+    private List<Menu> 메뉴전체조회() {
         return menuService.findAll();
     }
 

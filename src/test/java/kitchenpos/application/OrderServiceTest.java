@@ -262,27 +262,27 @@ public class OrderServiceTest {
     }
 
 
-    Order 주문등록(Order request) {
+    private Order 주문등록(Order request) {
         return orderService.create(request);
     }
 
-    Order 주문수락(Order order) {
+    private Order 주문수락(Order order) {
         return orderService.accept(order.getId());
     }
 
-    Order 주문메뉴제공(Order order) {
+    private Order 주문메뉴제공(Order order) {
         return orderService.serve(order.getId());
     }
 
-    Order 배달시작(Order order) {
+    private Order 배달시작(Order order) {
         return orderService.startDelivery(order.getId());
     }
 
-    Order 배달완료(Order order) {
+    private Order 배달완료(Order order) {
         return orderService.completeDelivery(order.getId());
     }
 
-    Order 주문해결(Order order) {
+    private Order 주문해결(Order order) {
         return orderService.complete(order.getId());
     }
 

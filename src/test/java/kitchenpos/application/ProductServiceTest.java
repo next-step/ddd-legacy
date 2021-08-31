@@ -118,15 +118,15 @@ public class ProductServiceTest {
         assertThat(expected).containsOnly(saved1, saved2);
     }
 
-    Product 상품등록(final Product product) {
+    private Product 상품등록(final Product product) {
         return productService.create(product);
     }
 
-    Product 상품가격수정(final UUID productId, final Product product) {
+    private Product 상품가격수정(final UUID productId, final Product product) {
         return productService.changePrice(productId, product);
     }
 
-    List<Product> 상품전체조회() {
+    private List<Product> 상품전체조회() {
         return productService.findAll();
     }
 

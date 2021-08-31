@@ -59,11 +59,11 @@ public class MenuGroupServiceTest {
     }
 
 
-    MenuGroup 메뉴그룹등록(final MenuGroup menuGroup) {
+    private MenuGroup 메뉴그룹등록(final MenuGroup menuGroup) {
         return menuGroupService.create(menuGroup);
     }
 
-    List<MenuGroup> 메뉴그룹조회() {
+    private List<MenuGroup> 메뉴그룹조회() {
         return menuGroupService.findAll();
     }
 }

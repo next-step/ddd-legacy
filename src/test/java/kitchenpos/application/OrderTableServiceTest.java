@@ -137,23 +137,23 @@ public class OrderTableServiceTest {
         assertThat(expected).containsOnly(saved1, saved2);
     }
 
-    OrderTable 주문테이블등록(final OrderTable orderTable) {
+    private OrderTable 주문테이블등록(final OrderTable orderTable) {
         return orderTableService.create(orderTable);
     }
 
-    OrderTable 주문테이블에앉기(final UUID orderTableId) {
+    private OrderTable 주문테이블에앉기(final UUID orderTableId) {
         return orderTableService.sit(orderTableId);
     }
 
-    OrderTable 주문테이블비우기(final UUID orderTableId) {
+    private OrderTable 주문테이블비우기(final UUID orderTableId) {
         return orderTableService.clear(orderTableId);
     }
 
-    OrderTable 주문테이블인원수변경(final UUID orderTableId, OrderTable request) {
+    private OrderTable 주문테이블인원수변경(final UUID orderTableId, OrderTable request) {
         return orderTableService.changeNumberOfGuests(orderTableId, request);
     }
 
-    List<OrderTable> 주문테이블전체조회() {
+    private List<OrderTable> 주문테이블전체조회() {
         return orderTableService.findAll();
     }
 
