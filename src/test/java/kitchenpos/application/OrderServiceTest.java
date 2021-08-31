@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
@@ -99,7 +100,7 @@ public class OrderServiceTest {
         );
     }
 
-    @DisplayName("매장 식사시엔 비어있지 않은 테이블 정보를 지녀야한다.")
+    @DisplayName("테이블이 비어있는 경우 매장식사 주문을 받을수 없다.")
     @Test
     void eatIn_create_table() {
         OrderTable newTable = new OrderTable();
@@ -113,23 +114,16 @@ public class OrderServiceTest {
     }
 
     @DisplayName("주문 방법을 선택하지 않으면 주문할 수 없다.")
-    @Test
-    void create_type(){
-        deliveryOrder.setType(null);
-        takeOutOrder.setType(null);
-        eatInOrder.setType(null);
+    @NullSource
+    @ParameterizedTest
+    void create_type(OrderType type){
+        deliveryOrder.setType(type);
 
-        assertAll(
-                () -> assertThatExceptionOfType(IllegalArgumentException.class)
-                        .isThrownBy(() -> 주문등록(deliveryOrder)),
-                () -> assertThatExceptionOfType(IllegalArgumentException.class)
-                        .isThrownBy(() -> 주문등록(takeOutOrder)),
-                () -> assertThatExceptionOfType(IllegalArgumentException.class)
-                        .isThrownBy(() -> 주문등록(eatInOrder))
-        );
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> 주문등록(deliveryOrder));
     }
 
-    @DisplayName("주문시 한 가지 이상의 비어있지 않은 주문항목이 필요하다.")
+    @DisplayName("주문상품이 비어있는 경우 IllegalArgumentException을 반환한다.")
     @Test
     void create_orderLineItem() {
         deliveryOrder.setOrderLineItems(emptyList());
@@ -147,14 +141,22 @@ public class OrderServiceTest {
         assertThat(주문등록(eatInOrder).getId()).isNotNull();
     }
 
-    @DisplayName("포장주문과 배달주문은 수량이 0보다 작을 수 없다.")
+    @DisplayName("배달주문은 수량이 0보다 작을 수 없다.")
     @ValueSource(strings = "-1")
     @ParameterizedTest
-    void deliveryAndTakeOut_create(int quantity) {
+    void delivery_create(int quantity) {
         orderLineItems.get(0).setQuantity(quantity);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> 주문등록(deliveryOrder));
+    }
+
+    @DisplayName("포장주문은 수량이 0보다 작을 수 없다.")
+    @ValueSource(strings = "-1")
+    @ParameterizedTest
+    void takeOut_create(int quantity) {
+        orderLineItems.get(0).setQuantity(quantity);
+
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> 주문등록(takeOutOrder));
     }

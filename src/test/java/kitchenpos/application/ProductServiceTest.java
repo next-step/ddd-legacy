@@ -1,9 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,9 +11,12 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static java.util.UUID.randomUUID;
+import static kitchenpos.application.MenuServiceTest.메뉴만들기;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -102,9 +102,18 @@ public class ProductServiceTest {
     @DisplayName("상품의 가격을 변경할 때 상품에 속한 메뉴의 가격이 메뉴 상품 가격의 총합과 다를 경우 메뉴를 노출하지 않는다.")
     @Test
     void changePrice_Menu() {
-        final Menu menu = new Menu();
+        final Product saved = 상품등록(product);
+        final Menu menu = 가격변경_메뉴만들기(saved, menuRepository, BigDecimal.valueOf(7000L));
+        assertThat(menuRepository.findById(menu.getId()).get().isDisplayed()).isTrue();
+        final Product price = new Product();
+        price.setPrice(BigDecimal.valueOf(1000L));
+
+        상품가격수정(saved.getId(), price);
+
+        assertThat(menuRepository.findById(menu.getId()).get().isDisplayed()).isFalse();
     }
 
+    @DisplayName("상품을 전체 조회한다.")
     @Test
     void findAll() {
         final Product other = new Product();
@@ -133,9 +142,22 @@ public class ProductServiceTest {
 
     public static Product 상품만들기(ProductRepository productRepository) {
         final Product product = new Product();
-        product.setId(UUID.randomUUID());
+        product.setId(randomUUID());
         product.setName("상품 이름");
         product.setPrice(BigDecimal.valueOf(10_000L));
         return productRepository.save(product);
+    }
+
+    private static Menu 가격변경_메뉴만들기(Product product, MenuRepository menuRepository, BigDecimal price) {
+        final Menu menu = new Menu();
+        menu.setId(randomUUID());
+        menu.setPrice(BigDecimal.valueOf(7000L));
+        menu.setDisplayed(true);
+        final MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(product);
+        menuProduct.setProductId(product.getId());
+        menuProduct.setQuantity(1L);
+        menu.setMenuProducts(Arrays.asList(menuProduct));
+        return menuRepository.save(menu);
     }
 }
