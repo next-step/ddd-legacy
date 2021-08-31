@@ -2,6 +2,7 @@ package kitchenpos.ui;
 
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.OrderTable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@RequestMapping("/api/order-tables")
+@RequestMapping(value = "/api/order-tables", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
 @RestController
 public class OrderTableRestController {
     private final OrderTableService orderTableService;

@@ -2,6 +2,7 @@ package kitchenpos.ui;
 
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.Product;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,7 +10,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-@RequestMapping("/api/products")
+@RequestMapping(value = "/api/products", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
 @RestController
 public class ProductRestController {
     private final ProductService productService;

@@ -2,13 +2,14 @@ package kitchenpos.ui;
 
 import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
 
-@RequestMapping("/api/menu-groups")
+@RequestMapping(value = "/api/menu-groups", produces = MediaType.APPLICATION_JSON_VALUE + ";charset=UTF-8")
 @RestController
 public class MenuGroupRestController {
     private final MenuGroupService menuGroupService;
