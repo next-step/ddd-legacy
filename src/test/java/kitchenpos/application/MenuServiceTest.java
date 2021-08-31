@@ -85,9 +85,10 @@ public class MenuServiceTest {
     }
 
     @DisplayName("메뉴의 메뉴상품은 한 가지 이상이어야한다.")
-    @Test
-    void create_MenuProduct() {
-        menu.setMenuProducts(emptyList());
+    @NullAndEmptySource
+    @ParameterizedTest
+    void create_MenuProduct(List menuProducts) {
+        menu.setMenuProducts(menuProducts);
 
         assertThatThrownBy(() -> 메뉴등록(menu))
                 .isInstanceOf(IllegalArgumentException.class);
