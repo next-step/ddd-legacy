@@ -55,7 +55,7 @@ class MenuRestControllerTest extends BaseControllerTest {
 
         product = productGenerator.generate();
 
-        menuProduct = menuProductGenerator.generateByProduct(product);
+        menuProduct = menuProductGenerator.generateRequestByProduct(product);
 
         menuProducts = new ArrayList<>();
         menuProducts.add(menuProduct);
@@ -130,7 +130,7 @@ class MenuRestControllerTest extends BaseControllerTest {
 
         product = productGenerator.generate();
 
-        menuProduct = menuProductGenerator.generateByProduct(product);
+        menuProduct = menuProductGenerator.generateRequestByProduct(product);
 
         menuProducts = new ArrayList<>();
         menuProducts.add(menuProduct);

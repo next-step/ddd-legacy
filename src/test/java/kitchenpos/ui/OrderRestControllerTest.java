@@ -5,7 +5,6 @@ import kitchenpos.application.OrderService;
 import kitchenpos.application.OrderTableService;
 import kitchenpos.commons.*;
 import kitchenpos.domain.*;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +65,7 @@ class OrderRestControllerTest extends BaseControllerTest {
 
         product = productGenerator.generate();
 
-        menuProduct = menuProductGenerator.generateByProduct(product);
+        menuProduct = menuProductGenerator.generateRequestByProduct(product);
 
         menu = menuGenerator.generateByMenuGroupAndMenuProducts(menuGroup, Collections.singletonList(menuProduct));
 
@@ -118,7 +117,7 @@ class OrderRestControllerTest extends BaseControllerTest {
 
         product = productGenerator.generate();
 
-        menuProduct = menuProductGenerator.generateByProduct(product);
+        menuProduct = menuProductGenerator.generateRequestByProduct(product);
 
         menu = menuGenerator.generateByMenuGroupAndMenuProducts(menuGroup, Collections.singletonList(menuProduct));
 

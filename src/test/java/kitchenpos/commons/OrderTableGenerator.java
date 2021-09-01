@@ -5,16 +5,23 @@ import kitchenpos.domain.OrderTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class OrderTableGenerator {
     @Autowired
     private OrderTableService orderTableService;
 
-    @Autowired
     public OrderTable generate() {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName("order table 1");
+        OrderTable orderTable = this.generateRequest();
         return orderTableService.create(orderTable);
+    }
+
+    public OrderTable generateRequest() {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName("order table 1");
+        return orderTable;
     }
 
 }
