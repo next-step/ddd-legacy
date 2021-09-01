@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.commons.*;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +43,14 @@ class OrderServiceTest {
     @Mock
     private KitchenridersClient kitchenridersClient;
 
+    private OrderGenerator orderGenerator = new OrderGenerator();
+    private OrderTableGenerator orderTableGenerator = new OrderTableGenerator();
+    private OrderLineItemGenerator orderLineItemGenerator = new OrderLineItemGenerator();
+    private MenuGenerator menuGenerator = new MenuGenerator();
+    private MenuGroupGenerator menuGroupGenerator = new MenuGroupGenerator();
+    private ProductGenerator productGenerator = new ProductGenerator();
+    private MenuProductGenerator menuProductGenerator = new MenuProductGenerator();
+
     private OrderTable mockOrderTable;
     private Menu mockMenu;
     private OrderLineItem mockOrderLineItem;
@@ -71,53 +80,18 @@ class OrderServiceTest {
     }
 
     private void generateOrderRequest(OrderType orderType) {
-        mockOrderTable = generateOrderTable(UUID.randomUUID());
+        MenuGroup mockMenuGroup = menuGroupGenerator.generateRequest();
+        Product mockProduct = productGenerator.generateRequest();
+        MenuProduct mockMenuProduct = menuProductGenerator.generateRequestByProduct(mockProduct);
+        mockMenu = menuGenerator.generateRequestByMenuGroupAndMenuProducts(mockMenuGroup, Collections.singletonList(mockMenuProduct));
 
-        mockMenu = generateMenu(UUID.randomUUID());
+        mockOrderTable = orderTableGenerator.generateRequest();
 
-        mockOrderLineItem = generateOrderLineItem();
-        mockOrderLineItem.setMenu(mockMenu);
-        mockOrderLineItem.setMenuId(mockMenu.getId());
-
+        mockOrderLineItem = orderLineItemGenerator.generateRequestByMenu(mockMenu);
         mockOrderLineItems = new ArrayList<>();
         mockOrderLineItems.add(mockOrderLineItem);
 
-        mockOrder = generateOrder(UUID.randomUUID(), orderType);
-        mockOrder.setOrderTable(mockOrderTable);
-        mockOrder.setOrderTableId(mockOrderTable.getId());
-        mockOrder.setOrderLineItems(mockOrderLineItems);
-    }
-
-    private Menu generateMenu(UUID id) {
-        Menu menu = new Menu();
-        menu.setId(id);
-        menu.setName("menu");
-        menu.setPrice(BigDecimal.valueOf(1000));
-        menu.setDisplayed(true);
-        return menu;
-    }
-
-    private OrderTable generateOrderTable(UUID id) {
-        OrderTable OrderTable = new OrderTable();
-        OrderTable.setId(id);
-        OrderTable.setName("OrderTable 1");
-        return OrderTable;
-    }
-
-    private OrderLineItem generateOrderLineItem() {
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setSeq(1L);
-        orderLineItem.setQuantity(2L);
-        orderLineItem.setPrice(BigDecimal.valueOf(1000));
-        return orderLineItem;
-    }
-
-    private Order generateOrder(UUID id, OrderType orderType) {
-        Order order = new Order();
-        order.setId(id);
-        order.setType(orderType);
-        order.setDeliveryAddress("address");
-        return order;
+        mockOrder = orderGenerator.generateRequestByOrderTypeAndOrderTableAndOrderLineItems(orderType, mockOrderTable, mockOrderLineItems);
     }
 
     @Test
@@ -545,7 +519,7 @@ class OrderServiceTest {
     }
 
     private List<Order> generateOrders(int size) {
-        return IntStream.range(0, size).mapToObj(i -> generateOrder(UUID.randomUUID(), OrderType.EAT_IN)).collect(Collectors.toList());
+        return IntStream.range(0, size).mapToObj(i -> new Order()).collect(Collectors.toList());
     }
 
 }

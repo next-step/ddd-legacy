@@ -1,5 +1,9 @@
 package kitchenpos.application;
 
+import kitchenpos.commons.MenuGenerator;
+import kitchenpos.commons.MenuGroupGenerator;
+import kitchenpos.commons.MenuProductGenerator;
+import kitchenpos.commons.ProductGenerator;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
@@ -38,6 +42,11 @@ class MenuServiceTest {
 
     @Mock
     private PurgomalumClient purgomalumClient;
+
+    private MenuGenerator menuGenerator = new MenuGenerator();
+    private MenuGroupGenerator menuGroupGenerator = new MenuGroupGenerator();
+    private ProductGenerator productGenerator = new ProductGenerator();
+    private MenuProductGenerator menuProductGenerator = new MenuProductGenerator();
 
     private MenuGroup mockMenuGroup;
     private Product mockProduct;
@@ -85,52 +94,16 @@ class MenuServiceTest {
     }
 
     private void generateMenuRequest() {
-        mockMenuGroup = generateMenuGroup(UUID.randomUUID());
+        mockMenuGroup = menuGroupGenerator.generateRequest();
 
-        mockProduct = generateProduct(UUID.randomUUID());
+        mockProduct = productGenerator.generateRequest();
 
-        mockMenuProduct = generateMenuProduct();
-        mockMenuProduct.setProduct(mockProduct);
-        mockMenuProduct.setProductId(mockProduct.getId());
+        mockMenuProduct = menuProductGenerator.generateRequestByProduct(mockProduct);
 
         mockMenuProducts = new ArrayList<>();
         mockMenuProducts.add(mockMenuProduct);
 
-        mockMenu = generateMenu(UUID.randomUUID());
-        mockMenu.setMenuGroup(mockMenuGroup);
-        mockMenu.setMenuGroupId(mockMenuGroup.getId());
-        mockMenu.setMenuProducts(mockMenuProducts);
-    }
-
-    private MenuGroup generateMenuGroup(UUID id) {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(id);
-        menuGroup.setName("menu group");
-        return menuGroup;
-    }
-
-    private MenuProduct generateMenuProduct() {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setSeq(1L);
-        menuProduct.setQuantity(2);
-        return menuProduct;
-    }
-
-    private Product generateProduct(UUID id) {
-        Product product = new Product();
-        product.setId(id);
-        product.setName("product");
-        product.setPrice(BigDecimal.valueOf(1000));
-        return product;
-    }
-
-    private Menu generateMenu(UUID id) {
-        Menu menu = new Menu();
-        menu.setId(id);
-        menu.setName("menu");
-        menu.setPrice(BigDecimal.valueOf(2000));
-        menu.setDisplayed(true);
-        return menu;
+        mockMenu = menuGenerator.generateRequestByMenuGroupAndMenuProducts(mockMenuGroup, mockMenuProducts);
     }
 
     @Test
@@ -398,6 +371,6 @@ class MenuServiceTest {
     }
 
     private List<Menu> generateMenus(int size) {
-        return IntStream.range(0, size).mapToObj(i -> generateMenu(UUID.randomUUID())).collect(Collectors.toList());
+        return IntStream.range(0, size).mapToObj(i -> new Menu()).collect(Collectors.toList());
     }
 }
