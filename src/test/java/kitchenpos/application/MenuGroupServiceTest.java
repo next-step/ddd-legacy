@@ -59,11 +59,9 @@ class MenuGroupServiceTest {
     void addMenuGroup_BadRequest_Empty_Input() {
         // given
         MenuGroup menuGroup = generateMenuGroup(UUID.randomUUID());
-
-        // when
         menuGroup.setName(null);
 
-        // then
+        // when then
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> menuGroupService.create(menuGroup));
     }
 
