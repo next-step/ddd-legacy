@@ -10,6 +10,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -163,12 +164,13 @@ class OrderServiceTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> orderService.create(mockOrder));
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("주문 추가 - 실패: 매장식사가 아닐때 1개 미만의 주문 수량 입력")
-    void addOrder_IllegalArgumentException_Invalid_Quantity() {
+    @ValueSource(ints = {-1})
+    void addOrder_IllegalArgumentException_Invalid_Quantity(int quantity) {
         // given
         generateOrderRequest(OrderType.DELIVERY);
-        mockOrderLineItem.setQuantity(-1);
+        mockOrderLineItem.setQuantity(quantity);
 
         // mocking
         given(menuRepository.findAllById(any())).willReturn(Collections.singletonList(mockMenu));
