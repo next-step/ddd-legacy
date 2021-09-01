@@ -2,11 +2,9 @@ package kitchenpos.application;
 
 import kitchenpos.commons.*;
 import kitchenpos.domain.*;
+import kitchenpos.domain.Order;
 import kitchenpos.infra.KitchenridersClient;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -21,6 +19,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -505,6 +504,7 @@ class OrderServiceTest {
     @DisplayName("모든 주문 조회")
     void findAllOrder() {
         // given
+        generateOrderRequest(OrderType.EAT_IN);
         int size = 10;
         List<Order> mockOrders = generateOrders(size);
 
@@ -515,11 +515,18 @@ class OrderServiceTest {
         List<Order> Orders = orderService.findAll();
 
         // then
-        assertThat(Orders.size()).isEqualTo(size);
+        Order order = Orders.get(0);
+        assertAll(
+                () -> assertThat(order.getId()).isEqualTo(mockOrder.getId()),
+                () -> assertThat(order.getOrderDateTime()).isEqualTo(mockOrder.getOrderDateTime()),
+                () -> assertThat(order.getOrderTable()).isEqualTo(mockOrder.getOrderTable()),
+                () -> assertThat(Orders.size()).isEqualTo(size)
+        );
+
     }
 
     private List<Order> generateOrders(int size) {
-        return IntStream.range(0, size).mapToObj(i -> new Order()).collect(Collectors.toList());
+        return IntStream.range(0, size).mapToObj(i -> mockOrder).collect(Collectors.toList());
     }
 
 }
