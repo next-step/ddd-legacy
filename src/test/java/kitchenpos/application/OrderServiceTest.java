@@ -2,9 +2,11 @@ package kitchenpos.application;
 
 import kitchenpos.commons.*;
 import kitchenpos.domain.*;
-import kitchenpos.domain.Order;
 import kitchenpos.infra.KitchenridersClient;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -56,20 +58,53 @@ class OrderServiceTest {
     private List<OrderLineItem> mockOrderLineItems;
     private Order mockOrder;
 
-    @ParameterizedTest
-    @DisplayName("주문 추가 - 성공")
-    @EnumSource(OrderType.class)
-    void createOrder(OrderType orderType) {
+    @Test
+    @DisplayName("주문 추가 Eat In - 성공")
+    void createOrder_EatIn() {
         // given
-        generateOrderRequest(orderType);
+        generateOrderRequest(OrderType.EAT_IN);
 
         // mocking
         given(orderRepository.save(any())).willReturn(mockOrder);
         given(menuRepository.findAllById(any())).willReturn(Collections.singletonList(mockMenu));
         given(menuRepository.findById(any())).willReturn(Optional.of(mockMenu));
-        if (orderType.equals(OrderType.EAT_IN)) {
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(mockOrderTable));
-        }
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(mockOrderTable));
+
+        // when
+        Order newOrder = orderService.create(mockOrder);
+
+        // then
+        assertThat(newOrder.getId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("주문 추가 Takeout - 성공")
+    void createOrder_Takeout() {
+        // given
+        generateOrderRequest(OrderType.TAKEOUT);
+
+        // mocking
+        given(orderRepository.save(any())).willReturn(mockOrder);
+        given(menuRepository.findAllById(any())).willReturn(Collections.singletonList(mockMenu));
+        given(menuRepository.findById(any())).willReturn(Optional.of(mockMenu));
+
+        // when
+        Order newOrder = orderService.create(mockOrder);
+
+        // then
+        assertThat(newOrder.getId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("주문 추가 Delivery - 성공")
+    void createOrder_Delivery() {
+        // given
+        generateOrderRequest(OrderType.DELIVERY);
+
+        // mocking
+        given(orderRepository.save(any())).willReturn(mockOrder);
+        given(menuRepository.findAllById(any())).willReturn(Collections.singletonList(mockMenu));
+        given(menuRepository.findById(any())).willReturn(Optional.of(mockMenu));
 
         // when
         Order newOrder = orderService.create(mockOrder);
@@ -218,19 +253,52 @@ class OrderServiceTest {
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> orderService.create(mockOrder));
     }
 
-    @ParameterizedTest
-    @DisplayName("Order Accept - 성공")
-    @EnumSource(OrderType.class)
-    void acceptOrder(OrderType orderType) {
+    @Test
+    @DisplayName("Order Accept Eat In - 성공")
+    void acceptOrder() {
         // given
-        generateOrderRequest(orderType);
+        generateOrderRequest(OrderType.EAT_IN);
         mockOrder.setStatus(OrderStatus.WAITING);
 
         // mocking
         given(orderRepository.findById(any())).willReturn(Optional.of(mockOrder));
-        if (orderType.equals(OrderType.DELIVERY)) {
-            willDoNothing().given(kitchenridersClient).requestDelivery(any(), any(), any());
-        }
+
+        // when
+        Order accept = orderService.accept(mockOrder.getId());
+
+        // then
+        assertThat(accept).isNotNull();
+        assertThat(accept.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @Test
+    @DisplayName("Order Accept Takeout - 성공")
+    void acceptOrder_Takeout() {
+        // given
+        generateOrderRequest(OrderType.TAKEOUT);
+        mockOrder.setStatus(OrderStatus.WAITING);
+
+        // mocking
+        given(orderRepository.findById(any())).willReturn(Optional.of(mockOrder));
+
+        // when
+        Order accept = orderService.accept(mockOrder.getId());
+
+        // then
+        assertThat(accept).isNotNull();
+        assertThat(accept.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @Test
+    @DisplayName("Order Accept Delivery - 성공")
+    void acceptOrder_Delivery() {
+        // given
+        generateOrderRequest(OrderType.DELIVERY);
+        mockOrder.setStatus(OrderStatus.WAITING);
+
+        // mocking
+        given(orderRepository.findById(any())).willReturn(Optional.of(mockOrder));
+        willDoNothing().given(kitchenridersClient).requestDelivery(any(), any(), any());
 
         // when
         Order accept = orderService.accept(mockOrder.getId());
@@ -430,16 +498,49 @@ class OrderServiceTest {
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> orderService.completeDelivery(mockOrder.getId()));
     }
 
-    @ParameterizedTest
-    @DisplayName("Order Complete - 성공")
-    @EnumSource(OrderType.class)
-    void completeOrder(OrderType orderType) {
+    @Test
+    @DisplayName("Order Complete Eat-in - 성공")
+    void completeOrder_EatIn() {
         // given
-        generateOrderRequest(orderType);
+        generateOrderRequest(OrderType.EAT_IN);
         mockOrder.setStatus(OrderStatus.SERVED);
-        if (orderType.equals(OrderType.DELIVERY)) {
-            mockOrder.setStatus(OrderStatus.DELIVERED);
-        }
+
+        // mocking
+        given(orderRepository.findById(any())).willReturn(Optional.of(mockOrder));
+
+        // when
+        Order accept = orderService.complete(mockOrder.getId());
+
+        // then
+        assertThat(accept).isNotNull();
+        assertThat(accept.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("Order Complete Takeout - 성공")
+    void completeOrder_Takeout() {
+        // given
+        generateOrderRequest(OrderType.TAKEOUT);
+        mockOrder.setStatus(OrderStatus.SERVED);
+
+        // mocking
+        given(orderRepository.findById(any())).willReturn(Optional.of(mockOrder));
+
+        // when
+        Order accept = orderService.complete(mockOrder.getId());
+
+        // then
+        assertThat(accept).isNotNull();
+        assertThat(accept.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("Order Complete Delivery - 성공")
+    void completeOrder_Delivery() {
+        // given
+        generateOrderRequest(OrderType.DELIVERY);
+        mockOrder.setStatus(OrderStatus.SERVED);
+        mockOrder.setStatus(OrderStatus.DELIVERED);
 
         // mocking
         given(orderRepository.findById(any())).willReturn(Optional.of(mockOrder));
