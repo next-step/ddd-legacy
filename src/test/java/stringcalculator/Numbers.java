@@ -25,7 +25,7 @@ public class Numbers {
     public int sum() {
         int result = 0;
         for (int number: this.numbers) {
-            result += sum();
+            result += number;
         }
         return result;
     }
