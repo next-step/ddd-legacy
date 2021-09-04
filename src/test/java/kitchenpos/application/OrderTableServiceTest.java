@@ -1,8 +1,8 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.fixture.OrderFixture;
-import kitchenpos.fixture.OrderTableFixture;
+import kitchenpos.utils.fixture.OrderFixture;
+import kitchenpos.utils.fixture.OrderTableFixture;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

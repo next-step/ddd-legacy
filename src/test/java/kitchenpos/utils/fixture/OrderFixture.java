@@ -1,4 +1,4 @@
-package kitchenpos.fixture;
+package kitchenpos.utils.fixture;
 
 import kitchenpos.application.InMemoryOrderRepository;
 import kitchenpos.domain.*;
@@ -6,7 +6,6 @@ import kitchenpos.domain.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.UUID;
 
 import static java.util.UUID.randomUUID;
 

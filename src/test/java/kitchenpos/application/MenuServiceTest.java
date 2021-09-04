@@ -1,12 +1,11 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.fixture.MenuFixture;
-import kitchenpos.fixture.MenuGroupFixture;
-import kitchenpos.fixture.ProductFixture;
+import kitchenpos.utils.fixture.MenuFixture;
+import kitchenpos.utils.fixture.MenuGroupFixture;
+import kitchenpos.utils.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

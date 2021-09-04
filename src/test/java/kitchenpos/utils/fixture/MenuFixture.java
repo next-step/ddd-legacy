@@ -1,4 +1,4 @@
-package kitchenpos.fixture;
+package kitchenpos.utils.fixture;
 
 import kitchenpos.application.InMemoryMenuRepository;
 import kitchenpos.domain.*;
