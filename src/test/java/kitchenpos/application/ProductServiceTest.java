@@ -17,18 +17,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class ProductServiceTest {
-    private ProductService productService;
     private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
-
-    @BeforeEach
-    void setUp() {
-        productService = new ProductService(ProductFixture.productRepository, MenuFixture.menuRepository, purgomalumClient);
-    }
+    private ProductService productService = new ProductService(ProductFixture.productRepository, MenuFixture.menuRepository, purgomalumClient);
 
     @AfterEach
     void cleanUp() {
@@ -124,14 +118,5 @@ public class ProductServiceTest {
 
     private List<Product> 상품전체조회() {
         return productService.findAll();
-    }
-
-
-    public static Product 상품만들기(ProductRepository productRepository) {
-        final Product product = new Product();
-        product.setId(randomUUID());
-        product.setName("상품 이름");
-        product.setPrice(BigDecimal.valueOf(10_000L));
-        return productRepository.save(product);
     }
 }

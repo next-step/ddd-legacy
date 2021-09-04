@@ -13,21 +13,14 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
-import java.util.*;
 
 import static java.util.Collections.emptyList;
-import static kitchenpos.application.MenuServiceTest.메뉴만들기;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class OrderServiceTest {
-    private OrderService orderService;
     private FakeKitchenridersClient kitchenridersClient = new FakeKitchenridersClient();
-
-    @BeforeEach
-    void setUp() {
-        orderService = new OrderService(OrderFixture.orderRepository, MenuFixture.menuRepository, OrderTableFixture.orderTableRepository, kitchenridersClient);
-    }
+    private OrderService orderService = new OrderService(OrderFixture.orderRepository, MenuFixture.menuRepository, OrderTableFixture.orderTableRepository, kitchenridersClient);
 
     @AfterEach
     void cleanUp() {
@@ -260,7 +253,6 @@ public class OrderServiceTest {
         assertThat(eatIn.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
-
     private Order 주문등록(Order request) {
         return orderService.create(request);
     }
@@ -283,21 +275,6 @@ public class OrderServiceTest {
 
     private Order 주문해결(Order order) {
         return orderService.complete(order.getId());
-    }
-
-    public static OrderLineItem 주문항목만들기(MenuRepository menuRepository, MenuGroupRepository menuGroupRepository, ProductRepository productRepository) {
-        Menu menu = 메뉴만들기(menuRepository, menuGroupRepository, productRepository);
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenu(menu);
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setQuantity(2);
-        orderLineItem.setPrice(menu.getPrice());
-        return orderLineItem;
-    }
-
-    public static Order 주문만들기(OrderRepository orderRepository, Order order) {
-        order.setId(UUID.randomUUID());
-        return orderRepository.save(order);
     }
 
 }

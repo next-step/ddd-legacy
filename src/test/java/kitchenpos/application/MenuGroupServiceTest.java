@@ -15,12 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MenuGroupServiceTest {
-    private MenuGroupService menuGroupService;
-
-    @BeforeEach
-    void setUp() {
-        menuGroupService = new MenuGroupService(MenuGroupFixture.menuGroupRepository);
-    }
+    private MenuGroupService menuGroupService = new MenuGroupService(MenuGroupFixture.menuGroupRepository);
 
     @AfterEach
     void cleanUp() {

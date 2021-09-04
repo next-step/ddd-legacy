@@ -4,7 +4,6 @@ import kitchenpos.domain.*;
 import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,12 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class OrderTableServiceTest {
-    private OrderTableService orderTableService;
-
-    @BeforeEach
-    void setUp() {
-        orderTableService = new OrderTableService(OrderTableFixture.orderTableRepository, OrderFixture.orderRepository);
-    }
+    private OrderTableService orderTableService = new OrderTableService(OrderTableFixture.orderTableRepository, OrderFixture.orderRepository);
 
     @AfterEach
     void cleanUp() {
@@ -156,12 +150,5 @@ public class OrderTableServiceTest {
 
     private List<OrderTable> 주문테이블전체조회() {
         return orderTableService.findAll();
-    }
-
-    public static OrderTable 주문테이블만들기(OrderTableRepository orderTableRepository) {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName("주문테이블");
-        return orderTableRepository.save(orderTable);
     }
 }

@@ -15,23 +15,15 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.application.ProductServiceTest.상품만들기;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MenuServiceTest {
-    private MenuService menuService;
     private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
-
-    @BeforeEach
-    void setUp() {
-        menuService = new MenuService(MenuFixture.menuRepository, MenuGroupFixture.menuGroupRepository, ProductFixture.productRepository, purgomalumClient);
-    }
+    private MenuService menuService = new MenuService(MenuFixture.menuRepository, MenuGroupFixture.menuGroupRepository, ProductFixture.productRepository, purgomalumClient);
 
     @AfterEach
     void cleanUp() {
@@ -182,7 +174,6 @@ public class MenuServiceTest {
         assertThat(메뉴전체조회()).containsOnly(saved1, saved2);
     }
 
-
     private Menu 메뉴등록(Menu menu) {
         return menuService.create(menu);
     }
@@ -198,41 +189,4 @@ public class MenuServiceTest {
     private List<Menu> 메뉴전체조회() {
         return menuService.findAll();
     }
-
-    public static Menu 메뉴만들기(MenuRepository menuRepository, MenuGroupRepository menuGroupRepository, ProductRepository productRepository) {
-        MenuGroup menuGroup = 메뉴그룹만들기(menuGroupRepository);
-        List<MenuProduct> menuProducts = 메뉴상품들만들기(productRepository);
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName("메뉴");
-        menu.setPrice(BigDecimal.valueOf(10_000L));
-        menu.setMenuGroup(menuGroup);
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuProducts(menuProducts);
-        menu.setDisplayed(true);
-        return menuRepository.save(menu);
-    }
-
-    public static List<MenuProduct> 메뉴상품들만들기(ProductRepository productRepository) {
-        final Product product = 상품만들기(productRepository);
-
-        final MenuProduct menuProduct1 = new MenuProduct();
-        menuProduct1.setProduct(product);
-        menuProduct1.setProductId(product.getId());
-        menuProduct1.setQuantity(1L);
-
-        final MenuProduct menuProduct2 = new MenuProduct();
-        menuProduct2.setProduct(product);
-        menuProduct2.setProductId(product.getId());
-        menuProduct2.setQuantity(2L);
-        return new ArrayList<>(Arrays.asList(menuProduct1, menuProduct2));
-    }
-
-    public static MenuGroup 메뉴그룹만들기(MenuGroupRepository menuGroupRepository) {
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("메뉴 그룹");
-        return menuGroupRepository.save(menuGroup);
-    }
-
 }
