@@ -1,7 +1,10 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.OrderFixture;
+import kitchenpos.fixture.OrderTableFixture;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,47 +17,29 @@ import java.util.*;
 
 import static java.util.Collections.emptyList;
 import static kitchenpos.application.MenuServiceTest.메뉴만들기;
-import static kitchenpos.application.OrderTableServiceTest.주문테이블만들기;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class OrderServiceTest {
     private OrderService orderService;
-    private OrderRepository orderRepository = new InMemoryOrderRepository();
-    private MenuRepository menuRepository = new InMemoryMenuRepository();
-    private OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
     private FakeKitchenridersClient kitchenridersClient = new FakeKitchenridersClient();
-    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
-    private ProductRepository productRepository = new InMemoryProductRepository();
-    private Order deliveryOrder;
-    private Order takeOutOrder;
-    private Order eatInOrder;
-    private List<OrderLineItem> orderLineItems;
-    private OrderTable orderTable;
 
     @BeforeEach
     void setUp() {
-        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
-        orderLineItems = new ArrayList<>(Arrays.asList(주문항목만들기(menuRepository, menuGroupRepository, productRepository), 주문항목만들기(menuRepository, menuGroupRepository, productRepository)));
-        orderTable = 주문테이블만들기(orderTableRepository);
-        deliveryOrder = new Order();
-        deliveryOrder.setType(OrderType.DELIVERY);
-        deliveryOrder.setOrderLineItems(orderLineItems);
-        deliveryOrder.setDeliveryAddress("배달주소");
-        takeOutOrder = new Order();
-        takeOutOrder.setType(OrderType.TAKEOUT);
-        takeOutOrder.setOrderLineItems(orderLineItems);
-        eatInOrder = new Order();
-        eatInOrder.setType(OrderType.EAT_IN);
-        eatInOrder.setOrderLineItems(orderLineItems);
-        eatInOrder.setOrderTable(orderTable);
-        eatInOrder.setOrderTableId(orderTable.getId());
+        orderService = new OrderService(OrderFixture.orderRepository, MenuFixture.menuRepository, OrderTableFixture.orderTableRepository, kitchenridersClient);
+    }
+
+    @AfterEach
+    void cleanUp() {
+        OrderFixture.비우기();
+        MenuFixture.비우기();
+        OrderTableFixture.비우기();
     }
 
     @DisplayName("배달주문을 생성할 수 있다.")
     @Test
     void delivery_create() {
-        final Order saved = 주문등록(deliveryOrder);
+        final Order saved = 주문등록(OrderFixture.배달주문());
 
         assertAll(
                 () -> assertThat(saved.getId()).isNotNull(),
@@ -68,6 +53,7 @@ public class OrderServiceTest {
     @DisplayName("배달주문은 배달주소를 포함해야한다.")
     @Test
     void delivery_create_address() {
+        final Order deliveryOrder = OrderFixture.배달주문();
         deliveryOrder.setDeliveryAddress(null);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -77,7 +63,7 @@ public class OrderServiceTest {
     @DisplayName("포장주문을 생성할 수 있다.")
     @Test
     void takeOut_create() {
-        final Order saved = 주문등록(takeOutOrder);
+        final Order saved = 주문등록(OrderFixture.포장주문());
 
         assertAll(
                 () -> assertThat(saved.getId()).isNotNull(),
@@ -90,7 +76,7 @@ public class OrderServiceTest {
     @DisplayName("매장 식사주문을 생성할 수 있다.")
     @Test
     void eatIn_create() {
-        final Order saved = 주문등록(eatInOrder);
+        final Order saved = 주문등록(OrderFixture.매장주문());
 
         assertAll(
                 () -> assertThat(saved.getId()).isNotNull(),
@@ -103,11 +89,8 @@ public class OrderServiceTest {
     @DisplayName("테이블이 비어있는 경우 매장식사 주문을 받을수 없다.")
     @Test
     void eatIn_create_table() {
-        OrderTable newTable = new OrderTable();
-        newTable.setId(UUID.randomUUID());
-        newTable.setEmpty(true);
-        orderTableRepository.save(newTable);
-        eatInOrder.setOrderTableId(newTable.getId());
+        final Order eatInOrder = OrderFixture.매장주문();
+        eatInOrder.setOrderTableId(OrderTableFixture.주문테이블저장().getId());
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> 주문등록(eatInOrder));
@@ -117,15 +100,17 @@ public class OrderServiceTest {
     @NullSource
     @ParameterizedTest
     void create_type(OrderType type){
-        deliveryOrder.setType(type);
+        final Order order = OrderFixture.주문();
+        order.setType(type);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> 주문등록(deliveryOrder));
+                .isThrownBy(() -> 주문등록(order));
     }
 
     @DisplayName("주문상품이 비어있는 경우 IllegalArgumentException을 반환한다.")
     @Test
     void create_orderLineItem() {
+        final Order deliveryOrder = OrderFixture.배달주문();
         deliveryOrder.setOrderLineItems(emptyList());
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -136,16 +121,20 @@ public class OrderServiceTest {
     @ValueSource(strings = "-1")
     @ParameterizedTest
     void eatIn_create(int quantity) {
-        orderLineItems.get(0).setQuantity(quantity);
+        final Order eatInOrder = OrderFixture.매장주문();
+        eatInOrder.getOrderLineItems().get(0).setQuantity(quantity);
 
-        assertThat(주문등록(eatInOrder).getId()).isNotNull();
+        final Order expected = 주문등록(eatInOrder);
+
+        assertThat(expected.getId()).isNotNull();
     }
 
     @DisplayName("배달주문은 수량이 0보다 작을 수 없다.")
     @ValueSource(strings = "-1")
     @ParameterizedTest
     void delivery_create(int quantity) {
-        orderLineItems.get(0).setQuantity(quantity);
+        final Order deliveryOrder = OrderFixture.배달주문();
+        deliveryOrder.getOrderLineItems().get(0).setQuantity(quantity);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> 주문등록(deliveryOrder));
@@ -155,7 +144,8 @@ public class OrderServiceTest {
     @ValueSource(strings = "-1")
     @ParameterizedTest
     void takeOut_create(int quantity) {
-        orderLineItems.get(0).setQuantity(quantity);
+        final Order takeOutOrder = OrderFixture.포장주문();
+        takeOutOrder.getOrderLineItems().get(0).setQuantity(quantity);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> 주문등록(takeOutOrder));
@@ -165,24 +155,19 @@ public class OrderServiceTest {
     @ValueSource(strings = {"3000000000"})
     @ParameterizedTest
     void create_menu(BigDecimal price) {
-        orderLineItems.get(0).setPrice(price);
+        final Order deliveryOrder = OrderFixture.배달주문();
+        deliveryOrder.getOrderLineItems().get(0).setPrice(price);
 
-        assertAll(
-                () -> assertThatExceptionOfType(IllegalArgumentException.class)
-                        .isThrownBy(() -> 주문등록(deliveryOrder)),
-                () -> assertThatExceptionOfType(IllegalArgumentException.class)
-                        .isThrownBy(() -> 주문등록(takeOutOrder)),
-                () -> assertThatExceptionOfType(IllegalArgumentException.class)
-                        .isThrownBy(() -> 주문등록(eatInOrder))
-        );
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> 주문등록(deliveryOrder));
     }
 
     @DisplayName("대기 상태의 주문을 수락할 수 있다.")
     @Test
     void accept() {
-        final Order delivery = 주문수락(주문등록(deliveryOrder));
-        final Order takeOut = 주문수락(주문등록(takeOutOrder));
-        final Order eatIn = 주문수락(주문등록(eatInOrder));
+        final Order delivery = 주문수락(OrderFixture.주문저장(OrderFixture.배달주문()));
+        final Order takeOut = 주문수락(OrderFixture.주문저장(OrderFixture.포장주문()));
+        final Order eatIn = 주문수락(OrderFixture.주문저장(OrderFixture.매장주문()));
 
         assertAll(
                 () -> assertThat(delivery.getStatus()).isEqualTo(OrderStatus.ACCEPTED),
@@ -196,13 +181,16 @@ public class OrderServiceTest {
     @DisplayName("수락 상태의 주문을 메뉴 제공상태로 변경할 수 있다.")
     @Test
     void serve() {
+        final Order deliveryOrder = OrderFixture.배달주문();
+        final Order takeOutOrder = OrderFixture.포장주문();
+        final Order eatInOrder = OrderFixture.매장주문();
         deliveryOrder.setStatus(OrderStatus.ACCEPTED);
         takeOutOrder.setStatus(OrderStatus.ACCEPTED);
         eatInOrder.setStatus(OrderStatus.ACCEPTED);
 
-        final Order delivery = 주문메뉴제공(주문만들기(orderRepository, deliveryOrder));
-        final Order takeOut = 주문메뉴제공(주문만들기(orderRepository, takeOutOrder));
-        final Order eatIn = 주문메뉴제공(주문만들기(orderRepository, eatInOrder));
+        final Order delivery = 주문메뉴제공(OrderFixture.주문저장(deliveryOrder));
+        final Order takeOut = 주문메뉴제공(OrderFixture.주문저장(takeOutOrder));
+        final Order eatIn = 주문메뉴제공(OrderFixture.주문저장(eatInOrder));
 
         assertThat(delivery.getStatus()).isEqualTo(OrderStatus.SERVED);
         assertThat(takeOut.getStatus()).isEqualTo(OrderStatus.SERVED);
@@ -212,51 +200,60 @@ public class OrderServiceTest {
     @DisplayName("메뉴가 제공된 배달 주문만 배달을 시작할 수 있다.")
     @Test
     void startDelivery() {
+        final Order deliveryOrder = OrderFixture.배달주문();
+        final Order takeOutOrder = OrderFixture.포장주문();
+        final Order eatInOrder = OrderFixture.매장주문();
         deliveryOrder.setStatus(OrderStatus.SERVED);
         takeOutOrder.setStatus(OrderStatus.SERVED);
         eatInOrder.setStatus(OrderStatus.SERVED);
 
-        final Order delivery = 배달시작(주문만들기(orderRepository, deliveryOrder));
+        final Order delivery = 배달시작(OrderFixture.주문저장(deliveryOrder));
 
         assertThat(delivery.getStatus()).isEqualTo(OrderStatus.DELIVERING);
 
 
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> 배달시작(주문만들기(orderRepository, takeOutOrder)));
+                .isThrownBy(() -> 배달시작(OrderFixture.주문저장(takeOutOrder)));
 
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> 배달시작(주문만들기(orderRepository, eatInOrder)));
+                .isThrownBy(() -> 배달시작(OrderFixture.주문저장(eatInOrder)));
     }
 
     @DisplayName("배달 중인 배달 주문만 배달 완료할 수 있다.")
     @Test
     void completeDelivery() {
+        final Order deliveryOrder = OrderFixture.배달주문();
+        final Order takeOutOrder = OrderFixture.포장주문();
+        final Order eatInOrder = OrderFixture.매장주문();
         deliveryOrder.setStatus(OrderStatus.DELIVERING);
         takeOutOrder.setStatus(OrderStatus.SERVED);
         eatInOrder.setStatus(OrderStatus.SERVED);
 
-        final Order delivery = 배달완료(주문만들기(orderRepository, deliveryOrder));
+        final Order delivery = 배달완료(OrderFixture.주문저장(deliveryOrder));
 
         assertThat(delivery.getStatus()).isEqualTo(OrderStatus.DELIVERED);
 
 
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> 배달완료(주문만들기(orderRepository, takeOutOrder)));
+                .isThrownBy(() -> 배달완료(OrderFixture.주문저장(takeOutOrder)));
 
         assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> 배달완료(주문만들기(orderRepository, eatInOrder)));
+                .isThrownBy(() -> 배달완료(OrderFixture.주문저장(eatInOrder)));
     }
 
     @DisplayName("주문을 해결할 수 있다.")
     @Test
     void complete() {
+        final Order deliveryOrder = OrderFixture.배달주문();
+        final Order takeOutOrder = OrderFixture.포장주문();
+        final Order eatInOrder = OrderFixture.매장주문();
         deliveryOrder.setStatus(OrderStatus.DELIVERED);
         takeOutOrder.setStatus(OrderStatus.SERVED);
         eatInOrder.setStatus(OrderStatus.SERVED);
 
-        final Order delivery = 주문해결(주문만들기(orderRepository, deliveryOrder));
-        final Order takeOut = 주문해결(주문만들기(orderRepository, takeOutOrder));
-        final Order eatIn = 주문해결(주문만들기(orderRepository, eatInOrder));
+        final Order delivery = 주문해결(OrderFixture.주문저장(deliveryOrder));
+        final Order takeOut = 주문해결(OrderFixture.주문저장(takeOutOrder));
+        final Order eatIn = 주문해결(OrderFixture.주문저장(eatInOrder));
 
         assertThat(delivery.getStatus()).isEqualTo(OrderStatus.COMPLETED);
         assertThat(takeOut.getStatus()).isEqualTo(OrderStatus.COMPLETED);
