@@ -1,7 +1,8 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.fixture.MenuGroupFixture;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,21 +15,22 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MenuGroupServiceTest {
-
     private MenuGroupService menuGroupService;
-    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
-    private MenuGroup menuGroup;
 
     @BeforeEach
     void setUp() {
-        menuGroupService = new MenuGroupService(menuGroupRepository);
-        menuGroup = new MenuGroup();
-        menuGroup.setName("메뉴그룹 이름");
+        menuGroupService = new MenuGroupService(MenuGroupFixture.menuGroupRepository);
+    }
+
+    @AfterEach
+    void cleanUp() {
+        MenuGroupFixture.비우기();
     }
 
     @DisplayName("메뉴 그룹을 생성할 수 있다.")
     @Test
     void create() {
+        final MenuGroup menuGroup = MenuGroupFixture.메뉴그룹();
         final MenuGroup saved = 메뉴그룹등록(menuGroup);
 
         assertAll(
@@ -41,6 +43,7 @@ public class MenuGroupServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void create(String name) {
+        final MenuGroup menuGroup = MenuGroupFixture.메뉴그룹();
         menuGroup.setName(name);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -50,14 +53,11 @@ public class MenuGroupServiceTest {
     @DisplayName("메뉴 그룹을 조회할 수 있다.")
     @Test
     void findAll() {
-        final MenuGroup other = new MenuGroup();
-        other.setName("다른 메뉴그룹");
-        final MenuGroup saved1 = 메뉴그룹등록(menuGroup);
-        final MenuGroup saved2 = 메뉴그룹등록(other);
+        final MenuGroup saved1 = MenuGroupFixture.메뉴그룹저장();
+        final MenuGroup saved2 = MenuGroupFixture.메뉴그룹저장();
 
         assertThat(메뉴그룹조회()).containsOnly(saved1, saved2);
     }
-
 
     private MenuGroup 메뉴그룹등록(final MenuGroup menuGroup) {
         return menuGroupService.create(menuGroup);

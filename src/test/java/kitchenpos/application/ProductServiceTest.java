@@ -1,8 +1,10 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,24 +14,26 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import static java.util.UUID.randomUUID;
-import static kitchenpos.application.MenuServiceTest.메뉴만들기;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class ProductServiceTest {
     private ProductService productService;
-    private ProductRepository productRepository = new InMemoryProductRepository();
-    private MenuRepository menuRepository = new InMemoryMenuRepository();
     private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
 
     @BeforeEach
     void setUp() {
-        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+        productService = new ProductService(ProductFixture.productRepository, MenuFixture.menuRepository, purgomalumClient);
+    }
+
+    @AfterEach
+    void cleanUp() {
+        ProductFixture.비우기();
+        MenuFixture.비우기();
     }
 
     @DisplayName("상품을 등록할 수 있다.")
@@ -73,7 +77,7 @@ public class ProductServiceTest {
     @DisplayName("상품의 가격을 변경할 수 있다.")
     @Test
     void changePrice() {
-        final Product saved = ProductFixture.상품저장(productRepository);
+        final Product saved = ProductFixture.상품저장();
         final Product request = new Product();
         request.setPrice(BigDecimal.valueOf(3_000L));
 
@@ -91,7 +95,7 @@ public class ProductServiceTest {
     @NullSource
     @ParameterizedTest
     void changePrice(BigDecimal price) {
-        final Product saved = ProductFixture.상품저장(productRepository);
+        final Product saved = ProductFixture.상품저장();
         final Product request = new Product();
         request.setPrice(price);
 
@@ -99,25 +103,11 @@ public class ProductServiceTest {
                 .isThrownBy(() -> 상품가격수정(saved.getId(), request));
     }
 
-    @DisplayName("상품의 가격을 변경할 때 상품에 속한 메뉴의 가격이 메뉴 상품 가격의 총합과 다를 경우 메뉴를 노출하지 않는다.")
-    @Test
-    void changePrice_Menu() {
-        final Product saved = ProductFixture.상품저장(productRepository);
-        final Menu menu = 가격변경_메뉴만들기(saved, menuRepository, BigDecimal.valueOf(7000L));
-        assertThat(menuRepository.findById(menu.getId()).get().isDisplayed()).isTrue();
-        final Product price = new Product();
-        price.setPrice(BigDecimal.valueOf(1000L));
-
-        상품가격수정(saved.getId(), price);
-
-        assertThat(menuRepository.findById(menu.getId()).get().isDisplayed()).isFalse();
-    }
-
     @DisplayName("상품을 전체 조회한다.")
     @Test
     void findAll() {
-        final Product saved1 = ProductFixture.상품저장(productRepository);
-        final Product saved2 = ProductFixture.상품저장(productRepository);
+        final Product saved1 = ProductFixture.상품저장();
+        final Product saved2 = ProductFixture.상품저장();
 
         List<Product> expected = 상품전체조회();
 
@@ -143,18 +133,5 @@ public class ProductServiceTest {
         product.setName("상품 이름");
         product.setPrice(BigDecimal.valueOf(10_000L));
         return productRepository.save(product);
-    }
-
-    private static Menu 가격변경_메뉴만들기(Product product, MenuRepository menuRepository, BigDecimal price) {
-        final Menu menu = new Menu();
-        menu.setId(randomUUID());
-        menu.setPrice(BigDecimal.valueOf(7000L));
-        menu.setDisplayed(true);
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setProductId(product.getId());
-        menuProduct.setQuantity(1L);
-        menu.setMenuProducts(Arrays.asList(menuProduct));
-        return menuRepository.save(menu);
     }
 }

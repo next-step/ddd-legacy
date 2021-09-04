@@ -1,7 +1,11 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.MenuGroupFixture;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,40 +20,30 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static java.util.Collections.emptyList;
 import static kitchenpos.application.ProductServiceTest.상품만들기;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MenuServiceTest {
     private MenuService menuService;
-    private MenuRepository menuRepository = new InMemoryMenuRepository();
-    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
-    private ProductRepository productRepository = new InMemoryProductRepository();
     private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
-    private Menu menu;
-    private MenuGroup menuGroup;
-    private List<MenuProduct> menuProducts;
-
 
     @BeforeEach
     void setUp() {
-        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+        menuService = new MenuService(MenuFixture.menuRepository, MenuGroupFixture.menuGroupRepository, ProductFixture.productRepository, purgomalumClient);
+    }
 
-        menuGroup = 메뉴그룹만들기(menuGroupRepository);
-        menuProducts = 메뉴상품들만들기(productRepository);
-        menu = new Menu();
-        menu.setName("메뉴");
-        menu.setPrice(BigDecimal.valueOf(10_000L));
-        menu.setMenuGroup(menuGroup);
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuProducts(menuProducts);
-        menu.setDisplayed(true);
+    @AfterEach
+    void cleanUp() {
+        MenuFixture.비우기();
+        MenuGroupFixture.비우기();
+        ProductFixture.비우기();
     }
 
     @DisplayName("메뉴를 등록할 수 있다.")
     @Test
     void create() {
+        final Menu menu = MenuFixture.메뉴();
         final Menu saved = 메뉴등록(menu);
 
         assertAll(
@@ -57,7 +51,7 @@ public class MenuServiceTest {
                 () -> assertThat(saved.getName()).isEqualTo(menu.getName()),
                 () -> assertThat(saved.getPrice()).isEqualTo(menu.getPrice()),
                 () -> assertThat(saved.getMenuProducts()).hasSize(2),
-                () -> assertThat(saved.getMenuGroup()).isEqualTo(menuGroup),
+                () -> assertThat(saved.getMenuGroup()).isEqualTo(menu.getMenuGroup()),
                 () -> assertThat(saved.isDisplayed()).isTrue()
         );
     }
@@ -67,6 +61,7 @@ public class MenuServiceTest {
     @NullSource
     @ParameterizedTest
     void create(BigDecimal price) {
+        final Menu menu = MenuFixture.메뉴();
         menu.setPrice(price);
 
         assertThatThrownBy(() -> 메뉴등록(menu))
@@ -78,6 +73,7 @@ public class MenuServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void create(String name) {
+        final Menu menu = MenuFixture.메뉴();
         menu.setName(name);
 
         assertThatThrownBy(() -> 메뉴등록(menu))
@@ -88,6 +84,7 @@ public class MenuServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void create_MenuProduct(List menuProducts) {
+        final Menu menu = MenuFixture.메뉴();
         menu.setMenuProducts(menuProducts);
 
         assertThatThrownBy(() -> 메뉴등록(menu))
@@ -97,8 +94,8 @@ public class MenuServiceTest {
     @DisplayName("메뉴의 메뉴상품은 등록된 상품이어야한다.")
     @Test
     void create_MenuProduct_without_Product() {
-        menuProducts.add(등록되지않은_메뉴상품만들기());
-        menu.setMenuProducts(menuProducts);
+        final Menu menu = MenuFixture.메뉴();
+        menu.getMenuProducts().add(MenuFixture.등록되지않은_메뉴상품());
 
         assertThatThrownBy(() -> 메뉴등록(menu))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -107,8 +104,8 @@ public class MenuServiceTest {
     @DisplayName("메뉴의 메뉴상품 수량은 0보다 커야한다.")
     @Test
     void create_MenuProduct_quantity() {
-        menuProducts.add(수량이음수인_메뉴상품만들기(productRepository));
-        menu.setMenuProducts(menuProducts);
+        final Menu menu = MenuFixture.메뉴();
+        menu.getMenuProducts().add(MenuFixture.수량이음수인_메뉴상품());
 
         assertThatThrownBy(() -> 메뉴등록(menu))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -117,9 +114,10 @@ public class MenuServiceTest {
     @DisplayName("메뉴의 가격을 변경할 수 있다.")
     @Test
     void changePrice() {
-        final Menu saved = 메뉴등록(menu);
+        final Menu saved = MenuFixture.메뉴저장();
         final Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(8_000L));
+
         final Menu expected = 메뉴가격변경(saved.getId(), request);
 
         assertAll(
@@ -134,7 +132,7 @@ public class MenuServiceTest {
     @NullSource
     @ParameterizedTest
     void changePrice(BigDecimal price) {
-        final Menu saved = 메뉴등록(menu);
+        final Menu saved = MenuFixture.메뉴저장();
         final Menu request = new Menu();
         request.setPrice(price);
 
@@ -145,8 +143,9 @@ public class MenuServiceTest {
     @DisplayName("메뉴를 노출할 수 있다.")
     @Test
     void display() {
+        final Menu menu = MenuFixture.메뉴();
         menu.setDisplayed(false);
-        final Menu saved = 메뉴등록(menu);
+        final Menu saved = MenuFixture.메뉴저장(menu);
         assertThat(saved.isDisplayed()).isFalse();
 
         final Menu expected = 메뉴노출(saved.getId());
@@ -156,10 +155,10 @@ public class MenuServiceTest {
     @DisplayName("메뉴를 노출할땐 가격이 메뉴상품의 가격합보다 커서는 안된다.")
     @Test
     void display_price() {
-        menu.setId(UUID.randomUUID());
+        final Menu menu = MenuFixture.메뉴();
         menu.setDisplayed(false);
         menu.setPrice(BigDecimal.valueOf(12_000L));
-        final Menu saved = menuRepository.save(menu);
+        final Menu saved = MenuFixture.메뉴저장(menu);
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> 메뉴노출(saved.getId()));
@@ -168,7 +167,7 @@ public class MenuServiceTest {
     @DisplayName("메뉴를 숨길 수 있다.")
     @Test
     void hide() {
-        final Menu saved = 메뉴등록(menu);
+        final Menu saved = MenuFixture.메뉴저장();
 
         final Menu expected = menuService.hide(saved.getId());
         assertThat(expected.isDisplayed()).isFalse();
@@ -177,8 +176,8 @@ public class MenuServiceTest {
     @DisplayName("메뉴를 전체조회할 수 있다.")
     @Test
     void findAll(){
-        final Menu saved1 = 메뉴만들기(menuRepository, menuGroupRepository, productRepository);
-        final Menu saved2 = 메뉴만들기(menuRepository, menuGroupRepository, productRepository);
+        final Menu saved1 = MenuFixture.메뉴저장();
+        final Menu saved2 = MenuFixture.메뉴저장();
 
         assertThat(메뉴전체조회()).containsOnly(saved1, saved2);
     }
@@ -236,22 +235,4 @@ public class MenuServiceTest {
         return menuGroupRepository.save(menuGroup);
     }
 
-    public static MenuProduct 등록되지않은_메뉴상품만들기() {
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(1L);
-        menuProduct.setProductId(product.getId());
-        return menuProduct;
-    }
-
-    public static MenuProduct 수량이음수인_메뉴상품만들기(ProductRepository productRepository) {
-        final Product product = 상품만들기(productRepository);
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setProductId(product.getId());
-        menuProduct.setQuantity(-1);
-        return menuProduct;
-    }
 }
