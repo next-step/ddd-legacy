@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,19 +26,16 @@ public class ProductServiceTest {
     private ProductRepository productRepository = new InMemoryProductRepository();
     private MenuRepository menuRepository = new InMemoryMenuRepository();
     private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
-    private Product product;
 
     @BeforeEach
     void setUp() {
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
-        product = new Product();
-        product.setName("상품 이름");
-        product.setPrice(BigDecimal.valueOf(1000));
     }
 
     @DisplayName("상품을 등록할 수 있다.")
     @Test
     void create() {
+        final Product product = ProductFixture.상품();
         final Product expected = 상품등록(product);
 
         assertThat(expected).isNotNull();
@@ -53,6 +51,7 @@ public class ProductServiceTest {
     @NullSource
     @ParameterizedTest
     void create(BigDecimal price) {
+        final Product product = ProductFixture.상품();
         product.setPrice(price);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -64,6 +63,7 @@ public class ProductServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void create(String name) {
+        final Product product = ProductFixture.상품();
         product.setName(name);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -73,7 +73,7 @@ public class ProductServiceTest {
     @DisplayName("상품의 가격을 변경할 수 있다.")
     @Test
     void changePrice() {
-        final Product saved = 상품등록(product);
+        final Product saved = ProductFixture.상품저장(productRepository);
         final Product request = new Product();
         request.setPrice(BigDecimal.valueOf(3_000L));
 
@@ -91,18 +91,18 @@ public class ProductServiceTest {
     @NullSource
     @ParameterizedTest
     void changePrice(BigDecimal price) {
-        final Product saved = 상품등록(product);
+        final Product saved = ProductFixture.상품저장(productRepository);
         final Product request = new Product();
         request.setPrice(price);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() ->상품가격수정(saved.getId(), request));
+                .isThrownBy(() -> 상품가격수정(saved.getId(), request));
     }
 
     @DisplayName("상품의 가격을 변경할 때 상품에 속한 메뉴의 가격이 메뉴 상품 가격의 총합과 다를 경우 메뉴를 노출하지 않는다.")
     @Test
     void changePrice_Menu() {
-        final Product saved = 상품등록(product);
+        final Product saved = ProductFixture.상품저장(productRepository);
         final Menu menu = 가격변경_메뉴만들기(saved, menuRepository, BigDecimal.valueOf(7000L));
         assertThat(menuRepository.findById(menu.getId()).get().isDisplayed()).isTrue();
         final Product price = new Product();
@@ -116,11 +116,8 @@ public class ProductServiceTest {
     @DisplayName("상품을 전체 조회한다.")
     @Test
     void findAll() {
-        final Product other = new Product();
-        other.setName("다른 상품");
-        other.setPrice(BigDecimal.valueOf(3000));
-        final Product saved1 = 상품등록(product);
-        final Product saved2 = 상품등록(other);
+        final Product saved1 = ProductFixture.상품저장(productRepository);
+        final Product saved2 = ProductFixture.상품저장(productRepository);
 
         List<Product> expected = 상품전체조회();
 
