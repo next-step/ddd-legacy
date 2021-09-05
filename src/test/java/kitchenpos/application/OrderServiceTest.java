@@ -1,6 +1,10 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.mock.FakeKitchenridersClient;
+import kitchenpos.mock.InMemoryMenuRepository;
+import kitchenpos.mock.InMemoryOrderRepository;
+import kitchenpos.mock.InMemoryOrderTableRepository;
 import kitchenpos.utils.fixture.MenuFixture;
 import kitchenpos.utils.fixture.OrderFixture;
 import kitchenpos.utils.fixture.OrderTableFixture;

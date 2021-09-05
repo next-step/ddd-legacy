@@ -1,4 +1,4 @@
-package kitchenpos.application;
+package kitchenpos.mock;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;

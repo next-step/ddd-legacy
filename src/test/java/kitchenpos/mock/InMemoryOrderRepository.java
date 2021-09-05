@@ -1,4 +1,4 @@
-package kitchenpos.application;
+package kitchenpos.mock;
 
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderRepository;

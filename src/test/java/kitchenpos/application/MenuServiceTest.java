@@ -2,6 +2,10 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.mock.FakePurgomalumClient;
+import kitchenpos.mock.InMemoryMenuGroupRepository;
+import kitchenpos.mock.InMemoryMenuRepository;
+import kitchenpos.mock.InMemoryProductRepository;
 import kitchenpos.utils.fixture.MenuFixture;
 import kitchenpos.utils.fixture.MenuGroupFixture;
 import kitchenpos.utils.fixture.ProductFixture;
