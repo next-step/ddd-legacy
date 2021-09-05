@@ -1,8 +1,9 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.utils.fixture.MenuGroupFixture;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,15 +11,18 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MenuGroupServiceTest {
-    private MenuGroupService menuGroupService = new MenuGroupService(MenuGroupFixture.menuGroupRepository);
+    private MenuGroupService menuGroupService;
+    private MenuGroupRepository menuGroupRepository;
 
-    @AfterEach
-    void cleanUp() {
-        MenuGroupFixture.비우기();
+    @BeforeEach
+    void setUp() {
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
     @DisplayName("메뉴 그룹을 생성할 수 있다.")
@@ -47,8 +51,8 @@ public class MenuGroupServiceTest {
     @DisplayName("메뉴 그룹을 조회할 수 있다.")
     @Test
     void findAll() {
-        final MenuGroup saved1 = MenuGroupFixture.메뉴그룹저장();
-        final MenuGroup saved2 = MenuGroupFixture.메뉴그룹저장();
+        final MenuGroup saved1 = menuGroupRepository.save(MenuGroupFixture.메뉴그룹());
+        final MenuGroup saved2 = menuGroupRepository.save(MenuGroupFixture.메뉴그룹());
 
         assertThat(메뉴그룹조회()).containsOnly(saved1, saved2);
     }

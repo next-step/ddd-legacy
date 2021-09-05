@@ -1,10 +1,11 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
-import kitchenpos.utils.fixture.MenuFixture;
-import kitchenpos.utils.fixture.ProductFixture;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import org.junit.jupiter.api.AfterEach;
+import kitchenpos.utils.fixture.ProductFixture;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,17 +17,21 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class ProductServiceTest {
     private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
-    private ProductService productService = new ProductService(ProductFixture.productRepository, MenuFixture.menuRepository, purgomalumClient);
+    private ProductRepository productRepository;
+    private MenuRepository menuRepository;
+    private ProductService productService;
 
-    @AfterEach
-    void cleanUp() {
-        ProductFixture.비우기();
-        MenuFixture.비우기();
+    @BeforeEach
+    void setUp() {
+        productRepository = new InMemoryProductRepository();
+        menuRepository = new InMemoryMenuRepository();
+        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
     @DisplayName("상품을 등록할 수 있다.")
@@ -70,7 +75,7 @@ public class ProductServiceTest {
     @DisplayName("상품의 가격을 변경할 수 있다.")
     @Test
     void changePrice() {
-        final Product saved = ProductFixture.상품저장();
+        final Product saved = productRepository.save(ProductFixture.상품());
         final Product request = new Product();
         request.setPrice(BigDecimal.valueOf(3_000L));
 
@@ -88,7 +93,7 @@ public class ProductServiceTest {
     @NullSource
     @ParameterizedTest
     void changePrice(BigDecimal price) {
-        final Product saved = ProductFixture.상품저장();
+        final Product saved = productRepository.save(ProductFixture.상품());
         final Product request = new Product();
         request.setPrice(price);
 
@@ -99,8 +104,8 @@ public class ProductServiceTest {
     @DisplayName("상품을 전체 조회한다.")
     @Test
     void findAll() {
-        final Product saved1 = ProductFixture.상품저장();
-        final Product saved2 = ProductFixture.상품저장();
+        final Product saved1 = productRepository.save(ProductFixture.상품());
+        final Product saved2 = productRepository.save(ProductFixture.상품());
 
         List<Product> expected = 상품전체조회();
 

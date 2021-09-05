@@ -3,7 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.utils.fixture.OrderFixture;
 import kitchenpos.utils.fixture.OrderTableFixture;
-import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,12 +17,15 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class OrderTableServiceTest {
-    private OrderTableService orderTableService = new OrderTableService(OrderTableFixture.orderTableRepository, OrderFixture.orderRepository);
+    private OrderTableService orderTableService;
+    private OrderTableRepository orderTableRepository;
+    private OrderRepository orderRepository;
 
-    @AfterEach
-    void cleanUp() {
-        OrderTableFixture.비우기();
-        OrderFixture.비우기();
+    @BeforeEach
+    void setUp() {
+        orderTableRepository = new InMemoryOrderTableRepository();
+        orderRepository = new InMemoryOrderRepository();
+        orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 
     @DisplayName("주문 테이블을 등록할 수 있다.")
@@ -53,7 +56,7 @@ public class OrderTableServiceTest {
     @DisplayName("비어있는 주문 테이블에 앉을 수 있다.")
     @Test
     void sit() {
-        final OrderTable saved = OrderTableFixture.주문테이블저장();
+        final OrderTable saved = orderTableRepository.save(OrderTableFixture.주문테이블());
 
         final OrderTable expected = 주문테이블에앉기(saved.getId());
 
@@ -63,7 +66,9 @@ public class OrderTableServiceTest {
     @DisplayName("테이블을 비울 수 있다.")
     @Test
     void clear() {
-        final OrderTable seated = OrderTableFixture.앉은테이블저장();
+        final OrderTable orderTable = OrderTableFixture.주문테이블();
+        orderTable.setEmpty(false);
+        final OrderTable seated = orderTableRepository.save(orderTable);
 
         final OrderTable expected = 주문테이블비우기(seated.getId());
 
@@ -76,11 +81,8 @@ public class OrderTableServiceTest {
     @DisplayName("해당 테이블에 식사가 완료되지 않은 주문이 있다면 테이블을 비울 수 없다.")
     @Test
     void clear_order() {
-        final OrderTable table = OrderTableFixture.주문테이블저장();
-        final Order order = OrderFixture.주문();
-        order.setType(OrderType.EAT_IN);
-        order.setOrderTable(table);
-        OrderFixture.주문저장(order);
+        final OrderTable table = orderTableRepository.save(OrderTableFixture.주문테이블());
+        final Order order = orderRepository.save(OrderFixture.매장주문(new Menu(), table));
 
         assertThatThrownBy(() -> 주문테이블비우기(table.getId()))
                 .isInstanceOf(IllegalStateException.class);
@@ -89,7 +91,7 @@ public class OrderTableServiceTest {
     @DisplayName("테이블에 앉은 인원수를 변경할 수 있다.")
     @Test
     void changeNumberOfGuests() {
-        final OrderTable seated = OrderTableFixture.앉은테이블저장();
+        final OrderTable seated = orderTableRepository.save(OrderTableFixture.앉은테이블());
         final OrderTable request = new OrderTable();
         request.setNumberOfGuests(5);
 
@@ -102,7 +104,7 @@ public class OrderTableServiceTest {
     @ValueSource(strings = "-1")
     @ParameterizedTest
     void changeNumberOfGuests(int numberOfGuests) {
-        final OrderTable seated = OrderTableFixture.앉은테이블저장();
+        final OrderTable seated = orderTableRepository.save(OrderTableFixture.앉은테이블());
         final OrderTable request = new OrderTable();
         request.setNumberOfGuests(numberOfGuests);
 
@@ -113,7 +115,7 @@ public class OrderTableServiceTest {
     @DisplayName("테이블의 인원수를 변경하려면 테이블에 이미 앉아있어야한다")
     @Test
     void changeNumberOfGuests_sit() {
-        final OrderTable saved = OrderTableFixture.주문테이블저장();
+        final OrderTable saved = orderTableRepository.save(OrderTableFixture.주문테이블());
         final OrderTable request = new OrderTable();
         request.setNumberOfGuests(5);
 
@@ -124,8 +126,8 @@ public class OrderTableServiceTest {
     @DisplayName("테이블을 전체조회할 수 있다.")
     @Test
     void findAll() {
-        final OrderTable saved1 = OrderTableFixture.주문테이블저장();
-        final OrderTable saved2 = OrderTableFixture.주문테이블저장();
+        final OrderTable saved1 = orderTableRepository.save(OrderTableFixture.주문테이블());
+        final OrderTable saved2 = orderTableRepository.save(OrderTableFixture.주문테이블());
 
         List<OrderTable> expected = 주문테이블전체조회();
 
