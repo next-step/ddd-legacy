@@ -1,5 +1,8 @@
 package stringcalculator;
 
+import org.springframework.util.StringUtils;
+
+import java.util.Objects;
 import java.util.function.BinaryOperator;
 
 public class StringCalculator {
@@ -15,6 +18,6 @@ public class StringCalculator {
     }
 
     private boolean isEmpty(String text) {
-        return text == null || text.isEmpty();
+        return Objects.isNull(text) || !StringUtils.hasText(text);
     }
 }
