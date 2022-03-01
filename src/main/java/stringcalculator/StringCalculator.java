@@ -1,5 +1,7 @@
 package stringcalculator;
 
+import java.util.Arrays;
+
 public class StringCalculator {
 
     public int add(String text) {
@@ -7,10 +9,8 @@ public class StringCalculator {
             return 0;
         }
 
-        try {
-            return Integer.parseInt(text);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException();
-        }
+        return Arrays.stream(text.split(","))
+            .mapToInt(Integer::parseInt)
+            .sum();
     }
 }
