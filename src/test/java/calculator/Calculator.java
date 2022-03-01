@@ -29,7 +29,25 @@ public class Calculator {
         }
 
         return Arrays.stream(numbers)
+                .filter(this::isNumeric)
                 .map(CalculatorUtil::toInt)
+                .filter(this::isPositive)
                 .reduce(0, Integer::sum);
+    }
+
+    private boolean isPositive(Integer number) {
+        if(number < 0) {
+            throw new RuntimeException("문자열 계산기에 음수는 입력될 수 없습니다.");
+        }
+        return true;
+    }
+
+    private boolean isNumeric(String text) {
+        try {
+            Double.parseDouble(text);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
     }
 }
