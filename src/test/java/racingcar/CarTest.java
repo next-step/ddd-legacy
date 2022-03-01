@@ -19,14 +19,14 @@ class CarTest {
     @DisplayName("자동차 이름은 5 글자를 넘을 수 없다.")
     @Test
     void constructor() {
-        assertThatThrownBy(() -> new Car("동해물과 백두산이"))
+        assertThatThrownBy(() -> new Car("ESCALADE"))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("자동차가 전진한다.")
     @Test
     void forward() {
-        final Car car = new Car("wkdchdaud123", 0);
+        final Car car = new Car("BMW", 0);
         car.move(new ForwardStrategy());
         assertThat(car.getPosition()).isEqualTo(1);
     }
@@ -36,7 +36,7 @@ class CarTest {
     @ParameterizedTest
     @Test
     void hold() {
-        final Car car = new Car("wkdchdaud123", 0);
+        final Car car = new Car("BENZ", 0);
         car.move(new HoldStrategy());
         assertThat(car.getPosition()).isZero();
     }
