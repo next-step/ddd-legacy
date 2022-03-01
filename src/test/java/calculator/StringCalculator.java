@@ -1,5 +1,10 @@
 package calculator;
 
+import calculator.separator.BasicSeparator;
+import calculator.separator.CustomSeparator;
+import calculator.separator.Separator;
+
+import javax.persistence.Basic;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -18,11 +23,9 @@ import static calculator.CalculratorValidation.*;
 public class StringCalculator {
 
     private int EMPTY_TEXT_ZERO = 0;
-    private String COMMA = ",";
-    private String COLON = ":";
 
-    public StringCalculator() {
-    }
+
+    public StringCalculator() {}
 
     public int add(String text) {
         if (isNullOrEmpty(text)) {
@@ -33,17 +36,15 @@ public class StringCalculator {
             return Integer.parseInt(text);
         }
 
-        return division(text);
+        if(isCustomSeparator(text)) {
+            return sum(text, new CustomSeparator());
+        }
+
+        return sum(text, new BasicSeparator());
     }
 
-    private int division(String text) {
-        Numbers numbers = Numbers.of(
-            text.split(separator(COMMA, COLON))
-        );
+    private int sum(String text, Separator separator) {
+        Numbers numbers = Numbers.of(separator.division(text));
         return numbers.sum();
-    }
-
-    private String separator(String... separator) {
-        return Arrays.stream(separator).collect(Collectors.joining("|"));
     }
 }
