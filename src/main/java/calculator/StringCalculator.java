@@ -1,16 +1,18 @@
 package calculator;
 
+import java.util.Arrays;
+
 public final class StringCalculator {
+
+    private static final String DEFAULT_DELIMITER = ",";
 
     public int add(final String expression) {
         if (isBlank(expression)) {
             return 0;
         }
-        try {
-            return Integer.parseInt(expression);
-        } catch (NumberFormatException e) {
-            return 1;
-        }
+        return Arrays.stream(expression.split(DEFAULT_DELIMITER))
+                .mapToInt(Integer::valueOf)
+                .sum();
     }
 
     private boolean isBlank(String expression) {
