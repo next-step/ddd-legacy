@@ -43,21 +43,24 @@ class StringCalculatorTest {
     }
 
     @DisplayName("숫자 두개를 comma 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
-    @Test
-    void commaDelimiter() {
-        assertThat(calculator.add("1,2")).isEqualTo(3);
+    @ParameterizedTest
+    @ValueSource(strings = {"1,2"})
+    void commaDelimiter(final String text) {
+        assertThat(calculator.add(text)).isEqualTo(3);
     }
 
     @DisplayName("구분자를 comma 이외에 colon 을 사용할 수 있다.")
-    @Test
-    void commaColonDelimiter() {
-        assertThat(calculator.add("1,2:3")).isEqualTo(6);
+    @ParameterizedTest
+    @ValueSource(strings = {"1,2:3"})
+    void commaColonDelimiter(final String text) {
+        assertThat(calculator.add(text)).isEqualTo(6);
     }
 
     @DisplayName("\"//\"와 \"\\n\" 문자 사이에 커스텀 구분자를 지정할 수 있다.")
-    @Test
-    void customDelimiter() {
-        assertThat(calculator.add("//;\n1;2;3")).isEqualTo(6);
+    @ParameterizedTest
+    @ValueSource(strings = {"//;\n1;2;3"})
+    void customDelimiter(final String text) {
+        assertThat(calculator.add(text)).isEqualTo(6);
     }
 
     @DisplayName("문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
