@@ -15,6 +15,7 @@ import static calculator.CalculratorValidation.*;
 public class StringCalculator {
 
     private int EMPTY_TEXT_ZERO = 0;
+    private String COMMA_SEPARATOR = ",";
 
     public StringCalculator() {}
 
@@ -27,6 +28,11 @@ public class StringCalculator {
             return Integer.parseInt(text);
         }
 
-        return -1;
+        return division(text);
+    }
+
+    private int division(String text) {
+        Numbers numbers = Numbers.of(text.split(COMMA_SEPARATOR));
+        return numbers.sum();
     }
 }
