@@ -22,9 +22,7 @@ public class StringCalculator {
         }
         Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
         if (matcher.find()) {
-            String customDelimiter = matcher.group(CUSTOM_DELIMITER_INDEX);
-            String[] tokens = matcher.group(CUSTOM_DELIMITER_INPUT_INDEX).split(customDelimiter);
-            return sum(tokens);
+            return sumByCustomDelimiter(matcher);
         }
         return sum(text.split(TOKEN_DELIMITER));
     }
@@ -36,6 +34,12 @@ public class StringCalculator {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    private int sumByCustomDelimiter(Matcher matcher) {
+        String customDelimiter = matcher.group(CUSTOM_DELIMITER_INDEX);
+        String[] tokens = matcher.group(CUSTOM_DELIMITER_INPUT_INDEX).split(customDelimiter);
+        return sum(tokens);
     }
 
     private int sum(String[] tokens) {
