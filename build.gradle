@@ -6,7 +6,7 @@ plugins {
 
 group = 'camp.nextstep.edu'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = '11'
 description = 'Kitchenpos project with domain-driven design'
 
 repositories {
