@@ -1,5 +1,14 @@
 package racingcar;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+
 /**
  * 요구 사항
  *
@@ -15,4 +24,17 @@ package racingcar;
  */
 public class CarTest {
 
+    @ParameterizedTest
+    @ValueSource(strings = { "long name", "looong name", "looooooooong name" })
+    @DisplayName("자동차의 이름은 5글자를 넘을 수 없다. 5글자가 넘으면 IllegalArgumentException이 발생한다.")
+    void carNameLengthIsLessThen5(String name) {
+        assertThatIllegalArgumentException().isThrownBy(() -> new Car(name));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = { "short", "srt", "s" })
+    @DisplayName("자동차의 이름이 5글자 이하이면 Car 생성이 가능하다.")
+    void successCreateCar(String name) {
+        assertThatCode(() -> new Car(name)).doesNotThrowAnyException();
+    }
 }
