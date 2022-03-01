@@ -6,7 +6,11 @@ public final class StringCalculator {
         if (isBlank(expression)) {
             return 0;
         }
-        return 1;
+        try {
+            return Integer.parseInt(expression);
+        } catch (NumberFormatException e) {
+            return 1;
+        }
     }
 
     private boolean isBlank(String expression) {
