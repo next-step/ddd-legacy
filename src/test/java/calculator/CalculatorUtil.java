@@ -12,5 +12,4 @@ public class CalculatorUtil {
     public static int toInt(String text) {
         return Integer.parseInt(text);
     }
-
 }

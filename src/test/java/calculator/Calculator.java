@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 
 import static calculator.CalculatorUtil.isNullOrEmpty;
 import static calculator.CalculatorUtil.toInt;
-import static org.hibernate.query.criteria.internal.ValueHandlerFactory.isNumeric;
 
 /* //와 \n 문자 사이에 커스텀 구분자를 지정할 수 있다. */
 public class Calculator {
