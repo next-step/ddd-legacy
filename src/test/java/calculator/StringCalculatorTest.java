@@ -24,12 +24,28 @@ public class StringCalculatorTest {
         assertThat(StringCalculator.add(text)).isEqualTo(sum);
     }
 
+    @SuppressWarnings("unused")
     static Stream<Arguments> addNumbersTest() {
         return Stream.of(
             Arguments.of("", 0),
             Arguments.of("1,2", 3),
             Arguments.of("1,2,3", 6),
             Arguments.of("1,2:3", 6)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    @DisplayName("`//`와 `\\n`로 명시된 추가 구분자를 사용해도 일반적인 합 결과가 나타나야 한다.")
+    void addNumbersTestWithCustomDelimiter(String text, int sum) {
+        assertThat(StringCalculator.add(text)).isEqualTo(sum);
+    }
+
+    @SuppressWarnings("unused")
+    static Stream<Arguments> addNumbersTestWithCustomDelimiter() {
+        return Stream.of(
+            Arguments.of("//;\\n1;2;3", 6),
+            Arguments.of("//;\\n1,2:3;4", 10)
         );
     }
 }
