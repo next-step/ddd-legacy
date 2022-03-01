@@ -6,21 +6,6 @@ import java.util.regex.Pattern;
 
 public final class StringCalculator {
 
-    public int add(final String expression) {
-        if (isBlank(expression)) {
-            return 0;
-        }
-        return Arrays.stream(split(expression))
-                .map(PositiveInteger::new)
-                .reduce(new PositiveInteger(0), PositiveInteger::add)
-                .intValue();
-    }
-
-    private static final String DEFAULT_DELIMITER = "[,:]";
-    private static final Pattern DEFAULT_PATTERN = Pattern.compile("//(.)\n(.*)");
-    private static final int DELIMITER_IDX = 1;
-    private static final int NUMBERS_IDX = 2;
-
     private static class PositiveInteger {
 
         private static final int ZERO_VALUE = 0;
@@ -48,6 +33,21 @@ public final class StringCalculator {
             return number;
         }
 
+    }
+
+    private static final String DEFAULT_DELIMITER = "[,:]";
+    private static final Pattern DEFAULT_PATTERN = Pattern.compile("//(.)\n(.*)");
+    private static final int DELIMITER_IDX = 1;
+    private static final int NUMBERS_IDX = 2;
+
+    public int add(final String expression) {
+        if (isBlank(expression)) {
+            return 0;
+        }
+        return Arrays.stream(split(expression))
+                .map(PositiveInteger::new)
+                .reduce(new PositiveInteger(0), PositiveInteger::add)
+                .intValue();
     }
 
     private boolean isBlank(String expression) {
