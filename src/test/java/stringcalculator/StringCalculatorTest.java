@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class StringCalculatorTest {
 
@@ -51,8 +52,10 @@ public class StringCalculatorTest {
     }
 
     @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
-    @Test
-    void testNegativeNumber() {
-
+    @ValueSource(strings = {"-1", "-2", "-10"})
+    @ParameterizedTest
+    void testNegativeNumber(String negativeNumber) {
+        StringCalculator stringCalculator = new StringCalculator();
+        assertThatThrownBy(() -> stringCalculator.add(negativeNumber)).isInstanceOf(RuntimeException.class);
     }
 }
