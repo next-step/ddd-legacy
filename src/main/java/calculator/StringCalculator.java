@@ -21,17 +21,11 @@ public class StringCalculator {
 
 		List<Integer> numbers = numberTokenizers.tokenize(text);
 
-		return add(numbers);
-	}
+		final PositiveOrZeroNumber result = numbers.stream()
+				.map(PositiveOrZeroNumber::new)
+				.reduce(PositiveOrZeroNumber::plus)
+				.orElse(new PositiveOrZeroNumber(DEFAULT_RESULT));
 
-	private int add(final List<Integer> numbers) {
-		validateNegativeNumber(numbers);
-		return numbers.stream().mapToInt(Integer::valueOf).sum();
-	}
-
-	private void validateNegativeNumber(final List<Integer> numbers) {
-		numbers.forEach(number -> {
-			if (number < 0) throw new IllegalArgumentException("음수를 더할 수 없습니다.");
-		});
+		return result.getValue();
 	}
 }
