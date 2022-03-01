@@ -1,12 +1,14 @@
 package calculator;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static calculator.CalculatorUtil.isNullOrEmpty;
 import static calculator.CalculatorUtil.toInt;
 import static org.hibernate.query.criteria.internal.ValueHandlerFactory.isNumeric;
 
-/* 구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다. */
+/* //와 \n 문자 사이에 커스텀 구분자를 지정할 수 있다. */
 public class Calculator {
 
     public int add(String text) {
@@ -19,6 +21,12 @@ public class Calculator {
             return toInt(text);
         }
         String[] numbers = text.split(",|:");
+        Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
+
+        if(matcher.find()) {
+            String delimiter = matcher.group(1);
+            numbers = matcher.group(2).split(delimiter);
+        }
 
         return Arrays.stream(numbers)
                 .map(CalculatorUtil::toInt)
