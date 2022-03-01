@@ -1,5 +1,8 @@
 package calculator;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import static calculator.CalculratorValidation.*;
 
 /**
@@ -15,16 +18,18 @@ import static calculator.CalculratorValidation.*;
 public class StringCalculator {
 
     private int EMPTY_TEXT_ZERO = 0;
-    private String COMMA_SEPARATOR = ",";
+    private String COMMA = ",";
+    private String COLON = ":";
 
-    public StringCalculator() {}
+    public StringCalculator() {
+    }
 
     public int add(String text) {
-        if(isNullOrEmpty(text)) {
+        if (isNullOrEmpty(text)) {
             return EMPTY_TEXT_ZERO;
         }
 
-        if(isSingleNumber(text)) {
+        if (isSingleNumber(text)) {
             return Integer.parseInt(text);
         }
 
@@ -32,7 +37,13 @@ public class StringCalculator {
     }
 
     private int division(String text) {
-        Numbers numbers = Numbers.of(text.split(COMMA_SEPARATOR));
+        Numbers numbers = Numbers.of(
+            text.split(separator(COMMA, COLON))
+        );
         return numbers.sum();
+    }
+
+    private String separator(String... separator) {
+        return Arrays.stream(separator).collect(Collectors.joining("|"));
     }
 }
