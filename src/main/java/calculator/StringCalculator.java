@@ -19,6 +19,10 @@ public class StringCalculator {
 			return DEFAULT_RESULT;
 		}
 
+		if (isPositiveOrZero(text)) {
+			return Integer.parseInt(text);
+		}
+
 		final List<Integer> numbers = numberTokenizers.tokenize(text);
 
 		final PositiveOrZeroNumber result = numbers.stream()
@@ -27,5 +31,13 @@ public class StringCalculator {
 				.orElse(new PositiveOrZeroNumber(DEFAULT_RESULT));
 
 		return result.getValue();
+	}
+
+	private boolean isPositiveOrZero(String text) {
+		try {
+			return Integer.parseInt(text) >= 0;
+		} catch (NumberFormatException e) {
+			return false;
+		}
 	}
 }
