@@ -1,5 +1,7 @@
 package calculator;
 
+import static calculator.CalculratorValidation.*;
+
 /**
  * <pre>
  * calculator
@@ -12,22 +14,19 @@ package calculator;
 
 public class StringCalculator {
 
-    private int ZERO = 0;
+    private int EMPTY_TEXT_ZERO = 0;
 
     public StringCalculator() {}
 
     public int add(String text) {
         if(isNullOrEmpty(text)) {
-            return ZERO;
+            return EMPTY_TEXT_ZERO;
         }
+
+        if(isSingleNumber(text)) {
+            return Integer.parseInt(text);
+        }
+
         return -1;
-    }
-
-    public boolean isNullOrEmpty(final String text) {
-        return isNull(text) || text.trim().isEmpty();
-    }
-
-    public boolean isNull(final String text) {
-        return text == null;
     }
 }
