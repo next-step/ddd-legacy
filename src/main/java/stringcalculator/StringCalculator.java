@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
-    private static final int EMPTY_NUMBER = 0;
+    private static final int MIN_NUMBER = 0;
     private static final int SINGLE_INPUT_LENGTH = 1;
     private static final String TOKEN_DELIMITER = ",|:";
 
@@ -15,7 +15,7 @@ public class StringCalculator {
 
     public int add(String text) {
         if (text == null  || text.isEmpty()) {
-            return EMPTY_NUMBER;
+            return MIN_NUMBER;
         }
         if (text.length() == SINGLE_INPUT_LENGTH && isInteger(text)) {
             return Integer.parseInt(text);
@@ -43,10 +43,18 @@ public class StringCalculator {
     }
 
     private int sum(String[] tokens) {
-        int sum = EMPTY_NUMBER;
+        int sum = MIN_NUMBER;
         for (String token : tokens) {
-            sum+=Integer.parseInt(token);
+            int number = Integer.parseInt(token);
+            validateNegative(number);
+            sum+=number;
         }
         return sum;
+    }
+
+    private void validateNegative(int number) {
+        if (number < MIN_NUMBER) {
+            throw new RuntimeException();
+        }
     }
 }
