@@ -1,15 +1,13 @@
 package calculator;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class StringCalculator {
 
-	private static final String DEFAULT_REGEX = "[,:]";
-
 	public int add(final String text) {
 		NumberTokenizer numberTokenizer = new SlashTokenizer();
+		NumberTokenizer defaultTokenizer = new DefaultTokenizer();
+
 		if (text == null || text.isBlank()) {
 			return 0;
 		}
@@ -19,16 +17,8 @@ public class StringCalculator {
 			return add(numbers);
 		}
 
-		List<Integer> numbers = tokenizeDefault(text);
+		List<Integer> numbers = defaultTokenizer.tokenize(text);
 		return add(numbers);
-	}
-
-	private List<Integer> tokenizeDefault(final String text) {
-		final String[] tokens = text.split(DEFAULT_REGEX);
-		return Arrays.stream(tokens)
-				.mapToInt(Integer::valueOf)
-				.boxed()
-				.collect(Collectors.toList());
 	}
 
 	private int add(final List<Integer> numbers) {
