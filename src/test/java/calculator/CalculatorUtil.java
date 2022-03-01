@@ -3,10 +3,7 @@ package calculator;
 public class CalculatorUtil {
 
     public static boolean isNullOrEmpty(String text) {
-        if(text == null || "".equals(text) || " ".equals(text) ) {
-            return true;
-        }
-        return false;
+        return text == null || "".equals(text) || " ".equals(text);
     }
 
     public static int toInt(String text) {
