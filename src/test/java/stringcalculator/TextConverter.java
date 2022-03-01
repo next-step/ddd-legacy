@@ -21,13 +21,12 @@ public class TextConverter {
         if (Objects.isNull(text) || text.trim().isEmpty()) {
             return new PositiveNumbers();
         }
-        final String[] splitText = text.split(delimiter);
-
         final Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
         if (matcher.find()) {
             return getNumbersWithCustomDelimiter(matcher);
         }
-        List<PositiveNumber> numbers = getNumbersWithNoCustomDelimiter(splitText);
+        final String[] splitText = text.split(delimiter);
+        final List<PositiveNumber> numbers = getNumbersWithNoCustomDelimiter(splitText);
         return new PositiveNumbers(numbers);
     }
 
