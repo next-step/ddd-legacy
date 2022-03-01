@@ -15,7 +15,7 @@ public class StringCalculator {
 	}
 
 	public int add(final String text) {
-		if (text == null || text.isBlank()) {
+		if (text == null || text.trim().isEmpty()) {
 			return DEFAULT_RESULT;
 		}
 

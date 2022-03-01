@@ -8,7 +8,13 @@ public class NumberTokenizers {
 	private final List<NumberTokenizer> values;
 
 	public NumberTokenizers(final NumberTokenizer numberTokenizer) {
-		this(List.of(numberTokenizer));
+		this(toList(numberTokenizer));
+	}
+
+	private static List<NumberTokenizer> toList(NumberTokenizer numberTokenizer) {
+		List<NumberTokenizer> tokens = new ArrayList<>();
+		tokens.add(numberTokenizer);
+		return tokens;
 	}
 
 	public NumberTokenizers(final List<NumberTokenizer> numberTokenizers) {
