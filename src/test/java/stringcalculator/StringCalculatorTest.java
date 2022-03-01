@@ -2,6 +2,7 @@ package stringcalculator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -38,5 +39,17 @@ class StringCalculatorTest {
     @ValueSource(strings = {"0", "1", "2", "3", "4", "5"})
     void singleInput(String input) {
         assertThat(calculator.add(input)).isEqualTo(Integer.parseInt(input));
+    }
+
+    @DisplayName("숫자 두개를 comma 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
+    @Test
+    void commaDelimiter() {
+        assertThat(calculator.add("1,2")).isEqualTo(3);
+    }
+
+    @DisplayName("구분자를 comma 이외에 colon 을 사용할 수 있다.")
+    @Test
+    void commaColonDelimiter() {
+        assertThat(calculator.add("1,2:3")).isEqualTo(6);
     }
 }
