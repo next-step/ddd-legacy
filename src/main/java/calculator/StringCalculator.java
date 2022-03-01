@@ -18,7 +18,7 @@ public class StringCalculator {
         }
 
         return Arrays.stream(split(text))
-                     .mapToInt(Integer::parseInt)
+                     .mapToInt(StringCalculator::parse)
                      .sum();
     }
 
@@ -34,5 +34,14 @@ public class StringCalculator {
         }
 
         return text.split(DEFAULT_DELIMITER);
+    }
+
+    private static int parse(String number) {
+        int result = Integer.parseInt(number);
+        if (result < 0) {
+            throw new RuntimeException();
+        }
+
+        return result;
     }
 }

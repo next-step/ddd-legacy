@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * 요구 사항
@@ -46,6 +47,23 @@ public class StringCalculatorTest {
         return Stream.of(
             Arguments.of("//;\\n1;2;3", 6),
             Arguments.of("//;\\n1,2:3;4", 10)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    @DisplayName("음수 혹은 숫자가 아닌 문자가 포함되어 있으면 RuntimeException 예외가 발생한다.")
+    void throwExceptionTest(String text) {
+        assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> StringCalculator.add(text));
+    }
+
+    @SuppressWarnings("unused")
+    static Stream<Arguments> throwExceptionTest() {
+        return Stream.of(
+            Arguments.of("-1,2,3"),
+            Arguments.of("a14,5:6"),
+            Arguments.of("*,5:6")
         );
     }
 }
