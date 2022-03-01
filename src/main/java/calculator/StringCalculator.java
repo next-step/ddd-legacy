@@ -5,6 +5,8 @@ import java.util.Objects;
 
 public class StringCalculator {
 
+	private static final int DEFAULT_RESULT = 0;
+
 	private final NumberTokenizers numberTokenizers;
 
 	public StringCalculator(NumberTokenizers numberTokenizers) {
@@ -14,7 +16,7 @@ public class StringCalculator {
 
 	public int add(final String text) {
 		if (text == null || text.isBlank()) {
-			return 0;
+			return DEFAULT_RESULT;
 		}
 
 		List<Integer> numbers = numberTokenizers.tokenize(text);
