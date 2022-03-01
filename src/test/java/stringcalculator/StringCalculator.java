@@ -8,8 +8,10 @@ public class StringCalculator {
 
     private static final int SINGLE_STRING_LENGTH = 1;
 
+    private StringCalculator() {
+    }
 
-    public int add(String source) {
+    public static int add(String source) {
         if (isNullOrEmpty(source)) {
             return ZERO.getValue();
         }
@@ -20,11 +22,11 @@ public class StringCalculator {
                 .add();
     }
 
-    private boolean isNullOrEmpty(String source) {
+    private static boolean isNullOrEmpty(String source) {
         return source == null || source.isEmpty();
     }
 
-    private boolean isSingleLengthString(String input) {
+    private static boolean isSingleLengthString(String input) {
         return input.length() == SINGLE_STRING_LENGTH;
     }
 }

@@ -14,16 +14,15 @@ public class StringCalculatorTest {
     @NullAndEmptySource
     @ParameterizedTest
     void testEmptyValue(String nullAndEmpty) {
-        StringCalculator stringCalculator = new StringCalculator();
-        assertThat(stringCalculator.add(nullAndEmpty)).isZero();
+        assertThat(StringCalculator.add(nullAndEmpty)).isZero();
     }
 
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
     @ValueSource(strings = {"1","2","3"})
     @ParameterizedTest
     void testSingleNumber(String singleNumber) {
-        StringCalculator stringCalculator = new StringCalculator();
-        assertThat(stringCalculator.add(singleNumber)).isEqualTo(Integer.parseInt(singleNumber));
+        
+        assertThat(StringCalculator.add(singleNumber)).isEqualTo(Integer.parseInt(singleNumber));
 
     }
 
@@ -31,16 +30,16 @@ public class StringCalculatorTest {
     @ValueSource(strings = {"1,2"})
     @ParameterizedTest
     void testCommaSeparatedNumber(String source) {
-        StringCalculator stringCalculator = new StringCalculator();
-        assertThat(stringCalculator.add(source)).isEqualTo(3);
+        
+        assertThat(StringCalculator.add(source)).isEqualTo(3);
     }
 
     @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
     @ValueSource(strings = {"3:4"})
     @ParameterizedTest
     void testColonDelimiter(String source) {
-        StringCalculator stringCalculator = new StringCalculator();
-        assertThat(stringCalculator.add(source)).isEqualTo(7);
+        
+        assertThat(StringCalculator.add(source)).isEqualTo(7);
 
     }
 
@@ -48,15 +47,15 @@ public class StringCalculatorTest {
     @ParameterizedTest
     @ValueSource(strings = {"//;\\n1;2;3"})
     void testCustomDelimiter(String source) {
-        StringCalculator stringCalculator = new StringCalculator();
-        assertThat(stringCalculator.add(source)).isEqualTo(6);
+        
+        assertThat(StringCalculator.add(source)).isEqualTo(6);
     }
 
     @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @ValueSource(strings = {"-1", "-2", "-10"})
     @ParameterizedTest
     void testNegativeNumber(String negativeNumber) {
-        StringCalculator stringCalculator = new StringCalculator();
-        assertThatThrownBy(() -> stringCalculator.add(negativeNumber)).isInstanceOf(RuntimeException.class);
+        
+        assertThatThrownBy(() -> StringCalculator.add(negativeNumber)).isInstanceOf(RuntimeException.class);
     }
 }
