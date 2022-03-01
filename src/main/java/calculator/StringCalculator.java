@@ -1,20 +1,15 @@
 package calculator;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class StringCalculator {
 
-	private final List<NumberTokenizer> numberTokenizers;
+	private final NumberTokenizers numberTokenizers;
 
-	public StringCalculator(NumberTokenizer numberTokenizer) {
-		this(List.of(numberTokenizer));
-	}
-
-	public StringCalculator(List<NumberTokenizer> numberTokenizers) {
-		List<NumberTokenizer> l = new ArrayList<>(numberTokenizers);
-		l.add(new DefaultTokenizer());
-		this.numberTokenizers = l;
+	public StringCalculator(NumberTokenizers numberTokenizers) {
+		Objects.requireNonNull(numberTokenizers);
+		this.numberTokenizers = numberTokenizers;
 	}
 
 	public int add(final String text) {
@@ -22,11 +17,7 @@ public class StringCalculator {
 			return 0;
 		}
 
-		final List<Integer> numbers = numberTokenizers.stream()
-				.filter(tokenizer -> tokenizer.canTokenize(text))
-				.findFirst()
-				.orElseThrow(() -> new IllegalStateException("처리 가능한 토크나이저가 없습니다."))
-				.tokenize(text);
+		List<Integer> numbers = numberTokenizers.tokenize(text);
 
 		return add(numbers);
 	}
