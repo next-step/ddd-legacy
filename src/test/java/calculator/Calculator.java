@@ -6,7 +6,7 @@ import static calculator.CalculatorUtil.isNullOrEmpty;
 import static calculator.CalculatorUtil.toInt;
 import static org.hibernate.query.criteria.internal.ValueHandlerFactory.isNumeric;
 
-/* 숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다. */
+/* 구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다. */
 public class Calculator {
 
     public int add(String text) {
@@ -18,7 +18,7 @@ public class Calculator {
         if(text.length()==1 && isNumeric(text)) {
             return toInt(text);
         }
-        String[] numbers = text.split(",");
+        String[] numbers = text.split(",|:");
 
         return Arrays.stream(numbers)
                 .map(CalculatorUtil::toInt)
