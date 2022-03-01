@@ -1,14 +1,14 @@
 package calculator;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static calculator.CalculatorUtil.isNullOrEmpty;
-import static calculator.CalculatorUtil.toInt;
+import static calculator.CalculatorUtil.*;
+import static java.util.Arrays.stream;
 
-/* //와 \n 문자 사이에 커스텀 구분자를 지정할 수 있다. */
 public class Calculator {
+    private final static String DEFAULT_DELIMITER_REGEX = ",|:";
+    private final static String CUSTOM_DELIMITER_REGEX = "//(.)\n(.*)";
 
     public int add(String text) {
         int answer = 0;
@@ -19,16 +19,18 @@ public class Calculator {
         if(text.length()==1 && isNumeric(text)) {
             return toInt(text);
         }
-        String[] numbers = text.split(",|:");
-        Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
 
+        String[] numbers = text.split(DEFAULT_DELIMITER_REGEX);
+
+        /* 커스텀 구분자가 지정된 경우*/
+        Matcher matcher = Pattern.compile(CUSTOM_DELIMITER_REGEX).matcher(text);
         if(matcher.find()) {
             String delimiter = matcher.group(1);
             numbers = matcher.group(2).split(delimiter);
         }
 
-        return Arrays.stream(numbers)
-                .filter(this::isNumeric)
+        return stream(numbers)
+                .filter(CalculatorUtil::isNumeric)
                 .map(CalculatorUtil::toInt)
                 .filter(this::isPositive)
                 .reduce(0, Integer::sum);
@@ -41,12 +43,4 @@ public class Calculator {
         return true;
     }
 
-    private boolean isNumeric(String text) {
-        try {
-            Double.parseDouble(text);
-        } catch (NumberFormatException e) {
-            return false;
-        }
-        return true;
-    }
 }
