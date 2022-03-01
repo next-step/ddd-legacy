@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
-    private static final Pattern DEFAULT_DELIMITER_PATTERN = Pattern.compile("[,]");
+    private static final Pattern DEFAULT_DELIMITER_PATTERN = Pattern.compile("[,:]");
 
 
     public int add(String source) {

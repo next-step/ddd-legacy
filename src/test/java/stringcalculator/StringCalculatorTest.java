@@ -36,8 +36,11 @@ public class StringCalculatorTest {
     }
 
     @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
-    @Test
-    void testColonDelimiter() {
+    @ValueSource(strings = {"3:4"})
+    @ParameterizedTest
+    void testColonDelimiter(String source) {
+        StringCalculator stringCalculator = new StringCalculator();
+        assertThat(stringCalculator.add(source)).isEqualTo(7);
 
     }
 
