@@ -1,11 +1,14 @@
 package racingcar;
 
 public class Car {
+    public static final int DEFAULT_POSITION = 0;
+    public static final int NAME_LENGTH_LIMIT = 5;
+
     private final String name;
     private int position;
 
     public Car(final String name) {
-        this(name, 0);
+        this(name, DEFAULT_POSITION);
     }
 
     public Car(final String name, final int position) {
@@ -14,8 +17,8 @@ public class Car {
         this.position = position;
     }
 
-    private void validate(String name) {
-        if (name.length() > 5) {
+    private void validate(final String name) {
+        if (name.length() > NAME_LENGTH_LIMIT) {
             throw new IllegalArgumentException();
         }
     }
