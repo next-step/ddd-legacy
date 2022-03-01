@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public final class StringCalculator {
 
-    private static final String DEFAULT_DELIMITER = ",";
+    private static final String DEFAULT_DELIMITER = "[,:]";
 
     public int add(final String expression) {
         if (isBlank(expression)) {
