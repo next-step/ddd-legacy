@@ -4,6 +4,7 @@ import stringcalculator.Number;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -30,5 +31,18 @@ public class DefaultDelimiterOperator implements Operator {
         return inputNumbers.stream()
                 .reduce(ZERO, Number::sum)
                 .getValue();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DefaultDelimiterOperator that = (DefaultDelimiterOperator) o;
+        return Objects.equals(inputNumbers, that.inputNumbers);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(inputNumbers);
     }
 }
