@@ -7,6 +7,10 @@ public class StringCalculator {
             return 0;
         }
 
-        return 0;
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException();
+        }
     }
 }
