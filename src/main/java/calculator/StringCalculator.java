@@ -9,7 +9,7 @@ public class StringCalculator {
 
 	private final NumberTokenizers numberTokenizers;
 
-	public StringCalculator(NumberTokenizers numberTokenizers) {
+	public StringCalculator(final NumberTokenizers numberTokenizers) {
 		Objects.requireNonNull(numberTokenizers);
 		this.numberTokenizers = numberTokenizers;
 	}
@@ -19,7 +19,7 @@ public class StringCalculator {
 			return DEFAULT_RESULT;
 		}
 
-		List<Integer> numbers = numberTokenizers.tokenize(text);
+		final List<Integer> numbers = numberTokenizers.tokenize(text);
 
 		final PositiveOrZeroNumber result = numbers.stream()
 				.map(PositiveOrZeroNumber::new)

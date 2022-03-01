@@ -6,18 +6,18 @@ public class PositiveOrZeroNumber {
 
 	private final int value;
 
-	public PositiveOrZeroNumber(int value) {
+	public PositiveOrZeroNumber(final int value) {
 		validate(value);
 		this.value = value;
 	}
 
-	private void validate(int value) {
+	private void validate(final int value) {
 		if (value < 0) {
 			throw new IllegalArgumentException("0보다 작은 값으로 생성할 수 없습니다. value: " + value);
 		}
 	}
 
-	public PositiveOrZeroNumber plus(PositiveOrZeroNumber that) {
+	public PositiveOrZeroNumber plus(final PositiveOrZeroNumber that) {
 		return new PositiveOrZeroNumber(this.value + that.value);
 	}
 

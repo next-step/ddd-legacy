@@ -7,12 +7,12 @@ public class NumberTokenizers {
 
 	private final List<NumberTokenizer> values;
 
-	public NumberTokenizers(NumberTokenizer numberTokenizer) {
+	public NumberTokenizers(final NumberTokenizer numberTokenizer) {
 		this(List.of(numberTokenizer));
 	}
 
-	public NumberTokenizers(List<NumberTokenizer> numberTokenizers) {
-		List<NumberTokenizer> list = new ArrayList<>(numberTokenizers);
+	public NumberTokenizers(final List<NumberTokenizer> numberTokenizers) {
+		final List<NumberTokenizer> list = new ArrayList<>(numberTokenizers);
 		list.add(new DefaultTokenizer());
 		this.values = list;
 	}
