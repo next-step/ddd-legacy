@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * 요구사항
@@ -57,5 +58,12 @@ class StringCalculatorTest {
     @Test
     void customDelimiter() {
         assertThat(calculator.add("//;\n1;2;3")).isEqualTo(6);
+    }
+
+    @DisplayName("문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @Test
+    void negative() {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> calculator.add("-1"));
     }
 }
