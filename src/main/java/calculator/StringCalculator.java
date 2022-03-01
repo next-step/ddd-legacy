@@ -23,7 +23,7 @@ public final class StringCalculator {
 
     private static class PositiveInteger {
 
-        public static final int ZERO_VALUE = 0;
+        private static final int ZERO_VALUE = 0;
         private final int number;
 
         PositiveInteger(int number) {
