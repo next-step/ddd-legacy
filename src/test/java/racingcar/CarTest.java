@@ -1,12 +1,14 @@
 package racingcar;
 
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 /**
@@ -24,17 +26,63 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
  */
 public class CarTest {
 
+    private static final Engine DONT_CARE_ENGINE = () -> 0;
+
     @ParameterizedTest
     @ValueSource(strings = { "long name", "looong name", "looooooooong name" })
     @DisplayName("자동차의 이름은 5글자를 넘을 수 없다. 5글자가 넘으면 IllegalArgumentException이 발생한다.")
     void carNameLengthIsLessThen5(String name) {
-        assertThatIllegalArgumentException().isThrownBy(() -> new Car(name));
+        assertThatIllegalArgumentException().isThrownBy(() -> new Car(name, DONT_CARE_ENGINE));
     }
 
     @ParameterizedTest
     @ValueSource(strings = { "short", "srt", "s" })
     @DisplayName("자동차의 이름이 5글자 이하이면 Car 생성이 가능하다.")
     void successCreateCar(String name) {
-        assertThatCode(() -> new Car(name)).doesNotThrowAnyException();
+        assertThatCode(() -> new Car(name, DONT_CARE_ENGINE)).doesNotThrowAnyException();
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    @DisplayName("숫자값이 4 ~ 9이면 자동차가 이동")
+    void moveConditionTest(int number) {
+        // given
+        Engine engine = () -> number;
+        Car car = new Car("name", engine);
+
+        // when
+        car.move();
+        car.move();
+        car.move();
+
+        // then
+        assertThat(car.distance()).isEqualTo(3);
+    }
+
+    @SuppressWarnings("unused")
+    static Stream<Arguments> moveConditionTest() {
+        return Stream.of(4, 5, 6, 7, 8, 9).map(Arguments::of);
+    }
+
+    @ParameterizedTest
+    @MethodSource
+    @DisplayName("숫자값이 0 ~ 3이면 자동차가 이동하지 않는다.")
+    void notMoveConditionTest(int number) {
+        // given
+        Engine engine = () -> number;
+        Car car = new Car("name", engine);
+
+        // when
+        car.move();
+        car.move();
+        car.move();
+
+        // then
+        assertThat(car.distance()).isZero();
+    }
+
+    @SuppressWarnings("unused")
+    static Stream<Arguments> notMoveConditionTest() {
+        return Stream.of(0, 1, 2, 3).map(Arguments::of);
     }
 }
