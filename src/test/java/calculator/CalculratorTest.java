@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
  * @since 2022-03-01 오후 11:40
  */
 
-public class CalculratorTest {
+class CalculratorTest {
 
     private StringCalculator calculator;
 
