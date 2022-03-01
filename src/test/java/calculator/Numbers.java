@@ -2,6 +2,7 @@ package calculator;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -27,10 +28,18 @@ public class Numbers {
     }
 
     private static List<Integer> convertCollection(String[] split) {
+
         return Arrays.asList(split)
                 .stream()
-                .map(Integer::valueOf)
+                .map(convert())
                 .collect(Collectors.toList());
+    }
+
+    private static Function<String, Integer> convert() {
+        return v -> {
+            CalculratorValidation.convertValidation(v);
+            return Integer.valueOf(v);
+        };
     }
 
     public int sum() {

@@ -41,4 +41,21 @@ public class CalculratorValidation {
         Matcher matcher = CUSTOM_PATTERN.matcher(text);
         return matcher.find();
     }
+
+    public static void numberValidation(int number) {
+        if(number >= 0) {
+            return;
+        }
+
+        throw new RuntimeException("문자열 계산기에는 음수를 사용할 수 없습니다.");
+    }
+
+    public static void convertValidation(String stringNumber) {
+        try {
+            Integer number = Integer.valueOf(stringNumber);
+            numberValidation(number);
+        }catch (NumberFormatException e) {
+            throw new RuntimeException("문자열 계산기에 숫자 이외의 값을 사용할 수 없습니다.");
+        }
+    }
 }
