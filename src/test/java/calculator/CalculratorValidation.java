@@ -3,6 +3,7 @@ package calculator;
 import calculator.separator.CustomSeparator;
 import org.thymeleaf.expression.Numbers;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +26,7 @@ public class CalculratorValidation {
     }
 
     public static boolean isNull(final String text) {
-        return text == null;
+        return Objects.isNull(text);
     }
 
     public static boolean isSingleNumber(String text) {
