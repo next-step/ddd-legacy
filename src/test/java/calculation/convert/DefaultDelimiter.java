@@ -1,7 +1,5 @@
 package calculation.convert;
 
-import java.util.regex.Matcher;
-
 public class DefaultDelimiter {
 	final static String COLONS_REGEX = "[,:]";
 
