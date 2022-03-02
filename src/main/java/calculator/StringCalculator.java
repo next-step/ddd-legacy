@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
+    private static final int DEFAULT_VALUE = 0;
     private static final String DEFAULT_DELIMITER = "[,:]";
     private static final String CUSTOM_DELIMITER = "[,:%s]";
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\\\\n(.*)");
@@ -14,12 +15,13 @@ public class StringCalculator {
 
     public static int add(String text) {
         if (isBlank(text)) {
-            return 0;
+            return DEFAULT_VALUE;
         }
 
         return Arrays.stream(split(text))
-                     .mapToInt(StringCalculator::parse)
-                     .sum();
+                     .map(PositiveNumber::from)
+                     .reduce(PositiveNumber.ZERO, PositiveNumber::add)
+                     .getValue();
     }
 
     private static boolean isBlank(String text) {
@@ -34,14 +36,5 @@ public class StringCalculator {
         }
 
         return text.split(DEFAULT_DELIMITER);
-    }
-
-    private static int parse(String number) {
-        int result = Integer.parseInt(number);
-        if (result < 0) {
-            throw new RuntimeException();
-        }
-
-        return result;
     }
 }
