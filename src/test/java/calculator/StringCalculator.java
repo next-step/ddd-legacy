@@ -33,7 +33,7 @@ public class StringCalculator {
         }
 
         if (isSingleNumber(text)) {
-            CalculratorValidation.convertValidation(text);
+            CalculratorValidation.validate(text);
             return Integer.parseInt(text);
         }
 

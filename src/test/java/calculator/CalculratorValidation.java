@@ -43,7 +43,7 @@ public class CalculratorValidation {
         return matcher.find();
     }
 
-    public static void numberValidation(final int number) {
+    public static void validateNumber(final int number) {
         if (number >= 0) {
             return;
         }
@@ -51,10 +51,10 @@ public class CalculratorValidation {
         throw new RuntimeException("문자열 계산기에는 음수를 사용할 수 없습니다.");
     }
 
-    public static void convertValidation(final String stringNumber) {
+    public static void validate(final String stringNumber) {
         try {
             Integer number = Integer.valueOf(stringNumber);
-            numberValidation(number);
+            validateNumber(number);
         } catch (NumberFormatException e) {
             throw new RuntimeException("문자열 계산기에 숫자 이외의 값을 사용할 수 없습니다.");
         }

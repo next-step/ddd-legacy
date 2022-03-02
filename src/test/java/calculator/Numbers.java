@@ -37,7 +37,7 @@ public class Numbers {
 
     private static Function<String, Integer> convert() {
         return v -> {
-            CalculratorValidation.convertValidation(v);
+            CalculratorValidation.validate(v);
             return Integer.valueOf(v);
         };
     }
