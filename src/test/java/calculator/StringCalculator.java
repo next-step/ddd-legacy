@@ -34,10 +34,4 @@ public class StringCalculator {
     public int add(String text) {
         return rootHandler.calculate(text);
     }
-
-    private int sum(String text, Separator separator) {
-
-        Numbers numbers = Numbers.of(separator.division(text));
-        return numbers.sum();
-    }
 }
