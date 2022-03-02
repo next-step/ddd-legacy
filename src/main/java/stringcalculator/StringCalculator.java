@@ -13,6 +13,9 @@ public class StringCalculator {
     private static final int CUSTOM_DELIMITER_INDEX = 1;
     private static final int CUSTOM_DELIMITER_INPUT_INDEX = 2;
 
+    private StringCalculator() {
+    }
+
     public static int add(String text) {
         if (text == null  || text.isEmpty()) {
             return MIN_NUMBER;
