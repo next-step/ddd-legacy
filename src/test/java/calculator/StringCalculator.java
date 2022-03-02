@@ -1,5 +1,6 @@
 package calculator;
 
+import calculator.chain.*;
 import calculator.separator.BasicSeparator;
 import calculator.separator.CustomSeparator;
 import calculator.separator.Separator;
@@ -22,25 +23,24 @@ import static calculator.CalculratorValidation.*;
 
 public class StringCalculator {
 
-    private static final int EMPTY_TEXT_ZERO = 0;
+    private CalculatorHandler rootHandler;
+    public StringCalculator() {
+        initHandler();
+    }
 
-    public StringCalculator() {}
+    private void initHandler() {
+        rootHandler = new EmptyHandler();
+        CalculatorHandler singleNumberHandler = new SingleNumberHandler();
+        CalculatorHandler customHandler = new CustomHandler();
+        CalculatorHandler basicHandler = new BasicHandler();
+
+        rootHandler.nextHandler(singleNumberHandler);
+        singleNumberHandler.nextHandler(customHandler);
+        customHandler.nextHandler(basicHandler);
+    }
 
     public int add(String text) {
-        if (isNullOrEmpty(text)) {
-            return EMPTY_TEXT_ZERO;
-        }
-
-        if (isSingleNumber(text)) {
-            CalculratorValidation.validate(text);
-            return Integer.parseInt(text);
-        }
-
-        if(isCustomSeparator(text)) {
-            return sum(text, new CustomSeparator());
-        }
-
-        return sum(text, new BasicSeparator());
+        return rootHandler.calculate(text);
     }
 
     private int sum(String text, Separator separator) {
