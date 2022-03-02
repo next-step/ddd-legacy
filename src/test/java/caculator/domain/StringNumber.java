@@ -11,7 +11,15 @@ public class StringNumber {
     }
 
     public static StringNumber valueOf(String number) {
-        return new StringNumber(Integer.parseInt(number));
+        return new StringNumber(toInteger(number));
+    }
+
+    private static int toInteger(String number) {
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            throw new StringNumberException(number);
+        }
     }
 
     public int value() {
