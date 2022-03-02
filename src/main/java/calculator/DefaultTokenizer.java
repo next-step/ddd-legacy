@@ -14,11 +14,11 @@ public class DefaultTokenizer implements NumberTokenizer {
 	}
 
 	@Override
-	public List<Integer> tokenize(final String text) {
+	public List<PositiveOrZeroNumber> tokenize(final String text) {
 		final String[] tokens = text.split(DEFAULT_REGEX);
 		return Arrays.stream(tokens)
 				.mapToInt(Integer::valueOf)
-				.boxed()
+				.mapToObj(PositiveOrZeroNumber::new)
 				.collect(Collectors.toList());
 	}
 }

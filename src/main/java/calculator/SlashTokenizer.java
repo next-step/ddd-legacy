@@ -16,7 +16,7 @@ class SlashTokenizer implements NumberTokenizer {
 	}
 
 	@Override
-	public List<Integer> tokenize(final String text) {
+	public List<PositiveOrZeroNumber> tokenize(final String text) {
 		final Matcher matcher = SLASH_PATTERN.matcher(text);
 
 		if (!matcher.find()) {
@@ -28,7 +28,7 @@ class SlashTokenizer implements NumberTokenizer {
 
 		return Arrays.stream(tokenizableText.split(tokenizer))
 				.mapToInt(Integer::valueOf)
-				.boxed()
+				.mapToObj(PositiveOrZeroNumber::new)
 				.collect(Collectors.toList());
 	}
 }

@@ -23,7 +23,7 @@ public class NumberTokenizers {
 		this.numberTokenizers = list;
 	}
 
-	public List<Integer> tokenize(final String text) {
+	public List<PositiveOrZeroNumber> tokenize(final String text) {
 		return numberTokenizers.stream()
 				.filter(tokenizer -> tokenizer.canTokenize(text))
 				.findFirst()

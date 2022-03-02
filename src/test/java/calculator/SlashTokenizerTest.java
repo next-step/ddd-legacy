@@ -39,8 +39,8 @@ class SlashTokenizerTest {
 	@DisplayName("토크나이징 가능한 문자열은 토크나이징이 가능하다.")
 	@Test
 	void tokenizeSuccess() {
-		List<Integer> result = slashTokenizer.tokenize("//%\n1%4%-6");
-		assertThat(result).containsExactly(1, 4, -6);
+		List<PositiveOrZeroNumber> result = slashTokenizer.tokenize("//%\n1%4%6");
+		assertThat(result).containsExactly(new PositiveOrZeroNumber(1), new PositiveOrZeroNumber(4), new PositiveOrZeroNumber(6));
 	}
 
 	@DisplayName("토크나이징 할 수 없는 문자열로 토크나이징 하는 경우 예외가 발생한다.")

@@ -23,30 +23,30 @@ class DefaultTokenizerTest {
 	@DisplayName("콤마(,) 로 숫자를 쪼갤 수 있다.")
 	@Test
 	void comma() {
-		List<Integer> result = defaultTokenizer.tokenize("10,2");
-		assertThat(result).containsExactly(10, 2);
+		List<PositiveOrZeroNumber> result = defaultTokenizer.tokenize("10,2");
+		assertThat(result).containsExactly(new PositiveOrZeroNumber(10), new PositiveOrZeroNumber(2));
 	}
 
 	@DisplayName("콜론(:) 으로 숫자를 쪼갤 수 있다.")
 	@Test
 	void colon() {
-		List<Integer> result = defaultTokenizer.tokenize("10:2");
-		assertThat(result).containsExactly(10, 2);
+		List<PositiveOrZeroNumber> result = defaultTokenizer.tokenize("10:2");
+		assertThat(result).containsExactly(new PositiveOrZeroNumber(10), new PositiveOrZeroNumber(2));
 	}
 
 	@DisplayName("콤마(,) 와 콜론(:) 을 함께 사용하여 숫자를 쪼갤 수도 있다.")
 	@Test
 	void commaWithColon() {
-		List<Integer> result = defaultTokenizer.tokenize("10:2,5");
-		assertThat(result).containsExactly(10, 2, 5);
+		List<PositiveOrZeroNumber> result = defaultTokenizer.tokenize("10:2,5");
+		assertThat(result).containsExactly(new PositiveOrZeroNumber(10), new PositiveOrZeroNumber(2), new PositiveOrZeroNumber(5));
 	}
 
 	@DisplayName("입력값에 숫자만 존재하는 경우 숫자 그대로 반환한다.")
 	@ParameterizedTest
-	@ValueSource(strings = {"-2", "0", "4"})
+	@ValueSource(strings = {"0", "4"})
 	void onlyNumber(String input) {
-		int expected = Integer.parseInt(input);
-		List<Integer> result = defaultTokenizer.tokenize(input);
+		PositiveOrZeroNumber expected = new PositiveOrZeroNumber(Integer.parseInt(input));
+		List<PositiveOrZeroNumber> result = defaultTokenizer.tokenize(input);
 		assertThat(result).containsExactly(expected);
 	}
 

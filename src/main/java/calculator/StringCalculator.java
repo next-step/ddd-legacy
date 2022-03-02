@@ -23,10 +23,9 @@ public class StringCalculator {
 			return Integer.parseInt(text);
 		}
 
-		final List<Integer> numbers = numberTokenizers.tokenize(text);
+		final List<PositiveOrZeroNumber> numbers = numberTokenizers.tokenize(text);
 
 		final PositiveOrZeroNumber result = numbers.stream()
-				.map(PositiveOrZeroNumber::new)
 				.reduce(PositiveOrZeroNumber::plus)
 				.orElse(new PositiveOrZeroNumber(DEFAULT_RESULT));
 
