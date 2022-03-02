@@ -22,8 +22,7 @@ import static calculator.CalculratorValidation.*;
 
 public class StringCalculator {
 
-    private int EMPTY_TEXT_ZERO = 0;
-
+    private static final int EMPTY_TEXT_ZERO = 0;
 
     public StringCalculator() {}
 
