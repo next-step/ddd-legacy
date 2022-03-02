@@ -44,11 +44,9 @@ public class CalculratorValidation {
     }
 
     public static void validateNumber(final int number) {
-        if (number >= 0) {
-            return;
+        if (number < 0) {
+            throw new RuntimeException("문자열 계산기에는 음수를 사용할 수 없습니다.");
         }
-
-        throw new RuntimeException("문자열 계산기에는 음수를 사용할 수 없습니다.");
     }
 
     public static void validate(final String stringNumber) {
