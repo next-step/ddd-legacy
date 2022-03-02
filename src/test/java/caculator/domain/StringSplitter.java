@@ -1,5 +1,6 @@
 package caculator.domain;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +16,10 @@ public class StringSplitter {
     }
 
     public static Numbers split(String stringNumbers) {
+        if (Objects.isNull(stringNumbers) || stringNumbers.isEmpty()) {
+            return Numbers.EMPTY;
+        }
+
         Matcher matcher = CUSTOM_DELIMITER.matcher(stringNumbers);
         if (matcher.find()) {
             return splitByCustomDelimiter(matcher);
