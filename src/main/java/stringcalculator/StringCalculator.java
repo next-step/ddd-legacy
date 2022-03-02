@@ -13,7 +13,7 @@ public class StringCalculator {
     private static final int CUSTOM_DELIMITER_INDEX = 1;
     private static final int CUSTOM_DELIMITER_INPUT_INDEX = 2;
 
-    public int add(String text) {
+    public static int add(String text) {
         if (text == null  || text.isEmpty()) {
             return MIN_NUMBER;
         }
@@ -27,7 +27,7 @@ public class StringCalculator {
         return sum(text.split(TOKEN_DELIMITER));
     }
 
-    private boolean isInteger(String text) {
+    private static boolean isInteger(String text) {
         try {
             Integer.parseInt(text);
             return true;
@@ -36,13 +36,13 @@ public class StringCalculator {
         }
     }
 
-    private int sumByCustomDelimiter(Matcher matcher) {
+    private static int sumByCustomDelimiter(Matcher matcher) {
         String customDelimiter = matcher.group(CUSTOM_DELIMITER_INDEX);
         String[] tokens = matcher.group(CUSTOM_DELIMITER_INPUT_INDEX).split(customDelimiter);
         return sum(tokens);
     }
 
-    private int sum(String[] tokens) {
+    private static int sum(String[] tokens) {
         int sum = MIN_NUMBER;
         for (String token : tokens) {
             int number = Integer.parseInt(token);
@@ -52,7 +52,7 @@ public class StringCalculator {
         return sum;
     }
 
-    private void validateNegative(int number) {
+    private static void validateNegative(int number) {
         if (number < MIN_NUMBER) {
             throw new RuntimeException();
         }
