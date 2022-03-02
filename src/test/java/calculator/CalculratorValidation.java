@@ -1,11 +1,7 @@
 package calculator;
 
-import calculator.separator.CustomSeparator;
-import org.thymeleaf.expression.Numbers;
-
 import java.util.Objects;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static calculator.separator.CustomSeparator.*;
 
@@ -22,14 +18,18 @@ import static calculator.separator.CustomSeparator.*;
 public class CalculratorValidation {
 
     public static boolean isNullOrEmpty(final String text) {
-        return isNull(text) || text.trim().isEmpty();
+        return isNull(text) || isEmpty(text);
     }
 
     public static boolean isNull(final String text) {
         return Objects.isNull(text);
     }
 
-    public static boolean isSingleNumber(String text) {
+    public static boolean isEmpty(final String text) {
+        return text.trim().isEmpty();
+    }
+
+    public static boolean isSingleNumber(final String text) {
         try {
             Integer.parseInt(text);
             return true;
@@ -38,12 +38,12 @@ public class CalculratorValidation {
         }
     }
 
-    public static boolean isCustomSeparator(String text) {
+    public static boolean isCustomSeparator(final String text) {
         Matcher matcher = CUSTOM_PATTERN.matcher(text);
         return matcher.find();
     }
 
-    public static void numberValidation(int number) {
+    public static void numberValidation(final int number) {
         if(number >= 0) {
             return;
         }
@@ -51,7 +51,7 @@ public class CalculratorValidation {
         throw new RuntimeException("문자열 계산기에는 음수를 사용할 수 없습니다.");
     }
 
-    public static void convertValidation(String stringNumber) {
+    public static void convertValidation(final String stringNumber) {
         try {
             Integer number = Integer.valueOf(stringNumber);
             numberValidation(number);
