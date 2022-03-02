@@ -18,7 +18,7 @@ public class TextConverter {
     }
 
     public static PositiveNumbers convertToNumbers(String text, String delimiter) {
-        if (Objects.isNull(text) || text.trim().isEmpty()) {
+        if (Objects.isNull(text) || isEmpty(text)) {
             return new PositiveNumbers();
         }
         final Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
@@ -28,6 +28,10 @@ public class TextConverter {
         final String[] splitText = text.split(delimiter);
         final List<PositiveNumber> numbers = getNumbersWithNoCustomDelimiter(splitText);
         return new PositiveNumbers(numbers);
+    }
+
+    private static boolean isEmpty(String text) {
+        return text.trim().isEmpty();
     }
 
     private static PositiveNumbers getNumbersWithCustomDelimiter(Matcher matcher) {
