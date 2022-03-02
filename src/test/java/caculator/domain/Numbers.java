@@ -9,7 +9,7 @@ public class Numbers {
 
     private final List<StringNumber> stringNumbers;
 
-    public Numbers(List<StringNumber> stringNumbers) {
+    private Numbers(List<StringNumber> stringNumbers) {
         this.stringNumbers = stringNumbers;
     }
 
@@ -17,6 +17,12 @@ public class Numbers {
         return new Numbers(Arrays.stream(stringNumbers)
             .map(StringNumber::valueOf)
             .collect(Collectors.toList()));
+    }
+
+    public int sum() {
+        return stringNumbers.stream()
+            .mapToInt(StringNumber::value)
+            .sum();
     }
 
     @Override
