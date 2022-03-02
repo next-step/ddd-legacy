@@ -1,15 +1,7 @@
 package calculator;
 
-import calculator.chain.*;
-import calculator.separator.BasicSeparator;
-import calculator.separator.CustomSeparator;
+import calculator.handler.*;
 import calculator.separator.Separator;
-
-import javax.persistence.Basic;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import static calculator.CalculratorValidation.*;
 
 /**
  * <pre>

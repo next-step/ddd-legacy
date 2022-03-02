@@ -1,4 +1,4 @@
-package calculator.chain;
+package calculator.handler;
 
 import calculator.Numbers;
 import calculator.separator.BasicSeparator;
