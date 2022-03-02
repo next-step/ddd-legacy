@@ -21,11 +21,11 @@ public class CalculratorValidation {
         return isNull(text) || isEmpty(text);
     }
 
-    public static boolean isNull(final String text) {
+    private static boolean isNull(final String text) {
         return Objects.isNull(text);
     }
 
-    public static boolean isEmpty(final String text) {
+    private static boolean isEmpty(final String text) {
         return text.trim().isEmpty();
     }
 
