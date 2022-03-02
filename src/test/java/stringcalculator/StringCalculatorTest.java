@@ -3,7 +3,6 @@ package stringcalculator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,12 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class StringCalculatorTest {
 
-    private StringCalculator calculator;
-
-    @BeforeEach
-    void setUp() {
-        calculator = new StringCalculator();
-    }
+    private StringCalculator calculator = new StringCalculator();
 
     @DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")
     @ParameterizedTest
@@ -51,6 +45,13 @@ class StringCalculatorTest {
     @ParameterizedTest
     @ValueSource(strings = {"//;\n1;2;3"})
     void customDelimiter(final String text) {
+        assertThat(calculator.add(text)).isSameAs(6);
+    }
+
+    @DisplayName("//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다. 커스텀 구분자가 여러개 인 경우")
+    @ParameterizedTest
+    @ValueSource(strings = {"//;\n//%\n//&\n1;2;3"})
+    void customDelimiters(final String text) {
         assertThat(calculator.add(text)).isSameAs(6);
     }
 
