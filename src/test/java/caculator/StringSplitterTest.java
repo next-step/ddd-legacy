@@ -25,4 +25,18 @@ class StringSplitterTest {
 
     }
 
+    @DisplayName("커스텀 구분자로 분리")
+    @ParameterizedTest(name = "[{arguments}]")
+    @ValueSource(strings = {
+        "//;\n1;2;3",
+        "//!\n1!2!3",
+    })
+    void customDelimiter(String stringNumbers) {
+        //when
+        Numbers numbers = StringSplitter.split(stringNumbers);
+
+        //then
+        assertThat(numbers).isEqualTo(Numbers.from(new String[]{"1", "2", "3"}));
+
+    }
 }
