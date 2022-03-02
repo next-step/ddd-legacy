@@ -25,9 +25,13 @@ public class StringNumber {
     }
 
     private static void validatePositive(int number) {
-        if (number < 0) {
+        if (isNegative(number)) {
             throw new StringNumberException(number);
         }
+    }
+
+    private static boolean isNegative(int number) {
+        return number < 0;
     }
 
     public int value() {

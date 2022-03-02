@@ -7,6 +7,8 @@ import caculator.domain.StringNumber;
 import caculator.domain.StringNumberException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class StringNumberTest {
 
@@ -23,25 +25,14 @@ class StringNumberTest {
         assertThat(actual).isEqualTo(StringNumber.valueOf(number));
     }
     
-    @DisplayName("숫자 이외의 값 예외")
-    @Test
-    void notANumberException() {
+    @DisplayName("숫자 이외 또는 음수")
+    @ParameterizedTest(name = "[{arguments}]")
+    @ValueSource(strings = "일, -1")
+    void notANumberException(String notANumber) {
 
-        String 숫자_아닌_문자 = "일";
-
-        assertThatThrownBy(() -> StringNumber.valueOf(숫자_아닌_문자))
+        assertThatThrownBy(() -> StringNumber.valueOf(notANumber))
             .isInstanceOf(StringNumberException.class)
-            .hasMessageEndingWith(숫자_아닌_문자);
+            .hasMessageEndingWith(notANumber);
     }
 
-    @DisplayName("음수 예외")
-    @Test
-    void negativeException() {
-
-        String 음수 = "-1";
-
-        assertThatThrownBy(() -> StringNumber.valueOf(음수))
-            .isInstanceOf(StringNumberException.class)
-            .hasMessageEndingWith(음수);
-    }
 }
