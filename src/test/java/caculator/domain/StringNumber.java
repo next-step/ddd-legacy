@@ -1,0 +1,37 @@
+package caculator.domain;
+
+import java.util.Objects;
+
+public class StringNumber {
+
+    private final int value;
+
+    private StringNumber(int value) {
+        this.value = value;
+    }
+
+    public static StringNumber valueOf(String number) {
+        return new StringNumber(Integer.parseInt(number));
+    }
+
+    public int value() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        StringNumber that = (StringNumber) o;
+        return value == that.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
+    }
+}
