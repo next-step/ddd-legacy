@@ -16,8 +16,16 @@ public class StringNumber {
 
     private static int toInteger(String number) {
         try {
-            return Integer.parseInt(number);
+            int stringNumber = Integer.parseInt(number);
+            validatePositive(stringNumber);
+            return stringNumber;
         } catch (NumberFormatException e) {
+            throw new StringNumberException(number);
+        }
+    }
+
+    private static void validatePositive(int number) {
+        if (number < 0) {
             throw new StringNumberException(number);
         }
     }

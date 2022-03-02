@@ -33,4 +33,15 @@ class StringNumberTest {
             .isInstanceOf(StringNumberException.class)
             .hasMessageEndingWith(숫자_아닌_문자);
     }
+
+    @DisplayName("음수 예외")
+    @Test
+    void negativeException() {
+
+        String 음수 = "-1";
+
+        assertThatThrownBy(() -> StringNumber.valueOf(음수))
+            .isInstanceOf(StringNumberException.class)
+            .hasMessageEndingWith(음수);
+    }
 }
