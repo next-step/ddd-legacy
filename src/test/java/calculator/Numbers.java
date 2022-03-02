@@ -17,9 +17,9 @@ import java.util.stream.Collectors;
 
 public class Numbers {
 
-    private final List<Integer> numbers;
+    private final List<Number> numbers;
 
-    private Numbers(List<Integer> numbers) {
+    private Numbers(List<Number> numbers) {
         this.numbers = numbers;
     }
 
@@ -27,24 +27,16 @@ public class Numbers {
         return new Numbers(convertCollection(split));
     }
 
-    private static List<Integer> convertCollection(String[] split) {
-
+    private static List<Number> convertCollection(String[] split) {
         return Arrays.asList(split)
                 .stream()
-                .map(convert())
+                .map(Number::of)
                 .collect(Collectors.toList());
-    }
-
-    private static Function<String, Integer> convert() {
-        return v -> {
-            CalculratorValidation.validate(v);
-            return Integer.valueOf(v);
-        };
     }
 
     public int sum() {
         return this.numbers.stream()
-                .mapToInt(i -> i)
+                .mapToInt(Number::value)
                 .sum();
     }
 }
