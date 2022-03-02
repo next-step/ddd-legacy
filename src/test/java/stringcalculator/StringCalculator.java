@@ -51,7 +51,7 @@ public class StringCalculator {
     }
 
     private boolean hasAnyNegativeNumber(String[] numbers) {
-        return Arrays.stream(numbers).map(Integer::parseInt).anyMatch(n -> n < 0);
+        return Arrays.stream(numbers).map(Integer::parseInt).anyMatch(n -> n < ZERO);
     }
 
     private boolean hasOnlyOneNumber(String[] numbers) {
