@@ -13,9 +13,9 @@ public class StringCalculator {
     private static final String NEW_LINE = "\n";
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(CUSTOM_DELIMITER_PREFIX + "(.)");
 
-    public int add(String text) {
+    public PositiveNumber add(String text) {
         if (text == null || text.isEmpty()) {
-            return 0;
+            return PositiveNumber.ZERO;
         }
 
         final List<String> customDelimiters = findAllCustomDelimiters(text);
@@ -28,8 +28,9 @@ public class StringCalculator {
         ).collect(Collectors.joining("|", "[", "]"));
 
         return Arrays.stream(numbersText.split(allDelimitersRegex))
-            .mapToInt(Integer::parseInt)
-            .sum();
+            .map(Integer::parseInt)
+            .map(PositiveNumber::new)
+            .reduce(PositiveNumber.ZERO, PositiveNumber::plus);
     }
 
     private String parseNumbers(String text) {
