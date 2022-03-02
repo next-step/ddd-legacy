@@ -7,7 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SyntaxTest {
 
-    @DisplayName("빈 문자열의 경우 0을 반환한다")
+    @DisplayName("빈 문자열의 경우 빈 문자열을 반환한다")
     @Test
     void emptyString() {
         assertThat(Syntax.parse("")).containsExactly("");
