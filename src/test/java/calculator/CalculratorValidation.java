@@ -33,7 +33,7 @@ public class CalculratorValidation {
         try {
             Integer.parseInt(text);
             return true;
-        }catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return false;
         }
     }
@@ -44,7 +44,7 @@ public class CalculratorValidation {
     }
 
     public static void numberValidation(final int number) {
-        if(number >= 0) {
+        if (number >= 0) {
             return;
         }
 
@@ -55,7 +55,7 @@ public class CalculratorValidation {
         try {
             Integer number = Integer.valueOf(stringNumber);
             numberValidation(number);
-        }catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             throw new RuntimeException("문자열 계산기에 숫자 이외의 값을 사용할 수 없습니다.");
         }
     }
