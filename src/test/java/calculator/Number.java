@@ -16,15 +16,18 @@ public class Number {
     private final int value;
 
     public Number(int value) {
+
         this.value = value;
     }
 
     public static Number of(String value) {
+
         CalculratorValidation.validate(value);
         return new Number(Integer.parseInt(value));
     }
 
     public int value() {
+
         return this.value;
     }
 }

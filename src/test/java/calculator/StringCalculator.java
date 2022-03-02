@@ -44,6 +44,7 @@ public class StringCalculator {
     }
 
     private int sum(String text, Separator separator) {
+
         Numbers numbers = Numbers.of(separator.division(text));
         return numbers.sum();
     }

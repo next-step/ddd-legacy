@@ -24,10 +24,12 @@ public class Numbers {
     }
 
     public static Numbers of(String[] split) {
+
         return new Numbers(convertCollection(split));
     }
 
     private static List<Number> convertCollection(String[] split) {
+
         return Arrays.asList(split)
                 .stream()
                 .map(Number::of)
@@ -35,6 +37,7 @@ public class Numbers {
     }
 
     public int sum() {
+
         return this.numbers.stream()
                 .mapToInt(Number::value)
                 .sum();
