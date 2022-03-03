@@ -7,6 +7,7 @@ public class StringNumber {
     private final int value;
 
     private StringNumber(int value) {
+        validatePositive(value);
         this.value = value;
     }
 
@@ -16,9 +17,7 @@ public class StringNumber {
 
     private static int toInteger(String number) {
         try {
-            int stringNumber = Integer.parseInt(number);
-            validatePositive(stringNumber);
-            return stringNumber;
+            return Integer.parseInt(number);
         } catch (NumberFormatException e) {
             throw new StringNumberException(number);
         }
