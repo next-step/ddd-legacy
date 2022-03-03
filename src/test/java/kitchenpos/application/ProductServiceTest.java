@@ -185,4 +185,13 @@ class ProductServiceTest {
         //then
         assertThat(변경된_상품.getPrice()).isEqualTo(변경할_상품_가격);
     }
+
+    @DisplayName("상품 조회 - 등록된 모든 상품을 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given & when
+        productService.findAll();
+        //then
+        verify(productRepository).findAll();
+    }
 }
