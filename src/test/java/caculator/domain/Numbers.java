@@ -19,7 +19,13 @@ public class Numbers {
     public static Numbers from(String[] stringNumbers) {
         return new Numbers(Arrays.stream(stringNumbers)
             .map(StringNumber::valueOf)
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList())
+        );
+    }
+
+    public static Numbers from(String stringNumbers) {
+        StringNet stringNet = StringNetFactory.getStringNet(stringNumbers);
+        return from(stringNet.strain(stringNumbers));
     }
 
     public int sum() {
