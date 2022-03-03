@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static kitchenpos.stub.MenuGroupStub.generateTestMenuGroup;
+import static kitchenpos.stub.MenuGroupStub.generateFirstTestMenuGroup;
 import static kitchenpos.stub.MenuProductStub.generateTestMenuProducts;
 
 public class MenuStub {
@@ -18,7 +18,7 @@ public class MenuStub {
 
     public static Menu generateFiveThousandPriceVisibleValidPriceMenu() {
         Menu menu = new Menu();
-        menu.setMenuGroup(generateTestMenuGroup());
+        menu.setMenuGroup(generateFirstTestMenuGroup());
         menu.setMenuProducts(generateTestMenuProducts());
         menu.setDisplayed(true);
         menu.setName(FIVE_THOUSAND_VISIBLE_MENU_NAME);
@@ -28,7 +28,7 @@ public class MenuStub {
 
     public static Menu generateFiveThousandPriceVisibleInValidPriceMenu() {
         Menu menu = new Menu();
-        menu.setMenuGroup(generateTestMenuGroup());
+        menu.setMenuGroup(generateFirstTestMenuGroup());
         menu.setMenuProducts(generateTestMenuProducts());
         menu.setDisplayed(true);
         menu.setName(FIVE_THOUSAND_VISIBLE_MENU_NAME);
