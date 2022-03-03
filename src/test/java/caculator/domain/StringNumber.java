@@ -4,6 +4,8 @@ import java.util.Objects;
 
 public class StringNumber {
 
+    private static final int MINIMUM_BOUND = 0;
+
     private final int value;
 
     private StringNumber(int value) {
@@ -13,6 +15,10 @@ public class StringNumber {
 
     public static StringNumber valueOf(String number) {
         return new StringNumber(toInteger(number));
+    }
+
+    public static StringNumber zero() {
+        return new StringNumber(MINIMUM_BOUND);
     }
 
     private static int toInteger(String number) {
@@ -30,7 +36,11 @@ public class StringNumber {
     }
 
     private static boolean isNegative(int number) {
-        return number < 0;
+        return number < MINIMUM_BOUND;
+    }
+
+    public StringNumber add(StringNumber other) {
+        return new StringNumber(value + other.value());
     }
 
     public int value() {

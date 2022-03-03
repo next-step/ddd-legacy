@@ -24,8 +24,8 @@ public class Numbers {
 
     public int sum() {
         return stringNumbers.stream()
-            .mapToInt(StringNumber::value)
-            .sum();
+            .reduce(StringNumber.zero(), StringNumber::add)
+            .value();
     }
 
     @Override
