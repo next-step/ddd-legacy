@@ -60,4 +60,13 @@ class MenuGroupServiceTest {
         verify(menuGroupRepository).save(any(MenuGroup.class));
     }
 
+    @DisplayName("메뉴 그룹 조회 - 등록된 모든 메뉴 그룹을 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given & when
+        menuGroupService.findAll();
+        //then
+        verify(menuGroupRepository).findAll();
+    }
+
 }
