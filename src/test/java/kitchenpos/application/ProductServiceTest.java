@@ -47,12 +47,12 @@ class ProductServiceTest {
     @DisplayName("상품등록 - 상품의 가격은 반드시 0보다 큰 값을 가져야 한다.")
     @MethodSource("providePriceForNullAndNegative")
     @ParameterizedTest
-    public void create01(BigDecimal input) {
+    public void create01(BigDecimal 등록할_상품_가격) {
         //given
-        Product product = new Product();
-        product.setPrice(input);
+        Product 등록할_상품 = mock(Product.class);
+        when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
         //when & then
-        assertThatThrownBy(() -> productService.create(product))
+        assertThatThrownBy(() -> productService.create(등록할_상품))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -60,10 +60,11 @@ class ProductServiceTest {
     @Test
     public void create02() {
         //given
-        Product product = new Product();
-        product.setPrice(BigDecimal.valueOf(1000l));
+        Product 등록할_상품 = mock(Product.class);
+        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000l);
+        when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
         //when & then
-        assertThatThrownBy(() -> productService.create(product))
+        assertThatThrownBy(() -> productService.create(등록할_상품))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -71,14 +72,16 @@ class ProductServiceTest {
     @Test
     public void create03() {
         //given
-        Product product = new Product();
-        product.setPrice(BigDecimal.valueOf(1000l));
-        String slang = "X나 맛없는 미트파이";
-        product.setName(slang);
-        when(purgomalumClient.containsProfanity(slang))
+
+        Product 등록할_상품 = mock(Product.class);
+        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000l);
+        String 등록할_상품_이름 = "X나 맛없는 미트파이";
+        when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
+        when(등록할_상품.getName()).thenReturn(등록할_상품_이름);
+        when(purgomalumClient.containsProfanity(등록할_상품_이름))
                 .thenReturn(Boolean.TRUE);
         //when & then
-        assertThatThrownBy(() -> productService.create(product))
+        assertThatThrownBy(() -> productService.create(등록할_상품))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -86,14 +89,15 @@ class ProductServiceTest {
     @Test
     public void create04() {
         //given
-        Product request = new Product();
-        request.setPrice(BigDecimal.valueOf(1000l));
-        String name = "맛있는 미트파이";
-        request.setName(name);
-        when(purgomalumClient.containsProfanity(name))
-                .thenReturn(Boolean.FALSE);
+        Product 등록할_상품 = mock(Product.class);
+        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000l);
+        String 등록할_상품_이름 = "맛있는 미트파이";
+        when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
+        when(등록할_상품.getName()).thenReturn(등록할_상품_이름);
+        when(purgomalumClient.containsProfanity(등록할_상품_이름))
+                .thenReturn(Boolean.TRUE);
         //when
-        productService.create(request);
+        productService.create(등록할_상품);
 
         // & then
         verify(productRepository).save(any(Product.class));
@@ -104,8 +108,8 @@ class ProductServiceTest {
     @ParameterizedTest
     public void changePrice01(BigDecimal 변경할_상품_가격) {
         //given
-        Product 변경할_상품 = new Product();
-        변경할_상품.setPrice(변경할_상품_가격);
+        Product 변경할_상품 = mock(Product.class);
+        when(변경할_상품.getPrice()).thenReturn(변경할_상품_가격);
         //when & then
         assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), 변경할_상품))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -120,7 +124,8 @@ class ProductServiceTest {
         BigDecimal 계속_공개될_메뉴_가격 = BigDecimal.valueOf(2500l);
         BigDecimal 비공개될_메뉴_가격 = BigDecimal.valueOf(2800l);
 
-        Product 변경할_상품 = new Product();
+        Product 변경할_상품 = mock(Product.class);
+        given(변경할_상품.getPrice()).willReturn(변경할_상품_가격);
         변경할_상품.setPrice(변경할_상품_가격);
 
         Product 저장된_상품 = spy(Product.class);
@@ -132,18 +137,17 @@ class ProductServiceTest {
         given(저장된_메뉴_상품.getQuantity()).willReturn(1l);
 
         Menu 계속_공개될_메뉴 = spy(Menu.class);
-        계속_공개될_메뉴.setDisplayed(true);
+        given(계속_공개될_메뉴.isDisplayed()).willReturn(Boolean.TRUE);
         given(계속_공개될_메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(저장된_메뉴_상품)));
         given(계속_공개될_메뉴.getPrice()).willReturn(계속_공개될_메뉴_가격);
 
         Menu 비공개될_메뉴 = spy(Menu.class);
-        비공개될_메뉴.setDisplayed(true);
+        given(계속_공개될_메뉴.isDisplayed()).willReturn(Boolean.TRUE);
         given(비공개될_메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(저장된_메뉴_상품)));
         given(비공개될_메뉴.getPrice()).willReturn(비공개될_메뉴_가격);
 
         given(menuRepository.findAllByProductId(any(UUID.class)))
                 .willReturn(new ArrayList<>(Arrays.asList(계속_공개될_메뉴, 비공개될_메뉴)));
-
 
         //when
         productService.changePrice(UUID.randomUUID(), 변경할_상품);

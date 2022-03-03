@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,13 +11,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
@@ -40,8 +38,8 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     public void create01(String name) {
         //given
-        MenuGroup 등록할_메뉴_그룹 = new MenuGroup();
-        등록할_메뉴_그룹.setName(name);
+        MenuGroup 등록할_메뉴_그룹 = mock(MenuGroup.class);
+        when(등록할_메뉴_그룹.getName()).thenReturn(name);
 
         //when & then
         assertThatThrownBy(() -> menuGroupService.create(등록할_메뉴_그룹))
@@ -52,8 +50,9 @@ class MenuGroupServiceTest {
     @Test
     public void create02() {
         //given
-        MenuGroup 등록할_메뉴_그룹 = new MenuGroup();
-        등록할_메뉴_그룹.setName("런치 세트 메뉴");
+        MenuGroup 등록할_메뉴_그룹 = mock(MenuGroup.class);
+        String 등록할_메뉴_그룹_이름 = "런치 세트 메뉴";
+        when(등록할_메뉴_그룹.getName()).thenReturn(등록할_메뉴_그룹_이름);
         //when
         menuGroupService.create(등록할_메뉴_그룹);
         //then
