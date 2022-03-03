@@ -8,7 +8,15 @@ public class PositiveNumber {
     private static final String EXCEPTION_MESSAGE_NEGATIVE_NUMBER = "문자열 계산기의 입력값은 음수가 될수 없습니다.";
     private int number;
 
-    private PositiveNumber(int number) {
+    public PositiveNumber() {
+        this(0);
+    }
+
+    public PositiveNumber(String numberText) {
+        this(Integer.parseInt(numberText));
+    }
+
+    public PositiveNumber(int number) {
         validation(number);
         this.number = number;
     }
@@ -19,11 +27,11 @@ public class PositiveNumber {
         }
     }
 
-    public static PositiveNumber create(int number) {
-        return new PositiveNumber(number);
-    }
-
     public int getNumber() {
         return number;
+    }
+
+    public void add(PositiveNumber positiveNumber) {
+        this.number += positiveNumber.number;
     }
 }

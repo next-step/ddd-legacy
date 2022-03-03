@@ -8,19 +8,17 @@ public class Numbers {
 
     private List<PositiveNumber> numbers;
 
-    private Numbers(String[] numbers) {
+    public Numbers(String[] numbers) {
         this.numbers = Arrays.stream(numbers)
-                .map(number -> PositiveNumber.create(Integer.parseInt(number)))
+                .map(number -> new PositiveNumber(number))
                 .collect(Collectors.toList());
     }
 
-    public static Numbers create(String[] numberTexts) {
-        return new Numbers(numberTexts);
-    }
-
     public int sum() {
-        return numbers.stream()
-                .mapToInt(PositiveNumber::getNumber)
-                .sum();
+        PositiveNumber number = new PositiveNumber();
+
+        numbers.forEach(positiveNumber -> number.add(positiveNumber));
+
+        return number.getNumber();
     }
 }

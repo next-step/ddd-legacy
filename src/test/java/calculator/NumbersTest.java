@@ -13,6 +13,6 @@ public class NumbersTest {
     @CsvSource(value = {"1,2,3", "1,1,2", "0,1,1"}, delimiter = ',')
     void sumNumbers(String firstNumber, String secondNumber, int sumNumber) {
         String[] numbers = {firstNumber, secondNumber};
-        assertThat(Numbers.create(numbers).sum()).isEqualTo(sumNumber);
+        assertThat(new Numbers(numbers).sum()).isEqualTo(sumNumber);
     }
 }
