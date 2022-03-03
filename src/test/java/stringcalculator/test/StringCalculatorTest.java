@@ -1,9 +1,11 @@
-package stringcalculator;
+package stringcalculator.test;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import stringcalculator.StringCalculator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -14,7 +16,7 @@ class StringCalculatorTest {
     @NullAndEmptySource
     @ParameterizedTest
     void nullOrEmptyValue(String source) {
-        assertThat(new StringCalculator(source).add()).isZero();
+        Assertions.assertThat(new StringCalculator(source).add()).isZero();
     }
 
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")

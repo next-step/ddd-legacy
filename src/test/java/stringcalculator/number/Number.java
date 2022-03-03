@@ -1,4 +1,4 @@
-package stringcalculator;
+package stringcalculator.number;
 
 import java.util.Objects;
 
@@ -24,8 +24,8 @@ public class Number {
         }
     }
 
-    public Number sum(Number a, Number b) {
-        return new Number(Integer.sum(a.value, b.value));
+    public Number sum(Number other) {
+        return new Number(Integer.sum(other.getValue(), value));
     }
 
     public int getValue() {

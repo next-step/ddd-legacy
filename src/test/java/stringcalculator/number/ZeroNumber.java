@@ -1,6 +1,6 @@
-package stringcalculator;
+package stringcalculator.number;
 
-import java.util.Objects;
+import stringcalculator.number.Number;
 
 public class ZeroNumber extends Number {
 

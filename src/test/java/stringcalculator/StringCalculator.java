@@ -1,5 +1,9 @@
 package stringcalculator;
 
+import stringcalculator.number.Number;
+import stringcalculator.number.ZeroNumber;
+import stringcalculator.operator.OperatorSelector;
+
 public class StringCalculator {
 
     private static final int SINGLE_STRING_LENGTH = 1;
@@ -19,7 +23,7 @@ public class StringCalculator {
             return new Number(source).getValue();
         }
 
-        return 0;
+        return new OperatorSelector().select(source).add();
     }
 
     private boolean isNullOrEmpty(String source) {
