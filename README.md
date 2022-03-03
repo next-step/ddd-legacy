@@ -4,6 +4,13 @@
 * kitchenpos 패키지의 코드를 보고 키친포스의 요구 사항을 README.md에 작성한다.
 * http 디렉터리의 .http 파일(HTTP client)을 보고 어떤 요청을 받는지 참고한다
 
+### step3 진행방법
+* 정리한 키친포스의 요구 사항을 토대로 테스트 코드를 작성한다.
+* 모든 Business Object에 대한 테스트 코드를 작성한다.
+  * SpringBootTest를 이용한 통합 테스트 코드
+  * 또는 @ExtendWith(MockitoExtension.class)를 이용한 단위 테스트 코드를 작성한다.
+* Controller에 대한 테스트 코드 작성은 권장하지만 필수는 아니다.
+
 ## 요구 사항
 * 가게에서 메뉴에 대한 주문을 처리할 수 있는 POS(Point Of Sales)를 구현한다.
 * 상품
