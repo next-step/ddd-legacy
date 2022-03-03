@@ -42,6 +42,6 @@
 - [ ] 좋은 객체란
   - [x] StringSplitter 이름 변경
     - End With -ER 은 안티패턴이다. 우선 이름부터 변경해보자. 
-  - [ ] StringNet 인터페이스 추출
+  - [x] StringNet 인터페이스 추출
   - [ ] 기본 구분자로 분리
   - [ ] 커스텀 구분자로 분리
