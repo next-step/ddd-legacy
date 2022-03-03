@@ -11,18 +11,10 @@ public class StringCalculator {
     }
 
     public PositiveNumber add(String text) {
-        if (isNullOrEmpty(text)) {
-            return PositiveNumber.ZERO;
-        }
-
         final List<Integer> numbers = numberParser.parse(text);
 
         return numbers.stream()
             .map(PositiveNumber::new)
             .reduce(PositiveNumber.ZERO, PositiveNumber::plus);
-    }
-
-    private boolean isNullOrEmpty(String text) {
-        return text == null || text.isEmpty();
     }
 }

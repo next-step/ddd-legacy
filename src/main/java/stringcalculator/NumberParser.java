@@ -1,6 +1,7 @@
 package stringcalculator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -14,12 +15,20 @@ public class NumberParser {
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(CUSTOM_DELIMITER_PREFIX + "(.)");
 
     public List<Integer> parse(String text) {
+        if (isNullOrEmpty(text)) {
+            return Collections.emptyList();
+        }
+
         final String numberText = parseNumberText(text);
         final String allDelimiterRegex = findAllDelimiterRegex(text);
 
         return Arrays.stream(numberText.split(allDelimiterRegex))
             .map(Integer::parseInt)
             .collect(Collectors.toList());
+    }
+
+    private boolean isNullOrEmpty(String text) {
+        return text == null || text.isEmpty();
     }
 
     private String parseNumberText(String text) {
