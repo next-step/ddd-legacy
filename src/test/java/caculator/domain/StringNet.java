@@ -4,14 +4,14 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringSplitter {
+public class StringNet {
 
     public static final String DEFAULT_DELIMITER = "[,:]";
     public static final Pattern CUSTOM_DELIMITER = Pattern.compile("//(.)\n(.*)");
     public static final int CUSTOM_DELIMITER_INDEX = 1;
     public static final int CUSTOM_NUMBERS_INDEX = 2;
 
-    private StringSplitter() {
+    private StringNet() {
         throw new AssertionError();
     }
 
