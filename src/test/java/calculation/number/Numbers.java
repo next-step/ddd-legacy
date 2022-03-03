@@ -1,30 +1,16 @@
 package calculation.number;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Numbers {
-	private final List<Number> numbers = new ArrayList<>();
+	private final List<Number> numbers;
 
-	public List<Number> getNumbers() {
-		return numbers;
-	}
-
-	public void addNumber(Number number) {
-		getNumbers().add(number);
-	}
-
-	public Numbers convertStringsToIntegers(String[] stringNumbers) {
-		Arrays.stream(stringNumbers).map(Number::convert).forEach(this::addNumber);
-		return this;
+	public Numbers(List<Number> numbers) {
+		this.numbers = numbers;
 	}
 
 	public int sum() {
-		return numbers.stream().mapToInt(Number::getNumber).sum();
-	}
-
-	public void addZero() {
-		getNumbers().add(new Number(0));
+		return numbers.stream().map(Number::getValue).reduce(new Number().getValue(), Number::sum);
 	}
 }

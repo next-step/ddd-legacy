@@ -1,26 +1,53 @@
 package calculation.convert;
 
+import calculation.calculator.CalculationResult;
 import calculation.number.Number;
 import calculation.number.Numbers;
 
-import static calculation.calculator.CalculatorCheckValidation.*;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static calculation.ErrorMessage.THIS_DELIMITER_ARE_NOT_ALLOWED;
+import static calculation.convert.StringSeparation.*;
 
 public class ConvertStringsToNumbers {
+	private final CalculationResult result;
 
-	public static Numbers convertToNumbers(String text) {
-		Numbers numbers = new Numbers();
-		if (isNull(text) || isEmpty(text)) {
-			numbers.addZero();
-			return numbers;
+	public int getResult() {
+		return result.getResult();
+	}
+
+	public ConvertStringsToNumbers(String formula) {
+		result = this.deriveResults(formula);
+	}
+
+	public CalculationResult deriveResults(String formula) {
+		if (isNull(formula) || isEmpty(formula)) {
+			return new CalculationResult();
 		}
-		if (isNum(text)) {
-			Number number = Number.convert(text);
-			numbers.getNumbers().add(number);
-			return numbers;
+		String[] strings = getStrings(formula);
+		Numbers numbers = new Numbers(Arrays.stream(strings).map(this::convertStringToNumber).collect(Collectors.toList()));
+		return new CalculationResult(numbers.sum());
+	}
+
+	private Number convertStringToNumber(String string) {
+		if (isNull(string) || isEmpty(string)) {
+			return new Number();
 		}
-		if (isContainsColons(text)) {
-			return numbers.convertStringsToIntegers(DefaultDelimiter.convertFormula(text));
+		try {
+			final int parseInt = Integer.parseInt(string);
+			return new Number(parseInt);
+		} catch (NumberFormatException e) {
+			throw new RuntimeException(THIS_DELIMITER_ARE_NOT_ALLOWED + " : " + string);
 		}
-		return numbers.convertStringsToIntegers(CustomDelimiter.convertFormula(text));
+	}
+
+	private boolean isNull(String string) {
+		return Objects.isNull(string);
+	}
+
+	private boolean isEmpty(String string) {
+		return string.trim().isEmpty();
 	}
 }
