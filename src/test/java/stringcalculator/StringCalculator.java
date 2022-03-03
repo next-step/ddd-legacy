@@ -4,7 +4,7 @@ public class StringCalculator {
 
     private static final int SINGLE_STRING_LENGTH = 1;
 
-    private String source;
+    private final String source;
 
     public StringCalculator(String source) {
         this.source = source;
@@ -12,11 +12,11 @@ public class StringCalculator {
 
     public int add() {
         if (isNullOrEmpty(source)) {
-            return 0;
+            return new ZeroNumber().getValue();
         }
 
         if (isSingleLength(source)) {
-            return 0;
+            return new Number(source).getValue();
         }
 
         return 0;
