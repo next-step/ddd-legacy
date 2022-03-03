@@ -1,10 +1,10 @@
 package stringcalculator;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
 
-    private static final int MIN_NUMBER = 0;
     private static final int SINGLE_INPUT_LENGTH = 1;
     private static final Pattern NUMERIC_PATTERN = Pattern.compile("[+-]?\\d*(\\.\\d+)?");
 
@@ -13,7 +13,7 @@ public class StringCalculator {
 
     public static int add(String text) {
         if (isNullOrEmpty(text)) {
-            return MIN_NUMBER;
+            return PositiveNumber.MIN_NUMBER;
         }
         if (isSingleInputInteger(text)) {
             return Integer.parseInt(text);
@@ -37,18 +37,10 @@ public class StringCalculator {
     }
 
     private static int sum(String[] tokens) {
-        int sum = MIN_NUMBER;
-        for (String token : tokens) {
-            int number = Integer.parseInt(token);
-            validateNegative(number);
-            sum+=number;
-        }
-        return sum;
+        return Arrays.stream(tokens)
+                .map(PositiveNumber::new)
+                .mapToInt(PositiveNumber::getNumber)
+                .sum();
     }
 
-    private static void validateNegative(int number) {
-        if (number < MIN_NUMBER) {
-            throw new RuntimeException();
-        }
-    }
 }
