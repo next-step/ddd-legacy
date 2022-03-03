@@ -8,6 +8,7 @@ import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -34,7 +35,10 @@ class ProductServiceTest {
     private ProductRepository productRepository;
 
     @Mock
-    private  MenuRepository menuRepository;
+    private MenuRepository menuRepository;
+
+    @InjectMocks
+    private ProductService productService;
 
 
     @DisplayName("새 상품을 등록할 수 있다.")
@@ -44,7 +48,6 @@ class ProductServiceTest {
         Product newProduct = generateThousandPriceProduct();
         when(purgomalumClient.containsProfanity(any())).thenReturn(false);
         when(productRepository.save(any())).thenReturn(newProduct);
-        ProductService productService = new ProductService(productRepository, menuRepository, purgomalumClient);
 
         //when
         Product result = productService.create(newProduct);
@@ -59,7 +62,6 @@ class ProductServiceTest {
         //given
         Product newProduct = generateThousandPriceProduct();
         when(purgomalumClient.containsProfanity(any())).thenReturn(true);
-        ProductService productService = new ProductService(productRepository, menuRepository, purgomalumClient);
 
         //when & then
         assertThatThrownBy(() -> productService.create(newProduct)).isInstanceOf(IllegalArgumentException.class);
@@ -70,7 +72,6 @@ class ProductServiceTest {
     void mustBePositivePrice() {
         //given
         Product negativePriceProduct = generateNegativePriceProduct();
-        ProductService productService = new ProductService(productRepository, menuRepository, purgomalumClient);
 
         //when & then
         assertThatThrownBy(() -> productService.create(negativePriceProduct)).isInstanceOf(IllegalArgumentException.class);
@@ -85,7 +86,6 @@ class ProductServiceTest {
         List<Menu> createdProductRelatedMenus = generateSingleSizeValidPriceTestMenus();
         when(productRepository.findById(any())).thenReturn(Optional.of(createdProduct));
         when(menuRepository.findAllByProductId(any())).thenReturn(createdProductRelatedMenus);
-        ProductService productService = new ProductService(productRepository, menuRepository, purgomalumClient);
 
         //when
         Product result = productService.changePrice(createdProduct.getId(), priceChangedProduct);
@@ -100,7 +100,6 @@ class ProductServiceTest {
         //given
         Product createdProduct = generateThousandPriceProduct();
         Product negativePriceProduct = generateNegativePriceProduct();
-        ProductService productService = new ProductService(productRepository, menuRepository, purgomalumClient);
 
         //when & then
         assertThatThrownBy(() -> productService.changePrice(createdProduct.getId(), negativePriceProduct)).isInstanceOf(IllegalArgumentException.class);
@@ -113,7 +112,6 @@ class ProductServiceTest {
         Product createdProduct = generateThousandPriceProduct();
         Product priceChangedProduct = generateTwoThousandPriceProduct();
         when(productRepository.findById(any())).thenReturn(Optional.empty());
-        ProductService productService = new ProductService(productRepository, menuRepository, purgomalumClient);
 
         //when & then
         assertThatThrownBy(() -> productService.changePrice(createdProduct.getId(), priceChangedProduct)).isInstanceOf(NoSuchElementException.class);
@@ -128,7 +126,6 @@ class ProductServiceTest {
         List<Menu> createdProductRelatedMenus = generateSingleSizeInValidPriceTestMenus();
         when(productRepository.findById(any())).thenReturn(Optional.of(createdProduct));
         when(menuRepository.findAllByProductId(any())).thenReturn(createdProductRelatedMenus);
-        ProductService productService = new ProductService(productRepository, menuRepository, purgomalumClient);
 
         //when
         productService.changePrice(createdProduct.getId(), priceChangedProduct);
@@ -146,7 +143,6 @@ class ProductServiceTest {
         allProducts.add(generateThousandPriceProduct());
         allProducts.add(generateTwoThousandPriceProduct());
         when(productRepository.findAll()).thenReturn(allProducts);
-        ProductService productService = new ProductService(productRepository, menuRepository, purgomalumClient);
 
         //when
         List<Product> results = productService.findAll();
