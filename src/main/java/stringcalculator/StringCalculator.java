@@ -1,9 +1,12 @@
 package stringcalculator;
 
+import java.util.regex.Pattern;
+
 public class StringCalculator {
 
     private static final int MIN_NUMBER = 0;
     private static final int SINGLE_INPUT_LENGTH = 1;
+    private static final Pattern NUMERIC_PATTERN = Pattern.compile("[+-]?\\d*(\\.\\d+)?");
 
     private StringCalculator() {
     }
@@ -30,12 +33,7 @@ public class StringCalculator {
     }
 
     private static boolean isInteger(String text) {
-        try {
-            Integer.parseInt(text);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
+        return NUMERIC_PATTERN.matcher(text).matches();
     }
 
     private static int sum(String[] tokens) {
