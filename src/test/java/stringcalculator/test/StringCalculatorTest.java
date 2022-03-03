@@ -20,7 +20,7 @@ class StringCalculatorTest {
     }
 
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
-    @ValueSource(strings = {"1","2","3"})
+    @ValueSource(strings = {"1", "2", "3"})
     @ParameterizedTest
     void singleNumber(String source) {
         assertThat(new StringCalculator(source).add()).isEqualTo(Integer.parseInt(source));

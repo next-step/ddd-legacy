@@ -4,7 +4,7 @@ import stringcalculator.operator.Operator;
 
 public interface OperatorPattern {
 
-    boolean isPattern(String input) ;
+    boolean isPattern(String input);
 
     Operator getOperator(String input);
 
