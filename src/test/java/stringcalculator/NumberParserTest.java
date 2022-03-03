@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -24,6 +26,13 @@ class NumberParserTest {
     void notParse(String value) {
         assertThatIllegalArgumentException()
             .isThrownBy(() -> numberParser.parse(value));
+    }
+
+    @Test
+    @DisplayName("문자열인 경우 예외가 발생한다.")
+    void string() {
+        assertThatIllegalArgumentException()
+            .isThrownBy(() -> numberParser.parse("abc"));
     }
 
     @ParameterizedTest(name = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다. {0}인 경우")
