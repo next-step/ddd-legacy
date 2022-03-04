@@ -385,6 +385,7 @@ public class MenuServiceTest {
     @DisplayName("메뉴 가격 변경 - 메뉴에 가격은 메뉴에 속한 모든 상품의 가격의 합보다 클 수 없다.")
     @Test
     void changePrice02() {
+        //given
         UUID 변경할_메뉴_아이디 = UUID.randomUUID();
         Menu 변경할_메뉴 = mock(Menu.class);
         BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(2000l);
@@ -434,6 +435,57 @@ public class MenuServiceTest {
 
         //then
         verify(조회된_메뉴).setPrice(변경할_메뉴_가격);
+    }
+
+    @DisplayName("메뉴 노출 - 메뉴에 속한 상품의 가격의 합이 메뉴의 가격 보다 큰 경우 노출 할 수 없다.")
+    @Test
+    void display01() {
+        //given
+        UUID 노출할_메뉴_아이디 = UUID.randomUUID();
+        Menu 조회된_메뉴 = mock(Menu.class);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(2000l);
+        given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
+        List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
+        given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
+        MenuProduct 조회된_메뉴_상품 = mock(MenuProduct.class);
+        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500l);
+        long 조회된_메뉴_상품_수량 = 1l;
+        Product 조회된_상품 = mock(Product.class);
+        given(조회된_상품.getPrice()).willReturn(조회된_메뉴_상품_가격);
+        given(조회된_메뉴_상품.getQuantity()).willReturn(조회된_메뉴_상품_수량);
+        given(조회된_메뉴_상품.getProduct()).willReturn(조회된_상품);
+        조회된_메뉴_상품들.add(조회된_메뉴_상품);
+        given(menuRepository.findById(노출할_메뉴_아이디)).willReturn(Optional.ofNullable(조회된_메뉴));
+        //when & then
+        assertThatThrownBy(() -> menuService.display(노출할_메뉴_아이디))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("메뉴 노출 - 메뉴를 노출 할 수 있다.")
+    @Test
+    void display02() {
+        //given
+        UUID 노출할_메뉴_아이디 = UUID.randomUUID();
+        Menu 조회된_메뉴 = mock(Menu.class);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(1000l);
+        given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
+        List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
+        given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
+        MenuProduct 조회된_메뉴_상품 = mock(MenuProduct.class);
+        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500l);
+        long 조회된_메뉴_상품_수량 = 1l;
+        Product 조회된_상품 = mock(Product.class);
+        given(조회된_상품.getPrice()).willReturn(조회된_메뉴_상품_가격);
+        given(조회된_메뉴_상품.getQuantity()).willReturn(조회된_메뉴_상품_수량);
+        given(조회된_메뉴_상품.getProduct()).willReturn(조회된_상품);
+        조회된_메뉴_상품들.add(조회된_메뉴_상품);
+        given(menuRepository.findById(노출할_메뉴_아이디)).willReturn(Optional.ofNullable(조회된_메뉴));
+
+        //when
+        menuService.display(노출할_메뉴_아이디);
+
+        //then
+        verify(조회된_메뉴).setDisplayed(true);
     }
 
 }
