@@ -109,9 +109,10 @@ class ProductServiceTest {
     public void changePrice01(BigDecimal 변경할_상품_가격) {
         //given
         Product 변경할_상품 = mock(Product.class);
+        UUID 변경할_상품_아이디 = UUID.randomUUID();
         when(변경할_상품.getPrice()).thenReturn(변경할_상품_가격);
         //when & then
-        assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), 변경할_상품))
+        assertThatThrownBy(() -> productService.changePrice(변경할_상품_아이디, 변경할_상품))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
