@@ -5,6 +5,6 @@ public class StringCalculator {
 
     public int add(String text) {
         final PositiveNumbers positiveNumbers = TextConverter.convertToNumbers(text, DELIMITER);
-        return positiveNumbers.getSum();
+        return positiveNumbers.sum().getValue();
     }
 }
