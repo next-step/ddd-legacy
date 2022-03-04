@@ -4,6 +4,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "order_table")
@@ -55,5 +56,18 @@ public class OrderTable {
 
     public void setEmpty(final boolean empty) {
         this.empty = empty;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OrderTable that = (OrderTable) o;
+        return numberOfGuests == that.numberOfGuests && empty == that.empty && Objects.equals(id, that.id) && Objects.equals(name, that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, numberOfGuests, empty);
     }
 }
