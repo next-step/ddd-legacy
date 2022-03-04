@@ -29,6 +29,7 @@ class StringCalculatorTest {
 			Arguments.of("1", 1),
 			Arguments.of("1,2", 3),
 			Arguments.of("1,2:3", 6),
+			Arguments.of("1,2::3", 6),
 			Arguments.of("//;\n1;2;3", 6),
 			Arguments.of("//;\n1;;3", 4)
 		);

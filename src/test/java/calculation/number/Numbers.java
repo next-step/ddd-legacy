@@ -13,7 +13,6 @@ public final class Numbers {
 
 	public Numbers() {
 		numbers = new ArrayList<>();
-		this.numbers.add(Number.EMPTY);
 	}
 
 	public int sum() {
