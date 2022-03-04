@@ -503,4 +503,13 @@ public class MenuServiceTest {
         verify(조회된_메뉴).setDisplayed(false);
     }
 
+    @DisplayName("메뉴 조회 - 등록된 모든 메뉴를 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given & when
+        menuService.findAll();
+        //then
+        verify(menuRepository).findAll();
+    }
+
 }
