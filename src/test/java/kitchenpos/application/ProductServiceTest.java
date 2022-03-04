@@ -36,7 +36,7 @@ class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
-    private static Stream<BigDecimal> providePriceForNullAndNegative() { // argument source method
+    private static Stream<BigDecimal> providePriceForNullAndNegative() {
         return Stream.of(
                 null,
                 BigDecimal.valueOf(-1000L)
@@ -94,7 +94,7 @@ class ProductServiceTest {
         when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
         when(등록할_상품.getName()).thenReturn(등록할_상품_이름);
         when(purgomalumClient.containsProfanity(등록할_상품_이름))
-                .thenReturn(Boolean.TRUE);
+                .thenReturn(Boolean.FALSE);
         //when
         productService.create(등록할_상품);
 
@@ -115,6 +115,7 @@ class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    //@TODO 모든 메뉴의 가격의 합이 아닌 개발 메뉴와 비교하고 있음 -> 모든 메뉴의 가격의 합과 비교 할 수 있도록 개선
     @DisplayName("상품 가격 수정 - 가격을 변경하는 상품을 포함하는 메뉴의 가격보다 메뉴에 포함한 상품의 가격이 커지는 경우 메뉴를 진열하지 않는다.")
     @Test
     public void changePrice02() {

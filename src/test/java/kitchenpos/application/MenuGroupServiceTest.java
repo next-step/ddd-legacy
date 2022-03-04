@@ -26,7 +26,7 @@ class MenuGroupServiceTest {
     @InjectMocks
     private MenuGroupService menuGroupService;
 
-    private static Stream<String> provideMenuNameForNullAndEmptyString() { // argument source method
+    private static Stream<String> provideMenuNameForNullAndEmptyString() {
         return Stream.of(
                 null,
                 ""

@@ -38,7 +38,7 @@ public class MenuServiceTest {
     @InjectMocks
     private MenuService menuService;
 
-    private static Stream<BigDecimal> providePriceForNullAndNegative() { // argument source method
+    private static Stream<BigDecimal> providePriceForNullAndNegative() {
         return Stream.of(
                 null,
                 BigDecimal.valueOf(-1000L)
@@ -73,7 +73,7 @@ public class MenuServiceTest {
     }
 
 
-    private static Stream<List<MenuProduct>> provideMenuProductForNullAndEmpty() { // argument source method
+    private static Stream<List<MenuProduct>> provideMenuProductForNullAndEmpty() {
         return Stream.of(
                 null,
                 Collections.emptyList()
@@ -313,7 +313,7 @@ public class MenuServiceTest {
         verify(menuRepository).save(any(Menu.class));
     }
 
-    private static Stream<Arguments> provideDisplayFlagForTrueAndFalse() { // argument source method
+    private static Stream<Arguments> provideDisplayFlagForTrueAndFalse() {
         return Stream.of(
                 Arguments.of(TRUE, TRUE),
                 Arguments.of(FALSE, FALSE)

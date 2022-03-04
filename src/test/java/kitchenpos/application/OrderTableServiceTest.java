@@ -34,7 +34,7 @@ class OrderTableServiceTest {
     private OrderTableService orderTableService;
 
 
-    private static Stream<String> provideTableNameForNullAndEmptyString() { // argument source method
+    private static Stream<String> provideTableNameForNullAndEmptyString() {
         return Stream.of(
                 null,
                 ""
