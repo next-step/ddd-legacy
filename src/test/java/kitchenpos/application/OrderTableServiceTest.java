@@ -157,4 +157,13 @@ class OrderTableServiceTest {
         verify(인원_변경할_테이블).setNumberOfGuests(변경할_인원_수);
     }
 
+    @DisplayName("테이블 조회 - 등록된 모든 메뉴 테이블을 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given & when
+        orderTableService.findAll();
+        //then
+        verify(orderTableRepository).findAll();
+    }
+
 }
