@@ -96,15 +96,65 @@ class OrderTableServiceTest {
     @Test
     void clear02() {
         //given
-        UUID 정리할_테이블_이름 = UUID.randomUUID();
+        UUID 정리할_테이블_아이디 = UUID.randomUUID();
         OrderTable 정리할_테이블 = mock(OrderTable.class);
-        given(orderTableRepository.findById(정리할_테이블_이름)).willReturn(Optional.of(정리할_테이블));
+        given(orderTableRepository.findById(정리할_테이블_아이디)).willReturn(Optional.of(정리할_테이블));
         given(orderRepository.existsByOrderTableAndStatusNot(정리할_테이블, OrderStatus.COMPLETED)).willReturn(false);
         //when
-        orderTableService.clear(정리할_테이블_이름);
+        orderTableService.clear(정리할_테이블_아이디);
         //then
         verify(정리할_테이블).setNumberOfGuests(0);
         verify(정리할_테이블).setEmpty(true);
+    }
+
+//    - [ ] 테이블에 손님 수를 변경 할 수 있다.
+//  - [ ] 비어 있지 않은 테이블에만 손님을 지정할 수 있다.
+//            - [ ] 테이블에 손님은 반드시 1명 이상이여야 한다.
+
+    //@TODO 0명이 착석할 수 있음. 의도한 동작인지 확인후 개선
+    @DisplayName("테이블 인원 변경 - 테이블에 손님은 반드시 0명 이상이여야 한다.")
+    @Test
+    void changeNumberOfGuests01() {
+        //given
+        UUID 인원_변경할_테이블_아이디 = UUID.randomUUID();
+        OrderTable 인원_변경_요청 = mock(OrderTable.class);
+        given(인원_변경_요청.getNumberOfGuests()).willReturn(-1);
+
+        //when & then
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(인원_변경할_테이블_아이디, 인원_변경_요청))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("테이블 인원 변경 - 비어 있지 않은 테이블에만 손님을 지정할 수 있다.")
+    @Test
+    void changeNumberOfGuests02() {
+        //given
+        UUID 인원_변경할_테이블_아이디 = UUID.randomUUID();
+        OrderTable 인원_변경_요청 = mock(OrderTable.class);
+        given(인원_변경_요청.getNumberOfGuests()).willReturn(1);
+        OrderTable 인원_변경할_테이블 = mock(OrderTable.class);
+        given(인원_변경할_테이블.isEmpty()).willReturn(true);
+        given(orderTableRepository.findById(인원_변경할_테이블_아이디)).willReturn(Optional.of(인원_변경할_테이블));
+        //when & then
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(인원_변경할_테이블_아이디, 인원_변경_요청))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("테이블 인원 변경 - 테이블에 손님 수를 변경 할 수 있다.")
+    @Test
+    void changeNumberOfGuests03() {
+        //given
+        UUID 인원_변경할_테이블_아이디 = UUID.randomUUID();
+        OrderTable 인원_변경_요청 = mock(OrderTable.class);
+        int 변경할_인원_수 = 4;
+        given(인원_변경_요청.getNumberOfGuests()).willReturn(변경할_인원_수);
+        OrderTable 인원_변경할_테이블 = mock(OrderTable.class);
+        given(인원_변경할_테이블.isEmpty()).willReturn(false);
+        given(orderTableRepository.findById(인원_변경할_테이블_아이디)).willReturn(Optional.of(인원_변경할_테이블));
+        //when
+        orderTableService.changeNumberOfGuests(인원_변경할_테이블_아이디, 인원_변경_요청);
+        //then
+        verify(인원_변경할_테이블).setNumberOfGuests(변경할_인원_수);
     }
 
 }
