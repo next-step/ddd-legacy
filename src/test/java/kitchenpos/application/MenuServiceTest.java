@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +16,7 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static java.lang.Boolean.*;
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,7 +45,7 @@ public class MenuServiceTest {
         );
     }
 
-    @DisplayName("메뉴등록 - 메뉴의 가격은 반드시 0보다 큰 값을 가져야 한다.")
+    @DisplayName("메뉴 등록 - 메뉴의 가격은 반드시 0보다 큰 값을 가져야 한다.")
     @MethodSource("providePriceForNullAndNegative")
     @ParameterizedTest
     public void create01(BigDecimal 등록할_메뉴_가격) {
@@ -58,7 +57,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴등록 - 메뉴는 반드시 하나의 메뉴 그룹에 속해야 한다.")
+    @DisplayName("메뉴 등록 - 메뉴는 반드시 하나의 메뉴 그룹에 속해야 한다.")
     @Test
     public void create02() {
         //given
@@ -81,7 +80,7 @@ public class MenuServiceTest {
         );
     }
 
-    @DisplayName("메뉴등록 - 메뉴는 반드시 하나 이상의 상품(product)을 포함해야 한다.")
+    @DisplayName("메뉴 등록 - 메뉴는 반드시 하나 이상의 상품(product)을 포함해야 한다.")
     @MethodSource("provideMenuProductForNullAndEmpty")
     @ParameterizedTest
     public void create03(List<MenuProduct> 메뉴에_등록될_상품들) {
@@ -98,7 +97,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴등록 - 메뉴에 포함할 상품은 반드시 존재해야 한다.")
+    @DisplayName("메뉴 등록 - 메뉴에 포함할 상품은 반드시 존재해야 한다.")
     @Test
     public void create03() {
         //given
@@ -124,7 +123,7 @@ public class MenuServiceTest {
     }
 
     // @TODO 품목 별 수량 0개 등록 가능 -> 1개 이상 등록 가능하도록 개선
-    @DisplayName("메뉴등록 - 메뉴는 반드시 하나 이상의 상품(product)을 포함해야 한다. - 품목별 수량은 -1보다 큰 값을 가져야 한다.")
+    @DisplayName("메뉴 등록 - 메뉴는 반드시 하나 이상의 상품(product)을 포함해야 한다. - 품목별 수량은 -1보다 큰 값을 가져야 한다.")
     @Test
     public void create04() {
         //given
@@ -155,7 +154,7 @@ public class MenuServiceTest {
 
     }
 
-    @DisplayName("메뉴등록 - 메뉴에 가격은 메뉴에 속한 모든 상품의 가격의 합보다 클 수 없다.")
+    @DisplayName("메뉴 등록 - 메뉴에 가격은 메뉴에 속한 모든 상품의 가격의 합보다 클 수 없다.")
     @Test
     public void create05() {
         //given
@@ -192,7 +191,7 @@ public class MenuServiceTest {
 
     }
     // @TODO 메뉴 이름 EmptyString 가능함 -> EmptyString 유효성 검증
-    @DisplayName("메뉴등록 -  메뉴는 반드시 이름을 가져야 한다.")
+    @DisplayName("메뉴 등록 -  메뉴는 반드시 이름을 가져야 한다.")
     @Test
     public void create06() {
         //given
@@ -229,7 +228,7 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴등록 -  메뉴의 이름은 비속어를 포함할 수 없다.")
+    @DisplayName("메뉴 등록 -  메뉴의 이름은 비속어를 포함할 수 없다.")
     @Test
     public void create07() {
         //given
@@ -260,7 +259,7 @@ public class MenuServiceTest {
         given(productRepository.findById(any(UUID.class)))
                 .willReturn(Optional.of(조회된_상품));
 
-        String 등록할_메뉴_이름 = "X나 맛있는 미트파이 정식";
+        String 등록할_메뉴_이름 = "X나 맛없는 미트파이 정식";
         given(등록할_메뉴.getName()).willReturn(등록할_메뉴_이름);
         when(purgomalumClient.containsProfanity(등록할_메뉴_이름))
                 .thenReturn(TRUE);
@@ -270,8 +269,7 @@ public class MenuServiceTest {
     }
 
 
-
-    @DisplayName("메뉴등록 -  메뉴를 등록 할 수 있다.")
+    @DisplayName("메뉴 등록 -  메뉴를 등록 할 수 있다.")
     @Test
     public void create08() {
         //given
@@ -322,7 +320,7 @@ public class MenuServiceTest {
         );
     }
 
-    @DisplayName("메뉴등록 -  메뉴는 노출 여부를 가진다.")
+    @DisplayName("메뉴 등록 - 메뉴는 노출 여부를 가진다.")
     @MethodSource("provideDisplayFlagForTrueAndFalse")
     @ParameterizedTest
     public void create09(Boolean 등록할_노출_여부, Boolean 등록된_노출_여부) {
@@ -363,11 +361,79 @@ public class MenuServiceTest {
         given(등록할_메뉴.isDisplayed()).willReturn(등록할_노출_여부);
         when(menuRepository.save(any(Menu.class))).thenAnswer(params -> params.getArgument(0)); // by pass
         //when & then
-        Menu menu = menuService.create(등록할_메뉴);
+        Menu 등록된_메뉴 = menuService.create(등록할_메뉴);
 
         // then
-        assertThat(menu.isDisplayed()).isEqualTo(등록된_노출_여부);
+        assertThat(등록된_메뉴.isDisplayed()).isEqualTo(등록된_노출_여부);
+        //vs
+        verify(등록할_메뉴).isDisplayed();
     }
 
+    @DisplayName("메뉴 가격 변경 - 메뉴의 가격은 반드시 0보다 큰 값을 가져야 한다.")
+    @MethodSource("providePriceForNullAndNegative")
+    @ParameterizedTest
+    void changePrice01(BigDecimal 변경할_메뉴_가격) {
+        //given
+        UUID 변경할_메뉴_아이디 = UUID.randomUUID();
+        Menu 변경할_메뉴 = mock(Menu.class);
+        given(변경할_메뉴.getPrice()).willReturn(변경할_메뉴_가격);
+        //when & then
+        assertThatThrownBy(() -> menuService.changePrice(변경할_메뉴_아이디, 변경할_메뉴))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴 가격 변경 - 메뉴에 가격은 메뉴에 속한 모든 상품의 가격의 합보다 클 수 없다.")
+    @Test
+    void changePrice02() {
+        UUID 변경할_메뉴_아이디 = UUID.randomUUID();
+        Menu 변경할_메뉴 = mock(Menu.class);
+        BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(2000l);
+        given(변경할_메뉴.getPrice()).willReturn(변경할_메뉴_가격);
+
+        Menu 조회된_메뉴 = mock(Menu.class);
+        List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
+        given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
+        MenuProduct 조회된_메뉴_상품 = mock(MenuProduct.class);
+        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500l);
+        long 조회된_메뉴_상품_수량 = 1l;
+        Product 조회된_상품 = mock(Product.class);
+        given(조회된_상품.getPrice()).willReturn(조회된_메뉴_상품_가격);
+        given(조회된_메뉴_상품.getQuantity()).willReturn(조회된_메뉴_상품_수량);
+        given(조회된_메뉴_상품.getProduct()).willReturn(조회된_상품);
+        조회된_메뉴_상품들.add(조회된_메뉴_상품);
+        given(menuRepository.findById(변경할_메뉴_아이디)).willReturn(Optional.ofNullable(조회된_메뉴));
+
+        //when & then
+        assertThatThrownBy(() -> menuService.changePrice(변경할_메뉴_아이디, 변경할_메뉴))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴 가격 변경 - 메뉴의 가격을 수정할 수 있다.")
+    @Test
+    void changePrice03() {
+        UUID 변경할_메뉴_아이디 = UUID.randomUUID();
+        Menu 변경할_메뉴 = mock(Menu.class);
+        BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(1000l);
+        given(변경할_메뉴.getPrice()).willReturn(변경할_메뉴_가격);
+
+        Menu 조회된_메뉴 = mock(Menu.class);
+        List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
+        given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
+        MenuProduct 조회된_메뉴_상품 = mock(MenuProduct.class);
+        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500l);
+        long 조회된_메뉴_상품_수량 = 1l;
+        Product 조회된_상품 = mock(Product.class);
+        given(조회된_상품.getPrice()).willReturn(조회된_메뉴_상품_가격);
+        given(조회된_메뉴_상품.getQuantity()).willReturn(조회된_메뉴_상품_수량);
+        given(조회된_메뉴_상품.getProduct()).willReturn(조회된_상품);
+        조회된_메뉴_상품들.add(조회된_메뉴_상품);
+        given(menuRepository.findById(변경할_메뉴_아이디)).willReturn(Optional.ofNullable(조회된_메뉴));
+
+        //when
+        menuService.changePrice(변경할_메뉴_아이디, 변경할_메뉴);
+
+        //then
+        verify(조회된_메뉴).setPrice(변경할_메뉴_가격);
+    }
 
 }
