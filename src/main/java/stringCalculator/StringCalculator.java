@@ -2,53 +2,69 @@ package stringCalculator;
 
 import io.micrometer.core.instrument.util.StringUtils;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-public class StringCalculator {
+public class StringCalculator implements Calculator {
 
-    private String text;
+    private static final int ZERO = 0;
+    private static final String CUSTOM_DELIMITER = "//(.)\n(.*)";
+    private static final Pattern CALC_PATTERN = Pattern.compile(CUSTOM_DELIMITER);
 
+    private static final String DEFAULT_SEPARATOR = ",|:";
+    private static final Pattern DEFAULT_PATTERN = Pattern.compile(DEFAULT_SEPARATOR);
+
+    @Override
     public int add(String text) {
 
-        int parseInt = 0;
+        if (StringUtils.isBlank(text))
+            return ZERO;
 
-        if (StringUtils.isBlank(text)) {
-            return parseInt;
+        List<PositiveNumber> listPositiveNumbers = getPositiveNumbersListCustomMatchPattern(text);
+        if (!listPositiveNumbers.isEmpty()) {
+            return listPositiveNumbers.stream()
+                                        .map(pn -> pn.getPositiveNumber())
+                                        .reduce(0, Integer::sum);
         }
 
-        // 참고. https://enterkey.tistory.com/353
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
-        if (m.find()) {
-            int sum = 0;
-            String customDelimiter = m.group(1);                    // (.)의 값
-            String[] tokens = m.group(2).split(customDelimiter);    // (.*)의 값
-            for (String tmpStr : tokens) {
-                sum += Integer.parseInt(tmpStr);
-            }
-            return sum;
+        listPositiveNumbers = getPositiveNumbersListDefaultMatchPattern(text);
+        if (!listPositiveNumbers.isEmpty()) {
+            return listPositiveNumbers.stream()
+                    .map(pn -> pn.getPositiveNumber())
+                    .reduce(0, Integer::sum);
         }
 
-        if (text.indexOf(",") > -1 || text.indexOf(":") > -1) {
-            int sum = 0;
-            String[] tokens = text.split(",|:");
-            for (String tmpStr : tokens) {
-                sum += Integer.parseInt(tmpStr);
-            }
-            return sum;
-        }
-
-        try {
-            parseInt = Integer.parseInt(text);
-            if (parseInt < 0) {
-                throw new RuntimeException("음수를 사용할 수 없습니다.");
-            }
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("숫자 이외의 값을 사용할 수 없습니다.");
-        }
-
-        return parseInt;
+        return new PositiveNumber(text).getPositiveNumber();
     }
 
+    private List<PositiveNumber> getPositiveNumbersListCustomMatchPattern(String text) {
+
+        Matcher matcher = CALC_PATTERN.matcher(text);
+        if (!matcher.find())
+            return Collections.emptyList();
+
+        return Arrays.stream(
+                    matcher.group(2).split(matcher.group(1))
+                )
+                .map(PositiveNumber::new)
+                .collect(Collectors.toList());
+    }
+
+    private List<PositiveNumber> getPositiveNumbersListDefaultMatchPattern(String text) {
+
+        Matcher matcher = DEFAULT_PATTERN.matcher(text);
+        if (!matcher.find())
+            return Collections.emptyList();
+
+        return Arrays.stream(
+                    text.split(DEFAULT_SEPARATOR)
+                )
+                .map(PositiveNumber::new)
+                .collect(Collectors.toList());
+    }
 
 }
