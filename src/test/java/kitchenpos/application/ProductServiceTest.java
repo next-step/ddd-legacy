@@ -19,7 +19,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -137,13 +136,11 @@ class ProductServiceTest {
         given(저장된_메뉴_상품.getProduct()).willReturn(저장된_상품);
         given(저장된_메뉴_상품.getQuantity()).willReturn(1l);
 
-        Menu 계속_공개될_메뉴 = spy(Menu.class);
-        given(계속_공개될_메뉴.isDisplayed()).willReturn(Boolean.TRUE);
+        Menu 계속_공개될_메뉴 = mock(Menu.class);
         given(계속_공개될_메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(저장된_메뉴_상품)));
         given(계속_공개될_메뉴.getPrice()).willReturn(계속_공개될_메뉴_가격);
 
-        Menu 비공개될_메뉴 = spy(Menu.class);
-        given(계속_공개될_메뉴.isDisplayed()).willReturn(Boolean.TRUE);
+        Menu 비공개될_메뉴 = mock(Menu.class);
         given(비공개될_메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(저장된_메뉴_상품)));
         given(비공개될_메뉴.getPrice()).willReturn(비공개될_메뉴_가격);
 
@@ -154,8 +151,9 @@ class ProductServiceTest {
         productService.changePrice(UUID.randomUUID(), 변경할_상품);
 
         //then
-        assertThat(계속_공개될_메뉴.isDisplayed()).isTrue();
-        assertThat(비공개될_메뉴.isDisplayed()).isFalse();
+
+        verify(계속_공개될_메뉴, times(0)).setDisplayed(anyBoolean());
+        verify(비공개될_메뉴).setDisplayed(false);
     }
 
 
@@ -177,18 +175,18 @@ class ProductServiceTest {
         given(저장된_메뉴_상품.getProduct()).willReturn(저장된_상품);
         given(저장된_메뉴_상품.getQuantity()).willReturn(1l);
 
-        Menu 계속_공개될_메뉴 = spy(Menu.class);
-        계속_공개될_메뉴.setDisplayed(true);
+        Menu 계속_공개될_메뉴 = mock(Menu.class);
         given(계속_공개될_메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(저장된_메뉴_상품)));
         given(계속_공개될_메뉴.getPrice()).willReturn(계속_공개될_메뉴_가격);
 
         given(menuRepository.findAllByProductId(any(UUID.class)))
                 .willReturn(new ArrayList<>(Arrays.asList(계속_공개될_메뉴)));
         //when
-        Product 변경된_상품 = productService.changePrice(UUID.randomUUID(), 변경할_상품);
+        productService.changePrice(UUID.randomUUID(), 변경할_상품);
 
         //then
-        assertThat(변경된_상품.getPrice()).isEqualTo(변경할_상품_가격);
+        verify(저장된_상품).setPrice(변경할_상품_가격);
+        verify(계속_공개될_메뉴, times(0)).setDisplayed(anyBoolean());
     }
 
     @DisplayName("상품 조회 - 등록된 모든 상품을 조회할 수 있다.")
