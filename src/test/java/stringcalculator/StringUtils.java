@@ -1,10 +1,14 @@
 package stringcalculator;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringUtils {
 
+    private static final String DEFAULT_SEPARATOR = "[,:]";
+
     private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d");
+    private static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     static boolean isBlank(final String text) {
         return text == null || text.isEmpty();
@@ -16,6 +20,15 @@ public class StringUtils {
         }
 
         return Integer.parseInt(text);
+    }
+
+    static String[] parseTokens(String text) {
+        Matcher customPatternMatcher = CUSTOM_SEPARATOR_PATTERN.matcher(text);
+        if (customPatternMatcher.find()) {
+            return customPatternMatcher.group(2).split(customPatternMatcher.group(1));
+        }
+
+        return text.split(DEFAULT_SEPARATOR);
     }
 
 }
