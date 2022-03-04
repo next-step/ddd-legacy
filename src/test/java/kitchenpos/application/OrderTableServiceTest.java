@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -60,6 +62,20 @@ class OrderTableServiceTest {
 
         //then
         verify(orderTableRepository).save(any(OrderTable.class));
+    }
+
+    //@TODO 더블부킹이 가능하다 -> 이미 착성한 테이블에 착성 할 수 없도록 해야하지 않을까?
+    @DisplayName("테이블 착석 - 테이블에 착성 할 수 있다.")
+    @Test
+    void sit() {
+        //given
+        UUID 착석할_테이블_이름 = UUID.randomUUID();
+        OrderTable 착석할_테이블 = mock(OrderTable.class);
+        given(orderTableRepository.findById(착석할_테이블_이름)).willReturn(Optional.of(착석할_테이블));
+        //when
+        orderTableService.sit(착석할_테이블_이름);
+        //then
+        verify(착석할_테이블).setEmpty(false);
     }
 
 }
