@@ -47,8 +47,8 @@ class MenuServiceTest {
         List<Product> relatedProducts = getProductsRelatedMenu(newMenu);
         when(menuGroupRepository.findById(any())).thenReturn(Optional.of(relatedMenuGroup));
         when(productRepository.findAllByIdIn(any())).thenReturn(relatedProducts);
-        when(productRepository.findById(eq(newMenu.getMenuProducts().get(0).getProductId()))).thenReturn(Optional.of(relatedProducts.get(0)));
-        when(productRepository.findById(eq(newMenu.getMenuProducts().get(1).getProductId()))).thenReturn(Optional.of(relatedProducts.get(1)));
+        when(productRepository.findById(eq(findSpecificIndexMenuProductProductId(newMenu, 0)))).thenReturn(Optional.of(relatedProducts.get(0)));
+        when(productRepository.findById(eq(findSpecificIndexMenuProductProductId(newMenu, 1)))).thenReturn(Optional.of(relatedProducts.get(1)));
         when(purgomalumClient.containsProfanity(any())).thenReturn(false);
         when(menuRepository.save(any())).thenReturn(newMenu);
 
@@ -128,8 +128,8 @@ class MenuServiceTest {
         List<Product> relatedProducts = getProductsRelatedMenu(invalidPriceMenu);
         when(menuGroupRepository.findById(any())).thenReturn(Optional.of(relatedMenuGroup));
         when(productRepository.findAllByIdIn(any())).thenReturn(relatedProducts);
-        when(productRepository.findById(eq(invalidPriceMenu.getMenuProducts().get(0).getProductId()))).thenReturn(Optional.of(relatedProducts.get(0)));
-        when(productRepository.findById(eq(invalidPriceMenu.getMenuProducts().get(1).getProductId()))).thenReturn(Optional.of(relatedProducts.get(1)));
+        when(productRepository.findById(eq(findSpecificIndexMenuProductProductId(invalidPriceMenu, 0)))).thenReturn(Optional.of(relatedProducts.get(0)));
+        when(productRepository.findById(eq(findSpecificIndexMenuProductProductId(invalidPriceMenu, 1)))).thenReturn(Optional.of(relatedProducts.get(1)));
 
         //when & then
         assertThatThrownBy(() -> menuService.create(invalidPriceMenu)).isInstanceOf(IllegalArgumentException.class);
@@ -144,8 +144,8 @@ class MenuServiceTest {
         List<Product> relatedProducts = getProductsRelatedMenu(newMenu);
         when(menuGroupRepository.findById(any())).thenReturn(Optional.of(relatedMenuGroup));
         when(productRepository.findAllByIdIn(any())).thenReturn(relatedProducts);
-        when(productRepository.findById(eq(newMenu.getMenuProducts().get(0).getProductId()))).thenReturn(Optional.of(relatedProducts.get(0)));
-        when(productRepository.findById(eq(newMenu.getMenuProducts().get(1).getProductId()))).thenReturn(Optional.of(relatedProducts.get(1)));
+        when(productRepository.findById(eq(findSpecificIndexMenuProductProductId(newMenu, 0)))).thenReturn(Optional.of(relatedProducts.get(0)));
+        when(productRepository.findById(eq(findSpecificIndexMenuProductProductId(newMenu, 1)))).thenReturn(Optional.of(relatedProducts.get(1)));
         when(purgomalumClient.containsProfanity(any())).thenReturn(true);
 
         //when & then
@@ -164,7 +164,7 @@ class MenuServiceTest {
         Menu result = menuService.changePrice(createdMenu.getId(), priceChangedMenu);
 
         //then
-        assertThat(result).isEqualTo(priceChangedMenu);
+        assertThat(result.getPrice()).isEqualTo(priceChangedMenu.getPrice());
     }
 
     @DisplayName("이미 등록 된 메뉴를 노출할 수 있다.")
@@ -216,6 +216,10 @@ class MenuServiceTest {
                 .stream()
                 .map(MenuProduct::getProduct)
                 .collect(Collectors.toList());
+    }
+
+    private UUID findSpecificIndexMenuProductProductId(Menu menu, int index) {
+        return menu.getMenuProducts().get(index).getProductId();
     }
 
 }
