@@ -12,6 +12,6 @@ public final class Numbers {
 	}
 
 	public int sum() {
-		return numbers.stream().map(Number::getValue).reduce(Number.EMPTY.getValue(), Number.EMPTY::sum);
+		return numbers.stream().mapToInt(Number::getValue).sum();
 	}
 }
