@@ -14,6 +14,9 @@ import static kitchenpos.stub.MenuProductStub.generateTestMenuProducts;
 public class MenuStub {
 
     public static final String FIVE_THOUSAND_VISIBLE_MENU_NAME = "5000원보이는메뉴";
+    public static final String FIVE_THOUSAND_INVISIBLE_MENU_NAME = "5000원안보이는메뉴";
+    public static final String FOUR_THOUSAND_VISIBLE_MENU_NAME = "4000원보이는메뉴";
+    public static final String NINE_THOUSAND_VISIBLE_MENU_NAME = "9000원보이는메뉴";
 
     private MenuStub() {
     }
@@ -33,7 +36,7 @@ public class MenuStub {
         menu.setMenuGroup(generateFirstTestMenuGroup());
         menu.setMenuProducts(generateTestMenuProducts());
         menu.setDisplayed(true);
-        menu.setName(FIVE_THOUSAND_VISIBLE_MENU_NAME);
+        menu.setName(FOUR_THOUSAND_VISIBLE_MENU_NAME);
         menu.setPrice(BigDecimal.valueOf(4000));
         return menu;
     }
@@ -43,7 +46,7 @@ public class MenuStub {
         menu.setMenuGroup(generateFirstTestMenuGroup());
         menu.setMenuProducts(generateTestMenuProducts());
         menu.setDisplayed(false);
-        menu.setName(FIVE_THOUSAND_VISIBLE_MENU_NAME);
+        menu.setName(FIVE_THOUSAND_INVISIBLE_MENU_NAME);
         menu.setPrice(BigDecimal.valueOf(5000));
         return menu;
     }
@@ -53,7 +56,7 @@ public class MenuStub {
         menu.setMenuGroup(generateFirstTestMenuGroup());
         menu.setMenuProducts(generateTestMenuProducts());
         menu.setDisplayed(true);
-        menu.setName(FIVE_THOUSAND_VISIBLE_MENU_NAME);
+        menu.setName(NINE_THOUSAND_VISIBLE_MENU_NAME);
         menu.setPrice(BigDecimal.valueOf(9000));
         return menu;
     }
