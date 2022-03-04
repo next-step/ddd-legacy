@@ -1,6 +1,5 @@
 package calculation.test;
 
-import calculation.calculator.StringCalculator;
 import calculation.convert.Delimiter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,7 +11,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DelimiterTest {
+class DelimiterTest {
 
 	@ParameterizedTest(name = "비교 {index} [{arguments}]")
 	@DisplayName("Delimiter을 이용한 문자열 분리")
@@ -26,10 +25,10 @@ public class DelimiterTest {
 
 	private static Stream<Arguments> add() {
 		return Stream.of(
-				Arguments.of("1", new String[]{"1"}),
-				Arguments.of("1,2", new String[]{"1", "2"}),
-				Arguments.of("1,2:3", new String[]{"1", "2", "3"}),
-				Arguments.of("//;\n1;2;3", new String[]{"1", "2", "3"})
+			Arguments.of("1", new String[]{"1"}),
+			Arguments.of("1,2", new String[]{"1", "2"}),
+			Arguments.of("1,2:3", new String[]{"1", "2", "3"}),
+			Arguments.of("//;\n1;2;3", new String[]{"1", "2", "3"})
 		);
 	}
 

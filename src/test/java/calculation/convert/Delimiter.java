@@ -19,5 +19,4 @@ public class Delimiter {
 		return formula.split(CUSTOM_DELIMITER);
 	}
 
-
 }

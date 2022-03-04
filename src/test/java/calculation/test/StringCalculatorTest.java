@@ -24,13 +24,13 @@ class StringCalculatorTest {
 
 	private static Stream<Arguments> add() {
 		return Stream.of(
-				Arguments.of("", 0),
-				Arguments.of(null, 0),
-				Arguments.of("1", 1),
-				Arguments.of("1,2", 3),
-				Arguments.of("1,2:3", 6),
-				Arguments.of("//;\n1;2;3", 6),
-				Arguments.of("//;\n1;;3", 4)
+			Arguments.of("", 0),
+			Arguments.of(null, 0),
+			Arguments.of("1", 1),
+			Arguments.of("1,2", 3),
+			Arguments.of("1,2:3", 6),
+			Arguments.of("//;\n1;2;3", 6),
+			Arguments.of("//;\n1;;3", 4)
 		);
 	}
 
@@ -38,13 +38,13 @@ class StringCalculatorTest {
 	@Test
 	void negative() {
 		assertThatExceptionOfType(RuntimeException.class)
-				.isThrownBy(() -> StringCalculator.add("-1"));
+			.isThrownBy(() -> StringCalculator.add("-1"));
 	}
 
 	@DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
 	@Test
 	void negative2() {
 		assertThatExceptionOfType(RuntimeException.class)
-				.isThrownBy(() -> StringCalculator.add("1:-1"));
+			.isThrownBy(() -> StringCalculator.add("1:-1"));
 	}
 }
