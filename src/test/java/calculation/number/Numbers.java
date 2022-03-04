@@ -11,10 +11,6 @@ public final class Numbers {
 		this.numbers = numbers;
 	}
 
-	public Numbers() {
-		numbers = new ArrayList<>();
-	}
-
 	public int sum() {
 		return numbers.stream().map(Number::getValue).reduce(Number.EMPTY.getValue(), Number.EMPTY::sum);
 	}
