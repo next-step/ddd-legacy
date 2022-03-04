@@ -488,4 +488,19 @@ public class MenuServiceTest {
         verify(조회된_메뉴).setDisplayed(true);
     }
 
+    @DisplayName("메뉴 숨김 - 메뉴를 숨길 수 있다.")
+    @Test
+    void hide() {
+        //given
+        UUID 숨길_메뉴_아이디 = UUID.randomUUID();
+        Menu 조회된_메뉴 = mock(Menu.class);
+        given(menuRepository.findById(숨길_메뉴_아이디)).willReturn(Optional.ofNullable(조회된_메뉴));
+
+        //when
+        menuService.hide(숨길_메뉴_아이디);
+
+        //then
+        verify(조회된_메뉴).setDisplayed(false);
+    }
+
 }
