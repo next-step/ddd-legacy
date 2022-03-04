@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -76,6 +77,34 @@ class OrderTableServiceTest {
         orderTableService.sit(착석할_테이블_이름);
         //then
         verify(착석할_테이블).setEmpty(false);
+    }
+
+    @DisplayName("테이블 정리 - 식사가 완료되지 않은 테이블은 정리 할 수 없다.")
+    @Test
+    void clear01() {
+        //given
+        UUID 정리할_테이블_이름 = UUID.randomUUID();
+        OrderTable 정리할_테이블 = mock(OrderTable.class);
+        given(orderTableRepository.findById(정리할_테이블_이름)).willReturn(Optional.of(정리할_테이블));
+        given(orderRepository.existsByOrderTableAndStatusNot(정리할_테이블, OrderStatus.COMPLETED)).willReturn(true);
+        //when & then
+        assertThatThrownBy(() -> orderTableService.clear(정리할_테이블_이름))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("테이블 정리 - 테이블을 정리(clear) 할 수 있다.")
+    @Test
+    void clear02() {
+        //given
+        UUID 정리할_테이블_이름 = UUID.randomUUID();
+        OrderTable 정리할_테이블 = mock(OrderTable.class);
+        given(orderTableRepository.findById(정리할_테이블_이름)).willReturn(Optional.of(정리할_테이블));
+        given(orderRepository.existsByOrderTableAndStatusNot(정리할_테이블, OrderStatus.COMPLETED)).willReturn(false);
+        //when
+        orderTableService.clear(정리할_테이블_이름);
+        //then
+        verify(정리할_테이블).setNumberOfGuests(0);
+        verify(정리할_테이블).setEmpty(true);
     }
 
 }
