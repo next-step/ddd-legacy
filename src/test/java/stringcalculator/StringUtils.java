@@ -25,7 +25,10 @@ public class StringUtils {
     static String[] parseTokens(String text) {
         Matcher customPatternMatcher = CUSTOM_SEPARATOR_PATTERN.matcher(text);
         if (customPatternMatcher.find()) {
-            return customPatternMatcher.group(2).split(customPatternMatcher.group(1));
+            String parsedText = customPatternMatcher.group(2);
+            String separator = customPatternMatcher.group(1);
+
+            return parsedText.split(separator);
         }
 
         return text.split(DEFAULT_SEPARATOR);
