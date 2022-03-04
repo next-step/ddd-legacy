@@ -23,7 +23,7 @@ public class Positive {
         return Arrays.stream(numbers).anyMatch(Positive::isNegative);
     }
 
-    public static boolean isNegative(int number) {
+    public static boolean isNegative(final int number) {
         return number < 0;
     }
 }
