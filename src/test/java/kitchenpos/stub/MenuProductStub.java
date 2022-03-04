@@ -27,6 +27,13 @@ public class MenuProductStub {
         return menuProduct;
     }
 
+    public static MenuProduct generateNegativeQuantityMenuProduct() {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(generateTwoThousandPriceProduct());
+        menuProduct.setQuantity(-1);
+        return menuProduct;
+    }
+
     public static List<MenuProduct> generateTestMenuProducts() {
         List<MenuProduct> menuProducts = new ArrayList<>();
         menuProducts.add(generateThousandPriceOneQuantityMenuProduct());

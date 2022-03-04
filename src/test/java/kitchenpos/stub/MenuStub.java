@@ -4,9 +4,11 @@ import kitchenpos.domain.Menu;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static kitchenpos.stub.MenuGroupStub.generateFirstTestMenuGroup;
+import static kitchenpos.stub.MenuProductStub.generateNegativeQuantityMenuProduct;
 import static kitchenpos.stub.MenuProductStub.generateTestMenuProducts;
 
 public class MenuStub {
@@ -16,7 +18,7 @@ public class MenuStub {
     private MenuStub() {
     }
 
-    public static Menu generateFiveThousandPriceVisibleValidPriceMenu() {
+    public static Menu generateFiveThousandMenuProductsPriceVisibleSamePriceMenu() {
         Menu menu = new Menu();
         menu.setMenuGroup(generateFirstTestMenuGroup());
         menu.setMenuProducts(generateTestMenuProducts());
@@ -26,7 +28,27 @@ public class MenuStub {
         return menu;
     }
 
-    public static Menu generateFiveThousandPriceVisibleInValidPriceMenu() {
+    public static Menu generateFiveThousandMenuProductsPriceVisibleSmallerPriceMenu() {
+        Menu menu = new Menu();
+        menu.setMenuGroup(generateFirstTestMenuGroup());
+        menu.setMenuProducts(generateTestMenuProducts());
+        menu.setDisplayed(true);
+        menu.setName(FIVE_THOUSAND_VISIBLE_MENU_NAME);
+        menu.setPrice(BigDecimal.valueOf(4000));
+        return menu;
+    }
+
+    public static Menu generateFiveThousandMenuProductsPriceInVisibleSamePriceMenu() {
+        Menu menu = new Menu();
+        menu.setMenuGroup(generateFirstTestMenuGroup());
+        menu.setMenuProducts(generateTestMenuProducts());
+        menu.setDisplayed(false);
+        menu.setName(FIVE_THOUSAND_VISIBLE_MENU_NAME);
+        menu.setPrice(BigDecimal.valueOf(5000));
+        return menu;
+    }
+
+    public static Menu generateNineThousandMenuProductsPriceVisibleLargerPriceMenu() {
         Menu menu = new Menu();
         menu.setMenuGroup(generateFirstTestMenuGroup());
         menu.setMenuProducts(generateTestMenuProducts());
@@ -36,14 +58,34 @@ public class MenuStub {
         return menu;
     }
 
+    public static Menu generateNegativePriceMenu() {
+        Menu menu = new Menu();
+        menu.setPrice(BigDecimal.valueOf(-1000));
+        return menu;
+    }
+
+    public static Menu generateEmptyMenuProductsMenu() {
+        Menu menu = new Menu();
+        menu.setPrice(BigDecimal.valueOf(1000));
+        return menu;
+    }
+
+    public static Menu generateContainingNegativeQuantityMenuProductMenu() {
+        Menu menu = new Menu();
+        menu.setMenuGroup(generateFirstTestMenuGroup());
+        menu.setMenuProducts(Collections.singletonList(generateNegativeQuantityMenuProduct()));
+        menu.setPrice(BigDecimal.valueOf(0));
+        return menu;
+    }
+
     public static List<Menu> generateSingleSizeValidPriceTestMenus() {
         List<Menu> menus = new ArrayList<>();
-        menus.add(generateFiveThousandPriceVisibleValidPriceMenu());
+        menus.add(generateFiveThousandMenuProductsPriceVisibleSamePriceMenu());
         return menus;
     }
     public static List<Menu> generateSingleSizeInValidPriceTestMenus() {
         List<Menu> menus = new ArrayList<>();
-        menus.add(generateFiveThousandPriceVisibleInValidPriceMenu());
+        menus.add(generateNineThousandMenuProductsPriceVisibleLargerPriceMenu());
         return menus;
     }
 
