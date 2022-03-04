@@ -12,7 +12,7 @@ public class CalculatorUtil {
 
     public static boolean isNumeric(String text) {
         try {
-            Double.parseDouble(text);
+            Integer.parseInt(text);
         } catch (NumberFormatException e) {
             return false;
         }

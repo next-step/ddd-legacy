@@ -9,20 +9,18 @@ import static java.util.Arrays.stream;
 public class Calculator {
     private final static String DEFAULT_DELIMITER_REGEX = ",|:";
     private final static String CUSTOM_DELIMITER_REGEX = "//(.)\n(.*)";
+    private final static int ZERO_VALUE = 0;
 
     public int add(String text) {
         if (isNullOrEmpty(text)) {
-            return 0;
-        }
-        if (text.length() == 1 && isNumeric(text)) {
-            return toInt(text);
+            return ZERO_VALUE;
         }
         String[] numbers = getNumbersFromText(text);
         return stream(numbers)
                 .filter(CalculatorUtil::isNumeric)
                 .map(CalculatorUtil::toInt)
                 .filter(this::isPositive)
-                .reduce(0, Integer::sum);
+                .reduce(ZERO_VALUE, Integer::sum);
     }
 
     private String[] getNumbersFromText(String text) {
@@ -37,7 +35,8 @@ public class Calculator {
     }
 
     private boolean isPositive(Integer number) {
-        if (number < 0) {
+        System.out.println(number);
+        if (number < ZERO_VALUE) {
             throw new RuntimeException("문자열 계산기에 음수는 입력될 수 없습니다.");
         }
         return true;
