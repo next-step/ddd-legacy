@@ -1,9 +1,9 @@
 package calculator;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import static calculator.Positive.*;
 
 public class StringCalculator implements Calculator {
     private static final String DELIMITERS = "[,:]";
@@ -15,12 +15,9 @@ public class StringCalculator implements Calculator {
             return 0;
         }
 
-        int[] operands = parseInt(split(text));
-        if (doesHaveNegative(operands)) {
-            throw new RuntimeException();
-        }
-
-        return sum(operands);
+        StringNumbers stringNumbers = new StringNumbers(split(text));
+        Positives positives = new Positives(stringNumbers.parseInt());
+        return positives.sum();
     }
 
     private boolean isValidText(final String text) {
@@ -32,7 +29,7 @@ public class StringCalculator implements Calculator {
                 text.isEmpty();
     }
 
-    private String[] split(String text) {
+    private List<String> split(String text) {
         String delimiter = DELIMITERS;
 
         Matcher matcher = Pattern.compile(CUSTOM_DELIMITERS_PATTERN).matcher(text);
@@ -40,6 +37,6 @@ public class StringCalculator implements Calculator {
             delimiter = matcher.group(1);
             text = matcher.group(2);
         }
-        return text.split(delimiter);
+        return Arrays.asList(text.split(delimiter));
     }
 }

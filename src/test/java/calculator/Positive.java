@@ -1,29 +1,20 @@
 package calculator;
 
-import java.util.Arrays;
-
 public class Positive {
-    public static int[] parseInt(final String[] numbers) {
-        int[] result = null;
-        try {
-            result = Arrays.stream(numbers)
-                    .mapToInt(Integer::parseInt)
-                    .toArray();
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
+    private final int positive;
+
+    public Positive(int number) {
+        if (isNegative(number)) {
+            throw new RuntimeException();
         }
-        return result;
+        this.positive = number;
     }
 
-    public static int sum(final int[] numbers) {
-        return Arrays.stream(numbers).sum();
-    }
-
-    public static boolean doesHaveNegative(final int[] numbers) {
-        return Arrays.stream(numbers).anyMatch(Positive::isNegative);
-    }
-
-    public static boolean isNegative(final int number) {
+    private boolean isNegative(final int number) {
         return number < 0;
+    }
+
+    public int getPositive() {
+        return positive;
     }
 }
