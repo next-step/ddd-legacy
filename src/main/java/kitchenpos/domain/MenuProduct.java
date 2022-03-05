@@ -1,6 +1,7 @@
 package kitchenpos.domain;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "menu_product")
@@ -58,5 +59,18 @@ public class MenuProduct {
 
     public void setProductId(final UUID productId) {
         this.productId = productId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MenuProduct that = (MenuProduct) o;
+        return quantity == that.quantity && Objects.equals(seq, that.seq) && Objects.equals(product, that.product) && Objects.equals(productId, that.productId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(seq, product, quantity, productId);
     }
 }
