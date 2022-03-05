@@ -308,4 +308,68 @@ class OrderServiceTest {
         verify(orderRepository).save(any(Order.class));
     }
 
+
+    private static Stream<OrderStatus> provideOrderStatusExceptForWaiting() {
+        return Stream.of(
+                OrderStatus.ACCEPTED,
+                OrderStatus.COMPLETED,
+                OrderStatus.DELIVERED,
+                OrderStatus.DELIVERING,
+                OrderStatus.SERVED
+        );
+    }
+
+    @DisplayName("주문 승인(accept) - 대기중(waiting)인 주문만 승인할 수 있다.")
+    @MethodSource("provideOrderStatusExceptForWaiting")
+    @ParameterizedTest
+    void accept01(OrderStatus 조회된_주문_상태) {
+        //given
+        UUID 승인할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getStatus()).willReturn(조회된_주문_상태);
+        given(orderRepository.findById(승인할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+
+        //when & then
+        assertThatThrownBy(() -> orderService.accept(승인할_주문_아이디))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문 승인(accept) -  배달주문의 경우 라이더에게 배달을 요청해야 한다.")
+    @Test
+    void accept02() {
+        //given
+        UUID 승인할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getStatus()).willReturn(OrderStatus.WAITING);
+        given(조회된_주문.getType()).willReturn(OrderType.DELIVERY);
+        given(조회된_주문.getDeliveryAddress()).willReturn("우리집으로 빨리 와줘");
+        given(orderRepository.findById(승인할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+
+        //when & then
+        orderService.accept(승인할_주문_아이디);
+
+        //then
+        verify(kitchenridersClient).requestDelivery(승인할_주문_아이디, BigDecimal.ZERO, "우리집으로 빨리 와줘");
+    }
+
+    @DisplayName("주문 승인(accept) - 주문을 승인할 수 있다.")
+    @Test
+    void accept03() {
+        //given
+        UUID 승인할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getStatus()).willReturn(OrderStatus.WAITING);
+        given(조회된_주문.getType()).willReturn(OrderType.TAKEOUT);
+        given(orderRepository.findById(승인할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+
+        //when & then
+        orderService.accept(승인할_주문_아이디);
+
+        //then
+        verify(조회된_주문).setStatus(OrderStatus.ACCEPTED);
+    }
+
+
+
+
 }
