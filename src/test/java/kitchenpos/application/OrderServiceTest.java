@@ -518,4 +518,72 @@ class OrderServiceTest {
         verify(조회된_주문).setStatus(OrderStatus.DELIVERED);
     }
 
+
+    @DisplayName("주문 완료(complete) - 매장식사, 테이크아웃의 경우 서빙된 주문만 완료 할 수 있다.")
+    @MethodSource("provideOrderTypeExceptForDelivery")
+    @ParameterizedTest
+    void complete01(OrderType 조회된_주문_타입) {
+        //given
+        UUID 완료할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getType()).willReturn(조회된_주문_타입);
+        given(조회된_주문.getStatus()).willReturn(OrderStatus.ACCEPTED);
+        given(orderRepository.findById(완료할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+
+        //when & then
+        assertThatThrownBy(() -> orderService.complete(완료할_주문_아이디))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문 완료(complete) - 배달주문의 경우 배달완료된 주문만 완료 할 수 있다.")
+    @Test
+    void complete02() {
+        //given
+        UUID 완료할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getType()).willReturn(OrderType.DELIVERY);
+        given(조회된_주문.getStatus()).willReturn(OrderStatus.ACCEPTED);
+        given(orderRepository.findById(완료할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+
+        //when & then
+        assertThatThrownBy(() -> orderService.complete(완료할_주문_아이디))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문 완료(complete) - 매장식사의 경우 주문이 완료 되면 테이블을 정리해야 한다.")
+    @Test
+    void complete03() {
+        //given
+        UUID 완료할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        OrderTable 조회된_주문_테이블 = mock(OrderTable.class);
+        given(조회된_주문.getType()).willReturn(OrderType.EAT_IN);
+        given(조회된_주문.getStatus()).willReturn(OrderStatus.SERVED);
+        given(조회된_주문.getOrderTable()).willReturn(조회된_주문_테이블);
+        given(orderRepository.findById(완료할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+        given(orderRepository.existsByOrderTableAndStatusNot(조회된_주문_테이블, OrderStatus.COMPLETED))
+                .willReturn(false);
+        //when
+        orderService.complete(완료할_주문_아이디);
+        //then
+        verify(조회된_주문_테이블).setEmpty(true);
+        verify(조회된_주문_테이블).setNumberOfGuests(0);
+    }
+
+    @DisplayName("주문 완료(complete) - 주문을 완료할 수 있다.")
+    @Test
+    void complete04() {
+        //given
+        UUID 완료할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getType()).willReturn(OrderType.TAKEOUT);
+        given(조회된_주문.getStatus()).willReturn(OrderStatus.SERVED);
+        given(orderRepository.findById(완료할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+        //when
+        orderService.complete(완료할_주문_아이디);
+        //then
+        verify(조회된_주문).setStatus(OrderStatus.COMPLETED);
+    }
+
+
 }
