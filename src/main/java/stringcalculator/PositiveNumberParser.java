@@ -1,30 +1,32 @@
 package stringcalculator;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class NumberParser {
+public class PositiveNumberParser {
 
     private static final List<String> DEFAULT_DELIMITERS = Arrays.asList(",", ":");
     private static final String CUSTOM_DELIMITER_PREFIX = "//";
     private static final String NEW_LINE = "\n";
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(CUSTOM_DELIMITER_PREFIX + "(.)");
 
-    public List<Integer> parse(String text) {
+    public PositiveNumbers parse(String text) {
         if (isNullOrEmpty(text)) {
-            return Collections.emptyList();
+            return new PositiveNumbers();
         }
 
         final String numberText = parseNumberText(text);
         final String allDelimiterRegex = findAllDelimiterRegex(text);
 
-        return Arrays.stream(numberText.split(allDelimiterRegex))
-            .map(Integer::parseInt)
-            .collect(Collectors.toList());
+        return new PositiveNumbers(
+            Arrays.stream(numberText.split(allDelimiterRegex))
+                .map(Integer::parseInt)
+                .map(PositiveNumber::new)
+                .collect(Collectors.toList())
+        );
     }
 
     private boolean isNullOrEmpty(String text) {
