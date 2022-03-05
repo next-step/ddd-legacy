@@ -36,7 +36,7 @@ class MenuGroupServiceTest {
     @DisplayName("메뉴 그룹 등록 - 메뉴 그룹은 반드시 이름을 가져야 한다.")
     @MethodSource("provideMenuNameForNullAndEmptyString")
     @ParameterizedTest
-    public void create01(String name) {
+    void create01(String name) {
         //given
         MenuGroup 등록할_메뉴_그룹 = mock(MenuGroup.class);
         when(등록할_메뉴_그룹.getName()).thenReturn(name);
@@ -48,7 +48,7 @@ class MenuGroupServiceTest {
 
     @DisplayName("메뉴 그룹 등록 - 메뉴그룹을 등록 할 수 있다.")
     @Test
-    public void create02() {
+    void create02() {
         //given
         MenuGroup 등록할_메뉴_그룹 = mock(MenuGroup.class);
         String 등록할_메뉴_그룹_이름 = "런치 세트 메뉴";

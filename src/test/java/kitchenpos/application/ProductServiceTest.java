@@ -46,7 +46,7 @@ class ProductServiceTest {
     @DisplayName("상품등록 - 상품의 가격은 반드시 0보다 큰 값을 가져야 한다.")
     @MethodSource("providePriceForNullAndNegative")
     @ParameterizedTest
-    public void create01(BigDecimal 등록할_상품_가격) {
+    void create01(BigDecimal 등록할_상품_가격) {
         //given
         Product 등록할_상품 = mock(Product.class);
         when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
@@ -57,7 +57,7 @@ class ProductServiceTest {
 
     @DisplayName("상품등록 - 상품은 반드시 이름을 가진다.")
     @Test
-    public void create02() {
+    void create02() {
         //given
         Product 등록할_상품 = mock(Product.class);
         BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000l);
@@ -69,7 +69,7 @@ class ProductServiceTest {
 
     @DisplayName("상품등록 - 상품의 이름은 비속어를 포함할 수 없다.")
     @Test
-    public void create03() {
+    void create03() {
         //given
 
         Product 등록할_상품 = mock(Product.class);
@@ -86,7 +86,7 @@ class ProductServiceTest {
 
     @DisplayName("상품등록 - 상품을 등록할 수 있다.")
     @Test
-    public void create04() {
+    void create04() {
         //given
         Product 등록할_상품 = mock(Product.class);
         BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000l);
@@ -105,7 +105,7 @@ class ProductServiceTest {
     @DisplayName("상품 가격 수정 - 상품의 가격은 반드시 0보다 큰 값을 가져야 한다.")
     @MethodSource("providePriceForNullAndNegative")
     @ParameterizedTest
-    public void changePrice01(BigDecimal 변경할_상품_가격) {
+    void changePrice01(BigDecimal 변경할_상품_가격) {
         //given
         Product 변경할_상품 = mock(Product.class);
         UUID 변경할_상품_아이디 = UUID.randomUUID();
@@ -118,7 +118,7 @@ class ProductServiceTest {
     //@TODO 모든 메뉴의 가격의 합이 아닌 개발 메뉴와 비교하고 있음 -> 모든 메뉴의 가격의 합과 비교 할 수 있도록 개선
     @DisplayName("상품 가격 수정 - 가격을 변경하는 상품을 포함하는 메뉴의 가격보다 메뉴에 포함한 상품의 가격이 커지는 경우 메뉴를 진열하지 않는다.")
     @Test
-    public void changePrice02() {
+    void changePrice02() {
         //given
         BigDecimal 변경할_상품_가격 = BigDecimal.valueOf(2700l);
         BigDecimal 기존_상품_가격 = BigDecimal.valueOf(3000l);
@@ -160,7 +160,7 @@ class ProductServiceTest {
 
     @DisplayName("상품 가격 수정 - 상품의 가격을 수정할 수 있다.")
     @Test
-    public void changePrice03() {
+    void changePrice03() {
         //given
         BigDecimal 변경할_상품_가격 = BigDecimal.valueOf(2700l);
         BigDecimal 기존_상품_가격 = BigDecimal.valueOf(3000l);

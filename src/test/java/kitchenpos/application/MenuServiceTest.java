@@ -48,7 +48,7 @@ public class MenuServiceTest {
     @DisplayName("메뉴 등록 - 메뉴의 가격은 반드시 0보다 큰 값을 가져야 한다.")
     @MethodSource("providePriceForNullAndNegative")
     @ParameterizedTest
-    public void create01(BigDecimal 등록할_메뉴_가격) {
+    void create01(BigDecimal 등록할_메뉴_가격) {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
         given(등록할_메뉴.getPrice()).willReturn(등록할_메뉴_가격);
@@ -59,7 +59,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴 등록 - 메뉴는 반드시 하나의 메뉴 그룹에 속해야 한다.")
     @Test
-    public void create02() {
+    void create02() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
         BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
@@ -83,7 +83,7 @@ public class MenuServiceTest {
     @DisplayName("메뉴 등록 - 메뉴는 반드시 하나 이상의 상품(product)을 포함해야 한다.")
     @MethodSource("provideMenuProductForNullAndEmpty")
     @ParameterizedTest
-    public void create03(List<MenuProduct> 메뉴에_등록될_상품들) {
+    void create03(List<MenuProduct> 메뉴에_등록될_상품들) {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
         BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
@@ -99,7 +99,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴 등록 - 메뉴에 포함할 상품은 반드시 존재해야 한다.")
     @Test
-    public void create03() {
+    void create03() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
         BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
@@ -125,7 +125,7 @@ public class MenuServiceTest {
     // @TODO 품목 별 수량 0개 등록 가능 -> 1개 이상 등록 가능하도록 개선
     @DisplayName("메뉴 등록 - 메뉴는 반드시 하나 이상의 상품(product)을 포함해야 한다. - 품목별 수량은 -1보다 큰 값을 가져야 한다.")
     @Test
-    public void create04() {
+    void create04() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
         BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
@@ -156,7 +156,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴 등록 - 메뉴에 가격은 메뉴에 속한 모든 상품의 가격의 합보다 클 수 없다.")
     @Test
-    public void create05() {
+    void create05() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
         BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
@@ -190,10 +190,11 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
 
     }
+
     // @TODO 메뉴 이름 EmptyString 가능함 -> EmptyString 유효성 검증
     @DisplayName("메뉴 등록 -  메뉴는 반드시 이름을 가져야 한다.")
     @Test
-    public void create06() {
+    void create06() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
         BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
@@ -230,7 +231,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴 등록 -  메뉴의 이름은 비속어를 포함할 수 없다.")
     @Test
-    public void create07() {
+    void create07() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
         BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
@@ -271,7 +272,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴 등록 -  메뉴를 등록 할 수 있다.")
     @Test
-    public void create08() {
+    void create08() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
         BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
@@ -323,7 +324,7 @@ public class MenuServiceTest {
     @DisplayName("메뉴 등록 - 메뉴는 노출 여부를 가진다.")
     @MethodSource("provideDisplayFlagForTrueAndFalse")
     @ParameterizedTest
-    public void create09(Boolean 등록할_노출_여부, Boolean 등록된_노출_여부) {
+    void create09(Boolean 등록할_노출_여부, Boolean 등록된_노출_여부) {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
         BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
