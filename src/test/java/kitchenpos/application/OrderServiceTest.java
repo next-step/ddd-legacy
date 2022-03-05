@@ -586,4 +586,13 @@ class OrderServiceTest {
     }
 
 
+    @DisplayName("주문 조회 - 등록된 모든 주문을 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given & when
+        orderService.findAll();
+        //then
+        verify(orderRepository).findAll();
+    }
+
 }
