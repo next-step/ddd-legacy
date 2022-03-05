@@ -369,7 +369,46 @@ class OrderServiceTest {
         verify(조회된_주문).setStatus(OrderStatus.ACCEPTED);
     }
 
+    private static Stream<OrderStatus> provideOrderStatusExceptForAccepted() {
+        return Stream.of(
+                OrderStatus.WAITING,
+                OrderStatus.COMPLETED,
+                OrderStatus.DELIVERED,
+                OrderStatus.DELIVERING,
+                OrderStatus.SERVED
+        );
+    }
 
+    @DisplayName("주문 서빙(serve) - 승인된(accept) 주문만 서빙할 수 있다.")
+    @MethodSource("provideOrderStatusExceptForAccepted")
+    @ParameterizedTest
+    void serve01(OrderStatus 조회된_주문_상태) {
+        //given
+        UUID 승인할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getStatus()).willReturn(조회된_주문_상태);
+        given(orderRepository.findById(승인할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+
+        //when & then
+        assertThatThrownBy(() -> orderService.serve(승인할_주문_아이디))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문 승인(accept) - 주문을 승인할 수 있다.")
+    @Test
+    void serve02() {
+        //given
+        UUID 승인할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getStatus()).willReturn(OrderStatus.ACCEPTED);
+        given(orderRepository.findById(승인할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+
+        //when & then
+        orderService.serve(승인할_주문_아이디);
+
+        //then
+        verify(조회된_주문).setStatus(OrderStatus.SERVED);
+    }
 
 
 }
