@@ -410,6 +410,47 @@ public class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    //@TODO 버그 픽스
+    @DisplayName("메뉴 가격 변경 - 개별 상품 가격과 메뉴 가격을 비교하고 있어 변경 가능한 상태임에도 불구하고 변경되지 않는다.")
+    @Test
+    void changePrice02_01() {
+        //given
+        UUID 변경할_메뉴_아이디 = UUID.randomUUID();
+        Menu 조회된_메뉴 = mock(Menu.class);
+        Menu 변경할_메뉴 = mock(Menu.class);
+        BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(2500l);
+        given(변경할_메뉴.getPrice()).willReturn(변경할_메뉴_가격);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(2000l);
+
+        given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
+        List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
+        given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
+        long 조회된_메뉴_상품_수량 = 1l;
+        MenuProduct 조회된_메뉴_상품01 = mock(MenuProduct.class);
+        BigDecimal 조회된_메뉴_상품_가격01 = BigDecimal.valueOf(1500l);
+        Product 조회된_상품01 = mock(Product.class);
+        given(조회된_상품01.getPrice()).willReturn(조회된_메뉴_상품_가격01);
+        given(조회된_메뉴_상품01.getQuantity()).willReturn(조회된_메뉴_상품_수량);
+        given(조회된_메뉴_상품01.getProduct()).willReturn(조회된_상품01);
+
+        MenuProduct 조회된_메뉴_상품02 = mock(MenuProduct.class);
+        BigDecimal 조회된_메뉴_상품_가격02 = BigDecimal.valueOf(1500l);
+        Product 조회된_상품02 = mock(Product.class);
+        given(조회된_상품02.getPrice()).willReturn(조회된_메뉴_상품_가격02);
+        given(조회된_메뉴_상품02.getQuantity()).willReturn(조회된_메뉴_상품_수량);
+        given(조회된_메뉴_상품02.getProduct()).willReturn(조회된_상품02);
+
+        조회된_메뉴_상품들.add(조회된_메뉴_상품01);
+        조회된_메뉴_상품들.add(조회된_메뉴_상품02);
+
+        given(menuRepository.findById(변경할_메뉴_아이디)).willReturn(Optional.ofNullable(조회된_메뉴));
+        //when & then
+        assertThatThrownBy(() -> menuService.changePrice(변경할_메뉴_아이디, 변경할_메뉴))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(조회된_메뉴).setPrice(변경할_메뉴_가격);
+    }
+
     @DisplayName("메뉴 가격 변경 - 메뉴의 가격을 수정할 수 있다.")
     @Test
     void changePrice03() {
@@ -461,6 +502,46 @@ public class MenuServiceTest {
         assertThatThrownBy(() -> menuService.display(노출할_메뉴_아이디))
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    //@TODO 버그 픽스
+    @DisplayName("메뉴 노출 - 개별 상품 가격과 메뉴 가격을 비교하고 있어 노출 가능한 상태임에도 불구하고 노출되지 않는다.")
+    @Test
+    void display01_01() {
+        //given
+        UUID 노출할_메뉴_아이디 = UUID.randomUUID();
+        Menu 조회된_메뉴 = mock(Menu.class);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(2000l);
+        given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
+        List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
+        given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
+        long 조회된_메뉴_상품_수량 = 1l;
+        MenuProduct 조회된_메뉴_상품01 = mock(MenuProduct.class);
+        BigDecimal 조회된_메뉴_상품_가격01 = BigDecimal.valueOf(1500l);
+        Product 조회된_상품01 = mock(Product.class);
+        given(조회된_상품01.getPrice()).willReturn(조회된_메뉴_상품_가격01);
+        given(조회된_메뉴_상품01.getQuantity()).willReturn(조회된_메뉴_상품_수량);
+        given(조회된_메뉴_상품01.getProduct()).willReturn(조회된_상품01);
+
+        MenuProduct 조회된_메뉴_상품02 = mock(MenuProduct.class);
+        BigDecimal 조회된_메뉴_상품_가격02 = BigDecimal.valueOf(1500l);
+        Product 조회된_상품02 = mock(Product.class);
+        given(조회된_상품02.getPrice()).willReturn(조회된_메뉴_상품_가격02);
+        given(조회된_메뉴_상품02.getQuantity()).willReturn(조회된_메뉴_상품_수량);
+        given(조회된_메뉴_상품02.getProduct()).willReturn(조회된_상품02);
+
+        조회된_메뉴_상품들.add(조회된_메뉴_상품01);
+        조회된_메뉴_상품들.add(조회된_메뉴_상품02);
+
+        given(menuRepository.findById(노출할_메뉴_아이디)).willReturn(Optional.ofNullable(조회된_메뉴));
+
+        //when
+        assertThatThrownBy(() -> menuService.display(노출할_메뉴_아이디))
+                .isInstanceOf(IllegalStateException.class);
+
+        // then
+        verify(조회된_메뉴).setDisplayed(true);
+    }
+
 
     @DisplayName("메뉴 노출 - 메뉴를 노출 할 수 있다.")
     @Test

@@ -115,7 +115,6 @@ class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    //@TODO 모든 메뉴의 가격의 합이 아닌 개발 메뉴와 비교하고 있음 -> 모든 메뉴의 가격의 합과 비교 할 수 있도록 개선
     @DisplayName("상품 가격 수정 - 가격을 변경하는 상품을 포함하는 메뉴의 가격보다 메뉴에 포함한 상품의 가격이 커지는 경우 메뉴를 진열하지 않는다.")
     @Test
     void changePrice02() {
@@ -156,7 +155,6 @@ class ProductServiceTest {
         verify(계속_공개될_메뉴, times(0)).setDisplayed(anyBoolean());
         verify(비공개될_메뉴).setDisplayed(false);
     }
-
 
     @DisplayName("상품 가격 수정 - 상품의 가격을 수정할 수 있다.")
     @Test
