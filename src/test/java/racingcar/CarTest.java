@@ -17,7 +17,7 @@ public class CarTest {
 	@DisplayName("4 이상인 경우 자동차가 전진한다")
 	@Test
 	void go() {
-		final Car car = new Car("chae-yh", 0);
+		final Car car = new Car("chae", 0);
 		car.move(new MustGoStrategy());
 		Assertions.assertThat(car.getPosition()).isEqualTo(1);
 	}
@@ -26,15 +26,14 @@ public class CarTest {
 	@ValueSource(ints = {0, 1, 2, 3})
 	@ParameterizedTest
 	void stop(final int number) {
-		final Car car = new Car("chae-yh", 0);
+		final Car car = new Car("chae", 0);
 		car.move(number);
 		Assertions.assertThat(car.getPosition()).isZero();
 	}
 
 	@DisplayName("3 이하인 경우 자동차가 움직이지 않는다")
-	@ParameterizedTest
 	void stop() {
-		final Car car = new Car("chae-yh", 0);
+		final Car car = new Car("chae", 0);
 		car.move(new MustStopStrategy());
 		Assertions.assertThat(car.getPosition()).isZero();
 	}
