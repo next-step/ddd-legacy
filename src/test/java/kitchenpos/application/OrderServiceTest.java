@@ -384,31 +384,96 @@ class OrderServiceTest {
     @ParameterizedTest
     void serve01(OrderStatus 조회된_주문_상태) {
         //given
-        UUID 승인할_주문_아이디 = UUID.randomUUID();
+        UUID 서빙할_주문_아이디 = UUID.randomUUID();
         Order 조회된_주문 = mock(Order.class);
         given(조회된_주문.getStatus()).willReturn(조회된_주문_상태);
-        given(orderRepository.findById(승인할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+        given(orderRepository.findById(서빙할_주문_아이디)).willReturn(Optional.of(조회된_주문));
 
         //when & then
-        assertThatThrownBy(() -> orderService.serve(승인할_주문_아이디))
+        assertThatThrownBy(() -> orderService.serve(서빙할_주문_아이디))
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("주문 승인(accept) - 주문을 승인할 수 있다.")
+    @DisplayName("주문 서빙(serve) - 주문을 서빙할 수 있다.")
     @Test
     void serve02() {
         //given
-        UUID 승인할_주문_아이디 = UUID.randomUUID();
+        UUID 서빙할_주문_아이디 = UUID.randomUUID();
         Order 조회된_주문 = mock(Order.class);
         given(조회된_주문.getStatus()).willReturn(OrderStatus.ACCEPTED);
-        given(orderRepository.findById(승인할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+        given(orderRepository.findById(서빙할_주문_아이디)).willReturn(Optional.of(조회된_주문));
 
         //when & then
-        orderService.serve(승인할_주문_아이디);
+        orderService.serve(서빙할_주문_아이디);
 
         //then
         verify(조회된_주문).setStatus(OrderStatus.SERVED);
     }
 
+    private static Stream<OrderType> provideOrderTypeExceptForDelivery() {
+        return Stream.of(
+                OrderType.EAT_IN,
+                OrderType.TAKEOUT
+        );
+    }
+
+    @DisplayName("주문 배달(delivering) 시작 - 배달주문인 경우에만 배달을 시작할 수 있다.")
+    @MethodSource("provideOrderTypeExceptForDelivery")
+    @ParameterizedTest
+    void startDelivery01(OrderType 조회된_주문_타입) {
+        //given
+        UUID 배달할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getType()).willReturn(조회된_주문_타입);
+        given(orderRepository.findById(배달할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+
+        //when & then
+        assertThatThrownBy(() -> orderService.startDelivery(배달할_주문_아이디))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+
+    private static Stream<OrderStatus> provideOrderStatusExceptForServed() {
+        return Stream.of(
+                OrderStatus.ACCEPTED,
+                OrderStatus.COMPLETED,
+                OrderStatus.DELIVERED,
+                OrderStatus.DELIVERING,
+                OrderStatus.WAITING
+        );
+    }
+
+    @DisplayName("주문 배달(delivering) 시작 - 서빙(accept)된 주문만 배달을 시작할 수 있다.")
+    @MethodSource("provideOrderStatusExceptForServed")
+    @ParameterizedTest
+    void startDelivery02(OrderStatus 조회된_주문_상태) {
+        //given
+        UUID 배달할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getType()).willReturn(OrderType.DELIVERY);
+        given(조회된_주문.getStatus()).willReturn(조회된_주문_상태);
+        given(orderRepository.findById(배달할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+
+        //when & then
+        assertThatThrownBy(() -> orderService.startDelivery(배달할_주문_아이디))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문 배달(delivering) 시작 - 배달을 시작 할 수 있다.")
+    @Test
+    void startDelivery03() {
+        //given
+        UUID 배달할_주문_아이디 = UUID.randomUUID();
+        Order 조회된_주문 = mock(Order.class);
+        given(조회된_주문.getType()).willReturn(OrderType.DELIVERY);
+        given(조회된_주문.getStatus()).willReturn(OrderStatus.SERVED);
+        given(orderRepository.findById(배달할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+
+        //when
+        orderService.startDelivery(배달할_주문_아이디);
+
+        //then
+        verify(조회된_주문).setStatus(OrderStatus.DELIVERING);
+    }
 
 }
