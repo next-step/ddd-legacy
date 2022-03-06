@@ -15,7 +15,7 @@ public class NumbersTest {
 		Numbers numbers = new Numbers();
 
 		assertThatThrownBy(() -> IntStream.range(1, 102)
-			.forEach(i -> numbers.addNumber(new Number("1")))).isInstanceOf(IllegalStateException.class);
+			.forEach(i -> numbers.addNumber(new Number("1")))).isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@DisplayName("목록이 비었을 경우 0을 반환한다")
@@ -29,7 +29,8 @@ public class NumbersTest {
 	@DisplayName("목록에 있는 값들의 합을 반환한다")
 	@Test
 	void when_get_sum_method_is_called_return_sum_of_number_list() {
-		Numbers numbers = new Numbers(Arrays.asList(new Number("1"), new Number("2")));
+		String[] stringNumbers = {"1", "2"};
+		Numbers numbers = new Numbers(stringNumbers);
 
 		assertThat(numbers.getSum()).isEqualTo(3);
 	}

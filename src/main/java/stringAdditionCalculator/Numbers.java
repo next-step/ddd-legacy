@@ -12,25 +12,37 @@ public class Numbers {
 		this.numbers = new ArrayList<>();
 	}
 
-	public Numbers(List<Number> numbers) {
-		// TODO null check
-		this.numbers = numbers;
-	}
-
 	public Numbers(String[] stringNumbers) {
 		this();
-		// TODO null check
+		validateListEmptiness(stringNumbers);
+
 		for (String number : stringNumbers) {
 			addNumber(new Number(number));
 		}
 	}
 
-	public void addNumber(Number number) {
-		if (numbers.size() >= MAXIMUM_SIZE) {
-			throw new IllegalStateException("너무 많은 값을 입력하였습니다.");
+	private void validateListEmptiness(String[] stringNumbers) {
+		if (stringNumbers == null || stringNumbers.length == EMPTY) {
+			throw new IllegalArgumentException("null 혹은 빈 값은 입력할 수 없습니다");
 		}
-		// TODO null check
+	}
+
+	public void addNumber(Number number) {
+		validateSize();
+		validateEmptiness(number);
 		this.numbers.add(number);
+	}
+
+	private void validateEmptiness(Number number) {
+		if (number == null) {
+			throw new IllegalArgumentException("null은 추가할 수 없습니다");
+		}
+	}
+
+	private void validateSize() {
+		if (numbers.size() >= MAXIMUM_SIZE) {
+			throw new IllegalArgumentException("너무 많은 값을 입력하였습니다.");
+		}
 	}
 
 	public int getSum() {
