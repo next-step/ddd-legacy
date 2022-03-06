@@ -477,6 +477,21 @@ public class MenuServiceTest {
         verify(조회된_메뉴).setPrice(변경할_메뉴_가격);
     }
 
+    @DisplayName("메뉴 가격 변경 - 가격을 변경하려는 메뉴는 반드시 존재해야 한다.")
+    @Test
+    void changePrice04() {
+        //given
+        UUID 변경할_메뉴_아이디 = UUID.randomUUID();
+        Menu 변경할_메뉴 = mock(Menu.class);
+        BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(1000L);
+        given(변경할_메뉴.getPrice()).willReturn(변경할_메뉴_가격);
+        given(menuRepository.findById(변경할_메뉴_아이디)).willReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> menuService.changePrice(변경할_메뉴_아이디, 변경할_메뉴))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
     @DisplayName("메뉴 노출 - 메뉴에 속한 상품의 가격의 합이 메뉴의 가격 보다 큰 경우 노출 할 수 없다.")
     @Test
     void display01() {
@@ -568,9 +583,22 @@ public class MenuServiceTest {
         verify(조회된_메뉴).setDisplayed(true);
     }
 
+    @DisplayName("메뉴 노출 - 노출하려는 메뉴는 반드시 존재해야 한다.")
+    @Test
+    void display03() {
+        //given
+        UUID 노출할_메뉴_아이디 = UUID.randomUUID();
+        given(menuRepository.findById(노출할_메뉴_아이디)).willReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> menuService.display(노출할_메뉴_아이디))
+                .isInstanceOf(NoSuchElementException.class);
+
+    }
+
     @DisplayName("메뉴 숨김 - 메뉴를 숨길 수 있다.")
     @Test
-    void hide() {
+    void hide01() {
         //given
         UUID 숨길_메뉴_아이디 = UUID.randomUUID();
         Menu 조회된_메뉴 = mock(Menu.class);
@@ -581,6 +609,18 @@ public class MenuServiceTest {
 
         //then
         verify(조회된_메뉴).setDisplayed(false);
+    }
+
+    @DisplayName("메뉴 숨김 - 숨기려는 메뉴는 반드시 존재해야 한다.")
+    @Test
+    void hide02() {
+        //given
+        UUID 숨길_메뉴_아이디 = UUID.randomUUID();
+        given(menuRepository.findById(숨길_메뉴_아이디)).willReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> menuService.hide(숨길_메뉴_아이디))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @DisplayName("메뉴 조회 - 등록된 모든 메뉴를 조회할 수 있다.")
