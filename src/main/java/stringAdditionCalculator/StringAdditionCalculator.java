@@ -6,13 +6,10 @@ public class StringAdditionCalculator {
 			return Number.ZERO;
 		}
 
-		String[] stringNumbers = inputStringNumbers.split(",|:");
+		return getNumbers(inputStringNumbers).getSum();
+	}
 
-		Numbers numbers = new Numbers();
-		for (String number : stringNumbers) {
-			numbers.addNumber(new Number(number));
-		}
-
-		return numbers.getSum();
+	private Numbers getNumbers(String inputStringNumbers) {
+		return new Numbers(Separator.split(inputStringNumbers));
 	}
 }

@@ -13,13 +13,23 @@ public class Numbers {
 	}
 
 	public Numbers(List<Number> numbers) {
+		// TODO null check
 		this.numbers = numbers;
+	}
+
+	public Numbers(String[] stringNumbers) {
+		this();
+		// TODO null check
+		for (String number : stringNumbers) {
+			addNumber(new Number(number));
+		}
 	}
 
 	public void addNumber(Number number) {
 		if (numbers.size() >= MAXIMUM_SIZE) {
 			throw new IllegalStateException("너무 많은 값을 입력하였습니다.");
 		}
+		// TODO null check
 		this.numbers.add(number);
 	}
 
