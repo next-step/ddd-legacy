@@ -16,7 +16,7 @@ class StringCalculatorTest {
 
     @BeforeEach
     void setUp() {
-        stringCalculator = new StringCalculator();
+        stringCalculator = new StringCalculator(new StringPatternParse());
     }
 
     @DisplayName("빈 문자열 또는 null을 입력할 경우, 0을 반환해야 한다.")
@@ -65,5 +65,14 @@ class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> stringCalculator.add("-1"));
     }
+
+    @DisplayName("커스텀 문자열에 잘못 들어간 문자열은 계산 할 수 없다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"//;\n1;2;3,4;5"})
+    void negativeCustomDelimiter(final String text) {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> stringCalculator.add(text));
+    }
+
 
 }
