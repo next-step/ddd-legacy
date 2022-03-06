@@ -31,7 +31,7 @@ public class PositiveNumber {
         return number;
     }
 
-    public void add(PositiveNumber positiveNumber) {
-        this.number += positiveNumber.number;
+    public PositiveNumber add(PositiveNumber positiveNumber) {
+        return new PositiveNumber(this.number += positiveNumber.number);
     }
 }
