@@ -19,13 +19,8 @@ public class PositiveNumber {
 
     private void validatePositive(int number) {
         if (number < 0) {
-            resetNumber();
             throw new RuntimeException("음수는 사용할 수 없습니다.");
         }
-    }
-
-    private void resetNumber() {
-        this.number = 0;
     }
 
     public int getPositiveNumber() {
