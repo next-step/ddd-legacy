@@ -7,8 +7,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
+    private static final StringParser stringParser = new StringParser();
+    private final Numbers numbers;
+    private String[] token;
 
     public StringCalculator() {
+        numbers = new Numbers();
     }
 
     private Boolean checkIfNull(String text) {
@@ -18,25 +22,8 @@ public class StringCalculator {
         return true;
     }
 
-    private Matcher findCustomDelimiter(String text) {
-        return Pattern.compile("//(.)\n(.*)").matcher(text);
-    }
-
-    private String[] splitString(String text) {
-        Matcher m = findCustomDelimiter(text);
-        if (m.find()) {
-            String customDelimiter = m.group(1);
-            return m.group(2).split(customDelimiter);
-        }
-        return text.split(",|:");
-    }
-
-    private int addTokens(String[] tokens) {
-        return Arrays.stream(tokens)
-                .map(number -> Integer.parseInt(number))
-                .peek(number -> {
-                    if (number < 0) throw new RuntimeException();
-                })
+    private int calculate(Numbers numbers) {
+        return numbers.getNumbers().stream()
                 .reduce(0, Integer::sum);
     }
 
@@ -44,6 +31,8 @@ public class StringCalculator {
         if (checkIfNull(text)) {
             return 0;
         }
-        return addTokens(splitString(text));
+        token = stringParser.splitStringToToken(text);
+        numbers.addNumbersFromToken(token);
+        return calculate(numbers);
     }
 }
