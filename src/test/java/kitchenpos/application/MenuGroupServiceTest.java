@@ -2,27 +2,35 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.StubMenuGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
+@DataJpaTest
+@Transactional
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class MenuGroupServiceTest {
+
+    @Autowired
     private MenuGroupRepository menuGroupRepository;
 
     private MenuGroupService menuGroupService;
 
     @BeforeEach
     void setUp() {
-        menuGroupRepository = new StubMenuGroupRepository();
         menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
@@ -59,12 +67,12 @@ class MenuGroupServiceTest {
         final String givenName2 = "test2";
         MenuGroup request1 = createMenuGroup(givenUUID1, givenName1);
         MenuGroup request2 = createMenuGroup(givenUUID2, givenName2);
-        menuGroupRepository.save(request1);
-        menuGroupRepository.save(request2);
+        MenuGroup menuGroup1 = menuGroupRepository.save(request1);
+        MenuGroup menuGroup2 = menuGroupRepository.save(request2);
 
         List<MenuGroup> foundMenuGroup = menuGroupService.findAll();
 
-        assertThat(foundMenuGroup).containsExactly(request1, request2);
+        assertThat(foundMenuGroup).containsAll(Arrays.asList(menuGroup1, menuGroup2));
     }
 
     private MenuGroup createMenuGroup(UUID uuid, String name) {
