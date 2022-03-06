@@ -1,14 +1,14 @@
 package StringAddCalculator;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StringCalculator {
 
+    public static final int ZERO_NUMBER = 0;
+
     public int add(String text) {
-        if(text == null || text.isEmpty()) {
-            return 0;
+        if(isNullOrBlank(text)) {
+            return ZERO_NUMBER;
         }
 
         return Arrays.stream(PatternMatcherUtils.customDelimit(text))
@@ -17,9 +17,13 @@ public class StringCalculator {
                 .sum();
     }
 
+    private boolean isNullOrBlank(String text) {
+        return (text == null || text.isEmpty());
+    }
+
 
     private boolean isNegativeValue(int text) {
-        if(text < 0) {
+        if(text < ZERO_NUMBER) {
             throw new RuntimeException("음수는 처리할 수 없습니다.");
         }
         return true;
