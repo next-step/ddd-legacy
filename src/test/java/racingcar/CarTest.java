@@ -14,7 +14,6 @@ class CarTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-
     @DisplayName("자동차가 전진한다")
     @Test
     void go() {
