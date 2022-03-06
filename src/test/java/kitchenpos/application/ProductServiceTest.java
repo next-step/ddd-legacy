@@ -12,10 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,6 +22,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
+
+    private static final BigDecimal 정상적인_상품_가격 = BigDecimal.valueOf(1_500L);
+    private static final BigDecimal 정상적이지_않은_상품_가격 = BigDecimal.valueOf(-1_000L);
 
     @Mock
     private ProductRepository productRepository;
@@ -39,7 +39,7 @@ class ProductServiceTest {
     private static Stream<BigDecimal> providePriceForNullAndNegative() {
         return Stream.of(
                 null,
-                BigDecimal.valueOf(-1000L)
+                정상적이지_않은_상품_가격
         );
     }
 
@@ -60,8 +60,7 @@ class ProductServiceTest {
     void create02() {
         //given
         Product 등록할_상품 = mock(Product.class);
-        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000L);
-        when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
+        when(등록할_상품.getPrice()).thenReturn(정상적인_상품_가격);
         //when & then
         assertThatThrownBy(() -> productService.create(등록할_상품))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -73,9 +72,9 @@ class ProductServiceTest {
         //given
 
         Product 등록할_상품 = mock(Product.class);
-        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000L);
         String 등록할_상품_이름 = "X나 맛없는 미트파이";
-        when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
+
+        when(등록할_상품.getPrice()).thenReturn(정상적인_상품_가격);
         when(등록할_상품.getName()).thenReturn(등록할_상품_이름);
         when(purgomalumClient.containsProfanity(등록할_상품_이름))
                 .thenReturn(Boolean.TRUE);
@@ -89,9 +88,8 @@ class ProductServiceTest {
     void create04() {
         //given
         Product 등록할_상품 = mock(Product.class);
-        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000L);
         String 등록할_상품_이름 = "맛있는 미트파이";
-        when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
+        when(등록할_상품.getPrice()).thenReturn(정상적인_상품_가격);
         when(등록할_상품.getName()).thenReturn(등록할_상품_이름);
         when(purgomalumClient.containsProfanity(등록할_상품_이름))
                 .thenReturn(Boolean.FALSE);
@@ -187,6 +185,21 @@ class ProductServiceTest {
         verify(저장된_상품).setPrice(변경할_상품_가격);
         verify(계속_공개될_메뉴, times(0)).setDisplayed(anyBoolean());
     }
+
+    @DisplayName("상품 가격 수정 - 가격을 변경하려는 상품은 반드시 존재해야 한다.")
+    @Test
+    void changePrice04() {
+        //given
+        Product 변경할_상품 = mock(Product.class);
+        UUID 변경할_상품_아이디 = UUID.randomUUID();
+        when(변경할_상품.getPrice()).thenReturn(정상적인_상품_가격);
+        when(productRepository.findById(변경할_상품_아이디))
+                .thenReturn(Optional.empty());
+        //when & then
+        assertThatThrownBy(() -> productService.changePrice(변경할_상품_아이디, 변경할_상품))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
 
     @DisplayName("상품 조회 - 등록된 모든 상품을 조회할 수 있다.")
     @Test
