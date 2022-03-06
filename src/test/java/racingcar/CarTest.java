@@ -14,7 +14,7 @@ class CarTest {
     @DisplayName("생성 조건을 확인한다.")
     @Test
     void constructor() {
-       assertThatThrownBy(() -> new Car("동해물과백두산이"))
+        assertThatThrownBy(() -> new Car("동해물과백두산이"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
