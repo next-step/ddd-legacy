@@ -7,12 +7,20 @@ import org.junit.jupiter.api.Test;
 
 public class NumberTest {
 
+	@DisplayName("입력 값이 음수면 에러가 발생한다")
+	@Test
+	void negative_is_input_then_error_occurred() {
+		String negativeNumberString = "-1";
+
+		assertThatThrownBy(() -> new Number(negativeNumberString)).isInstanceOf(RuntimeException.class);
+	}
+
 	@DisplayName("입력 값이 float(or double) 형이면 에러가 발생한다")
 	@Test
 	void float_or_double_is_input_then_error_occurred() {
 		String floatNumberString = "12.34";
 
-		assertThatThrownBy(() -> new Number(floatNumberString)).isInstanceOf(IllegalArgumentException.class);
+		assertThatThrownBy(() -> new Number(floatNumberString)).isInstanceOf(RuntimeException.class);
 	}
 
 	@DisplayName("입력 값이 100을 넘어가면 에러가 발생한다")
@@ -28,7 +36,7 @@ public class NumberTest {
 	void not_number_is_input_then_error_occurred() {
 		String notNumber = "a";
 
-		assertThatThrownBy(() -> new Number(notNumber)).isInstanceOf(IllegalArgumentException.class);
+		assertThatThrownBy(() -> new Number(notNumber)).isInstanceOf(RuntimeException.class);
 	}
 
 	@DisplayName("null을 입력할 경우 0을 반환한다")

@@ -36,7 +36,7 @@ class StringAdditionCalculatorTest {
 	void if_not_number_string_is_contained_error_occurs() {
 		String numbersWithNotNumberString = "1,2,a";
 
-		assertThatThrownBy(() -> stringAdditionCalculator.sum(numbersWithNotNumberString)).isInstanceOf(IllegalArgumentException.class);
+		assertThatThrownBy(() -> stringAdditionCalculator.sum(numbersWithNotNumberString)).isInstanceOf(RuntimeException.class);
 	}
 
 	@DisplayName("문자 숫자 하나를 입력할 경우 해당 숫자를 반환한다")

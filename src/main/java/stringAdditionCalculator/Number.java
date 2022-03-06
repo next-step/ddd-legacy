@@ -9,22 +9,45 @@ public class Number {
 	private boolean isEmptyString;
 
 	public Number(String stringNumber) {
-		validateStringNumber(stringNumber);
+		validateEmptiness(stringNumber);
 
 		if (!isEmptyString) {
-			validateValue(Integer.parseInt(stringNumber));
+			validate(getIntegerValue(stringNumber));
 		}
 	}
 
-	private void validateValue(int inputValue) {
-		if (inputValue >= MAXIMUM_VALUE) {
-			throw new IllegalStateException("너무 큰 값을 입력하였습니다");
+	private int getIntegerValue(String stringNumber) {
+		int value;
+
+		try {
+			value = Integer.parseInt(stringNumber);
+		} catch (Exception e) {
+			throw new RuntimeException("숫자로 변경할 수 없습니다");
 		}
+
+		return value;
+	}
+
+	private void validate(int inputValue) {
+		validateMaximum(inputValue);
+		validateNegative(inputValue);
 
 		this.number = inputValue;
 	}
 
-	private void validateStringNumber(String stringNumber) {
+	private void validateNegative(int inputValue) {
+		if (inputValue < ZERO) {
+			throw new RuntimeException("음수는 입력할 수 없습니다");
+		}
+	}
+
+	private void validateMaximum(int inputValue) {
+		if (inputValue >= MAXIMUM_VALUE) {
+			throw new IllegalStateException("너무 큰 값을 입력하였습니다");
+		}
+	}
+
+	private void validateEmptiness(String stringNumber) {
 		if (stringNumber == null || stringNumber.isEmpty()) {
 			this.number = ZERO;
 			this.isEmptyString = true;
