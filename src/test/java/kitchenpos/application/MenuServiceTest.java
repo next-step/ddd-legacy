@@ -62,7 +62,7 @@ public class MenuServiceTest {
     void create02() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
-        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000L);
         given(등록할_메뉴.getPrice()).willReturn(등록할_메뉴_가격);
         given(등록할_메뉴.getMenuGroupId()).willReturn(UUID.randomUUID());
         given(menuGroupRepository.findById(any(UUID.class)))
@@ -86,7 +86,7 @@ public class MenuServiceTest {
     void create03(List<MenuProduct> 메뉴에_등록될_상품들) {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
-        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000L);
         given(등록할_메뉴.getPrice()).willReturn(등록할_메뉴_가격);
         given(등록할_메뉴.getMenuGroupId()).willReturn(UUID.randomUUID());
         given(menuGroupRepository.findById(any(UUID.class)))
@@ -102,7 +102,7 @@ public class MenuServiceTest {
     void create03() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
-        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000L);
         given(등록할_메뉴.getPrice()).willReturn(등록할_메뉴_가격);
         given(등록할_메뉴.getMenuGroupId()).willReturn(UUID.randomUUID());
         given(menuGroupRepository.findById(any(UUID.class)))
@@ -128,8 +128,8 @@ public class MenuServiceTest {
     void create04() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
-        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
-        long 등록할_상품_품목_수량 = -1l;
+        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000L);
+        long 등록할_상품_품목_수량 = -1L;
 
         given(등록할_메뉴.getPrice()).willReturn(등록할_메뉴_가격);
         given(등록할_메뉴.getMenuGroupId()).willReturn(UUID.randomUUID());
@@ -159,8 +159,8 @@ public class MenuServiceTest {
     void create05() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
-        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
-        long 등록할_상품_품목_수량 = 1l;
+        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000L);
+        long 등록할_상품_품목_수량 = 1L;
 
         given(등록할_메뉴.getPrice()).willReturn(등록할_메뉴_가격);
         given(등록할_메뉴.getMenuGroupId()).willReturn(UUID.randomUUID());
@@ -180,7 +180,7 @@ public class MenuServiceTest {
         given(productRepository.findAllByIdIn(anyList())).willReturn(조회된_상품들);
 
         Product 조회된_상품 = mock(Product.class);
-        BigDecimal 조회된_상품_가격 = BigDecimal.valueOf(500l);
+        BigDecimal 조회된_상품_가격 = BigDecimal.valueOf(500L);
         given(조회된_상품.getPrice()).willReturn(조회된_상품_가격);
         given(productRepository.findById(any(UUID.class)))
                 .willReturn(Optional.of(조회된_상품));
@@ -197,7 +197,7 @@ public class MenuServiceTest {
     void create06() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
-        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000L);
         long 등록할_상품_품목_수량 = 1l;
 
         given(등록할_메뉴.getPrice()).willReturn(등록할_메뉴_가격);
@@ -218,7 +218,7 @@ public class MenuServiceTest {
         given(productRepository.findAllByIdIn(anyList())).willReturn(조회된_상품들);
 
         Product 조회된_상품 = mock(Product.class);
-        BigDecimal 조회된_상품_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_상품_가격 = BigDecimal.valueOf(1500L);
         given(조회된_상품.getPrice()).willReturn(조회된_상품_가격);
         given(productRepository.findById(any(UUID.class)))
                 .willReturn(Optional.of(조회된_상품));
@@ -234,7 +234,7 @@ public class MenuServiceTest {
     void create07() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
-        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000L);
         long 등록할_상품_품목_수량 = 1l;
 
         given(등록할_메뉴.getPrice()).willReturn(등록할_메뉴_가격);
@@ -255,7 +255,7 @@ public class MenuServiceTest {
         given(productRepository.findAllByIdIn(anyList())).willReturn(조회된_상품들);
 
         Product 조회된_상품 = mock(Product.class);
-        BigDecimal 조회된_상품_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_상품_가격 = BigDecimal.valueOf(1500L);
         given(조회된_상품.getPrice()).willReturn(조회된_상품_가격);
         given(productRepository.findById(any(UUID.class)))
                 .willReturn(Optional.of(조회된_상품));
@@ -275,7 +275,7 @@ public class MenuServiceTest {
     void create08() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
-        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000L);
         long 등록할_상품_품목_수량 = 1l;
 
         given(등록할_메뉴.getPrice()).willReturn(등록할_메뉴_가격);
@@ -296,7 +296,7 @@ public class MenuServiceTest {
         given(productRepository.findAllByIdIn(anyList())).willReturn(조회된_상품들);
 
         Product 조회된_상품 = mock(Product.class);
-        BigDecimal 조회된_상품_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_상품_가격 = BigDecimal.valueOf(1500L);
         given(조회된_상품.getPrice()).willReturn(조회된_상품_가격);
         given(productRepository.findById(any(UUID.class)))
                 .willReturn(Optional.of(조회된_상품));
@@ -327,7 +327,7 @@ public class MenuServiceTest {
     void create09(Boolean 등록할_노출_여부, Boolean 등록된_노출_여부) {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
-        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 등록할_메뉴_가격 = BigDecimal.valueOf(1000L);
         long 등록할_상품_품목_수량 = 1l;
 
         given(등록할_메뉴.getPrice()).willReturn(등록할_메뉴_가격);
@@ -348,7 +348,7 @@ public class MenuServiceTest {
         given(productRepository.findAllByIdIn(anyList())).willReturn(조회된_상품들);
 
         Product 조회된_상품 = mock(Product.class);
-        BigDecimal 조회된_상품_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_상품_가격 = BigDecimal.valueOf(1500L);
         given(조회된_상품.getPrice()).willReturn(조회된_상품_가격);
         given(productRepository.findById(any(UUID.class)))
                 .willReturn(Optional.of(조회된_상품));
@@ -389,14 +389,14 @@ public class MenuServiceTest {
         //given
         UUID 변경할_메뉴_아이디 = UUID.randomUUID();
         Menu 변경할_메뉴 = mock(Menu.class);
-        BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(2000l);
+        BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(2000L);
         given(변경할_메뉴.getPrice()).willReturn(변경할_메뉴_가격);
 
         Menu 조회된_메뉴 = mock(Menu.class);
         List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
         given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
         MenuProduct 조회된_메뉴_상품 = mock(MenuProduct.class);
-        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500L);
         long 조회된_메뉴_상품_수량 = 1l;
         Product 조회된_상품 = mock(Product.class);
         given(조회된_상품.getPrice()).willReturn(조회된_메뉴_상품_가격);
@@ -418,23 +418,21 @@ public class MenuServiceTest {
         UUID 변경할_메뉴_아이디 = UUID.randomUUID();
         Menu 조회된_메뉴 = mock(Menu.class);
         Menu 변경할_메뉴 = mock(Menu.class);
-        BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(2500l);
+        BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(2500L);
         given(변경할_메뉴.getPrice()).willReturn(변경할_메뉴_가격);
-        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(2000l);
 
-        given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
         List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
         given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
         long 조회된_메뉴_상품_수량 = 1l;
         MenuProduct 조회된_메뉴_상품01 = mock(MenuProduct.class);
-        BigDecimal 조회된_메뉴_상품_가격01 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_상품_가격01 = BigDecimal.valueOf(1500L);
         Product 조회된_상품01 = mock(Product.class);
         given(조회된_상품01.getPrice()).willReturn(조회된_메뉴_상품_가격01);
         given(조회된_메뉴_상품01.getQuantity()).willReturn(조회된_메뉴_상품_수량);
         given(조회된_메뉴_상품01.getProduct()).willReturn(조회된_상품01);
 
         MenuProduct 조회된_메뉴_상품02 = mock(MenuProduct.class);
-        BigDecimal 조회된_메뉴_상품_가격02 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_상품_가격02 = BigDecimal.valueOf(1500L);
         Product 조회된_상품02 = mock(Product.class);
         given(조회된_상품02.getPrice()).willReturn(조회된_메뉴_상품_가격02);
         given(조회된_메뉴_상품02.getQuantity()).willReturn(조회된_메뉴_상품_수량);
@@ -456,14 +454,14 @@ public class MenuServiceTest {
     void changePrice03() {
         UUID 변경할_메뉴_아이디 = UUID.randomUUID();
         Menu 변경할_메뉴 = mock(Menu.class);
-        BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 변경할_메뉴_가격 = BigDecimal.valueOf(1000L);
         given(변경할_메뉴.getPrice()).willReturn(변경할_메뉴_가격);
 
         Menu 조회된_메뉴 = mock(Menu.class);
         List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
         given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
         MenuProduct 조회된_메뉴_상품 = mock(MenuProduct.class);
-        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500L);
         long 조회된_메뉴_상품_수량 = 1l;
         Product 조회된_상품 = mock(Product.class);
         given(조회된_상품.getPrice()).willReturn(조회된_메뉴_상품_가격);
@@ -485,12 +483,12 @@ public class MenuServiceTest {
         //given
         UUID 노출할_메뉴_아이디 = UUID.randomUUID();
         Menu 조회된_메뉴 = mock(Menu.class);
-        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(2000l);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(2000L);
         given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
         List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
         given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
         MenuProduct 조회된_메뉴_상품 = mock(MenuProduct.class);
-        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500L);
         long 조회된_메뉴_상품_수량 = 1l;
         Product 조회된_상품 = mock(Product.class);
         given(조회된_상품.getPrice()).willReturn(조회된_메뉴_상품_가격);
@@ -510,20 +508,20 @@ public class MenuServiceTest {
         //given
         UUID 노출할_메뉴_아이디 = UUID.randomUUID();
         Menu 조회된_메뉴 = mock(Menu.class);
-        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(2000l);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(2000L);
         given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
         List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
         given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
         long 조회된_메뉴_상품_수량 = 1l;
         MenuProduct 조회된_메뉴_상품01 = mock(MenuProduct.class);
-        BigDecimal 조회된_메뉴_상품_가격01 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_상품_가격01 = BigDecimal.valueOf(1500L);
         Product 조회된_상품01 = mock(Product.class);
         given(조회된_상품01.getPrice()).willReturn(조회된_메뉴_상품_가격01);
         given(조회된_메뉴_상품01.getQuantity()).willReturn(조회된_메뉴_상품_수량);
         given(조회된_메뉴_상품01.getProduct()).willReturn(조회된_상품01);
 
         MenuProduct 조회된_메뉴_상품02 = mock(MenuProduct.class);
-        BigDecimal 조회된_메뉴_상품_가격02 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_상품_가격02 = BigDecimal.valueOf(1500L);
         Product 조회된_상품02 = mock(Product.class);
         given(조회된_상품02.getPrice()).willReturn(조회된_메뉴_상품_가격02);
         given(조회된_메뉴_상품02.getQuantity()).willReturn(조회된_메뉴_상품_수량);
@@ -549,12 +547,12 @@ public class MenuServiceTest {
         //given
         UUID 노출할_메뉴_아이디 = UUID.randomUUID();
         Menu 조회된_메뉴 = mock(Menu.class);
-        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(1000L);
         given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
         List<MenuProduct> 조회된_메뉴_상품들 = spy(ArrayList.class);
         given(조회된_메뉴.getMenuProducts()).willReturn(조회된_메뉴_상품들);
         MenuProduct 조회된_메뉴_상품 = mock(MenuProduct.class);
-        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_상품_가격 = BigDecimal.valueOf(1500L);
         long 조회된_메뉴_상품_수량 = 1l;
         Product 조회된_상품 = mock(Product.class);
         given(조회된_상품.getPrice()).willReturn(조회된_메뉴_상품_가격);

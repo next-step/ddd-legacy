@@ -60,7 +60,7 @@ class ProductServiceTest {
     void create02() {
         //given
         Product 등록할_상품 = mock(Product.class);
-        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000L);
         when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
         //when & then
         assertThatThrownBy(() -> productService.create(등록할_상품))
@@ -73,7 +73,7 @@ class ProductServiceTest {
         //given
 
         Product 등록할_상품 = mock(Product.class);
-        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000L);
         String 등록할_상품_이름 = "X나 맛없는 미트파이";
         when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
         when(등록할_상품.getName()).thenReturn(등록할_상품_이름);
@@ -89,7 +89,7 @@ class ProductServiceTest {
     void create04() {
         //given
         Product 등록할_상품 = mock(Product.class);
-        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000l);
+        BigDecimal 등록할_상품_가격 = BigDecimal.valueOf(1000L);
         String 등록할_상품_이름 = "맛있는 미트파이";
         when(등록할_상품.getPrice()).thenReturn(등록할_상품_가격);
         when(등록할_상품.getName()).thenReturn(등록할_상품_이름);
@@ -119,10 +119,10 @@ class ProductServiceTest {
     @Test
     void changePrice02() {
         //given
-        BigDecimal 변경할_상품_가격 = BigDecimal.valueOf(2700l);
-        BigDecimal 기존_상품_가격 = BigDecimal.valueOf(3000l);
-        BigDecimal 계속_공개될_메뉴_가격 = BigDecimal.valueOf(2500l);
-        BigDecimal 비공개될_메뉴_가격 = BigDecimal.valueOf(2800l);
+        BigDecimal 변경할_상품_가격 = BigDecimal.valueOf(2700L);
+        BigDecimal 기존_상품_가격 = BigDecimal.valueOf(3000L);
+        BigDecimal 계속_공개될_메뉴_가격 = BigDecimal.valueOf(2500L);
+        BigDecimal 비공개될_메뉴_가격 = BigDecimal.valueOf(2800L);
 
         Product 변경할_상품 = mock(Product.class);
         given(변경할_상품.getPrice()).willReturn(변경할_상품_가격);
@@ -134,7 +134,7 @@ class ProductServiceTest {
 
         MenuProduct 저장된_메뉴_상품 = mock(MenuProduct.class);
         given(저장된_메뉴_상품.getProduct()).willReturn(저장된_상품);
-        given(저장된_메뉴_상품.getQuantity()).willReturn(1l);
+        given(저장된_메뉴_상품.getQuantity()).willReturn(1L);
 
         Menu 계속_공개될_메뉴 = mock(Menu.class);
         given(계속_공개될_메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(저장된_메뉴_상품)));
@@ -160,9 +160,9 @@ class ProductServiceTest {
     @Test
     void changePrice03() {
         //given
-        BigDecimal 변경할_상품_가격 = BigDecimal.valueOf(2700l);
-        BigDecimal 기존_상품_가격 = BigDecimal.valueOf(3000l);
-        BigDecimal 계속_공개될_메뉴_가격 = BigDecimal.valueOf(2500l);
+        BigDecimal 변경할_상품_가격 = BigDecimal.valueOf(2700L);
+        BigDecimal 기존_상품_가격 = BigDecimal.valueOf(3000L);
+        BigDecimal 계속_공개될_메뉴_가격 = BigDecimal.valueOf(2500L);
 
         Product 변경할_상품 = new Product();
         변경할_상품.setPrice(변경할_상품_가격);
@@ -172,7 +172,7 @@ class ProductServiceTest {
 
         MenuProduct 저장된_메뉴_상품 = mock(MenuProduct.class);
         given(저장된_메뉴_상품.getProduct()).willReturn(저장된_상품);
-        given(저장된_메뉴_상품.getQuantity()).willReturn(1l);
+        given(저장된_메뉴_상품.getQuantity()).willReturn(1L);
 
         Menu 계속_공개될_메뉴 = mock(Menu.class);
         given(계속_공개될_메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(저장된_메뉴_상품)));

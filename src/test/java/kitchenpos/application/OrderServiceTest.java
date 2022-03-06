@@ -123,7 +123,7 @@ class OrderServiceTest {
         given(주문_등록_요청.getType()).willReturn(주문_등록_요청_타입);
         List<OrderLineItem> 주문_등록_요청_메뉴들 = spy(ArrayList.class);
         OrderLineItem 주문_등록_요청_메뉴 = mock(OrderLineItem.class);
-        given(주문_등록_요청_메뉴.getQuantity()).willReturn(-1l);
+        given(주문_등록_요청_메뉴.getQuantity()).willReturn(-1L);
         주문_등록_요청_메뉴들.add(주문_등록_요청_메뉴);
         given(주문_등록_요청.getOrderLineItems()).willReturn(주문_등록_요청_메뉴들);
         List<OrderLineItem> 조회된_메뉴들 = mock(List.class);
@@ -184,7 +184,7 @@ class OrderServiceTest {
 
         Menu 조회된_메뉴 = mock(Menu.class);
         given(조회된_메뉴.isDisplayed()).willReturn(true);
-        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(2000l);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(2000L);
         given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
         given(menuRepository.findById(주문_등록_요청_메뉴_아이디)).willReturn(Optional.of(조회된_메뉴));
         //when & then
@@ -223,7 +223,7 @@ class OrderServiceTest {
 
         Menu 조회된_메뉴 = mock(Menu.class);
         given(조회된_메뉴.isDisplayed()).willReturn(true);
-        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(1500L);
         given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
         given(menuRepository.findById(주문_등록_요청_메뉴_아이디)).willReturn(Optional.of(조회된_메뉴));
 
@@ -266,7 +266,7 @@ class OrderServiceTest {
 
         Menu 조회된_메뉴 = mock(Menu.class);
         given(조회된_메뉴.isDisplayed()).willReturn(true);
-        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(1500L);
         given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
         given(menuRepository.findById(주문_등록_요청_메뉴_아이디)).willReturn(Optional.of(조회된_메뉴));
 
@@ -299,7 +299,7 @@ class OrderServiceTest {
 
         Menu 조회된_메뉴 = mock(Menu.class);
         given(조회된_메뉴.isDisplayed()).willReturn(true);
-        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(1500l);
+        BigDecimal 조회된_메뉴_가격 = BigDecimal.valueOf(1500L);
         given(조회된_메뉴.getPrice()).willReturn(조회된_메뉴_가격);
         given(menuRepository.findById(주문_등록_요청_메뉴_아이디)).willReturn(Optional.of(조회된_메뉴));
         //when
