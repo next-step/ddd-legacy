@@ -334,6 +334,7 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
+
     @DisplayName("주문 승인(accept) -  배달주문의 경우 라이더에게 배달을 요청해야 한다.")
     @Test
     void accept02() {
@@ -367,6 +368,19 @@ class OrderServiceTest {
 
         //then
         verify(조회된_주문).setStatus(OrderStatus.ACCEPTED);
+    }
+
+
+    @DisplayName("주문 승인(accept) - 존재하는 주문만 승인할 수 있다.")
+    @Test
+    void accept04() {
+        //given
+        UUID 승인할_주문_아이디 = UUID.randomUUID();
+        given(orderRepository.findById(승인할_주문_아이디)).willReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> orderService.accept(승인할_주문_아이디))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     private static Stream<OrderStatus> provideOrderStatusExceptForAccepted() {
@@ -408,6 +422,18 @@ class OrderServiceTest {
 
         //then
         verify(조회된_주문).setStatus(OrderStatus.SERVED);
+    }
+
+    @DisplayName("주문 서빙(accept) - 존재하는 주문만 서빙할 수 있다.")
+    @Test
+    void serve03() {
+        //given
+        UUID 서빙할_주문_아이디 = UUID.randomUUID();
+        given(orderRepository.findById(서빙할_주문_아이디)).willReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> orderService.serve(서빙할_주문_아이디))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     private static Stream<OrderType> provideOrderTypeExceptForDelivery() {
@@ -476,6 +502,18 @@ class OrderServiceTest {
         verify(조회된_주문).setStatus(OrderStatus.DELIVERING);
     }
 
+    @DisplayName("주문 배달(delivering) 시작 - 존재하는 주문만 배달을 시작할 수 있다.")
+    @Test
+    void startDelivery04() {
+        //given
+        UUID 배달할_주문_아이디 = UUID.randomUUID();
+        given(orderRepository.findById(배달할_주문_아이디)).willReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> orderService.startDelivery(배달할_주문_아이디))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
     private static Stream<OrderStatus> provideOrderStatusExceptForDelivering() {
         return Stream.of(
                 OrderStatus.ACCEPTED,
@@ -502,20 +540,32 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("배달 완료(delivered) - 배달을  완료할 수 있다.")
+    @DisplayName("배달 완료(delivered) - 배달을 완료할 수 있다.")
     @Test
     void completeDelivery02() {
         //given
-        UUID 배달할_주문_아이디 = UUID.randomUUID();
+        UUID 배달_완료할_주문_아이디 = UUID.randomUUID();
         Order 조회된_주문 = mock(Order.class);
         given(조회된_주문.getStatus()).willReturn(OrderStatus.DELIVERING);
-        given(orderRepository.findById(배달할_주문_아이디)).willReturn(Optional.of(조회된_주문));
+        given(orderRepository.findById(배달_완료할_주문_아이디)).willReturn(Optional.of(조회된_주문));
 
         //when
-        orderService.completeDelivery(배달할_주문_아이디);
+        orderService.completeDelivery(배달_완료할_주문_아이디);
 
         //then
         verify(조회된_주문).setStatus(OrderStatus.DELIVERED);
+    }
+
+    @DisplayName("배달 완료(accept) - 존재하는 주문만 배달을 완료할 수 있다.")
+    @Test
+    void completeDelivery03() {
+        //given
+        UUID 배달_완료할_주문_아이디 = UUID.randomUUID();
+        given(orderRepository.findById(배달_완료할_주문_아이디)).willReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> orderService.startDelivery(배달_완료할_주문_아이디))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
 
@@ -583,6 +633,18 @@ class OrderServiceTest {
         orderService.complete(완료할_주문_아이디);
         //then
         verify(조회된_주문).setStatus(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("배달 완료(accept) - 존재하는 주문만 주문을 완료할 수 있다.")
+    @Test
+    void complete05() {
+        //given
+        UUID 완료할_주문_아이디 = UUID.randomUUID();
+        given(orderRepository.findById(완료할_주문_아이디)).willReturn(Optional.empty());
+
+        //when & then
+        assertThatThrownBy(() -> orderService.complete(완료할_주문_아이디))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
 
