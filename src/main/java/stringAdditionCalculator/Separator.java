@@ -4,12 +4,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Separator {
-	public static final String BASE_SEPARATOR = "[,:]";
-	public static final Pattern pattern = Pattern.compile("//(.*)\n(.*)");
-	public static final int SEPARATOR_GROUP = 1;
-	public static final int NUMBER_GROUP = 2;
-	public static final int ALLOWED_LENGTH = 1;
-	public static final int FIRST_INDEX = 0;
+	private static final String BASE_SEPARATOR = "[,:]";
+	private static final Pattern pattern = Pattern.compile("//(.*)\n(.*)");
+	private static final int SEPARATOR_GROUP = 1;
+	private static final int NUMBER_GROUP = 2;
+	private static final int ALLOWED_LENGTH = 1;
+	private static final int FIRST_INDEX = 0;
 
 	public static String[] split(String input) {
 		Matcher matcher = pattern.matcher(input);

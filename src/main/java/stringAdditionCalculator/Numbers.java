@@ -6,7 +6,7 @@ import java.util.List;
 public class Numbers {
 	public static final int EMPTY = 0;
 	public static final int MAXIMUM_SIZE = 100;
-	List<Number> numbers;
+	private List<Number> numbers;
 
 	public Numbers() {
 		this.numbers = new ArrayList<>();
