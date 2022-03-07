@@ -10,8 +10,8 @@ public final class StringCalculator {
     public static int calculate(String value) {
         String[] numberValues = Syntax.parse(value);
         return Arrays.stream(numberValues)
-                .map(Number::new)
-                .collect(collectingAndThen(toList(), Numbers::new))
+                .map(PositiveNumber::new)
+                .collect(collectingAndThen(toList(), PositiveNumbers::new))
                 .sum();
     }
 }
