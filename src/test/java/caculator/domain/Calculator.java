@@ -13,7 +13,8 @@ public class Calculator {
             return 0;
         }
 
-        return Numbers.from(stringNumbers).sum();
+        StringNet stringNet = StringNetFactory.getStringNet(stringNumbers);
+        return Numbers.from(stringNet.strain(stringNumbers)).sum();
     }
 
     private static boolean cannotCalculate(String stringNumbers) {
