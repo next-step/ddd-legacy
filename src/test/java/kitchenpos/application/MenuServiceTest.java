@@ -1,6 +1,12 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -42,6 +53,8 @@ class MenuServiceTest {
     void setUp() {
         purgomalumClient = new FakePurgomalumClient(false);
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+        MenuGroup request = createMenuGroup(UUID.randomUUID(), "test group");
+        menuGroupRepository.save(request);
     }
 
     @DisplayName("메뉴를 생성할 수 있다.")
@@ -152,13 +165,17 @@ class MenuServiceTest {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    void change_price() {
+
+    }
+
     private MenuGroup findAnyMenuGroup() {
         return menuGroupRepository.findAll()
                 .stream()
                 .findAny()
                 .orElseThrow(EntityNotFoundException::new);
     }
-
 
     private Product createProduct(String givenProductName, int givenPrice) {
         Product product = new Product();
@@ -190,6 +207,13 @@ class MenuServiceTest {
         menu.setName(menuMainAttribute.getName());
         menu.setDisplayed(menuMainAttribute.isDisplay());
         return menu;
+    }
+
+    private MenuGroup createMenuGroup(UUID uuid, String name) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(uuid);
+        menuGroup.setName(name);
+        return menuGroup;
     }
 
     static class MenuMainAttribute {

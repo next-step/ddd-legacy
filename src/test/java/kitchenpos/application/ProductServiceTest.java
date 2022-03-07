@@ -1,6 +1,12 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -42,6 +52,8 @@ class ProductServiceTest {
     void setUp() {
         purgomalumClient = new FakePurgomalumClient(false);
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+        MenuGroup request = createMenuGroup(UUID.randomUUID(), "test group");
+        menuGroupRepository.save(request);
     }
 
     @DisplayName("상품을 등록할 수 있다.")
@@ -230,8 +242,8 @@ class ProductServiceTest {
 
     private Menu createMenu(int price, String name, boolean display, List<MenuProduct> products) {
         MenuGroup menuGroup = menuGroupRepository.findAll()
-                .stream().
-                findAny()
+                .stream()
+                .findAny()
                 .orElseThrow(EntityNotFoundException::new);
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
@@ -241,7 +253,6 @@ class ProductServiceTest {
         menu.setDisplayed(display);
         menu.setMenuGroupId(menuGroup.getId());
         menu.setMenuProducts(products);
-
         return menu;
     }
 
@@ -251,5 +262,12 @@ class ProductServiceTest {
         product.setName(givenProductName);
         product.setPrice(givenPrice);
         return product;
+    }
+
+    private MenuGroup createMenuGroup(UUID uuid, String name) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(uuid);
+        menuGroup.setName(name);
+        return menuGroup;
     }
 }
