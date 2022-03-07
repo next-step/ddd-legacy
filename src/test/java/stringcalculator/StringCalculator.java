@@ -24,6 +24,7 @@ public class StringCalculator {
 
     private int calculate(Numbers numbers) {
         return numbers.getNumbers().stream()
+                .map(Number::getValue)
                 .reduce(0, Integer::sum);
     }
 
