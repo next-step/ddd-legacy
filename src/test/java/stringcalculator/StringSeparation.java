@@ -12,9 +12,9 @@ public class StringSeparation {
     private static final Pattern PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final String DELIMITER = "[,:]";
 
-    public List<Number> separate(String text) {
+    public List<PositiveNumber> separate(String text) {
         if (text == null || text.isEmpty()) {
-            return Collections.singletonList(Number.ZERO);
+            return Collections.singletonList(PositiveNumber.zero());
         }
 
         Matcher matcher = PATTERN.matcher(text);
@@ -26,17 +26,17 @@ public class StringSeparation {
         return separateByDefaultDelimiter(text);
     }
 
-    private List<Number> separateByCustomDelimiter(Matcher matcher) {
+    private List<PositiveNumber> separateByCustomDelimiter(Matcher matcher) {
         String customDelimiter = matcher.group(1);
 
         return Arrays.stream(matcher.group(2).split(customDelimiter))
-                .map(Number::new)
+                .map(PositiveNumber::new)
                 .collect(Collectors.toList());
     }
 
-    private List<Number> separateByDefaultDelimiter(String text) {
+    private List<PositiveNumber> separateByDefaultDelimiter(String text) {
         return Arrays.stream(text.split(DELIMITER))
-                .map(Number::new)
+                .map(PositiveNumber::new)
                 .collect(Collectors.toList());
     }
 }
