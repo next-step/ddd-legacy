@@ -1,23 +1,9 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderLineItem;
-import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.domain.OrderType;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -31,14 +17,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 @DataJpaTest
@@ -69,18 +54,17 @@ class OrderServiceTest {
         menuGroupRepository.save(request);
     }
 
-    @DisplayName("최초 주문시 대기 상태이다.")
+    @DisplayName("주문을 생성할 수 있다.")
     @Test
     void create_order() {
         final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
         final List<OrderLineItem> orderLineItems = Collections.singletonList(createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
         final OrderTable orderTable = createOrderTable("table1", 3, false);
-        final String deliveryAddress = "test address";
-        final Order request = createOrderRequest(OrderType.EAT_IN, orderLineItems, orderTable.getId(), deliveryAddress);
+        final Order request = createOrderRequest(OrderType.EAT_IN, orderLineItems, orderTable.getId(), null);
 
         final Order actual = orderService.create(request);
 
-        assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
+        assertThat(actual).isNotNull();
     }
 
     @DisplayName("주문 형태가 존재해야한다.")
@@ -201,6 +185,182 @@ class OrderServiceTest {
                 () -> orderService.create(request)
         ).isInstanceOf(IllegalStateException.class);
     }
+
+    @TestFactory
+    Collection<DynamicTest> 승인_상태_변경() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final OrderTable orderTable = createOrderTable("table1", 3, false);
+        final Order request = createOrderRequest(OrderType.EAT_IN, orderLineItems, orderTable.getId(), null);
+
+        final Order actual = orderService.create(request);
+        return Arrays.asList(dynamicTest("주문 생성 후 최초상태는 주문대기이다", () -> {
+                    assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
+                }),
+                dynamicTest("승인 상태로 변경할 수 있다.", () -> {
+                    final Order changed = orderService.accept(actual.getId());
+                    assertThat(changed.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+                }));
+    }
+
+    @DisplayName("승인 상태로 변경시 대기에서 변경해야한다.")
+    @Test
+    void accept_from_not_order_wait_status() {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.ACCEPTED);
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.accept(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("승인 상태로 변경시 주문이 존재해야한다.")
+    @Test
+    void accept_from_not_found_order() {
+        final String notFoundUUID = "06fe3514-a8a6-48ed-85e6-e7296d0e1000";
+
+        assertThatCode(() -> orderService.accept(UUID.fromString(notFoundUUID)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("승인 상태로 변경시 주문 타입이 배달이면 키친 라이더 클라이언트에 배달 요청을 한다.")
+    @Test
+    void request_delivery_after_accept() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final String givenAddress = "address1";
+        final Order request = createOrderRequest(OrderType.DELIVERY, orderLineItems, null, givenAddress);
+        final Order givenOrder = orderService.create(request);
+
+        final Order actual = orderService.accept(givenOrder.getId());
+
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        verify(kitchenridersClient).requestDelivery(eq(givenOrder.getId()), eq(BigDecimal.valueOf(1000)), eq(givenAddress));
+    }
+
+    @DisplayName("조리 상태로 변경할 수 있다.")
+    @Test
+    void serve() {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.ACCEPTED);
+        final Order givenOrder = orderRepository.save(order);
+
+        final Order actual = orderService.serve(givenOrder.getId());
+
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
+
+    @DisplayName("조리 상태로 변경시 승인상태가 아니면 예외를 던진다.")
+    @ParameterizedTest
+    @CsvSource({"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void serve_when_order_status_not_accept(OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setStatus(orderStatus);
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.serve(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("조리 상태로 변경시 주문이 존재해야한다.")
+    @Test
+    void serve_from_not_found_order() {
+        final String notFoundUUID = "06fe3514-a8a6-48ed-85e6-e7296d0e1000";
+
+        assertThatCode(() -> orderService.serve(UUID.fromString(notFoundUUID)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("배달중으로 변경할 수 있다.")
+    @Test
+    void start_delivery() {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.SERVED);
+        final Order givenOrder = orderRepository.save(order);
+
+        final Order actual = orderService.startDelivery(givenOrder.getId());
+
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+    }
+
+    @DisplayName("배달중으로 변경시 주문이 존재해야한다.")
+    @Test
+    void start_delivery_from_not_found_order() {
+        final String notFoundUUID = "06fe3514-a8a6-48ed-85e6-e7296d0e1000";
+
+        assertThatCode(() -> orderService.startDelivery(UUID.fromString(notFoundUUID)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("배달중으로 변경시 주문 형태가 배달이어야  한다.")
+    @ParameterizedTest
+    @CsvSource({"TAKEOUT", "EAT_IN"})
+    void start_delivery_with_not_order_type_delivery(OrderType orderType) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.startDelivery(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("배달중으로 변경시 조리상태가 아니면 예외를 던진다.")
+    @ParameterizedTest
+    @CsvSource({"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void start_delivery_with_not_order_status_served(OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(orderStatus);
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.startDelivery(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("배달 완료로 변경할 수 있다.")
+    @Test
+    void complete_delivery() {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.DELIVERING);
+        final Order givenOrder = orderRepository.save(order);
+
+        final Order actual = orderService.completeDelivery(givenOrder.getId());
+
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+    }
+
+    @DisplayName("배달완료로 변경시 주문이 존재해야한다.")
+    @Test
+    void complete_delivery_from_not_found_order() {
+        final String notFoundUUID = "06fe3514-a8a6-48ed-85e6-e7296d0e1000";
+
+        assertThatCode(() -> orderService.completeDelivery(UUID.fromString(notFoundUUID)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("배달완료로 변경시 기존 주문이 배달중이 아니면.예외를 던진다.")
+    @ParameterizedTest
+    @CsvSource({"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
+    void complete_delivery_with_not_order_status_delivering(OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(orderStatus);
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.completeDelivery(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
 
     private Menu createSavedMenu(String productName, int productPrice, int menuPrice, String menuName, boolean display) {
         final Product product = createProduct(productName, BigDecimal.valueOf(productPrice));
