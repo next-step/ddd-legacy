@@ -11,6 +11,6 @@ public class Positives {
     }
 
     public int sum() {
-        return positives.stream().mapToInt(Positive::getPositive).sum();
+        return positives.stream().reduce(Positive::add).get().getNumber();
     }
 }
