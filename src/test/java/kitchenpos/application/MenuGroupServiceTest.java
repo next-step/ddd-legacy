@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -32,9 +33,10 @@ class MenuGroupServiceTest {
             doReturn(menuGroup).when(menuGroupRepository).save(any());
 
             final MenuGroup actual = menuGroupService.create(menuGroup);
-            assertThat(actual)
-                .isNotNull()
-                .isEqualTo(menuGroup);
+            assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo(menuGroup.getName())
+            );
         }
 
         @ParameterizedTest(name = "{0} 인 경우 추가 할 수 없다.")
