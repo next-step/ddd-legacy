@@ -5,6 +5,7 @@ import java.util.Objects;
 public class StringNumber {
 
     private static final int MINIMUM_BOUND = 0;
+    public static final StringNumber MINIMUM = new StringNumber(MINIMUM_BOUND);
 
     private final int value;
 
@@ -15,10 +16,6 @@ public class StringNumber {
 
     public static StringNumber valueOf(String number) {
         return new StringNumber(toInteger(number));
-    }
-
-    public static StringNumber zero() {
-        return new StringNumber(MINIMUM_BOUND);
     }
 
     private static int toInteger(String number) {

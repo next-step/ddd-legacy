@@ -25,7 +25,7 @@ public class Numbers {
 
     public int sum() {
         return stringNumbers.stream()
-            .reduce(StringNumber.zero(), StringNumber::add)
+            .reduce(StringNumber.MINIMUM, StringNumber::add)
             .value();
     }
 
