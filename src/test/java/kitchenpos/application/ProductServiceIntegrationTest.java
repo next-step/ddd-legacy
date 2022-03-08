@@ -160,7 +160,7 @@ class ProductServiceIntegrationTest extends IntegrationTest {
 	@DisplayName("가격이 널 또는 음수이면 상품 가격 변경 실패")
 	@ParameterizedTest
 	@ArgumentsSource(NullAndNegativeBigDecimalArgumentsProvider.class)
-	void failChangingProductPriceWhenPriceNullOrNagativeDecimal(BigDecimal price) {
+	void failChangingProductPriceWhenPriceNullOrNegativeDecimal(BigDecimal price) {
 		// given
 		Product product = ProductFixture.PRODUCT(PRODUCT_PRICE);
 		productRepository.save(product);
