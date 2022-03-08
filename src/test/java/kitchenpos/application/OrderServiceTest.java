@@ -1,12 +1,30 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
-import kitchenpos.domain.*;
+import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.OrderType;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.KitchenridersClient;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,10 +35,18 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
@@ -361,6 +387,128 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
+    @MethodSource("paramsForBeforeOrderComplete")
+    @ParameterizedTest(name = "주문완료로 변경시 주문형태가 {0}이면 {1}에서 변경해야한다.")
+    void complete(OrderType orderType, OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setOrderTable(createOrderTable("table1", 3, false));
+        order.setOrderDateTime(LocalDateTime.now());
+        final Order givenOrder = orderRepository.save(order);
+
+        final Order actual = orderService.complete(givenOrder.getId());
+
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("주문완료로 변경시 주문형태가 배달이면서 배달완료가 아닐시 예외를 던진다.")
+    @ParameterizedTest
+    @CsvSource({"WAITING", "ACCEPTED", "SERVED", "DELIVERING", "COMPLETED"})
+    void complete_with_type_delivery_and_not_delivered(OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(orderStatus);
+        order.setOrderTable(createOrderTable("table1", 3, false));
+        order.setOrderDateTime(LocalDateTime.now());
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.complete(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @MethodSource("paramsForNotPassOrderComplete")
+    @ParameterizedTest(name = "주문완료로 변경시 주문형태가 {0}이면 {1}일 경우 예외를 던진다")
+    void complete_with_not_serve(OrderType orderType, OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setOrderTable(createOrderTable("table1", 3, false));
+        order.setOrderDateTime(LocalDateTime.now());
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.complete(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문완료로 변경시 주문이 존재해야한다.")
+    @Test
+    void complete_with_order_not_found() {
+        final String notFoundUUID = "06fe3514-a8a6-48ed-85e6-e7296d0e1000";
+
+        assertThatCode(() -> orderService.complete(UUID.fromString(notFoundUUID)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("주문완료로 변경시 주문형태가 식당내 식사이고 테이블 정보가 있으면 주문 테이블의 0으로 변경하고 빈 상태로 둔다.")
+    @Test
+    void table_empty_after_complete() {
+        OrderTable table = createOrderTable("table1", 3, false);
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.EAT_IN);
+        order.setStatus(OrderStatus.SERVED);
+        order.setOrderTable(table);
+        order.setOrderDateTime(LocalDateTime.now());
+        final Order givenOrder = orderRepository.save(order);
+
+        final Order actual = orderService.complete(givenOrder.getId());
+
+        OrderTable orderTableAfterComplete = actual.getOrderTable();
+        assertAll(
+                () -> assertThat(orderTableAfterComplete.getNumberOfGuests()).isEqualTo(0),
+                () -> assertThat(orderTableAfterComplete.isEmpty()).isTrue()
+        );
+    }
+
+    @DisplayName("주문 목록을 조회할 수 있다.")
+    @TestFactory
+    Stream<DynamicTest> getAllOrders() {
+        return Stream.of(
+                dynamicTest("주문을 생성한다", () -> {
+                    final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+                    final List<OrderLineItem> orderLineItems = Collections.singletonList(createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+                    final OrderTable orderTable1 = createOrderTable("table1", 3, false);
+                    final OrderTable orderTable2 = createOrderTable("table2", 3, false);
+                    final Order request1 = createOrderRequest(OrderType.EAT_IN, orderLineItems, orderTable1.getId(), null);
+                    final Order request2 = createOrderRequest(OrderType.EAT_IN, orderLineItems, orderTable2.getId(), null);
+                    orderService.create(request1);
+                    orderService.create(request2);
+                }),
+                dynamicTest("생성된 주문을 가져온다.", () -> {
+                    // test code
+                    List<Order> actual = orderService.findAll();
+
+                    assertThat(actual.size()).isEqualTo(2);
+                })
+        );
+    }
+
+    private static Stream<Arguments> paramsForBeforeOrderComplete() {
+        return Stream.of(
+                Arguments.of(OrderType.DELIVERY, OrderStatus.DELIVERED),
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.SERVED),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.SERVED)
+        );
+    }
+
+    private static Stream<Arguments> paramsForNotPassOrderComplete() {
+        return Stream.of(
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.COMPLETED),
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.DELIVERED),
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.ACCEPTED),
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.DELIVERING),
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.WAITING),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.COMPLETED),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.DELIVERED),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.ACCEPTED),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.DELIVERING),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.WAITING)
+        );
+    }
 
     private Menu createSavedMenu(String productName, int productPrice, int menuPrice, String menuName, boolean display) {
         final Product product = createProduct(productName, BigDecimal.valueOf(productPrice));
