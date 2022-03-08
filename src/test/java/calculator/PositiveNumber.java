@@ -2,7 +2,7 @@ package calculator;
 
 import java.util.Objects;
 
-public final class Number {
+public final class PositiveNumber {
 
     private static final String NOT_POSITIVE = "음수를 입력할 수 없습니다.";
     private static final String NOT_A_NUMBER = "숫자가 아닌 값을 입력 할 수 없습니다.";
@@ -10,7 +10,7 @@ public final class Number {
 
     private final int value;
 
-    public Number(String value) {
+    public PositiveNumber(String value) {
         if (value.isEmpty()) {
             this.value = MIN;
             return;
@@ -44,8 +44,8 @@ public final class Number {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Number number = (Number) o;
-        return value == number.value;
+        PositiveNumber positiveNumber = (PositiveNumber) o;
+        return value == positiveNumber.value;
     }
 
     @Override
