@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -105,5 +107,26 @@ class ProductServiceTest {
         Optional<Product> changedProduct = productRepository.findById(product.getId());
         assertThat(changedProduct).isPresent();
         assertThat(changedProduct.get().getPrice()).isEqualByComparingTo(new BigDecimal("1000"));
+    }
+    
+    @DisplayName("등록한 상품 목록을 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given
+        Product product1 = new Product();
+        product1.setName("후라이드치킨");
+        product1.setPrice(new BigDecimal("15000"));
+        Product product1Created = productService.create(product1);
+
+        Product product2 = new Product();
+        product2.setName("양념치킨");
+        product2.setPrice(new BigDecimal("16000"));
+        Product product2Created = productService.create(product2);
+
+        // when
+        List<Product> products = productService.findAll();
+
+        // then
+        assertThat(products.stream().map(Product::getId).toArray()).contains(new UUID[] {product1Created.getId(), product2Created.getId()});
     }
 }
