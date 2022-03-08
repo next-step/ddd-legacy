@@ -3,7 +3,12 @@ package kitchenpos.domain;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kitchenpos.domain.OrderStatus.*;
+import static kitchenpos.domain.OrderStatus.ACCEPTED;
+import static kitchenpos.domain.OrderStatus.COMPLETED;
+import static kitchenpos.domain.OrderStatus.DELIVERED;
+import static kitchenpos.domain.OrderStatus.DELIVERING;
+import static kitchenpos.domain.OrderStatus.SERVED;
+import static kitchenpos.domain.OrderStatus.WAITING;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OrderStatusTest {

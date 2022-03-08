@@ -4,7 +4,7 @@ import kitchenpos.infra.PurgomalumClient;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 
 public class FakePurgomalumClient extends PurgomalumClient {
-    private boolean containsNotAllowedWords;
+    private final boolean containsNotAllowedWords;
 
     public FakePurgomalumClient(boolean containsNotAllowedWords) {
         super(new RestTemplateBuilder());
