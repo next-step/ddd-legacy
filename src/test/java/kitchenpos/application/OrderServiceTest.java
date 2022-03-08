@@ -82,7 +82,7 @@ class OrderServiceTest {
 
     @DisplayName("주문을 생성할 수 있다.")
     @Test
-    void create_order() {
+    void create_order_eat_in() {
         final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
         final List<OrderLineItem> orderLineItems = Collections.singletonList(createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
         final OrderTable orderTable = createOrderTable("table1", 3, false);
@@ -91,6 +91,21 @@ class OrderServiceTest {
         final Order actual = orderService.create(request);
 
         assertThat(actual).isNotNull();
+        assertThat(actual.getOrderDateTime()).isNotNull();
+    }
+
+    @DisplayName("배달 주소가 존재할 수 있다.")
+    @Test
+    void create_order_delivery() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final String givenAddress = "test address";
+        final Order request = createOrderRequest(OrderType.DELIVERY, orderLineItems, null, givenAddress);
+
+        final Order actual = orderService.create(request);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getDeliveryAddress()).isEqualTo(givenAddress);
     }
 
     @DisplayName("주문 형태가 존재해야한다.")
