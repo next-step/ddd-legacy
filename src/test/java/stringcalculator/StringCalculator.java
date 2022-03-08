@@ -2,7 +2,7 @@ package stringcalculator;
 
 import stringcalculator.number.Number;
 import stringcalculator.number.ZeroNumber;
-import stringcalculator.operator.OperatorSelector;
+import stringcalculator.operator.SelectedOperator;
 
 public class StringCalculator {
 
@@ -23,7 +23,7 @@ public class StringCalculator {
             return new Number(source).getValue();
         }
 
-        return new OperatorSelector().select(source).add();
+        return new SelectedOperator(source).add();
     }
 
     private boolean isNullOrEmpty(String source) {
