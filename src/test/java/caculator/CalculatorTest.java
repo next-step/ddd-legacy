@@ -20,7 +20,6 @@ class CalculatorTest {
 
         //then
         assertThat(actual).isEqualTo(expected);
-
     }
 
     private static Stream<Arguments> add() {

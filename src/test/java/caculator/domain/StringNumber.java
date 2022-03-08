@@ -4,9 +4,13 @@ import java.util.Objects;
 
 public class StringNumber {
 
+    private static final int MINIMUM_BOUND = 0;
+    public static final StringNumber MINIMUM = new StringNumber(MINIMUM_BOUND);
+
     private final int value;
 
     private StringNumber(int value) {
+        validatePositive(value);
         this.value = value;
     }
 
@@ -16,9 +20,7 @@ public class StringNumber {
 
     private static int toInteger(String number) {
         try {
-            int stringNumber = Integer.parseInt(number);
-            validatePositive(stringNumber);
-            return stringNumber;
+            return Integer.parseInt(number);
         } catch (NumberFormatException e) {
             throw new StringNumberException(number);
         }
@@ -31,7 +33,11 @@ public class StringNumber {
     }
 
     private static boolean isNegative(int number) {
-        return number < 0;
+        return number < MINIMUM_BOUND;
+    }
+
+    public StringNumber add(StringNumber other) {
+        return new StringNumber(value + other.value());
     }
 
     public int value() {

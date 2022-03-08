@@ -31,6 +31,18 @@ class NumbersTest {
 
         //then
         assertThat(actual).isEqualTo(6);
+    }
 
+    @Test
+    @DisplayName("빈 숫자 집합의 합산")
+    void emptySum() {
+        //given
+        Numbers numbers = Numbers.EMPTY;
+
+        //when
+        int actual = numbers.sum();
+
+        //then
+        assertThat(actual).isZero();
     }
 }

@@ -19,13 +19,14 @@ public class Numbers {
     public static Numbers from(String[] stringNumbers) {
         return new Numbers(Arrays.stream(stringNumbers)
             .map(StringNumber::valueOf)
-            .collect(Collectors.toList()));
+            .collect(Collectors.toList())
+        );
     }
 
     public int sum() {
         return stringNumbers.stream()
-            .mapToInt(StringNumber::value)
-            .sum();
+            .reduce(StringNumber.MINIMUM, StringNumber::add)
+            .value();
     }
 
     @Override
