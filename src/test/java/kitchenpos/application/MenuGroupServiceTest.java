@@ -25,21 +25,6 @@ class MenuGroupServiceTest {
 
 	@InjectMocks
 	private MenuGroupService menuGroupService;
-	//  - [ ] 도메인 정보
-//    - [ ] 메뉴를 분류하는 이름을 가집니다.
-//		- [ ] 메뉴 그룹 안에는 메뉴 그룹에 속한 메뉴 정보들이 나타납니다.
-//  - [ ] 서비스
-//    - [ ] 가게 점주는 메뉴 그룹을 생성할 수 있습니다.
-//      - [ ] 메뉴를 분류할 수 있도록 이름을 지정해 생성합니다.
-//      - [ ] 메뉴를 분류하는 그룹에는 이름이 꼭 필요합니다.
-//		- [ ] 가게 점주와 가게 손님은 모든 메뉴 그룹을 가져올 수 있습니다.
-
-
-	@Test
-	@DisplayName("도메인 정보")
-	void domainInformation() {
-
-	}
 
 	@Test
 	@DisplayName("가게 점주는 메뉴 그룹을 생성할 수 있습니다.")
@@ -49,6 +34,18 @@ class MenuGroupServiceTest {
 
 		MenuGroup createMenuGroup = menuGroupService.create(menuGroup);
 		assertThat(createMenuGroup).isEqualTo(menuGroup);
+	}
+
+	@Test
+	@DisplayName("메뉴를 분류하는 그룹에는 이름이 꼭 필요합니다.")
+	void createMenuGroupButNameless() {
+		MenuGroup menuGroup = getMenuGroup("");
+		lenient().when(menuGroupRepository.save(any())).thenReturn(menuGroup);
+
+		assertThatExceptionOfType(IllegalArgumentException.class)
+			.isThrownBy(() -> {
+				MenuGroup createMenuGroup = menuGroupService.create(menuGroup);
+			});
 	}
 
 	@Test
@@ -69,7 +66,7 @@ class MenuGroupServiceTest {
 		assertThat(menuGroupList).isSameAs(findMenuGroupList);
 	}
 
-	private MenuGroup getMenuGroup(String name) {
+	private static MenuGroup getMenuGroup(String name) {
 		MenuGroup menuGroup = new MenuGroup();
 		menuGroup.setName(name);
 		return menuGroup;
