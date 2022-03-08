@@ -24,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ProductServiceIntegrationTest extends IntegrationTest {
 	private static final String PRODUCT_NAME = "product";
-	private static final BigDecimal PRODUCT_PRICE = new BigDecimal(17000);
-	private static final BigDecimal CHANGED_PRODUCT_SIZE = new BigDecimal(18000);
-	private static final BigDecimal MENU_HIGH_PRICE = new BigDecimal(100000000);
+	private static final BigDecimal PRODUCT_PRICE = new BigDecimal(20000);
+	private static final BigDecimal CHANGED_PRODUCT_SIZE = new BigDecimal(30000);
+	private static final BigDecimal MENU_HIGH_PRICE = new BigDecimal(1000000000);
 	private static final String PROFANITY = "fuck";
 
 	@Autowired

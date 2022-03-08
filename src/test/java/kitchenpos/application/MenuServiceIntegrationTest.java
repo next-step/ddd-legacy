@@ -26,13 +26,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MenuServiceIntegrationTest extends IntegrationTest {
-	private static final String MENU_NAME = "후라이드+후라이드";
-	private static final BigDecimal MENU_PRICE = new BigDecimal(19000);
+	private static final String MENU_NAME = "양념양념";
+	private static final BigDecimal MENU_PRICE = new BigDecimal(20000);
 	private static final BigDecimal MENU_LOW_PRICE = new BigDecimal(15000);
-	private static final BigDecimal MENU_HIGH_PRICE = new BigDecimal(100000000);
-	private static final BigDecimal PRODUCT_PRICE = new BigDecimal(17000);
-	private static final long PRODUCT_QUANTITY = 2;
-	private static final long PRODUCT_NEGATIVE_QUANTITY = -2;
+	private static final BigDecimal MENU_HIGH_PRICE = new BigDecimal(1000000000);
+	private static final BigDecimal PRODUCT_PRICE = new BigDecimal(18000);
+	private static final long PRODUCT_QUANTITY = 10;
+	private static final long PRODUCT_NEGATIVE_QUANTITY = -10;
 	private static final String PROFANITY = "fuck";
 
 	@Autowired
