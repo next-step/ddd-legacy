@@ -16,5 +16,4 @@ public class StringNetFactory {
     private static boolean hasCustomPrefix(String input) {
         return !Objects.isNull(input) && input.startsWith(CUSTOM_DELIMITER_PREFIX);
     }
-
 }

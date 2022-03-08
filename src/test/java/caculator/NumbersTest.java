@@ -31,7 +31,6 @@ class NumbersTest {
 
         //then
         assertThat(actual).isEqualTo(6);
-
     }
 
     @Test
@@ -45,8 +44,5 @@ class NumbersTest {
 
         //then
         assertThat(actual).isZero();
-
     }
-
-
 }

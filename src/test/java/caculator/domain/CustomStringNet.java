@@ -18,6 +18,4 @@ public class CustomStringNet implements StringNet {
         String excludedDelimiter = matcher.group(CUSTOM_NUMBERS_INDEX);
         return excludedDelimiter.split(customDelimiter);
     }
-
-
 }

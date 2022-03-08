@@ -25,7 +25,5 @@ class CustomStringNetTest {
 
         //then
         assertThat(actual).isEqualTo(new String[]{"1", "2", "3"});
-
     }
-
 }

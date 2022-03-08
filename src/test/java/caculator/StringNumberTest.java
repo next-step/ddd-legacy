@@ -34,5 +34,4 @@ class StringNumberTest {
             .isInstanceOf(StringNumberException.class)
             .hasMessageEndingWith(notANumber);
     }
-
 }
