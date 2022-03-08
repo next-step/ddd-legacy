@@ -23,11 +23,6 @@ public class Numbers {
         );
     }
 
-    public static Numbers from(String stringNumbers) {
-        StringNet stringNet = StringNetFactory.getStringNet(stringNumbers);
-        return from(stringNet.strain(stringNumbers));
-    }
-
     public int sum() {
         return stringNumbers.stream()
             .reduce(StringNumber.zero(), StringNumber::add)
