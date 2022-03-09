@@ -60,7 +60,30 @@ class OrderTableServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName(value = "테이블의 착석여부를 착석으로 변경할 수 있다")
+    @Test
+    void sit_success() throws Exception {
+        //given
+        OrderTable 주문테이블 = mock(OrderTable.class);
+        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
 
+        //when
+        orderTableService.sit(UUID.randomUUID());
+
+        //then
+        verify(주문테이블, times(1)).setEmpty(false);
+    }
+
+    @DisplayName(value = "존재하는 테이블만 착석으로 변경할 수 있다")
+    @Test
+    void sit_fail_no_order_table() throws Exception {
+        //given
+        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() -> orderTableService.sit(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
+    }
 
     private static Stream<String> 잘못된_주문테이블명() {
         return Stream.of(
