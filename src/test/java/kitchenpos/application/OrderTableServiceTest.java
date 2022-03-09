@@ -1,9 +1,9 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.domain.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,8 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-
-import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -76,13 +74,53 @@ class OrderTableServiceTest {
 
     @DisplayName(value = "존재하는 테이블만 착석으로 변경할 수 있다")
     @Test
-    void sit_fail_no_order_table() throws Exception {
+    void sit_fail_no_order_table () throws Exception {
         //given
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
         //when, then
         assertThatThrownBy(() -> orderTableService.sit(UUID.randomUUID()))
                 .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName(value = "테이블의 착석여부를 공석으로 변경할 수 있다")
+    @Test
+    void clear_success() throws Exception {
+        //given
+        OrderTable 주문테이블 = mock(OrderTable.class);
+        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
+
+        //when
+        orderTableService.clear(UUID.randomUUID());
+
+        //then
+        verify(주문테이블, times(1)).setNumberOfGuests(0);
+        verify(주문테이블, times(1)).setEmpty(true);
+    }
+
+    @DisplayName(value = "존재하는 테이블만 공석으로 변경할 수 있다")
+    @Test
+    void clear_fail_no_order_table () throws Exception {
+        //given
+        OrderTable 주문테이블 = mock(OrderTable.class);
+        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() -> orderTableService.clear(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName(value = "주문의 상태가 주문종결인 경우만 공석으로 변경할 수 있다")
+    @Test
+    void clear_fail_no_complete () throws Exception {
+        //given
+        OrderTable 주문테이블 = mock(OrderTable.class);
+        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
+        given(orderRepository.existsByOrderTableAndStatusNot(주문테이블, OrderStatus.COMPLETED)).willReturn(true);
+
+        //when, then
+        assertThatThrownBy(() -> orderTableService.clear(UUID.randomUUID()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     private static Stream<String> 잘못된_주문테이블명() {
