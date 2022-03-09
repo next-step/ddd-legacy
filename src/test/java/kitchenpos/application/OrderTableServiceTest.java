@@ -188,6 +188,16 @@ class OrderTableServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName(value = "전체 주문 테이블을 조회할 수 있다")
+    @Test
+    void findAll_success() throws Exception {
+        //given,when
+        orderTableService.findAll();
+
+        //then
+        verify(orderTableRepository, times(1)).findAll();
+    }
+
     private static Stream<String> 잘못된_주문테이블명() {
         return Stream.of(
                 null,
