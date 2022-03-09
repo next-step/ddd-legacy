@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 @Transactional
@@ -44,7 +45,10 @@ class MenuGroupServiceTest {
 
         MenuGroup actual = menuGroupService.create(request);
 
-        assertThat(actual.getName()).isEqualTo(givenMenuGroupName);
+        assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo(givenMenuGroupName)
+        );
     }
 
     @DisplayName("메뉴 이름이 존재해야한다.")
