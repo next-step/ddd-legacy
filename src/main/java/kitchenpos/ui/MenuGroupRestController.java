@@ -11,21 +11,21 @@ import java.util.List;
 @RequestMapping("/api/menu-groups")
 @RestController
 public class MenuGroupRestController {
-    private final MenuGroupService menuGroupService;
+	private final MenuGroupService menuGroupService;
 
-    public MenuGroupRestController(final MenuGroupService menuGroupService) {
-        this.menuGroupService = menuGroupService;
-    }
+	public MenuGroupRestController(final MenuGroupService menuGroupService) {
+		this.menuGroupService = menuGroupService;
+	}
 
-    @PostMapping
-    public ResponseEntity<MenuGroup> create(@RequestBody final MenuGroup request) {
-        final MenuGroup response = menuGroupService.create(request);
-        return ResponseEntity.created(URI.create("/api/menu-groups/" + response.getId()))
-            .body(response);
-    }
+	@PostMapping
+	public ResponseEntity<MenuGroup> create(@RequestBody final MenuGroup request) {
+		final MenuGroup response = menuGroupService.create(request);
+		return ResponseEntity.created(URI.create("/api/menu-groups/" + response.getId()))
+			.body(response);
+	}
 
-    @GetMapping
-    public ResponseEntity<List<MenuGroup>> findAll() {
-        return ResponseEntity.ok(menuGroupService.findAll());
-    }
+	@GetMapping
+	public ResponseEntity<List<MenuGroup>> findAll() {
+		return ResponseEntity.ok(menuGroupService.findAll());
+	}
 }
