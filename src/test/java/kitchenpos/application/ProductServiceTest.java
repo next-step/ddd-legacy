@@ -218,8 +218,8 @@ class ProductServiceTest {
     }
 
     private Menu saveMenuWithProduct(Product product) {
-        MenuProduct menuProduct = MenuFactory.createMenuProduct(product);
-        Menu menu = MenuFactory.createMenu(UUID.randomUUID(), 2000, "test menu1", true, findMenuGroup(), Collections.singletonList(menuProduct));
+        MenuProduct menuProduct = MenuFactory.createMenuProductWithQuantity(product, 1);
+        Menu menu = MenuFactory.createMenu(UUID.randomUUID(), BigDecimal.valueOf(2000), "test menu1", true, findMenuGroup(), Collections.singletonList(menuProduct));
         return menuRepository.save(menu);
     }
 

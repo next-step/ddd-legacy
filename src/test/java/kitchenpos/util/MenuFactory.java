@@ -13,22 +13,23 @@ public class MenuFactory {
     private MenuFactory() {
     }
 
-    public static Menu createMenu(UUID uuid, int price, String name, boolean display, MenuGroup menuGroup, List<MenuProduct> products) {
+    public static Menu createMenu(UUID uuid, BigDecimal price, String name, boolean display, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setId(uuid);
         menu.setName(name);
-        menu.setPrice(BigDecimal.valueOf(price));
+        menu.setPrice(price);
         menu.setMenuGroup(menuGroup);
         menu.setDisplayed(display);
         menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuProducts(products);
+        menu.setMenuProducts(menuProducts);
         return menu;
     }
 
-    public static MenuProduct createMenuProduct(Product saved) {
+    public static MenuProduct createMenuProductWithQuantity(Product product, long quantity) {
         MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(saved);
-        menuProduct.setProductId(saved.getId());
+        menuProduct.setProduct(product);
+        menuProduct.setProductId(product.getId());
+        menuProduct.setQuantity(quantity);
         return menuProduct;
     }
 }

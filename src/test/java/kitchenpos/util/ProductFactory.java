@@ -9,9 +9,9 @@ public class ProductFactory {
     private ProductFactory() {
     }
 
-    public static Product createProduct(UUID uuid, String name, BigDecimal price) {
+    public static Product createProduct(UUID id, String name, BigDecimal price) {
         Product product = new Product();
-        product.setId(uuid);
+        product.setId(id);
         product.setName(name);
         product.setPrice(price);
         return product;
