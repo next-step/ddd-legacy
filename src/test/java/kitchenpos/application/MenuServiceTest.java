@@ -380,7 +380,11 @@ class MenuServiceTest {
     @DisplayName(value = "전체 메뉴를 조회할 수 있다")
     @Test
     void findAll_success() {
+        //given, when
+        menuService.findAll();
 
+        //then
+        verify(menuRepository, times(1)).findAll();
     }
 
     private static Stream<BigDecimal> 잘못된_메뉴가격() {
