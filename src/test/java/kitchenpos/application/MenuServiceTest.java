@@ -65,24 +65,24 @@ class MenuServiceTest {
 	@DisplayName("가게 점주는 메뉴를 추가 할 수 있습니다.")
 	void addMenu() {
 		//given
-		Menu menu = mock(Menu.class);
+		Menu request = mock(Menu.class);
 		MenuGroup menuGroup = mock(MenuGroup.class);
 		MenuProduct menuProduct = mock(MenuProduct.class);
 		Product product = mock(Product.class);
 
-		when(menu.getPrice()).thenReturn(MENU_PRICE);
+		when(request.getPrice()).thenReturn(MENU_PRICE);
 		when(menuGroupRepository.findById(any())).thenReturn(Optional.ofNullable(menuGroup));
 		List<MenuProduct> menuProducts = Arrays.asList(menuProduct, menuProduct);
-		when(menu.getMenuProducts()).thenReturn(menuProducts);
+		when(request.getMenuProducts()).thenReturn(menuProducts);
 		List<Product> productList = Arrays.asList(product, product);
 		when(productRepository.findAllByIdIn(any())).thenReturn(productList);
 		when(menuProduct.getQuantity()).thenReturn(POSITIVE_NUM);
 		when(productRepository.findById(any())).thenReturn(Optional.ofNullable(product));
 		when(requireNonNull(product).getPrice()).thenReturn(PRODUCT_PRICE);
-		when(menu.getName()).thenReturn(MENU_NAME);
+		when(request.getName()).thenReturn(MENU_NAME);
 
 		//then
-		menuService.create(menu);
+		menuService.create(request);
 	}
 
 	@Order(2)
@@ -91,13 +91,13 @@ class MenuServiceTest {
 	@DisplayName("메뉴의 가격은 0원 이상이어야 합니다.")
 	void price(BigDecimal price) {
 		//given
-		Menu menu = mock(Menu.class);
+		Menu request = mock(Menu.class);
 
 		//when
-		when(menu.getPrice()).thenReturn(price);
+		when(request.getPrice()).thenReturn(price);
 
 		//then
-		assertThatThrownBy(() -> menuService.create(menu))
+		assertThatThrownBy(() -> menuService.create(request))
 			.isInstanceOf(IllegalArgumentException.class);
 	}
 
@@ -106,15 +106,15 @@ class MenuServiceTest {
 	@DisplayName("메뉴는 메뉴 그룹에 속해 있지 않으면 예외를 던집니다.")
 	void menuInMenuGroup() {
 		//given
-		Menu menu = mock(Menu.class);
+		Menu request = mock(Menu.class);
 
-		when(menu.getPrice()).thenReturn(BigDecimal.ZERO);
-		when(menu.getMenuGroupId()).thenReturn(RANDOM_UUID);
+		when(request.getPrice()).thenReturn(BigDecimal.ZERO);
+		when(request.getMenuGroupId()).thenReturn(RANDOM_UUID);
 		//when
 		when(menuGroupRepository.findById(any())).thenReturn(Optional.empty());
 
 		//then
-		assertThatThrownBy(() -> menuService.create(menu))
+		assertThatThrownBy(() -> menuService.create(request))
 			.isInstanceOf(NoSuchElementException.class);
 	}
 
@@ -123,22 +123,22 @@ class MenuServiceTest {
 	@DisplayName("메뉴에 올라간 상품과 메뉴에 올라간 상품의 정보를 이용해 가져온 상품의 사이즈는 같습니다.")
 	void checkProductAndMenuProduct() {
 		//given
-		Menu menu = mock(Menu.class);
+		Menu request = mock(Menu.class);
 		MenuGroup menuGroup = mock(MenuGroup.class);
 		MenuProduct menuProduct = mock(MenuProduct.class);
 		Product product = mock(Product.class);
 
-		when(menu.getPrice()).thenReturn(MENU_PRICE);
+		when(request.getPrice()).thenReturn(MENU_PRICE);
 		when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
 		List<MenuProduct> menuProducts = Arrays.asList(menuProduct, menuProduct);
-		when(menu.getMenuProducts()).thenReturn(menuProducts);
+		when(request.getMenuProducts()).thenReturn(menuProducts);
 		//when
 		List<Product> productList = Arrays.asList(product, product, product);
 		when(productRepository.findAllByIdIn(any())).thenReturn(productList);
 
 		//then
 		assertThatThrownBy(() -> {
-			menuService.create(menu);
+			menuService.create(request);
 		}).isInstanceOf(IllegalArgumentException.class);
 
 
@@ -149,15 +149,15 @@ class MenuServiceTest {
 	@DisplayName("메뉴에 올라간 상품의 수량은 0개 이상이어야 합니다.")
 	void checkQuantity() {
 		//given
-		Menu menu = mock(Menu.class);
+		Menu request = mock(Menu.class);
 		MenuGroup menuGroup = mock(MenuGroup.class);
 		MenuProduct menuProduct = mock(MenuProduct.class);
 		Product product = mock(Product.class);
 
-		when(menu.getPrice()).thenReturn(MENU_PRICE);
+		when(request.getPrice()).thenReturn(MENU_PRICE);
 		when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
 		List<MenuProduct> menuProducts = Arrays.asList(menuProduct, menuProduct);
-		when(menu.getMenuProducts()).thenReturn(menuProducts);
+		when(request.getMenuProducts()).thenReturn(menuProducts);
 		List<Product> productList = Arrays.asList(product, product);
 		when(productRepository.findAllByIdIn(any())).thenReturn(productList);
 
@@ -165,7 +165,7 @@ class MenuServiceTest {
 		when(menuProduct.getQuantity()).thenReturn(NEGATIVE_NUM);
 
 		//then
-		assertThatThrownBy(() -> menuService.create(menu))
+		assertThatThrownBy(() -> menuService.create(request))
 			.isInstanceOf(IllegalArgumentException.class);
 	}
 
@@ -174,15 +174,15 @@ class MenuServiceTest {
 	@DisplayName("메뉴 가격은 메뉴의 상품들 가격의 합보다 비쌀 수 없습니다.")
 	void comparePrice() {
 		//given
-		Menu menu = mock(Menu.class);
+		Menu request = mock(Menu.class);
 		MenuGroup menuGroup = mock(MenuGroup.class);
 		MenuProduct menuProduct = mock(MenuProduct.class);
 		Product product = mock(Product.class);
 
-		when(menu.getPrice()).thenReturn(MENU_PRICE);
+		when(request.getPrice()).thenReturn(MENU_PRICE);
 		when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
 		List<MenuProduct> menuProducts = Arrays.asList(menuProduct, menuProduct);
-		when(menu.getMenuProducts()).thenReturn(menuProducts);
+		when(request.getMenuProducts()).thenReturn(menuProducts);
 		List<Product> productList = Arrays.asList(product, product);
 		when(productRepository.findAllByIdIn(any())).thenReturn(productList);
 		when(menuProduct.getQuantity()).thenReturn(POSITIVE_NUM);
@@ -191,7 +191,7 @@ class MenuServiceTest {
 		when(productRepository.findById(any())).thenReturn(Optional.of(product));
 
 		//then
-		assertThatThrownBy(() -> menuService.create(menu))
+		assertThatThrownBy(() -> menuService.create(request))
 			.isInstanceOf(IllegalArgumentException.class);
 	}
 
@@ -224,7 +224,6 @@ class MenuServiceTest {
 	void changePriceIsPositiveNum(BigDecimal price) {
 		//given
 		Menu request = mock(Menu.class);
-		Menu menu = mock(Menu.class);
 		MenuProduct menuProduct = mock(MenuProduct.class);
 
 		//when
@@ -283,7 +282,7 @@ class MenuServiceTest {
 	@Test
 	@Order(11)
 	@DisplayName("메뉴 가격은 메뉴의 상품들 가격의 합보다 비쌀 수 없습니다.")
-	void name() {
+	void checkMenuPrice() {
 		//given
 		Menu menu = mock(Menu.class);
 		MenuProduct menuProduct = mock(MenuProduct.class);
