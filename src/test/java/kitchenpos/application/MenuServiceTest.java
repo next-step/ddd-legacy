@@ -39,8 +39,8 @@ class MenuServiceTest {
     void create_success() {
         //given
         Menu 등록할_메뉴 = mock(Menu.class);
-        String 메뉴명 = "후라이드치킨";
         BigDecimal 메뉴가격 = BigDecimal.valueOf(17000L);
+        String 메뉴명 = "후라이드치킨";
         given(등록할_메뉴.getPrice()).willReturn(메뉴가격);
         given(등록할_메뉴.getName()).willReturn(메뉴명);
         given(비속어_판별기.containsProfanity(메뉴명)).willReturn(false);
