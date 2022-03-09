@@ -13,7 +13,7 @@ public class MenuFixture {
 	public static Menu DISPLAYED_MENU(BigDecimal price, MenuGroup menuGroup, Product product) {
 		Menu menu = new Menu();
 		menu.setId(UUID.randomUUID());
-		menu.setName("후라이드+후라이드");
+		menu.setName("바삭바삭");
 		menu.setPrice(price);
 		menu.setMenuGroup(menuGroup);
 		menu.setDisplayed(true);
@@ -24,7 +24,7 @@ public class MenuFixture {
 	public static Menu HIDDEN_MENU(BigDecimal price, MenuGroup menuGroup, Product product) {
 		Menu menu = new Menu();
 		menu.setId(UUID.randomUUID());
-		menu.setName("후라이드+후라이드");
+		menu.setName("양념양념");
 		menu.setPrice(price);
 		menu.setMenuGroup(menuGroup);
 		menu.setDisplayed(false);

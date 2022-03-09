@@ -9,7 +9,7 @@ public class ProductFixture {
 	public static Product PRODUCT(BigDecimal price) {
 		Product product = new Product();
 		product.setId(UUID.randomUUID());
-		product.setName("강정치킨");
+		product.setName("바삭양념");
 		product.setPrice(price);
 		return product;
 	}

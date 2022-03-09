@@ -62,7 +62,7 @@ public class OrderService {
             }
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
                 throw new IllegalArgumentException();
-            }
+            }에
             final OrderLineItem orderLineItem = new OrderLineItem();
             orderLineItem.setMenu(menu);
             orderLineItem.setQuantity(quantity);
