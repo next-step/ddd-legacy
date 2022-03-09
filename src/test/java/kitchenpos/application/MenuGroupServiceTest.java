@@ -44,9 +44,11 @@ class MenuGroupServiceTest {
 	void createMenuGroupButNameless(String name) {
 		//given
 		MenuGroup menuGroup = mock(MenuGroup.class);
+
+		//when
 		when(menuGroup.getName()).thenReturn(name);
 
-		//when & then
+		//then
 		assertThatThrownBy(() -> menuGroupService.create(menuGroup))
 			.isInstanceOf(IllegalArgumentException.class);
 	}
@@ -54,6 +56,7 @@ class MenuGroupServiceTest {
 	@Test
 	@DisplayName("가게 점주는 메뉴 그룹을 생성할 수 있습니다.")
 	void createMenuGroup() {
+		//given
 		MenuGroup menuGroup = getMenuGroup(FIRST_MENU_GROUP);
 		when(menuGroupRepository.save(any())).thenReturn(menuGroup);
 
@@ -66,6 +69,7 @@ class MenuGroupServiceTest {
 	@Test
 	@DisplayName("가게 점주와 가게 손님은 모든 메뉴 그룹을 가져올 수 있습니다.")
 	void findMenuGroupAll() {
+		//given
 		MenuGroup firstMenuGroup = getMenuGroup(FIRST_MENU_GROUP);
 		MenuGroup secondMenuGroup = getMenuGroup(SECOND_MENU_GROUP);
 
