@@ -296,37 +296,64 @@ class MenuServiceTest {
     @Test
     void display_success() {
         //given
+        Menu 메뉴 = mock(Menu.class);
+        given(menuRepository.findById(any(UUID.class))).willReturn(Optional.of(메뉴));
+
+        BigDecimal 메뉴가격 = BigDecimal.valueOf(17000L);
+        MenuProduct 메뉴구성상품 = mock(MenuProduct.class);
+        BigDecimal 상품가격 = BigDecimal.valueOf(17000L);
+        given(메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(메뉴구성상품)));
+        given(메뉴.getPrice()).willReturn(메뉴가격);
+        given(메뉴구성상품.getQuantity()).willReturn(1L);
+        Product 상품 = mock(Product.class);
+        given(메뉴구성상품.getProduct()).willReturn(상품);
+        given(상품.getPrice()).willReturn(상품가격);
 
         //when
+        menuService.display(UUID.randomUUID());
 
         //then
-    }
-
-
-
-    @DisplayName(value = "메뉴 가격이 각 메뉴구성상품 가격의 합보다 큰경우 판매중으로 변경할 수 없다")
-    @Test
-    void display_fail_menu_price_gt_sum_of_menu_product() {
-        //given
-
-        //when
-
-        //then
-    }
-
-    @DisplayName(value = "메뉴의 판매상태를 판매중단으로 변경할 수 있다")
-    @Test
-    void hide_success() {
-        //given
-
-        //when
-
-        //then
+        verify(메뉴,times(1)).setDisplayed(true);
     }
 
     @DisplayName(value = "존재하는 메뉴만 판매상태를 판매중단으로 변경할 수 있다")
     @Test
     void hide_fail_menu_not_exist() {
+        //given
+        given(menuRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() ->menuService.display(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName(value = "메뉴 가격이 각 메뉴구성상품 가격의 합보다 큰경우 판매중으로 변경할 수 없다")
+    @Test
+    void display_fail_menu_price_gt_sum_of_menu_product() {
+        //given
+        Menu 메뉴 = mock(Menu.class);
+        BigDecimal 메뉴가격 = BigDecimal.valueOf(17500L);
+        BigDecimal 상품가격 = BigDecimal.valueOf(17000L);
+
+        given(menuRepository.findById(any(UUID.class))).willReturn(Optional.of(메뉴));
+
+        MenuProduct 메뉴구성상품 = mock(MenuProduct.class);
+        given(메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(메뉴구성상품)));
+        given(메뉴.getPrice()).willReturn(메뉴가격);
+
+        given(메뉴구성상품.getQuantity()).willReturn(1L);
+        Product 상품 = mock(Product.class);
+
+        given(메뉴구성상품.getProduct()).willReturn(상품);
+        given(상품.getPrice()).willReturn(상품가격);
+        //when, then
+        assertThatThrownBy(() ->menuService.display(UUID.randomUUID()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName(value = "메뉴의 판매상태를 판매중단으로 변경할 수 있다")
+    @Test
+    void hide_success() {
         //given
 
         //when
