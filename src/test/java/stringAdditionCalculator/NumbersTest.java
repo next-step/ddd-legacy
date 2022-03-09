@@ -2,7 +2,8 @@ package stringAdditionCalculator;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -12,18 +13,10 @@ public class NumbersTest {
 	@DisplayName("100개 이상의 값을 추가하면 에러가 발생한다")
 	@Test
 	void insert_above_100_values_then_error_occurred() {
-		Numbers numbers = new Numbers();
+		List<String> stringNumbersOverOneHundred = new ArrayList<>();
+		IntStream.range(1, 103).forEach(i -> stringNumbersOverOneHundred.add("1"));
 
-		assertThatThrownBy(() -> IntStream.range(1, 102)
-			.forEach(i -> numbers.addNumber(new Number("1")))).isInstanceOf(IllegalArgumentException.class);
-	}
-
-	@DisplayName("목록이 비었을 경우 0을 반환한다")
-	@Test
-	void when_get_Sum_method_is_called_and_list_is_empty_then_return_zero() {
-		Numbers numbers = new Numbers();
-
-		assertThat(numbers.getSum()).isZero();
+		assertThatThrownBy(() -> new Numbers(stringNumbersOverOneHundred.toArray(new String[0]))).isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@DisplayName("목록에 있는 값들의 합을 반환한다")

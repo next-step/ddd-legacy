@@ -6,14 +6,10 @@ public class Number {
 	public static final int ZERO = 0;
 	public static final int MAXIMUM_VALUE = 100;
 	private int number;
-	private boolean isEmptyString;
 
 	public Number(String stringNumber) {
 		validateEmptiness(stringNumber);
-
-		if (!isEmptyString) {
-			validate(getIntegerValue(stringNumber));
-		}
+		validate(getIntegerValue(stringNumber));
 	}
 
 	private int getIntegerValue(String stringNumber) {
@@ -49,8 +45,7 @@ public class Number {
 
 	private void validateEmptiness(String stringNumber) {
 		if (stringNumber == null || stringNumber.isEmpty()) {
-			this.number = ZERO;
-			this.isEmptyString = true;
+			throw new IllegalStateException("null 또는 Empty를 입력할 수 없습니다");
 		}
 	}
 

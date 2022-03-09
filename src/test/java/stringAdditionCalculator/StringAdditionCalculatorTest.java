@@ -23,12 +23,12 @@ class StringAdditionCalculatorTest {
 		assertThat(stringAdditionCalculator.sum(numbersWithCustomSeparator)).isEqualTo(6);
 	}
 
-	@DisplayName("빈 문자열이 있으면 0을 반환하고 나머지의 합을 반환한다")
+	@DisplayName("빈 문자열이 있으면 에러가 발생한다")
 	@Test
-	void empty_strings_is_one_of_input_then_return_zero_and_sum_of_the_rest() {
+	void empty_strings_is_one_of_input_then_error_occurs() {
 		String numbersWithEmptyStrings = ",3";
 
-		assertThat(stringAdditionCalculator.sum(numbersWithEmptyStrings)).isEqualTo(3);
+		assertThatThrownBy(() -> stringAdditionCalculator.sum(numbersWithEmptyStrings)).isInstanceOf(IllegalStateException.class);
 	}
 
 	@DisplayName("숫자가 아닌 문자열이 포함되어 있으면 에러가 발생한다")

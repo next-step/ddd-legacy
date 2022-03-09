@@ -43,19 +43,15 @@ public class NumberTest {
 	@Test
 	void null_is_input_then_return_zero() {
 		String nullString = null;
-		Number number = new Number(nullString);
 
-		assertThat(number.getNumber()).isZero();
-		assertThat(number).isEqualTo(new Number("0"));
+		assertThatThrownBy(() -> new Number(nullString)).isInstanceOf(IllegalStateException.class);
 	}
 
-	@DisplayName("빈 문자열을 입력할 경우 0을 반환한다")
+	@DisplayName("빈 문자열을 입력할 경우 에러가 발생한다")
 	@Test
 	void empty_string_is_input_then_return_zero() {
 		String emptyString = "";
-		Number number = new Number(emptyString);
 
-		assertThat(number.getNumber()).isZero();
-		assertThat(number).isEqualTo(new Number("0"));
+		assertThatThrownBy(() -> new Number(emptyString)).isInstanceOf(IllegalStateException.class);
 	}
 }

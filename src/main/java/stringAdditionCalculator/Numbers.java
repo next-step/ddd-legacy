@@ -8,13 +8,9 @@ public class Numbers {
 	public static final int MAXIMUM_SIZE = 100;
 	private List<Number> numbers;
 
-	public Numbers() {
-		this.numbers = new ArrayList<>();
-	}
-
 	public Numbers(String[] stringNumbers) {
-		this();
 		validateListEmptiness(stringNumbers);
+		this.numbers = new ArrayList<>();
 
 		for (String number : stringNumbers) {
 			addNumber(new Number(number));

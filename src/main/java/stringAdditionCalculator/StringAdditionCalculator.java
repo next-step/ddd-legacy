@@ -2,7 +2,7 @@ package stringAdditionCalculator;
 
 public class StringAdditionCalculator {
 	public int sum(String inputStringNumbers) {
-		if (inputStringNumbers == null) {
+		if (inputStringNumbers == null || inputStringNumbers.isEmpty()) {
 			return Number.ZERO;
 		}
 
