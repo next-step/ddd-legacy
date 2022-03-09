@@ -231,24 +231,65 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName(value = "변경하려는 메뉴의 가격은 존재해야하며, 0원 이상이어야 한다")
+    @DisplayName(value = "메뉴의 가격을 변경할 수 있다")
     @Test
-    void changePrice_fail_invalid_menu_price() {
+    void changePrice_success() {
         //given
-
+        BigDecimal 변경할_메뉴가격 = BigDecimal.valueOf(17500);
         //when
 
         //then
+    }
+
+    @DisplayName(value = "변경하려는 메뉴의 가격은 존재해야하며, 0원 이상이어야 한다")
+    @ParameterizedTest
+    @MethodSource("잘못된_메뉴가격")
+    void changePrice_fail_invalid_menu_price(final BigDecimal 변경할_메뉴가격) {
+        //given
+        Menu 가격변경_요청 = mock(Menu.class);
+        given(가격변경_요청.getPrice()).willReturn(변경할_메뉴가격);
+
+        //when, then
+        assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), 가격변경_요청))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName(value = "존재하는 메뉴만 판매상태를 판매중으로 변경할 수 있다")
+    @Test
+    void display_fail_menu_not_exist() {
+        //given
+        final Menu 가격변경_요청 = mock(Menu.class);
+        final BigDecimal 변경할_메뉴가격 = BigDecimal.valueOf(17000);
+        given(가격변경_요청.getPrice()).willReturn(변경할_메뉴가격);
+        given(menuRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), 가격변경_요청))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @DisplayName(value = "메뉴 가격을 각 메뉴구성상품 가격의 합보다 크게 변경할 수 없다")
     @Test
     void changePrice_fail_menu_price_gt_sum_of_menu_product_price() {
         //given
+        final Menu 가격변경_요청 = mock(Menu.class);
+        final BigDecimal 변경할_메뉴가격 = BigDecimal.valueOf(17500);
+        final BigDecimal 기존_상품가격 = BigDecimal.valueOf(17000);
+        given(가격변경_요청.getPrice()).willReturn(변경할_메뉴가격);
 
-        //when
+        final Menu 가격_변경될_메뉴 = mock(Menu.class);
+        given(menuRepository.findById(any(UUID.class))).willReturn(Optional.of(가격_변경될_메뉴));
 
-        //then
+        MenuProduct 메뉴구성상품 = mock(MenuProduct.class);
+        given(가격_변경될_메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(메뉴구성상품)));
+        given(메뉴구성상품.getQuantity()).willReturn(1L);
+        Product 상품 = mock(Product.class);
+        given(메뉴구성상품.getProduct()).willReturn(상품);
+        given(상품.getPrice()).willReturn(기존_상품가격);
+
+        //when, then
+        assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), 가격변경_요청))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName(value = "메뉴의 판매상태를 판매중으로 변경할 수 있다")
@@ -261,15 +302,7 @@ class MenuServiceTest {
         //then
     }
 
-    @DisplayName(value = "존재하는 메뉴만 판매상태를 판매중으로 변경할 수 있다")
-    @Test
-    void display_fail_menu_not_exist() {
-        //given
 
-        //when
-
-        //then
-    }
 
     @DisplayName(value = "메뉴 가격이 각 메뉴구성상품 가격의 합보다 큰경우 판매중으로 변경할 수 없다")
     @Test
