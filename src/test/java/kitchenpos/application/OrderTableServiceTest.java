@@ -57,7 +57,6 @@ class OrderTableServiceTest {
 		verify(orderTable).setEmpty(false);
 	}
 
-
 	@Test
 	@DisplayName("가게 점주는 주문이 완료되고 나면 주문 테이블의 상태를 비어있도록 변경할 수 있습니다.")
 	void changeTableStatusGetOrder() {
@@ -84,7 +83,6 @@ class OrderTableServiceTest {
 		Assertions.assertThatThrownBy(() -> orderTableService.clear(RANDOM_UUID))
 			.isInstanceOf(IllegalStateException.class);
 	}
-
 
 	@Test
 	@DisplayName("가게 점주는 주문 변동에 따라 손님의 수를 변경할 수 있습니다.")

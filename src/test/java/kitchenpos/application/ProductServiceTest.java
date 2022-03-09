@@ -25,7 +25,6 @@ class ProductServiceTest {
 	private static final BigDecimal MENU_PRICE = BigDecimal.valueOf(10000L);
 	private static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(10000L);
 	private static final BigDecimal CHANGE_PRICE = BigDecimal.valueOf(20000L);
-
 	private static final String PRODUCT_NAME = "product name";
 	public static final UUID RANDOM_UUID = UUID.randomUUID();
 	public static final long POSITIVE_NUM = 1L;
@@ -43,7 +42,6 @@ class ProductServiceTest {
 
 	@InjectMocks
 	private ProductService productService;
-
 
 	private static Stream<BigDecimal> menuPriceNullAndMinus() {
 		return Stream.of(

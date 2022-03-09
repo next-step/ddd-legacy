@@ -31,15 +31,6 @@ class MenuServiceTest {
 	public static final BigDecimal MENU_PRICE = BigDecimal.valueOf(10000);
 	public static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(5000);
 	public static final UUID RANDOM_UUID = UUID.randomUUID();
-	//	- [ ] 메뉴(menu)
-//  - [ ] 도메인 정보
-//    - [ ] 메뉴는 이름과 가집니다.
-//    - [ ] 메뉴는 메뉴에 올라간 상품 정보를 포함합니다.
-//    - [ ] 메뉴의 가격은 0원 이상입니다.
-//		- [ ] 메뉴는 가격을 가지고, 가격은 메뉴에 올라간 모든 상품들의 합보다 크거나 같아야 합니다.
-//    - [ ] 메뉴는 메뉴 그룹에 포함이 됩니다.
-//    - [ ] 메뉴 숨김 처리 여부 기능이 존재합니다.
-//		- [ ] 숨김 처리가 된 메뉴는 주문을 할 수 없습니다.
 
 	@Mock
 	MenuRepository menuRepository;
