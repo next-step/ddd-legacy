@@ -51,6 +51,16 @@ class MenuGroupServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName(value = "전체 메뉴그룹을 조회할 수 있다")
+    @Test
+    void findAll_success() throws Exception {
+        //given, when
+        menuGroupService.findAll();
+
+        //then
+        verify(menuGroupRepository, times(1)).findAll();
+    }
+
     private static Stream<String> 잘못된_메뉴그룹명() {
         return Stream.of(
                 null,
