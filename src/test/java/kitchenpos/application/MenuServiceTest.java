@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,6 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static java.util.Objects.*;
-import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
@@ -30,7 +28,7 @@ class MenuServiceTest {
 	private static final long ZERO = 0L;
 	public static final long POSITIVE_NUM = 1L;
 	private static final Long NEGATIVE_NUM = -1L;
-	public static final BigDecimal PRICE = BigDecimal.valueOf(10000);
+	public static final BigDecimal MENU_PRICE = BigDecimal.valueOf(10000);
 	public static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(5000);
 	public static final UUID RANDOM_UUID = UUID.randomUUID();
 	//	- [ ] 메뉴(menu)
@@ -72,7 +70,7 @@ class MenuServiceTest {
 		MenuProduct menuProduct = mock(MenuProduct.class);
 		Product product = mock(Product.class);
 
-		when(menu.getPrice()).thenReturn(PRICE);
+		when(menu.getPrice()).thenReturn(MENU_PRICE);
 		when(menuGroupRepository.findById(any())).thenReturn(Optional.ofNullable(menuGroup));
 		List<MenuProduct> menuProducts = Arrays.asList(menuProduct, menuProduct);
 		when(menu.getMenuProducts()).thenReturn(menuProducts);
@@ -130,7 +128,7 @@ class MenuServiceTest {
 		MenuProduct menuProduct = mock(MenuProduct.class);
 		Product product = mock(Product.class);
 
-		when(menu.getPrice()).thenReturn(PRICE);
+		when(menu.getPrice()).thenReturn(MENU_PRICE);
 		when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
 		List<MenuProduct> menuProducts = Arrays.asList(menuProduct, menuProduct);
 		when(menu.getMenuProducts()).thenReturn(menuProducts);
@@ -156,7 +154,7 @@ class MenuServiceTest {
 		MenuProduct menuProduct = mock(MenuProduct.class);
 		Product product = mock(Product.class);
 
-		when(menu.getPrice()).thenReturn(PRICE);
+		when(menu.getPrice()).thenReturn(MENU_PRICE);
 		when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
 		List<MenuProduct> menuProducts = Arrays.asList(menuProduct, menuProduct);
 		when(menu.getMenuProducts()).thenReturn(menuProducts);
@@ -167,10 +165,8 @@ class MenuServiceTest {
 		when(menuProduct.getQuantity()).thenReturn(NEGATIVE_NUM);
 
 		//then
-		assertThatThrownBy(() -> {
-			menuService.create(menu);
-		}).isInstanceOf(IllegalArgumentException.class);
-
+		assertThatThrownBy(() -> menuService.create(menu))
+			.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
@@ -183,7 +179,7 @@ class MenuServiceTest {
 		MenuProduct menuProduct = mock(MenuProduct.class);
 		Product product = mock(Product.class);
 
-		when(menu.getPrice()).thenReturn(PRICE);
+		when(menu.getPrice()).thenReturn(MENU_PRICE);
 		when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
 		List<MenuProduct> menuProducts = Arrays.asList(menuProduct, menuProduct);
 		when(menu.getMenuProducts()).thenReturn(menuProducts);
@@ -195,9 +191,8 @@ class MenuServiceTest {
 		when(productRepository.findById(any())).thenReturn(Optional.of(product));
 
 		//then
-		assertThatThrownBy(() -> {
-			menuService.create(menu);
-		}).isInstanceOf(IllegalArgumentException.class);
+		assertThatThrownBy(() -> menuService.create(menu))
+			.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
@@ -209,7 +204,7 @@ class MenuServiceTest {
 		Menu menu = mock(Menu.class);
 		MenuProduct menuProduct = mock(MenuProduct.class);
 
-		when(request.getPrice()).thenReturn(PRICE);
+		when(request.getPrice()).thenReturn(MENU_PRICE);
 		when(menuRepository.findById(any())).thenReturn(Optional.ofNullable(menu));
 		List<MenuProduct> menuProductList = Arrays.asList(menuProduct, menuProduct);
 		when(requireNonNull(menu).getMenuProducts()).thenReturn(menuProductList);
@@ -219,6 +214,7 @@ class MenuServiceTest {
 
 		//then
 		menuService.changePrice(RANDOM_UUID, request);
+		verify(menu).setPrice(MENU_PRICE);
 	}
 
 	@Order(8)
@@ -235,9 +231,8 @@ class MenuServiceTest {
 		when(request.getPrice()).thenReturn(price);
 
 		//then
-		assertThatThrownBy(() -> {
-			menuService.changePrice(RANDOM_UUID, request);
-		}).isInstanceOf(IllegalArgumentException.class);
+		assertThatThrownBy(() -> menuService.changePrice(RANDOM_UUID, request))
+			.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
@@ -249,7 +244,7 @@ class MenuServiceTest {
 		Menu menu = mock(Menu.class);
 		MenuProduct menuProduct = mock(MenuProduct.class);
 
-		when(request.getPrice()).thenReturn(PRICE);
+		when(request.getPrice()).thenReturn(MENU_PRICE);
 		when(menuRepository.findById(any())).thenReturn(Optional.ofNullable(menu));
 		List<MenuProduct> menuProductList = Arrays.asList(menuProduct, menuProduct);
 		when(requireNonNull(menu).getMenuProducts()).thenReturn(menuProductList);
@@ -260,9 +255,8 @@ class MenuServiceTest {
 		when(menuProduct.getQuantity()).thenReturn(POSITIVE_NUM);
 
 		//then
-		assertThatThrownBy(() -> {
-			menuService.changePrice(RANDOM_UUID, request);
-		}).isInstanceOf(IllegalArgumentException.class);
+		assertThatThrownBy(() -> menuService.changePrice(RANDOM_UUID, request))
+			.isInstanceOf(IllegalArgumentException.class);
 	}
 
 	@Test
@@ -279,10 +273,11 @@ class MenuServiceTest {
 		when(menuProduct.getProduct()).thenReturn(mock(Product.class));
 		when(menuProduct.getProduct().getPrice()).thenReturn(PRODUCT_PRICE);
 		when(menuProduct.getQuantity()).thenReturn(POSITIVE_NUM);
-		when(menu.getPrice()).thenReturn(PRICE);
+		when(menu.getPrice()).thenReturn(MENU_PRICE);
 
 		//then
 		menuService.display(RANDOM_UUID);
+		verify(menu).setDisplayed(true);
 	}
 
 	@Test
@@ -301,12 +296,11 @@ class MenuServiceTest {
 		//when
 		when(menuProduct.getProduct().getPrice()).thenReturn(BigDecimal.ZERO);
 		when(menuProduct.getQuantity()).thenReturn(POSITIVE_NUM);
-		when(menu.getPrice()).thenReturn(PRICE);
+		when(menu.getPrice()).thenReturn(MENU_PRICE);
 
 		//then
-		assertThatThrownBy(() -> {
-			menuService.display(RANDOM_UUID);
-		}).isInstanceOf(IllegalStateException.class);
+		assertThatThrownBy(() -> menuService.display(RANDOM_UUID))
+			.isInstanceOf(IllegalStateException.class);
 	}
 
 	@Test
@@ -320,6 +314,7 @@ class MenuServiceTest {
 
 		//then
 		menuService.hide(RANDOM_UUID);
+		verify(menu).setDisplayed(false);
 	}
 
 	@Test
@@ -333,6 +328,7 @@ class MenuServiceTest {
 
 		//then
 		menuService.findAll();
+		verify(menuRepository).findAll();
 	}
 
 
