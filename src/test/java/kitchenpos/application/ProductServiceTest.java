@@ -8,6 +8,9 @@ import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.util.MenuFactory;
+import kitchenpos.util.MenuGroupFactory;
+import kitchenpos.util.ProductFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,6 +32,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
 @Transactional
@@ -52,7 +56,7 @@ class ProductServiceTest {
     void setUp() {
         purgomalumClient = new FakePurgomalumClient(false);
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
-        MenuGroup request = createMenuGroup(UUID.randomUUID(), "test group");
+        MenuGroup request = MenuGroupFactory.createMenuGroup(UUID.randomUUID(), "test group");
         menuGroupRepository.save(request);
     }
 
@@ -60,22 +64,24 @@ class ProductServiceTest {
     @Test
     void create_with_valid_attribute() {
         final String givenProductName = "test";
-        final UUID givenUUID = UUID.fromString("06fe3514-a8a6-48ed-85e6-e7296d0e1801");
         final BigDecimal givenPrice = BigDecimal.valueOf(1000);
-        final Product request = createProduct(givenProductName, givenUUID, givenPrice);
+        final Product request = ProductFactory.createProduct(null, givenProductName, givenPrice);
 
         final Product actual = productService.create(request);
 
-        assertThat(actual).isNotNull();
+        assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo(givenProductName),
+                () -> assertThat(actual.getPrice()).isEqualTo(givenPrice)
+        );
     }
 
     @DisplayName("상품은 가격이 존재해야한다.")
     @Test
     void create_with_null_price() {
         final String givenProductName = "test";
-        final UUID givenUUID = UUID.fromString("06fe3514-a8a6-48ed-85e6-e7296d0e1801");
         final BigDecimal givenPrice = null;
-        final Product request = createProduct(givenProductName, givenUUID, givenPrice);
+        Product request = ProductFactory.createProduct(null, givenProductName, givenPrice);
 
         assertThatCode(
                 () -> productService.create(request)
@@ -87,9 +93,8 @@ class ProductServiceTest {
     @ValueSource(ints = {-100, -1000, -5000, -10000})
     void create_with_negative_price(int price) {
         final String givenProductName = "test";
-        final UUID givenUUID = UUID.fromString("06fe3514-a8a6-48ed-85e6-e7296d0e1801");
         final BigDecimal givenPrice = BigDecimal.valueOf(price);
-        final Product request = createProduct(givenProductName, givenUUID, givenPrice);
+        final Product request = ProductFactory.createProduct(null, givenProductName, givenPrice);
 
         assertThatCode(
                 () -> productService.create(request)
@@ -100,10 +105,9 @@ class ProductServiceTest {
     @ParameterizedTest
     @NullSource
     void create_with_empty_name(String name) {
-        final UUID givenUUID = UUID.fromString("06fe3514-a8a6-48ed-85e6-e7296d0e1801");
+        final String givenProductName = name;
         final BigDecimal givenPrice = BigDecimal.valueOf(1000);
-        final Product request = createProduct(name, givenUUID, givenPrice);
-
+        final Product request = ProductFactory.createProduct(null, givenProductName, givenPrice);
         assertThatCode(
                 () -> productService.create(request)
         ).isInstanceOf(IllegalArgumentException.class);
@@ -113,10 +117,10 @@ class ProductServiceTest {
     @Test
     void create_with_not_allowed_name() {
         final String givenProductName = "대충 심한욕";
-        final UUID givenUUID = UUID.fromString("06fe3514-a8a6-48ed-85e6-e7296d0e1801");
         final BigDecimal givenPrice = BigDecimal.valueOf(1000);
-        final Product request = createProduct(givenProductName, givenUUID, givenPrice);
-        productService = new ProductService(productRepository, menuRepository, new FakePurgomalumClient(true));
+        final Product request = ProductFactory.createProduct(null, givenProductName, givenPrice);
+        final boolean containsNotAllowedWords = true;
+        productService = new ProductService(productRepository, menuRepository, new FakePurgomalumClient(containsNotAllowedWords));
 
         assertThatCode(
                 () -> productService.create(request)
@@ -132,8 +136,8 @@ class ProductServiceTest {
         final String givenName2 = "test2";
         final BigDecimal givenPrice1 = BigDecimal.valueOf(1000);
         final BigDecimal givenPrice2 = BigDecimal.valueOf(1000);
-        final Product request1 = createProduct(givenName1, givenUUID1, givenPrice1);
-        final Product request2 = createProduct(givenName2, givenUUID2, givenPrice2);
+        final Product request1 = ProductFactory.createProduct(givenUUID1, givenName1, givenPrice1);
+        final Product request2 = ProductFactory.createProduct(givenUUID2, givenName2, givenPrice2);
         final Product product1 = productRepository.save(request1);
         final Product product2 = productRepository.save(request2);
 
@@ -145,14 +149,11 @@ class ProductServiceTest {
     @DisplayName("상품의 가격을 변경 할 수 있다.")
     @Test
     void change_product_with_valid_price() {
-        final Product request = createProduct(
-                "test1",
-                UUID.fromString("06fe3514-a8a6-48ed-85e6-e7296d0e1801"),
-                BigDecimal.valueOf(1000)
-        );
-        Product givenProduct = productService.create(request);
+        final BigDecimal givenPrice = BigDecimal.valueOf(1000);
+        final Product request = ProductFactory.createProduct(null, "test product", givenPrice);
+        final Product givenProduct = productService.create(request);
         final BigDecimal changePrice = BigDecimal.valueOf(2000);
-        final Product changeRequest = createProduct(null, null, changePrice);
+        final Product changeRequest = ProductFactory.createProduct(null, null, changePrice);
 
         final Product actual = productService.changePrice(givenProduct.getId(), changeRequest);
 
@@ -162,14 +163,10 @@ class ProductServiceTest {
     @DisplayName("상품은 가격이 존재해야한다.")
     @Test
     void change_product_price_with_null_price() {
-        final Product request = createProduct(
-                "test1",
-                UUID.fromString("06fe3514-a8a6-48ed-85e6-e7296d0e1801"),
-                BigDecimal.valueOf(1000)
-        );
-        Product givenProduct = productService.create(request);
+        final Product request = ProductFactory.createProduct(null, "test1", BigDecimal.valueOf(1000));
+        final Product givenProduct = productService.create(request);
         final BigDecimal changePrice = null;
-        final Product changeRequest = createProduct(null, null, changePrice);
+        final Product changeRequest = ProductFactory.createProduct(null, null, changePrice);
 
         assertThatCode(() ->
                 productService.changePrice(givenProduct.getId(), changeRequest)
@@ -179,15 +176,10 @@ class ProductServiceTest {
     @DisplayName("상품 가격 변경시 상품은 가격이 0 보다 커야한다.")
     @ParameterizedTest
     @ValueSource(ints = {-100, -1000, -5000})
-    void change_product_price_with_negative_price(int price) {
-        final Product request = createProduct(
-                "test1",
-                UUID.fromString("06fe3514-a8a6-48ed-85e6-e7296d0e1801"),
-                BigDecimal.valueOf(1000)
-        );
-        Product givenProduct = productService.create(request);
-        final BigDecimal changePrice = BigDecimal.valueOf(price);
-        final Product changeRequest = createProduct(null, null, changePrice);
+    void change_product_price_with_negative_price(int changePrice) {
+        final Product request = ProductFactory.createProduct(null, "test1", BigDecimal.valueOf(1000));
+        final Product givenProduct = productService.create(request);
+        final Product changeRequest = ProductFactory.createProduct(null, null, BigDecimal.valueOf(changePrice));
 
         assertThatCode(() ->
                 productService.changePrice(givenProduct.getId(), changeRequest)
@@ -200,7 +192,7 @@ class ProductServiceTest {
         final String not_exist_uuid = "06fe3514-a8a6-48ed-85e6-e7296d0e1800";
         final Product not_exist_product = productRepository.getById(UUID.fromString(not_exist_uuid));
         final BigDecimal changePrice = BigDecimal.valueOf(1000);
-        final Product changeRequest = createProduct(null, null, changePrice);
+        final Product changeRequest = ProductFactory.createProduct(null, null, changePrice);
 
         assertThatCode(() ->
                 productService.changePrice(not_exist_product.getId(), changeRequest)
@@ -210,15 +202,13 @@ class ProductServiceTest {
     @DisplayName("메뉴가격이 메뉴 상품의 합보다 크다면 메뉴 전시상태를 비활성화한다.")
     @Test
     void menu_display_false_when_change_price_bigger_than_menu_price() {
-        final Product request = createProduct(
-                "test1",
-                UUID.fromString("06fe3514-a8a6-48ed-85e6-e7296d0e1801"),
-                BigDecimal.valueOf(1000)
-        );
+        final String givenProductName = "test";
+        final BigDecimal givenPrice = BigDecimal.valueOf(1000);
+        final Product request = ProductFactory.createProduct(null, givenProductName, givenPrice);
         final Product saved = productService.create(request);
-        final Menu savedMenu = saveMenu(saved);
+        final Menu savedMenu = saveMenuWithProduct(saved);
         final BigDecimal changePrice = BigDecimal.valueOf(5000);
-        final Product changeRequest = createProduct(null, null, changePrice);
+        final Product changeRequest = ProductFactory.createProduct(null, null, changePrice);
 
         productService.changePrice(saved.getId(), changeRequest);
         final Menu menu = menuRepository.findById(savedMenu.getId())
@@ -227,47 +217,16 @@ class ProductServiceTest {
         assertThat(menu.isDisplayed()).isFalse();
     }
 
-    private Menu saveMenu(Product saved) {
-        MenuProduct menuProduct = createMenuProduct(saved);
-        Menu menu = createMenu(2000, "test menu1", true, Collections.singletonList(menuProduct));
+    private Menu saveMenuWithProduct(Product product) {
+        MenuProduct menuProduct = MenuFactory.createMenuProduct(product);
+        Menu menu = MenuFactory.createMenu(UUID.randomUUID(), 2000, "test menu1", true, findMenuGroup(), Collections.singletonList(menuProduct));
         return menuRepository.save(menu);
     }
 
-    private MenuProduct createMenuProduct(Product saved) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(saved);
-        menuProduct.setProductId(saved.getId());
-        return menuProduct;
-    }
-
-    private Menu createMenu(int price, String name, boolean display, List<MenuProduct> products) {
-        MenuGroup menuGroup = menuGroupRepository.findAll()
+    private MenuGroup findMenuGroup() {
+        return menuGroupRepository.findAll()
                 .stream()
                 .findAny()
                 .orElseThrow(EntityNotFoundException::new);
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName(name);
-        menu.setPrice(BigDecimal.valueOf(price));
-        menu.setMenuGroup(menuGroup);
-        menu.setDisplayed(display);
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuProducts(products);
-        return menu;
-    }
-
-    private Product createProduct(String givenProductName, UUID givenUUID, BigDecimal givenPrice) {
-        Product product = new Product();
-        product.setId(givenUUID);
-        product.setName(givenProductName);
-        product.setPrice(givenPrice);
-        return product;
-    }
-
-    private MenuGroup createMenuGroup(UUID uuid, String name) {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(uuid);
-        menuGroup.setName(name);
-        return menuGroup;
     }
 }
