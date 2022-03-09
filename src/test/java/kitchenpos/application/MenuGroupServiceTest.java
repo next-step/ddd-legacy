@@ -19,14 +19,18 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void nameIsMandatory(String name) {
-        assertThatThrownBy(() -> createMenuGroup(name))
+        // given when
+        MenuGroup menuGroupRequest = createMenuGroupRequest(name);
+
+        // then
+        assertThatThrownBy(() -> menuGroupService.create(menuGroupRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    public MenuGroup createMenuGroup(String name) {
+    public static MenuGroup createMenuGroupRequest(String name) {
         MenuGroup menuGroupRequest = new MenuGroup();
         menuGroupRequest.setName(name);
-        return menuGroupService.create(menuGroupRequest);
+        return menuGroupRequest;
     }
 
 }

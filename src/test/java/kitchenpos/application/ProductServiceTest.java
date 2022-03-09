@@ -30,7 +30,11 @@ class ProductServiceTest {
     @NullSource
     @ParameterizedTest
     void nameIsMandatory(String name) {
-        assertThatThrownBy(() -> createProduct(name, new BigDecimal("15000")))
+        // given when
+        Product productRequest = createProductRequest(name, new BigDecimal("15000"));
+
+        // then
+        assertThatThrownBy(() -> productService.create(productRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -38,22 +42,33 @@ class ProductServiceTest {
     @ParameterizedTest
     @ValueSource(strings = {"xxxx"})
     void nameContainsProfanity(String name) {
-        assertThatThrownBy(() -> createProduct(name, new BigDecimal("15000")))
+        // given when
+        Product productRequest = createProductRequest(name, new BigDecimal("15000"));
+
+        // then
+        assertThatThrownBy(() -> productService.create(productRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("상품에는 반드시 가격이 있어야 한다.")
     @Test
     void priceIsMandatory() {
-        assertThatThrownBy(() -> createProduct("후라이드치킨", null))
-                .isInstanceOf(IllegalArgumentException.class);
+        // given when
+        Product productRequest = createProductRequest("후라이드치킨", null);
+
+        // then
+        assertThatThrownBy(() -> productService.create(productRequest))
+        .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("상품 가격은 0보다 작을 수 없다.")
     @ParameterizedTest
     @ValueSource(strings = {"-1", "-1000"})
     void negativePrice(String price) {
-        assertThatThrownBy(() -> createProduct("후라이드치킨", new BigDecimal(price)))
+        // given when
+        Product productRequest = createProductRequest("후라이드치킨", new BigDecimal(price));
+
+        assertThatThrownBy(() -> productService.create(productRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -61,7 +76,8 @@ class ProductServiceTest {
     @Test
     void changePrice() {
         // given
-        Product product = createProduct("후라이드치킨", BigDecimal.ZERO);
+        Product productRequest = createProductRequest("후라이드치킨", BigDecimal.ZERO);
+        Product product = productService.create(productRequest);
 
         // when
         Product priceChangeRequest = new Product();
@@ -78,8 +94,10 @@ class ProductServiceTest {
     @Test
     void findAll() {
         // given
-        Product product1 = createProduct("후라이드치킨", new BigDecimal("15000"));
-        Product product2 = createProduct("양념치킨", new BigDecimal("16000"));
+        Product product1Request = createProductRequest("후라이드치킨", new BigDecimal("15000"));
+        Product product1 = productService.create(product1Request);
+        Product product2Request = createProductRequest("양념치킨", new BigDecimal("16000"));
+        Product product2 = productService.create(product2Request);
 
         // when
         List<Product> products = productService.findAll();
@@ -88,10 +106,10 @@ class ProductServiceTest {
         assertThat(products.stream().map(Product::getId).toArray()).contains(new UUID[] {product1.getId(), product2.getId()});
     }
 
-    public Product createProduct(String name, BigDecimal price) {
+    public static Product createProductRequest(String name, BigDecimal price) {
         Product productRequest = new Product();
         productRequest.setName(name);
         productRequest.setPrice(price);
-        return productService.create(productRequest);
+        return productRequest;
     }
 }
