@@ -226,7 +226,7 @@ class MenuServiceTest {
     @ValueSource(ints = {-1, -10, -100})
     void create_with_negative_menu_product_quantity(int quantity) {
         final Product product1 = productRepository.save(createProduct("test1", 1000));
-        final Product product2 = createProduct("test2", 1000);
+        final Product product2 = productRepository.save(createProduct("test2", 1000));
         final List<MenuProduct> menuProducts = createMenuProduct(Arrays.asList(product1, product2), quantity);
         final MenuGroup menuGroup = findAnyMenuGroup();
         final Menu request = createMenu(

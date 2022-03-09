@@ -1,25 +1,9 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderLineItem;
-import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.domain.OrderType;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -36,12 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -480,27 +459,22 @@ class OrderServiceTest {
     }
 
     @DisplayName("주문 목록을 조회할 수 있다.")
-    @TestFactory
-    Stream<DynamicTest> getAllOrders() {
-        return Stream.of(
-                dynamicTest("주문을 생성한다", () -> {
-                    final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
-                    final List<OrderLineItem> orderLineItems = Collections.singletonList(createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
-                    final OrderTable orderTable1 = createOrderTable("table1", 3, false);
-                    final OrderTable orderTable2 = createOrderTable("table2", 3, false);
-                    final Order request1 = createOrderRequest(OrderType.EAT_IN, orderLineItems, orderTable1.getId(), null);
-                    final Order request2 = createOrderRequest(OrderType.EAT_IN, orderLineItems, orderTable2.getId(), null);
-                    orderService.create(request1);
-                    orderService.create(request2);
-                }),
-                dynamicTest("생성된 주문을 가져온다.", () -> {
-                    // test code
-                    List<Order> actual = orderService.findAll();
+    @Test
+    void getAllOrders() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final OrderTable orderTable1 = createOrderTable("table1", 3, false);
+        final OrderTable orderTable2 = createOrderTable("table2", 3, false);
+        final Order request1 = createOrderRequest(OrderType.EAT_IN, orderLineItems, orderTable1.getId(), null);
+        final Order request2 = createOrderRequest(OrderType.EAT_IN, orderLineItems, orderTable2.getId(), null);
+        final Order order1 = orderService.create(request1);
+        final Order order2 = orderService.create(request2);
 
-                    assertThat(actual.size()).isEqualTo(2);
-                })
-        );
+        final List<Order> actual = orderService.findAll();
+
+        assertThat(actual).containsAll(Arrays.asList(order1, order2));
     }
+
 
     private static Stream<Arguments> paramsForBeforeOrderComplete() {
         return Stream.of(
