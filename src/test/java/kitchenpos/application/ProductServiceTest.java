@@ -2,13 +2,11 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -26,26 +24,23 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
-
-    @InjectMocks ProductService productService;
-    @Mock ProductRepository productRepository;
-    @Mock MenuRepository menuRepository;
-    @Mock        PurgomalumClient 비속어_판별기;
-
-    @BeforeEach
-    void setUp() {
-
-    }
+    @InjectMocks
+    ProductService productService;
+    @Mock
+    ProductRepository productRepository;
+    @Mock
+    MenuRepository menuRepository;
+    @Mock
+    PurgomalumClient 비속어_판별기;
 
     @DisplayName(value = "상품을 등록 할 수 있다")
-    @ParameterizedTest
-    @ValueSource(strings = {"후라이드치킨"})
-    void create_success(final String 상품명) {
+    @Test
+    void create_success() {
         //given
         Product 등록할_상품 = mock(Product.class);
-        given(등록할_상품.getPrice()).willReturn(new BigDecimal("1000"));
-        given(등록할_상품.getName()).willReturn(상품명);
-        given(비속어_판별기.containsProfanity(상품명)).willReturn(false);
+        given(등록할_상품.getPrice()).willReturn(new BigDecimal("17000"));
+        given(등록할_상품.getName()).willReturn("후라이드치킨");
+        given(비속어_판별기.containsProfanity("후라이드치킨")).willReturn(false);
 
         //when
         productService.create(등록할_상품);
@@ -73,7 +68,7 @@ class ProductServiceTest {
     void create_fail_invalid_name(final String 상품명) {
         //given
         Product 등록할_상품 = mock(Product.class);
-        given(등록할_상품.getPrice()).willReturn(new BigDecimal("1000"));
+        given(등록할_상품.getPrice()).willReturn(new BigDecimal("17000"));
         given(등록할_상품.getName()).willReturn(상품명);
 
         //when
@@ -163,6 +158,15 @@ class ProductServiceTest {
         verify(메뉴,times(1)).setDisplayed(false);
     }
 
+    @DisplayName(value = "전체 상품리스트를 조회할 수 있다")
+    @Test
+    void findAll_success() {
+        //given, when
+        productService.findAll();
+
+        // then
+        verify(productRepository,times(1)).findAll();
+    }
 
     private static Stream<String> 잘못된_상품명() {
         return Stream.of(
@@ -177,6 +181,4 @@ class ProductServiceTest {
                 new BigDecimal("-1")
         );
     }
-
-
 }
