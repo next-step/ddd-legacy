@@ -100,7 +100,7 @@ class OrderTableServiceTest {
 
     @DisplayName(value = "존재하는 테이블만 공석으로 변경할 수 있다")
     @Test
-    void clear_fail_no_order_table () throws Exception {
+    void clear_fail_table_not_exists () throws Exception {
         //given
         OrderTable 주문테이블 = mock(OrderTable.class);
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
@@ -123,10 +123,81 @@ class OrderTableServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName(value = "주문테이블의 착석인원을 변경한다")
+    @Test
+    void changeNumberOfGuests_success() throws Exception {
+        //given
+        OrderTable 착석인원_변경요청          = mock(OrderTable.class);
+        int 변경_착석인원 = 3;
+        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
+
+        OrderTable 변경할_주문테이블 = mock(OrderTable.class);
+        given(변경할_주문테이블.isEmpty()).willReturn(false);
+        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(변경할_주문테이블));
+
+        //when
+        orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원_변경요청);
+
+        //then
+        verify(변경할_주문테이블, times(1)).setNumberOfGuests(변경_착석인원);
+    }
+
+    @DisplayName(value = "착석인원은 최소 0명 이상이어야 한다")
+    @ParameterizedTest
+    @MethodSource("잘못된_착석인원")
+    void changeNumberOfGuests_fail_invalid_numberOfGuests(final int 변경_착석인원) throws Exception {
+        //given
+        OrderTable 착석인원_변경요청          = mock(OrderTable.class);
+        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
+
+        //when, then
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원_변경요청))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName(value = "존재하는 테이블만 착석인원을 변경할 수 있다")
+    @Test
+    void changeNumberOfGuests_fail_table_not_exist() throws Exception {
+        //given
+        OrderTable 착석인원_변경요청          = mock(OrderTable.class);
+        int 변경_착석인원 = 3;
+        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
+
+        OrderTable 변경할_주문테이블 = mock(OrderTable.class);
+        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원_변경요청))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName(value = "테이블이 공석일때는 착석인원을 변경할 수 없다")
+    @Test
+    void changeNumberOfGuest_fail_table_not_empty() throws Exception {
+        //given
+        OrderTable 착석인원_변경요청          = mock(OrderTable.class);
+        int 변경_착석인원 = 3;
+        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
+
+        OrderTable 변경할_주문테이블 = mock(OrderTable.class);
+        given(변경할_주문테이블.isEmpty()).willReturn(true);
+        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(변경할_주문테이블));
+
+        //when,then
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원_변경요청))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
     private static Stream<String> 잘못된_주문테이블명() {
         return Stream.of(
                 null,
                 ""
+        );
+    }
+
+    private static Stream<Integer> 잘못된_착석인원() {
+        return Stream.of(
+                -1
         );
     }
 }
