@@ -254,9 +254,9 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName(value = "존재하는 메뉴만 판매상태를 판매중으로 변경할 수 있다")
+    @DisplayName(value = "존재하는 메뉴만 가격을 변경할 수 있다")
     @Test
-    void display_fail_menu_not_exist() {
+    void changePrice_fail_menu_not_exist() {
         //given
         final Menu 가격변경_요청 = mock(Menu.class);
         final BigDecimal 변경할_메뉴가격 = BigDecimal.valueOf(17000);
@@ -316,7 +316,7 @@ class MenuServiceTest {
         verify(메뉴,times(1)).setDisplayed(true);
     }
 
-    @DisplayName(value = "존재하는 메뉴만 판매상태를 판매중단으로 변경할 수 있다")
+    @DisplayName(value = "존재하는 메뉴만 판매상태를 판매중으로 변경할 수 있다")
     @Test
     void hide_fail_menu_not_exist() {
         //given
@@ -355,20 +355,32 @@ class MenuServiceTest {
     @Test
     void hide_success() {
         //given
+        Menu 메뉴 = mock(Menu.class);
+        given(menuRepository.findById(any(UUID.class))).willReturn(Optional.of(메뉴));
 
         //when
+        menuService.hide(UUID.randomUUID());
 
         //then
+        verify(메뉴,times(1)).setDisplayed(false);
+    }
+
+    @DisplayName(value = "존재하는 메뉴만 판매상태를 판매중단으로 변경할 수 있다")
+    @Test
+    void hide_fail_no_exist_menu() {
+        //given
+        Menu 메뉴 = mock(Menu.class);
+        given(menuRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() ->menuService.hide(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @DisplayName(value = "전체 메뉴를 조회할 수 있다")
     @Test
     void findAll_success() {
-        //given
 
-        //when
-
-        //then
     }
 
     private static Stream<BigDecimal> 잘못된_메뉴가격() {
