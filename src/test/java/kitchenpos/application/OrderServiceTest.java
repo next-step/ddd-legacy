@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -253,30 +254,69 @@ class OrderServiceTest {
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
         given(주문테이블.isEmpty()).willReturn(true);
 
-
         //when, then
         assertThatThrownBy(() -> orderService.create(등록할_주문))
                 .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName(value = "주문상태를 주문수락으로 변경할 수 있다")
-    @Test
-    void accept_success() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING"})
+    void accept_success(final OrderStatus 주문상태) throws Exception {
         //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getStatus()).willReturn(주문상태);
 
         //when
+        orderService.accept(UUID.randomUUID());
 
         //then
+        verify(배달요청, times(0)).requestDelivery(any(),any(),any());
+        verify(주문,times(1)).setStatus(OrderStatus.ACCEPTED);
+    }
+
+    @DisplayName(value = "주문수락으로 변경 후 주문형태가 배달인 경우 배달 라이더를 요청한다")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING"})
+    void accept_success_call_rider(final OrderStatus 주문상태) throws Exception {
+        //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getStatus()).willReturn(주문상태);
+        given(주문.getType()).willReturn(OrderType.DELIVERY);
+
+        //when
+        orderService.accept(UUID.randomUUID());
+
+        //then
+        verify(배달요청, times(1)).requestDelivery(any(),any(),any());
+        verify(주문,times(1)).setStatus(OrderStatus.ACCEPTED);
+    }
+
+    @DisplayName(value = "존재하는 주문만 주문수락으로 변경할 수 있다")
+    @Test
+    void accept_no_exist_order() throws Exception {
+        //given
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() -> orderService.accept(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @DisplayName(value = "주문상태가 수락대기인 경우만 주문수락으로 변경할 수 있다")
-    @Test
-    void accept_status_should_waiting() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void accept_status_should_waiting(final OrderStatus 주문상태) throws Exception {
         //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getStatus()).willReturn(주문상태);
 
-        //when
-
-        //then
+        //when, then
+        assertThatThrownBy(() -> orderService.accept(UUID.randomUUID()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName(value = "주문상태를 서빙완료로 변경할 수 있다")
