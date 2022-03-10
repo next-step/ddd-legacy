@@ -361,33 +361,59 @@ class OrderServiceTest {
     }
 
     @DisplayName(value = "주문상태를 배달중으로 변경할 수 있다")
-    @Test
-    void startDelivery_success() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"SERVED"})
+    void startDelivery_success(final OrderStatus 주문상태) throws Exception {
         //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getStatus()).willReturn(주문상태);
+        given(주문.getType()).willReturn(OrderType.DELIVERY);
 
         //when
+        orderService.startDelivery(UUID.randomUUID());
 
         //then
+        verify(주문,times(1)).setStatus(OrderStatus.DELIVERING);
+    }
+
+    @DisplayName(value = "존재하는 주문만 서빙완료로 변경할 수 있다")
+    @Test
+    void startDelivery_no_exist_order() throws Exception {
+        //given
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @DisplayName(value = "주문상태가 서빙완료인 경우만 배달중으로 변경한다")
-    @Test
-    void startDelivery_status_should_serve() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING" , "DELIVERED", "COMPLETED"})
+    void startDelivery_status_should_serve(final OrderStatus 주문상태) throws Exception {
         //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getStatus()).willReturn(주문상태);
+        given(주문.getType()).willReturn(OrderType.DELIVERY);
 
-        //when
-
-        //then
+        //when, then
+        assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName(value = "주문형태가 배달인 경우만 배달중으로 변경한다")
-    @Test
-    void startDelivery_type_should_delivery() throws Exception {
-        //given
+    @ParameterizedTest
+    @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
+    void startDelivery_type_should_delivery(final OrderType 주문형태) throws Exception {
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getType()).willReturn(주문형태);
 
-        //when
-
-        //then
+        //when, then
+        assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName(value = "주문상태를 배달완료로 변경할 수 있다")
