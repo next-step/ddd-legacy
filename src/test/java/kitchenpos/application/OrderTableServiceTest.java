@@ -31,11 +31,25 @@ class OrderTableServiceTest {
     @Mock
     OrderRepository orderRepository;
 
+    private static Stream<String> 잘못된_주문테이블명() {
+        return Stream.of(
+                null,
+                ""
+        );
+    }
+
+    private static Stream<Integer> 잘못된_착석인원() {
+        return Stream.of(
+                -1
+        );
+    }
+
     @DisplayName(value = "주문테이블을 등록할 수 있다")
     @Test
     void create_success() throws Exception {
         //given
         OrderTable 등록할_주문테이블 = mock(OrderTable.class);
+
         given(등록할_주문테이블.getName()).willReturn("1번");
 
         //when
@@ -51,6 +65,7 @@ class OrderTableServiceTest {
     void create_fail_invalid_name(final String 주문테이블명) {
         //given
         OrderTable 등록할_주문테이블 = mock(OrderTable.class);
+
         given(등록할_주문테이블.getName()).willReturn(주문테이블명);
 
         //when, then
@@ -63,6 +78,7 @@ class OrderTableServiceTest {
     void sit_success() throws Exception {
         //given
         OrderTable 주문테이블 = mock(OrderTable.class);
+
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
 
         //when
@@ -74,7 +90,7 @@ class OrderTableServiceTest {
 
     @DisplayName(value = "존재하는 테이블만 착석으로 변경할 수 있다")
     @Test
-    void sit_fail_no_order_table () throws Exception {
+    void sit_fail_no_order_table() throws Exception {
         //given
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
@@ -88,6 +104,7 @@ class OrderTableServiceTest {
     void clear_success() throws Exception {
         //given
         OrderTable 주문테이블 = mock(OrderTable.class);
+
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
 
         //when
@@ -100,9 +117,10 @@ class OrderTableServiceTest {
 
     @DisplayName(value = "존재하는 테이블만 공석으로 변경할 수 있다")
     @Test
-    void clear_fail_table_not_exists () throws Exception {
+    void clear_fail_table_not_exists() throws Exception {
         //given
         OrderTable 주문테이블 = mock(OrderTable.class);
+
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
         //when, then
@@ -112,9 +130,10 @@ class OrderTableServiceTest {
 
     @DisplayName(value = "주문의 상태가 주문종결인 경우만 공석으로 변경할 수 있다")
     @Test
-    void clear_fail_no_complete () throws Exception {
+    void clear_fail_no_complete() throws Exception {
         //given
         OrderTable 주문테이블 = mock(OrderTable.class);
+
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
         given(orderRepository.existsByOrderTableAndStatusNot(주문테이블, OrderStatus.COMPLETED)).willReturn(true);
 
@@ -127,11 +146,12 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests_success() throws Exception {
         //given
-        OrderTable 착석인원_변경요청          = mock(OrderTable.class);
-        int 변경_착석인원 = 3;
-        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
-
+        OrderTable 착석인원_변경요청 = mock(OrderTable.class);
         OrderTable 변경할_주문테이블 = mock(OrderTable.class);
+
+        int 변경_착석인원 = 3;
+
+        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
         given(변경할_주문테이블.isEmpty()).willReturn(false);
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(변경할_주문테이블));
 
@@ -147,7 +167,8 @@ class OrderTableServiceTest {
     @MethodSource("잘못된_착석인원")
     void changeNumberOfGuests_fail_invalid_numberOfGuests(final int 변경_착석인원) throws Exception {
         //given
-        OrderTable 착석인원_변경요청          = mock(OrderTable.class);
+        OrderTable 착석인원_변경요청 = mock(OrderTable.class);
+
         given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
 
         //when, then
@@ -159,11 +180,11 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests_fail_table_not_exist() throws Exception {
         //given
-        OrderTable 착석인원_변경요청          = mock(OrderTable.class);
-        int 변경_착석인원 = 3;
-        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
+        OrderTable 착석인원_변경요청 = mock(OrderTable.class);
 
-        OrderTable 변경할_주문테이블 = mock(OrderTable.class);
+        int 변경_착석인원 = 3;
+
+        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
         //when, then
@@ -175,11 +196,12 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuest_fail_table_not_empty() throws Exception {
         //given
-        OrderTable 착석인원_변경요청          = mock(OrderTable.class);
-        int 변경_착석인원 = 3;
-        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
-
+        OrderTable 착석인원_변경요청 = mock(OrderTable.class);
         OrderTable 변경할_주문테이블 = mock(OrderTable.class);
+
+        int 변경_착석인원 = 3;
+
+        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
         given(변경할_주문테이블.isEmpty()).willReturn(true);
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(변경할_주문테이블));
 
@@ -196,18 +218,5 @@ class OrderTableServiceTest {
 
         //then
         verify(orderTableRepository, times(1)).findAll();
-    }
-
-    private static Stream<String> 잘못된_주문테이블명() {
-        return Stream.of(
-                null,
-                ""
-        );
-    }
-
-    private static Stream<Integer> 잘못된_착석인원() {
-        return Stream.of(
-                -1
-        );
     }
 }
