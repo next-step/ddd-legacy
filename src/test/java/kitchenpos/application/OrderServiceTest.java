@@ -6,9 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -16,7 +15,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Stream;
 
 import static kitchenpos.testBuilders.MenuBuilder.DEFAULT_MENU_PRICE;
 import static kitchenpos.testBuilders.MenuBuilder.aDefaultMenu;
@@ -308,27 +306,16 @@ class OrderServiceTest {
 				.isInstanceOf(IllegalStateException.class);
 	}
 
-	@DisplayName("배달 타입의 주문을 수락 상태로 변경 시 배달클라이언트에 배달을 요청한다")
-	@Test
-	void acceptDeliveryRequest() {
+	@DisplayName("주문을 수락 상태로 변경 시 해당 주문이 배달 타입인 경우 배달클라이언트에 배달을 요청한다")
+	@ParameterizedTest(name = "주문이 {0} 타입 - {1} 번 요청")
+	@CsvSource(value = {
+			"DELIVERY, 1",
+			"EAT_IN  , 0",
+			"TAKEOUT , 0"
+	})
+	void acceptDeliveryRequest(OrderType orderType, int times) {
 		// given
-		Order order = aDeliveryOrder().withStatus(OrderStatus.WAITING).build();
-		UUID orderId = order.getId();
-
-		given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
-
-		// when
-		orderService.accept(orderId);
-
-		// then
-		verify(kitchenridersClient, only()).requestDelivery(any(), any(), any());
-	}
-
-	@DisplayName("배달 타입의 주문을 수락 상태로 변경 시 배달클라이언트에 배달을 요청한다")
-	@ParameterizedTest(name = "주문 {0} 인 경우 {1} 번 요청")
-	@MethodSource("provideAcceptDeliveryRequest")
-	void acceptDeliveryRequest(Order order, int times) {
-		// given
+		Order order = aOrderByType(orderType).withStatus(OrderStatus.WAITING).build();
 		UUID orderId = order.getId();
 
 		given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
@@ -609,13 +596,5 @@ class OrderServiceTest {
 
 		// then
 		assertThat(result).containsExactly(takeoutOrder, deliveryOrder);
-	}
-
-	private static Stream<Arguments> provideAcceptDeliveryRequest() {
-		return Stream.of(
-				Arguments.of(aDeliveryOrder().withStatus(OrderStatus.WAITING).build(), 1),
-				Arguments.of(aTakeoutOrder().withStatus(OrderStatus.WAITING).build(), 0),
-				Arguments.of(aEatInOrder().withStatus(OrderStatus.WAITING).build(), 0)
-		);
 	}
 }
