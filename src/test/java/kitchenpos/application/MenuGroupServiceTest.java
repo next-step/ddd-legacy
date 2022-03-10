@@ -52,7 +52,7 @@ class MenuGroupServiceTest {
     void create_fail_invalid_name(final String 메뉴그룹명) throws Exception {
         //given
         MenuGroup 등록할_메뉴그룹 = mock(MenuGroup.class);
-        
+
         given(등록할_메뉴그룹.getName()).willReturn(메뉴그룹명);
 
         //when, then
