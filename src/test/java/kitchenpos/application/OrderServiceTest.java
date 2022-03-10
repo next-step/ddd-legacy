@@ -230,8 +230,6 @@ class OrderServiceTest {
 				.isInstanceOf(NoSuchElementException.class);
 	}
 
-	// accept
-
 	@DisplayName("매장식사 타입의 주문 생성 시 해당 주문테이블이 미사용중인 경우 예외가 발생한다")
 	@Test
 	void createNotEmptyOrderTable() {
