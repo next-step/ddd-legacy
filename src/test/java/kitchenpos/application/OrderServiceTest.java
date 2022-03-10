@@ -457,44 +457,105 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName(value = "주문상태를 주문종결로 변경할 수 있다")
-    @Test
-    void complete_success() throws Exception {
+    @DisplayName(value = "주문상태를 주문종결로 변경할 수 있다 - 배달")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"DELIVERED"})
+    void complete_success_delivery(final OrderStatus 주문상태) throws Exception {
         //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getStatus()).willReturn(주문상태);
+        given(주문.getType()).willReturn(OrderType.DELIVERY);
 
         //when
+        orderService.complete(UUID.randomUUID());
 
         //then
+        verify(주문,times(1)).setStatus(OrderStatus.COMPLETED);
     }
 
-    @DisplayName(value = "주문형태가 배달인 경우, 주문상태가 배달중인 경우만 주문종결로 변경한다")
-    @Test
-    void complete_when_type_delivery_status_should_delivering() throws Exception {
+    @DisplayName(value = "주문상태를 주문종결로 변경할 수 있다 - 매장식사")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"SERVED"})
+    void complete_success_eat_in(final OrderStatus 주문상태) throws Exception {
         //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getStatus()).willReturn(주문상태);
+        given(주문.getType()).willReturn(OrderType.EAT_IN);
+        OrderTable 주문테이블 = mock(OrderTable.class);
+        given(orderRepository.existsByOrderTableAndStatusNot(주문테이블, OrderStatus.COMPLETED)).willReturn(false);
+        given(주문.getOrderTable()).willReturn(주문테이블);
 
         //when
+        orderService.complete(UUID.randomUUID());
 
         //then
+        verify(주문테이블, times(1)).setNumberOfGuests(0);
+        verify(주문테이블, times(1)).setEmpty(true);
+        verify(주문,times(1)).setStatus(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName(value = "주문상태를 주문종결로 변경할 수 있다 - 테이크아웃")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"SERVED"})
+    void complete_success_take_out(final OrderStatus 주문상태) throws Exception {
+        //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getStatus()).willReturn(주문상태);
+        given(주문.getType()).willReturn(OrderType.TAKEOUT);
+
+        //when
+        orderService.complete(UUID.randomUUID());
+
+        //then
+        verify(주문,times(1)).setStatus(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName(value = "주문형태가 배달인 경우, 주문상태가 배달완료인 경우만 주문종결로 변경한다")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED" , "DELIVERING", "COMPLETED"})
+    void complete_when_type_delivery_status_should_delivering(final OrderStatus 주문상태) throws Exception {
+        //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getType()).willReturn(OrderType.DELIVERY);
+        given(주문.getStatus()).willReturn(주문상태);
+
+        //when, then
+        assertThatThrownBy(() -> orderService.complete(UUID.randomUUID()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName(value = "주문형태가 매장식사 또는 테이크아웃인경우, 주문상태가 서빙완료인경우만 주문종결로 변경한다")
-    @Test
-    void complete_when_type_eat_in_or_take_out_status_should_serve() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING" , "DELIVERED", "COMPLETED"})
+    void complete_when_type_eat_in_or_take_out_status_should_serve(final OrderStatus 주문상태) throws Exception {
         //given
+        Order 주문1 = mock(Order.class);
+        UUID 주문1_ID = UUID.randomUUID();
+        given(orderRepository.findById(주문1_ID)).willReturn(Optional.of(주문1));
+        given(주문1.getType()).willReturn(OrderType.TAKEOUT);
+        given(주문1.getStatus()).willReturn(주문상태);
 
-        //when
+        Order 주문2= mock(Order.class);
+        UUID 주문2_ID = UUID.randomUUID();
+        given(orderRepository.findById(주문2_ID)).willReturn(Optional.of(주문2));
+        given(주문2.getType()).willReturn(OrderType.EAT_IN);
+        given(주문2.getStatus()).willReturn(주문상태);
 
-        //then
+        //when, then
+        assertThatThrownBy(() -> orderService.complete(주문1_ID))
+                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> orderService.complete(주문2_ID))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName(value = "전체 주문을 조회할 수 있다")
     @Test
     void findAll_success() throws Exception {
-        //given
 
-        //when
-
-        //then
     }
 
     private static Stream<List<OrderLineItem>> 잘못된_주문구성메뉴_리스트() {
