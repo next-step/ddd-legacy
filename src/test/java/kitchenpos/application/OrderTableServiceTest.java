@@ -102,7 +102,7 @@ class OrderTableServiceTest {
 				.isInstanceOf(NoSuchElementException.class);
 	}
 
-	@DisplayName("주문테이블을 미사용중으로 변경 시 손님 수는 0으로 변경된다")
+	@DisplayName("주문테이블을 미사용중으로 변경한다")
 	@Test
 	void clear() {
 		// given
@@ -128,8 +128,6 @@ class OrderTableServiceTest {
 	void clearNotExist() {
 		// given
 		UUID notExistedOrderTableId = UUID.randomUUID();
-
-		OrderTable orderTable = aOrderTable().withEmpty(false).build();
 
 		given(orderTableRepository.findById(notExistedOrderTableId)).willReturn(Optional.empty());
 
