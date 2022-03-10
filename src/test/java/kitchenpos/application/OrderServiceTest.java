@@ -555,7 +555,11 @@ class OrderServiceTest {
     @DisplayName(value = "전체 주문을 조회할 수 있다")
     @Test
     void findAll_success() throws Exception {
+        //given, when
+        orderService.findAll();
 
+        //verify
+        verify(orderRepository, times(1)).findAll();
     }
 
     private static Stream<List<OrderLineItem>> 잘못된_주문구성메뉴_리스트() {
