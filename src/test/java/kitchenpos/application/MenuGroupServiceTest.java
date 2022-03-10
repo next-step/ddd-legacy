@@ -2,11 +2,11 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,77 +14,64 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Stream;
 
+import static kitchenpos.KitchenposFixture.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
-	private static final String FIRST_MENU_GROUP = "첫 번째 테스트 메뉴 그룹";
-	private static final String SECOND_MENU_GROUP = "두 번째 테스트 메뉴 그룹";
 
-	@Mock
-	private MenuGroupRepository menuGroupRepository;
+  @Mock
+  private MenuGroupRepository menuGroupRepository;
 
-	@InjectMocks
-	private MenuGroupService menuGroupService;
+  @InjectMocks
+  private MenuGroupService menuGroupService;
 
-	@ParameterizedTest
-	@NullAndEmptySource
-	@DisplayName("메뉴를 분류하는 그룹에는 이름이 꼭 필요합니다.")
-	void createMenuGroupButNameless(String name) {
-		//given
-		MenuGroup menuGroup = mock(MenuGroup.class);
+  @ParameterizedTest
+  @NullAndEmptySource
+  @DisplayName("이름이 null이거나 empty이면 IllegalArgumentException 예외 발생")
+  void createMenuGroupButNameless(String name) {
+    //given
+    MenuGroup menuGroup = menuGroup();
+    menuGroup.setName(name);
 
-		//when
-		when(menuGroup.getName()).thenReturn(name);
+    //then
+    assertThatThrownBy(() -> menuGroupService.create(menuGroup))
+            .isInstanceOf(IllegalArgumentException.class);
+  }
 
-		//then
-		assertThatThrownBy(() -> menuGroupService.create(menuGroup))
-			.isInstanceOf(IllegalArgumentException.class);
-	}
+  @Test
+  @DisplayName("메뉴 그룹 생성")
+  void createMenuGroup() {
+    //given
+    MenuGroup menuGroup = menuGroup();
 
-	@Test
-	@DisplayName("가게 점주는 메뉴 그룹을 생성할 수 있습니다.")
-	void createMenuGroup() {
-		//given
-		MenuGroup menuGroup = getMenuGroup(FIRST_MENU_GROUP);
-		when(menuGroupRepository.save(any())).thenReturn(menuGroup);
+    when(menuGroupRepository.save(any())).thenReturn(menuGroup);
 
-		MenuGroup createMenuGroup = menuGroupService.create(menuGroup);
+    assertDoesNotThrow(()->{
+      MenuGroup createMenuGroup = menuGroupService.create(menuGroup);
+    });
+  }
 
-		verify(menuGroupRepository).save(any(MenuGroup.class));
-		assertThat(createMenuGroup).isEqualTo(menuGroup);
-	}
+  @Test
+  @DisplayName("메뉴 그룹 전체 조회")
+  void findMenuGroupAll() {
+    //given
+    List<MenuGroup> menuGroupList = new ArrayList<>();
+    menuGroupList.add(menuGroup());
+    menuGroupList.add(menuGroup());
 
-	@Test
-	@DisplayName("가게 점주와 가게 손님은 모든 메뉴 그룹을 가져올 수 있습니다.")
-	void findMenuGroupAll() {
-		//given
-		MenuGroup firstMenuGroup = getMenuGroup(FIRST_MENU_GROUP);
-		MenuGroup secondMenuGroup = getMenuGroup(SECOND_MENU_GROUP);
+    when(menuGroupRepository.findAll()).thenReturn(menuGroupList);
 
-		List<MenuGroup> menuGroupList = new ArrayList<>();
-		menuGroupList.add(firstMenuGroup);
-		menuGroupList.add(secondMenuGroup);
+    List<MenuGroup> findMenuGroupList = menuGroupService.findAll();
 
-		when(menuGroupRepository.findAll()).thenReturn(menuGroupList);
+    verify(menuGroupRepository).findAll();
 
-		List<MenuGroup> findMenuGroupList = menuGroupService.findAll();
+    assertThat(findMenuGroupList.size()).isEqualTo(menuGroupList.size());
+    assertThat(menuGroupList).isSameAs(findMenuGroupList);
+  }
 
-		verify(menuGroupRepository).findAll();
-
-		assertThat(findMenuGroupList.size()).isEqualTo(menuGroupList.size());
-		assertThat(menuGroupList).isSameAs(findMenuGroupList);
-	}
-
-	private static MenuGroup getMenuGroup(String name) {
-		MenuGroup menuGroup = new MenuGroup();
-		menuGroup.setId(UUID.randomUUID());
-		menuGroup.setName(name);
-		return menuGroup;
-	}
 }

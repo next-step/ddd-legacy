@@ -41,7 +41,7 @@ public class MenuGroup {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     MenuGroup menuGroup = (MenuGroup) o;
-    return Objects.equals(getId(), menuGroup.getId()) && Objects.equals(getName(), menuGroup.getName());
+    return Objects.equals(getName(), menuGroup.getName());
   }
 
   @Override
