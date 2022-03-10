@@ -2,10 +2,9 @@ package kitchenpos.application;
 
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.domain.OrderType;
+import kitchenpos.util.OrderTableFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
@@ -19,7 +18,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -51,7 +49,7 @@ class OrderTableServiceTest {
     @DisplayName("테이블을 등록할 수 있다.")
     @Test
     void create() {
-        final OrderTable request = createOrderTable("table1");
+        final OrderTable request = OrderTableFactory.createOrderTableWithName("table1");
 
         final OrderTable actual = orderTableService.create(request);
 
@@ -65,7 +63,7 @@ class OrderTableServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void create_with_empty_name(String name) {
-        final OrderTable request = createOrderTable(name);
+        final OrderTable request = OrderTableFactory.createOrderTableWithName(name);
 
         assertThatCode(
                 () -> orderTableService.create(request)
@@ -75,8 +73,8 @@ class OrderTableServiceTest {
     @DisplayName("테이블 목록을 조회할 수 있다.")
     @Test
     void find_all() {
-        final OrderTable request1 = createOrderTable("table1");
-        final OrderTable request2 = createOrderTable("table1");
+        final OrderTable request1 = OrderTableFactory.createOrderTableWithName("table1");
+        final OrderTable request2 = OrderTableFactory.createOrderTableWithName("table2");
         final OrderTable orderTable1 = orderTableService.create(request1);
         final OrderTable orderTable2 = orderTableService.create(request2);
 
@@ -87,7 +85,7 @@ class OrderTableServiceTest {
 
     @TestFactory
     Collection<DynamicTest> 앉은상태_상태_변경() {
-        final OrderTable request = createOrderTable("table1");
+        final OrderTable request = OrderTableFactory.createOrderTableWithName("table1");
         final OrderTable givenOrder = orderTableService.create(request);
 
         return Arrays.asList(dynamicTest("최초의 테이블은 비어있는 상태가 활성화이다.", () -> {
@@ -138,8 +136,8 @@ class OrderTableServiceTest {
     @DisplayName("주문완료 상태가 아닌 테이블은 해제시 예외를 던진다.")
     @Test
     void clear_with_exist_order_table_and_status_not_order_complete() {
-        final OrderTable givenOrderTable = orderTableRepository.save(createNotEmptyOrderTable());
-        final Order orderRequest = createOrderWithNotOrderComplete(givenOrderTable);
+        final OrderTable givenOrderTable = orderTableRepository.save(OrderTableFactory.createNotEmptyOrderTable());
+        final Order orderRequest = OrderTableFactory.createOrderWithNotOrderComplete(givenOrderTable);
         orderRepository.save(orderRequest);
 
         assertThatCode(() -> orderTableService.clear(givenOrderTable.getId())
@@ -205,32 +203,5 @@ class OrderTableServiceTest {
 
         assertThatCode(() -> orderTableService.changeNumberOfGuests(givenOrderTable.getId(), changeRequest))
                 .isInstanceOf(IllegalStateException.class);
-    }
-
-    private OrderTable createOrderTable(String name) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName(name);
-        return orderTable;
-    }
-
-    private OrderTable createNotEmptyOrderTable() {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setEmpty(false);
-        orderTable.setNumberOfGuests(5);
-        orderTable.setName("sit table");
-        return orderTable;
-    }
-
-    private Order createOrderWithNotOrderComplete(OrderTable givenOrderTable) {
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.EAT_IN);
-        order.setStatus(OrderStatus.SERVED);
-        order.setOrderTable(givenOrderTable);
-        order.setOrderTableId(givenOrderTable.getId());
-        order.setOrderDateTime(LocalDateTime.now());
-        return order;
     }
 }
