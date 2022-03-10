@@ -24,11 +24,19 @@ class MenuGroupServiceTest {
     @Mock
     MenuGroupRepository menuGroupRepository;
 
+    private static Stream<String> 잘못된_메뉴그룹명() {
+        return Stream.of(
+                null,
+                ""
+        );
+    }
+
     @DisplayName(value = "메뉴그룹을 등록할 수 있다")
     @Test
     void create_success() throws Exception {
         //given
         MenuGroup 등록할_메뉴그룹 = mock(MenuGroup.class);
+
         given(등록할_메뉴그룹.getName()).willReturn("한마리메뉴");
 
         //when
@@ -44,6 +52,7 @@ class MenuGroupServiceTest {
     void create_fail_invalid_name(final String 메뉴그룹명) throws Exception {
         //given
         MenuGroup 등록할_메뉴그룹 = mock(MenuGroup.class);
+        
         given(등록할_메뉴그룹.getName()).willReturn(메뉴그룹명);
 
         //when, then
@@ -59,12 +68,5 @@ class MenuGroupServiceTest {
 
         //then
         verify(menuGroupRepository, times(1)).findAll();
-    }
-
-    private static Stream<String> 잘못된_메뉴그룹명() {
-        return Stream.of(
-                null,
-                ""
-        );
     }
 }
