@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -20,6 +21,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.BDDMockito.given;
 
 @DataJpaTest
 @Transactional
@@ -70,10 +72,11 @@ class MenuGroupServiceTest {
         final UUID givenUUID2 = UUID.fromString("b619cf4e-3725-48b3-9e32-84eb2e92e5b9");
         final String givenName1 = "test1";
         final String givenName2 = "test2";
-        MenuGroup request1 = MenuGroupFactory.createMenuGroup(givenUUID1, givenName1);
-        MenuGroup request2 = MenuGroupFactory.createMenuGroup(givenUUID2, givenName2);
-        MenuGroup menuGroup1 = menuGroupRepository.save(request1);
-        MenuGroup menuGroup2 = menuGroupRepository.save(request2);
+        MenuGroup menuGroup1 = MenuGroupFactory.createMenuGroup(givenUUID1, givenName1);
+        MenuGroup menuGroup2 = MenuGroupFactory.createMenuGroup(givenUUID2, givenName2);
+
+        menuGroupService = Mockito.mock(MenuGroupService.class);
+        given(menuGroupService.findAll()).willReturn(Arrays.asList(menuGroup1, menuGroup2));
 
         List<MenuGroup> foundMenuGroup = menuGroupService.findAll();
 
