@@ -206,20 +206,20 @@ class ProductServiceTest {
         final BigDecimal givenPrice = BigDecimal.valueOf(1000);
         final Product request = ProductFactory.createProduct(null, givenProductName, givenPrice);
         final Product saved = productService.create(request);
-        final Menu savedMenu = saveMenuWithProduct(saved);
+        final Menu savedMenu = saveMenu(saved, BigDecimal.valueOf(7000), "test menu1");
         final BigDecimal changePrice = BigDecimal.valueOf(5000);
         final Product changeRequest = ProductFactory.createProduct(null, null, changePrice);
 
         productService.changePrice(saved.getId(), changeRequest);
+
         final Menu menu = menuRepository.findById(savedMenu.getId())
                 .orElseThrow(EntityNotFoundException::new);
-
         assertThat(menu.isDisplayed()).isFalse();
     }
 
-    private Menu saveMenuWithProduct(Product product) {
-        MenuProduct menuProduct = MenuFactory.createMenuProductWithQuantity(product, 1);
-        Menu menu = MenuFactory.createMenu(UUID.randomUUID(), BigDecimal.valueOf(2000), "test menu1", true, findMenuGroup(), Collections.singletonList(menuProduct));
+    private Menu saveMenu(Product saved, BigDecimal menuPrice, String menuName) {
+        MenuProduct menuProduct = MenuFactory.createMenuProductWithQuantity(saved, 1);
+        Menu menu = MenuFactory.createMenu(UUID.randomUUID(), menuPrice, menuName, true, findMenuGroup(), Collections.singletonList(menuProduct));
         return menuRepository.save(menu);
     }
 
