@@ -33,11 +33,26 @@ class ProductServiceTest {
     @Mock
     PurgomalumClient 비속어_판별기;
 
+    private static Stream<String> 잘못된_상품명() {
+        return Stream.of(
+                null,
+                "XX치킨"
+        );
+    }
+
+    private static Stream<BigDecimal> 잘못된_상품가격() {
+        return Stream.of(
+                null,
+                new BigDecimal("-1")
+        );
+    }
+
     @DisplayName(value = "상품을 등록 할 수 있다")
     @Test
     void create_success() {
         //given
         Product 등록할_상품 = mock(Product.class);
+
         given(등록할_상품.getPrice()).willReturn(new BigDecimal("17000"));
         given(등록할_상품.getName()).willReturn("후라이드치킨");
         given(비속어_판별기.containsProfanity("후라이드치킨")).willReturn(false);
@@ -55,6 +70,7 @@ class ProductServiceTest {
     void create_fail_invalid_price(final BigDecimal 상품가격) {
         //given
         Product 등록할_상품 = mock(Product.class);
+
         given(등록할_상품.getPrice()).willReturn(상품가격);
 
         //when, then
@@ -68,6 +84,7 @@ class ProductServiceTest {
     void create_fail_invalid_name(final String 상품명) {
         //given
         Product 등록할_상품 = mock(Product.class);
+
         given(등록할_상품.getPrice()).willReturn(new BigDecimal("17000"));
         given(등록할_상품.getName()).willReturn(상품명);
 
@@ -83,21 +100,19 @@ class ProductServiceTest {
     @Test
     void changePrice_success() {
         //given
-        BigDecimal  변경할_상품가격 = new BigDecimal("17500");
+        Product 가격변경_요청 = mock(Product.class);
+        Product 가격이_변경될_상품 = mock(Product.class);
+        Menu 메뉴 = mock(Menu.class);
+        MenuProduct 상품구성 = mock(MenuProduct.class);
+
+        BigDecimal 변경할_상품가격 = new BigDecimal("17500");
         BigDecimal 메뉴가격 = new BigDecimal("17000");
 
-        Product     가격변경_요청 = mock(Product.class);
         given(가격변경_요청.getPrice()).willReturn(변경할_상품가격);
-
-        Product 가격이_변경될_상품 = mock(Product.class);
         given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(가격이_변경될_상품));
         given(가격이_변경될_상품.getPrice()).willReturn(변경할_상품가격);
-
-        Menu 메뉴 = mock(Menu.class);
         given(메뉴.getPrice()).willReturn(메뉴가격);
         given(menuRepository.findAllByProductId(any(UUID.class))).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
-
-        MenuProduct 상품구성 = mock(MenuProduct.class);
         given(상품구성.getProduct()).willReturn(가격이_변경될_상품);
         given(상품구성.getQuantity()).willReturn(1L);
         given(메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(상품구성)));
@@ -109,7 +124,7 @@ class ProductServiceTest {
         verify(productRepository, times(1)).findById(any(UUID.class));
         verify(가격이_변경될_상품, times(1)).setPrice(변경할_상품가격);
         verify(menuRepository, times(1)).findAllByProductId(any(UUID.class));
-        verify(메뉴,times(0)).setDisplayed(false);
+        verify(메뉴, times(0)).setDisplayed(false);
     }
 
     @DisplayName(value = "변경하려는 상품의 가격은 0원 이상이어야 한다")
@@ -117,7 +132,8 @@ class ProductServiceTest {
     @MethodSource("잘못된_상품가격")
     void changePrice_fail_invalid_price(final BigDecimal 변경할_상품가격) {
         //given
-        Product     가격변경_요청   = mock(Product.class);
+        Product 가격변경_요청 = mock(Product.class);
+
         given(가격변경_요청.getPrice()).willReturn(변경할_상품가격);
 
         //when, then
@@ -129,21 +145,19 @@ class ProductServiceTest {
     @Test
     void changePrice_fail_menu_price_gt_product_price() {
         //given
-        BigDecimal  변경할_상품가격 = new BigDecimal("16500");
+        Product 가격변경_요청 = mock(Product.class);
+        Product 가격이_변경될_상품 = mock(Product.class);
+        Menu 메뉴 = mock(Menu.class);
+        MenuProduct 상품구성 = mock(MenuProduct.class);
+
+        BigDecimal 변경할_상품가격 = new BigDecimal("16500");
         BigDecimal 메뉴가격 = new BigDecimal("17000");
 
-        Product     가격변경_요청 = mock(Product.class);
         given(가격변경_요청.getPrice()).willReturn(변경할_상품가격);
-
-        Product 가격이_변경될_상품 = mock(Product.class);
         given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(가격이_변경될_상품));
         given(가격이_변경될_상품.getPrice()).willReturn(변경할_상품가격);
-
-        Menu 메뉴 = mock(Menu.class);
         given(메뉴.getPrice()).willReturn(메뉴가격);
         given(menuRepository.findAllByProductId(any(UUID.class))).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
-
-        MenuProduct 상품구성 = mock(MenuProduct.class);
         given(상품구성.getProduct()).willReturn(가격이_변경될_상품);
         given(상품구성.getQuantity()).willReturn(1L);
         given(메뉴.getMenuProducts()).willReturn(new ArrayList<>(Arrays.asList(상품구성)));
@@ -155,7 +169,7 @@ class ProductServiceTest {
         verify(productRepository, times(1)).findById(any(UUID.class));
         verify(가격이_변경될_상품, times(1)).setPrice(변경할_상품가격);
         verify(menuRepository, times(1)).findAllByProductId(any(UUID.class));
-        verify(메뉴,times(1)).setDisplayed(false);
+        verify(메뉴, times(1)).setDisplayed(false);
     }
 
     @DisplayName(value = "전체 상품리스트를 조회할 수 있다")
@@ -165,20 +179,6 @@ class ProductServiceTest {
         productService.findAll();
 
         // then
-        verify(productRepository,times(1)).findAll();
-    }
-
-    private static Stream<String> 잘못된_상품명() {
-        return Stream.of(
-                null,
-                "XX치킨"
-        );
-    }
-
-    private static Stream<BigDecimal> 잘못된_상품가격() {
-        return Stream.of(
-                null,
-                new BigDecimal("-1")
-        );
+        verify(productRepository, times(1)).findAll();
     }
 }
