@@ -320,23 +320,44 @@ class OrderServiceTest {
     }
 
     @DisplayName(value = "주문상태를 서빙완료로 변경할 수 있다")
-    @Test
-    void serve_success() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"ACCEPTED"})
+    void serve_success(final OrderStatus 주문상태) throws Exception {
         //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getStatus()).willReturn(주문상태);
 
         //when
+        orderService.serve(UUID.randomUUID());
 
         //then
+        verify(주문,times(1)).setStatus(OrderStatus.SERVED);
+    }
+
+    @DisplayName(value = "존재하는 주문만 서빙완료로 변경할 수 있다")
+    @Test
+    void serve_no_exist_order() throws Exception {
+        //given
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+
+        //when, then
+        assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @DisplayName(value = "주문상태가 주문수락인 경우만 서빙완료로 변경 한다")
-    @Test
-    void serve_status_should_accept() throws Exception {
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void serve_status_should_accept(final OrderStatus 주문상태) throws Exception {
         //given
+        Order 주문 = mock(Order.class);
+        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(주문.getStatus()).willReturn(주문상태);
 
-        //when
-
-        //then
+        //when, then
+        assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName(value = "주문상태를 배달중으로 변경할 수 있다")
