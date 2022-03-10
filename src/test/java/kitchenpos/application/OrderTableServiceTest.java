@@ -43,7 +43,8 @@ class OrderTableServiceTest {
 	@Test
 	void create() {
 		// given
-		OrderTable request = aOrderTable().withName("1번 테이블").build();
+		String orderTableName = "1번 테이블";
+		OrderTable request = aOrderTable().withName(orderTableName).build();
 
 		given(orderTableRepository.save(any(OrderTable.class))).willAnswer(returnsFirstArg());
 
@@ -53,6 +54,7 @@ class OrderTableServiceTest {
 		// then
 		assertAll(
 				() -> assertThat(result).isNotNull(),
+				() -> assertThat(result.getName()).isEqualTo(orderTableName),
 				() -> assertThat(result.isEmpty()).isTrue(),
 				() -> assertThat(result.getNumberOfGuests()).isZero()
 		);
