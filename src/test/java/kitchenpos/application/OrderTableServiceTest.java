@@ -39,7 +39,7 @@ class OrderTableServiceTest {
 	@InjectMocks
 	private OrderTableService orderTableService;
 
-	@DisplayName("주문테이블을 생성 시 손님수는 0이고 미사용중으로 초기화된다")
+	@DisplayName("주문테이블을 생성 시 고객 수는 0이고 미사용중으로 초기화된다")
 	@Test
 	void create() {
 		// given
