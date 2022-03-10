@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,15 +23,15 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
-	public static final String MENU_NAME = "menu name";
-	public static final String MENU_GROUP_NAME = "menu group name";
-	public static final String PRODUCT_NAME = "product name";
+	private static final String MENU_NAME = "menu name";
+	private static final String MENU_GROUP_NAME = "menu group name";
+	private static final String PRODUCT_NAME = "product name";
 	private static final long ZERO = 0L;
-	public static final long POSITIVE_NUM = 1L;
+	private static final long POSITIVE_NUM = 1L;
 	private static final Long NEGATIVE_NUM = -1L;
-	public static final BigDecimal MENU_PRICE = BigDecimal.valueOf(10000);
-	public static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(5000);
-	public static final UUID RANDOM_UUID = UUID.randomUUID();
+	private static final BigDecimal MENU_PRICE = BigDecimal.valueOf(10000);
+	private static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(5000);
+	private static final UUID RANDOM_UUID = UUID.randomUUID();
 
 	@Mock
 	MenuRepository menuRepository;
@@ -43,13 +44,6 @@ class MenuServiceTest {
 
 	@InjectMocks
 	private MenuService menuService;
-
-	private static Stream<BigDecimal> menuPriceNullAndMinus() {
-		return Stream.of(
-			BigDecimal.valueOf(NEGATIVE_NUM),
-			null
-		);
-	}
 
 	@Test
 	@Order(1)
@@ -210,7 +204,7 @@ class MenuServiceTest {
 
 	@Order(8)
 	@ParameterizedTest
-	@MethodSource("menuPriceNullAndMinus")
+	@NullAndEmptySource
 	@DisplayName("변경하려는 메뉴의 가격은 0원 이상입니다.")
 	void changePriceIsPositiveNum(BigDecimal price) {
 		//given

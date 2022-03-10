@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,8 +23,8 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
-	public static final String FIRST_MENU_GROUP = "첫 번째 테스트 메뉴 그룹";
-	public static final String SECOND_MENU_GROUP = "두 번째 테스트 메뉴 그룹";
+	private static final String FIRST_MENU_GROUP = "첫 번째 테스트 메뉴 그룹";
+	private static final String SECOND_MENU_GROUP = "두 번째 테스트 메뉴 그룹";
 
 	@Mock
 	private MenuGroupRepository menuGroupRepository;
@@ -31,15 +32,8 @@ class MenuGroupServiceTest {
 	@InjectMocks
 	private MenuGroupService menuGroupService;
 
-	private static Stream<String> menuNameIsEmptyAndNull() {
-		return Stream.of(
-			null,
-			""
-		);
-	}
-
-	@MethodSource("menuNameIsEmptyAndNull")
 	@ParameterizedTest
+	@NullAndEmptySource
 	@DisplayName("메뉴를 분류하는 그룹에는 이름이 꼭 필요합니다.")
 	void createMenuGroupButNameless(String name) {
 		//given
