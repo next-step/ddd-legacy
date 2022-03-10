@@ -19,13 +19,9 @@ public class PositiveNumber {
     }
 
     private void isPositive() {
-        if (number < 0) {
+        if (number < MINIMUM_NUMBER) {
             throw new InvalidArgumentException(InvalidArgumentExceptionMessage.NEGATIVE_NUMBER_EXCEPTION.getMessage());
         }
-    }
-
-    public static int getMinimumNumber() {
-        return MINIMUM_NUMBER;
     }
 
     public static PositiveNumber getZero() {
@@ -37,7 +33,7 @@ public class PositiveNumber {
     }
 
     public PositiveNumber add(final PositiveNumber positiveNumber) {
-        return new PositiveNumber(number + positiveNumber.number);
+        return from(number + positiveNumber.number);
     }
 
     public int getNumber() {

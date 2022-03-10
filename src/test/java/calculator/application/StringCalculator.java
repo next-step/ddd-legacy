@@ -14,7 +14,8 @@ public class StringCalculator {
     public int add(final String text) {
 
         if (isNullOrEmpty(text)) {
-            return PositiveNumber.getMinimumNumber();
+            return PositiveNumber.getZero()
+                                 .getNumber();
         }
 
         String[] filteredNumberInText = delimiterSeparate(text);
@@ -26,10 +27,7 @@ public class StringCalculator {
     }
 
     private boolean isNullOrEmpty(final String text) {
-        if (Objects.isNull(text)) {
-            return true;
-        }
-        if (text.isEmpty()) {
+        if (Objects.isNull(text) || text.isEmpty()) {
             return true;
         }
         return false;
