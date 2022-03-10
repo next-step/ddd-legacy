@@ -1,8 +1,9 @@
 package kitchenpos.domain;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class OrderTableTest {
 
@@ -11,11 +12,14 @@ class OrderTableTest {
 	void changeNumberOfGuests() {
 		// given
 		OrderTable orderTable = new OrderTable();
+		orderTable.setNumberOfGuests(0);
+
+		int changedNumberOfGuests = 2;
 
 		// when
-		orderTable.set;
+		orderTable.setNumberOfGuests(changedNumberOfGuests);
 
 		// then
-		Assertions.assertThat(result).;
+		assertThat(orderTable.getNumberOfGuests()).isEqualTo(changedNumberOfGuests);
 	}
 }
