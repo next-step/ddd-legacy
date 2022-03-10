@@ -7,6 +7,6 @@ import java.util.UUID;
 
 @Component
 public class KitchenridersClient {
-	public void requestDelivery(final UUID orderId, final BigDecimal amount, final String deliveryAddress) {
-	}
+  public void requestDelivery(final UUID orderId, final BigDecimal amount, final String deliveryAddress) {
+  }
 }
