@@ -26,16 +26,16 @@ import static org.mockito.BDDMockito.given;
 class ProductServiceTest {
 
 	@Mock
-	ProductRepository productRepository;
+	private ProductRepository productRepository;
 
 	@Mock
-	MenuRepository menuRepository;
+	private MenuRepository menuRepository;
 
 	@Mock(lenient = true)
-	PurgomalumClient purgomalumClient;
+	private PurgomalumClient purgomalumClient;
 
 	@InjectMocks
-	ProductService productService;
+	private ProductService productService;
 
 	@DisplayName("새로운 상품을 추가한다")
 	@Test

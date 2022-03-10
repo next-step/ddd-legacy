@@ -28,19 +28,19 @@ import static org.mockito.BDDMockito.given;
 class MenuServiceCreateTest {
 
 	@Mock
-	MenuRepository menuRepository;
+	private MenuRepository menuRepository;
 
 	@Mock
-	MenuGroupRepository menuGroupRepository;
+	private MenuGroupRepository menuGroupRepository;
 
 	@Mock
-	ProductRepository productRepository;
+	private ProductRepository productRepository;
 
 	@Mock(lenient = true)
-	PurgomalumClient purgomalumClient;
+	private PurgomalumClient purgomalumClient;
 
 	@InjectMocks
-	MenuService menuService;
+	private MenuService menuService;
 
 	@DisplayName("메뉴를 생성할 수 있다")
 	@Test

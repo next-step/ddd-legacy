@@ -37,19 +37,19 @@ import static org.mockito.Mockito.*;
 class OrderServiceTest {
 
 	@Mock
-	OrderRepository orderRepository;
+	private OrderRepository orderRepository;
 
 	@Mock
-	MenuRepository menuRepository;
+	private MenuRepository menuRepository;
 
 	@Mock
-	OrderTableRepository orderTableRepository;
+	private OrderTableRepository orderTableRepository;
 
 	@Mock
-	KitchenridersClient kitchenridersClient;
+	private KitchenridersClient kitchenridersClient;
 
 	@InjectMocks
-	OrderService orderService;
+	private OrderService orderService;
 
 	@DisplayName("주문을 생성 시 웨이팅 상태로 초기화된다")
 	@Test

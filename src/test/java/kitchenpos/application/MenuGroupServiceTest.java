@@ -22,12 +22,12 @@ import static org.mockito.BDDMockito.given;
 class MenuGroupServiceTest {
 
 	@Mock
-	MenuGroupRepository menuGroupRepository;
+	private MenuGroupRepository menuGroupRepository;
 
 	@InjectMocks
-	MenuGroupService menuGroupService;
+	private MenuGroupService menuGroupService;
 
-	MenuGroup mockResultMenuGroup;
+	private MenuGroup mockResultMenuGroup;
 
 	@DisplayName("메뉴그룹을 생성하여 반환한다")
 	@Test
