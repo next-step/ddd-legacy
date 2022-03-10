@@ -55,7 +55,7 @@ class OrderServiceTest {
 	@Test
 	void create() {
 		// given
-		OrderTable orderTable = aEmptyOrderTable().build();
+		OrderTable orderTable = aNotEmptyOrderTable().build();
 		UUID orderTableId = orderTable.getId();
 
 		OrderLineItem orderLineItemForRequest = aOrderLineItem()
