@@ -116,7 +116,7 @@ class OrderTableServiceTest {
     //given
     OrderTable request = orderTable();
     //when
-    when(request.getNumberOfGuests()).thenReturn(NEGATIVE_NUMBER_OF_GUESTS);
+    request.setNumberOfGuests(NEGATIVE_NUMBER_OF_GUESTS);
 
     //then
     assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(RANDOM_UUID, request))
