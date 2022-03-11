@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 
 import java.util.Map;
 
-public class AcceptanceFixture {
+public class AcceptanceSupport {
 
     public static ExtractableResponse<Response> post(Map<String, Object> params, String endpoint) {
 

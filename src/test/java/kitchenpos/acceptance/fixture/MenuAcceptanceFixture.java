@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static kitchenpos.acceptance.fixture.AcceptanceFixture.get;
-import static kitchenpos.acceptance.fixture.AcceptanceFixture.put;
+import static kitchenpos.acceptance.fixture.AcceptanceSupport.get;
+import static kitchenpos.acceptance.fixture.AcceptanceSupport.put;
 
 public class MenuAcceptanceFixture {
     private static final String ENDPOINT = "/api/menus";
@@ -33,7 +33,7 @@ public class MenuAcceptanceFixture {
         params.put("displayed", true);
         params.put("menuProducts", Arrays.asList(productRequest));
 
-        return AcceptanceFixture.post(params, ENDPOINT);
+        return AcceptanceSupport.post(params, ENDPOINT);
     }
 
     public static ExtractableResponse<Response> findAllMenu() {

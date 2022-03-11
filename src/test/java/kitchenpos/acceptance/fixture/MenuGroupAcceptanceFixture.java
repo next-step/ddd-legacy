@@ -6,7 +6,7 @@ import io.restassured.response.Response;
 import java.util.HashMap;
 import java.util.Map;
 
-import static kitchenpos.acceptance.fixture.AcceptanceFixture.*;
+import static kitchenpos.acceptance.fixture.AcceptanceSupport.*;
 
 public class MenuGroupAcceptanceFixture {
     private static final String ENDPOINT = "/api/menu-groups";

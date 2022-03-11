@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static kitchenpos.acceptance.fixture.AcceptanceFixture.*;
+import static kitchenpos.acceptance.fixture.AcceptanceSupport.*;
 import static kitchenpos.domain.OrderType.*;
 import static kitchenpos.domain.OrderType.EAT_IN;
 import static org.assertj.core.api.Assertions.assertThat;
