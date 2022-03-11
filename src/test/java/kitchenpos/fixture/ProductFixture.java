@@ -7,26 +7,32 @@ import java.util.UUID;
 
 public class ProductFixture {
 
-    public static Product createProduct(String name, BigDecimal price) {
-        Product 상품 = new Product();
-        상품.setPrice(price);
-        상품.setName(name);
-        상품.setId(UUID.randomUUID());
-        return 상품;
-    }
+    public static class ProductBuilder {
+        private UUID id;
+        private String name;
+        private BigDecimal price;
 
-    public static Product createProduct(BigDecimal price) {
-        Product 상품 = new Product();
-        상품.setPrice(price);
-        상품.setId(UUID.randomUUID());
-        return 상품;
-    }
+        public ProductBuilder() {
+            this.id = UUID.randomUUID();
+        }
 
-    public static Product createProduct(String name) {
-        Product 상품 = new Product();
-        상품.setName(name);
-        상품.setId(UUID.randomUUID());
-        return 상품;
+        public ProductBuilder name(String name) {
+            this.name=name;
+            return this;
+        }
+
+        public ProductBuilder price(BigDecimal price) {
+            this.price = price;
+            return this;
+        }
+
+        public Product build() {
+            Product product = new Product();
+            product.setId(this.id);
+            product.setName(this.name);
+            product.setPrice(this.price);
+            return product;
+        }
     }
 
 }
