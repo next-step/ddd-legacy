@@ -42,8 +42,8 @@ public class OrderFixture {
             return this;
         }
 
-        public OrderBuilder deliveryAddress(List<OrderLineItem> orderLineItems) {
-            this.orderLineItems=orderLineItems;
+        public OrderBuilder deliveryAddress(String deliveryAddress) {
+            this.deliveryAddress=deliveryAddress;
             return this;
         }
 
