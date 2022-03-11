@@ -21,7 +21,7 @@ public class ProductSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 가격_수정_요청(ExtractableResponse<Response> createResponse, int price) {
+    public static ExtractableResponse<Response> 상품_가격_수정_요청(ExtractableResponse<Response> createResponse, int price) {
         String id = createResponse.body().jsonPath().getString("id");
         String name = createResponse.body().jsonPath().getString("name");
 
@@ -43,7 +43,7 @@ public class ProductSteps {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
-    public static void 가격_수정_완료(ExtractableResponse<Response> response) {
+    public static void 상품_가격_수정_완료(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
     }
 

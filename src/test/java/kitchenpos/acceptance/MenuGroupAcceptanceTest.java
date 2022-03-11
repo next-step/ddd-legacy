@@ -2,7 +2,6 @@ package kitchenpos.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import kitchenpos.acceptance.step.MenuGroupSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +17,7 @@ class MenuGroupAcceptanceTest extends AcceptanceTest {
         ExtractableResponse<Response> createResponse = 메뉴_그룹_등록_요청(MENU_GROUP_NAME);
         메뉴_그룹_생성_완료(createResponse);
 
-        ExtractableResponse<Response> findResponse = MenuGroupSteps.메뉴_그룹_목록_조회_요청();
+        ExtractableResponse<Response> findResponse = 메뉴_그룹_목록_조회_요청();
         메뉴_그룹_목록_조회_완료(findResponse);
     }
 }

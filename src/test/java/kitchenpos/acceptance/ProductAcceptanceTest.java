@@ -15,11 +15,11 @@ class ProductAcceptanceTest extends AcceptanceTest {
     @DisplayName("상품을 관리한다")
     @Test
     void manageProduct() {
-        ExtractableResponse<Response> createResponse= 상품_생성_요청(PRODUCT_NAME, PRODUCT_PRICE);
+        ExtractableResponse<Response> createResponse = 상품_생성_요청(PRODUCT_NAME, PRODUCT_PRICE);
         상품_생성_완료(createResponse);
 
-        ExtractableResponse<Response> updateResponse = 가격_수정_요청(createResponse, 15000);
-        가격_수정_완료(updateResponse);
+        ExtractableResponse<Response> updateResponse = 상품_가격_수정_요청(createResponse, 15000);
+        상품_가격_수정_완료(updateResponse);
 
         ExtractableResponse<Response> findResponse = 상품_목록_조회_요청();
         상품_목록_조회_완료(findResponse);
