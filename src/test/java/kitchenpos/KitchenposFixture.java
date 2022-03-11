@@ -9,7 +9,6 @@ import java.util.UUID;
 
 public class KitchenposFixture {
   private static final String MENU_NAME = "menu name";
-  private static final String MENU_GROUP_NAME = "menu group name";
   private static final BigDecimal MENU_PRICE = BigDecimal.valueOf(10000);
   private static final long QUANTITY = 1L;
   private static final String PRODUCT_NAME = "product name";

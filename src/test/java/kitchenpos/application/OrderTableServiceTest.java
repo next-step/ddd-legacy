@@ -1,10 +1,8 @@
 package kitchenpos.application;
 
-import kitchenpos.KitchenposFixture;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +21,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
-  private static final String TABLE_NAME = "table name";
   private static final UUID RANDOM_UUID = UUID.randomUUID();
   private static final Integer POSITIVE_NUMBER_OF_GUESTS = 10;
   private static final Integer NEGATIVE_NUMBER_OF_GUESTS = -10;
