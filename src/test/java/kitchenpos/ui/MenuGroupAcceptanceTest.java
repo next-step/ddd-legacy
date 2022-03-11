@@ -1,8 +1,8 @@
-package kitchenpos.acceptance;
+package kitchenpos.ui;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import kitchenpos.acceptance.fixture.MenuGroupAcceptanceFixture;
+import kitchenpos.ui.fixture.MenuGroupAcceptanceFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

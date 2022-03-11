@@ -1,4 +1,4 @@
-package kitchenpos.acceptance.fixture;
+package kitchenpos.ui.fixture;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;

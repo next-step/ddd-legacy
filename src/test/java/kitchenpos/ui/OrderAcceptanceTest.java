@@ -1,9 +1,9 @@
-package kitchenpos.acceptance;
+package kitchenpos.ui;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import kitchenpos.acceptance.fixture.MenuAcceptanceFixture;
-import kitchenpos.acceptance.fixture.OrderTableAcceptanceFixture;
+import kitchenpos.ui.fixture.MenuAcceptanceFixture;
+import kitchenpos.ui.fixture.OrderTableAcceptanceFixture;
 import kitchenpos.domain.OrderType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static kitchenpos.acceptance.fixture.AcceptanceSupport.*;
+import static kitchenpos.ui.fixture.AcceptanceSupport.*;
 import static kitchenpos.domain.OrderType.*;
 import static kitchenpos.domain.OrderType.EAT_IN;
 import static org.assertj.core.api.Assertions.assertThat;

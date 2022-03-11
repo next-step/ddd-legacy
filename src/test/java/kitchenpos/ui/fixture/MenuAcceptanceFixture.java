@@ -1,4 +1,4 @@
-package kitchenpos.acceptance.fixture;
+package kitchenpos.ui.fixture;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static kitchenpos.acceptance.fixture.AcceptanceSupport.get;
-import static kitchenpos.acceptance.fixture.AcceptanceSupport.put;
+import static kitchenpos.ui.fixture.AcceptanceSupport.get;
+import static kitchenpos.ui.fixture.AcceptanceSupport.put;
 
 public class MenuAcceptanceFixture {
     private static final String ENDPOINT = "/api/menus";

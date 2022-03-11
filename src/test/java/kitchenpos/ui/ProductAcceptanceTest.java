@@ -1,11 +1,11 @@
-package kitchenpos.acceptance;
+package kitchenpos.ui;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static kitchenpos.acceptance.fixture.ProductAcceptanceFixture.*;
+import static kitchenpos.ui.fixture.ProductAcceptanceFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.HttpStatus.CREATED;
 import static org.springframework.http.HttpStatus.OK;
