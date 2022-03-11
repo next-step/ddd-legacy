@@ -1,4 +1,4 @@
-package kitchenpos.application.fixture;
+package kitchenpos.unit.fixture;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kitchenpos.application.fixture.ProductFixture.*;
+import static kitchenpos.unit.fixture.ProductFixture.*;
 
 public class MenuFixture {
     public static final MenuGroup 탕수육_세트;

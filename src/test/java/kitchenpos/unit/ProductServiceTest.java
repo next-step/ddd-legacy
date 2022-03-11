@@ -1,10 +1,13 @@
-package kitchenpos.application;
+package kitchenpos.unit;
 
+import kitchenpos.application.ProductService;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.unit.fixture.MenuFixture;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,8 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static kitchenpos.application.fixture.MenuFixture.*;
-import static kitchenpos.application.fixture.ProductFixture.*;
+import static kitchenpos.unit.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -79,9 +81,9 @@ class ProductServiceTest {
         // given
         BigDecimal changePrice = 탕수육.getPrice().add(BigDecimal.valueOf(1000));
         List<Menu> menus = new ArrayList<>();
-        menus.add(한그릇_세트);
-        menus.add(두그릇_세트);
-        menus.add(세그릇_세트);
+        menus.add(MenuFixture.한그릇_세트);
+        menus.add(MenuFixture.두그릇_세트);
+        menus.add(MenuFixture.세그릇_세트);
 
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(탕수육));
         when(menuRepository.findAllByProductId(PRODUCT_ID)).thenReturn(menus);
@@ -111,9 +113,9 @@ class ProductServiceTest {
     void changePriceWhenBiggerMenuPrice() {
         // given
         List<Menu> menus = new ArrayList<>();
-        menus.add(한그릇_세트);
-        menus.add(두그릇_세트);
-        menus.add(세그릇_세트);
+        menus.add(MenuFixture.한그릇_세트);
+        menus.add(MenuFixture.두그릇_세트);
+        menus.add(MenuFixture.세그릇_세트);
 
         when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(탕수육));
         when(menuRepository.findAllByProductId(PRODUCT_ID)).thenReturn(menus);
@@ -123,8 +125,8 @@ class ProductServiceTest {
         productService.changePrice(PRODUCT_ID, 탕수육);
 
         // then
-        assertThat(한그릇_세트.isDisplayed()).isFalse();
-        assertThat(두그릇_세트.isDisplayed()).isFalse();
-        assertThat(세그릇_세트.isDisplayed()).isFalse();
+        Assertions.assertThat(MenuFixture.한그릇_세트.isDisplayed()).isFalse();
+        Assertions.assertThat(MenuFixture.두그릇_세트.isDisplayed()).isFalse();
+        Assertions.assertThat(MenuFixture.세그릇_세트.isDisplayed()).isFalse();
     }
 }
