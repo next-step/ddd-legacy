@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class KitchenposFixture {
+  public static final UUID UUID = java.util.UUID.randomUUID();
   private static final String MENU_NAME = "menu name";
   private static final long QUANTITY = 1L;
   private static final String PRODUCT_NAME = "product name";
@@ -16,14 +17,14 @@ public class KitchenposFixture {
 
   public static MenuGroup menuGroup() {
     MenuGroup menuGroup = new MenuGroup();
-    menuGroup.setId(UUID.randomUUID());
+    menuGroup.setId(UUID);
     menuGroup.setName("menu group name");
     return menuGroup;
   }
 
   public static OrderTable orderTable() {
     OrderTable orderTable = new OrderTable();
-    orderTable.setId(UUID.randomUUID());
+    orderTable.setId(java.util.UUID.randomUUID().randomUUID());
     orderTable.setName("order table name");
     orderTable.setEmpty(false);
     return orderTable;
@@ -31,7 +32,7 @@ public class KitchenposFixture {
 
   public static Menu menu() {
     Menu menu = new Menu();
-    menu.setId(UUID.randomUUID());
+    menu.setId(java.util.UUID.randomUUID().randomUUID());
     menu.setName(MENU_NAME);
     menu.setPrice(PRICE);
     menu.setDisplayed(true);
@@ -57,7 +58,7 @@ public class KitchenposFixture {
 
   public static Product product() {
     Product product = new Product();
-    product.setId(UUID.randomUUID());
+    product.setId(java.util.UUID.randomUUID().randomUUID());
     product.setName(PRODUCT_NAME);
     product.setPrice(PRICE);
     return product;
@@ -65,7 +66,7 @@ public class KitchenposFixture {
 
   public static Order order() {
     Order order = new Order();
-    order.setId(UUID.randomUUID());
+    order.setId(java.util.UUID.randomUUID().randomUUID());
 
     OrderTable orderTable = orderTable();
     order.setOrderTable(orderTable);

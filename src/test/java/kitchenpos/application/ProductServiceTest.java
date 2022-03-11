@@ -14,7 +14,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import static kitchenpos.KitchenposFixture.*;
@@ -28,8 +27,7 @@ class ProductServiceTest {
   private static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(10000L);
   private static final BigDecimal CHANGE_PRICE = BigDecimal.valueOf(20000L);
   private static final String PRODUCT_NAME = "product name";
-  public static final UUID RANDOM_UUID = UUID.randomUUID();
-  public static final long POSITIVE_NUM = 1L;
+  private static final long POSITIVE_NUM = 1L;
   private static final long NEGATIVE_NUM = -1L;
   private static final long ZERO = 0L;
 
@@ -97,7 +95,7 @@ class ProductServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      Product product = productService.changePrice(RANDOM_UUID, request);
+      Product product = productService.changePrice(UUID, request);
     });
   }
 
@@ -112,7 +110,7 @@ class ProductServiceTest {
 
     //then
     assertThatThrownBy(() -> {
-      productService.changePrice(RANDOM_UUID, request);
+      productService.changePrice(UUID, request);
     }).isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -135,7 +133,7 @@ class ProductServiceTest {
     when(menuRepository.findAllByProductId(any())).thenReturn(Collections.singletonList(menu));
 
     //then
-    productService.changePrice(RANDOM_UUID, request);
+    productService.changePrice(UUID, request);
     assertThat(menu.isDisplayed()).isFalse();
 
   }

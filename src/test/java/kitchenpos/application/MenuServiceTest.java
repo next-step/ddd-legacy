@@ -28,7 +28,6 @@ class MenuServiceTest {
 
   private static final long POSITIVE_NUM = 1L;
   private static final Long NEGATIVE_NUM = -1L;
-  private static final UUID RANDOM_UUID = UUID.randomUUID();
 
   @Mock
   MenuRepository menuRepository;
@@ -174,7 +173,7 @@ class MenuServiceTest {
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu()));
 
     //then
-    Menu changePriceMenu = menuService.changePrice(RANDOM_UUID, request);
+    Menu changePriceMenu = menuService.changePrice(UUID, request);
     assertThat(changePriceMenu.getPrice()).isEqualTo(changePrice);
   }
 
@@ -190,7 +189,7 @@ class MenuServiceTest {
     request.setPrice(price);
 
     //then
-    assertThatThrownBy(() -> menuService.changePrice(RANDOM_UUID, request))
+    assertThatThrownBy(() -> menuService.changePrice(UUID, request))
             .isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -211,7 +210,7 @@ class MenuServiceTest {
     });
 
     //then
-    assertThatThrownBy(() -> menuService.changePrice(RANDOM_UUID, request))
+    assertThatThrownBy(() -> menuService.changePrice(UUID, request))
             .isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -225,7 +224,7 @@ class MenuServiceTest {
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
     //then
-    menuService.display(RANDOM_UUID);
+    menuService.display(UUID);
     assertThat(menu.isDisplayed()).isTrue();
   }
 
@@ -245,7 +244,7 @@ class MenuServiceTest {
     });
 
     //then
-    assertThatThrownBy(() -> menuService.display(RANDOM_UUID))
+    assertThatThrownBy(() -> menuService.display(UUID))
             .isInstanceOf(IllegalStateException.class);
   }
 
@@ -259,7 +258,7 @@ class MenuServiceTest {
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
     //then
-    menuService.hide(RANDOM_UUID);
+    menuService.hide(UUID);
     assertThat(menu.isDisplayed()).isFalse();
   }
 

@@ -28,7 +28,7 @@ class OrderServiceTest {
 
   private static final Long NEGATIVE_NUM = -1L;
   private static final BigDecimal PRICE_ZERO = BigDecimal.ZERO;
-  public static final UUID RANDOM_UUID = UUID.randomUUID();
+  private static final UUID RANDOM_UUID = UUID.randomUUID();
 
   @Mock
   private OrderRepository orderRepository;

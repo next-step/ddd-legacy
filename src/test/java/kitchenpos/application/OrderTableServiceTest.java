@@ -21,7 +21,6 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
-  private static final UUID RANDOM_UUID = UUID.randomUUID();
   private static final Integer POSITIVE_NUMBER_OF_GUESTS = 10;
   private static final Integer NEGATIVE_NUMBER_OF_GUESTS = -10;
 
@@ -58,7 +57,7 @@ class OrderTableServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      orderTableService.sit(RANDOM_UUID);
+      orderTableService.sit(UUID);
     });
   }
 
@@ -73,7 +72,7 @@ class OrderTableServiceTest {
     when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(false);
 
     //then
-    orderTableService.clear(RANDOM_UUID);
+    orderTableService.clear(UUID);
     assertAll(() -> {
       assertThat(orderTable.isEmpty()).isEqualTo(true);
       assertThat(orderTable.getNumberOfGuests()).isZero();
@@ -91,7 +90,7 @@ class OrderTableServiceTest {
     when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(true);
 
     //then
-    assertThatThrownBy(() -> orderTableService.clear(RANDOM_UUID))
+    assertThatThrownBy(() -> orderTableService.clear(UUID))
             .isInstanceOf(IllegalStateException.class);
   }
 
@@ -106,7 +105,7 @@ class OrderTableServiceTest {
     request.setNumberOfGuests(POSITIVE_NUMBER_OF_GUESTS);
     //then
     assertDoesNotThrow(() -> {
-      orderTableService.changeNumberOfGuests(RANDOM_UUID, request);
+      orderTableService.changeNumberOfGuests(UUID, request);
     });
   }
 
@@ -119,7 +118,7 @@ class OrderTableServiceTest {
     request.setNumberOfGuests(NEGATIVE_NUMBER_OF_GUESTS);
 
     //then
-    assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(RANDOM_UUID, request))
+    assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID, request))
             .isInstanceOf(IllegalArgumentException.class);
   }
 
