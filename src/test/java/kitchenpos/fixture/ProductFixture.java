@@ -34,5 +34,4 @@ public class ProductFixture {
             return product;
         }
     }
-
 }
