@@ -244,7 +244,7 @@ class OrderServiceTest {
     order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
     //then
-    assertDoesNotThrow(()->{
+    assertDoesNotThrow(() -> {
       orderService.serve(RANDOM_UUID);
     });
   }
@@ -274,7 +274,7 @@ class OrderServiceTest {
     order.setStatus(OrderStatus.SERVED);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
-    assertDoesNotThrow(()->{
+    assertDoesNotThrow(() -> {
       orderService.startDelivery(RANDOM_UUID);
     });
   }
@@ -318,7 +318,7 @@ class OrderServiceTest {
     order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
-    assertDoesNotThrow(()->{
+    assertDoesNotThrow(() -> {
       orderService.completeDelivery(RANDOM_UUID);
     });
   }
@@ -350,7 +350,7 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     //then
-    assertDoesNotThrow(()->{
+    assertDoesNotThrow(() -> {
       orderService.complete(RANDOM_UUID);
     });
   }
@@ -385,7 +385,7 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     //then
-    assertDoesNotThrow(()->{
+    assertDoesNotThrow(() -> {
       orderService.complete(RANDOM_UUID);
     });
   }
@@ -421,7 +421,7 @@ class OrderServiceTest {
     when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(false);
 
     //then
-    assertDoesNotThrow(()->{
+    assertDoesNotThrow(() -> {
       orderService.complete(RANDOM_UUID);
     });
   }

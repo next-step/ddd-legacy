@@ -276,6 +276,4 @@ class MenuServiceTest {
     menuService.findAll();
     verify(menuRepository).findAll();
   }
-
-
 }

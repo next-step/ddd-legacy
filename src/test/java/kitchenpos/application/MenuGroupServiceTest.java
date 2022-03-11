@@ -50,7 +50,7 @@ class MenuGroupServiceTest {
 
     when(menuGroupRepository.save(any())).thenReturn(menuGroup);
 
-    assertDoesNotThrow(()->{
+    assertDoesNotThrow(() -> {
       MenuGroup createMenuGroup = menuGroupService.create(menuGroup);
     });
   }
@@ -72,5 +72,4 @@ class MenuGroupServiceTest {
     assertThat(findMenuGroupList.size()).isEqualTo(menuGroupList.size());
     assertThat(menuGroupList).isSameAs(findMenuGroupList);
   }
-
 }
