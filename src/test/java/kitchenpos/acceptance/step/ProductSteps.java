@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ProductSteps {
     private static final String ENDPOINT = "/api/products";
 
-    public static ExtractableResponse<Response> 상품_등록_요청(String name, int price) {
+    public static ExtractableResponse<Response> 상품_생성_요청(String name, int price) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(createParams(name, price))
@@ -39,7 +39,7 @@ public class ProductSteps {
                 .then().log().all().extract();
     }
 
-    public static void 상품_등록_완료(ExtractableResponse<Response> response) {
+    public static void 상품_생성_완료(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
 
