@@ -21,7 +21,7 @@ public class MenuProductFixture {
             return this;
         }
 
-        public MenuProductBuilder productBuilder(Product product) {
+        public MenuProductBuilder product(Product product) {
             this.product=product;
             return this;
         }
