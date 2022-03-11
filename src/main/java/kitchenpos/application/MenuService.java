@@ -98,7 +98,7 @@ public class MenuService {
               .multiply(BigDecimal.valueOf(menuProduct.getQuantity())));
     }
     if (price.compareTo(sum) > 0) {
-      throw new IllegalArgumentException();
+        throw new IllegalArgumentException();
     }
     menu.setPrice(price);
     return menu;
