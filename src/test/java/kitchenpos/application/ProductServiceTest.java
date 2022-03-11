@@ -17,133 +17,137 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static kitchenpos.KitchenposFixture.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
-	private static final BigDecimal MENU_PRICE = BigDecimal.valueOf(10000L);
-	private static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(10000L);
-	private static final BigDecimal CHANGE_PRICE = BigDecimal.valueOf(20000L);
-	private static final String PRODUCT_NAME = "product name";
-	public static final UUID RANDOM_UUID = UUID.randomUUID();
-	public static final long POSITIVE_NUM = 1L;
-	private static final long NEGATIVE_NUM = -1L;
-	private static final long ZERO = 0L;
+  private static final BigDecimal MENU_PRICE = BigDecimal.valueOf(10000L);
+  private static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(10000L);
+  private static final BigDecimal CHANGE_PRICE = BigDecimal.valueOf(20000L);
+  private static final String PRODUCT_NAME = "product name";
+  public static final UUID RANDOM_UUID = UUID.randomUUID();
+  public static final long POSITIVE_NUM = 1L;
+  private static final long NEGATIVE_NUM = -1L;
+  private static final long ZERO = 0L;
 
-	@Mock
-	private ProductRepository productRepository;
+  @Mock
+  private ProductRepository productRepository;
 
-	@Mock
-	private MenuRepository menuRepository;
+  @Mock
+  private MenuRepository menuRepository;
 
-	@Mock
-	private PurgomalumClient purgomalumClient;
+  @Mock
+  private PurgomalumClient purgomalumClient;
 
-	@InjectMocks
-	private ProductService productService;
+  @InjectMocks
+  private ProductService productService;
 
-	private static Stream<BigDecimal> menuPriceNullAndMinus() {
-		return Stream.of(
-			BigDecimal.valueOf(NEGATIVE_NUM),
-			null
-		);
-	}
+  private static Stream<BigDecimal> menuPriceNullAndMinus() {
+    return Stream.of(
+            BigDecimal.valueOf(NEGATIVE_NUM),
+            null
+    );
+  }
 
-	@Test
-	@DisplayName("상품을 생성합니다.")
-	void createProduct() {
-		//given
-		Product request = mock(Product.class);
-		when(request.getPrice()).thenReturn(PRODUCT_PRICE);
-		when(request.getName()).thenReturn(PRODUCT_NAME);
+  @Test
+  @DisplayName("상품을 생성합니다.")
+  void createProduct() {
+    //given
+    Product request = product();
 
-		//then
-		productService.create(request);
-		verify(productRepository).save(any());
-	}
+    //then
+    assertDoesNotThrow(() -> {
+      productService.create(request);
+    });
+  }
 
-	@ParameterizedTest
-	@MethodSource("menuPriceNullAndMinus")
-	@DisplayName("상품의 가격은 0원 이상입니다.")
-	void checkProducePrice1(BigDecimal price) {
-		//given
-		Product request = mock(Product.class);
-		when(request.getPrice()).thenReturn(price);
+  @ParameterizedTest
+  @MethodSource("menuPriceNullAndMinus")
+  @DisplayName("상품을 생성할 때, 상품 가격이 음수이면 IllegalArgumentException 예외 발생")
+  void checkProducePrice1(BigDecimal price) {
+    //given
+    Product request = product();
+    request.setPrice(price);
 
-		//then
-		assertThatThrownBy(() -> {
-			productService.create(request);
-		}).isInstanceOf(IllegalArgumentException.class);
-	}
+    //then
+    assertThatThrownBy(() -> {
+      productService.create(request);
+    }).isInstanceOf(IllegalArgumentException.class);
+  }
 
-	@Test
-	void changeProductPrice() {
-		//given
-		Product request = mock(Product.class);
-		Menu menu = mock(Menu.class);
-		MenuProduct menuProduct = mock(MenuProduct.class);
+  @Test
+  @DisplayName("상품을 가격을 변경합니다.")
+  void changeProductPrice() {
+    //given
+    Product request = product();
+    Menu menu = menu();
 
-		when(request.getPrice()).thenReturn(CHANGE_PRICE);
-		when(menu.getMenuProducts()).thenReturn(Collections.singletonList(menuProduct));
-		when(menu.getPrice()).thenReturn(MENU_PRICE);
-		when(menuProduct.getProduct()).thenReturn(mock(Product.class));
-		when(menuProduct.getProduct().getPrice()).thenReturn(PRODUCT_PRICE);
-		when(menuProduct.getQuantity()).thenReturn(POSITIVE_NUM);
-		when(productRepository.findById(any())).thenReturn(Optional.of(mock(Product.class)));
-		when(menuRepository.findAllByProductId(any())).thenReturn(Collections.singletonList(menu));
+    request.setPrice(CHANGE_PRICE);
+    menu.setPrice(MENU_PRICE);
 
-		//then
-		Product product = productService.changePrice(RANDOM_UUID, request);
-	}
+    menu.getMenuProducts().forEach(menuProduct -> {
+      menuProduct.getProduct().setPrice(PRODUCT_PRICE);
+      menuProduct.setQuantity(POSITIVE_NUM);
+    });
+    when(productRepository.findById(any())).thenReturn(Optional.of(mock(Product.class)));
+    when(menuRepository.findAllByProductId(any())).thenReturn(Collections.singletonList(menu));
+
+    //then
+    assertDoesNotThrow(() -> {
+      Product product = productService.changePrice(RANDOM_UUID, request);
+    });
+  }
 
 
-	@ParameterizedTest
-	@MethodSource("menuPriceNullAndMinus")
-	@DisplayName("상품의 가격은 0원 이상입니다.")
-	void checkProducePrice2(BigDecimal price) {
-		//given
-		Product request = mock(Product.class);
-		when(request.getPrice()).thenReturn(price);
+  @ParameterizedTest
+  @MethodSource("menuPriceNullAndMinus")
+  @DisplayName("상품 가격을 변경할 때, 상품의 가격이 음수이면, IllegalArgumentException 예외가 발생")
+  void checkProducePrice2(BigDecimal price) {
+    //given
+    Product request = product();
+    request.setPrice(price);
 
-		//then
-		assertThatThrownBy(() -> {
-			productService.changePrice(RANDOM_UUID, request);
-		}).isInstanceOf(IllegalArgumentException.class);
-	}
+    //then
+    assertThatThrownBy(() -> {
+      productService.changePrice(RANDOM_UUID, request);
+    }).isInstanceOf(IllegalArgumentException.class);
+  }
 
-	@Test
-	@DisplayName("메뉴의 가격이 메뉴에 올라간 상품의 가격의 합보다 크면 메뉴가 숨김 처리가 됩니다.")
-	void checkMenuChange() {
-		//given
-		Product request = mock(Product.class);
-		Menu menu = mock(Menu.class);
-		MenuProduct menuProduct = mock(MenuProduct.class);
+  @Test
+  @DisplayName("메뉴의 가격이 메뉴에 올라간 상품의 가격의 합보다 크면 메뉴가 숨김 처리가 됩니다.")
+  void checkMenuChange() {
+    //given
+    Product request = product();
+    Menu menu = menu();
 
-		when(request.getPrice()).thenReturn(PRODUCT_PRICE);
-		when(menu.getMenuProducts()).thenReturn(Collections.singletonList(menuProduct));
-		when(menu.getPrice()).thenReturn(MENU_PRICE);
-		//when
-		when(menuProduct.getProduct()).thenReturn(mock(Product.class));
-		when(menuProduct.getProduct().getPrice()).thenReturn(CHANGE_PRICE);
-		when(menuProduct.getQuantity()).thenReturn(ZERO);
+    request.setPrice(PRODUCT_PRICE);
+    menu.setPrice(MENU_PRICE);
+    //when
+    menu.setDisplayed(true);
+    menu.getMenuProducts().forEach(menuProduct -> {
+      menuProduct.getProduct().setPrice(CHANGE_PRICE);
+      menuProduct.setQuantity(ZERO);
+    });
+    when(productRepository.findById(any())).thenReturn(Optional.of(mock(Product.class)));
+    when(menuRepository.findAllByProductId(any())).thenReturn(Collections.singletonList(menu));
 
-		when(productRepository.findById(any())).thenReturn(Optional.of(mock(Product.class)));
-		when(menuRepository.findAllByProductId(any())).thenReturn(Collections.singletonList(menu));
+    //then
+    productService.changePrice(RANDOM_UUID, request);
+    assertThat(menu.isDisplayed()).isFalse();
 
-		//then
-		productService.changePrice(RANDOM_UUID, request);
-		verify(menu).setDisplayed(false);
-	}
+  }
 
-	@Test
-	@DisplayName("상품의 모든 정보를 가져옵니다.")
-	void findAll() {
-		//given
-		when(productRepository.findAll()).thenReturn(Collections.singletonList(mock(Product.class)));
+  @Test
+  @DisplayName("상품의 모든 정보를 가져옵니다.")
+  void findAll() {
+    //given
+    when(productRepository.findAll()).thenReturn(Collections.singletonList(product()));
 
-		//then
-		productService.findAll();
-		verify(productRepository).findAll();
-	}
+    //then
+    productService.findAll();
+    verify(productRepository).findAll();
+  }
 }
