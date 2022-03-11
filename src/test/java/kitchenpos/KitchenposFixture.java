@@ -9,10 +9,10 @@ import java.util.UUID;
 
 public class KitchenposFixture {
   private static final String MENU_NAME = "menu name";
-  private static final BigDecimal MENU_PRICE = BigDecimal.valueOf(10000);
   private static final long QUANTITY = 1L;
   private static final String PRODUCT_NAME = "product name";
-  private static final BigDecimal PRODUCT_PRICE = BigDecimal.valueOf(10000);
+  private static final BigDecimal PRICE = BigDecimal.valueOf(10000L);
+  private static final String ADDRESS = "Address";
 
   public static MenuGroup menuGroup() {
     MenuGroup menuGroup = new MenuGroup();
@@ -33,7 +33,7 @@ public class KitchenposFixture {
     Menu menu = new Menu();
     menu.setId(UUID.randomUUID());
     menu.setName(MENU_NAME);
-    menu.setPrice(MENU_PRICE);
+    menu.setPrice(PRICE);
     menu.setDisplayed(true);
 
     List<MenuProduct> menuProductList = Collections.singletonList(menuProduct());
@@ -59,9 +59,34 @@ public class KitchenposFixture {
     Product product = new Product();
     product.setId(UUID.randomUUID());
     product.setName(PRODUCT_NAME);
-    product.setPrice(PRODUCT_PRICE);
+    product.setPrice(PRICE);
     return product;
   }
 
+  public static Order order() {
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+
+    OrderTable orderTable = orderTable();
+    order.setOrderTable(orderTable);
+    order.setOrderTableId(orderTable.getId());
+    order.setDeliveryAddress(ADDRESS);
+
+    List<OrderLineItem> orderLineItemList = Collections.singletonList(orderLineItem());
+    order.setOrderLineItems(orderLineItemList);
+
+    return order;
+  }
+
+  public static OrderLineItem orderLineItem() {
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setPrice(PRICE);
+    orderLineItem.setQuantity(QUANTITY);
+
+    Menu menu = menu();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setMenu(menu);
+    return orderLineItem;
+  }
 
 }

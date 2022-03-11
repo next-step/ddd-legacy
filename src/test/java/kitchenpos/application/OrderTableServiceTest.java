@@ -101,9 +101,9 @@ class OrderTableServiceTest {
     //given
     OrderTable request = orderTable();
     OrderTable orderTable = mock(OrderTable.class);
-    when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
     //when
-    when(request.getNumberOfGuests()).thenReturn(POSITIVE_NUMBER_OF_GUESTS);
+    when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+    request.setNumberOfGuests(POSITIVE_NUMBER_OF_GUESTS);
     //then
     assertDoesNotThrow(() -> {
       orderTableService.changeNumberOfGuests(RANDOM_UUID, request);

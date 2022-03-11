@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,10 +26,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
-  private static final Long ZERO = 0L;
   private static final Long NEGATIVE_NUM = -1L;
-  private static final Long POSITIVE_NUM = 1L;
-  private static final BigDecimal PRICE = BigDecimal.valueOf(10000L);
   private static final BigDecimal PRICE_ZERO = BigDecimal.ZERO;
   public static final UUID RANDOM_UUID = UUID.randomUUID();
 
