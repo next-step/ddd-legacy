@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static kitchenpos.fixture.OrderTableFixture.OrderTableBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -48,12 +50,10 @@ class OrderTableServiceTest {
     @Test
     void create_success() throws Exception {
         //given
-        OrderTable 등록할_주문테이블 = mock(OrderTable.class);
-
-        given(등록할_주문테이블.getName()).willReturn("1번");
+        OrderTable 등록할주문테이블 = new OrderTableBuilder().name("1번").build();
 
         //when
-        orderTableService.create(등록할_주문테이블);
+        orderTableService.create(등록할주문테이블);
 
         //then
         verify(orderTableRepository, times(1)).save(any(OrderTable.class));
@@ -64,12 +64,10 @@ class OrderTableServiceTest {
     @MethodSource("잘못된_주문테이블명")
     void create_fail_invalid_name(final String 주문테이블명) {
         //given
-        OrderTable 등록할_주문테이블 = mock(OrderTable.class);
-
-        given(등록할_주문테이블.getName()).willReturn(주문테이블명);
+        OrderTable 등록할주문테이블 = new OrderTableBuilder().name(주문테이블명).build();
 
         //when, then
-        assertThatThrownBy(() -> orderTableService.create(등록할_주문테이블))
+        assertThatThrownBy(() -> orderTableService.create(등록할주문테이블))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -77,15 +75,15 @@ class OrderTableServiceTest {
     @Test
     void sit_success() throws Exception {
         //given
-        OrderTable 주문테이블 = mock(OrderTable.class);
+        OrderTable 주문테이블 = new OrderTableBuilder().build();
 
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
+        given(orderTableRepository.findById(주문테이블.getId())).willReturn(Optional.of(주문테이블));
 
         //when
-        orderTableService.sit(UUID.randomUUID());
+        orderTableService.sit(주문테이블.getId());
 
         //then
-        verify(주문테이블, times(1)).setEmpty(false);
+        assertThat(주문테이블.isEmpty()).isFalse();
     }
 
     @DisplayName(value = "존재하는 테이블만 착석으로 변경할 수 있다")
@@ -103,24 +101,22 @@ class OrderTableServiceTest {
     @Test
     void clear_success() throws Exception {
         //given
-        OrderTable 주문테이블 = mock(OrderTable.class);
+        OrderTable 주문테이블 = new OrderTableBuilder().build();
 
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
+        given(orderTableRepository.findById(주문테이블.getId())).willReturn(Optional.of(주문테이블));
 
         //when
-        orderTableService.clear(UUID.randomUUID());
+        orderTableService.clear(주문테이블.getId());
 
         //then
-        verify(주문테이블, times(1)).setNumberOfGuests(0);
-        verify(주문테이블, times(1)).setEmpty(true);
+        assertThat(주문테이블.isEmpty()).isTrue();
+        assertThat(주문테이블.getNumberOfGuests()).isZero();
     }
 
     @DisplayName(value = "존재하는 테이블만 공석으로 변경할 수 있다")
     @Test
     void clear_fail_table_not_exists() throws Exception {
         //given
-        OrderTable 주문테이블 = mock(OrderTable.class);
-
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
         //when, then
@@ -132,13 +128,13 @@ class OrderTableServiceTest {
     @Test
     void clear_fail_no_complete() throws Exception {
         //given
-        OrderTable 주문테이블 = mock(OrderTable.class);
+        OrderTable 주문테이블 = new OrderTableBuilder().build();
 
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
+        given(orderTableRepository.findById(주문테이블.getId())).willReturn(Optional.of(주문테이블));
         given(orderRepository.existsByOrderTableAndStatusNot(주문테이블, OrderStatus.COMPLETED)).willReturn(true);
 
         //when, then
-        assertThatThrownBy(() -> orderTableService.clear(UUID.randomUUID()))
+        assertThatThrownBy(() -> orderTableService.clear(주문테이블.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -146,30 +142,25 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests_success() throws Exception {
         //given
-        OrderTable 착석인원_변경요청 = mock(OrderTable.class);
-        OrderTable 변경할_주문테이블 = mock(OrderTable.class);
+        OrderTable 착석인원변경요청 = new OrderTableBuilder().numberOfGuests(3).build();
+        OrderTable 변경할주문테이블 = new OrderTableBuilder().empty(false).build();
 
-        int 변경_착석인원 = 3;
-
-        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
-        given(변경할_주문테이블.isEmpty()).willReturn(false);
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(변경할_주문테이블));
+        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(변경할주문테이블));
 
         //when
-        orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원_변경요청);
+        orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원변경요청);
 
         //then
-        verify(변경할_주문테이블, times(1)).setNumberOfGuests(변경_착석인원);
+        assertThat(변경할주문테이블.getNumberOfGuests()).isEqualTo(3);
+        assertThat(변경할주문테이블.isEmpty()).isFalse();
     }
 
     @DisplayName(value = "착석인원은 최소 0명 이상이어야 한다")
     @ParameterizedTest
     @MethodSource("잘못된_착석인원")
-    void changeNumberOfGuests_fail_invalid_numberOfGuests(final int 변경_착석인원) throws Exception {
+    void changeNumberOfGuests_fail_invalid_numberOfGuests(final int 변경착석인원) throws Exception {
         //given
-        OrderTable 착석인원_변경요청 = mock(OrderTable.class);
-
-        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
+        OrderTable 착석인원_변경요청 = new OrderTableBuilder().numberOfGuests(변경착석인원).build();
 
         //when, then
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원_변경요청))
@@ -180,15 +171,12 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests_fail_table_not_exist() throws Exception {
         //given
-        OrderTable 착석인원_변경요청 = mock(OrderTable.class);
+        OrderTable 착석인원변경요청 = new OrderTableBuilder().numberOfGuests(3).build();
 
-        int 변경_착석인원 = 3;
-
-        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
         given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
 
         //when, then
-        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원_변경요청))
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원변경요청))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -196,17 +184,13 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuest_fail_table_not_empty() throws Exception {
         //given
-        OrderTable 착석인원_변경요청 = mock(OrderTable.class);
-        OrderTable 변경할_주문테이블 = mock(OrderTable.class);
+        OrderTable 착석인원변경요청 = new OrderTableBuilder().numberOfGuests(3).build();
+        OrderTable 변경할주문테이블 = new OrderTableBuilder().empty(true).build();
 
-        int 변경_착석인원 = 3;
-
-        given(착석인원_변경요청.getNumberOfGuests()).willReturn(변경_착석인원);
-        given(변경할_주문테이블.isEmpty()).willReturn(true);
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(변경할_주문테이블));
+        given(orderTableRepository.findById(변경할주문테이블.getId())).willReturn(Optional.of(변경할주문테이블));
 
         //when,then
-        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원_변경요청))
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(변경할주문테이블.getId(), 착석인원변경요청))
                 .isInstanceOf(IllegalStateException.class);
     }
 
