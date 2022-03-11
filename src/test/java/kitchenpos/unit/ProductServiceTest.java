@@ -110,7 +110,7 @@ class ProductServiceTest {
 
     @DisplayName("메뉴의 가격이 상품 목록 가격의 합보다 크면 메뉴를 비공개로 변경한다")
     @Test
-    void changePriceWhenBiggerMenuPrice() {
+    void changePriceBiggerThanProductsAmount() {
         // given
         List<Menu> menus = new ArrayList<>();
         menus.add(MenuFixture.한그릇_세트);
