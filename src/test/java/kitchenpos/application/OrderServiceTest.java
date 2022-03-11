@@ -1,0 +1,584 @@
+package kitchenpos.application;
+
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.OrderType;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
+import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.util.MenuFactory;
+import kitchenpos.util.MenuGroupFactory;
+import kitchenpos.util.OrderFactory;
+import kitchenpos.util.OrderTableFactory;
+import kitchenpos.util.ProductFactory;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+
+@ExtendWith(MockitoExtension.class)
+@DataJpaTest
+@Transactional
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+class OrderServiceTest {
+    @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
+    private MenuRepository menuRepository;
+    @Autowired
+    private OrderTableRepository orderTableRepository;
+    @Autowired
+    private MenuGroupRepository menuGroupRepository;
+    @Mock
+    private KitchenridersClient kitchenridersClient;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    private OrderService orderService;
+
+    @BeforeEach
+    void setUp() {
+        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
+
+        MenuGroup request = MenuGroupFactory.createMenuGroup(UUID.randomUUID(), "test group");
+        menuGroupRepository.save(request);
+    }
+
+    @DisplayName("식당에서 식사 주문을 생성할 수 있다.")
+    @Test
+    void create_order_eat_in() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(OrderFactory.createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final OrderTable orderTable = saveOrderTable("table1", 3, false);
+        final Order request = OrderFactory.createOrder(null, OrderType.EAT_IN, orderLineItems, orderTable.getId(), null);
+
+        final Order actual = orderService.create(request);
+
+        assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getOrderDateTime()).isNotNull(),
+                () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(actual.getType()).isEqualTo(OrderType.EAT_IN),
+                () -> assertThat(actual.getOrderTable()).isNotNull()
+        );
+    }
+
+    @DisplayName("배달 주문을 생성할 수 있다.")
+    @Test
+    void create_order_delivery() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(OrderFactory.createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final String givenAddress = "test address";
+        final Order request = OrderFactory.createOrder(null, OrderType.DELIVERY, orderLineItems, null, givenAddress);
+
+        final Order actual = orderService.create(request);
+
+        assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getOrderDateTime()).isNotNull(),
+                () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(actual.getType()).isEqualTo(OrderType.DELIVERY),
+                () -> assertThat(actual.getDeliveryAddress()).isEqualTo(givenAddress),
+                () -> assertThat(actual.getOrderTable()).isNull()
+        );
+    }
+
+    @DisplayName("테이크 아웃 주문을 생성할 수 있다.")
+    @Test
+    void create_order_takeout() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(OrderFactory.createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final Order request = OrderFactory.createOrder(null, OrderType.TAKEOUT, orderLineItems, null, null);
+
+        final Order actual = orderService.create(request);
+
+        assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getOrderDateTime()).isNotNull(),
+                () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(actual.getType()).isEqualTo(OrderType.TAKEOUT),
+                () -> assertThat(actual.getOrderTable()).isNull()
+        );
+    }
+
+    @DisplayName("주문 생성시 주문 형태가 존재해야한다.")
+    @Test
+    void create_with_no_orderType() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(OrderFactory.createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final OrderType orderType = null;
+        final Order request = OrderFactory.createOrder(null, orderType, orderLineItems, null, null);
+
+        assertThatCode(
+                () -> orderService.create(request)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("주문 생성시 주문 라인 아이템이 비어있으면 안된다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void create_with_no_orderLineItems(List<OrderLineItem> orderLineItems) {
+        final Order request = OrderFactory.createOrder(null, OrderType.EAT_IN, orderLineItems, null, null);
+
+        assertThatCode(
+                () -> orderService.create(request)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("주문 생성시 주문 라인 아이템 갯수와 존재하는 메뉴의 갯수가 동일해야한다.")
+    @Test
+    void create_with_different_menu_size_and_order_line_size() {
+        final Menu givenMenu1 = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final Menu givenMenu2 = MenuFactory.createMenu(UUID.randomUUID(), BigDecimal.valueOf(1000), "menu2", false, findAnyMenuGroup(), Collections.emptyList());
+        final List<OrderLineItem> orderLineItems = Arrays.asList(
+                OrderFactory.createOrderLineItem(givenMenu1, 1, BigDecimal.valueOf(1000)),
+                OrderFactory.createOrderLineItem(givenMenu2, 1, BigDecimal.valueOf(1000)));
+        final Order request = OrderFactory.createOrder(null, OrderType.EAT_IN, orderLineItems, null, null);
+
+        assertThatCode(
+                () -> orderService.create(request)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("주문 생성시 식당내 식사가 아닐때는 주문 라인 아이템의 수량은 0보다 커야한다.")
+    @ParameterizedTest
+    @CsvSource({"DELIVERY, -1", "DELIVERY, -10", "TAKEOUT,-10", "TAKEOUT,-5"})
+    void create_with_negative_quantity_negative_when_not_eat_in(OrderType orderType, int quantity) {
+        final Menu givenMenu1 = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Arrays.asList(
+                OrderFactory.createOrderLineItem(givenMenu1, quantity, BigDecimal.valueOf(1000)));
+        final Order request = OrderFactory.createOrder(null, orderType, orderLineItems, null, null);
+
+        assertThatCode(
+                () -> orderService.create(request)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("주문 생성시 메뉴의 전시 상태가 활성화 되어야한다.")
+    @Test
+    void create_with_not_display_menu() {
+        final Menu givenMenu1 = createSavedMenu("test1", 1000, 1000, "menu1", false);
+        final List<OrderLineItem> orderLineItems = Arrays.asList(
+                OrderFactory.createOrderLineItem(givenMenu1, 1, BigDecimal.valueOf(1000)));
+        final Order request = OrderFactory.createOrder(null, OrderType.DELIVERY, orderLineItems, null, null);
+
+        assertThatCode(
+                () -> orderService.create(request)
+        ).isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문 생성시 메뉴가격은 주문 라인 아이템과 가격이 같아야한다.")
+    @Test
+    void create_with_not_same_menu_price_and_order_line_items_sum() {
+        final Menu givenMenu1 = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Arrays.asList(
+                OrderFactory.createOrderLineItem(givenMenu1, 1, BigDecimal.valueOf(5000)));
+        final Order request = OrderFactory.createOrder(null, OrderType.DELIVERY, orderLineItems, null, null);
+
+        assertThatCode(
+                () -> orderService.create(request)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("주문 형태가 배달이면 배달 주소가 존재해야한다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void create_delivery_with_no_delivery_address(String deliveryAddress) {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(OrderFactory.createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final Order request = OrderFactory.createOrder(null, OrderType.DELIVERY, orderLineItems, null, deliveryAddress);
+
+        assertThatCode(
+                () -> orderService.create(request)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("주문 형태가 식당내 식사일 경우 테이블 정보가 존재해야한다.")
+    @Test
+    void create_eat_in_with_no_order_table() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(OrderFactory.createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final UUID notExistUUID = UUID.fromString("06fe3514-a8a6-48ed-85e6-e7296d0e1000");
+        final Order request = OrderFactory.createOrder(null, OrderType.EAT_IN, orderLineItems, notExistUUID, null);
+
+        assertThatCode(
+                () -> orderService.create(request)
+        ).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("주문 형태가 식당내 식사일 경우 테이블이 비어있으면 주문할 수 없다.")
+    @Test
+    void create_eat_in_with_order_table_empty() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(OrderFactory.createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final OrderTable orderTable = saveOrderTable("table1", 3, true);
+        final String deliveryAddress = "test address";
+        final Order request = OrderFactory.createOrder(null, OrderType.EAT_IN, orderLineItems, orderTable.getId(), deliveryAddress);
+
+        assertThatCode(
+                () -> orderService.create(request)
+        ).isInstanceOf(IllegalStateException.class);
+    }
+
+    @TestFactory
+    Collection<DynamicTest> 승인_상태_변경() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(OrderFactory.createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final OrderTable orderTable = saveOrderTable("table1", 3, false);
+        final Order request = OrderFactory.createOrder(null, OrderType.EAT_IN, orderLineItems, orderTable.getId(), null);
+
+        final Order actual = orderService.create(request);
+        return Arrays.asList(dynamicTest("주문 생성 후 최초상태는 주문대기이다", () -> {
+                    assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
+                }),
+                dynamicTest("승인 상태로 변경할 수 있다.", () -> {
+                    final Order changed = orderService.accept(actual.getId());
+                    assertThat(changed.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+                }));
+    }
+
+    @DisplayName("승인 상태로 변경시 대기에서 변경해야한다.")
+    @Test
+    void accept_from_not_order_wait_status() {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.ACCEPTED);
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.accept(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("승인 상태로 변경시 주문이 존재해야한다.")
+    @Test
+    void accept_from_not_found_order() {
+        final String notFoundUUID = "06fe3514-a8a6-48ed-85e6-e7296d0e1000";
+
+        assertThatCode(() -> orderService.accept(UUID.fromString(notFoundUUID)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("승인 상태로 변경시 주문 타입이 배달이면 키친 라이더 클라이언트에 배달 요청을 한다.")
+    @Test
+    void request_delivery_after_accept() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(OrderFactory.createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final String givenAddress = "address1";
+        final Order request = OrderFactory.createOrder(null, OrderType.DELIVERY, orderLineItems, null, givenAddress);
+        final Order givenOrder = orderService.create(request);
+
+        final Order actual = orderService.accept(givenOrder.getId());
+
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        verify(kitchenridersClient).requestDelivery(eq(givenOrder.getId()), eq(BigDecimal.valueOf(1000)), eq(givenAddress));
+    }
+
+    @DisplayName("조리 상태로 변경할 수 있다.")
+    @Test
+    void serve() {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.ACCEPTED);
+        final Order givenOrder = orderRepository.save(order);
+
+        final Order actual = orderService.serve(givenOrder.getId());
+
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
+
+    @DisplayName("조리 상태로 변경시 승인상태가 아니면 예외를 던진다.")
+    @ParameterizedTest
+    @CsvSource({"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void serve_when_order_status_not_accept(OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setStatus(orderStatus);
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.serve(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("조리 상태로 변경시 주문이 존재해야한다.")
+    @Test
+    void serve_from_not_found_order() {
+        final String notFoundUUID = "06fe3514-a8a6-48ed-85e6-e7296d0e1000";
+
+        assertThatCode(() -> orderService.serve(UUID.fromString(notFoundUUID)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("배달중으로 변경할 수 있다.")
+    @Test
+    void start_delivery() {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.SERVED);
+        final Order givenOrder = orderRepository.save(order);
+
+        final Order actual = orderService.startDelivery(givenOrder.getId());
+
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+    }
+
+    @DisplayName("배달중으로 변경시 주문이 존재해야한다.")
+    @Test
+    void start_delivery_from_not_found_order() {
+        final String notFoundUUID = "06fe3514-a8a6-48ed-85e6-e7296d0e1000";
+
+        assertThatCode(() -> orderService.startDelivery(UUID.fromString(notFoundUUID)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("배달중으로 변경시 주문 형태가 배달이어야  한다.")
+    @ParameterizedTest
+    @CsvSource({"TAKEOUT", "EAT_IN"})
+    void start_delivery_with_not_order_type_delivery(OrderType orderType) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.startDelivery(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("배달중으로 변경시 조리상태가 아니면 예외를 던진다.")
+    @ParameterizedTest
+    @CsvSource({"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void start_delivery_with_not_order_status_served(OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(orderStatus);
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.startDelivery(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("배달 완료로 변경할 수 있다.")
+    @Test
+    void complete_delivery() {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.DELIVERING);
+        final Order givenOrder = orderRepository.save(order);
+
+        final Order actual = orderService.completeDelivery(givenOrder.getId());
+
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+    }
+
+    @DisplayName("배달완료로 변경시 주문이 존재해야한다.")
+    @Test
+    void complete_delivery_from_not_found_order() {
+        final String notFoundUUID = "06fe3514-a8a6-48ed-85e6-e7296d0e1000";
+
+        assertThatCode(() -> orderService.completeDelivery(UUID.fromString(notFoundUUID)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("배달완료로 변경시 기존 주문이 배달중이 아니면.예외를 던진다.")
+    @ParameterizedTest
+    @CsvSource({"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
+    void complete_delivery_with_not_order_status_delivering(OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(orderStatus);
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.completeDelivery(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @MethodSource("paramsForBeforeOrderComplete")
+    @ParameterizedTest(name = "주문완료로 변경시 주문형태가 {0}이면 {1}에서 변경해야한다.")
+    void complete(OrderType orderType, OrderStatus orderStatus) {
+        OrderTable saveOrderTable = saveOrderTable("table1", 3, false);
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setOrderTable(saveOrderTable);
+        order.setOrderDateTime(LocalDateTime.now());
+        final Order givenOrder = orderRepository.save(order);
+
+        final Order actual = orderService.complete(givenOrder.getId());
+
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("주문완료로 변경시 주문형태가 배달이면서 배달완료가 아닐시 예외를 던진다.")
+    @ParameterizedTest
+    @CsvSource({"WAITING", "ACCEPTED", "SERVED", "DELIVERING", "COMPLETED"})
+    void complete_with_type_delivery_and_not_delivered(OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(orderStatus);
+        order.setOrderTable(saveOrderTable("table1", 3, false));
+        order.setOrderDateTime(LocalDateTime.now());
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.complete(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @MethodSource("paramsForNotPassOrderComplete")
+    @ParameterizedTest(name = "주문완료로 변경시 주문형태가 {0}이면 {1}일 경우 예외를 던진다")
+    void complete_with_not_serve(OrderType orderType, OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setOrderTable(saveOrderTable("table1", 3, false));
+        order.setOrderDateTime(LocalDateTime.now());
+        final Order givenOrder = orderRepository.save(order);
+
+        assertThatCode(() -> orderService.complete(givenOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문완료로 변경시 주문이 존재해야한다.")
+    @Test
+    void complete_with_order_not_found() {
+        final String notFoundUUID = "06fe3514-a8a6-48ed-85e6-e7296d0e1000";
+
+        assertThatCode(() -> orderService.complete(UUID.fromString(notFoundUUID)))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("주문완료로 변경시 주문형태가 식당내 식사이고 테이블 정보가 있으면 주문 테이블의 0으로 변경하고 빈 상태로 둔다.")
+    @Test
+    void table_empty_after_complete() {
+        OrderTable table = saveOrderTable("table1", 3, false);
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.EAT_IN);
+        order.setStatus(OrderStatus.SERVED);
+        order.setOrderTable(table);
+        order.setOrderDateTime(LocalDateTime.now());
+        final Order givenOrder = orderRepository.save(order);
+
+        final Order actual = orderService.complete(givenOrder.getId());
+
+        OrderTable orderTableAfterComplete = actual.getOrderTable();
+        assertAll(
+                () -> assertThat(orderTableAfterComplete.getNumberOfGuests()).isEqualTo(0),
+                () -> assertThat(orderTableAfterComplete.isEmpty()).isTrue()
+        );
+    }
+
+    @DisplayName("주문 목록을 조회할 수 있다.")
+    @Test
+    void getAllOrders() {
+        final Menu givenMenu = createSavedMenu("test1", 1000, 1000, "menu1", true);
+        final List<OrderLineItem> orderLineItems = Collections.singletonList(OrderFactory.createOrderLineItem(givenMenu, 1, BigDecimal.valueOf(1000)));
+        final OrderTable orderTable1 = saveOrderTable("table1", 3, false);
+        final OrderTable orderTable2 = saveOrderTable("table2", 3, false);
+        final Order request1 = OrderFactory.createOrder(null, OrderType.EAT_IN, orderLineItems, orderTable1.getId(), null);
+        final Order request2 = OrderFactory.createOrder(null, OrderType.EAT_IN, orderLineItems, orderTable2.getId(), null);
+        final Order order1 = orderService.create(request1);
+        final Order order2 = orderService.create(request2);
+
+        final List<Order> actual = orderService.findAll();
+
+        assertThat(actual).containsAll(Arrays.asList(order1, order2));
+    }
+
+    private static Stream<Arguments> paramsForBeforeOrderComplete() {
+        return Stream.of(
+                Arguments.of(OrderType.DELIVERY, OrderStatus.DELIVERED),
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.SERVED),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.SERVED)
+        );
+    }
+
+    private static Stream<Arguments> paramsForNotPassOrderComplete() {
+        return Stream.of(
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.COMPLETED),
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.DELIVERED),
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.ACCEPTED),
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.DELIVERING),
+                Arguments.of(OrderType.TAKEOUT, OrderStatus.WAITING),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.COMPLETED),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.DELIVERED),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.ACCEPTED),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.DELIVERING),
+                Arguments.of(OrderType.EAT_IN, OrderStatus.WAITING)
+        );
+    }
+
+    private OrderTable saveOrderTable(String name, Integer numberOfGuests, boolean empty) {
+        OrderTable orderTable = OrderTableFactory.createOrderTable(UUID.randomUUID(), name, numberOfGuests, empty);
+        return orderTableRepository.save(orderTable);
+    }
+
+    public Product saveProduct(String name, BigDecimal price) {
+        Product product = ProductFactory.createProduct(UUID.randomUUID(), name, price);
+        return productRepository.save(product);
+    }
+
+    private Menu createSavedMenu(String productName, int productPrice, int menuPrice, String menuName, boolean display) {
+        final Product product = saveProduct(productName, BigDecimal.valueOf(productPrice));
+        final MenuProduct menuProduct = MenuFactory.createMenuProductWithQuantity(product, 1);
+        final Menu givenMenu = saveMenu(MenuFactory.createMenu(UUID.randomUUID(), BigDecimal.valueOf(menuPrice), menuName, display, findAnyMenuGroup(), Collections.singletonList(menuProduct)));
+        return givenMenu;
+    }
+
+    private Menu saveMenu(Menu menu) {
+        return menuRepository.save(menu);
+    }
+
+    private MenuGroup findAnyMenuGroup() {
+        return menuGroupRepository.findAll()
+                .stream()
+                .findAny()
+                .orElseThrow(EntityNotFoundException::new);
+    }
+}
