@@ -76,10 +76,10 @@ class MenuServiceTest {
   @DisplayName("메뉴의 가격이 존재하지 않거나 음수이면 IllegalArgumentException 예외 발생")
   void price(BigDecimal price) {
     //given
-    Menu request = mock(Menu.class);
+    Menu request = menu();
 
     //when
-    when(request.getPrice()).thenReturn(price);
+    request.setPrice(price);
 
     //then
     assertThatThrownBy(() -> menuService.create(request))
@@ -201,7 +201,7 @@ class MenuServiceTest {
   void compareChangePrice() {
     //given
     Menu request = menu();
-    Menu menu = mock(Menu.class);
+    Menu menu = menu();
 
     when(menuRepository.findById(any())).thenReturn(Optional.ofNullable(menu));
 
