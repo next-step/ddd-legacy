@@ -201,6 +201,18 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 전시상태를 전시중으로 변경 할 수 있다.")
+    @Test
+    void display() {
+        menu = menu(menuGroup(), chickenProduct(), pastaProduct());
+        menu.setDisplayed(false);
+        menuRepository.save(menu);
+
+        Menu changedMenu = menuService.display(menu.getId());
+
+        assertThat(changedMenu.isDisplayed()).isTrue();
+    }
+
     private BigDecimal totalMenuProductPrice(List<MenuProduct> menuProducts) {
         BigDecimal totalPrice = BigDecimal.ZERO;
         for (final MenuProduct menuProduct : menuProducts) {
