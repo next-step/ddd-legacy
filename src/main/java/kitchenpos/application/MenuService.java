@@ -91,14 +91,18 @@ public class MenuService {
         }
         final Menu menu = menuRepository.findById(menuId)
             .orElseThrow(NoSuchElementException::new);
+        BigDecimal sum = BigDecimal.ZERO;
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
-            final BigDecimal sum = menuProduct.getProduct()
-                .getPrice()
-                .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
-            if (price.compareTo(sum) > 0) {
-                throw new IllegalArgumentException();
-            }
+            BigDecimal menuProductPrice = menuProduct.getProduct()
+                    .getPrice()
+                    .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
+            sum = sum.add(menuProductPrice);
         }
+
+        if (price.compareTo(sum) > 0) {
+            throw new IllegalArgumentException();
+        }
+
         menu.setPrice(price);
         return menu;
     }
