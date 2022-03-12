@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.application.stub.MenuRepositoryStub;
 import kitchenpos.application.stub.OrderRepositoryStub;
 import kitchenpos.application.stub.OrderTableRepositoryStub;
 import kitchenpos.domain.*;
@@ -11,7 +12,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
@@ -31,7 +31,6 @@ class OrderServiceTest {
     @InjectMocks
     private OrderService orderService;
 
-    @Mock
     private MenuRepository menuRepository;
 
     private OrderRepository orderRepository;
@@ -44,7 +43,19 @@ class OrderServiceTest {
     void setUp() {
         orderRepository = new OrderRepositoryStub();
         orderTableRepository = new OrderTableRepositoryStub();
+        menuRepository = new MenuRepositoryStub();
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, null);
+    }
+
+    @DisplayName("주문을 생성할 수 있다.")
+    @Test
+    void create() {
+        Menu menu = createMenu();
+        order = orderEatIn(menu);
+
+        Order newOrder = orderService.create(order);
+
+        assertThat(newOrder.getId()).isNotNull();
     }
 
     @DisplayName("주문할 메뉴가 없으면 주문을 등록할 수 없다.")
@@ -271,11 +282,6 @@ class OrderServiceTest {
     }
 
     private Menu createMenu() {
-        Product chickenProduct = chickenProduct();
-        Product pastaProduct = pastaProduct();
-
-        MenuGroup menuGroup = menuGroup();
-
-        return menu(menuGroup, chickenProduct, pastaProduct);
+        return menuRepository.save(menu(menuGroup(), chickenProduct(), pastaProduct()));
     }
 }
