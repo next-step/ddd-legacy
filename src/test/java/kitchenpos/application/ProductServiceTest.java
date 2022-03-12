@@ -1,5 +1,10 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.Fixtures.createMenu;
+import static kitchenpos.application.Fixtures.createMenuProduct;
+import static kitchenpos.application.Fixtures.createProduct;
+import static kitchenpos.application.Fixtures.십원_상품;
+import static kitchenpos.application.Fixtures.일원짜리_Product;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -38,53 +43,6 @@ class ProductServiceTest {
         menuRepository,
         purgomalumClient
     );
-
-    private static Product createProduct(BigDecimal price) {
-        return createProduct("좋은말", price);
-    }
-
-    private static Product createProduct(String name, BigDecimal price) {
-        return createProduct(UUID.randomUUID(), name, price);
-    }
-
-    private static Product createProduct(UUID productId, BigDecimal price) {
-        return createProduct(productId, "좋은말", price);
-    }
-
-    private static Product 일원짜리_Product(UUID productId) {
-        return createProduct(productId, "좋은말", BigDecimal.ONE);
-    }
-
-    private static Product createProduct(UUID productId, String name, BigDecimal price) {
-        final Product product = new Product();
-        product.setId(productId);
-        product.setPrice(price);
-        product.setName(name);
-        return product;
-    }
-
-    private static Product 십원_상품(UUID productId) {
-        return createProduct(productId, "십원짜리", BigDecimal.TEN);
-    }
-
-    private static MenuProduct createMenuProduct(Product product) {
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setQuantity(2);
-        menuProduct.setProduct(product);
-        return menuProduct;
-    }
-
-    private static Menu createMenu(BigDecimal price, boolean display, MenuProduct... menuProducts) {
-        final Menu menu = new Menu();
-        menu.setPrice(price);
-        menu.setDisplayed(display);
-        menu.setMenuProducts(
-            Arrays.asList(
-                menuProducts
-            )
-        );
-        return menu;
-    }
 
     @DisplayName("등록할 수 있다.")
     @Nested

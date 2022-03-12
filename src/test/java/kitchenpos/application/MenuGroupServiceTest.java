@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.Fixtures.createMenuGroup;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -7,7 +8,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
-import java.util.UUID;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -51,14 +51,5 @@ class MenuGroupServiceTest {
         }
     }
 
-    private static MenuGroup createMenuGroup(UUID id, String name) {
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(id);
-        menuGroup.setName(name);
-        return menuGroup;
-    }
 
-    private static MenuGroup createMenuGroup(String name) {
-        return createMenuGroup(null, name);
-    }
 }

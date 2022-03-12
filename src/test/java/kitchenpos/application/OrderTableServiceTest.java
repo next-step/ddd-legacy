@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.Fixtures.createOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
@@ -221,30 +222,5 @@ class OrderTableServiceTest {
         }
     }
 
-    private OrderTable createOrderTable(
-        UUID id,
-        String name,
-        int numberOfGuests,
-        boolean empty
-    ) {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(id);
-        orderTable.setName(name);
-        orderTable.setNumberOfGuests(numberOfGuests);
-        orderTable.setEmpty(empty);
-        return orderTable;
-    }
 
-    private OrderTable createOrderTable(
-        String name,
-        int numberOfGuests,
-        boolean empty
-    ) {
-        return createOrderTable(
-            UUID.randomUUID(),
-            name,
-            numberOfGuests,
-            empty
-        );
-    }
 }
