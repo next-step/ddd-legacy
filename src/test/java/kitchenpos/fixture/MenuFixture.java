@@ -17,7 +17,7 @@ public class MenuFixture {
         private String name;
         private BigDecimal price;
         private MenuGroup menuGroup;
-        private Boolean displayed;
+        private boolean displayed;
         private List<MenuProduct> menuProducts;
         private UUID menuGroupId;
 
