@@ -4,10 +4,10 @@ import kitchenpos.domain.MenuGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
+import static kitchenpos.KitchenposFixture.ID;
 
 public class MenuGroupFixture {
-  private static final UUID ID = UUID.randomUUID();
   private static final String MENU_GROUP = "menu group name";
 
   public static MenuGroup 정상_메뉴_그룹() {

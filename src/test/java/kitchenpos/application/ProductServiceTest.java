@@ -95,7 +95,7 @@ class ProductServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      Product product = productService.changePrice(UUID, request);
+      Product product = productService.changePrice(ID, request);
     });
   }
 
@@ -110,7 +110,7 @@ class ProductServiceTest {
 
     //then
     assertThatThrownBy(() -> {
-      productService.changePrice(UUID, request);
+      productService.changePrice(ID, request);
     }).isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -133,7 +133,7 @@ class ProductServiceTest {
     when(menuRepository.findAllByProductId(any())).thenReturn(Collections.singletonList(menu));
 
     //then
-    productService.changePrice(UUID, request);
+    productService.changePrice(ID, request);
     assertThat(menu.isDisplayed()).isFalse();
 
   }

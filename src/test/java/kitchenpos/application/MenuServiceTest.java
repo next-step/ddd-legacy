@@ -173,7 +173,7 @@ class MenuServiceTest {
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu()));
 
     //then
-    Menu changePriceMenu = menuService.changePrice(UUID, request);
+    Menu changePriceMenu = menuService.changePrice(ID, request);
     assertThat(changePriceMenu.getPrice()).isEqualTo(changePrice);
   }
 
@@ -189,7 +189,7 @@ class MenuServiceTest {
     request.setPrice(price);
 
     //then
-    assertThatThrownBy(() -> menuService.changePrice(UUID, request))
+    assertThatThrownBy(() -> menuService.changePrice(ID, request))
             .isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -210,7 +210,7 @@ class MenuServiceTest {
     });
 
     //then
-    assertThatThrownBy(() -> menuService.changePrice(UUID, request))
+    assertThatThrownBy(() -> menuService.changePrice(ID, request))
             .isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -224,7 +224,7 @@ class MenuServiceTest {
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
     //then
-    menuService.display(UUID);
+    menuService.display(ID);
     assertThat(menu.isDisplayed()).isTrue();
   }
 
@@ -244,7 +244,7 @@ class MenuServiceTest {
     });
 
     //then
-    assertThatThrownBy(() -> menuService.display(UUID))
+    assertThatThrownBy(() -> menuService.display(ID))
             .isInstanceOf(IllegalStateException.class);
   }
 
@@ -258,7 +258,7 @@ class MenuServiceTest {
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
     //then
-    menuService.hide(UUID);
+    menuService.hide(ID);
     assertThat(menu.isDisplayed()).isFalse();
   }
 
