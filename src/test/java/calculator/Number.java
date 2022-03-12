@@ -1,7 +1,8 @@
 package calculator;
 
-import com.sun.javafx.css.CalculatedValue;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 /**
  * <pre>
@@ -14,11 +15,16 @@ import org.junit.jupiter.api.Test;
  */
 
 public class Number {
+    public static final Number ZERO = new Number("0");
     private final int value;
 
     public Number(String value) {
         validate(value);
         this.value = Integer.parseInt(value);
+    }
+
+    public Number plus(Number add) {
+        return new Number(String.valueOf(this.value + add.value()));
     }
 
     public int value() {

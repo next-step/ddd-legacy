@@ -37,10 +37,8 @@ public class Numbers {
     }
 
     public int sum() {
-
-        return this.numbers.stream()
-                .map(Number::value)
-                .reduce(0, (sum, number) -> sum + number);
-
+        Number sum = this.numbers.stream()
+                .reduce(Number.ZERO, (total, number) -> total.plus(number));
+        return sum.value();
     }
 }
