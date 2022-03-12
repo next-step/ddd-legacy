@@ -32,14 +32,15 @@ public class Numbers {
 
         return Arrays.asList(split)
                 .stream()
-                .map(Number::of)
+                .map(Number::new)
                 .collect(Collectors.toList());
     }
 
     public int sum() {
 
         return this.numbers.stream()
-                .mapToInt(Number::value)
-                .sum();
+                .map(Number::value)
+                .reduce(0, (sum, number) -> sum + number);
+
     }
 }
