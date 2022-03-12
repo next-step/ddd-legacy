@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @since 2022-03-02 오전 2:46
  */
 
-public class BasicSeparator implements Separator{
+public class BasicSeparator implements Separator {
 
     private static final String COMMA = ",";
     private static final String COLON = ":";
