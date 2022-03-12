@@ -4,7 +4,9 @@ import calculator.Numbers;
 import calculator.separator.CustomSeparator;
 import calculator.separator.Separator;
 
-import static calculator.CalculratorValidation.isCustomSeparator;
+import java.util.regex.Matcher;
+
+import static calculator.separator.CustomSeparator.CUSTOM_PATTERN;
 
 /**
  * <pre>
@@ -16,7 +18,7 @@ import static calculator.CalculratorValidation.isCustomSeparator;
  * @since 2022-03-03 오전 2:48
  */
 
-public class CustomHandler implements CalculatorHandler{
+public class CustomHandler implements CalculatorHandler {
 
     private CalculatorHandler handler;
 
@@ -28,7 +30,7 @@ public class CustomHandler implements CalculatorHandler{
     @Override
     public int calculate(String text) {
 
-        if(isCustomSeparator(text)) {
+        if (isCustomSeparator(text)) {
             return sum(text, new CustomSeparator());
         }
 
@@ -38,5 +40,11 @@ public class CustomHandler implements CalculatorHandler{
     private int sum(String text, Separator separator) {
         Numbers numbers = Numbers.of(separator.division(text));
         return numbers.sum();
+    }
+
+    private boolean isCustomSeparator(final String text) {
+
+        Matcher matcher = CUSTOM_PATTERN.matcher(text);
+        return matcher.find();
     }
 }

@@ -1,6 +1,6 @@
 package calculator.handler;
 
-import calculator.CalculratorValidation;
+import java.util.Objects;
 
 /**
  * <pre>
@@ -24,11 +24,21 @@ public class EmptyHandler implements CalculatorHandler {
 
     @Override
     public int calculate(final String text) {
-
-        if (CalculratorValidation.isNullOrEmpty(text)) {
+        if (isNullOrEmpty(text)) {
             return EMPTY_TEXT_ZERO;
         }
-
         return handler.calculate(text);
+    }
+
+    private boolean isNullOrEmpty(final String text) {
+        return isNull(text) || isEmpty(text);
+    }
+
+    private boolean isNull(final String text) {
+        return Objects.isNull(text);
+    }
+
+    private boolean isEmpty(final String text) {
+        return text.trim().isEmpty();
     }
 }

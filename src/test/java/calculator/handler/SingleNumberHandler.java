@@ -1,8 +1,6 @@
 package calculator.handler;
 
-import calculator.CalculratorValidation;
-
-import static calculator.CalculratorValidation.*;
+import calculator.Number;
 
 /**
  * <pre>
@@ -14,7 +12,7 @@ import static calculator.CalculratorValidation.*;
  * @since 2022-03-03 오전 2:47
  */
 
-public class SingleNumberHandler implements CalculatorHandler{
+public class SingleNumberHandler implements CalculatorHandler {
 
     private CalculatorHandler handler;
 
@@ -24,13 +22,20 @@ public class SingleNumberHandler implements CalculatorHandler{
     }
 
     @Override
-    public int calculate(String text) {
-
-        if(isSingleNumber(text)) {
-            CalculratorValidation.validate(text);
-            return Integer.parseInt(text);
+    public int calculate(final String text) {
+        if (isSingleNumber(text)) {
+            Number number = new Number(text);
+            return number.value();
         }
-
         return handler.calculate(text);
+    }
+
+    private boolean isSingleNumber(final String text) {
+        try {
+            Integer.parseInt(text);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }
