@@ -158,7 +158,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴의 가격이 변경 될 수 있다.")
+    @DisplayName("메뉴의 가격이 변경될 수 있다.")
     @Test
     void changePrice() {
         Menu menu = createMenu();
@@ -201,7 +201,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴의 전시상태를 전시중으로 변경 할 수 있다.")
+    @DisplayName("메뉴의 전시상태를 전시중으로 변경할 수 있다.")
     @Test
     void display() {
         menu = menu(menuGroup(), chickenProduct(), pastaProduct());
@@ -213,7 +213,7 @@ class MenuServiceTest {
         assertThat(changedMenu.isDisplayed()).isTrue();
     }
 
-    @DisplayName("메뉴의 가격이 메뉴의 모든 상품의 가격의 합보다 크면 전시상태를 전시중으로 변경 할 수 없다")
+    @DisplayName("메뉴의 가격이 메뉴의 모든 상품의 가격의 합보다 크면 전시상태를 전시중으로 변경할 수 없다")
     @Test
     void doNotDisplay() {
         menu = menu(menuGroup(), chickenProduct(), pastaProduct());
@@ -223,6 +223,25 @@ class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.display(menu.getId()))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("메뉴의 전시상태를 전시중지로 변경할 수 있다.")
+    @Test
+    void hide() {
+        menu = menu(menuGroup(), chickenProduct(), pastaProduct());
+        menu.setDisplayed(true);
+        menuRepository.save(menu);
+
+        Menu changedMenu = menuService.hide(menu.getId());
+
+        assertThat(changedMenu.isDisplayed()).isFalse();
+    }
+
+    @DisplayName("존재하지 않는 메뉴의 전시상태를 전시중지로 변경할 수 있다.")
+    @Test
+    void NoSuchMenuHide() {
+        assertThatThrownBy(() -> menuService.hide(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     private BigDecimal totalMenuProductPrice(List<MenuProduct> menuProducts) {
