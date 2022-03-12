@@ -76,8 +76,10 @@ public class KitchenposFixture {
     }
 
     public static Order orderEatIn(Menu... menus) {
-        OrderTable orderTable = orderTable();
+        return orderEatIn(orderTable(), menus);
+    }
 
+    public static Order orderEatIn(OrderTable orderTable, Menu... menus) {
         Order order = commonOrder(OrderType.EAT_IN, menus);
         order.setOrderTable(orderTable);
         order.setOrderTableId(orderTable.getId());
