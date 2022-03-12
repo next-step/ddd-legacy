@@ -15,9 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static kitchenpos.fixture.KitchenposFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -173,10 +171,51 @@ class MenuServiceTest {
         assertThat(newPriceMenu.getPrice()).isEqualTo(newPrice);
     }
 
+    @DisplayName("메뉴의 가격이 존재하지 않을 경우 가격을 변경할 수 없다.")
+    @ParameterizedTest
+    @NullSource
+    void nullPrice(BigDecimal price) {
+        menu.setId(UUID.randomUUID());
+        menu.setPrice(price);
+
+        assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu));
+    }
+
+    @DisplayName("메뉴의 가격이 0 보다 작을 경우 메뉴의 가격을 변경할 수 없다.")
+    @Test
+    void negativePrice() {
+        menu.setId(UUID.randomUUID());
+        menu.setPrice(BigDecimal.valueOf(-1));
+
+        assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu));
+    }
+
+    @DisplayName("메뉴의 가격이 메뉴에 있는 모든 상품 가격의 총 합보다 클 경우 가격을 수정할 수 없다.")
+    @Test
+    void overPrice() {
+        menu = createMenu();
+        BigDecimal totalPrice = totalMenuProductPrice(menu.getMenuProducts());
+        menu.setPrice(totalPrice.add(BigDecimal.valueOf(100)));
+
+        assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private BigDecimal totalMenuProductPrice(List<MenuProduct> menuProducts) {
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (final MenuProduct menuProduct : menuProducts) {
+            BigDecimal menuProductPrice = menuProduct.getProduct()
+                    .getPrice()
+                    .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
+            totalPrice = totalPrice.add(menuProductPrice);
+        }
+        return totalPrice;
+    }
+
     private Menu createMenu() {
         Product chicken = saveProduct(chickenProduct());
         Product pasta = saveProduct(pastaProduct());
-        return menu(menuGroup(), chicken, pasta);
+        return menuRepository.save(menu(menuGroup(), chicken, pasta));
     }
 
     private Product saveProduct(Product product) {
