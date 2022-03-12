@@ -213,6 +213,18 @@ class MenuServiceTest {
         assertThat(changedMenu.isDisplayed()).isTrue();
     }
 
+    @DisplayName("메뉴의 가격이 메뉴의 모든 상품의 가격의 합보다 크면 전시상태를 전시중으로 변경 할 수 없다")
+    @Test
+    void doNotDisplay() {
+        menu = menu(menuGroup(), chickenProduct(), pastaProduct());
+        menu.setDisplayed(false);
+        menu.setPrice(BigDecimal.valueOf(100000));
+        menuRepository.save(menu);
+
+        assertThatThrownBy(() -> menuService.display(menu.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
     private BigDecimal totalMenuProductPrice(List<MenuProduct> menuProducts) {
         BigDecimal totalPrice = BigDecimal.ZERO;
         for (final MenuProduct menuProduct : menuProducts) {
