@@ -72,7 +72,6 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    //    - [ ] 주문한 메뉴당 갯수는 1개 이상이여야 한다. -- 테이크 아웃, 배달 주문
     @DisplayName("테이크 아웃 주문일 경우 주문한 메뉴당 수량은 0 미만일 수 없다.")
     @Test
     void negativeQuantityTakeout() {
