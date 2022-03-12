@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import kitchenpos.application.stub.MenuRepositoryStub;
+import kitchenpos.application.stub.ProductRepositoryStub;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,22 +16,25 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static kitchenpos.fixture.KitchenposFixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
     @Mock
     private MenuGroupRepository menuGroupRepository;
-    @Mock
-    private ProductRepository productRepository;
+
     @Mock
     private PurgomalumClient purgomalumClient;
+
+    private ProductRepository productRepository;
+
+    private MenuRepository menuRepository;
 
     private Menu menu;
 
@@ -38,7 +43,24 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
+        menuRepository = new MenuRepositoryStub();
+        productRepository = new ProductRepositoryStub();
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+
         menu = new Menu();
+    }
+
+    @DisplayName("메뉴를 등록할 수 있다.")
+    @Test
+    void create() {
+        Menu request = createMenu();
+
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(request.getMenuGroup()));
+        when(purgomalumClient.containsProfanity(anyString())).thenReturn(false);
+
+        Menu newMenu = menuService.create(request);
+
+        assertThat(newMenu).isNotNull();
     }
 
     @DisplayName("메뉴의 가격이 입력되지 않으면 메뉴를 등록할 수 없다.")
@@ -63,17 +85,12 @@ class MenuServiceTest {
     @DisplayName("메뉴의 가격은 메뉴 상품에 속해 있는 상품들의 총 가격의 합보다 클 수 없다.")
     @Test
     void sumPrice() {
-        MenuGroup menuGroup = menuGroup();
-        Product chicken = chickenProduct();
-        Product pasta = pastaProduct();
-        Menu menu = menu(menuGroup, chicken, pasta);
-        BigDecimal price = chicken.getPrice().add(pasta.getPrice()).add(BigDecimal.valueOf(1000));
+        Menu request = createMenu();
+
+        BigDecimal price = chickenProduct().getPrice().add(pastaProduct().getPrice()).add(BigDecimal.valueOf(1000));
         menu.setPrice(price);
 
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllByIdIn(anyList())).thenReturn(Arrays.asList(chicken, pasta));
-        when(productRepository.findById(chicken.getId())).thenReturn(Optional.of(chicken));
-        when(productRepository.findById(pasta.getId())).thenReturn(Optional.of(pasta));
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(request.getMenuGroup()));
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -83,16 +100,10 @@ class MenuServiceTest {
     @ParameterizedTest
     @NullSource
     void nullName(String name) {
-        MenuGroup menuGroup = menuGroup();
-        Product chicken = chickenProduct();
-        Product pasta = pastaProduct();
-        Menu menu = menu(menuGroup, chicken, pasta);
+        Menu menu = createMenu();
         menu.setName(name);
 
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllByIdIn(anyList())).thenReturn(Arrays.asList(chicken, pasta));
-        when(productRepository.findById(chicken.getId())).thenReturn(Optional.of(chicken));
-        when(productRepository.findById(pasta.getId())).thenReturn(Optional.of(pasta));
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menu.getMenuGroup()));
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -101,15 +112,9 @@ class MenuServiceTest {
     @DisplayName("메뉴 이름에 나쁜말이 포함되어 있으면 메뉴를 등록할 수 없다.")
     @Test
     void badName() {
-        MenuGroup menuGroup = menuGroup();
-        Product chicken = chickenProduct();
-        Product pasta = pastaProduct();
-        Menu menu = menu(menuGroup, chicken, pasta);
+        Menu menu = createMenu();
 
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllByIdIn(anyList())).thenReturn(Arrays.asList(chicken, pasta));
-        when(productRepository.findById(chicken.getId())).thenReturn(Optional.of(chicken));
-        when(productRepository.findById(pasta.getId())).thenReturn(Optional.of(pasta));
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menu.getMenuGroup()));
         when(purgomalumClient.containsProfanity(anyString())).thenReturn(true);
 
         assertThatThrownBy(() -> menuService.create(menu))
@@ -119,14 +124,10 @@ class MenuServiceTest {
     @DisplayName("메뉴 상품이 없으면 메뉴를 등록할 수 없다.")
     @Test
     void noMenuProduct() {
-        MenuGroup menuGroup = menuGroup();
-        Product chicken = chickenProduct();
-        Product pasta = pastaProduct();
-        Menu menu = menu(menuGroup, chicken, pasta);
-
+        Menu menu = createMenu();
         menu.setMenuProducts(new ArrayList<>());
 
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menu.getMenuGroup()));
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -135,11 +136,7 @@ class MenuServiceTest {
     @DisplayName("메뉴 그룹을 입력해 주지 않으면 메뉴로 등록할 수 없다.")
     @Test
     void noMenuGroup() {
-        Product chicken = chickenProduct();
-        Product pasta = pastaProduct();
-        Menu menu = menu(null, chicken, pasta);
-
-        menu.setMenuProducts(new ArrayList<>());
+        Menu menu = createMenu();
 
         when(menuGroupRepository.findById(any())).thenReturn(Optional.empty());
 
@@ -151,16 +148,25 @@ class MenuServiceTest {
     @Test
     void negativeMenuProductQuantity() {
         MenuGroup menuGroup = menuGroup();
-        Product chickenProduct = chickenProduct();
-        Product pastaProduct = pastaProduct();
-        MenuProduct chickenMenuProduct = menuProduct(chickenProduct, -1);
-        MenuProduct pastaMenuProduct = menuProduct(pastaProduct, 1);
+        Product chicken = saveProduct(chickenProduct());
+        Product pasta = saveProduct(pastaProduct());
+        MenuProduct chickenMenuProduct = menuProduct(chicken, -1);
+        MenuProduct pastaMenuProduct = menuProduct(pasta, 1);
         Menu menu = menuWithMenuProduct(menuGroup, chickenMenuProduct, pastaMenuProduct);
 
         when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllByIdIn(anyList())).thenReturn(Arrays.asList(chickenProduct, pastaProduct));
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private Menu createMenu() {
+        Product chicken = saveProduct(chickenProduct());
+        Product pasta = saveProduct(pastaProduct());
+        return menu(menuGroup(), chicken, pasta);
+    }
+
+    private Product saveProduct(Product product) {
+        return productRepository.save(product);
     }
 }
