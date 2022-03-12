@@ -16,6 +16,11 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static kitchenpos.fixture.MenuFixture.MenuBuilder;
+import static kitchenpos.fixture.OrderFixture.OrderBuilder;
+import static kitchenpos.fixture.OrderLineItemFixture.OrderLineItemBuilder;
+import static kitchenpos.fixture.OrderTableFixture.OrderTableBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -52,27 +57,17 @@ class OrderServiceTest {
     @Test
     void create_success() throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
-        OrderLineItem 주문구성메뉴 = mock(OrderLineItem.class);
-        Menu 메뉴 = mock(Menu.class);
-        OrderTable 주문테이블 = mock(OrderTable.class);
+        OrderLineItem 주문구성메뉴 = new OrderLineItemBuilder().price(BigDecimal.valueOf(17000L)).quantity(1L).build();
+        Order 등록할주문 = new OrderBuilder().type(OrderType.EAT_IN).orderLineItems(new ArrayList<>(Arrays.asList(주문구성메뉴))).build();
+        Menu 메뉴 = new MenuBuilder().displayed(true).price(BigDecimal.valueOf(17000L)).build();
+        OrderTable 주문테이블 = new OrderTableBuilder().empty(false).build();
 
-        BigDecimal 주문구성메뉴가격 = BigDecimal.valueOf(17000L);
-        BigDecimal 메뉴가격 = BigDecimal.valueOf(17000L);
-
-        given(등록할_주문.getType()).willReturn(OrderType.EAT_IN);
-        given(등록할_주문.getOrderLineItems()).willReturn(new ArrayList<>(Arrays.asList(주문구성메뉴)));
         given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
-        given(주문구성메뉴.getQuantity()).willReturn(1L);
         given(menuRepository.findById(any())).willReturn(Optional.of(메뉴));
-        given(메뉴.isDisplayed()).willReturn(true);
-        given(메뉴.getPrice()).willReturn(메뉴가격);
-        given(주문구성메뉴.getPrice()).willReturn(주문구성메뉴가격);
         given(orderTableRepository.findById(any())).willReturn(Optional.of(주문테이블));
-        given(주문테이블.isEmpty()).willReturn(false);
 
         //when
-        orderService.create(등록할_주문);
+        orderService.create(등록할주문);
 
         //then
         verify(orderRepository, times(1)).save(any(Order.class));
@@ -82,25 +77,22 @@ class OrderServiceTest {
     @Test
     void create_fail_should_contain_type() throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
+        Order 등록할주문 = new OrderBuilder().build();
 
         //when,then
-        assertThatThrownBy(() -> orderService.create(등록할_주문))
+        assertThatThrownBy(() -> orderService.create(등록할주문))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName(value = "주문은 반드시 하나 이상의 주문구성메뉴를 포함하고 있어야 한다")
     @ParameterizedTest
     @MethodSource("잘못된_주문구성메뉴_리스트")
-    void create_fail_should_contain_orderLineItem(final List<OrderLineItem> 주문구성메뉴_리스트) throws Exception {
+    void create_fail_should_contain_orderLineItem(final List<OrderLineItem> 주문구성메뉴리스트) throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
-
-        given(등록할_주문.getType()).willReturn(OrderType.DELIVERY);
-        given(등록할_주문.getOrderLineItems()).willReturn(주문구성메뉴_리스트);
+        Order 등록할주문 = new OrderBuilder().type(OrderType.DELIVERY).orderLineItems(주문구성메뉴리스트).build();
 
         //when, then
-        assertThatThrownBy(() -> orderService.create(등록할_주문))
+        assertThatThrownBy(() -> orderService.create(등록할주문))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -108,17 +100,13 @@ class OrderServiceTest {
     @Test
     void create_fail_menuList_size_should_same_orderLineItemList_size() throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
-        OrderLineItem 주문구성메뉴 = mock(OrderLineItem.class);
-        Menu 메뉴1 = mock(Menu.class);
-        Menu 메뉴2 = mock(Menu.class);
+        OrderLineItem 주문구성메뉴 = new OrderLineItemBuilder().build();
+        Order 등록할주문 = new OrderBuilder().type(OrderType.DELIVERY).orderLineItems(new ArrayList<>(Arrays.asList(주문구성메뉴))).build();
 
-        given(등록할_주문.getType()).willReturn(OrderType.DELIVERY);
-        given(등록할_주문.getOrderLineItems()).willReturn(new ArrayList<>(Arrays.asList(주문구성메뉴)));
-        given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(메뉴1, 메뉴2)));
+        given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(mock(Menu.class), mock(Menu.class))));
 
         //when, then
-        assertThatThrownBy(() -> orderService.create(등록할_주문))
+        assertThatThrownBy(() -> orderService.create(등록할주문))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -126,17 +114,13 @@ class OrderServiceTest {
     @Test
     void create_fail_orderLineItem_quantity_should_gt_0() throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
-        OrderLineItem 주문구성메뉴 = mock(OrderLineItem.class);
-        Menu 메뉴 = mock(Menu.class);
+        Menu 메뉴 = new MenuBuilder().build();
+        OrderLineItem 주문구성메뉴 = new OrderLineItemBuilder().quantity(-10).menu(메뉴).menuId(메뉴.getId()).build();
+        Order 등록할주문 = new OrderBuilder().type(OrderType.DELIVERY).orderLineItems(new ArrayList<>(Arrays.asList(주문구성메뉴))).build();
 
-        given(등록할_주문.getType()).willReturn(OrderType.DELIVERY);
-        given(등록할_주문.getOrderLineItems()).willReturn(new ArrayList<>(Arrays.asList(주문구성메뉴)));
         given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
-        given(주문구성메뉴.getQuantity()).willReturn(-1L);
-
         //when, then
-        assertThatThrownBy(() -> orderService.create(등록할_주문))
+        assertThatThrownBy(() -> orderService.create(등록할주문))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -144,18 +128,15 @@ class OrderServiceTest {
     @Test
     void create_fail_menu_no_exist() throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
-        OrderLineItem 주문구성메뉴 = mock(OrderLineItem.class);
-        Menu 메뉴 = mock(Menu.class);
+        OrderLineItem 주문구성메뉴 = new OrderLineItemBuilder().quantity(1L).build();
+        Order 등록할주문 = new OrderBuilder().orderLineItems(new ArrayList<>(Arrays.asList(주문구성메뉴))).type(OrderType.DELIVERY).build();
+        Menu 메뉴 = new MenuBuilder().build();
 
-        given(등록할_주문.getType()).willReturn(OrderType.DELIVERY);
-        given(등록할_주문.getOrderLineItems()).willReturn(new ArrayList<>(Arrays.asList(주문구성메뉴)));
         given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
-        given(주문구성메뉴.getQuantity()).willReturn(1L);
-        given(menuRepository.findById(any())).willReturn(Optional.empty());
+        given(menuRepository.findById(주문구성메뉴.getMenuId())).willReturn(Optional.empty());
 
         //when, then
-        assertThatThrownBy(() -> orderService.create(등록할_주문))
+        assertThatThrownBy(() -> orderService.create(등록할주문))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -163,19 +144,15 @@ class OrderServiceTest {
     @Test
     void create_fail_menu_should_display() throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
-        OrderLineItem 주문구성메뉴 = mock(OrderLineItem.class);
-        Menu 메뉴 = mock(Menu.class);
+        OrderLineItem 주문구성메뉴 = new OrderLineItemBuilder().quantity(1L).build();
+        Order 등록할주문 = new OrderBuilder().orderLineItems(new ArrayList<>(Arrays.asList(주문구성메뉴))).type(OrderType.DELIVERY).build();
+        Menu 메뉴 = new MenuBuilder().displayed(false).build();
 
-        given(등록할_주문.getType()).willReturn(OrderType.DELIVERY);
-        given(등록할_주문.getOrderLineItems()).willReturn(new ArrayList<>(Arrays.asList(주문구성메뉴)));
         given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
-        given(주문구성메뉴.getQuantity()).willReturn(1L);
         given(menuRepository.findById(any())).willReturn(Optional.of(메뉴));
-        given(메뉴.isDisplayed()).willReturn(false);
 
         //when, then
-        assertThatThrownBy(() -> orderService.create(등록할_주문))
+        assertThatThrownBy(() -> orderService.create(등록할주문))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -183,24 +160,15 @@ class OrderServiceTest {
     @Test
     void create_fail_menu_price_should_same_orderLineItem_price() throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
-        OrderLineItem 주문구성메뉴 = mock(OrderLineItem.class);
-        Menu 메뉴 = mock(Menu.class);
+        OrderLineItem 주문구성메뉴 = new OrderLineItemBuilder().price(BigDecimal.valueOf(17500L)).quantity(1L).build();
+        Order 등록할주문 = new OrderBuilder().orderLineItems(new ArrayList<>(Arrays.asList(주문구성메뉴))).type(OrderType.DELIVERY).build();
+        Menu 메뉴 = new MenuBuilder().price(BigDecimal.valueOf(17000L)).displayed(true).build();
 
-        BigDecimal 메뉴가격 = BigDecimal.valueOf(17000L);
-        BigDecimal 주문구성메뉴가격 = BigDecimal.valueOf(17500L);
-
-        given(등록할_주문.getType()).willReturn(OrderType.DELIVERY);
-        given(등록할_주문.getOrderLineItems()).willReturn(new ArrayList<>(Arrays.asList(주문구성메뉴)));
         given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
-        given(주문구성메뉴.getQuantity()).willReturn(1L);
         given(menuRepository.findById(any())).willReturn(Optional.of(메뉴));
-        given(메뉴.isDisplayed()).willReturn(true);
-        given(주문구성메뉴.getPrice()).willReturn(주문구성메뉴가격);
-        given(메뉴.getPrice()).willReturn(메뉴가격);
 
         //when, then
-        assertThatThrownBy(() -> orderService.create(등록할_주문))
+        assertThatThrownBy(() -> orderService.create(등록할주문))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -209,25 +177,15 @@ class OrderServiceTest {
     @MethodSource("잘못된_주문주소")
     void create_fail_when_type_delivery_should_contain_delivery_address(final String 주문주소) throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
-        OrderLineItem 주문구성메뉴 = mock(OrderLineItem.class);
-        Menu 메뉴 = mock(Menu.class);
+        OrderLineItem 주문구성메뉴 = new OrderLineItemBuilder().price(BigDecimal.valueOf(17000L)).quantity(1L).build();
+        Order 등록할주문 = new OrderBuilder().deliveryAddress(주문주소).orderLineItems(new ArrayList<>(Arrays.asList(주문구성메뉴))).type(OrderType.DELIVERY).build();
+        Menu 메뉴 = new MenuBuilder().price(BigDecimal.valueOf(17000L)).displayed(true).build();
 
-        BigDecimal 메뉴가격 = BigDecimal.valueOf(17000L);
-        BigDecimal 주문구성메뉴가격 = BigDecimal.valueOf(17000L);
-
-        given(등록할_주문.getType()).willReturn(OrderType.DELIVERY);
-        given(등록할_주문.getOrderLineItems()).willReturn(new ArrayList<>(Arrays.asList(주문구성메뉴)));
         given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
-        given(주문구성메뉴.getQuantity()).willReturn(1L);
         given(menuRepository.findById(any())).willReturn(Optional.of(메뉴));
-        given(메뉴.isDisplayed()).willReturn(true);
-        given(주문구성메뉴.getPrice()).willReturn(주문구성메뉴가격);
-        given(메뉴.getPrice()).willReturn(메뉴가격);
-        given(등록할_주문.getDeliveryAddress()).willReturn(주문주소);
 
         //when, then
-        assertThatThrownBy(() -> orderService.create(등록할_주문))
+        assertThatThrownBy(() -> orderService.create(등록할주문))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -235,53 +193,34 @@ class OrderServiceTest {
     @Test
     void create_fail_when_type_eat_in_should_contain_order_table() throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
-        OrderLineItem 주문구성메뉴 = mock(OrderLineItem.class);
-        Menu 메뉴 = mock(Menu.class);
+        OrderLineItem 주문구성메뉴 = new OrderLineItemBuilder().price(BigDecimal.valueOf(17000L)).quantity(1L).build();
+        Order 등록할주문 = new OrderBuilder().orderLineItems(new ArrayList<>(Arrays.asList(주문구성메뉴))).type(OrderType.EAT_IN).build();
+        Menu 메뉴 = new MenuBuilder().price(BigDecimal.valueOf(17000L)).displayed(true).build();
 
-        BigDecimal 메뉴가격 = BigDecimal.valueOf(17000L);
-        BigDecimal 주문구성메뉴가격 = BigDecimal.valueOf(17000L);
-
-        given(등록할_주문.getType()).willReturn(OrderType.EAT_IN);
-        given(등록할_주문.getOrderLineItems()).willReturn(new ArrayList<>(Arrays.asList(주문구성메뉴)));
         given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
-        given(주문구성메뉴.getQuantity()).willReturn(1L);
         given(menuRepository.findById(any())).willReturn(Optional.of(메뉴));
-        given(메뉴.isDisplayed()).willReturn(true);
-        given(주문구성메뉴.getPrice()).willReturn(주문구성메뉴가격);
-        given(메뉴.getPrice()).willReturn(메뉴가격);
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.empty());
+        given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
         //when, then
-        assertThatThrownBy(() -> orderService.create(등록할_주문))
+        assertThatThrownBy(() -> orderService.create(등록할주문))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
-    @DisplayName(value = "공석이 아닌 주문테이블에 주문을 등록할 수 없다")
+    @DisplayName(value = "공석인 주문테이블에 주문을 등록할 수 없다")
     @Test
     void create_fail_table_should_empty() throws Exception {
         //given
-        Order 등록할_주문 = mock(Order.class);
-        OrderLineItem 주문구성메뉴 = mock(OrderLineItem.class);
-        Menu 메뉴 = mock(Menu.class);
-        OrderTable 주문테이블 = mock(OrderTable.class);
+        OrderLineItem 주문구성메뉴 = new OrderLineItemBuilder().price(BigDecimal.valueOf(17000L)).quantity(1L).build();
+        Menu 메뉴 = new MenuBuilder().price(BigDecimal.valueOf(17000L)).displayed(true).build();
+        OrderTable 주문테이블 = new OrderTableBuilder().empty(true).build();
+        Order 등록할주문 = new OrderBuilder().orderTable(주문테이블).orderTableId(주문테이블.getId()).orderLineItems(new ArrayList<>(Arrays.asList(주문구성메뉴))).type(OrderType.EAT_IN).build();
 
-        BigDecimal 메뉴가격 = BigDecimal.valueOf(17000L);
-        BigDecimal 주문구성메뉴가격 = BigDecimal.valueOf(17000L);
-
-        given(등록할_주문.getType()).willReturn(OrderType.EAT_IN);
-        given(등록할_주문.getOrderLineItems()).willReturn(new ArrayList<>(Arrays.asList(주문구성메뉴)));
         given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
-        given(주문구성메뉴.getQuantity()).willReturn(1L);
-        given(주문테이블.isEmpty()).willReturn(true);
         given(menuRepository.findById(any())).willReturn(Optional.of(메뉴));
-        given(메뉴.isDisplayed()).willReturn(true);
-        given(주문구성메뉴.getPrice()).willReturn(주문구성메뉴가격);
-        given(메뉴.getPrice()).willReturn(메뉴가격);
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(주문테이블));
+        given(orderTableRepository.findById(주문테이블.getId())).willReturn(Optional.of(주문테이블));
 
         //when, then
-        assertThatThrownBy(() -> orderService.create(등록할_주문))
+        assertThatThrownBy(() -> orderService.create(등록할주문))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -290,17 +229,16 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING"})
     void accept_success(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).build();
 
         given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getStatus()).willReturn(주문상태);
 
         //when
         orderService.accept(UUID.randomUUID());
 
         //then
         verify(배달요청, times(0)).requestDelivery(any(), any(), any());
-        verify(주문, times(1)).setStatus(OrderStatus.ACCEPTED);
+        assertThat(주문.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
     @DisplayName(value = "주문수락으로 변경 후 주문형태가 배달인 경우 배달 라이더를 요청한다")
@@ -308,18 +246,18 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING"})
     void accept_success_call_rider(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Menu 메뉴 = new MenuBuilder().price(BigDecimal.valueOf(17000L)).displayed(true).build();
+        OrderLineItem 주문구성메뉴 = new OrderLineItemBuilder().price(BigDecimal.valueOf(17000L)).menu(메뉴).quantity(1L).build();
+        Order 주문 = new OrderBuilder().status(주문상태).orderLineItems(new ArrayList<>(Arrays.asList(주문구성메뉴))).type(OrderType.DELIVERY).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getType()).willReturn(OrderType.DELIVERY);
-        given(주문.getStatus()).willReturn(주문상태);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.accept(UUID.randomUUID());
+        orderService.accept(주문.getId());
 
         //then
         verify(배달요청, times(1)).requestDelivery(any(), any(), any());
-        verify(주문, times(1)).setStatus(OrderStatus.ACCEPTED);
+        assertThat(주문.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
     @DisplayName(value = "존재하는 주문만 주문수락으로 변경할 수 있다")
@@ -338,13 +276,12 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void accept_status_should_waiting(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).type(OrderType.DELIVERY).build();
 
         given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getStatus()).willReturn(주문상태);
 
         //when, then
-        assertThatThrownBy(() -> orderService.accept(UUID.randomUUID()))
+        assertThatThrownBy(() -> orderService.accept(주문.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -353,16 +290,15 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"ACCEPTED"})
     void serve_success(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getStatus()).willReturn(주문상태);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.serve(UUID.randomUUID());
+        orderService.serve(주문.getId());
 
         //then
-        verify(주문, times(1)).setStatus(OrderStatus.SERVED);
+        assertThat(주문.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
     @DisplayName(value = "존재하는 주문만 서빙완료로 변경할 수 있다")
@@ -381,13 +317,12 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void serve_status_should_accept(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getStatus()).willReturn(주문상태);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when, then
-        assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
+        assertThatThrownBy(() -> orderService.serve(주문.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -396,17 +331,15 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"SERVED"})
     void startDelivery_success(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).type(OrderType.DELIVERY).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getType()).willReturn(OrderType.DELIVERY);
-        given(주문.getStatus()).willReturn(주문상태);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.startDelivery(UUID.randomUUID());
+        orderService.startDelivery(주문.getId());
 
         //then
-        verify(주문, times(1)).setStatus(OrderStatus.DELIVERING);
+        assertThat(주문.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     }
 
     @DisplayName(value = "존재하는 주문만 서빙완료로 변경할 수 있다")
@@ -425,14 +358,12 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void startDelivery_status_should_serve(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).type(OrderType.DELIVERY).build();
 
         given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getType()).willReturn(OrderType.DELIVERY);
-        given(주문.getStatus()).willReturn(주문상태);
 
         //when, then
-        assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+        assertThatThrownBy(() -> orderService.startDelivery(주문.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -440,13 +371,12 @@ class OrderServiceTest {
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
     void startDelivery_type_should_delivery(final OrderType 주문형태) throws Exception {
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().type(주문형태).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getType()).willReturn(주문형태);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when, then
-        assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+        assertThatThrownBy(() -> orderService.startDelivery(주문.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -455,16 +385,15 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"DELIVERING"})
     void completeDelivery_success(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).type(OrderType.DELIVERY).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getStatus()).willReturn(주문상태);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.completeDelivery(UUID.randomUUID());
+        orderService.completeDelivery(주문.getId());
 
         //then
-        verify(주문, times(1)).setStatus(OrderStatus.DELIVERED);
+        assertThat(주문.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
     @DisplayName(value = "존재하는 주문만 배달완료로 변경할 수 있다")
@@ -483,13 +412,12 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
     void completeDelivery_status_should_startDelivery(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getStatus()).willReturn(주문상태);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when, then
-        assertThatThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()))
+        assertThatThrownBy(() -> orderService.completeDelivery(주문.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -498,17 +426,15 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"DELIVERED"})
     void complete_success_delivery(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).type(OrderType.DELIVERY).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getStatus()).willReturn(주문상태);
-        given(주문.getType()).willReturn(OrderType.DELIVERY);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.complete(UUID.randomUUID());
+        orderService.complete(주문.getId());
 
         //then
-        verify(주문, times(1)).setStatus(OrderStatus.COMPLETED);
+        assertThat(주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName(value = "주문상태를 주문종결로 변경할 수 있다 - 매장식사")
@@ -516,22 +442,19 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"SERVED"})
     void complete_success_eat_in(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
-        OrderTable 주문테이블 = mock(OrderTable.class);
+        OrderTable 주문테이블 = new OrderTableBuilder().build();
+        Order 주문 = new OrderBuilder().status(주문상태).orderTable(주문테이블).type(OrderType.EAT_IN).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getStatus()).willReturn(주문상태);
-        given(주문.getType()).willReturn(OrderType.EAT_IN);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
         given(orderRepository.existsByOrderTableAndStatusNot(주문테이블, OrderStatus.COMPLETED)).willReturn(false);
-        given(주문.getOrderTable()).willReturn(주문테이블);
 
         //when
-        orderService.complete(UUID.randomUUID());
+        orderService.complete(주문.getId());
 
         //then
-        verify(주문테이블, times(1)).setNumberOfGuests(0);
-        verify(주문테이블, times(1)).setEmpty(true);
-        verify(주문, times(1)).setStatus(OrderStatus.COMPLETED);
+        assertThat(주문테이블.getNumberOfGuests()).isZero();
+        assertThat(주문테이블.isEmpty()).isTrue();
+        assertThat(주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName(value = "주문상태를 주문종결로 변경할 수 있다 - 테이크아웃")
@@ -539,17 +462,15 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"SERVED"})
     void complete_success_take_out(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).type(OrderType.TAKEOUT).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getStatus()).willReturn(주문상태);
-        given(주문.getType()).willReturn(OrderType.TAKEOUT);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.complete(UUID.randomUUID());
+        orderService.complete(주문.getId());
 
         //then
-        verify(주문, times(1)).setStatus(OrderStatus.COMPLETED);
+        assertThat(주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName(value = "주문형태가 배달인 경우, 주문상태가 배달완료인 경우만 주문종결로 변경한다")
@@ -557,14 +478,12 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERING", "COMPLETED"})
     void complete_when_type_delivery_status_should_delivering(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문 = mock(Order.class);
+        Order 주문 = new OrderBuilder().status(주문상태).type(OrderType.DELIVERY).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
-        given(주문.getType()).willReturn(OrderType.DELIVERY);
-        given(주문.getStatus()).willReturn(주문상태);
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when, then
-        assertThatThrownBy(() -> orderService.complete(UUID.randomUUID()))
+        assertThatThrownBy(() -> orderService.complete(주문.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -573,23 +492,16 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void complete_when_type_eat_in_or_take_out_status_should_serve(final OrderStatus 주문상태) throws Exception {
         //given
-        Order 주문1 = mock(Order.class);
-        Order 주문2 = mock(Order.class);
+        Order 주문1 = new OrderBuilder().status(주문상태).type(OrderType.TAKEOUT).build();
+        Order 주문2 = new OrderBuilder().status(주문상태).type(OrderType.EAT_IN).build();
 
-        UUID 주문1_ID = UUID.randomUUID();
-        UUID 주문2_ID = UUID.randomUUID();
-
-        given(orderRepository.findById(주문1_ID)).willReturn(Optional.of(주문1));
-        given(주문1.getType()).willReturn(OrderType.TAKEOUT);
-        given(주문1.getStatus()).willReturn(주문상태);
-        given(orderRepository.findById(주문2_ID)).willReturn(Optional.of(주문2));
-        given(주문2.getType()).willReturn(OrderType.EAT_IN);
-        given(주문2.getStatus()).willReturn(주문상태);
+        given(orderRepository.findById(주문1.getId())).willReturn(Optional.of(주문1));
+        given(orderRepository.findById(주문2.getId())).willReturn(Optional.of(주문2));
 
         //when, then
-        assertThatThrownBy(() -> orderService.complete(주문1_ID))
+        assertThatThrownBy(() -> orderService.complete(주문1.getId()))
                 .isInstanceOf(IllegalStateException.class);
-        assertThatThrownBy(() -> orderService.complete(주문2_ID))
+        assertThatThrownBy(() -> orderService.complete(주문2.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
