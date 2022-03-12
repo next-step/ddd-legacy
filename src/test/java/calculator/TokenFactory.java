@@ -1,12 +1,12 @@
 package calculator;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.springframework.lang.Nullable;
 
 final class TokenFactory {
@@ -16,11 +16,7 @@ final class TokenFactory {
     private static final String DEFAULT_DELIMITERS;
 
     static {
-        final List<Delimiter> defaultDelimiters = new ArrayList<>();
-        defaultDelimiters.add(Delimiter.COMMA);
-        defaultDelimiters.add(Delimiter.COLON);
-
-        DEFAULT_DELIMITERS = defaultDelimiters.stream()
+        DEFAULT_DELIMITERS = Stream.of(Delimiter.COMMA, Delimiter.COLON)
             .map(Delimiter::getValue)
             .collect(Collectors.joining("|"));
     }
