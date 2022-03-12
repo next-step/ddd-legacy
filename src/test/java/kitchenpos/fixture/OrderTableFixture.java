@@ -7,7 +7,7 @@ import java.util.UUID;
 public class OrderTableFixture {
 
     public static class OrderTableBuilder {
-        private UUID id;
+        private final UUID id;
         private String name;
         private int numberOfGuests;
         private boolean empty;
@@ -17,17 +17,17 @@ public class OrderTableFixture {
         }
 
         public OrderTableBuilder name(String name) {
-            this.name=name;
+            this.name = name;
             return this;
         }
 
         public OrderTableBuilder numberOfGuests(int numberOfGuests) {
-            this.numberOfGuests=numberOfGuests;
+            this.numberOfGuests = numberOfGuests;
             return this;
         }
 
         public OrderTableBuilder empty(boolean empty) {
-            this.empty=empty;
+            this.empty = empty;
             return this;
         }
 

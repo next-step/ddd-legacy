@@ -49,7 +49,7 @@ class MenuGroupServiceTest {
     @MethodSource("잘못된_메뉴그룹명")
     void create_fail_invalid_name(final String 메뉴그룹명) throws Exception {
         //given
-        MenuGroup 등록할메뉴그룹 = new MenuGroupBuilder().name(메뉴그룹명).build();;
+        MenuGroup 등록할메뉴그룹 = new MenuGroupBuilder().name(메뉴그룹명).build();
 
         //when, then
         assertThatThrownBy(() -> menuGroupService.create(등록할메뉴그룹))

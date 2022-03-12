@@ -9,7 +9,7 @@ import java.util.UUID;
 public class OrderFixture {
 
     public static class OrderBuilder {
-        private UUID id;
+        private final UUID id;
         private OrderType type;
         private OrderStatus status;
         private LocalDateTime orderDateTime;
@@ -23,12 +23,12 @@ public class OrderFixture {
         }
 
         public OrderBuilder type(OrderType orderType) {
-            this.type=orderType;
+            this.type = orderType;
             return this;
         }
 
         public OrderBuilder status(OrderStatus orderStatus) {
-            this.status=orderStatus;
+            this.status = orderStatus;
             return this;
         }
 
@@ -38,12 +38,12 @@ public class OrderFixture {
         }
 
         public OrderBuilder orderLineItems(List<OrderLineItem> orderLineItems) {
-            this.orderLineItems=orderLineItems;
+            this.orderLineItems = orderLineItems;
             return this;
         }
 
         public OrderBuilder deliveryAddress(String deliveryAddress) {
-            this.deliveryAddress=deliveryAddress;
+            this.deliveryAddress = deliveryAddress;
             return this;
         }
 

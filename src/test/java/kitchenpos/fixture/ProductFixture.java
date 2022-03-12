@@ -8,7 +8,7 @@ import java.util.UUID;
 public class ProductFixture {
 
     public static class ProductBuilder {
-        private UUID id;
+        private final UUID id;
         private String name;
         private BigDecimal price;
 
@@ -17,7 +17,7 @@ public class ProductFixture {
         }
 
         public ProductBuilder name(String name) {
-            this.name=name;
+            this.name = name;
             return this;
         }
 

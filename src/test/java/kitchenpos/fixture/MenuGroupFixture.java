@@ -1,17 +1,13 @@
 package kitchenpos.fixture;
 
-import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
 
-import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 
 public class MenuGroupFixture {
 
     public static class MenuGroupBuilder {
-        private UUID id;
+        private final UUID id;
         private String name;
 
         public MenuGroupBuilder() {
@@ -19,7 +15,7 @@ public class MenuGroupFixture {
         }
 
         public MenuGroupBuilder name(String name) {
-            this.name=name;
+            this.name = name;
             return this;
         }
 

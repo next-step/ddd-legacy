@@ -3,7 +3,6 @@ package kitchenpos.fixture;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 public class MenuProductFixture {
@@ -14,25 +13,26 @@ public class MenuProductFixture {
         private long quantity;
         private UUID productId;
 
-        public MenuProductBuilder() { }
+        public MenuProductBuilder() {
+        }
 
         public MenuProductBuilder seq(long seq) {
-            this.seq=seq;
+            this.seq = seq;
             return this;
         }
 
         public MenuProductBuilder product(Product product) {
-            this.product=product;
+            this.product = product;
             return this;
         }
 
         public MenuProductBuilder quantity(long quantity) {
-            this.quantity=quantity;
+            this.quantity = quantity;
             return this;
         }
 
         public MenuProductBuilder productId(UUID productId) {
-            this.productId=productId;
+            this.productId = productId;
             return this;
         }
 

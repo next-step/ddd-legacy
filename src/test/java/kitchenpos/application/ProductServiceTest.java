@@ -58,7 +58,6 @@ class ProductServiceTest {
         Product 상품등록요청 = new ProductBuilder().name("후라이드치킨").price(BigDecimal.valueOf(17000L)).build();
 
         given(비속어_판별기.containsProfanity("후라이드치킨")).willReturn(false);
-
         //when
         Product 등록된상품 = productService.create(상품등록요청);
 
@@ -66,7 +65,7 @@ class ProductServiceTest {
         verify(productRepository, times(1)).save(any(Product.class));
     }
 
-    @DisplayName(value = "상품은 반드시 상품가격을 가지며, 0원 이상이어야 한다")
+    @DisplayName(value = "반드시 0원 이상의 상품가격을 입력해야 한다")
     @ParameterizedTest
     @MethodSource("잘못된_상품가격")
     void create_fail_invalid_price(final BigDecimal 상품가격) {
@@ -78,7 +77,7 @@ class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName(value = "상품은 반드시 상품명을 가지며, 비속어가 포함될 수 없다")
+    @DisplayName(value = "반드시 상품명을 입력해야 하며, 비속어가 포함될 수 없다")
     @ParameterizedTest
     @MethodSource("잘못된_상품명")
     void create_fail_invalid_name(final String 상품명) {
@@ -127,12 +126,12 @@ class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName(value = "가격변경시 상품을 포함하고 있는 메뉴 가격이 각 상품 가격의 합보다 클 경우 메뉴 판매를 중단한다")
+    @DisplayName(value = "상품을 포함하고 있는 메뉴 가격이 각 상품 가격의 합보다 클 경우 메뉴 판매를 중단한다")
     @Test
     void changePrice_fail_menu_price_gt_product_price() {
         //given
         Product 가격변경_요청 = new ProductBuilder().price(BigDecimal.valueOf(16500)).build();
-        Product 가격이변경될상품 = new ProductBuilder().price(BigDecimal.valueOf(17000)).build();;
+        Product 가격이변경될상품 = new ProductBuilder().price(BigDecimal.valueOf(17000)).build();
         MenuProduct 상품구성 = new MenuProductBuilder().product(가격이변경될상품).quantity(1L).build();
         Menu 메뉴 = new MenuBuilder().price(BigDecimal.valueOf(17000)).displayed(true).menuProducts(new ArrayList<>(Arrays.asList(상품구성))).build();
 

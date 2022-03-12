@@ -21,17 +21,17 @@ public class OrderLineItemFixture {
         }
 
         public OrderLineItemBuilder seq(Long seq) {
-            this.seq=seq;
+            this.seq = seq;
             return this;
         }
 
         public OrderLineItemBuilder menu(Menu menu) {
-            this.menu=menu;
+            this.menu = menu;
             return this;
         }
 
         public OrderLineItemBuilder quantity(long quantity) {
-            this.quantity=quantity;
+            this.quantity = quantity;
             return this;
         }
 
@@ -41,7 +41,7 @@ public class OrderLineItemFixture {
         }
 
         public OrderLineItemBuilder price(BigDecimal price) {
-            this.price=price;
+            this.price = price;
             return this;
         }
 
