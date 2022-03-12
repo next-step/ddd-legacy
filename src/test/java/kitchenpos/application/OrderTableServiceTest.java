@@ -28,7 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@DisplayName("상품")
+@DisplayName("식탁")
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
 
