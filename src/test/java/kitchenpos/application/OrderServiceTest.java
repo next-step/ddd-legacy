@@ -147,10 +147,23 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("주문을 수락할 수 있다.")
+    @Test
+    void accept() {
+        Menu menu = createMenu();
+        order = orderEatIn(menu);
+        order.setStatus(OrderStatus.WAITING);
+        orderRepository.save(order);
+
+        Order acceptedOrder = orderService.accept(order.getId());
+
+        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
     @DisplayName("주문 대기 상태가 아니면 주문을 수락할 수 없다.")
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
-    void accept(OrderStatus status) {
+    void doNotAccept(OrderStatus status) {
         Order order = new Order();
         order.setStatus(status);
         orderRepository.save(order);
