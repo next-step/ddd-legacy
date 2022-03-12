@@ -82,6 +82,19 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 가격이 변경 될 수 있다.")
+    @Test
+    void changePrice() {
+        Menu menu = createMenu();
+        menuRepository.save(menu);
+        BigDecimal newPrice = menu.getPrice().subtract(BigDecimal.valueOf(1000));
+        menu.setPrice(newPrice);
+
+        Menu newPriceMenu = menuService.changePrice(menu.getId(), menu);
+
+        assertThat(newPriceMenu.getPrice()).isEqualTo(newPrice);
+    }
+
     @DisplayName("메뉴의 가격은 메뉴 상품에 속해 있는 상품들의 총 가격의 합보다 클 수 없다.")
     @Test
     void sumPrice() {
