@@ -13,8 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.stream.Stream;
 
+import static kitchenpos.fixture.MenuGroupFixture.MenuGroupBuilder;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,12 +35,10 @@ class MenuGroupServiceTest {
     @Test
     void create_success() throws Exception {
         //given
-        MenuGroup 등록할_메뉴그룹 = mock(MenuGroup.class);
-
-        given(등록할_메뉴그룹.getName()).willReturn("한마리메뉴");
+        MenuGroup 등록할메뉴그룹 = new MenuGroupBuilder().name("한마리메뉴").build();
 
         //when
-        menuGroupService.create(등록할_메뉴그룹);
+        menuGroupService.create(등록할메뉴그룹);
 
         //then
         verify(menuGroupRepository, times(1)).save(any(MenuGroup.class));
@@ -51,12 +49,10 @@ class MenuGroupServiceTest {
     @MethodSource("잘못된_메뉴그룹명")
     void create_fail_invalid_name(final String 메뉴그룹명) throws Exception {
         //given
-        MenuGroup 등록할_메뉴그룹 = mock(MenuGroup.class);
-
-        given(등록할_메뉴그룹.getName()).willReturn(메뉴그룹명);
+        MenuGroup 등록할메뉴그룹 = new MenuGroupBuilder().name(메뉴그룹명).build();;
 
         //when, then
-        assertThatThrownBy(() -> menuGroupService.create(등록할_메뉴그룹))
+        assertThatThrownBy(() -> menuGroupService.create(등록할메뉴그룹))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
