@@ -7,10 +7,12 @@ import kitchenpos.domain.Product;
 public class ProductFixture {
 
     public static final Product 뿌링클 = new Product();
+    public static final Product 맛초킹 = new Product();
     public static final Product 콜라 = new Product();
 
     static {
         initialize(뿌링클, "뿌링클", 10_000L);
+        initialize(맛초킹, "맛초킹", 10_000L);
         initialize(콜라, "콜라", 2_000L);
     }
 
