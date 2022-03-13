@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -270,6 +268,28 @@ class MenuServiceTest {
         // then
         assertThatThrownBy(() -> menuService.create(menuCreateRequest))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴를 등록할 때는 메뉴그룹을 지정해 주어야 한다.")
+    @Test
+    void menuGroupIsMandatory() {
+        // given
+        MenuGroup emptyMenuGroup = new MenuGroup();
+        emptyMenuGroup.setId(UUID.randomUUID());
+
+        Product productRequest = ProductServiceTest.createProductRequest("후라이드치킨", new BigDecimal("15000"));
+        Product product = productService.create(productRequest);
+
+        // when
+        List<MenuProduct> menuProducts = new ArrayList<>();
+        menuProducts.add(createMenuProduct(product, 1));
+        menuProducts.add(createMenuProduct(product, 1));
+
+        Menu menuCreateRequest = createMenuRequest(new BigDecimal("30000"), emptyMenuGroup, menuProducts, "후라이드치킨두마리");
+
+        // then
+        assertThatThrownBy(() -> menuService.create(menuCreateRequest))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     private Menu createMenuRequest(BigDecimal price, MenuGroup menuGroup, List<MenuProduct> menuProducts, String name) {
