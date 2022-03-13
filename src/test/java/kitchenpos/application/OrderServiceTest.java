@@ -215,6 +215,35 @@ class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
     }
 
+    @DisplayName("배달유형 주문의 주문상태 순서 테스트")
+    @Test
+    void deliveryTypeOrder() {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.DELIVERY, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+        Order order = orderService.create(orderRequest);
+
+        // then
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
+        order = orderService.accept(order.getId());
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        order = orderService.serve(order.getId());
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
+        order = orderService.startDelivery(order.getId());
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        order = orderService.completeDelivery(order.getId());
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+        order = orderService.complete(order.getId());
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+
     private Order createOrderRequest(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId) {
         Order orderCreateRequest = new Order();
         orderCreateRequest.setType(orderType);
