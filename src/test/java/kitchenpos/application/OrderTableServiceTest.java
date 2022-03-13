@@ -52,11 +52,14 @@ class OrderTableServiceTest {
         //given
         OrderTable 등록할주문테이블 = new OrderTableBuilder().name("1번").build();
 
+        given(orderTableRepository.save(any(OrderTable.class))).willReturn(등록할주문테이블);
+
         //when
-        orderTableService.create(등록할주문테이블);
+        OrderTable 등록된주문테이블 = orderTableService.create(등록할주문테이블);
 
         //then
         verify(orderTableRepository, times(1)).save(any(OrderTable.class));
+        assertThat(등록된주문테이블.getName()).isEqualTo("1번");
     }
 
     @DisplayName(value = "주문테이블은 반드시 한글자 이상의 이름을 가진다")
@@ -80,10 +83,10 @@ class OrderTableServiceTest {
         given(orderTableRepository.findById(주문테이블.getId())).willReturn(Optional.of(주문테이블));
 
         //when
-        orderTableService.sit(주문테이블.getId());
+        OrderTable 착석중인주문테이블 = orderTableService.sit(주문테이블.getId());
 
         //then
-        assertThat(주문테이블.isEmpty()).isFalse();
+        assertThat(착석중인주문테이블.isEmpty()).isFalse();
     }
 
     @DisplayName(value = "존재하는 테이블만 착석으로 변경할 수 있다")
@@ -106,11 +109,11 @@ class OrderTableServiceTest {
         given(orderTableRepository.findById(주문테이블.getId())).willReturn(Optional.of(주문테이블));
 
         //when
-        orderTableService.clear(주문테이블.getId());
+        OrderTable 공석인주문테이블 = orderTableService.clear(주문테이블.getId());
 
         //then
-        assertThat(주문테이블.isEmpty()).isTrue();
-        assertThat(주문테이블.getNumberOfGuests()).isZero();
+        assertThat(공석인주문테이블.isEmpty()).isTrue();
+        assertThat(공석인주문테이블.getNumberOfGuests()).isZero();
     }
 
     @DisplayName(value = "존재하는 테이블만 공석으로 변경할 수 있다")
@@ -145,10 +148,10 @@ class OrderTableServiceTest {
         OrderTable 착석인원변경요청 = new OrderTableBuilder().numberOfGuests(3).build();
         OrderTable 변경할주문테이블 = new OrderTableBuilder().empty(false).build();
 
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(변경할주문테이블));
+        given(orderTableRepository.findById(변경할주문테이블.getId())).willReturn(Optional.of(변경할주문테이블));
 
         //when
-        orderTableService.changeNumberOfGuests(UUID.randomUUID(), 착석인원변경요청);
+        orderTableService.changeNumberOfGuests(변경할주문테이블.getId(), 착석인원변경요청);
 
         //then
         assertThat(변경할주문테이블.getNumberOfGuests()).isEqualTo(3);
