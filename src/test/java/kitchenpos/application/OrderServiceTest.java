@@ -65,12 +65,15 @@ class OrderServiceTest {
         given(menuRepository.findAllByIdIn(any())).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
         given(menuRepository.findById(any())).willReturn(Optional.of(메뉴));
         given(orderTableRepository.findById(any())).willReturn(Optional.of(주문테이블));
+        given(orderRepository.save(any(Order.class))).willReturn(등록할주문);
 
         //when
-        orderService.create(등록할주문);
+        Order 등록된주문 = orderService.create(등록할주문);
 
         //then
         verify(orderRepository, times(1)).save(any(Order.class));
+        assertThat(등록된주문.getType()).isEqualTo(OrderType.EAT_IN);
+        assertThat(등록된주문.getOrderLineItems()).containsExactly(주문구성메뉴);
     }
 
     @DisplayName(value = "주문을 등록할때 반드시 주문형태를 선택해야 한다")
@@ -231,14 +234,14 @@ class OrderServiceTest {
         //given
         Order 주문 = new OrderBuilder().status(주문상태).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.accept(UUID.randomUUID());
+        Order 주문수락상태인주문 = orderService.accept(주문.getId());
 
         //then
         verify(배달요청, times(0)).requestDelivery(any(), any(), any());
-        assertThat(주문.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        assertThat(주문수락상태인주문.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
     @DisplayName(value = "주문수락으로 변경 후 주문형태가 배달인 경우 배달 라이더를 요청한다")
@@ -253,11 +256,11 @@ class OrderServiceTest {
         given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.accept(주문.getId());
+        Order 주문수락상태인주문 = orderService.accept(주문.getId());
 
         //then
         verify(배달요청, times(1)).requestDelivery(any(), any(), any());
-        assertThat(주문.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        assertThat(주문수락상태인주문.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
     @DisplayName(value = "존재하는 주문만 주문수락으로 변경할 수 있다")
@@ -278,7 +281,7 @@ class OrderServiceTest {
         //given
         Order 주문 = new OrderBuilder().status(주문상태).type(OrderType.DELIVERY).build();
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(주문));
+        given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when, then
         assertThatThrownBy(() -> orderService.accept(주문.getId()))
@@ -295,10 +298,10 @@ class OrderServiceTest {
         given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.serve(주문.getId());
+        Order 서빙완료된주문 = orderService.serve(주문.getId());
 
         //then
-        assertThat(주문.getStatus()).isEqualTo(OrderStatus.SERVED);
+        assertThat(서빙완료된주문.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
     @DisplayName(value = "존재하는 주문만 서빙완료로 변경할 수 있다")
@@ -336,10 +339,10 @@ class OrderServiceTest {
         given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.startDelivery(주문.getId());
+        Order 배달중인주문 = orderService.startDelivery(주문.getId());
 
         //then
-        assertThat(주문.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        assertThat(배달중인주문.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     }
 
     @DisplayName(value = "존재하는 주문만 서빙완료로 변경할 수 있다")
@@ -390,10 +393,10 @@ class OrderServiceTest {
         given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.completeDelivery(주문.getId());
+        Order 배달완료된주문 = orderService.completeDelivery(주문.getId());
 
         //then
-        assertThat(주문.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+        assertThat(배달완료된주문.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
     @DisplayName(value = "존재하는 주문만 배달완료로 변경할 수 있다")
@@ -431,10 +434,10 @@ class OrderServiceTest {
         given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.complete(주문.getId());
+        Order 주문종결된주문 = orderService.complete(주문.getId());
 
         //then
-        assertThat(주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(주문종결된주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName(value = "주문상태를 주문종결로 변경할 수 있다 - 매장식사")
@@ -449,12 +452,12 @@ class OrderServiceTest {
         given(orderRepository.existsByOrderTableAndStatusNot(주문테이블, OrderStatus.COMPLETED)).willReturn(false);
 
         //when
-        orderService.complete(주문.getId());
+        Order 주문종결된주문 = orderService.complete(주문.getId());
 
         //then
         assertThat(주문테이블.getNumberOfGuests()).isZero();
         assertThat(주문테이블.isEmpty()).isTrue();
-        assertThat(주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(주문종결된주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName(value = "주문상태를 주문종결로 변경할 수 있다 - 테이크아웃")
@@ -467,10 +470,10 @@ class OrderServiceTest {
         given(orderRepository.findById(주문.getId())).willReturn(Optional.of(주문));
 
         //when
-        orderService.complete(주문.getId());
+        Order 주문종결된주문 = orderService.complete(주문.getId());
 
         //then
-        assertThat(주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(주문종결된주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName(value = "주문형태가 배달인 경우, 주문상태가 배달완료인 경우만 주문종결로 변경한다")
