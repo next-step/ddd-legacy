@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * @since 2022-03-02 오전 2:45
  */
 
-public class CustomSeparator implements Separator{
+public class CustomSeparator implements Separator {
 
     public static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
 

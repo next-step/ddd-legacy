@@ -14,7 +14,7 @@ import calculator.separator.Separator;
  * @since 2022-03-03 오전 2:59
  */
 
-public class BasicHandler implements CalculatorHandler{
+public class BasicHandler implements CalculatorHandler {
 
     private CalculatorHandler handler;
 

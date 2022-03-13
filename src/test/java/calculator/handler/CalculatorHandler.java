@@ -13,5 +13,6 @@ package calculator.handler;
 public interface CalculatorHandler {
 
     void nextHandler(CalculatorHandler handler);
+
     int calculate(String text);
 }

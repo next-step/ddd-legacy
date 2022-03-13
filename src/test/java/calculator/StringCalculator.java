@@ -16,6 +16,7 @@ import calculator.separator.Separator;
 public class StringCalculator {
 
     private CalculatorHandler rootHandler;
+
     public StringCalculator() {
         initHandler();
     }
