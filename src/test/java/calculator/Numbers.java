@@ -2,6 +2,7 @@ package calculator;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Numbers {
@@ -15,10 +16,9 @@ public class Numbers {
     }
 
     public int sum() {
-        PositiveNumber number = new PositiveNumber();
-
-        numbers.forEach(positiveNumber -> number.add(positiveNumber));
-
-        return number.getNumber();
+        PositiveNumber positiveNumber = numbers.stream()
+                .reduce((firstPositiveNumber, secondPositiveNumber) -> firstPositiveNumber.add(secondPositiveNumber))
+                .get();
+        return positiveNumber.getNumber();
     }
 }
