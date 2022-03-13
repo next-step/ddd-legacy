@@ -295,10 +295,10 @@ class MenuServiceTest {
     public static Menu createMenuRequest(BigDecimal price, MenuGroup menuGroup, List<MenuProduct> menuProducts, String name) {
         Menu menuCreateRequest = new Menu();
         menuCreateRequest.setPrice(price);
-        menuCreateRequest.setMenuGroup(menuGroup);
         menuCreateRequest.setMenuGroupId(menuGroup.getId());
         menuCreateRequest.setMenuProducts(menuProducts);
         menuCreateRequest.setName(name);
+        menuCreateRequest.setDisplayed(true);
         return menuCreateRequest;
     }
 
