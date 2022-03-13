@@ -292,7 +292,7 @@ class MenuServiceTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
-    private Menu createMenuRequest(BigDecimal price, MenuGroup menuGroup, List<MenuProduct> menuProducts, String name) {
+    public static Menu createMenuRequest(BigDecimal price, MenuGroup menuGroup, List<MenuProduct> menuProducts, String name) {
         Menu menuCreateRequest = new Menu();
         menuCreateRequest.setPrice(price);
         menuCreateRequest.setMenuGroup(menuGroup);
@@ -302,7 +302,7 @@ class MenuServiceTest {
         return menuCreateRequest;
     }
 
-    private MenuProduct createMenuProduct(Product product, long quantity) {
+    public static MenuProduct createMenuProduct(Product product, long quantity) {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setProduct(product);
         menuProduct.setProductId(product.getId());
