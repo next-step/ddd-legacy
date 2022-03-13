@@ -102,9 +102,9 @@ public class OrderService {
         if (order.getType() == OrderType.DELIVERY) {
             BigDecimal sum = BigDecimal.ZERO;
             for (final OrderLineItem orderLineItem : order.getOrderLineItems()) {
-                sum = orderLineItem.getMenu()
+                sum = sum.add(orderLineItem.getMenu()
                     .getPrice()
-                    .multiply(BigDecimal.valueOf(orderLineItem.getQuantity()));
+                    .multiply(BigDecimal.valueOf(orderLineItem.getQuantity())));
             }
             kitchenridersClient.requestDelivery(orderId, sum, order.getDeliveryAddress());
         }
