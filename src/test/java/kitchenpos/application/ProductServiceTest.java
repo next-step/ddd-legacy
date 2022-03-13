@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.MenuFixture.뿌링클_세트;
+import static kitchenpos.application.MenuProductFixture.뿌링클_1개;
+import static kitchenpos.application.MenuProductFixture.콜라_1개;
 import static kitchenpos.application.ProductFixture.뿌링클;
 import static kitchenpos.application.ProductFixture.콜라;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -96,11 +98,15 @@ class ProductServiceTest {
     @MethodSource("changePrice")
     void changePrice(long price, boolean expectedDisplayed) {
         //given
-        뿌링클_세트.setDisplayed(true);
+        Menu menu = new Menu();
+        menu.setDisplayed(true);
+        menu.setMenuProducts(Arrays.asList(뿌링클_1개, 콜라_1개));
+        menu.setPrice(BigDecimal.valueOf(11_000L));
+
         Product 변경할_금액 = 상품_금액(price);
 
         given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(뿌링클));
-        given(menuRepository.findAllByProductId(any(UUID.class))).willReturn(Collections.singletonList(뿌링클_세트));
+        given(menuRepository.findAllByProductId(any(UUID.class))).willReturn(Collections.singletonList(menu));
 
         //when
         Product product = productService.changePrice(뿌링클.getId(), 변경할_금액);
@@ -108,7 +114,7 @@ class ProductServiceTest {
         //then
         assertAll(
             () -> assertThat(product.getPrice()).isEqualTo(BigDecimal.valueOf(price)),
-            () -> assertThat(뿌링클_세트.isDisplayed()).isEqualTo(expectedDisplayed)
+            () -> assertThat(menu.isDisplayed()).isEqualTo(expectedDisplayed)
         );
     }
 
