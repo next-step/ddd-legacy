@@ -44,6 +44,10 @@ public final class Fixtures {
         return createProduct(productId, "십원짜리", BigDecimal.TEN);
     }
 
+    public static Product 십원_상품() {
+        return createProduct(UUID.randomUUID(), "십원짜리", BigDecimal.TEN);
+    }
+
     public static MenuProduct createMenuProduct(Product product) {
         final MenuProduct menuProduct = new MenuProduct();
         menuProduct.setQuantity(2);
@@ -51,16 +55,11 @@ public final class Fixtures {
         return menuProduct;
     }
 
-    public static Menu createMenu(BigDecimal price, boolean display, MenuProduct... menuProducts) {
-        final Menu menu = new Menu();
-        menu.setPrice(price);
-        menu.setDisplayed(display);
-        menu.setMenuProducts(
-            Arrays.asList(
-                menuProducts
-            )
-        );
-        return menu;
+    public static MenuProduct 십원짜리_상품_2개인_menuProduct() {
+        final MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setQuantity(2);
+        menuProduct.setProduct(십원_상품());
+        return menuProduct;
     }
 
     public static OrderTable createOrderTable(
@@ -98,7 +97,7 @@ public final class Fixtures {
     }
 
     public static MenuGroup createMenuGroup(String name) {
-        return createMenuGroup(null, name);
+        return createMenuGroup(UUID.randomUUID(), name);
     }
 
     public static Menu createMenu(

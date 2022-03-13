@@ -183,7 +183,12 @@ class ProductServiceTest {
                 final UUID productId = UUID.randomUUID();
                 final Product product = 십원_상품(productId);
                 final MenuProduct menuProduct = createMenuProduct(product);
-                final Menu menu = createMenu(BigDecimal.valueOf(100), true, menuProduct);
+                final Menu menu = createMenu(
+                    BigDecimal.valueOf(100),
+                    true,
+                    UUID.randomUUID(),
+                    menuProduct
+                );
 
                 doReturn(Optional.of(product)).when(productRepository).findById(productId);
                 doReturn(Arrays.asList(menu)).when(menuRepository).findAllByProductId(productId);
@@ -208,6 +213,7 @@ class ProductServiceTest {
                 final Menu menu = createMenu(
                     BigDecimal.ONE,
                     displayed,
+                    UUID.randomUUID(),
                     menuProduct
                 );
 
