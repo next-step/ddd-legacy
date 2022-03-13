@@ -14,7 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.stream.Stream;
 
 import static kitchenpos.fixture.MenuGroupFixture.MenuGroupBuilder;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,12 +38,14 @@ class MenuGroupServiceTest {
     void create_success() throws Exception {
         //given
         MenuGroup 등록할메뉴그룹 = new MenuGroupBuilder().name("한마리메뉴").build();
+        given(menuGroupRepository.save(any(MenuGroup.class))).willReturn(등록할메뉴그룹);
 
         //when
-        menuGroupService.create(등록할메뉴그룹);
+        MenuGroup 등록된메뉴그룹 = menuGroupService.create(등록할메뉴그룹);
 
         //then
         verify(menuGroupRepository, times(1)).save(any(MenuGroup.class));
+        assertThat(등록된메뉴그룹.getName()).isEqualTo("한마리메뉴");
     }
 
     @DisplayName(value = "반드시 한글자 이상의 메뉴그룹명을 가진다")
