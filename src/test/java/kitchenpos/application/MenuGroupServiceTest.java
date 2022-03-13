@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static kitchenpos.KitchenposFixture.*;
+import static kitchenpos.fixture.MenuGroupFixture.정상_메뉴_그룹;
 import static kitchenpos.fixture.MenuGroupFixture.정상_메뉴_그룹_리스트;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;

@@ -8,21 +8,14 @@ import java.util.List;
 import java.util.UUID;
 
 public class KitchenposFixture {
-  public static final UUID ID = UUID.randomUUID();
   private static final String MENU_NAME = "menu name";
+  public static final UUID ID = UUID.randomUUID();
   private static final long QUANTITY = 1L;
   private static final String PRODUCT_NAME = "product name";
   private static final BigDecimal PRICE = BigDecimal.valueOf(10000L);
   private static final String ADDRESS = "Address";
 
   public static MenuGroup menuGroup() {
-    MenuGroup menuGroup = new MenuGroup();
-    menuGroup.setId(ID);
-    menuGroup.setName("menu group name");
-    return menuGroup;
-  }
-
-  public static MenuGroup 정상_메뉴_그룹() {
     MenuGroup menuGroup = new MenuGroup();
     menuGroup.setId(ID);
     menuGroup.setName("menu group name");
