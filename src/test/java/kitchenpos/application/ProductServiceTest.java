@@ -15,7 +15,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import static kitchenpos.fixture.MenuFixture.MenuBuilder;
@@ -58,11 +57,14 @@ class ProductServiceTest {
         Product 상품등록요청 = new ProductBuilder().name("후라이드치킨").price(BigDecimal.valueOf(17000L)).build();
 
         given(비속어_판별기.containsProfanity("후라이드치킨")).willReturn(false);
+        given(productRepository.save(any(Product.class))).willReturn(상품등록요청);
         //when
         Product 등록된상품 = productService.create(상품등록요청);
 
         //then
         verify(productRepository, times(1)).save(any(Product.class));
+        assertThat(등록된상품.getName()).isEqualTo("후라이드치킨");
+        assertThat(등록된상품.getPrice()).isEqualTo(BigDecimal.valueOf(17000L));
     }
 
     @DisplayName(value = "반드시 0원 이상의 상품가격을 입력해야 한다")
@@ -101,16 +103,16 @@ class ProductServiceTest {
         MenuProduct 상품구성 = new MenuProductBuilder().product(가격변경될상품).quantity(1L).build();
         Menu 가격변경될상품을포함한메뉴 = new MenuBuilder().price(BigDecimal.valueOf(17000L)).menuProducts(new ArrayList<>(Arrays.asList(상품구성))).displayed(true).build();
 
-        given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(가격변경될상품));
-        given(menuRepository.findAllByProductId(any(UUID.class))).willReturn(new ArrayList<>(Arrays.asList(가격변경될상품을포함한메뉴)));
+        given(productRepository.findById(가격변경될상품.getId())).willReturn(Optional.of(가격변경될상품));
+        given(menuRepository.findAllByProductId(가격변경될상품.getId())).willReturn(new ArrayList<>(Arrays.asList(가격변경될상품을포함한메뉴)));
 
         //when
-        productService.changePrice(가격변경될상품.getId(), 가격변경요청);
+        Product 가격변경된상품 = productService.changePrice(가격변경될상품.getId(), 가격변경요청);
 
         //then
         verify(productRepository, times(1)).findById(가격변경될상품.getId());
         verify(menuRepository, times(1)).findAllByProductId(가격변경될상품.getId());
-        assertThat(가격변경될상품.getPrice()).isEqualTo(BigDecimal.valueOf(17500L));
+        assertThat(가격변경된상품.getPrice()).isEqualTo(BigDecimal.valueOf(17500L));
         assertThat(가격변경될상품을포함한메뉴.isDisplayed()).isTrue();
     }
 
@@ -130,21 +132,21 @@ class ProductServiceTest {
     @Test
     void changePrice_fail_menu_price_gt_product_price() {
         //given
-        Product 가격변경_요청 = new ProductBuilder().price(BigDecimal.valueOf(16500)).build();
-        Product 가격이변경될상품 = new ProductBuilder().price(BigDecimal.valueOf(17000)).build();
-        MenuProduct 상품구성 = new MenuProductBuilder().product(가격이변경될상품).quantity(1L).build();
+        Product 가격변경요청 = new ProductBuilder().price(BigDecimal.valueOf(16500)).build();
+        Product 가격변경될상품 = new ProductBuilder().price(BigDecimal.valueOf(17000)).build();
+        MenuProduct 상품구성 = new MenuProductBuilder().product(가격변경될상품).quantity(1L).build();
         Menu 메뉴 = new MenuBuilder().price(BigDecimal.valueOf(17000)).displayed(true).menuProducts(new ArrayList<>(Arrays.asList(상품구성))).build();
 
-        given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(가격이변경될상품));
-        given(menuRepository.findAllByProductId(any(UUID.class))).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
+        given(productRepository.findById(가격변경될상품.getId())).willReturn(Optional.of(가격변경될상품));
+        given(menuRepository.findAllByProductId(가격변경될상품.getId())).willReturn(new ArrayList<>(Arrays.asList(메뉴)));
 
         //when
-        productService.changePrice(UUID.randomUUID(), 가격변경_요청);
+        Product 가격변경된상품 = productService.changePrice(가격변경될상품.getId(), 가격변경요청);
 
         //then
-        verify(productRepository, times(1)).findById(any(UUID.class));
-        verify(menuRepository, times(1)).findAllByProductId(any(UUID.class));
-        assertThat(가격이변경될상품.getPrice()).isEqualTo(BigDecimal.valueOf(16500));
+        verify(productRepository, times(1)).findById(가격변경될상품.getId());
+        verify(menuRepository, times(1)).findAllByProductId(가격변경될상품.getId());
+        assertThat(가격변경된상품.getPrice()).isEqualTo(BigDecimal.valueOf(16500));
         assertThat(메뉴.isDisplayed()).isFalse();
     }
 
