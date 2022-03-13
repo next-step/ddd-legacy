@@ -305,10 +305,10 @@ class MenuServiceTest {
     @Test
     void hide() {
         //given
-        given(menuRepository.findById(any())).willReturn(Optional.of(뿌링클_세트));
+        given(menuRepository.findById(any())).willReturn(Optional.of(맛초킹_세트));
 
         //when
-        Menu menu = menuService.hide(뿌링클_세트.getId());
+        Menu menu = menuService.hide(맛초킹_세트.getId());
 
         //then
         assertThat(menu.isDisplayed()).isFalse();
