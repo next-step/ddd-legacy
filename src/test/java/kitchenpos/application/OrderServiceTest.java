@@ -5,16 +5,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
@@ -124,6 +123,96 @@ class OrderServiceTest {
         // then
         assertThatThrownBy(() -> orderService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("주문 시에는 반드시 주문항목을 입력해 주어야 한다.")
+    @ParameterizedTest
+    @EnumSource(OrderType.class)
+    void orderLineItemsAreMandatory(OrderType orderType) {
+        // given
+        OrderTable orderTable = createOrderTable();
+
+        // when
+        Order orderRequest = createOrderRequest(orderType, Collections.emptyList(), "성남시 분당구 정자동", orderTable.getId());
+
+        // then
+        assertThatThrownBy(() -> orderService.create(orderRequest))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("존재하지 않는 메뉴를 선택할 수 없다.")
+    @Test
+    void notExistsMenu() {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.EAT_IN, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+
+        // then
+        assertThatThrownBy(() -> orderService.create(orderRequest))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("판매중이지 않은(숨겨진) 메뉴는 선택할 수 없다.")
+    @Test
+    void hideMenu() {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+        menu = menuService.hide(menu.getId());
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.EAT_IN, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+
+        // then
+        assertThatThrownBy(() -> orderService.create(orderRequest))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("메뉴의 가격과 주문항목의 가격은 반드시 동일해야 한다.")
+    @Test
+    void illegalOrderLinePrice() {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("16000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.EAT_IN, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+
+        // then
+        assertThatThrownBy(() -> orderService.create(orderRequest))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("주문생성시 초기 상태는 '대기'이다")
+    @ParameterizedTest
+    @EnumSource(OrderType.class)
+    void defaultState(OrderType orderType) {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(orderType, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+        Order order = orderService.create(orderRequest);
+
+        // then
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
     }
 
     private Order createOrderRequest(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId) {
