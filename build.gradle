@@ -22,6 +22,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.flywaydb:flyway-core'
     runtimeOnly 'com.h2database:h2'
+
+    testImplementation 'io.rest-assured:rest-assured:4.5.1'
+//    testImplementation 'io.rest-assured:json-path:4.5.1'
+    testImplementation 'io.rest-assured:xml-path:4.5.1'
+
+    testImplementation 'com.google.guava:guava:31.1-jre'
+
+
+
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
