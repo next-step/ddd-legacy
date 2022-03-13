@@ -38,4 +38,8 @@ public class MenuProductFixture {
   }
 
 
+  public static List<MenuProduct> 상품_품목_리스트_가격_이만원() {
+    return Collections.singletonList(정상_메뉴_품목_가격_이만원());
+  }
+
 }

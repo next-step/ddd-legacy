@@ -35,7 +35,7 @@ class MenuServiceTest {
   MenuGroupRepository menuGroupRepository;
   @Mock
   ProductRepository productRepository;
-  @Mock
+  @Mock(lenient = true)
   PurgomalumClient purgomalumClient;
 
   @InjectMocks

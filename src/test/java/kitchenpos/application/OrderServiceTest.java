@@ -19,6 +19,9 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static kitchenpos.KitchenposFixture.*;
+import static kitchenpos.fixture.MenuFixture.정상_메뉴_가격_만원;
+import static kitchenpos.fixture.MenuFixture.정상_메뉴_가격_이만원;
+import static kitchenpos.fixture.orderFixture.OrderFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -36,7 +39,8 @@ class OrderServiceTest {
   private MenuRepository menuRepository;
   @Mock
   private OrderTableRepository orderTableRepository;
-  @Mock
+
+  @Mock(lenient = true)
   private KitchenridersClient kitchenridersClient;
 
   @InjectMocks
@@ -49,21 +53,23 @@ class OrderServiceTest {
     );
   }
 
-  @ParameterizedTest
-  @EnumSource(value = OrderType.class, names = {"DELIVERY"})
+  @Test
   @DisplayName("배달인 경우 주문 시작]")
-  void createOrderDelivery(OrderType orderType) {
+  void createOrderDelivery() {
     //given
-    Order request = order();
-    Menu menu = menu();
-    request.setType(orderType);
+    Order request = 배달_타입_주문_생성();
+    Menu menu = 정상_메뉴_가격_만원();
 
     when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-
+    when(orderRepository.save(any())).thenReturn(request);
     assertDoesNotThrow(() -> {
-      orderService.create(request);
+      Order order = orderService.create(request);
+      assertThat(order.getType()).isEqualTo(OrderType.DELIVERY);
+      assertThat(order.getDeliveryAddress()).isEqualTo(request.getDeliveryAddress());
+      assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
     });
+
   }
 
   @ParameterizedTest
@@ -71,15 +77,10 @@ class OrderServiceTest {
   @DisplayName("주문 타입이 배달이거나 포장일 경우, 각각 상품품목 수량이 음수이면, IllegalArgumentException 예외 발생")
   void checkQuantity(OrderType orderType) {
     //given
-    Order request = order();
-    Menu menu = menu();
-
-    request.setType(orderType);
+    Order request = 주문_생성_타입_입력_수량이_음수(orderType);
+    Menu menu = 정상_메뉴_가격_만원();
 
     when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
-    request.getOrderLineItems().forEach(orderLineItem -> {
-      orderLineItem.setQuantity(NEGATIVE_NUM);
-    });
 
     //then
     assertThatThrownBy(() -> orderService.create(request))
@@ -91,12 +92,10 @@ class OrderServiceTest {
   @DisplayName("배달인 경우 주문 시작 : 배달 주문일 때, 주소가 없으면 IllegalArgumentException 예외 발생")
   void DeliveryNeedAddress(String address) {
     //given
-    Order request = order();
-    Menu menu = menu();
+    Order request = 배달_타입_주문_생성_주소_입력(address);
+    Menu menu = 정상_메뉴_가격_만원();
 
-    request.setType(OrderType.DELIVERY);
     //when
-    request.setDeliveryAddress(address);
     when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
@@ -104,16 +103,12 @@ class OrderServiceTest {
             .isInstanceOf(IllegalArgumentException.class);
   }
 
-  @ParameterizedTest
-  @EnumSource(value = OrderType.class, names = {"EAT_IN"})
+  @Test
   @DisplayName("손님은 가게에 주문을 할 수 있습니다.")
-  void createOrderEatIn(OrderType orderType) {
+  void createOrderEatIn() {
     //given
-    Order request = order();
-    Menu menu = menu();
-
-    request.setType(orderType);
-    request.getOrderTable().setEmpty(true);
+    Order request = 매장_내_식사_주문_생성();
+    Menu menu = 정상_메뉴_가격_만원();
 
     when(orderTableRepository.findById(any())).thenReturn(Optional.of(request.getOrderTable()));
     when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
@@ -124,17 +119,16 @@ class OrderServiceTest {
     });
   }
 
-  @ParameterizedTest
-  @EnumSource(value = OrderType.class, names = {"EAT_IN"})
+  @Test
   @DisplayName("매장 내 식사 주문인 경우 주문 테이블이 비어있지 않으면 IllegalStateException 예외 발생")
-  void EatInNeedOrderTable(OrderType orderType) {
+  void EatInNeedOrderTable() {
     //given
-    Order request = order();
-    Menu menu = menu();
+    Order request = 매장_내_식사_주문_생성();
+    request.getOrderTable().setEmpty(false);
+
+    Menu menu = 정상_메뉴_가격_만원();
 
     //when
-    request.setType(orderType);
-    request.getOrderTable().setEmpty(false);
     when(orderTableRepository.findById(any())).thenReturn(Optional.of(request.getOrderTable()));
     when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -148,12 +142,11 @@ class OrderServiceTest {
   @DisplayName("주문할 때, 메뉴가 숨김 처리가 되어 있으면, IllegalStateException 예외 발생")
   void menuDisabledFalse(OrderType orderType) {
     //given
-    Order request = order();
-    Menu menu = menu();
+    Order request = 주문_생성_타입_입력(orderType);
+    Menu menu = 정상_메뉴_가격_만원();
+    menu.setDisplayed(false);
 
     //when
-    menu.setDisplayed(false);
-    request.setType(orderType);
     when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
@@ -167,16 +160,14 @@ class OrderServiceTest {
   @DisplayName("메뉴 가격과 주문하려는 메뉴의 상품품목의 가격이 같지 않으면 IllegalArgumentException 예외 발생")
   void checkMenuPrice(OrderType orderType) {
     //given
-    Order request = order();
-    Menu menu = menu();
+    Order request = 주문_생성_타입_입력(orderType);
+    Menu menu = 정상_메뉴_가격_이만원();
 
-    request.setType(orderType);
     //when
-    menu.setPrice(PRICE_ZERO);
-
     when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
+    //then
     assertThatThrownBy(() -> orderService.create(request))
             .isInstanceOf(IllegalArgumentException.class);
   }
@@ -186,12 +177,9 @@ class OrderServiceTest {
   @EnumSource(value = OrderType.class, names = {"DELIVERY"}, mode = EnumSource.Mode.EXCLUDE)
   void acceptOrderExcludeDelivery(OrderType orderType) {
     //given
-    Order order = order();
+    Order order = 주문_생성_타입_입력(orderType);
 
     //when
-    order.setStatus(OrderStatus.WAITING);
-    order.setType(orderType);
-
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     //then
@@ -205,11 +193,9 @@ class OrderServiceTest {
   @EnumSource(value = OrderType.class, names = {"DELIVERY"})
   void acceptOrderDeliveryType(OrderType orderType) {
     //given
-    Order order = order();
+    Order order = 주문_생성_타입_입력(orderType);
 
     //when
-    order.setType(orderType);
-    order.setStatus(OrderStatus.WAITING);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     //then
@@ -223,10 +209,8 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"WAITING"}, mode = EnumSource.Mode.EXCLUDE)
   void acceptOrderOnlyWaitingType(OrderStatus orderStatus) {
     //given
-    Order order = order();
-
+    Order order = 주문_생성_상태_입력(orderStatus);
     //when
-    order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     //then
@@ -239,9 +223,9 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"ACCEPTED"})
   void serve(OrderStatus orderStatus) {
     //given
-    Order order = order();
+    Order order = 주문_생성_상태_입력(orderStatus);
+
     //when
-    order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
     //then
     assertDoesNotThrow(() -> {
@@ -254,24 +238,22 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"ACCEPTED"}, mode = EnumSource.Mode.EXCLUDE)
   void serveOnlyAccepted(OrderStatus orderStatus) {
     //given
-    Order order = order();
+    Order order = 주문_생성_상태_입력(orderStatus);
+
     //when
-    order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
     //then
     assertThatThrownBy(() -> orderService.serve(RANDOM_UUID))
             .isInstanceOf(IllegalStateException.class);
   }
 
-  @ParameterizedTest
+  @Test
   @DisplayName("주문 상태를 배송중 상태로 변경합니다.")
-  @EnumSource(value = OrderType.class, names = {"DELIVERY"})
-  void startDelivery(OrderType orderType) {
+  void startDelivery() {
     //given
-    Order order = order();
-    //when
-    order.setType(orderType);
-    order.setStatus(OrderStatus.SERVED);
+    Order order = 배달_타입_주문_상태_준비중();
+
+      //when
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertDoesNotThrow(() -> {
@@ -298,10 +280,9 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"SERVED"}, mode = EnumSource.Mode.EXCLUDE)
   void startDeliveryOnlyServed(OrderStatus orderStatus) {
     //given
-    Order order = order();
-    //when
+    Order order = 주문_생성_상태_입력(orderStatus);
     order.setType(OrderType.DELIVERY);
-    order.setStatus(orderStatus);
+    //when
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertThatThrownBy(() -> orderService.startDelivery(RANDOM_UUID))
@@ -313,9 +294,8 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"DELIVERING"})
   void completeDelivery(OrderStatus orderStatus) {
     //given
-    Order order = order();
+    Order order = 배달_타입_주문_상태_배달중();
     //when
-    order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertDoesNotThrow(() -> {
@@ -328,9 +308,9 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"DELIVERING"}, mode = EnumSource.Mode.EXCLUDE)
   void completeDeliveryOnlyDelivering(OrderStatus orderStatus) {
     //given
-    Order order = order();
+    Order order = 주문_생성_상태_입력(orderStatus);
+    order.setType(OrderType.DELIVERY);
     //when
-    order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertThatThrownBy(() -> orderService.completeDelivery(RANDOM_UUID))
@@ -342,11 +322,9 @@ class OrderServiceTest {
   @EnumSource(value = OrderType.class, names = {"DELIVERY"})
   void completeDelivery(OrderType orderType) {
     //given
-    Order order = order();
+    Order order = 배달_타입_주문_상태_배달완료();
 
     //when
-    order.setType(orderType);
-    order.setStatus(OrderStatus.DELIVERED);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     //then
@@ -360,11 +338,10 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"DELIVERED"}, mode = EnumSource.Mode.EXCLUDE)
   void completeDeliveryOnlyDelivered(OrderStatus orderStatus) {
     //given
-    Order order = order();
+    Order order = 주문_생성_상태_입력(orderStatus);
+    order.setType(OrderType.DELIVERY);
 
     //when
-    order.setType(OrderType.DELIVERY);
-    order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     //then
@@ -377,11 +354,9 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"SERVED"})
   void completeTakeOutAndEanIn(OrderStatus orderStatus) {
     //given
-    Order order = order();
+    Order order = 포장_상태_준비중();
 
     //when
-    order.setType(OrderType.TAKEOUT);
-    order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     //then
@@ -395,11 +370,10 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"SERVED"}, mode = EnumSource.Mode.EXCLUDE)
   void completeTakeOutOnlyServed(OrderStatus orderStatus) {
     //given
-    Order order = order();
+    Order order = 주문_생성_상태_입력(orderStatus);
+    order.setType(OrderType.TAKEOUT);
 
     //when
-    order.setType(OrderType.TAKEOUT);
-    order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     //then
@@ -407,16 +381,13 @@ class OrderServiceTest {
             .isInstanceOf(IllegalStateException.class);
   }
 
-  @ParameterizedTest
+  @Test
   @DisplayName("매장 식사 타입의 주문 상태를 완료 상태로 변경합니다")
-  @EnumSource(value = OrderStatus.class, names = {"SERVED"})
-  void completeEanIn(OrderStatus orderStatus) {
+  void completeEanIn() {
     //given
-    Order order = order();
+    Order order = 매장_내_식사_주문_생성_상태_준비중();
 
     //when
-    order.setType(OrderType.EAT_IN);
-    order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
     when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(false);
 
@@ -431,11 +402,10 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"SERVED"}, mode = EnumSource.Mode.EXCLUDE)
   void completeEatInOnlyServed(OrderStatus orderStatus) {
     //given
-    Order order = order();
+    Order order = 주문_생성_상태_입력(orderStatus);
+    order.setType(OrderType.EAT_IN);
 
     //when
-    order.setType(OrderType.EAT_IN);
-    order.setStatus(orderStatus);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     //then
@@ -447,7 +417,7 @@ class OrderServiceTest {
   @DisplayName("가게 점주는 주문 정보를 모두 조회할 수 있습니다.")
   void findAll() {
     //given
-    when(orderRepository.findAll()).thenReturn(Collections.singletonList(order()));
+    when(orderRepository.findAll()).thenReturn(주문_리스트());
 
     //then
     orderService.findAll();

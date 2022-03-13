@@ -52,6 +52,7 @@ class MenuGroupServiceTest {
 
     assertDoesNotThrow(() -> {
       MenuGroup result = menuGroupService.create(request);
+      assertThat(request.getName()).isEqualTo(result.getName());
     });
   }
 
