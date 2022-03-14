@@ -12,16 +12,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static kitchenpos.KitchenposFixture.*;
 import static kitchenpos.fixture.MenuFixture.정상_메뉴_가격_만원;
 import static kitchenpos.fixture.MenuFixture.정상_메뉴_가격_이만원;
 import static kitchenpos.fixture.orderFixture.OrderFixture.*;
+import static kitchenpos.fixture.orderFixture.OrderTypeDeliveryFixture.*;
+import static kitchenpos.fixture.orderFixture.OrderTypeEatInFixture.*;
+import static kitchenpos.fixture.orderFixture.OrderTypeTakeOutFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,8 +30,6 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
-  private static final Long NEGATIVE_NUM = -1L;
-  private static final BigDecimal PRICE_ZERO = BigDecimal.ZERO;
   private static final UUID RANDOM_UUID = UUID.randomUUID();
 
   @Mock
@@ -123,9 +122,7 @@ class OrderServiceTest {
   @DisplayName("매장 내 식사 주문인 경우 주문 테이블이 비어있지 않으면 IllegalStateException 예외 발생")
   void EatInNeedOrderTable() {
     //given
-    Order request = 매장_내_식사_주문_생성();
-    request.getOrderTable().setEmpty(false);
-
+    Order request = 매장_내_식사_주문_테이블_존재하지_않음();
     Menu menu = 정상_메뉴_가격_만원();
 
     //when
@@ -266,9 +263,8 @@ class OrderServiceTest {
   @EnumSource(value = OrderType.class, names = {"DELIVERY"}, mode = EnumSource.Mode.EXCLUDE)
   void startDeliveryOnlyDelivery(OrderType orderType) {
     //given
-    Order order = order();
+    Order order = 주문_생성_타입_입력(orderType);
     //when
-    order.setType(orderType);
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertThatThrownBy(() -> orderService.startDelivery(RANDOM_UUID))
@@ -338,8 +334,7 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"DELIVERED"}, mode = EnumSource.Mode.EXCLUDE)
   void completeDeliveryOnlyDelivered(OrderStatus orderStatus) {
     //given
-    Order order = 주문_생성_상태_입력(orderStatus);
-    order.setType(OrderType.DELIVERY);
+    Order order = 배달_타입_주문_상태_입력(orderStatus);
 
     //when
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
@@ -370,8 +365,7 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"SERVED"}, mode = EnumSource.Mode.EXCLUDE)
   void completeTakeOutOnlyServed(OrderStatus orderStatus) {
     //given
-    Order order = 주문_생성_상태_입력(orderStatus);
-    order.setType(OrderType.TAKEOUT);
+    Order order = 포장_타입_주문_상태_입력(orderStatus);
 
     //when
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
@@ -402,8 +396,7 @@ class OrderServiceTest {
   @EnumSource(value = OrderStatus.class, names = {"SERVED"}, mode = EnumSource.Mode.EXCLUDE)
   void completeEatInOnlyServed(OrderStatus orderStatus) {
     //given
-    Order order = 주문_생성_상태_입력(orderStatus);
-    order.setType(OrderType.EAT_IN);
+    Order order = 매장_내_식사_타입_주문_상태_입력(orderStatus);
 
     //when
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
