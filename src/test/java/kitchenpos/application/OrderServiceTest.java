@@ -22,6 +22,8 @@ class OrderServiceTest {
     @Autowired
     private OrderService orderService;
     @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
     private OrderTableService orderTableService;
     @Autowired
     private MenuService menuService;
@@ -215,9 +217,10 @@ class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
     }
 
-    @DisplayName("배달유형 주문의 주문상태 순서 테스트")
-    @Test
-    void deliveryTypeOrder() {
+    @DisplayName("주문 접수는 주문대기 상태에서만 가능하다.")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void accept(OrderStatus orderStatus) {
         // given
         OrderTable orderTable = createOrderTable();
         Menu menu = createMenu();
@@ -228,21 +231,145 @@ class OrderServiceTest {
         // when
         Order orderRequest = createOrderRequest(OrderType.DELIVERY, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
         Order order = orderService.create(orderRequest);
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
 
         // then
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
-        order = orderService.accept(order.getId());
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
-        order = orderService.serve(order.getId());
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
-        order = orderService.startDelivery(order.getId());
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
-        order = orderService.completeDelivery(order.getId());
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
-        order = orderService.complete(order.getId());
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThatThrownBy(() -> orderService.accept(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("메뉴 제공은 주문 접수 상태에서만 가능하다.")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void serve(OrderStatus orderStatus) {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.DELIVERY, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+        Order order = orderService.create(orderRequest);
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+
+        // then
+        assertThatThrownBy(() -> orderService.serve(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("포장 주문의 경우 메뉴제공 상태에서만 완료가 가능하다.")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void completeTakeOutOrder(OrderStatus orderStatus) {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.TAKEOUT, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+        Order order = orderService.create(orderRequest);
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+
+        // then
+        assertThatThrownBy(() -> orderService.complete(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("매장식사 주문의 경우 메뉴제공 상태에서만 완료가 가능하다.")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void completeEatInOrder(OrderStatus orderStatus) {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.EAT_IN, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+        Order order = orderService.create(orderRequest);
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+
+        // then
+        assertThatThrownBy(() -> orderService.complete(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("배달주문의 경우 메뉴제공 상태에서 배달시작이 가능하다.")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void startDelivery(OrderStatus orderStatus) {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.DELIVERY, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+        Order order = orderService.create(orderRequest);
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+
+        // then
+        assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("배달주문의 경우 배달중 상태에서 배달완료가 가능하다.")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
+    void completeDelivery(OrderStatus orderStatus) {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.DELIVERY, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+        Order order = orderService.create(orderRequest);
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+
+        // then
+        assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("배달주문의 경우 배달완료 상태에서 완료처리가 가능하다.")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERING", "COMPLETED"})
+    void completeDeliveryOrder(OrderStatus orderStatus) {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.DELIVERY, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+        Order order = orderService.create(orderRequest);
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+
+        // then
+        assertThatThrownBy(() -> orderService.complete(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
 
     private Order createOrderRequest(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId) {
         Order orderCreateRequest = new Order();
