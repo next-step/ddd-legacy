@@ -75,6 +75,7 @@ class ProductServiceTest {
     //then
     assertDoesNotThrow(() -> {
       Product result = productService.changePrice(ID, request);
+      assertThat(result.getPrice()).isEqualTo(request.getPrice());
     });
   }
 

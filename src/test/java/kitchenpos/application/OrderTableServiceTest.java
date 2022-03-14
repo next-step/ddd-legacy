@@ -41,8 +41,8 @@ class OrderTableServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      OrderTable orderTable = orderTableService.create(request);
-      assertThat(orderTable.getName()).isEqualTo(request.getName());
+      OrderTable result = orderTableService.create(request);
+      assertThat(result.getName()).isEqualTo(request.getName());
     });
   }
 
@@ -55,8 +55,8 @@ class OrderTableServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      OrderTable sitOrder = orderTableService.sit(ID);
-      assertThat(sitOrder.isEmpty()).isFalse();
+      OrderTable result = orderTableService.sit(ID);
+      assertThat(result.isEmpty()).isFalse();
     });
   }
 
@@ -71,10 +71,10 @@ class OrderTableServiceTest {
     when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(false);
 
     //then
-    orderTableService.clear(ID);
+    OrderTable result = orderTableService.clear(ID);
     assertAll(() -> {
-      assertThat(orderTable.isEmpty()).isEqualTo(true);
-      assertThat(orderTable.getNumberOfGuests()).isZero();
+      assertThat(result.isEmpty()).isEqualTo(true);
+      assertThat(result.getNumberOfGuests()).isZero();
     });
   }
 
@@ -98,12 +98,12 @@ class OrderTableServiceTest {
   void changeNumberOfGuests() {
     //given
     OrderTable request = 오더_테이블_손님_10명();
-    OrderTable result = 정상_오더_테이블();
+    OrderTable orderTable = 정상_오더_테이블();
     //when
-    when(orderTableRepository.findById(any())).thenReturn(Optional.of(result));
+    when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
     //then
     assertDoesNotThrow(() -> {
-      orderTableService.changeNumberOfGuests(ID, request);
+      OrderTable result = orderTableService.changeNumberOfGuests(ID, request);
       assertThat(result.getNumberOfGuests()).isEqualTo(request.getNumberOfGuests());
     });
   }

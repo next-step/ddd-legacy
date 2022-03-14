@@ -63,10 +63,10 @@ class OrderServiceTest {
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
     when(orderRepository.save(any())).thenReturn(request);
     assertDoesNotThrow(() -> {
-      Order order = orderService.create(request);
-      assertThat(order.getType()).isEqualTo(OrderType.DELIVERY);
-      assertThat(order.getDeliveryAddress()).isEqualTo(request.getDeliveryAddress());
-      assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
+      Order result = orderService.create(request);
+      assertThat(result.getType()).isEqualTo(OrderType.DELIVERY);
+      assertThat(result.getDeliveryAddress()).isEqualTo(request.getDeliveryAddress());
+      assertThat(result.getStatus()).isEqualTo(OrderStatus.WAITING);
     });
 
   }
@@ -112,9 +112,11 @@ class OrderServiceTest {
     when(orderTableRepository.findById(any())).thenReturn(Optional.of(request.getOrderTable()));
     when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+    when(orderRepository.save(any())).thenReturn(request);
 
     assertDoesNotThrow(() -> {
-      Order order = orderService.create(request);
+      Order result = orderService.create(request);
+      assertThat(result.getType()).isEqualTo(request.getType());
       verify(orderRepository).save(any(Order.class));
     });
   }
@@ -182,8 +184,8 @@ class OrderServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      Order acceptOrder = orderService.accept(RANDOM_UUID);
-      assertThat(acceptOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+      Order result = orderService.accept(RANDOM_UUID);
+      assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     });
   }
 
@@ -199,8 +201,8 @@ class OrderServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      Order acceptOrder = orderService.accept(RANDOM_UUID);
-      assertThat(acceptOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+      Order result = orderService.accept(RANDOM_UUID);
+      assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     });
   }
 
@@ -229,8 +231,8 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
     //then
     assertDoesNotThrow(() -> {
-      Order serveOrder = orderService.serve(RANDOM_UUID);
-      assertThat(serveOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+      Order result = orderService.serve(RANDOM_UUID);
+      assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED);
     });
   }
 
@@ -258,8 +260,8 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertDoesNotThrow(() -> {
-      Order startDeliveryOrder = orderService.startDelivery(RANDOM_UUID);
-      assertThat(startDeliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+      Order result = orderService.startDelivery(RANDOM_UUID);
+      assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     });
 
   }
@@ -301,8 +303,8 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertDoesNotThrow(() -> {
-      Order completeDeliveryOrder = orderService.completeDelivery(RANDOM_UUID);
-      assertThat(completeDeliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+      Order result = orderService.completeDelivery(RANDOM_UUID);
+      assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     });
   }
 
@@ -332,8 +334,8 @@ class OrderServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      Order completeOrder = orderService.complete(RANDOM_UUID);
-      assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+      Order result = orderService.complete(RANDOM_UUID);
+      assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     });
 
   }
@@ -365,8 +367,8 @@ class OrderServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      Order completeOrder = orderService.complete(RANDOM_UUID);
-      assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+      Order result = orderService.complete(RANDOM_UUID);
+      assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     });
   }
 
@@ -397,8 +399,8 @@ class OrderServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      Order completeOrder = orderService.complete(RANDOM_UUID);
-      assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+      Order result = orderService.complete(RANDOM_UUID);
+      assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     });
   }
 

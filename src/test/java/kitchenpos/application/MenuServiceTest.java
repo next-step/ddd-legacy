@@ -105,10 +105,11 @@ class MenuServiceTest {
     when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
     //when
     when(productRepository.findAllByIdIn(any())).thenReturn(상품_리스트_가격_만원_갯수_두개());
-
+    when(menuRepository.save(any())).thenReturn(request);
     //then
     assertThatThrownBy(() -> {
-      menuService.create(request);
+      Menu result = menuService.create(request);
+      assertThat(result.getPrice()).isEqualTo(request.getPrice());
     }).isInstanceOf(IllegalArgumentException.class);
   }
 
@@ -175,8 +176,8 @@ class MenuServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      Menu changePriceMenu = menuService.changePrice(ID, request);
-      assertThat(changePriceMenu.getPrice()).isEqualTo(request.getPrice());
+      Menu result = menuService.changePrice(ID, request);
+      assertThat(result.getPrice()).isEqualTo(request.getPrice());
     });
   }
 
@@ -215,8 +216,8 @@ class MenuServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      menuService.display(ID);
-      assertThat(menu.isDisplayed()).isTrue();
+      Menu result = menuService.display(ID);
+      assertThat(result.isDisplayed()).isTrue();
     });
   }
 
@@ -243,8 +244,8 @@ class MenuServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      Menu hide = menuService.hide(ID);
-      assertThat(hide.isDisplayed()).isFalse();
+      Menu result = menuService.hide(ID);
+      assertThat(result.isDisplayed()).isFalse();
     });
   }
 
