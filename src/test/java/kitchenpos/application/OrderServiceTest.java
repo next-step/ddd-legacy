@@ -47,8 +47,8 @@ class OrderServiceTest {
 
   private static Stream<String> getAddress() {
     return Stream.of(
-            "",
-            null
+      "",
+      null
     );
   }
 
@@ -83,7 +83,7 @@ class OrderServiceTest {
 
     //then
     assertThatThrownBy(() -> orderService.create(request))
-            .isInstanceOf(IllegalArgumentException.class);
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @ParameterizedTest
@@ -99,7 +99,7 @@ class OrderServiceTest {
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
     assertThatThrownBy(() -> orderService.create(request))
-            .isInstanceOf(IllegalArgumentException.class);
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
@@ -132,7 +132,7 @@ class OrderServiceTest {
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
     //then
     assertThatThrownBy(() -> orderService.create(request))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @ParameterizedTest
@@ -150,7 +150,7 @@ class OrderServiceTest {
 
     //then
     assertThatThrownBy(() -> orderService.create(request))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @ParameterizedTest
@@ -167,7 +167,7 @@ class OrderServiceTest {
 
     //then
     assertThatThrownBy(() -> orderService.create(request))
-            .isInstanceOf(IllegalArgumentException.class);
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @ParameterizedTest
@@ -215,7 +215,7 @@ class OrderServiceTest {
 
     //then
     assertThatThrownBy(() -> orderService.accept(RANDOM_UUID))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @ParameterizedTest
@@ -245,7 +245,7 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
     //then
     assertThatThrownBy(() -> orderService.serve(RANDOM_UUID))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @Test
@@ -254,7 +254,7 @@ class OrderServiceTest {
     //given
     Order order = 배달_타입_주문_상태_준비중();
 
-      //when
+    //when
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertDoesNotThrow(() -> {
@@ -274,7 +274,7 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertThatThrownBy(() -> orderService.startDelivery(RANDOM_UUID))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @ParameterizedTest
@@ -288,7 +288,7 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertThatThrownBy(() -> orderService.startDelivery(RANDOM_UUID))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @ParameterizedTest
@@ -317,7 +317,7 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertThatThrownBy(() -> orderService.completeDelivery(RANDOM_UUID))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @ParameterizedTest
@@ -350,7 +350,7 @@ class OrderServiceTest {
 
     //then
     assertThatThrownBy(() -> orderService.complete(RANDOM_UUID))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @ParameterizedTest
@@ -382,7 +382,7 @@ class OrderServiceTest {
 
     //then
     assertThatThrownBy(() -> orderService.complete(RANDOM_UUID))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @Test
@@ -414,7 +414,7 @@ class OrderServiceTest {
 
     //then
     assertThatThrownBy(() -> orderService.complete(RANDOM_UUID))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @Test
@@ -424,7 +424,7 @@ class OrderServiceTest {
     when(orderRepository.findAll()).thenReturn(주문_리스트());
 
     //then
-    assertDoesNotThrow(()->{
+    assertDoesNotThrow(() -> {
       orderService.findAll();
       verify(orderRepository).findAll();
     });

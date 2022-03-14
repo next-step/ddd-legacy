@@ -90,7 +90,7 @@ class OrderTableServiceTest {
 
     //then
     assertThatThrownBy(() -> orderTableService.clear(ID))
-            .isInstanceOf(IllegalStateException.class);
+      .isInstanceOf(IllegalStateException.class);
   }
 
   @Test
@@ -116,7 +116,7 @@ class OrderTableServiceTest {
 
     //then
     assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(ID, request))
-            .isInstanceOf(IllegalArgumentException.class);
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test

@@ -48,9 +48,11 @@ public class ProductFixture {
   public static List<Product> 상품_리스트_가격_만원() {
     return Collections.singletonList(상품_가격_만원());
   }
+
   public static List<Product> 상품_리스트_가격_이만원() {
     return Collections.singletonList(상품_가격_이만원());
   }
+
   public static List<Product> 상품_리스트_가격_만원_갯수_두개() {
     return Arrays.asList(상품_가격_만원(), 상품_가격_만원());
   }

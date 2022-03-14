@@ -25,10 +25,10 @@ public class Order {
 
   @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(
-          name = "order_id",
-          nullable = false,
-          columnDefinition = "varbinary(16)",
-          foreignKey = @ForeignKey(name = "fk_order_line_item_to_orders")
+    name = "order_id",
+    nullable = false,
+    columnDefinition = "varbinary(16)",
+    foreignKey = @ForeignKey(name = "fk_order_line_item_to_orders")
   )
   private List<OrderLineItem> orderLineItems;
 
@@ -37,9 +37,9 @@ public class Order {
 
   @ManyToOne
   @JoinColumn(
-          name = "order_table_id",
-          columnDefinition = "varbinary(16)",
-          foreignKey = @ForeignKey(name = "fk_orders_to_order_table")
+    name = "order_table_id",
+    columnDefinition = "varbinary(16)",
+    foreignKey = @ForeignKey(name = "fk_orders_to_order_table")
   )
   private OrderTable orderTable;
 

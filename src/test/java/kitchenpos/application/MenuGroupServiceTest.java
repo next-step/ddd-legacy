@@ -39,7 +39,7 @@ class MenuGroupServiceTest {
 
     //then
     assertThatThrownBy(() -> menuGroupService.create(menuGroup))
-            .isInstanceOf(IllegalArgumentException.class);
+      .isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test

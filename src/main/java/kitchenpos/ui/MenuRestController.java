@@ -22,7 +22,7 @@ public class MenuRestController {
   public ResponseEntity<Menu> create(@RequestBody final Menu request) {
     final Menu response = menuService.create(request);
     return ResponseEntity.created(URI.create("/api/menus/" + response.getId()))
-            .body(response);
+      .body(response);
   }
 
   @PutMapping("/{menuId}/price")

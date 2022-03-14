@@ -102,7 +102,7 @@ class ProductServiceTest {
     when(menuRepository.findAllByProductId(any())).thenReturn(menus);
 
     //then
-    assertDoesNotThrow(()->{
+    assertDoesNotThrow(() -> {
       productService.changePrice(ID, request);
     });
     menus.forEach(menu -> {
@@ -117,7 +117,7 @@ class ProductServiceTest {
     when(productRepository.findAll()).thenReturn(상품_리스트_가격_만원());
 
     //then
-    assertDoesNotThrow(()->{
+    assertDoesNotThrow(() -> {
       productService.findAll();
       verify(productRepository).findAll();
     });

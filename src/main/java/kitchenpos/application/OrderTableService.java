@@ -39,7 +39,7 @@ public class OrderTableService {
   @Transactional
   public OrderTable sit(final UUID orderTableId) {
     final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+      .orElseThrow(NoSuchElementException::new);
     orderTable.setEmpty(false);
     return orderTable;
   }
@@ -47,7 +47,7 @@ public class OrderTableService {
   @Transactional
   public OrderTable clear(final UUID orderTableId) {
     final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+      .orElseThrow(NoSuchElementException::new);
     if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
       throw new IllegalStateException();
     }
@@ -63,7 +63,7 @@ public class OrderTableService {
       throw new IllegalArgumentException();
     }
     final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+      .orElseThrow(NoSuchElementException::new);
     if (orderTable.isEmpty()) {
       throw new IllegalStateException();
     }
