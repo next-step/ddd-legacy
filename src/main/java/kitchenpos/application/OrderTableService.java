@@ -19,6 +19,7 @@ public class OrderTableService {
 
     public OrderTableService(final OrderTableRepository orderTableRepository,
         final OrderRepository orderRepository) {
+
         this.orderTableRepository = orderTableRepository;
         this.orderRepository = orderRepository;
     }
@@ -29,11 +30,13 @@ public class OrderTableService {
         if (Objects.isNull(name) || name.isEmpty()) {
             throw new IllegalArgumentException();
         }
+
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(name);
         orderTable.setNumberOfGuests(0);
         orderTable.setEmpty(true);
+
         return orderTableRepository.save(orderTable);
     }
 
@@ -41,7 +44,9 @@ public class OrderTableService {
     public OrderTable sit(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
+
         orderTable.setEmpty(false);
+
         return orderTable;
     }
 
@@ -52,8 +57,10 @@ public class OrderTableService {
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
             throw new IllegalStateException();
         }
+
         orderTable.setNumberOfGuests(0);
         orderTable.setEmpty(true);
+
         return orderTable;
     }
 
@@ -63,12 +70,15 @@ public class OrderTableService {
         if (numberOfGuests < 0) {
             throw new IllegalArgumentException();
         }
+
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (orderTable.isEmpty()) {
             throw new IllegalStateException();
         }
+
         orderTable.setNumberOfGuests(numberOfGuests);
+
         return orderTable;
     }
 

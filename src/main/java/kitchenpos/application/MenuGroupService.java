@@ -23,9 +23,11 @@ public class MenuGroupService {
         if (Objects.isNull(name) || name.isEmpty()) {
             throw new IllegalArgumentException();
         }
+
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
         menuGroup.setName(name);
+
         return menuGroupRepository.save(menuGroup);
     }
 
