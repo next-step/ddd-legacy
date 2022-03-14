@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,6 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static java.util.Objects.*;
 import static kitchenpos.KitchenposFixture.*;
 import static kitchenpos.fixture.MenuFixture.*;
 import static kitchenpos.fixture.MenuGroupFixture.정상_메뉴_그룹;
@@ -52,7 +50,6 @@ class MenuServiceTest {
   }
 
   @Test
-  @Order(1)
   @DisplayName("가게 점주는 메뉴를 추가 할 수 있습니다.")
   void addMenu() {
     //given
@@ -72,7 +69,6 @@ class MenuServiceTest {
     });
   }
 
-  @Order(2)
   @ParameterizedTest
   @MethodSource("menuPriceNullAndMinus")
   @DisplayName("메뉴의 가격이 존재하지 않거나 음수이면 IllegalArgumentException 예외 발생")
@@ -85,7 +81,6 @@ class MenuServiceTest {
       .isInstanceOf(IllegalArgumentException.class);
   }
 
-  @Order(3)
   @Test
   @DisplayName("생성하려는 메뉴에 메뉴 그룹이 존재하지 않으면 NoSuchElementException 예외 발생")
   void menuInMenuGroup() {
@@ -100,7 +95,6 @@ class MenuServiceTest {
       .isInstanceOf(NoSuchElementException.class);
   }
 
-  @Order(4)
   @Test
   @DisplayName("메뉴에 올라간 상품과 메뉴에 올라간 상품의 사이즈가 다르면 IllegalArgumentException 예외 발생")
   void checkProductAndMenuProduct() {
@@ -152,8 +146,26 @@ class MenuServiceTest {
       .isInstanceOf(IllegalArgumentException.class);
   }
 
+
   @Test
-  @Order(7)
+  @DisplayName(" 메뉴 이름이 존재해야하고, 비속어가 포함이 되면 안됩니다.생")
+  void needName() {
+    //given
+    Menu request = 정상_메뉴_가격_만원();
+    List<Product> productList = 상품_리스트_가격_만원();
+
+    when(menuGroupRepository.findById(any())).thenReturn(Optional.of(request.getMenuGroup()));
+    when(productRepository.findAllByIdIn(any())).thenReturn(productList);
+    when(productRepository.findById(any())).thenReturn(productList.stream().findFirst());
+    //when
+    when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+
+    //then
+    assertThatThrownBy(() -> menuService.create(request))
+      .isInstanceOf(IllegalArgumentException.class);
+  }
+
+  @Test
   @DisplayName("가게 점주는 가격을 변경할 수 있습니다.")
   void changePriceInMenu() {
     //given
@@ -168,7 +180,6 @@ class MenuServiceTest {
     });
   }
 
-  @Order(8)
   @Test
   @DisplayName("변경하려는 메뉴의 가격은 음수면 IllegalArgumentException 예외 발생")
   void changePriceIsPositiveNum() {
@@ -181,7 +192,6 @@ class MenuServiceTest {
   }
 
   @Test
-  @Order(9)
   @DisplayName("메뉴 가격은 메뉴의 상품들 가격의 합보다 비싸면 IllegalArgumentException 예외 발생")
   void compareChangePrice() {
     //given
@@ -196,7 +206,6 @@ class MenuServiceTest {
   }
 
   @Test
-  @Order(10)
   @DisplayName("가게 점주는 메뉴 숨김 처리를 해제할 수 있습니다.")
   void uncoverMenu() {
     //given
@@ -212,7 +221,6 @@ class MenuServiceTest {
   }
 
   @Test
-  @Order(11)
   @DisplayName("메뉴 가격은 메뉴의 상품들 가격의 합보다 비싸면 IllegalStateException 예외 발생")
   void checkMenuPrice() {
     //given
@@ -226,7 +234,6 @@ class MenuServiceTest {
   }
 
   @Test
-  @Order(12)
   @DisplayName("점주는 메뉴를 숨김 처리할 수 있습니다.")
   void hideMenu() {
     //given
@@ -242,7 +249,6 @@ class MenuServiceTest {
   }
 
   @Test
-  @Order(13)
   @DisplayName("가게 점주와 가게 손님은 메뉴를 전부 조회할 수 있습니다.")
   void findAll() {
     //given
