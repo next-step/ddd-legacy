@@ -1,13 +1,18 @@
 package kitchenpos.application;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 
 public final class Fixtures {
@@ -49,9 +54,19 @@ public final class Fixtures {
     }
 
     public static MenuProduct createMenuProduct(Product product) {
+        return createMenuProduct(0L, product, 2);
+    }
+
+    public static MenuProduct createMenuProduct(
+        Long seq,
+        Product product,
+        long quantity
+    ) {
         final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setQuantity(2);
+        menuProduct.setSeq(seq);
         menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        menuProduct.setProductId(product.getId());
         return menuProduct;
     }
 
@@ -110,13 +125,37 @@ public final class Fixtures {
     }
 
     public static Menu createMenu(
+        BigDecimal price,
+        String name,
+        boolean display,
+        UUID menuProductId,
+        MenuProduct... menuProducts
+    ) {
+        return createMenu(
+            UUID.randomUUID(),
+            price,
+            name,
+            display,
+            menuProductId,
+            Arrays.asList(menuProducts)
+        );
+    }
+
+    public static Menu createMenu(
         UUID menuId,
         BigDecimal price,
         boolean display,
         UUID menuProductId,
         MenuProduct... menuProducts
     ) {
-        return createMenu(menuId, price, display, menuProductId, Arrays.asList(menuProducts));
+        return createMenu(
+            menuId,
+            price,
+            "좋은말",
+            display,
+            menuProductId,
+            Arrays.asList(menuProducts)
+        );
     }
 
     public static Menu createMenu(
@@ -125,12 +164,20 @@ public final class Fixtures {
         UUID menuProductId,
         List<MenuProduct> menuProducts
     ) {
-        return createMenu(UUID.randomUUID(), price, display, menuProductId, menuProducts);
+        return createMenu(
+            UUID.randomUUID(),
+            price,
+            "좋은말",
+            display,
+            menuProductId,
+            menuProducts
+        );
     }
 
     public static Menu createMenu(
         UUID menuId,
         BigDecimal price,
+        String name,
         boolean display,
         UUID menuProductId,
         List<MenuProduct> menuProducts
@@ -138,9 +185,70 @@ public final class Fixtures {
         final Menu menu = new Menu();
         menu.setId(menuId);
         menu.setPrice(price);
+        menu.setName(name);
         menu.setDisplayed(display);
         menu.setMenuGroupId(menuProductId);
         menu.setMenuProducts(menuProducts);
         return menu;
+    }
+
+    public static OrderLineItem createOrderLineItem(
+        Long seq,
+        Menu menu,
+        long quantity,
+        UUID menuId,
+        BigDecimal price
+    ) {
+        final OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setSeq(seq);
+        orderLineItem.setMenu(menu);
+        orderLineItem.setQuantity(quantity);
+        orderLineItem.setMenuId(menuId);
+        orderLineItem.setPrice(price);
+        return orderLineItem;
+    }
+
+    public static Order createOrder(
+        UUID id,
+        OrderType type,
+        OrderStatus status,
+        LocalDateTime orderDateTime,
+        String deliveryAddress,
+        OrderTable orderTable,
+        UUID orderTableId,
+        List<OrderLineItem> orderLineItems
+    ) {
+        final Order order = new Order();
+        order.setId(id);
+        order.setType(type);
+        order.setStatus(status);
+        order.setOrderDateTime(orderDateTime);
+        order.setDeliveryAddress(deliveryAddress);
+        order.setOrderTable(orderTable);
+        order.setOrderTableId(orderTableId);
+        order.setOrderLineItems(orderLineItems);
+        return order;
+    }
+
+    public static Order createOrder(
+        UUID id,
+        OrderType type,
+        OrderStatus status,
+        LocalDateTime orderDateTime,
+        String deliveryAddress,
+        OrderTable orderTable,
+        UUID orderTableId,
+        OrderLineItem... orderLineItems
+    ) {
+        return createOrder(
+            id,
+            type,
+            status,
+            orderDateTime,
+            deliveryAddress,
+            orderTable,
+            orderTableId,
+            Arrays.asList(orderLineItems)
+        );
     }
 }
