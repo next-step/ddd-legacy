@@ -148,7 +148,7 @@ class MenuServiceTest {
 
 
   @Test
-  @DisplayName(" 메뉴 이름이 존재해야하고, 비속어가 포함이 되면 안됩니다.생")
+  @DisplayName("메뉴 이름이 존재해야하고, 비속어가 포함이 되면 안됩니다.")
   void needName() {
     //given
     Menu request = 정상_메뉴_가격_만원();
