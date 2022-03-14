@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static kitchenpos.KitchenposFixture.ID;
-import static kitchenpos.KitchenposFixture.orderTable;
 
 public class OrderTableFixture {
   private static final String ORDER_TABLE_NAME = "order table name";

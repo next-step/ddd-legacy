@@ -114,7 +114,8 @@ class OrderServiceTest {
     when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
     assertDoesNotThrow(() -> {
-      orderService.create(request);
+      Order order = orderService.create(request);
+      verify(orderRepository).save(any(Order.class));
     });
   }
 
@@ -181,9 +182,9 @@ class OrderServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      orderService.accept(RANDOM_UUID);
+      Order acceptOrder = orderService.accept(RANDOM_UUID);
+      assertThat(acceptOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     });
-    assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
   }
 
   @ParameterizedTest
@@ -198,9 +199,9 @@ class OrderServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      orderService.accept(RANDOM_UUID);
+      Order acceptOrder = orderService.accept(RANDOM_UUID);
+      assertThat(acceptOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     });
-    assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
   }
 
   @ParameterizedTest
@@ -228,9 +229,9 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
     //then
     assertDoesNotThrow(() -> {
-      orderService.serve(RANDOM_UUID);
+      Order serveOrder = orderService.serve(RANDOM_UUID);
+      assertThat(serveOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
     });
-    assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
   }
 
   @ParameterizedTest
@@ -257,9 +258,9 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertDoesNotThrow(() -> {
-      orderService.startDelivery(RANDOM_UUID);
+      Order startDeliveryOrder = orderService.startDelivery(RANDOM_UUID);
+      assertThat(startDeliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     });
-    assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
 
   }
 
@@ -300,9 +301,9 @@ class OrderServiceTest {
     when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
     assertDoesNotThrow(() -> {
-      orderService.completeDelivery(RANDOM_UUID);
+      Order completeDeliveryOrder = orderService.completeDelivery(RANDOM_UUID);
+      assertThat(completeDeliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     });
-    assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
   }
 
   @ParameterizedTest
@@ -331,9 +332,9 @@ class OrderServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      orderService.complete(RANDOM_UUID);
+      Order completeOrder = orderService.complete(RANDOM_UUID);
+      assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     });
-    assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
 
   }
 
@@ -364,9 +365,9 @@ class OrderServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      orderService.complete(RANDOM_UUID);
+      Order completeOrder = orderService.complete(RANDOM_UUID);
+      assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     });
-    assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
   }
 
   @ParameterizedTest
@@ -396,9 +397,9 @@ class OrderServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      orderService.complete(RANDOM_UUID);
+      Order completeOrder = orderService.complete(RANDOM_UUID);
+      assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     });
-    assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
   }
 
   @ParameterizedTest
@@ -423,7 +424,9 @@ class OrderServiceTest {
     when(orderRepository.findAll()).thenReturn(주문_리스트());
 
     //then
-    orderService.findAll();
-    verify(orderRepository).findAll();
+    assertDoesNotThrow(()->{
+      orderService.findAll();
+      verify(orderRepository).findAll();
+    });
   }
 }

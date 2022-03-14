@@ -117,7 +117,9 @@ class ProductServiceTest {
     when(productRepository.findAll()).thenReturn(상품_리스트_가격_만원());
 
     //then
-    productService.findAll();
-    verify(productRepository).findAll();
+    assertDoesNotThrow(()->{
+      productService.findAll();
+      verify(productRepository).findAll();
+    });
   }
 }

@@ -38,9 +38,11 @@ class OrderTableServiceTest {
     OrderTable request = 정상_오더_테이블();
 
     when(orderTableRepository.save(any())).thenReturn(request);
+
     //then
     assertDoesNotThrow(() -> {
-      orderTableService.create(request);
+      OrderTable orderTable = orderTableService.create(request);
+      assertThat(orderTable.getName()).isEqualTo(request.getName());
     });
   }
 
@@ -53,7 +55,8 @@ class OrderTableServiceTest {
 
     //then
     assertDoesNotThrow(() -> {
-      orderTableService.sit(ID);
+      OrderTable sitOrder = orderTableService.sit(ID);
+      assertThat(sitOrder.isEmpty()).isFalse();
     });
   }
 
@@ -79,7 +82,7 @@ class OrderTableServiceTest {
   @DisplayName("가게 점주는 주문을 받을 때, 음식이 완료되지 않으면 IllegalStateException 예외 발생")
   void changeTableButIllegal() {
     //given
-    OrderTable orderTable = orderTable();
+    OrderTable orderTable = 정상_오더_테이블();
     when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
 
     //when
