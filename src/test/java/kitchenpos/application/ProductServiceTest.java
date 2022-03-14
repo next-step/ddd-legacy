@@ -38,7 +38,7 @@ class ProductServiceTest {
   @DisplayName("상품을 생성합니다.")
   void createProduct() {
     //given
-    Product request = 정상_상품();
+    Product request = 상품_가격_만원();
 
     //when
     when(productRepository.save(any())).thenReturn(request);
