@@ -396,6 +396,28 @@ class OrderServiceTest {
         assertThat(orderTable.getNumberOfGuests()).isZero();
     }
 
+    @DisplayName("주문이 완료되지 않은 상태에서 주문테이블을 비울 수 없다.")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERING", "DELIVERED"})
+    void clearTableInvalidInOrderStatus(OrderStatus orderStatus) {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.EAT_IN, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+        Order order = orderService.create(orderRequest);
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+
+        // then
+        assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
     private Order createOrderRequest(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId) {
         Order orderCreateRequest = new Order();
         orderCreateRequest.setType(orderType);
