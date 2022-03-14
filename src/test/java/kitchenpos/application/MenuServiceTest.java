@@ -102,15 +102,12 @@ class MenuServiceTest {
     Menu request = 메뉴의_메뉴_상품과_메뉴에_올라간_상품_사이즈_다름();
     MenuGroup menuGroup = request.getMenuGroup();
 
-    when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
     //when
+    when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
     when(productRepository.findAllByIdIn(any())).thenReturn(상품_리스트_가격_만원_갯수_두개());
-    when(menuRepository.save(any())).thenReturn(request);
+
     //then
-    assertThatThrownBy(() -> {
-      Menu result = menuService.create(request);
-      assertThat(result.getPrice()).isEqualTo(request.getPrice());
-    }).isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
   }
 
   @Test
