@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
+import kitchenpos.MemoryPurgomalumClient;
 import kitchenpos.domain.*;
-import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +14,7 @@ import java.util.Optional;
 
 import static kitchenpos.KitchenposFixture.*;
 import static kitchenpos.fixture.MenuFixture.메뉴_리스트_가격_이만원;
+import static kitchenpos.fixture.MenuFixture.정상_메뉴_가격_만원;
 import static kitchenpos.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,8 +29,8 @@ class ProductServiceTest {
   @Mock
   private MenuRepository menuRepository;
 
-  @Mock(lenient = true)
-  private PurgomalumClient purgomalumClient;
+  @Mock
+  private MemoryPurgomalumClient purgomalumClient;
 
   @InjectMocks
   private ProductService productService;
@@ -61,6 +62,19 @@ class ProductServiceTest {
       productService.create(request);
     }).isInstanceOf(IllegalArgumentException.class);
   }
+
+  @Test
+  @DisplayName("메뉴 이름이 존재해야하고, 비속어가 포함이 되면 안됩니다.")
+  void needName() {
+    //given
+    Product request = 상품_가격_만원();
+    when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+
+    assertThatThrownBy(() -> {
+      productService.create(request);
+    }).isInstanceOf(IllegalArgumentException.class);
+  }
+
 
   @Test
   @DisplayName("상품을 가격을 변경합니다.")

@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.MemoryKitchenridersClient;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.DisplayName;
@@ -39,8 +40,8 @@ class OrderServiceTest {
   @Mock
   private OrderTableRepository orderTableRepository;
 
-  @Mock(lenient = true)
-  private KitchenridersClient kitchenridersClient;
+  @Mock
+  private MemoryKitchenridersClient kitchenridersClient;
 
   @InjectMocks
   OrderService orderService;

@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.MemoryPurgomalumClient;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
@@ -36,8 +37,8 @@ class MenuServiceTest {
   MenuGroupRepository menuGroupRepository;
   @Mock
   ProductRepository productRepository;
-  @Mock(lenient = true)
-  PurgomalumClient purgomalumClient;
+  @Mock
+  MemoryPurgomalumClient purgomalumClient;
 
   @InjectMocks
   private MenuService menuService;
