@@ -8,7 +8,7 @@ public class ProductFixture {
     public static final Product FRIED_CHICKEN =
         ProductFixture.builder()
                       .id(UUID.randomUUID())
-                      .name("프라이드 치킨")
+                      .name("후라이드 치킨")
                       .price(BigDecimal.valueOf(18000L))
                       .build();
 
