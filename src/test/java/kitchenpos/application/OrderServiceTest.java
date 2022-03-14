@@ -26,6 +26,8 @@ class OrderServiceTest {
     @Autowired
     private OrderTableService orderTableService;
     @Autowired
+    private OrderTableRepository orderTableRepository;
+    @Autowired
     private MenuService menuService;
     @Autowired
     private MenuGroupService menuGroupService;
@@ -369,6 +371,29 @@ class OrderServiceTest {
         // then
         assertThatThrownBy(() -> orderService.complete(order.getId()))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문의 유형이 매장식사인 경우, 주문이 완료되는 시점에 주문테이블을 비워야 한다.")
+    @Test
+    void clearTable() {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        // when
+        Order orderRequest = createOrderRequest(OrderType.EAT_IN, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+        Order order = orderService.create(orderRequest);
+        order.setStatus(OrderStatus.SERVED);
+        orderRepository.save(order);
+        orderService.complete(order.getId());
+
+        // then
+        orderTable = orderTableRepository.findById(orderTable.getId()).orElseThrow(NoSuchElementException::new);
+        assertThat(orderTable.isEmpty()).isTrue();
+        assertThat(orderTable.getNumberOfGuests()).isZero();
     }
 
     private Order createOrderRequest(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress, UUID orderTableId) {
