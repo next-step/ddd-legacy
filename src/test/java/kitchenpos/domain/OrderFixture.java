@@ -19,6 +19,15 @@ public class OrderFixture {
                     .deliveryAddress("address")
                     .build();
 
+    public static Order TAKEOUT_CHICKEN_ORDER =
+        OrderFixture.builder()
+                    .id(UUID.randomUUID())
+                    .type(OrderType.TAKEOUT)
+                    .status(OrderStatus.WAITING)
+                    .orderDateTime(LocalDateTime.now())
+                    .orderLineItems(Collections.singletonList(CHICKEN_ORDER_LINE))
+                    .build();
+
     private UUID id;
     private OrderType type;
     private OrderStatus status;
