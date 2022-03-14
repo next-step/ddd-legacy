@@ -183,6 +183,7 @@ class OrderServiceTest {
     assertDoesNotThrow(() -> {
       orderService.accept(RANDOM_UUID);
     });
+    assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
   }
 
   @ParameterizedTest
@@ -199,6 +200,7 @@ class OrderServiceTest {
     assertDoesNotThrow(() -> {
       orderService.accept(RANDOM_UUID);
     });
+    assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
   }
 
   @ParameterizedTest
@@ -228,6 +230,7 @@ class OrderServiceTest {
     assertDoesNotThrow(() -> {
       orderService.serve(RANDOM_UUID);
     });
+    assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
   }
 
   @ParameterizedTest
@@ -256,6 +259,8 @@ class OrderServiceTest {
     assertDoesNotThrow(() -> {
       orderService.startDelivery(RANDOM_UUID);
     });
+    assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+
   }
 
   @ParameterizedTest
@@ -297,6 +302,7 @@ class OrderServiceTest {
     assertDoesNotThrow(() -> {
       orderService.completeDelivery(RANDOM_UUID);
     });
+    assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
   }
 
   @ParameterizedTest
@@ -327,6 +333,8 @@ class OrderServiceTest {
     assertDoesNotThrow(() -> {
       orderService.complete(RANDOM_UUID);
     });
+    assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+
   }
 
   @ParameterizedTest
@@ -358,6 +366,7 @@ class OrderServiceTest {
     assertDoesNotThrow(() -> {
       orderService.complete(RANDOM_UUID);
     });
+    assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
   }
 
   @ParameterizedTest
@@ -389,6 +398,7 @@ class OrderServiceTest {
     assertDoesNotThrow(() -> {
       orderService.complete(RANDOM_UUID);
     });
+    assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
   }
 
   @ParameterizedTest
