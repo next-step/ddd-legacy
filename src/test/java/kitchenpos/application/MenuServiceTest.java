@@ -4,6 +4,7 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
+import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,12 +13,15 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class MenuServiceTest {
@@ -28,6 +32,8 @@ class MenuServiceTest {
     private MenuGroupService menuGroupService;
     @Autowired
     private ProductService productService;
+    @MockBean
+    private PurgomalumClient purgomalumClient;
 
     @DisplayName("메뉴에는 반드시 이름이 있어야 한다.")
     @ParameterizedTest
@@ -67,6 +73,7 @@ class MenuServiceTest {
 
         // when
         Menu menuCreateRequest = createMenuRequest(new BigDecimal("15000"), menuGroup, menuProducts, name);
+        when(purgomalumClient.containsProfanity(any())).thenReturn(true);
 
         // then
         assertThatThrownBy(() -> menuService.create(menuCreateRequest))
