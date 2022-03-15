@@ -21,6 +21,7 @@ import static kitchenpos.unit.fixture.ProductFixture.짜장면;
 import static kitchenpos.unit.fixture.ProductFixture.탕수육;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.when;
 
@@ -47,7 +48,7 @@ class MenuServiceTest {
     void create() {
         // given
         when(menuGroupRepository.findById(탕수육_세트.getId())).thenReturn(Optional.of(탕수육_세트));
-        when(productRepository.findAllByIdIn(any(List.class))).thenReturn(한그릇_세트_상품목록);
+        when(productRepository.findAllByIdIn(anyList())).thenReturn(한그릇_세트_상품목록);
         when(productRepository.findById(탕수육.getId())).thenReturn(Optional.of(탕수육));
         when(productRepository.findById(짜장면.getId())).thenReturn(Optional.of(짜장면));
         when(purgomalumClient.containsProfanity(한그릇_세트.getName())).thenReturn(false);
@@ -65,7 +66,7 @@ class MenuServiceTest {
     @ValueSource(strings = {"-1"})
     @NullSource
     void createInvalidPrice(BigDecimal price) {
-        assertThatThrownBy(() -> menuService.create(createMenu(탕수육_세트, "한그릇 세트", price, 한그릇_세트_상품목록)))
+        assertThatThrownBy(() -> menuService.create(createMenu(탕수육_세트, "한그릇 세트", price, 한그릇_세트_상품목록, true)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -74,7 +75,7 @@ class MenuServiceTest {
     @NullSource
     void createInvalidName(String name) {
         // given
-        Menu menu = createMenu(탕수육_세트, name, BigDecimal.valueOf(14000), 한그릇_세트_상품목록);
+        Menu menu = createMenu(탕수육_세트, name, BigDecimal.valueOf(14000), 한그릇_세트_상품목록, true);
         when(menuGroupRepository.findById(탕수육_세트.getId())).thenReturn(Optional.of(탕수육_세트));
         when(productRepository.findAllByIdIn(any(List.class))).thenReturn(한그릇_세트_상품목록);
         when(productRepository.findById(탕수육.getId())).thenReturn(Optional.of(탕수육));
@@ -118,7 +119,7 @@ class MenuServiceTest {
         // given
         List<MenuProduct> menuProducts = new ArrayList<>();
         menuProducts.add(createMenuProduct(탕수육, -1));
-        Menu menu = createMenuWithMenuProducts(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(14000), menuProducts);
+        Menu menu = createMenuWithMenuProducts(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(14000), menuProducts, true);
 
         when(menuGroupRepository.findById(탕수육_세트.getId())).thenReturn(Optional.of(탕수육_세트));
         when(productRepository.findAllByIdIn(any(List.class))).thenReturn(한그릇_세트_상품목록);
@@ -133,7 +134,7 @@ class MenuServiceTest {
     @Test
     void creatBiggerThanProductsAmount() {
         // given
-        Menu menu = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(99999), 한그릇_세트_상품목록);
+        Menu menu = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(99999), 한그릇_세트_상품목록, true);
 
         when(menuGroupRepository.findById(탕수육_세트.getId())).thenReturn(Optional.of(탕수육_세트));
         when(productRepository.findAllByIdIn(any(List.class))).thenReturn(한그릇_세트_상품목록);
@@ -150,7 +151,7 @@ class MenuServiceTest {
     @Test
     void changePrice() {
         // given
-        Menu menu = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(13000), 한그릇_세트_상품목록);
+        Menu menu = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(13000), 한그릇_세트_상품목록, true);
         when(menuRepository.findById(한그릇_세트.getId())).thenReturn(Optional.of(한그릇_세트));
 
         // when
@@ -164,7 +165,7 @@ class MenuServiceTest {
     @Test
     void changeInvalidPrice() {
         // given
-        Menu menu = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(-1), 한그릇_세트_상품목록);
+        Menu menu = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(-1), 한그릇_세트_상품목록, true);
 
         // when
         // then
@@ -176,7 +177,7 @@ class MenuServiceTest {
     @Test
     void changePriceBiggerThanProductsAmount() {
         // given
-        Menu menu = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(99999), 한그릇_세트_상품목록);
+        Menu menu = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(99999), 한그릇_세트_상품목록, true);
         when(menuRepository.findById(한그릇_세트.getId())).thenReturn(Optional.of(한그릇_세트));
 
         // when
@@ -216,7 +217,7 @@ class MenuServiceTest {
     @Test
     void displayBiggerThanProductsAmount() {
         // given
-        Menu menu = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(99999), 한그릇_세트_상품목록);
+        Menu menu = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(99999), 한그릇_세트_상품목록, true);
         when(menuRepository.findById(한그릇_세트.getId())).thenReturn(Optional.of(menu));
 
         // when

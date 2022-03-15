@@ -8,6 +8,7 @@ import kitchenpos.domain.Product;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static kitchenpos.unit.fixture.ProductFixture.*;
@@ -28,35 +29,24 @@ public class MenuFixture {
         두그릇_세트_상품목록 = Arrays.asList(탕수육, 짜장면, 짬뽕);
         세그릇_세트_상품목록 = Arrays.asList(탕수육, 짜장면, 짬뽕, 볶음밥);
 
-        한그릇_세트 = createMenu("f1860abc2ea1411bbd4abaa44f0d5580", 탕수육_세트, "한그릇 세트", BigDecimal.valueOf(14000), 한그릇_세트_상품목록);
-        두그릇_세트 = createMenu("cbc75faefeb04bb18be2cb8ce5d8fded", 탕수육_세트, "두그릇 세트", BigDecimal.valueOf(20000), 두그릇_세트_상품목록);
-        세그릇_세트 = createMenu("5e9879b761124791a4cef22e94af8752", 탕수육_세트, "세그릇 세트", BigDecimal.valueOf(25000), 세그릇_세트_상품목록);
+        한그릇_세트 = createMenu(탕수육_세트, "한그릇 세트", BigDecimal.valueOf(14000), 한그릇_세트_상품목록, true);
+        두그릇_세트 = createMenu(탕수육_세트, "두그릇 세트", BigDecimal.valueOf(20000), 두그릇_세트_상품목록, true);
+        세그릇_세트 = createMenu(탕수육_세트, "세그릇 세트", BigDecimal.valueOf(25000), 세그릇_세트_상품목록, true);
     }
 
-    private static Menu createMenu(String id, MenuGroup menuGroup, String name, BigDecimal price, List<Product> products) {
+    public static Menu createMenu(MenuGroup menuGroup, String name, BigDecimal price, List<Product> products, boolean displayed) {
+        return createMenuWithMenuProducts(menuGroup, name, price, createMenuProducts(products), displayed);
+    }
+
+    public static Menu createMenuWithMenuProducts(MenuGroup menuGroup, String name, BigDecimal price, List<MenuProduct> menuProducts, boolean displayed) {
         Menu menu = new Menu();
-        menu.setMenuGroup(menuGroup);
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setName(name);
-        menu.setPrice(price);
-        menu.setMenuProducts(createMenuProducts(products));
-        menu.setDisplayed(true);
-
-        return menu;
-    }
-
-    public static Menu createMenu(MenuGroup menuGroup, String name, BigDecimal price, List<Product> products) {
-        return createMenu("", menuGroup, name, price, products);
-    }
-
-    public static Menu createMenuWithMenuProducts(MenuGroup menuGroup, String name, BigDecimal price, List<MenuProduct> menuProducts) {
-        Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
         menu.setMenuGroup(menuGroup);
         menu.setMenuGroupId(menuGroup.getId());
         menu.setName(name);
         menu.setPrice(price);
         menu.setMenuProducts(menuProducts);
-        menu.setDisplayed(true);
+        menu.setDisplayed(displayed);
 
         return menu;
     }
