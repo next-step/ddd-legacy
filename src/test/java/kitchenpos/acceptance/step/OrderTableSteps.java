@@ -71,7 +71,7 @@ public class OrderTableSteps {
     private static Map<String, Object> createParams(String name) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("name", name);
-        params.put("numberOfGuests", "3");
+        params.put("numberOfGuests", "0");
         params.put("empty", true);
         return params;
     }
