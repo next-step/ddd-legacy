@@ -14,23 +14,19 @@ import static kitchenpos.acceptance.step.ProductSteps.상품_생성_요청;
 
 @DisplayName("메뉴 관리 기능")
 class MenuAcceptanceTest extends AcceptanceTest {
-    private static final String MENU_NAME = "탕수육+짜장면";
+    private static final String MENU_NAME = "한그릇 세트";
     private static final int MENU_PRICE = 14000;
 
-    Map<String, String> 탕수육;
-    Map<String, String> 짜장면;
-    Map<String, String> 짬뽕;
-    Map<String, String> 볶음밥;
+    private Map<String, String> 탕수육;
+    private Map<String, String> 짜장면;
 
-    Map<String, String> 탕수육_세트;
+    private Map<String, String> 탕수육_세트;
 
     @BeforeEach
     public void setUp() {
         super.setUp();
         탕수육 = 상품_생성_요청("탕수육", 10000).body().jsonPath().get(".");
         짜장면 = 상품_생성_요청("짜장면", 5000).body().jsonPath().get(".");
-        짬뽕 = 상품_생성_요청("짬뽕", 6000).body().jsonPath().get(".");
-        볶음밥 = 상품_생성_요청("볶음밥", 7000).body().jsonPath().get(".");
 
         탕수육_세트 = 메뉴_그룹_등록_요청("탕수육 세트").body().jsonPath().get(".");
     }
