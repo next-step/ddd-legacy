@@ -9,51 +9,51 @@ import java.util.UUID;
 @Table(name = "order_table")
 @Entity
 public class OrderTable {
-    @Column(name = "id", columnDefinition = "varbinary(16)")
-    @Id
-    private UUID id;
+  @Column(name = "id", columnDefinition = "varbinary(16)")
+  @Id
+  private UUID id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    @Column(name = "number_of_guests", nullable = false)
-    private int numberOfGuests;
+  @Column(name = "number_of_guests", nullable = false)
+  private int numberOfGuests;
 
-    @Column(name = "empty", nullable = false)
-    private boolean empty;
+  @Column(name = "empty", nullable = false)
+  private boolean empty;
 
-    public OrderTable() {
-    }
+  public OrderTable() {
+  }
 
-    public UUID getId() {
-        return id;
-    }
+  public UUID getId() {
+    return id;
+  }
 
-    public void setId(final UUID id) {
-        this.id = id;
-    }
+  public void setId(final UUID id) {
+    this.id = id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(final String name) {
-        this.name = name;
-    }
+  public void setName(final String name) {
+    this.name = name;
+  }
 
-    public int getNumberOfGuests() {
-        return numberOfGuests;
-    }
+  public int getNumberOfGuests() {
+    return numberOfGuests;
+  }
 
-    public void setNumberOfGuests(final int numberOfGuests) {
-        this.numberOfGuests = numberOfGuests;
-    }
+  public void setNumberOfGuests(final int numberOfGuests) {
+    this.numberOfGuests = numberOfGuests;
+  }
 
-    public boolean isEmpty() {
-        return empty;
-    }
+  public boolean isEmpty() {
+    return empty;
+  }
 
-    public void setEmpty(final boolean empty) {
-        this.empty = empty;
-    }
+  public void setEmpty(final boolean empty) {
+    this.empty = empty;
+  }
 }

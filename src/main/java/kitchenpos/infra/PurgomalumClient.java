@@ -9,17 +9,17 @@ import java.net.URI;
 
 @Component
 public class PurgomalumClient {
-    private final RestTemplate restTemplate;
+  private final RestTemplate restTemplate;
 
-    public PurgomalumClient(final RestTemplateBuilder restTemplateBuilder) {
-        this.restTemplate = restTemplateBuilder.build();
-    }
+  public PurgomalumClient(final RestTemplateBuilder restTemplateBuilder) {
+    this.restTemplate = restTemplateBuilder.build();
+  }
 
-    public boolean containsProfanity(final String text) {
-        final URI url = UriComponentsBuilder.fromUriString("https://www.purgomalum.com/service/containsprofanity")
-            .queryParam("text", text)
-            .build()
-            .toUri();
-        return Boolean.parseBoolean(restTemplate.getForObject(url, String.class));
-    }
+  public boolean containsProfanity(final String text) {
+    final URI url = UriComponentsBuilder.fromUriString("https://www.purgomalum.com/service/containsprofanity")
+      .queryParam("text", text)
+      .build()
+      .toUri();
+    return Boolean.parseBoolean(restTemplate.getForObject(url, String.class));
+  }
 }
