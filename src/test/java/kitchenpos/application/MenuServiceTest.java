@@ -5,6 +5,7 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,6 +35,32 @@ class MenuServiceTest {
     private ProductService productService;
     @MockBean
     private PurgomalumClient purgomalumClient;
+    
+    @DisplayName("메뉴를 등록한다.")
+    @Test
+    void create() {
+        // given
+        MenuGroup menuGroupRequest = MenuGroupServiceTest.createMenuGroupRequest("한마리메뉴");
+        MenuGroup menuGroup = menuGroupService.create(menuGroupRequest);
+
+        Product productRequest = ProductServiceTest.createProductRequest("후라이드치킨", new BigDecimal("15000"));
+        Product product = productService.create(productRequest);
+
+        List<MenuProduct> menuProducts = new ArrayList<>();
+        menuProducts.add(createMenuProduct(product, 1));
+
+        Menu menuCreateRequest = createMenuRequest(new BigDecimal("15000"), menuGroup, menuProducts, "후라이드치킨");
+        
+        // when
+        Menu actual = menuService.create(menuCreateRequest);
+
+        // then
+        Assertions.assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo("후라이드치킨"),
+                () -> assertThat(actual.getPrice()).isEqualByComparingTo(new BigDecimal("15000"))
+        );
+    }
 
     @DisplayName("메뉴에는 반드시 이름이 있어야 한다.")
     @ParameterizedTest

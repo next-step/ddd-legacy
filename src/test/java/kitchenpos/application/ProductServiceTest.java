@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -31,6 +32,23 @@ class ProductServiceTest {
     private ProductRepository productRepository;
     @MockBean
     private PurgomalumClient purgomalumClient;
+
+    @DisplayName("상품을 등록한다.")
+    @Test
+    void create() {
+        // given
+        Product productRequest = createProductRequest("후라이드치킨", new BigDecimal("15000"));
+
+        // when
+        Product actual = productService.create(productRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo("후라이드치킨"),
+                () -> assertThat(actual.getPrice()).isEqualByComparingTo(new BigDecimal("15000"))
+        );
+    }
 
     @DisplayName("상품에는 반드시 이름이 있어야 한다.")
     @NullSource

@@ -11,12 +11,29 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 class OrderTableServiceTest {
 
     @Autowired
     private OrderTableService orderTableService;
+    
+    @DisplayName("주문테이블을 등록한다.")
+    @Test
+    void create() {
+        // given
+        OrderTable orderTableCreateRequest = createOrderTableCreateRequest("1번");
+
+        // when
+        OrderTable actual = orderTableService.create(orderTableCreateRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo("1번")
+        );
+    }
 
     @DisplayName("테이블을 지정하는 이름을 입력해야 한다.")
     @ParameterizedTest

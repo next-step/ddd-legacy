@@ -15,6 +15,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 class OrderServiceTest {
@@ -33,6 +34,30 @@ class OrderServiceTest {
     private MenuGroupService menuGroupService;
     @Autowired
     private ProductService productService;
+
+    @DisplayName("주문을 등록한다.")
+    @ParameterizedTest
+    @EnumSource(OrderType.class)
+    void create(OrderType orderType) {
+        // given
+        OrderTable orderTable = createOrderTable();
+        Menu menu = createMenu();
+
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        orderLineItems.add(createOrderLineItemRequest(menu.getId(), 1, new BigDecimal("15000")));
+
+        Order orderRequest = createOrderRequest(orderType, orderLineItems, "성남시 분당구 정자동", orderTable.getId());
+
+        // when
+        Order actual = orderService.create(orderRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getOrderLineItems()).isNotNull(),
+                () -> assertThat(actual.getOrderLineItems()).isNotEmpty()
+        );
+    }
 
     @DisplayName("주문유형을 반드시 입력해주어야 한다.")
     @Test
