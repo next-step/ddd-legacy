@@ -7,52 +7,47 @@ import static kitchenpos.application.ProductFixture.콜라;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Stream;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.ProfanityClient;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
-@DisplayName("상품")
-@ExtendWith(MockitoExtension.class)
+@DisplayName("상품 관리")
 class ProductServiceTest {
 
-    @Mock
-    private ProductRepository productRepository;
-    @Mock
-    private MenuRepository menuRepository;
-    @Mock(lenient = true)
-    private PurgomalumClient purgomalumClient;
+    private final ProductRepository productRepository = new InMemoryProductRepository();
+    private final MenuRepository menuRepository = new InMemoryMenuRepository();
+    private final ProfanityClient profanityClient = new FakeProfanityClient();
 
-    @InjectMocks
     private ProductService productService;
 
-    @DisplayName("상품 가격 0원 이하 불가")
+    @BeforeEach
+    void setUp() {
+        productService = new ProductService(productRepository, menuRepository, profanityClient);
+    }
+
+    @DisplayName("가격은 0원 이상이어야 한다.")
     @ParameterizedTest(name = "상품금액: [{arguments}]")
-    @MethodSource("priceException")
+    @ValueSource(strings = {"-1"})
+    @NullSource
     void createPriceException(BigDecimal price) {
         //given
-        Product product = 상품_금액(price);
+        Product product = 상품_생성(price);
 
         //when
         ThrowingCallable actual = () -> productService.create(product);
@@ -61,23 +56,13 @@ class ProductServiceTest {
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
     }
 
-    private static Stream<Arguments> priceException() {
-        return Stream.of(
-            Arguments.of((BigDecimal) null),
-            Arguments.of(BigDecimal.valueOf(-1))
-        );
-    }
-
-    @DisplayName("상품의 이름에 비속어 사용 불가")
+    @DisplayName("이름에 비속어를 사용할 수 없다.")
     @ParameterizedTest(name = "상품 이름: [{arguments}]")
-    @MethodSource("constructorNameException")
+    @ValueSource(strings = {"비속어", "욕"})
+    @NullSource
     void createNameException(String name) {
         //given
-        Product product = new Product();
-        product.setPrice(BigDecimal.valueOf(10_000L));
-        product.setName(name);
-
-        given(purgomalumClient.containsProfanity("비속어")).willReturn(true);
+        Product product = 상품_생성(name);
 
         //when
         ThrowingCallable actual = () -> productService.create(product);
@@ -86,27 +71,23 @@ class ProductServiceTest {
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
     }
 
-    private static Stream<Arguments> constructorNameException() {
-        return Stream.of(
-            Arguments.of((String) null),
-            Arguments.of("비속어")
-        );
-    }
-
-    @DisplayName("가격 변경")
+    @DisplayName("가격을 변경할 수 있다. 가격이 해당 상품을 포함하는 메뉴의 가격보다 크면 메뉴를 진열하지 않는다.")
     @ParameterizedTest(name = "변경할 가격: [{0}], 진열 여부: [{1}]")
-    @MethodSource("changePrice")
+    @CsvSource(value = {
+        "8000, false",
+        "15000, true"
+    })
     void changePrice(long price, boolean expectedDisplayed) {
         //given
+        productRepository.save(뿌링클);
+
         Menu menu = new Menu();
         menu.setDisplayed(true);
         menu.setMenuProducts(Arrays.asList(뿌링클_1개, 콜라_1개));
         menu.setPrice(BigDecimal.valueOf(11_000L));
+        menuRepository.save(menu);
 
-        Product 변경할_금액 = 상품_금액(price);
-
-        given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(뿌링클));
-        given(menuRepository.findAllByProductId(any(UUID.class))).willReturn(Collections.singletonList(menu));
+        Product 변경할_금액 = 상품_생성(price);
 
         //when
         Product product = productService.changePrice(뿌링클.getId(), 변경할_금액);
@@ -118,64 +99,71 @@ class ProductServiceTest {
         );
     }
 
-    private static Stream<Arguments> changePrice() {
-        return Stream.of(
-            Arguments.of(8_000L, false),
-            Arguments.of(15_000L, true)
-        );
-    }
-
-    @DisplayName("가격 변경 예외")
+    @DisplayName("0원 미만의 가격으로 변경할 수 없다.")
     @ParameterizedTest(name = "변경할 가격: [{arguments}]")
-    @MethodSource("priceException")
+    @ValueSource(strings = {"-1"})
+    @NullSource
     void changePriceException(BigDecimal price) {
         //given
-        Product 뿌링클_가격_변경 = 상품_금액(price);
+        Product 사이다 = 상품_생성(2_000L);
+        productRepository.save(사이다);
+
+        Product 사이다_가격_변경 = 상품_생성(price);
 
         //when
-        ThrowingCallable actual = () -> productService.changePrice(뿌링클.getId(), 뿌링클_가격_변경);
+        ThrowingCallable actual = () -> productService.changePrice(사이다.getId(), 사이다_가격_변경);
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
 
     }
 
-    @DisplayName("등록되지 않은 상품의 가격 변경 예외")
+    @DisplayName("등록되지 않은 상품은 가격을 변경할 수 없다.")
     @Test
     void changePriceNotExistProductException() {
         //given
-        Product 뿌링클_가격_변경 = 상품_금액(10_000L);
+        UUID 등록되지_않은_상품_ID = UUID.randomUUID();
 
-        given(productRepository.findById(any(UUID.class))).willThrow(IllegalArgumentException.class);
+        Product 뿌링클_가격_변경 = 상품_생성(10_000L);
 
         //when
-        ThrowingCallable actual = () -> productService.changePrice(뿌링클.getId(), 뿌링클_가격_변경);
+        ThrowingCallable actual = () -> productService.changePrice(등록되지_않은_상품_ID, 뿌링클_가격_변경);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(NoSuchElementException.class);
 
     }
 
-    @DisplayName("모든 상품 조회")
+    @DisplayName("등록된 상품들을 조회할 수 있다.")
     @Test
     void findAll() {
         //given
-        given(productRepository.findAll()).willReturn(Arrays.asList(뿌링클, 콜라));
+        productRepository.save(뿌링클);
+        productRepository.save(콜라);
 
         //when
         List<Product> products = productService.findAll();
 
         //then
-        assertThat(products).containsExactly(뿌링클, 콜라);
+        assertThat(products).hasSize(2);
 
     }
 
-    private Product 상품_금액(long price) {
-        return 상품_금액(BigDecimal.valueOf(price));
+    private Product 상품_생성(String name) {
+        return 상품_생성(name, BigDecimal.valueOf(1_000L));
     }
 
-    private Product 상품_금액(BigDecimal price) {
+    private Product 상품_생성(long price) {
+        return 상품_생성(BigDecimal.valueOf(price));
+    }
+
+    private Product 상품_생성(BigDecimal price) {
+        return 상품_생성("상품", price);
+    }
+
+    private Product 상품_생성(String name, BigDecimal price) {
         Product product = new Product();
+        product.setName(name);
         product.setPrice(price);
         return product;
     }
