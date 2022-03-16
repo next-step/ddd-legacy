@@ -6,41 +6,36 @@ import static kitchenpos.application.OrderTableFixture.일번_테이블;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.EnumSource.Mode;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@DisplayName("식탁")
-@ExtendWith(MockitoExtension.class)
+@DisplayName("식탁 관리")
 class OrderTableServiceTest {
 
-    @Mock
-    private OrderTableRepository orderTableRepository;
-    @Mock
-    private OrderRepository orderRepository;
-
-    @InjectMocks
+    private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
+    private final OrderRepository orderRepository = new InMemoryOrderRepository();
     private OrderTableService orderTableService;
 
-    @DisplayName("식탁 생성 예외 - 식탁 이름 없음")
+    @BeforeEach
+    void setUp() {
+        orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+    }
+
+    @DisplayName("식탁은 이름이 있어야 한다.")
     @ParameterizedTest(name = "식탁 이름: [{arguments}]")
     @NullAndEmptySource
     void createException(String orderTableName) {
@@ -54,78 +49,43 @@ class OrderTableServiceTest {
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("식탁 생성")
+    @DisplayName("식탁을 생성한다. 식탁의 기본 상태는 0명의 손님이며 비어있다.")
     @Test
     void create() {
         //given
         OrderTable 신규_테이블 = 식탁_생성("3번");
 
-        given(orderTableRepository.save(any(OrderTable.class))).willReturn(삼번_테이블);
         //when
         OrderTable orderTable = orderTableService.create(신규_테이블);
 
         //then
         assertAll(
-            () -> assertThat(orderTable.getName()).isEqualTo("3번"),
+            () -> assertThat(orderTable.getName()).isEqualTo(신규_테이블.getName()),
             () -> assertThat(orderTable.getNumberOfGuests()).isZero(),
             () -> assertThat(orderTable.isEmpty()).isTrue()
         );
     }
 
-    @DisplayName("손님 착석")
+    @DisplayName("손님이 앉을 수 있다. 손님이 앉으면 착석 상태다.")
     @Test
     void sit() {
         //given
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(일번_테이블));
+        OrderTable 빈_식탁 = 빈_식탁();
+        orderTableRepository.save(빈_식탁);
 
         //when
-        OrderTable orderTable = orderTableService.sit(일번_테이블.getId());
-
-        boolean actual = orderTable.isEmpty();
+        OrderTable actual = orderTableService.sit(빈_식탁.getId());
 
         //then
-        assertThat(actual).isFalse();
+        assertThat(actual.isEmpty()).isFalse();
     }
 
-    @DisplayName("식탁 정리 예외 - 주문완료되지 않은 식탁")
-    @Test
-    void clearException() {
-        //given
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(일번_테이블));
-        given(orderRepository.existsByOrderTableAndStatusNot(any(OrderTable.class), any(OrderStatus.class)))
-            .willReturn(true);
 
-        //when
-        ThrowingCallable actual = () -> orderTableService.clear(일번_테이블.getId());
-
-        //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
-    }
-
-    @DisplayName("식탁 정리")
-    @Test
-    void clear() {
-        //given
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(일번_테이블));
-        given(orderRepository.existsByOrderTableAndStatusNot(any(OrderTable.class), any(OrderStatus.class)))
-            .willReturn(false);
-
-        //when
-        OrderTable cleanTable = orderTableService.clear(일번_테이블.getId());
-
-        //then
-        assertAll(
-            () -> Assertions.assertThat(cleanTable.getNumberOfGuests()).isZero(),
-            () -> Assertions.assertThat(cleanTable.isEmpty()).isTrue()
-        );
-
-    }
-
-    @DisplayName("손님 수 변경 예외 - 0명 미만으로 변경 불가")
+    @DisplayName("착석한 손님의 수를 0명 미만으로 변경할 수 없다.")
     @Test
     void changeNumberOfGuestsException() {
         //given
-        OrderTable 손님_수_변경 = 식탁_생성("1번 테이블 손님", -1);
+        OrderTable 손님_수_변경 = 식탁_생성(-1);
 
         //when
         ThrowingCallable actual = () -> orderTableService.changeNumberOfGuests(일번_테이블.getId(), 손님_수_변경);
@@ -134,37 +94,79 @@ class OrderTableServiceTest {
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("손님 수 변경 예외 - 착석하지 않은 식탁")
+    @DisplayName("착석하지 않은 식탁은 손님 수를 변경할 수 없다.")
     @Test
     void tableIsEmptyThenChangeNumberOfGuestsException() {
         //given
-        OrderTable 손님_수_변경 = 식탁_생성("1번 테이블 손님", 3);
+        OrderTable 빈_식탁 = 빈_식탁();
+        orderTableRepository.save(빈_식탁);
 
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(일번_테이블));
+        OrderTable 손님_수_변경 = 식탁_생성(3);
 
         //when
-        ThrowingCallable actual = () -> orderTableService.changeNumberOfGuests(일번_테이블.getId(), 손님_수_변경);
+        ThrowingCallable actual = () -> orderTableService.changeNumberOfGuests(빈_식탁.getId(), 손님_수_변경);
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("손님 수 변경")
+    @DisplayName("착석한 손님의 수를 변경할 수 있다.")
     @Test
     void changeNumberOfGuests() {
         //given
-        OrderTable 손님_수_변경 = 식탁_생성("3번 테이블 손님", 3);
-
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(일번_테이블));
-        orderTableService.sit(일번_테이블.getId());
+        OrderTable 삼번_테이블 = 식탁_생성("3번 테이블", 3, false);
+        orderTableRepository.save(삼번_테이블);
+        OrderTable 손님_수_변경 = 식탁_생성(4);
 
         //when
-        OrderTable orderTable = orderTableService.changeNumberOfGuests(일번_테이블.getId(), 손님_수_변경);
+        OrderTable orderTable = orderTableService.changeNumberOfGuests(삼번_테이블.getId(), 손님_수_변경);
 
         //then
         assertAll(
-            () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(3),
+            () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(4),
             () -> assertThat(orderTable.isEmpty()).isFalse()
+        );
+    }
+
+    @DisplayName("주문완료되지 않은 식탁은 정리할 수 없다.")
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"COMPLETED"}, mode = Mode.EXCLUDE)
+    void clearException(OrderStatus orderStatus) {
+        //given
+        OrderTable 삼번_테이블 = 식탁_생성("3번 테이블", 3, false);
+        orderTableRepository.save(삼번_테이블);
+
+        Order 매장_주문 = new Order();
+        매장_주문.setOrderTableId(삼번_테이블.getId());
+        매장_주문.setStatus(orderStatus);
+        orderRepository.save(매장_주문);
+
+        //when
+        ThrowingCallable actual = () -> orderTableService.clear(삼번_테이블.getId());
+
+        //then
+        assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문 완료된 식탁은 정리할 수 있다. 정리된 식탁은 기본 상태가 된다.")
+    @Test
+    void clear() {
+        //given
+        OrderTable 삼번_테이블 = 식탁_생성("3번 테이블", 3, false);
+        orderTableRepository.save(삼번_테이블);
+
+        Order 매장_주문 = new Order();
+        매장_주문.setOrderTableId(삼번_테이블.getId());
+        매장_주문.setStatus(OrderStatus.COMPLETED);
+        orderRepository.save(매장_주문);
+
+        //when
+        OrderTable cleanTable = orderTableService.clear(삼번_테이블.getId());
+
+        //then
+        assertAll(
+            () -> Assertions.assertThat(cleanTable.getNumberOfGuests()).isZero(),
+            () -> Assertions.assertThat(cleanTable.isEmpty()).isTrue()
         );
     }
 
@@ -172,7 +174,8 @@ class OrderTableServiceTest {
     @Test
     void findAll() {
         //given
-        given(orderTableRepository.findAll()).willReturn(Arrays.asList(일번_테이블, 삼번_테이블));
+        orderTableRepository.save(일번_테이블);
+        orderTableRepository.save(삼번_테이블);
 
         //when
         List<OrderTable> orderTables = orderTableService.findAll();
@@ -180,20 +183,27 @@ class OrderTableServiceTest {
         //then
         assertAll(
             () -> assertThat(orderTables).hasSize(2),
-            () -> assertThat(orderTables).containsExactly(일번_테이블, 삼번_테이블)
+            () -> assertThat(orderTables).contains(일번_테이블, 삼번_테이블)
         );
     }
 
-    private OrderTable 식탁_생성(String orderTableName) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName(orderTableName);
-        return orderTable;
+    private OrderTable 식탁_생성(String name) {
+        return 식탁_생성(name, 0, true);
     }
 
-    private OrderTable 식탁_생성(String orderTableName, int numberOfGuests) {
-        OrderTable orderTable = 식탁_생성(orderTableName);
+    private OrderTable 빈_식탁() {
+        return 식탁_생성("빈 식탁", 0, true);
+    }
+
+    private OrderTable 식탁_생성(int numberOfGuests) {
+        return 식탁_생성("이름없는 식탁", numberOfGuests, false);
+    }
+
+    private OrderTable 식탁_생성(String name, int numberOfGuests, boolean empty) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setName(name);
         orderTable.setNumberOfGuests(numberOfGuests);
-        orderTable.setEmpty(false);
+        orderTable.setEmpty(empty);
         return orderTable;
     }
 }
