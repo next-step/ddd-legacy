@@ -20,9 +20,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
+@DisplayName("메뉴 그룹 관리")
 @WebMvcTest(MenuGroupRestController.class)
 class MenuGroupRestControllerTest {
+
+    private static final String MENU_GROUPS_URI = "/api/menu-groups";
 
     @Autowired
     private MockMvc webMvc;
@@ -36,17 +40,16 @@ class MenuGroupRestControllerTest {
     @DisplayName("메뉴그룹 생성")
     @Test
     void create() throws Exception {
-        //when
+        //given
         String body = objectMapper.writeValueAsString(세트메뉴);
 
-        //when
         given(menuGroupService.create(any())).willReturn(세트메뉴);
 
+        //when
+        ResultActions resultActions = 그룹_생성_요청(body);
+
         //then
-        webMvc.perform(post("/api/menu-groups")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(body))
-            .andDo(print())
+        resultActions
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.id").isNotEmpty())
             .andExpect(jsonPath("$.name").value(세트메뉴.getName()));
@@ -55,15 +58,29 @@ class MenuGroupRestControllerTest {
     @DisplayName("메뉴그룹 조회")
     @Test
     void findAll() throws Exception {
-        //when
+        //given
         given(menuGroupService.findAll()).willReturn(메뉴판);
 
+        //when
+        ResultActions resultActions = 그룹_조회_요청();
+
         //then
-        webMvc.perform(get("/api/menu-groups")
-                .accept(MediaType.APPLICATION_JSON))
-            .andDo(print())
+        resultActions
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].name").value(세트메뉴.getName()))
             .andExpect(jsonPath("$[1].name").value(추천메뉴.getName()));
+    }
+
+    private ResultActions 그룹_생성_요청(String body) throws Exception {
+        return webMvc.perform(post(MENU_GROUPS_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body))
+            .andDo(print());
+    }
+
+    private ResultActions 그룹_조회_요청() throws Exception {
+        return webMvc.perform(get(MENU_GROUPS_URI)
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print());
     }
 }
