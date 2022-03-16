@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.application.fake.helper.ProductFixtureFactory.레몬에이드;
 import static kitchenpos.application.fake.helper.ProductFixtureFactory.미트파이;
 
 
@@ -17,13 +18,22 @@ public final class MenuFixtureFactory {
 
     public static final String 미트파이_하나를_포함한_메뉴_이름 = "미트파이_하나를_포함한_메뉴";
     public static final BigDecimal 미트파이_하나를_포함한_메뉴_가격 = BigDecimal.valueOf(800L);
-    public static final int 미트파이_하나를_포함한_메뉴_미트파이_수량 = 1;
+    public static final int 수량 = 1;
 
     public static final Menu 미트파이_하나를_포함한_메뉴 = new Builder()
             .id(UUID.randomUUID())
             .name(미트파이_하나를_포함한_메뉴_이름)
             .price(미트파이_하나를_포함한_메뉴_가격)
-            .addProduct(미트파이, 미트파이_하나를_포함한_메뉴_미트파이_수량)
+            .addProduct(미트파이, 수량)
+            .displayed(true)
+            .build();
+
+    public static final Menu 미트파이_레몬에이드_세트_메뉴 = new Builder()
+            .id(UUID.randomUUID())
+            .name(미트파이_하나를_포함한_메뉴_이름)
+            .price(BigDecimal.valueOf(1800L))
+            .addProduct(미트파이, 수량)
+            .addProduct(레몬에이드, 수량)
             .displayed(true)
             .build();
 

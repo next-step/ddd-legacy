@@ -21,6 +21,12 @@ public final class ProductFixtureFactory {
             .price(미트파이_상품_가격)
             .build();
 
+    public static final Product 레몬에이드 = new Builder()
+            .id(UUID.randomUUID())
+            .name("레몬에이드")
+            .price(BigDecimal.valueOf(1000L))
+            .build();
+
     public static final class Builder implements FixtureBuilder<Product> {
         private UUID id;
         private String name;
