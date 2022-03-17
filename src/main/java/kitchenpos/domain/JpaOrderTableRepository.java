@@ -4,5 +4,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-public interface JapMenuGroupRepository extends MenuGroupRepository, JpaRepository<MenuGroup, UUID> {
+public interface JpaOrderTableRepository extends OrderTableRepository, JpaRepository<OrderTable, UUID> {
 }
