@@ -19,7 +19,8 @@ public class FakeMenuGroupRepository implements MenuGroupRepository {
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
-        return elements.put(menuGroup.getId(), menuGroup);
+        elements.put(menuGroup.getId(), menuGroup);
+        return menuGroup;
     }
 
     @Override

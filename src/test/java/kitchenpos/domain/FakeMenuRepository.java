@@ -35,7 +35,8 @@ public class FakeMenuRepository implements MenuRepository {
 
     @Override
     public Menu save(Menu menu) {
-        return elements.put(menu.getId(), menu);
+        elements.put(menu.getId(), menu);
+        return menu;
     }
 
     @Override

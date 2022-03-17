@@ -18,7 +18,9 @@ public class FakeOrderRepository implements OrderRepository {
 
     @Override
     public Order save(Order order) {
-        return elements.put(order.getId(), order);
+        final UUID orderId = order.getId();
+        elements.put(orderId, order);
+        return elements.get(orderId);
     }
 
     @Override

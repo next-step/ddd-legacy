@@ -26,7 +26,8 @@ public class FakeProductRepository implements ProductRepository {
 
     @Override
     public Product save(Product product) {
-        return elements.put(product.getId(), product);
+        elements.put(product.getId(), product);
+        return product;
     }
 
     @Override

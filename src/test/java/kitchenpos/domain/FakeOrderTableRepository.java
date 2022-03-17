@@ -23,6 +23,7 @@ public class FakeOrderTableRepository implements OrderTableRepository {
 
     @Override
     public OrderTable save(OrderTable orderTable) {
-        return elements.put(orderTable.getId(), orderTable);
+        elements.put(orderTable.getId(), orderTable);
+        return orderTable;
     }
 }
