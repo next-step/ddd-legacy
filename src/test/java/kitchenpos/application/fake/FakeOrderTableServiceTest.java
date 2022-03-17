@@ -11,10 +11,8 @@ import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@ExtendWith(MockitoExtension.class)
 class FakeOrderTableServiceTest {
 
     private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
@@ -163,12 +160,18 @@ class FakeOrderTableServiceTest {
     @Test
     void changeNumberOfGuests03() {
         //given
-        orderTableRepository.save(OrderTableFixtureFactory.오션뷰_테이블_02_이용중);
+        UUID 인원변경할_테이블_아이디 = UUID.randomUUID();
+        OrderTable 인원변경할_테이블 = new OrderTableFixtureFactory.Builder()
+                .id(인원변경할_테이블_아이디)
+                .name("인원변경할_테이블")
+                .empty(false)
+                .build();
+        orderTableRepository.save(인원변경할_테이블);
         OrderTable 테이블_인원_변경_요청 = new OrderTableFixtureFactory.Builder()
                 .numberOfGuests(2)
                 .build();
         //when
-        OrderTable updated = orderTableService.changeNumberOfGuests(OrderTableFixtureFactory.오션뷰_테이블_02_이용중.getId(), 테이블_인원_변경_요청);
+        OrderTable updated = orderTableService.changeNumberOfGuests(인원변경할_테이블_아이디, 테이블_인원_변경_요청);
         //then
         assertThat(updated.getNumberOfGuests()).isEqualTo(2);
     }

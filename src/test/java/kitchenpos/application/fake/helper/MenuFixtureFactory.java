@@ -28,6 +28,14 @@ public final class MenuFixtureFactory {
             .displayed(true)
             .build();
 
+    public static final Menu 미트파이_하나를_포함한_메뉴_미진열 = new Builder()
+            .id(UUID.randomUUID())
+            .name(미트파이_하나를_포함한_메뉴_이름)
+            .price(미트파이_하나를_포함한_메뉴_가격)
+            .addProduct(미트파이, 수량)
+            .displayed(false)
+            .build();
+
     public static final Menu 미트파이_레몬에이드_세트_메뉴 = new Builder()
             .id(UUID.randomUUID())
             .name(미트파이_하나를_포함한_메뉴_이름)
