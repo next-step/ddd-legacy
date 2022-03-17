@@ -23,7 +23,6 @@ import static kitchenpos.application.fake.helper.ProductFixtureFactory.미트파
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
 
 
 public class FakeProductServiceTest {
@@ -53,7 +52,7 @@ public class FakeProductServiceTest {
     void create01(BigDecimal 등록할_상품_가격) {
         //given
         Product 등록할_상품 = new ProductFixtureFactory.Builder()
-                .name(any(String.class))
+                .name("미트파이")
                 .price(등록할_상품_가격)
                 .build();
 
@@ -111,7 +110,7 @@ public class FakeProductServiceTest {
                 .price(변경할_상품_가격)
                 .build();
         //when & then
-        assertThatThrownBy(() -> productService.changePrice(any(UUID.class), 상품_변경_요청))
+        assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), 상품_변경_요청))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -149,13 +148,13 @@ public class FakeProductServiceTest {
         BigDecimal 변경할_상품_가격 = BigDecimal.valueOf(600L);
 
         Product 등록된_상품 = new ProductFixtureFactory.Builder()
-                .id(any(UUID.class))
-                .name(any(String.class))
+                .id(UUID.randomUUID())
+                .name("미트파이")
                 .price(현재_등록된_상품_가격)
                 .build();
 
         Menu 등록된_메뉴 = new MenuFixtureFactory.Builder().id(UUID.randomUUID())
-                .name(any(String.class))
+                .name("미트파이 런치 세트")
                 .price(현재_등록된_메뉴_가격)
                 .addProduct(등록된_상품, 1)
                 .displayed(true)

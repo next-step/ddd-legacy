@@ -25,7 +25,6 @@ import static kitchenpos.application.fake.helper.ProductFixtureFactory.미트파
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
 
 public class FakeMenuServiceTest {
 
@@ -79,7 +78,7 @@ public class FakeMenuServiceTest {
         //given
         menuGroupRepository.save(MenuGroupFixtureFactory.런체세트그룹);
         Menu 메뉴_생성_요청 = new MenuFixtureFactory.Builder()
-                .name(any(String.class))
+                .name("미트파이 런치 세트")
                 .price(BigDecimal.valueOf(1000L))
                 .addAllManuProducts(Collections.emptyList())
                 .menuGroup(MenuGroupFixtureFactory.런체세트그룹)
@@ -96,7 +95,7 @@ public class FakeMenuServiceTest {
         //given
         menuGroupRepository.save(MenuGroupFixtureFactory.런체세트그룹);
         Menu 메뉴_생성_요청 = new MenuFixtureFactory.Builder()
-                .name(any(String.class))
+                .name("미트파이 런치 세트")
                 .price(BigDecimal.valueOf(1000L))
                 .addProduct(ProductFixtureFactory.미트파이, 1)
                 .menuGroup(MenuGroupFixtureFactory.런체세트그룹)
@@ -116,7 +115,7 @@ public class FakeMenuServiceTest {
         menuGroupRepository.save(MenuGroupFixtureFactory.런체세트그룹);
         productRepository.save(ProductFixtureFactory.미트파이);
         Menu 메뉴_생성_요청 = new MenuFixtureFactory.Builder()
-                .name(any(String.class))
+                .name("미트파이 런치 세트")
                 .price(BigDecimal.valueOf(1000L))
                 .addProduct(ProductFixtureFactory.미트파이, 미트파이_수량)
                 .menuGroup(MenuGroupFixtureFactory.런체세트그룹)
@@ -135,7 +134,7 @@ public class FakeMenuServiceTest {
         productRepository.save(ProductFixtureFactory.미트파이);
 
         Menu 메뉴_생성_요청 = new MenuFixtureFactory.Builder()
-                .name(any(String.class))
+                .name("미트파이 런치 세트")
                 .price(ProductFixtureFactory.미트파이.getPrice().add(BigDecimal.valueOf(1000L)))
                 .addProduct(ProductFixtureFactory.미트파이, 1)
                 .menuGroup(MenuGroupFixtureFactory.런체세트그룹)
@@ -310,7 +309,7 @@ public class FakeMenuServiceTest {
         BigDecimal 메뉴_가격 = ProductFixtureFactory.미트파이.getPrice().add(BigDecimal.valueOf(1000L));
         Menu 노출할_메뉴 = new MenuFixtureFactory.Builder()
                 .id(UUID.randomUUID())
-                .name(any(String.class))
+                .name("미트파이 런치 세트")
                 .price(메뉴_가격) // 메뉴 가격이 상품 가격의 합보다 크다.
                 .addProduct(미트파이, 1)
                 .displayed(false)
@@ -331,7 +330,7 @@ public class FakeMenuServiceTest {
         BigDecimal 메뉴_가격 = BigDecimal.valueOf(1500L);
         Menu 노출할_메뉴 = new MenuFixtureFactory.Builder()
                 .id(UUID.randomUUID())
-                .name(any(String.class))
+                .name("미트파이 런치 세트")
                 .price(메뉴_가격) // 메뉴 가격이 상품 가격의 합보다 크다.
                 .addProduct(미트파이, 1)
                 .addProduct(레몬에이드, 1)
@@ -354,7 +353,7 @@ public class FakeMenuServiceTest {
         BigDecimal 메뉴_가격 = ProductFixtureFactory.미트파이.getPrice().subtract(BigDecimal.valueOf(200L));
         Menu 노출할_메뉴 = new MenuFixtureFactory.Builder()
                 .id(UUID.randomUUID())
-                .name(any(String.class))
+                .name("미트파이 런치 세트")
                 .price(메뉴_가격)  // 메뉴 가격이 상품 가격의 합보다 작다.
                 .addProduct(미트파이, 1)
                 .displayed(false)
