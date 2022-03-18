@@ -114,28 +114,6 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("주문 등록(wating) - 메뉴 품목별 수량은 매장 식사가 아닌 경우 0보다 큰 값을 가져야 한다.")
-    @MethodSource("provideOrderTypeForDeliveryAndTakeout")
-    @ParameterizedTest
-    void create05(OrderType 주문_등록_요청_타입) {
-        //given
-        Order 주문_등록_요청 = mock(Order.class);
-        given(주문_등록_요청.getType()).willReturn(주문_등록_요청_타입);
-        List<OrderLineItem> 주문_등록_요청_메뉴들 = spy(ArrayList.class);
-        OrderLineItem 주문_등록_요청_메뉴 = mock(OrderLineItem.class);
-        given(주문_등록_요청_메뉴.getQuantity()).willReturn(-1L);
-        주문_등록_요청_메뉴들.add(주문_등록_요청_메뉴);
-        given(주문_등록_요청.getOrderLineItems()).willReturn(주문_등록_요청_메뉴들);
-        List<OrderLineItem> 조회된_메뉴들 = mock(List.class);
-        int 조회된_메뉴_수 = 1;
-        when(조회된_메뉴들.size()).thenReturn(조회된_메뉴_수);
-        given(menuRepository.findAllByIdIn(any(List.class))).willReturn(조회된_메뉴들);
-
-        //when & then
-        assertThatThrownBy(() -> orderService.create(주문_등록_요청))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
     @DisplayName("주문 등록(wating) - 진열된 메뉴만 선택할 수 있다")
     @Test
     void create06() {
@@ -469,7 +447,7 @@ class OrderServiceTest {
         );
     }
 
-    @DisplayName("주문 배달(delivering) 시작 - 서빙(accept)된 주문만 배달을 시작할 수 있다.")
+    @DisplayName("주문 배달(delivering) 시작 - 서빙(serve)된 주문만 배달을 시작할 수 있다.")
     @MethodSource("provideOrderStatusExceptForServed")
     @ParameterizedTest
     void startDelivery02(OrderStatus 조회된_주문_상태) {
