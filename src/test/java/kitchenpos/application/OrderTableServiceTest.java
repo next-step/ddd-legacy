@@ -209,8 +209,6 @@ class OrderTableServiceTest {
                 3,
                 false
             );
-            orderTable.setId(orderTableId);
-            orderTable.setEmpty(false);
 
             doReturn(Optional.of(orderTable)).when(orderTableRepository).findById(orderTableId);
             doReturn(true).when(orderRepository)
