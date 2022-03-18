@@ -56,8 +56,8 @@ class MenuGroupServiceTest {
     void findAll() {
         // Arrange
         MenuGroup menuGroup1 = createMenuGroupWithName();
-        MenuGroup menuGroup2 = new MenuGroup();
-        MenuGroup menuGroup3 = new MenuGroup();
+        MenuGroup menuGroup2 = createMenuGroupWithName();
+        MenuGroup menuGroup3 = createMenuGroupWithName();
 
         menuGroupService.create(menuGroup1);
         menuGroupService.create(menuGroup2);

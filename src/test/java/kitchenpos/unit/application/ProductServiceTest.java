@@ -137,8 +137,8 @@ class ProductServiceTest {
         @Test
         void menuPriceRaiseThenUnDisplayed() {
             // Arrange
-            Product product = 제품_생성_요청("name", BigDecimal.ONE);
-            Product request = createProduct(BigDecimal.TEN);
+            Product product = 제품_생성_요청("name", BigDecimal.TEN);
+            Product request = createProduct(BigDecimal.ONE);
             Menu menu = 메뉴_생성_요청(product);
 
             // Act
@@ -177,7 +177,6 @@ class ProductServiceTest {
             // Assert
             assertThat(menu.isDisplayed()).isTrue();
         }
-
     }
 
     private Menu 메뉴_생성_요청(Product product) {
