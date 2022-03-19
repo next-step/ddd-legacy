@@ -33,11 +33,11 @@ public class OrderService {
     public Order create(final Order request) {
         final OrderType type = request.getType();
         if (Objects.isNull(type)) {
-            throw new IllegalArgumentException();
+            throw new OrderTypeNotExistException();
         }
         final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new OrderLineItemNotExistException();
         }
         final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
@@ -45,23 +45,24 @@ public class OrderService {
                 .collect(Collectors.toList())
         );
         if (menus.size() != orderLineItemRequests.size()) {
-            throw new IllegalArgumentException();
+            throw new OrderLineItemNotMatchException();
         }
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
             if (type != OrderType.EAT_IN) {
                 if (quantity < 0) {
-                    throw new IllegalArgumentException();
+                    throw new OrderInvalidQuantityException(quantity);
                 }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
-                throw new IllegalStateException();
+                throw new OrderDisplayException();
             }
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
-                throw new IllegalArgumentException();
+                throw new OrderLineItemPriceException(menu.getName(), menu.getPrice().longValue(),
+                    orderLineItemRequest.getPrice().longValue());
             }
             final OrderLineItem orderLineItem = new OrderLineItem();
             orderLineItem.setMenu(menu);
@@ -77,7 +78,7 @@ public class OrderService {
         if (type == OrderType.DELIVERY) {
             final String deliveryAddress = request.getDeliveryAddress();
             if (Objects.isNull(deliveryAddress) || deliveryAddress.isEmpty()) {
-                throw new IllegalArgumentException();
+                throw new OrderDeliveryAddressException();
             }
             order.setDeliveryAddress(deliveryAddress);
         }
@@ -178,5 +179,48 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<Order> findAll() {
         return orderRepository.findAll();
+    }
+
+
+    static class OrderTypeNotExistException extends IllegalStateException {
+        public OrderTypeNotExistException() {
+            super("주문 유형이 올바르지 않습니다");
+        }
+    }
+
+    static class OrderLineItemNotExistException extends IllegalStateException {
+        public OrderLineItemNotExistException() {
+            super("주문 상품이 없습니다.");
+        }
+    }
+
+    static class OrderLineItemNotMatchException extends IllegalStateException {
+        public OrderLineItemNotMatchException() {
+            super("등록되지 않은 메뉴는 주문할 수 없습니다.");
+        }
+    }
+
+    static class OrderInvalidQuantityException extends IllegalStateException {
+        public OrderInvalidQuantityException(long quantity) {
+            super("최소 주문 수량은 0개 이상입니다. 주문 수량 : " + quantity);
+        }
+    }
+
+    static class OrderDisplayException extends IllegalStateException {
+        public OrderDisplayException() {
+            super("진열되지 않은 메뉴는 주문할 수 없습니다.");
+        }
+    }
+
+    static class OrderLineItemPriceException extends IllegalArgumentException {
+        public OrderLineItemPriceException(String menu, long menuPrice, long requestPrice) {
+            super("가격이 일치하지 않습니다. 메뉴명: " + menu + ", 메뉴 가격: " + menuPrice + ", 지불 가격: " + requestPrice);
+        }
+    }
+
+    static class OrderDeliveryAddressException extends IllegalArgumentException {
+        public OrderDeliveryAddressException() {
+            super("배달 주소가 없습니다.");
+        }
     }
 }

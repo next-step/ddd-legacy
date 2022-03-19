@@ -1,35 +1,28 @@
 package kitchenpos.application;
 
 import static kitchenpos.application.MenuFixture.뿌링클_세트;
-import static kitchenpos.application.OrderFixture.매장_주문;
-import static kitchenpos.application.OrderFixture.배달_주문;
-import static kitchenpos.application.OrderFixture.포장_주문;
-import static kitchenpos.application.OrderTableFixture.일번_테이블;
-import static kitchenpos.application.OrderTableFixture.착석_테이블;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
+import kitchenpos.application.OrderService.OrderDeliveryAddressException;
+import kitchenpos.application.OrderService.OrderDisplayException;
+import kitchenpos.application.OrderService.OrderInvalidQuantityException;
+import kitchenpos.application.OrderService.OrderLineItemNotExistException;
+import kitchenpos.application.OrderService.OrderLineItemNotMatchException;
+import kitchenpos.application.OrderService.OrderLineItemPriceException;
+import kitchenpos.application.OrderService.OrderTypeNotExistException;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
 import kitchenpos.infra.KitchenridersClient;
@@ -37,204 +30,173 @@ import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.EnumSource.Mode;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@DisplayName("주문")
-@ExtendWith(MockitoExtension.class)
+@DisplayName("주문 관리")
 class OrderServiceTest {
 
-    @Mock
-    private OrderRepository orderRepository;
-    @Mock
-    private MenuRepository menuRepository;
-    @Mock
-    private OrderTableRepository orderTableRepository;
-    @Mock
-    private KitchenridersClient kitchenridersClient;
+    private final OrderRepository orderRepository = new InMemoryOrderRepository();
+    private final MenuRepository menuRepository = new InMemoryMenuRepository();
+    private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
+    private final KitchenridersClient kitchenridersClient = new KitchenridersClient();
 
-    @InjectMocks
     private OrderService orderService;
-
-    private Order 신규_주문;
 
     @BeforeEach
     void setUp() {
-        신규_주문 = new Order();
-        신규_주문.setId(UUID.randomUUID());
-        신규_주문.setType(OrderType.DELIVERY);
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenu(뿌링클_세트);
-        orderLineItem.setMenuId(뿌링클_세트.getId());
-        orderLineItem.setQuantity(1L);
-        orderLineItem.setPrice(뿌링클_세트.getPrice());
-        신규_주문.setOrderLineItems(Collections.singletonList(orderLineItem));
-        신규_주문.setDeliveryAddress("배달주소");
-        신규_주문.setOrderTableId(일번_테이블.getId());
-        신규_주문.setOrderTable(일번_테이블);
-        신규_주문.setStatus(OrderStatus.WAITING);
-        신규_주문.setOrderDateTime(LocalDateTime.now());
+        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
-    @DisplayName("주문 예외 - 주문 유형 없음")
+    @DisplayName("주문 유형이 반드시 있어야 한다.")
     @Test
     void createOrderTypeException() {
         //given
-        신규_주문.setType(null);
+        Order order = new Order();
 
         //when
-        ThrowingCallable actual = () -> orderService.create(new Order());
+        ThrowingCallable actual = () -> orderService.create(order);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(OrderTypeNotExistException.class);
     }
 
-
-
-    @DisplayName("주문 예외 - 주문 메뉴 없음")
+    @DisplayName("상품없이 주문할 수 없다.")
     @ParameterizedTest(name = "주문 메뉴: [{arguments}]")
     @NullAndEmptySource
     void createOrderHasNoMenuException(List<OrderLineItem> orderLineItems) {
         //given
-        신규_주문.setOrderLineItems(orderLineItems);
+        Order 상품_없는_주문 = 신규_배달_주문(orderLineItems);
 
         //when
-        ThrowingCallable actual = () -> orderService.create(신규_주문);
+        ThrowingCallable actual = () -> orderService.create(상품_없는_주문);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(OrderLineItemNotExistException.class);
     }
 
-    @DisplayName("주문 예외 - 등록되지 않은 메뉴 주문")
+    @DisplayName("등록되지 않은 상품은 주문할 수 없다.")
     @Test
     void createOrderInvalidMenuException() {
         //given
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(new ArrayList<>());
+        OrderLineItem 등록_되지_않은_상품 = 주문_항목_1개(new Menu());
+        Order 등록되지_않은_상품_주문 = 신규_배달_주문(Collections.singletonList(등록_되지_않은_상품));
 
         //when
-        ThrowingCallable actual = () -> orderService.create(신규_주문);
+        ThrowingCallable actual = () -> orderService.create(등록되지_않은_상품_주문);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(OrderLineItemNotMatchException.class);
     }
 
-    @DisplayName("주문 예외 - 포장 또는 배달 메뉴 수량 미달")
+    @DisplayName("포장 또는 배달 주문인 경우 0개 미만의 수량으로 주문할 수 없다.")
     @ParameterizedTest(name = "메뉴 유형: [{arguments}]")
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT"})
     void createOrderInvalidQuantityException(OrderType orderType) {
         //given
-        신규_주문.setType(orderType);
-        OrderLineItem 모자란_수량 = new OrderLineItem();
-        모자란_수량.setQuantity(-1L);
-        신규_주문.setOrderLineItems(Collections.singletonList(모자란_수량));
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(new ArrayList<>());
+        Menu menu = menuRepository.save(뿌링클_세트);
+        OrderLineItem 모자란_수량 = 주문_항목(menu, -1);
+        Order 신규_배달_주문 = 신규_주문(orderType, Collections.singletonList(모자란_수량));
 
         //when
-        ThrowingCallable actual = () -> orderService.create(신규_주문);
+        ThrowingCallable actual = () -> orderService.create(신규_배달_주문);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(OrderInvalidQuantityException.class);
     }
 
-    @DisplayName("주문 예외 - 진열되지 않은 메뉴 주문")
+    @DisplayName("진열되지 않은 상품은 주문할 수 없다.")
     @Test
     void createOrderNotDisplayedMenuException() {
         //given
-        Menu 진열되지_않은_메뉴 = new Menu();
-        진열되지_않은_메뉴.setDisplayed(false);
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(Collections.singletonList(뿌링클_세트));
-        given(menuRepository.findById(any())).willReturn(Optional.of(진열되지_않은_메뉴));
+        Menu 진열되지_않은_메뉴 = menuRepository.save(new Menu());
+        List<OrderLineItem> 진열되지_않은_메뉴_상품 = Collections.singletonList(주문_항목_1개(진열되지_않은_메뉴));
+        Order 진열되지_않은_상품_주문 = 신규_배달_주문(진열되지_않은_메뉴_상품);
 
         //when
-        ThrowingCallable actual = () -> orderService.create(신규_주문);
+        ThrowingCallable actual = () -> orderService.create(진열되지_않은_상품_주문);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(actual).isInstanceOf(OrderDisplayException.class);
     }
 
-    @DisplayName("주문 예외 - 가격 불일치")
+    @DisplayName("상품가격과 일치하지 않은 금액으로 주문할 수 없다.")
     @Test
     void createOrderMismatchPriceException() {
         //given
-        OrderLineItem 모자란_금액 = new OrderLineItem();
-        모자란_금액.setPrice(BigDecimal.valueOf(10_000L));
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
 
-        신규_주문.setOrderLineItems(Collections.singletonList(모자란_금액));
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(Collections.singletonList(뿌링클_세트));
-        given(menuRepository.findById(any())).willReturn(Optional.of(뿌링클_세트));
+        List<OrderLineItem> 모자란_금액 = Collections.singletonList(주문_항목_1개(뿌링클_세트, 8_000));
+        Order 모자란_금액_주문 = 신규_배달_주문(모자란_금액);
 
         //when
-        ThrowingCallable actual = () -> orderService.create(신규_주문);
+        ThrowingCallable actual = () -> orderService.create(모자란_금액_주문);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(OrderLineItemPriceException.class);
     }
 
-    @DisplayName("주문 예외 - 배달 주문 시 배달 주소 없음")
+    @DisplayName("배달 주문인 경우 배달 주소가 반드시 있어야 한다.")
     @ParameterizedTest(name = "배달 주소: [{arguments}]")
     @NullAndEmptySource
     void createDeliveryOrderHasNoAddressException(String deliveryAddress) {
         //given
-        신규_주문.setDeliveryAddress(deliveryAddress);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
 
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(Collections.singletonList(뿌링클_세트));
-        given(menuRepository.findById(any())).willReturn(Optional.of(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        Order 주소_없는_배달_주문 = 신규_배달_주문(뿌링클_1개, deliveryAddress);
 
         //when
-        ThrowingCallable actual = () -> orderService.create(신규_주문);
+        ThrowingCallable actual = () -> orderService.create(주소_없는_배달_주문);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(OrderDeliveryAddressException.class);
     }
 
-    @DisplayName("주문 예외 - 식당 내 주문 시 착석하지 않음")
+    @DisplayName("식탁에 착석하지 않으면 매장 주문을 할 수 없다.")
     @Test
     void createEatInException() {
         //given
-        신규_주문.setType(OrderType.EAT_IN);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
 
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(Collections.singletonList(뿌링클_세트));
-        given(menuRepository.findById(any())).willReturn(Optional.of(뿌링클_세트));
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(일번_테이블));
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        Order 착석하지_않고_주문 = 신규_주문(OrderType.EAT_IN, 뿌링클_1개);
+        OrderTable orderTable1 = new OrderTable();
+        orderTable1.setEmpty(true);
+        OrderTable orderTable = orderTableRepository.save(orderTable1);
+        착석하지_않고_주문.setOrderTable(orderTable);
+        착석하지_않고_주문.setOrderTableId(orderTable.getId());
 
         //when
-        ThrowingCallable actual = () -> orderService.create(신규_주문);
+        ThrowingCallable actual = () -> orderService.create(착석하지_않고_주문);
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("매장 주문 성공")
+    @DisplayName("매장 식당 주문")
     @Test
     void createOrderEatIn() {
         //given
-        신규_주문.setType(OrderType.EAT_IN);
-        신규_주문.setOrderTableId(착석_테이블.getId());
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        OrderTable orderTable = orderTableRepository.save(착석한_식탁());
 
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(Collections.singletonList(뿌링클_세트));
-        given(menuRepository.findById(any())).willReturn(Optional.of(뿌링클_세트));
-        given(orderTableRepository.findById(any(UUID.class))).willReturn(Optional.of(착석_테이블));
-        given(orderRepository.save(any(Order.class))).willReturn(신규_주문);
+        Order 매장_식사_주문 = 신규_주문(OrderType.EAT_IN, 뿌링클_1개);
+        매장_식사_주문.setOrderTableId(orderTable.getId());
 
         //when
-        Order order = orderService.create(신규_주문);
+        Order order = orderService.create(매장_식사_주문);
 
         //then
         assertAll(
             () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
             () -> assertThat(order.getType()).isEqualTo(OrderType.EAT_IN),
-            () -> assertThat(order.getOrderDateTime()).isEqualTo(신규_주문.getOrderDateTime()),
-            () -> assertThat(order.getOrderTableId()).isEqualTo(착석_테이블.getId())
+            () -> assertThat(order.getOrderTable().getId()).isEqualTo(orderTable.getId())
         );
     }
 
@@ -242,20 +204,18 @@ class OrderServiceTest {
     @Test
     void createOrderTakeout() {
         //given
-        신규_주문.setType(OrderType.TAKEOUT);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(Collections.singletonList(뿌링클_세트));
-        given(menuRepository.findById(any())).willReturn(Optional.of(뿌링클_세트));
-        given(orderRepository.save(any(Order.class))).willReturn(신규_주문);
+        Order 포장_식사_주문 = 신규_주문(OrderType.TAKEOUT, 뿌링클_1개);
 
         //when
-        Order order = orderService.create(신규_주문);
+        Order order = orderService.create(포장_식사_주문);
 
         //then
         assertAll(
             () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
-            () -> assertThat(order.getType()).isEqualTo(OrderType.TAKEOUT),
-            () -> assertThat(order.getOrderDateTime()).isEqualTo(신규_주문.getOrderDateTime())
+            () -> assertThat(order.getType()).isEqualTo(OrderType.TAKEOUT)
         );
     }
 
@@ -263,81 +223,84 @@ class OrderServiceTest {
     @Test
     void createOrderDelivery() {
         //given
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(Collections.singletonList(뿌링클_세트));
-        given(menuRepository.findById(any())).willReturn(Optional.of(뿌링클_세트));
-        given(orderRepository.save(any(Order.class))).willReturn(신규_주문);
+        Order 배달_식사_주문 = 신규_배달_주문(뿌링클_1개, "우리집");
 
         //when
-        Order order = orderService.create(신규_주문);
+        Order order = orderService.create(배달_식사_주문);
 
         //then
         assertAll(
             () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
             () -> assertThat(order.getType()).isEqualTo(OrderType.DELIVERY),
-            () -> assertThat(order.getOrderDateTime()).isEqualTo(신규_주문.getOrderDateTime())
+            () -> assertThat(order.getDeliveryAddress()).isEqualTo("우리집")
         );
     }
 
-    @DisplayName("주문 수락 예외 - 대기중인 주문만 수락 가능")
+    @DisplayName("대기중인 주문만 수락할 수 있다.")
     @ParameterizedTest(name = "주문 상태: [{arguments}]")
-    @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    @EnumSource(value = OrderStatus.class, names = {"WAITING"}, mode = Mode.EXCLUDE)
     void accept(OrderStatus orderStatus) {
         //given
-        신규_주문.setStatus(orderStatus);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 대기중이_아닌_배달_식사_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", orderStatus));
 
         //when
-        ThrowingCallable actual = () -> orderService.accept(신규_주문.getId());
+        ThrowingCallable actual = () -> orderService.accept(대기중이_아닌_배달_식사_주문.getId());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("배달 주문 수락")
+    @DisplayName("대기 중인 배달 주문만 수락할 수 있다.")
     @Test
     void acceptOrderDelivery() {
         //given
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+
+        Order 대기중인_배달_식사_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집"));
 
         //when
-        Order actual = orderService.accept(신규_주문.getId());
-
-        //then
-        assertAll(
-            () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED),
-            () -> verify(kitchenridersClient, atLeastOnce()).requestDelivery(any(), any(), any())
-        );
-    }
-
-    @DisplayName("주문 수락")
-    @ParameterizedTest(name = "주문 유형: [{arguments}]")
-    @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
-    void accept(OrderType orderType) {
-        //given
-        신규_주문.setType(orderType);
-
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
-
-        //when
-        Order actual = orderService.accept(신규_주문.getId());
+        Order actual = orderService.accept(대기중인_배달_식사_주문.getId());
 
         //then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
-    @DisplayName("조리 완료 예외 - 수락된 주문만 가능")
-    @ParameterizedTest(name = "주문 상태: [{arguments}]")
-    @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
-    void serveException(OrderStatus orderStatus) {
+    @DisplayName("대기 중인 주문만 수락할 수 있다.")
+    @ParameterizedTest(name = "주문 유형: [{arguments}]")
+    @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
+    void accept(OrderType orderType) {
         //given
-        신규_주문.setStatus(orderStatus);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 대기중인_주문 = orderRepository.save(신규_주문(orderType, 뿌링클_1개, OrderStatus.WAITING));
 
         //when
-        ThrowingCallable actual = () -> orderService.serve(신규_주문.getId());
+        Order actual = orderService.accept(대기중인_주문.getId());
+
+        //then
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @DisplayName("수락된 주문만 조리 완료할 수 있다.")
+    @ParameterizedTest(name = "주문 상태: [{arguments}]")
+    @EnumSource(value = OrderStatus.class, names = {"ACCEPTED"}, mode = Mode.EXCLUDE)
+    void serveException(OrderStatus orderStatus) {
+        //given
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+
+        Order 수락되지_않은_주문 = orderRepository.save(신규_주문(OrderType.EAT_IN, 뿌링클_1개, orderStatus));
+
+        //when
+        ThrowingCallable actual = () -> orderService.serve(수락되지_않은_주문.getId());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
@@ -347,44 +310,47 @@ class OrderServiceTest {
     @Test
     void serve() {
         //given
-        신규_주문.setStatus(OrderStatus.ACCEPTED);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 수락된_주문 = orderRepository.save(신규_주문(OrderType.EAT_IN, 뿌링클_1개, OrderStatus.ACCEPTED));
 
         //when
-        Order actual = orderService.serve(신규_주문.getId());
+        Order actual = orderService.serve(수락된_주문.getId());
 
         //then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
-    @DisplayName("배달 중 예외 - 배달 주문만 가능")
+    @DisplayName("배달 주문만 배달 시작할 수 있다.")
     @ParameterizedTest(name = "주문 유형: [{arguments}]")
     @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
     void startDeliveryOrderTypeException(OrderType orderType) {
         //given
-        신규_주문.setType(orderType);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 배달이_아닌_주문 = orderRepository.save(신규_주문(orderType, 뿌링클_1개, OrderStatus.SERVED));
 
         //when
-        ThrowingCallable actual = () -> orderService.startDelivery(신규_주문.getId());
+        ThrowingCallable actual = () -> orderService.startDelivery(배달이_아닌_주문.getId());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("배달 중 예외 - 조리완료된 주문만 가능")
+    @DisplayName("조리완료된 주문만 배달을 시작할 수 있다.")
     @ParameterizedTest(name = "주문 상태: [{arguments}]")
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void startDeliveryOrderStatusException(OrderStatus orderStatus) {
         //given
-        신규_주문.setStatus(orderStatus);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 조리_완료되지_않은_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", orderStatus));
 
         //when
-        ThrowingCallable actual = () -> orderService.startDelivery(신규_주문.getId());
+        ThrowingCallable actual = () -> orderService.startDelivery(조리_완료되지_않은_배달_주문.getId());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
@@ -394,29 +360,30 @@ class OrderServiceTest {
     @Test
     void startDelivery() {
         //given
-        신규_주문.setType(OrderType.DELIVERY);
-        신규_주문.setStatus(OrderStatus.SERVED);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 조리_완료된_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", OrderStatus.SERVED));
 
         //when
-        Order actual = orderService.startDelivery(신규_주문.getId());
+        Order actual = orderService.startDelivery(조리_완료된_배달_주문.getId());
 
         //then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     }
 
-    @DisplayName("배달 완료 예외 - 배달중인 주문만 가능")
+    @DisplayName("배달중인 주문만 가능 배달완료할 수 있다.")
     @ParameterizedTest(name = "주문 상태: [{arguments}]")
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
     void completeDeliveryOrderStatusException(OrderStatus orderStatus) {
         //given
-        신규_주문.setStatus(orderStatus);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 배달중인_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", orderStatus));
 
         //when
-        ThrowingCallable actual = () -> orderService.completeDelivery(신규_주문.getId());
+        ThrowingCallable actual = () -> orderService.completeDelivery(배달중인_배달_주문.getId());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
@@ -426,30 +393,30 @@ class OrderServiceTest {
     @Test
     void completeDelivery() {
         //given
-        신규_주문.setType(OrderType.DELIVERY);
-        신규_주문.setStatus(OrderStatus.DELIVERING);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 배달중인_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", OrderStatus.DELIVERING));
 
         //when
-        Order actual = orderService.completeDelivery(신규_주문.getId());
+        Order actual = orderService.completeDelivery(배달중인_배달_주문.getId());
 
         //then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
-    @DisplayName("배달 주문 완료 예외 - 배달 완료 주문만 가능")
+    @DisplayName("배달 완료 주문만 주문 완료할 수 있다.")
     @ParameterizedTest(name = "주문 상태: [{arguments}]")
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERING", "COMPLETED"})
     void completeDeliveryStatusException(OrderStatus orderStatus) {
         //given
-        신규_주문.setType(OrderType.DELIVERY);
-        신규_주문.setStatus(orderStatus);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 배달완료되지_않은_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", orderStatus));
 
         //when
-        ThrowingCallable actual = () -> orderService.complete(신규_주문.getId());
+        ThrowingCallable actual = () -> orderService.complete(배달완료되지_않은_배달_주문.getId());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
@@ -459,47 +426,47 @@ class OrderServiceTest {
     @Test
     void completeDeliveryOrder() {
         //given
-        신규_주문.setType(OrderType.DELIVERY);
-        신규_주문.setStatus(OrderStatus.DELIVERED);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 배달완료된_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", OrderStatus.DELIVERED));
 
         //when
-        Order actual = orderService.complete(신규_주문.getId());
+        Order actual = orderService.complete(배달완료된_배달_주문.getId());
 
         //then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
-    @DisplayName("포장 주문 완료 예외 - 조리완료된 주문만 가능")
+    @DisplayName("조리완료된 포장주문만 주문완료할 수 있다.")
     @ParameterizedTest(name = "주문 상태: [{arguments}]")
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERED", "DELIVERING", "COMPLETED"})
     void completeTakeoutOrderStatusException(OrderStatus orderStatus) {
         //given
-        신규_주문.setType(OrderType.TAKEOUT);
-        신규_주문.setStatus(orderStatus);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 조리완료되지_않은_포장_주문 = orderRepository.save(신규_주문(OrderType.TAKEOUT, 뿌링클_1개, orderStatus));
 
         //when
-        ThrowingCallable actual = () -> orderService.complete(신규_주문.getId());
+        ThrowingCallable actual = () -> orderService.complete(조리완료되지_않은_포장_주문.getId());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("매장 주문 완료 예외 - 조리완료된 주문만 가능")
+    @DisplayName("조리완료된 매장주문만 주문완료할 수 있다.")
     @ParameterizedTest(name = "주문 상태: [{arguments}]")
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERED", "DELIVERING", "COMPLETED"})
     void completeEatInStatusException(OrderStatus orderStatus) {
         //given
-        신규_주문.setType(OrderType.EAT_IN);
-        신규_주문.setStatus(orderStatus);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 조리완료되지_않은_매장_주문 = orderRepository.save(신규_주문(OrderType.TAKEOUT, 뿌링클_1개, orderStatus));
 
         //when
-        ThrowingCallable actual = () -> orderService.complete(신규_주문.getId());
+        ThrowingCallable actual = () -> orderService.complete(조리완료되지_않은_매장_주문.getId());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
@@ -510,13 +477,13 @@ class OrderServiceTest {
     @MethodSource("completeTakeoutOrDelivery")
     void completeTakeoutOrDeliveryOrder(OrderType orderType, OrderStatus orderStatus) {
         //given
-        신규_주문.setType(orderType);
-        신규_주문.setStatus(orderStatus);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
+        Order 조리완료된_주문 = orderRepository.save(신규_주문(orderType, 뿌링클_1개, orderStatus));
 
         //when
-        Order actual = orderService.complete(신규_주문.getId());
+        Order actual = orderService.complete(조리완료된_주문.getId());
 
         //then
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
@@ -533,14 +500,18 @@ class OrderServiceTest {
     @Test
     void completeEatInOrder() {
         //given
-        신규_주문.setType(OrderType.EAT_IN);
-        신규_주문.setStatus(OrderStatus.SERVED);
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
 
-        given(orderRepository.findById(any(UUID.class))).willReturn(Optional.of(신규_주문));
-        given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
+        OrderTable orderTable = orderTableRepository.save(착석한_식탁());
+        Order 신규_주문 = 신규_주문(OrderType.EAT_IN, 뿌링클_1개, OrderStatus.SERVED);
+        신규_주문.setOrderTableId(orderTable.getId());
+        신규_주문.setOrderTable(orderTable);
+
+        Order 조리완료된_주문 = orderRepository.save(신규_주문);
 
         //when
-        Order actual = orderService.complete(신규_주문.getId());
+        Order actual = orderService.complete(조리완료된_주문.getId());
 
         //then
         assertAll(
@@ -554,13 +525,82 @@ class OrderServiceTest {
     @Test
     void findAll() {
         //given
-        given(orderRepository.findAll()).willReturn(Arrays.asList(배달_주문, 포장_주문, 매장_주문));
+        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
+        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+
+        Order 매장_주문 = 신규_주문(OrderType.EAT_IN, 뿌링클_1개);
+        Order 포장_주문 = 신규_주문(OrderType.TAKEOUT, 뿌링클_1개);
+        Order 배달_주문 = 신규_주문(OrderType.DELIVERY, 뿌링클_1개);
+
+        orderRepository.save(매장_주문);
+        orderRepository.save(포장_주문);
+        orderRepository.save(배달_주문);
 
         //when
         List<Order> actual = orderService.findAll();
 
         //then
         assertThat(actual).hasSize(3);
+    }
+
+    private OrderTable 착석한_식탁() {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setEmpty(false);
+        return orderTable;
+    }
+
+    private Menu 뿌링클_세트() {
+        Menu menu = new Menu();
+        menu.setDisplayed(true);
+        menu.setPrice(BigDecimal.valueOf(10_000));
+        return menu;
+    }
+
+    private Order 신규_주문(OrderType orderType, List<OrderLineItem> orderLineItems) {
+        return 신규_주문(orderType, orderLineItems, OrderStatus.WAITING);
+    }
+
+    private Order 신규_주문(OrderType orderType, List<OrderLineItem> orderLineItems, OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setType(orderType);
+        order.setOrderLineItems(orderLineItems);
+        order.setStatus(orderStatus);
+        return order;
+    }
+
+    private Order 신규_배달_주문(List<OrderLineItem> orderLineItems, String deliveryAddress, OrderStatus orderStatus) {
+        Order order = 신규_주문(OrderType.DELIVERY, orderLineItems, orderStatus);
+        order.setDeliveryAddress(deliveryAddress);
+        return order;
+    }
+
+    private Order 신규_배달_주문(List<OrderLineItem> orderLineItems, String deliveryAddress) {
+        return 신규_배달_주문(orderLineItems, deliveryAddress, OrderStatus.WAITING);
+    }
+
+    private Order 신규_배달_주문(List<OrderLineItem> orderLineItems) {
+        return 신규_배달_주문(orderLineItems, "독도");
+    }
+
+    public static OrderLineItem 주문_항목_1개(Menu menu) {
+        return 주문_항목(menu, 1);
+    }
+
+    public static OrderLineItem 주문_항목_1개(Menu menu, int price) {
+        return 주문_항목(menu, 1, price);
+    }
+
+    public static OrderLineItem 주문_항목(Menu menu, int quantity) {
+        return 주문_항목(menu, quantity, 10_000);
+    }
+
+    public static OrderLineItem 주문_항목(Menu menu, int quantity, int price) {
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setMenu(menu);
+        orderLineItem.setMenuId(menu.getId());
+        orderLineItem.setQuantity(quantity);
+        orderLineItem.setPrice(BigDecimal.valueOf(price));
+        return orderLineItem;
     }
 
 }
