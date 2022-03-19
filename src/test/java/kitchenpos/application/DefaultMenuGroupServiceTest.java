@@ -17,14 +17,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 @DisplayName("메뉴 그룹")
-class MenuGroupServiceTest {
+class DefaultMenuGroupServiceTest {
 
     private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
-    private MenuGroupService menuGroupService;
+    private DefaultMenuGroupService menuGroupService;
 
     @BeforeEach
     void setUp() {
-        menuGroupService = new MenuGroupService(menuGroupRepository);
+        menuGroupService = new DefaultMenuGroupService(menuGroupRepository);
     }
 
     @DisplayName("이름이 없으면 예외 발생")
