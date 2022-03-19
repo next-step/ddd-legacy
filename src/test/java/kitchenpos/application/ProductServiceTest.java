@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -79,18 +80,23 @@ class ProductServiceTest {
     })
     void changePrice(long price, boolean expectedDisplayed) {
         //given
-        productRepository.save(뿌링클);
+        Product 신규_상품 = productRepository.save(상품_생성(12_000));
+
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(신규_상품);
+        menuProduct.setProductId(신규_상품.getId());
+        menuProduct.setQuantity(1);
 
         Menu menu = new Menu();
         menu.setDisplayed(true);
-        menu.setMenuProducts(Arrays.asList(뿌링클_1개, 콜라_1개));
+        menu.setMenuProducts(Arrays.asList(menuProduct, 콜라_1개));
         menu.setPrice(BigDecimal.valueOf(11_000L));
         menuRepository.save(menu);
 
         Product 변경할_금액 = 상품_생성(price);
 
         //when
-        Product product = productService.changePrice(뿌링클.getId(), 변경할_금액);
+        Product product = productService.changePrice(신규_상품.getId(), 변경할_금액);
 
         //then
         assertAll(
