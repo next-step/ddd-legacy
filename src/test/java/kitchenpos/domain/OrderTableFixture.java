@@ -3,6 +3,22 @@ package kitchenpos.domain;
 import java.util.UUID;
 
 public class OrderTableFixture {
+
+    public static final OrderTable TABLE_1_EMPTY =
+        OrderTableFixture.builder()
+                         .id(UUID.randomUUID())
+                         .name("1번 테이블")
+                         .empty(true)
+                         .build();
+
+    public static final OrderTable TABLE_1_NOT_EMPTY =
+        OrderTableFixture.builder()
+                         .id(TABLE_1_EMPTY.getId())
+                         .name("1번 테이블")
+                         .empty(false)
+                         .numberOfGuests(5)
+                         .build();
+
     private UUID id;
     private String name;
     private int numberOfGuests;
