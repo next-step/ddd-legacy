@@ -1,4 +1,4 @@
-package kitchenpos.stub;
+package kitchenpos.testdouble;
 
 import kitchenpos.infra.ProfanityClient;
 

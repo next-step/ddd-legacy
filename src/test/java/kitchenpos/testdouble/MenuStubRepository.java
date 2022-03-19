@@ -1,4 +1,4 @@
-package kitchenpos.stub;
+package kitchenpos.testdouble;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;

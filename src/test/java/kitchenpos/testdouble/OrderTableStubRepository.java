@@ -1,4 +1,4 @@
-package kitchenpos.stub;
+package kitchenpos.testdouble;
 
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;

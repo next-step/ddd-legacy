@@ -2,8 +2,8 @@ package kitchenpos.unit.application;
 
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.*;
-import kitchenpos.stub.OrderStubRepository;
-import kitchenpos.stub.OrderTableStubRepository;
+import kitchenpos.testdouble.OrderStubRepository;
+import kitchenpos.testdouble.OrderTableStubRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
