@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FakeOrderRepository implements OrderRepository {
+public class InMemoryOrderRepository implements OrderRepository {
 
     private final Map<UUID, Order> elements = new HashMap<>();
 

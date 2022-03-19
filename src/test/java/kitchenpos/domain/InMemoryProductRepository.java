@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class FakeProductRepository implements ProductRepository {
+public class InMemoryProductRepository implements ProductRepository {
 
     private final Map<UUID, Product> elements = new HashMap<>();
 

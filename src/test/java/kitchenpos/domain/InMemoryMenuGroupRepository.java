@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FakeMenuGroupRepository implements MenuGroupRepository {
+public class InMemoryMenuGroupRepository implements MenuGroupRepository {
 
     private final Map<UUID, MenuGroup> elements = new HashMap<>();
 

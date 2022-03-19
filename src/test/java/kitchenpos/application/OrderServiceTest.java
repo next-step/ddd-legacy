@@ -18,9 +18,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import kitchenpos.domain.FakeMenuRepository;
-import kitchenpos.domain.FakeOrderRepository;
-import kitchenpos.domain.FakeOrderTableRepository;
+import kitchenpos.domain.InMemoryMenuRepository;
+import kitchenpos.domain.InMemoryOrderRepository;
+import kitchenpos.domain.InMemoryOrderTableRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
@@ -54,9 +54,9 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        orderRepository = new FakeOrderRepository();
-        menuRepository = new FakeMenuRepository();
-        orderTableRepository = new FakeOrderTableRepository();
+        orderRepository = new InMemoryOrderRepository();
+        menuRepository = new InMemoryMenuRepository();
+        orderTableRepository = new InMemoryOrderTableRepository();
         kitchenridersClient = new KitchenridersClient();
 
         orderService = new OrderService(
