@@ -1,6 +1,8 @@
 package kitchenpos.ui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Arrays;
+import java.util.Collections;
 import kitchenpos.application.OrderTableService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,6 +16,7 @@ import static kitchenpos.domain.OrderTableFixture.TABLE_1_EMPTY;
 import static kitchenpos.domain.OrderTableFixture.TABLE_1_NOT_EMPTY;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -90,6 +93,20 @@ class OrderTableRestControllerTest {
                .andExpect(status().isOk())
                .andExpect(jsonPath("$.id").value(TABLE_1_NOT_EMPTY.getId().toString()))
                .andExpect(jsonPath("$.name").value(TABLE_1_NOT_EMPTY.getName()))
+               .andDo(print());
+    }
+
+    @Test
+    @DisplayName("주문 테이블 전체 조회 테스트")
+    void findAllTest() throws Exception {
+        // given
+        given(orderTableService.findAll()).willReturn(Collections.singletonList(TABLE_1_NOT_EMPTY));
+
+        // when
+        mockMvc.perform(get(BASE_URL))
+               .andExpect(status().isOk())
+               .andExpect(jsonPath("$[0].id").value(TABLE_1_NOT_EMPTY.getId().toString()))
+               .andExpect(jsonPath("$[0].name").value(TABLE_1_NOT_EMPTY.getName()))
                .andDo(print());
     }
 }
