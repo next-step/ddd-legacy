@@ -113,8 +113,7 @@ class OrderServiceTest {
     @Test
     void createOrderNotDisplayedMenuException() {
         //given
-        Menu 진열되지_않은_메뉴 = menuRepository.save(new Menu());
-        List<OrderLineItem> 진열되지_않은_메뉴_상품 = Collections.singletonList(주문_항목_1개(진열되지_않은_메뉴));
+        List<OrderLineItem> 진열되지_않은_메뉴_상품 = 메뉴_뿌링클_1개(new Menu());
         Order 진열되지_않은_상품_주문 = 신규_배달_주문(진열되지_않은_메뉴_상품);
 
         //when
@@ -145,9 +144,7 @@ class OrderServiceTest {
     @NullAndEmptySource
     void createDeliveryOrderHasNoAddressException(String deliveryAddress) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
         Order 주소_없는_배달_주문 = 신규_배달_주문(뿌링클_1개, deliveryAddress);
 
         //when
@@ -161,9 +158,7 @@ class OrderServiceTest {
     @Test
     void createEatInException() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
         Order 착석하지_않고_주문 = 신규_주문(OrderType.EAT_IN, 뿌링클_1개);
         OrderTable orderTable1 = new OrderTable();
         orderTable1.setEmpty(true);
@@ -182,8 +177,7 @@ class OrderServiceTest {
     @Test
     void createOrderEatIn() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
         OrderTable orderTable = orderTableRepository.save(착석한_식탁());
 
         Order 매장_식사_주문 = 신규_주문(OrderType.EAT_IN, 뿌링클_1개);
@@ -204,8 +198,7 @@ class OrderServiceTest {
     @Test
     void createOrderTakeout() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 포장_식사_주문 = 신규_주문(OrderType.TAKEOUT, 뿌링클_1개);
 
@@ -223,8 +216,7 @@ class OrderServiceTest {
     @Test
     void createOrderDelivery() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 배달_식사_주문 = 신규_배달_주문(뿌링클_1개, "우리집");
 
@@ -244,8 +236,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING"}, mode = Mode.EXCLUDE)
     void accept(OrderStatus orderStatus) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 대기중이_아닌_배달_식사_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", orderStatus));
 
@@ -260,8 +251,7 @@ class OrderServiceTest {
     @Test
     void acceptOrderDelivery() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 대기중인_배달_식사_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집"));
 
@@ -277,8 +267,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
     void accept(OrderType orderType) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 대기중인_주문 = orderRepository.save(신규_주문(orderType, 뿌링클_1개, OrderStatus.WAITING));
 
@@ -294,8 +283,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"ACCEPTED"}, mode = Mode.EXCLUDE)
     void serveException(OrderStatus orderStatus) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 수락되지_않은_주문 = orderRepository.save(신규_주문(OrderType.EAT_IN, 뿌링클_1개, orderStatus));
 
@@ -310,8 +298,7 @@ class OrderServiceTest {
     @Test
     void serve() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 수락된_주문 = orderRepository.save(신규_주문(OrderType.EAT_IN, 뿌링클_1개, OrderStatus.ACCEPTED));
 
@@ -327,8 +314,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
     void startDeliveryOrderTypeException(OrderType orderType) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 배달이_아닌_주문 = orderRepository.save(신규_주문(orderType, 뿌링클_1개, OrderStatus.SERVED));
 
@@ -344,8 +330,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
     void startDeliveryOrderStatusException(OrderStatus orderStatus) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 조리_완료되지_않은_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", orderStatus));
 
@@ -360,8 +345,7 @@ class OrderServiceTest {
     @Test
     void startDelivery() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 조리_완료된_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", OrderStatus.SERVED));
 
@@ -377,8 +361,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
     void completeDeliveryOrderStatusException(OrderStatus orderStatus) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 배달중인_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", orderStatus));
 
@@ -393,8 +376,7 @@ class OrderServiceTest {
     @Test
     void completeDelivery() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 배달중인_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", OrderStatus.DELIVERING));
 
@@ -410,8 +392,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERING", "COMPLETED"})
     void completeDeliveryStatusException(OrderStatus orderStatus) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 배달완료되지_않은_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", orderStatus));
 
@@ -426,8 +407,7 @@ class OrderServiceTest {
     @Test
     void completeDeliveryOrder() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 배달완료된_배달_주문 = orderRepository.save(신규_배달_주문(뿌링클_1개, "우리집", OrderStatus.DELIVERED));
 
@@ -443,8 +423,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERED", "DELIVERING", "COMPLETED"})
     void completeTakeoutOrderStatusException(OrderStatus orderStatus) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 조리완료되지_않은_포장_주문 = orderRepository.save(신규_주문(OrderType.TAKEOUT, 뿌링클_1개, orderStatus));
 
@@ -460,8 +439,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "DELIVERED", "DELIVERING", "COMPLETED"})
     void completeEatInStatusException(OrderStatus orderStatus) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 조리완료되지_않은_매장_주문 = orderRepository.save(신규_주문(OrderType.TAKEOUT, 뿌링클_1개, orderStatus));
 
@@ -477,8 +455,7 @@ class OrderServiceTest {
     @MethodSource("completeTakeoutOrDelivery")
     void completeTakeoutOrDeliveryOrder(OrderType orderType, OrderStatus orderStatus) {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 조리완료된_주문 = orderRepository.save(신규_주문(orderType, 뿌링클_1개, orderStatus));
 
@@ -500,11 +477,10 @@ class OrderServiceTest {
     @Test
     void completeEatInOrder() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
-        OrderTable orderTable = orderTableRepository.save(착석한_식탁());
         Order 신규_주문 = 신규_주문(OrderType.EAT_IN, 뿌링클_1개, OrderStatus.SERVED);
+        OrderTable orderTable = orderTableRepository.save(착석한_식탁());
         신규_주문.setOrderTableId(orderTable.getId());
         신규_주문.setOrderTable(orderTable);
 
@@ -521,12 +497,16 @@ class OrderServiceTest {
         );
     }
 
+    private List<OrderLineItem> 메뉴_뿌링클_1개(Menu menu) {
+        Menu 뿌링클_세트 = menuRepository.save(menu);
+        return Collections.singletonList(주문_항목_1개(뿌링클_세트));
+    }
+
     @DisplayName("모든 주문 조회")
     @Test
     void findAll() {
         //given
-        Menu 뿌링클_세트 = menuRepository.save(뿌링클_세트());
-        List<OrderLineItem> 뿌링클_1개 = Collections.singletonList(주문_항목_1개(뿌링클_세트));
+        List<OrderLineItem> 뿌링클_1개 = 메뉴_뿌링클_1개(뿌링클_세트());
 
         Order 매장_주문 = 신규_주문(OrderType.EAT_IN, 뿌링클_1개);
         Order 포장_주문 = 신규_주문(OrderType.TAKEOUT, 뿌링클_1개);
