@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.exception.MenuGroupNameException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +22,7 @@ public class MenuGroupService {
     public MenuGroup create(final MenuGroup request) {
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new MenuGroupNameException("메뉴 그룹명은 필수 입니다.");
         }
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
