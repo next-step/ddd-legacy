@@ -11,6 +11,8 @@ import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,11 +39,18 @@ class OrderTableServiceTest {
     @InjectMocks
     private OrderTableService sut;
 
-    @Test
+    @ParameterizedTest
+    @NullAndEmptySource
     @DisplayName("주문테이블 생성 시 이름이 비어 있으면 오류")
-    void createFail() {
+    void createFail(String name) {
+        // given
+        OrderTable request = OrderTableFixture.builder()
+                                              .name(name)
+                                              .build();
+
+        // then
         assertThatIllegalArgumentException()
-            .isThrownBy(() -> sut.create(new OrderTable()));
+            .isThrownBy(() -> sut.create(request));
     }
 
     @Test
