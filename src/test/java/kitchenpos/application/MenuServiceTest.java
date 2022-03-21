@@ -22,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -162,8 +163,6 @@ class MenuServiceTest {
     @DisplayName("메뉴 생성 시 입력한 가격이 입력한 상품했던 상품의 합보다 작지 않으면 예외 발생")
     void throwExceptionIfPriceBiggerThenSum() {
         // given
-        UUID productId = UUID.randomUUID();
-
         Menu request =
             MenuFixture.builder()
                        .price(BigDecimal.valueOf(5000L))
@@ -189,19 +188,18 @@ class MenuServiceTest {
             .isThrownBy(() -> sut.create(request));
     }
 
-    @Test
+    @ParameterizedTest
+    @NullAndEmptySource
     @DisplayName("메뉴 생성 시 이름이 null이면 예외 발생")
-    void throwExceptionIfEmptyName() {
+    void throwExceptionIfNullAndEmptyName(String name) {
         // given
-        UUID productId = UUID.randomUUID();
-
         Menu request =
             MenuFixture.builder()
                        .price(BigDecimal.valueOf(5000L))
                        .menuGroupId(CHICKEN_MENU_GROUP.getId())
                        .menuProducts(Arrays.asList(MP_FRIED_CHICKEN, MP_HONEY_COMBO))
                        .price(BigDecimal.valueOf(20000L))
-                       .name(null)
+                       .name(name)
                        .build();
 
         given(menuGroupRepository.findById(request.getMenuGroupId()))
