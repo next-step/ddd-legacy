@@ -164,7 +164,7 @@ class MenuServiceTest {
 
         @ParameterizedTest(name = "{0} 인 경우")
         @DisplayName("이름은 비어있거나 욕설이 포함될 수 없다.")
-        @NullSource
+        @NullAndEmptySource
         @ValueSource(strings = "나쁜말")
         void 이름은_비어있거나_욕설이_포함될_수_없다(String name) {
             // given
