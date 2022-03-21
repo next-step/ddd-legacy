@@ -14,6 +14,7 @@ import kitchenpos.domain.MenuProductFixture;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.infra.MockPurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static kitchenpos.domain.MenuFixture.CHICKEN_MENU;
@@ -46,8 +48,8 @@ class MenuServiceTest {
     private MenuGroupRepository menuGroupRepository;
     @Mock
     private ProductRepository productRepository;
-    @Mock
-    private PurgomalumClient purgomalumClient;
+    @Spy
+    private PurgomalumClient purgomalumClient = new MockPurgomalumClient();
 
     @InjectMocks
     private MenuService sut;
@@ -231,7 +233,7 @@ class MenuServiceTest {
                        .menuGroupId(CHICKEN_MENU_GROUP.getId())
                        .menuProducts(Arrays.asList(MP_FRIED_CHICKEN, MP_HONEY_COMBO))
                        .price(BigDecimal.valueOf(20000L))
-                       .name("profanity")
+                       .name("f**k")
                        .build();
 
         given(menuGroupRepository.findById(request.getMenuGroupId()))
@@ -245,8 +247,6 @@ class MenuServiceTest {
 
         given(productRepository.findById(MP_HONEY_COMBO.getProductId()))
             .willReturn(Optional.of(HONEY_COMBO));
-
-        given(purgomalumClient.containsProfanity(any())).willReturn(true);
 
         // when
         assertThatIllegalArgumentException()
@@ -279,8 +279,6 @@ class MenuServiceTest {
 
         given(productRepository.findById(MP_HONEY_COMBO.getProductId()))
             .willReturn(Optional.of(HONEY_COMBO));
-
-        given(purgomalumClient.containsProfanity(any())).willReturn(false);
 
         // when
         assertThatCode(() -> sut.create(request)).doesNotThrowAnyException();

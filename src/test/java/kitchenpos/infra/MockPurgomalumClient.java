@@ -1,12 +1,6 @@
 package kitchenpos.infra;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
-
-public class MockPurgomalumClient extends PurgomalumClient {
-
-    public MockPurgomalumClient() {
-        super(new RestTemplateBuilder());
-    }
+public class MockPurgomalumClient implements PurgomalumClient {
 
     @Override
     public boolean containsProfanity(String text) {

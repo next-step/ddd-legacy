@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static kitchenpos.domain.OrderTableFixture.TABLE_1_EMPTY;
 import static kitchenpos.domain.OrderTableFixture.TABLE_1_NOT_EMPTY;
+import static kitchenpos.domain.OrderTableFixture.TABLE_2_EMPTY;
+import static kitchenpos.domain.OrderTableFixture.TABLE_3_NOT_EMPTY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
@@ -120,7 +122,7 @@ class OrderTableServiceTest {
                                                  .numberOfGuests(3)
                                                  .build();
 
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(TABLE_1_EMPTY));
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(TABLE_2_EMPTY));
 
         // when
         assertThatIllegalStateException()
@@ -135,7 +137,7 @@ class OrderTableServiceTest {
                                                  .numberOfGuests(3)
                                                  .build();
 
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(TABLE_1_NOT_EMPTY));
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(TABLE_3_NOT_EMPTY));
 
         // when
         OrderTable actual = sut.changeNumberOfGuests(UUID.randomUUID(), orderTable);

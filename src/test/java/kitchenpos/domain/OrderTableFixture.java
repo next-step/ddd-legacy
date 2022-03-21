@@ -19,6 +19,21 @@ public class OrderTableFixture {
                          .numberOfGuests(5)
                          .build();
 
+    public static final OrderTable TABLE_2_EMPTY =
+        OrderTableFixture.builder()
+                         .id(UUID.randomUUID())
+                         .name("2번 테이블")
+                         .empty(true)
+                         .build();
+
+    public static final OrderTable TABLE_3_NOT_EMPTY =
+        OrderTableFixture.builder()
+                         .id(UUID.randomUUID())
+                         .name("3번 테이블")
+                         .empty(false)
+                         .numberOfGuests(10)
+                         .build();
+
     private UUID id;
     private String name;
     private int numberOfGuests;
