@@ -1,10 +1,10 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.Fixtures.createMenu;
-import static kitchenpos.application.Fixtures.createMenuProduct;
-import static kitchenpos.application.Fixtures.createProduct;
-import static kitchenpos.application.Fixtures.십원_상품;
-import static kitchenpos.application.Fixtures.일원짜리_Product;
+import static kitchenpos.application.fixture.MenuFixtures.createMenu;
+import static kitchenpos.application.fixture.MenuFixtures.createMenuProduct;
+import static kitchenpos.application.fixture.ProductFixtures.createProduct;
+import static kitchenpos.application.fixture.ProductFixtures.십원_상품;
+import static kitchenpos.application.fixture.ProductFixtures.일원짜리_Product;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

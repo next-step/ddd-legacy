@@ -1,9 +1,9 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.Fixtures.createMenu;
-import static kitchenpos.application.Fixtures.createMenuProduct;
-import static kitchenpos.application.Fixtures.십원_상품;
-import static kitchenpos.application.Fixtures.십원짜리_상품_2개인_menuProduct;
+import static kitchenpos.application.fixture.MenuFixtures.createMenu;
+import static kitchenpos.application.fixture.MenuFixtures.createMenuProduct;
+import static kitchenpos.application.fixture.MenuFixtures.십원짜리_상품_2개인_menuProduct;
+import static kitchenpos.application.fixture.ProductFixtures.십원_상품;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.Fixtures.createMenuGroup;
+import static kitchenpos.application.fixture.MenuGroupFixtures.createMenuGroup;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertAll;

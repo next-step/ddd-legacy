@@ -1,12 +1,12 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.Fixtures.createDeliveryOrder;
-import static kitchenpos.application.Fixtures.createEatInOrder;
-import static kitchenpos.application.Fixtures.createMenu;
-import static kitchenpos.application.Fixtures.createOrder;
-import static kitchenpos.application.Fixtures.createOrderLineItem;
-import static kitchenpos.application.Fixtures.createOrderTable;
-import static kitchenpos.application.Fixtures.createTakeOutOrder;
+import static kitchenpos.application.fixture.MenuFixtures.createMenu;
+import static kitchenpos.application.fixture.OrderFixtures.createDeliveryOrder;
+import static kitchenpos.application.fixture.OrderFixtures.createEatInOrder;
+import static kitchenpos.application.fixture.OrderFixtures.createOrder;
+import static kitchenpos.application.fixture.OrderFixtures.createOrderLineItem;
+import static kitchenpos.application.fixture.OrderFixtures.createTakeOutOrder;
+import static kitchenpos.application.fixture.OrderTableFixtures.createOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;

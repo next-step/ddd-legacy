@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.Fixtures.createOrderTable;
+import static kitchenpos.application.fixture.OrderTableFixtures.createOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
