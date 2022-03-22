@@ -19,4 +19,12 @@ public class MenuProductFixture {
     public static MenuProduct 메뉴_상품(Long id, Product product, long quantity, UUID productId) {
         return new MenuProduct(id, product, quantity, productId);
     }
+
+    public static MenuProduct 메뉴_상품(UUID productId, long quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(ProductFixture.상품());
+        menuProduct.setProductId(productId);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
 }

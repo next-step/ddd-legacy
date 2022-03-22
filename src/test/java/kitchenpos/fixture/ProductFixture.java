@@ -31,11 +31,15 @@ public class ProductFixture {
         return new Product(UUID.randomUUID(), "후라이드", BigDecimal.valueOf(16000L));
     }
 
+    public static Product 상품(UUID uuid, String name, BigDecimal price) {
+        return new Product(uuid, name, price);
+    }
+
     public static List<Product> 상품_목록() {
         return Arrays.asList(
-            new Product(UUID.randomUUID(), "후라이드", BigDecimal.valueOf(16000L)),
-            new Product(UUID.randomUUID(), "양념치킨", BigDecimal.valueOf(16000L)),
-            new Product(UUID.randomUUID(), "반반치킨", BigDecimal.valueOf(16000L))
+                new Product(UUID.randomUUID(), "후라이드", BigDecimal.valueOf(16000L)),
+                new Product(UUID.randomUUID(), "양념치킨", BigDecimal.valueOf(16000L)),
+                new Product(UUID.randomUUID(), "반반치킨", BigDecimal.valueOf(16000L))
         );
     }
 

@@ -19,6 +19,10 @@ public class MenuGroup {
     public MenuGroup() {
     }
 
+    public MenuGroup(UUID id) {
+        this.id = id;
+    }
+
     public MenuGroup(UUID id, String name) {
         this.id = id;
         this.name = name;

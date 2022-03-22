@@ -119,7 +119,7 @@ class ProductServiceTest {
         given(productRepository.findById(uuid)).willReturn(Optional.of(ProductFixture.변경_상품(uuid)));
         given(menuRepository.findAllByProductId(uuid)).willReturn(Collections.singletonList(menu));
 
-        Product product = productService.changePrice(uuid, requestProduct);
+        productService.changePrice(uuid, requestProduct);
         assertThat(menu.isDisplayed()).isTrue();
     }
 

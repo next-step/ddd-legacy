@@ -16,6 +16,10 @@ import java.util.UUID;
 
 public class MenuGroupFixture {
 
+    public static MenuGroup 빈_메뉴_그룹(UUID uuid) {
+        return new MenuGroup(uuid);
+    }
+
     public static MenuGroup 메뉴_그룹(UUID uuid, String name) {
         return new MenuGroup(uuid, name);
     }
