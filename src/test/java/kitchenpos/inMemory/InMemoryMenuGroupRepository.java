@@ -22,6 +22,9 @@ public class InMemoryMenuGroupRepository implements MenuGroupRepository {
 
     @Override
     public Optional<MenuGroup> findById(final UUID menuGroupId) {
-        return Optional.ofNullable(menuGroups.get(menuGroupId));
+        return menuGroups.values()
+                .stream()
+                .filter(it -> Objects.equals(it.getId(), menuGroupId))
+                .findAny();
     }
 }

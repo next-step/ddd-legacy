@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MenuGroupServiceTest {
 
-    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+    private static MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
 
     private MenuGroupService menuGroupService;
 
@@ -32,7 +32,7 @@ class MenuGroupServiceTest {
 
         // given
         final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName("족보세트");
+        menuGroup.setName("세트메뉴");
 
         // when
         final MenuGroup actual = menuGroupService.create(menuGroup);
@@ -40,7 +40,7 @@ class MenuGroupServiceTest {
         // then
         Assertions.assertAll(
                 () -> assertThat(actual.getId()).isNotNull(),
-                () -> assertThat(actual.getName()).isEqualTo("족발세트")
+                () -> assertThat(actual.getName()).isEqualTo("세트메뉴")
         );
     }
 
@@ -48,8 +48,8 @@ class MenuGroupServiceTest {
     @Test
     void findAll() {
         // given
-        menuGroupRepository.save(createMenuGroup("족발세트"));
-        menuGroupRepository.save(createMenuGroup("보쌈세트"));
+        menuGroupRepository.save(createMenuGroup("세트메뉴"));
+        menuGroupRepository.save(createMenuGroup("사이드메뉴"));
 
         // when
         final List<MenuGroup> listMenuGroup = menuGroupService.findAll();
@@ -68,11 +68,11 @@ class MenuGroupServiceTest {
         ).isInstanceOf(MenuGroupNameException.class);
     }
 
-    private MenuGroup createMenuGroup(String name) {
+    static MenuGroup createMenuGroup(String name) {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
         menuGroup.setName(name);
-        return menuGroup;
+        return menuGroupRepository.save(menuGroup);
     }
 
 }
