@@ -24,11 +24,11 @@ import static org.assertj.core.api.Assertions.*;
 
 class ProductServiceTest {
 
-    private ProductRepository productRepository = new InMemoryProductRepository();
+    private final ProductRepository productRepository = new InMemoryProductRepository();
 
-    private MenuRepository menuRepository = new InMemoryMenuRepository();
+    private final MenuRepository menuRepository = new InMemoryMenuRepository();
 
-    private ProfanityClient purgomalumClient = new FakeProfanityClient();
+    private final ProfanityClient purgomalumClient = new FakeProfanityClient();
 
     private ProductService productService;
 

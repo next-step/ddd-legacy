@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MenuGroupServiceTest {
 
-    private static MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+    private static final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
 
     private MenuGroupService menuGroupService;
 

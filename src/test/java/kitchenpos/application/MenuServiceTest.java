@@ -25,18 +25,18 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MenuServiceTest {
 
-    private MenuRepository menuRepository = new InMemoryMenuRepository();
+    private final MenuRepository menuRepository = new InMemoryMenuRepository();
 
-    private static MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+    private static final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
 
-    private static ProductRepository productRepository = new InMemoryProductRepository();
+    private static final ProductRepository productRepository = new InMemoryProductRepository();
 
-    private ProfanityClient purgomalumClient = new FakeProfanityClient();
+    private final ProfanityClient purgomalumClient = new FakeProfanityClient();
 
     private static MenuService menuService;
 
-    private static String 세트_메뉴 = "세트메뉴;";
-    private static String 족보_세트= "족보세트;";
+    private static final String 세트_메뉴 = "세트메뉴;";
+    private static final String 족보_세트= "족보세트;";
 
     @BeforeEach
     void setUp() throws Exception {
