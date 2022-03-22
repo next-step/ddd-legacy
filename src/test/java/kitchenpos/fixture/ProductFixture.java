@@ -2,9 +2,14 @@ package kitchenpos.fixture;
 
 import kitchenpos.domain.Product;
 
+<<<<<<< HEAD
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+=======
+import javax.persistence.Column;
+import java.math.BigDecimal;
+>>>>>>> 089fb8acd7302a8603969a0abbd6bfd510ebb2f4
 import java.util.UUID;
 
 /**
@@ -14,11 +19,16 @@ import java.util.UUID;
  * </pre>
  *
  * @author YunJin Choi(zzdd1558@gmail.com)
+<<<<<<< HEAD
  * @since 2022-03-20 오후 11:49
+=======
+ * @since 2022-03-15 오전 12:00
+>>>>>>> 089fb8acd7302a8603969a0abbd6bfd510ebb2f4
  */
 
 public class ProductFixture {
 
+<<<<<<< HEAD
     public static Product 상품_가격_이름_NULL() {
         return new Product(UUID.randomUUID(), null, null);
     }
@@ -49,5 +59,36 @@ public class ProductFixture {
 
     public static Product 변경_값() {
         return new Product(null, "순살치킨", BigDecimal.valueOf(17000L));
+=======
+    public static Product normalProduct() {
+        Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setName("아이스 아메리카노");
+        product.setPrice(new BigDecimal(5000L));
+        return product;
+    }
+
+    public static Product emptyProductName() {
+        Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setPrice(new BigDecimal(5000L));
+        return product;
+    }
+
+    public static Product slangProductName() {
+        Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setName("맛있는 Fuck");
+        product.setPrice(new BigDecimal(5000L));
+        return product;
+    }
+
+    public static Product wrongPriceProduct() {
+        Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setName("아이스 아메리카노");
+        product.setPrice(new BigDecimal(-1000L));
+        return product;
+>>>>>>> 089fb8acd7302a8603969a0abbd6bfd510ebb2f4
     }
 }
