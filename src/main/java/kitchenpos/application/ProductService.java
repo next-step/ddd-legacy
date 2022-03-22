@@ -71,7 +71,7 @@ public class ProductService {
                     .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
             }
 
-            if (menu.getPrice().compareTo(sum) > 0) {
+            if (sum.compareTo(menu.getPrice()) > 0) {
                 menu.setDisplayed(false);
             }
         }

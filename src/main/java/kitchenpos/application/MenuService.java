@@ -81,7 +81,7 @@ public class MenuService {
             menuProducts.add(menuProduct);
         }
 
-        if (price.compareTo(sum) > 0) {
+        if (sum.compareTo(price) > 0) {
             throw new IllegalArgumentException();
         }
 
@@ -116,7 +116,7 @@ public class MenuService {
                 .getPrice()
                 .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
 
-            if (price.compareTo(sum) > 0) {
+            if (sum.compareTo(price) > 0) {
                 throw new IllegalArgumentException();
             }
         }
@@ -136,7 +136,7 @@ public class MenuService {
                 .getPrice()
                 .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
 
-            if (menu.getPrice().compareTo(sum) > 0) {
+            if (sum.compareTo(menu.getPrice()) > 0) {
                 throw new IllegalStateException();
             }
         }

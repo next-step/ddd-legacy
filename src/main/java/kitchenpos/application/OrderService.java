@@ -62,10 +62,8 @@ public class OrderService {
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
-            if (type != OrderType.EAT_IN) {
-                if (quantity < 0) {
-                    throw new IllegalArgumentException();
-                }
+            if (quantity < 0) {
+                throw new IllegalArgumentException();
             }
 
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
@@ -104,7 +102,7 @@ public class OrderService {
         if (type == OrderType.EAT_IN) {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
-            if (orderTable.isEmpty()) {
+            if (!orderTable.isEmpty()) {
                 throw new IllegalStateException();
             }
 
@@ -126,9 +124,9 @@ public class OrderService {
             BigDecimal sum = BigDecimal.ZERO;
 
             for (final OrderLineItem orderLineItem : order.getOrderLineItems()) {
-                sum = orderLineItem.getMenu()
+                sum = sum.add(orderLineItem.getMenu()
                     .getPrice()
-                    .multiply(BigDecimal.valueOf(orderLineItem.getQuantity()));
+                    .multiply(BigDecimal.valueOf(orderLineItem.getQuantity())));
             }
 
             kitchenridersClient.requestDelivery(orderId, sum, order.getDeliveryAddress());
@@ -174,6 +172,11 @@ public class OrderService {
     public Order completeDelivery(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
             .orElseThrow(NoSuchElementException::new);
+
+        if (order.getType() != OrderType.DELIVERY) {
+            throw new IllegalStateException();
+        }
+
         if (order.getStatus() != OrderStatus.DELIVERING) {
             throw new IllegalStateException();
         }
