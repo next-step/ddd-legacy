@@ -1,7 +1,9 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.exception.ProductNameException;
+import kitchenpos.exception.ProductPriceException;
+import kitchenpos.infra.ProfanityClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,27 +17,27 @@ import java.util.UUID;
 public class ProductService {
     private final ProductRepository productRepository;
     private final MenuRepository menuRepository;
-    private final PurgomalumClient purgomalumClient;
+    private final ProfanityClient profanityClient;
 
     public ProductService(
         final ProductRepository productRepository,
         final MenuRepository menuRepository,
-        final PurgomalumClient purgomalumClient
+        final ProfanityClient profanityClient
     ) {
         this.productRepository = productRepository;
         this.menuRepository = menuRepository;
-        this.purgomalumClient = purgomalumClient;
+        this.profanityClient = profanityClient;
     }
 
     @Transactional
     public Product create(final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new ProductPriceException("상품의 가격은 음수가 될 수 없습니다.");
         }
         final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+        if (Objects.isNull(name) || profanityClient.containsProfanity(name)) {
+            throw new ProductNameException("상품의 이름에는 비속어가 포함될 수 없습니다.");
         }
         final Product product = new Product();
         product.setId(UUID.randomUUID());
