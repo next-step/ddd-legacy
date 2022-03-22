@@ -8,7 +8,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 @Component
-public class PurgomalumClient {
+public class PurgomalumClient implements ProfanityClient {
     private final RestTemplate restTemplate;
 
     public PurgomalumClient(final RestTemplateBuilder restTemplateBuilder) {
