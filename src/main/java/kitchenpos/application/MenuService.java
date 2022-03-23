@@ -70,7 +70,7 @@ public class MenuService {
             throw new IllegalArgumentException();
         }
         final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
+        if (Objects.isNull(name) || name.isEmpty() || purgomalumClient.containsProfanity(name)) {
             throw new IllegalArgumentException();
         }
         final Menu menu = new Menu();
@@ -91,14 +91,18 @@ public class MenuService {
         }
         final Menu menu = menuRepository.findById(menuId)
             .orElseThrow(NoSuchElementException::new);
+        BigDecimal sum = BigDecimal.ZERO;
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
-            final BigDecimal sum = menuProduct.getProduct()
-                .getPrice()
-                .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
-            if (price.compareTo(sum) > 0) {
-                throw new IllegalArgumentException();
-            }
+            BigDecimal productPrice = menuProduct.getProduct()
+                                                 .getPrice()
+                                                 .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
+            sum = sum.add(productPrice);
         }
+
+        if (price.compareTo(sum) > 0) {
+            throw new IllegalArgumentException();
+        }
+
         menu.setPrice(price);
         return menu;
     }
@@ -107,13 +111,15 @@ public class MenuService {
     public Menu display(final UUID menuId) {
         final Menu menu = menuRepository.findById(menuId)
             .orElseThrow(NoSuchElementException::new);
+        BigDecimal sum = BigDecimal.ZERO;
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
-            final BigDecimal sum = menuProduct.getProduct()
-                .getPrice()
-                .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
-            if (menu.getPrice().compareTo(sum) > 0) {
-                throw new IllegalStateException();
-            }
+            BigDecimal productPrice = menuProduct.getProduct()
+                                                 .getPrice()
+                                                 .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
+            sum = sum.add(productPrice);
+        }
+        if (menu.getPrice().compareTo(sum) > 0) {
+            throw new IllegalStateException();
         }
         menu.setDisplayed(true);
         return menu;
