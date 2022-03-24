@@ -5,6 +5,7 @@ import java.util.UUID;
 
 @Table(name = "menu_product")
 @Entity
+
 public class MenuProduct {
     @Column(name = "seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)

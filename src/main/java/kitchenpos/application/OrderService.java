@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.infra.KitchenClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,13 +15,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final OrderTableRepository orderTableRepository;
-    private final KitchenridersClient kitchenridersClient;
+    private final KitchenClient kitchenridersClient;
 
     public OrderService(
         final OrderRepository orderRepository,
         final MenuRepository menuRepository,
         final OrderTableRepository orderTableRepository,
-        final KitchenridersClient kitchenridersClient
+        final KitchenClient kitchenridersClient
     ) {
         this.orderRepository = orderRepository;
         this.menuRepository = menuRepository;
@@ -57,6 +57,9 @@ public class OrderService {
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
+
+
+
             if (!menu.isDisplayed()) {
                 throw new IllegalStateException();
             }
