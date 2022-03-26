@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -91,13 +92,14 @@ class OrderTableServiceTest {
     }
 
     @DisplayName("빈 테이블을 설정할 테이블은 주문 상태가 `완료` 상태여야만 한다.")
-    @Test
-    void emptyTableOnlyCompleted() {
+    @ValueSource(strings = {"DELIVERED", "ACCEPTED", "DELIVERING","SERVED", "WAITING"})
+    @ParameterizedTest
+    void emptyTableOnlyCompleted(OrderStatus orderStatus) {
 
         // given
         OrderTable orderTable = createOrderTable("8번");
         orderTableRepository.save(orderTable);
-        Order order = createOrder(OrderStatus.DELIVERED, orderTable);
+        Order order = createOrder(orderStatus, orderTable);
         orderRepository.save(order);
 
         assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
