@@ -58,7 +58,6 @@ public class MenuServiceTest {
     void create() {
         // given
         Menu menu = createMenuRequest("후라이드양념세트", 30_000);
-
         addMenuGroupId(menu);
         addMenuProducts(menu);
 
@@ -120,12 +119,25 @@ public class MenuServiceTest {
 
 
     @DisplayName("메뉴의 가격은 메뉴의 속하는 상품 가격의 합보다 크지 않아야 한다.")
-    @Test
-    void MenuSum() {
+    @ValueSource(strings = "36000")
+    @ParameterizedTest
+    void MenuSum(BigDecimal price) {
+
+        int productPrice = 10000;
+
         // given
-        Menu menu = createMenuRequest("후라이드양념세트", 36_000);
-        addMenuGroupId(menu);
-        addMenuProducts(menu);
+        Menu menu = createMenuWithMenuProductsAndGroup(
+                "후라이드양념콤보",
+                Arrays.asList(menuProduct,menuProduct2),
+                menuGroup
+        );
+        menu.setPrice(price);
+
+        menu.getMenuProducts()
+                .forEach(menuProduct -> {
+                    Product product = new Product();
+                    product.setPrice(BigDecimal.valueOf(productPrice));
+                });
 
         // when - given
         assertThatThrownBy(() -> menuService.create(menu))

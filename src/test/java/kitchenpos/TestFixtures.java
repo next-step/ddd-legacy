@@ -53,6 +53,18 @@ public class TestFixtures {
         return orderTable;
     }
 
+
+    public static Menu createMenuWithMenuProductsAndGroup(String name, List<MenuProduct> menuProducts, MenuGroup menuGroup) {
+        Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setPrice(BigDecimal.valueOf(10000));
+        menu.setMenuProducts(menuProducts);
+        menu.setMenuGroup(menuGroup);
+        menu.setMenuGroupId(menuGroup.getId());
+        menu.setName(name);
+        return menu;
+    }
+
     public static Menu createMenu(String name, int price) {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
@@ -138,7 +150,6 @@ public class TestFixtures {
 
     public static Menu createMenuRequest(String name, int price) {
         Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
         menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(price));
         return menu;
