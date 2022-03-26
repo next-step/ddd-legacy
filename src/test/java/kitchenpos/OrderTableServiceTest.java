@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static kitchenpos.TestFixtures.createOrderTable;
-import static kitchenpos.TestFixtures.createOrderTableRequest;
+import static kitchenpos.TestFixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -200,8 +199,8 @@ class OrderTableServiceTest {
     void changeNumberOfGuestsNotEmpty() {
 
         // given
-        OrderTable orderTable = createOrderTable("8번");
-        orderTable.setEmpty(true);
+        OrderTable orderTable = createEmptyTableWithName("8번");
+
         orderTableRepository.save(orderTable);
 
         OrderTable orderTableRequest = createOrderTableRequest("8번");
@@ -211,6 +210,8 @@ class OrderTableServiceTest {
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTableRequest))
                 .isInstanceOf(IllegalStateException.class);
     }
+
+
 
     @DisplayName("주문 테이블의 목록을 조회할 수 있다.")
     @Test

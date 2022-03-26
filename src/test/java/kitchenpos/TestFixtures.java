@@ -8,6 +8,13 @@ import java.util.UUID;
 
 public class TestFixtures {
 
+
+    public static OrderTable createEmptyTableWithName(String name) {
+        OrderTable orderTable = createOrderTable(name);
+        orderTable.setEmpty(true);
+        return orderTable;
+    }
+
     public static Order createOrderRequest(OrderType orderType, List<OrderLineItem> orderLineItems, OrderTable orderTable) {
         Order order = new Order();
         order.setType(orderType);
