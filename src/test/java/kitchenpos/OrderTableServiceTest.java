@@ -5,6 +5,8 @@ import kitchenpos.domain.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -47,10 +49,11 @@ class OrderTableServiceTest {
     }
 
     @DisplayName("주문 테이블 등록 시 이름은 비어있을 수 없다.")
-    @Test
-    void createWithoutName() {
+    @NullAndEmptySource
+    @ParameterizedTest
+    void createWithoutName(String name) {
         // given
-        OrderTable orderTableRequest = createOrderTableRequest(null);
+        OrderTable orderTableRequest = createOrderTableRequest(name);
 
 
         // when - then
