@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static kitchenpos.TestFixtures.createOrderRequest;
+import static kitchenpos.TestFixtures.createOrderRequestWithoutOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -36,8 +37,8 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
 
-        menu1 = TestFixtures.createMenu("메뉴1", true, 8000);
-        menu2 = TestFixtures.createMenu("메뉴2", true, 9000);
+        menu1 = TestFixtures.createMenuRequest("메뉴1", true, 8000);
+        menu2 = TestFixtures.createMenuRequest("메뉴2", true, 9000);
         menuRepository.save(menu1);
         menuRepository.save(menu2);
 
@@ -104,7 +105,7 @@ class OrderServiceTest {
     @Test
     void itemCountGreaterThanZero() {
         // given
-        Menu menu3 = TestFixtures.createMenu("메뉴3", true, 9000);
+        Menu menu3 = TestFixtures.createMenuRequest("메뉴3", true, 9000);
         menuRepository.save(menu3);
         OrderLineItem orderLineItem3 = TestFixtures.createOrderLineItemRequest(null, menu3.getId(), -3, 9000);
         orderLineItems.add(orderLineItem3);
@@ -120,7 +121,7 @@ class OrderServiceTest {
     @Test
     void menuAlreadyRegistered() {
         // given
-        Menu menu3 = TestFixtures.createMenu("메뉴3", true, 9000);
+        Menu menu3 = TestFixtures.createMenuRequest("메뉴3", true, 9000);
         OrderLineItem orderLineItem3 = TestFixtures.createOrderLineItemRequest(null, menu3.getId(), -3, 9000);
         orderLineItems.add(orderLineItem3);
 
@@ -135,7 +136,7 @@ class OrderServiceTest {
     @Test
     void orderMenuDisplayed() {
         // given
-        Menu menu3 = TestFixtures.createMenu("메뉴3", true, 9000);
+        Menu menu3 = TestFixtures.createMenuRequest("메뉴3", true, 9000);
         menuRepository.save(menu3);
         OrderLineItem orderLineItem3 = TestFixtures.createOrderLineItemRequest(null, menu3.getId(), 2, 9000);
         menu3.setDisplayed(false);
@@ -152,7 +153,7 @@ class OrderServiceTest {
     @Test
     void menuOrderHasSamePrice() {
         // given
-        Menu menu3 = TestFixtures.createMenu("메뉴3", true, 9000);
+        Menu menu3 = TestFixtures.createMenuRequest("메뉴3", true, 9000);
         menuRepository.save(menu3);
         OrderLineItem orderLineItem3 = TestFixtures.createOrderLineItemRequest(null, menu3.getId(), 2, 8000);
         orderLineItems.add(orderLineItem3);
@@ -180,12 +181,14 @@ class OrderServiceTest {
     @Test
     void tableAlreadyRegistered() {
         // given
-        Order orderRequest = createOrderRequest(OrderType.EAT_IN, orderLineItems, null);
+        Order orderRequest = createOrderRequestWithoutOrderTable(OrderType.EAT_IN, orderLineItems);
 
         // when - then
         assertThatThrownBy(() -> orderService.create(orderRequest))
                 .isInstanceOf(NoSuchElementException.class);
     }
+
+
 
     @DisplayName("주문 등록시 주문 타입이 `매장안 식사`시 빈 테이블에는 주문을 등록할 수 없다.")
     @Test

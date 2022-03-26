@@ -132,7 +132,7 @@ class ProductServiceTest {
         final Product product = createProduct("후라이드", 18_000);
         productRepository.save(product);
 
-        final Menu menu = createMenu(18_000);
+        final Menu menu = createMenuRequest(18_000);
         MenuProduct menuProduct = createMenuProduct(product, 1L);
         menu.setMenuProducts(new ArrayList<>());
         menu.getMenuProducts().add(menuProduct);

@@ -13,9 +13,14 @@ public class TestFixtures {
         order.setType(orderType);
         order.setOrderLineItems(orderLineItems);
         order.setOrderTable(orderTable);
-        if (orderTable != null) {
-            order.setOrderTableId(orderTable.getId());
-        }
+        order.setOrderTableId(orderTable.getId());
+        order.setDeliveryAddress("어느시 어느동");
+        return order;
+    }
+    public static  Order createOrderRequestWithoutOrderTable(OrderType orderType, List<OrderLineItem> orderLineItems) {
+        Order order = new Order();
+        order.setType(orderType);
+        order.setOrderLineItems(orderLineItems);
         order.setDeliveryAddress("어느시 어느동");
         return order;
     }
@@ -27,6 +32,7 @@ public class TestFixtures {
         order.setDeliveryAddress("어느시 어느동");
         return order;
     }
+
     public static OrderTable createOrderTable(String name) {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
@@ -40,8 +46,9 @@ public class TestFixtures {
         return orderTable;
     }
 
-    public static Menu createMenuRequest(String name, int price) {
+    public static Menu createMenu(String name, int price) {
         Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
         menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(price));
         return menu;
@@ -70,9 +77,14 @@ public class TestFixtures {
         return menuProduct;
     }
 
-    public static Menu createMenu(int price) {
+    public static Menu createMenuRequest(int price) {
         Menu menu = new Menu();
         menu.setPrice(BigDecimal.valueOf(price));
+        return menu;
+    }
+    public static Menu createMenuRequest(BigDecimal price) {
+        Menu menu = new Menu();
+        menu.setPrice(price);
         return menu;
     }
 
@@ -117,7 +129,7 @@ public class TestFixtures {
         return menuProduct;
     }
 
-    public static Menu createMenu(String name, int price) {
+    public static Menu createMenuRequest(String name, int price) {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setName(name);
@@ -125,7 +137,7 @@ public class TestFixtures {
         return menu;
     }
 
-    public static OrderLineItem createOrderLineItemRequest(Long orderId, UUID menuId, long quantity, int price)  {
+    public static OrderLineItem createOrderLineItemRequest(Long orderId, UUID menuId, long quantity, int price) {
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItem.setMenuId(menuId);
         orderLineItem.setQuantity(quantity);
@@ -133,7 +145,7 @@ public class TestFixtures {
         return orderLineItem;
     }
 
-    public static Menu createMenu(String name, boolean isDisplayed, int price) {
+    public static Menu createMenuRequest(String name, boolean isDisplayed, int price) {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setName(name);

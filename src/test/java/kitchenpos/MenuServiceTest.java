@@ -137,7 +137,7 @@ public class MenuServiceTest {
     @DisplayName("메뉴의 가격을 수정할 수 있다.")
     void update() {
         // given
-        Menu menu = TestFixtures.createMenu("후라이드양념세트", 30_000);
+        Menu menu = createMenuRequest("후라이드양념세트", 30_000);
         addMenuGroupId(menu);
         addMenuProducts(menu);
         menuRepository.save(menu);
@@ -153,22 +153,18 @@ public class MenuServiceTest {
         assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(10_000));
     }
 
-    @DisplayName("메뉴의 가격은 0원 이상이여야 하고 비어있지 않아야 수정 가능하다.")
+    @DisplayName("메뉴의 가격은 0원 이상이여야 한다.")
     @NullSource
     @ValueSource(strings = {"-100", "-10000"})
     @ParameterizedTest
-    void menuChangePriceNegative(Integer price) {
+    void menuChangePriceNegative(BigDecimal price) {
         // given
-        Menu menu = TestFixtures.createMenu("후라이드양념세트", 30_000);
+        Menu menu = createMenuRequest("후라이드양념세트", 30_000);
         addMenuGroupId(menu);
         addMenuProducts(menu);
         menuRepository.save(menu);
 
-        Menu menuRequest = new Menu();
-        if (price != null) {
-            menuRequest.setPrice(BigDecimal.valueOf(price));
-        }
-
+        Menu menuRequest = createMenuRequest(price);
         // when - then
         assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menuRequest))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -179,7 +175,7 @@ public class MenuServiceTest {
     @Test
     void menuNotSaved() {
         // given
-        Menu menu = TestFixtures.createMenu("후라이드양념세트", 30_000);
+        Menu menu = createMenuRequest("후라이드양념세트", 30_000);
         addMenuGroupId(menu);
         addMenuProducts(menu);
 
@@ -195,7 +191,7 @@ public class MenuServiceTest {
     @Test
     void menuSum() {
         // given
-        Menu menu = TestFixtures.createMenu("후라이드양념세트", 30_000);
+        Menu menu = createMenuRequest("후라이드양념세트", 30_000);
         addMenuGroupId(menu);
         addMenuProducts(menu);
         menuRepository.save(menu);
@@ -215,7 +211,7 @@ public class MenuServiceTest {
     @Test
     void menuDisplayed() {
         // given
-        Menu menu = TestFixtures.createMenu("후라이드양념세트", 10_000);
+        Menu menu = createMenuRequest("후라이드양념세트", 10_000);
         addMenuGroupId(menu);
         addMenuProducts(menu);
         menuRepository.save(menu);
@@ -232,7 +228,7 @@ public class MenuServiceTest {
     @Test
     void menuNotRegistered() {
         // given
-        Menu menu = TestFixtures.createMenu("후라이드양념세트", 10_000);
+        Menu menu = createMenuRequest("후라이드양념세트", 10_000);
         addMenuGroupId(menu);
         addMenuProducts(menu);
 
@@ -247,7 +243,7 @@ public class MenuServiceTest {
     void menuSumProductSum() {
 
         // given
-        Menu menu = TestFixtures.createMenu("후라이드양념세트", 35_000);
+        Menu menu = createMenuRequest("후라이드양념세트", 35_000);
         addMenuGroupId(menu);
         addMenuProducts(menu);
         menuRepository.save(menu);
@@ -262,7 +258,7 @@ public class MenuServiceTest {
     @Test
     void menuNotDisplayed() {
         // given
-        Menu menu = TestFixtures.createMenu("후라이드양념세트", 10_000);
+        Menu menu = createMenuRequest("후라이드양념세트", 10_000);
         addMenuGroupId(menu);
         addMenuProducts(menu);
         menuRepository.save(menu);
@@ -278,7 +274,7 @@ public class MenuServiceTest {
     @Test
     void menuNotRegisteredNotHide() {
         // given
-        Menu menu = TestFixtures.createMenu("후라이드양념세트", 10_000);
+        Menu menu = createMenuRequest("후라이드양념세트", 10_000);
         addMenuGroupId(menu);
         addMenuProducts(menu);
 
@@ -292,7 +288,7 @@ public class MenuServiceTest {
     @Test
     void test() {
         // given
-        Menu menu = TestFixtures.createMenu("후라이드양념세트", 10_000);
+        Menu menu = createMenuRequest("후라이드양념세트", 10_000);
         addMenuGroupId(menu);
         addMenuProducts(menu);
         menuRepository.save(menu);
