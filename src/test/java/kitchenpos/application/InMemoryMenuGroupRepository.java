@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.MenuGroup;
@@ -15,6 +16,9 @@ public class InMemoryMenuGroupRepository implements MenuGroupRepository {
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
+        if (Objects.isNull(menuGroup.getId())) {
+            menuGroup.setId(UUID.randomUUID());
+        }
         menuGroups.put(menuGroup.getId(), menuGroup);
         return menuGroup;
     }

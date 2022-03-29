@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.Order;
@@ -29,7 +30,9 @@ public class InMemoryOrderRepository implements OrderRepository {
 
     @Override
     public Order save(Order order) {
-        order.setId(UUID.randomUUID());
+        if (Objects.isNull(order.getId())) {
+            order.setId(UUID.randomUUID());
+        }
         orders.put(order.getId(), order);
         return order;
     }

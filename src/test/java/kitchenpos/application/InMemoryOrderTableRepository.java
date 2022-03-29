@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.OrderTable;
@@ -20,7 +21,9 @@ public class InMemoryOrderTableRepository implements OrderTableRepository {
 
     @Override
     public OrderTable save(OrderTable orderTable) {
-        orderTable.setId(UUID.randomUUID());
+        if (Objects.isNull(orderTable.getId())) {
+            orderTable.setId(UUID.randomUUID());
+        }
         orderTables.put(orderTable.getId(), orderTable);
         return orderTable;
     }
