@@ -20,7 +20,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 class DefaultMenuGroupServiceTest {
 
     private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
-    private DefaultMenuGroupService menuGroupService;
+    private MenuGroupService menuGroupService;
 
     @BeforeEach
     void setUp() {
@@ -70,8 +70,7 @@ class DefaultMenuGroupServiceTest {
         //then
         assertAll(
             () -> assertThat(menuGroups).hasSize(2),
-            () -> assertThat(menuGroups).extracting("name")
-                .contains(세트메뉴.getName(), 추천메뉴.getName())
+            () -> assertThat(menuGroups).containsExactlyInAnyOrder(세트메뉴, 추천메뉴)
         );
     }
 

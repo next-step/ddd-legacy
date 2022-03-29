@@ -183,7 +183,7 @@ class OrderTableServiceTest {
         //then
         assertAll(
             () -> assertThat(orderTables).hasSize(2),
-            () -> assertThat(orderTables).contains(일번_테이블, 삼번_테이블)
+            () -> assertThat(orderTables).containsExactlyInAnyOrder(일번_테이블, 삼번_테이블)
         );
     }
 
