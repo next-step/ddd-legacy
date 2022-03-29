@@ -16,6 +16,3 @@ public interface OrderRepository {
     List<Order> findAll();
 }
 
-interface JpaOrderRepository extends OrderRepository, JpaRepository<Order, UUID> {
-
-}

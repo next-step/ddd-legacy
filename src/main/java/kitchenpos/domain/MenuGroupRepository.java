@@ -15,6 +15,3 @@ public interface MenuGroupRepository {
     Optional<MenuGroup> findById(UUID menuGroupId);
 }
 
-interface JpaMenuGroupRepository extends MenuGroupRepository, JpaRepository<MenuGroup, UUID> {
-
-}

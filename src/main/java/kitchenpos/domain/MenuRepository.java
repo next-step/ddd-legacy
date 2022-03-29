@@ -22,6 +22,3 @@ public interface MenuRepository {
 
 }
 
-interface JpaMenuRepository extends MenuRepository, JpaRepository<Menu, UUID> {
-
-}

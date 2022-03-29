@@ -16,6 +16,3 @@ public interface ProductRepository {
     List<Product> findAll();
 }
 
-interface JpaProductRepository extends ProductRepository, JpaRepository<Product, UUID> {
-
-}
