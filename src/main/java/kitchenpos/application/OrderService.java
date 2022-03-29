@@ -1,6 +1,13 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.domain.exception.OrderDeliveryAddressException;
+import kitchenpos.domain.exception.OrderDisplayException;
+import kitchenpos.domain.exception.OrderInvalidQuantityException;
+import kitchenpos.domain.exception.OrderLineItemNotExistException;
+import kitchenpos.domain.exception.OrderLineItemNotMatchException;
+import kitchenpos.domain.exception.OrderLineItemPriceException;
+import kitchenpos.domain.exception.OrderTypeNotExistException;
 import kitchenpos.infra.KitchenridersClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -181,46 +188,4 @@ public class OrderService {
         return orderRepository.findAll();
     }
 
-
-    static class OrderTypeNotExistException extends IllegalStateException {
-        public OrderTypeNotExistException() {
-            super("주문 유형이 올바르지 않습니다");
-        }
-    }
-
-    static class OrderLineItemNotExistException extends IllegalStateException {
-        public OrderLineItemNotExistException() {
-            super("주문 상품이 없습니다.");
-        }
-    }
-
-    static class OrderLineItemNotMatchException extends IllegalStateException {
-        public OrderLineItemNotMatchException() {
-            super("등록되지 않은 메뉴는 주문할 수 없습니다.");
-        }
-    }
-
-    static class OrderInvalidQuantityException extends IllegalStateException {
-        public OrderInvalidQuantityException(long quantity) {
-            super("최소 주문 수량은 0개 이상입니다. 주문 수량 : " + quantity);
-        }
-    }
-
-    static class OrderDisplayException extends IllegalStateException {
-        public OrderDisplayException() {
-            super("진열되지 않은 메뉴는 주문할 수 없습니다.");
-        }
-    }
-
-    static class OrderLineItemPriceException extends IllegalArgumentException {
-        public OrderLineItemPriceException(String menu, long menuPrice, long requestPrice) {
-            super("가격이 일치하지 않습니다. 메뉴명: " + menu + ", 메뉴 가격: " + menuPrice + ", 지불 가격: " + requestPrice);
-        }
-    }
-
-    static class OrderDeliveryAddressException extends IllegalArgumentException {
-        public OrderDeliveryAddressException() {
-            super("배달 주소가 없습니다.");
-        }
-    }
 }
