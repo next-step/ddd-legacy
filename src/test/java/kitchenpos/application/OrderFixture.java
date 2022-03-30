@@ -2,7 +2,7 @@ package kitchenpos.application;
 
 import static kitchenpos.application.MenuFixture.맛초킹_세트;
 import static kitchenpos.application.MenuFixture.뿌링클_세트;
-import static kitchenpos.application.OrderTableFixture.일번_테이블;
+import static kitchenpos.application.OrderTableFixture.일번_식탁;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,8 +21,8 @@ public class OrderFixture {
         매장_주문.setId(UUID.randomUUID());
         매장_주문.setType(OrderType.EAT_IN);
         매장_주문.setOrderLineItems(Collections.singletonList(주문_항목_뿌링클_세트()));
-        매장_주문.setOrderTable(일번_테이블);
-        매장_주문.setOrderTableId(일번_테이블.getId());
+        매장_주문.setOrderTable(일번_식탁);
+        매장_주문.setOrderTableId(일번_식탁.getId());
 
         포장_주문.setId(UUID.randomUUID());
         포장_주문.setType(OrderType.TAKEOUT);

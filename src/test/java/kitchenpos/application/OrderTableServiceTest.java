@@ -1,8 +1,8 @@
 package kitchenpos.application;
 
 
-import static kitchenpos.application.OrderTableFixture.삼번_테이블;
-import static kitchenpos.application.OrderTableFixture.일번_테이블;
+import static kitchenpos.application.OrderTableFixture.삼번_식탁;
+import static kitchenpos.application.OrderTableFixture.일번_식탁;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -53,14 +53,14 @@ class OrderTableServiceTest {
     @Test
     void create() {
         //given
-        OrderTable 신규_테이블 = 식탁_생성("3번");
+        OrderTable 신규_식탁 = 식탁_생성("3번");
 
         //when
-        OrderTable orderTable = orderTableService.create(신규_테이블);
+        OrderTable orderTable = orderTableService.create(신규_식탁);
 
         //then
         assertAll(
-            () -> assertThat(orderTable.getName()).isEqualTo(신규_테이블.getName()),
+            () -> assertThat(orderTable.getName()).isEqualTo(신규_식탁.getName()),
             () -> assertThat(orderTable.getNumberOfGuests()).isZero(),
             () -> assertThat(orderTable.isEmpty()).isTrue()
         );
@@ -88,7 +88,7 @@ class OrderTableServiceTest {
         OrderTable 손님_수_변경 = 식탁_생성(-1);
 
         //when
-        ThrowingCallable actual = () -> orderTableService.changeNumberOfGuests(일번_테이블.getId(), 손님_수_변경);
+        ThrowingCallable actual = () -> orderTableService.changeNumberOfGuests(일번_식탁.getId(), 손님_수_변경);
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
@@ -114,12 +114,12 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests() {
         //given
-        OrderTable 삼번_테이블 = 식탁_생성("3번 테이블", 3, false);
-        orderTableRepository.save(삼번_테이블);
+        OrderTable 삼번_식탁 = 식탁_생성("3번 식탁", 3, false);
+        orderTableRepository.save(삼번_식탁);
         OrderTable 손님_수_변경 = 식탁_생성(4);
 
         //when
-        OrderTable orderTable = orderTableService.changeNumberOfGuests(삼번_테이블.getId(), 손님_수_변경);
+        OrderTable orderTable = orderTableService.changeNumberOfGuests(삼번_식탁.getId(), 손님_수_변경);
 
         //then
         assertAll(
@@ -133,16 +133,16 @@ class OrderTableServiceTest {
     @EnumSource(value = OrderStatus.class, names = {"COMPLETED"}, mode = Mode.EXCLUDE)
     void clearException(OrderStatus orderStatus) {
         //given
-        OrderTable 삼번_테이블 = 식탁_생성("3번 테이블", 3, false);
-        orderTableRepository.save(삼번_테이블);
+        OrderTable 삼번_식탁 = 식탁_생성("3번 식탁", 3, false);
+        orderTableRepository.save(삼번_식탁);
 
         Order 매장_주문 = new Order();
-        매장_주문.setOrderTableId(삼번_테이블.getId());
+        매장_주문.setOrderTableId(삼번_식탁.getId());
         매장_주문.setStatus(orderStatus);
         orderRepository.save(매장_주문);
 
         //when
-        ThrowingCallable actual = () -> orderTableService.clear(삼번_테이블.getId());
+        ThrowingCallable actual = () -> orderTableService.clear(삼번_식탁.getId());
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
@@ -152,16 +152,16 @@ class OrderTableServiceTest {
     @Test
     void clear() {
         //given
-        OrderTable 삼번_테이블 = 식탁_생성("3번 테이블", 3, false);
-        orderTableRepository.save(삼번_테이블);
+        OrderTable 삼번_식탁 = 식탁_생성("3번 식탁", 3, false);
+        orderTableRepository.save(삼번_식탁);
 
         Order 매장_주문 = new Order();
-        매장_주문.setOrderTableId(삼번_테이블.getId());
+        매장_주문.setOrderTableId(삼번_식탁.getId());
         매장_주문.setStatus(OrderStatus.COMPLETED);
         orderRepository.save(매장_주문);
 
         //when
-        OrderTable cleanTable = orderTableService.clear(삼번_테이블.getId());
+        OrderTable cleanTable = orderTableService.clear(삼번_식탁.getId());
 
         //then
         assertAll(
@@ -174,8 +174,8 @@ class OrderTableServiceTest {
     @Test
     void findAll() {
         //given
-        orderTableRepository.save(일번_테이블);
-        orderTableRepository.save(삼번_테이블);
+        orderTableRepository.save(일번_식탁);
+        orderTableRepository.save(삼번_식탁);
 
         //when
         List<OrderTable> orderTables = orderTableService.findAll();
@@ -183,7 +183,7 @@ class OrderTableServiceTest {
         //then
         assertAll(
             () -> assertThat(orderTables).hasSize(2),
-            () -> assertThat(orderTables).containsExactlyInAnyOrder(일번_테이블, 삼번_테이블)
+            () -> assertThat(orderTables).containsExactlyInAnyOrder(일번_식탁, 삼번_식탁)
         );
     }
 
