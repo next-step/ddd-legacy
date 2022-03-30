@@ -64,10 +64,10 @@ class MenuServiceTest {
     @Test
     void createMenuGroupNotExistException() {
         //given
-        Menu 메뉴_그룹_없는_메뉴 = 메뉴_생성(11_000);
+        Menu 메뉴_그룹에_속하지_않은_메뉴 = 메뉴_생성(11_000);
 
         //when
-        ThrowingCallable actual = () -> menuService.create(메뉴_그룹_없는_메뉴);
+        ThrowingCallable actual = () -> menuService.create(메뉴_그룹에_속하지_않은_메뉴);
 
         //then
         assertThatThrownBy(actual).isInstanceOf(NoSuchElementException.class);
