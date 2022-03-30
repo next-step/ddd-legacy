@@ -6,8 +6,6 @@ import io.restassured.response.Response;
 import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 
 import java.util.UUID;
@@ -16,9 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MenuGroupRestControllerTest extends Acceptance {
-
-    @Autowired
-    ApplicationContext applicationContext;
 
     @DisplayName("메뉴 그룹 생성 테스트.")
     @Test
