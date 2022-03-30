@@ -57,7 +57,8 @@ class OrderTableServiceTest {
             assertAll(
                     () -> assertThat(result.getId()).isNotNull(),
                     () -> assertThat(result.getName()).isEqualTo("order table name"),
-                    () -> assertThat(result.getNumberOfGuests()).isZero()
+                    () -> assertThat(result.getNumberOfGuests()).isZero(),
+                    () -> assertThat(result.isEmpty()).isTrue()
             );
         }
     }
