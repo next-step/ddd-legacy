@@ -6,13 +6,11 @@ import kitchenpos.infra.ProfanityClient;
 import kitchenpos.testdouble.MenuStubRepository;
 import kitchenpos.testdouble.ProductStubRepository;
 import kitchenpos.testdouble.ProfanityClientStub;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -177,6 +175,20 @@ class ProductServiceTest {
             // Assert
             assertThat(menu.isDisplayed()).isTrue();
         }
+    }
+
+    @DisplayName("등록된 모든 제품을 조회한다.")
+    @Test
+    void findAllRegisteredProducts() {
+        // Arrange
+        Product product1 = 제품_생성_요청("product 1", BigDecimal.ONE);
+        Product product2 = 제품_생성_요청("product 2", BigDecimal.ONE);
+
+        // Act
+        List<Product> products = productService.findAll();
+
+        // Assert
+        assertThat(products).contains(product1, product2);
     }
 
     private Menu 메뉴_생성_요청(Product product) {
