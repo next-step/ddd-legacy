@@ -108,7 +108,7 @@ class MenuServiceTest {
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴는 수량이 부족한 상품을 포함할 수 없다.")
+    @DisplayName("메뉴는 수량이 부족한 메뉴상품을 포함할 수 없다.")
     @Test
     void createMenuProductsLackQuantityException() {
         //given
@@ -116,12 +116,12 @@ class MenuServiceTest {
         productRepository.save(맛초킹);
         productRepository.save(콜라);
 
-        Menu 상품_수량_오류_메뉴 = 메뉴_생성(11_000);
-        상품_수량_오류_메뉴.setMenuGroupId(세트_메뉴.getId());
-        상품_수량_오류_메뉴.setMenuProducts(Arrays.asList(맛초킹_1개, 콜라_수량_오류));
+        Menu 메뉴상품_수량_오류_메뉴 = 메뉴_생성(11_000);
+        메뉴상품_수량_오류_메뉴.setMenuGroupId(세트_메뉴.getId());
+        메뉴상품_수량_오류_메뉴.setMenuProducts(Arrays.asList(맛초킹_1개, 콜라_수량_오류));
 
         //when
-        ThrowingCallable actual = () -> menuService.create(상품_수량_오류_메뉴);
+        ThrowingCallable actual = () -> menuService.create(메뉴상품_수량_오류_메뉴);
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
