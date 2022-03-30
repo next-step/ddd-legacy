@@ -2,13 +2,12 @@ package kitchenpos.unit.application;
 
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.*;
+import kitchenpos.domain.Order;
 import kitchenpos.testdouble.OrderStubRepository;
 import kitchenpos.testdouble.OrderTableStubRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -143,6 +142,20 @@ class OrderTableServiceTest {
             // Assert
             assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(id, request)).isInstanceOf(IllegalStateException.class);
         }
+    }
+
+    @DisplayName("등록된 모든 테이블을 조회 한다.")
+    @Test
+    void findAllRegisteredTable() {
+        // Arrange
+        OrderTable table1 = 주문_테이블_생성_요청();
+        OrderTable table2 = 주문_테이블_생성_요청();
+
+        // Act
+        List<OrderTable> orderTables = orderTableService.findAll();
+
+        // Assert
+        assertThat(orderTables).contains(table1, table2);
     }
 
     private Order 주문_생성_요청(OrderTable orderTable, OrderStatus status) {
