@@ -731,7 +731,7 @@ class OrderServiceTest {
         return createOrder(null, null, null, null, null, null, null, null);
     }
 
-    public Order createOrder(UUID id,
+    private Order createOrder(UUID id,
                              OrderType type,
                              OrderStatus status,
                              LocalDateTime orderDateTime,
