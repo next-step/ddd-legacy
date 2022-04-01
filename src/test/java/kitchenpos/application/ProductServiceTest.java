@@ -40,7 +40,6 @@ class ProductServiceTest {
 	@InjectMocks
 	private ProductService productService;
 
-
 	@DisplayName("상품 전체를 조회할 수 있다")
 	@Test
 	void find_all_product() {
