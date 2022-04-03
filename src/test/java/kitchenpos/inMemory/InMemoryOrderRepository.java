@@ -13,8 +13,6 @@ public class InMemoryOrderRepository implements OrderRepository {
 
     @Override
     public boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status) {
-        System.out.println(orderTable.getNumberOfGuests());
-        System.out.println(orderTable.isEmpty());
         if (orderTable.getNumberOfGuests() != 0 || !orderTable.isEmpty())
             return true;
         if (!OrderStatus.COMPLETED.equals(status)) {

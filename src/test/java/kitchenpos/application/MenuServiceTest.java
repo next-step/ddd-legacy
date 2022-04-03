@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import kitchenpos.fixture.MenuProductFixture;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.domain.*;
 import kitchenpos.exception.MenuNameException;
 import kitchenpos.exception.MenuPriceException;
@@ -57,12 +59,12 @@ class MenuServiceTest {
         menu.setDisplayed(Boolean.TRUE);
 
         final List<MenuProduct> listMenuProducts = new ArrayList<>();
-        final Product 보쌈_중짜 = productRepository.save(ProductServiceTest.createProduct("보쌈(중)", 24_000));
-        final Product 족발_중짜 =  productRepository.save(ProductServiceTest.createProduct("족발(중)", 23_000));
-        final Product 막국수 =  productRepository.save(ProductServiceTest.createProduct("막국수", 5_000));
-        listMenuProducts.add(MenuProductTest.create(보쌈_중짜, 1));
-        listMenuProducts.add(MenuProductTest.create(족발_중짜, 1));
-        listMenuProducts.add(MenuProductTest.create(막국수, 1));
+        final Product 보쌈_중짜 = productRepository.save(ProductFixture.createMetaProduct("보쌈(중)", 24_000));
+        final Product 족발_중짜 =  productRepository.save(ProductFixture.createMetaProduct("족발(중)", 23_000));
+        final Product 막국수 =  productRepository.save(ProductFixture.createMetaProduct("막국수", 5_000));
+        listMenuProducts.add(MenuProductFixture.create(보쌈_중짜, 1));
+        listMenuProducts.add(MenuProductFixture.create(족발_중짜, 1));
+        listMenuProducts.add(MenuProductFixture.create(막국수, 1));
         menu.setMenuProducts(listMenuProducts);
 
         // when
@@ -77,6 +79,18 @@ class MenuServiceTest {
                 () -> assertThat(actual.isDisplayed()).isEqualTo(Boolean.TRUE),
                 () -> assertThat(actual.getMenuProducts()).isNotEmpty()
         );
+
+    }
+
+    @DisplayName("[추가] 메뉴는 반드시 이름을 갖는다.")
+    @Test
+    void checkMenuName() {
+        // given
+        final Menu menu = getSimpleMenuRequest("세트메뉴", null, 23_000);
+
+        // then
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(MenuNameException.class);
 
     }
 
@@ -151,7 +165,6 @@ class MenuServiceTest {
         return getSimpleMenuRequest(세트_메뉴, 족보_세트, price);
     }
 
-
     static Menu getSimpleMenuRequest(String menuGroupName, String menuName, int price) {
         final Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
@@ -164,10 +177,10 @@ class MenuServiceTest {
         menu.setDisplayed(Boolean.TRUE);
 
         final List<MenuProduct> listMenuProducts = new ArrayList<>();
-        final Product 보쌈_중짜 = productRepository.save(ProductServiceTest.createProduct("보쌈(중)", 24_000));
-        final Product 족발_중짜 =  productRepository.save(ProductServiceTest.createProduct("족발(중)", 23_000));
-        listMenuProducts.add(MenuProductTest.create(보쌈_중짜, 1));
-        listMenuProducts.add(MenuProductTest.create(족발_중짜, 1));
+        final Product 보쌈_중짜 = productRepository.save(ProductFixture.createMetaProduct("보쌈(중)", 24_000));
+        final Product 족발_중짜 =  productRepository.save(ProductFixture.createMetaProduct("족발(중)", 23_000));
+        listMenuProducts.add(MenuProductFixture.create(보쌈_중짜, 1));
+        listMenuProducts.add(MenuProductFixture.create(족발_중짜, 1));
         menu.setMenuProducts(listMenuProducts);
 
         return menu;

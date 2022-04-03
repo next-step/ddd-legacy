@@ -14,10 +14,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
-import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static kitchenpos.fixture.OrderTableFixture.createSimpleOrderTable;
+import static org.assertj.core.api.Assertions.*;
 
 class OrderTableServiceTest {
 
@@ -101,18 +100,30 @@ class OrderTableServiceTest {
         final OrderTable orderTable = orderTableRepository.save(createSimpleOrderTable("Number1"));
 
         // when
+        OrderTable actual = orderTableService.sit(orderTable.getId());
+        orderTable.setNumberOfGuests(numberOfGuests);
+        actual = orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
+
+        // then
+        assertThat(actual.getNumberOfGuests()).isEqualTo(numberOfGuests);
+    }
+
+    @DisplayName("[추가] 테이블 손님의 수는 0명 이상이다.")
+    @ParameterizedTest
+    @ValueSource(ints = {-1, -2, -8})
+    void checkNumberOfGuests(int numberOfGuests) {
+        // given
+        final OrderTable orderTable = orderTableRepository.save(createSimpleOrderTable("Number1"));
+
+        // when
+        OrderTable actual = orderTableService.sit(orderTable.getId());
         orderTable.setNumberOfGuests(numberOfGuests);
 
         // then
-        assertThat(orderTable.getNumberOfGuests()).isEqualTo(numberOfGuests);
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
-
-    private OrderTable createSimpleOrderTable(String tableName) {
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName(tableName);
-        return orderTable;
-    }
 
 }

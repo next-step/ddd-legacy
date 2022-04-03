@@ -62,7 +62,6 @@ class MenuGroupServiceTest {
     @Test
     void createMenuGroupNameException() {
         final MenuGroup menuGroup = createMenuGroup(null);
-        System.out.println(menuGroup);
         assertThatThrownBy(
                 () -> menuGroupService.create(menuGroup)
         ).isInstanceOf(MenuGroupNameException.class);

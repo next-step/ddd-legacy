@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -18,7 +19,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -42,7 +42,7 @@ class ProductServiceTest {
     void create() {
 
         // given
-        final Product product = createProductRequest(23_000);
+        final Product product = ProductFixture.createRequest(23_000);
 
         // when
         final Product actual = productService.create(product);
@@ -61,7 +61,7 @@ class ProductServiceTest {
     void create(final int price) {
 
         // given
-        final Product product = createProductRequest(price);
+        final Product product = ProductFixture.createRequest(price);
 
         // when, then
         assertThatIllegalArgumentException()
@@ -75,7 +75,7 @@ class ProductServiceTest {
     void create(final String name) {
 
         // given
-        final Product product = createProductRequest(name, 23_000);
+        final Product product = ProductFixture.createRequest(name, 23_000);
 
         assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(ProductNameException.class);
@@ -84,8 +84,8 @@ class ProductServiceTest {
     @DisplayName("등록한 모든 상품을 볼 수 있다.")
     @Test
     void finalAll() {
-        productRepository.save(createProduct("족발(소)", 18_000));
-        productRepository.save(createProduct("족발(중)", 23_000));
+        productRepository.save(ProductFixture.createMetaProduct("족발(소)", 18_000));
+        productRepository.save(ProductFixture.createMetaProduct("족발(중)", 23_000));
 
         final List<Product> actual = productService.findAll();
         assertThat(actual).hasSize(2);
@@ -97,7 +97,7 @@ class ProductServiceTest {
     void changePrice(BigDecimal price) {
 
         // given
-        final Product product = createProductRequest(23_000);
+        final Product product = ProductFixture.createRequest(23_000);
         final Product actualProduct = productService.create(product);
 
         // when
@@ -106,29 +106,6 @@ class ProductServiceTest {
         // then
         final Product changedProduct = productService.changePrice(actualProduct.getId(), actualProduct);
         assertThat(changedProduct.getPrice()).isEqualTo(price);
-    }
-
-    private Product createProductRequest(final int price) {
-        return createProductRequest("족발(중)", price);
-    }
-
-    static Product createProductRequest(final String name, final int price) {
-        final Product product = new Product();
-        product.setName(name);
-        product.setPrice(BigDecimal.valueOf(price));
-        return product;
-    }
-
-    static Product createProduct(final String name, final int price) {
-        return createProduct(UUID.randomUUID(), name, BigDecimal.valueOf(price));
-    }
-
-    static Product createProduct(final UUID id, final String name, final BigDecimal price) {
-        final Product product = new Product();
-        product.setId(id);
-        product.setName(name);
-        product.setPrice(price);
-        return product;
     }
 
 

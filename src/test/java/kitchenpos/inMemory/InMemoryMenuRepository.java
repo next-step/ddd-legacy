@@ -12,16 +12,20 @@ public class InMemoryMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAllByIdIn(final List<UUID> ids) {
-        return null;
+        return menus.values()
+                .stream()
+                .filter(it -> ids.contains(it.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Menu> findAllByProductId(final UUID productId) {
         return menus.values()
                 .stream()
-                .filter(menu -> menu.getMenuProducts().stream().anyMatch(product -> Objects.equals(product.getProductId(), productId))
-                ).collect(Collectors.toList())
-                ;
+                .filter(menu -> menu.getMenuProducts()
+                        .stream()
+                        .anyMatch(product -> Objects.equals(product.getProductId(), productId))
+                ).collect(Collectors.toList());
     }
 
     @Override
@@ -31,8 +35,11 @@ public class InMemoryMenuRepository implements MenuRepository {
     }
 
     @Override
-    public Optional<Menu> findById(final UUID id) {
-        return Optional.ofNullable(menus.get(id));
+    public Optional<Menu> findById(final UUID menuId) {
+        return menus.values()
+                .stream()
+                .filter(it -> Objects.equals(it.getId(), menuId))
+                .findAny();
     }
 
     @Override
