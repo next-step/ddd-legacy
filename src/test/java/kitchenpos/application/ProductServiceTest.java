@@ -1,12 +1,10 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.MenuProductFixture.뿌링클_1개;
 import static kitchenpos.application.MenuProductFixture.콜라_1개;
 import static kitchenpos.application.ProductFixture.뿌링클;
 import static kitchenpos.application.ProductFixture.콜라;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -72,13 +70,32 @@ class ProductServiceTest {
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("가격을 변경할 수 있다. 가격이 해당 상품을 포함하는 메뉴의 가격보다 크면 메뉴를 진열하지 않는다.")
+    @DisplayName("가격을 변경할 수 있다")
+    @ParameterizedTest(name = "변경할 가격: [{0}]")
+    @CsvSource(value = {
+        "8000",
+        "15000"
+    })
+    void changePrice(long price) {
+        //given
+        Product 신규_상품 = productRepository.save(상품_생성(12_000));
+
+        Product 변경할_금액 = 상품_생성(price);
+
+        //when
+        Product product = productService.changePrice(신규_상품.getId(), 변경할_금액);
+
+        //then
+        assertThat(product.getPrice()).isEqualTo(BigDecimal.valueOf(price));
+    }
+
+    @DisplayName("상품의 가격이 해당 상품을 포함하는 메뉴의 가격보다 크면 메뉴를 진열하지 않는다.")
     @ParameterizedTest(name = "변경할 가격: [{0}], 진열 여부: [{1}]")
     @CsvSource(value = {
         "8000, false",
         "15000, true"
     })
-    void changePrice(long price, boolean expectedDisplayed) {
+    void changePriceThenMenuDisplayed(long price, boolean expectedDisplayed) {
         //given
         Product 신규_상품 = productRepository.save(상품_생성(12_000));
 
@@ -87,7 +104,7 @@ class ProductServiceTest {
         menuProduct.setProductId(신규_상품.getId());
         menuProduct.setQuantity(1);
 
-        Menu menu = new Menu();
+        Menu menu = new MenuBuilder().build();
         menu.setDisplayed(true);
         menu.setMenuProducts(Arrays.asList(menuProduct, 콜라_1개));
         menu.setPrice(BigDecimal.valueOf(11_000L));
@@ -96,13 +113,10 @@ class ProductServiceTest {
         Product 변경할_금액 = 상품_생성(price);
 
         //when
-        Product product = productService.changePrice(신규_상품.getId(), 변경할_금액);
+        productService.changePrice(신규_상품.getId(), 변경할_금액);
 
         //then
-        assertAll(
-            () -> assertThat(product.getPrice()).isEqualTo(BigDecimal.valueOf(price)),
-            () -> assertThat(menu.isDisplayed()).isEqualTo(expectedDisplayed)
-        );
+        assertThat(menu.isDisplayed()).isEqualTo(expectedDisplayed);
     }
 
     @DisplayName("0원 미만의 가격으로 변경할 수 없다.")
