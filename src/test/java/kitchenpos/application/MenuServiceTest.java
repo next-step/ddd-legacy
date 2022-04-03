@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -51,7 +52,9 @@ class MenuServiceTest {
     @NullSource
     void createPriceUnderZeroException(BigDecimal price) {
         //given
-        Menu 잘못된_가격의_메뉴 = 메뉴_생성(price);
+        Menu 잘못된_가격의_메뉴 = 메뉴생성()
+            .withPrice(price)
+            .build();
 
         //when
         ThrowingCallable actual = () -> menuService.create(잘못된_가격의_메뉴);
@@ -64,7 +67,9 @@ class MenuServiceTest {
     @Test
     void createMenuGroupNotExistException() {
         //given
-        Menu 메뉴_그룹에_속하지_않은_메뉴 = 메뉴_생성(11_000);
+        Menu 메뉴_그룹에_속하지_않은_메뉴 = 메뉴생성()
+            .withMenuGroup(null)
+            .build();
 
         //when
         ThrowingCallable actual = () -> menuService.create(메뉴_그룹에_속하지_않은_메뉴);
@@ -79,8 +84,10 @@ class MenuServiceTest {
         //given
         MenuGroup 세트_메뉴 = menuGroupRepository.save(세트메뉴);
 
-        Menu 상품_없는_메뉴 = 메뉴_생성(11_000);
-        상품_없는_메뉴.setMenuGroupId(세트_메뉴.getId());
+        Menu 상품_없는_메뉴 = 메뉴생성()
+            .withMenuGroup(세트_메뉴)
+            .withMenuGroupId(세트_메뉴.getId())
+            .build();
 
         //when
         ThrowingCallable actual = () -> menuService.create(상품_없는_메뉴);
@@ -97,12 +104,14 @@ class MenuServiceTest {
         productRepository.save(맛초킹);
         productRepository.save(콜라);
 
-        Menu 상품_없는_메뉴 = 메뉴_생성(11_000);
-        상품_없는_메뉴.setMenuGroupId(세트_메뉴.getId());
-        상품_없는_메뉴.setMenuProducts(Arrays.asList(맛초킹_1개, 맛초킹_1개, 콜라_1개));
+        Menu 중복된_상품을_포함하는_메뉴 = 메뉴생성()
+            .withMenuGroup(세트_메뉴)
+            .withMenuGroupId(세트_메뉴.getId())
+            .withMenuProducts(맛초킹_1개, 맛초킹_1개, 콜라_1개)
+            .build();
 
         //when
-        ThrowingCallable actual = () -> menuService.create(상품_없는_메뉴);
+        ThrowingCallable actual = () -> menuService.create(중복된_상품을_포함하는_메뉴);
 
         //then
         assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
@@ -116,9 +125,11 @@ class MenuServiceTest {
         productRepository.save(맛초킹);
         productRepository.save(콜라);
 
-        Menu 메뉴상품_수량_오류_메뉴 = 메뉴_생성(11_000);
-        메뉴상품_수량_오류_메뉴.setMenuGroupId(세트_메뉴.getId());
-        메뉴상품_수량_오류_메뉴.setMenuProducts(Arrays.asList(맛초킹_1개, 콜라_수량_오류));
+        Menu 메뉴상품_수량_오류_메뉴 = 메뉴생성()
+            .withMenuGroup(세트_메뉴)
+            .withMenuGroupId(세트_메뉴.getId())
+            .withMenuProducts(맛초킹_1개, 콜라_수량_오류)
+            .build();
 
         //when
         ThrowingCallable actual = () -> menuService.create(메뉴상품_수량_오류_메뉴);
@@ -135,9 +146,12 @@ class MenuServiceTest {
         productRepository.save(맛초킹);
         productRepository.save(콜라);
 
-        Menu 비싼_메뉴 = 메뉴_생성(15_000);
-        비싼_메뉴.setMenuGroupId(세트_메뉴.getId());
-        비싼_메뉴.setMenuProducts(Arrays.asList(맛초킹_1개, 콜라_1개));
+        Menu 비싼_메뉴 = 메뉴생성()
+            .withPrice(15_000L)
+            .withMenuGroup(세트_메뉴)
+            .withMenuGroupId(세트_메뉴.getId())
+            .withMenuProducts(맛초킹_1개, 콜라_1개)
+            .build();
 
         //when
         ThrowingCallable actual = () -> menuService.create(비싼_메뉴);
@@ -154,10 +168,11 @@ class MenuServiceTest {
         productRepository.save(맛초킹);
         productRepository.save(콜라);
 
-        Menu 비속어_메뉴 = 메뉴_생성(11_000);
-        비속어_메뉴.setMenuGroupId(세트_메뉴.getId());
-        비속어_메뉴.setMenuProducts(Arrays.asList(맛초킹_1개, 콜라_1개));
-        비속어_메뉴.setName("비속어");
+        Menu 비속어_메뉴 = 메뉴생성()
+            .withName("비속어")
+            .withMenuGroupId(세트_메뉴.getId())
+            .withMenuProducts(맛초킹_1개, 콜라_1개)
+            .build();
 
         //when
         ThrowingCallable actual = () -> menuService.create(비속어_메뉴);
@@ -190,7 +205,7 @@ class MenuServiceTest {
     @NullSource
     void changePriceException(BigDecimal price) {
         //given
-        Menu 포장_전용_메뉴 = menuRepository.save(메뉴_생성(20_000));
+        Menu 포장_전용_메뉴 = menuRepository.save(메뉴생성().build());
 
         Menu 가격_변경 = 메뉴_생성(price);
 
@@ -234,7 +249,7 @@ class MenuServiceTest {
     @Test
     void displayNotExistException() {
         //given
-        Menu 없는_메뉴 = new Menu();
+        Menu 없는_메뉴 = new MenuBuilder().build();
 
         //when
         ThrowingCallable actual = () -> menuService.display(없는_메뉴.getId());
@@ -273,7 +288,7 @@ class MenuServiceTest {
     @Test
     void hideException() {
         //given
-        Menu 없는_메뉴 = new Menu();
+        Menu 없는_메뉴 = new MenuBuilder().build();
 
         //when
         ThrowingCallable actual = () -> menuService.hide(없는_메뉴.getId());
@@ -299,8 +314,8 @@ class MenuServiceTest {
     @Test
     void findALl() {
         //given
-        menuRepository.save(메뉴_생성(10_000));
-        menuRepository.save(메뉴_생성(20_000));
+        menuRepository.save(메뉴생성().build());
+        menuRepository.save(메뉴생성().build());
 
         //when
         List<Menu> actual = menuService.findAll();
@@ -317,11 +332,13 @@ class MenuServiceTest {
         MenuProduct 맛초킹1개 = 메뉴_상품_생성(맛초킹);
         MenuProduct 콜라1개 = 메뉴_상품_생성(콜라);
 
-        Menu 맛초킹_세트 = 메뉴_생성(price);
-        맛초킹_세트.setMenuGroupId(세트_메뉴.getId());
-        맛초킹_세트.setMenuProducts(Arrays.asList(맛초킹1개, 콜라1개));
-        맛초킹_세트.setName("맛초킹 세트");
-
+        Menu 맛초킹_세트 = 메뉴생성()
+            .withMenuGroupId(세트_메뉴.getId())
+            .withMenuGroup(세트메뉴)
+            .withMenuProducts(Arrays.asList(맛초킹1개, 콜라1개))
+            .withName("맛초킹 세트")
+            .withPrice(price)
+            .build();
         return menuRepository.save(맛초킹_세트);
     }
 
@@ -338,9 +355,18 @@ class MenuServiceTest {
     }
 
     private Menu 메뉴_생성(BigDecimal price) {
-        Menu menu = new Menu();
-        menu.setPrice(price);
-        return menu;
+        return new MenuBuilder()
+            .withPrice(price)
+            .build();
     }
 
+    private MenuBuilder 메뉴생성() {
+        return new MenuBuilder()
+            .withMenuGroup(new MenuGroup())
+            .withMenuGroupId(UUID.randomUUID())
+            .withName("맛초킹 세트")
+            .withDisplayed(true)
+            .withMenuProducts(Arrays.asList(맛초킹_1개, 콜라_1개))
+            .withPrice(BigDecimal.valueOf(11_000L));
+    }
 }
