@@ -258,7 +258,7 @@ class OrderServiceTest {
 		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
 
 		// when & then
-		assertThatThrownBy(() -> orderService.complete(uuid));
+		assertThatThrownBy(() -> orderService.complete(uuid)).isInstanceOf(IllegalStateException.class);
 	}
 
 	@DisplayName("완료 하려는 주문은 미리 등록되어 있어야 한다")
@@ -301,7 +301,7 @@ class OrderServiceTest {
 		assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
 	}
 
-	@DisplayName("배달완료 하려는 주문은 배달 중이 아닌 상태 값을 가질 수 없다")
+	@DisplayName("배달완료 하려는 주문은 배달 중이어야 한다")
 	@Test
 	void when_to_make_delivered_order_can_not_be_delivering() {
 		// given
