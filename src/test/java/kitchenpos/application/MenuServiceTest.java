@@ -312,7 +312,7 @@ class MenuServiceTest {
 
     @DisplayName("모든 메뉴 조회")
     @Test
-    void findALl() {
+    void findAll() {
         //given
         menuRepository.save(메뉴생성().build());
         menuRepository.save(메뉴생성().build());
