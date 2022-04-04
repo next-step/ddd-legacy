@@ -19,4 +19,3 @@ public interface MenuRepository {
     List<Menu> findAll();
 
 }
-

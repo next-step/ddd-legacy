@@ -12,4 +12,3 @@ public interface MenuGroupRepository {
 
     Optional<MenuGroup> findById(UUID menuGroupId);
 }
-

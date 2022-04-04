@@ -12,4 +12,3 @@ public interface OrderTableRepository {
 
     List<OrderTable> findAll();
 }
-
