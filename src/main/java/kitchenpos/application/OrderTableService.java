@@ -4,6 +4,8 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.exception.OrderTableIsEmptyException;
+import kitchenpos.exception.OrderTableIsUsingException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,7 +51,7 @@ public class OrderTableService {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
-            throw new IllegalStateException();
+            throw new OrderTableIsUsingException("주문 테이블이 이용 중입니다.");
         }
         orderTable.setNumberOfGuests(0);
         orderTable.setEmpty(true);
@@ -65,7 +67,7 @@ public class OrderTableService {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (orderTable.isEmpty()) {
-            throw new IllegalStateException();
+            throw new OrderTableIsEmptyException("비어 있는 테이블입니다. 바로 이용 가능합니다.");
         }
         orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;

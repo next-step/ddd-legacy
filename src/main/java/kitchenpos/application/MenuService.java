@@ -1,7 +1,9 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.exception.MenuNameException;
+import kitchenpos.exception.MenuPriceException;
+import kitchenpos.infra.ProfanityClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,18 +16,18 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final MenuGroupRepository menuGroupRepository;
     private final ProductRepository productRepository;
-    private final PurgomalumClient purgomalumClient;
+    private final ProfanityClient profanityClient;
 
     public MenuService(
         final MenuRepository menuRepository,
         final MenuGroupRepository menuGroupRepository,
         final ProductRepository productRepository,
-        final PurgomalumClient purgomalumClient
+        final ProfanityClient profanityClient
     ) {
         this.menuRepository = menuRepository;
         this.menuGroupRepository = menuGroupRepository;
         this.productRepository = productRepository;
-        this.purgomalumClient = purgomalumClient;
+        this.profanityClient = profanityClient;
     }
 
     @Transactional
@@ -67,11 +69,11 @@ public class MenuService {
             menuProducts.add(menuProduct);
         }
         if (price.compareTo(sum) > 0) {
-            throw new IllegalArgumentException();
+            throw new MenuPriceException("메뉴 가격은 구성 상품의 총 금액보다 클 수 없습니다.");
         }
         final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+        if (Objects.isNull(name) || profanityClient.containsProfanity(name)) {
+            throw new MenuNameException("올바른 메뉴명을 입력해주세요.");
         }
         final Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
