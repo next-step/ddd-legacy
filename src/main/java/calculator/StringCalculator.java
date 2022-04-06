@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 public class StringCalculator {
 
-	private final Pattern pattern = Pattern.compile("//(.)\n(.*)");
+	private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
 
 	public int add(String text) {
 		if (text == null || text.isEmpty()) {
