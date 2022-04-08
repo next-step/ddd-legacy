@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -57,28 +56,12 @@ class OrderServiceTest {
 	@Test
 	void menu_price_and_order_line_item_price_are_identical() {
 		// given
+		Order orderRequest =  getOrderRequest();
+
 		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
 		Product productRequest = new Product("상품", new BigDecimal(6000));
 		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
-
-		OrderLineItem orderLineItemRequest = new OrderLineItem(menuRequest, 2L, new BigDecimal(15000));
-		String addressRequest = "주소";
-		OrderTable orderTableRequest = new OrderTable("테이블");
-		Order orderRequest = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItemRequest), addressRequest, orderTableRequest);
-
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.WAITING);
+		Menu menu = new Menu("메뉴", new BigDecimal(20000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
 
 		when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
 		when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -87,32 +70,32 @@ class OrderServiceTest {
 		assertThatThrownBy(() -> orderService.create(orderRequest)).isInstanceOf(IllegalArgumentException.class);
 	}
 
-	@DisplayName("주문항목의 메뉴는 반드시 노출되어 있는 상태여야 한다")
-	@Test
-	void menu_in_order_line_item_is_displayed() {
-		// given
-		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
-		Product productRequest = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
+	private Order getOrderRequest() {
+		Menu menuRequest = getMenu();
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem(menuRequest, 2L, new BigDecimal(10000));
 		String addressRequest = "주소";
 		OrderTable orderTableRequest = new OrderTable("테이블");
-		Order orderRequest = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItemRequest), addressRequest, orderTableRequest);
+		return new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItemRequest), addressRequest, orderTableRequest);
+	}
+
+	private Menu getMenu() {
+		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
+		Product productRequest = new Product("상품", new BigDecimal(6000));
+		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
+		return new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
+	}
+
+	@DisplayName("주문항목의 메뉴는 반드시 노출되어 있는 상태여야 한다")
+	@Test
+	void menu_in_order_line_item_is_displayed() {
+		// given
+		Order orderRequest = getOrderRequest();
 
 		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
 		Product product = new Product("상품", new BigDecimal(6000));
 		MenuProduct menuProduct = new MenuProduct(product, 2L);
 		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, false, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.WAITING);
 
 		when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
 		when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -125,28 +108,9 @@ class OrderServiceTest {
 	@Test
 	void order_line_item_have_menu() {
 		// given
-		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
-		Product productRequest = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
+		Order orderRequest = getOrderRequest();
 
-		OrderLineItem orderLineItemRequest = new OrderLineItem(menuRequest, 2L, new BigDecimal(10000));
-		String addressRequest = "주소";
-		OrderTable orderTableRequest = new OrderTable("테이블");
-		Order orderRequest = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItemRequest), addressRequest, orderTableRequest);
-
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.WAITING);
+		Order order = getOrderResult(OrderType.DELIVERY, OrderStatus.WAITING);
 
 		when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.emptyList());
 
@@ -158,20 +122,9 @@ class OrderServiceTest {
 	@Test
 	void find_all_order() {
 		// given
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.EAT_IN, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.SERVED);
-
-		when(orderRepository.findAll()).thenReturn(Arrays.asList(order));
+		Menu menu = getMenu();
+		Order orderResult = getOrderResult(OrderType.EAT_IN, OrderStatus.SERVED);
+		when(orderRepository.findAll()).thenReturn(Collections.singletonList(orderResult));
 		// when & then
 		List<Order> result = orderService.findAll();
 
@@ -186,23 +139,18 @@ class OrderServiceTest {
 	void clear_order_table_when_order_status_is_completed_and_it_is_a_eat_in_order() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
-
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
+		Menu menu = getMenu();
 		OrderTable orderTable = new OrderTable("테이블", 3);
 
 		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
 		String address = "주소";
-		Order order = new Order(OrderType.EAT_IN, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.SERVED);
+		Order orderResult = new Order(OrderType.EAT_IN, Collections.singletonList(orderLineItem), address, orderTable);
+		orderResult.setOrderDateTime(LocalDateTime.now());
+		orderResult.setStatus(OrderStatus.SERVED);
 
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
-		when(orderRepository.existsByOrderTableAndStatusNot(eq(orderTable), eq(OrderStatus.COMPLETED))).thenReturn(false);
-		// when & then
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
+		when(orderRepository.existsByOrderTableAndStatusNot(any(), eq(OrderStatus.COMPLETED))).thenReturn(false);
+		// when
 		Order result = orderService.complete(uuid);
 
 		// then
@@ -216,21 +164,8 @@ class OrderServiceTest {
 	void when_order_type_is_eat_in_or_take_out_order_status_must_be_served() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
-
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.EAT_IN, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.WAITING);
-
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
+		Order orderResult = getOrderResult(OrderType.EAT_IN, OrderStatus.ACCEPTED);
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
 
 		// when & then
 		assertThatThrownBy(() -> orderService.complete(uuid)).isInstanceOf(IllegalStateException.class);
@@ -241,21 +176,9 @@ class OrderServiceTest {
 	void when_order_type_is_delivery_order_status_must_be_delivered() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
+		Order orderResult = getOrderResult(OrderType.DELIVERY, OrderStatus.SERVED);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.SERVED);
-
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
 
 		// when & then
 		assertThatThrownBy(() -> orderService.complete(uuid)).isInstanceOf(IllegalStateException.class);
@@ -278,19 +201,7 @@ class OrderServiceTest {
 	void change_order_status_into_completed() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
-
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.DELIVERED);
+		Order order = getOrderResult(OrderType.DELIVERY, OrderStatus.DELIVERED);
 
 		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
 
@@ -306,19 +217,7 @@ class OrderServiceTest {
 	void when_to_make_delivered_order_can_not_be_delivering() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
-
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.SERVED);
+		Order order = getOrderResult(OrderType.DELIVERY, OrderStatus.SERVED);
 
 		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
 
@@ -343,21 +242,9 @@ class OrderServiceTest {
 	void change_order_status_into_delivered() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
+		Order orderResult = getOrderResult(OrderType.DELIVERY, OrderStatus.DELIVERING);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.DELIVERING);
-
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
 
 		// when
 		Order result = orderService.completeDelivery(uuid);
@@ -371,21 +258,9 @@ class OrderServiceTest {
 	void order_status_must_be_served() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
+		Order orderResult = getOrderResult(OrderType.EAT_IN, OrderStatus.WAITING);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.EAT_IN, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.WAITING);
-
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
 
 		// when & then
 		assertThatThrownBy(() -> orderService.startDelivery(uuid)).isInstanceOf(IllegalStateException.class);
@@ -396,21 +271,9 @@ class OrderServiceTest {
 	void delivery_order_type_must_be_delivery() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
+		Order orderResult = getOrderResult(OrderType.EAT_IN, OrderStatus.SERVED);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.EAT_IN, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.SERVED);
-
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
 
 		// when & then
 		assertThatThrownBy(() -> orderService.startDelivery(uuid)).isInstanceOf(IllegalStateException.class);
@@ -433,21 +296,9 @@ class OrderServiceTest {
 	void change_order_status_into_delivering() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
+		Order orderResult = getOrderResult(OrderType.DELIVERY, OrderStatus.SERVED);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.SERVED);
-
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
 
 		// when
 		Order result = orderService.startDelivery(uuid);
@@ -461,21 +312,9 @@ class OrderServiceTest {
 	void when_to_serve_order_must_be_accepted() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
+		Order orderResult = getOrderResult(OrderType.DELIVERY, OrderStatus.WAITING);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.WAITING);
-
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
 
 		// when & then
 		assertThatThrownBy(() -> orderService.serve(uuid)).isInstanceOf(IllegalStateException.class);
@@ -487,19 +326,6 @@ class OrderServiceTest {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.ACCEPTED);
-
 		when(orderRepository.findById(uuid)).thenReturn(Optional.empty());
 
 		assertThatThrownBy(() -> orderService.serve(uuid)).isInstanceOf(NoSuchElementException.class);
@@ -510,21 +336,9 @@ class OrderServiceTest {
 	void change_order_status_into_the_served() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
+		Order orderResult = getOrderResult(OrderType.DELIVERY, OrderStatus.ACCEPTED);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.ACCEPTED);
-
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
 
 		// when
 		Order result = orderService.serve(uuid);
@@ -538,21 +352,9 @@ class OrderServiceTest {
 	void when_to_accept_order_must_be_waiting() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
+		Order orderResult = getOrderResult(OrderType.DELIVERY, OrderStatus.DELIVERING);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.DELIVERING);
-
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
 
 		// when & then
 		assertThatThrownBy(() -> orderService.accept(uuid)).isInstanceOf(IllegalStateException.class);
@@ -575,21 +377,9 @@ class OrderServiceTest {
 	void change_order_status_into_the_accepted() {
 		// given
 		UUID uuid = UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a");
+		Order orderResult = getOrderResult(OrderType.DELIVERY, OrderStatus.WAITING);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.WAITING);
-
-		when(orderRepository.findById(uuid)).thenReturn(Optional.of(order));
+		when(orderRepository.findById(uuid)).thenReturn(Optional.of(orderResult));
 
 		// when
 		Order result = orderService.accept(uuid);
@@ -602,20 +392,14 @@ class OrderServiceTest {
 	@Test
 	void wehn_to_have_eat_in_order_order_table_is_not_vacant() {
 		// given
-		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
-		Product productRequest = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
+		Menu menuRequest = getMenu();
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem(menuRequest, 2L, new BigDecimal(10000));
 		String addressRequest = "주소";
 		OrderTable orderTableRequest = new OrderTable("테이블", 3);
 		Order orderRequest = new Order(OrderType.EAT_IN, Collections.singletonList(orderLineItemRequest), addressRequest, orderTableRequest);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
+		Menu menu = getMenu();
 
 		OrderTable orderTable = new OrderTable("테이블");
 
@@ -633,32 +417,31 @@ class OrderServiceTest {
 		assertThatThrownBy(() -> orderService.create(orderRequest)).isInstanceOf(IllegalStateException.class);
 	}
 
+	private Order getOrderResult(OrderType orderType, OrderStatus orderStatus) {
+		Menu menu = getMenu();
+		OrderTable orderTable = new OrderTable("테이블", 3);
+
+		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
+		String address = "주소";
+		Order order = new Order(orderType, Collections.singletonList(orderLineItem), address, orderTable);
+		order.setOrderDateTime(LocalDateTime.now());
+		order.setStatus(orderStatus);
+
+		return order;
+	}
+
 	@DisplayName("주문 종류가 매장 내 식사라면 매장 테이블이 미리 존재해야 한다")
 	@Test
 	void eat_in_order_must_have_order_table() {
 		// given
-		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
-		Product productRequest = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
+		Menu menuRequest = getMenu();
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem(menuRequest, 2L, new BigDecimal(10000));
 		String addressRequest = "주소";
 		OrderTable orderTableRequest = new OrderTable("테이블");
 		Order orderRequest = new Order(OrderType.EAT_IN, Collections.singletonList(orderLineItemRequest), addressRequest, orderTableRequest);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.WAITING);
+		Menu menu = getMenu();
 
 		when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
 		when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -672,20 +455,14 @@ class OrderServiceTest {
 	@Test
 	void delivery_order_must_have_delivery_address() {
 		// given
-		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
-		Product productRequest = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
+		Menu menuRequest = getMenu();
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem(menuRequest, 2L, new BigDecimal(10000));
 		String addressRequest = "";
 		OrderTable orderTableRequest = new OrderTable("테이블");
 		Order orderRequest = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItemRequest), addressRequest, orderTableRequest);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
+		Menu menu = getMenu();
 
 		when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
 		when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -698,28 +475,14 @@ class OrderServiceTest {
 	@Test
 	void order_line_item_which_is_not_eat_in_has_above_zero_quantity() {
 		// given
-		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
-		Product productRequest = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
+		Menu menuRequest = getMenu();
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem(menuRequest, -1L, new BigDecimal(10000));
 		String addressRequest = "주소";
 		OrderTable orderTableRequest = new OrderTable("테이블", 3);
 		Order orderRequest = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItemRequest), addressRequest, orderTableRequest);
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.WAITING);
+		Menu menu = getMenu();
 
 		when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
 
@@ -731,11 +494,6 @@ class OrderServiceTest {
 	@Test
 	void order_line_item_is_must() {
 		// given
-		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
-		Product productRequest = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
-
 		String addressRequest = "주소";
 		OrderTable orderTableRequest = new OrderTable("테이블", 3);
 		Order orderRequest = new Order(OrderType.DELIVERY, Collections.emptyList(), addressRequest, orderTableRequest);
@@ -748,10 +506,7 @@ class OrderServiceTest {
 	@Test
 	void order_type_is_must() {
 		// given
-		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
-		Product productRequest = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
+		Menu menuRequest = getMenu();
 
 		OrderLineItem orderLineItemRequest = new OrderLineItem(menuRequest, 2L, new BigDecimal(10000));
 		String addressRequest = "주소";
@@ -766,32 +521,13 @@ class OrderServiceTest {
 	@Test
 	void create_order() {
 		// given
-		MenuGroup menuGroupRequest = new MenuGroup("메뉴 그룹");
-		Product productRequest = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProductRequest = new MenuProduct(productRequest, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroupRequest, true, Collections.singletonList(menuProductRequest));
-
-		OrderLineItem orderLineItemRequest = new OrderLineItem(menuRequest, 2L, new BigDecimal(10000));
-		String addressRequest = "주소";
-		OrderTable orderTableRequest = new OrderTable("테이블");
-		Order orderRequest = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItemRequest), addressRequest, orderTableRequest);
-
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
-
-		OrderTable orderTable = new OrderTable("테이블", 3);
-
-		OrderLineItem orderLineItem = new OrderLineItem(menu, 2L, new BigDecimal(10000));
-		String address = "주소";
-		Order order = new Order(OrderType.DELIVERY, Collections.singletonList(orderLineItem), address, orderTable);
-		order.setOrderDateTime(LocalDateTime.now());
-		order.setStatus(OrderStatus.WAITING);
+		Order orderRequest = getOrderRequest();
+		Menu menu = getMenu();
+		Order orderResult = getOrderResult(OrderType.DELIVERY, OrderStatus.WAITING);
 
 		when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
 		when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-		when(orderRepository.save(any())).thenReturn(order);
+		when(orderRepository.save(any())).thenReturn(orderResult);
 
 		// when
 		Order result = orderService.create(orderRequest);

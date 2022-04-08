@@ -41,12 +41,9 @@ class MenuRestControllerTest {
 
 	@Test
 	void create_menu() throws Exception {
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
+		Menu menuRequest = new Menu("메뉴", new BigDecimal(10000), getMenuGroup(), true, Collections.singletonList(getMenuProduct()));
 
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
+		Menu menu = new Menu("메뉴", new BigDecimal(10000), getMenuGroup(), true, Collections.singletonList(getMenuProduct()));
 		ReflectionTestUtils.setField(menu, "id", UUID.fromString("2f48f241-9d64-4d16-bf56-70b9d4e0e79a"));
 
 		when(menuService.create(any())).thenReturn(menu);
@@ -66,10 +63,7 @@ class MenuRestControllerTest {
 		Menu menuRequest = new Menu();
 		menuRequest.setPrice(new BigDecimal(15000));
 
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 3L);
-		Menu menu = new Menu("메뉴", new BigDecimal(10000), menuGroup, true, Collections.singletonList(menuProduct));
+		Menu menu = new Menu("메뉴", new BigDecimal(10000), getMenuGroup(), true, Collections.singletonList(getMenuProduct()));
 
 		when(menuService.changePrice(eq(uuid), any())).thenReturn(menu);
 
@@ -84,10 +78,7 @@ class MenuRestControllerTest {
 
 	@Test
 	void display_menu() throws Exception {
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(20000), menuGroup, true, Collections.singletonList(menuProduct));
+		Menu menu = new Menu("메뉴", new BigDecimal(20000), getMenuGroup(), true, Collections.singletonList(getMenuProduct()));
 
 		when(menuService.display(any())).thenReturn(menu);
 
@@ -100,10 +91,7 @@ class MenuRestControllerTest {
 
 	@Test
 	void hide_menu() throws Exception {
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(20000), menuGroup, false, Collections.singletonList(menuProduct));
+		Menu menu = new Menu("메뉴", new BigDecimal(20000), getMenuGroup(), false, Collections.singletonList(getMenuProduct()));
 
 		when(menuService.hide(any())).thenReturn(menu);
 
@@ -116,17 +104,23 @@ class MenuRestControllerTest {
 
 	@Test
 	void find_all_menu() throws Exception {
-		MenuGroup menuGroup = new MenuGroup("메뉴 그룹");
-		Product product = new Product("상품", new BigDecimal(6000));
-		MenuProduct menuProduct = new MenuProduct(product, 2L);
-		Menu menu = new Menu("메뉴", new BigDecimal(20000), menuGroup, true, Collections.singletonList(menuProduct));
+		Menu menu = new Menu("메뉴", new BigDecimal(20000), getMenuGroup(), true, Collections.singletonList(getMenuProduct()));
 
-		when(menuService.findAll()).thenReturn(Arrays.asList(menu));
+		when(menuService.findAll()).thenReturn(Collections.singletonList(menu));
 
 		mockMvc.perform(get("/api/menus")
 			.accept(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.length()", Matchers.is(1)))
 			.andDo(print());
+	}
+
+	private MenuGroup getMenuGroup() {
+		return new MenuGroup("메뉴 그룹");
+	}
+
+	private MenuProduct getMenuProduct() {
+		Product product = new Product("상품", new BigDecimal(6000));
+		return new MenuProduct(product, 2L);
 	}
 }

@@ -77,7 +77,7 @@ class ProductServiceTest {
 		when(menuRepository.findAllByProductId(any())).thenReturn(Arrays.asList(menu1, menu2));
 
 		// when & then
-		Product result = productService.changePrice(uuid, productRequest);
+		productService.changePrice(uuid, productRequest);
 
 		// then
 		assertThat(menu2.isDisplayed()).isFalse();
