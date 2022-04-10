@@ -22,6 +22,11 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.exception.MenuMarginException;
+import kitchenpos.domain.exception.MenuPriceException;
+import kitchenpos.domain.exception.MenuProductException;
+import kitchenpos.domain.exception.MenuProductNotExistException;
+import kitchenpos.domain.exception.MenuProductQuantityException;
 import kitchenpos.infra.ProfanityClient;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +65,7 @@ class MenuServiceTest {
         ThrowingCallable actual = () -> menuService.create(잘못된_가격의_메뉴);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(MenuPriceException.class);
     }
 
     @DisplayName("메뉴는 메뉴 그룹에 속해야 한다.")
@@ -93,7 +98,7 @@ class MenuServiceTest {
         ThrowingCallable actual = () -> menuService.create(상품_없는_메뉴);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(MenuProductNotExistException.class);
     }
 
     @DisplayName("중복된 메뉴상품을 가질 수 없다.")
@@ -114,7 +119,7 @@ class MenuServiceTest {
         ThrowingCallable actual = () -> menuService.create(중복된_상품을_포함하는_메뉴);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(MenuProductException.class);
     }
 
     @DisplayName("메뉴는 수량이 부족한 메뉴상품을 포함할 수 없다.")
@@ -135,7 +140,7 @@ class MenuServiceTest {
         ThrowingCallable actual = () -> menuService.create(메뉴상품_수량_오류_메뉴);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(MenuProductQuantityException.class);
     }
 
     @DisplayName("메뉴의 가격은 상품들의 합산 가격과 같거나 작아야 한다.")
@@ -157,7 +162,7 @@ class MenuServiceTest {
         ThrowingCallable actual = () -> menuService.create(비싼_메뉴);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(MenuMarginException.class);
     }
 
     @DisplayName("메뉴 이름에는 비속어가 포함될 수 없다.")
@@ -213,7 +218,7 @@ class MenuServiceTest {
         ThrowingCallable actual = () -> menuService.changePrice(포장_전용_메뉴.getId(), 가격_변경);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(MenuPriceException.class);
     }
 
     @DisplayName("상품들의 총 가격보다 높은 가격으로 변경할 수 없다.")
@@ -227,7 +232,7 @@ class MenuServiceTest {
         ThrowingCallable actual = () -> menuService.changePrice(맛초킹_세트.getId(), 가격_변경);
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(actual).isInstanceOf(MenuMarginException.class);
     }
 
     @DisplayName("가격 변경")
@@ -268,7 +273,7 @@ class MenuServiceTest {
         ThrowingCallable actual = () -> menuService.display(마진_대박_맛초킹_세트.getId());
 
         //then
-        assertThatThrownBy(actual).isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(actual).isInstanceOf(MenuMarginException.class);
     }
 
     @DisplayName("진열")
