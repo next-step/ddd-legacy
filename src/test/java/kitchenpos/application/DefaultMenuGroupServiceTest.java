@@ -68,10 +68,7 @@ class DefaultMenuGroupServiceTest {
         List<MenuGroup> menuGroups = menuGroupService.findAll();
 
         //then
-        assertAll(
-            () -> assertThat(menuGroups).hasSize(2),
-            () -> assertThat(menuGroups).containsExactlyInAnyOrder(세트메뉴, 추천메뉴)
-        );
+        assertThat(menuGroups).containsExactlyInAnyOrder(세트메뉴, 추천메뉴);
     }
 
     private MenuGroup 메뉴_그룹_생성(String name) {
