@@ -47,7 +47,4 @@ public class InMemoryMenuRepository implements MenuRepository {
         return new ArrayList<>(menus.values());
     }
 
-    public void deleteDataForTest() {
-        menus.clear();
-    }
 }
