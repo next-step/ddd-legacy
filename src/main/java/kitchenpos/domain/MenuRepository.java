@@ -1,6 +1,5 @@
 package kitchenpos.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -19,9 +18,4 @@ public interface MenuRepository {
     Optional<Menu> findById(UUID menuId);
 
     List<Menu> findAll();
-
-    void deleteDataForTest();
-}
-
-interface JpaMenuRepository extends MenuRepository, JpaRepository<Menu, UUID> {
 }
