@@ -1,8 +1,25 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.OrderType;
 import kitchenpos.domain.exception.OrderDeliveryAddressException;
 import kitchenpos.domain.exception.OrderDisplayException;
+import kitchenpos.domain.exception.OrderFromEmptyOrderTableException;
 import kitchenpos.domain.exception.OrderInvalidQuantityException;
 import kitchenpos.domain.exception.OrderLineItemNotExistException;
 import kitchenpos.domain.exception.OrderLineItemNotMatchException;
@@ -12,13 +29,9 @@ import kitchenpos.infra.KitchenridersClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Service
 public class OrderService {
+
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final OrderTableRepository orderTableRepository;
@@ -93,7 +106,7 @@ public class OrderService {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
             if (orderTable.isEmpty()) {
-                throw new IllegalStateException();
+                throw new OrderFromEmptyOrderTableException();
             }
             order.setOrderTable(orderTable);
         }
