@@ -1,29 +1,35 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.InMemoryOrderTableRepository;
-import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
+import static kitchenpos.MenuFixture.menu;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class OrderTableServiceTest {
 
-    public static OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
-    private OrderRepository orderRepository = OrderServiceTest.orderRepository;
+    private OrderTableRepository orderTableRepository;
+    private OrderRepository orderRepository;
 
-    private OrderTableService orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+    private OrderTableService orderTableService;
+
+    @BeforeEach
+    void setUp() {
+        orderTableRepository = new InMemoryOrderTableRepository();
+        orderRepository = new InMemoryOrderRepository();
+        orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+    }
 
     @DisplayName("주문테이블을 생성한다.")
     @Test
@@ -41,13 +47,9 @@ class OrderTableServiceTest {
         );
     }
 
-    static Stream<String> invalidOrderTableName() {
-        return Stream.of(null, "");
-    }
-
     @DisplayName("주문테이블의 이름은 필수로 지정해야한다.")
     @ParameterizedTest
-    @MethodSource("invalidOrderTableName")
+    @NullAndEmptySource
     void necessaryTableName(String tableName) {
         OrderTable orderTable = new OrderTable();
         orderTable.setName(tableName);
@@ -74,14 +76,17 @@ class OrderTableServiceTest {
 
         OrderTable orderTable = orderTableService.clear(savedOrderTable.getId());
 
-        assertThat(orderTable.isEmpty()).isTrue();
+        assertAll(
+                () -> assertThat(orderTable.isEmpty()).isTrue(),
+                () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(0)
+        );
     }
 
     @DisplayName("완료되지 않은 주문이 존재하면 빈테이블로 변경할수 없다.")
     @Test
     void unableClear() {
         OrderTable savedOrderTable = saveOrderTable("1번테이블", 4, false);
-        OrderServiceTest.saveOrderTargetTable(savedOrderTable);
+        saveOrderTargetTable(savedOrderTable);
 
         assertThatThrownBy(
                 () -> orderTableService.clear(savedOrderTable.getId())
@@ -129,20 +134,18 @@ class OrderTableServiceTest {
     void findAll() {
         saveOrderTable("1번 테이블");
         saveOrderTable("2번 테이블");
-        int orderTablesSize = orderTableRepository.findAll()
-                .size();
 
         List<OrderTable> orderTables = orderTableService.findAll();
 
-        assertThat(orderTables).hasSize(orderTablesSize);
+        assertThat(orderTables).hasSize(2);
 
     }
 
-    public static OrderTable saveOrderTable(String name) {
+    public OrderTable saveOrderTable(String name) {
         return orderTableRepository.save(saveOrderTable(name, 0, true));
     }
 
-    public static OrderTable saveOrderTable(String name, int numberOfGuests, boolean empty) {
+    public OrderTable saveOrderTable(String name, int numberOfGuests, boolean empty) {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(name);
@@ -150,5 +153,35 @@ class OrderTableServiceTest {
         orderTable.setEmpty(empty);
 
         return orderTableRepository.save(orderTable);
+    }
+
+    public void saveOrderTargetTable(OrderTable savedOrderTable) {
+        saveOrder(createEatInOrder(null, savedOrderTable, Arrays.asList(createOrderLineItem(menu(), 1))));
+    }
+
+    private OrderLineItem createOrderLineItem(Menu singleMenu, int quantity) {
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setMenuId(singleMenu.getId());
+        orderLineItem.setQuantity(quantity);
+        orderLineItem.setPrice(singleMenu.getPrice());
+        return orderLineItem;
+    }
+
+    public Order createEatInOrder(OrderStatus status, OrderTable savedOrderTable, List<OrderLineItem> orderLineItems) {
+        return createOrder(status, OrderType.EAT_IN, savedOrderTable.getId(), null, orderLineItems);
+    }
+
+    public Order saveOrder(Order order) {
+        return orderRepository.save(order);
+    }
+
+    private Order createOrder(OrderStatus status, OrderType orderType, UUID savedOrderTableId, String address, List<OrderLineItem> orderLineItems) {
+        Order order = new Order();
+        order.setStatus(status);
+        order.setType(orderType);
+        order.setOrderTableId(savedOrderTableId);
+        order.setDeliveryAddress(address);
+        order.setOrderLineItems(orderLineItems);
+        return order;
     }
 }

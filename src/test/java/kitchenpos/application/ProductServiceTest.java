@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.infra.FakeProfanityClient;
 import kitchenpos.infra.ProfanityClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,22 +11,34 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static kitchenpos.MenuFixture.menu;
+import static kitchenpos.MenuProductFixture.menuProduct;
+import static kitchenpos.ProductFixture.product;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ProductServiceTest {
 
-    public static ProductRepository productRepository = new InMemoryProductRepository();
+    private ProductRepository productRepository;
+    private MenuRepository menuRepository;
 
-    private ProfanityClient profanityClient = new FakeProfanityClient();
-    public MenuRepository menuRepository = MenuServiceTest.menuRepository;
+    private ProfanityClient profanityClient;
 
-    private ProductService productService = new ProductService(productRepository, menuRepository, profanityClient);
+    private ProductService productService;
+
+    @BeforeEach
+    void setUp() {
+        productRepository = new InMemoryProductRepository();
+        menuRepository = new InMemoryMenuRepository();
+
+        profanityClient = new FakeProfanityClient();
+
+        productService = new ProductService(productRepository, menuRepository, profanityClient);
+    }
 
     @DisplayName("상품을 생성한다.")
     @Test
@@ -98,15 +111,11 @@ class ProductServiceTest {
     @ParameterizedTest
     @ValueSource(strings = {"1000", "5000", "10000"})
     void ifExpensiveMenuPriceThenHideMenu(BigDecimal price) {
-        MenuGroup menuGroup = MenuGroupServiceTest.saveMenuGroup(MenuGroupTest.create("1+1 치킨세트"));
-        Product 후라이드 = save(ProductTest.create("후라이드", 18000L));
-        Product 양념치킨 = save(ProductTest.create("양념치킨", 20000L));
+        Product 후라이드 = save(product("후라이드", 18000L));
+        Product 양념치킨 = save(product("양념치킨", 20000L));
 
-        List<MenuProduct> setMenuProducts = new ArrayList();
-        setMenuProducts.add(MenuProductTest.create(후라이드, 1));
-        setMenuProducts.add(MenuProductTest.create(양념치킨, 1));
-
-        Menu setMenu = MenuServiceTest.save("반반세트", 35000L, true, menuGroup, setMenuProducts);
+        Menu setMenu = menu("2마리 세트", 35000L, true, menuProduct(후라이드, 1), menuProduct(양념치킨, 1));
+        menuRepository.save(setMenu);
 
         후라이드.setPrice(price);
         productService.changePrice(후라이드.getId(), 후라이드);
@@ -120,22 +129,19 @@ class ProductServiceTest {
     @DisplayName("상품의 목록을 조회한다.")
     @Test
     void findAll() {
-        Product 후라이드 = ProductTest.create("후라이드", 18000L);
-        Product 양념치킨 = ProductTest.create("양념치킨", 20000L);
-        Product 치킨무 = ProductTest.create("치킨무", 500L);
+        Product 후라이드 = product("후라이드", 18000L);
+        Product 양념치킨 = product("양념치킨", 20000L);
+        Product 치킨무 = product("치킨무", 500L);
         productRepository.save(후라이드);
         productRepository.save(양념치킨);
         productRepository.save(치킨무);
 
-        int productSize = productRepository.findAll()
-                .size();
-
         List<Product> products = productService.findAll();
 
-        assertThat(products).hasSize(productSize);
+        assertThat(products).hasSize(3);
     }
 
-    public static Product save(Product product) {
+    public Product save(Product product) {
         return productRepository.save(product);
     }
 }

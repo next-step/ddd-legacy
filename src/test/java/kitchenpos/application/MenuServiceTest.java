@@ -3,93 +3,74 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.infra.FakeProfanityClient;
 import kitchenpos.infra.ProfanityClient;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
+import static kitchenpos.MenuGroupFixture.menuGroup;
+import static kitchenpos.MenuProductFixture.menuProduct;
+import static kitchenpos.ProductFixture.product;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MenuServiceTest {
 
-    public static MenuRepository menuRepository = new InMemoryMenuRepository();
+    private MenuRepository menuRepository;
+    private MenuGroupRepository menuGroupRepository;
+    private ProductRepository productRepository;
 
-    private MenuGroupRepository menuGroupRepository = MenuGroupServiceTest.menuGroupRepository;
-    private ProductRepository productRepository = ProductServiceTest.productRepository;
+    private ProfanityClient profanityClient;
 
-    private ProfanityClient profanityClient = new FakeProfanityClient();
-
-    private MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, profanityClient);
+    private MenuService menuService;
 
     private MenuGroup menuGroup;
     private Product product;
-    private MenuGroup toastMenuGroup;
-    private Menu savedSingleMenu;
-    private Menu hideMenu;
 
     @BeforeEach
-    public void saveDummyMenu() {
+    void setUp() {
+        menuRepository = new InMemoryMenuRepository();
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        productRepository = new InMemoryProductRepository();
+        profanityClient = new FakeProfanityClient();
 
-        menuGroup = MenuGroupServiceTest.saveMenuGroup(MenuGroupTest.create("1인 혼닭"));
-        product = ProductServiceTest.save(ProductTest.create("옛날통닭", 18000L));
-
-        MenuGroup setMenuGroup = MenuGroupServiceTest.saveMenuGroup(MenuGroupTest.create("1인메뉴"));
-        toastMenuGroup = MenuGroupServiceTest.saveMenuGroup(MenuGroupTest.create("인기 대표 토스트"));
-
-        Product 토스트 = ProductServiceTest.save(ProductTest.create("계란햄치즈토스트", 5000L));
-        Product 커피 = ProductServiceTest.save(ProductTest.create("아이스아메리카노", 3000L));
-
-        List<MenuProduct> setMenuProducts = new ArrayList();
-        List<MenuProduct> singleMenuProducts = new ArrayList();
-        setMenuProducts.add(MenuProductTest.create(토스트, 1));
-        setMenuProducts.add(MenuProductTest.create(커피, 1));
-
-        singleMenuProducts.add(MenuProductTest.create(토스트, 1));
-
-        Menu setMenu = createMenu("든든한 아침 세트", 7000L, setMenuGroup, setMenuProducts);
-        Menu singleMenu = createMenu("토스트 단품", 5000L, toastMenuGroup, singleMenuProducts);
-        Menu hideMenu = createMenu("사장님의 비밀병기", 5000L, false, toastMenuGroup, singleMenuProducts);
-
-        menuRepository.save(setMenu);
-
-        this.savedSingleMenu = menuRepository.save(singleMenu);
-        this.hideMenu = menuRepository.save(hideMenu);
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, profanityClient);
+        saveDummyMenu();
     }
 
-    @AfterEach
-    void clearDummyMenu() {
-        menuRepository.deleteDataForTest();
+    void saveDummyMenu() {
+        menuGroup = menuGroupRepository.save(menuGroup());
+        product = productRepository.save(product("옛날통닭", 18000L));
     }
 
     @DisplayName("메뉴를 생성한다.")
     @Test
     void create() {
-        List<MenuProduct> menuProducts = new ArrayList();
-        MenuProduct menuProduct = MenuProductTest.create(product, 1);
-        menuProducts.add(menuProduct);
+        MenuProduct menuProduct = menuProduct(product.getId(), 1);
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct);
 
         Menu createdMenu = menuService.create(createMenu("후라이드 1인 메뉴", 18000L, menuGroup, menuProducts));
 
-        assertThat(createdMenu).isNotNull();
-        assertThat(createdMenu.getId()).isNotNull();
+        assertAll(
+                () -> assertThat(createdMenu).isNotNull(),
+                () -> assertThat(createdMenu.getId()).isNotNull()
+        );
     }
 
     @DisplayName("메뉴의 가격은 0원 이상이여야한다.")
     @ParameterizedTest
     @ValueSource(ints = {-100, -5000, -10000})
     void menuPriceTest(int price) {
-        List<MenuProduct> menuProducts = new ArrayList();
-        menuProducts.add(MenuProductTest.create(product, 1));
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product.getId(), 1));
 
         assertThatThrownBy(
                 () -> menuService.create(createMenu("후라이드 1인 메뉴", price, menuGroup, menuProducts))
@@ -108,36 +89,40 @@ public class MenuServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, -5, -10})
     void necessaryProductCount(int quantity) {
-        List<MenuProduct> menuProducts = new ArrayList();
-        menuProducts.add(MenuProductTest.create(product, quantity));
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product.getId(), quantity));
 
         assertThatThrownBy(
                 () -> menuService.create(createMenu("후라이드 1인 메뉴", 18000L, menuGroup, menuProducts))
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴의 가격은 메뉴에 포함된 상품 총가격보다 비싸면안된다.")
+    @DisplayName("메뉴의 가격은 메뉴에 포함된 상품 총가격보다 비싸면 안된다.")
     @ParameterizedTest
     @CsvSource(value = {"19000,1", "37000,2", "55000,3"}, delimiter = ',')
     void menuPriceUnderThanProductPrice(int menuPrice, int productQuantity) {
-        List<MenuProduct> menuProducts = new ArrayList();
-        menuProducts.add(MenuProductTest.create(product, productQuantity));
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product.getId(), productQuantity));
 
         assertThatThrownBy(
                 () -> menuService.create(createMenu("후라이드 1인 메뉴", menuPrice, menuGroup, menuProducts))
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    static Stream<String> invalidMenuNames() {
-        return Stream.of(null, "비속어", "욕설");
+    @DisplayName("메뉴의 이름은 반듯이 입력해야한다.")
+    @ParameterizedTest
+    @NullSource
+    void invalidMenuNamesNullCase(String menuName) {
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product.getId(), 1));
+
+        assertThatThrownBy(
+                () -> menuService.create(createMenu(menuName, 18000L, menuGroup, menuProducts))
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴의 이름은 지정해야하며 욕설, 비속어등이 올수없다.")
+    @DisplayName("메뉴의 이름은 욕설, 비속어등이 올수없다.")
     @ParameterizedTest
-    @MethodSource("invalidMenuNames")
+    @ValueSource(strings = {"욕설", "비속어"})
     void invalidMenuNames(String menuName) {
-        List<MenuProduct> menuProducts = new ArrayList();
-        menuProducts.add(MenuProductTest.create(product, 1));
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product.getId(), 1));
 
         assertThatThrownBy(
                 () -> menuService.create(createMenu(menuName, 18000L, menuGroup, menuProducts))
@@ -148,20 +133,25 @@ public class MenuServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {3000, 3500, 4000})
     void changeMenuPrice(int price) {
-        Menu singleMenu = this.savedSingleMenu;
-        singleMenu.setPrice(BigDecimal.valueOf(price));
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product, 1));
+        Menu singleMenu = menuRepository.save(createMenu("양념치킨", 5000L, menuGroup, menuProducts));
 
+        singleMenu.setPrice(BigDecimal.valueOf(price));
         Menu menu = menuService.changePrice(singleMenu.getId(), singleMenu);
 
-        assertThat(menu.getId()).isEqualTo(singleMenu.getId());
-        assertThat(menu.getPrice()).isEqualTo(BigDecimal.valueOf(price));
+        assertAll(
+                () -> assertThat(menu.getId()).isEqualTo(singleMenu.getId()),
+                () -> assertThat(menu.getPrice()).isEqualTo(BigDecimal.valueOf(price))
+        );
     }
 
     @DisplayName("메뉴의 0원 이상이여야 한다.")
     @ParameterizedTest
     @ValueSource(ints = {-100, -1000, -2000})
     void invalidMenuPrice(int price) {
-        Menu singleMenu = this.savedSingleMenu;
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product, 1));
+        Menu singleMenu = menuRepository.save(createMenu("양념치킨", 5000L, menuGroup, menuProducts));
+
         singleMenu.setPrice(BigDecimal.valueOf(price));
 
         assertThatThrownBy(
@@ -173,7 +163,8 @@ public class MenuServiceTest {
     @ParameterizedTest
     @ValueSource(ints = {20000, 30000, 40000})
     void invalidMenuPriceUpperThanProductPrice(int price) {
-        Menu singleMenu = this.savedSingleMenu;
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product, 1));
+        Menu singleMenu = menuRepository.save(createMenu("양념치킨", 5000L, menuGroup, menuProducts));
         singleMenu.setPrice(BigDecimal.valueOf(price));
 
         assertThatThrownBy(
@@ -184,7 +175,11 @@ public class MenuServiceTest {
     @DisplayName("메뉴를 노출상태로 변경할수 있다.")
     @Test
     void display() {
-        Menu menu = menuService.display(hideMenu.getId());
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product, 1));
+        Menu hideMenu = createMenu("사장님의 비밀병기", 5000L, false, menuGroup, menuProducts);
+        Menu savedHideMenu = menuRepository.save(hideMenu);
+
+        Menu menu = menuService.display(savedHideMenu.getId());
 
         assertThat(menu.isDisplayed()).isTrue();
     }
@@ -192,7 +187,11 @@ public class MenuServiceTest {
     @DisplayName("메뉴를 비노출상태로 변경할수 있다.")
     @Test
     void hide() {
-        Menu menu = menuService.hide(savedSingleMenu.getId());
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product, 1));
+        Menu createdMenu = createMenu("간장마늘치킨", 5000L, menuGroup, menuProducts);
+        Menu savedMenu = menuRepository.save(createdMenu);
+
+        Menu menu = menuService.hide(savedMenu.getId());
 
         assertThat(menu.isDisplayed()).isFalse();
     }
@@ -200,9 +199,8 @@ public class MenuServiceTest {
     @DisplayName("메뉴에 포함된 상품의 총 가격보다 메뉴의 가격이 바쌀경우 노출상태로 변경이 불가능하다.")
     @Test
     void unableChangeDisplay() {
-        List<MenuProduct> menuProducts = new ArrayList();
-        menuProducts.add(MenuProductTest.create(product, 1));
-        Menu menu = createMenu("준비중인메뉴 단품", 200000L, toastMenuGroup, menuProducts);
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product, 1));
+        Menu menu = createMenu("준비중인메뉴 단품", 200000L, menuGroup, menuProducts);
         menuRepository.save(menu);
 
         assertThatThrownBy(
@@ -214,15 +212,16 @@ public class MenuServiceTest {
     @DisplayName("메뉴를 조회한다.")
     @Test
     void findAll() {
-        int menuSize = menuRepository.findAll()
-                .size();
+        List<MenuProduct> menuProducts = Arrays.asList(menuProduct(product.getId(), 1));
+        Menu menu = createMenu("준비중인메뉴 단품", 200000L, menuGroup, menuProducts);
+        menuRepository.save(menu);
 
         List<Menu> findMenu = menuService.findAll();
 
-        assertThat(findMenu).hasSize(menuSize);
+        assertThat(findMenu).hasSize(1);
     }
 
-    public static Menu createMenu(String name, long price, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+    public Menu createMenu(String name, long price, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setName(name);
         menu.setMenuGroupId(menuGroup.getId());
@@ -233,7 +232,7 @@ public class MenuServiceTest {
         return createMenu(name, price, true, menuGroup, menuProducts);
     }
 
-    public static Menu createMenu(String name, long price, boolean display, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+    public Menu createMenu(String name, long price, boolean display, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setName(name);
         menu.setMenuGroupId(menuGroup.getId());
@@ -242,10 +241,5 @@ public class MenuServiceTest {
         menu.setMenuProducts(menuProducts);
 
         return menu;
-    }
-
-    public static Menu save(String name, long price, boolean display, MenuGroup menuGroup, List<MenuProduct> setMenuProducts) {
-        Menu setMenu = MenuServiceTest.createMenu(name, price, display, menuGroup, setMenuProducts);
-        return menuRepository.save(setMenu);
     }
 }
