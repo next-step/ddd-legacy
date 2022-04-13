@@ -1,17 +1,37 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.OrderType;
+import kitchenpos.domain.exception.OrderDeliveryAddressException;
+import kitchenpos.domain.exception.OrderDisplayException;
+import kitchenpos.domain.exception.OrderFromEmptyOrderTableException;
+import kitchenpos.domain.exception.OrderInvalidQuantityException;
+import kitchenpos.domain.exception.OrderLineItemNotExistException;
+import kitchenpos.domain.exception.OrderLineItemNotMatchException;
+import kitchenpos.domain.exception.OrderLineItemPriceException;
+import kitchenpos.domain.exception.OrderTypeNotExistException;
 import kitchenpos.infra.KitchenridersClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
-
 @Service
 public class OrderService {
+
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final OrderTableRepository orderTableRepository;
@@ -33,11 +53,11 @@ public class OrderService {
     public Order create(final Order request) {
         final OrderType type = request.getType();
         if (Objects.isNull(type)) {
-            throw new IllegalArgumentException();
+            throw new OrderTypeNotExistException();
         }
         final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new OrderLineItemNotExistException();
         }
         final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
@@ -45,23 +65,24 @@ public class OrderService {
                 .collect(Collectors.toList())
         );
         if (menus.size() != orderLineItemRequests.size()) {
-            throw new IllegalArgumentException();
+            throw new OrderLineItemNotMatchException();
         }
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
             if (type != OrderType.EAT_IN) {
                 if (quantity < 0) {
-                    throw new IllegalArgumentException();
+                    throw new OrderInvalidQuantityException(quantity);
                 }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
-                throw new IllegalStateException();
+                throw new OrderDisplayException();
             }
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
-                throw new IllegalArgumentException();
+                throw new OrderLineItemPriceException(menu.getName(), menu.getPrice().longValue(),
+                    orderLineItemRequest.getPrice().longValue());
             }
             final OrderLineItem orderLineItem = new OrderLineItem();
             orderLineItem.setMenu(menu);
@@ -77,7 +98,7 @@ public class OrderService {
         if (type == OrderType.DELIVERY) {
             final String deliveryAddress = request.getDeliveryAddress();
             if (Objects.isNull(deliveryAddress) || deliveryAddress.isEmpty()) {
-                throw new IllegalArgumentException();
+                throw new OrderDeliveryAddressException();
             }
             order.setDeliveryAddress(deliveryAddress);
         }
@@ -85,7 +106,7 @@ public class OrderService {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
             if (orderTable.isEmpty()) {
-                throw new IllegalStateException();
+                throw new OrderFromEmptyOrderTableException();
             }
             order.setOrderTable(orderTable);
         }
@@ -102,9 +123,9 @@ public class OrderService {
         if (order.getType() == OrderType.DELIVERY) {
             BigDecimal sum = BigDecimal.ZERO;
             for (final OrderLineItem orderLineItem : order.getOrderLineItems()) {
-                sum = orderLineItem.getMenu()
+                sum = sum.add(orderLineItem.getMenu()
                     .getPrice()
-                    .multiply(BigDecimal.valueOf(orderLineItem.getQuantity()));
+                    .multiply(BigDecimal.valueOf(orderLineItem.getQuantity())));
             }
             kitchenridersClient.requestDelivery(orderId, sum, order.getDeliveryAddress());
         }
@@ -179,4 +200,5 @@ public class OrderService {
     public List<Order> findAll() {
         return orderRepository.findAll();
     }
+
 }
