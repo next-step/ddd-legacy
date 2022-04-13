@@ -7,9 +7,7 @@ public class InMemoryOrderTableRepository implements OrderTableRepository {
 
     @Override
     public OrderTable save(OrderTable orderTable) {
-        UUID id = UUID.randomUUID();
-        orderTable.setId(id);
-        orderTables.put(id, orderTable);
+        orderTables.put(orderTable.getId(), orderTable);
 
         return orderTable;
     }

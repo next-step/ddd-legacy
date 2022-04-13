@@ -9,17 +9,13 @@ public class InMemoryOrderRepository implements OrderRepository {
     public boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status) {
         return orders.values()
                 .stream()
-                .filter(order -> Objects.equals(order.getOrderTableId(), orderTable.getId()))
-                .filter(order -> !Objects.equals(order.getStatus(), status))
-                .findAny()
-                .isPresent();
+                .anyMatch(order -> Objects.equals(order.getOrderTableId(), orderTable.getId()) &&
+                        !Objects.equals(order.getStatus(), status));
     }
 
     @Override
     public Order save(Order order) {
-        UUID id = UUID.randomUUID();
-        order.setId(id);
-        orders.put(id, order);
+        orders.put(order.getId(), order);
 
         return order;
     }

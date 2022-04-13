@@ -16,9 +16,7 @@ public class InMemoryProductRepository implements ProductRepository {
 
     @Override
     public Product save(Product product) {
-        UUID id = UUID.randomUUID();
-        product.setId(id);
-        products.put(id, product);
+        products.put(product.getId(), product);
 
         return product;
     }

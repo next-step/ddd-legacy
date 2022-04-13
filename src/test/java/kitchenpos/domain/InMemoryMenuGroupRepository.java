@@ -7,9 +7,7 @@ public class InMemoryMenuGroupRepository implements MenuGroupRepository {
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
-        UUID uuid = UUID.randomUUID();
-        menuGroup.setId(uuid);
-        menuGroups.put(uuid, menuGroup);
+        menuGroups.put(menuGroup.getId(), menuGroup);
 
         return menuGroup;
     }
