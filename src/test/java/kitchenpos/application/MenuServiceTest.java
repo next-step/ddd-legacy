@@ -53,16 +53,19 @@ public class MenuServiceTest {
     }
 
     @DisplayName("메뉴를 생성한다.")
-    @Test
-    void create() {
+    @ParameterizedTest
+    @CsvSource(value = {"1인 한마리메뉴,18000", "이벤트 특가,10000"}, delimiter = ',')
+    void create(String name, long price) {
         MenuProduct menuProduct = menuProduct(product.getId(), 1);
         List<MenuProduct> menuProducts = Arrays.asList(menuProduct);
 
-        Menu createdMenu = menuService.create(createMenu("후라이드 1인 메뉴", 18000L, menuGroup, menuProducts));
+        Menu createdMenu = menuService.create(createMenu(name, price, menuGroup, menuProducts));
 
+        assertThat(createdMenu).isNotNull();
         assertAll(
-                () -> assertThat(createdMenu).isNotNull(),
-                () -> assertThat(createdMenu.getId()).isNotNull()
+                () -> assertThat(createdMenu.getId()).isNotNull(),
+                () -> assertThat(createdMenu.getName()).isEqualTo(name),
+                () -> assertThat(createdMenu.getPrice()).isEqualTo(BigDecimal.valueOf(price))
         );
     }
 
