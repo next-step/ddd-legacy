@@ -47,8 +47,8 @@ class ProductServiceTest {
 
         Product createdProduct = productService.create(product);
 
+        assertThat(createdProduct).isNotNull();
         assertAll(
-                () -> assertThat(createdProduct).isNotNull(),
                 () -> assertThat(createdProduct.getId()).isNotNull(),
                 () -> assertThat(createdProduct.getPrice()).isNotNull()
         );

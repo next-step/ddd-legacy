@@ -33,8 +33,8 @@ public class MenuGroupServiceTest {
         String menuName = "1인 메뉴";
         MenuGroup createdMenuGroup = menuGroupService.create(createMenu(menuName));
 
+        assertThat(createdMenuGroup).isNotNull();
         assertAll(
-                () -> assertThat(createdMenuGroup).isNotNull(),
                 () -> assertThat(createdMenuGroup.getId()).isNotNull(),
                 () -> assertThat(createdMenuGroup.getName()).isEqualTo(menuName)
         );

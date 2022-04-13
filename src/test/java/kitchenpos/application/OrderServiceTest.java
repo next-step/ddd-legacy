@@ -48,8 +48,8 @@ class OrderServiceTest {
 
         Order createOrder = orderService.create(order);
 
+        assertThat(createOrder).isNotNull();
         assertAll(
-                () -> assertThat(createOrder).isNotNull(),
                 () -> assertThat(createOrder.getId()).isNotNull(),
                 () -> assertThat(createOrder.getStatus()).isEqualTo(OrderStatus.WAITING),
                 () -> assertThat(createOrder.getType()).isEqualTo(OrderType.EAT_IN)
@@ -65,8 +65,8 @@ class OrderServiceTest {
 
         Order createOrder = orderService.create(order);
 
+        assertThat(createOrder).isNotNull();
         assertAll(
-                () -> assertThat(createOrder).isNotNull(),
                 () -> assertThat(createOrder.getId()).isNotNull(),
                 () -> assertThat(createOrder.getStatus()).isEqualTo(OrderStatus.WAITING),
                 () -> assertThat(createOrder.getType()).isEqualTo(OrderType.TAKEOUT)
@@ -81,8 +81,8 @@ class OrderServiceTest {
 
         Order createOrder = orderService.create(order);
 
+        assertThat(createOrder).isNotNull();
         assertAll(
-                () -> assertThat(createOrder).isNotNull(),
                 () -> assertThat(createOrder.getId()).isNotNull(),
                 () -> assertThat(createOrder.getStatus()).isEqualTo(OrderStatus.WAITING),
                 () -> assertThat(createOrder.getType()).isEqualTo(OrderType.DELIVERY)
@@ -365,15 +365,5 @@ class OrderServiceTest {
         orderLineItem.setQuantity(quantity);
         orderLineItem.setPrice(singleMenu.getPrice());
         return orderLineItem;
-    }
-
-    public OrderTable saveOrderTable(String name, int numberOfGuests, boolean empty) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName(name);
-        orderTable.setNumberOfGuests(numberOfGuests);
-        orderTable.setEmpty(empty);
-
-        return orderTableRepository.save(orderTable);
     }
 }

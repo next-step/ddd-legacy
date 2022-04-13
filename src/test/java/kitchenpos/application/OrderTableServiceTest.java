@@ -39,8 +39,8 @@ class OrderTableServiceTest {
 
         OrderTable createdOrderTable = orderTableService.create(orderTable);
 
+        assertThat(createdOrderTable).isNotNull();
         assertAll(
-                () -> assertThat(createdOrderTable).isNotNull(),
                 () -> assertThat(createdOrderTable.getId()).isNotNull(),
                 () -> assertThat(createdOrderTable.getNumberOfGuests()).isEqualTo(0),
                 () -> assertThat(createdOrderTable.isEmpty()).isTrue()
