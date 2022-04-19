@@ -1,135 +1,136 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.fixture.MenuFixture;
-import kitchenpos.fixture.ProductFixture;
-import kitchenpos.infra.PurgomalumClient;
-import org.assertj.core.api.Assertions;
+import kitchenpos.infra.FakeProfanityClient;
+import kitchenpos.infra.ProfanityClient;
+import kitchenpos.repository.InMemoryMenuRepository;
+import kitchenpos.repository.InMemoryProductRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.lenient;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @DisplayName("[상품]")
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 class ProductServiceTest {
 
-    @Mock
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository = new InMemoryProductRepository();
+    private final MenuRepository menuRepository = new InMemoryMenuRepository();
+    private final ProfanityClient profanityClient = new FakeProfanityClient();
 
-    @Mock
-    private MenuRepository menuRepository;
-
-    @Mock
-    private PurgomalumClient purgomalumClient;
-
-    @InjectMocks
     private ProductService productService;
 
+    @BeforeEach
+    void setUp() {
+        productService = new ProductService(productRepository, menuRepository, profanityClient);
+    }
 
-    @Test
-    @DisplayName("상품의 가격은 0보다 크거나 같아야 한다")
-    public void productPriceLessThanZeroTest() {
-        Product product = ProductFixture.상품_가격_0원_미만();
+    @ValueSource(strings = {"-1", "-100"})
+    @ParameterizedTest
+    @DisplayName("상품의 가격은 음수가 될 수 없다.")
+    void productPriceLessThanZeroTest(final BigDecimal price) {
+        Product product = createProduct("후라이드", price);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    @DisplayName("상품의 가격은 0보다 크거나 같아야 한다")
-    public void productNamePriceNullTest() {
-        Product product = ProductFixture.상품_가격_이름_NULL();
+    @DisplayName("상품 가격과 상품의 이름은 필수로 있어야 한다.")
+    void productNameNotNull() {
+        Product product = createProduct(null, null);
+        AssertionsForClassTypes.assertThatThrownBy(() -> productService.create(product))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("상품의 이름에는 비속어가 포함되면 안된다.")
+    void productNameNotProfanity() {
+        Product product = createProduct("욕설", 18000);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(IllegalArgumentException.class);
+
     }
 
     @Test
     @DisplayName("상품이 정상적으로 등록된다.")
-    public void productNamePurgomalumTest() {
+    void create() {
+        final Product request = createProduct("후라이드", 18000);
 
-        Product request = ProductFixture.상품();
+        final Product actual = productService.create(request);
 
-        lenient().when(purgomalumClient.containsProfanity(request.getName())).thenReturn(false);
-        given(productRepository.save(any())).willReturn(request);
-
-        Product product = productService.create(request);
-
-        assertThat(product.getId()).isEqualTo(request.getId());
-        assertThat(product.getName()).isEqualTo(request.getName());
-        assertThat(product.getPrice()).isEqualTo(request.getPrice());
+        Assertions.assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo(request.getName()),
+                () -> assertThat(actual.getPrice()).isEqualTo(request.getPrice())
+        );
     }
 
     @Test
-    @DisplayName("변경하고자 하는 상품이 있어야 한다.")
+    @DisplayName("가격을 변경하고자 하는 Product가 없다면 NoSuchElementException 발생")
     public void existProductTest() {
         UUID uuid = UUID.randomUUID();
-        Product requestProduct = ProductFixture.변경_상품(uuid);
+        productRepository.save(createProduct(uuid, "후라이드", BigDecimal.valueOf(18_000L)));
+        Product changeProduct = createProduct(uuid, "후라이드", BigDecimal.valueOf(19_000L));
 
-        given(productRepository.findById(uuid)).willReturn(Optional.of(requestProduct));
+        Product actual = productService.changePrice(changeProduct.getId(), changeProduct);
 
-        Optional<Product> product = productRepository.findById(uuid);
-        assertThat(product.isPresent()).isEqualTo(true);
+        Assertions.assertAll(
+                () -> assertThat(actual.getId()).isEqualTo(changeProduct.getId()),
+                () -> assertThat(actual.getPrice()).isEqualTo(changeProduct.getPrice())
+        );
     }
 
-    @Test
-    @DisplayName("상품의 가격이 정상적으로 변경되었다")
-    public void changePriceTest() {
-        UUID uuid = UUID.randomUUID();
-        Product requestProduct = ProductFixture.변경_값();
-        Menu menu = MenuFixture.메뉴();
+    @ValueSource(strings = {"-1", "-100"})
+    @ParameterizedTest
+    @DisplayName("상품 변경시 가격은 0보다 크거나 같아야한다.")
+    void changePriceLessThanZeroTest(final BigDecimal price) {
+        Product product = createProduct("후라이드", price);
 
-        given(productRepository.findById(uuid)).willReturn(Optional.of(ProductFixture.변경_상품(uuid)));
-        given(menuRepository.findAllByProductId(uuid)).willReturn(Collections.singletonList(menu));
-
-        Product product = productService.changePrice(uuid, requestProduct);
-
-        assertThat(product.getPrice()).isEqualTo(requestProduct.getPrice());
+        AssertionsForClassTypes.assertThatThrownBy(() -> productService.changePrice(product.getId(), product))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Test
-    @DisplayName("메뉴 상품의 가격의 합이 메뉴의 가격보다 클 경우 메뉴의 판매를 중단(false)한다")
-    public void validateUpdateProductTest() {
-        UUID uuid = UUID.randomUUID();
-        Product requestProduct = ProductFixture.변경_값();
-        Menu menu = MenuFixture.메뉴();
-
-        given(productRepository.findById(uuid)).willReturn(Optional.of(ProductFixture.변경_상품(uuid)));
-        given(menuRepository.findAllByProductId(uuid)).willReturn(Collections.singletonList(menu));
-
-        productService.changePrice(uuid, requestProduct);
-        assertThat(menu.isDisplayed()).isTrue();
-    }
 
     @Test
     @DisplayName("상품의 전체 목록 조회")
-    public void searchProductAllTest() {
-        List<Product> requestProducts = ProductFixture.상품_목록();
-        given(productRepository.findAll()).willReturn(requestProducts);
-        List<Product> products = productRepository.findAll();
+    void searchProductAllTest() {
 
-        assertThat(requestProducts.size()).isEqualTo(products.size());
+        productRepository.save(createProduct("후라이드", 18000));
+        productRepository.save(createProduct("양념치킨", 20000));
+        productRepository.save(createProduct("간장치킨", 19000));
+        List<Product> actual = productRepository.findAll();
+        assertThat(actual).hasSize(3);
+    }
+
+    private Product createProduct(final String name, final int price) {
+        return createProduct(UUID.randomUUID(), name, BigDecimal.valueOf(price));
+    }
+
+    private Product createProduct(final String name, final BigDecimal price) {
+        return createProduct(UUID.randomUUID(), name, price);
+    }
+
+    private Product createProduct(final UUID id, final String name, final BigDecimal price) {
+        final Product product = new Product();
+        product.setId(id);
+        product.setName(name);
+        product.setPrice(price);
+        return product;
     }
 }
