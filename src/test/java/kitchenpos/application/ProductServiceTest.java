@@ -43,7 +43,7 @@ class ProductServiceTest {
     @ParameterizedTest
     @DisplayName("상품의 가격은 음수가 될 수 없다.")
     void productPriceLessThanZeroTest(final BigDecimal price) {
-        Product product = createProduct("후라이드", price);
+        Product product = createProductRequest(price);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -70,7 +70,7 @@ class ProductServiceTest {
     @Test
     @DisplayName("상품이 정상적으로 등록된다.")
     void create() {
-        final Product request = createProduct("후라이드", 18000);
+        final Product request = createProductRequest(18000);
 
         final Product actual = productService.create(request);
 
@@ -118,12 +118,27 @@ class ProductServiceTest {
         assertThat(actual).hasSize(3);
     }
 
-    private Product createProduct(final String name, final int price) {
-        return createProduct(UUID.randomUUID(), name, BigDecimal.valueOf(price));
+    private Product createProductRequest(final int price) {
+        return createProductRequest("후라이드", BigDecimal.valueOf(price));
+    }
+
+    private Product createProductRequest(final BigDecimal price) {
+        return createProductRequest("후라이드", price);
+    }
+
+    private Product createProductRequest(final String name, final BigDecimal price) {
+        final Product product = new Product();
+        product.setName(name);
+        product.setPrice(price);
+        return product;
     }
 
     private Product createProduct(final String name, final BigDecimal price) {
         return createProduct(UUID.randomUUID(), name, price);
+    }
+
+    private Product createProduct(final String name, final int price) {
+        return createProduct(UUID.randomUUID(), name, BigDecimal.valueOf(price));
     }
 
     private Product createProduct(final UUID id, final String name, final BigDecimal price) {
