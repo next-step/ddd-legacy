@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface MenuGroupRepository {
+public interface  MenuGroupRepository {
     MenuGroup save(MenuGroup menuGroup);
 
     List<MenuGroup> findAll();
