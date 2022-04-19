@@ -14,7 +14,7 @@ public class InMemoryProductRepository implements ProductRepository {
     public List<Product> findAllByIdIn(final List<UUID> ids) {
         return products.values()
                 .stream()
-                .filter(it -> ids.contains(it))
+                .filter(it -> ids.contains(it.getId()))
                 .collect(Collectors.toList());
     }
 

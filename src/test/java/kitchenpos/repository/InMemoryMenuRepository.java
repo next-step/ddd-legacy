@@ -31,7 +31,8 @@ public class InMemoryMenuRepository implements MenuRepository {
 
     @Override
     public Menu save(Menu menu) {
-        return menus.put(menu.getId(), menu);
+        menus.put(menu.getId(), menu);
+        return menu;
     }
 
     @Override
