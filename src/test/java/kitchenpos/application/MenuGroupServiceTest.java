@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.exception.NameNotEmptyException;
 import kitchenpos.repository.InMemoryMenuGroupRepository;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.Assertions;
@@ -9,18 +10,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 /**
  * <pre>
@@ -49,7 +44,7 @@ public class MenuGroupServiceTest {
     public void requiredMenuGroupName() {
         MenuGroup menuGroup = new MenuGroup();
         AssertionsForClassTypes.assertThatThrownBy(() -> menuGroupService.create(menuGroup))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(NameNotEmptyException.class);
     }
 
     @Test

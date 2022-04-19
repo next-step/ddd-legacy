@@ -2,6 +2,8 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.exception.NameNotEmptyException;
+import kitchenpos.exception.PriceLessThanZeroException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +23,7 @@ public class MenuGroupService {
     public MenuGroup create(final MenuGroup request) {
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new NameNotEmptyException();
         }
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());

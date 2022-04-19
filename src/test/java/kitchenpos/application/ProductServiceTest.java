@@ -3,6 +3,8 @@ package kitchenpos.application;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.exception.EmptyOrProfanityNameException;
+import kitchenpos.exception.PriceLessThanZeroException;
 import kitchenpos.infra.FakeProfanityClient;
 import kitchenpos.infra.ProfanityClient;
 import kitchenpos.repository.InMemoryMenuRepository;
@@ -46,15 +48,7 @@ class ProductServiceTest {
         Product product = createProductRequest(price);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> productService.create(product))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    @DisplayName("상품 가격과 상품의 이름은 필수로 있어야 한다.")
-    void productNameNotNull() {
-        Product product = createProduct(null, null);
-        AssertionsForClassTypes.assertThatThrownBy(() -> productService.create(product))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(PriceLessThanZeroException.class);
     }
 
     @Test
@@ -63,7 +57,7 @@ class ProductServiceTest {
         Product product = createProduct("욕설", 18000);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> productService.create(product))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(EmptyOrProfanityNameException.class);
 
     }
 
@@ -103,7 +97,7 @@ class ProductServiceTest {
         Product product = createProduct("후라이드", price);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> productService.changePrice(product.getId(), product))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(PriceLessThanZeroException.class);
     }
 
 

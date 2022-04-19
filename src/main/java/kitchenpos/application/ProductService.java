@@ -1,6 +1,8 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.exception.EmptyOrProfanityNameException;
+import kitchenpos.exception.PriceLessThanZeroException;
 import kitchenpos.infra.ProfanityClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.springframework.stereotype.Service;
@@ -32,11 +34,11 @@ public class ProductService {
     public Product create(final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new PriceLessThanZeroException();
         }
         final String name = request.getName();
         if (Objects.isNull(name) || profanityClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+            throw new EmptyOrProfanityNameException();
         }
         final Product product = new Product();
         product.setId(UUID.randomUUID());
@@ -49,7 +51,7 @@ public class ProductService {
     public Product changePrice(final UUID productId, final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new PriceLessThanZeroException();
         }
         final Product product = productRepository.findById(productId)
             .orElseThrow(NoSuchElementException::new);
