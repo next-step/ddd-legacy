@@ -13,13 +13,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 
 @DisplayName("[주문]")
@@ -286,6 +284,34 @@ class OrderServiceTest {
 
         AssertionsForClassTypes.assertThatThrownBy(() -> orderService.accept(order.getId()))
                 .isInstanceOf(IllegalStateException.class);
+    }
 
+    @Test
+    @DisplayName("주문 타입이 배달인 경우 라이더에게 주문을 요청한다.")
+    void orderAcceptStatusDeliveryVerifyKitchenridersClientTest() {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setOrderLineItems(Collections.emptyList());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.WAITING);
+        orderRepository.save(order);
+
+        orderService.accept(order.getId());
+//        Mockito.verify(kitchenridersClient, Mockito.atLeastOnce()).requestDelivery(order.getId(), BigDecimal.valueOf(18_000L), "ABC");
+    }
+
+    @Test
+    @DisplayName("주문을 수락한다")
+    void acceptOrderTest() {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setOrderLineItems(Collections.emptyList());
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.WAITING);
+        orderRepository.save(order);
+
+        Order actual = orderService.accept(order.getId());
+
+        Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 }
