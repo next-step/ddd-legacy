@@ -6,7 +6,9 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Component
-public class KitchenridersClient {
+public class KitchenridersClient implements Kitchenriders{
+
+    @Override
     public void requestDelivery(final UUID orderId, final BigDecimal amount, final String deliveryAddress) {
     }
 }

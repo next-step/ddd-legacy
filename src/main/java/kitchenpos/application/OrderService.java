@@ -1,6 +1,8 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.exception.*;
+import kitchenpos.infra.Kitchenriders;
 import kitchenpos.infra.KitchenridersClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,13 +17,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final OrderTableRepository orderTableRepository;
-    private final KitchenridersClient kitchenridersClient;
+    private final Kitchenriders kitchenridersClient;
 
     public OrderService(
         final OrderRepository orderRepository,
         final MenuRepository menuRepository,
         final OrderTableRepository orderTableRepository,
-        final KitchenridersClient kitchenridersClient
+        final Kitchenriders kitchenridersClient
     ) {
         this.orderRepository = orderRepository;
         this.menuRepository = menuRepository;
@@ -33,11 +35,11 @@ public class OrderService {
     public Order create(final Order request) {
         final OrderType type = request.getType();
         if (Objects.isNull(type)) {
-            throw new IllegalArgumentException();
+            throw new OrderTypeNullException();
         }
         final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new OrderLineItemEmptyException();
         }
         final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
@@ -45,23 +47,23 @@ public class OrderService {
                 .collect(Collectors.toList())
         );
         if (menus.size() != orderLineItemRequests.size()) {
-            throw new IllegalArgumentException();
+            throw new NotTheSameSizeException();
         }
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
             if (type != OrderType.EAT_IN) {
                 if (quantity < 0) {
-                    throw new IllegalArgumentException();
+                    throw new QuantityLessThenZeroException();
                 }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
-                throw new IllegalStateException();
+                throw new DisplayFalseException();
             }
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
-                throw new IllegalArgumentException();
+                throw new NotTheSamePriceException();
             }
             final OrderLineItem orderLineItem = new OrderLineItem();
             orderLineItem.setMenu(menu);
@@ -77,13 +79,13 @@ public class OrderService {
         if (type == OrderType.DELIVERY) {
             final String deliveryAddress = request.getDeliveryAddress();
             if (Objects.isNull(deliveryAddress) || deliveryAddress.isEmpty()) {
-                throw new IllegalArgumentException();
+                throw new DeliveryAddressEmptyException();
             }
             order.setDeliveryAddress(deliveryAddress);
         }
         if (type == OrderType.EAT_IN) {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(OrderTableNotFoundException::new);
             if (orderTable.isEmpty()) {
                 throw new IllegalStateException();
             }

@@ -14,7 +14,7 @@ public class InMemoryMenuRepository implements MenuRepository {
     public List<Menu> findAllByIdIn(List<UUID> ids) {
         return menus.values()
                 .stream()
-                .filter(ids::contains)
+                .filter(it -> ids.contains(it.getId()))
                 .collect(Collectors.toList());
     }
 

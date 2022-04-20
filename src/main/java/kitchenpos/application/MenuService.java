@@ -3,10 +3,9 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.exception.EmptyOrProfanityNameException;
 import kitchenpos.exception.PriceLessThanZeroException;
-import kitchenpos.exception.ProductNotSameMenuProductRequestException;
+import kitchenpos.exception.NotTheSameSizeException;
 import kitchenpos.exception.QuantityLessThenZeroException;
 import kitchenpos.infra.ProfanityClient;
-import kitchenpos.infra.PurgomalumClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +50,7 @@ public class MenuService {
                 .collect(Collectors.toList())
         );
         if (products.size() != menuProductRequests.size()) {
-            throw new ProductNotSameMenuProductRequestException();
+            throw new NotTheSameSizeException();
         }
         final List<MenuProduct> menuProducts = new ArrayList<>();
         BigDecimal sum = BigDecimal.ZERO;

@@ -3,11 +3,10 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.exception.EmptyOrProfanityNameException;
 import kitchenpos.exception.PriceLessThanZeroException;
-import kitchenpos.exception.ProductNotSameMenuProductRequestException;
+import kitchenpos.exception.NotTheSameSizeException;
 import kitchenpos.exception.QuantityLessThenZeroException;
 import kitchenpos.infra.FakeProfanityClient;
 import kitchenpos.infra.ProfanityClient;
-import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.repository.InMemoryMenuGroupRepository;
 import kitchenpos.repository.InMemoryMenuRepository;
 import kitchenpos.repository.InMemoryProductRepository;
@@ -19,18 +18,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 import java.math.BigDecimal;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.any;
-import static org.mockito.BDDMockito.given;
 
 @DisplayName("[메뉴]")
 @ExtendWith(MockitoExtension.class)
@@ -110,7 +104,7 @@ class MenuServiceTest {
         productRepository.save(후라이드);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> menuService.create(menu))
-                .isInstanceOf(ProductNotSameMenuProductRequestException.class);
+                .isInstanceOf(NotTheSameSizeException.class);
     }
 
     @Test

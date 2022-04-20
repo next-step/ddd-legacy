@@ -10,9 +10,5 @@ package kitchenpos.exception;
  * @since 2022-04-20 오전 3:11
  */
 
-public class ProductNotSameMenuProductRequestException extends RuntimeException{
-
-    public ProductNotSameMenuProductRequestException() {
-        super();
-    }
+public class NotTheSameSizeException extends RuntimeException{
 }
