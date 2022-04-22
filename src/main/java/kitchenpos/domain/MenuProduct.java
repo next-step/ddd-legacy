@@ -28,6 +28,13 @@ public class MenuProduct {
     public MenuProduct() {
     }
 
+    public MenuProduct(Long seq, Product product, long quantity, UUID productId) {
+        this.seq = seq;
+        this.product = product;
+        this.quantity = quantity;
+        this.productId = productId;
+    }
+
     public Long getSeq() {
         return seq;
     }

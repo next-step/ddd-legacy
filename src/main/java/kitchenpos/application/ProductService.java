@@ -1,6 +1,9 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.exception.EmptyOrProfanityNameException;
+import kitchenpos.exception.PriceLessThanZeroException;
+import kitchenpos.infra.ProfanityClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,27 +18,27 @@ import java.util.UUID;
 public class ProductService {
     private final ProductRepository productRepository;
     private final MenuRepository menuRepository;
-    private final PurgomalumClient purgomalumClient;
+    private final ProfanityClient profanityClient;
 
     public ProductService(
         final ProductRepository productRepository,
         final MenuRepository menuRepository,
-        final PurgomalumClient purgomalumClient
+        final ProfanityClient profanityClient
     ) {
         this.productRepository = productRepository;
         this.menuRepository = menuRepository;
-        this.purgomalumClient = purgomalumClient;
+        this.profanityClient = profanityClient;
     }
 
     @Transactional
     public Product create(final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new PriceLessThanZeroException();
         }
         final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+        if (Objects.isNull(name) || profanityClient.containsProfanity(name)) {
+            throw new EmptyOrProfanityNameException();
         }
         final Product product = new Product();
         product.setId(UUID.randomUUID());
@@ -48,7 +51,7 @@ public class ProductService {
     public Product changePrice(final UUID productId, final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new PriceLessThanZeroException();
         }
         final Product product = productRepository.findById(productId)
             .orElseThrow(NoSuchElementException::new);
