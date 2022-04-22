@@ -3,7 +3,6 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.exception.GuestLessThanZeroException;
 import kitchenpos.exception.OrderTabmeIsEmptyException;
-import kitchenpos.exception.PriceLessThanZeroException;
 import kitchenpos.repository.InMemoryOrderRepository;
 import kitchenpos.repository.InMemoryOrderTableRepository;
 import org.assertj.core.api.Assertions;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("[주문 테이블]")
 @ExtendWith(MockitoExtension.class)
@@ -37,21 +36,21 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("주문 테이블을 생성한다")
     void createOrderTableTest() {
-
-        OrderTable orderTableRequest = new OrderTable();
-        orderTableRequest.setName("1번 테이블");
+        final OrderTable orderTableRequest = createOrderTable("1번 테이블");
 
         OrderTable actual = orderTableService.create(orderTableRequest);
-        org.junit.jupiter.api.Assertions.assertAll(
+
+        assertAll(
                 () -> Assertions.assertThat(actual.getId()).isNotNull(),
                 () -> Assertions.assertThat(actual.getName()).isEqualTo(orderTableRequest.getName())
         );
     }
+
+
     @Test
     @DisplayName("주문 테이블의 이름은 필수로 있어야 한다.")
     void createOrderTableNameTest() {
-
-        OrderTable orderTableRequest = new OrderTable();
+        final OrderTable orderTableRequest = createOrderTable();
 
         AssertionsForClassTypes.assertThatThrownBy(() -> orderTableService.create(orderTableRequest))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -64,14 +63,11 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("주문 테이블을 착석 상태(false)로 변경")
     void orderTableSitTest() {
+        final OrderTable orderTable = createOrderTable(true);
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setEmpty(true);
         orderTableRepository.save(orderTable);
 
-        OrderTable actual = orderTableService.sit(orderTable.getId());
-
+        final OrderTable actual = orderTableService.sit(orderTable.getId());
         Assertions.assertThat(actual.isEmpty()).isFalse();
     }
 
@@ -79,8 +75,7 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블을 착성 상태로 변경시 주문 테이블의 정보가 있어야 한다")
     void orderTableSitNotFoundTest() {
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
+        final OrderTable orderTable = createOrderTable();
 
         AssertionsForClassTypes.assertThatThrownBy(() -> orderTableService.sit(orderTable.getId()))
                 .isInstanceOf(NoSuchElementException.class);
@@ -89,57 +84,43 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("주문 테이블을 공석 상태(true)로 변경")
     void orderTableClearTest() {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setNumberOfGuests(4);
-        orderTable.setEmpty(false);
-        orderTableRepository.save(orderTable);
+        final OrderTable orderTable = createOrderTable(false, 4);
+        final Order order = createOrder(OrderStatus.COMPLETED, orderTable);
 
-        Order order = new Order();
-        order.setOrderTable(orderTable);
-        order.setStatus(OrderStatus.COMPLETED);
+        orderTableRepository.save(orderTable);
         orderRepository.save(order);
 
         OrderTable actual = orderTableService.clear(orderTable.getId());
 
-        org.junit.jupiter.api.Assertions.assertAll(
+        assertAll(
                 () -> Assertions.assertThat(actual.isEmpty()).isTrue(),
                 () -> Assertions.assertThat(actual.getNumberOfGuests()).isZero()
         );
     }
 
     /*
-    * 주문 테이블의 인원 변경
-    * */
+     * 주문 테이블의 인원 변경
+     * */
 
     @Test
     @DisplayName("주문 테이블의 변경 인원이 0보다 작으면 안된다.")
     void orderTableChangeNumberOfGuestsTest() {
+        final OrderTable orderTableRequest = createOrderTable(-1);
+        final OrderTable orderTable = createOrderTable(false, 4);
 
-        OrderTable orderTableRequest = new OrderTable();
-        orderTableRequest.setNumberOfGuests(-1);
-
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setNumberOfGuests(4);
-        orderTable.setEmpty(false);
         orderTableRepository.save(orderTable);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTableRequest))
                 .isInstanceOf(GuestLessThanZeroException.class);
     }
 
+
     @Test
     @DisplayName("주문 테이블이 공석이라면 인원수 변경이 가능하다")
-    void orderTableChangeNumberOfGuests() {
+    void orderTablePossibleChangeNumberOgGuestTest() {
+        final OrderTable orderTableRequest = createOrderTable(7);
+        final OrderTable orderTable = createOrderTable(true, 4);
 
-        OrderTable orderTableRequest = new OrderTable();
-        orderTableRequest.setNumberOfGuests(7);
-
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setNumberOfGuests(4);
-        orderTable.setEmpty(true);
         orderTableRepository.save(orderTable);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTableRequest))
@@ -149,21 +130,60 @@ class OrderTableServiceTest {
     /*
      * 주문 테이블의 인원 변경
      * */
+
+    @Test
+    @DisplayName("주문 테이블을 전체 조회할 수 있다.")
     void orderTableFindAllTest() {
-        OrderTable orderTable1 = new OrderTable();
-        orderTable1.setId(UUID.randomUUID());
-        orderTableRepository.save(orderTable1);
-
-        OrderTable orderTable2 = new OrderTable();
-        orderTable2.setId(UUID.randomUUID());
-        orderTableRepository.save(orderTable2);
-
-        OrderTable orderTable3 = new OrderTable();
-        orderTable3.setId(UUID.randomUUID());
-        orderTableRepository.save(orderTable3);
+        orderTableRepository.save(createOrderTable());
+        orderTableRepository.save(createOrderTable());
+        orderTableRepository.save(createOrderTable());
 
         List<OrderTable> orderTables = orderTableService.findAll();
 
         Assertions.assertThat(orderTables).hasSize(3);
+    }
+
+    private Order createOrder(final OrderStatus orderStatus, final OrderTable orderTable) {
+        final Order order = new Order();
+        order.setStatus(orderStatus);
+        order.setOrderTable(orderTable);
+
+        return order;
+    }
+
+
+    private OrderTable createOrderTable() {
+        final OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        return orderTable;
+    }
+
+    private OrderTable createOrderTable(final String name) {
+        final OrderTable orderTable = createOrderTable();
+        orderTable.setName(name);
+
+        return orderTable;
+    }
+
+    private OrderTable createOrderTable(final boolean isEmpty) {
+        final OrderTable orderTable = createOrderTable();
+        orderTable.setEmpty(isEmpty);
+
+        return orderTable;
+    }
+
+
+    private OrderTable createOrderTable(final int numberOfGuests) {
+        final OrderTable orderTable = createOrderTable();
+        orderTable.setNumberOfGuests(numberOfGuests);
+
+        return orderTable;
+    }
+
+    private OrderTable createOrderTable(final boolean isEmpty, final int numberOfGuests) {
+        final OrderTable orderTable = createOrderTable(isEmpty);
+        orderTable.setNumberOfGuests(numberOfGuests);
+
+        return orderTable;
     }
 }

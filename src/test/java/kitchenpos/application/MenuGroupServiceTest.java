@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
 public class MenuGroupServiceTest {
 
-    private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+    private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
     private MenuGroupService menuGroupService;
 
     @BeforeEach
@@ -41,16 +41,16 @@ public class MenuGroupServiceTest {
 
     @Test
     @DisplayName("메뉴 그룹 이름값을 필수로 갖는다")
-    public void requiredMenuGroupName() {
-        MenuGroup menuGroup = new MenuGroup();
+    void requiredMenuGroupNameTest() {
+        final MenuGroup menuGroup = new MenuGroup();
         AssertionsForClassTypes.assertThatThrownBy(() -> menuGroupService.create(menuGroup))
                 .isInstanceOf(NameNotEmptyException.class);
     }
 
     @Test
     @DisplayName("메뉴 그룹을 등록한다")
-    public void createMenuGroup() {
-        MenuGroup menuGroup = createMenuGroupRequest("세트 메뉴");
+    void createMenuGroupTest() {
+        final MenuGroup menuGroup = createMenuGroupRequest("세트 메뉴");
 
         final MenuGroup actual = menuGroupService.create(menuGroup);
 
@@ -62,7 +62,7 @@ public class MenuGroupServiceTest {
 
     @Test
     @DisplayName("메뉴 그룹을 전체 조회할 수 있다.")
-    public void searchMenuGroupAll() {
+    void searchMenuGroupAllTest() {
 
         menuGroupRepository.save(createMenuGroup("한마리 메뉴"));
         menuGroupRepository.save(createMenuGroup("신메뉴"));
@@ -73,14 +73,14 @@ public class MenuGroupServiceTest {
         assertThat(actual).hasSize(3);
     }
 
-    private MenuGroup createMenuGroupRequest(String name) {
-        MenuGroup menuGroup = new MenuGroup();
+    private MenuGroup createMenuGroupRequest(final String name) {
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName(name);
         return menuGroup;
     }
 
-    private MenuGroup createMenuGroup(String name) {
-        MenuGroup menuGroup = new MenuGroup();
+    private MenuGroup createMenuGroup(final String name) {
+        final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
         menuGroup.setName(name);
 

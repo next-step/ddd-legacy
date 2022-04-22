@@ -45,7 +45,7 @@ class ProductServiceTest {
     @ParameterizedTest
     @DisplayName("상품의 가격은 음수가 될 수 없다.")
     void productPriceLessThanZeroTest(final BigDecimal price) {
-        Product product = createProductRequest(price);
+        final Product product = createProductRequest(price);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(PriceLessThanZeroException.class);
@@ -54,7 +54,7 @@ class ProductServiceTest {
     @Test
     @DisplayName("상품의 이름에는 비속어가 포함되면 안된다.")
     void productNameNotProfanity() {
-        Product product = createProduct("욕설", 18000);
+        final Product product = createProduct("욕설", 18000);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> productService.create(product))
                 .isInstanceOf(EmptyOrProfanityNameException.class);
@@ -65,7 +65,6 @@ class ProductServiceTest {
     @DisplayName("상품이 정상적으로 등록된다.")
     void create() {
         final Product request = createProductRequest(18000);
-
         final Product actual = productService.create(request);
 
         Assertions.assertAll(
@@ -77,12 +76,13 @@ class ProductServiceTest {
 
     @Test
     @DisplayName("가격을 변경하고자 하는 Product가 없다면 NoSuchElementException 발생")
-    public void existProductTest() {
-        UUID uuid = UUID.randomUUID();
-        productRepository.save(createProduct(uuid, "후라이드", BigDecimal.valueOf(18_000L)));
-        Product changeProduct = createProduct(uuid, "후라이드", BigDecimal.valueOf(19_000L));
+    void existProductTest() {
+        final UUID uuid = UUID.randomUUID();
+        final Product changeProduct = createProduct(uuid, "후라이드", BigDecimal.valueOf(19_000L));
 
-        Product actual = productService.changePrice(changeProduct.getId(), changeProduct);
+        productRepository.save(createProduct(uuid, "후라이드", BigDecimal.valueOf(18_000L)));
+
+        final Product actual = productService.changePrice(changeProduct.getId(), changeProduct);
 
         Assertions.assertAll(
                 () -> assertThat(actual.getId()).isEqualTo(changeProduct.getId()),
@@ -94,7 +94,7 @@ class ProductServiceTest {
     @ParameterizedTest
     @DisplayName("상품 변경시 가격은 0보다 크거나 같아야한다.")
     void changePriceLessThanZeroTest(final BigDecimal price) {
-        Product product = createProduct("후라이드", price);
+        final Product product = createProduct("후라이드", price);
 
         AssertionsForClassTypes.assertThatThrownBy(() -> productService.changePrice(product.getId(), product))
                 .isInstanceOf(PriceLessThanZeroException.class);
@@ -104,11 +104,12 @@ class ProductServiceTest {
     @Test
     @DisplayName("상품의 전체 목록 조회")
     void searchProductAllTest() {
-
         productRepository.save(createProduct("후라이드", 18000));
         productRepository.save(createProduct("양념치킨", 20000));
         productRepository.save(createProduct("간장치킨", 19000));
+
         List<Product> actual = productRepository.findAll();
+
         assertThat(actual).hasSize(3);
     }
 
