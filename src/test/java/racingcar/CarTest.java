@@ -3,6 +3,7 @@ package racingcar;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
@@ -22,5 +23,23 @@ class CarTest {
     @Test
     void constructor() {
         assertThatCode(() -> new Car("12345")).doesNotThrowAnyException();
+    }
+
+    @DisplayName("4 이상인 경우 움직인다.")
+    @Test
+    void movable() {
+        final Car car = new Car("무빙", 0);
+        car.move(4);
+
+        assertThat(car.getPosition()).isEqualTo(1);
+    }
+
+    @DisplayName("4 미만인 경우 멈춘다.")
+    @Test
+    void stop() {
+        final Car car = new Car("스톱", 0);
+        car.move(3);
+
+        assertThat(car.getPosition()).isEqualTo(0);
     }
 }
