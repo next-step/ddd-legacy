@@ -1,5 +1,6 @@
 package racingCar;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -40,5 +41,29 @@ public class CarTest {
     void constructorWithWrongName(String name) {
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> new Car(name));
+    }
+
+    @DisplayName("이동조건을 만족한 경우 이동한다.")
+    @Test
+    void moveForward() {
+        //given
+        int position = 1;
+        Car car = new Car("name", position);
+        //when
+        car.move(() -> true);
+        //then
+        assertThat(car.getPosition()).isEqualTo(position + 1);
+    }
+
+    @DisplayName("이동조건을 만족하지 못한 경우 그대로 있는다.")
+    @Test
+    void moveHold() {
+        //given
+        int position = 1;
+        Car car = new Car("name", position);
+        //when
+        car.move(() -> false);
+        //then
+        assertThat(car.getPosition()).isEqualTo(position);
     }
 }

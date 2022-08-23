@@ -1,12 +1,8 @@
 package racingCar;
 
-import java.util.Random;
-
 public class Car {
 
     private static final int DEFAULT_POSITION = 0;
-    private static final int MINIMUM_MOVE_CONDITION = 4;
-    private static final Random random = new Random(10);
 
     private String name;
     private int position;
@@ -21,8 +17,8 @@ public class Car {
         this.position = position;
     }
 
-    public void move() {
-        if (random.nextInt() >= MINIMUM_MOVE_CONDITION) {
+    public void move(MovingStrategy movingStrategy) {
+        if (movingStrategy.movable()) {
             this.position++;
         }
     }
