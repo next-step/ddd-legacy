@@ -9,7 +9,7 @@ import java.util.UUID;
 @Table(name = "order_table")
 @Entity
 public class OrderTable {
-    @Column(name = "id", columnDefinition = "varbinary(16)")
+    @Column(name = "id", columnDefinition = "binary(16)")
     @Id
     private UUID id;
 
@@ -19,8 +19,8 @@ public class OrderTable {
     @Column(name = "number_of_guests", nullable = false)
     private int numberOfGuests;
 
-    @Column(name = "empty", nullable = false)
-    private boolean empty;
+    @Column(name = "occupied", nullable = false)
+    private boolean occupied;
 
     public OrderTable() {
     }
@@ -49,11 +49,11 @@ public class OrderTable {
         this.numberOfGuests = numberOfGuests;
     }
 
-    public boolean isEmpty() {
-        return empty;
+    public boolean isOccupied() {
+        return occupied;
     }
 
-    public void setEmpty(final boolean empty) {
-        this.empty = empty;
+    public void setOccupied(final boolean occupied) {
+        this.occupied = occupied;
     }
 }

@@ -15,7 +15,7 @@ public class OrderLineItem {
     @ManyToOne(optional = false)
     @JoinColumn(
         name = "menu_id",
-        columnDefinition = "varbinary(16)",
+        columnDefinition = "binary(16)",
         foreignKey = @ForeignKey(name = "fk_order_line_item_to_menu")
     )
     private Menu menu;

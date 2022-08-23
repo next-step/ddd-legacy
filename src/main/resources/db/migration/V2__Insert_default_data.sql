@@ -46,22 +46,22 @@ values (1, x'0ac16db71b024a87b9c1e7d8f226c48d', x'b9c670b04ef5409083496868df1c7d
 insert into menu_product (quantity, product_id, menu_id)
 values (1, x'7de4b8affa0f4391aaa9c61ea9b40f83', x'a64af6cac34d4cd882fe454abf512d1f');
 
-insert into order_table (id, empty, name, number_of_guests)
-values (x'8d71004329b6420e8452233f5a035520', true, '1번', 0);
-insert into order_table (id, empty, name, number_of_guests)
-values (x'6ab59e8106eb441684e99faabc87c9ca', true, '2번', 0);
-insert into order_table (id, empty, name, number_of_guests)
-values (x'ae92335ccd264626b7979e4ae8c4efbd', true, '3번', 0);
-insert into order_table (id, empty, name, number_of_guests)
-values (x'a9858d4b80d0428881f48f41596a23fb', true, '4번', 0);
-insert into order_table (id, empty, name, number_of_guests)
-values (x'3faec3ab5217405daaa2804f87697f84', true, '5번', 0);
-insert into order_table (id, empty, name, number_of_guests)
-values (x'815b8395a2ad4e3589dc74c3b2191478', true, '6번', 0);
-insert into order_table (id, empty, name, number_of_guests)
-values (x'7ce8b3a235454542ab9cb3d493bbd4fb', true, '7번', 0);
-insert into order_table (id, empty, name, number_of_guests)
-values (x'7bdb1ffde36e4e2b94e3d2c14d391ef3', true, '8번', 0);
+insert into order_table (id, occupied, name, number_of_guests)
+values (x'8d71004329b6420e8452233f5a035520', false, '1번', 0);
+insert into order_table (id, occupied, name, number_of_guests)
+values (x'6ab59e8106eb441684e99faabc87c9ca', false, '2번', 0);
+insert into order_table (id, occupied, name, number_of_guests)
+values (x'ae92335ccd264626b7979e4ae8c4efbd', false, '3번', 0);
+insert into order_table (id, occupied, name, number_of_guests)
+values (x'a9858d4b80d0428881f48f41596a23fb', false, '4번', 0);
+insert into order_table (id, occupied, name, number_of_guests)
+values (x'3faec3ab5217405daaa2804f87697f84', false, '5번', 0);
+insert into order_table (id, occupied, name, number_of_guests)
+values (x'815b8395a2ad4e3589dc74c3b2191478', false, '6번', 0);
+insert into order_table (id, occupied, name, number_of_guests)
+values (x'7ce8b3a235454542ab9cb3d493bbd4fb', false, '7번', 0);
+insert into order_table (id, occupied, name, number_of_guests)
+values (x'7bdb1ffde36e4e2b94e3d2c14d391ef3', false, '8번', 0);
 
 insert into orders (id, delivery_address, order_date_time, status, type, order_table_id)
 values (x'69d78f383bff457cbb7226319c985fd8', '서울시 송파구 위례성대로 2', '2021-07-27', 'WAITING', 'DELIVERY', null);

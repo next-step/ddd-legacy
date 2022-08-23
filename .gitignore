@@ -5,6 +5,9 @@ build/
 !**/src/main/**
 !**/src/test/**
 
+### macOS ###
+.DS_Store
+
 ### STS ###
 .apt_generated
 .classpath
@@ -30,3 +33,8 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Docker ###
+docker/db/mysql/data/
+docker/db/mysql/init/*
+!docker/db/mysql/init/init.sql
