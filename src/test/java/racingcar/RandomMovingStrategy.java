@@ -6,11 +6,14 @@ public class RandomMovingStrategy implements MovingStrategy {
     private static final int MOVING_CONDITION = 4;
     private static final int RANDOM_RANGE = 10;
 
-    private final Random random = new Random();
+    private final RandomGenerator randomGenerator;
 
+    public RandomMovingStrategy(final RandomGenerator randomGenerator) {
+        this.randomGenerator = randomGenerator;
+    }
     @Override
     public boolean canMove() {
-        if (random.nextInt(RANDOM_RANGE) >= MOVING_CONDITION) {
+        if (randomGenerator.generate(RANDOM_RANGE) >= MOVING_CONDITION) {
             return true;
         }
         return false;
