@@ -3,11 +3,13 @@ package racingcar;
 import java.util.Objects;
 
 public class Car {
+
     private static final int MAX_NAME_SIZE = 5;
 
     private final String name;
     private int position = 0;
     private MovingStrategy movingStrategy;
+
     public Car(final String name,
                final MovingStrategy movingStrategy) {
         validateName(name);

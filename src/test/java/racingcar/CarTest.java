@@ -9,10 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+
 /**
- * 자동차 이름은 5 글자를 넘을 수 없다.
- * 5 글자가 넘는 경우, IllegalArgumentException이 발생한다.
- * 자동차가 움직이는 조건은 MovingStrategy에 따라 결정된다.
+ * 자동차 이름은 5 글자를 넘을 수 없다. 5 글자가 넘는 경우, IllegalArgumentException이 발생한다. 자동차가 움직이는 조건은 MovingStrategy에 따라 결정된다.
  */
 class CarTest {
 
@@ -21,7 +20,7 @@ class CarTest {
     @ValueSource(strings = {"a", "ab", "abc", "abcd", "abcde"})
     void constructor(final String name) {
         assertThatCode(() -> new Car(name, new RandomMovingStrategy(new RandomNumber())))
-                  .doesNotThrowAnyException();
+            .doesNotThrowAnyException();
     }
 
     @DisplayName("자동차 이름은 5 글자를 넘을 수 없다")
