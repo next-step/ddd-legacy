@@ -12,18 +12,24 @@ public class Car {
 	}
 
 	public Car(String name, final int position) {
-		if (name == null) {
-			throw new IllegalArgumentException("자동차 이름은 비어있을 수 없습니다.");
-		}
-		if (name.isBlank()) {
-			throw new IllegalArgumentException("자동차 이름은 비어있을 수 없습니다.");
-		}
-		if (name.length() > MAXIMUM_NAME_LENGTH) {
-			throw new IllegalArgumentException("자동차 이름은 5글자를 넘을 수 없습니다.");
-		}
+		validateName(name);
 
 		this.name = name;
 		this.position = position;
+	}
+
+	private void validateName(String name) {
+		if (name == null) {
+			throw new IllegalArgumentException("자동차 이름은 비어있을 수 없습니다.");
+		}
+
+		if (name.isBlank()) {
+			throw new IllegalArgumentException("자동차 이름은 비어있을 수 없습니다.");
+		}
+
+		if (name.length() > MAXIMUM_NAME_LENGTH) {
+			throw new IllegalArgumentException("자동차 이름은 5글자를 넘을 수 없습니다.");
+		}
 	}
 
 	public void move(final MoveStrategy moveStrategy) {
