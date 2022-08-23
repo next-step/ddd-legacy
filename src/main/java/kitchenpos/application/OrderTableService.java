@@ -32,7 +32,7 @@ public class OrderTableService {
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(name);
         orderTable.setNumberOfGuests(0);
-        orderTable.setEmpty(true);
+        orderTable.setOccupied(false);
         return orderTableRepository.save(orderTable);
     }
 
@@ -40,7 +40,7 @@ public class OrderTableService {
     public OrderTable sit(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
-        orderTable.setEmpty(false);
+        orderTable.setOccupied(true);
         return orderTable;
     }
 
@@ -52,7 +52,7 @@ public class OrderTableService {
             throw new IllegalStateException();
         }
         orderTable.setNumberOfGuests(0);
-        orderTable.setEmpty(true);
+        orderTable.setOccupied(false);
         return orderTable;
     }
 
@@ -64,7 +64,7 @@ public class OrderTableService {
         }
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
-        if (orderTable.isEmpty()) {
+        if (!orderTable.isOccupied()) {
             throw new IllegalStateException();
         }
         orderTable.setNumberOfGuests(numberOfGuests);

@@ -9,7 +9,7 @@ import java.util.UUID;
 @Table(name = "menu_group")
 @Entity
 public class MenuGroup {
-    @Column(name = "id", columnDefinition = "varbinary(16)")
+    @Column(name = "id", columnDefinition = "binary(16)")
     @Id
     private UUID id;
 

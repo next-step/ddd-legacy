@@ -8,7 +8,7 @@ import java.util.UUID;
 @Table(name = "orders")
 @Entity
 public class Order {
-    @Column(name = "id", columnDefinition = "varbinary(16)")
+    @Column(name = "id", columnDefinition = "binary(16)")
     @Id
     private UUID id;
 
@@ -27,7 +27,7 @@ public class Order {
     @JoinColumn(
         name = "order_id",
         nullable = false,
-        columnDefinition = "varbinary(16)",
+        columnDefinition = "binary(16)",
         foreignKey = @ForeignKey(name = "fk_order_line_item_to_orders")
     )
     private List<OrderLineItem> orderLineItems;
@@ -38,7 +38,7 @@ public class Order {
     @ManyToOne
     @JoinColumn(
         name = "order_table_id",
-        columnDefinition = "varbinary(16)",
+        columnDefinition = "binary(16)",
         foreignKey = @ForeignKey(name = "fk_orders_to_order_table")
     )
     private OrderTable orderTable;
