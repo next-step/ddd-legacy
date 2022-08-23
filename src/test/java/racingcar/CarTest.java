@@ -3,6 +3,7 @@ package racingcar;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,7 +20,7 @@ class CarTest {
     @ParameterizedTest
     @ValueSource(strings = {"a", "ab", "abc", "abcd", "abcde"})
     void constructor(final String name) {
-        assertThatCode(() -> new Car(name))
+        assertThatCode(() -> new Car(name, new RandomMovingStrategy()))
                   .doesNotThrowAnyException();
     }
 
@@ -27,7 +28,7 @@ class CarTest {
     @Test
     void constructor_with_max_size_name() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> new Car("abcdef"));
+            .isThrownBy(() -> new Car("abcdef", new RandomMovingStrategy()));
     }
 
     @DisplayName("자동차 이름은 비어 있을 수 없다")
@@ -35,7 +36,24 @@ class CarTest {
     @NullAndEmptySource
     void constructor_with_empty_and_null_name(final String name) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> new Car(name));
+            .isThrownBy(() -> new Car(name, new RandomMovingStrategy()));
     }
 
+    @DisplayName("자동차는 움직일 수 있으면 움직인다.")
+    @Test
+    void move() {
+        final Car car = new Car("iljun", new ForwardStrategy());
+        final int previousPosition = car.currentPosition();
+        car.move();
+        Assertions.assertThat(car.currentPosition() == previousPosition + 1);
+    }
+
+    @DisplayName("자동차는 움직 일 수 없으면 움직이지 않는다.")
+    @Test
+    void hold() {
+        final Car car = new Car("iljun", new HoldStrategy());
+        final int previousPosition = car.currentPosition();
+        car.move();
+        Assertions.assertThat(car.currentPosition() == previousPosition);
+    }
 }

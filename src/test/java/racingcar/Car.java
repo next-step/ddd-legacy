@@ -6,10 +6,13 @@ public class Car {
     private static final int MAX_NAME_SIZE = 5;
 
     private final String name;
-
-    public Car(final String name) {
+    private int position = 0;
+    private MovingStrategy movingStrategy;
+    public Car(final String name,
+               final MovingStrategy movingStrategy) {
         validateName(name);
         this.name = name;
+        this.movingStrategy = movingStrategy;
     }
 
     private void validateName(String name) {
@@ -22,4 +25,13 @@ public class Car {
         }
     }
 
+    public void move() {
+        if (movingStrategy.canMove()) {
+            this.position++;
+        }
+    }
+
+    public int currentPosition() {
+        return this.position;
+    }
 }
