@@ -7,9 +7,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import racingcar.strategy.MoveStrategy;
+import racingcar.strategy.ForwardStrategy;
+import racingcar.strategy.HoldStrategy;
 
 class CarTest {
+
     private static final String VALID_NAME = "valid";
 
     @DisplayName("이름이 기준값 보다 클 경우 예외 발생")
@@ -37,10 +39,9 @@ class CarTest {
     void movable() {
         // given
         Car car = new Car(VALID_NAME);
-        MoveStrategy movableStrategy = () -> true;
 
         // when
-        car.move(movableStrategy);
+        car.move(new ForwardStrategy());
 
         // then
         assertThat(car.getDistance()).isOne();
@@ -51,10 +52,9 @@ class CarTest {
     void immovable() {
         // given
         Car car = new Car(VALID_NAME);
-        MoveStrategy immovableStrategy = () -> false;
 
         // when
-        car.move(immovableStrategy);
+        car.move(new HoldStrategy());
 
         // then
         assertThat(car.getDistance()).isZero();
