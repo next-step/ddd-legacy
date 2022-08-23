@@ -4,6 +4,7 @@ import racingcar.strategy.MoveStrategy;
 
 public class Car {
     private static final int MAX_OF_NAME = 5;
+    private static final String NAME_EXCEPTION_MESSAGE = "자동차 이름은 %d 글자를 넘을 수 없습니다.";
 
     private final String name;
     private int distance;
@@ -16,7 +17,7 @@ public class Car {
 
     private void validateSizeOfName(String name) {
         if (name.length() > MAX_OF_NAME) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(String.format(NAME_EXCEPTION_MESSAGE, MAX_OF_NAME));
         }
     }
 
