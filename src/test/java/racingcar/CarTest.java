@@ -33,7 +33,7 @@ public class CarTest {
     @DisplayName("자동차는 움직일 수 없는 경우에만 정지한다.")
     @Test
     void check_car_movable() {
-
+        // 작성예정
     }
 
 }

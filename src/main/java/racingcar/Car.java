@@ -1,7 +1,5 @@
 package racingcar;
 
-import org.springframework.util.StringUtils;
-
 public class Car {
     public Car(String name) {
         if (name == null || name.length() <= 0) {
