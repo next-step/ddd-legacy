@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import racingcar.strategy.ForwardStrategy;
 import racingcar.strategy.HoldStrategy;
@@ -13,6 +14,13 @@ import racingcar.strategy.HoldStrategy;
 class CarTest {
 
     private static final String VALID_NAME = "valid";
+
+    @DisplayName("이름은 비어있을수 없다")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void createWithNullAndEmptyName(String nameOfCar) {
+        assertThatIllegalArgumentException().isThrownBy(() -> new Car(nameOfCar));
+    }
 
     @DisplayName("이름이 기준값 보다 클 경우 예외 발생")
     @ParameterizedTest
