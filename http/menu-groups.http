@@ -3,7 +3,7 @@ POST {{host}}/api/menu-groups
 Content-Type: application/json
 
 {
-  "carName": "추천메뉴"
+  "name": "추천메뉴"
 }
 
 ###

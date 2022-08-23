@@ -3,7 +3,7 @@ POST {{host}}/api/products
 Content-Type: application/json
 
 {
-  "carName": "강정치킨",
+  "name": "강정치킨",
   "price": 17000
 }
 

@@ -2,7 +2,7 @@ create table menu
 (
     id            binary(16)     not null,
     displayed     bit            not null,
-    carName          varchar(255)   not null,
+    name          varchar(255)   not null,
     price         decimal(19, 2) not null,
     menu_group_id binary(16)     not null,
     primary key (id)
@@ -11,7 +11,7 @@ create table menu
 create table menu_group
 (
     id   binary(16)   not null,
-    carName varchar(255) not null,
+    name varchar(255) not null,
     primary key (id)
 ) engine = InnoDB;
 
@@ -37,7 +37,7 @@ create table order_table
 (
     id               binary(16)   not null,
     occupied         bit          not null,
-    carName             varchar(255) not null,
+    name             varchar(255) not null,
     number_of_guests integer      not null,
     primary key (id)
 ) engine = InnoDB;
@@ -56,7 +56,7 @@ create table orders
 create table product
 (
     id    binary(16)     not null,
-    carName  varchar(255)   not null,
+    name  varchar(255)   not null,
     price decimal(19, 2) not null,
     primary key (id)
 ) engine = InnoDB;
