@@ -4,7 +4,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 /**
@@ -22,7 +21,9 @@ class CarTest {
     @DisplayName("자동차 이름은 5자 이내이다.")
     @Test
     void constructor() {
-        assertThatCode(() -> new Car("12345")).doesNotThrowAnyException();
+        final Car car = new Car("12345");
+
+        assertThat(car.getName()).isEqualTo("12345");
     }
 
     @DisplayName("4 이상인 경우 움직인다.")
