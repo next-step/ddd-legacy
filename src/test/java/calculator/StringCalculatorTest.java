@@ -4,6 +4,7 @@ package calculator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -24,13 +25,17 @@ import org.junit.jupiter.params.provider.ValueSource;
  */
 public class StringCalculatorTest {
 
+    private StringCalculator stringCalculator;
+
+    @BeforeEach
+    void setUp() {
+        stringCalculator = new StringCalculator();
+    }
+
     @DisplayName("쉼표 또는 콜론으로 구분된 숫자 문자열을 받아 합을 계산한다.")
     @ParameterizedTest
     @CsvSource(value = {"1:2:3/6", "1,2,3/6", "10,2:3/15", "152/152"}, delimiter = '/')
     void calculate_1(String expression, int expected) {
-        //given
-        StringCalculator stringCalculator = new StringCalculator();
-
         //when, then
         assertThat(stringCalculator.calculate(expression)).isEqualTo(expected);
     }
@@ -39,8 +44,6 @@ public class StringCalculatorTest {
     @NullAndEmptySource
     @ParameterizedTest
     void calculate_null_or_emptyString(String expression) {
-        //given
-        StringCalculator stringCalculator = new StringCalculator();
         //when, then
         assertThat(stringCalculator.calculate(expression)).isZero();
     }
@@ -49,9 +52,6 @@ public class StringCalculatorTest {
     @ParameterizedTest
     @ValueSource(strings = {"1:가", "1,a,3", "-1,2:3"})
     void calculate_with_wrong_value(String expression) {
-        //given
-        StringCalculator stringCalculator = new StringCalculator();
-
         //when, then
         assertThatThrownBy(() -> stringCalculator.calculate(expression))
             .isInstanceOf(RuntimeException.class);
@@ -64,7 +64,6 @@ public class StringCalculatorTest {
     void calculate_with_custom_expression_delimiter(String expression) {
         //given
         int expected = 6;
-        StringCalculator stringCalculator = new StringCalculator();
 
         //when,then
         assertThat(stringCalculator.calculate(expression)).isEqualTo(expected);
