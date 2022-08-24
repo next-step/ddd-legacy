@@ -11,7 +11,7 @@ public class CarTest {
     @DisplayName("자동차 이름은 5글자 이하이다.")
     @Test
     void constructor() {
-        assertThatCode(() -> new Car("name"))
+        assertThatCode(() -> new Car("name", 0))
                 .doesNotThrowAnyException();
     }
 
@@ -20,14 +20,14 @@ public class CarTest {
     @ParameterizedTest
     void constructor_with_null_and_empty_name(final String name) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new Car(name));
+                .isThrownBy(() -> new Car(name, 0));
     }
 
     @DisplayName("자동차 이름은 5글자를 넘을 수 없다.")
     @Test
     void constructor_with_invalid_params() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new Car("잘못된 차이름입니다."));
+                .isThrownBy(() -> new Car("잘못된 차이름입니다.", 0));
     }
 
     @DisplayName("자동차는 움직일 수 없는 경우에만 정지한다.")
