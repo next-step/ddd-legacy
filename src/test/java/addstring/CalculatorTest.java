@@ -20,10 +20,17 @@ class CalculatorTest {
     @DisplayName("빈 문자열이나 null일 경우 0을 반환한다.")
     @NullAndEmptySource
     @ParameterizedTest
-    void calculate_string_general_success(String s) {
+    void calculate_string_empty_and_null(String s) {
         StringCalculator stringCalculator = new StringCalculator();
         int result = stringCalculator.add(s);
         assertThat(result).isEqualTo(0);
+    }
+
+    @Test
+    void calculate_string_general_with_custom_separator() {
+        StringCalculator stringCalculator = new StringCalculator();
+        int result = stringCalculator.add("//;\n1;2;3");
+        assertThat(result).isEqualTo(6);
     }
 
 }
