@@ -2,10 +2,13 @@ package stringcalculator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class StringCalculatorTest {
@@ -23,5 +26,12 @@ class StringCalculatorTest {
     @NullAndEmptySource
     void sum_invalid_negative_or_value_without_number(String value) {
         assertThatThrownBy(() -> stringCalculator.sum(value)).isInstanceOf(RuntimeException.class);
+    }
+
+    @DisplayName("쉼표(,) 구분자로 가지는 문자열을 전달하면, 구분자를 기준으로 분리한 각 숫자들의 합을 반환한다.")
+    @ParameterizedTest
+    @CsvSource(value = {"1:1", "1,2:3", "1,2,3:6"}, delimiter = ':')
+    void sum_with_comma(String value, int expected) {
+        assertThat(stringCalculator.sum(value)).isEqualTo(expected);
     }
 }

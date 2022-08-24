@@ -1,6 +1,7 @@
 package stringcalculator;
 
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class StringCalculator {
 
@@ -13,10 +14,9 @@ public class StringCalculator {
         if (Objects.isNull(value) || value.isBlank()) {
             throw new RuntimeException("Null 이거나 공란일 수 없습니다.");
         }
-
-        for (String stringNumber : value.split(SEPARATOR)) {
-            PositiveNumber number = new PositiveNumber(stringNumber);
-        }
-        return 0;
+        return Stream.of(value.split(SEPARATOR))
+                .map(PositiveNumber::new)
+                .mapToInt(PositiveNumber::toInt)
+                .sum();
     }
 }
