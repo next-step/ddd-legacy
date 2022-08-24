@@ -1,4 +1,4 @@
-package calculator;
+package calculator.src;
 
 public class StringCalculator {
 
