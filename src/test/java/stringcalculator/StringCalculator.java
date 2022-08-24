@@ -9,12 +9,14 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
+    private static final int EMPTY_VALUE = 0;
+
     public StringCalculator() {
     }
 
     public int sum(final String value) {
         if (Objects.isNull(value) || value.isBlank()) {
-            throw new RuntimeException("Null 이거나 공란일 수 없습니다.");
+            return EMPTY_VALUE;
         }
 
         boolean type = checkSplitterType(value);

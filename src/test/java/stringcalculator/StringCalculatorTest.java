@@ -20,10 +20,16 @@ class StringCalculatorTest {
         stringCalculator = new StringCalculator();
     }
 
+    @DisplayName("문자열 계산기에 공란이거나 Null 일 경우 0을 반환한다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void sum_invalid_null_or_empty(String value) {
+        assertThat(stringCalculator.sum(value)).isZero();
+    }
+
     @DisplayName("문자열 계산기에 숫자 이외의 값 또는 음수를 전달할 수 없다.")
     @ParameterizedTest
     @ValueSource(strings = {"-1", "one"})
-    @NullAndEmptySource
     void sum_invalid_negative_or_value_without_number(String value) {
         assertThatThrownBy(() -> stringCalculator.sum(value)).isInstanceOf(RuntimeException.class);
     }
