@@ -14,7 +14,7 @@ public class StringCalculator {
     }
 
     public int add(String s) {
-        if (s == null || s.isEmpty()){
+        if (s == null || s.isEmpty()) {
             return 0;
         }
 
@@ -28,31 +28,31 @@ public class StringCalculator {
                 .sum();
     }
 
-    private String checkPolicy(String s){
+    private String checkPolicy(String s) {
         String[] parsedString = splitStringToArrayBySeparator(s, WRAPPED_STRING);
 
-        if (parsedString[0].equals(s)){
+        if (parsedString[0].equals(s)) {
             return s;
         }
 
         int lastIndex = parsedString.length - 1;
-        String customSeparator = parsedString[lastIndex-1];
+        String customSeparator = parsedString[lastIndex - 1];
         String stringToCalculate = parsedString[lastIndex];
         this.separator = this.separator.concat(customSeparator);
         return stringToCalculate;
     }
 
-    private void checkNegativeNumber(String[] stringNumberArray){
+    private void checkNegativeNumber(String[] stringNumberArray) {
         boolean hasNegativeNumber = Arrays.stream(stringNumberArray)
                 .mapToInt(Integer::parseInt)
                 .anyMatch(s -> s < 0);
 
-        if (hasNegativeNumber){
+        if (hasNegativeNumber) {
             throw new RuntimeException("음수를 입력할 수 없습니다.");
         }
     }
 
-    private String[] splitStringToArrayBySeparator(String s, String separator){
+    private String[] splitStringToArrayBySeparator(String s, String separator) {
         String separatorPolicy = String.format("[%s]", separator);
         return s.split(separatorPolicy);
     }
