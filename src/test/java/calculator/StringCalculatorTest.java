@@ -4,9 +4,7 @@ package calculator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -28,7 +26,7 @@ public class StringCalculatorTest {
 
     @DisplayName("쉼표 또는 콜론으로 구분된 숫자 문자열을 받아 합을 계산한다.")
     @ParameterizedTest
-    @CsvSource(value = {"1:2:3/6", "1,2,3/6", "1,2:3/6", "1/1"}, delimiter = '/')
+    @CsvSource(value = {"1:2:3/6", "1,2,3/6", "10,2:3/15", "152/152"}, delimiter = '/')
     void calculate_1(String expression, int expected) {
         //given
         StringCalculator stringCalculator = new StringCalculator();
@@ -60,4 +58,15 @@ public class StringCalculatorTest {
     }
 
 
+    @DisplayName("커스텀 구분자를 사용한 문자열의 합을 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"//;\n1;2;3", "//!\n6"})
+    void calculate_with_custom_expression_delimiter(String expression) {
+        //given
+        int expected = 6;
+        StringCalculator stringCalculator = new StringCalculator();
+
+        //when,then
+        assertThat(stringCalculator.calculate(expression)).isEqualTo(expected);
+    }
 }

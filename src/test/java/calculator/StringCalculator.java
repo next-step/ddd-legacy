@@ -6,8 +6,9 @@ import org.junit.platform.commons.util.StringUtils;
 
 public class StringCalculator {
 
-    private static final Pattern pattern = Pattern.compile("^[0-9]+([,:][0-9]+)*$");
-    public static final String EXPRESSION_DEFAULT_DELIMITER = "[,:]";
+    private static final Pattern DEFAULT_EXPRESSION_PATTERN = Pattern.compile("^[0-9]+([,:][0-9]+)*$");
+    private static final Pattern CUSTOM_EXPRESSION_PATTERN = Pattern.compile("^//[^0-9a-zA-Z.,:\\$]\\n[0-9]([^0-9a-zA-Z.,:\\$][0-9]+)*$");
+    public static final String DEFAULT_DELIMITER = "[,:]";
 
     public StringCalculator() {}
 
@@ -16,11 +17,22 @@ public class StringCalculator {
             return 0;
         }
 
-        if (!pattern.matcher(expression).matches()) {
-            throw new RuntimeException();
+        if (CUSTOM_EXPRESSION_PATTERN.matcher(expression).matches()) {
+            int splitIndex = expression.indexOf("\n");
+            String delimiter = expression.substring(0, splitIndex).replace("//", "").replace("\n", "");
+            String newExpression = expression.substring(splitIndex + 1);
+            return calculate(newExpression, delimiter);
         }
 
-        return Arrays.stream(expression.split(EXPRESSION_DEFAULT_DELIMITER))
+        if (DEFAULT_EXPRESSION_PATTERN.matcher(expression).matches()) {
+            return calculate(expression, DEFAULT_DELIMITER);
+        }
+
+        throw new RuntimeException();
+    }
+
+    private int calculate(String expression, String delimiter) {
+        return Arrays.stream(expression.split(delimiter))
             .mapToInt(Integer::parseInt)
             .sum();
     }
