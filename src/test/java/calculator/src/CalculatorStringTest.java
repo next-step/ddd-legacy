@@ -77,4 +77,14 @@ class CalculatorStringTest {
 
 		assertThat(delimiter).isEmpty();
 	}
+
+	@DisplayName("positiveNumber로 변환한다.")
+	@Test
+	void toPositiveNumber() {
+		CalculatorString threeString = new CalculatorString("3");
+
+		PositiveNumber threeNumber =threeString.toPositiveNumber();
+
+		assertThat(threeNumber).isEqualTo(new PositiveNumber(3));
+	}
 }

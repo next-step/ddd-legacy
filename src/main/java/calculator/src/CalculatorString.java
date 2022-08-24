@@ -48,6 +48,10 @@ public class CalculatorString {
 		return Optional.ofNullable(delimiter);
 	}
 
+	public PositiveNumber toPositiveNumber() {
+		return new PositiveNumber(value);
+	}
+
 	public String getValue() {
 		return value;
 	}
