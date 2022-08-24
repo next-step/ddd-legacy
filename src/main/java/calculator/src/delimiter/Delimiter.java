@@ -1,17 +1,33 @@
 package calculator.src.delimiter;
 
-import static java.util.stream.Collectors.toList;
+import java.util.Objects;
 
-import java.util.Arrays;
-import java.util.List;
+public abstract class Delimiter {
 
-abstract class Delimiter {
+	private final String value;
 
-	public List<String> tokenize(String input) {
-		return Arrays.stream(input.split(delimiter()))
-			.map(String::trim)
-			.collect(toList());
+	public Delimiter(String value) {
+		this.value = value;
 	}
 
-	abstract protected String delimiter();
+	public String getValue() {
+		return value;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Delimiter delimiter = (Delimiter) o;
+		return Objects.equals(value, delimiter.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(value);
+	}
 }
