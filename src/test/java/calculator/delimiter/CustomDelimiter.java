@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class CustomDelimiter implements Delimiter {
+
     private static final String CUSTOM_DELIMITER = "//(.)\n(.*)";
 
     @Override

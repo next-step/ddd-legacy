@@ -12,6 +12,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class CommaDelimiterTest {
 
+    private static Stream<Arguments> provideCommaExpressions() {
+        return Stream.of(
+            Arguments.of("1:2", Arrays.asList("1:2")),
+            Arguments.of("1,2,3", Arrays.asList("1", "2", "3")),
+            Arguments.of("1,2:3", Arrays.asList("1", "2:3"))
+        );
+    }
+
     @DisplayName(",를 기준으로 문자열을 분리한다")
     @ParameterizedTest
     @MethodSource("provideCommaExpressions")
@@ -20,13 +28,5 @@ class CommaDelimiterTest {
         final List<String> result = commaDelimiter.split(Arrays.asList(expression));
 
         assertThat(result).isEqualTo(splitExpression);
-    }
-
-    private static Stream<Arguments> provideCommaExpressions() {
-        return Stream.of(
-            Arguments.of("1:2", Arrays.asList("1:2")),
-            Arguments.of("1,2,3", Arrays.asList("1", "2", "3")),
-            Arguments.of("1,2:3", Arrays.asList("1", "2:3"))
-        );
     }
 }

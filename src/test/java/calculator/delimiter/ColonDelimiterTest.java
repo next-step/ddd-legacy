@@ -12,6 +12,14 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class ColonDelimiterTest {
 
+    private static Stream<Arguments> provideColonExpressions() {
+        return Stream.of(
+            Arguments.of("1:2", Arrays.asList("1", "2")),
+            Arguments.of("1:2:3", Arrays.asList("1", "2", "3")),
+            Arguments.of("1:2,3", Arrays.asList("1", "2,3"))
+        );
+    }
+
     @DisplayName(":을 기준으로 문자열을 분리한다")
     @ParameterizedTest
     @MethodSource("provideColonExpressions")
@@ -20,13 +28,5 @@ class ColonDelimiterTest {
         final List<String> result = colonDelimiter.split(Arrays.asList(expression));
 
         assertThat(result).isEqualTo(splitExpression);
-    }
-
-    private static Stream<Arguments> provideColonExpressions() {
-        return Stream.of(
-            Arguments.of("1:2", Arrays.asList("1", "2")),
-            Arguments.of("1:2:3", Arrays.asList("1", "2", "3")),
-            Arguments.of("1:2,3", Arrays.asList("1", "2,3"))
-        );
     }
 }

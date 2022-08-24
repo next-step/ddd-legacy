@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 @FunctionalInterface
 public interface Delimiter {
+
     List<String> split(List<String> expressions);
 
     default List<String> split(List<String> expressions, String delimiter) {
