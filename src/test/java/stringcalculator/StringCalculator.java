@@ -10,7 +10,7 @@ public class StringCalculator {
     public StringCalculator() {
     }
 
-    public int sum(String value) {
+    public int sum(final String value) {
         if (Objects.isNull(value) || value.isBlank()) {
             throw new RuntimeException("Null 이거나 공란일 수 없습니다.");
         }
