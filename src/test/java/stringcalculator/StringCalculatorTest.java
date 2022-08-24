@@ -2,6 +2,7 @@ package stringcalculator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -46,5 +47,11 @@ class StringCalculatorTest {
     }, delimiter = '|')
     void sum_with_comma_and_colon(String value, int expected) {
         assertThat(stringCalculator.sum(value)).isEqualTo(expected);
+    }
+
+    @DisplayName("//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @Test
+    void sum_with_custom_separator() {
+        assertThat(stringCalculator.sum("//;\n1;2;3")).isEqualTo(6);
     }
 }
