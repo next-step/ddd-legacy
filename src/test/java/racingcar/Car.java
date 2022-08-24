@@ -34,13 +34,13 @@ public class Car {
         return true;
     }
 
-    public int getPosition() {
-        return position;
-    }
-
     public void move(final MovingStrategy strategy) {
         if (strategy.isMovable(this.position)) {
             position++;
         }
+    }
+
+    public int getPosition() {
+        return position;
     }
 }
