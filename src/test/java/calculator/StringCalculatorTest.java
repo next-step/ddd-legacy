@@ -4,6 +4,7 @@ package calculator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,9 +37,18 @@ public class StringCalculatorTest {
         assertThat(stringCalculator.calculate(expression)).isEqualTo(expected);
     }
 
+    @DisplayName("null 또는 공백 문자열인 경우 0을 반환한다.")
+    @NullAndEmptySource
+    @ParameterizedTest
+    void calculate_null_or_emptyString(String expression) {
+        //given
+        StringCalculator stringCalculator = new StringCalculator();
+        //when, then
+        assertThat(stringCalculator.calculate(expression)).isZero();
+    }
+
     @DisplayName("숫자 이외의 값 또는 음수를 전달하는 경우 에러를 Throw한다.")
     @ParameterizedTest
-    @NullAndEmptySource
     @ValueSource(strings = {"1:가", "1,a,3", "-1,2:3"})
     void calculate_with_wrong_value(String expression) {
         //given

@@ -2,6 +2,7 @@ package calculator;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import org.junit.platform.commons.util.StringUtils;
 
 public class StringCalculator {
 
@@ -11,6 +12,10 @@ public class StringCalculator {
     public StringCalculator() {}
 
     public int calculate(String expression) {
+        if (StringUtils.isBlank(expression)) {
+            return 0;
+        }
+
         if (!pattern.matcher(expression).matches()) {
             throw new RuntimeException();
         }
