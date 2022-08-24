@@ -24,7 +24,6 @@ public class CarTest {
     void name() {
 
         Assertions.assertDoesNotThrow(() -> Car.of("람보르기니"));
-
     }
 
     @DisplayName("자동차 이름이 5글자를 넘을 경우 예외 발생 테스트")
@@ -33,7 +32,24 @@ public class CarTest {
 
         assertThatThrownBy(() -> Car.of("람보르기니우라칸"))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
 
+//    자동차가 움직이는 조건은 0에서 9 사이의 무작위 값을 구한 후, 무작위 값이 4 이상인 경우이다.
+    @DisplayName("자동차 4이상일 경우 이동 테스트")
+    @Test
+    void move() {
+
+        Car car = Car.of("람보르기니");
+        Assertions.assertTrue(car.move(5));
+    }
+
+    //    자동차가 움직이는 조건은 0에서 9 사이의 무작위 값을 구한 후, 무작위 값이 4 이상인 경우이다.
+    @DisplayName("자동차 4미만일 경우 정지 테스트")
+    @Test
+    void stop() {
+
+        Car car = Car.of("람보르기니");
+        Assertions.assertFalse(car.move(3));
     }
 
 }

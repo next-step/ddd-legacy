@@ -15,4 +15,8 @@ public class Car{
         return new Car(name);
     }
 
+    public boolean move(int num) {
+        return num >= 4;
+    }
+
 }
