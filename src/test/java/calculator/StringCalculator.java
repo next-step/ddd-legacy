@@ -17,15 +17,15 @@ public class StringCalculator {
             return 0;
         }
 
+        if (DEFAULT_EXPRESSION_PATTERN.matcher(expression).matches()) {
+            return calculate(expression, DEFAULT_DELIMITER);
+        }
+
         if (CUSTOM_EXPRESSION_PATTERN.matcher(expression).matches()) {
             int splitIndex = expression.indexOf("\n");
             String delimiter = expression.substring(0, splitIndex).replace("//", "").replace("\n", "");
             String newExpression = expression.substring(splitIndex + 1);
             return calculate(newExpression, delimiter);
-        }
-
-        if (DEFAULT_EXPRESSION_PATTERN.matcher(expression).matches()) {
-            return calculate(expression, DEFAULT_DELIMITER);
         }
 
         throw new RuntimeException();
