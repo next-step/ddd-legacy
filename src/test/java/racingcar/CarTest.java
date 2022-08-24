@@ -3,6 +3,8 @@ package racingcar;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 //JUnit의 Assertions이 아닌 AssertJ의 Assertions를 사용한다.
@@ -19,11 +21,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class CarTest {
 
-    @DisplayName("자동차 객체 생성 테스트")
+    @DisplayName("자동차 이름은 5글자 이하이다.")
     @Test
-    void name() {
-
-        Assertions.assertDoesNotThrow(() -> Car.of("람보르기니"));
+    void constructor() {
+        assertThatNoException()
+                .isThrownBy(() -> Car.of("람보르기니"));
     }
 
     @DisplayName("자동차 이름이 5글자를 넘을 경우 예외 발생 테스트")
