@@ -4,30 +4,32 @@ import java.util.Objects;
 
 public class PositiveNumber {
 
-	private final long value;
+	public static final PositiveNumber ZERO = new PositiveNumber(0);
+
+	private final int value;
 
 	public PositiveNumber(String value) {
 		this.value = toNumeric(value);
 	}
 
-	private long toNumeric(String value) {
+	private int toNumeric(String value) {
+		if(value == null || value.isBlank()) {
+			return 0;
+		}
+
 		try {
-			return Long.parseLong(value);
+			return Integer.parseInt(value);
 		} catch (NumberFormatException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
 	public PositiveNumber(int value) {
-		this((long) value);
-	}
-
-	public PositiveNumber(long value) {
 		validatePositive(value);
 		this.value = value;
 	}
 
-	private void validatePositive(long value) {
+	private void validatePositive(int value) {
 		if (value < 0) {
 			throw new RuntimeException();
 		}
@@ -35,6 +37,10 @@ public class PositiveNumber {
 
 	public PositiveNumber sum(PositiveNumber positiveNumber) {
 		return new PositiveNumber(this.value + positiveNumber.value);
+	}
+
+	public int intValue() {
+		return value;
 	}
 
 	@Override

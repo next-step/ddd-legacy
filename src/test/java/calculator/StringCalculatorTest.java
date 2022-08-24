@@ -4,6 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import calculator.src.StringCalculator;
+import calculator.src.delimiter.ColonDelimiter;
+import calculator.src.delimiter.CommaDelimiter;
+import calculator.src.delimiter.Delimiters;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +21,12 @@ class StringCalculatorTest {
 
 	@BeforeEach
 	void setUp() {
-		calculator = new StringCalculator();
+		Delimiters delimiters = new Delimiters(List.of(
+			new ColonDelimiter(),
+			new CommaDelimiter()
+		));
+
+		calculator = new StringCalculator(delimiters);
 	}
 
 	@DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")

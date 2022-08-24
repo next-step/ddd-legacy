@@ -18,6 +18,8 @@ public class CalculatorString {
 	private final String value;
 
 	public CalculatorString(String value) {
+		value = toEmptyStringIfNull(value);
+
 		Matcher matcher = pattern.matcher(value);
 
 		if (matcher.find()) {
@@ -28,6 +30,11 @@ public class CalculatorString {
 
 		this.delimiter = null;
 		this.value = value;
+	}
+
+	private String toEmptyStringIfNull(String value) {
+		return Optional.ofNullable(value)
+			.orElse("");
 	}
 
 	private Delimiter createCustomDelimiter(Matcher matcher) {
