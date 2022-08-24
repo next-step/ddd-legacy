@@ -56,7 +56,7 @@ public class CalculatorString {
 	}
 
 	public PositiveNumber toPositiveNumber() {
-		return new PositiveNumber(value);
+		return PositiveNumber.valueOf(value);
 	}
 
 	public String getValue() {

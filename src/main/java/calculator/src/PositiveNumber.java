@@ -8,22 +8,6 @@ public class PositiveNumber {
 
 	private final int value;
 
-	public PositiveNumber(String value) {
-		this.value = toNumeric(value);
-	}
-
-	private int toNumeric(String value) {
-		if(value == null || value.isBlank()) {
-			return 0;
-		}
-
-		try {
-			return Integer.parseInt(value);
-		} catch (NumberFormatException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	public PositiveNumber(int value) {
 		validatePositive(value);
 		this.value = value;
@@ -32,6 +16,22 @@ public class PositiveNumber {
 	private void validatePositive(int value) {
 		if (value < 0) {
 			throw new RuntimeException();
+		}
+	}
+
+	public static PositiveNumber valueOf(String value) {
+		return new PositiveNumber(toNumeric(value));
+	}
+
+	private static int toNumeric(String value) {
+		if(value == null || value.isBlank()) {
+			return 0;
+		}
+
+		try {
+			return Integer.parseInt(value);
+		} catch (NumberFormatException e) {
+			throw new RuntimeException(e);
 		}
 	}
 

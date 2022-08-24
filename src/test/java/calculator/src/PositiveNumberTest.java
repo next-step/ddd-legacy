@@ -18,7 +18,7 @@ class PositiveNumberTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"2", "3", "4"})
 	void constructor(String input) {
-		assertThatCode(() -> new PositiveNumber(input))
+		assertThatCode(() -> PositiveNumber.valueOf(input))
 			.doesNotThrowAnyException();
 	}
 
@@ -26,7 +26,7 @@ class PositiveNumberTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"2.", "3v", "d"})
 	void constructor_exception_when_invalid_format(String input) {
-		assertThatThrownBy(() -> new PositiveNumber(input))
+		assertThatThrownBy(() -> PositiveNumber.valueOf(input))
 			.isInstanceOf(RuntimeException.class);
 	}
 
@@ -34,7 +34,7 @@ class PositiveNumberTest {
 	@ParameterizedTest
 	@ValueSource(strings = {"-2", "-3", "-4"})
 	void constructor_exception_when_negative_number(String input) {
-		assertThatThrownBy(() -> new PositiveNumber(input))
+		assertThatThrownBy(() -> PositiveNumber.valueOf(input))
 			.isInstanceOf(RuntimeException.class);
 	}
 
@@ -42,11 +42,11 @@ class PositiveNumberTest {
 	@ParameterizedTest
 	@CsvSource(value = {"2, 3, 5", "1, 2, 3", "5, 4, 9"})
 	void sum(String a, String b, String result) {
-		PositiveNumber aNumber = new PositiveNumber(a);
-		PositiveNumber bNumber = new PositiveNumber(b);
+		PositiveNumber aNumber = PositiveNumber.valueOf(a);
+		PositiveNumber bNumber = PositiveNumber.valueOf(b);
 
 		PositiveNumber sumNumber = aNumber.sum(bNumber);
 
-		assertThat(sumNumber).isEqualTo(new PositiveNumber(result));
+		assertThat(sumNumber).isEqualTo(PositiveNumber.valueOf(result));
 	}
 }
