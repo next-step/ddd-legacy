@@ -5,6 +5,4 @@ public class ForwardStrategy implements MovingStrategy {
     public boolean isMovable(int position) {
         return (position >= _MOVABLE_POSITION_VALUE);
     }
-
-
 }

@@ -6,56 +6,55 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 public class CarTest {
+
     @DisplayName("자동차 이름은 5글자 이하이다.")
     @Test
     void constructor() {
-        assertThatCode(() -> new Car("name", 0))
+        assertThatCode(() -> new Car("name"))
                 .doesNotThrowAnyException();
     }
 
     @DisplayName("자동차 이름은 비어 있을 수 없다.")
     @NullAndEmptySource
     @ParameterizedTest
-    void constructor_with_null_and_empty_name(final String name) {
+    void constructor_with_null_and_empty(final String name) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new Car(name, 0));
+                .isThrownBy(() -> new Car(name));
     }
 
-    @DisplayName("자동차 이름은 5글자를 넘을 수 없다.")
+    @DisplayName("자동차 이름은 5글자를 넘을수 없다.")
     @Test
-    void constructor_with_invalid_params() {
+    void constructor_with_illegal_name() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new Car("잘못된 차이름입니다.", 0));
+                .isThrownBy(() -> new Car("5글자를 넘는 자동차 이름"));
     }
 
-    @DisplayName("자동차는 움직일 수 없는 경우에는 정지한다.")
+    @DisplayName("자동차 위치는 0보다 작을 수 없다.")
     @Test
-    void check_car_stop() {
-        int beforePosition = 1;
+    void constructor_with_illegal_position() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> new Car("myCar", -1));
+    }
+
+    @DisplayName("자동차는 움직일수 없는 경우 정지한다.")
+    @Test
+    void check_stop_by_position() {
+        final int beforePosition = 0;
         Car stoppedCar = new Car("MyCar", beforePosition);
+        stoppedCar.move((new StopStrategy()));
 
-        assertThat(stoppedCar.move((new StopStrategy())).isStopStatus(beforePosition))
-                .isFalse();
+        assertThat(stoppedCar.getPosition()).isZero();
     }
 
-    @DisplayName("자동차는 움직일 수 있는 경우에는 이동한다.")
+    @DisplayName("자동차는 움직일 수 있는 경우 이동한다.")
     @Test
-    void check_car_moveForward() {
-        int beforePosition = 4;
+    void check_move_forward_by_position() {
+        final int beforePosition = 4;
         Car movableCar = new Car("MyCar", beforePosition);
 
-        assertThat(movableCar.move((new ForwardStrategy())).isMoveForwardStatus(beforePosition))
-                .isTrue();
-    }
-
-    @DisplayName("자동차는 위치는 0보다 작을 수 없다.")
-    @Test
-    void move_car_invalid_position() {
-        int invalidPosition = -1;
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new Car("MyCar", invalidPosition));
+        movableCar.move((new ForwardStrategy()));
+        assertThat(movableCar.getPosition()).isEqualTo(beforePosition + 1);
     }
 }

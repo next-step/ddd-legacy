@@ -6,14 +6,19 @@ public class Car {
     private int position;
     private String name;
 
-    public Car(String name, int position) {
+    public Car(final String name) {
+        this(name, 0);
+    }
+
+    public Car(final String name, final int position) {
         if (isValidCarName(name) && isValidCarPosition(position)) {
             this.name = name;
             this.position = position;
         }
     }
+
     private boolean isValidCarName(String name) {
-        if (name == null || name.length() <= 0) {
+        if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("자동차 이름은 비어있을 수 없습니다.");
         }
         if (name.length() > MAX_NAME_LENGTH) {
@@ -29,20 +34,13 @@ public class Car {
         return true;
     }
 
-    public boolean isMoveForwardStatus(int beforePosition) {
-        isValidCarPosition(beforePosition);
-        return (this.position > beforePosition);
+    public int getPosition() {
+        return position;
     }
 
-    public boolean isStopStatus(int beforePosition) {
-        isValidCarPosition(beforePosition);
-        return (this.position == beforePosition);
-    }
-
-    public Car move(MovingStrategy strategy) {
+    public void move(final MovingStrategy strategy) {
         if (strategy.isMovable(this.position)) {
             position++;
         }
-        return this;
     }
 }
