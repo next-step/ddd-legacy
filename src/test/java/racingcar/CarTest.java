@@ -8,6 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import racingcar.testdouble.ForwardMovingStrategy;
+import racingcar.testdouble.HoldMovingStrategy;
 
 class CarTest {
 
@@ -37,7 +39,7 @@ class CarTest {
     @Test
     void move() {
         Car car = new Car("gmoon");
-        car.move(MovingStrategy::forward);
+        car.move(new ForwardMovingStrategy());
         assertThat(car).hasFieldOrPropertyWithValue("position", 1);
     }
 
@@ -45,7 +47,7 @@ class CarTest {
     @Test
     void stop() {
         Car car = new Car("gmoon");
-        car.move(MovingStrategy::hold);
+        car.move(new HoldMovingStrategy());
         assertThat(car).hasFieldOrPropertyWithValue("position", 0);
     }
 }
