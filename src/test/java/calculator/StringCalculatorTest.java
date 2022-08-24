@@ -6,6 +6,8 @@ import calculator.delimiter.ColonDelimiter;
 import calculator.delimiter.CommaDelimiter;
 import calculator.delimiter.CustomDelimiter;
 import calculator.delimiter.Delimiters;
+import calculator.verifier.NumberVerifier;
+import calculator.verifier.PositiveNumberVerifier;
 import java.util.Arrays;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +27,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 class StringCalculatorTest {
 
     private Delimiters delimiters;
+    private NumberVerifier numberVerifier;
 
     @BeforeEach
     void setup() {
@@ -33,26 +36,27 @@ class StringCalculatorTest {
             new CommaDelimiter(),
             new CustomDelimiter()
         ));
+        numberVerifier = new PositiveNumberVerifier();
     }
     @DisplayName("빈 문자열 또는 null을 입력한 경우 0을 반환해야 한다.")
     @ParameterizedTest
     @NullAndEmptySource
     void empty_and_null_value_is_zero(final String expression) {
-        assertThat(StringCalculator.calculate(expression, delimiters) == 0);
+        assertThat(StringCalculator.calculate(expression, delimiters, numberVerifier) == 0);
     }
 
     @DisplayName("숫자 하나를 문자열로 입력한 경우 해당 숫자를 반환한다.")
     @ParameterizedTest
     @ValueSource(strings = {"0", "1", "2", "34"})
     void not_contain_delimiter(final String expression) {
-        assertThat(StringCalculator.calculate(expression, delimiters) == Integer.parseInt(expression));
+        assertThat(StringCalculator.calculate(expression, delimiters, numberVerifier) == Integer.parseInt(expression));
     }
 
     @DisplayName("쉼표, 콜론을 구분자로 문자열을 전달하는 경우 숫자를 분리하고 합을 반환")
     @ParameterizedTest
     @MethodSource("provideNormalExpressions")
     void summary_by_normal_expressions(final String expression, int summary) {
-        assertThat(StringCalculator.calculate(expression, delimiters) == summary);
+        assertThat(StringCalculator.calculate(expression, delimiters, numberVerifier) == summary);
     }
 
     private static Stream<Arguments> provideNormalExpressions() {
@@ -67,7 +71,7 @@ class StringCalculatorTest {
     @ParameterizedTest
     @MethodSource("provideCustomExpressions")
     void custom_delimiter(final String expression, int summary) {
-        assertThat(StringCalculator.calculate(expression, delimiters) == summary);
+        assertThat(StringCalculator.calculate(expression, delimiters, numberVerifier) == summary);
     }
 
     private static Stream<Arguments> provideCustomExpressions() {
@@ -82,6 +86,6 @@ class StringCalculatorTest {
     @ValueSource(strings = {"abc", "-1", "1,-1", "1:3:b"})
     void no_positive_number(final String expression) {
         assertThatExceptionOfType(RuntimeException.class)
-            .isThrownBy(() -> StringCalculator.calculate(expression, delimiters));
+            .isThrownBy(() -> StringCalculator.calculate(expression, delimiters, numberVerifier));
     }
 }
