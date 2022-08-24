@@ -2,7 +2,6 @@ package calculator;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -32,11 +31,11 @@ public class StringCalculator {
             formula = matcher.group(2);
         }
 
-        return sum(toPositiveNumbers(removeZero(formula.split(delimiter))));
+        return sum(toPositiveNumbers(removeZero(List.of(formula.split(delimiter)))));
     }
 
-    private List<String> removeZero(String[] tokens) {
-        return Arrays.stream(tokens)
+    private List<String> removeZero(List<String> tokens) {
+        return tokens.stream()
             .filter(token -> !"0".equals(token))
             .collect(toList());
     }
