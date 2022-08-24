@@ -5,7 +5,13 @@ import java.util.Arrays;
 public class StringCalculator {
 
     private static final String WRAPPED_STRING = "//\n";
-    private String separator = ",:";
+    private static final String DEFAULT_SEPARATOR = ",:";
+
+    private String separator;
+
+    public StringCalculator() {
+        this.separator = DEFAULT_SEPARATOR;
+    }
 
     public int add(String s) {
         if (s == null || s.isEmpty()){
@@ -15,13 +21,16 @@ public class StringCalculator {
         String stringToCalculate = checkPolicy(s);
 
         String[] stringNumberArray = splitStringToArrayBySeparator(stringToCalculate, this.separator);
+        checkNegativeNumber(stringNumberArray);
+
         return Arrays.stream(stringNumberArray)
                 .mapToInt(Integer::parseInt)
                 .sum();
     }
 
-    public String checkPolicy(String s){
+    private String checkPolicy(String s){
         String[] parsedString = splitStringToArrayBySeparator(s, WRAPPED_STRING);
+
         if (parsedString[0].equals(s)){
             return s;
         }
@@ -31,6 +40,16 @@ public class StringCalculator {
         String stringToCalculate = parsedString[lastIndex];
         this.separator = this.separator.concat(customSeparator);
         return stringToCalculate;
+    }
+
+    private void checkNegativeNumber(String[] stringNumberArray){
+        boolean hasNegativeNumber = Arrays.stream(stringNumberArray)
+                .mapToInt(Integer::parseInt)
+                .anyMatch(s -> s < 0);
+
+        if (hasNegativeNumber){
+            throw new RuntimeException("음수를 입력할 수 없습니다.");
+        }
     }
 
     private String[] splitStringToArrayBySeparator(String s, String separator){
