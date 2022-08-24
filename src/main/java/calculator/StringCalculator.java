@@ -15,18 +15,11 @@ public class StringCalculator {
         if (isEmpty(text)) {
             return 0;
         }
-        if (isSingleCharacter(text)) {
-            return Integer.parseInt(text);
-        }
         return calculate(text);
     }
 
     private boolean isEmpty(String text) {
         return text == null || text.isEmpty();
-    }
-
-    private boolean isSingleCharacter(String text) {
-        return text.length() == 1;
     }
 
     private int calculate(final String text) {
