@@ -2,10 +2,14 @@ package calculator;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * 쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열을 전달하는 경우 구분자를 기준으로 분리한 각 숫자의 합을 반환
@@ -23,10 +27,27 @@ public class StringCalculatorTest {
 
     @DisplayName("쉼표 또는 콜론으로 구분된 숫자 문자열을 받아 합을 계산한다.")
     @ParameterizedTest
-    @CsvSource(value = {"1:2:3/6", "1,2,3/6", "1,2:3/6"}, delimiter = '/')
+    @CsvSource(value = {"1:2:3/6", "1,2,3/6", "1,2:3/6", "1/1"}, delimiter = '/')
     void calculate_1(String expression, int expected) {
+        //given
         StringCalculator stringCalculator = new StringCalculator();
+
         //when, then
         assertThat(stringCalculator.calculate(expression)).isEqualTo(expected);
     }
+
+    @DisplayName("숫자 이외의 값 또는 음수를 전달하는 경우 에러를 Throw한다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"1:가", "1,a,3", "-1,2:3"})
+    void calculate_with_wrong_value(String expression) {
+        //given
+        StringCalculator stringCalculator = new StringCalculator();
+
+        //when, then
+        assertThatThrownBy(() -> stringCalculator.calculate(expression))
+            .isInstanceOf(RuntimeException.class);
+    }
+
+
 }
