@@ -1,34 +1,28 @@
 package calculator;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import calculator.utils.StringUtils;
+import java.util.List;
 
 public final class StringCalculator {
 
-    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
+    private final StringNumberParser stringNumberParser;
+
+    public StringCalculator() {
+        stringNumberParser = new StringNumberParser();
+    }
 
     public int add(String text) {
-        if (isBlank(text)) {
+        if (StringUtils.isBlank(text)) {
             return 0;
         }
 
-        return Stream.of(toArrays(text))
-                .map(Integer::parseInt)
-                .reduce(0, Integer::sum);
+        return toStringNumbers(text)
+                .stream()
+                .mapToInt(Integer::parseInt)
+                .sum();
     }
 
-    private boolean isBlank(String text) {
-        return text == null || text.isBlank();
-    }
-
-    private String[] toArrays(String text) {
-        Matcher m = CUSTOM_DELIMITER_PATTERN.matcher(text);
-        if (m.find()) {
-            String customDelimiter = m.group(1);
-            return m.group(2).split(customDelimiter);
-        }
-
-        return text.split("[,:]");
+    private List<String> toStringNumbers(String text) {
+        return stringNumberParser.convertToList(text);
     }
 }
