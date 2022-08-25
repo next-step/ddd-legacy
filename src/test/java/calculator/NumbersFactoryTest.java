@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 public class NumbersFactoryTest {
 
     private NumbersFactory numbersFactory;
-    
+
     @BeforeEach
     void setUp() {
         this.numbersFactory = new NumbersFactory();
@@ -29,21 +29,21 @@ public class NumbersFactoryTest {
     @ParameterizedTest
     @ValueSource(strings = {"1,2"})
     void twoNumbers(final String text) {
-        assertThat(numbersFactory.getNumbers(text)).containsExactly(1,2);
+        assertThat(numbersFactory.getNumbers(text)).containsExactly(1, 2);
     }
 
     @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
     @ParameterizedTest
     @ValueSource(strings = {"1,2:3"})
     void colons(final String text) {
-        assertThat(numbersFactory.getNumbers(text)).containsExactly(1,2,3);
+        assertThat(numbersFactory.getNumbers(text)).containsExactly(1, 2, 3);
     }
 
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @ParameterizedTest
     @ValueSource(strings = {"//;\n1;2;3"})
     void customDelimiter(final String text) {
-        assertThat(numbersFactory.getNumbers(text)).containsExactly(1,2,3);
+        assertThat(numbersFactory.getNumbers(text)).containsExactly(1, 2, 3);
     }
 
     @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
