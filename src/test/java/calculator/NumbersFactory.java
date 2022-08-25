@@ -43,9 +43,9 @@ public class NumbersFactory {
     }
 
     private boolean isNaturalNumber(String param) {
-        char[] chars = param.toCharArray();
-        for (char aChar : chars) {
-            if (aChar > '9' || aChar < '0') {
+        char[] characters = param.toCharArray();
+        for (char character : characters) {
+            if (character > '9' || character < '0') {
                 return false;
             }
         }
