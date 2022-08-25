@@ -24,7 +24,7 @@ public class PositiveNumber {
 	}
 
 	private static int toNumeric(String value) {
-		if(value == null || value.isBlank()) {
+		if (value == null || value.isBlank()) {
 			return 0;
 		}
 

@@ -7,13 +7,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.assertj.core.api.SoftAssertions;
-import org.hibernate.annotations.Parameter;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -83,7 +80,7 @@ class CalculatorStringTest {
 	void toPositiveNumber() {
 		CalculatorString threeString = new CalculatorString("3");
 
-		PositiveNumber threeNumber =threeString.toPositiveNumber();
+		PositiveNumber threeNumber = threeString.toPositiveNumber();
 
 		assertThat(threeNumber).isEqualTo(new PositiveNumber(3));
 	}
