@@ -23,6 +23,7 @@ package calculator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static calculator.StringCalculator.of;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("문자열 계산기")
@@ -31,7 +32,20 @@ public class StringCalculatorTest {
     @DisplayName("공백 문자열을 입력할 경우 “” => 0 ")
     @Test
     void name() {
-        assertThat(new StringCalculator("").calculate()).isEqualTo(0);
+        String value = "";
+        assertThat(of(value).calculate()).isEqualTo(0);
+    }
+
+    @DisplayName("기본 구분자 사용 : /* 1,2 => 3 */")
+    @Test
+    void defaultCalculate() {
+
+        //        given
+        String value = "1,2";
+
+        //        then
+        assertThat(of(value).calculate()).isEqualTo(3);
+
     }
 
 }
