@@ -48,4 +48,16 @@ public class StringCalculatorTest {
 
     }
 
+    @DisplayName("기본 구분자 사용 : \"1,2,3\" => 6")
+    @Test
+    void 세개숫자의합() {
+
+        //        given
+        String value = "1,2,3";
+
+        //        then
+        assertThat(of(value).calculate()).isEqualTo(6);
+
+    }
+
 }
