@@ -39,7 +39,7 @@ public class NumbersFactory {
             }
             numbers.add(Integer.parseInt(number));
         }
-        return numbers.stream().mapToInt(v->v).toArray();
+        return numbers.stream().mapToInt(v -> v).toArray();
     }
 
     private boolean isNaturalNumber(String param) {

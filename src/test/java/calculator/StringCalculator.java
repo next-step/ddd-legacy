@@ -3,6 +3,7 @@ package calculator;
 import io.micrometer.core.instrument.util.StringUtils;
 
 public class StringCalculator {
+
     private final NumbersFactory numbersFactory;
 
     public StringCalculator() {
