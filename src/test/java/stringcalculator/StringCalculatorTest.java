@@ -36,14 +36,6 @@ class StringCalculatorTest {
                 .hasMessage("숫자가 아니면 계산할 수 없습니다.");
     }
 
-    @DisplayName("음수를 전달하면 예외가 발생한다.")
-    @Test
-    void negative_number() {
-        assertThatThrownBy(() -> StringCalculator.calculate("-1,2"))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("음수는 계산할 수 없습니다.");
-    }
-
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @Test
     void custom_delimiter() {
