@@ -2,13 +2,16 @@ package calculator;
 
 public class StringCalculator {
 
-    private int number;
-
     public int add(String text) {
+        CalculatorNumber number = CalculatorNumber.zeroNumber();
         if (text == null || text.isBlank()) {
             return 0;
         }
-        final int addNumber = Integer.parseInt(text);
-        return number + addNumber;
+
+        for (String stringNumber : StringTokenUtils.tokenizer(text)) {
+            number.add(new CalculatorNumber(stringNumber));
+        }
+
+        return number.getNumber();
     }
 }
