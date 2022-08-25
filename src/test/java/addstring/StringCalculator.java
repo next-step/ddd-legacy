@@ -37,8 +37,9 @@ public class StringCalculator {
 
         int lastIndex = parsedString.length - 1;
         String customSeparator = parsedString[lastIndex - 1];
-        String stringToCalculate = parsedString[lastIndex];
         this.separator = this.separator.concat(customSeparator);
+
+        String stringToCalculate = parsedString[lastIndex];
         return stringToCalculate;
     }
 

@@ -56,8 +56,7 @@ class CalculatorTest {
     void calculate_string_negative_number(String s) {
         StringCalculator stringCalculator = new StringCalculator();
         assertThatThrownBy(
-                () -> stringCalculator.add(s)
+            () -> stringCalculator.add(s)
         ).isInstanceOf(RuntimeException.class);
     }
-
 }
