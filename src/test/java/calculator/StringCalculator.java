@@ -5,6 +5,10 @@ public class StringCalculator {
     private int number;
 
     public int add(String text) {
-        return 0;
+        if (text == null || text.isBlank()) {
+            return 0;
+        }
+        final int addNumber = Integer.parseInt(text);
+        return number + addNumber;
     }
 }
