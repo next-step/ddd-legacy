@@ -16,6 +16,11 @@ public class StringCalculator {
             return sum;
         }
         int[] numbers = numbersFactory.getNumbers(input);
+        sum = getSum(sum, numbers);
+        return sum;
+    }
+
+    private int getSum(int sum, int[] numbers) {
         for (int number : numbers) {
             sum += number;
         }
