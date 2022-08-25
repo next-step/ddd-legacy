@@ -5,14 +5,17 @@ public class PositiveNumber {
     private final int number;
 
     public PositiveNumber(int number) {
+        if (number < ZERO) {
+            throw new RuntimeException("음수는 불가능합니다.");
+        }
         this.number = number;
     }
 
     public static PositiveNumber of(String numberText) {
-        int number = Integer.parseInt(numberText);
-        if (number < ZERO) {
-            throw new RuntimeException("음수는 불가능합니다.");
+        if (numberText == null || numberText.isBlank()) {
+            return zero();
         }
+        int number = Integer.parseInt(numberText);
         return new PositiveNumber(number);
     }
 
