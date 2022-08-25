@@ -1,16 +1,14 @@
 package addstring;
 
-import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringCalculator {
 
-    private static final String WRAPPED_STRING = "//\n";
-    private static final String DEFAULT_SEPARATOR = ",:";
-
-    private String separator;
+    private static final String CUSTOM_DELIMITER_REGEX = "//(.)\n(.*)";
+    private static final String DEFAULT_DELIMITER = "[,:]";
 
     public StringCalculator() {
-        this.separator = DEFAULT_SEPARATOR;
     }
 
     public int add(String s) {
@@ -18,44 +16,20 @@ public class StringCalculator {
             return 0;
         }
 
-        String stringToCalculate = checkPolicy(s);
+        String[] stringNumberArray = splitStringToArrayByDelimiter(s);
 
-        String[] stringNumberArray = splitStringToArrayBySeparator(stringToCalculate, this.separator);
-        checkNegativeNumber(stringNumberArray);
-
-        return Arrays.stream(stringNumberArray)
-                .mapToInt(Integer::parseInt)
-                .sum();
+        Number number = new Number();
+        return number.convertStringNumbersToIntSum(stringNumberArray);
     }
 
-    private String checkPolicy(String s) {
-        String[] parsedString = splitStringToArrayBySeparator(s, WRAPPED_STRING);
-
-        if (parsedString[0].equals(s)) {
-            return s;
+    private String[] splitStringToArrayByDelimiter(String s) {
+        Matcher m = Pattern.compile(CUSTOM_DELIMITER_REGEX).matcher(s);
+        if (m.find()) {
+            String customDelimiter = m.group(1);
+            return m.group(2).split(customDelimiter);
         }
+        return s.split(DEFAULT_DELIMITER);
 
-        int lastIndex = parsedString.length - 1;
-        String customSeparator = parsedString[lastIndex - 1];
-        this.separator = this.separator.concat(customSeparator);
-
-        String stringToCalculate = parsedString[lastIndex];
-        return stringToCalculate;
-    }
-
-    private void checkNegativeNumber(String[] stringNumberArray) {
-        boolean hasNegativeNumber = Arrays.stream(stringNumberArray)
-                .mapToInt(Integer::parseInt)
-                .anyMatch(s -> s < 0);
-
-        if (hasNegativeNumber) {
-            throw new RuntimeException("음수를 입력할 수 없습니다.");
-        }
-    }
-
-    private String[] splitStringToArrayBySeparator(String s, String separator) {
-        String separatorPolicy = String.format("[%s]", separator);
-        return s.split(separatorPolicy);
     }
 
 }
