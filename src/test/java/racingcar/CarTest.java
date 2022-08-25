@@ -66,4 +66,24 @@ public class CarTest {
 
         assertThat(car.getPosition()).isEqualTo(0);
     }
+
+    @DisplayName("자동차 움직이는 조건이 참이면 움직인다.")
+    @Test
+    void move_with_forward() {
+        String name = "weno";
+        Car car = new Car(name);
+        car.move(new ForwardStrategy());
+
+        assertThat(car.getPosition()).isEqualTo(1);
+    }
+
+    @DisplayName("자동차 움직이는 조건이 참이면 움직인다.")
+    @Test
+    void move_with_hold() {
+        String name = "weno";
+        Car car = new Car(name);
+        car.move(new HoldStrategy());
+
+        assertThat(car.getPosition()).isZero();
+    }
 }

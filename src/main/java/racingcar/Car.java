@@ -33,6 +33,12 @@ public class Car {
         return position;
     }
 
+    public void move(MovingStrategy strategy) {
+        if (strategy.movable()) {
+            position++;
+        }
+    }
+
     private boolean isEmpty(String name) {
         return name == null || name.isBlank();
     }
