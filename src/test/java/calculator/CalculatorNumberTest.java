@@ -1,6 +1,7 @@
 package calculator;
 
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +40,16 @@ class CalculatorNumberTest {
     void cannot_have_null_and_Empty(String stringNumber) {
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> new CalculatorNumber(stringNumber));
+    }
+
+    @DisplayName("계산할 숫자를 더한다")
+    @Test
+    void add_number() {
+        CalculatorNumber source = new CalculatorNumber(3);
+
+        source.add(new CalculatorNumber(5));
+
+        assertThat(source.getNumber()).isEqualTo(8);
     }
 
 }
