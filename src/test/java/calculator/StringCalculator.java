@@ -4,14 +4,18 @@ import java.util.Objects;
 
 public class StringCalculator {
 
-    private final String string;
+    private final String value;
 
-    public StringCalculator(String s) {
-        this.string = s;
+    private StringCalculator(String value) {
+        this.value = value;
+    }
+
+    public static StringCalculator of(String value) {
+        return new StringCalculator(value);
     }
 
     public int calculate() {
-        if (Objects.equals(string, "")) {
+        if (Objects.equals(value, "")) {
             return 0;
         }
         return 1;
