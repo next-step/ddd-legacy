@@ -1,29 +1,18 @@
 package addstring;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
-class NumberTest {
-
-    private Number number;
-
-    @BeforeEach
-    void setup(){
-        number = new Number();
-    }
+class NumbersTest {
 
     @Test
     @DisplayName("문자열 숫자 배열을 성공적으로 계산한다.")
     void convertStringNumbersToIntSumTest() {
         String[] array = new String[]{"1", "2", "3"};
-        assertThat(number.convertStringNumbersToIntSum(array)).isEqualTo(6);
+        assertThat(Numbers.from(array).sum()).isEqualTo(6);
     }
 
     @Test
@@ -31,7 +20,7 @@ class NumberTest {
     void convertStringNumbersToIntSumFailTest() {
         String[] array = new String[]{"-1", "2", "3"};
         assertThatThrownBy(
-            () -> number.convertStringNumbersToIntSum(array)
+            () -> Numbers.from(array).sum()
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -40,7 +29,7 @@ class NumberTest {
     void invalidNumberFailTest() {
         String[] array = new String[]{"a", "2", "3"};
         assertThatThrownBy(
-            () -> number.convertStringNumbersToIntSum(array)
+            () -> Numbers.from(array).sum()
         ).isInstanceOf(IllegalArgumentException.class);
     }
 }
