@@ -35,7 +35,7 @@ public class NumbersFactory {
         List<Integer> numbers = new ArrayList<>();
         for (String number : tokens) {
             if (!isNaturalNumber(number)) {
-                throw new RuntimeException();
+                throw new RuntimeException(ExceptionMessages.WRONG_INPUT_EXCEPTION);
             }
             numbers.add(Integer.parseInt(number));
         }
