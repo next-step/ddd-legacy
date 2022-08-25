@@ -4,16 +4,8 @@ public class PositiveNumber {
     private static final int ZERO = 0;
     private final int number;
 
-    public PositiveNumber add(PositiveNumber positiveNumber) {
-        return new PositiveNumber(positiveNumber.number + this.number);
-    }
-
     public PositiveNumber(int number) {
         this.number = number;
-    }
-
-    public int getNumber() {
-        return number;
     }
 
     public static PositiveNumber of(String numberText) {
@@ -26,5 +18,13 @@ public class PositiveNumber {
 
     public static PositiveNumber zero() {
         return new PositiveNumber(ZERO);
+    }
+
+    public PositiveNumber add(PositiveNumber positiveNumber) {
+        return new PositiveNumber(positiveNumber.number + this.number);
+    }
+
+    public int getNumber() {
+        return number;
     }
 }
