@@ -6,8 +6,13 @@ public class Car {
     private static final String EMPTY_NAME_MESSAGE = "자동차 이름은 비어있을 수 없습니다.";
 
     private String name;
+    private int position;
 
     public Car(String name) {
+        this(name, 0);
+    }
+
+    public Car(String name, int position) {
         if (isEmpty(name)) {
             throw new IllegalArgumentException(EMPTY_NAME_MESSAGE);
         }
@@ -17,10 +22,15 @@ public class Car {
         }
 
         this.name = name;
+        this.position = position;
     }
 
     public String getName() {
         return name;
+    }
+
+    public int getPosition() {
+        return position;
     }
 
     private boolean isEmpty(String name) {

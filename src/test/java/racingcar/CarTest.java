@@ -46,4 +46,24 @@ public class CarTest {
                 () -> new Car(name)
         );
     }
+
+    @DisplayName("자동차는 이름과 위치값을 가질 수 있다.")
+    @Test
+    void construct_with_name_and_position() {
+        String name = "weno";
+        int position = 5;
+        Car car = new Car(name, position);
+
+        assertThat(car.getName()).isEqualTo(name);
+        assertThat(car.getPosition()).isEqualTo(position);
+    }
+
+    @DisplayName("자동차 이름만 추가하면 위치값은 0으로 설정된다.")
+    @Test
+    void construct_with_only_name_and_zero_position() {
+        String name = "weno";
+        Car car = new Car(name);
+
+        assertThat(car.getPosition()).isEqualTo(0);
+    }
 }
