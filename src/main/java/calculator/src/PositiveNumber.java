@@ -15,7 +15,7 @@ public class PositiveNumber {
 
 	private void validatePositive(int value) {
 		if (value < 0) {
-			throw new RuntimeException();
+			throw new RuntimeException("[PositiveNumber] 입력값이 양수가 아닙니다.");
 		}
 	}
 
@@ -31,7 +31,7 @@ public class PositiveNumber {
 		try {
 			return Integer.parseInt(value);
 		} catch (NumberFormatException e) {
-			throw new RuntimeException(e);
+			throw new RuntimeException("입력값이 숫자가 아닙니다.", e);
 		}
 	}
 
