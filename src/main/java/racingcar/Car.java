@@ -19,7 +19,11 @@ public class Car {
     }
 
     private static void checkValidCarName(String name) {
-        if (name == null || name.isBlank() || name.length() > LIMIT_CAR_NAME_LENGTH) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("자동차 이름은 비어 있을수 없습니다.");
+        }
+
+        if (name.length() > LIMIT_CAR_NAME_LENGTH) {
             throw new IllegalArgumentException(
                     String.format("자동차 이름은 %d 글자를 넘을 수 없다.", LIMIT_CAR_NAME_LENGTH));
         }
