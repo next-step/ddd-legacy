@@ -29,6 +29,7 @@ public class StringCalculator {
         String customDelimiter = m.group(1);
         return m.group(2).split(customDelimiter);
     }
+
     private String[] getTokenByDefaultDelimiter(String input) {
         return input.split(DEFAULT_REGEX);
     }
