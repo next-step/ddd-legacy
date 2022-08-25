@@ -15,7 +15,7 @@ public class StringNumber {
 
     public StringNumber(int number) {
         if (number < MINIMUM_NUMBER) {
-            throw new RuntimeException("0이상의 숫자를 입력해주세요.");
+            throw new RuntimeException(MINIMUM_NUMBER + "이상의 숫자를 입력해주세요.");
         }
 
         this.number = number;
