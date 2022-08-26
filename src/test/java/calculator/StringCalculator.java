@@ -2,7 +2,6 @@ package calculator;
 
 import calculator.delimiter.Delimiters;
 import calculator.number.PositiveNumber;
-import calculator.verifier.NumberVerifier;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 

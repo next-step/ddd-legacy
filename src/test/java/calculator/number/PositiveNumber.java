@@ -1,8 +1,7 @@
 package calculator.number;
 
-import java.util.Objects;
-
 public class PositiveNumber {
+
     private static final int ZERO = 0;
 
     private int value;
@@ -14,7 +13,7 @@ public class PositiveNumber {
 
     private void validate(final String number) {
         if (number.chars()
-                      .noneMatch(character -> Character.isDigit(character))) {
+                  .noneMatch(character -> Character.isDigit(character))) {
             throw new IllegalArgumentException("숫자가 아닌 문자는 입력 불가능 합니다.");
         }
 
