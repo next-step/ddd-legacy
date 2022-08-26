@@ -13,7 +13,7 @@ public class StringCalculator {
     private StringCalculator() {
     }
 
-    public static int calculate(final String expression, Delimiters delimiters, NumberVerifier numberVerifier) {
+    public static int calculate(final String expression, Delimiters delimiters) {
         if (Strings.isBlank(expression)) {
             return ZERO;
         }
@@ -21,7 +21,7 @@ public class StringCalculator {
         List<String> splitExpressions = delimiters.split(expression);
 
         return splitExpressions.stream()
-                               .map(number -> new PositiveNumber(number))
+                               .map(PositiveNumber::new)
                                .map(PositiveNumber::value)
                                .reduce(0, Integer::sum);
     }

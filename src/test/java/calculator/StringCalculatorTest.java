@@ -56,28 +56,28 @@ class StringCalculatorTest {
     @ParameterizedTest
     @NullAndEmptySource
     void empty_and_null_value_is_zero(final String expression) {
-        assertThat(StringCalculator.calculate(expression, delimiters, numberVerifier)).isEqualTo(0);
+        assertThat(StringCalculator.calculate(expression, delimiters)).isEqualTo(0);
     }
 
     @DisplayName("숫자 하나를 문자열로 입력한 경우 해당 숫자를 반환한다.")
     @ParameterizedTest
     @ValueSource(strings = {"0", "1", "2", "34"})
     void not_contain_delimiter(final String expression) {
-        assertThat(StringCalculator.calculate(expression, delimiters, numberVerifier)).isEqualTo(Integer.parseInt(expression));
+        assertThat(StringCalculator.calculate(expression, delimiters)).isEqualTo(Integer.parseInt(expression));
     }
 
     @DisplayName("쉼표, 콜론을 구분자로 문자열을 전달하는 경우 숫자를 분리하고 합을 반환")
     @ParameterizedTest
     @MethodSource("provideNormalExpressions")
     void summary_by_normal_expressions(final String expression, int summary) {
-        assertThat(StringCalculator.calculate(expression, delimiters, numberVerifier)).isEqualTo(summary);
+        assertThat(StringCalculator.calculate(expression, delimiters)).isEqualTo(summary);
     }
 
     @DisplayName("'\\'와 '\n'의 사이에 위치하는 문자는 custom 구분자로 사용이 가능하며, 합을 반환한다.")
     @ParameterizedTest
     @MethodSource("provideCustomExpressions")
     void custom_delimiter(final String expression, int summary) {
-        assertThat(StringCalculator.calculate(expression, delimiters, numberVerifier)).isEqualTo(summary);
+        assertThat(StringCalculator.calculate(expression, delimiters)).isEqualTo(summary);
     }
 
     @DisplayName("숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException을 반환한다")
@@ -85,6 +85,6 @@ class StringCalculatorTest {
     @ValueSource(strings = {"abc", "-1", "1,-1", "1:3:b"})
     void no_positive_number(final String expression) {
         assertThatExceptionOfType(RuntimeException.class)
-            .isThrownBy(() -> StringCalculator.calculate(expression, delimiters, numberVerifier));
+            .isThrownBy(() -> StringCalculator.calculate(expression, delimiters));
     }
 }
