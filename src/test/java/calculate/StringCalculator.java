@@ -1,5 +1,6 @@
 package calculate;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,12 +14,10 @@ public class StringCalculator {
       return 0;
     }
 
-    String[] operands = split(text);
-    int sum = 0;
-    for (String operand : operands) {
-      sum += new PositiveNumber(operand).getNumber();
-    }
-    return sum;
+    return Arrays.stream(split(text))
+        .map(PositiveNumber::new)
+        .mapToInt(PositiveNumber::getNumber)
+        .sum();
   }
 
   private static String[] split(String text) {
