@@ -2,6 +2,7 @@ package calculator.verifier;
 
 import java.util.List;
 
+@Deprecated
 public class PositiveNumberVerifier implements NumberVerifier {
 
     private static final int MIN_VALUE = 0;

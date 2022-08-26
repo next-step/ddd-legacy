@@ -1,6 +1,7 @@
 package calculator;
 
 import calculator.delimiter.Delimiters;
+import calculator.number.PositiveNumber;
 import calculator.verifier.NumberVerifier;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
@@ -19,10 +20,9 @@ public class StringCalculator {
 
         List<String> splitExpressions = delimiters.split(expression);
 
-        numberVerifier.verify(splitExpressions);
-
         return splitExpressions.stream()
-                               .map(splitExpression -> Integer.parseInt(splitExpression))
+                               .map(number -> new PositiveNumber(number))
+                               .map(PositiveNumber::value)
                                .reduce(0, Integer::sum);
     }
 
