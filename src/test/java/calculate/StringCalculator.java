@@ -12,7 +12,7 @@ public class StringCalculator {
     String[] operands = text.split(DEFAULT_DELIMITER);
     int sum = 0;
     for (String operand : operands) {
-      sum += Integer.parseInt(operand);
+      sum += new PositiveNumber(operand).getNumber();
     }
     return sum;
   }

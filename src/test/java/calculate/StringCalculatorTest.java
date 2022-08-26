@@ -1,12 +1,14 @@
 package calculate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class StringCalculatorTest {
 
@@ -32,6 +34,19 @@ class StringCalculatorTest {
   @ParameterizedTest
   void calculate_DefaultDelimiter(String text, int sum) {
     assertThat(StringCalculator.calculate(text)).isEqualTo(sum);
+  }
+
+  @DisplayName("숫자 이외의 값 또는 음수를 전달할 경우 런타임 예외가 발생한다")
+  @ValueSource(strings = {
+      "-1",
+      "A",
+      "1,A",
+      "1,-2",
+  })
+  @ParameterizedTest
+  void calculate(String text) {
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> StringCalculator.calculate(text));
   }
 
 }
