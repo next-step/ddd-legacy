@@ -2,28 +2,48 @@ package calculator;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class StringCalculator {
 
-    private final String value;
+    public StringCalculator() {
 
-    private StringCalculator(String value) {
-        this.value = value;
     }
 
-    public static StringCalculator of(String value) {
-        return new StringCalculator(value);
-    }
+    public int add(String text) {
 
-    public int calculate() {
-
-        if (Objects.equals(this.value, "")) {
+        if (text == null || text.isBlank()) {
             return 0;
         }
 
-        String[] numbers = this.value.split("[,:]");
+        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+        String[] tokens = null;
 
-        return Arrays.stream(numbers).mapToInt(Integer::parseInt).sum();
+        if (m.find()) {
+            String customDelimiter = m.group(1);
+            tokens = m.group(2).split(customDelimiter);
+        }
+
+        int sum = 0;
+        if (tokens != null) {
+            for (String token : tokens) {
+                sum = sum + Arrays.stream(token.split("[,:]")).mapToInt(Integer::parseInt).sum();
+            }
+
+
+        } else{
+            String[] tokenss = text.split("[,:]");
+            for (String token : tokenss) {
+                if (Integer.parseInt(token) < 0) {
+                    throw new IllegalArgumentException();
+                }
+            }
+
+            sum = Arrays.stream(tokenss).mapToInt(Integer::parseInt).sum();
+        }
+
+        return sum;
     }
 
 }
