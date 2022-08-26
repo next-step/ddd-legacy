@@ -1,5 +1,8 @@
 package calculator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,10 +10,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-
 public class StringCalculatorTest {
+
     private StringCalculator calculator;
 
     @BeforeEach
@@ -36,7 +37,7 @@ public class StringCalculatorTest {
     @Test
     void negative() {
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add("-1"));
+            .isThrownBy(() -> calculator.add("-1"));
     }
 
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
@@ -58,7 +59,7 @@ public class StringCalculatorTest {
     @ValueSource(strings = {"1,2:3,4,5,6:7@8,9,10"})
     void invalid_delimiter(final String text) {
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add(text));
+            .isThrownBy(() -> calculator.add(text));
     }
 
     @DisplayName(value = "입력값이 모두 0인 경우, 합은 0이다.")
@@ -73,7 +74,7 @@ public class StringCalculatorTest {
     @ValueSource(strings = {",,:,,,,:::::,:,:,:,,,,"})
     void colons_empty_input(final String text) {
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add(text));
+            .isThrownBy(() -> calculator.add(text));
     }
 
     @DisplayName(value = "입력값에 문자가 포함되어 있는 경우, RuntimeException 예외 처리를 한다.")
@@ -81,7 +82,7 @@ public class StringCalculatorTest {
     @ValueSource(strings = {"a,2,4,6,8,:10,12:14,16:18,20"})
     void colons_invalid_input(final String text) {
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add(text));
+            .isThrownBy(() -> calculator.add(text));
     }
 
     @DisplayName(value = "입력값에 음수가 포함되어 있는 경우, RuntimeException 예외 처리를 한다.")
@@ -89,7 +90,7 @@ public class StringCalculatorTest {
     @ValueSource(strings = {"99,8:-1,0:5"})
     void colons_negative_input(final String text) {
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add(text));
+            .isThrownBy(() -> calculator.add(text));
     }
 
     @DisplayName(value = "//와 \n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
@@ -104,7 +105,7 @@ public class StringCalculatorTest {
     @ValueSource(strings = {"//-\n1-2//?\n3-4-5-6-7-8-9-10"})
     void multiple_custom_delimiter(final String text) {
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add(text));
+            .isThrownBy(() -> calculator.add(text));
     }
 
     @DisplayName(value = "커스텀 구분자를 사용하면서, 입력이 0인 경우 합은 0이다.")
@@ -117,20 +118,20 @@ public class StringCalculatorTest {
     @Test
     void negative_custom_delimiter() {
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add("//;\n-1;2;3;4;5;6;7;8;9;10"));
+            .isThrownBy(() -> calculator.add("//;\n-1;2;3;4;5;6;7;8;9;10"));
     }
 
     @DisplayName(value = "커스텀 구분자를 사용하면서, 문자를 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @Test
     void invalid_input_custom_delimiter() {
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add("//;\n1;invalidinput;3"));
+            .isThrownBy(() -> calculator.add("//;\n1;invalidinput;3"));
     }
 
     @DisplayName(value = "커스텀 구분자를 사용하면서, 입력값이 없는 경우 RuntimeException 예외 처리를 한다.")
     @Test
     void empty_input_custom_delimiter() {
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add("//;\n;;"));
+            .isThrownBy(() -> calculator.add("//;\n;;"));
     }
 }

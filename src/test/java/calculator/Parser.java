@@ -1,46 +1,30 @@
 package calculator;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Parser {
-    private String[] tokens;
 
-    public Parser execute(String text) {
-        parsingTextByCustomDelimiter(text);
-        if (this.isEmptyToken()) parsingText(text);
+    private final Pattern customDelimiterPattern = Pattern.compile("//(.)\n(.*)");
+    private final String DELIMITER_COMMON_REGEX = ",|:";
 
-        return this;
-    }
-
-    public String[] getTokens() {
-        return this.tokens;
-    }
-
-    private boolean isEmptyToken() {
-        return (this.tokens == null || this.tokens.length <= 0);
-    }
-
-    private void parsingText(String text) {
-        this.tokens = text.split(",|:");
-    }
-
-    private boolean isNumeric(String text) {
-        if (text == null || text.isEmpty()) return false;
-        return text.matches("\\d+");
-    }
-
-    private void parsingTextByCustomDelimiter(String text) {
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
-        if (m.find()) {
-            String customDelimiter = m.group(1);
-            this.tokens = Arrays.stream(m.group(2).split("\\" + customDelimiter))
-                    .map(x -> {
-                        if (!isNumeric(x)) throw new RuntimeException("숫자가 아닙니다.");
-                        return x;
-                    })
-                    .toArray(String[]::new);
+    public String[] execute(String text) {
+        Matcher matcher = customDelimiterPattern.matcher(text);
+        if (matcher.find()) {
+            return splitTextByCustomDelimiter(matcher);
         }
+        return splitText(text);
+    }
+
+    private String[] splitTextByCustomDelimiter(Matcher m) {
+        String customDelimiter = m.group(1);
+        if ("+".equals(customDelimiter) || "*".equals(customDelimiter)) {
+            customDelimiter = String.format("\\%s", customDelimiter);
+        }
+        return m.group(2).split(customDelimiter);
+    }
+
+    private String[] splitText(String text) {
+        return text.split(DELIMITER_COMMON_REGEX);
     }
 }
