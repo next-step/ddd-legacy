@@ -60,4 +60,16 @@ public class StringCalculatorTest {
 
     }
 
+    @DisplayName("기본 구분자 쉼표와 콜론 동시 사용 : “1,2:3” => 6")
+    @Test
+    void 콜론쉼표계산() {
+
+        //        given
+        String value = "1,2,3";
+
+        //        then
+        assertThat(of(value).calculate()).isEqualTo(6);
+
+    }
+
 }

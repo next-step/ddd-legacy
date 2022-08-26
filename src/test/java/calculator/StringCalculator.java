@@ -21,7 +21,7 @@ public class StringCalculator {
             return 0;
         }
 
-        String[] numbers = this.value.split(",");
+        String[] numbers = this.value.split("[,:]");
 
         return Arrays.stream(numbers).mapToInt(Integer::parseInt).sum();
     }
