@@ -27,7 +27,8 @@ public final class StringCalculator {
 
     private int sum(List<PositiveNumber> positiveNumbers) {
         return positiveNumbers.stream()
-                .mapToInt(PositiveNumber::getValue)
-                .sum();
+                .reduce(PositiveNumber::sum)
+                .map(PositiveNumber::getValue)
+                .orElse(DEFAULT_VALUE);
     }
 }

@@ -19,6 +19,10 @@ public class PositiveNumber {
         }
     }
 
+    public PositiveNumber sum(PositiveNumber other) {
+        return new PositiveNumber(value + other.value);
+    }
+
     public int getValue() {
         return value;
     }
