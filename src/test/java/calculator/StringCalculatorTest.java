@@ -1,6 +1,7 @@
 package calculator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +19,7 @@ class StringCalculatorTest {
         calculator = new StringCalculator();
     }
 
-    @DisplayName("1. 빈 문자열 또는 null을 입력할 경우 0을 반환해야 한다.")
+    @DisplayName("빈 문자열 또는 null을 입력할 경우 0을 반환해야 한다.")
     @ParameterizedTest
     @NullAndEmptySource
     void isBlank(String text) {
@@ -39,6 +40,14 @@ class StringCalculatorTest {
     void customDelimiter(String actual) {
         assertThat(calculator.add(actual))
                 .isEqualTo(6);
+    }
+
+    @DisplayName("음수를 전달할 경우 RuntimeException 예외가 발생해야 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"-1", "-1,2,3"})
+    void positiveStringNumbers(String actual) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> calculator.add(actual));
     }
 
     @DisplayName("쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열을 전달하는 경우 "

@@ -19,8 +19,8 @@ class StringNumberParserTest {
     @DisplayName("기본적으로 ',' 와 ':' 구분자를 지정한다.")
     @ParameterizedTest
     @ValueSource(strings = {"1,2,3", "1:2:3", "1,2:3"})
-    void convertToList(String actual) {
-        assertThat(stringNumberParser.convertToList(actual))
+    void success(String actual) {
+        assertThat(stringNumberParser.toPositiveNumbers(actual))
                 .hasSize(3);
     }
 
@@ -28,7 +28,7 @@ class StringNumberParserTest {
     @ParameterizedTest
     @ValueSource(strings = {"//;\n1;2;3",})
     void customDelimiter(String actual) {
-        assertThat(stringNumberParser.convertToList(actual))
+        assertThat(stringNumberParser.toPositiveNumbers(actual))
                 .hasSize(3);
     }
 }

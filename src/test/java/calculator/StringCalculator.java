@@ -16,13 +16,16 @@ public final class StringCalculator {
             return 0;
         }
 
-        return toStringNumbers(text)
-                .stream()
-                .mapToInt(Integer::parseInt)
-                .sum();
+        return sum(toPositiveNumbers(text));
     }
 
-    private List<String> toStringNumbers(String text) {
-        return stringNumberParser.convertToList(text);
+    private List<PositiveNumber> toPositiveNumbers(String text) {
+        return stringNumberParser.toPositiveNumbers(text);
+    }
+
+    private int sum(List<PositiveNumber> positiveNumbers) {
+        return positiveNumbers.stream()
+                .mapToInt(PositiveNumber::getValue)
+                .sum();
     }
 }
