@@ -1,7 +1,10 @@
 package addstring;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class StringCalculator {
 
@@ -19,8 +22,12 @@ public class StringCalculator {
 
         String[] stringNumberArray = splitStringToArrayByDelimiter(s);
 
-        return Numbers.from(stringNumberArray)
-            .sum();
+        List<Number> numberList = Arrays.stream(stringNumberArray)
+            .map(Number::new)
+            .collect(Collectors.toList());
+        Numbers numbers = new Numbers(numberList);
+
+        return numbers.sum();
     }
 
     private String[] splitStringToArrayByDelimiter(String s) {

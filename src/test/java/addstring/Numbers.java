@@ -1,8 +1,6 @@
 package addstring;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Numbers {
 
@@ -16,13 +14,6 @@ public class Numbers {
         return numbers.stream()
             .mapToInt(Number::getIntValue)
             .sum();
-    }
-
-    static public Numbers from(String[] stringNumbers) {
-        List<Number> numbers = Arrays.stream(stringNumbers)
-            .map(Number::new)
-            .collect(Collectors.toList());
-        return new Numbers(numbers);
     }
 
 }
