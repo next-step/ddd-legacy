@@ -8,14 +8,26 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class CarTest {
 
-    @Test
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "hello",
+        "",
+        "1",
+        "22",
+        "333",
+        "4444",
+        "55555",
+        "@ˆˆîf",
+    })
     @DisplayName("자동차 이름은 5글자 이하이다")
-    void test01() {
+    void test01(String name) {
         assertDoesNotThrow(() -> {
-            new Car("hello");
+            new Car(name);
         });
     }
 
@@ -24,14 +36,6 @@ public class CarTest {
     void test02() {
         assertThrows(IllegalArgumentException.class, () -> {
             new Car("hello2");
-        });
-    }
-
-    @Test
-    @DisplayName("자동차 이름은 길이가 0일 수 있다")
-    void test03() {
-        assertDoesNotThrow(() -> {
-            new Car("");
         });
     }
 
