@@ -1,11 +1,6 @@
 package stringcalculator;
 
-import stringcalculator.factory.SplitterFactory;
-import stringcalculator.factory.splitter.CustomSplitter;
-
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StringCalculator {
 
@@ -19,17 +14,11 @@ public class StringCalculator {
             return EMPTY_VALUE;
         }
 
-        boolean type = checkSplitterType(value);
-        return SplitterFactory.findSplitter(type)
-                .split(value)
-                .stream().parallel()
+        return new Splitter().split(value)
+                .stream()
+                .parallel()
                 .map(PositiveNumber::new)
                 .mapToInt(PositiveNumber::toInt)
                 .sum();
-    }
-
-    private boolean checkSplitterType(String value) {
-        Matcher m = Pattern.compile(CustomSplitter.CUSTOM_DELIMITER_REGEX).matcher(value);
-        return m.find();
     }
 }
