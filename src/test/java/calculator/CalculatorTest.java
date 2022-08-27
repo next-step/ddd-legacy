@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class CalculatorTest {
     /**
@@ -17,7 +18,7 @@ public class CalculatorTest {
     @DisplayName("빈 문자열이나 Null 값의 경우 0을 반환한다.")
     @NullAndEmptySource
     @ParameterizedTest
-    void input_null_and_empty_text(final String input) {
+    void null_and_empty(final String input) {
         final int result = Calculator.sum(input);
         assertThat(result).isZero();
     }
@@ -25,7 +26,7 @@ public class CalculatorTest {
     @DisplayName("쉼표 구분자로 덧셈을 한다.")
     @ParameterizedTest
     @ValueSource(strings = "1,2,3")
-    void input_comma_text(final String input) {
+    void comma(final String input) {
         final int result = Calculator.sum(input);
         assertThat(result).isEqualTo(6);
     }
@@ -33,7 +34,7 @@ public class CalculatorTest {
     @DisplayName("콜론 구분자로 덧셈을 한다.")
     @ParameterizedTest
     @ValueSource(strings = "1:2:3")
-    void input_colon_text(final String input) {
+    void colon(final String input) {
         final int result = Calculator.sum(input);
         assertThat(result).isEqualTo(6);
     }
@@ -41,8 +42,25 @@ public class CalculatorTest {
     @DisplayName("쉼표 및 콜론 구분자로 덧셈을 한다.")
     @ParameterizedTest
     @ValueSource(strings = "1:2,3")
-    void input_colon_and_comma_text(final String input) {
+    void colon_and_comma(final String input) {
         final int result = Calculator.sum(input);
         assertThat(result).isEqualTo(6);
     }
+
+    @DisplayName("음수 값을 넣으면 예외가 발생한다.")
+    @ParameterizedTest
+    @ValueSource(strings = "-1")
+    void negative(final String input) {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> Calculator.sum(input));
+    }
+
+    @DisplayName("숫자 이외의 값을 넣으면 예외가 발생한다.")
+    @ParameterizedTest
+    @ValueSource(strings = "a,b,c")
+    void NonNumber(final String input) {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> Calculator.sum(input));
+    }
+
 }
