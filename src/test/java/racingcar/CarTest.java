@@ -1,5 +1,6 @@
 package racingcar;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -38,5 +39,13 @@ public class CarTest {
         assertThrows(NullPointerException.class, () -> {
             new Car(null);
         });
+    }
+
+    @Test
+    @DisplayName("자동차 이름을 확인할 수 있다")
+    void nameTest05() {
+        final String name = "안녕하세요";
+        Car car = new Car(name);
+        assertThat(car.getName()).isEqualTo(name);
     }
 }
