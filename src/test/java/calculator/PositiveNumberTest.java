@@ -10,20 +10,21 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class CalculatorNumberTest {
+@DisplayName("양수 클래스 테스트")
+class PositiveNumberTest {
 
     @DisplayName("음수를 가질수 없다")
     @Test
     void cannot_have_negative_numbers() {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new CalculatorNumber(-1));
+                .isThrownBy(() -> new PositiveNumber(-1));
     }
 
     @DisplayName("문자열 음수를 가질수 없다")
     @Test
     void string_cannot_have_negative_numbers() {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new CalculatorNumber("-1"));
+                .isThrownBy(() -> new PositiveNumber("-1"));
     }
 
     @DisplayName("숫자가 아닌 문자열을 가질수 없다")
@@ -31,7 +32,7 @@ class CalculatorNumberTest {
     @ValueSource(strings = {"a", "b"})
     void cannot_have_native_string(String stringNumber) {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new CalculatorNumber(stringNumber));
+                .isThrownBy(() -> new PositiveNumber(stringNumber));
     }
 
     @DisplayName("공백, null을 가질수 없다")
@@ -39,15 +40,15 @@ class CalculatorNumberTest {
     @NullAndEmptySource
     void cannot_have_null_and_Empty(String stringNumber) {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new CalculatorNumber(stringNumber));
+                .isThrownBy(() -> new PositiveNumber(stringNumber));
     }
 
     @DisplayName("계산할 숫자를 넣으면 숫자의 합을 반환 한다.")
     @Test
-    void input_number_then_sumNember() {
-        CalculatorNumber source = new CalculatorNumber(3);
+    void input_number_then_sum_nember() {
+        PositiveNumber source = new PositiveNumber(3);
 
-        source.add(new CalculatorNumber(5));
+        source.add(new PositiveNumber(5));
 
         assertThat(source.getNumber()).isEqualTo(8);
     }

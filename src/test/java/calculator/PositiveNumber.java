@@ -2,30 +2,28 @@ package calculator;
 
 import java.util.Objects;
 
-public class CalculatorNumber {
+public class PositiveNumber {
     private static final int ZERO = 0;
     private static final int MIN_NUMBER = ZERO;
 
     private int number;
 
-    private CalculatorNumber() {}
-
-    public CalculatorNumber(String number) {
+    public PositiveNumber(String number) {
         this(Integer.parseInt(number));
     }
 
-    public CalculatorNumber(int number) {
+    public PositiveNumber(int number) {
         if (number < MIN_NUMBER) {
             throw new IllegalArgumentException("계산할 숫자는 음수를 가질수 없습니다.");
         }
         this.number = number;
     }
 
-    public static CalculatorNumber zeroNumber() {
-        return new CalculatorNumber(ZERO);
+    public static PositiveNumber zeroNumber() {
+        return new PositiveNumber(ZERO);
     }
 
-    public void add(CalculatorNumber addNumber) {
+    public void add(PositiveNumber addNumber) {
         this.number += addNumber.number;
     }
 
@@ -41,7 +39,7 @@ public class CalculatorNumber {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        CalculatorNumber that = (CalculatorNumber) o;
+        PositiveNumber that = (PositiveNumber) o;
         return getNumber() == that.getNumber();
     }
 
