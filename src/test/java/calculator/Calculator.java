@@ -1,5 +1,6 @@
 package calculator;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class Calculator {
@@ -11,6 +12,9 @@ public class Calculator {
             return DEFAULT_VALUE;
         }
 
-        return -1;
+        String[] numbers = input.split(",|:");
+        return Arrays.stream(numbers)
+                .mapToInt(value -> Integer.parseInt(value))
+                .sum();
     }
 }

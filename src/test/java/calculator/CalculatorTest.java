@@ -3,6 +3,7 @@ package calculator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,9 +17,32 @@ public class CalculatorTest {
     @DisplayName("빈 문자열이나 Null 값의 경우 0을 반환한다.")
     @NullAndEmptySource
     @ParameterizedTest
-    void input_text_null_and_empty_name(final String input) {
+    void input_null_and_empty_text(final String input) {
         final int result = Calculator.sum(input);
         assertThat(result).isZero();
     }
 
+    @DisplayName("쉼표 구분자로 덧셈을 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = "1,2,3")
+    void input_comma_text(final String input) {
+        final int result = Calculator.sum(input);
+        assertThat(result).isEqualTo(6);
+    }
+
+    @DisplayName("콜론 구분자로 덧셈을 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = "1:2:3")
+    void input_colon_text(final String input) {
+        final int result = Calculator.sum(input);
+        assertThat(result).isEqualTo(6);
+    }
+
+    @DisplayName("쉼표 및 콜론 구분자로 덧셈을 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = "1:2,3")
+    void input_colon_and_comma_text(final String input) {
+        final int result = Calculator.sum(input);
+        assertThat(result).isEqualTo(6);
+    }
 }
