@@ -65,10 +65,20 @@ docker compose -p kitchenpos up -d
 
 ### 주문
 생성
+```
+주문의 상태 변화
+WAITING
+```
 - [ ] 주문은 배달, 테이크아웃, 홀 타입으로 나누어 진다. (DELIVERY, TAKEOUT, EAT_IN)
 - [ ] 타입은 비어있을 수 없다.
-- [ ] 주문은 여러 주문메뉴정보 을 가질 수 있다.
+- [ ] 주문은 여러 주문메뉴정보를 가질 수 있다.
 - [ ] 주문은 적어도 하나의 주문메뉴정보를 가져야 한다.
+- [ ] 주문에 포함된 주문메뉴정보는, 주문메뉴정보의 제약조건을 모두 만족해야 한다.
+  - [ ] 주문메뉴정보의 메뉴는 항상 존재해야 한다(메뉴가 없으면 안됨).
+  - [ ] 홀에서 먹을 경우, 수량은 음수를 허용한다.
+  - [ ] 홀이 아닐경우, 음수를 허용하지 않는다.
+  - [ ] 모든 메뉴는 전시중이어야 한다.
+  - [ ] 메뉴 가격과 주문메뉴정보에 명시된 가격은 동일해야 한다.
 - [ ] 주문의 초기 상태는 WAITING이다.
 - [ ] 주문의 타입이 DEVIVERY라면, 주소를 필수로 입력받는다.
 - [ ] 주소는 널이거나 비어있지 않다.
@@ -77,28 +87,56 @@ docker compose -p kitchenpos up -d
 - [ ] 주문 테이블은 존재해야 한다.
 
 주문 accept
+```
+주문의 상태 변화
+WAITING -> ACCEPTED
+```
 - [ ] 주문은 존재해야 한다.
 - [ ] 주문의 상태는 WAITING 상태여야 한다.
 - [ ] 주문 타입이 DELIVER라면, 라이더 시스템으로 배달 요청을 전송한다.
 - [ ] 주문 상태를 ACCEPTED 로 변경된다..
 
 주문 serve
+```
+주문의 상태 변화
+ACCEPTED -> SERVED
+```
 - [ ] 주문은 존재해야 한다.
 - [ ] 주문 상태가 ACCEPTED 상태여야 한다. 
 - [ ] 주문 상태는 SERVED 로 변경된다.
 
 주문 startDelivery
+```
+사전 조건
+DELIVERY 타입.
+
+주문의 상태 변화
+SERVED -> DELIVERING
+```
 - [ ] 주문은 존재해야 한다.
 - [ ] 주문은 DELIVERY 타입이어야 한다.
 - [ ] 주문은 SERVED 상태여야 한다.
 - [ ] 주문 상태는 DELIVERING 으로 변경된다.
 
 주문 completeDelivery
+```
+주문의 상태 변화
+DELIVERING -> DELIVERED
+```
 - [ ] 주문은 존재해야 한다.
 - [ ] 주문 상태는 DELIVERING 이어야 한다.
 - [ ] 주문 상태는 DELIVERED 로 변경된다.
 
 주문 complete
+```
+주문의 상태 변화
+ 
+[DELIVERY 타입]
+DELIVERED -> COMPLETED
+
+[TAKEOUT, EAT_INT 타입]
+SERVED -> COMPLETED
+```
 - [ ] 주문은 존재해야 한다.
 - [ ] 주문이 DELIVERY 타입이면, DELIVERED 상태여야 한다.
 - [ ] 주문이 TAKEOUT, EAT_IN 타입이면, SERVED 상태여야 한다.
