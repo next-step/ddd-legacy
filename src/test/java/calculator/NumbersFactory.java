@@ -48,11 +48,14 @@ public class NumbersFactory {
 
     private boolean isNaturalNumber(String param) {
         char[] characters = param.toCharArray();
+        List<Character> temp = new ArrayList<>();
         for (char character : characters) {
-            if (character > '9' || character < '0') {
-                return false;
-            }
+            temp.add(character);
         }
-        return true;
+        return temp.stream().allMatch(this::isNumberCharacter);
+    }
+
+    private boolean isNumberCharacter(char character) {
+        return character <= '9' && character >= '0';
     }
 }
