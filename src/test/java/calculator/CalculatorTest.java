@@ -23,42 +23,18 @@ public class CalculatorTest {
         assertThat(result).isZero();
     }
 
-    @DisplayName("쉼표 구분자로 덧셈을 한다.")
-    @ParameterizedTest
-    @ValueSource(strings = "1,2,3")
-    void comma(final String input) {
-        final int result = Calculator.sum(input);
-        assertThat(result).isEqualTo(6);
-    }
-
-    @DisplayName("콜론 구분자로 덧셈을 한다.")
-    @ParameterizedTest
-    @ValueSource(strings = "1:2:3")
-    void colon(final String input) {
-        final int result = Calculator.sum(input);
-        assertThat(result).isEqualTo(6);
-    }
-
     @DisplayName("쉼표 및 콜론 구분자로 덧셈을 한다.")
     @ParameterizedTest
-    @ValueSource(strings = "1:2,3")
+    @ValueSource(strings = {"1,2,3", "1:2:3", "1:2,3"})
     void colon_and_comma(final String input) {
         final int result = Calculator.sum(input);
         assertThat(result).isEqualTo(6);
     }
 
-    @DisplayName("음수 값을 넣으면 예외가 발생한다.")
+    @DisplayName("음수 및 숫자 이외의 값을 넣으면 예외가 발생한다.")
     @ParameterizedTest
-    @ValueSource(strings = "-1")
-    void negative(final String input) {
-        assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> Calculator.sum(input));
-    }
-
-    @DisplayName("숫자 이외의 값을 넣으면 예외가 발생한다.")
-    @ParameterizedTest
-    @ValueSource(strings = "a,b,c")
-    void NonNumber(final String input) {
+    @ValueSource(strings = {"-1", "a,b,c"})
+    void no_number_and_negative(final String input) {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> Calculator.sum(input));
     }
