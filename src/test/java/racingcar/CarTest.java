@@ -3,6 +3,8 @@ package racingcar;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,5 +49,29 @@ public class CarTest {
         final String name = "안녕하세요";
         Car car = new Car(name);
         assertThat(car.getName()).isEqualTo(name);
+    }
+
+    @DisplayName("MovingStrategy 가 참을 반환하면 자동차는 움직일 수 있다")
+    @Test
+    void moveTest01() {
+        // given
+        MovingStrategy strategy = mock(MovingStrategy.class);
+        Car car = new Car("hello", strategy);
+        given(strategy.moveAble()).willReturn(true);
+
+        // when, then
+        assertThat(car.move()).isTrue();
+    }
+
+    @DisplayName("MovingStrategy 가 거짓을 반환하면 자동차는 움직일 수 없다")
+    @Test
+    void moveTest02() {
+        // given
+        MovingStrategy strategy = mock(MovingStrategy.class);
+        Car car = new Car("hello", strategy);
+        given(strategy.moveAble()).willReturn(false);
+
+        // when, then
+        assertThat(car.move()).isFalse();
     }
 }
