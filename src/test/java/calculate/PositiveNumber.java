@@ -4,6 +4,7 @@ import java.util.regex.Pattern;
 
 public class PositiveNumber {
 
+    public static final int MIN_NUMBER = 1;
     private static final Pattern pattern = Pattern.compile("\\d+");
 
     private final int number;
@@ -13,7 +14,7 @@ public class PositiveNumber {
     }
 
     public PositiveNumber(int number) {
-        if (number < 1) {
+        if (number < MIN_NUMBER) {
             throw new IllegalArgumentException("숫자는 음수일 수 없습니다.");
         }
         this.number = number;
