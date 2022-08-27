@@ -23,7 +23,7 @@ class Expression {
     }
 
     static Expression of(final String input) {
-        validateNonNull(input);
+        validateNonEmpty(input);
 
         final Matcher customDelimiterExpression = CUSTOM_DELIMITER_PATTERN.matcher(input);
         if (!customDelimiterExpression.find()) {
@@ -36,8 +36,8 @@ class Expression {
         );
     }
 
-    private static void validateNonNull(String input) {
-        if (input == null) {
+    private static void validateNonEmpty(String input) {
+        if (input == null || input.trim().length() == 0) {
             throw new RuntimeException();
         }
     }
