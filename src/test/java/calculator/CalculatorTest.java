@@ -23,9 +23,6 @@ public class CalculatorTest {
         calculator = new Calculator();
     }
 
-    @BeforeEach
-
-
     @DisplayName("빈 문자열이나 Null 값의 경우 0을 반환한다.")
     @NullAndEmptySource
     @ParameterizedTest
