@@ -13,7 +13,7 @@ public class CarTest {
 
     @Test
     @DisplayName("자동차 이름은 5글자 이하이다")
-    void nameTest01() {
+    void test01() {
         assertDoesNotThrow(() -> {
             new Car("hello");
         });
@@ -21,7 +21,7 @@ public class CarTest {
 
     @Test
     @DisplayName("자동차 이름이 5글자를 넘으면 IllegalArgumentException 이 발생한다")
-    void nameTest02() {
+    void test02() {
         assertThrows(IllegalArgumentException.class, () -> {
             new Car("hello2");
         });
@@ -29,7 +29,7 @@ public class CarTest {
 
     @Test
     @DisplayName("자동차 이름은 길이가 0일 수 있다")
-    void nameTest03() {
+    void test03() {
         assertDoesNotThrow(() -> {
             new Car("");
         });
@@ -37,7 +37,7 @@ public class CarTest {
 
     @Test
     @DisplayName("자동차 이름은 null 이면 NullPointerException 이 발생한다")
-    void nameTest04() {
+    void test04() {
         assertThrows(NullPointerException.class, () -> {
             new Car(null);
         });
@@ -45,15 +45,15 @@ public class CarTest {
 
     @Test
     @DisplayName("자동차 이름을 확인할 수 있다")
-    void nameTest05() {
+    void test05() {
         final String name = "안녕하세요";
         Car car = new Car(name);
         assertThat(car.getName()).isEqualTo(name);
     }
 
-    @DisplayName("MovingStrategy 가 참을 반환하면 자동차는 움직일 수 있다")
     @Test
-    void moveTest01() {
+    @DisplayName("모킹한 MovingStrategy 가 참을 반환하면 자동차는 움직일 수 있다")
+    void test06() {
         // given
         MovingStrategy strategy = mock(MovingStrategy.class);
         Car car = new Car("hello", strategy);
@@ -63,9 +63,9 @@ public class CarTest {
         assertThat(car.move()).isTrue();
     }
 
-    @DisplayName("MovingStrategy 가 거짓을 반환하면 자동차는 움직일 수 없다")
     @Test
-    void moveTest02() {
+    @DisplayName("모킹한 MovingStrategy 가 거짓을 반환하면 자동차는 움직일 수 없다")
+    void test07() {
         // given
         MovingStrategy strategy = mock(MovingStrategy.class);
         Car car = new Car("hello", strategy);
