@@ -31,7 +31,7 @@ public class CalculatorTest {
         assertThat(result).isEqualTo(6);
     }
 
-    @DisplayName("음수 및 숫자 이외의 값을 넣으면 예외가 발생한다.")
+    @DisplayName("음수 및 숫자 이외의 값을 넣으면 RuntimeException 발생한다.")
     @ParameterizedTest
     @ValueSource(strings = {"-1", "a,b,c"})
     void no_number_and_negative(final String input) {
@@ -39,4 +39,11 @@ public class CalculatorTest {
                 .isThrownBy(() -> Calculator.sum(input));
     }
 
+    @DisplayName("//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"//;\n1;2;3"})
+    void custom(final String input) {
+        final int result = Calculator.sum(input);
+        assertThat(result).isEqualTo(6);
+    }
 }
