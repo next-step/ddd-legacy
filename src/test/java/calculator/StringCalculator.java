@@ -9,7 +9,7 @@ public class StringCalculator {
         }
 
         for (String stringNumber : StringTokenUtils.tokenizer(text)) {
-            number.add(new PositiveNumber(stringNumber));
+            number = number.add(new PositiveNumber(stringNumber));
         }
 
         return number.getNumber();

@@ -48,9 +48,9 @@ class PositiveNumberTest {
     void input_number_then_sum_nember() {
         PositiveNumber source = new PositiveNumber(3);
 
-        source.add(new PositiveNumber(5));
+        final PositiveNumber result = source.add(new PositiveNumber(5));
 
-        assertThat(source.getNumber()).isEqualTo(8);
+        assertThat(result.getNumber()).isEqualTo(8);
     }
 
 }

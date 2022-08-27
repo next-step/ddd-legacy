@@ -6,7 +6,7 @@ public class PositiveNumber {
     private static final int ZERO = 0;
     private static final int MIN_NUMBER = ZERO;
 
-    private int number;
+    private final int number;
 
     public PositiveNumber(String number) {
         this(Integer.parseInt(number));
@@ -23,8 +23,8 @@ public class PositiveNumber {
         return new PositiveNumber(ZERO);
     }
 
-    public void add(PositiveNumber addNumber) {
-        this.number += addNumber.number;
+    public PositiveNumber add(PositiveNumber addNumber) {
+        return new PositiveNumber(this.number + addNumber.number);
     }
 
     public int getNumber() {
