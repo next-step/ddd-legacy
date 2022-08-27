@@ -7,7 +7,9 @@ public class StringAddCalculator {
             return 0;
         }
 
-        return 0;
+        int number = Integer.parseInt(input);
+
+        return number;
     }
 
     private static boolean validateInput(String input) {
