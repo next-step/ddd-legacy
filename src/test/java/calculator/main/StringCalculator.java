@@ -1,4 +1,4 @@
-package calculator;
+package calculator.main;
 
 import java.util.Arrays;
 
