@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-class ExpressionTest {
+class StringExpressionTest {
 
     private static Stream<Arguments> provideParseTestArguments() {
         return Stream.of(
@@ -29,14 +29,14 @@ class ExpressionTest {
     @ValueSource(strings = " ")
     void createFailTest(final String given) {
         assertThatExceptionOfType(RuntimeException.class)
-            .isThrownBy(() -> Expression.of(given));
+            .isThrownBy(() -> StringExpression.of(given));
     }
 
     @DisplayName("문자열 계산식을 파싱할 수 있다.")
     @ParameterizedTest
     @MethodSource("provideParseTestArguments")
     void parseTest(final String given, final List<Integer> expected) {
-        final Expression expression = Expression.of(given);
+        final StringExpression expression = StringExpression.of(given);
         assertThat(expression.parse())
             .containsExactlyElementsOf(expected);
     }

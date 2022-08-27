@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-class Expression {
+class StringExpression {
 
     private static final String DEFAULT_DELIMITER = "[,:]";
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
@@ -17,20 +17,20 @@ class Expression {
     private final String expression;
     private final String delimiter;
 
-    private Expression(final String expression, final String delimiter) {
+    private StringExpression(final String expression, final String delimiter) {
         this.expression = Objects.requireNonNull(expression);
         this.delimiter = Objects.requireNonNull(delimiter);
     }
 
-    static Expression of(final String input) {
+    static StringExpression of(final String input) {
         validateNonEmpty(input);
 
         final Matcher customDelimiterExpression = CUSTOM_DELIMITER_PATTERN.matcher(input);
         if (!customDelimiterExpression.find()) {
-            return new Expression(input, DEFAULT_DELIMITER);
+            return new StringExpression(input, DEFAULT_DELIMITER);
         }
 
-        return new Expression(
+        return new StringExpression(
             customDelimiterExpression.group(EXPRESSION_GROUP_INDEX),
             customDelimiterExpression.group(DELIMITER_GROUP_INDEX)
         );
