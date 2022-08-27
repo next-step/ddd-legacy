@@ -11,11 +11,13 @@ public class Splitter {
     private static final int CUSTOM_DELIMITER_INDEX = 1;
     private static final int NUMBER_VALUE_INDEX = 2;
 
+    private static final Pattern pattern = Pattern.compile(CUSTOM_DELIMITER_REGEX);
+
     public Splitter() {
     }
 
     public List<String> split(String value) {
-        Matcher matcher = Pattern.compile(CUSTOM_DELIMITER_REGEX).matcher(value);
+        Matcher matcher = pattern.matcher(value);
         if (matcher.find()) {
             String customDelimiter = matcher.group(CUSTOM_DELIMITER_INDEX);
             String[] split = matcher.group(NUMBER_VALUE_INDEX).split(customDelimiter);
