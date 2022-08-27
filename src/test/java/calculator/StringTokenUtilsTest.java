@@ -13,9 +13,7 @@ public class StringTokenUtilsTest {
     @ParameterizedTest
     @DisplayName(" ', ':'문자열으로 구분한다.")
     @ValueSource(strings = {"3,4", "3:4"})
-    void tokenString() {
-        // given
-        String word = "3,4";
+    void tokenString(String word) {
         // when
         String tokens[] = StringTokenUtils.tokenizer(word);
         // then
