@@ -23,7 +23,7 @@ public class Calculator {
                 .sum();
     }
 
-    private String[] parseInput(String input) {
+    private String[] parseInput(final String input) {
         Matcher matcher = Pattern.compile(CUSTOM_REGEX).matcher(input);
         if (matcher.find()) {
             String customInput = matcher.group(2);
@@ -32,13 +32,13 @@ public class Calculator {
         return input.split(DEFAULT_REGEX);
     }
 
-    private int parseInt(String value) {
+    private int parseInt(final String value) {
         checkNumber(value);
         checkNegative(value);
         return Integer.parseInt(value);
     }
 
-    private void checkNegative(String value) {
+    private void checkNegative(final String value) {
         int iValue = Integer.parseInt(value);
 
         if (iValue < 0) {
@@ -46,7 +46,7 @@ public class Calculator {
         }
     }
 
-    private void checkNumber(String value) {
+    private void checkNumber(final String value) {
         boolean isNumber = value.matches("\\d");
 
         if (!isNumber) {
