@@ -1,19 +1,48 @@
 package calculator;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class StringAddCalculator {
+
+    private static final String DEFAULT_DELIMITER = ",|:";
+    private static final String DELIMITER_REGEX = "//(.)\n(.*)";
+    private static final int DELIMITER_MATCHER_GROUP = 1;
+    private static final int INPUT_NUMBER_MATCHER_GROUP = 2;
+
+    private StringAddCalculator() {
+    }
+
     public static int splitAndSum(String input) {
 
         if (!validateInput(input)) {
             return 0;
         }
 
-        int number = Integer.parseInt(input);
+        String delimiter = DEFAULT_DELIMITER;
 
-        return number;
+        Matcher matcher = Pattern.compile(DELIMITER_REGEX).matcher(input);
+        if (matcher.find()) {
+            delimiter = matcher.group(DELIMITER_MATCHER_GROUP);
+            input = matcher.group(INPUT_NUMBER_MATCHER_GROUP);
+        }
+
+        int calculatorValue = 0;
+
+        for (String splitNumber : splitDelimiter(input, delimiter)) {
+            PositiveNumber positiveNumber = new PositiveNumber(splitNumber);
+            calculatorValue = positiveNumber.add(calculatorValue);
+        }
+
+        return calculatorValue;
     }
 
     private static boolean validateInput(String input) {
         return input != null && !input.isEmpty();
+    }
+
+    private static String[] splitDelimiter(String beforeSplit, String delimiter) {
+        return beforeSplit.split(delimiter);
     }
 
 }
