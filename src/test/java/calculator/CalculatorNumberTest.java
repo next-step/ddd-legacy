@@ -42,9 +42,9 @@ class CalculatorNumberTest {
                 .isThrownBy(() -> new CalculatorNumber(stringNumber));
     }
 
-    @DisplayName("계산할 숫자를 더한다")
+    @DisplayName("계산할 숫자를 넣으면 숫자의 합을 반환 한다.")
     @Test
-    void add_number() {
+    void input_number_then_sumNember() {
         CalculatorNumber source = new CalculatorNumber(3);
 
         source.add(new CalculatorNumber(5));
