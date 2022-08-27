@@ -74,4 +74,35 @@ public class CarTest {
         // when, then
         assertThat(car.move()).isFalse();
     }
+
+
+    @Test
+    @DisplayName("MovingStrategy 가 참을 반환하면 자동차는 움직일 수 있다")
+    void test08() {
+        // given
+        MovingStrategy strategy = new MoveTestMovingStrategy();
+        Car car = new Car("hello", strategy);
+
+        // when, then
+        assertThat(car.move()).isTrue();
+    }
+
+    @Test
+    @DisplayName("MovingStrategy 가 거짓을 반환하면 자동차는 움직일 수 없다")
+    void test09() {
+        // given
+        MovingStrategy strategy = new StopTestMovingStrategy();
+        Car car = new Car("hello", strategy);
+
+        // when, then
+        assertThat(car.move()).isFalse();
+    }
+
+    @Test
+    @DisplayName("MovingStrategy가 null이면 Car객체는 생성할 수 없고 NullPointerException이 발생한다")
+    void test10() {
+        assertThrows(NullPointerException.class, () -> {
+            new Car("hello", null);
+        });
+    }
 }
