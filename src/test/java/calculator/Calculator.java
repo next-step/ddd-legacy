@@ -11,7 +11,7 @@ public class Calculator {
     public static final String CUSTOM_REGEX = "//(.)\n(.*)";
     public static final String DEFAULT_REGEX = ",|:";
 
-    public static int sum(final String input) {
+    public int sum(final String input) {
         if (Objects.isNull(input) || input.isBlank()) {
             return DEFAULT_VALUE;
         }
@@ -19,25 +19,26 @@ public class Calculator {
         String[] numbers = parseInput(input);
 
         return Arrays.stream(numbers)
-                .mapToInt(Calculator::parseInt)
+                .mapToInt(this::parseInt)
                 .sum();
     }
 
-    private static String[] parseInput(String input) {
-        Matcher m = Pattern.compile(CUSTOM_REGEX).matcher(input);
-        if (m.find()) {
-            return m.group(2).split(m.group(1));
+    private String[] parseInput(String input) {
+        Matcher matcher = Pattern.compile(CUSTOM_REGEX).matcher(input);
+        if (matcher.find()) {
+            String customInput = matcher.group(2);
+            return customInput.split(matcher.group(1));
         }
         return input.split(DEFAULT_REGEX);
     }
 
-    private static int parseInt(String value) {
+    private int parseInt(String value) {
         checkNumber(value);
         checkNegative(value);
         return Integer.parseInt(value);
     }
 
-    private static void checkNegative(String value) {
+    private void checkNegative(String value) {
         int iValue = Integer.parseInt(value);
 
         if (iValue < 0) {
@@ -45,7 +46,7 @@ public class Calculator {
         }
     }
 
-    private static void checkNumber(String value) {
+    private void checkNumber(String value) {
         boolean isNumber = value.matches("\\d");
 
         if (!isNumber) {
