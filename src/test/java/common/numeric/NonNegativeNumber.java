@@ -1,10 +1,10 @@
-package calculator;
+package common.numeric;
 
-class NonNegativeNumber {
+public class NonNegativeNumber {
 
     private final int number;
 
-    NonNegativeNumber(final String input) {
+    public NonNegativeNumber(final String input) {
         int number = parseInt(input);
         if (number < 0) {
             throw new RuntimeException();
@@ -20,7 +20,7 @@ class NonNegativeNumber {
         }
     }
 
-    int getInt() {
+    public int getInt() {
         return this.number;
     }
 }
