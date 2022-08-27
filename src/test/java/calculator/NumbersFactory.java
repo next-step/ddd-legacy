@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
 
 public class NumbersFactory {
 
-    public int[] getNumbers(String input) {
+    public List<Integer> getNumbers(String input) {
         Matcher matcher = getCustomPatternMatcher(input);
         if (matcher.find()) {
-            return splitNumbers(getTokenByCustomDelimiter(matcher));
+            return convertNumbersToInt(getTokenByCustomDelimiter(matcher));
         }
-        return splitNumbers(getTokenByDefaultDelimiter(input));
+        return convertNumbersToInt(getTokenByDefaultDelimiter(input));
     }
 
     private Matcher getCustomPatternMatcher(String input) {
@@ -31,15 +31,19 @@ public class NumbersFactory {
         return input.split(DEFAULT_REGEX);
     }
 
-    private int[] splitNumbers(String[] tokens) {
+    private List<Integer> convertNumbersToInt(String[] tokens) {
         List<Integer> numbers = new ArrayList<>();
         for (String number : tokens) {
-            if (!isNaturalNumber(number)) {
-                throw new RuntimeException(ExceptionMessages.WRONG_INPUT_EXCEPTION);
-            }
+            validateNumber(number);
             numbers.add(Integer.parseInt(number));
         }
-        return numbers.stream().mapToInt(v -> v).toArray();
+        return numbers;
+    }
+
+    private void validateNumber(String number) {
+        if (!isNaturalNumber(number)) {
+            throw new RuntimeException(ExceptionMessages.WRONG_INPUT_EXCEPTION);
+        }
     }
 
     private boolean isNaturalNumber(String param) {

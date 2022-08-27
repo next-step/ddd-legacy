@@ -1,6 +1,7 @@
 package calculator;
 
 import io.micrometer.core.instrument.util.StringUtils;
+import java.util.List;
 
 public class StringCalculator {
 
@@ -11,20 +12,12 @@ public class StringCalculator {
     }
 
     public int add(String input) {
-        int sum = 0;
         if (StringUtils.isEmpty(input)) {
-            return sum;
+            return 0;
         }
-        int[] numbers = numbersFactory.getNumbers(input);
-        sum = getSum(sum, numbers);
-        return sum;
-    }
-
-    private int getSum(int sum, int[] numbers) {
-        for (int number : numbers) {
-            sum += number;
-        }
-        return sum;
+        return numbersFactory.getNumbers(input)
+            .stream()
+            .reduce(0, Integer::sum);
     }
 
 }
