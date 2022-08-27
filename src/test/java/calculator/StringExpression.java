@@ -43,10 +43,9 @@ class StringExpression {
         }
     }
 
-    List<Integer> parse() {
+    List<NonNegativeNumber> parse() {
         return Arrays.stream(this.expression.split(this.delimiter))
             .map(NonNegativeNumber::new)
-            .map(NonNegativeNumber::getInt)
             .collect(Collectors.toUnmodifiableList());
     }
 }

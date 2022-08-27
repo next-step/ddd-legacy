@@ -1,5 +1,7 @@
 package calculator;
 
+import common.numeric.NonNegativeNumber;
+
 public class StringCalculator {
 
     public int add(final String input) {
@@ -16,7 +18,7 @@ public class StringCalculator {
     private int sum(final StringExpression expression) {
         return expression.parse()
             .stream()
-            .mapToInt(Integer::intValue)
-            .sum();
+            .reduce(new NonNegativeNumber(0), NonNegativeNumber::add)
+            .getInt();
     }
 }
