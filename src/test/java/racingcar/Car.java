@@ -2,6 +2,7 @@ package racingcar;
 
 public class Car {
     private static final int MAX_NAME_LENGTH = 5;
+    private static final int MIN_MOVABLE_THRESHOLD = 4;
     private final String name;
     private int position;
 
@@ -26,7 +27,7 @@ public class Car {
     }
 
     public void move(int condition) {
-        if (condition >= 4) {
+        if (condition >= MIN_MOVABLE_THRESHOLD) {
             position++;
         }
     }
