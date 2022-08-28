@@ -24,7 +24,13 @@ public class StringCalculator {
 
         final var delimiterPattern = compileDelimiterPattern(input.group(DELIMITER_PLACEHOLDER));
 
-        final String[] tokens = splitTokensByDelimiter(input.group(TOKENS_PLACEHOLDER), delimiterPattern);
+        final var tokenPart = input.group(TOKENS_PLACEHOLDER);
+
+        if (tokenPart.isBlank()) {
+            return 0;
+        }
+
+        final String[] tokens = splitTokensByDelimiter(tokenPart, delimiterPattern);
 
         return Arrays.stream(tokens)
                 .mapToInt(this::parseIntegerFromToken)

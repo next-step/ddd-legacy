@@ -48,9 +48,13 @@ public class StringCalculatorTest {
     }
 
     @DisplayName("//와 \\n 사이에 위치하는 문자를 커스텀 구분자로 사용")
-    @Test
-    void customizedDelimiter() {
-        assertThat(calculator.add("//;\n1;2")).isEqualTo(3);
+    @ParameterizedTest(name = "\"{0}\"이면, 계산 결과는 {1}이다.")
+    @CsvSource(value = {
+            "'//;\n1;2'|3",
+            "'//#\n'|0"
+    }, delimiter = '|')
+    void customizedDelimiter(String input, int output) {
+        assertThat(calculator.add(input)).isEqualTo(output);
     }
 
     @DisplayName("올바르지 않은 문자열을 입력하면 예외를 발생시킨다.")
