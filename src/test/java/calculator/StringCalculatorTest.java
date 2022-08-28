@@ -5,8 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 /**
@@ -55,6 +57,17 @@ public class StringCalculatorTest {
     }, delimiter = '|')
     void customizedDelimiter(String input, int output) {
         assertThat(calculator.add(input)).isEqualTo(output);
+    }
+
+    @DisplayName("음수를 입력하면 예외를 발생시킨다.")
+    @ParameterizedTest(name = "\"{0}\"는 음수가 포함되어 있다.")
+    @ValueSource(strings = {
+            "-7",
+            "-1,1",
+            "//;\n-3,5"
+    })
+    void negative(String input) {
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> calculator.add(input));
     }
 
     @DisplayName("올바르지 않은 문자열을 입력하면 예외를 발생시킨다.")

@@ -26,7 +26,7 @@ public class StringCalculator {
         final String[] tokens = splitTokensByDelimiter(expression.getTokens(), delimiterPattern);
 
         return Arrays.stream(tokens)
-                .mapToInt(this::parseIntegerFromToken)
+                .mapToInt(this::parsePositiveIntFromToken)
                 .sum();
     }
 
@@ -42,7 +42,13 @@ public class StringCalculator {
         return Pattern.compile(DEFAULT_DELIMITER_REGEX + "|" + customizedDelimiter);
     }
 
-    private int parseIntegerFromToken(String token) {
-        return parseInt(token);
+    private int parsePositiveIntFromToken(String token) {
+        final var integer = parseInt(token);
+
+        if (integer < 0) {
+            throw new RuntimeException("음수는 계산할 수 없습니다.");
+        }
+
+        return integer;
     }
 }
