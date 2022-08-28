@@ -1,11 +1,13 @@
 package calculator;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 /**
  * # 요구 사항
@@ -43,5 +45,17 @@ public class StringCalculatorTest {
     }, delimiter = '|')
     void multipleNumberWithComma(String input, int output) {
         assertThat(calculator.add(input)).isEqualTo(output);
+    }
+
+    @DisplayName("//와 \\n 사이에 위치하는 문자를 커스텀 구분자로 사용")
+    @Test
+    void customizedDelimiter() {
+        assertThat(calculator.add("//;\n1;2")).isEqualTo(3);
+    }
+
+    @DisplayName("올바르지 않은 문자열을 입력하면 예외를 발생시킨다.")
+    @Test
+    void illegalFormat() {
+        assertThatIllegalArgumentException().isThrownBy(() -> calculator.add("\\\\;\n12"));
     }
 }

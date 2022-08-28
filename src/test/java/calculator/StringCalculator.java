@@ -1,6 +1,7 @@
 package calculator;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import static java.lang.Integer.parseInt;
 
@@ -13,7 +14,21 @@ public class StringCalculator {
             return 0;
         }
 
-        String[] tokens = text.split(DELIMITER_REGEX);
+        var a = Pattern.compile("(?://(?<delimiter>.)\\n)?(?<tokens>.*)").matcher(text);
+
+        if (!a.find()) {
+            throw new IllegalArgumentException("올바르지 않은 형태입니다.");
+        }
+
+        var customDelimiter = a.group("delimiter");
+
+        var delimiterRegex = DELIMITER_REGEX;
+
+        if (customDelimiter != null) {
+            delimiterRegex = delimiterRegex + "|" + customDelimiter;
+        }
+
+        String[] tokens = a.group("tokens").split(delimiterRegex);
 
         return Arrays.stream(tokens)
                 .mapToInt(this::parseIntegerFromToken)
