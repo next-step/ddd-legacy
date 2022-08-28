@@ -1,7 +1,6 @@
 package calculator;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -9,7 +8,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 /**
  * # 요구 사항
@@ -70,9 +68,16 @@ public class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> calculator.add(input));
     }
 
-    @DisplayName("올바르지 않은 문자열을 입력하면 예외를 발생시킨다.")
-    @Test
-    void illegalFormat() {
-        assertThatIllegalArgumentException().isThrownBy(() -> calculator.add("\\\\;\n12"));
+    @DisplayName("숫자가 아닌 값을 입력하면 예외를 발생시킨다.")
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "a",
+            "1,(",
+            "//;\n3@5"
+    })
+    void illegalToken(String input) {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> calculator.add(input))
+                .withMessage("숫자를 입력해주세요.");
     }
 }

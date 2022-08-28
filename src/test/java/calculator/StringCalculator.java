@@ -43,12 +43,20 @@ public class StringCalculator {
     }
 
     private int parsePositiveIntFromToken(String token) {
-        final var integer = parseInt(token);
+        final var integer = tryParseInt(token);
 
         if (integer < 0) {
             throw new RuntimeException("음수는 계산할 수 없습니다.");
         }
 
         return integer;
+    }
+
+    private int tryParseInt(String token) {
+        try {
+            return parseInt(token);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("숫자를 입력해주세요.");
+        }
     }
 }
