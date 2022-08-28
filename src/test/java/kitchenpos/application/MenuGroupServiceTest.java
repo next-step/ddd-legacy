@@ -17,10 +17,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
     @Mock
-    MenuGroupRepository menuGroupRepository;
+    private MenuGroupRepository menuGroupRepository;
 
     @InjectMocks
-    MenuGroupService sut;
+    private MenuGroupService target;
 
     @DisplayName("메뉴그룹은 이름을 가진다")
     @Test
@@ -28,7 +28,7 @@ class MenuGroupServiceTest {
         MenuGroup request = new MenuGroup();
         request.setName("치킨류");
 
-        sut.create(request);
+        target.create(request);
 
         Mockito.verify(menuGroupRepository).save(Mockito.any());
     }
@@ -41,7 +41,7 @@ class MenuGroupServiceTest {
         request.setName(name);
 
         assertThatThrownBy(() -> {
-            sut.create(request);
+            target.create(request);
         })
                 .isInstanceOf(IllegalArgumentException.class);
         Mockito.verifyNoInteractions(menuGroupRepository);
