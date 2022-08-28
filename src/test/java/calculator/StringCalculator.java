@@ -1,6 +1,6 @@
 package calculator;
 
-import static java.lang.Integer.parseInt;
+import java.util.Arrays;
 
 public class StringCalculator {
     public int add(String text) {
@@ -8,6 +8,10 @@ public class StringCalculator {
             return 0;
         }
 
-        return parseInt(text);
+        String[] numbers = text.split(",|:");
+
+        return Arrays.stream(numbers)
+                .mapToInt(Integer::parseInt)
+                .sum();
     }
 }

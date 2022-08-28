@@ -1,11 +1,9 @@
 package calculator;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,6 +31,17 @@ public class StringCalculatorTest {
             "1, 1"
     })
     void singleNumber(String input, int output) {
+        assertThat(calculator.add(input)).isEqualTo(output);
+    }
+
+    @DisplayName("콤마나 콜론으로 구분된 여러 숫자를 입력하면, 숫자의 합을 반환한다.")
+    @ParameterizedTest(name = "\"{0}\"이면, 계산 결과는 {1}이다.")
+    @CsvSource(value = {
+            "1,2|3",
+            "3:4|7",
+            "5,6:7|18"
+    }, delimiter = '|')
+    void multipleNumberWithComma(String input, int output) {
         assertThat(calculator.add(input)).isEqualTo(output);
     }
 }
