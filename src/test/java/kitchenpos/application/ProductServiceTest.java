@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
@@ -15,6 +16,7 @@ import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,6 +41,11 @@ class ProductServiceTest {
 
     @InjectMocks
     private ProductService productService;
+
+    @BeforeEach
+    void setUp() {
+        Fixtures.initialize();
+    }
 
     @DisplayName("제품 등록")
     @Nested
@@ -116,8 +123,10 @@ class ProductServiceTest {
             Product result = productService.changePrice(productId, product);
 
             // then
-            assertThat(result.getPrice()).isEqualTo("1000");
-            assertThat(Fixtures.MENU.isDisplayed()).isFalse();
+            assertAll(
+                () -> assertThat(result.getPrice()).isEqualTo("1000"),
+                () -> assertThat(Fixtures.MENU.isDisplayed()).isFalse()
+            );
         }
 
         @DisplayName("가격이 null 이거나 0보다 작을수 없음")

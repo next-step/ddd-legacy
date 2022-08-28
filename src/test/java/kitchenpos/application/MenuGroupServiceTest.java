@@ -10,6 +10,7 @@ import java.util.List;
 import kitchenpos.constant.Fixtures;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,11 @@ class MenuGroupServiceTest {
 
     @InjectMocks
     private MenuGroupService menuGroupService;
+
+    @BeforeEach
+    void setUp() {
+        Fixtures.initialize();
+    }
 
     @DisplayName("메뉴 그룹 등록")
     @Nested
