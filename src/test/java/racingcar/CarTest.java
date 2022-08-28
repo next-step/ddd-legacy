@@ -26,20 +26,20 @@ class CarTest {
         assertThat(car.getName()).isEqualTo("12345");
     }
 
-    @DisplayName("4 이상인 경우 움직인다.")
+    @DisplayName("움직일 수 있는 경우 1칸 움직인다.")
     @Test
     void movable() {
         final Car car = new Car("무빙", 0);
-        car.move(4);
+        car.move(new ForwardStrategy());
 
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
-    @DisplayName("4 미만인 경우 멈춘다.")
+    @DisplayName("움직일 수 없는 경우 멈춘다.")
     @Test
     void stop() {
         final Car car = new Car("스톱", 0);
-        car.move(3);
+        car.move(new HoldStrategy());
 
         assertThat(car.getPosition()).isEqualTo(0);
     }

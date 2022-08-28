@@ -26,8 +26,8 @@ public class Car {
         return name;
     }
 
-    public void move(int condition) {
-        if (condition >= MIN_MOVABLE_THRESHOLD) {
+    public void move(MovingStrategy strategy) {
+        if (strategy.canMove()) {
             position++;
         }
     }
