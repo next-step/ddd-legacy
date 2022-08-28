@@ -2,6 +2,8 @@ package racingcar;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -24,6 +26,13 @@ class CarTest {
         final Car car = new Car("12345");
 
         assertThat(car.getName()).isEqualTo("12345");
+    }
+
+    @DisplayName("자동차 이름은 비어 있을 수 없다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void carNameShouldNotBeNullOrBlank(String name) {
+        assertThatIllegalArgumentException().isThrownBy(() -> new Car(name));
     }
 
     @DisplayName("움직일 수 있는 경우 1칸 움직인다.")

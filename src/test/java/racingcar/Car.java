@@ -11,6 +11,10 @@ public class Car {
     }
 
     public Car(final String name, final int initPosition) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("이름은 비어 있을 수 없습니다.");
+        }
+
         if (name.length() > MAX_NAME_LENGTH) {
             throw new IllegalArgumentException("이름은 5자를 넘을 수 없습니다.");
         }
