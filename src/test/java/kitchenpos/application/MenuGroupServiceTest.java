@@ -22,11 +22,17 @@ class MenuGroupServiceTest {
     @InjectMocks
     private MenuGroupService target;
 
-    @DisplayName("메뉴그룹은 이름을 가진다")
+    private MenuGroup buildValidMenuGroup() {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName("치킨류");
+
+        return menuGroup;
+    }
+
     @Test
+    @DisplayName("메뉴그룹은 이름을 가진다")
     public void create() {
-        MenuGroup request = new MenuGroup();
-        request.setName("치킨류");
+        MenuGroup request = buildValidMenuGroup();
 
         target.create(request);
 
@@ -37,7 +43,7 @@ class MenuGroupServiceTest {
     @DisplayName("이름은 빈 값이거나 빈 문자열일 수 없다.")
     @NullAndEmptySource
     public void noEmptyOrNullName(String name) {
-        MenuGroup request = new MenuGroup();
+        MenuGroup request = buildValidMenuGroup();
         request.setName(name);
 
         assertThatThrownBy(() -> {
