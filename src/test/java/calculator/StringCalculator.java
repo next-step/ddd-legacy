@@ -8,13 +8,14 @@ import static java.lang.Integer.parseInt;
 public class StringCalculator {
 
     private static final String DELIMITER_REGEX = ",|:";
+    private static final Pattern VALID_INPUT_PATTERN = Pattern.compile("(?://(?<delimiter>.)\\n)?(?<tokens>.*)");
 
     public int add(String text) {
         if (text == null || text.isBlank()) {
             return 0;
         }
 
-        var a = Pattern.compile("(?://(?<delimiter>.)\\n)?(?<tokens>.*)").matcher(text);
+        var a = VALID_INPUT_PATTERN.matcher(text);
 
         if (!a.find()) {
             throw new IllegalArgumentException("올바르지 않은 형태입니다.");
