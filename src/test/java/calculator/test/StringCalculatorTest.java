@@ -4,13 +4,12 @@ import calculator.source.Number;
 import calculator.source.StringCalculator;
 import calculator.source.splitter.FixedSplitter;
 import calculator.source.splitter.RegexSplitter;
-import calculator.source.splitter.StringSplitter;
+import calculator.source.splitter.StringSplitters;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
-import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,10 +19,9 @@ public class StringCalculatorTest {
     private static final String REGEX = "//(.)\n(.*)";
     private static final String FIXED_DELIMITER = ",|:";
 
-    private final List<StringSplitter> splitters = List.of(
-            new RegexSplitter(REGEX),
-            new FixedSplitter(FIXED_DELIMITER)
-    );
+    private final StringSplitters splitters = new StringSplitters()
+            .add(new RegexSplitter(REGEX))
+            .add(new FixedSplitter(FIXED_DELIMITER));
     private final StringCalculator calculator = new StringCalculator(splitters);
 
     @ParameterizedTest

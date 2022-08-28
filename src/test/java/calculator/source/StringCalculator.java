@@ -1,13 +1,11 @@
 package calculator.source;
 
-import calculator.source.splitter.StringSplitter;
-
-import java.util.List;
+import calculator.source.splitter.StringSplitters;
 
 public class StringCalculator {
-    private final List<StringSplitter> splitters;
+    private final StringSplitters splitters;
 
-    public StringCalculator(final List<StringSplitter> splitters) {
+    public StringCalculator(final StringSplitters splitters) {
         this.splitters = splitters;
     }
 
@@ -15,20 +13,11 @@ public class StringCalculator {
         if(input==null || input.isBlank()){
             return new Number(0);
         }
-        return split(input)
+        return splitters.split(input)
                 .stream()
                 .map(Number::new)
                 .reduce(Number::plus)
-                .orElseThrow(() -> new RuntimeException("ss"));
+                .orElseThrow(() -> new RuntimeException("문자열 덧셈을 실패했습니다."));
     }
 
-    private List<String> split(final String input) {
-        for (StringSplitter splitter : splitters) {
-            List<String> result = splitter.split(input);
-            if (result != null && !result.isEmpty()) {
-                return result;
-            }
-        }
-        return List.of(input);
-    }
 }
