@@ -5,7 +5,7 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Calculator {
+public class StringCalculator {
 
     public static final int DEFAULT_VALUE = 0;
     public static final String CUSTOM_REGEX = "//(.)\n(.*)";
