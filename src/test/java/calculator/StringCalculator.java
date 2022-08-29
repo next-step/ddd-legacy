@@ -40,9 +40,9 @@ public class StringCalculator {
     }
 
     private void checkNegative(final String value) {
-        int iValue = Integer.parseInt(value);
+        int parseIntValue = Integer.parseInt(value);
 
-        if (iValue < 0) {
+        if (parseIntValue < 0) {
             throw new RuntimeException("문자열 계산기에서 음수값은 허용되지 않습니다.");
         }
     }
