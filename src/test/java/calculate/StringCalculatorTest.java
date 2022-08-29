@@ -2,7 +2,6 @@ package calculate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,33 +16,33 @@ import static org.assertj.core.api.Assertions.assertThat;
  * 앞의 기본 구분자(쉼표, 콜론) 외에 커스텀 구분자를 지정할 수 있다. 커스텀 구분자는 문자열 앞부분의 “//”와 “\n” 사이에 위치하는 문자를 커스텀 구분자로 사용한다. 예를 들어 “//;\n1;2;3”과 같이 값을 입력할 경우 커스텀 구분자는 세미콜론(;)이며, 결과 값은 6이 반환되어야 한다.
  * 문자열 계산기에 숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException 예외를 throw 한다.
  */
-class CalculatorTest {
-    private Calculator calculator;
+class StringCalculatorTest {
+    private StringCalculator stringCalculator;
 
     @BeforeEach
     void setup() {
-        calculator = new Calculator();
+        stringCalculator = new StringCalculator();
     }
 
     @ParameterizedTest
     @DisplayName("구분자를 쉼표로 숫자의 합을 구할 수 있다.")
     @ValueSource(strings = {"1,2,3"})
     void calculate_comma(String text) {
-        assertThat(calculator.add(text)).isEqualTo(6);
+        assertThat(stringCalculator.calculate(text)).isEqualTo(6);
     }
 
     @ParameterizedTest
     @DisplayName("구분자를 콜론으로 숫자의 합을 구할 수 있다.")
     @ValueSource(strings = {"1:2:3"})
     void calculate_colon(String text) {
-        assertThat(calculator.add(text)).isEqualTo(6);
+        assertThat(stringCalculator.calculate(text)).isEqualTo(6);
     }
 
     @ParameterizedTest
     @DisplayName("구분자를 콜론 또는 쉼표로 숫자의 합을 구할 수 있다.")
     @MethodSource("calculatorParametersProvider")
     void calculate_colon_and_comma(String text, int result) {
-        assertThat(calculator.add(text)).isEqualTo(result);
+        assertThat(stringCalculator.calculate(text)).isEqualTo(result);
     }
 
     static Stream<Arguments> calculatorParametersProvider() {
