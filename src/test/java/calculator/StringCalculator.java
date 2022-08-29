@@ -1,32 +1,38 @@
 package calculator;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StringCalculator {
 
   public int add(String text) {
-    if (text == null || text.isBlank()) {
+    if (isTextBlank(text)) {
       return 0;
     }
 
-    String[] result = text.split(",|:");
-    Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(text);
-    if (matcher.find()) {
-      String customDelimiter = matcher.group(1);
-      result = matcher.group(2).split(customDelimiter + "|,|:");
-    }
+    String[] result = getNumbers(text);
+    return Arrays.stream(result)
+        .mapToInt(this::toInteger)
+        .sum();
+  }
 
-    return Arrays.stream(result).mapToInt(this::toInteger).sum();
+  private boolean isTextBlank(String text) {
+    return text == null || text.isBlank();
+  }
+
+  private String[] getNumbers(String text) {
+    Separator separator = new Separator(text);
+    return separator.numbers();
   }
 
   private int toInteger(String token) {
     int result = Integer.parseInt(token);
-    if (result < 0) {
+    validateNegativeInteger(result);
+    return result;
+  }
+
+  private void validateNegativeInteger(int num) {
+    if (num < 0) {
       throw new RuntimeException("음수는 계산할 수 없습니다.");
     }
-
-    return result;
   }
 }
