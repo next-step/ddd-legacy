@@ -1,89 +1,23 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.infra.PurgomalumClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 
-@ExtendWith(MockitoExtension.class)
-class MenuServiceTest {
-    @Mock
-    private MenuRepository menuRepository;
-    @Mock
-    private MenuGroupRepository menuGroupRepository;
-    @Mock
-    private ProductRepository productRepository;
-    @Mock
-    private PurgomalumClient purgomalumClient;
-
-
-    @InjectMocks
+@SpringBootTest
+class MenuServiceTest extends InitTest {
+    @Resource
     private MenuService target;
-
-    private static final UUID MENU_GROUP_ID = UUID.randomUUID();
-    private static final UUID PRODUCT_ID = UUID.randomUUID();
-    private static final UUID INVALID_ID = UUID.randomUUID();
-    private static final UUID MENU_ID = UUID.randomUUID();
-
-    private MenuGroup buildValidMenuGroup() {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(MENU_GROUP_ID);
-
-        return menuGroup;
-    }
-
-    private Product buildValidProduct() {
-        Product product = new Product();
-        product.setId(PRODUCT_ID);
-        product.setPrice(BigDecimal.ONE);
-
-        return product;
-    }
-
-    private MenuProduct buildValidMenuProduct() {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(PRODUCT_ID);
-        menuProduct.setProduct(buildValidProduct());
-        menuProduct.setQuantity(1L);
-
-        return menuProduct;
-    }
-
-    private Menu buildValidMenu() {
-        Menu menu = new Menu();
-        menu.setPrice(BigDecimal.ONE);
-        menu.setMenuGroupId(MENU_GROUP_ID);
-        menu.setMenuProducts(List.of(buildValidMenuProduct()));
-        menu.setName("양념치킨");
-
-        return menu;
-    }
-
-    @BeforeEach
-    void initTest() {
-        Mockito.lenient().when(menuRepository.findById(MENU_ID)).thenReturn(Optional.of(buildValidMenu()));
-        Mockito.lenient().when(menuGroupRepository.findById(MENU_GROUP_ID)).thenReturn(Optional.of(buildValidMenuGroup()));
-        Mockito.lenient().when(menuGroupRepository.findById(INVALID_ID)).thenReturn(Optional.empty());
-        Mockito.lenient().when(productRepository.findAllByIdIn(List.of(PRODUCT_ID))).thenReturn(List.of(buildValidProduct()));
-        Mockito.lenient().when(productRepository.findById(PRODUCT_ID)).thenReturn(Optional.of(buildValidProduct()));
-        Mockito.lenient().when(purgomalumClient.containsProfanity("fuck")).thenReturn(true);
-        Mockito.lenient().when(purgomalumClient.containsProfanity("asshole")).thenReturn(true);
-    }
 
     @Test
     @DisplayName("정상생성")
@@ -91,8 +25,6 @@ class MenuServiceTest {
         Menu request = buildValidMenu();
 
         target.create(request);
-
-        Mockito.verify(menuRepository).save(any());
     }
 
     @Test
@@ -190,22 +122,8 @@ class MenuServiceTest {
     @Test
     @DisplayName("디피된 메뉴의 가격은 구성 상품의 가격의 총합보다 클 수 없다.")
     void cannotDisplayMenuPriceGreaterThanProductPriceSum() {
-        Product product = new Product();
-        product.setPrice(BigDecimal.ONE);
-
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setQuantity(1L);
-        menuProduct.setProduct(product);
-
-        Menu menu = new Menu();
-        menu.setDisplayed(false);
-        menu.setPrice(BigDecimal.TEN);
-        menu.setMenuProducts(List.of(menuProduct));
-
-        Mockito.when(menuRepository.findById(MENU_ID)).thenReturn(Optional.of(menu));
-
         assertThatThrownBy(() -> {
-            target.display(MENU_ID);
+            target.display(UNDISPLAYED_MENU_ID);
         })
                 .isInstanceOf(IllegalStateException.class);
     }
