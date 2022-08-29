@@ -1,22 +1,10 @@
 package calculator.domain;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.List;
 
-public enum Separator {
-    REST(","),
-    COLON(":");
+public interface Separator {
 
-    private final String text;
+    public List<String> split(String text);
 
-    Separator(String text) {
-        this.text = text;
-    }
-
-    public static Separator findByText(String text) {
-        return Arrays.stream(values())
-            .filter(it -> Objects.equals(it.text, text))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("일치하는 구분자를 찾을 수 없습니다."));
-    }
+    public boolean isMatchWithText(String text);
 }
