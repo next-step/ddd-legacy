@@ -6,13 +6,13 @@ import java.util.regex.Pattern;
 
 public class CustomSeparator implements Separator {
 
-    private static final String CUSTOM_SEPARATOR_PARSE_PATTERN = "//(.)\n(.*)";
+    private static final Pattern CUSTOM_SEPARATOR_PARSE_PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final int CUSTOM_SEPARATOR_INDEX = 1;
     private static final int NUMBERS_INDEX = 2;
 
     @Override
     public List<String> split(String text) {
-        Matcher matcher = Pattern.compile(CUSTOM_SEPARATOR_PARSE_PATTERN).matcher(text);
+        Matcher matcher = CUSTOM_SEPARATOR_PARSE_PATTERN.matcher(text);
 
         if (matcher.find()) {
             String customSeparator = matcher.group(CUSTOM_SEPARATOR_INDEX);
@@ -24,6 +24,7 @@ public class CustomSeparator implements Separator {
 
     @Override
     public boolean isMatchWithText(String text) {
-        return text.matches(CUSTOM_SEPARATOR_PARSE_PATTERN);
+        return CUSTOM_SEPARATOR_PARSE_PATTERN.matcher(text)
+            .matches();
     }
 }

@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface Separator {
 
-    public List<String> split(String text);
+    List<String> split(String text);
 
-    public boolean isMatchWithText(String text);
+    boolean isMatchWithText(String text);
 }
