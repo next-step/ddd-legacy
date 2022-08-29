@@ -11,6 +11,7 @@ public class StringCalculator {
     private static final String CUSTOM_REGEX = "//(.)\n(.*)";
     private static final String DEFAULT_REGEX = ",|:";
     private static final Pattern pattern = Pattern.compile(CUSTOM_REGEX);
+    private static final String NUMBER = "\\d";
 
     public int sum(final String input) {
         if (Objects.isNull(input) || input.isBlank()) {
@@ -48,7 +49,7 @@ public class StringCalculator {
     }
 
     private void checkNumber(final String value) {
-        boolean isNumber = value.matches("\\d");
+        boolean isNumber = value.matches(NUMBER);
 
         if (!isNumber) {
             throw new RuntimeException("숫자 이외의 값은 허용되지 않습니다.");
