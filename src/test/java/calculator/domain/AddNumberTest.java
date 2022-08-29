@@ -12,7 +12,7 @@ class AddNumberTest {
     @ParameterizedTest
     @ValueSource(ints = {-1, -2, -3, -4, -5})
     void negativeException(int negativeNumber) {
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> new AddNumber(negativeNumber));
     }
 
@@ -20,7 +20,7 @@ class AddNumberTest {
     @ParameterizedTest
     @ValueSource(strings = {"", " ", "#", "AB", "C"})
     void negativeException(String invalidString) {
-        assertThatExceptionOfType(IllegalArgumentException.class)
+        assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> AddNumber.from(invalidString));
     }
 }

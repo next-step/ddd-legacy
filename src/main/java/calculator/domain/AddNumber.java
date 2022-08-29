@@ -13,7 +13,7 @@ public class AddNumber {
 
     private void validateNegative(int value) {
         if (value < 0) {
-            throw new IllegalArgumentException("덧셈 값은 음수일 수 없습니다.");
+            throw new RuntimeException("덧셈 값은 음수일 수 없습니다.");
         }
     }
 
@@ -21,7 +21,7 @@ public class AddNumber {
         try {
             return new AddNumber(Integer.parseInt(value));
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("정수 외 값은 덧셈 값이 될 수 없습니다.");
+            throw new RuntimeException("정수 외 값은 덧셈 값이 될 수 없습니다.");
         }
     }
 
