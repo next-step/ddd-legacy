@@ -19,7 +19,7 @@ public class StringCalculator {
             return DEFAULT_RESULT;
         }
 
-        return sumPositives(toIntegers(split(source)));
+        return sumPositives(toPositives(split(source)));
     }
 
     private static String[] split(String source) {
@@ -35,24 +35,20 @@ public class StringCalculator {
         return numericStrings.split(delimiter);
     }
 
-    private static List<Integer> toIntegers(String[] strings) {
+    private static List<PositiveInteger> toPositives(String[] strings) {
         try {
             return Arrays.stream(strings)
-                    .map(Integer::parseInt)
+                    .map(PositiveInteger::new)
                     .collect(Collectors.toList());
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("숫자가 아니면 계산할 수 없습니다.");
         }
     }
 
-    private static int sumPositives(List<Integer> integers) {
-        return integers.stream()
-                .reduce(0, (acc, it) -> {
-                    if (it < 0) {
-                        throw new IllegalArgumentException("음수는 계산할 수 없습니다.");
-                    }
-
-                    return Integer.sum(acc, it);
-                });
+    private static int sumPositives(List<PositiveInteger> positives) {
+        return positives.stream()
+                .reduce(PositiveInteger::add)
+                .map(PositiveInteger::getNumber)
+                .orElseThrow();
     }
 }
