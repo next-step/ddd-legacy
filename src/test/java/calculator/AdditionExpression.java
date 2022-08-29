@@ -8,8 +8,11 @@ public class AdditionExpression {
     private static final String TOKENS_PLACEHOLDER = "tokens";
     private static final String VALID_INPUT_REGEX = "(?://(?<" + CUSTOM_DELIMITER_PLACEHOLDER + ">.)\\n)?(?<" + TOKENS_PLACEHOLDER + ">.*)";
     public static final Pattern VALID_INPUT_PATTERN = Pattern.compile(VALID_INPUT_REGEX);
+    private static final String DEFAULT_DELIMITER_REGEX = ",|:";
+    private static final Pattern DEFAULT_DELIMITER_PATTERN = Pattern.compile(DEFAULT_DELIMITER_REGEX);
+    private static final String[] EMPTY_TOKENS = {};
 
-    private final String customDelimiter;
+    private final Pattern delimiter;
     private final String tokens;
 
     public AdditionExpression(String text) {
@@ -19,16 +22,8 @@ public class AdditionExpression {
 
         final var matcher = match(text);
 
-        this.customDelimiter = matcher.group(CUSTOM_DELIMITER_PLACEHOLDER);
+        this.delimiter = compileDelimiterPattern(matcher.group(CUSTOM_DELIMITER_PLACEHOLDER));
         this.tokens = matcher.group(TOKENS_PLACEHOLDER);
-    }
-
-    public String getTokens() {
-        return tokens;
-    }
-
-    public boolean isTokensBlank() {
-        return tokens.isBlank();
     }
 
     private Matcher match(String text) {
@@ -41,7 +36,18 @@ public class AdditionExpression {
         return matcher;
     }
 
-    public String getCustomDelimiter() {
-        return customDelimiter;
+    private Pattern compileDelimiterPattern(String customizedDelimiter) {
+        if (customizedDelimiter == null) {
+            return DEFAULT_DELIMITER_PATTERN;
+        }
+
+        return Pattern.compile(DEFAULT_DELIMITER_REGEX + "|" + customizedDelimiter);
+    }
+
+    public String[] splitTokensByDelimiter() {
+        if (tokens.isBlank()) {
+            return EMPTY_TOKENS;
+        }
+        return delimiter.split(tokens);
     }
 }
