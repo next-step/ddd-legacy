@@ -29,6 +29,13 @@ class StringCalculatorTest {
         assertThat(result).isZero();
     }
 
+    @ParameterizedTest(name = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
+    @ValueSource(strings = "1")
+    void input_one_number(final String input) {
+        final int result = calculator.sum(input);
+        assertThat(result).isEqualTo(1);
+    }
+
     @ParameterizedTest(name = "쉼표 및 콜론 구분자로 덧셈을 한다.")
     @ValueSource(strings = {"1,2,3", "1:2:3", "1:2,3"})
     void colon_and_comma(final String input) {
