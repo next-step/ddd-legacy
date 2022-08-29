@@ -10,6 +10,7 @@ public class StringCalculator {
     public static final int DEFAULT_VALUE = 0;
     public static final String CUSTOM_REGEX = "//(.)\n(.*)";
     public static final String DEFAULT_REGEX = ",|:";
+    private static final Pattern pattern = Pattern.compile(CUSTOM_REGEX);
 
     public int sum(final String input) {
         if (Objects.isNull(input) || input.isBlank()) {
@@ -24,7 +25,7 @@ public class StringCalculator {
     }
 
     private String[] parseInput(final String input) {
-        Matcher matcher = Pattern.compile(CUSTOM_REGEX).matcher(input);
+        Matcher matcher = pattern.matcher(input);
         if (matcher.find()) {
             String customInput = matcher.group(2);
             return customInput.split(matcher.group(1));
