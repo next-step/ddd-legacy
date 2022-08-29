@@ -36,5 +36,6 @@ public final class Fixtures {
         MENU.setMenuGroup(MENU_GROUP);
         MENU.setDisplayed(true);
         MENU.setMenuProducts(List.of(MENU_PRODUCT));
+        MENU.setMenuGroupId(MENU_GROUP.getId());
     }
 }
