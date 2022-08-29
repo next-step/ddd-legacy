@@ -9,10 +9,11 @@ public class StringCalculator {
 
     private static final String DEFAULT_DELIMITER_REGEX = ",|:";
     private static final Pattern DEFAULT_DELIMITER_PATTERN = Pattern.compile(DEFAULT_DELIMITER_REGEX);
+    private static final int EMPTY_EXPRESSION_RESULT = 0;
 
     public int add(String text) {
         if (text == null) {
-            return 0;
+            return EMPTY_EXPRESSION_RESULT;
         }
 
         final var expression = new AdditionExpression(text);
@@ -20,7 +21,7 @@ public class StringCalculator {
         final var delimiterPattern = compileDelimiterPattern(expression.getCustomDelimiter());
 
         if (expression.isTokensBlank()) {
-            return 0;
+            return EMPTY_EXPRESSION_RESULT;
         }
 
         final String[] tokens = splitTokensByDelimiter(expression.getTokens(), delimiterPattern);
