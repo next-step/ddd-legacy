@@ -6,6 +6,7 @@ import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.Product;
 
 public final class Fixtures {
@@ -13,6 +14,7 @@ public final class Fixtures {
     public static final MenuGroup MENU_GROUP = new MenuGroup();
     public static final MenuProduct MENU_PRODUCT = new MenuProduct();
     public static final Menu MENU = new Menu();
+    public static final OrderTable ORDER_TABLE = new OrderTable();
 
     static {
         initialize();
@@ -37,5 +39,10 @@ public final class Fixtures {
         MENU.setDisplayed(true);
         MENU.setMenuProducts(List.of(MENU_PRODUCT));
         MENU.setMenuGroupId(MENU_GROUP.getId());
+
+        ORDER_TABLE.setId(UUID.randomUUID());
+        ORDER_TABLE.setName("SampleOrderTable");
+        ORDER_TABLE.setNumberOfGuests(0);
+        ORDER_TABLE.setOccupied(false);
     }
 }
