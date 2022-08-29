@@ -16,9 +16,11 @@ public class StringCalculator {
     private static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile(CUSTOM_SEPARATOR);
 
     public int calculate(final String text) {
-        String[] splitText = split(text);
+        if(text == null || text.isEmpty()) {
+            return ZERO;
+        }
 
-        return Arrays.stream(splitText)
+        return Arrays.stream(split(text))
                 .map(Integer::parseInt)
                 .reduce(ZERO, Integer::sum);
     }

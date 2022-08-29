@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.stream.Stream;
@@ -22,6 +23,13 @@ class StringCalculatorTest {
     @BeforeEach
     void setup() {
         stringCalculator = new StringCalculator();
+    }
+
+    @ParameterizedTest
+    @DisplayName("문자열이 null이거나 비어있으면 0을 반환한다.")
+    @NullAndEmptySource
+    void calculate_null_and_empty_string(String text) {
+        assertThat(stringCalculator.calculate(text)).isEqualTo(0);
     }
 
     @ParameterizedTest
