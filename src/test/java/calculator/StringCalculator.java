@@ -18,6 +18,15 @@ public class StringCalculator {
       result = matcher.group(2).split(customDelimiter + "|,|:");
     }
 
-    return Arrays.stream(result).mapToInt(Integer::parseInt).sum();
+    return Arrays.stream(result).mapToInt(this::toInteger).sum();
+  }
+
+  private int toInteger(String token) {
+    int result = Integer.parseInt(token);
+    if (result < 0) {
+      throw new RuntimeException("음수는 계산할 수 없습니다.");
+    }
+
+    return result;
   }
 }
