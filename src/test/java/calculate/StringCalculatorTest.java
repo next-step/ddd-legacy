@@ -45,10 +45,25 @@ class StringCalculatorTest {
         assertThat(stringCalculator.calculate(text)).isEqualTo(result);
     }
 
+    @ParameterizedTest
+    @DisplayName("커스텀 구분자를 지정하여 숫자의 합을 구할 수 있다.")
+    @MethodSource("customCalculatorParametersProvider")
+    void calculate_custom(String text, int result) {
+        assertThat(stringCalculator.calculate(text)).isEqualTo(result);
+    }
+
     static Stream<Arguments> calculatorParametersProvider() {
         return Stream.of(
                 Arguments.arguments("1,2:3", 6),
                 Arguments.arguments("2:3,4,5", 14)
+        );
+    }
+
+    static Stream<Arguments> customCalculatorParametersProvider() {
+        return Stream.of(
+                Arguments.arguments("//;\n1;2;3", 6),
+                Arguments.arguments("//@\n1@2@3", 6),
+                Arguments.arguments("//#\n2#3#4#5", 14)
         );
     }
 

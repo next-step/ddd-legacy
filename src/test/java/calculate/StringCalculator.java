@@ -1,6 +1,8 @@
 package calculate;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열을 전달하는 경우 구분자를 기준으로 분리한 각 숫자의 합을 반환 (예: “” => 0, "1,2" => 3, "1,2,3" => 6, “1,2:3” => 6)
@@ -10,12 +12,24 @@ import java.util.Arrays;
 public class StringCalculator {
     private static final int ZERO = 0;
     private static final String SEPARATOR = "[,:]";
+    private static final String CUSTOM_SEPARATOR = "//(.)\\n(.*)";
+    private static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile(CUSTOM_SEPARATOR);
 
     public int calculate(final String text) {
-        String[] splitText = text.split(SEPARATOR);
+        String[] splitText = split(text);
 
         return Arrays.stream(splitText)
                 .map(Integer::parseInt)
                 .reduce(ZERO, Integer::sum);
+    }
+
+    private String[] split(String text) {
+        Matcher matcher = CUSTOM_SEPARATOR_PATTERN.matcher(text);
+        if (matcher.find()) {
+            String customDelimiter = matcher.group(1);
+            return matcher.group(2).split(customDelimiter);
+        }
+
+        return text.split(SEPARATOR);
     }
 }
