@@ -12,7 +12,7 @@ public class MenuStub {
 
 	private static final String DEFAULT_NAME = "기본 메뉴";
 	private static final boolean DEFAULT_DISPLAYED = true;
-	private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(10000);
+	private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(1000);
 
 	private MenuStub() {
 	}
