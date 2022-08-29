@@ -3,8 +3,6 @@ package calculator;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import static java.lang.Integer.parseInt;
-
 public class StringCalculator {
 
     private static final String DEFAULT_DELIMITER_REGEX = ",|:";
@@ -27,7 +25,8 @@ public class StringCalculator {
         final String[] tokens = splitTokensByDelimiter(expression.getTokens(), delimiterPattern);
 
         return Arrays.stream(tokens)
-                .mapToInt(this::parsePositiveIntFromToken)
+                .map(PositiveInteger::parse)
+                .mapToInt(PositiveInteger::getValue)
                 .sum();
     }
 
@@ -41,23 +40,5 @@ public class StringCalculator {
         }
 
         return Pattern.compile(DEFAULT_DELIMITER_REGEX + "|" + customizedDelimiter);
-    }
-
-    private int parsePositiveIntFromToken(String token) {
-        final var integer = tryParseInt(token);
-
-        if (integer < 0) {
-            throw new RuntimeException("음수는 계산할 수 없습니다.");
-        }
-
-        return integer;
-    }
-
-    private int tryParseInt(String token) {
-        try {
-            return parseInt(token);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("숫자를 입력해주세요.");
-        }
     }
 }
