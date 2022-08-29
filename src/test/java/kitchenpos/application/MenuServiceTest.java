@@ -145,13 +145,13 @@ class MenuServiceTest {
         @Test
         void createWithInvalidSumPrice() {
             // given
-            MenuProduct menuProductRequests = new MenuProduct();
-            menuProductRequests.setProduct(Fixtures.PRODUCT);
-            menuProductRequests.setQuantity(1);
+            MenuProduct menuProductRequest = new MenuProduct();
+            menuProductRequest.setProduct(Fixtures.PRODUCT);
+            menuProductRequest.setQuantity(1);
 
             Menu request = new Menu();
             request.setPrice(BigDecimal.valueOf(100_000));
-            request.setMenuProducts(List.of(menuProductRequests));
+            request.setMenuProducts(List.of(menuProductRequest));
 
             given(menuGroupRepository.findById(any())).willReturn(Optional.of(Fixtures.MENU_GROUP));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(Fixtures.PRODUCT));
@@ -167,13 +167,13 @@ class MenuServiceTest {
         @Test
         void createWithNullName() {
             // given
-            MenuProduct menuProductRequests = new MenuProduct();
-            menuProductRequests.setProduct(Fixtures.PRODUCT);
-            menuProductRequests.setQuantity(1);
+            MenuProduct menuProductRequest = new MenuProduct();
+            menuProductRequest.setProduct(Fixtures.PRODUCT);
+            menuProductRequest.setQuantity(1);
 
             Menu request = new Menu();
             request.setPrice(BigDecimal.valueOf(5000));
-            request.setMenuProducts(List.of(menuProductRequests));
+            request.setMenuProducts(List.of(menuProductRequest));
 
             given(menuGroupRepository.findById(any())).willReturn(Optional.of(Fixtures.MENU_GROUP));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(Fixtures.PRODUCT));
