@@ -19,4 +19,20 @@ class CalculatorTest {
 
         assertThat(calculator.add("1,2,3")).isEqualTo(6);
     }
+
+    @Test
+    @DisplayName("구분자를 콜론으로 숫자의 합을 구할 수 있다.")
+    void calculate_colon() {
+        Calculator calculator = new Calculator();
+
+        assertThat(calculator.add("1:2:3")).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("구분자를 콜론 또는 쉼표로 숫자의 합을 구할 수 있다.")
+    void calculate_colon_and_comma() {
+        Calculator calculator = new Calculator();
+
+        assertThat(calculator.add("1,2:3")).isEqualTo(6);
+    }
 }

@@ -9,7 +9,7 @@ import java.util.Arrays;
  */
 public class Calculator {
     private static final int ZERO = 0;
-    private static final String SEPARATOR = ",";
+    private static final String SEPARATOR = "[,:]";
 
     public int add(final String text) {
         String[] splitText = text.split(SEPARATOR);
