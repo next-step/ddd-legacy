@@ -1,12 +1,17 @@
 package kitchenpos.constant;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 
 public final class Fixtures {
@@ -15,6 +20,8 @@ public final class Fixtures {
     public static final MenuProduct MENU_PRODUCT = new MenuProduct();
     public static final Menu MENU = new Menu();
     public static final OrderTable ORDER_TABLE = new OrderTable();
+    public static final OrderLineItem ORDER_LINE_ITEM = new OrderLineItem();
+    public static final Order ORDER = new Order();
 
     static {
         initialize();
@@ -42,7 +49,46 @@ public final class Fixtures {
 
         ORDER_TABLE.setId(UUID.randomUUID());
         ORDER_TABLE.setName("SampleOrderTable");
-        ORDER_TABLE.setNumberOfGuests(0);
-        ORDER_TABLE.setOccupied(false);
+        ORDER_TABLE.setNumberOfGuests(5);
+        ORDER_TABLE.setOccupied(true);
+
+        ORDER_LINE_ITEM.setSeq(1L);
+        ORDER_LINE_ITEM.setMenu(MENU);
+        ORDER_LINE_ITEM.setQuantity(1L);
+        ORDER_LINE_ITEM.setPrice(BigDecimal.valueOf(5000));
+
+        ORDER.setId(UUID.randomUUID());
+        ORDER.setType(OrderType.EAT_IN);
+        ORDER.setStatus(OrderStatus.WAITING);
+        ORDER.setOrderDateTime(LocalDateTime.parse("2022-01-01T09:00:00"));
+        ORDER.setDeliveryAddress("SampleAddress");
+        ORDER.setOrderTable(ORDER_TABLE);
+        ORDER.setOrderLineItems(List.of(ORDER_LINE_ITEM));
+    }
+
+    public static OrderTable createSampleOrderTable(int numberOfGuests, boolean occupied) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName("SampleOrderTable");
+        orderTable.setNumberOfGuests(numberOfGuests);
+        orderTable.setOccupied(occupied);
+        return orderTable;
+    }
+
+    public static Order createSampleOrder(OrderType orderType, OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setOrderDateTime(LocalDateTime.parse("2022-01-01T09:00:00"));
+        order.setOrderLineItems(List.of(Fixtures.ORDER_LINE_ITEM));
+
+        if (orderType == OrderType.EAT_IN) {
+            order.setOrderTable(ORDER_TABLE);
+        }
+        if (orderType == OrderType.DELIVERY) {
+            order.setDeliveryAddress("SampleAddress");
+        }
+        return order;
     }
 }
