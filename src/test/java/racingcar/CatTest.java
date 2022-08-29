@@ -21,9 +21,8 @@ public class CatTest {
                 .doesNotThrowAnyException();
     }
 
-    @DisplayName("자동차 이름은 비어 있을 수 없다.")
     @NullAndEmptySource
-    @ParameterizedTest
+    @ParameterizedTest(name = "자동차 이름은 비어 있을 수 없다.")
     void constructor_with_null_and_empty_name(final String name) {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> new Car(name));

@@ -23,32 +23,28 @@ public class CalculatorTest {
         calculator = new Calculator();
     }
 
-    @DisplayName("빈 문자열이나 Null 값의 경우 0을 반환한다.")
     @NullAndEmptySource
-    @ParameterizedTest
+    @ParameterizedTest(name = "빈 문자열이나 Null 값의 경우 0을 반환한다.")
     void null_and_empty(final String input) {
         final int result = calculator.sum(input);
         assertThat(result).isZero();
     }
 
-    @DisplayName("쉼표 및 콜론 구분자로 덧셈을 한다.")
-    @ParameterizedTest
+    @ParameterizedTest(name = "쉼표 및 콜론 구분자로 덧셈을 한다.")
     @ValueSource(strings = {"1,2,3", "1:2:3", "1:2,3"})
     void colon_and_comma(final String input) {
         final int result = calculator.sum(input);
         assertThat(result).isEqualTo(6);
     }
 
-    @DisplayName("음수 및 숫자 이외의 값을 넣으면 RuntimeException 발생한다.")
-    @ParameterizedTest
+    @ParameterizedTest(name = "음수 및 숫자 이외의 값을 넣으면 RuntimeException 발생한다.")
     @ValueSource(strings = {"-1", "a,b,c"})
     void no_number_and_negative(final String input) {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> calculator.sum(input));
     }
 
-    @DisplayName("//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
-    @ParameterizedTest
+    @ParameterizedTest(name = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @ValueSource(strings = {"//;\n1;2;3"})
     void custom(final String input) {
         final int result = calculator.sum(input);
