@@ -7,9 +7,9 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
-    public static final int DEFAULT_VALUE = 0;
-    public static final String CUSTOM_REGEX = "//(.)\n(.*)";
-    public static final String DEFAULT_REGEX = ",|:";
+    private static final int DEFAULT_VALUE = 0;
+    private static final String CUSTOM_REGEX = "//(.)\n(.*)";
+    private static final String DEFAULT_REGEX = ",|:";
     private static final Pattern pattern = Pattern.compile(CUSTOM_REGEX);
 
     public int sum(final String input) {
