@@ -90,7 +90,7 @@ class MenuServiceTest {
 
         @DisplayName("제품 1개 이상 등록 해야함")
         @Test
-        void createWithEmptyMenu() {
+        void createWithEmptyProduct() {
             // given
             Menu request = new Menu();
             request.setPrice(BigDecimal.valueOf(3000));
@@ -105,7 +105,7 @@ class MenuServiceTest {
 
         @DisplayName("반드시 이미 등록된 제품만 등록 해야함")
         @Test
-        void createWithNotExistsMenu() {
+        void createWithNotExistsProduct() {
             // given
             Menu request = new Menu();
             request.setPrice(BigDecimal.valueOf(3000));
@@ -124,13 +124,13 @@ class MenuServiceTest {
         @Test
         void createWithInvalidQuantity() {
             // given
-            MenuProduct menuProductRequests = new MenuProduct();
-            menuProductRequests.setProduct(Fixtures.PRODUCT);
-            menuProductRequests.setQuantity(-1);
+            MenuProduct menuProductRequest = new MenuProduct();
+            menuProductRequest.setProduct(Fixtures.PRODUCT);
+            menuProductRequest.setQuantity(-1);
 
             Menu request = new Menu();
             request.setPrice(BigDecimal.valueOf(3000));
-            request.setMenuProducts(List.of(menuProductRequests));
+            request.setMenuProducts(List.of(menuProductRequest));
 
             given(menuGroupRepository.findById(any())).willReturn(Optional.of(Fixtures.MENU_GROUP));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(Fixtures.PRODUCT));
