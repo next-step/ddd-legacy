@@ -41,8 +41,15 @@ public class StringCalculatorTest {
 
   @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
   @ParameterizedTest
-  @ValueSource(strings = {"1,2:3"})
-  void colons(final String text) {
-    assertThat(calculator.add(text)).isSameAs(6);
+  @CsvSource(value = {"1,2:3|6"}, delimiter = '|')
+  void colons(final String text, final int result) {
+    assertThat(calculator.add(text)).isSameAs(result);
+  }
+
+  @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+  @ParameterizedTest
+  @CsvSource(value = {"'//;\n1;2;3'|6"}, delimiter = '|')
+  void customDelimiter(final String text, final int result) {
+    assertThat(calculator.add(text)).isSameAs(result);
   }
 }
