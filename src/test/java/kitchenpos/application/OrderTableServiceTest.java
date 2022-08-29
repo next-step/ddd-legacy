@@ -50,10 +50,13 @@ class OrderTableServiceTest {
         @Test
         void create() {
             // given
+            OrderTable orderTable = new OrderTable();
+            orderTable.setName("SampleOrderTable");
+
             given(orderTableRepository.save(any())).willReturn(any());
 
             // when
-            orderTableService.create(Fixtures.ORDER_TABLE);
+            orderTableService.create(orderTable);
 
             // then
             then(orderTableRepository).should().save(any());
