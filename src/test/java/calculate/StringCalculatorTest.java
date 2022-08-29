@@ -2,6 +2,7 @@ package calculate;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -11,6 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * 쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열을 전달하는 경우 구분자를 기준으로 분리한 각 숫자의 합을 반환 (예: “” => 0, "1,2" => 3, "1,2,3" => 6, “1,2:3” => 6)
@@ -30,6 +32,27 @@ class StringCalculatorTest {
     @NullAndEmptySource
     void calculate_null_and_empty_string(String text) {
         assertThat(stringCalculator.calculate(text)).isEqualTo(0);
+    }
+
+    @ParameterizedTest
+    @DisplayName("숫자 하나를 문자열로 입력할 경우 해당 문자를 숫자로 반환한다.")
+    @ValueSource(strings = {"1", "2", "3", "4", "5"})
+    void calculate_one_string_number(String text) {
+        assertThat(stringCalculator.calculate(text)).isEqualTo(Integer.parseInt(text));
+    }
+
+    @Test
+    @DisplayName("문자열에 음수를 입력한 경우 예외가 발생한다.")
+    void calculate_minus_number() {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> stringCalculator.calculate("1;-1;2"));
+    }
+
+    @Test
+    @DisplayName("문자열에 숫자가 아닌 다른 문자를 입력한 경우 예외가 발생한다.")
+    void calculate_wrong_number() {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> stringCalculator.calculate("1;s;2"));
     }
 
     @ParameterizedTest

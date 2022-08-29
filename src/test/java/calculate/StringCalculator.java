@@ -16,13 +16,12 @@ public class StringCalculator {
     private static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile(CUSTOM_SEPARATOR);
 
     public int calculate(final String text) {
-        if(text == null || text.isEmpty()) {
+        if (text == null || text.isEmpty()) {
             return ZERO;
         }
 
-        return Arrays.stream(split(text))
-                .map(Integer::parseInt)
-                .reduce(ZERO, Integer::sum);
+        Numbers numbers = new Numbers(split(text));
+        return numbers.calculate();
     }
 
     private String[] split(String text) {
