@@ -5,6 +5,8 @@ import java.util.List;
 
 public final class StringCalculator {
 
+    private static final int DEFAULT_VALUE = 0;
+
     private final StringNumberParser stringNumberParser;
 
     public StringCalculator() {
@@ -13,7 +15,7 @@ public final class StringCalculator {
 
     public int add(String text) {
         if (StringUtils.isBlank(text)) {
-            return 0;
+            return DEFAULT_VALUE;
         }
 
         return sum(toPositiveNumbers(text));
@@ -25,7 +27,8 @@ public final class StringCalculator {
 
     private int sum(List<PositiveNumber> positiveNumbers) {
         return positiveNumbers.stream()
-                .mapToInt(PositiveNumber::getValue)
-                .sum();
+                .reduce(PositiveNumber::sum)
+                .map(PositiveNumber::getValue)
+                .orElse(DEFAULT_VALUE);
     }
 }
