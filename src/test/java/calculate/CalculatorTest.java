@@ -1,7 +1,14 @@
 package calculate;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,28 +18,39 @@ import static org.assertj.core.api.Assertions.assertThat;
  * 문자열 계산기에 숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException 예외를 throw 한다.
  */
 class CalculatorTest {
+    private Calculator calculator;
 
-    @Test
+    @BeforeEach
+    void setup() {
+        calculator = new Calculator();
+    }
+
+    @ParameterizedTest
     @DisplayName("구분자를 쉼표로 숫자의 합을 구할 수 있다.")
-    void calculate_comma() {
-        Calculator calculator = new Calculator();
-
-        assertThat(calculator.add("1,2,3")).isEqualTo(6);
+    @ValueSource(strings = {"1,2,3"})
+    void calculate_comma(String text) {
+        assertThat(calculator.add(text)).isEqualTo(6);
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("구분자를 콜론으로 숫자의 합을 구할 수 있다.")
-    void calculate_colon() {
-        Calculator calculator = new Calculator();
-
-        assertThat(calculator.add("1:2:3")).isEqualTo(6);
+    @ValueSource(strings = {"1:2:3"})
+    void calculate_colon(String text) {
+        assertThat(calculator.add(text)).isEqualTo(6);
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("구분자를 콜론 또는 쉼표로 숫자의 합을 구할 수 있다.")
-    void calculate_colon_and_comma() {
-        Calculator calculator = new Calculator();
-
-        assertThat(calculator.add("1,2:3")).isEqualTo(6);
+    @MethodSource("calculatorParametersProvider")
+    void calculate_colon_and_comma(String text, int result) {
+        assertThat(calculator.add(text)).isEqualTo(result);
     }
+
+    static Stream<Arguments> calculatorParametersProvider() {
+        return Stream.of(
+                Arguments.arguments("1,2:3", 6),
+                Arguments.arguments("2:3,4,5", 14)
+        );
+    }
+
 }
