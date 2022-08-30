@@ -37,31 +37,39 @@ class MenuGroupServiceTest {
     @DisplayName("메뉴 그룹 등록")
     @Nested
     public class CreateTest {
-        @DisplayName("정상 동작")
-        @Test
-        void create() {
-            // given
-            given(menuGroupRepository.save(any())).willReturn(any());
+        @DisplayName("성공 테스트")
+        @Nested
+        public class SuccessTest {
+            @DisplayName("정상 동작")
+            @Test
+            void create() {
+                // given
+                given(menuGroupRepository.save(any())).willReturn(any());
 
-            // when
-            menuGroupService.create(Fixtures.MENU_GROUP);
+                // when
+                menuGroupService.create(Fixtures.MENU_GROUP);
 
-            // then
-            then(menuGroupRepository).should().save(any());
+                // then
+                then(menuGroupRepository).should().save(any());
+            }
         }
 
-        @DisplayName("이름이 null 또는 빈값일 수 없음")
-        @ParameterizedTest
-        @NullAndEmptySource
-        void createWithNullOrEmptyName(String name) {
-            // given
-            MenuGroup menuGroup = new MenuGroup();
-            menuGroup.setName(name);
+        @DisplayName("실패 테스트")
+        @Nested
+        public class FailTest {
+            @DisplayName("이름이 null 또는 빈값일 수 없음")
+            @ParameterizedTest
+            @NullAndEmptySource
+            void createWithNullOrEmptyName(String name) {
+                // given
+                MenuGroup menuGroup = new MenuGroup();
+                menuGroup.setName(name);
 
-            // when then
-            assertThatIllegalArgumentException().isThrownBy(
-                () -> menuGroupService.create(menuGroup)
-            );
+                // when then
+                assertThatIllegalArgumentException().isThrownBy(
+                    () -> menuGroupService.create(menuGroup)
+                );
+            }
         }
     }
 
