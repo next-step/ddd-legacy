@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class PositiveIntegerTest {
     @DisplayName("음수를 입력할 시 에러 반환")
@@ -39,6 +40,29 @@ class PositiveIntegerTest {
     void positiveOrZero(String validString, int value) {
         final var integer = PositiveInteger.parse(validString);
 
-        assertThat(integer.getValue()).isEqualTo(value);
+        assertThat(integer.toInt()).isEqualTo(value);
+    }
+
+    @DisplayName("ZERO는 0이다.")
+    @Test
+    void zeroConstant() {
+        assertThat(PositiveInteger.ZERO.toInt()).isZero();
+    }
+
+    @DisplayName("양수를 더하면 새로운 양수 인스턴스가 반환된다.")
+    @ParameterizedTest
+    @CsvSource({
+            "1, 2, 3",
+            "4, 5, 9"
+    })
+    void plus(int a, int b, int expectedSum) {
+        final var first = new PositiveInteger(a);
+        final var second = new PositiveInteger(b);
+        final var actualSum = first.plus(second);
+
+        assertAll(
+                () -> assertThat(first).isNotSameAs(actualSum),
+                () -> assertThat(actualSum.toInt()).isEqualTo(expectedSum)
+        );
     }
 }
