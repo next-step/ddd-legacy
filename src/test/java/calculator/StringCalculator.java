@@ -1,17 +1,21 @@
 package calculator;
 
+import java.util.Arrays;
+
 public class StringCalculator {
 
     public int add(String text) {
-        PositiveNumber number = PositiveNumber.zeroNumber();
         if (text == null || text.isBlank()) {
             return 0;
         }
 
-        for (String stringNumber : StringTokenUtils.tokenizer(text)) {
-            number = number.add(new PositiveNumber(stringNumber));
-        }
+        return tokenNumberSum(StringTokenUtils.tokenizer(text));
+    }
 
-        return number.getNumber();
+    private int tokenNumberSum(String[] tokens) {
+        return Arrays.stream(tokens)
+                .map(PositiveNumber::new)
+                .reduce(PositiveNumber.zeroNumber(), PositiveNumber::add)
+                .getNumber();
     }
 }
