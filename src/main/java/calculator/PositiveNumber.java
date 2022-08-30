@@ -9,22 +9,22 @@ public class PositiveNumber {
         this.positiveNumber = Integer.parseInt(number);
     }
 
-    public int add(int addValue) {
+    public final int add(int addValue) {
         return addValue + positiveNumber;
     }
 
-    private static void validatePositiveNumber(String splitNumbers) {
+    private void validatePositiveNumber(String splitNumbers) {
         validateNumberIsDigit(splitNumbers);
         minusNumberCheck(splitNumbers);
     }
 
-    private static void validateNumberIsDigit(String splitNumbers) {
+    private void validateNumberIsDigit(String splitNumbers) {
         if (!splitNumbers.chars().allMatch(Character::isDigit)) {
             throw new NotPositiveNumberException();
         }
     }
 
-    private static void minusNumberCheck(String splitNumbers) {
+    private void minusNumberCheck(String splitNumbers) {
         if (Integer.parseInt(splitNumbers) < ZERO_NUMBER) {
             throw new NotPositiveNumberException();
         }
