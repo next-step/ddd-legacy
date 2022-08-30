@@ -6,6 +6,12 @@ public class Number {
     private static final int MIN_VALUE = 0;
     private final int value;
 
+    private void validateRange(final int value) {
+        if (value < MIN_VALUE) {
+            throw new RuntimeException("음수가 아닌 숫자를 입력하세요.");
+        }
+    }
+
     public Number(final int input) {
         validateRange(input);
         this.value = input;
@@ -13,12 +19,6 @@ public class Number {
 
     public Number(final String input) {
         this(Integer.parseInt(input));
-    }
-
-    private void validateRange(final int value) {
-        if (value < MIN_VALUE) {
-            throw new RuntimeException("음수가 아닌 숫자를 입력하세요.");
-        }
     }
 
     public Number plus(final Number number) {

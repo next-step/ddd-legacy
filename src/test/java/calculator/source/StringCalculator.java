@@ -10,14 +10,11 @@ public class StringCalculator {
     }
 
     public Number plus(final String input) {
-        if(input==null || input.isBlank()){
+        if (input == null || input.isBlank()) {
             return new Number(0);
         }
-        return splitters.split(input)
-                .stream()
-                .map(Number::new)
-                .reduce(Number::plus)
-                .orElseThrow(() -> new RuntimeException("문자열 덧셈을 실패했습니다."));
+        return Numbers.from(splitters.split(input))
+                .plusAll();
     }
 
 }
