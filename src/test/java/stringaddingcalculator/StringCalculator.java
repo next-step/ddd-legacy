@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
  * 문자열 계산기에 숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException 예외를 throw 한다.
  */
 public class StringCalculator {
-    private static final Pattern simpleNumberFormatStringPattern = Pattern.compile("^([0-9]+)$");
-    private static final Pattern customSeparatorFormatStringPattern = Pattern.compile("//(.)\\\\n(.+)");
+    private static final Pattern SIMPLE_NUMBER_FORMAT_STRING_PATTERN = Pattern.compile("^([0-9]+)$");
+    private static final Pattern CUSTOM_SEPARATOR_FORMAT_STRING_PATTERN = Pattern.compile("//(.)\\\\n(.+)");
     private static final String DEFAULT_SEPARATOR_REGULAR_EXPRESSION = "[,:]";
     private static final String COLON_SEPARATOR = ":";
 
@@ -20,12 +20,12 @@ public class StringCalculator {
             return 0;
         }
 
-        final Matcher simpleNumberFormatStringMatcher = simpleNumberFormatStringPattern.matcher(source);
+        final Matcher simpleNumberFormatStringMatcher = SIMPLE_NUMBER_FORMAT_STRING_PATTERN.matcher(source);
         if (simpleNumberFormatStringMatcher.find()) {
             return parseIntAndValidate(source);
         }
 
-        final Matcher matcher = customSeparatorFormatStringPattern.matcher(source);
+        final Matcher matcher = CUSTOM_SEPARATOR_FORMAT_STRING_PATTERN.matcher(source);
         if (matcher.find()) {
             final String replacedSeparatorSource = matcher.group(2).replace(matcher.group(1), COLON_SEPARATOR);
             return add(COLON_SEPARATOR, replacedSeparatorSource);
