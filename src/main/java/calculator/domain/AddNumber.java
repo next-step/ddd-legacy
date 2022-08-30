@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class AddNumber {
 
+    private static final AddNumber ZERO = new AddNumber(0);
     private final int value;
 
     public AddNumber(int value) {
@@ -19,10 +20,18 @@ public class AddNumber {
 
     public static AddNumber from(String value) {
         try {
-            return new AddNumber(Integer.parseInt(value));
+            return convertToAddNumber(value);
         } catch (NumberFormatException e) {
             throw new RuntimeException("정수 외 값은 덧셈 값이 될 수 없습니다.");
         }
+    }
+
+    private static AddNumber convertToAddNumber(String value) {
+        if (Objects.isNull(value) || value.isBlank()) {
+            return ZERO;
+        }
+
+        return new AddNumber(Integer.parseInt(value));
     }
 
     public int getValue() {
