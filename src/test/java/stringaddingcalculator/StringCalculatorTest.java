@@ -50,7 +50,7 @@ class StringCalculatorTest {
     }
 
     @Test
-    @DisplayName("comma 구분자를 이용하여 덧셈에 성공해야한다.")
+    @DisplayName("숫자 여러개를 comma(,) 구분자로 구분하여 입력할 경우 comma(,) 로 구분된 숫자의 합을 반환한다")
     void testAddUsingCommaSeparator() {
         // given
         final String source = "1,2,3,4,5";
