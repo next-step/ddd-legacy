@@ -80,6 +80,8 @@ class ProductServiceTest {
                 Product product = new Product();
                 if (price != null) {
                     product.setPrice(BigDecimal.valueOf(price));
+                } else {
+                    product.setPrice(null);
                 }
 
                 // when then
@@ -160,6 +162,8 @@ class ProductServiceTest {
                 Product product = new Product();
                 if (price != null) {
                     product.setPrice(BigDecimal.valueOf(price));
+                } else {
+                    product.setPrice(null);
                 }
 
                 // when then

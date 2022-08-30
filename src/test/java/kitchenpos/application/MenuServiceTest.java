@@ -91,6 +91,8 @@ class MenuServiceTest {
                 Menu request = new Menu();
                 if (price != null) {
                     request.setPrice(BigDecimal.valueOf(price));
+                } else {
+                    request.setPrice(null);
                 }
 
                 // when then
@@ -263,6 +265,8 @@ class MenuServiceTest {
                 Menu request = new Menu();
                 if (price != null) {
                     request.setPrice(BigDecimal.valueOf(price));
+                } else {
+                    request.setPrice(null);
                 }
 
                 // when then
