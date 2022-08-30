@@ -26,9 +26,8 @@ class StringCalculatorTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @ValueSource(strings = {
-            "", " ", "   ", "     ", "       "
-    })
+    @ValueSource(strings = {"", " ", "   ", "     ", "       "})
+    @DisplayName("NULL, Empty, Blank String 이 전달되어질 경우 0을 반환해야한다.")
     void testAddIfSourceIsNullOrEmptyOrBlankString(final String source) {
         // given when
         final int sum = stringCalculator.add(source);
