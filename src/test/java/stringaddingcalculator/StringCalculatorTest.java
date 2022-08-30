@@ -8,6 +8,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.Set;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
@@ -18,10 +20,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
  */
 class StringCalculatorTest {
     private StringCalculator stringCalculator;
+    private final Set<StringToNumberParser> stringToNumberParsers = Set.of(
+            new DefaultStringFormatStringToNumberParser(),
+            new CustomSeparatorFormatStringToNumberParser()
+    );
 
     @BeforeEach
     void setUp() {
-        this.stringCalculator = new StringCalculator();
+        this.stringCalculator = new StringCalculator(stringToNumberParsers);
     }
 
     @ParameterizedTest
@@ -110,6 +116,17 @@ class StringCalculatorTest {
     void testAddIfSourceIsNegative() {
         // given
         final String negativeSource = "1:-2:3";
+
+        // when then
+        assertThatThrownBy(() -> stringCalculator.add(negativeSource))
+                .isExactlyInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    @DisplayName("숫자 이외의 값이 전달되면 RuntimeException 이 발생해야한다")
+    void testAddIfSourceIsNotNumber() {
+        // given
+        final String negativeSource = "a:b:1";
 
         // when then
         assertThatThrownBy(() -> stringCalculator.add(negativeSource))
