@@ -114,6 +114,7 @@ class OrderServiceTest {
         void createWithInvalidType() {
             // given
             Order request = new Order();
+            request.setType(null);
 
             // when then
             assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(request));

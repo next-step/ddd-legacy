@@ -172,6 +172,7 @@ class MenuServiceTest {
             menuProductRequest.setQuantity(1);
 
             Menu request = new Menu();
+            request.setName(null);
             request.setPrice(BigDecimal.valueOf(5000));
             request.setMenuProducts(List.of(menuProductRequest));
 

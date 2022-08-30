@@ -84,6 +84,7 @@ class ProductServiceTest {
         void createWithNullName() {
             // given
             Product product = new Product();
+            product.setName(null);
             product.setPrice(BigDecimal.TEN);
 
             // when then
