@@ -1,8 +1,6 @@
 package kitchenpos.application;
 
 import static kitchenpos.test.constant.MethodSource.NEGATIVE_NUMBERS;
-import static kitchenpos.test.fixture.Fixture.MENU_PRODUCT;
-import static kitchenpos.test.fixture.Fixture.PRODUCT;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,6 +11,7 @@ import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.test.Fixture;
 import kitchenpos.test.UnitTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,10 +41,7 @@ class ProductServiceTest extends UnitTestCase {
 
     @BeforeEach
     void setUp() {
-        product = new Product();
-        product.setId(PRODUCT.getId());
-        product.setName(PRODUCT.getName());
-        product.setPrice(PRODUCT.getPrice());
+        product = Fixture.createProduct();
     }
 
     @DisplayName("제품 등록")
@@ -56,7 +52,7 @@ class ProductServiceTest extends UnitTestCase {
         @Test
         void success() {
             // when then
-            assertThatCode(() -> service.create(PRODUCT))
+            assertThatCode(() -> service.create(product))
                     .doesNotThrowAnyException();
         }
 
@@ -82,7 +78,7 @@ class ProductServiceTest extends UnitTestCase {
 
             // when then
             assertThatIllegalArgumentException()
-                    .isThrownBy(() -> service.create(PRODUCT));
+                    .isThrownBy(() -> service.create(product));
         }
 
         @DisplayName("제품 가격은 0원 이상 입력 가능하다.")
@@ -108,7 +104,7 @@ class ProductServiceTest extends UnitTestCase {
         @Test
         void success() {
             // given
-            UUID id = PRODUCT.getId();
+            UUID id = product.getId();
             BigDecimal requestPrice = BigDecimal.valueOf(1_000);
 
             Product request = new Product();
@@ -141,7 +137,7 @@ class ProductServiceTest extends UnitTestCase {
         @Test
         void success_disabledMenu() {
             // given
-            UUID id = PRODUCT.getId();
+            UUID id = product.getId();
             BigDecimal requestPrice = BigDecimal.valueOf(1_000);
             Product request = new Product();
             request.setPrice(requestPrice);
@@ -149,7 +145,7 @@ class ProductServiceTest extends UnitTestCase {
             given(productRepository.findById(any()))
                     .willReturn(Optional.ofNullable(product));
 
-            BigDecimal menuProductPrice = PRODUCT.getPrice();
+            BigDecimal menuProductPrice = product.getPrice();
             BigDecimal menuPrice = menuProductPrice.add(BigDecimal.ONE);
             Menu menu = getEnabledMenu(menuPrice);
             given(menuRepository.findAllByProductId(any()))
@@ -164,11 +160,8 @@ class ProductServiceTest extends UnitTestCase {
         }
 
         private Menu getEnabledMenu(BigDecimal menuPrice) {
-            Menu menu = new Menu();
-            menu.setName("후라이드 1개");
-            menu.setDisplayed(Boolean.TRUE);
+            Menu menu = Fixture.createMenu();
             menu.setPrice(menuPrice);
-            menu.setMenuProducts(List.of(MENU_PRODUCT));
             return menu;
         }
     }
@@ -178,10 +171,10 @@ class ProductServiceTest extends UnitTestCase {
     void findAll() {
         // given
         given(productRepository.findAll())
-                .willReturn(List.of(PRODUCT));
+                .willReturn(List.of(product));
 
         // when then
         assertThat(service.findAll())
-                .contains(PRODUCT);
+                .contains(product);
     }
 }
