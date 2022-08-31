@@ -1,6 +1,7 @@
 package kitchenpos.test;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
@@ -8,6 +9,8 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 public final class Fixture {
+
+    public static final BigDecimal PRICES_FOR_ALL_PRODUCTS_ON_THE_MENU = BigDecimal.valueOf(16_000);
 
     private Fixture() {
     }
@@ -33,7 +36,10 @@ public final class Fixture {
         menu.setName("후라이드 1개");
         menu.setDisplayed(Boolean.TRUE);
         menu.setPrice(BigDecimal.valueOf(15_000));
-        menu.setMenuProducts(List.of(createMenuProduct()));
+
+        List<MenuProduct> menuProducts = new ArrayList<>();
+        menuProducts.add(createMenuProduct());
+        menu.setMenuProducts(menuProducts);
         return menu;
     }
 }
