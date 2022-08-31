@@ -34,6 +34,8 @@ docker compose -p kitchenpos up -d
 
 - [ ] `상품(Product)` 목록을 조회 할 수 있다.
 
+<br />
+
 ### 메뉴 그룹 (MenuGroup)
 
 #### Create
@@ -44,6 +46,8 @@ docker compose -p kitchenpos up -d
 #### Read
 
 - [ ] `메뉴 그룹(MenuGroup)` 목록을 조회할 수 있다.
+
+<br />
 
 ### 메뉴 (Menu)
 
@@ -72,6 +76,8 @@ docker compose -p kitchenpos up -d
 
 - [ ] `메뉴(Menu)` 목록을 조회 할 수 있다.
 
+<br />
+
 ### 주문 테이블 (OrderTable)
 
 #### Create
@@ -97,6 +103,8 @@ docker compose -p kitchenpos up -d
 #### Read
 
 - [ ] `주문 테이블(OrderTable)` 목록을 조회 할 수 있다.
+
+<br />
 
 ### 주문 (Order)
 
@@ -148,6 +156,12 @@ docker compose -p kitchenpos up -d
 #### Read
 
 - [ ] `주문(Order)` 목록을 조회할 수 있다.
+
+<br />
+
+###### Order State Diagram
+
+<img src="order_state_diagram.png" width="50%"  alt="Order State Diagram"/>
 
 ---
 
