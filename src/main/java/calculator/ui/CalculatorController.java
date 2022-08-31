@@ -1,7 +1,7 @@
 package calculator.ui;
 
 import calculator.application.CalculatorService;
-import calculator.domain.AddNumber;
+import calculator.domain.Operand;
 
 public class CalculatorController {
 
@@ -17,7 +17,7 @@ public class CalculatorController {
 
     public void execute() {
         String inputText = inputView.InputAddNumber();
-        AddNumber result = calculatorService.add(inputText);
+        Operand result = calculatorService.add(inputText);
         outputView.printResult(result.getValue());
     }
 }

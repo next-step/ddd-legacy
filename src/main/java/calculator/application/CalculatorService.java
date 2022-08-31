@@ -1,7 +1,7 @@
 package calculator.application;
 
-import calculator.domain.AddNumber;
-import calculator.domain.AddNumbers;
+import calculator.domain.Operand;
+import calculator.domain.Operands;
 import calculator.domain.Separators;
 import java.util.List;
 
@@ -17,9 +17,9 @@ public class CalculatorService {
         this.separators = separators;
     }
 
-    public AddNumber add(String text) {
+    public Operand add(String text) {
         List<String> texts = separators.splitText(text);
-        AddNumbers numbers = AddNumbers.from(texts);
-        return numbers.addAllNumbers();
+        Operands numbers = Operands.from(texts);
+        return numbers.addAll();
     }
 }

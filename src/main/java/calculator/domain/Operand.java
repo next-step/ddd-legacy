@@ -2,12 +2,12 @@ package calculator.domain;
 
 import java.util.Objects;
 
-public class AddNumber {
+public class Operand {
 
-    private static final AddNumber ZERO = new AddNumber(0);
+    private static final Operand ZERO = new Operand(0);
     private final int value;
 
-    public AddNumber(int value) {
+    public Operand(int value) {
         this.value = value;
         validateNegative(this.value);
     }
@@ -18,20 +18,20 @@ public class AddNumber {
         }
     }
 
-    public static AddNumber from(String value) {
+    public static Operand from(String value) {
         try {
-            return convertToAddNumber(value);
+            return convertToOperand(value);
         } catch (NumberFormatException e) {
             throw new RuntimeException("정수 외 값은 덧셈 값이 될 수 없습니다.");
         }
     }
 
-    private static AddNumber convertToAddNumber(String value) {
+    private static Operand convertToOperand(String value) {
         if (Objects.isNull(value) || value.isBlank()) {
             return ZERO;
         }
 
-        return new AddNumber(Integer.parseInt(value));
+        return new Operand(Integer.parseInt(value));
     }
 
     public int getValue() {
@@ -46,8 +46,8 @@ public class AddNumber {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AddNumber addNumber = (AddNumber) o;
-        return value == addNumber.value;
+        Operand operand = (Operand) o;
+        return value == operand.value;
     }
 
     @Override
