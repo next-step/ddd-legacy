@@ -15,8 +15,8 @@ public class StringCalculator {
     String[] result = getNumbers(text);
 
     return Arrays.stream(result)
-        .map(PosiviteInteger::getInstance)
-        .mapToInt(PosiviteInteger::getNum)
+        .map(PositiveInteger::getInstance)
+        .mapToInt(PositiveInteger::getNum)
         .sum();
   }
 

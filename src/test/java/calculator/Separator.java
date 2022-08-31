@@ -7,7 +7,9 @@ public class Separator {
 
   private static final String COMMA_COLON = ",|:";
   private static final String CUSTOM_SEPARATOR_FOUND = "//(.)\n(.*)";
-  private final Pattern PATTERN_SEPARATOR_FOUND = Pattern.compile(CUSTOM_SEPARATOR_FOUND);
+  private static final Pattern PATTERN_SEPARATOR_FOUND = Pattern.compile(CUSTOM_SEPARATOR_FOUND);
+
+  private Matcher matcher;
 
   private final String text;
 
@@ -16,25 +18,26 @@ public class Separator {
   }
 
   public String[] numbers() {
+    getMatcher();
     if (isMatcherFind()) {
       return getDelimiterNumbers().split(getCustomDelimiter() + "|" + COMMA_COLON);
     }
     return text.split(COMMA_COLON);
   }
 
+  private void getMatcher() {
+    matcher = PATTERN_SEPARATOR_FOUND.matcher(text);
+  }
+
   private boolean isMatcherFind() {
-    return getMatcher().find();
+    return matcher.find();
   }
 
   private String getCustomDelimiter() {
-    return getMatcher().group(1);
+    return matcher.group(1);
   }
 
   private String getDelimiterNumbers() {
-    return getMatcher().group(2);
-  }
-
-  private Matcher getMatcher() {
-    return PATTERN_SEPARATOR_FOUND.matcher(text);
+    return matcher.group(2);
   }
 }
