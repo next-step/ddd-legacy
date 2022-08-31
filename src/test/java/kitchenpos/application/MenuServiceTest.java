@@ -28,6 +28,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+@DisplayName("메뉴")
 class MenuServiceTest extends UnitTestCase {
 
     @InjectMocks
@@ -45,7 +46,7 @@ class MenuServiceTest extends UnitTestCase {
     @Mock
     private PurgomalumClient purgomalumClient;
 
-    @DisplayName("메뉴 등록")
+    @DisplayName("등록")
     @Nested
     class CreateTest {
 
@@ -222,7 +223,7 @@ class MenuServiceTest extends UnitTestCase {
         }
     }
 
-    @DisplayName("메뉴 가격 수정")
+    @DisplayName("가격 수정")
     @Nested
     class ChangePriceTest {
 
@@ -278,7 +279,7 @@ class MenuServiceTest extends UnitTestCase {
         }
     }
 
-    @DisplayName("메뉴 활성화")
+    @DisplayName("활성화")
     @Nested
     class DisplayTest {
 
@@ -320,7 +321,7 @@ class MenuServiceTest extends UnitTestCase {
         }
     }
 
-    @DisplayName("메뉴 비활성화")
+    @DisplayName("비활성화")
     @Nested
     class HideTest {
 

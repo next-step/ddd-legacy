@@ -23,6 +23,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+@DisplayName("제품")
 class ProductServiceTest extends UnitTestCase {
 
     @InjectMocks
@@ -44,7 +45,7 @@ class ProductServiceTest extends UnitTestCase {
         product = Fixture.createProduct();
     }
 
-    @DisplayName("제품 등록")
+    @DisplayName("등록")
     @Nested
     class CreateTest {
 
@@ -96,7 +97,7 @@ class ProductServiceTest extends UnitTestCase {
         }
     }
 
-    @DisplayName("제품 수정")
+    @DisplayName("가격 수정")
     @Nested
     class ChangePriceTest {
 

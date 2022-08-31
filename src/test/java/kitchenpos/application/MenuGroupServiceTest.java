@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+@DisplayName("메뉴 그룹")
 class MenuGroupServiceTest extends UnitTestCase {
 
     @InjectMocks
@@ -31,7 +32,7 @@ class MenuGroupServiceTest extends UnitTestCase {
         menuGroup.setName("순살파닭두마리메뉴");
     }
 
-    @DisplayName("메뉴 그룹 등록")
+    @DisplayName("등록")
     @Nested
     class CreateTest {
 
