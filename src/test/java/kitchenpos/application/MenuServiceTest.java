@@ -144,6 +144,18 @@ class MenuServiceTest extends UnitTestCase {
                 assertThatIllegalArgumentException()
                         .isThrownBy(() -> service.create(requestMenu));
             }
+
+            @DisplayName("선택한 제품 목록의 제품 중 존재하지 않는 제품이 있다면 등록되지 않는다.")
+            @Test
+            void error3() {
+                // given
+                mockingForSelectedMenuGroup(Optional.of(menuGroup));
+                mockingForSelectedMenuProduct(List.of(product, product));
+
+                // then
+                assertThatIllegalArgumentException()
+                        .isThrownBy(() -> service.create(requestMenu));
+            }
         }
 
         @DisplayName("메뉴 가격을 입력한다.")
