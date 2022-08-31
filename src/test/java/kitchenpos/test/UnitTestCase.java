@@ -11,7 +11,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.mockito.BDDMockito.BDDMyOngoingStubbing;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.OngoingStubbing;
 
 @ExtendWith(MockitoExtension.class)
 public abstract class UnitTestCase {
@@ -33,8 +35,17 @@ public abstract class UnitTestCase {
         return Assertions.assertThatIllegalArgumentException();
     }
 
+    public AbstractThrowableAssert<?, ? extends Throwable> assertThatThrownBy(
+            ThrowingCallable shouldRaiseThrowable) {
+        return Assertions.assertThatThrownBy(shouldRaiseThrowable);
+    }
+
     public <T> BDDMyOngoingStubbing<T> given(T methodCall) {
         return BDDMockito.given(methodCall);
+    }
+
+    public <T> OngoingStubbing<T> when(T methodCall) {
+        return Mockito.when(methodCall);
     }
 
     public <T> T any() {
