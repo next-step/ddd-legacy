@@ -145,24 +145,18 @@ class ProductServiceTest extends UnitTestCase {
             given(productRepository.findById(any()))
                     .willReturn(Optional.ofNullable(product));
 
-            BigDecimal menuProductPrice = product.getPrice();
-            BigDecimal menuPrice = menuProductPrice.add(BigDecimal.ONE);
-            Menu menu = getEnabledMenu(menuPrice);
+            // when
+            BigDecimal menuProductPrice = Fixture.PRICES_FOR_ALL_PRODUCTS_ON_THE_MENU;
+            Menu menu = Fixture.createMenu();
+            menu.setPrice(menuProductPrice.add(BigDecimal.ONE));
             given(menuRepository.findAllByProductId(any()))
                     .willReturn(List.of(menu));
 
-            // when
             service.changePrice(id, request);
 
             // then
             assertThat(menu)
                     .hasFieldOrPropertyWithValue("displayed", Boolean.FALSE);
-        }
-
-        private Menu getEnabledMenu(BigDecimal menuPrice) {
-            Menu menu = Fixture.createMenu();
-            menu.setPrice(menuPrice);
-            return menu;
         }
     }
 
