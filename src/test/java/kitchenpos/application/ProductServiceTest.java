@@ -46,7 +46,7 @@ class ProductServiceTest extends UnitTestCase {
 
     @DisplayName("제품 등록")
     @Nested
-    class Create {
+    class CreateTest {
 
         @DisplayName("제품 이름과 가격으로 등록한다.")
         @Test
@@ -98,7 +98,7 @@ class ProductServiceTest extends UnitTestCase {
 
     @DisplayName("제품 수정")
     @Nested
-    class ChangePrice {
+    class ChangePriceTest {
 
         @DisplayName("제품 가격을 수정할 수 있다.")
         @Test

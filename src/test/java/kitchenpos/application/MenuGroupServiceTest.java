@@ -33,7 +33,7 @@ class MenuGroupServiceTest extends UnitTestCase {
 
     @DisplayName("메뉴 그룹 등록")
     @Nested
-    class Create {
+    class CreateTest {
 
         @DisplayName("메뉴 그룹은 이름으로 등록한다.")
         @Test
