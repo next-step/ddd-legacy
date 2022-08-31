@@ -60,7 +60,7 @@ public class StringCalculatorTest {
 
     @DisplayName("커스텀 구분자를 사용한 문자열의 합을 반환한다.")
     @ParameterizedTest
-    @ValueSource(strings = {"//;\n1;2;3", "//!\n6"})
+    @ValueSource(strings = {"//;\n1;2;3", "//!\n6", "//a\n1a2a3"})
     void calculate_with_custom_expression_delimiter(String expression) {
         //given
         int expected = 6;

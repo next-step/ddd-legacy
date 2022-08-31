@@ -7,7 +7,7 @@ import org.junit.platform.commons.util.StringUtils;
 public class StringCalculator {
 
     private static final Pattern DEFAULT_EXPRESSION_PATTERN = Pattern.compile("^[0-9]+([,:][0-9]+)*$");
-    private static final Pattern CUSTOM_EXPRESSION_PATTERN = Pattern.compile("^//[^0-9a-zA-Z.,:\\$]\\n[0-9]([^0-9a-zA-Z.,:\\$][0-9]+)*$");
+    private static final Pattern CUSTOM_EXPRESSION_PATTERN = Pattern.compile("^//[^0-9.,:\\$]\\n[0-9]([^0-9.,:\\$][0-9]+)*$");
     public static final String DEFAULT_DELIMITER = "[,:]";
 
     public StringCalculator() {}
