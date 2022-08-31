@@ -1,5 +1,7 @@
 package racingcar;
 
+import java.util.Objects;
+
 public class Car {
 
   private static final int MAXMUM_NAME_LENGTH = 5;
@@ -12,7 +14,7 @@ public class Car {
   }
 
   public Car(String name, int position) {
-    if (name == null || name.isBlank()) {
+    if (Objects.isNull(name) || name.isBlank()) {
       throw new IllegalArgumentException("자동차의 이름은 비어 있을 수 없습니다.");
     }
 
