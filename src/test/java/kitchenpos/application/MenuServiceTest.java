@@ -316,7 +316,7 @@ class MenuServiceTest extends UnitTestCase {
                     .hasFieldOrPropertyWithValue("displayed", Boolean.TRUE);
         }
 
-        @DisplayName("메뉴의 가격이 갖고 있는 상품 목록 가격의 합보다 크면 수정되지 않는다.")
+        @DisplayName("메뉴의 가격이 갖고 있는 상품 목록 가격의 합보다 크면 노출되지 않는다.")
         @Test
         void error1() {
             // given
