@@ -58,9 +58,7 @@ class MenuServiceTest extends UnitTestCase {
         void setUp() {
             requestMenu = Fixture.createMenu();
             product = Fixture.createProduct();
-            menuGroup = new MenuGroup();
-            menuGroup.setId(UUID.randomUUID());
-            menuGroup.setName("한마리 메뉴");
+            menuGroup = Fixture.createMenuGroup();
         }
 
         @DisplayName("메뉴 그룹, 제품 목록, 이름, 가격, 노출 여부로 등록한다.")

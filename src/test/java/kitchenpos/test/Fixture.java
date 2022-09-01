@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
@@ -41,5 +42,12 @@ public final class Fixture {
         menuProducts.add(createMenuProduct());
         menu.setMenuProducts(menuProducts);
         return menu;
+    }
+
+    public static MenuGroup createMenuGroup() {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(UUID.randomUUID());
+        menuGroup.setName("한마리 메뉴");
+        return menuGroup;
     }
 }
