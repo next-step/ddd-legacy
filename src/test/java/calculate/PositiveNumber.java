@@ -9,7 +9,7 @@ public class PositiveNumber {
 
     private int parseNumber(String numberString) {
         int number = parseInt(numberString);
-        if(number < 0) {
+        if (number < 0) {
             throw new RuntimeException("숫자는 음수일 수 없습니다.");
         }
         return number;
