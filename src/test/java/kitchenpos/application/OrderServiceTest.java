@@ -222,7 +222,7 @@ class OrderServiceTest {
 
         OrderLineItem oli = anOrderLineItem(menu, 1);
         oli.setPrice(BigDecimal.valueOf(10_000));
-        
+
         Order request = new Order();
         request.setType(OrderType.DELIVERY);
         request.setOrderLineItems(Collections.singletonList(oli));

@@ -9,27 +9,22 @@ import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 public class Fixtures {
 
     static MenuGroup aMenuGroup() {
-        MenuGroup menuGroup = new MenuGroup("한마리치킨");
-        menuGroup.setId(UUID.randomUUID());
-        return menuGroup;
+        return new MenuGroup("한마리치킨");
     }
 
     static Product aProduct(int price) {
         Product product = new Product();
-        product.setId(UUID.randomUUID());
         product.setName("후라이드 치킨");
         product.setPrice(BigDecimal.valueOf(price));
         return product;
     }
 
     static MenuProduct aMenuProduct(int price, int quantity) {
-        Product product = aProduct(price);
-        return aMenuProduct(product, quantity);
+        return aMenuProduct(aProduct(price), quantity);
     }
 
     static MenuProduct aMenuProduct(Product product, int quantity) {
@@ -60,7 +55,6 @@ public class Fixtures {
 
     static OrderTable anOrderTable(boolean occupied) {
         OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
         orderTable.setOccupied(occupied);
         return orderTable;
     }
