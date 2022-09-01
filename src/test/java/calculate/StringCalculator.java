@@ -1,6 +1,5 @@
 package calculate;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,8 +19,8 @@ public class StringCalculator {
             return ZERO;
         }
 
-        Numbers numbers = new Numbers(split(text));
-        return numbers.calculate();
+        PositiveNumbers positiveNumbers = new PositiveNumbers(split(text));
+        return positiveNumbers.calculate();
     }
 
     private String[] split(String text) {
