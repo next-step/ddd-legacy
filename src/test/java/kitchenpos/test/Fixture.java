@@ -24,24 +24,28 @@ public final class Fixture {
         return product;
     }
 
-    public static MenuProduct createMenuProduct() {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(createProduct());
-        menuProduct.setSeq(0L);
-        menuProduct.setQuantity(1);
-        return menuProduct;
+    public static Menu createMenu() {
+        return createMenu(1);
     }
 
-    public static Menu createMenu() {
+    public static Menu createMenu(int quantityOfMenuProduct) {
         Menu menu = new Menu();
-        menu.setName("후라이드 1개");
+        menu.setName(String.format("%s %d개", "후라이드", quantityOfMenuProduct));
         menu.setDisplayed(Boolean.TRUE);
         menu.setPrice(BigDecimal.valueOf(15_000));
 
         List<MenuProduct> menuProducts = new ArrayList<>();
-        menuProducts.add(createMenuProduct());
+        menuProducts.add(createMenuProduct(quantityOfMenuProduct));
         menu.setMenuProducts(menuProducts);
         return menu;
+    }
+
+    public static MenuProduct createMenuProduct(int quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(createProduct());
+        menuProduct.setSeq(0L);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
     }
 
     public static MenuGroup createMenuGroup() {

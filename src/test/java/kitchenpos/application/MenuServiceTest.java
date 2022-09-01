@@ -126,9 +126,8 @@ class MenuServiceTest extends UnitTestCase {
                         .willReturn(List.of(product));
 
                 // when
-                List<MenuProduct> menuProducts = requestMenu.getMenuProducts();
-                MenuProduct menuProduct = menuProducts.get(0);
-                menuProduct.setQuantity(actual.intValue());
+                int quantityOfMenuProduct = actual.intValue();
+                Menu requestMenu = Fixture.createMenu(quantityOfMenuProduct);
 
                 // then
                 assertThatIllegalArgumentException()
