@@ -65,28 +65,16 @@ class MenuServiceTest extends UnitTestCase {
         @Test
         void success() {
             // given
-            mockingForSelectedMenuGroup(Optional.of(menuGroup));
-            mockingForSelectedMenuProduct(List.of(product));
-            mockingForProductOfSelectedMenuProduct(Optional.of(product));
+            given(menuGroupRepository.findById(any()))
+                    .willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(any()))
+                    .willReturn(List.of(product));
+            given((productRepository.findById(any())))
+                    .willReturn(Optional.of(product));
 
             // when then
             assertThatCode(() -> service.create(requestMenu))
                     .doesNotThrowAnyException();
-        }
-
-        private void mockingForSelectedMenuGroup(Optional<MenuGroup> menuGroup) {
-            given(menuGroupRepository.findById(any()))
-                    .willReturn(menuGroup);
-        }
-
-        private void mockingForSelectedMenuProduct(List<Product> products) {
-            given(productRepository.findAllByIdIn(any()))
-                    .willReturn(products);
-        }
-
-        private void mockingForProductOfSelectedMenuProduct(Optional<Product> product) {
-            given((productRepository.findById(any())))
-                    .willReturn(product);
         }
 
         @DisplayName("메뉴 그룹을 선택한다.")
@@ -97,7 +85,8 @@ class MenuServiceTest extends UnitTestCase {
             @Test
             void error1() {
                 // given
-                mockingForSelectedMenuGroup(Optional.empty());
+                given(menuGroupRepository.findById(any()))
+                        .willReturn(Optional.empty());
 
                 // when
                 assertThatThrownBy(() -> service.create(requestMenu))
@@ -115,7 +104,8 @@ class MenuServiceTest extends UnitTestCase {
             @MethodSource(EMPTY_LIST)
             void error1(List<MenuProduct> actual) {
                 // given
-                mockingForSelectedMenuGroup(Optional.of(menuGroup));
+                given(menuGroupRepository.findById(any()))
+                        .willReturn(Optional.of(menuGroup));
 
                 // when
                 requestMenu.setMenuProducts(actual);
@@ -130,8 +120,10 @@ class MenuServiceTest extends UnitTestCase {
             @MethodSource(NEGATIVE_NUMBERS)
             void error2(BigDecimal actual) {
                 // given
-                mockingForSelectedMenuGroup(Optional.of(menuGroup));
-                mockingForSelectedMenuProduct(List.of(product));
+                given(menuGroupRepository.findById(any()))
+                        .willReturn(Optional.of(menuGroup));
+                given(productRepository.findAllByIdIn(any()))
+                        .willReturn(List.of(product));
 
                 // when
                 List<MenuProduct> menuProducts = requestMenu.getMenuProducts();
@@ -147,8 +139,10 @@ class MenuServiceTest extends UnitTestCase {
             @Test
             void error3() {
                 // given
-                mockingForSelectedMenuGroup(Optional.of(menuGroup));
-                mockingForSelectedMenuProduct(List.of(product, product));
+                given(menuGroupRepository.findById(any()))
+                        .willReturn(Optional.of(menuGroup));
+                given(productRepository.findAllByIdIn(any()))
+                        .willReturn(List.of(product, product));
 
                 // then
                 assertThatIllegalArgumentException()
@@ -177,9 +171,12 @@ class MenuServiceTest extends UnitTestCase {
             @Test
             void error2() {
                 // given
-                mockingForSelectedMenuGroup(Optional.of(menuGroup));
-                mockingForSelectedMenuProduct(List.of(product));
-                mockingForProductOfSelectedMenuProduct(Optional.of(product));
+                given(menuGroupRepository.findById(any()))
+                        .willReturn(Optional.of(menuGroup));
+                given(productRepository.findAllByIdIn(any()))
+                        .willReturn(List.of(product));
+                given((productRepository.findById(any())))
+                        .willReturn(Optional.of(product));
 
                 // when
                 BigDecimal priceForAllProducts = Fixture.PRICES_FOR_ALL_PRODUCTS_ON_THE_MENU;
@@ -200,10 +197,13 @@ class MenuServiceTest extends UnitTestCase {
             @NullSource
             void error1(String actual) {
                 // given
-                mockingForSelectedMenuGroup(Optional.of(menuGroup));
-                mockingForSelectedMenuProduct(List.of(product));
+                given(menuGroupRepository.findById(any()))
+                        .willReturn(Optional.of(menuGroup));
+                given(productRepository.findAllByIdIn(any()))
+                        .willReturn(List.of(product));
 
-                mockingForProductOfSelectedMenuProduct(Optional.of(product));
+                given((productRepository.findById(any())))
+                        .willReturn(Optional.of(product));
 
                 // when
                 requestMenu.setName(actual);
@@ -217,10 +217,13 @@ class MenuServiceTest extends UnitTestCase {
             @Test
             void error2() {
                 // given
-                mockingForSelectedMenuGroup(Optional.of(menuGroup));
-                mockingForSelectedMenuProduct(List.of(product));
+                given(menuGroupRepository.findById(any()))
+                        .willReturn(Optional.of(menuGroup));
+                given(productRepository.findAllByIdIn(any()))
+                        .willReturn(List.of(product));
 
-                mockingForProductOfSelectedMenuProduct(Optional.of(product));
+                given((productRepository.findById(any())))
+                        .willReturn(Optional.of(product));
 
                 // when
                 when(purgomalumClient.containsProfanity(any()))
