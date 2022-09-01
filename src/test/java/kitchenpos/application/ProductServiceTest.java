@@ -103,9 +103,9 @@ class ProductServiceTest {
 
     @ParameterizedTest(name = "상품의 가격을 변경하면 상품을 포함하는 메뉴들은 가격에 따라 숨겨질 수 있다. price = {0}")
     @MethodSource("provideArgumentsForChangePrice")
-    void changePrice(BigDecimal menuPrice, boolean expected) {
+    void changePrice(int menuPrice, boolean expected) {
         // given
-        Product product = aProduct();
+        Product product = aProduct(10_000);
         MenuProduct menuProduct = aMenuProduct(product, 1);
         Menu menu = aMenu("후라이드 치킨", menuPrice, menuProduct);
 
@@ -124,9 +124,9 @@ class ProductServiceTest {
 
     public static Stream<Arguments> provideArgumentsForChangePrice() {
         return Stream.of(
-                Arguments.of(BigDecimal.valueOf(9_400), true),
-                Arguments.of(BigDecimal.valueOf(9_500), true),
-                Arguments.of(BigDecimal.valueOf(9_600), false)
+                Arguments.of(9_400, true),
+                Arguments.of(9_500, true),
+                Arguments.of(9_600, false)
         );
     }
 }
