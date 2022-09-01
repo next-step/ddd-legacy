@@ -1,6 +1,5 @@
 package kitchenpos.application;
 
-import static kitchenpos.test.constant.MethodSource.EMPTY_LIST;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 
@@ -31,7 +30,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -272,8 +270,7 @@ class OrderServiceTest extends UnitTestCase {
 
             @DisplayName("하나 이상의 메뉴를 선택해야 한다.")
             @ParameterizedTest
-            @NullSource
-            @MethodSource(EMPTY_LIST)
+            @NullAndEmptySource
             void error2(List<OrderLineItem> actual) {
                 // given
                 request.setOrderLineItems(actual);

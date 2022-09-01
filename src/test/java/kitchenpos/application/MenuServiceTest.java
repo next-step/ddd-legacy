@@ -1,6 +1,5 @@
 package kitchenpos.application;
 
-import static kitchenpos.test.constant.MethodSource.EMPTY_LIST;
 import static kitchenpos.test.constant.MethodSource.NEGATIVE_NUMBERS;
 
 import java.math.BigDecimal;
@@ -24,6 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -100,8 +100,7 @@ class MenuServiceTest extends UnitTestCase {
 
             @DisplayName("제품 목록을 선택하지 않으면 등록되지 않는다.")
             @ParameterizedTest
-            @NullSource
-            @MethodSource(EMPTY_LIST)
+            @NullAndEmptySource
             void error1(List<MenuProduct> actual) {
                 // given
                 given(menuGroupRepository.findById(any()))
