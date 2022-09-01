@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Stream;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
@@ -27,8 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -295,7 +293,7 @@ class OrderServiceTest extends UnitTestCase {
             @DisplayName("주문할 메뉴 수량은 0개 이상이어야 한다."
                     + "단 매장 주문일 경우는 제외한다.")
             @ParameterizedTest
-            @MethodSource("kitchenpos.application.OrderServiceTest#orderTypes")
+            @EnumSource(OrderType.class)
             void error4(OrderType orderType) {
                 assumeTrue(OrderType.EAT_IN != orderType);
 
@@ -390,7 +388,7 @@ class OrderServiceTest extends UnitTestCase {
 
             @DisplayName("수락 상태로 변경한다.")
             @ParameterizedTest
-            @MethodSource("kitchenpos.application.OrderServiceTest#orderTypes")
+            @EnumSource(OrderType.class)
             void success(OrderType orderType) {
                 // given
                 Order order = createOrder(orderType, OrderStatus.WAITING);
@@ -447,7 +445,7 @@ class OrderServiceTest extends UnitTestCase {
 
             @DisplayName("주문 대기 상태가 아닌 경우, 수락할 수 없다.")
             @ParameterizedTest
-            @MethodSource("kitchenpos.application.OrderServiceTest#orderStatus")
+            @EnumSource(OrderStatus.class)
             void error2(OrderStatus actual) {
                 assumeTrue(actual != OrderStatus.WAITING);
 
@@ -498,7 +496,7 @@ class OrderServiceTest extends UnitTestCase {
 
             @DisplayName("수락한 주문이 아니라면 전달 상태로 변경할 수 없다.")
             @ParameterizedTest
-            @MethodSource("kitchenpos.application.OrderServiceTest#orderStatus")
+            @EnumSource(OrderStatus.class)
             void error2(OrderStatus orderStatus) {
                 assumeTrue(orderStatus != OrderStatus.ACCEPTED);
 
@@ -552,7 +550,7 @@ class OrderServiceTest extends UnitTestCase {
 
             @DisplayName("배달 주문일 경우만, 배달 상태로 변경한다.")
             @ParameterizedTest
-            @MethodSource("kitchenpos.application.OrderServiceTest#orderTypes")
+            @EnumSource(OrderType.class)
             void error2(OrderType orderType) {
                 assumeTrue(orderType != OrderType.DELIVERY);
 
@@ -569,7 +567,7 @@ class OrderServiceTest extends UnitTestCase {
 
             @DisplayName("수락된 주문만 배달 상태로 변경한다.")
             @ParameterizedTest
-            @MethodSource("kitchenpos.application.OrderServiceTest#orderStatus")
+            @EnumSource(OrderStatus.class)
             void error3(OrderStatus orderStatus) {
                 assumeTrue(orderStatus != OrderStatus.SERVED);
 
@@ -620,7 +618,7 @@ class OrderServiceTest extends UnitTestCase {
 
             @DisplayName("주문 상태가 배달중일 경우 주문 완료 상태로 변경한다.")
             @ParameterizedTest
-            @MethodSource("kitchenpos.application.OrderServiceTest#orderStatus")
+            @EnumSource(OrderStatus.class)
             void error2(OrderStatus orderStatus) {
                 assumeTrue(orderStatus != OrderStatus.DELIVERING);
 
@@ -663,7 +661,7 @@ class OrderServiceTest extends UnitTestCase {
 
                 @DisplayName("배달 완료 상태일 경우에만 변경 가능하다.")
                 @ParameterizedTest
-                @MethodSource("kitchenpos.application.OrderServiceTest#orderStatus")
+                @EnumSource(OrderStatus.class)
                 void error1(OrderStatus orderStatus) {
                     assumeTrue(orderStatus != OrderStatus.DELIVERED);
 
@@ -702,7 +700,7 @@ class OrderServiceTest extends UnitTestCase {
 
                 @DisplayName("수락 상태일 경우에만 변경 가능하다.")
                 @ParameterizedTest
-                @MethodSource("kitchenpos.application.OrderServiceTest#orderStatus")
+                @EnumSource(OrderStatus.class)
                 void error1(OrderStatus orderStatus) {
                     assumeTrue(orderStatus != OrderStatus.SERVED);
 
@@ -781,7 +779,7 @@ class OrderServiceTest extends UnitTestCase {
 
                 @DisplayName("수락 상태일 경우에만 변경 가능하다.")
                 @ParameterizedTest
-                @MethodSource("kitchenpos.application.OrderServiceTest#orderStatus")
+                @EnumSource(OrderStatus.class)
                 void error1(OrderStatus orderStatus) {
                     assumeTrue(orderStatus != OrderStatus.SERVED);
 
@@ -823,16 +821,5 @@ class OrderServiceTest extends UnitTestCase {
         order.setType(delivery);
         order.setStatus(delivering);
         return order;
-    }
-
-
-    static Stream<Arguments> orderTypes() {
-        return Stream.of(OrderType.values())
-                .map(Arguments::of);
-    }
-
-    static Stream<Arguments> orderStatus() {
-        return Stream.of(OrderStatus.values())
-                .map(Arguments::of);
     }
 }
