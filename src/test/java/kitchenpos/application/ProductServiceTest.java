@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
@@ -135,8 +137,9 @@ class ProductServiceTest extends UnitTestCase {
 
         @DisplayName("제품이 등록된 메뉴의 가격이, "
                 + "메뉴 제품의 가격 합보다 큰 경우 메뉴는 비활성화 된다.")
-        @Test
-        void success_disabledMenu() {
+        @ParameterizedTest
+        @MethodSource("kitchenpos.application.ProductServiceTest#thresholdTestCaseOfMenuDisabledToRegisteredProductPrice")
+        void success_disabledMenu(BigDecimal actual, Boolean expectedOfDisplayedMenu) {
             // given
             UUID id = product.getId();
             BigDecimal requestPrice = BigDecimal.valueOf(1_000);
@@ -149,16 +152,24 @@ class ProductServiceTest extends UnitTestCase {
             // when
             BigDecimal menuProductPrice = Fixture.PRICES_FOR_ALL_PRODUCTS_ON_THE_MENU;
             Menu menu = Fixture.createMenu();
-            menu.setPrice(menuProductPrice.add(BigDecimal.ONE));
-            given(menuRepository.findAllByProductId(any()))
-                    .willReturn(List.of(menu));
+            menu.setPrice(menuProductPrice.add(actual));
+            when(menuRepository.findAllByProductId(any()))
+                    .thenReturn(List.of(menu));
 
             service.changePrice(id, request);
 
             // then
             assertThat(menu)
-                    .hasFieldOrPropertyWithValue("displayed", Boolean.FALSE);
+                    .hasFieldOrPropertyWithValue("displayed", expectedOfDisplayedMenu);
         }
+    }
+
+    static Stream<Arguments> thresholdTestCaseOfMenuDisabledToRegisteredProductPrice() {
+        return Stream.of(
+                Arguments.of(BigDecimal.valueOf(-1), Boolean.TRUE),
+                Arguments.of(BigDecimal.ZERO, Boolean.TRUE),
+                Arguments.of(BigDecimal.ONE, Boolean.FALSE)
+        );
     }
 
     @DisplayName("등록된 제품을 조회할 수 있다.")
