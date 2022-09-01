@@ -3,11 +3,14 @@ package kitchenpos.application;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 
 public class Fixtures {
@@ -57,5 +60,19 @@ public class Fixtures {
         OrderTable orderTable = new OrderTable();
         orderTable.setOccupied(occupied);
         return orderTable;
+    }
+
+    static Order anOrder(OrderType orderType) {
+        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(10_000, 1));
+
+        OrderLineItem oli = anOrderLineItem(menu, 1);
+        oli.setPrice(BigDecimal.valueOf(10_000));
+
+        Order order = new Order();
+        order.setType(orderType);
+        order.setOrderLineItems(Collections.singletonList(oli));
+        order.setDeliveryAddress("서울시 어딘가");
+
+        return order;
     }
 }

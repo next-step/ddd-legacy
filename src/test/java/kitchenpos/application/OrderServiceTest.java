@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -22,11 +23,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.application.Fixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -241,5 +244,130 @@ class OrderServiceTest {
         assertThat(saved.getStatus()).isEqualTo(OrderStatus.WAITING);
         assertThat(saved.getOrderDateTime()).isNotNull();
         assertThat(saved.getOrderLineItems()).hasSize(1);
+    }
+
+    @ParameterizedTest(name = "대기중인 주문만 수락할 수 있다. source = {0}")
+    @EnumSource(
+            value = OrderStatus.class,
+            names = {"WAITING"},
+            mode = EnumSource.Mode.EXCLUDE)
+    void accept_Illegal_State(OrderStatus orderStatus) {
+        // given
+        Order order = anOrder(OrderType.DELIVERY);
+        order.setStatus(orderStatus);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        // when + then
+        assertThatThrownBy(() -> orderService.accept(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("배송 주문 수락 시 배송 업체에게 배송 요청을 하고 주문 상태가 수락으로 변경된다.")
+    @Test
+    void accept_DELIVERY_ORDER() {
+        // given
+        Order order = anOrder(OrderType.DELIVERY);
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.WAITING);
+        order.setDeliveryAddress("서울시 어딘가");
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        // when
+        Order acceptedOrder = orderService.accept(order.getId());
+
+        // then
+        verify(kitchenridersClient).requestDelivery(order.getId(), BigDecimal.valueOf(10_000), "서울시 어딘가");
+        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @ParameterizedTest(name = "수락 상태의 주문만 서빙 상태로 변경할 수 있다. source = {0}")
+    @EnumSource(
+            value = OrderStatus.class,
+            names = {"ACCEPTED"},
+            mode = EnumSource.Mode.EXCLUDE)
+    void serve_Illegal_State(OrderStatus orderStatus) {
+        // given
+        Order order = anOrder(OrderType.DELIVERY);
+        order.setStatus(orderStatus);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        // when + then
+        assertThatThrownBy(() -> orderService.serve(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("수락 상태의 주문을 서빙 상태로 변경한다.")
+    @Test
+    void serve() {
+        // given
+        Order order = anOrder(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.ACCEPTED);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        // when
+        orderService.serve(order.getId());
+
+        // then
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
+
+    @ParameterizedTest(name = "주문 배송은 배송됨 상태에서만 완료 할 수 있다. source = {0}")
+    @EnumSource(
+            value = OrderStatus.class,
+            names = {"DELIVERED"},
+            mode = EnumSource.Mode.EXCLUDE)
+    void complete_DELIVERY_ORDER_Illegal_State(OrderStatus orderStatus) {
+        // given
+        Order order = anOrder(OrderType.DELIVERY);
+        order.setStatus(orderStatus);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        // when
+        assertThatThrownBy(() -> orderService.complete(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @ParameterizedTest(name = "매장 주문은 서빙된 상태에서만 완료 할 수 있다. source = {0}")
+    @EnumSource(
+            value = OrderStatus.class,
+            names = {"SERVED"},
+            mode = EnumSource.Mode.EXCLUDE)
+    void complete_EAT_IN_ORDER_Illegal_State(OrderStatus orderStatus) {
+        // given
+        Order order = anOrder(OrderType.EAT_IN);
+        order.setStatus(orderStatus);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        // when
+        assertThatThrownBy(() -> orderService.complete(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("매장 주문 완료시 주문 상태가 바뀌고 점유한 테이블이 비워진다.")
+    @Test
+    void complete_EAT_IN_ORDER() {
+        // given
+        OrderTable orderTable = anOrderTable(true);
+
+        Order order = anOrder(OrderType.EAT_IN);
+        order.setStatus(OrderStatus.SERVED);
+        order.setOrderTable(orderTable);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
+
+        // when
+        Order completedOrder = orderService.complete(order.getId());
+
+        // then
+        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(orderTable.getNumberOfGuests()).isZero();
+        assertThat(orderTable.isOccupied()).isFalse();
     }
 }
