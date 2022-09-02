@@ -5,35 +5,43 @@ import java.util.List;
 
 public class TestGlue {
 
-	private final List<Operation> operations;
+	private final TestGlueOperationContext context;
 
-	public TestGlue() {
-		this(new ArrayList<>());
+	public TestGlue(TestGlueOperationContext context) {
+		this.context = context;
 	}
 
-	public TestGlue(List<Operation> operations) {
-		this.operations = operations;
-	}
-
-	public void run() {
-		this.operations.forEach(Operation::run);
-	}
-
-	public static Builder builder() {
-		return new Builder();
+	public Builder builder() {
+		return new Builder(context, new ArrayList<>());
 	}
 
 	public static class Builder {
 
-		private List<Operation> operations;
+		private final TestGlueOperationContext context;
+		private final List<String> operations;
 
-		public Builder then(Operation op) {
+		public Builder(TestGlueOperationContext context, List<String> operations) {
+			this.context = context;
+			this.operations = operations;
+		}
+
+		public Builder given(String op) {
 			this.operations.add(op);
 			return this;
 		}
 
-		public TestGlue build() {
-			return new TestGlue(operations);
+		public Builder when(String op) {
+			this.operations.add(op);
+			return this;
+		}
+
+		public Builder then(String op) {
+			this.operations.add(op);
+			return this;
+		}
+
+		public void assertStart() {
+			new TestGlueRunner(context, operations).assertStart();
 		}
 	}
 }

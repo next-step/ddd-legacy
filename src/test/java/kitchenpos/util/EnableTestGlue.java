@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Import(TestGlueConfiguration.class)
+@Import(TestGlueInitializer.class)
 @Documented
 public @interface EnableTestGlue {
 

@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import kitchenpos.util.Operation;
 import kitchenpos.util.TestGlueConfiguration;
 import kitchenpos.util.TestGlueInitializer;
-import kitchenpos.util.TestGlueOperation;
 import kitchenpos.util.TestGlueOperationContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -76,50 +75,5 @@ class TestGlueInitializerTest {
 			() -> assertThat(testGlueOperationContext.get("test2")).isNotNull(),
 			() -> assertThat(testGlueOperationContext.get("test3")).isNotNull()
 		);
-	}
-
-	@TestGlueConfiguration
-	public static class TestConfiguration1 {
-
-		private int a = 0;
-
-		@TestGlueOperation("test1")
-		public void test() {
-			a++;
-		}
-
-		public int getA() {
-			return a;
-		}
-	}
-
-	@TestGlueConfiguration
-	public static class TestConfiguration2 {
-
-		private int a;
-
-		@TestGlueOperation("test2")
-		public void test() {
-			a++;
-		}
-
-		public int getA() {
-			return a;
-		}
-	}
-
-	@TestGlueConfiguration
-	public static class TestConfiguration3 {
-
-		private int a;
-
-		@TestGlueOperation("test3")
-		public void test() {
-			a++;
-		}
-
-		public int getA() {
-			return a;
-		}
 	}
 }

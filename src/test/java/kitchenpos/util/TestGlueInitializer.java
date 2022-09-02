@@ -5,15 +5,17 @@ import java.lang.reflect.Method;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 
 public class TestGlueInitializer implements ApplicationContextAware {
 
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		var context = (AnnotationConfigApplicationContext) applicationContext;
+		var context = (GenericApplicationContext) applicationContext;
+
 		context.registerBean(TestGlueOperationContext.class);
+		context.registerBean(TestGlue.class);
 
 		var testGlueOperationContext = context.getBean(TestGlueOperationContext.class);
 
