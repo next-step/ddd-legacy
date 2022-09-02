@@ -7,6 +7,8 @@ import static java.util.Arrays.stream;
 
 public class StringCalculator {
 
+    private static final Pattern regex = Pattern.compile("//(.)\n(.*)");
+
     private final String DELIMITER = ",:";
 
     public int add(String text) {
@@ -30,12 +32,12 @@ public class StringCalculator {
     }
 
     private String findOriginText(String text) {
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+        Matcher m = regex.matcher(text);
         return m.find() ? m.group(2) : text;
     }
 
     private String findCustomDelimiter(String text) {
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+        Matcher m = regex.matcher(text);
         return m.find() ? m.group(1) : null;
     }
 
