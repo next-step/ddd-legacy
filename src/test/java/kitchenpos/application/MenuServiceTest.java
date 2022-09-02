@@ -17,6 +17,7 @@ import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.test.Fixture;
 import kitchenpos.test.UnitTestCase;
+import kitchenpos.test.testdouble.FakePurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -224,8 +225,13 @@ class MenuServiceTest extends UnitTestCase {
                         .willReturn(Optional.of(product));
 
                 // when
-                when(purgomalumClient.containsProfanity(any()))
-                        .thenReturn(Boolean.TRUE);
+                boolean isProfanityName = Boolean.TRUE;
+                service = new MenuService(
+                        menuRepository,
+                        menuGroupRepository,
+                        productRepository,
+                        new FakePurgomalumClient(() -> isProfanityName)
+                );
 
                 // then
                 assertThatIllegalArgumentException()
