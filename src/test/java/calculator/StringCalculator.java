@@ -3,7 +3,8 @@ package calculator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.util.Arrays.stream;
+import static kitchenpos.utils.NumberUtils.sum;
+import static kitchenpos.utils.NumberUtils.validNativeNumber;
 
 public class StringCalculator {
 
@@ -20,7 +21,10 @@ public class StringCalculator {
         String originText = findOriginText(text);
         String delimiters = createDelimiters(text);
 
-        return sum(originText.split(delimiters));
+        String[] extractNumbers = originText.split(delimiters);
+
+        validNativeNumber(extractNumbers);
+        return sum(extractNumbers);
     }
 
     private String createDelimiters(String text) {
@@ -39,19 +43,6 @@ public class StringCalculator {
     private String findCustomDelimiter(String text) {
         Matcher m = regex.matcher(text);
         return m.find() ? m.group(1) : null;
-    }
-
-    private static int sum(String[] tokens) {
-        validNativeNumber(tokens);
-        return stream(tokens).mapToInt(Integer::parseInt).sum();
-    }
-
-    private static void validNativeNumber(String[] tokens) {
-        for (String token : tokens) {
-            if (Integer.parseInt(token) < 0) {
-                throw new IllegalArgumentException();
-            }
-        }
     }
 
 }
