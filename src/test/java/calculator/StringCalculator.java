@@ -17,7 +17,7 @@ public class StringCalculator {
 
         return Arrays.stream(tokens)
                 .map(PositiveInteger::parse)
-                .mapToInt(PositiveInteger::getValue)
-                .sum();
+                .reduce(PositiveInteger.ZERO, PositiveInteger::plus)
+                .toInt();
     }
 }

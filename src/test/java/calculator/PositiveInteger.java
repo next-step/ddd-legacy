@@ -3,6 +3,8 @@ package calculator;
 import static java.lang.Integer.parseInt;
 
 public class PositiveInteger {
+    public static final PositiveInteger ZERO = new PositiveInteger(0);
+
     private final int value;
 
     public PositiveInteger(int value) {
@@ -24,7 +26,11 @@ public class PositiveInteger {
         }
     }
 
-    public int getValue() {
+    public int toInt() {
         return value;
+    }
+
+    public PositiveInteger plus(PositiveInteger other) {
+        return new PositiveInteger(this.value + other.value);
     }
 }
