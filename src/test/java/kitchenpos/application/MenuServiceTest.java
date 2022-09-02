@@ -14,7 +14,6 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
 class MenuServiceTest extends InitTest {
     @Resource
     private MenuService target;

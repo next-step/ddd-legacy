@@ -11,7 +11,6 @@ import javax.annotation.Resource;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@SpringBootTest
 class MenuGroupServiceTest extends InitTest {
 
     @Resource
