@@ -14,4 +14,13 @@ public class MenuFixture {
         menu.setMenuProducts(List.of(menuProducts));
         return menu;
     }
+
+    public static Menu MenuWithoutMenuProducts(String name, int price, UUID menuGroupId) {
+        Menu menu = new Menu();
+        menu.setName(name);
+        menu.setPrice(BigDecimal.valueOf(price).setScale(2));
+        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuProducts(List.of());
+        return menu;
+    }
 }
