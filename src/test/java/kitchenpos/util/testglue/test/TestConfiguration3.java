@@ -1,7 +1,7 @@
-package kitchenpos.utiltest;
+package kitchenpos.util.testglue.test;
 
-import kitchenpos.util.TestGlueConfiguration;
-import kitchenpos.util.TestGlueOperation;
+import kitchenpos.util.testglue.TestGlueConfiguration;
+import kitchenpos.util.testglue.TestGlueOperation;
 
 @TestGlueConfiguration
 public class TestConfiguration3 {

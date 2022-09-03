@@ -1,4 +1,4 @@
-package kitchenpos.util;
+package kitchenpos.util.testglue;
 
 public interface Operation {
 

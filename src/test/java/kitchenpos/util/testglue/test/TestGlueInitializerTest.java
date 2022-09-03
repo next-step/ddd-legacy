@@ -1,14 +1,14 @@
-package kitchenpos.utiltest;
+package kitchenpos.util.testglue.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 
-import kitchenpos.util.Operation;
-import kitchenpos.util.TestGlueConfiguration;
-import kitchenpos.util.TestGlueInitializer;
-import kitchenpos.util.TestGlueOperationContext;
+import kitchenpos.util.testglue.Operation;
+import kitchenpos.util.testglue.TestGlueConfiguration;
+import kitchenpos.util.testglue.TestGlueInitializer;
+import kitchenpos.util.testglue.TestGlueOperationContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

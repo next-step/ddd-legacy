@@ -1,4 +1,4 @@
-package kitchenpos.util;
+package kitchenpos.util.testglue;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

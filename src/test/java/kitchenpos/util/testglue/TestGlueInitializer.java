@@ -1,4 +1,4 @@
-package kitchenpos.util;
+package kitchenpos.util.testglue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
