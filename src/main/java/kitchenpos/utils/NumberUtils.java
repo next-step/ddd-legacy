@@ -4,16 +4,18 @@ import static java.util.Arrays.stream;
 
 public class NumberUtils {
 
-    public static int sum(String[] numbers) {
-        return stream(numbers).mapToInt(Integer::parseInt).sum();
+    public static int sum(int[] numbers) {
+        return stream(numbers).sum();
     }
 
-    public static void validNativeNumber(String[] numbers) {
-        for (String number : numbers) {
-            if (Integer.parseInt(number) < 0) {
-                throw new IllegalArgumentException();
-            }
-        }
+    public static void validNativeNumberArray(String[] numbers) {
+        stream(numbers).filter(number -> Integer.parseInt(number) < 0).forEach(number -> {
+            throw new IllegalArgumentException();
+        });
+    }
+    public static int[] fromStringArrayConvertToPositiveNumberArray(String[] stringArray) {
+        validNativeNumberArray(stringArray);
+        return stream(stringArray).mapToInt(Integer::parseInt).toArray();
     }
 
 }
