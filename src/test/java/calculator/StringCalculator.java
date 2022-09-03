@@ -11,15 +11,15 @@ public class StringCalculator {
         if (text == null || text.isBlank()) {
             return 0;
         }
-        return sum(extractNumbers(text));
+        return sum(extractPositiveNumbers(text));
     }
 
-    private int[] extractNumbers(String text) {
+    private int[] extractPositiveNumbers(String text) {
         return fromStringArrayConvertToPositiveNumberArray(splitText(text));
     }
 
     private String[] splitText(String text) {
-        return StringUtils.splitText(text);
+        return StringUtils.filterTextByDelimiter(text);
     }
 
 }

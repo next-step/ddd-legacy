@@ -8,7 +8,7 @@ public class StringUtils {
     private static final Pattern regex = Pattern.compile("//(.)\n(.*)");
     private static final String DEFAULT_DELIMITER = ",:";
 
-    public static String[] splitText(String text) {
+    public static String[] filterTextByDelimiter(String text) {
 
         Matcher m = regex.matcher(text);
 
@@ -20,10 +20,10 @@ public class StringUtils {
             delimiters = delimiters + m.group(1);
         }
 
-        return originText.split(multipleDelimiter(delimiters));
+        return originText.split(delimiters(delimiters));
     }
 
-    private static String multipleDelimiter(String delimiter) {
+    private static String delimiters(String delimiter) {
         return "[" + delimiter + "]";
     }
 
