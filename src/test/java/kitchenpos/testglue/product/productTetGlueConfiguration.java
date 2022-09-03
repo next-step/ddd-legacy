@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.testglue.fixture.ProductMother;
+import kitchenpos.application.fixture.ProductMother;
 import kitchenpos.util.testglue.TestGlueConfiguration;
 import kitchenpos.util.testglue.TestGlueOperation;
 import kitchenpos.util.testglue.TestGlueSupport;

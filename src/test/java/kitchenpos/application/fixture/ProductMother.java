@@ -1,4 +1,4 @@
-package kitchenpos.testglue.fixture;
+package kitchenpos.application.fixture;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
