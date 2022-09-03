@@ -2,11 +2,11 @@ package kitchenpos.util.testglue;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Map;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.web.bind.annotation.GetMapping;
 
 public class TestGlueInitializer implements ApplicationContextAware {
 
@@ -17,6 +17,18 @@ public class TestGlueInitializer implements ApplicationContextAware {
 		context.registerBean(TestGlueOperationContext.class);
 		context.registerBean(TestGlue.class);
 
+		awareInit(context);
+		operationInit(context);
+	}
+
+	private void awareInit(GenericApplicationContext context) {
+		Map<String, TestGlueContextAware> testGlueContextAwares = context.getBeansOfType(TestGlueContextAware.class);
+		TestGlueValueContext testGlueValueContext = new TestGlueValueContext();
+
+		testGlueContextAwares.values().forEach(v -> v.testGlueContext(testGlueValueContext));
+	}
+
+	private void operationInit(GenericApplicationContext context) {
 		var testGlueOperationContext = context.getBean(TestGlueOperationContext.class);
 
 		var testGlueConfigurationNames = context.getBeanNamesForAnnotation(TestGlueConfiguration.class);
@@ -27,7 +39,6 @@ public class TestGlueInitializer implements ApplicationContextAware {
 		}
 	}
 
-	@GetMapping("test")
 	private void setTestGlueOperation(Object bean, TestGlueOperationContext testGlueOperationContext) {
 		Method[] methods = bean.getClass().getMethods();
 		for (Method method : methods) {
