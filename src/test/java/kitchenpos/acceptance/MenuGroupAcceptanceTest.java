@@ -46,17 +46,13 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
         Map<String, String> params = new HashMap<>();
         params.put("name", name);
 
-        ExtractableResponse<Response> response = 메뉴그룹_등록_요청(given(), params);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        return response;
+        return 메뉴그룹_등록_요청(given(), params);
     }
 
     private ExtractableResponse<Response> 메뉴그룹_목록_조회_요청함() {
-        ExtractableResponse<Response> response = 메뉴그룹_목록_조회_요청(given());
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        return response;
+        return 메뉴그룹_목록_조회_요청(given());
     }
-    
+
     private UUID 메뉴그룹이_등록됨(final String name) {
         return 메뉴그룹_등록_요청함(name).jsonPath().getUUID("id");
     }

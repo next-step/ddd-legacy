@@ -4,7 +4,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,24 +60,18 @@ public class ProductAcceptanceTest extends AcceptanceTest {
         params.put("price", String.valueOf(price));
         params.put("name", name);
 
-        ExtractableResponse<Response> response = 제품_등록_요청(given(), params);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        return response;
+        return 제품_등록_요청(given(), params);
     }
 
     private ExtractableResponse<Response> 제품_목록_조회_요청함() {
-        ExtractableResponse<Response> response = 제품_목록_조회_요청(given());
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        return response;
+        return 제품_목록_조회_요청(given());
     }
 
     private ExtractableResponse<Response> 제품의_가격_수정_요청함(final UUID id, final int price) {
         Map<String, String> params = new HashMap<>();
         params.put("price", String.valueOf(price));
 
-        ExtractableResponse<Response> response = 제품_가격_수정_요청(given(), id, params);
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        return response;
+        return 제품_가격_수정_요청(given(), id, params);
     }
 
     private UUID 제품이_등록됨(final int price, final String name) {
