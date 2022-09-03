@@ -2,20 +2,21 @@ package string_calculator.string_parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import string_calculator.NonNegativeLong;
 
 public class SimpleStringParser implements StringParser {
 
     @Override
-    public List<Long> parse(String string) {
+    public List<NonNegativeLong> parse(String string) {
         if (string == null || string.isBlank()) {
             return new ArrayList<>();
         }
 
         final String[] tokens = string.split("[,:]");
 
-        final List<Long> result = new ArrayList<>();
+        final List<NonNegativeLong> result = new ArrayList<>();
         for (String token : tokens) {
-            result.add(Long.valueOf(token));
+            result.add(new NonNegativeLong(token));
         }
         return result;
     }

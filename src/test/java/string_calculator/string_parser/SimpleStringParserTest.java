@@ -13,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import string_calculator.NonNegativeLong;
 
 class SimpleStringParserTest {
 
@@ -53,7 +54,7 @@ class SimpleStringParserTest {
     @NullAndEmptySource
     @ParameterizedTest
     void parse_null_or_empty(final String string) {
-        final List<Long> list = this.simpleStringParser.parse(string);
+        final List<NonNegativeLong> list = this.simpleStringParser.parse(string);
         assertThat(list).isEmpty();
     }
 
@@ -61,7 +62,7 @@ class SimpleStringParserTest {
     @ValueSource(strings = {"  ", "\t"})
     @ParameterizedTest
     void parse_blank(final String string) {
-        final List<Long> list = this.simpleStringParser.parse(string);
+        final List<NonNegativeLong> list = this.simpleStringParser.parse(string);
         assertThat(list).isEmpty();
     }
 
@@ -71,10 +72,10 @@ class SimpleStringParserTest {
     void parse_single_integer(final Long l) {
         final String string = l.toString();
 
-        final List<Long> list = this.simpleStringParser.parse(string);
+        final List<NonNegativeLong> list = this.simpleStringParser.parse(string);
 
         assertThat(list).hasSize(1);
-        assertThat(list.get(0)).isEqualTo(l);
+        assertThat(list.get(0)).isEqualTo(new NonNegativeLong(l));
     }
 
     @DisplayName("숫자가 아닌 문자로 구성된 문자열인 경우 runtime exception이 발생해야 한다.")
@@ -96,14 +97,14 @@ class SimpleStringParserTest {
     })
     @ParameterizedTest
     void parse(final String string) {
-        final List<Long> expectedList = new ArrayList<>();
-        expectedList.add(1L);
-        expectedList.add(2L);
-        expectedList.add(3L);
-        expectedList.add(4L);
-        expectedList.add(5L);
+        final List<NonNegativeLong> expectedList = new ArrayList<>();
+        expectedList.add(new NonNegativeLong(1));
+        expectedList.add(new NonNegativeLong(2));
+        expectedList.add(new NonNegativeLong(3));
+        expectedList.add(new NonNegativeLong(4));
+        expectedList.add(new NonNegativeLong(5));
 
-        final List<Long> list = this.simpleStringParser.parse(string);
+        final List<NonNegativeLong> list = this.simpleStringParser.parse(string);
 
         assertThat(list).isEqualTo(expectedList);
     }

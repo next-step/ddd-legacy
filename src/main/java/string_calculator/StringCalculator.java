@@ -12,7 +12,7 @@ public class StringCalculator {
     }
 
     public long calculate(final String string) {
-        List<Long> list = this.stringParser.parse(string);
+        List<NonNegativeLong> list = this.stringParser.parse(string);
         return new ListCalculator(list).sum();
     }
 }

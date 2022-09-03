@@ -4,9 +4,9 @@ import java.util.List;
 
 public class ListCalculator {
 
-    private final List<Long> list;
+    private final List<NonNegativeLong> list;
 
-    public ListCalculator(final List<Long> list) {
+    public ListCalculator(final List<NonNegativeLong> list) {
         if (list == null) {
             throw new IllegalArgumentException("list는 null일 수 없습니다");
         }
@@ -15,8 +15,8 @@ public class ListCalculator {
 
     public Long sum() {
         long result = 0;
-        for (final Long e : list) {
-            result += e;
+        for (final NonNegativeLong e : list) {
+            result += e.value();
         }
         return result;
     }

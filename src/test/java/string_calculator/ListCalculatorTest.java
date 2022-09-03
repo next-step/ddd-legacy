@@ -14,14 +14,14 @@ class ListCalculatorTest {
     @DisplayName("임의의 정수로 이루어진 임의의 길이를 가진 list로 초기화할 수 있다.")
     @Test
     void construct_with_any_list() {
-        final List<Long> list = new ArrayList<>();
+        final List<NonNegativeLong> list = new ArrayList<>();
         assertThatNoException().isThrownBy(() -> new ListCalculator(list));
     }
 
     @DisplayName("빈 list로 초기화할 수 있다.")
     @Test
     void construct_with_empty_list() {
-        final List<Long> list = new ArrayList<>();
+        final List<NonNegativeLong> list = new ArrayList<>();
         assertThatNoException().isThrownBy(() -> new ListCalculator(list));
     }
 
@@ -34,9 +34,9 @@ class ListCalculatorTest {
     @DisplayName("리스트 원소의 합을 올바르게 반환해야 한다.")
     @Test
     void sum_correct_value() {
-        final List<Long> list = new ArrayList<>();
+        final List<NonNegativeLong> list = new ArrayList<>();
         for (long i = 1; i < 11; i++) {
-            list.add(i);
+            list.add(new NonNegativeLong(i));
         }
 
         final ListCalculator listCalculator = new ListCalculator(list);
