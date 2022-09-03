@@ -23,10 +23,10 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
-    private final UUID DEFAULT_MENU_ID = UUID.randomUUID();
-    private final String DEFAULT_NAME = "메뉴";
-    private final BigDecimal DEFAULT_PRICE = BigDecimal.TEN;
-    private final UUID DEFAULT_MENU_GROUP_ID = UUID.randomUUID();
+    private static final UUID DEFAULT_MENU_ID = UUID.randomUUID();
+    private static final String DEFAULT_NAME = "메뉴";
+    private static final BigDecimal DEFAULT_PRICE = BigDecimal.TEN;
+    private static final UUID DEFAULT_MENU_GROUP_ID = UUID.randomUUID();
 
     @Mock
     private MenuRepository menuRepository;
@@ -40,7 +40,7 @@ class MenuServiceTest {
     @InjectMocks
     private MenuService menuService;
 
-    private List<MenuProduct> defaultMenuProducts() {
+    private static List<MenuProduct> defaultMenuProducts() {
         MenuProduct defaultMenuProduct = new MenuProduct();
         Product product = defaultProduct();
         defaultMenuProduct.setProductId(product.getId());
@@ -49,11 +49,11 @@ class MenuServiceTest {
 
         return Arrays.asList(defaultMenuProduct);
     }
-    private Menu defaultMenu() {
+    static Menu defaultMenu() {
         return createMenu(DEFAULT_MENU_ID, DEFAULT_NAME, DEFAULT_PRICE, DEFAULT_MENU_GROUP_ID, defaultMenuProducts());
     }
 
-    private Menu createMenu(final UUID ID, final String name, final BigDecimal price, final UUID menuGroupId, final List<MenuProduct> menuProducts) {
+    private static Menu createMenu(final UUID ID, final String name, final BigDecimal price, final UUID menuGroupId, final List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
 
         menu.setId(ID);
@@ -66,7 +66,7 @@ class MenuServiceTest {
         return menu;
     }
 
-    private MenuGroup defaultMenuGroup() {
+    private static MenuGroup defaultMenuGroup() {
         MenuGroup menuGroup = new MenuGroup();
 
         menuGroup.setId(UUID.randomUUID());
@@ -75,7 +75,7 @@ class MenuServiceTest {
         return menuGroup;
     }
 
-    private Product defaultProduct() {
+    private static Product defaultProduct() {
         Product product = new Product();
 
         product.setId(UUID.randomUUID());

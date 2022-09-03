@@ -39,7 +39,7 @@ class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
-    private Product createProduct(final UUID ID, final String name, final Long price) {
+    private static Product createProduct(final UUID ID, final String name, final Long price) {
         Product product = new Product();
 
         product.setId(ID);
@@ -51,7 +51,7 @@ class ProductServiceTest {
         return product;
     }
 
-    private Product defaultProduct() {
+    static Product defaultProduct() {
         return createProduct(DEFAULT_PRODUCT_ID, DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
     }
 

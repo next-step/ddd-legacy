@@ -36,11 +36,11 @@ class OrderTableServiceTest {
     @InjectMocks
     private OrderTableService orderTableService;
 
-    private OrderTable defaultOrderTable() {
+    static OrderTable defaultOrderTable() {
         return createOrderTable(DEFAULT_ID, DEFAULT_NAME, DEFAULT_GUEST);
     }
 
-    private OrderTable createOrderTable(final UUID ID, final String name, final int guest) {
+    private static OrderTable createOrderTable(final UUID ID, final String name, final int guest) {
         OrderTable orderTable = new OrderTable();
 
         orderTable.setId(ID);
@@ -120,7 +120,7 @@ class OrderTableServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getNumberOfGuests()).isEqualTo(changeGuest);
     }
-    
+
     @DisplayName("주문 테이블을 사용 가능한 손님의 숫자는 음수 일 수 없다")
     @Test
     void change_number_of_guest_by_negative_number() {
