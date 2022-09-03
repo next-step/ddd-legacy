@@ -41,7 +41,7 @@ public class ProductServiceTest {
             // then
             assertThat(savedProduct.getId()).isNotNull();
             assertThat(savedProduct.getName()).isEqualTo("후라이드 치킨");
-            assertThat(savedProduct.getPrice()).isEqualTo(BigDecimal.valueOf(15_000));
+            assertThat(savedProduct.getPrice()).isEqualTo(BigDecimal.valueOf(15_000).setScale(2));
         }
 
         @DisplayName("상품 금액은 null 일 수 없다.")
@@ -111,7 +111,7 @@ public class ProductServiceTest {
             // then
             assertThat(result.getId()).isEqualTo(후라이드_치킨.getId());
             assertThat(result.getName()).isEqualTo("후라이드 치킨");
-            assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(16_000));
+            assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(16_000).setScale(2));
         }
 
         @DisplayName("상품이 우선 존재해야 한다.")
