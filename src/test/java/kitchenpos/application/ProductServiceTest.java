@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import kitchenpos.domain.Product;
@@ -125,5 +126,20 @@ public class ProductServiceTest {
                 request_16000원
             )).isExactlyInstanceOf(NoSuchElementException.class);
         }
+    }
+
+    @DisplayName("전체 상품을 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given
+        Product 후라이드_치킨 = productRepository.save(ProductWithUUID("후라이드 치킨", 15_000));
+        Product 양념_치킨 = productRepository.save(ProductWithUUID("양념 치킨", 16_000));
+
+        // when
+        List<Product> results = productService.findAll();
+
+        // then
+        assertThat(results).usingRecursiveFieldByFieldElementComparator()
+            .containsExactly(후라이드_치킨, 양념_치킨);
     }
 }
