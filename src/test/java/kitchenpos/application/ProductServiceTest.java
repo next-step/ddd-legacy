@@ -1,11 +1,14 @@
 package kitchenpos.application;
 
-import static kitchenpos.domain.ProductFixture.Product;
+import static kitchenpos.domain.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,6 +20,9 @@ public class ProductServiceTest {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @DisplayName("새로운 상품을 생성할 수 있다.")
     @Nested
@@ -81,6 +87,43 @@ public class ProductServiceTest {
             // when, then
             assertThatThrownBy(() -> productService.create(request))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @DisplayName("상품의 금액을 변경할 수 있다.")
+    @Nested
+    class ChangePrice {
+
+        @DisplayName("성공")
+        @Test
+        void changePrice() {
+            // given
+            Product 후라이드_치킨 = productRepository.save(ProductWithUUID("후라이드 치킨", 15_000));
+            Product request_16000원 = Product("후라이드 치킨", 16_000);
+
+            // when
+            Product result = productService.changePrice(
+                후라이드_치킨.getId(),
+                request_16000원
+            );
+
+            // then
+            assertThat(result.getId()).isEqualTo(후라이드_치킨.getId());
+            assertThat(result.getName()).isEqualTo("후라이드 치킨");
+            assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(16_000));
+        }
+
+        @DisplayName("상품이 우선 존재해야 한다.")
+        @Test
+        void productNotFoundException() {
+            // given
+            Product request_16000원 = Product("후라이드 치킨", 16_000);
+
+            // when, then
+            assertThatThrownBy(() -> productService.changePrice(
+                UUID.fromString("00000000-0000-0000-0000-000000000000"),
+                request_16000원
+            )).isExactlyInstanceOf(NoSuchElementException.class);
         }
     }
 }
