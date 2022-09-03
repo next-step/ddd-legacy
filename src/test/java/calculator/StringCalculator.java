@@ -16,8 +16,8 @@ public class StringCalculator {
 
     return Arrays.stream(result)
         .map(PositiveInteger::getInstance)
-        .mapToInt(PositiveInteger::getNum)
-        .sum();
+        .reduce(PositiveInteger.ZERO_POSITIVE, PositiveInteger::add)
+        .getNum();
   }
 
   private boolean isTextBlank(String text) {

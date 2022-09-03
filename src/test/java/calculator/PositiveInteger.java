@@ -2,6 +2,8 @@ package calculator;
 
 public class PositiveInteger {
 
+  static final PositiveInteger ZERO_POSITIVE = new PositiveInteger(0);
+
   private final int num;
 
   private PositiveInteger(int num) {
@@ -21,5 +23,9 @@ public class PositiveInteger {
 
   public int getNum() {
     return num;
+  }
+
+  public PositiveInteger add(PositiveInteger target) {
+    return new PositiveInteger(this.num + target.getNum());
   }
 }

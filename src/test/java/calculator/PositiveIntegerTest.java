@@ -1,5 +1,6 @@
 package calculator;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 import org.junit.jupiter.api.DisplayName;
@@ -24,5 +25,16 @@ public class PositiveIntegerTest {
   void notInteger(String value) {
     assertThatExceptionOfType(RuntimeException.class)
         .isThrownBy(() -> PositiveInteger.getInstance(value));
+  }
+
+  @DisplayName(value = "두 인스턴스를 더하면 새로운 인스턴스가 나온다.")
+  @ParameterizedTest
+  @CsvSource(value = {"1, 2, 3"})
+  void add(String num1, String num2, int result) {
+    PositiveInteger first = PositiveInteger.getInstance(num1);
+    PositiveInteger second = PositiveInteger.getInstance(num2);
+    PositiveInteger addPositive = first.add(second);
+
+    assertThat(addPositive.getNum()).isEqualTo(result);
   }
 }
