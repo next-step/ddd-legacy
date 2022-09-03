@@ -14,7 +14,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -46,7 +49,7 @@ class MenuServiceTest {
         defaultMenuProduct.setQuantity(1);
         defaultMenuProduct.setProduct(product);
 
-        return Arrays.asList(defaultMenuProduct);
+        return List.of(defaultMenuProduct);
     }
 
     static Menu defaultMenu() {
@@ -93,7 +96,7 @@ class MenuServiceTest {
         given(menuGroupRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(defaultMenuGroup()));
         given(productRepository.findAllByIdIn(Mockito.any()))
-                .willReturn(Arrays.asList(defaultProduct()));
+                .willReturn(List.of(defaultProduct()));
         given(productRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(defaultProduct()));
         given(purgomalumClient.containsProfanity(Mockito.any(String.class)))
@@ -152,7 +155,7 @@ class MenuServiceTest {
         given(menuGroupRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(defaultMenuGroup()));
         given(productRepository.findAllByIdIn(Mockito.any()))
-                .willReturn(Arrays.asList());
+                .willReturn(List.of());
 
         final Menu menu = defaultMenu();
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -249,7 +252,7 @@ class MenuServiceTest {
     @DisplayName("생성된 메뉴를 조회할 수 있다")
     @Test
     void select_all_menus() {
-        final List<Menu> defaultMenus = Arrays.asList(defaultMenu());
+        final List<Menu> defaultMenus = List.of(defaultMenu());
         given(menuRepository.findAll())
                 .willReturn(defaultMenus);
 

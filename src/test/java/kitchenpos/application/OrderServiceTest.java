@@ -14,7 +14,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.application.MenuServiceTest.defaultMenu;
 import static kitchenpos.application.OrderTableServiceTest.defaultOrderTable;
@@ -49,7 +52,7 @@ class OrderServiceTest {
         orderLineItem.setMenuId(menu.getId());
         orderLineItem.setSeq(DEFAULT_ORDER_LINE_ITEM_ID);
 
-        return Arrays.asList(orderLineItem);
+        return List.of(orderLineItem);
     }
 
     private Order createOrder(final UUID id, final OrderStatus orderStatus, final OrderType orderType, final OrderTable orderTable, final List<OrderLineItem> orderLineItems, final String deliveryAddress) {
@@ -72,7 +75,7 @@ class OrderServiceTest {
         final Order order = createOrder(DEFAULT_ORDER_ID, OrderStatus.WAITING, OrderType.TAKEOUT, defaultOrderTable(), defaultOrderLineItems(), "");
 
         given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(Arrays.asList(defaultMenu()));
+                .willReturn(List.of(defaultMenu()));
         given(menuRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(defaultMenu()));
         given(orderRepository.save(Mockito.any(Order.class)))
@@ -108,7 +111,7 @@ class OrderServiceTest {
         final Order order = createOrder(DEFAULT_ORDER_ID, OrderStatus.WAITING, OrderType.TAKEOUT, defaultOrderTable(), defaultOrderLineItems(), "");
 
         given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(Arrays.asList(defaultMenu()));
+                .willReturn(List.of(defaultMenu()));
 
         Menu menu = defaultMenu();
         menu.setDisplayed(false);
@@ -125,7 +128,7 @@ class OrderServiceTest {
         final Order order = createOrder(DEFAULT_ORDER_ID, OrderStatus.WAITING, OrderType.TAKEOUT, defaultOrderTable(), defaultOrderLineItems(), "");
 
         given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(Arrays.asList(defaultMenu()));
+                .willReturn(List.of(defaultMenu()));
 
         Menu menu = defaultMenu();
         menu.setPrice(menu.getPrice().multiply(BigDecimal.valueOf(2)));
@@ -215,7 +218,7 @@ class OrderServiceTest {
         final Order order = createOrder(DEFAULT_ORDER_ID, OrderStatus.WAITING, OrderType.DELIVERY, defaultOrderTable(), defaultOrderLineItems(), address);
 
         given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(Arrays.asList(defaultMenu()));
+                .willReturn(List.of(defaultMenu()));
         given(menuRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(defaultMenu()));
 
@@ -233,7 +236,7 @@ class OrderServiceTest {
         final Order order = createOrder(DEFAULT_ORDER_ID, OrderStatus.WAITING, orderType, defaultOrderTable(), orderLineItems, "address");
 
         given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(Arrays.asList(defaultMenu()));
+                .willReturn(List.of(defaultMenu()));
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderService.create(order));
@@ -284,7 +287,7 @@ class OrderServiceTest {
         final Order order = createOrder(DEFAULT_ORDER_ID, OrderStatus.WAITING, OrderType.EAT_IN, defaultOrderTable(), defaultOrderLineItems(), "address");
 
         given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(Arrays.asList(defaultMenu()));
+                .willReturn(List.of(defaultMenu()));
         given(menuRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(defaultMenu()));
         given(orderTableRepository.findById(Mockito.any(UUID.class)))
@@ -300,7 +303,7 @@ class OrderServiceTest {
         final Order order = createOrder(DEFAULT_ORDER_ID, OrderStatus.WAITING, OrderType.EAT_IN, defaultOrderTable(), defaultOrderLineItems(), "address");
 
         given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(Arrays.asList(defaultMenu()));
+                .willReturn(List.of(defaultMenu()));
         given(menuRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(defaultMenu()));
         OrderTable orderTable = defaultOrderTable();
