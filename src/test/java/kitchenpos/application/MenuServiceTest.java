@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -49,6 +48,7 @@ class MenuServiceTest {
 
         return Arrays.asList(defaultMenuProduct);
     }
+
     static Menu defaultMenu() {
         return createMenu(DEFAULT_MENU_ID, DEFAULT_NAME, DEFAULT_PRICE, DEFAULT_MENU_GROUP_ID, defaultMenuProducts());
     }
