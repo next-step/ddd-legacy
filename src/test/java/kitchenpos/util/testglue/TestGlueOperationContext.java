@@ -20,12 +20,17 @@ public class TestGlueOperationContext {
 	}
 
 	public Operation get(String description) {
-		Operation operation = volume.get(description);
-
-		if (operation == null) {
-			throw new IllegalArgumentException("can not found operation");
-		}
+		Operation operation = volume.get(find(description));
 
 		return operation;
+	}
+
+	private String find(String description) {
+		final String targetDescription = description.replaceAll("'.*'", "{}");
+
+		return volume.keySet().stream()
+			.filter(v -> v.equals(targetDescription))
+			.findAny()
+			.orElseThrow(() -> new IllegalArgumentException(String.format("can not found operation : %s", description)));
 	}
 }

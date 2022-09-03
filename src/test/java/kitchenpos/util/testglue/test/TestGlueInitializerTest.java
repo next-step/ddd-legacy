@@ -49,9 +49,9 @@ class TestGlueInitializerTest {
 		Operation test1 = testGlueOperationContext.get("test1");
 		Operation test2 = testGlueOperationContext.get("test2");
 		Operation test3 = testGlueOperationContext.get("test3");
-		test1.run();
-		test2.run();
-		test3.run();
+		test1.run(new String[] {});
+		test2.run(new String[] {});
+		test3.run(new String[] {});
 
 		// then
 		assertAll(

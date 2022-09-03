@@ -46,18 +46,21 @@ public class TestGlueInitializer implements ApplicationContextAware {
 				continue;
 			}
 
-			validateParameterCount(method);
-
 			TestGlueOperation testGlueOperation = method.getAnnotation(TestGlueOperation.class);
 			String description = testGlueOperation.value();
 
 			validateDescription(method, description);
 
-			testGlueOperationContext.put(description, () -> {
+			testGlueOperationContext.put(description, parameters -> {
 				try {
-					method.invoke(bean);
+					method.invoke(bean, parameters);
 				} catch (IllegalAccessException | InvocationTargetException e) {
-					throw new IllegalArgumentException(e);
+					Throwable cause = e.getCause();
+					if (cause instanceof AssertionError) {
+						throw (AssertionError) cause;
+					}
+
+					throw new RuntimeException(e);
 				}
 			});
 		}
@@ -66,13 +69,6 @@ public class TestGlueInitializer implements ApplicationContextAware {
 	private void validateDescription(Method method, String description) {
 		if (description.isBlank()) {
 			throw new IllegalArgumentException(String.format("Method (%s) description cannot be empty", method.getName()));
-		}
-	}
-
-	private void validateParameterCount(Method method) {
-		int parameterCount = method.getParameterCount();
-		if (parameterCount != 0) {
-			throw new IllegalArgumentException(String.format("Method (%s) cannot have parameter.", method.getName()));
 		}
 	}
 }
