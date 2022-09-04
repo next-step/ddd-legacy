@@ -193,4 +193,34 @@ class ProductServiceTest {
             assertThat(actualDisplayed).isEqualTo(expectedDisplayed);
         }
     }
+
+    @DisplayName("모든 상품 목록 조회")
+    @Nested
+    class FindAll {
+        @Test
+        void findAll() {
+            // given
+            final var product1 = new Product();
+            product1.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+            final var product2 = new Product();
+            product2.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
+            final var product3 = new Product();
+            product3.setId(UUID.fromString("33333333-3333-3333-3333-333333333333"));
+            final var productsInRepository = List.of(product1, product2, product3);
+            when(productRepository.findAll()).thenReturn(productsInRepository);
+
+            // when
+            final var allProducts = testService.findAll();
+
+            // then
+            assertThat(allProducts)
+                    .hasSize(3)
+                    .extracting(Product::getId)
+                    .containsExactlyInAnyOrder(
+                            UUID.fromString("11111111-1111-1111-1111-111111111111"),
+                            UUID.fromString("22222222-2222-2222-2222-222222222222"),
+                            UUID.fromString("33333333-3333-3333-3333-333333333333")
+                    );
+        }
+    }
 }
