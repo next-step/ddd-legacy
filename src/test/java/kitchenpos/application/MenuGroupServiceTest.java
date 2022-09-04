@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import java.util.List;
+import java.util.UUID;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -55,5 +57,28 @@ class MenuGroupServiceTest {
             // then
             assertThat(result.getName()).isEqualTo("초밥");
         }
+    }
+
+    @DisplayName("모든 메뉴그룹을 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given
+        final var menuGroup1 = new MenuGroup();
+        menuGroup1.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        final var menuGroup2 = new MenuGroup();
+        menuGroup2.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
+        final var menuGroupsInRepo = List.of(menuGroup1, menuGroup2);
+        when(menuGroupRepository.findAll()).thenReturn(menuGroupsInRepo);
+
+        // when
+        final var result = testService.findAll();
+
+        // then
+        assertThat(result).hasSize(2)
+                .extracting(MenuGroup::getId)
+                .containsExactlyInAnyOrder(
+                        UUID.fromString("11111111-1111-1111-1111-111111111111"),
+                        UUID.fromString("22222222-2222-2222-2222-222222222222")
+                );
     }
 }
