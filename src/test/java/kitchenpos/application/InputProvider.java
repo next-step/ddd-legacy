@@ -28,6 +28,13 @@ public class InputProvider {
         );
     }
 
+    public static Stream<BigDecimal> provideNullOrMinusPrice() {
+        return Stream.of(
+                BigDecimal.valueOf(-1),
+                null
+        );
+    }
+
     public static Stream<UUID> provideValidMenuGroupId() {
         return Stream.of(UUID.fromString("5e9879b7-6112-4791-a4ce-f22e94af8752"));
     }
@@ -81,6 +88,14 @@ public class InputProvider {
     }
 
     public static Stream<UUID> provideInvalidMenuId() {
+        return Stream.of(new UUID(1, 2));
+    }
+
+    public static Stream<UUID> provideExistProductId() {
+        return Stream.of(UUID.fromString("0ac16db7-1b02-4a87-b9c1-e7d8f226c48d"));
+    }
+
+    public static Stream<UUID> provideNonExistProductId() {
         return Stream.of(new UUID(1, 2));
     }
 }
