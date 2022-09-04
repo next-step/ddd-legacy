@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("주문 제공")
 public class OrderServiceServeTest extends OrderServiceTestSupport {
-    @DisplayName("주문이어야 존재해야 한다.")
+    @DisplayName("주문이 존재해야 한다.")
     @Test
     void orderNotFound() {
         //given

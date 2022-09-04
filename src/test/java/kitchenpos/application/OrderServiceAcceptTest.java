@@ -24,7 +24,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @DisplayName("주문 접수")
 class OrderServiceAcceptTest extends OrderServiceTestSupport {
-    @DisplayName("주문이어야 존재해야 한다.")
+    @DisplayName("주문이 존재해야 한다.")
     @Test
     void orderNotFound() {
         //given
