@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -78,7 +78,7 @@ class ProductServiceTest {
             request.setPrice(new BigDecimal(1000));
             request.setName("심한말");
 
-            when(purgomalumClient.containsProfanity("심한말")).thenReturn(true);
+            given(purgomalumClient.containsProfanity("심한말")).willReturn(true);
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -94,9 +94,9 @@ class ProductServiceTest {
             request.setPrice(new BigDecimal(1000));
             request.setName("상품1");
 
-            when(purgomalumClient.containsProfanity("상품1")).thenReturn(false);
+            given(purgomalumClient.containsProfanity("상품1")).willReturn(false);
             //// 서비스에서 생성한 상품 객체를 그대로 반환
-            when(productRepository.save(any())).thenAnswer((invocationOnMock) -> invocationOnMock.getArgument(0));
+            given(productRepository.save(any())).willAnswer((invocationOnMock) -> invocationOnMock.getArgument(0));
 
             // when
             final var result = testService.create(request);
@@ -138,7 +138,7 @@ class ProductServiceTest {
             existingProduct.setId(existingProductId);
             existingProduct.setName("연어");
             existingProduct.setPrice(new BigDecimal(1000));
-            when(productRepository.findById(existingProductId)).thenReturn(Optional.of(existingProduct));
+            given(productRepository.findById(existingProductId)).willReturn(Optional.of(existingProduct));
 
             //// 요청
             final var targetPrice = new BigDecimal(8000);
@@ -169,7 +169,7 @@ class ProductServiceTest {
             existingProduct.setId(existingProductId);
             existingProduct.setName("연어");
             existingProduct.setPrice(new BigDecimal(1000));
-            when(productRepository.findById(existingProductId)).thenReturn(Optional.of(existingProduct));
+            given(productRepository.findById(existingProductId)).willReturn(Optional.of(existingProduct));
 
             //// 기존 메뉴
             final var menuProduct = new MenuProduct();
@@ -179,7 +179,7 @@ class ProductServiceTest {
             menu.setDisplayed(true);
             menu.setPrice(menuPrice);
             menu.setMenuProducts(List.of(menuProduct));
-            when(menuRepository.findAllByProductId(existingProductId)).thenReturn(List.of(menu));
+            given(menuRepository.findAllByProductId(existingProductId)).willReturn(List.of(menu));
 
             //// 요쳥
             final var request = new Product();
@@ -207,7 +207,7 @@ class ProductServiceTest {
             final var product3 = new Product();
             product3.setId(UUID.fromString("33333333-3333-3333-3333-333333333333"));
             final var productsInRepository = List.of(product1, product2, product3);
-            when(productRepository.findAll()).thenReturn(productsInRepository);
+            given(productRepository.findAll()).willReturn(productsInRepository);
 
             // when
             final var allProducts = testService.findAll();

@@ -13,7 +13,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 @DisplayName("주문 배달시작")
 public class OrderServiceStartDeliveryTest extends OrderServiceTestSupport {
@@ -23,7 +23,7 @@ public class OrderServiceStartDeliveryTest extends OrderServiceTestSupport {
         // given
         final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+        given(orderRepository.findById(orderId)).willReturn(Optional.empty());
 
         // when
         assertThatThrownBy(() -> testService.startDelivery(orderId))
@@ -40,7 +40,7 @@ public class OrderServiceStartDeliveryTest extends OrderServiceTestSupport {
         final var order = new Order();
         order.setType(type);
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
         // when
         assertThatThrownBy(() -> testService.startDelivery(orderId))
@@ -58,7 +58,7 @@ public class OrderServiceStartDeliveryTest extends OrderServiceTestSupport {
         order.setType(OrderType.DELIVERY);
         order.setStatus(statusBeforeStartingDelivery);
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
         // when
         assertThatThrownBy(() -> testService.startDelivery(orderId))
@@ -75,7 +75,7 @@ public class OrderServiceStartDeliveryTest extends OrderServiceTestSupport {
         order.setType(OrderType.DELIVERY);
         order.setStatus(OrderStatus.SERVED);
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
         // when
         testService.startDelivery(orderId);

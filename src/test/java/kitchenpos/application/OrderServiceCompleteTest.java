@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 @DisplayName("주문 완료")
 public class OrderServiceCompleteTest extends OrderServiceTestSupport {
@@ -27,7 +27,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
         // given
         final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+        given(orderRepository.findById(orderId)).willReturn(Optional.empty());
 
         // when
         assertThatThrownBy(() -> testService.complete(orderId))
@@ -48,7 +48,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
             order.setType(OrderType.DELIVERY);
             order.setStatus(statusBeforeCompleted);
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
             assertThatThrownBy(() -> testService.complete(orderId))
@@ -65,7 +65,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
             order.setType(OrderType.DELIVERY);
             order.setStatus(OrderStatus.DELIVERED);
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
             testService.complete(orderId);
@@ -88,7 +88,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
             order.setType(OrderType.TAKEOUT);
             order.setStatus(statusBeforeCompleted);
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
             assertThatThrownBy(() -> testService.complete(orderId))
@@ -105,7 +105,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
             order.setType(OrderType.TAKEOUT);
             order.setStatus(OrderStatus.SERVED);
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
             testService.complete(orderId);
@@ -132,7 +132,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
             order.setType(OrderType.EAT_IN);
             order.setStatus(statusBeforeCompleted);
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
             assertThatThrownBy(() -> testService.complete(orderId))
@@ -154,7 +154,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
             order.setStatus(OrderStatus.SERVED);
             order.setOrderTable(orderTable);
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+            given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
             testService.complete(orderId);
@@ -187,9 +187,9 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
             order.setStatus(OrderStatus.SERVED);
             order.setOrderTable(orderTable);
 
-            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
-            when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
-                    .thenReturn(anyCompletedOrderExists);
+            given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
+            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
+                    .willReturn(anyCompletedOrderExists);
 
             // when
             testService.complete(orderId);

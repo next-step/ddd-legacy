@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
@@ -49,7 +49,7 @@ class MenuGroupServiceTest {
             final var request = new MenuGroup();
             request.setName("초밥");
 
-            when(menuGroupRepository.save(any())).thenAnswer((invocation) -> invocation.getArgument(0));
+            given(menuGroupRepository.save(any())).willAnswer((invocation) -> invocation.getArgument(0));
 
             // when
             final var result = testService.create(request);
@@ -68,7 +68,7 @@ class MenuGroupServiceTest {
         final var menuGroup2 = new MenuGroup();
         menuGroup2.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
         final var menuGroupsInRepo = List.of(menuGroup1, menuGroup2);
-        when(menuGroupRepository.findAll()).thenReturn(menuGroupsInRepo);
+        given(menuGroupRepository.findAll()).willReturn(menuGroupsInRepo);
 
         // when
         final var result = testService.findAll();

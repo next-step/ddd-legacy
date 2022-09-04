@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 @DisplayName("주문 생성")
 class OrderServiceCreateTest extends OrderServiceTestSupport {
@@ -75,7 +75,7 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
 
         final var menuInRepo = new Menu();
         menuInRepo.setId(menuId);
-        when(menuRepository.findAllByIdIn(List.of(menuId, menuId))).thenReturn(List.of(menuInRepo));
+        given(menuRepository.findAllByIdIn(List.of(menuId, menuId))).willReturn(List.of(menuInRepo));
 
         // when
         assertThatThrownBy(() -> testService.create(request))
@@ -97,8 +97,8 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
 
         final var menuInRepo = new Menu();
         menuInRepo.setId(menuId);
-        when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
-        when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+        given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
+        given(menuRepository.findById(menuId)).willReturn(Optional.empty());
 
         // when
         assertThatThrownBy(() -> testService.create(request))
@@ -122,8 +122,8 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
         final var menuInRepo = new Menu();
         menuInRepo.setId(menuId);
         menuInRepo.setDisplayed(false);
-        when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
-        when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+        given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
+        given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
 
         // when
         assertThatThrownBy(() -> testService.create(request))
@@ -152,8 +152,8 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
         menuInRepo.setId(menuId);
         menuInRepo.setDisplayed(true);
         menuInRepo.setPrice(menuPrice);
-        when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
-        when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+        given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
+        given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
 
         // when
         assertThatThrownBy(() -> testService.create(request))
@@ -179,7 +179,7 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
 
             final var menuInRepo = new Menu();
             menuInRepo.setId(menuId);
-            when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
+            given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -207,8 +207,8 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
             menuInRepo.setId(menuId);
             menuInRepo.setDisplayed(true);
             menuInRepo.setPrice(new BigDecimal(10000));
-            when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+            given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -237,9 +237,9 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
             menuInRepo.setDisplayed(true);
             menuInRepo.setPrice(new BigDecimal(10000));
 
-            when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
-            when(orderRepository.save(any())).thenAnswer((invocation -> invocation.getArgument(0)));
+            given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
+            given(orderRepository.save(any())).willAnswer((invocation -> invocation.getArgument(0)));
 
             // when
             final var result = testService.create(request);
@@ -284,9 +284,9 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
             menuInRepo.setDisplayed(true);
             menuInRepo.setPrice(new BigDecimal(10000));
 
-            when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
-            when(orderTableRepository.findById(orderTableId)).thenReturn(Optional.empty());
+            given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
+            given(orderTableRepository.findById(orderTableId)).willReturn(Optional.empty());
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -319,9 +319,9 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
             final var tableInRepo = new OrderTable();
             tableInRepo.setOccupied(false);
 
-            when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
-            when(orderTableRepository.findById(orderTableId)).thenReturn(Optional.of(tableInRepo));
+            given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
+            given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(tableInRepo));
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -355,10 +355,10 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
             tableInRepo.setId(orderTableId);
             tableInRepo.setOccupied(true);
 
-            when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
-            when(orderTableRepository.findById(orderTableId)).thenReturn(Optional.of(tableInRepo));
-            when(orderRepository.save(any())).thenAnswer((invocation -> invocation.getArgument(0)));
+            given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
+            given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(tableInRepo));
+            given(orderRepository.save(any())).willAnswer((invocation -> invocation.getArgument(0)));
 
             // when
             final var result = testService.create(request);
@@ -396,7 +396,7 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
 
             final var menuInRepo = new Menu();
             menuInRepo.setId(menuId);
-            when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
+            given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -424,9 +424,9 @@ class OrderServiceCreateTest extends OrderServiceTestSupport {
             menuInRepo.setDisplayed(true);
             menuInRepo.setPrice(new BigDecimal(10000));
 
-            when(menuRepository.findAllByIdIn(List.of(menuId))).thenReturn(List.of(menuInRepo));
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
-            when(orderRepository.save(any())).thenAnswer((invocation -> invocation.getArgument(0)));
+            given(menuRepository.findAllByIdIn(List.of(menuId))).willReturn(List.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
+            given(orderRepository.save(any())).willAnswer((invocation -> invocation.getArgument(0)));
 
             // when
             final var result = testService.create(request);

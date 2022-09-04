@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
@@ -58,7 +58,7 @@ class OrderTableServiceTest {
             final var request = new OrderTable();
             request.setName("table 1");
 
-            when(orderTableRepository.save(any())).thenAnswer((invocation -> invocation.getArgument(0)));
+            given(orderTableRepository.save(any())).willAnswer((invocation -> invocation.getArgument(0)));
 
             // when
             final var result = testService.create(request);
@@ -82,7 +82,7 @@ class OrderTableServiceTest {
             // given
             final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-            when(orderTableRepository.findById(tableId)).thenReturn(Optional.empty());
+            given(orderTableRepository.findById(tableId)).willReturn(Optional.empty());
 
             // when
             assertThatThrownBy(() -> testService.sit(tableId))
@@ -100,7 +100,7 @@ class OrderTableServiceTest {
             final var table = new OrderTable();
             table.setOccupied(occupiedBeforeChanged);
 
-            when(orderTableRepository.findById(tableId)).thenReturn(Optional.of(table));
+            given(orderTableRepository.findById(tableId)).willReturn(Optional.of(table));
 
             // when
             testService.sit(tableId);
@@ -119,7 +119,7 @@ class OrderTableServiceTest {
             // given
             final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-            when(orderTableRepository.findById(tableId)).thenReturn(Optional.empty());
+            given(orderTableRepository.findById(tableId)).willReturn(Optional.empty());
 
             // when
             assertThatThrownBy(() -> testService.clear(tableId))
@@ -137,8 +137,8 @@ class OrderTableServiceTest {
             table.setOccupied(true);
             table.setNumberOfGuests(4);
 
-            when(orderTableRepository.findById(tableId)).thenReturn(Optional.of(table));
-            when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(true);
+            given(orderTableRepository.findById(tableId)).willReturn(Optional.of(table));
+            given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
 
             // when
             assertThatThrownBy(() -> testService.clear(tableId))
@@ -157,8 +157,8 @@ class OrderTableServiceTest {
             table.setOccupied(occupiedBeforeChanged);
             table.setNumberOfGuests(5);
 
-            when(orderTableRepository.findById(tableId)).thenReturn(Optional.of(table));
-            when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(false);
+            given(orderTableRepository.findById(tableId)).willReturn(Optional.of(table));
+            given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
 
             // when
             testService.clear(tableId);
@@ -196,7 +196,7 @@ class OrderTableServiceTest {
             final var request = new OrderTable();
             request.setNumberOfGuests(3);
 
-            when(orderTableRepository.findById(tableId)).thenReturn(Optional.empty());
+            given(orderTableRepository.findById(tableId)).willReturn(Optional.empty());
 
             // when
             assertThatThrownBy(() -> testService.changeNumberOfGuests(tableId, request))
@@ -214,7 +214,7 @@ class OrderTableServiceTest {
 
             final var tableInRepo = new OrderTable();
             tableInRepo.setOccupied(false);
-            when(orderTableRepository.findById(tableId)).thenReturn(Optional.of(tableInRepo));
+            given(orderTableRepository.findById(tableId)).willReturn(Optional.of(tableInRepo));
 
             // when
             assertThatThrownBy(() -> testService.changeNumberOfGuests(tableId, request))
@@ -233,7 +233,7 @@ class OrderTableServiceTest {
             final var tableInRepo = new OrderTable();
             tableInRepo.setOccupied(true);
             tableInRepo.setNumberOfGuests(0);
-            when(orderTableRepository.findById(tableId)).thenReturn(Optional.of(tableInRepo));
+            given(orderTableRepository.findById(tableId)).willReturn(Optional.of(tableInRepo));
 
             // when
             testService.changeNumberOfGuests(tableId, request);
@@ -252,7 +252,7 @@ class OrderTableServiceTest {
         final var table2 = new OrderTable();
         table2.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
         final var tablesInRepo = List.of(table1, table2);
-        when(orderTableRepository.findAll()).thenReturn(tablesInRepo);
+        given(orderTableRepository.findAll()).willReturn(tablesInRepo);
 
         // when
         final var result = testService.findAll();

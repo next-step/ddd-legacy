@@ -18,8 +18,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @DisplayName("주문 접수")
@@ -30,7 +30,7 @@ class OrderServiceAcceptTest extends OrderServiceTestSupport {
         //given
         final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+        given(orderRepository.findById(orderId)).willReturn(Optional.empty());
 
         // when
         assertThatThrownBy(() -> testService.accept(orderId))
@@ -47,7 +47,7 @@ class OrderServiceAcceptTest extends OrderServiceTestSupport {
         final var order = new Order();
         order.setStatus(statusBeforeAccepted);
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
         // when
         assertThatThrownBy(() -> testService.accept(orderId))
@@ -83,7 +83,7 @@ class OrderServiceAcceptTest extends OrderServiceTestSupport {
         order.setOrderLineItems(List.of(orderLineItem));
         order.setDeliveryAddress(deliveryAddress);
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
         // when
         testService.accept(orderId);
@@ -120,7 +120,7 @@ class OrderServiceAcceptTest extends OrderServiceTestSupport {
         order.setOrderLineItems(List.of(orderLineItem));
         order.setDeliveryAddress(deliveryAddress);
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+        given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
         // when
         testService.accept(orderId);

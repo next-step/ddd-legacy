@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
@@ -72,7 +72,7 @@ class MenuServiceTest {
             request.setPrice(new BigDecimal(2000));
             request.setMenuGroupId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
 
-            when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.empty());
+            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.empty());
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -90,7 +90,7 @@ class MenuServiceTest {
             request.setMenuGroupId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
             request.setMenuProducts(menuProducts);
 
-            when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(existingMenuGroup));
+            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(existingMenuGroup));
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -111,12 +111,12 @@ class MenuServiceTest {
             request.setMenuGroupId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
             request.setMenuProducts(List.of(duplicatedMenuProduct1, duplicatedMenuProduct2));
 
-            when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(existingMenuGroup));
+            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(existingMenuGroup));
             final var productInRepo = new Product();
             productInRepo.setId(productId);
             productInRepo.setPrice(new BigDecimal(2000));
-            when(productRepository.findAllByIdIn(List.of(duplicatedMenuProduct1.getProductId(), duplicatedMenuProduct2.getProductId())))
-                    .thenReturn(List.of(productInRepo));
+            given(productRepository.findAllByIdIn(List.of(duplicatedMenuProduct1.getProductId(), duplicatedMenuProduct2.getProductId())))
+                    .willReturn(List.of(productInRepo));
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -138,11 +138,11 @@ class MenuServiceTest {
             menuProduct.setQuantity(productQuantity);
             request.setMenuProducts(List.of(menuProduct));
 
-            when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(existingMenuGroup));
+            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(existingMenuGroup));
             final var productInRepo = new Product();
             productInRepo.setId(productId);
             productInRepo.setPrice(new BigDecimal(2000));
-            when(productRepository.findAllByIdIn(List.of(productId))).thenReturn(List.of(productInRepo));
+            given(productRepository.findAllByIdIn(List.of(productId))).willReturn(List.of(productInRepo));
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -163,12 +163,12 @@ class MenuServiceTest {
             request.setMenuGroupId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
             request.setMenuProducts(List.of(menuProduct));
 
-            when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(existingMenuGroup));
+            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(existingMenuGroup));
             final var productInRepo = new Product();
             productInRepo.setId(productId);
             productInRepo.setPrice(new BigDecimal(2000));
-            when(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).thenReturn(List.of(productInRepo));
-            when(productRepository.findById(productId)).thenReturn(Optional.empty());
+            given(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).willReturn(List.of(productInRepo));
+            given(productRepository.findById(productId)).willReturn(Optional.empty());
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -192,12 +192,12 @@ class MenuServiceTest {
             request.setMenuGroupId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
             request.setMenuProducts(List.of(menuProduct));
 
-            when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(existingMenuGroup));
+            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(existingMenuGroup));
             final var productInRepo = new Product();
             productInRepo.setId(productId);
             productInRepo.setPrice(productPrice);
-            when(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).thenReturn(List.of(productInRepo));
-            when(productRepository.findById(productId)).thenReturn(Optional.of(productInRepo));
+            given(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).willReturn(List.of(productInRepo));
+            given(productRepository.findById(productId)).willReturn(Optional.of(productInRepo));
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -220,12 +220,12 @@ class MenuServiceTest {
             request.setMenuProducts(List.of(menuProduct));
             request.setName(name);
 
-            when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(existingMenuGroup));
+            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(existingMenuGroup));
             final var productInRepo = new Product();
             productInRepo.setId(productId);
             productInRepo.setPrice(new BigDecimal(2000));
-            when(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).thenReturn(List.of(productInRepo));
-            when(productRepository.findById(productId)).thenReturn(Optional.of(productInRepo));
+            given(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).willReturn(List.of(productInRepo));
+            given(productRepository.findById(productId)).willReturn(Optional.of(productInRepo));
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -247,13 +247,13 @@ class MenuServiceTest {
             request.setMenuProducts(List.of(menuProduct));
             request.setName("나쁜말");
 
-            when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(existingMenuGroup));
+            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(existingMenuGroup));
             final var productInRepo = new Product();
             productInRepo.setId(productId);
             productInRepo.setPrice(new BigDecimal(2000));
-            when(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).thenReturn(List.of(productInRepo));
-            when(productRepository.findById(productId)).thenReturn(Optional.of(productInRepo));
-            when(purgomalumClient.containsProfanity("나쁜말")).thenReturn(true);
+            given(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).willReturn(List.of(productInRepo));
+            given(productRepository.findById(productId)).willReturn(Optional.of(productInRepo));
+            given(purgomalumClient.containsProfanity("나쁜말")).willReturn(true);
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -275,15 +275,15 @@ class MenuServiceTest {
             request.setMenuProducts(List.of(menuProduct));
             request.setName("아메리카노");
 
-            when(existingMenuGroup.getId()).thenReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
-            when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(existingMenuGroup));
+            given(existingMenuGroup.getId()).willReturn(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(existingMenuGroup));
             final var productInRepo = new Product();
             productInRepo.setId(productId);
             productInRepo.setPrice(new BigDecimal(2000));
-            when(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).thenReturn(List.of(productInRepo));
-            when(productRepository.findById(productId)).thenReturn(Optional.of(productInRepo));
-            when(purgomalumClient.containsProfanity(any())).thenReturn(false);
-            when(menuRepository.save(any())).thenAnswer((invocation -> invocation.getArgument(0)));
+            given(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).willReturn(List.of(productInRepo));
+            given(productRepository.findById(productId)).willReturn(Optional.of(productInRepo));
+            given(purgomalumClient.containsProfanity(any())).willReturn(false);
+            given(menuRepository.save(any())).willAnswer((invocation -> invocation.getArgument(0)));
 
             // when
             final var result = testService.create(request);
@@ -341,7 +341,7 @@ class MenuServiceTest {
             final var request = new Menu();
             request.setPrice(new BigDecimal(4000));
 
-            when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+            given(menuRepository.findById(menuId)).willReturn(Optional.empty());
 
             // when
             assertThatThrownBy(() -> testService.changePrice(menuId, request))
@@ -368,7 +368,7 @@ class MenuServiceTest {
             menuProduct.setQuantity(productQuantity);
             final var menuInRepo = new Menu();
             menuInRepo.setMenuProducts(List.of(menuProduct));
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
 
             // when
             assertThatThrownBy(() -> testService.changePrice(menuId, request))
@@ -396,7 +396,7 @@ class MenuServiceTest {
             final var menuInRepo = new Menu();
             menuInRepo.setPrice(menuPriceBeforeChanged);
             menuInRepo.setMenuProducts(List.of(menuProduct));
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
 
             // when
             testService.changePrice(menuId, request);
@@ -416,7 +416,7 @@ class MenuServiceTest {
             // given
             final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-            when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+            given(menuRepository.findById(menuId)).willReturn(Optional.empty());
 
             // when
             assertThatThrownBy(() -> testService.display(menuId))
@@ -444,7 +444,7 @@ class MenuServiceTest {
             menuInRepo.setMenuProducts(List.of(menuProduct));
             menuInRepo.setPrice(menuPrice);
 
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
 
             // when
             assertThatThrownBy(() -> testService.display(menuId))
@@ -470,7 +470,7 @@ class MenuServiceTest {
             menuInRepo.setMenuProducts(List.of(menuProduct));
             menuInRepo.setPrice(new BigDecimal(1000));
 
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
 
             // when
             testService.display(menuId);
@@ -489,7 +489,7 @@ class MenuServiceTest {
             // given
             final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
 
-            when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+            given(menuRepository.findById(menuId)).willReturn(Optional.empty());
 
             // when
             assertThatThrownBy(() -> testService.hide(menuId))
@@ -508,7 +508,7 @@ class MenuServiceTest {
             menuInRepo.setId(menuId);
             menuInRepo.setDisplayed(displayedBeforeChanged);
 
-            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+            given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
 
             // when
             testService.hide(menuId);
@@ -527,7 +527,7 @@ class MenuServiceTest {
         final var menu2 = new Menu();
         menu2.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
         final var menusInRepo = List.of(menu1, menu2);
-        when(menuRepository.findAll()).thenReturn(menusInRepo);
+        given(menuRepository.findAll()).willReturn(menusInRepo);
 
         // when
         final var result = testService.findAll();
