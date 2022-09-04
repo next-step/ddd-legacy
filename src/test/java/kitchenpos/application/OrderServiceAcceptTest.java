@@ -16,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -90,5 +91,41 @@ class OrderServiceAcceptTest extends OrderServiceTestSupport {
         // then
         verify(kitchenridersClient, times(invocationCount))
                 .requestDelivery(orderId, new BigDecimal(10000), deliveryAddress);
+    }
+
+    @DisplayName("대기중인 주문은 접수할 수 있다.")
+    @ParameterizedTest(name = "{0}인 주문을 접수할 수 있다.")
+    @CsvSource({
+            "DELIVERY,'서울시 송파구'",
+            "TAKEOUT,null",
+            "EAT_IN,null"
+    })
+    void accept(
+            OrderType type,
+            String deliveryAddress
+    ) {
+        //given
+        final var menu = new Menu();
+        menu.setPrice(new BigDecimal(10000));
+
+        final var orderLineItem = new OrderLineItem();
+        orderLineItem.setMenu(menu);
+        orderLineItem.setQuantity(1L);
+
+        final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        final var order = new Order();
+        order.setId(orderId);
+        order.setType(type);
+        order.setStatus(OrderStatus.WAITING);
+        order.setOrderLineItems(List.of(orderLineItem));
+        order.setDeliveryAddress(deliveryAddress);
+
+        when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+        // when
+        testService.accept(orderId);
+
+        // then
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 }
