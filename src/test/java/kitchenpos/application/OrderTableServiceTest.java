@@ -1,5 +1,8 @@
 package kitchenpos.application;
 
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
@@ -9,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -65,6 +69,43 @@ class OrderTableServiceTest {
                     () -> assertThat(result.isOccupied()).isFalse(),
                     () -> assertThat(result.getNumberOfGuests()).isZero()
             );
+        }
+    }
+
+    @DisplayName("매장테이블 차지")
+    @Nested
+    class Sit {
+        @DisplayName("등록된 테이블이어야 한다.")
+        @Test
+        void tableNotFound() {
+            // given
+            final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+            when(orderTableRepository.findById(tableId)).thenReturn(Optional.empty());
+
+            // when
+            assertThatThrownBy(() -> testService.sit(tableId))
+                    // then
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("매장테이블을 차지된 상태로 바꿀 수 있다.")
+        @ParameterizedTest(name = "기존 테이블 차지여부가 [{0}]일 때, 테이블을 차지 상태로 바꿀 수 있다.")
+        @ValueSource(booleans = {false, true})
+        void sit(boolean occupiedBeforeChanged) {
+            // given
+            final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+            final var table = new OrderTable();
+            table.setOccupied(occupiedBeforeChanged);
+
+            when(orderTableRepository.findById(tableId)).thenReturn(Optional.of(table));
+
+            // when
+            testService.sit(tableId);
+
+            // then
+            assertThat(table.isOccupied()).isTrue();
         }
     }
 }
