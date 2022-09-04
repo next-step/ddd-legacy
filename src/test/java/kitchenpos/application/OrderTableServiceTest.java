@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -240,5 +241,28 @@ class OrderTableServiceTest {
             // then
             assertThat(tableInRepo.getNumberOfGuests()).isEqualTo(3);
         }
+    }
+
+    @DisplayName("모든 매장테이블을 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given
+        final var table1 = new OrderTable();
+        table1.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        final var table2 = new OrderTable();
+        table2.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
+        final var tablesInRepo = List.of(table1, table2);
+        when(orderTableRepository.findAll()).thenReturn(tablesInRepo);
+
+        // when
+        final var result = testService.findAll();
+
+        // then
+        assertThat(result).hasSize(2)
+                .extracting(OrderTable::getId)
+                .containsExactlyInAnyOrder(
+                        UUID.fromString("11111111-1111-1111-1111-111111111111"),
+                        UUID.fromString("22222222-2222-2222-2222-222222222222")
+                );
     }
 }
