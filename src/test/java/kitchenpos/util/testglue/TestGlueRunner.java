@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 public class TestGlueRunner {
 
-	private static final Pattern tokenPattern = Pattern.compile("('.*')");
+	private static final Pattern tokenPattern = Pattern.compile("('[^']*')");
 
 	private final TestGlueOperationContext testGlueOperationContext;
 	private final List<String> operations;
@@ -29,10 +29,11 @@ public class TestGlueRunner {
 		Matcher matcher = tokenPattern.matcher(description);
 
 		List<String> result = new ArrayList<>();
-		if (matcher.find()) {
-			for (int i = 0; i < matcher.groupCount(); i++) {
-				result.add(matcher.group(i).replaceAll("'", "").trim());
-			}
+		while (matcher.find()) {
+			result.add(matcher.group().replaceAll("'", "").trim());
+
+			description = description.substring(matcher.end());
+			matcher = tokenPattern.matcher(description);
 		}
 
 		return result.toArray(String[]::new);

@@ -26,7 +26,7 @@ public class TestGlueOperationContext {
 	}
 
 	private String find(String description) {
-		final String targetDescription = description.replaceAll("'.*'", "{}");
+		final String targetDescription = description.replaceAll("'[^']*'", "{}");
 
 		return volume.keySet().stream()
 			.filter(v -> v.equals(targetDescription))
