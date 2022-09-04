@@ -177,13 +177,6 @@ public class MenuAcceptanceTest extends AcceptanceTest {
         }
     }
 
-    private Map<String, Object> 메뉴상품을_구성함(final UUID productId, final int quantity) {
-        Map<String, Object> menuProduct = new HashMap<>();
-        menuProduct.put("productId", productId);
-        menuProduct.put("quantity", quantity);
-        return menuProduct;
-    }
-
     private void 메뉴가_조회됨(final ExtractableResponse<Response> response, final String... names) {
         assertThat(response.jsonPath().getList("name", String.class)).contains(names);
     }
