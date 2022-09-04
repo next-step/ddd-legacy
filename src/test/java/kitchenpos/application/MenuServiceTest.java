@@ -517,4 +517,27 @@ class MenuServiceTest {
             assertThat(menuInRepo.isDisplayed()).isFalse();
         }
     }
+
+    @DisplayName("모든 메뉴를 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given
+        final var menu1 = new Menu();
+        menu1.setId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
+        final var menu2 = new Menu();
+        menu2.setId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
+        final var menusInRepo = List.of(menu1, menu2);
+        when(menuRepository.findAll()).thenReturn(menusInRepo);
+
+        // when
+        final var result = testService.findAll();
+
+        // then
+        assertThat(result).hasSize(2)
+                .extracting(Menu::getId)
+                .containsExactlyInAnyOrder(
+                        UUID.fromString("11111111-1111-1111-1111-111111111111"),
+                        UUID.fromString("22222222-2222-2222-2222-222222222222")
+                );
+    }
 }
