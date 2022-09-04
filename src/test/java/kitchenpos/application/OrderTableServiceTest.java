@@ -169,4 +169,76 @@ class OrderTableServiceTest {
             );
         }
     }
+
+    @DisplayName("매장테이블 손님 수 설정")
+    @Nested
+    class ChangeNumberOfGuests {
+        @DisplayName("손님 수는 음수가 아니어야 한다.")
+        @Test
+        void negativeNumberOfGuests() {
+            // given
+            final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var request = new OrderTable();
+            request.setNumberOfGuests(-1);
+
+            // when
+            assertThatThrownBy(() -> testService.changeNumberOfGuests(tableId, request))
+                    // then
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("등록된 테이블이어야 한다.")
+        @Test
+        void tableNotFound() {
+            // given
+            final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var request = new OrderTable();
+            request.setNumberOfGuests(3);
+
+            when(orderTableRepository.findById(tableId)).thenReturn(Optional.empty());
+
+            // when
+            assertThatThrownBy(() -> testService.changeNumberOfGuests(tableId, request))
+                    // then
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("차지된 상태의 테이블이어야 한다.")
+        @Test
+        void tableShouldBeOccupied() {
+            // given
+            final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var request = new OrderTable();
+            request.setNumberOfGuests(3);
+
+            final var tableInRepo = new OrderTable();
+            tableInRepo.setOccupied(false);
+            when(orderTableRepository.findById(tableId)).thenReturn(Optional.of(tableInRepo));
+
+            // when
+            assertThatThrownBy(() -> testService.changeNumberOfGuests(tableId, request))
+                    // then
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("테이블의 손님 수를 바꿀 수 있다.")
+        @Test
+        void changeNumberOfGuests() {
+            // given
+            final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var request = new OrderTable();
+            request.setNumberOfGuests(3);
+
+            final var tableInRepo = new OrderTable();
+            tableInRepo.setOccupied(true);
+            tableInRepo.setNumberOfGuests(0);
+            when(orderTableRepository.findById(tableId)).thenReturn(Optional.of(tableInRepo));
+
+            // when
+            testService.changeNumberOfGuests(tableId, request);
+
+            // then
+            assertThat(tableInRepo.getNumberOfGuests()).isEqualTo(3);
+        }
+    }
 }
