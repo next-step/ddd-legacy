@@ -299,4 +299,110 @@ class MenuServiceTest {
             );
         }
     }
+
+    @Nested
+    @DisplayName("메뉴 가격 변경")
+    class ChangePrice {
+        @DisplayName("변경하려는 가격은 비어 있지 않아야 한다.")
+        @ParameterizedTest(name = "변경하려는 가격이 [{0}]이 아니어야 한다.")
+        @NullSource
+        void nullPrice(BigDecimal targetPrice) {
+            // given
+            final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var request = new Menu();
+            request.setPrice(targetPrice);
+
+            // when
+            assertThatThrownBy(() -> testService.changePrice(menuId, request))
+                    // then
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("변경하려는 메뉴 가격은 음수가 아니어야 한다.")
+        @Test
+        void negativePrice() {
+            // given
+            final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var request = new Menu();
+            request.setPrice(new BigDecimal(-100));
+
+            // when
+            assertThatThrownBy(() -> testService.changePrice(menuId, request))
+                    // then
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("등록된 메뉴여야 한다.")
+        @Test
+        void menuNotFound() {
+            // given
+            final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var request = new Menu();
+            request.setPrice(new BigDecimal(4000));
+
+            when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+
+            // when
+            assertThatThrownBy(() -> testService.changePrice(menuId, request))
+                    // then
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("변경하려는 메뉴 가격은 메뉴에 포함된 상품 가격의 총합보다 작거나 같아야 한다.")
+        @Test
+        void menuPriceMustLessThanOrEqualToProductSumPrice() {
+            // given
+            final var targetMenuPrice = new BigDecimal(4000);
+            final var productPrice = new BigDecimal(2000);
+            final var productQuantity = 1L;
+
+            final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var request = new Menu();
+            request.setPrice(targetMenuPrice);
+
+            final var productInMenu = new Product();
+            productInMenu.setPrice(productPrice);
+            final var menuProduct = new MenuProduct();
+            menuProduct.setProduct(productInMenu);
+            menuProduct.setQuantity(productQuantity);
+            final var menuInRepo = new Menu();
+            menuInRepo.setMenuProducts(List.of(menuProduct));
+            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+
+            // when
+            assertThatThrownBy(() -> testService.changePrice(menuId, request))
+                    // then
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴 가격을 변경할 수 있다.")
+        @Test
+        void changePrice() {
+            // given
+            final var menuPriceBeforeChanged = new BigDecimal(5000);
+            final var targetMenuPrice = new BigDecimal(4000);
+            final var expectedMenuPriceAfterChanged = new BigDecimal(4000);
+
+            final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var request = new Menu();
+            request.setPrice(targetMenuPrice);
+
+            final var productInMenu = new Product();
+            productInMenu.setPrice(new BigDecimal(5000));
+            final var menuProduct = new MenuProduct();
+            menuProduct.setProduct(productInMenu);
+            menuProduct.setQuantity(1L);
+            final var menuInRepo = new Menu();
+            menuInRepo.setPrice(menuPriceBeforeChanged);
+            menuInRepo.setMenuProducts(List.of(menuProduct));
+            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+
+            // when
+            testService.changePrice(menuId, request);
+
+            // then
+            assertThat(menuInRepo.getPrice()).isEqualTo(expectedMenuPriceAfterChanged);
+        }
+
+    }
 }
