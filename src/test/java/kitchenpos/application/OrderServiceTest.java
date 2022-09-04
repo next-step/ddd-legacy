@@ -6,27 +6,19 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
-import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
-import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import static kitchenpos.domain.OrderType.DELIVERY;
 import static kitchenpos.domain.OrderType.EAT_IN;
@@ -40,23 +32,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-@ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
-    @Mock
-    private OrderRepository orderRepository;
-    @Mock
-    private MenuRepository menuRepository;
-    @Mock
-    private OrderTableRepository orderTableRepository;
-    @Mock
-    private KitchenridersClient kitchenridersClient;
-
-    @InjectMocks
-    private OrderService testService;
-
     @DisplayName("주문 생성")
     @Nested
-    class Create {
+    class Create extends OrderServiceTestSupport {
         @DisplayName("주문 종류가 지정되어야 한다.")
         @ParameterizedTest(name = "주문 종류가 null이 아니어야 한다.")
         @NullSource
@@ -474,7 +453,7 @@ class OrderServiceTest {
 
     @DisplayName("주문 접수")
     @Nested
-    class Accept {
+    class Accept extends OrderServiceTestSupport {
         @DisplayName("주문이어야 존재해야 한다.")
         @Test
         void orderNotFound() {
