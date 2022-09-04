@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class menuGroupSteps {
+public class MenuGroupSteps {
 
     public static ExtractableResponse<Response> 메뉴그룹_등록_요청(final RequestSpecification given, final Map<String, String> params) {
         return given.body(params)

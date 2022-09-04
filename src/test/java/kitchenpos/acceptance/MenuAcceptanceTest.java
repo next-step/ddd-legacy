@@ -13,7 +13,7 @@ import java.util.UUID;
 
 import static kitchenpos.acceptance.MenuSteps.*;
 import static kitchenpos.acceptance.ProductSteps.제품이_등록됨;
-import static kitchenpos.acceptance.menuGroupSteps.메뉴그룹이_등록됨;
+import static kitchenpos.acceptance.MenuGroupSteps.메뉴그룹이_등록됨;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("메뉴 관련 기능")

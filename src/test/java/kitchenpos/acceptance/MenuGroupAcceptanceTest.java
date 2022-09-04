@@ -4,14 +4,13 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static kitchenpos.acceptance.menuGroupSteps.메뉴그룹_등록_요청;
-import static kitchenpos.acceptance.menuGroupSteps.메뉴그룹_목록_조회_요청;
+import static kitchenpos.acceptance.MenuGroupSteps.메뉴그룹_등록_요청;
+import static kitchenpos.acceptance.MenuGroupSteps.메뉴그룹_목록_조회_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("메뉴그룹 관련 기능")
