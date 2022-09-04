@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @EnableTestGlue
 @SpringBootTest
-class ProductServiceTest {
+class ProductServiceTest_create {
 
 	@Autowired
 	private TestGlue testGlue;
