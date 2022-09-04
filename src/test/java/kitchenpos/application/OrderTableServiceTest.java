@@ -108,4 +108,65 @@ class OrderTableServiceTest {
             assertThat(table.isOccupied()).isTrue();
         }
     }
+
+    @DisplayName("매장테이블 비움")
+    @Nested
+    class Clear {
+        @DisplayName("등록된 테이블이어야 한다.")
+        @Test
+        void tableNotFound() {
+            // given
+            final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+            when(orderTableRepository.findById(tableId)).thenReturn(Optional.empty());
+
+            // when
+            assertThatThrownBy(() -> testService.clear(tableId))
+                    // then
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("완료되지 않은 주문이 있다면 비울 수 없다.")
+        @Test
+        void existsNotCompletedOrder() {
+            // given
+            final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+            final var table = new OrderTable();
+            table.setOccupied(true);
+            table.setNumberOfGuests(4);
+
+            when(orderTableRepository.findById(tableId)).thenReturn(Optional.of(table));
+            when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(true);
+
+            // when
+            assertThatThrownBy(() -> testService.clear(tableId))
+                    // then
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("매장테이블을 비워짐 상태로 바꾸고 손님 수는 0으로 설정된다.")
+        @ParameterizedTest(name = "기존 테이블 차지여부가 [{0}]일 때, 테이블을 비워짐 상태로 바꾸고 손님 수는 0으로 설정된다.")
+        @ValueSource(booleans = {false, true})
+        void clear(boolean occupiedBeforeChanged) {
+            // given
+            final var tableId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+            final var table = new OrderTable();
+            table.setOccupied(occupiedBeforeChanged);
+            table.setNumberOfGuests(5);
+
+            when(orderTableRepository.findById(tableId)).thenReturn(Optional.of(table));
+            when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(false);
+
+            // when
+            testService.clear(tableId);
+
+            // then
+            assertAll(
+                    () -> assertThat(table.isOccupied()).isFalse(),
+                    () -> assertThat(table.getNumberOfGuests()).isZero()
+            );
+        }
+    }
 }
