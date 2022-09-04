@@ -106,4 +106,8 @@ public class InputProvider {
     public static Stream<UUID> provideExistOrderTableId() {
         return Stream.of(UUID.fromString("3faec3ab-5217-405d-aaa2-804f87697f84"));
     }
+
+    public static Stream<UUID> provideNonExistOrderId() {
+        return Stream.of(new UUID(1, 2));
+    }
 }
