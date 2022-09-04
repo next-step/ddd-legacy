@@ -479,4 +479,42 @@ class MenuServiceTest {
             assertThat(menuInRepo.isDisplayed()).isTrue();
         }
     }
+
+    @DisplayName("메뉴 비공개")
+    @Nested
+    class Hide {
+        @DisplayName("등록된 메뉴여야 한다.")
+        @Test
+        void menuNotFound() {
+            // given
+            final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+            when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+
+            // when
+            assertThatThrownBy(() -> testService.hide(menuId))
+                    // then
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("메뉴를 비공개할 수 있다.")
+        @ParameterizedTest(name = "기존 메뉴 공개여부가 [{0}]일 때, 메뉴를 비공개할 수 있다.")
+        @ValueSource(booleans = {false, true})
+        void hide(boolean displayedBeforeChanged) {
+            // given
+            final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+            final var menuInRepo = new Menu();
+            menuInRepo.setId(menuId);
+            menuInRepo.setDisplayed(displayedBeforeChanged);
+
+            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+
+            // when
+            testService.hide(menuId);
+
+            // then
+            assertThat(menuInRepo.isDisplayed()).isFalse();
+        }
+    }
 }
