@@ -20,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -404,5 +405,78 @@ class MenuServiceTest {
             assertThat(menuInRepo.getPrice()).isEqualTo(expectedMenuPriceAfterChanged);
         }
 
+    }
+
+    @DisplayName("메뉴 공개")
+    @Nested
+    class Display {
+        @DisplayName("등록된 메뉴여야 한다.")
+        @Test
+        void menuNotFound() {
+            // given
+            final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+            when(menuRepository.findById(menuId)).thenReturn(Optional.empty());
+
+            // when
+            assertThatThrownBy(() -> testService.display(menuId))
+                    // then
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("공개하려는 메뉴의 가격이 메뉴에 포함된 상품 가격의 총합보다 크지 않아야 한다.")
+        @Test
+        void menuPriceShouldLessThanOrEqualToProductSumPrice() {
+            // given
+            final var menuPrice = new BigDecimal(2000);
+            final var productPrice = new BigDecimal(1000);
+            final var productQuantity = 1L;
+
+            final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var productInMenu = new Product();
+            productInMenu.setPrice(productPrice);
+            final var menuProduct = new MenuProduct();
+            menuProduct.setProduct(productInMenu);
+            menuProduct.setQuantity(productQuantity);
+            final var menuInRepo = new Menu();
+            menuInRepo.setId(menuId);
+            menuInRepo.setDisplayed(false);
+            menuInRepo.setMenuProducts(List.of(menuProduct));
+            menuInRepo.setPrice(menuPrice);
+
+            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+
+            // when
+            assertThatThrownBy(() -> testService.display(menuId))
+                    // then
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("메뉴를 공개할 수 있다.")
+        @ParameterizedTest(name = "기존 메뉴 공개여부가 [{0}]일 때, 메뉴를 공개할 수 있다.")
+        @ValueSource(booleans = {false, true})
+        void display(boolean displayedBeforeChanged) {
+            // given
+            final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+            final var productInMenu = new Product();
+            productInMenu.setPrice(new BigDecimal(1000));
+            final var menuProduct = new MenuProduct();
+            menuProduct.setProduct(productInMenu);
+            menuProduct.setQuantity(1L);
+            final var menuInRepo = new Menu();
+            menuInRepo.setId(menuId);
+            menuInRepo.setDisplayed(displayedBeforeChanged);
+            menuInRepo.setMenuProducts(List.of(menuProduct));
+            menuInRepo.setPrice(new BigDecimal(1000));
+
+            when(menuRepository.findById(menuId)).thenReturn(Optional.of(menuInRepo));
+
+            // when
+            testService.display(menuId);
+
+            // then
+            assertThat(menuInRepo.isDisplayed()).isTrue();
+        }
     }
 }
