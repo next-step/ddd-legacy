@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
@@ -34,7 +36,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.groups.Tuple.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -465,6 +469,79 @@ class OrderServiceTest {
                                 .containsExactly(tuple(UUID.fromString("11111111-1111-1111-1111-111111111111"), 1L))
                 );
             }
+        }
+    }
+
+    @DisplayName("주문 접수")
+    @Nested
+    class Accept {
+        @DisplayName("주문이어야 존재해야 한다.")
+        @Test
+        void orderNotFound() {
+            //given
+            final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+
+            when(orderRepository.findById(orderId)).thenReturn(Optional.empty());
+
+            // when
+            assertThatThrownBy(() -> testService.accept(orderId))
+                    // then
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("대기중인 주문이어야 한다.")
+        @ParameterizedTest(name = "주문상태가 {0}이 아닌 WAITING이어야 한다.")
+        @EnumSource(value = OrderStatus.class, names = "WAITING", mode = EnumSource.Mode.EXCLUDE)
+        void shouldBeWaiting(OrderStatus statusBeforeAccepted) {
+            //given
+            final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var order = new Order();
+            order.setStatus(statusBeforeAccepted);
+
+            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+            // when
+            assertThatThrownBy(() -> testService.accept(orderId))
+                    // then
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("배달 주문인 경우에만 배달 요청을 보낸다.")
+        @ParameterizedTest(name = "{0} 주문인 경우 배달 요청을 {2}회 보낸다.")
+        @CsvSource({
+                "DELIVERY,'서울시 송파구',1",
+                "TAKEOUT,null,0",
+                "EAT_IN,null,0"
+        })
+        void deliveryOrderShouldOnlyRequestDelivery(
+                OrderType type,
+                String deliveryAddress,
+                int invocationCount
+        ) {
+            //given
+            final var menu = new Menu();
+            menu.setPrice(new BigDecimal(10000));
+
+            final var orderLineItem = new OrderLineItem();
+            orderLineItem.setMenu(menu);
+            orderLineItem.setQuantity(1L);
+
+            final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            final var order = new Order();
+            order.setId(orderId);
+            order.setType(type);
+            order.setStatus(OrderStatus.WAITING);
+            order.setOrderLineItems(List.of(orderLineItem));
+            order.setDeliveryAddress(deliveryAddress);
+
+            when(orderRepository.findById(orderId)).thenReturn(Optional.of(order));
+
+            // when
+            testService.accept(orderId);
+
+            // then
+            verify(kitchenridersClient, times(invocationCount))
+                    .requestDelivery(orderId, new BigDecimal(10000), deliveryAddress);
         }
     }
 }
