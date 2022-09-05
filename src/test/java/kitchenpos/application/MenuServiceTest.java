@@ -29,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -156,6 +157,27 @@ class MenuServiceTest {
 
     // when & then
     assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(NoSuchElementException.class);
+  }
+
+  @DisplayName("요청 메뉴상품이 없거나 비어있을 수 없다.")
+  @NullAndEmptySource
+  @ParameterizedTest
+  void givenEmptyMenuProduct_whenCreate_thenNoSuchElementException(List<MenuProduct> menuProducts) {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23000),
+        true,
+        menuGroup,
+        menuProducts
+    );
+
+    given(menuGroupRepository.findById(menuGroup.getId())).willReturn(Optional.of(menuGroup));
+
+    // when & then
+    assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
   }
 
   private static Menu createMenu(
