@@ -34,7 +34,7 @@ public class NonNegativeLong {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        NonNegativeLong that = (NonNegativeLong) o;
+        final NonNegativeLong that = (NonNegativeLong) o;
         return value == that.value;
     }
 

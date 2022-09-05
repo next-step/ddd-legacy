@@ -46,7 +46,7 @@ class SimpleStringParserTest {
         return result.stream();
     }
 
-    private static boolean isValidCharacter(char c) {
+    private static boolean isValidCharacter(final char c) {
         return (c == ',' || c == ':' || ('0' <= c && c <= '9'));
     }
 
