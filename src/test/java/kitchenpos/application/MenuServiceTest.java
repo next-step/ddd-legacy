@@ -443,6 +443,36 @@ class MenuServiceTest {
         .isInstanceOf(NoSuchElementException.class);
   }
 
+  @DisplayName("메뉴가격은 메뉴의 포함된 메뉴상품금액(메뉴상품가격 * 수량)의 총액 보다 더 높을 수 없다.")
+  @Test
+  void givenNotValidPrice_whenChangePrice_thenReturnChangedMenu() {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
+    List<MenuProduct> menuProducts = List.of(
+        createMenuProduct(product1, 1),
+        createMenuProduct(product2, 1)
+    );
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23000),
+        true,
+        menuGroup,
+        menuProducts
+    );
+
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+    Menu changePriceMenu = new Menu();
+    changePriceMenu.setPrice(BigDecimal.valueOf(23100));
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> menuService.changePrice(menu.getId(), changePriceMenu));
+  }
+
   private static Menu createMenu(
       String name,
       BigDecimal price,
