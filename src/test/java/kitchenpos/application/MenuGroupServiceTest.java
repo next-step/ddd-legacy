@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -42,6 +45,19 @@ class MenuGroupServiceTest {
 
     // then
     Assertions.assertThat(createdMenuGroup.getName()).isEqualTo(menuGroup.getName());
+  }
+
+  @DisplayName("메뉴그룹 이름은 비어있을 수 없다.")
+  @NullAndEmptySource
+  @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
+  void givenNotValidPrice_whenCreate_thenIllegalArgumentException(String name) {
+    // given
+    MenuGroup menuGroup = new MenuGroup();
+    menuGroup.setId(UUID.randomUUID());
+    menuGroup.setName(name);
+
+    // when & then
+    assertThatIllegalArgumentException().isThrownBy(() -> menuGroupService.create(menuGroup));
   }
 
 }
