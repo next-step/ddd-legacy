@@ -27,6 +27,7 @@ class MenuGroupServiceTest {
     @InjectMocks
     private MenuGroupService testService;
 
+    @DisplayName("메뉴그룹 생성")
     @Nested
     class Create {
         @DisplayName("이름은 비어 있지 않아야 한다.")
