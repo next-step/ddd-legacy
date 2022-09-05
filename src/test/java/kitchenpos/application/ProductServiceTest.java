@@ -26,8 +26,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -193,7 +191,7 @@ class ProductServiceTest {
     product2.setName("양념치킨");
     product2.setPrice(BigDecimal.valueOf(12000));
 
-    given(productService.findAll()).willReturn(List.of(product1, product2));
+    given(productRepository.findAll()).willReturn(List.of(product1, product2));
 
     // when
     List<Product> products = productService.findAll();
