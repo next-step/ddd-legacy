@@ -7,13 +7,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import string_calculator.string_parser.SimpleStringParser;
 
 class StringCalculatorTest {
 
-    private final SimpleStringParser simpleStringParser = new SimpleStringParser();
-
-    private final StringCalculator stringCalculator = new StringCalculator(simpleStringParser);
+    private final StringCalculator stringCalculator = new StringCalculator();
 
     @DisplayName("string이 null 또는 empty인 경우 0을 반환해야 한다.")
     @NullAndEmptySource
@@ -63,5 +60,18 @@ class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(
                 () -> this.stringCalculator.calculate(string)
         );
+    }
+
+    @DisplayName("커스텀 delimiter를 지정할 수 있다.")
+    @ValueSource(strings = {
+            "//!\n1!2",
+            "//@\n1@2",
+            "//#\n1#2",
+            "//%\n1%2",
+            "//&\n1&2",
+    })
+    @ParameterizedTest
+    void customDelimiter(final String string) {
+        assertThat(this.stringCalculator.calculate(string)).isEqualTo(3L);
     }
 }
