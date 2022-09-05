@@ -1,5 +1,7 @@
 package kitchenpos.ui;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -9,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -78,6 +81,32 @@ class ProductRestControllerIntegrationTest {
         .andExpect(jsonPath("$.id").exists())
         .andExpect(jsonPath("$.name").value(product.getName()))
         .andExpect(jsonPath("$.price").value(changePriceProduct.getPrice()));
+  }
+
+  @DisplayName("상품조회 요청에 응답으로 200 OK 응답과 함계 등록된 상품목록을 반환한다")
+  @Test
+  void givenProducts_whenFindAll_thenReturnProducts() throws Exception {
+    Product product1 = new Product();
+    product1.setId(UUID.randomUUID());
+    product1.setName("후라이드치킨");
+    product1.setPrice(BigDecimal.valueOf(11000));
+
+    Product product2 = new Product();
+    product2.setId(UUID.randomUUID());
+    product2.setName("양념치킨");
+    product2.setPrice(BigDecimal.valueOf(12000));
+
+    productRepository.saveAll(List.of(product1, product2));
+
+    mvc.perform(get("/api/products").accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0].name").value(product1.getName()))
+        .andExpect(jsonPath("$[0].price").value(product1.getPrice().longValue()))
+        .andExpect(jsonPath("$[1].name").value(product2.getName()))
+        .andExpect(jsonPath("$[1].price").value(product2.getPrice().longValue()));
   }
 
 }
