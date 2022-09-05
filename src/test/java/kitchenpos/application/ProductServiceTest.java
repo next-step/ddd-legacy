@@ -17,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -40,9 +41,9 @@ class ProductServiceTest {
     this.productService = new ProductService(productRepository, menuRepository, purgomalumClient);
   }
 
-  @Test
   @DisplayName("유효한 상품명과 가격을 입력하여 상품을 등록할 수 있다.")
-  void whenCreate_thenReturnProduct() {
+  @Test
+  void givenProduct_whenCreate_thenReturnProduct() {
     // given
     Product product = new Product();
     product.setId(UUID.randomUUID());
@@ -59,6 +60,19 @@ class ProductServiceTest {
     assertThat(savedProduct.getId()).isNotNull();
     assertThat(savedProduct.getName()).isEqualTo(product.getName());
     assertThat(savedProduct.getPrice()).isEqualTo(product.getPrice());
+  }
+
+  @DisplayName("상품 가격은 0원 보다 작을 수 없다")
+  @Test
+  void givenNotValidPrice_whenCreate_thenIllegalArgumentException() {
+    // given
+    Product product = new Product();
+    product.setId(UUID.randomUUID());
+    product.setName("후라이드치킨");
+    product.setPrice(BigDecimal.valueOf(-1));
+
+    // when & then
+    assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
   }
 
 }
