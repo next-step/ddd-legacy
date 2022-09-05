@@ -1,9 +1,11 @@
 package kitchenpos.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -58,6 +60,28 @@ class MenuGroupServiceTest {
 
     // when & then
     assertThatIllegalArgumentException().isThrownBy(() -> menuGroupService.create(menuGroup));
+  }
+
+  @DisplayName("등록된 메뉴그룹을 조회하면 등록된 메뉴그룹 목록을 반환한다.")
+  @Test
+  void givenMenuGroups_whenFindAll_thenReturnMenuGroups() {
+    // given
+    MenuGroup menuGroup1 = new MenuGroup();
+    menuGroup1.setId(UUID.randomUUID());
+    menuGroup1.setName("추천메뉴");
+
+    MenuGroup menuGroup2 = new MenuGroup();
+    menuGroup2.setId(UUID.randomUUID());
+    menuGroup2.setName("점심특선메뉴");
+
+    given(menuGroupRepository.findAll()).willReturn(List.of(menuGroup1, menuGroup2));
+
+    // when
+    List<MenuGroup> menuGroups = menuGroupService.findAll();
+
+    // then
+    assertThat(menuGroups).hasSize(2);
+    assertThat(menuGroups).extracting(MenuGroup::getName).contains("추천메뉴", "점심특선메뉴");
   }
 
 }
