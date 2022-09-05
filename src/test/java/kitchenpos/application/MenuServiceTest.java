@@ -63,9 +63,10 @@ class MenuServiceTest {
         assertThat(result).isNotNull();
     }
 
-    @DisplayName("가격이 필수이다")
+    @DisplayName("가격이 null이라면 IllegalArgumentException을 발생시킨다")
     @ParameterizedTest
     @NullSource
+    @ValueSource(longs = -1)
     void create_menu_with_null_and_empty_price(final Long price) {
         Menu menu = TestFixture.createFirstMenu();
         BigDecimal wrapPrice = Optional.ofNullable(price)
@@ -77,7 +78,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(menu));
     }
 
-    @DisplayName("가격은 음수 일 수 없다")
+    @DisplayName("가격이 음수라면 IllegalArgumentException을 발생시킨다")
     @ParameterizedTest
     @ValueSource(longs = -1)
     void create_menu_with_negative_number(final long price) {
@@ -92,7 +93,7 @@ class MenuServiceTest {
     }
 
 
-    @DisplayName("메뉴의 속한 상품의 가격보다 작으면 등록이 불가능하다")
+    @DisplayName("메뉴의 속한 상품의 가격보다 등록하려는 가격이 작으면 IllegalArgumentException를 발생시킨다")
     @Test
     void create_menu_with_lower_price() {
         given(menuGroupRepository.findById(Mockito.any(UUID.class)))
@@ -104,7 +105,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(menu));
     }
 
-    @DisplayName("메뉴의 이름은 필수이다")
+    @DisplayName("메뉴의 이름이 null이거나 비어있다면 IllegalArgumentException을 발생시킨다")
     @NullAndEmptySource
     @ParameterizedTest
     void create_menu_with_null_and_empty_name(final String name) {
@@ -130,7 +131,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(menu));
     }
 
-    @DisplayName("메뉴에 속할 상품은 필수이다 ")
+    @DisplayName("메뉴에 속할 상품이 null이거나 비어있다면 IllegalArgumentException을 발생시킨다")
     @NullAndEmptySource
     @ParameterizedTest
     void create_menu_with_null_and_empty_menu_products(final List<MenuProduct> menuProducts) {
@@ -144,7 +145,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(menu));
     }
 
-    @DisplayName("메뉴에 속할 상품의 개수는 필수이다 ")
+    @DisplayName("메뉴에 속할 상품의 개수가 0보다 작다면 IllegalArgumentException을 발생시킨다")
     @ValueSource(longs = {-1, 0})
     @ParameterizedTest
     void create_menu_with_zero_quantity_menu_product(final long quantity) {
@@ -158,7 +159,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(menu));
     }
 
-    @DisplayName("메뉴는 하나의 메뉴 그룹에 속해야한다")
+    @DisplayName("메뉴 그룹에 속하지 않는다면 NoSuchElementException을 발생시킨다")
     @Test
     void create_menu_must_contain_one_menu() {
         given(menuGroupRepository.findById(Mockito.any(UUID.class)))
@@ -184,7 +185,7 @@ class MenuServiceTest {
     }
 
 
-    @DisplayName("메뉴에 속한 상품의 총 가격의 합보다 변경하려는 가격이 크다면 수정이 불가능하다")
+    @DisplayName("메뉴에 속한 상품의 총 가격의 합보다 변경하려는 가격이 크다면 IllegalArgumentException을 발생시킨다")
     @Test
     void change_price_bigger_than_contains_products() {
         Menu menu = TestFixture.createFirstMenu();

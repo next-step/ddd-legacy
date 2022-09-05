@@ -41,7 +41,7 @@ class OrderServiceTest {
     private OrderService orderService;
 
 
-    @DisplayName("주문을 생성할 때 주문 타입은 필수이다")
+    @DisplayName("주문을 생성할 때 주문 타입이 Null이라면 IllegalArgumentException을 발생시킨다")
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT", "EAT_IN"})
     void create_order_with_null_and_empty_order_type(final OrderType orderType) {
@@ -51,7 +51,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.create(order));
     }
 
-    @DisplayName("주문을 생성 할 때 주문할 메뉴의 항목은 필수이다")
+    @DisplayName("주문을 생성 할 때 주문할 메뉴의 항목은 Null이거나 비어있다면 IllegalArgumentException을 발생시킨다")
     @ParameterizedTest
     @NullAndEmptySource
     void create_order_with_null_and_empty_menu(final List<OrderLineItem> orderLineItems) {
@@ -63,7 +63,7 @@ class OrderServiceTest {
         });
     }
 
-    @DisplayName("비공개 상태의 메뉴는 주문이 불가능하다")
+    @DisplayName("비공개 상태의 메뉴를 주문한다면 IllegalStateException를 발생시킨다")
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT", "EAT_IN"})
     void create_order_with_none_display_menu(final OrderType orderType) {
@@ -81,7 +81,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.create(order));
     }
 
-    @DisplayName("메뉴의 가격과 주문을 통해 전달된 주문 가격이 다르면 주문이 불가능하다")
+    @DisplayName("메뉴의 가격과 주문을 통해 전달된 주문 가격이 다르면 IllegalArgumentException를 발생시킨다")
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT", "EAT_IN"})
     void create_order_with_not_match_total_price(final OrderType orderType) {
@@ -114,7 +114,7 @@ class OrderServiceTest {
     }
 
 
-    @DisplayName("주문 상태가 대기 중인 경우만 수락을 할 수 있다")
+    @DisplayName("주문을 수락할때 WAITING이 아니라면 IllegalStateException을 발생시킨다")
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "COMPLETED", "DELIVERED", "DELIVERING", "SERVED"})
     void accept_by_not_watting_status(final OrderStatus orderStatus) {
@@ -142,7 +142,7 @@ class OrderServiceTest {
         assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
-    @DisplayName("수락한 주문만 제공할 수 있다")
+    @DisplayName("주문을 제공할때 ACCEPTED의 상태가 아니라면 IllegalStateException를 발생시킨다")
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "COMPLETED", "DELIVERED", "DELIVERING", "SERVED"})
     void serve_with_not_accept_status(final OrderStatus orderStatus) {
@@ -161,10 +161,10 @@ class OrderServiceTest {
     class DeliveryOrderTest {
         private final OrderType orderType = OrderType.DELIVERY;
 
-        @DisplayName("배달이라면 배달 주소가 필수이다")
+        @DisplayName("배달 주소가 Null이거나 비어있다면 IllegalArgumentException를 발생시킨다")
         @ParameterizedTest
         @NullAndEmptySource
-        void create_delivery_order_without_address1(final String address) {
+        void create_delivery_order_without_address(final String address) {
             Order order = TestFixture.createFirstOrder(orderType);
             order.setDeliveryAddress(address);
 
@@ -193,7 +193,7 @@ class OrderServiceTest {
         }
 
 
-        @DisplayName("주문의 상태가 배송 중인 경우에만 배송 완료 처리가 가능하다")
+        @DisplayName("배달 중이 아닌 상태에서 완료처리를 하면 IllegalStateException를 발생시킨다")
         @ParameterizedTest
         @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "COMPLETED", "DELIVERED", "SERVED"})
         void complete_delivery_with_not_deliverd_status(final OrderStatus orderStatus) {
@@ -208,7 +208,7 @@ class OrderServiceTest {
         }
 
 
-        @DisplayName("주문 수량이 음수 일 수 없다")
+        @DisplayName("주문 수량이 음수라면 IllegalArgumentException를 발생시킨다")
         @Test
         void create_order_lower_than_zero_quantity() {
             Order order = TestFixture.createFirstOrder(orderType);
@@ -260,7 +260,7 @@ class OrderServiceTest {
 
         private final OrderType orderType = OrderType.TAKEOUT;
 
-        @DisplayName("주문 수량이 음수 일 수 없다")
+        @DisplayName("주문 수량이 음수라면 IllegalArgumentException를 발생시킨다")
         @Test
         void create_order_lower_than_zero_quantity() {
             Order order = TestFixture.createFirstOrder(orderType);
@@ -287,10 +287,6 @@ class OrderServiceTest {
             final Order result = orderService.complete(order.getId());
             assertThat(result).isNotNull();
             assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-            if (orderType == OrderType.EAT_IN) {
-                assertThat(result.getOrderTable().isOccupied()).isFalse();
-                assertThat(result.getOrderTable().getNumberOfGuests()).isZero();
-            }
         }
     }
 
@@ -300,7 +296,7 @@ class OrderServiceTest {
 
         private final OrderType orderType = OrderType.EAT_IN;
 
-        @DisplayName("주문 테이블이 존재해야한다")
+        @DisplayName("주문 테이블이 존재하지 않으면 NoSuchElementException를 발생시킨다")
         @Test
         void create_eat_in_order_with_no_such_order_table() {
             final Order order = TestFixture.createFirstOrder(orderType);
@@ -317,7 +313,7 @@ class OrderServiceTest {
         }
 
 
-        @DisplayName("매장 주문일때 주문 테이블이 비어있어야한다")
+        @DisplayName("주문 테이블이 비어있지 않다면 IllegalStateException를 발생시킨다")
         @Test
         void create_eat_in_order_with_empty_order_table() {
             final Order order = TestFixture.createFirstOrder(orderType);
@@ -351,25 +347,5 @@ class OrderServiceTest {
             assertThat(result.getOrderTable().getNumberOfGuests()).isZero();
         }
     }
-//    @DisplayName("주문을 생성할 수 있다")
-//    @Test
-//    void create_order() {
-//        final Order order = TestFixture.createFirstOrder();
-//
-//        given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-//                .willReturn(List.of(defaultMenu()));
-//        given(menuRepository.findById(Mockito.any(UUID.class)))
-//                .willReturn(Optional.of(defaultMenu()));
-//        given(orderRepository.save(Mockito.any(Order.class)))
-//                .willReturn(order);
-//
-//        final Order result = orderService.create(order);
-//        assertThat(result).isNotNull();
-//        assertThat(result).isEqualTo(order);
-//    }
-
-
-
-
 
 }

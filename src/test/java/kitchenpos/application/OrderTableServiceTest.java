@@ -52,7 +52,7 @@ class OrderTableServiceTest {
         assertThat(result.isOccupied()).isFalse();
     }
 
-    @DisplayName("주문 테이블의 이름은 필수이다")
+    @DisplayName("주문 테이블의 이름이 Null이거나 비어있다면 IllegalArgumentException를 발생시킨다")
     @ParameterizedTest
     @NullAndEmptySource
     void create_order_table_with_nll_and_empty_name(final String name) {
@@ -109,7 +109,7 @@ class OrderTableServiceTest {
         assertThat(result.getNumberOfGuests()).isEqualTo(changeGuest);
     }
 
-    @DisplayName("주문 테이블을 사용 가능한 손님의 숫자는 음수 일 수 없다")
+    @DisplayName("주문 테이블을 사용 가능한 손님의 숫자는 음수라면 IllegalArgumentException를 발생시킨다")
     @Test
     void change_number_of_guest_by_negative_number() {
         OrderTable orderTable = TestFixture.createFirstOrderTable();
@@ -122,7 +122,7 @@ class OrderTableServiceTest {
                 .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
     }
 
-    @DisplayName("사람이 앉아 있지 않는 상태의 주문 테이블은 손님의 숫자를 변경할 수 없다")
+    @DisplayName("비어있는 테이블의 손님 숫자를 변경하면 IllegalStateException를 발생시킨다")
     @Test
     void change_number_of_guest_in_occupied() {
         OrderTable orderTable = TestFixture.createFirstOrderTable();

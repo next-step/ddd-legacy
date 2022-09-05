@@ -55,7 +55,7 @@ class ProductServiceTest {
         assertThat(result.getPrice()).isEqualTo(TestFixture.FIRST_PRODUCT_PRICE);
     }
 
-    @DisplayName("가격은 필수 이며, 음수 일 수 없다")
+    @DisplayName("가격이 비어있거나 음수이면 IllegalArgumentException를 발생시킨다")
     @ParameterizedTest
     @NullSource
     @ValueSource(longs = -1)
@@ -114,7 +114,7 @@ class ProductServiceTest {
         assertThat(result.getPrice()).isEqualTo(changedPrice);
     }
 
-    @DisplayName("가격을 변경할 때 가격은 필수이며, 음수 일 수 없다")
+    @DisplayName("가격을 변경할 때 가격이 Null이거나 음수라면 IllegalArgumentException를 발생시킨다")
     @ParameterizedTest
     @NullSource
     @ValueSource(longs = -1)

@@ -48,7 +48,7 @@ class MenuGroupServiceTest {
         assertThat(result.getId()).isEqualTo(menuGroup.getId());
     }
 
-    @DisplayName("메뉴 그룹의 이름은 필수이다")
+    @DisplayName("메뉴 그룹의 이름이 null이거나 비어있다면 IllegalArgumentException을 발생시킨다.")
     @ParameterizedTest
     @NullAndEmptySource
     void create_menu_group_whit_null_or_empty_name(final String name) {
