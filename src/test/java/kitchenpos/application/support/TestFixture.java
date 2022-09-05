@@ -149,7 +149,7 @@ public class TestFixture {
         menu.setId(SECOND_MENU_ID);
         menu.setName(SECOND_MENU_NAME);
         menu.setPrice(SECOND_MENU_PRICE);
-        MenuGroup menuGroup = createFirstMenuGroup();
+        MenuGroup menuGroup = createSecondMenuGroup();
         menu.setMenuGroupId(menuGroup.getId());
         menu.setMenuProducts(createSecondMenuProducts());
         menu.setDisplayed(true);

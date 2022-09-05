@@ -92,14 +92,19 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(menu));
     }
 
-
-    @DisplayName("메뉴의 속한 상품의 가격보다 등록하려는 가격이 작으면 IllegalArgumentException를 발생시킨다")
+    @DisplayName("메뉴의 속한 상품의 가격보다 등록하려는 가격이 크다면 IllegalArgumentException를 발생시킨다")
     @Test
     void create_menu_with_lower_price() {
         given(menuGroupRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(TestFixture.createFirstMenuGroup()));
+        given(productRepository.findAllByIdIn(Mockito.any(List.class)))
+                .willReturn(TestFixture.createFirstMenuProducts());
+        Product product = TestFixture.createFirstProduct();
+        product.setPrice(BigDecimal.ONE);
+        given(productRepository.findById(Mockito.any(UUID.class)))
+                .willReturn(Optional.of(product));
 
-        Menu menu = TestFixture.createSecondMenu();
+        Menu menu = TestFixture.createFirstMenu();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(menu));
@@ -151,10 +156,16 @@ class MenuServiceTest {
     void create_menu_with_zero_quantity_menu_product(final long quantity) {
         given(menuGroupRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(TestFixture.createFirstMenuGroup()));
-        List<MenuProduct> menuProducts = TestFixture.createFirstMenuProducts();
-        menuProducts.get(0).setQuantity(quantity);
+        given(productRepository.findAllByIdIn(Mockito.any()))
+                .willReturn(List.of(TestFixture.createFirstProduct()));
 
-        final Menu menu = TestFixture.createFirstMenu();
+        List<MenuProduct> menuProducts = TestFixture.createFirstMenuProducts();
+        menuProducts.stream()
+                .forEach(menuProduct -> menuProduct.setQuantity(quantity));
+
+        Menu menu = TestFixture.createFirstMenu();
+        menu.setMenuProducts(menuProducts);
+
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(menu));
     }
@@ -185,7 +196,7 @@ class MenuServiceTest {
     }
 
 
-    @DisplayName("메뉴에 속한 상품의 총 가격의 합보다 변경하려는 가격이 크다면 IllegalArgumentException을 발생시킨다")
+    @DisplayName("메뉴에 속한 개별 상품의 가격보다 변경하려는 가격이 크다면 IllegalArgumentException을 발생시킨다")
     @Test
     void change_price_bigger_than_contains_products() {
         given(menuRepository.findById(Mockito.any(UUID.class)))
