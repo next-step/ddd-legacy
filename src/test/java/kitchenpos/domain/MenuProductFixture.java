@@ -10,4 +10,10 @@ public class MenuProductFixture {
         menuProduct.setQuantity(quantity);
         return menuProduct;
     }
+
+    public static MenuProduct MenuProductWithProduct(Product product, int quantity) {
+        MenuProduct menuProduct = MenuProduct(product.getId(), quantity);
+        menuProduct.setProduct(product);
+        return menuProduct;
+    }
 }

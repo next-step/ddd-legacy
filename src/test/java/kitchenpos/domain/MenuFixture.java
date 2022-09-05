@@ -15,6 +15,13 @@ public class MenuFixture {
         return menu;
     }
 
+    public static Menu MenuWithUUIDAndMenuGroup(String name, int price, MenuGroup menuGroup, MenuProduct... menuProducts) {
+        Menu menu = Menu(name, price, menuGroup.getId(), menuProducts);
+        menu.setId(UUID.randomUUID());
+        menu.setMenuGroup(menuGroup);
+        return menu;
+    }
+
     public static Menu MenuWithoutMenuProducts(String name, int price, UUID menuGroupId) {
         Menu menu = new Menu();
         menu.setName(name);
