@@ -28,6 +28,7 @@ import java.util.UUID;
 import static kitchenpos.application.Fixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -210,11 +211,13 @@ class OrderServiceTest {
         Order saved = orderService.create(request);
 
         // then
-        assertThat(saved.getId()).isNotNull();
-        assertThat(saved.getType()).isEqualTo(OrderType.EAT_IN);
-        assertThat(saved.getStatus()).isEqualTo(OrderStatus.WAITING);
-        assertThat(saved.getOrderDateTime()).isNotNull();
-        assertThat(saved.getOrderLineItems()).hasSize(1);
+        assertAll(
+                () -> assertThat(saved.getId()).isNotNull(),
+                () -> assertThat(saved.getType()).isEqualTo(OrderType.EAT_IN),
+                () -> assertThat(saved.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(saved.getOrderDateTime()).isNotNull(),
+                () -> assertThat(saved.getOrderLineItems()).hasSize(1)
+        );
     }
 
     @DisplayName("배송 주문 성공 케이스")
@@ -239,11 +242,13 @@ class OrderServiceTest {
         Order saved = orderService.create(request);
 
         // then
-        assertThat(saved.getId()).isNotNull();
-        assertThat(saved.getType()).isEqualTo(OrderType.DELIVERY);
-        assertThat(saved.getStatus()).isEqualTo(OrderStatus.WAITING);
-        assertThat(saved.getOrderDateTime()).isNotNull();
-        assertThat(saved.getOrderLineItems()).hasSize(1);
+        assertAll(
+                () -> assertThat(saved.getId()).isNotNull(),
+                () -> assertThat(saved.getType()).isEqualTo(OrderType.DELIVERY),
+                () -> assertThat(saved.getStatus()).isEqualTo(OrderStatus.WAITING),
+                () -> assertThat(saved.getOrderDateTime()).isNotNull(),
+                () -> assertThat(saved.getOrderLineItems()).hasSize(1)
+        );
     }
 
     @ParameterizedTest(name = "대기중인 주문만 수락할 수 있다. source = {0}")
@@ -366,8 +371,10 @@ class OrderServiceTest {
         Order completedOrder = orderService.complete(order.getId());
 
         // then
-        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-        assertThat(orderTable.getNumberOfGuests()).isZero();
-        assertThat(orderTable.isOccupied()).isFalse();
+        assertAll(
+                () -> assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                () -> assertThat(orderTable.getNumberOfGuests()).isZero(),
+                () -> assertThat(orderTable.isOccupied()).isFalse()
+        );
     }
 }
