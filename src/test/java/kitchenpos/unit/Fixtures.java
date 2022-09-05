@@ -60,7 +60,7 @@ public class Fixtures {
         return menu;
     }
 
-    static OrderLineItem anOrderLineItem(Menu menu, int quantity) {
+    public static OrderLineItem anOrderLineItem(Menu menu, int quantity) {
         OrderLineItem oli = new OrderLineItem();
         oli.setMenu(menu);
         oli.setQuantity(quantity);
@@ -68,15 +68,15 @@ public class Fixtures {
         return oli;
     }
 
-    static OrderTable anOrderTable(boolean occupied) {
+    public static OrderTable anOrderTable(boolean occupied) {
         return anOrderTable("1번 테이블", occupied);
     }
 
-    static OrderTable anOrderTable(String name, boolean occupied) {
+    public static OrderTable anOrderTable(String name, boolean occupied) {
         return anOrderTable(name, occupied, 0);
     }
 
-    static OrderTable anOrderTable(String name, boolean occupied, int numberOfGuests) {
+    public static OrderTable anOrderTable(String name, boolean occupied, int numberOfGuests) {
         OrderTable orderTable = new OrderTable();
         orderTable.setName(name);
         orderTable.setOccupied(occupied);
@@ -92,7 +92,7 @@ public class Fixtures {
         return order;
     }
 
-    static Order anEatInOrder(OrderTable orderTable, OrderLineItem... orderLineItems) {
+    public static Order anEatInOrder(OrderTable orderTable, OrderLineItem... orderLineItems) {
         Order order = new Order();
         order.setType(OrderType.EAT_IN);
         order.setOrderLineItems(List.of(orderLineItems));

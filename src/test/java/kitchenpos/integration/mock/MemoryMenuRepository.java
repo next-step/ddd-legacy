@@ -12,7 +12,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MemoryMenuRepository implements MenuRepository {
-
     private static final Map<UUID, Menu> STORE = new HashMap<>();
 
     @Override

@@ -2,14 +2,19 @@ package kitchenpos.integration;
 
 import kitchenpos.application.MenuGroupService;
 import kitchenpos.application.MenuService;
+import kitchenpos.application.OrderTableService;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.domain.ProfanityChecker;
 import kitchenpos.integration.mock.FakeProfanityChecker;
 import kitchenpos.integration.mock.MemoryMenuGroupRepository;
 import kitchenpos.integration.mock.MemoryMenuRepository;
+import kitchenpos.integration.mock.MemoryOrderRepository;
+import kitchenpos.integration.mock.MemoryOrderTableRepository;
 import kitchenpos.integration.mock.MemoryProductRepository;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +38,11 @@ public class TestConfig {
     }
 
     @Bean
+    OrderTableService orderTableService() {
+        return new OrderTableService(orderTableRepository(), orderRepository());
+    }
+
+    @Bean
     MenuGroupRepository menuGroupRepository() {
         return new MemoryMenuGroupRepository();
     }
@@ -45,6 +55,16 @@ public class TestConfig {
     @Bean
     ProductRepository productRepository() {
         return new MemoryProductRepository();
+    }
+
+    @Bean
+    OrderTableRepository orderTableRepository() {
+        return new MemoryOrderTableRepository();
+    }
+
+    @Bean
+    OrderRepository orderRepository() {
+        return new MemoryOrderRepository();
     }
 
     @Bean
