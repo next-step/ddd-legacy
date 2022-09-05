@@ -18,6 +18,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.AdditionalAnswers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -135,9 +136,6 @@ class OrderServiceTest {
         @Nested
         class EatIn {
 
-            @Captor
-            private ArgumentCaptor<Order> captor;
-
             @DisplayName("주문이 등록된다.")
             @Test
             void create() {
@@ -148,13 +146,10 @@ class OrderServiceTest {
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
                 given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+                given(orderRepository.save(any())).will(AdditionalAnswers.returnsFirstArg());
 
                 // when
-                orderService.create(request);
-
-                // then
-                then(orderRepository).should().save(captor.capture());
-                Order result = captor.getValue();
+                final Order result = orderService.create(request);
 
                 assertAll(() -> {
                     assertThat(result.getId()).isNotNull();
@@ -186,9 +181,6 @@ class OrderServiceTest {
         @Nested
         class Takeout {
 
-            @Captor
-            private ArgumentCaptor<Order> captor;
-
             @DisplayName("주문이 등록된다.")
             @Test
             void create() {
@@ -198,14 +190,12 @@ class OrderServiceTest {
                 final Menu menu = MenuStub.createDefault();
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+                given(orderRepository.save(any())).will(AdditionalAnswers.returnsFirstArg());
 
                 // when
-                orderService.create(request);
+                final Order result = orderService.create(request);
 
                 // then
-                then(orderRepository).should().save(captor.capture());
-                Order result = captor.getValue();
-
                 assertAll(() -> {
                     assertThat(result.getId()).isNotNull();
                     assertThat(result.getType()).isEqualTo(OrderType.TAKEOUT);
@@ -234,9 +224,6 @@ class OrderServiceTest {
         @Nested
         class Delivery {
 
-            @Captor
-            private ArgumentCaptor<Order> captor;
-
             @DisplayName("주문이 등록된다.")
             @Test
             void create() {
@@ -246,14 +233,12 @@ class OrderServiceTest {
                 final Menu menu = MenuStub.createDefault();
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+                given(orderRepository.save(any())).will(AdditionalAnswers.returnsFirstArg());
 
                 // when
-                orderService.create(request);
+                final Order result = orderService.create(request);
 
                 // then
-                then(orderRepository).should().save(captor.capture());
-                Order result = captor.getValue();
-
                 assertAll(() -> {
                     assertThat(result.getId()).isNotNull();
                     assertThat(result.getType()).isEqualTo(OrderType.DELIVERY);
