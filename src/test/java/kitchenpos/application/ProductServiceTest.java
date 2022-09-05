@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
@@ -22,6 +23,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -64,14 +70,17 @@ class ProductServiceTest {
     assertThat(savedProduct.getPrice()).isEqualTo(product.getPrice());
   }
 
+
+
   @DisplayName("상품 가격은 0원 보다 작을 수 없다")
-  @Test
-  void givenNotValidPrice_whenCreate_thenIllegalArgumentException() {
+  @MethodSource("provideBigDecimalsForNullAndNegative")
+  @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
+  void givenNotValidPrice_whenCreate_thenIllegalArgumentException(BigDecimal price) {
     // given
     Product product = new Product();
     product.setId(UUID.randomUUID());
     product.setName("후라이드치킨");
-    product.setPrice(BigDecimal.valueOf(-1));
+    product.setPrice(price);
 
     // when & then
     assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
@@ -140,8 +149,9 @@ class ProductServiceTest {
   }
 
   @DisplayName("상품 가격 변경할 상품 가격은 0원 보다 작을 수 없다")
-  @Test
-  void givenNotValidPrice_whenChangePrice_thenIllegalArgumentException() {
+  @MethodSource("provideBigDecimalsForNullAndNegative")
+  @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
+  void givenNotValidPrice_whenChangePrice_thenIllegalArgumentException(BigDecimal price) {
     // given
     Product product = new Product();
     product.setId(UUID.randomUUID());
@@ -149,7 +159,7 @@ class ProductServiceTest {
     product.setPrice(BigDecimal.valueOf(11000));
 
     Product changePriceProduct = new Product();
-    changePriceProduct.setPrice(BigDecimal.valueOf(-1));
+    changePriceProduct.setPrice(price);
 
     // when & then
     assertThatIllegalArgumentException().isThrownBy(
@@ -193,5 +203,12 @@ class ProductServiceTest {
     assertThat(products).extracting(Product::getName).contains("후라이드치킨", "양념치킨");
     assertThat(products).extracting(Product::getPrice)
         .contains(BigDecimal.valueOf(11000), BigDecimal.valueOf(12000));
+  }
+
+  private static Stream<Arguments> provideBigDecimalsForNullAndNegative() {
+    return Stream.of(
+        null,
+        Arguments.of(BigDecimal.valueOf(-1))
+    );
   }
 }
