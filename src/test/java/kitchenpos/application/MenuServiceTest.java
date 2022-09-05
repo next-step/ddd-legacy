@@ -162,7 +162,7 @@ class MenuServiceTest {
 
   @DisplayName("요청 메뉴상품이 없거나 비어있을 수 없다.")
   @NullAndEmptySource
-  @ParameterizedTest
+  @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
   void givenEmptyMenuProduct_whenCreate_thenNoSuchElementException(List<MenuProduct> menuProducts) {
     // given
     MenuGroup menuGroup = createMenuGroup("추천메뉴");
@@ -251,7 +251,7 @@ class MenuServiceTest {
     // given
     MenuGroup menuGroup = createMenuGroup("추천메뉴");
     Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
-    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12500));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
     List<MenuProduct> menuProducts = List.of(
         createMenuProduct(product1, 1),
         createMenuProduct(product2, 1)
@@ -281,7 +281,7 @@ class MenuServiceTest {
 
   @DisplayName("메뉴 이름은 비어있을 수 없다.")
   @NullSource
-  @ParameterizedTest
+  @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
   void givenEmptyName_whenCreate_thenNoSuchElementException(String name) {
     // given
     MenuGroup menuGroup = createMenuGroup("추천메뉴");
