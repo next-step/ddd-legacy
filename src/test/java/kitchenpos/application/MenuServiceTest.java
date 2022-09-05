@@ -353,21 +353,30 @@ class MenuServiceTest {
         @Test
         void menuPriceMustLessThanOrEqualToProductSumPrice() {
             // given
-            final var targetMenuPrice = new BigDecimal(4000);
-            final var productPrice = new BigDecimal(2000);
-            final var productQuantity = 1L;
+            final var targetMenuPrice = new BigDecimal(10_000);
+            final var product1Price = new BigDecimal(1_000);
+            final var product1Quantity = 1L;
+            final var product2Price = new BigDecimal(1_000);
+            final var product2Quantity = 3L;
 
             final var menuId = UUID.fromString("11111111-1111-1111-1111-111111111111");
             final var request = new Menu();
             request.setPrice(targetMenuPrice);
 
-            final var productInMenu = new Product();
-            productInMenu.setPrice(productPrice);
-            final var menuProduct = new MenuProduct();
-            menuProduct.setProduct(productInMenu);
-            menuProduct.setQuantity(productQuantity);
+            final var product1 = new Product();
+            product1.setPrice(product1Price);
+            final var menuProduct1 = new MenuProduct();
+            menuProduct1.setProduct(product1);
+            menuProduct1.setQuantity(product1Quantity);
+
+            final var product2 = new Product();
+            product2.setPrice(product2Price);
+            final var menuProduct2 = new MenuProduct();
+            menuProduct2.setProduct(product2);
+            menuProduct2.setQuantity(product2Quantity);
+
             final var menuInRepo = new Menu();
-            menuInRepo.setMenuProducts(List.of(menuProduct));
+            menuInRepo.setMenuProducts(List.of(menuProduct2));
             given(menuRepository.findById(menuId)).willReturn(Optional.of(menuInRepo));
 
             // when
