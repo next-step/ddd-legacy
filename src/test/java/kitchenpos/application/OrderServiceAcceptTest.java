@@ -44,8 +44,7 @@ class OrderServiceAcceptTest extends OrderServiceTestSupport {
     void shouldBeWaiting(OrderStatus statusBeforeAccepted) {
         //given
         final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        final var order = new Order();
-        order.setStatus(statusBeforeAccepted);
+        final var order = createOrderWithStatus(statusBeforeAccepted);
 
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 

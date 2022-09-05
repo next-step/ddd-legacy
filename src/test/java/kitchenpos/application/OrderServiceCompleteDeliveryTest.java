@@ -3,7 +3,6 @@ package kitchenpos.application;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderType;
 import org.junit.jupiter.api.DisplayName;
@@ -37,9 +36,7 @@ public class OrderServiceCompleteDeliveryTest extends OrderServiceTestSupport {
     void shouldBeDeliveryType(OrderType type) {
         // given
         final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        final var order = new Order();
-        order.setType(type);
-        order.setStatus(OrderStatus.DELIVERING);
+        final var order = createOrderBy(type, OrderStatus.DELIVERING);
 
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
@@ -55,9 +52,7 @@ public class OrderServiceCompleteDeliveryTest extends OrderServiceTestSupport {
     void shouldBeDelivering(OrderStatus statusBeforeDeliveryCompleted) {
         //given
         final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        final var order = new Order();
-        order.setType(OrderType.DELIVERY);
-        order.setStatus(statusBeforeDeliveryCompleted);
+        final var order = createOrderBy(OrderType.DELIVERY, statusBeforeDeliveryCompleted);
 
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
@@ -72,9 +67,7 @@ public class OrderServiceCompleteDeliveryTest extends OrderServiceTestSupport {
     void completeDelivery() {
         // given
         final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        final var order = new Order();
-        order.setType(OrderType.DELIVERY);
-        order.setStatus(OrderStatus.DELIVERING);
+        final var order = createOrderBy(OrderType.DELIVERY, OrderStatus.DELIVERING);
 
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 

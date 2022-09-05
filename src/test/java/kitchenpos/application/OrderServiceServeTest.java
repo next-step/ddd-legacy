@@ -3,7 +3,6 @@ package kitchenpos.application;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
-import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,8 +35,7 @@ public class OrderServiceServeTest extends OrderServiceTestSupport {
     void shouldBeWaiting(OrderStatus statusBeforeServed) {
         //given
         final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        final var order = new Order();
-        order.setStatus(statusBeforeServed);
+        final var order = createOrderWithStatus(statusBeforeServed);
 
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
@@ -52,8 +50,7 @@ public class OrderServiceServeTest extends OrderServiceTestSupport {
     void serve() {
         //given
         final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        final var order = new Order();
-        order.setStatus(OrderStatus.ACCEPTED);
+        final var order = createOrderWithStatus(OrderStatus.ACCEPTED);
 
         given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 

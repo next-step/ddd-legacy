@@ -44,9 +44,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
         void shouldBeDeliveredStatus(OrderStatus statusBeforeCompleted) {
             // given
             final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            final var order = new Order();
-            order.setType(OrderType.DELIVERY);
-            order.setStatus(statusBeforeCompleted);
+            final var order = createOrderBy(OrderType.DELIVERY, statusBeforeCompleted);
 
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
@@ -61,9 +59,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
         void complete() {
             // given
             final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            final var order = new Order();
-            order.setType(OrderType.DELIVERY);
-            order.setStatus(OrderStatus.DELIVERED);
+            final var order = createOrderBy(OrderType.DELIVERY, OrderStatus.DELIVERED);
 
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
@@ -84,9 +80,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
         void shouldBeServedStatus(OrderStatus statusBeforeCompleted) {
             // given
             final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            final var order = new Order();
-            order.setType(OrderType.TAKEOUT);
-            order.setStatus(statusBeforeCompleted);
+            final var order = createOrderBy(OrderType.TAKEOUT, statusBeforeCompleted);
 
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
@@ -101,9 +95,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
         void complete() {
             // given
             final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            final var order = new Order();
-            order.setType(OrderType.TAKEOUT);
-            order.setStatus(OrderStatus.SERVED);
+            final var order = createOrderBy(OrderType.TAKEOUT, OrderStatus.SERVED);
 
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
@@ -128,9 +120,7 @@ public class OrderServiceCompleteTest extends OrderServiceTestSupport {
             orderTable.setNumberOfGuests(3);
 
             final var orderId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-            final var order = new Order();
-            order.setType(OrderType.EAT_IN);
-            order.setStatus(statusBeforeCompleted);
+            final var order = createOrderBy(OrderType.EAT_IN, statusBeforeCompleted);
 
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
