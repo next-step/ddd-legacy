@@ -168,4 +168,30 @@ class ProductServiceTest {
         .isInstanceOf(NoSuchElementException.class);
 
   }
+
+  @DisplayName("상품조회 - 등록된 상품 목록을 조회할 수 있다.")
+  @Test
+  void givenProduct_whenFindAll_thenReturnProducts() {
+    // given
+    Product product1 = new Product();
+    product1.setId(UUID.randomUUID());
+    product1.setName("후라이드치킨");
+    product1.setPrice(BigDecimal.valueOf(11000));
+
+    Product product2 = new Product();
+    product2.setId(UUID.randomUUID());
+    product2.setName("양념치킨");
+    product2.setPrice(BigDecimal.valueOf(12000));
+
+    given(productService.findAll()).willReturn(List.of(product1, product2));
+
+    // when
+    List<Product> products = productService.findAll();
+
+    // then
+    assertThat(products).hasSize(2);
+    assertThat(products).extracting(Product::getName).contains("후라이드치킨", "양념치킨");
+    assertThat(products).extracting(Product::getPrice)
+        .contains(BigDecimal.valueOf(11000), BigDecimal.valueOf(12000));
+  }
 }
