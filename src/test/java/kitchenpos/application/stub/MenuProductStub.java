@@ -16,6 +16,13 @@ public class MenuProductStub {
         return menuProduct;
     }
 
+    public static MenuProduct createRequest(final Long quantity) {
+        final MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProductId(ProductStub.createDefault().getId());
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
+
     public static MenuProduct of(final Product product) {
         final MenuProduct menuProduct = new MenuProduct();
         menuProduct.setSeq(DEFAULT_SEQ);
