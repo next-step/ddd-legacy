@@ -626,6 +626,44 @@ class MenuServiceTest {
         .isInstanceOf(NoSuchElementException.class);
   }
 
+  @DisplayName("등록된 메뉴 목록을 조회할 수 있다.")
+  @Test
+  void givenProduct_whenFindAll_thenReturnProducts() {
+    // given
+    Menu menu1 = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23000),
+        true,
+        createMenuGroup("추천메뉴"),
+        List.of(
+            createMenuProduct(createProduct("후라이드치킨", BigDecimal.valueOf(11000)), 1),
+            createMenuProduct(createProduct("양념치킨", BigDecimal.valueOf(12000)), 1)
+        )
+    );
+
+    Menu menu2 = createMenu(
+        "간장치킨 + 마늘치킨",
+        BigDecimal.valueOf(26000),
+        true,
+        createMenuGroup("치맥추천메뉴"),
+        List.of(
+            createMenuProduct(createProduct("간장치킨", BigDecimal.valueOf(13000)), 1),
+            createMenuProduct(createProduct("마늘치킨", BigDecimal.valueOf(13000)), 1)
+        )
+    );
+
+    given(menuRepository.findAll()).willReturn(List.of(menu1, menu2));
+
+    // when
+    List<Menu> menus = menuService.findAll();
+
+    // then
+    assertThat(menus).hasSize(2);
+    assertThat(menus).extracting(Menu::getName).contains("후라이드 + 양념치킨", "간장치킨 + 마늘치킨");
+    assertThat(menus).extracting(Menu::getPrice)
+        .contains(BigDecimal.valueOf(26000), BigDecimal.valueOf(23000));
+  }
+
   private static Menu createMenu(
       String name,
       BigDecimal price,
