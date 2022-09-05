@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -22,6 +24,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -100,6 +105,31 @@ class MenuServiceTest {
     assertThat(createdMenu.getMenuProducts()).containsAll(menuProducts);
   }
 
+  @DisplayName("메뉴 가격은 0원 보다 작을 수 없다.")
+  @MethodSource("provideBigDecimalsForNullAndNegative")
+  @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
+  void givenNotValidPrice_whenCreate_thenIllegalArgumentException(BigDecimal price) {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
+    List<MenuProduct> menuProducts = List.of(
+        createMenuProduct(product1, 1),
+        createMenuProduct(product2, 1)
+    );
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        price,
+        true,
+        menuGroup,
+        menuProducts
+    );
+
+    // when & then
+    assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
+  }
+
   private static Menu createMenu(
       String name,
       BigDecimal price,
@@ -141,4 +171,10 @@ class MenuServiceTest {
     return product;
   }
 
+  private static Stream<Arguments> provideBigDecimalsForNullAndNegative() {
+    return Stream.of(
+        null,
+        Arguments.of(BigDecimal.valueOf(-1))
+    );
+  }
 }
