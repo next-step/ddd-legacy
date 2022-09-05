@@ -29,7 +29,7 @@ public class Fixtures {
         return product;
     }
 
-    static MenuProduct aChickenMenuProduct(int price, int quantity) {
+    public static MenuProduct aChickenMenuProduct(int price, int quantity) {
         return aMenuProduct(aChickenProduct(price), quantity);
     }
 
@@ -41,18 +41,22 @@ public class Fixtures {
         return menuProduct;
     }
 
-    static Menu aManWonChickenMenu(int price) {
+    public static Menu aManWonChickenMenu(int price) {
         return aMenu("후라이드 치킨", price, aChickenMenuProduct(1, 10_000));
     }
 
     public static Menu aMenu(String name, int price, MenuProduct... menuProducts) {
+        return aMenu(name, price, aMenuGroup(), menuProducts);
+    }
+
+    public static Menu aMenu(String name, int price, MenuGroup menuGroup, MenuProduct... menuProducts) {
         Menu menu = new Menu();
         menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(price));
         menu.setMenuProducts(List.of(menuProducts));
         menu.setDisplayed(true);
-        menu.setMenuGroup(aMenuGroup());
-        menu.setMenuGroupId(aMenuGroup().getId());
+        menu.setMenuGroup(menuGroup);
+        menu.setMenuGroupId(menuGroup.getId());
         return menu;
     }
 

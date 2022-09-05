@@ -1,6 +1,7 @@
 package kitchenpos.integration;
 
 import kitchenpos.application.MenuGroupService;
+import kitchenpos.application.MenuService;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
@@ -23,11 +24,12 @@ public class TestConfig {
 
     @Bean
     ProductService productService() {
-        return new ProductService(
-                productRepository(),
-                menuRepository(),
-                profanityChecker()
-        );
+        return new ProductService(productRepository(), menuRepository(), profanityChecker());
+    }
+
+    @Bean
+    MenuService menuService() {
+        return new MenuService(menuRepository(), menuGroupRepository(), productRepository(), profanityChecker());
     }
 
     @Bean

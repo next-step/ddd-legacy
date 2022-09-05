@@ -77,6 +77,7 @@ class MenuServiceTest {
         MenuGroup menuGroup = aMenuGroup();
         Menu request = aManWonChickenMenu(10_000);
         request.setMenuGroupId(menuGroup.getId());
+        request.setMenuProducts(Collections.emptyList());
 
         when(menuGroupRepository.findById(menuGroup.getId())).thenReturn(Optional.of(menuGroup));
 
