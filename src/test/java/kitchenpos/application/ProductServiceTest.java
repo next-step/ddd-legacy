@@ -2,12 +2,14 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
@@ -154,4 +156,16 @@ class ProductServiceTest {
         () -> productService.changePrice(product.getId(), changePriceProduct));
   }
 
+  @DisplayName("상품가격을 변경할 상품이 존재하지 않으면 상품 가격을 변경할 수 없다")
+  @Test
+  void givenNoSuchProduct_whenChangePrice_thenNoSuchElementException() {
+    // given
+    Product changePriceProduct = new Product();
+    changePriceProduct.setPrice(BigDecimal.valueOf(11000));
+
+    // when & then
+    assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), changePriceProduct))
+        .isInstanceOf(NoSuchElementException.class);
+
+  }
 }
