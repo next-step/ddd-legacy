@@ -1,15 +1,12 @@
 package kitchenpos.application;
 
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.MenuGroup;
@@ -56,7 +53,7 @@ class MenuGroupServiceTest {
         menuGroup.setName(name);
 
         assertThatIllegalArgumentException().isThrownBy(() ->
-            menuGroupService.create(menuGroup)
+                menuGroupService.create(menuGroup)
         );
     }
 
@@ -91,8 +88,8 @@ class MenuGroupServiceTest {
         final List<MenuGroup> menuGroups = menuGroupService.findAll();
 
         assertAll(
-                ()-> assertThat(menuGroups.size()).isEqualTo(2),
-                ()-> assertThat(menuGroups).contains(menuGroup1, menuGroup2)
+                () -> assertThat(menuGroups.size()).isEqualTo(2),
+                () -> assertThat(menuGroups).contains(menuGroup1, menuGroup2)
         );
     }
 
