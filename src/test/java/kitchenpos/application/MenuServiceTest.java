@@ -98,15 +98,16 @@ class MenuServiceTest {
                 .willReturn(Optional.of(TestFixture.createFirstMenuGroup()));
         given(productRepository.findAllByIdIn(Mockito.any(List.class)))
                 .willReturn(TestFixture.createFirstMenuProducts());
-        Product product = TestFixture.createFirstProduct();
-        product.setPrice(BigDecimal.ONE);
+        
+        Product product_price_1 = TestFixture.createFirstProduct();
+        product_price_1.setPrice(BigDecimal.ONE);
         given(productRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(product));
+                .willReturn(Optional.of(product_price_1));
 
-        Menu menu = TestFixture.createFirstMenu();
+        Menu menu_price_10 = TestFixture.createFirstMenu();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(menu));
+                .isThrownBy(() -> menuService.create(menu_price_10));
     }
 
     @DisplayName("메뉴의 이름이 null이거나 비어있다면 IllegalArgumentException을 발생시킨다")
