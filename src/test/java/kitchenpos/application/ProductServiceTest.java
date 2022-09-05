@@ -46,7 +46,6 @@ class ProductServiceTest {
     product.setId(UUID.randomUUID());
     product.setName("후라이드치킨");
     product.setPrice(BigDecimal.valueOf(11000));
-
     given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
     given(productRepository.save(any(Product.class))).willReturn(product);
 
@@ -79,6 +78,20 @@ class ProductServiceTest {
     Product product = new Product();
     product.setId(UUID.randomUUID());
     product.setPrice(BigDecimal.valueOf(11000));
+
+    // when & then
+    assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
+  }
+
+  @DisplayName("상품 이름에는 비속어를 포함할 수 없다.")
+  @Test
+  void givenProfanityName_whenCreate_thenIllegalArgumentException() {
+    // given
+    Product product = new Product();
+    product.setId(UUID.randomUUID());
+    product.setName("Shit");
+    product.setPrice(BigDecimal.valueOf(11000));
+    given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
 
     // when & then
     assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
