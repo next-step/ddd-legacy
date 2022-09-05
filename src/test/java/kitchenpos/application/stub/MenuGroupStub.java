@@ -15,9 +15,8 @@ public class MenuGroupStub {
         return menuGroup;
     }
 
-    public static MenuGroup create(final String name) {
+    public static MenuGroup createRequest(final String name) {
         MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
         menuGroup.setName(name);
         return menuGroup;
     }

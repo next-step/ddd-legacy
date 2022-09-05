@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -34,16 +35,16 @@ class MenuGroupServiceTest {
         @Test
         void createdMenuGroup() {
             // given
-            final MenuGroup request = MenuGroupStub.create("추천메뉴");
-
-            given(menuGroupRepository.save(any())).willReturn(request);
+            final MenuGroup request = MenuGroupStub.createRequest("추천메뉴");
+            given(menuGroupRepository.save(any())).will(AdditionalAnswers.returnsFirstArg());
 
             // when
-            MenuGroup menuGroup = menuGroupService.create(request);
+            MenuGroup result = menuGroupService.create(request);
 
             // then
             assertAll(() -> {
-                assertThat(menuGroup.getName()).isEqualTo("추천메뉴");
+                assertThat(result.getId()).isNotNull();
+                assertThat(result.getName()).isEqualTo("추천메뉴");
             });
         }
 
@@ -51,7 +52,7 @@ class MenuGroupServiceTest {
         @Test
         void null_name() {
             // given
-            final MenuGroup request = MenuGroupStub.create(null);
+            final MenuGroup request = MenuGroupStub.createRequest(null);
 
             // then
             assertThatThrownBy(() -> menuGroupService.create(request)).isInstanceOf(IllegalArgumentException.class);
