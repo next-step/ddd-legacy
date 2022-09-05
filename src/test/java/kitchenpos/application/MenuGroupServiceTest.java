@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.application.support.TestFixture;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -24,8 +25,6 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
-    private final static UUID MENU_GROUP_FIRST_ID = UUID.randomUUID();
-    private final static UUID MENU_GROUP_SECOND_ID = UUID.randomUUID();
 
     @Mock
     private MenuGroupRepository menuGroupRepository;
@@ -33,20 +32,12 @@ class MenuGroupServiceTest {
     @InjectMocks
     private MenuGroupService menuGroupService;
 
-    private MenuGroup createMenuGroup(final UUID ID, final String name) {
-        MenuGroup menuGroup = new MenuGroup();
-
-        menuGroup.setId(ID);
-        menuGroup.setName(name);
-
-        return menuGroup;
-    }
-
     @DisplayName("메뉴 그룹 생성")
     @ParameterizedTest
     @ValueSource(strings = {"menu Group", "proper name", "test name"})
     void create_menu_group(final String name) {
-        final MenuGroup menuGroup = createMenuGroup(MENU_GROUP_FIRST_ID, name);
+        final MenuGroup menuGroup = TestFixture.createFirstMenuGroup();
+        menuGroup.setName(name);
 
         given(menuGroupRepository.save(Mockito.any(MenuGroup.class)))
                 .willReturn(menuGroup);
@@ -61,7 +52,8 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void create_menu_group_whit_null_or_empty_name(final String name) {
-        final MenuGroup menuGroup = createMenuGroup(MENU_GROUP_FIRST_ID, name);
+        final MenuGroup menuGroup = TestFixture.createFirstMenuGroup();
+        menuGroup.setName(name);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuGroupService.create(menuGroup));
@@ -70,10 +62,10 @@ class MenuGroupServiceTest {
     @DisplayName("생성된 메뉴 그룹은 조회가 가능하다")
     @Test
     void select_all_menu_group() {
-        final MenuGroup chickenGroup = createMenuGroup(MENU_GROUP_FIRST_ID, "치킨");
-        final MenuGroup beerGroup = createMenuGroup(MENU_GROUP_SECOND_ID, "맥주");
+        final MenuGroup firstMenuGroup = TestFixture.createFirstMenuGroup();
+        final MenuGroup secondMenuGroup = TestFixture.createSecondMenuGroup();
 
-        final List<MenuGroup> menuGroupList = Arrays.asList(chickenGroup, beerGroup);
+        final List<MenuGroup> menuGroupList = Arrays.asList(firstMenuGroup, secondMenuGroup);
 
         given(menuGroupRepository.findAll())
                 .willReturn(menuGroupList);

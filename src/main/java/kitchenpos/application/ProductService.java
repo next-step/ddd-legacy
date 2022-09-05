@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import io.micrometer.core.instrument.util.StringUtils;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class ProductService {
             throw new IllegalArgumentException();
         }
         final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
+        if (StringUtils.isBlank(name) || purgomalumClient.containsProfanity(name)) {
             throw new IllegalArgumentException();
         }
         final Product product = new Product();
