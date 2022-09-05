@@ -23,4 +23,12 @@ public class MenuProductStub {
         menuProduct.setQuantity(DEFAULT_QUANTITY);
         return menuProduct;
     }
+
+    public static MenuProduct create(final Product product, final Long quantity) {
+        final MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq(DEFAULT_SEQ);
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
 }
