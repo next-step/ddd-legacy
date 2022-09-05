@@ -1,74 +1,42 @@
 package kitchenpos.order;
 
 import kitchenpos.AcceptanceTest;
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
-import kitchenpos.domain.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.menu.MenuSteps.메뉴_생성_요청;
-import static kitchenpos.menugroup.MenuGroupSteps.메뉴그룹_생성_요청;
+import static kitchenpos.order.OrderLineItemSteps.*;
 import static kitchenpos.order.OrderSteps.*;
 import static kitchenpos.ordertable.OrderTableSteps.주문테이블_생성_요청;
 import static kitchenpos.ordertable.OrderTableSteps.주문테이블에_앉기_요청;
-import static kitchenpos.product.ProductSteps.상품_생성_요청;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("주문")
 class OrderAcceptanceTest extends AcceptanceTest {
-    private UUID 추천메뉴;
-    private UUID 양념치킨;
-    private UUID 후라이드치킨;
-
-    private UUID 후라이드_두마리_메뉴;
-    private UUID 양념_두마리_메뉴;
-    private UUID 양념_후라이드_메뉴;
     private UUID 일번테이블;
-
     private OrderLineItem 주문_상품_1번;
     private OrderLineItem 주문_상품_2번;
     private OrderLineItem 보이지_않는_주문_상품;
+    private OrderLineItem 음수_개수_주문_상품;
 
     @BeforeEach
     void init() {
-        // 상품 생성
-        추천메뉴 = 메뉴그룹_생성_요청("추천메뉴").as(MenuGroup.class).getId();
-        양념치킨 = 상품_생성_요청("양념치킨", 19000).as(Product.class).getId();
-        후라이드치킨 = 상품_생성_요청("후라이드치킨", 17000).as(Product.class).getId();
+        메뉴그룹_메뉴_메뉴상품_생성();
+        주문_상품_1번 = 후라이드_두마리_2개_주문상품_생성();
+        주문_상품_2번 = 양념_두마리_1개_주문상품_생성();
+        보이지_않는_주문_상품 = 보이지_않는_주문상품_생성();
+        음수_개수_주문_상품 = 음수_개수_주문상품_생성();
 
-        // 상품 메뉴 생성
-        List<MenuProduct> 후라이드치킨_메뉴상품 = List.of(new MenuProduct(2, 후라이드치킨));
-        List<MenuProduct> 양념치킨_메뉴상품 = List.of(new MenuProduct(2, 양념치킨));
-        List<MenuProduct> 반반치킨_메뉴상품 = List.of(new MenuProduct(1, 후라이드치킨), new MenuProduct(1, 양념치킨));
-
-        // 메뉴 생성
-        Menu 메뉴1번 = new Menu("후라이드+후라이드", BigDecimal.valueOf(19000), true, 후라이드치킨_메뉴상품, 추천메뉴);
-        Menu 메뉴2번 = new Menu("양념+양념", BigDecimal.valueOf(19000), true, 양념치킨_메뉴상품, 추천메뉴);
-        Menu 메뉴3번 = new Menu("양념+후라이드", BigDecimal.valueOf(20000), false, 반반치킨_메뉴상품, 추천메뉴);
-        후라이드_두마리_메뉴 = 메뉴_생성_요청(메뉴1번).as(Menu.class).getId();
-        양념_두마리_메뉴 = 메뉴_생성_요청(메뉴2번).as(Menu.class).getId();
-        양념_후라이드_메뉴 = 메뉴_생성_요청(메뉴3번).as(Menu.class).getId();
-
-        // 주문 테이블 생성
         일번테이블 = 주문테이블_생성_요청("1번 테이블").as(OrderTable.class).getId();
-
-        // 주문 상품 생성
-        주문_상품_1번 = new OrderLineItem(2, 후라이드_두마리_메뉴, BigDecimal.valueOf(19000.0));
-        주문_상품_2번 = new OrderLineItem(1, 양념_두마리_메뉴, BigDecimal.valueOf(19000.0));
-        보이지_않는_주문_상품 = new OrderLineItem(1, 양념_후라이드_메뉴, BigDecimal.valueOf(20000));
     }
 
     @DisplayName("주문을 생성한다.")
@@ -106,7 +74,7 @@ class OrderAcceptanceTest extends AcceptanceTest {
     @DisplayName("주문 상품의 개수가 0개 미만이면 주문을 생성할 수 없다.")
     @Test
     void createWithOrderLineItemsNegativeQuantity() {
-        Order 주문 = new Order(OrderType.EAT_IN, List.of(new OrderLineItem(-1, 양념_두마리_메뉴, BigDecimal.valueOf(19000.0))), null, 일번테이블);
+        Order 주문 = new Order(OrderType.EAT_IN, List.of(음수_개수_주문_상품), null, 일번테이블);
 
         assertThat(주문_생성_요청(주문).statusCode())
                 .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -136,7 +104,7 @@ class OrderAcceptanceTest extends AcceptanceTest {
         var 일번테이블 = 주문테이블_생성_요청("1번 테이블");
         주문테이블에_앉기_요청(일번테이블.header("Location"));
 
-        Order 주문 = new Order(OrderType.EAT_IN, List.of(주문_상품_1번), null, 일번테이블.as(OrderTable.class).getId());
+        Order 주문 = new Order(OrderType.EAT_IN, List.of(주문_상품_1번, 주문_상품_2번), null, 일번테이블.as(OrderTable.class).getId());
 
         assertAll(
                 () -> assertThat(주문_생성_요청(주문).statusCode()).isEqualTo(HttpStatus.CREATED.value()),
@@ -150,7 +118,7 @@ class OrderAcceptanceTest extends AcceptanceTest {
     void createEatInOrderNotSit() {
         var 일번테이블 = 주문테이블_생성_요청("1번 테이블");
 
-        Order 주문 = new Order(OrderType.EAT_IN, List.of(주문_상품_1번), null, 일번테이블.as(OrderTable.class).getId());
+        Order 주문 = new Order(OrderType.EAT_IN, List.of(주문_상품_1번, 주문_상품_2번), null, 일번테이블.as(OrderTable.class).getId());
 
         assertThat(주문_생성_요청(주문).statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
