@@ -443,9 +443,9 @@ class MenuServiceTest {
         .isInstanceOf(NoSuchElementException.class);
   }
 
-  @DisplayName("메뉴가격은 메뉴의 포함된 메뉴상품금액(메뉴상품가격 * 수량)의 총액 보다 더 높을 수 없다.")
+  @DisplayName("메뉴가격변경 - 메뉴가격은 메뉴의 포함된 메뉴상품금액(메뉴상품가격 * 수량)의 총액 보다 더 높을 수 없다.")
   @Test
-  void givenNotValidPrice_whenChangePrice_thenReturnChangedMenu() {
+  void givenHighPrice_whenChangePrice_thenIllegalArgumentException() {
     // given
     MenuGroup menuGroup = createMenuGroup("추천메뉴");
     Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
@@ -507,6 +507,60 @@ class MenuServiceTest {
     assertThat(changedMenu.getMenuGroup().getName()).isEqualTo(menuGroup.getName());
     assertThat(changedMenu.getMenuProducts()).hasSize(2);
     assertThat(changedMenu.getMenuProducts()).containsAll(menuProducts);
+  }
+
+  @DisplayName("메뉴가 존재하지 않으면 메뉴를 진열할 수 없다.")
+  @Test
+  void givenNotFoundMenu_whenDisplay_thenNoSuchElementException() {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
+    List<MenuProduct> menuProducts = List.of(
+        createMenuProduct(product1, 1),
+        createMenuProduct(product2, 1)
+    );
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23000),
+        false,
+        menuGroup,
+        menuProducts
+    );
+
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.empty());
+
+    // when & then
+    assertThatThrownBy(() -> menuService.display(menu.getId()))
+        .isInstanceOf(NoSuchElementException.class);
+  }
+
+  @DisplayName("메뉴진열 - 메뉴가격은 메뉴의 포함된 메뉴상품금액(메뉴상품가격 * 수량)의 총액 보다 더 높을 수 없다.")
+  @Test
+  void givenHighPrice_whenDisplay_thenIllegalArgumentException() {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
+    List<MenuProduct> menuProducts = List.of(
+        createMenuProduct(product1, 1),
+        createMenuProduct(product2, 1)
+    );
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23100),
+        true,
+        menuGroup,
+        menuProducts
+    );
+
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> menuService.display(menu.getId()));
   }
 
   private static Menu createMenu(
