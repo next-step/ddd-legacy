@@ -361,11 +361,6 @@ class MenuServiceTest {
         createMenuProduct(product2, 1)
     );
 
-    List<Product> products = List.of(product1, product2);
-    List<UUID> productIds = products.stream()
-        .map(Product::getId)
-        .collect(Collectors.toList());
-
     Menu menu = createMenu(
         "후라이드 + 양념치킨",
         BigDecimal.valueOf(23000),
@@ -388,6 +383,64 @@ class MenuServiceTest {
     assertThat(changedMenu.getPrice()).isEqualTo(changedMenu.getPrice());
     assertThat(changedMenu.isDisplayed()).isEqualTo(menu.isDisplayed());
     assertThat(changedMenu.getMenuGroup().getId()).isEqualTo(menuGroup.getId());
+  }
+
+  @DisplayName("메뉴 가격 변경시 메뉴 가격은 0원 보다 작을 수 없다.")
+  @Test
+  void givenNotValidPrice_whenChangePrice_thenIllegalArgumentException() {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
+    List<MenuProduct> menuProducts = List.of(
+        createMenuProduct(product1, 1),
+        createMenuProduct(product2, 1)
+    );
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23000),
+        true,
+        menuGroup,
+        menuProducts
+    );
+
+    Menu changePriceMenu = new Menu();
+    changePriceMenu.setPrice(BigDecimal.valueOf(-1));
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> menuService.changePrice(menu.getId(), changePriceMenu));
+  }
+
+  @DisplayName("메뉴가 존재하지 않으면 메뉴 가격을 변경할 수 없다.")
+  @Test
+  void givenNotFoundMenu_whenChangePrice_thenNoSuchElementException() {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
+    List<MenuProduct> menuProducts = List.of(
+        createMenuProduct(product1, 1),
+        createMenuProduct(product2, 1)
+    );
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23000),
+        true,
+        menuGroup,
+        menuProducts
+    );
+
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.empty());
+
+    Menu changePriceMenu = new Menu();
+    changePriceMenu.setPrice(BigDecimal.valueOf(22000));
+
+    // when & then
+    assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changePriceMenu))
+        .isInstanceOf(NoSuchElementException.class);
   }
 
   private static Menu createMenu(
