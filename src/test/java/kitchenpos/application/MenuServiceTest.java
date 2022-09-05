@@ -286,7 +286,7 @@ class MenuServiceTest {
     // given
     MenuGroup menuGroup = createMenuGroup("추천메뉴");
     Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
-    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12500));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(120500));
     List<MenuProduct> menuProducts = List.of(
         createMenuProduct(product1, 1),
         createMenuProduct(product2, 1)
@@ -299,7 +299,7 @@ class MenuServiceTest {
 
     Menu menu = createMenu(
         name,
-        BigDecimal.valueOf(23100),
+        BigDecimal.valueOf(23000),
         true,
         menuGroup,
         menuProducts
@@ -320,7 +320,7 @@ class MenuServiceTest {
     // given
     MenuGroup menuGroup = createMenuGroup("추천메뉴");
     Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
-    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12500));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
     List<MenuProduct> menuProducts = List.of(
         createMenuProduct(product1, 1),
         createMenuProduct(product2, 1)
@@ -333,7 +333,7 @@ class MenuServiceTest {
 
     Menu menu = createMenu(
         "Shit",
-        BigDecimal.valueOf(23100),
+        BigDecimal.valueOf(23000),
         true,
         menuGroup,
         menuProducts
@@ -347,6 +347,47 @@ class MenuServiceTest {
 
     // when & then
     assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
+  }
+
+  @DisplayName("메뉴 가격은 메뉴ID와 변경할 메뉴가격 정보를 입력하여 변경할 수 있다.")
+  @Test
+  void givenChangePrice_whenChangePrice_thenReturnChangedMenu() {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
+    List<MenuProduct> menuProducts = List.of(
+        createMenuProduct(product1, 1),
+        createMenuProduct(product2, 1)
+    );
+
+    List<Product> products = List.of(product1, product2);
+    List<UUID> productIds = products.stream()
+        .map(Product::getId)
+        .collect(Collectors.toList());
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23000),
+        true,
+        menuGroup,
+        menuProducts
+    );
+
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+    Menu changePriceMenu = new Menu();
+    changePriceMenu.setPrice(BigDecimal.valueOf(22000));
+
+    // when
+    Menu changedMenu = menuService.changePrice(menu.getId(), changePriceMenu);
+
+    // then
+    assertThat(changedMenu.getId()).isNotNull();
+    assertThat(changedMenu.getName()).isEqualTo(menu.getName());
+    assertThat(changedMenu.getPrice()).isEqualTo(changedMenu.getPrice());
+    assertThat(changedMenu.isDisplayed()).isEqualTo(menu.isDisplayed());
+    assertThat(changedMenu.getMenuGroup().getId()).isEqualTo(menuGroup.getId());
   }
 
   private static Menu createMenu(
