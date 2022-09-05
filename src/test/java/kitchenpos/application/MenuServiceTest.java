@@ -173,14 +173,14 @@ class MenuServiceTest {
     @DisplayName("가격을 수정할 수 있다")
     @Test
     void change_price() {
-        Menu menu = TestFixture.createFirstMenu();
         given(menuRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(menu));
+                .willReturn(Optional.of(TestFixture.createFirstMenu()));
 
         final BigDecimal updatePrice = BigDecimal.valueOf(9);
-        menu.setPrice(updatePrice);
+        Menu updateMenu = TestFixture.createFirstMenu();
+        updateMenu.setPrice(updatePrice);
 
-        Menu result = menuService.changePrice(menu.getId(), menu);
+        Menu result = menuService.changePrice(updateMenu.getId(), updateMenu);
         assertThat(result.getPrice()).isEqualTo(updatePrice);
     }
 
@@ -188,15 +188,15 @@ class MenuServiceTest {
     @DisplayName("메뉴에 속한 상품의 총 가격의 합보다 변경하려는 가격이 크다면 IllegalArgumentException을 발생시킨다")
     @Test
     void change_price_bigger_than_contains_products() {
-        Menu menu = TestFixture.createFirstMenu();
         given(menuRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(menu));
+                .willReturn(Optional.of(TestFixture.createFirstMenu()));
 
-        final BigDecimal updatePrice = BigDecimal.valueOf(15);
-        menu.setPrice(updatePrice);
+        final BigDecimal updatePrice = BigDecimal.valueOf(10000);
+        Menu updateMenu = TestFixture.createFirstMenu();
+        updateMenu.setPrice(updatePrice);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.changePrice(menu.getId(), menu));
+                .isThrownBy(() -> menuService.changePrice(updateMenu.getId(), updateMenu));
     }
 
     @DisplayName("메뉴를 비공개할 수 있다")

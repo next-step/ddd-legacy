@@ -101,9 +101,10 @@ class OrderTableServiceTest {
                 .willReturn(Optional.of(orderTable));
 
         final int changeGuest = 3;
-        orderTable.setNumberOfGuests(changeGuest);
+        OrderTable updateOrderTable = TestFixture.createFirstOrderTable();
+        updateOrderTable.setNumberOfGuests(changeGuest);
 
-        final OrderTable result = orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
+        final OrderTable result = orderTableService.changeNumberOfGuests(updateOrderTable.getId(), updateOrderTable);
 
         assertThat(result).isNotNull();
         assertThat(result.getNumberOfGuests()).isEqualTo(changeGuest);
@@ -125,12 +126,11 @@ class OrderTableServiceTest {
     @DisplayName("비어있는 테이블의 손님 숫자를 변경하면 IllegalStateException를 발생시킨다")
     @Test
     void change_number_of_guest_in_occupied() {
-        OrderTable orderTable = TestFixture.createFirstOrderTable();
-
         given(orderTableRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(orderTable));
+                .willReturn(Optional.of(TestFixture.createFirstOrderTable()));
 
         final int changeGuest = 3;
+        OrderTable orderTable = TestFixture.createFirstOrderTable();
         orderTable.setNumberOfGuests(changeGuest);
 
         assertThatExceptionOfType(IllegalStateException.class)

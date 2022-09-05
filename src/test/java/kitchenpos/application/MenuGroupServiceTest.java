@@ -36,7 +36,7 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     @ValueSource(strings = {"menu Group", "proper name", "test name"})
     void create_menu_group(final String name) {
-        final MenuGroup menuGroup = TestFixture.createFirstMenuGroup();
+        MenuGroup menuGroup = TestFixture.createFirstMenuGroup();
         menuGroup.setName(name);
 
         given(menuGroupRepository.save(Mockito.any(MenuGroup.class)))
@@ -44,7 +44,7 @@ class MenuGroupServiceTest {
 
         final MenuGroup result = menuGroupService.create(menuGroup);
 
-        assertThat(result.getName()).isEqualTo(menuGroup.getName());
+        assertThat(result.getName()).isEqualTo(name);
         assertThat(result.getId()).isEqualTo(menuGroup.getId());
     }
 

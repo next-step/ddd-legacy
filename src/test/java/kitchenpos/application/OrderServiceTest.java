@@ -51,6 +51,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.create(order));
     }
 
+    // TODO change
     @DisplayName("주문을 생성 할 때 주문할 메뉴의 항목은 Null이거나 비어있다면 IllegalArgumentException을 발생시킨다")
     @ParameterizedTest
     @NullAndEmptySource
@@ -69,10 +70,10 @@ class OrderServiceTest {
     void create_order_with_none_display_menu(final OrderType orderType) {
         final Order order = TestFixture.createFirstOrder(orderType);
 
-        Menu menu = TestFixture.createFirstMenu();
         given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(List.of(menu));
+                .willReturn(List.of(TestFixture.createFirstMenu()));
 
+        Menu menu = TestFixture.createFirstMenu();
         menu.setDisplayed(false);
         given(menuRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(menu));
@@ -87,10 +88,10 @@ class OrderServiceTest {
     void create_order_with_not_match_total_price(final OrderType orderType) {
         final Order order = TestFixture.createFirstOrder(orderType);
 
-        Menu menu = TestFixture.createFirstMenu();
         given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(List.of(menu));
+                .willReturn(List.of(TestFixture.createFirstMenu()));
 
+        Menu menu = TestFixture.createFirstMenu();
         menu.setPrice(menu.getPrice().multiply(BigDecimal.valueOf(2)));
         given(menuRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(menu));
