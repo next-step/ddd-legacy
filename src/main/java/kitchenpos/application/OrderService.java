@@ -139,6 +139,9 @@ public class OrderService {
     public Order completeDelivery(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
             .orElseThrow(NoSuchElementException::new);
+        if (order.getType() != OrderType.DELIVERY) {
+            throw new IllegalStateException();
+        }
         if (order.getStatus() != OrderStatus.DELIVERING) {
             throw new IllegalStateException();
         }

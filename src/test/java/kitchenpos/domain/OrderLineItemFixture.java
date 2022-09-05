@@ -20,4 +20,13 @@ public class OrderLineItemFixture {
         orderLineItem.setQuantity(quantity);
         return orderLineItem;
     }
+
+    public static OrderLineItem OrderLineItermWithMenu(Menu menu, BigDecimal price, int quantity) {
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setMenu(menu);
+        orderLineItem.setMenuId(menu.getId());
+        orderLineItem.setPrice(price);
+        orderLineItem.setQuantity(quantity);
+        return orderLineItem;
+    }
 }

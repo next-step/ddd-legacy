@@ -447,7 +447,7 @@ public class MenuServiceTest extends IntegrationTest {
         // when
         List<Menu> result = menuService.findAll();
 
-        // then
+        // then // TODO: menuService.findAll() -> LazyLoading 관련 설정 확인
         assertThat(result).usingRecursiveFieldByFieldElementComparatorIgnoringFields("menuProducts")
             .containsExactly(햄버거_콜라_세트메뉴, 햄버거_단품메뉴);
     }

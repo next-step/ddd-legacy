@@ -1,14 +1,33 @@
 package kitchenpos.application;
 
+import static kitchenpos.domain.MenuFixture.MenuWithUUIDAndMenuGroup;
+import static kitchenpos.domain.MenuGroupFixture.MenuGroupWithUUID;
+import static kitchenpos.domain.MenuProductFixture.MenuProductWithProduct;
+import static kitchenpos.domain.OrderFixture.OrderWithUUIDAndOrderDateTimeAndStatus;
+import static kitchenpos.domain.OrderFixture.OrderWithUUIDAndOrderTableAndOrderDateTimeAndStatus;
+import static kitchenpos.domain.OrderLineItemFixture.OrderLineItermWithMenu;
+import static kitchenpos.domain.OrderStatus.DELIVERED;
+import static kitchenpos.domain.OrderStatus.SERVED;
 import static kitchenpos.domain.OrderTableFixture.OrderTable;
 import static kitchenpos.domain.OrderTableFixture.OrderTableWithUUID;
+import static kitchenpos.domain.OrderType.DELIVERY;
+import static kitchenpos.domain.OrderType.EAT_IN;
+import static kitchenpos.domain.ProductFixture.ProductWithUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderFixture;
+import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -125,11 +144,40 @@ public class OrderTableServiceTest extends IntegrationTest {
         @Test
         void invalidOrderStatusException() {
             // given
-            // TODO: 2022/09/05 주문 테스트 먼저 작성하고 완성
+            Product 햄버거 = productRepository.save(ProductWithUUID("햄버거", 15_000));
+            Product 콜라 = productRepository.save(ProductWithUUID("콜라", 2_000));
+            MenuProduct 햄버거_메뉴상품 = MenuProductWithProduct(햄버거, 1);
+            MenuProduct 콜라_메뉴상품 = MenuProductWithProduct(콜라, 1);
+            MenuGroup 세트메뉴 = menuGroupRepository.save(MenuGroupWithUUID("세트메뉴"));
+            Menu 햄버거_콜라_세트메뉴 = MenuWithUUIDAndMenuGroup(
+                "햄버거 + 콜라 세트메뉴",
+                17_000,
+                세트메뉴,
+                햄버거_메뉴상품, 콜라_메뉴상품
+            );
+            햄버거_콜라_세트메뉴.setDisplayed(true);
+            햄버거_콜라_세트메뉴 = menuRepository.save(햄버거_콜라_세트메뉴);
+
+            OrderLineItem orderLineItem = OrderLineItermWithMenu(
+                햄버거_콜라_세트메뉴,
+                햄버거_콜라_세트메뉴.getPrice(),
+                1
+            );
+
+            Order 햄버거_콜라_세트메뉴_주문 = orderRepository.save(
+                OrderWithUUIDAndOrderTableAndOrderDateTimeAndStatus(
+                    orderTable,
+                    EAT_IN,
+                    "서울특별시 최현구",
+                    LocalDateTime.of(2022, 9, 1, 18, 0),
+                    SERVED,
+                    orderLineItem
+                )
+            );
 
             // when, then
-//            assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
-//                .isExactlyInstanceOf(IllegalStateException.class);
+            assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
+                .isExactlyInstanceOf(IllegalStateException.class);
         }
     }
 
