@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProductRepository;
 import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.OrderLineItemRepository;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.ProductRepository;
@@ -31,8 +32,12 @@ public abstract class IntegrationTest {
     @Autowired
     protected OrderTableRepository orderTableRepository;
 
+    @Autowired
+    protected OrderLineItemRepository orderLineItemRepository;
+
     @BeforeEach
     void setUp() {
+        orderLineItemRepository.deleteAllInBatch();
         menuProductRepository.deleteAllInBatch();
         menuRepository.deleteAllInBatch();
         productRepository.deleteAllInBatch();

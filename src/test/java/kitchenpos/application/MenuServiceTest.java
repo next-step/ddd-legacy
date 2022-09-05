@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import static kitchenpos.domain.MenuFixture.Menu;
 import static kitchenpos.domain.MenuFixture.MenuWithUUIDAndMenuGroup;
-import static kitchenpos.domain.MenuFixture.MenuWithoutMenuProducts;
 import static kitchenpos.domain.MenuGroupFixture.MenuGroupWithUUID;
 import static kitchenpos.domain.MenuProductFixture.MenuProduct;
 import static kitchenpos.domain.MenuProductFixture.MenuProductWithProduct;
@@ -141,7 +140,7 @@ public class MenuServiceTest extends IntegrationTest {
         @Test
         void menuProductEmptyException() {
             // given
-            Menu request = MenuWithoutMenuProducts(
+            Menu request = Menu(
                 "햄버거 + 콜라 세트메뉴",
                 17_000,
                 세트메뉴.getId()

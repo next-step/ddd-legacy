@@ -21,13 +21,4 @@ public class MenuFixture {
         menu.setMenuGroup(menuGroup);
         return menu;
     }
-
-    public static Menu MenuWithoutMenuProducts(String name, int price, UUID menuGroupId) {
-        Menu menu = new Menu();
-        menu.setName(name);
-        menu.setPrice(BigDecimal.valueOf(price).setScale(2));
-        menu.setMenuGroupId(menuGroupId);
-        menu.setMenuProducts(List.of());
-        return menu;
-    }
 }

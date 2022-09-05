@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
-import static kitchenpos.domain.OrderTableFixture.*;
+import static kitchenpos.domain.OrderTableFixture.OrderTable;
+import static kitchenpos.domain.OrderTableFixture.OrderTableWithUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
