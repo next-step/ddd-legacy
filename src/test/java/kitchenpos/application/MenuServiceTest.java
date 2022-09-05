@@ -244,6 +244,40 @@ class MenuServiceTest {
     assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
   }
 
+  @DisplayName("메뉴가격은 메뉴의 포함된 메뉴상품금액(메뉴상품가격 * 수량)의 총액 보다 더 높을 수 없다.")
+  @Test
+  void givenPriceGreaterSumProductPrice_whenCreate_thenIllegalArgumentException() {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12500));
+    List<MenuProduct> menuProducts = List.of(
+        createMenuProduct(product1, 1),
+        createMenuProduct(product2, 1)
+    );
+
+    List<Product> products = List.of(product1, product2);
+    List<UUID> productIds = products.stream()
+        .map(Product::getId)
+        .collect(Collectors.toList());
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23100),
+        true,
+        menuGroup,
+        menuProducts
+    );
+
+    given(menuGroupRepository.findById(menuGroup.getId())).willReturn(Optional.of(menuGroup));
+    given(productRepository.findAllByIdIn(productIds)).willReturn(products);
+    given(productRepository.findById(product1.getId())).willReturn(Optional.of(product1));
+    given(productRepository.findById(product2.getId())).willReturn(Optional.of(product2));
+
+    // when & then
+    assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
+  }
+
   private static Menu createMenu(
       String name,
       BigDecimal price,
