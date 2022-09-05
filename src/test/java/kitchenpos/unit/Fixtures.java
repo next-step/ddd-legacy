@@ -14,7 +14,7 @@ import java.util.List;
 
 public class Fixtures {
 
-    static MenuGroup aMenuGroup() {
+    public static MenuGroup aMenuGroup() {
         return new MenuGroup("한마리치킨");
     }
 
