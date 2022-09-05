@@ -10,7 +10,6 @@ import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 
 public class Fixtures {
@@ -19,15 +18,19 @@ public class Fixtures {
         return new MenuGroup("한마리치킨");
     }
 
-    static Product aProduct(int price) {
+    static Product aChickenProduct(int price) {
+        return aProduct("후라이드 치킨", price);
+    }
+
+    static Product aProduct(String name, int price) {
         Product product = new Product();
-        product.setName("후라이드 치킨");
+        product.setName(name);
         product.setPrice(BigDecimal.valueOf(price));
         return product;
     }
 
-    static MenuProduct aMenuProduct(int price, int quantity) {
-        return aMenuProduct(aProduct(price), quantity);
+    static MenuProduct aChickenMenuProduct(int price, int quantity) {
+        return aMenuProduct(aChickenProduct(price), quantity);
     }
 
     static MenuProduct aMenuProduct(Product product, int quantity) {
@@ -36,6 +39,10 @@ public class Fixtures {
         menuProduct.setProductId(product.getId());
         menuProduct.setQuantity(quantity);
         return menuProduct;
+    }
+
+    static Menu aManWonChickenMenu(int price) {
+        return aMenu("후라이드 치킨", price, aChickenMenuProduct(1, 10_000));
     }
 
     static Menu aMenu(String name, int price, MenuProduct... menuProducts) {
@@ -53,26 +60,40 @@ public class Fixtures {
         OrderLineItem oli = new OrderLineItem();
         oli.setMenu(menu);
         oli.setQuantity(quantity);
+        oli.setPrice(menu.getPrice().multiply(BigDecimal.valueOf(quantity)));
         return oli;
     }
 
     static OrderTable anOrderTable(boolean occupied) {
+        return anOrderTable("1번 테이블", occupied);
+    }
+
+    static OrderTable anOrderTable(String name, boolean occupied) {
+        return anOrderTable(name, occupied, 0);
+    }
+
+    static OrderTable anOrderTable(String name, boolean occupied, int numberOfGuests) {
         OrderTable orderTable = new OrderTable();
+        orderTable.setName(name);
         orderTable.setOccupied(occupied);
+        orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;
     }
 
-    static Order anOrder(OrderType orderType) {
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(10_000, 1));
-
-        OrderLineItem oli = anOrderLineItem(menu, 1);
-        oli.setPrice(BigDecimal.valueOf(10_000));
-
+    static Order aDeliveryOrder(String deliveryAddress, OrderLineItem... orderLineItems) {
         Order order = new Order();
-        order.setType(orderType);
-        order.setOrderLineItems(Collections.singletonList(oli));
-        order.setDeliveryAddress("서울시 어딘가");
+        order.setType(OrderType.DELIVERY);
+        order.setOrderLineItems(List.of(orderLineItems));
+        order.setDeliveryAddress(deliveryAddress);
+        return order;
+    }
 
+    static Order anEatInOrder(OrderTable orderTable, OrderLineItem... orderLineItems) {
+        Order order = new Order();
+        order.setType(OrderType.EAT_IN);
+        order.setOrderLineItems(List.of(orderLineItems));
+        order.setOrderTable(orderTable);
+        order.setOrderTableId(orderTable.getId());
         return order;
     }
 }

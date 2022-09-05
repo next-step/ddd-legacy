@@ -50,9 +50,7 @@ class MenuServiceTest {
     @Test
     void create_Illegal_NegativePrice() {
         // given
-        Menu request = new Menu();
-        request.setName("후라이드 치킨");
-        request.setPrice(BigDecimal.valueOf(-1000));
+        Menu request = aManWonChickenMenu(-10_000);
 
         // when + then
         assertThatThrownBy(() -> menuService.create(request))
@@ -63,9 +61,7 @@ class MenuServiceTest {
     @Test
     void create_Illegal_MenuGroup() {
         // given
-        Menu request = new Menu();
-        request.setName("후라이드 치킨");
-        request.setPrice(BigDecimal.valueOf(10_000));
+        Menu request = aManWonChickenMenu(10_000);
         request.setMenuGroupId(UUID.randomUUID());
 
         // when + then
@@ -78,10 +74,7 @@ class MenuServiceTest {
     void create_Illegal_EmptyMenuProducts() {
         // given
         MenuGroup menuGroup = aMenuGroup();
-
-        Menu request = new Menu();
-        request.setName("후라이드 치킨");
-        request.setPrice(BigDecimal.valueOf(10_000));
+        Menu request = aManWonChickenMenu(10_000);
         request.setMenuGroupId(menuGroup.getId());
 
         when(menuGroupRepository.findById(menuGroup.getId())).thenReturn(Optional.of(menuGroup));
@@ -95,15 +88,9 @@ class MenuServiceTest {
     @Test
     void create_Illegal_NotExistingProducts() {
         // given
-        MenuGroup menuGroup = aMenuGroup();
+        Menu request = aManWonChickenMenu(10_000);
 
-        Menu request = new Menu();
-        request.setName("후라이드 치킨");
-        request.setPrice(BigDecimal.valueOf(10_000));
-        request.setMenuGroupId(menuGroup.getId());
-        request.setMenuProducts(Collections.singletonList(aMenuProduct(aProduct(10_000), 1)));
-
-        when(menuGroupRepository.findById(menuGroup.getId())).thenReturn(Optional.of(menuGroup));
+        when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(request.getMenuGroup()));
         when(productRepository.findAllByIdIn(any())).thenReturn(Collections.emptyList());
 
         // when + then
@@ -114,16 +101,12 @@ class MenuServiceTest {
     @DisplayName("메뉴의 가격은 메뉴상품 가격의 총합보다 클 수 없다.")
     @Test
     void create_Illegal_TooMuchPrice() {
-        MenuGroup menuGroup = aMenuGroup();
-        Product product = aProduct(10_000);
+        // given
+        MenuProduct menuProduct = aChickenMenuProduct(10_000, 1);
+        Product product = menuProduct.getProduct();
+        Menu request = aMenu("후라이드 치킨", 30_000, menuProduct);
 
-        Menu request = new Menu();
-        request.setName("후라이드 치킨");
-        request.setPrice(BigDecimal.valueOf(30_000));
-        request.setMenuGroupId(menuGroup.getId());
-        request.setMenuProducts(Collections.singletonList(aMenuProduct(product, 1)));
-
-        when(menuGroupRepository.findById(menuGroup.getId())).thenReturn(Optional.of(menuGroup));
+        when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(request.getMenuGroup()));
         when(productRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(product));
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
 
@@ -135,16 +118,12 @@ class MenuServiceTest {
     @DisplayName("메뉴의 이름은 비속어를 포함할 수 없다.")
     @Test
     void create_Illegal_ProfaneName() {
-        MenuGroup menuGroup = aMenuGroup();
-        Product product = aProduct(10_000);
+        // given
+        MenuProduct menuProduct = aChickenMenuProduct(10_000, 1);
+        Product product = menuProduct.getProduct();
+        Menu request = aMenu("바보", 10_000, menuProduct);
 
-        Menu request = new Menu();
-        request.setName("바보");
-        request.setPrice(BigDecimal.valueOf(10_000));
-        request.setMenuGroupId(menuGroup.getId());
-        request.setMenuProducts(Collections.singletonList(aMenuProduct(product, 1)));
-
-        when(menuGroupRepository.findById(menuGroup.getId())).thenReturn(Optional.of(menuGroup));
+        when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(request.getMenuGroup()));
         when(productRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(product));
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
         when(purgomalumClient.containsProfanity("바보")).thenReturn(true);
@@ -157,16 +136,12 @@ class MenuServiceTest {
     @DisplayName("메뉴 생성")
     @Test
     void create() {
-        MenuGroup menuGroup = aMenuGroup();
-        Product product = aProduct(10_000);
+        // given
+        MenuProduct menuProduct = aChickenMenuProduct(10_000, 1);
+        Product product = menuProduct.getProduct();
+        Menu request = aMenu("후라이드 치킨", 10_000, menuProduct);
 
-        Menu request = new Menu();
-        request.setName("후라이드 치킨");
-        request.setPrice(BigDecimal.valueOf(10_000));
-        request.setMenuGroupId(menuGroup.getId());
-        request.setMenuProducts(Collections.singletonList(aMenuProduct(product, 1)));
-
-        when(menuGroupRepository.findById(menuGroup.getId())).thenReturn(Optional.of(menuGroup));
+        when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(request.getMenuGroup()));
         when(productRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(product));
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
         when(menuRepository.save(any())).then(i -> i.getArgument(0, Menu.class));
@@ -182,12 +157,11 @@ class MenuServiceTest {
     @Test
     void changePrice_Illegal_NegativePrice() {
         // given
-        MenuProduct menuProduct = aMenuProduct(aProduct(10_000), 1);
-        Menu menu = aMenu("후라이드 치킨", 10_000, menuProduct);
-
-        // when + then
+        Menu menu = aManWonChickenMenu(10_000);
         Menu changeRequest = new Menu();
         changeRequest.setPrice(BigDecimal.valueOf(-10_000));
+
+        // when + then
         assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changeRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
@@ -196,14 +170,13 @@ class MenuServiceTest {
     @Test
     void changePrice_Illegal_TooMuchPrice() {
         // given
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(aProduct(10_000), 1));
+        Menu menu = aManWonChickenMenu(10_000);
+        Menu changeRequest = new Menu();
+        changeRequest.setPrice(BigDecimal.valueOf(30_000));
 
         when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
         // when + then
-        Menu changeRequest = new Menu();
-        changeRequest.setPrice(BigDecimal.valueOf(30_000));
-
         assertThatThrownBy(() -> menuService.changePrice(menu.getId(), changeRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
@@ -212,13 +185,13 @@ class MenuServiceTest {
     @Test
     void changePrice() {
         // given
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(aProduct(10_000), 1));
+        Menu menu = aManWonChickenMenu(10_000);
+        Menu changeRequest = new Menu();
+        changeRequest.setPrice(BigDecimal.valueOf(9_000));
 
         when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
         // when
-        Menu changeRequest = new Menu();
-        changeRequest.setPrice(BigDecimal.valueOf(9_000));
         Menu changed = menuService.changePrice(menu.getId(), changeRequest);
 
         // then
@@ -229,7 +202,7 @@ class MenuServiceTest {
     @Test
     void display_Illegal_TooMuchPrice() {
         // given
-        Menu menu = aMenu("후라이드 치킨", 20_000, aMenuProduct(aProduct(10_000), 1));
+        Menu menu = aManWonChickenMenu(20_000);
 
         when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
@@ -242,7 +215,7 @@ class MenuServiceTest {
     @Test
     void display() {
         // given
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(aProduct(10_000), 1));
+        Menu menu = aManWonChickenMenu(10_000);
 
         when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 

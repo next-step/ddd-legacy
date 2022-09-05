@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static kitchenpos.application.Fixtures.anOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -37,7 +38,7 @@ class OrderTableServiceTest {
     @NullAndEmptySource
     void create_Illegal_EmptyName(String source) {
         // given
-        OrderTable request = new OrderTable();
+        OrderTable request = anOrderTable(false);
         request.setName(source);
 
         /// when + then
@@ -49,7 +50,7 @@ class OrderTableServiceTest {
     @Test
     void create() {
         // given
-        OrderTable request = new OrderTable();
+        OrderTable request = anOrderTable(false);
         request.setName("1번 테이블");
 
         when(orderTableRepository.save(any())).then(i -> i.getArgument(0, OrderTable.class));
@@ -69,11 +70,9 @@ class OrderTableServiceTest {
     @Test
     void clear_Illegal_OrderNotComplete() {
         // given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName("1번 테이블");
-        orderTable.setOccupied(true);
+        OrderTable orderTable = anOrderTable(true);
 
-        when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+        when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(true);
 
         // when + then
@@ -85,9 +84,7 @@ class OrderTableServiceTest {
     @Test
     void clear() {
         // given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName("1번 테이블");
-        orderTable.setOccupied(true);
+        OrderTable orderTable = anOrderTable(true);
 
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
@@ -106,14 +103,13 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests_Illegal_NegativeNumberOfGuests() {
         // given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName("1번 테이블");
-        orderTable.setOccupied(true);
+        OrderTable orderTable = anOrderTable("1번 테이블", true, 3);
+
+        OrderTable changeRequest = new OrderTable();
+        changeRequest.setNumberOfGuests(-1);
 
         // when + then
-        OrderTable request = new OrderTable();
-        request.setNumberOfGuests(-1);
-        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), changeRequest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -121,17 +117,15 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests_Illegal_TableNotOccupied() {
         // given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName("1번 테이블");
-        orderTable.setNumberOfGuests(3);
-        orderTable.setOccupied(false);
+        OrderTable orderTable = anOrderTable("1번 테이블", false, 3);
 
-        when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+        OrderTable changeRequest = new OrderTable();
+        changeRequest.setNumberOfGuests(4);
+
+        when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
 
         // when + then
-        OrderTable request = new OrderTable();
-        request.setNumberOfGuests(4);
-        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), changeRequest))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -139,17 +133,15 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests() {
         // given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName("1번 테이블");
-        orderTable.setNumberOfGuests(3);
-        orderTable.setOccupied(true);
+        OrderTable orderTable = anOrderTable("1번 테이블", true, 3);
 
-        when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+        OrderTable changeRequest = new OrderTable();
+        changeRequest.setNumberOfGuests(4);
+
+        when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
 
         // when
-        OrderTable request = new OrderTable();
-        request.setNumberOfGuests(4);
-        OrderTable changedTable = orderTableService.changeNumberOfGuests(orderTable.getId(), request);
+        OrderTable changedTable = orderTableService.changeNumberOfGuests(orderTable.getId(), changeRequest);
 
         // then
         assertThat(changedTable.getNumberOfGuests()).isEqualTo(4);

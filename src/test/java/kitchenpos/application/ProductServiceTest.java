@@ -48,8 +48,7 @@ class ProductServiceTest {
     @Test
     void create_IllegalPrice() {
         // given
-        Product request = new Product();
-        request.setPrice(BigDecimal.valueOf(-10000));
+        Product request = aChickenProduct(-10_000);
 
         // when + then
         assertThatThrownBy(() -> productService.create(request))
@@ -60,9 +59,7 @@ class ProductServiceTest {
     @NullSource
     void create_EmptyName(String source) {
         // given
-        Product request = new Product();
-        request.setPrice(BigDecimal.valueOf(10000));
-        request.setName(source);
+        Product request = aProduct(source, 10_000);
 
         // when + then
         assertThatThrownBy(() -> productService.create(request))
@@ -73,9 +70,7 @@ class ProductServiceTest {
     @ValueSource(strings = {"바보"})
     void create_ProfaneName(String source) {
         // given
-        Product request = new Product();
-        request.setPrice(BigDecimal.valueOf(10000));
-        request.setName(source);
+        Product request = aProduct(source, 10_000);
 
         when(purgomalumClient.containsProfanity("바보")).thenReturn(true);
 
@@ -88,9 +83,7 @@ class ProductServiceTest {
     @Test
     void create() {
         // given
-        Product request = new Product();
-        request.setPrice(BigDecimal.valueOf(10000));
-        request.setName("후라이드 치킨");
+        Product request = aChickenProduct(10_000);
 
         when(productRepository.save(any())).then(i -> i.getArgument(0, Product.class));
 
@@ -103,20 +96,21 @@ class ProductServiceTest {
 
     @ParameterizedTest(name = "상품의 가격을 변경하면 상품을 포함하는 메뉴들은 가격에 따라 숨겨질 수 있다. price = {0}")
     @MethodSource("provideArgumentsForChangePrice")
-    void changePrice(int menuPrice, boolean expected) {
+    void changePrice(int originalPrice, boolean expected) {
         // given
-        Product product = aProduct(10_000);
+        Product product = aChickenProduct(10_000);
         MenuProduct menuProduct = aMenuProduct(product, 1);
-        Menu menu = aMenu("후라이드 치킨", menuPrice, menuProduct);
+        Menu menu = aMenu("후라이드 치킨", originalPrice, menuProduct);
+
+        Product changePriceRequest = new Product();
+        changePriceRequest.setPrice(BigDecimal.valueOf(9_500));
 
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
         when(menuRepository.findAllByProductId(product.getId()))
                 .thenReturn(Collections.singletonList(menu));
 
         // when
-        Product request = new Product();
-        request.setPrice(BigDecimal.valueOf(9_500));
-        productService.changePrice(product.getId(), request);
+        productService.changePrice(product.getId(), changePriceRequest);
 
         // then
         assertThat(menu.isDisplayed()).isEqualTo(expected);

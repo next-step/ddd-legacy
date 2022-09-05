@@ -23,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
-import java.util.UUID;
 
 import static kitchenpos.application.Fixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,6 +34,8 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
+
+    private static final Menu MENU = aMenu("후라이드 치킨", 10_000, aChickenMenuProduct(10_000, 1));
 
     @Mock
     OrderRepository orderRepository;
@@ -55,7 +56,8 @@ class OrderServiceTest {
     @Test
     void create_Illegal_EmptyOrderType() {
         // given
-        Order request = new Order();
+        Order request = aDeliveryOrder("서울시 어딘가", anOrderLineItem(MENU, 1));
+        request.setType(null);
 
         // when + then
         assertThatThrownBy(() -> orderService.create(request))
@@ -66,8 +68,7 @@ class OrderServiceTest {
     @Test
     void create_Illegal_EmptyOrderLineItems() {
         // given
-        Order request = new Order();
-        request.setType(OrderType.DELIVERY);
+        Order request = aDeliveryOrder("서울시 어딘가");
 
         // when + then
         assertThatThrownBy(() -> orderService.create(request))
@@ -78,14 +79,7 @@ class OrderServiceTest {
     @Test
     void create_Illegal_NotExistingMenus() {
         // given
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(10_000, 1));
-
-        OrderLineItem oli = anOrderLineItem(menu, 1);
-        oli.setPrice(BigDecimal.valueOf(10_000));
-
-        Order request = new Order();
-        request.setType(OrderType.DELIVERY);
-        request.setOrderLineItems(Collections.singletonList(oli));
+        Order request = aDeliveryOrder("서울시 어딘가", anOrderLineItem(MENU, 1));
 
         when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.emptyList());
 
@@ -98,18 +92,12 @@ class OrderServiceTest {
     @Test
     void create_Illegal_HiddenMenu() {
         // given
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(10_000, 1));
-        menu.setDisplayed(false);
+        Menu hiddenMenu = aMenu("후라이드 치킨", 10_000, aChickenMenuProduct(10_000, 1));
+        hiddenMenu.setDisplayed(false);
+        Order request = aDeliveryOrder("서울시 어딘가", anOrderLineItem(hiddenMenu, 1));
 
-        OrderLineItem oli = anOrderLineItem(menu, 1);
-        oli.setPrice(BigDecimal.valueOf(10_000));
-
-        Order request = new Order();
-        request.setType(OrderType.EAT_IN);
-        request.setOrderLineItems(Collections.singletonList(oli));
-
-        when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(hiddenMenu));
+        when(menuRepository.findById(hiddenMenu.getId())).thenReturn(Optional.of(hiddenMenu));
 
         // when + then
         assertThatThrownBy(() -> orderService.create(request))
@@ -120,17 +108,13 @@ class OrderServiceTest {
     @Test
     void create_Illegal_NotMatchingPrice() {
         // given
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(10_000, 1));
-
-        OrderLineItem oli = anOrderLineItem(menu, 1);
-        oli.setPrice(BigDecimal.valueOf(20_000));
-
-        Order request = new Order();
-        request.setType(OrderType.EAT_IN);
-        request.setOrderLineItems(Collections.singletonList(oli));
+        Menu menu = aMenu("후라이드 치킨", 10_000, aChickenMenuProduct(10_000, 1));
+        OrderLineItem orderLineItem = anOrderLineItem(menu, 1);
+        orderLineItem.setPrice(BigDecimal.valueOf(20_000));
+        Order request = aDeliveryOrder("서울시 어딘가", orderLineItem);
 
         when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        when(menuRepository.findById(MENU.getId())).thenReturn(Optional.of(MENU));
 
         // when + then
         assertThatThrownBy(() -> orderService.create(request))
@@ -141,18 +125,10 @@ class OrderServiceTest {
     @NullAndEmptySource
     void create_Illegal_MissingDeliveryAddress(String deliveryAddress) {
         // given
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(10_000, 1));
+        Order request = aDeliveryOrder(deliveryAddress, anOrderLineItem(MENU, 1));
 
-        OrderLineItem oli = anOrderLineItem(menu, 1);
-        oli.setPrice(BigDecimal.valueOf(10_000));
-
-        Order request = new Order();
-        request.setType(OrderType.DELIVERY);
-        request.setOrderLineItems(Collections.singletonList(oli));
-        request.setDeliveryAddress(deliveryAddress);
-
-        when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(MENU));
+        when(menuRepository.findById(MENU.getId())).thenReturn(Optional.of(MENU));
 
         // when + then
         assertThatThrownBy(() -> orderService.create(request))
@@ -163,21 +139,11 @@ class OrderServiceTest {
     @Test
     void create_Illegal_OrderTableOccupied() {
         // given
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(10_000, 1));
-
-        OrderLineItem oli = anOrderLineItem(menu, 1);
-        oli.setPrice(BigDecimal.valueOf(10_000));
-
         OrderTable orderTable = anOrderTable(false);
+        Order request = anEatInOrder(orderTable, anOrderLineItem(MENU, 1));
 
-        Order request = new Order();
-        request.setType(OrderType.EAT_IN);
-        request.setOrderLineItems(Collections.singletonList(oli));
-        request.setOrderTable(orderTable);
-        request.setOrderTableId(orderTable.getId());
-
-        when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(MENU));
+        when(menuRepository.findById(MENU.getId())).thenReturn(Optional.of(MENU));
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
 
         // when + then
@@ -189,21 +155,11 @@ class OrderServiceTest {
     @Test
     void create_EAT_IN_ORDER() {
         // given
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(10_000, 1));
-
-        OrderLineItem oli = anOrderLineItem(menu, 1);
-        oli.setPrice(BigDecimal.valueOf(10_000));
-
         OrderTable orderTable = anOrderTable(true);
+        Order request = anEatInOrder(orderTable, anOrderLineItem(MENU, 1));
 
-        Order request = new Order();
-        request.setType(OrderType.EAT_IN);
-        request.setOrderLineItems(Collections.singletonList(oli));
-        request.setOrderTable(orderTable);
-        request.setOrderTableId(orderTable.getId());
-
-        when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(MENU));
+        when(menuRepository.findById(MENU.getId())).thenReturn(Optional.of(MENU));
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(Optional.of(orderTable));
         when(orderRepository.save(any())).then(i -> i.getArgument(0, Order.class));
 
@@ -224,18 +180,10 @@ class OrderServiceTest {
     @Test
     void create_DELIVERY_ORDER() {
         // given
-        Menu menu = aMenu("후라이드 치킨", 10_000, aMenuProduct(10_000, 1));
+        Order request = aDeliveryOrder("서울시 어딘가", anOrderLineItem(MENU, 1));
 
-        OrderLineItem oli = anOrderLineItem(menu, 1);
-        oli.setPrice(BigDecimal.valueOf(10_000));
-
-        Order request = new Order();
-        request.setType(OrderType.DELIVERY);
-        request.setOrderLineItems(Collections.singletonList(oli));
-        request.setDeliveryAddress("서울시 어딘가");
-
-        when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(menu));
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(MENU));
+        when(menuRepository.findById(MENU.getId())).thenReturn(Optional.of(MENU));
         when(orderRepository.save(any())).then(i -> i.getArgument(0, Order.class));
 
         // when
@@ -258,10 +206,10 @@ class OrderServiceTest {
             mode = EnumSource.Mode.EXCLUDE)
     void accept_Illegal_State(OrderStatus orderStatus) {
         // given
-        Order order = anOrder(OrderType.DELIVERY);
+        Order order = aDeliveryOrder("서울시 어딘가", anOrderLineItem(MENU, 1));
         order.setStatus(orderStatus);
 
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 
         // when + then
         assertThatThrownBy(() -> orderService.accept(order.getId()))
@@ -272,12 +220,10 @@ class OrderServiceTest {
     @Test
     void accept_DELIVERY_ORDER() {
         // given
-        Order order = anOrder(OrderType.DELIVERY);
-        order.setId(UUID.randomUUID());
+        Order order = aDeliveryOrder("서울시 어딘가", anOrderLineItem(MENU, 1));
         order.setStatus(OrderStatus.WAITING);
-        order.setDeliveryAddress("서울시 어딘가");
 
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 
         // when
         Order acceptedOrder = orderService.accept(order.getId());
@@ -294,10 +240,10 @@ class OrderServiceTest {
             mode = EnumSource.Mode.EXCLUDE)
     void serve_Illegal_State(OrderStatus orderStatus) {
         // given
-        Order order = anOrder(OrderType.DELIVERY);
+        Order order = aDeliveryOrder("서울시 어딘가", anOrderLineItem(MENU, 1));
         order.setStatus(orderStatus);
 
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 
         // when + then
         assertThatThrownBy(() -> orderService.serve(order.getId()))
@@ -308,10 +254,10 @@ class OrderServiceTest {
     @Test
     void serve() {
         // given
-        Order order = anOrder(OrderType.DELIVERY);
+        Order order = aDeliveryOrder("서울시 어딘가", anOrderLineItem(MENU, 1));
         order.setStatus(OrderStatus.ACCEPTED);
 
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 
         // when
         orderService.serve(order.getId());
@@ -327,10 +273,10 @@ class OrderServiceTest {
             mode = EnumSource.Mode.EXCLUDE)
     void complete_DELIVERY_ORDER_Illegal_State(OrderStatus orderStatus) {
         // given
-        Order order = anOrder(OrderType.DELIVERY);
+        Order order = aDeliveryOrder("서울시 어딘가", anOrderLineItem(MENU, 1));
         order.setStatus(orderStatus);
 
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 
         // when
         assertThatThrownBy(() -> orderService.complete(order.getId()))
@@ -344,7 +290,7 @@ class OrderServiceTest {
             mode = EnumSource.Mode.EXCLUDE)
     void complete_EAT_IN_ORDER_Illegal_State(OrderStatus orderStatus) {
         // given
-        Order order = anOrder(OrderType.EAT_IN);
+        Order order = anEatInOrder(anOrderTable(true), anOrderLineItem(MENU, 1));
         order.setStatus(orderStatus);
 
         when(orderRepository.findById(any())).thenReturn(Optional.of(order));
@@ -359,10 +305,8 @@ class OrderServiceTest {
     void complete_EAT_IN_ORDER() {
         // given
         OrderTable orderTable = anOrderTable(true);
-
-        Order order = anOrder(OrderType.EAT_IN);
+        Order order = anEatInOrder(orderTable, anOrderLineItem(MENU, 1));
         order.setStatus(OrderStatus.SERVED);
-        order.setOrderTable(orderTable);
 
         when(orderRepository.findById(any())).thenReturn(Optional.of(order));
         when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
