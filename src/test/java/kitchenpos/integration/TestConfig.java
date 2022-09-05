@@ -2,6 +2,7 @@ package kitchenpos.integration;
 
 import kitchenpos.application.MenuGroupService;
 import kitchenpos.application.MenuService;
+import kitchenpos.application.OrderService;
 import kitchenpos.application.OrderTableService;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.MenuGroupRepository;
@@ -10,7 +11,9 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.domain.ProfanityChecker;
+import kitchenpos.domain.Riders;
 import kitchenpos.integration.mock.FakeProfanityChecker;
+import kitchenpos.integration.mock.FakeRidersClient;
 import kitchenpos.integration.mock.MemoryMenuGroupRepository;
 import kitchenpos.integration.mock.MemoryMenuRepository;
 import kitchenpos.integration.mock.MemoryOrderRepository;
@@ -43,6 +46,11 @@ public class TestConfig {
     }
 
     @Bean
+    OrderService orderService() {
+        return new OrderService(orderRepository(), menuRepository(), orderTableRepository(), riders());
+    }
+
+    @Bean
     MenuGroupRepository menuGroupRepository() {
         return new MemoryMenuGroupRepository();
     }
@@ -70,5 +78,10 @@ public class TestConfig {
     @Bean
     ProfanityChecker profanityChecker() {
         return new FakeProfanityChecker();
+    }
+
+    @Bean
+    Riders riders() {
+        return new FakeRidersClient();
     }
 }

@@ -63,6 +63,7 @@ public class Fixtures {
     public static OrderLineItem anOrderLineItem(Menu menu, int quantity) {
         OrderLineItem oli = new OrderLineItem();
         oli.setMenu(menu);
+        oli.setMenuId(menu.getId());
         oli.setQuantity(quantity);
         oli.setPrice(menu.getPrice().multiply(BigDecimal.valueOf(quantity)));
         return oli;
@@ -84,7 +85,7 @@ public class Fixtures {
         return orderTable;
     }
 
-    static Order aDeliveryOrder(String deliveryAddress, OrderLineItem... orderLineItems) {
+    public static Order aDeliveryOrder(String deliveryAddress, OrderLineItem... orderLineItems) {
         Order order = new Order();
         order.setType(OrderType.DELIVERY);
         order.setOrderLineItems(List.of(orderLineItems));
