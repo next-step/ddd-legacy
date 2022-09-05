@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,11 @@ class ProductRestControllerIntegrationTest {
 
   @Autowired
   private ProductRepository productRepository;
+
+  @AfterEach
+  void tearDown() {
+    productRepository.deleteAll();
+  }
 
   @DisplayName("유효한 상품명과 가격을 통한 상품등록 요청에 응답으로 HTTP 201 상태값과 함께 등록된 상품을 반환한다")
   @Test
