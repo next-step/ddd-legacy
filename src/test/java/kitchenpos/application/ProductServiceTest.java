@@ -130,7 +130,6 @@ class ProductServiceTest {
     menu.setName("후라이드치킨");
     menu.setPrice(BigDecimal.valueOf(11000));
     menu.setMenuProducts(List.of(menuProduct));
-    menu.setMenuProducts(List.of(menuProduct));
 
     given(menuRepository.findAllByProductId(product.getId())).willReturn(List.of(menu));
 
