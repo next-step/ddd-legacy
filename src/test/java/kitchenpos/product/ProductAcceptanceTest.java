@@ -55,9 +55,6 @@ class ProductAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    /**
-     * TODO: Menu 테스트 이후에 작성
-     */
     @DisplayName("상품의 가격을 변경할 때, 해당 상품을 포함하는 메뉴의 가격이 메뉴상품의 가격보다 작아지면 해당 메뉴는 숨겨진다.")
     @Test
     void changePriceWithMenuHide() {
