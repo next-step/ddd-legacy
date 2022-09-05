@@ -1,4 +1,4 @@
-package kitchenpos.unit;
+package kitchenpos;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;

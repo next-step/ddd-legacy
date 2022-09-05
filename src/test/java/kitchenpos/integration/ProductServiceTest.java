@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-import static kitchenpos.unit.Fixtures.*;
+import static kitchenpos.Fixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
