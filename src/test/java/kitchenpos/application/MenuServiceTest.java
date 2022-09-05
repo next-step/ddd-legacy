@@ -2,12 +2,14 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -128,6 +130,32 @@ class MenuServiceTest {
 
     // when & then
     assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
+  }
+
+  @DisplayName("메뉴그룹이 존재하지 않으면 메뉴를 등록할 수 없다.")
+  @Test
+  void givenNoMenuGroup_whenCreate_thenNoSuchElementException() {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
+    List<MenuProduct> menuProducts = List.of(
+        createMenuProduct(product1, 1),
+        createMenuProduct(product2, 1)
+    );
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23000),
+        true,
+        menuGroup,
+        menuProducts
+    );
+
+    given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.empty());
+
+    // when & then
+    assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(NoSuchElementException.class);
   }
 
   private static Menu createMenu(
