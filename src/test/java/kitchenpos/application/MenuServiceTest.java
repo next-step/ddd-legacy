@@ -353,4 +353,45 @@ public class MenuServiceTest {
             )).isExactlyInstanceOf(IllegalArgumentException.class);
         }
     }
+
+    @DisplayName("메뉴를 사용자에게 노출되도록 변경할 수 있다.")
+    @Nested
+    class Display {
+
+        private Menu 햄버거_콜라_세트메뉴;
+
+        @BeforeEach
+        void setUp() {
+            Product 햄버거 = productRepository.save(ProductWithUUID("햄버거", 15_000));
+            Product 콜라 = productRepository.save(ProductWithUUID("콜라", 2_000));
+            MenuProduct 햄버거_메뉴상품 = MenuProductWithProduct(햄버거, 1);
+            MenuProduct 콜라_메뉴상품 = MenuProductWithProduct(콜라, 1);
+            MenuGroup 세트메뉴 = menuGroupRepository.save(MenuGroupWithUUID("세트메뉴"));
+            햄버거_콜라_세트메뉴 = menuRepository.save(MenuWithUUIDAndMenuGroup(
+                "햄버거 + 콜라 세트메뉴",
+                17_000,
+                세트메뉴,
+                햄버거_메뉴상품, 콜라_메뉴상품
+            ));
+        }
+
+        @DisplayName("성공")
+        @Test
+        void success() {
+            // when
+            Menu result = menuService.display(햄버거_콜라_세트메뉴.getId());
+
+            // then
+            assertThat(result.isDisplayed()).isTrue();
+        }
+
+        @DisplayName("노출할 메뉴가 우선 존재해야 한다.")
+        @Test
+        void menuNotFoundException() {
+            // when, then
+            assertThatThrownBy(() -> menuService.display(
+                UUID.fromString("00000000-0000-0000-0000-000000000000")
+            )).isExactlyInstanceOf(NoSuchElementException.class);
+        }
+    }
 }
