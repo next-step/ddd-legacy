@@ -1,12 +1,12 @@
 package kitchenpos.application;
 
-import static kitchenpos.domain.MenuFixture.*;
 import static kitchenpos.domain.MenuFixture.Menu;
+import static kitchenpos.domain.MenuFixture.MenuWithUUIDAndMenuGroup;
 import static kitchenpos.domain.MenuFixture.MenuWithoutMenuProducts;
 import static kitchenpos.domain.MenuGroupFixture.MenuGroupWithUUID;
 import static kitchenpos.domain.MenuProductFixture.MenuProduct;
 import static kitchenpos.domain.MenuProductFixture.MenuProductWithProduct;
-import static kitchenpos.domain.ProductFixture.*;
+import static kitchenpos.domain.ProductFixture.Product;
 import static kitchenpos.domain.ProductFixture.ProductWithUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,32 +17,18 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-public class MenuServiceTest {
+public class MenuServiceTest extends IntegrationTest {
 
     @Autowired
     private MenuService menuService;
-
-    @Autowired
-    private MenuRepository menuRepository;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
 
     @DisplayName("새로운 메뉴를 생성할 수 있다.")
     @Nested
@@ -393,5 +379,77 @@ public class MenuServiceTest {
                 UUID.fromString("00000000-0000-0000-0000-000000000000")
             )).isExactlyInstanceOf(NoSuchElementException.class);
         }
+    }
+
+    @DisplayName("메뉴를 사용자에게 노출되지 않도록 감출 수 있다.")
+    @Nested
+    class Hide {
+
+        private Menu 햄버거_콜라_세트메뉴;
+
+        @BeforeEach
+        void setUp() {
+            Product 햄버거 = productRepository.save(ProductWithUUID("햄버거", 15_000));
+            Product 콜라 = productRepository.save(ProductWithUUID("콜라", 2_000));
+            MenuProduct 햄버거_메뉴상품 = MenuProductWithProduct(햄버거, 1);
+            MenuProduct 콜라_메뉴상품 = MenuProductWithProduct(콜라, 1);
+            MenuGroup 세트메뉴 = menuGroupRepository.save(MenuGroupWithUUID("세트메뉴"));
+            햄버거_콜라_세트메뉴 = menuRepository.save(MenuWithUUIDAndMenuGroup(
+                "햄버거 + 콜라 세트메뉴",
+                17_000,
+                세트메뉴,
+                햄버거_메뉴상품, 콜라_메뉴상품
+            ));
+        }
+
+        @DisplayName("성공")
+        @Test
+        void success() {
+            // when
+            Menu result = menuService.hide(햄버거_콜라_세트메뉴.getId());
+
+            // then
+            assertThat(result.isDisplayed()).isFalse();
+        }
+
+        @DisplayName("감출 메뉴가 우선 존재해야 한다.")
+        @Test
+        void menuNotFoundException() {
+            // when, then
+            assertThatThrownBy(() -> menuService.hide(
+                UUID.fromString("00000000-0000-0000-0000-000000000000")
+            )).isExactlyInstanceOf(NoSuchElementException.class);
+        }
+    }
+
+    @DisplayName("전체 메뉴를 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given
+        Product 햄버거 = productRepository.save(ProductWithUUID("햄버거", 15_000));
+        Product 콜라 = productRepository.save(ProductWithUUID("콜라", 2_000));
+        MenuProduct 햄버거_메뉴상품 = MenuProductWithProduct(햄버거, 1);
+        MenuProduct 콜라_메뉴상품 = MenuProductWithProduct(콜라, 1);
+        MenuGroup 세트메뉴 = menuGroupRepository.save(MenuGroupWithUUID("세트메뉴"));
+        MenuGroup 단품메뉴 = menuGroupRepository.save(MenuGroupWithUUID("단품메뉴"));
+        Menu 햄버거_콜라_세트메뉴 = menuRepository.save(MenuWithUUIDAndMenuGroup(
+            "햄버거 + 콜라 세트메뉴",
+            17_000,
+            세트메뉴,
+            햄버거_메뉴상품, 콜라_메뉴상품
+        ));
+        Menu 햄버거_단품메뉴 = menuRepository.save(MenuWithUUIDAndMenuGroup(
+            "햄버거 단품메뉴",
+            15_000,
+            단품메뉴,
+            햄버거_메뉴상품
+        ));
+
+        // when
+        List<Menu> result = menuService.findAll();
+
+        // then
+        assertThat(result).usingRecursiveFieldByFieldElementComparatorIgnoringFields("menuProducts")
+            .containsExactly(햄버거_콜라_세트메뉴, 햄버거_단품메뉴);
     }
 }

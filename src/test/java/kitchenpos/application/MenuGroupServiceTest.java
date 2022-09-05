@@ -7,21 +7,15 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-public class MenuGroupServiceTest {
+public class MenuGroupServiceTest extends IntegrationTest {
 
     @Autowired
     private MenuGroupService menuGroupService;
-
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
 
     @DisplayName("새로운 메뉴그룹을 생성할 수 있다.")
     @Nested
