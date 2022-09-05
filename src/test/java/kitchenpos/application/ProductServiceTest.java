@@ -4,7 +4,6 @@ import kitchenpos.application.support.TestFixture;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.purgomalum.HttpPurgomalumClient;
 import kitchenpos.infra.purgomalum.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
