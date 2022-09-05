@@ -473,6 +473,42 @@ class MenuServiceTest {
         .isThrownBy(() -> menuService.changePrice(menu.getId(), changePriceMenu));
   }
 
+  @DisplayName("메뉴는 메뉴ID를 통해 메뉴를 진열할 수 있다.")
+  @Test
+  void givenMenuId_whenDisplay_thenReturnDisplayedMenu() {
+    // given
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
+    List<MenuProduct> menuProducts = List.of(
+        createMenuProduct(product1, 1),
+        createMenuProduct(product2, 1)
+    );
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23000),
+        false,
+        menuGroup,
+        menuProducts
+    );
+
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+    // when
+    Menu changedMenu = menuService.display(menu.getId());
+
+    // then
+    assertThat(changedMenu.getId()).isNotNull();
+    assertThat(changedMenu.getName()).isEqualTo(menu.getName());
+    assertThat(changedMenu.getPrice()).isEqualTo(menu.getPrice());
+    assertThat(changedMenu.isDisplayed()).isTrue();
+    assertThat(changedMenu.getMenuGroup().getId()).isEqualTo(menuGroup.getId());
+    assertThat(changedMenu.getMenuGroup().getName()).isEqualTo(menuGroup.getName());
+    assertThat(changedMenu.getMenuProducts()).hasSize(2);
+    assertThat(changedMenu.getMenuProducts()).containsAll(menuProducts);
+  }
+
   private static Menu createMenu(
       String name,
       BigDecimal price,
