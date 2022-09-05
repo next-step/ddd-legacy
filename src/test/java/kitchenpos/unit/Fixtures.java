@@ -18,11 +18,11 @@ public class Fixtures {
         return new MenuGroup("한마리치킨");
     }
 
-    static Product aChickenProduct(int price) {
+    public static Product aChickenProduct(int price) {
         return aProduct("후라이드 치킨", price);
     }
 
-    static Product aProduct(String name, int price) {
+    public static Product aProduct(String name, int price) {
         Product product = new Product();
         product.setName(name);
         product.setPrice(BigDecimal.valueOf(price));
@@ -33,7 +33,7 @@ public class Fixtures {
         return aMenuProduct(aChickenProduct(price), quantity);
     }
 
-    static MenuProduct aMenuProduct(Product product, int quantity) {
+    public static MenuProduct aMenuProduct(Product product, int quantity) {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setProduct(product);
         menuProduct.setProductId(product.getId());
@@ -45,7 +45,7 @@ public class Fixtures {
         return aMenu("후라이드 치킨", price, aChickenMenuProduct(1, 10_000));
     }
 
-    static Menu aMenu(String name, int price, MenuProduct... menuProducts) {
+    public static Menu aMenu(String name, int price, MenuProduct... menuProducts) {
         Menu menu = new Menu();
         menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(price));

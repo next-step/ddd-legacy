@@ -10,13 +10,14 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FakeMenuGroupRepository implements MenuGroupRepository {
+public class MemoryMenuGroupRepository implements MenuGroupRepository {
 
     private static final Map<UUID, MenuGroup> STORE = new HashMap<>();
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
-        return STORE.put(menuGroup.getId(), menuGroup);
+        STORE.put(menuGroup.getId(), menuGroup);
+        return menuGroup;
     }
 
     @Override
