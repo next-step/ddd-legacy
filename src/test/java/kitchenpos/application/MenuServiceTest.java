@@ -1,9 +1,9 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fake.FakePurgomalumClient;
 import kitchenpos.application.support.TestFixture;
 import kitchenpos.domain.*;
-import kitchenpos.domain.Menu;
-import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,12 +11,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.awt.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -30,18 +27,21 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
 
-    @Mock
     private MenuRepository menuRepository;
-    @Mock
     private MenuGroupRepository menuGroupRepository;
-    @Mock
     private ProductRepository productRepository;
-    @Mock
-    private PurgomalumClient purgomalumClient;
+    private FakePurgomalumClient purgomalumClient;
 
-    @InjectMocks
     private MenuService menuService;
 
+    @BeforeEach
+    void setup() {
+        menuRepository = Mockito.mock(MenuRepository.class);
+        menuGroupRepository = Mockito.mock(MenuGroupRepository.class);
+        productRepository = Mockito.mock(ProductRepository.class);
+        purgomalumClient = new FakePurgomalumClient();
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+    }
 
     @DisplayName("메뉴를 생성 할 수 있다.")
     @Test
@@ -54,8 +54,7 @@ class MenuServiceTest {
                 .willReturn(List.of(TestFixture.createFirstProduct()));
         given(productRepository.findById(Mockito.any(UUID.class)))
                 .willReturn(Optional.of(TestFixture.createFirstProduct()));
-        given(purgomalumClient.containsProfanity(Mockito.any(String.class)))
-                .willReturn(false);
+        purgomalumClient.changeProfanity(false);
         given(menuRepository.save(Mockito.any(Menu.class)))
                 .willReturn(menu);
 
@@ -119,6 +118,23 @@ class MenuServiceTest {
 
         Menu menu = TestFixture.createFirstMenu();
         menu.setName(name);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.create(menu));
+    }
+
+    @DisplayName("메뉴 이름이 비속어가 포함되어 있다면, IllegalArgumentException을 발생시킨다.")
+    @Test
+    void create_menu_with_purgomalum() {
+        final Menu menu = TestFixture.createFirstMenu();
+
+        given(menuGroupRepository.findById(Mockito.any(UUID.class)))
+                .willReturn(Optional.of(TestFixture.createFirstMenuGroup()));
+        given(productRepository.findAllByIdIn(Mockito.any()))
+                .willReturn(List.of(TestFixture.createFirstProduct()));
+        given(productRepository.findById(Mockito.any(UUID.class)))
+                .willReturn(Optional.of(TestFixture.createFirstProduct()));
+        purgomalumClient.changeProfanity(true);
+
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(menu));
     }
