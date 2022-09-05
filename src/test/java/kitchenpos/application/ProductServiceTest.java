@@ -13,6 +13,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -21,7 +22,6 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -54,18 +54,19 @@ class ProductServiceTest {
         @Test
         void createdProduct() {
             // given
-            final Product request = ProductStub.create("후라이드 치킨", BigDecimal.valueOf(15_000));
+            final Product request = ProductStub.createRequest("후라이드 치킨", BigDecimal.valueOf(15_000));
 
             given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
-            given(productRepository.save(any())).willReturn(request);
+            given(productRepository.save(any())).will(AdditionalAnswers.returnsFirstArg());
 
             // when
-            final Product product = productService.create(request);
+            final Product result = productService.create(request);
 
             // then
             assertAll(() -> {
-                assertThat(product.getName()).isEqualTo("후라이드 치킨");
-                assertThat(product.getPrice()).isEqualTo(BigDecimal.valueOf(15_000));
+                assertThat(result.getId()).isNotNull();
+                assertThat(result.getName()).isEqualTo("후라이드 치킨");
+                assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(15_000));
             });
         }
 
@@ -73,7 +74,7 @@ class ProductServiceTest {
         @Test
         void null_name() {
             // given
-            final Product request = ProductStub.create(null, BigDecimal.valueOf(15_000));
+            final Product request = ProductStub.createRequest(null, BigDecimal.valueOf(15_000));
 
             // then
             assertThatThrownBy(() -> productService.create(request)).isInstanceOf(IllegalArgumentException.class);
@@ -83,7 +84,7 @@ class ProductServiceTest {
         @Test
         void negative_name() {
             // given
-            final Product request = ProductStub.create("후라이드 치킨", BigDecimal.valueOf(15_000));
+            final Product request = ProductStub.createRequest("후라이드 치킨", BigDecimal.valueOf(15_000));
 
             given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
 
@@ -95,7 +96,7 @@ class ProductServiceTest {
         @Test
         void negative_price() {
             // given
-            final Product request = ProductStub.create("후라이드 치킨", BigDecimal.valueOf(-15_000));
+            final Product request = ProductStub.createRequest("후라이드 치킨", BigDecimal.valueOf(-15_000));
 
             // then
             assertThatThrownBy(() -> productService.create(request)).isInstanceOf(IllegalArgumentException.class);

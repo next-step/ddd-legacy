@@ -25,4 +25,11 @@ public class ProductStub {
         product.setPrice(price);
         return product;
     }
+
+    public static Product createRequest(final String name, final BigDecimal price) {
+        final Product product = new Product();
+        product.setName(name);
+        product.setPrice(price);
+        return product;
+    }
 }
