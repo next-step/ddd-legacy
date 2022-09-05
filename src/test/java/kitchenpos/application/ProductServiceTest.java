@@ -3,7 +3,6 @@ package kitchenpos.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
@@ -136,6 +135,23 @@ class ProductServiceTest {
     assertThat(changedProduct.getId()).isNotNull();
     assertThat(changedProduct.getName()).isEqualTo(product.getName());
     assertThat(changedProduct.getPrice()).isEqualTo(changePriceProduct.getPrice());
+  }
+
+  @DisplayName("상품 가격 변경할 상품 가격은 0원 보다 작을 수 없다")
+  @Test
+  void givenNotValidPrice_whenChangePrice_thenIllegalArgumentException() {
+    // given
+    Product product = new Product();
+    product.setId(UUID.randomUUID());
+    product.setName("후라이드치킨");
+    product.setPrice(BigDecimal.valueOf(11000));
+
+    Product changePriceProduct = new Product();
+    changePriceProduct.setPrice(BigDecimal.valueOf(-1));
+
+    // when & then
+    assertThatIllegalArgumentException().isThrownBy(
+        () -> productService.changePrice(product.getId(), changePriceProduct));
   }
 
 }
