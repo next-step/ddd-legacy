@@ -6,7 +6,6 @@ import java.util.UUID;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderType;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,8 +31,6 @@ public class OrderServiceCompleteDeliveryTest extends OrderServiceTestSupport {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
-    // TODO: 구현에 검증 코드를 넣을지, 이 테스트 코드를 지울지 결정해야 합니다.
-    @Disabled
     @DisplayName("배달 주문이어야 한다.")
     @ParameterizedTest(name = "주문타입이 {0}이 아닌 DELIVERY여야 한다.")
     @EnumSource(value = OrderType.class, names = "DELIVERY", mode = EnumSource.Mode.EXCLUDE)
