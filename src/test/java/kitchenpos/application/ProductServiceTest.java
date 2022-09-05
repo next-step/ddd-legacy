@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -17,10 +16,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -70,6 +67,18 @@ class ProductServiceTest {
     product.setId(UUID.randomUUID());
     product.setName("후라이드치킨");
     product.setPrice(BigDecimal.valueOf(-1));
+
+    // when & then
+    assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
+  }
+
+  @DisplayName("상품 이름은 비어있을 수 없다.")
+  @Test
+  void givenNotValidName_whenCreate_thenIllegalArgumentException() {
+    // given
+    Product product = new Product();
+    product.setId(UUID.randomUUID());
+    product.setPrice(BigDecimal.valueOf(11000));
 
     // when & then
     assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
