@@ -1,11 +1,12 @@
-package kitchenpos.application;
+package kitchenpos.unit;
 
+import kitchenpos.application.ProductService;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.domain.ProfanityChecker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,7 +24,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static kitchenpos.application.Fixtures.*;
+import static kitchenpos.unit.Fixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,10 +40,11 @@ class ProductServiceTest {
     MenuRepository menuRepository;
 
     @Mock
-    PurgomalumClient purgomalumClient;
+    ProfanityChecker profanityChecker;
 
     @InjectMocks
     ProductService productService;
+
 
     @DisplayName("상품의 가격 0원보다 작을 수 없다.")
     @Test
@@ -72,7 +74,7 @@ class ProductServiceTest {
         // given
         Product request = aProduct(source, 10_000);
 
-        when(purgomalumClient.containsProfanity("바보")).thenReturn(true);
+        when(profanityChecker.containsProfanity("바보")).thenReturn(true);
 
         // when + then
         assertThatThrownBy(() -> productService.create(request))
@@ -86,6 +88,7 @@ class ProductServiceTest {
         Product request = aChickenProduct(10_000);
 
         when(productRepository.save(any())).then(i -> i.getArgument(0, Product.class));
+        when(profanityChecker.containsProfanity(any())).thenReturn(false);
 
         // when
         Product saved = productService.create(request);

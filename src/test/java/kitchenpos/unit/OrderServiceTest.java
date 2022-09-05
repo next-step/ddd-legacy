@@ -1,5 +1,6 @@
-package kitchenpos.application;
+package kitchenpos.unit;
 
+import kitchenpos.application.OrderService;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
@@ -9,7 +10,7 @@ import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
-import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.domain.Riders;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
 
-import static kitchenpos.application.Fixtures.*;
+import static kitchenpos.unit.Fixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -47,7 +48,7 @@ class OrderServiceTest {
     OrderTableRepository orderTableRepository;
 
     @Mock
-    KitchenridersClient kitchenridersClient;
+    Riders riders;
 
     @InjectMocks
     OrderService orderService;
@@ -229,7 +230,7 @@ class OrderServiceTest {
         Order acceptedOrder = orderService.accept(order.getId());
 
         // then
-        verify(kitchenridersClient).requestDelivery(order.getId(), BigDecimal.valueOf(10_000), "서울시 어딘가");
+        verify(riders).requestDelivery(order.getId(), BigDecimal.valueOf(10_000), "서울시 어딘가");
         assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 

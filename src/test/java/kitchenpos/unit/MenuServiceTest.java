@@ -1,5 +1,6 @@
-package kitchenpos.application;
+package kitchenpos.unit;
 
+import kitchenpos.application.MenuService;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -7,7 +8,7 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.domain.ProfanityChecker;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +22,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.application.Fixtures.*;
+import static kitchenpos.unit.Fixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,7 +41,7 @@ class MenuServiceTest {
     ProductRepository productRepository;
 
     @Mock
-    PurgomalumClient purgomalumClient;
+    ProfanityChecker profanityChecker;
 
     @InjectMocks
     MenuService menuService;
@@ -126,7 +127,7 @@ class MenuServiceTest {
         when(menuGroupRepository.findById(request.getMenuGroupId())).thenReturn(Optional.of(request.getMenuGroup()));
         when(productRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(product));
         when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
-        when(purgomalumClient.containsProfanity("바보")).thenReturn(true);
+        when(profanityChecker.containsProfanity("바보")).thenReturn(true);
 
         // when + then
         assertThatThrownBy(() -> menuService.create(request))

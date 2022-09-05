@@ -7,9 +7,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-public interface MenuRepository extends JpaRepository<Menu, UUID> {
+public interface JpaMenuRepository extends JpaRepository<Menu, UUID>, MenuRepository {
+    @Override
     List<Menu> findAllByIdIn(List<UUID> ids);
 
+    @Override
     @Query("select m from Menu m, MenuProduct mp where mp.product.id = :productId")
     List<Menu> findAllByProductId(@Param("productId") UUID productId);
 }
