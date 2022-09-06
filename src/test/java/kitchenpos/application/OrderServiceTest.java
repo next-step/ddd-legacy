@@ -522,4 +522,36 @@ class OrderServiceTest {
         .requestDelivery(order.getId(), BigDecimal.valueOf(23000).multiply(BigDecimal.valueOf(3)),
             "서울시 강남구");
   }
+
+  @DisplayName("주문 ID를 입력받아 제공완료 상태로 변경할 수 있다.")
+  @Test
+  void givenServeOrder_whenServe_thenOrder() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setMenu(menu);
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.DELIVERY);
+    order.setStatus(OrderStatus.ACCEPTED);
+    order.setDeliveryAddress("서울시 강남구");
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+    // when
+    Order servedOrder = orderService.serve(order.getId());
+
+    // then
+    assertThat(servedOrder.getId()).isEqualTo(order.getId());
+    assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+  }
+
 }
