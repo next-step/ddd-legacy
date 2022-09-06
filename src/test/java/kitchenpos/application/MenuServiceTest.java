@@ -1,5 +1,9 @@
 package kitchenpos.application;
 
+import static kitchenpos.fixtures.MenuFixtures.createMenu;
+import static kitchenpos.fixtures.MenuFixtures.createMenuGroup;
+import static kitchenpos.fixtures.MenuFixtures.createMenuProduct;
+import static kitchenpos.fixtures.MenuFixtures.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -662,47 +666,6 @@ class MenuServiceTest {
     assertThat(menus).extracting(Menu::getName).contains("후라이드 + 양념치킨", "간장치킨 + 마늘치킨");
     assertThat(menus).extracting(Menu::getPrice)
         .contains(BigDecimal.valueOf(26000), BigDecimal.valueOf(23000));
-  }
-
-  private static Menu createMenu(
-      String name,
-      BigDecimal price,
-      boolean isDisplayed,
-      MenuGroup menuGroup,
-      List<MenuProduct> menuProducts
-  ) {
-    Menu menu = new Menu();
-    menu.setId(UUID.randomUUID());
-    menu.setName(name);
-    menu.setPrice(price);
-    menu.setDisplayed(isDisplayed);
-    menu.setMenuGroupId(menuGroup.getId());
-    menu.setMenuGroup(menuGroup);
-    menu.setMenuProducts(menuProducts);
-    return menu;
-  }
-
-  private static MenuGroup createMenuGroup(String name) {
-    MenuGroup menuGroup = new MenuGroup();
-    menuGroup.setId(UUID.randomUUID());
-    menuGroup.setName(name);
-    return menuGroup;
-  }
-
-  private static MenuProduct createMenuProduct(Product product, int quantity) {
-    MenuProduct menuProduct = new MenuProduct();
-    menuProduct.setProductId(product.getId());
-    menuProduct.setProduct(product);
-    menuProduct.setQuantity(quantity);
-    return menuProduct;
-  }
-
-  private static Product createProduct(String name, BigDecimal price) {
-    Product product = new Product();
-    product.setId(UUID.randomUUID());
-    product.setName(name);
-    product.setPrice(price);
-    return product;
   }
 
   private static Stream<Arguments> provideBigDecimalsForNullAndNegative() {
