@@ -19,37 +19,6 @@ class SimpleStringParserTest {
 
     private final SimpleStringParser simpleStringParser = new SimpleStringParser();
 
-    private static LongStream randomNonNegativeLong() {
-        return new Random().longs(100)
-                .map(Math::abs);
-    }
-
-    private static Stream<Character> nonNumericChar() {
-        final List<Character> result = new ArrayList<>();
-        for (int c = 0x21; c < 0x80; c++) {
-            if (isValidCharacter((char) c)) {
-                continue;
-            }
-            result.add((char) c);
-        }
-        return result.stream();
-    }
-
-    private static Stream<Character> invalidDelimiter() {
-        final List<Character> result = new ArrayList<>();
-        for (int c = 0x01; c < 0x80; c++) {
-            if (isValidCharacter((char) c)) {
-                continue;
-            }
-            result.add((char) c);
-        }
-        return result.stream();
-    }
-
-    private static boolean isValidCharacter(final char c) {
-        return (c == ',' || c == ':' || ('0' <= c && c <= '9'));
-    }
-
     @DisplayName("string이 null 또는 empty인 경우 빈 배열을 반환해야 한다.")
     @NullAndEmptySource
     @ParameterizedTest
@@ -118,5 +87,36 @@ class SimpleStringParserTest {
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(
                 () -> this.simpleStringParser.parse(string)
         );
+    }
+
+    private static LongStream randomNonNegativeLong() {
+        return new Random().longs(100)
+                .map(Math::abs);
+    }
+
+    private static Stream<Character> nonNumericChar() {
+        final List<Character> result = new ArrayList<>();
+        for (int c = 0x21; c < 0x80; c++) {
+            if (isValidCharacter((char) c)) {
+                continue;
+            }
+            result.add((char) c);
+        }
+        return result.stream();
+    }
+
+    private static Stream<Character> invalidDelimiter() {
+        final List<Character> result = new ArrayList<>();
+        for (int c = 0x01; c < 0x80; c++) {
+            if (isValidCharacter((char) c)) {
+                continue;
+            }
+            result.add((char) c);
+        }
+        return result.stream();
+    }
+
+    private static boolean isValidCharacter(final char c) {
+        return (c == ',' || c == ':' || ('0' <= c && c <= '9'));
     }
 }

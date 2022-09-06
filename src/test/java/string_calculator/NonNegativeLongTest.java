@@ -14,16 +14,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class NonNegativeLongTest {
 
-    private static LongStream randomPositiveInteger() {
-        final Random random = new Random();
-        return random.longs(100)
-                .map(Math::abs);
-    }
-
-    private static LongStream randomNegativeInteger() {
-        return randomPositiveInteger().map((l) -> l * (-1));
-    }
-
     @DisplayName("value는 양의 정수일 수 있다.")
     @MethodSource("randomPositiveInteger")
     @ParameterizedTest
@@ -78,5 +68,15 @@ class NonNegativeLongTest {
     @ParameterizedTest
     void construct_with_blank_string(final String string) {
         assertThatIllegalArgumentException().isThrownBy(() -> new NonNegativeLong(string));
+    }
+
+    private static LongStream randomPositiveInteger() {
+        final Random random = new Random();
+        return random.longs(100)
+                .map(Math::abs);
+    }
+
+    private static LongStream randomNegativeInteger() {
+        return randomPositiveInteger().map((l) -> l * (-1));
     }
 }
