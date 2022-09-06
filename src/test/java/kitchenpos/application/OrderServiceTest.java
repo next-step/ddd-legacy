@@ -699,4 +699,32 @@ class OrderServiceTest {
     assertThat(servedOrder.getId()).isEqualTo(order.getId());
     assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
   }
+
+  @DisplayName("주문이 배송 중인 경우에만 배송완료 상태로 변경 가능하다.")
+  @Test
+  void givenNotDeliveringOrder_whenStartDelivery_thenIllegalStateException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setMenu(menu);
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.DELIVERY);
+    order.setStatus(OrderStatus.SERVED);
+    order.setDeliveryAddress("서울시 강남구");
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+    // when & then
+    assertThatIllegalStateException()
+        .isThrownBy(() -> orderService.completeDelivery(order.getId()));
+  }
 }
