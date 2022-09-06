@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MenuGroupServiceTest extends InitTest {
@@ -21,7 +22,9 @@ class MenuGroupServiceTest extends InitTest {
     public void create() {
         MenuGroup request = buildValidMenuGroup();
 
-        target.create(request);
+        MenuGroup menuGroup = target.create(request);
+
+        assertThat(menuGroup.getName()).isEqualTo(request.getName());
     }
 
     @ParameterizedTest
