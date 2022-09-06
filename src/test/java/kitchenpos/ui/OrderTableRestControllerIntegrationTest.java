@@ -1,5 +1,7 @@
 package kitchenpos.ui;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -129,6 +131,28 @@ class OrderTableRestControllerIntegrationTest {
         .andExpect(jsonPath("$.numberOfGuests").value(4))
         .andExpect(jsonPath("$.occupied").value(true))
     ;
+  }
+
+  @DisplayName("주문테이블 조회 요청에 HTTP 200과 함께 주문테이블들을 반환한다")
+  @Test
+  void givenOrderTables_whenFindAll_thenStatus200WithOrderTables() throws Exception {
+    OrderTable orderTable1 = new OrderTable();
+    orderTable1.setName("1번");
+
+    OrderTable orderTable2 = new OrderTable();
+    orderTable2.setName("2번");
+
+    orderTableService.create(orderTable1);
+    orderTableService.create(orderTable2);
+
+    mvc.perform(get("/api/order-tables").accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0].name").value("1번"))
+        .andExpect(jsonPath("$[1].name").value("2번"))
+        ;
   }
 
 }
