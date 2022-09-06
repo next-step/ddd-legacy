@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
@@ -9,6 +10,7 @@ import static org.mockito.BDDMockito.given;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
@@ -351,6 +353,38 @@ class OrderServiceTest {
     // when & then
     assertThatIllegalArgumentException()
         .isThrownBy(() -> orderService.create(order));
+  }
+
+  @DisplayName("매장식사 주문인 경우 주문테이블이 존재하지 않으면 주문을 생성할 수 없다.")
+  @Test
+  void givenEmptyTable_whenCreate_thenIllegalArgumentException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderTable orderTable = new OrderTable();
+    orderTable.setId(UUID.randomUUID());
+    orderTable.setOccupied(true);
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.EAT_IN);
+    order.setOrderTableId(orderTable.getId());
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+    given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.empty());
+
+    // when & then
+    assertThatThrownBy(() -> orderService.create(order))
+        .isInstanceOf(NoSuchElementException.class);
   }
 
 }
