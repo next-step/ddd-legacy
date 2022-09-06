@@ -127,4 +127,37 @@ class OrderServiceTest {
         .contains(menu.getId());
   }
 
+  @DisplayName("유효한 테이크아웃 주문정보를 입력하면 생성된 주문을 반환한다")
+  @Test
+  void givenValidTakeOutOrder_whenCreate_thenReturnOrder() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.TAKEOUT);
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+    given(orderRepository.save(any(Order.class))).willReturn(order);
+
+    // when
+    Order createdOrder = orderService.create(order);
+
+    // then
+    assertThat(createdOrder.getId()).isNotNull();
+    assertThat(createdOrder.getType()).isEqualTo(OrderType.TAKEOUT);
+    assertThat(createdOrder.getOrderLineItems()).hasSize(1);
+    assertThat(createdOrder.getOrderLineItems()).extracting(OrderLineItem::getMenuId)
+        .contains(menu.getId());
+  }
+
 }
