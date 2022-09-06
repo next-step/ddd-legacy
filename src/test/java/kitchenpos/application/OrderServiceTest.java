@@ -325,4 +325,32 @@ class OrderServiceTest {
         .isThrownBy(() -> orderService.create(order));
   }
 
+  @DisplayName("배달 주문인 경우 배달주소가 비어있을 수 없다.")
+  @NullAndEmptySource
+  @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
+  void givenEmptyDeliveryAddress_whenCreate_thenIllegalArgumentException(String deliveryAddress) {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.DELIVERY);
+    order.setOrderLineItems(List.of(orderLineItem));
+    order.setDeliveryAddress(deliveryAddress);
+
+    given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> orderService.create(order));
+  }
+
 }
