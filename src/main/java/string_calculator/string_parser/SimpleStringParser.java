@@ -1,7 +1,9 @@
 package string_calculator.string_parser;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import string_calculator.NonNegativeLong;
 
 public class SimpleStringParser implements StringParser {
@@ -14,10 +16,8 @@ public class SimpleStringParser implements StringParser {
 
         final String[] tokens = string.split("[,:]");
 
-        final List<NonNegativeLong> result = new ArrayList<>();
-        for (String token : tokens) {
-            result.add(new NonNegativeLong(token));
-        }
-        return result;
+        return Arrays.stream(tokens)
+                .map(NonNegativeLong::new)
+                .collect(Collectors.toUnmodifiableList());
     }
 }

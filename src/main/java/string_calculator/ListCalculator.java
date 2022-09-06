@@ -14,10 +14,8 @@ public class ListCalculator {
     }
 
     public Long sum() {
-        long result = 0;
-        for (final NonNegativeLong e : list) {
-            result += e.value();
-        }
-        return result;
+        return this.list.stream()
+                .mapToLong(NonNegativeLong::value)
+                .sum();
     }
 }
