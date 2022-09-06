@@ -845,4 +845,45 @@ class OrderServiceTest {
     assertThatIllegalStateException()
         .isThrownBy(() -> orderService.complete(order.getId()));
   }
+
+  @DisplayName("매장식사 주문인 경우 주문테이블에 포함된 주문 건이 모두 완료된 상태라면 주문테이블을 정리한다.")
+  @Test
+  void givenValidEatInOrder_whenComplete_thenIllegalStateException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderTable orderTable = new OrderTable();
+    orderTable.setId(UUID.randomUUID());
+    orderTable.setNumberOfGuests(5);
+    orderTable.setOccupied(true);
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setMenu(menu);
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setOrderTableId(orderTable.getId());
+    order.setOrderTable(orderTable);
+    order.setType(OrderType.EAT_IN);
+    order.setStatus(OrderStatus.SERVED);
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+    given(orderRepository.existsByOrderTableAndStatusNot(any(), any()))
+        .willReturn(false);
+
+    // when
+    Order completedOrder = orderService.complete(order.getId());
+
+    // then
+    assertThat(completedOrder.getId()).isEqualTo(order.getId());
+    assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    assertThat(completedOrder.getOrderTable().getNumberOfGuests()).isEqualTo(0);
+    assertThat(completedOrder.getOrderTable().isOccupied()).isEqualTo(false);
+  }
 }
