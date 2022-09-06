@@ -130,6 +130,24 @@ class OrderRestControllerIntegrationTest {
         .andExpect(jsonPath("$.status").value(OrderStatus.SERVED.name()));
   }
 
+  @DisplayName("주문 배송 시작 요청에 HTTP 200과 함께 배송 중 주문을 반환한다")
+  @Test
+  void givenValidOrder_whenStartDelivery_thenStatus200WithDeliveringOrder() throws Exception {
+    Order savedOrder = orderService.create(createDeliveryOrder());
+    orderService.accept(savedOrder.getId());
+    orderService.serve(savedOrder.getId());
+
+    mvc.perform(
+            put("/api/orders/{orderId}/start-delivery", savedOrder.getId())
+                .accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.id").exists())
+        .andExpect(jsonPath("$.type").value(OrderType.DELIVERY.name()))
+        .andExpect(jsonPath("$.status").value(OrderStatus.DELIVERING.name()));
+  }
+
   private Order createEatInOrder() {
     MenuGroup menuGroup = createMenuGroup("추천메뉴");
 
@@ -168,6 +186,41 @@ class OrderRestControllerIntegrationTest {
     Order order = new Order();
     order.setType(OrderType.EAT_IN);
     order.setOrderTableId(savedOrderTable.getId());
+    order.setOrderLineItems(List.of(orderLineItem));
+    return order;
+  }
+
+  private Order createDeliveryOrder() {
+    MenuGroup menuGroup = createMenuGroup("추천메뉴");
+
+    Product product1 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+    Product product2 = createProduct("양념치킨", BigDecimal.valueOf(12000));
+
+    MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
+    Product savedProduct1 = productRepository.save(product1);
+    Product savedProduct2 = productRepository.save(product2);
+
+    Menu menu = createMenu(
+        "후라이드 + 양념치킨",
+        BigDecimal.valueOf(23000),
+        true,
+        savedMenuGroup,
+        List.of(
+            createMenuProduct(savedProduct1, 1),
+            createMenuProduct(savedProduct2, 1)
+        )
+    );
+
+    Menu savedMenu = menuRepository.save(menu);
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(savedMenu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setType(OrderType.DELIVERY);
+    order.setDeliveryAddress("서울시 강남구");
     order.setOrderLineItems(List.of(orderLineItem));
     return order;
   }
