@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -45,7 +45,6 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
   void chageOrderTableSit() {
     ExtractableResponse<Response> response = OrderTableSteps.createOrderTable("1번");
 
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     assertThat(response.jsonPath().getBoolean("occupied")).isEqualTo(false);
 
     OrderTableSteps.chageOrderTableSit(response.jsonPath().getUUID("id"));
@@ -58,13 +57,11 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
 
   @DisplayName("주문 테이블 손님수 변경")
   @Test
-  void chageOrderTableNumberOfGuests() {
-    ExtractableResponse<Response> response = OrderTableSteps.createOrderTable("1번");
+  void chageOrderTableNumberOfGusts() {
+    UUID 테이블_1번 = OrderTableSteps.createOrderTable("1번").jsonPath().getUUID("id");
 
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(response.jsonPath().getUUID("id"));
-    OrderTableSteps.chageOrderTableNumberOfGuests(response.jsonPath().getUUID("id"), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
+    OrderTableSteps.chageOrderTableNumberOfGuests(테이블_1번, 2);
 
     ExtractableResponse<Response> result = OrderTableSteps.getOrderTables();
 
@@ -75,11 +72,9 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 테이블 손님수가 음수이면 에러")
   @Test
   void chageOrderTableNumberOfGuestsNegative() {
-    ExtractableResponse<Response> response = OrderTableSteps.createOrderTable("1번");
+    UUID 테이블_1번 = OrderTableSteps.createOrderTable("1번").jsonPath().getUUID("id");
 
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    ExtractableResponse<Response> result = OrderTableSteps.chageOrderTableNumberOfGuests(response.jsonPath().getUUID("id"), -1);
+    ExtractableResponse<Response> result = OrderTableSteps.chageOrderTableNumberOfGuests(테이블_1번, -1);
 
     assertThat(result.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
   }
@@ -87,11 +82,9 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 테이블 빈 테이블에서 손님수 변경시 에러")
   @Test
   void chageOrderTableNumberOfGuestsNotSit() {
-    ExtractableResponse<Response> response = OrderTableSteps.createOrderTable("1번");
+    UUID 테이블_1번 = OrderTableSteps.createOrderTable("1번").jsonPath().getUUID("id");
 
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    ExtractableResponse<Response> result = OrderTableSteps.chageOrderTableNumberOfGuests(response.jsonPath().getUUID("id"), 2);
+    ExtractableResponse<Response> result = OrderTableSteps.chageOrderTableNumberOfGuests(테이블_1번, 2);
 
     assertThat(result.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
   }

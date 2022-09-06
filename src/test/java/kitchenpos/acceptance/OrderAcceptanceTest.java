@@ -22,30 +22,29 @@ public class OrderAcceptanceTest extends AcceptanceTest {
 
   private UUID 추천메뉴;
   private UUID 강정치킨;
+  private UUID 테이블_1번;
+  private UUID 신메뉴;
 
-  private Menu 신메뉴;
+  private OrderLineItem orderLineItem;
 
   @BeforeEach
   void init() {
     추천메뉴 = MenuGroupSteps.createMenuGroup("추천메뉴").jsonPath().getUUID("id");
     강정치킨 = ProductSteps.createProduct("강정치킨", 17000).jsonPath().getUUID("id");
-    신메뉴 = new Menu("후라이드+후라이드", BigDecimal.valueOf(19000), true, List.of(new MenuProduct(2, 강정치킨)), 추천메뉴);
+    테이블_1번 = OrderTableSteps.createOrderTable("1번").jsonPath().getUUID("id");
+    Menu menu = new Menu("후라이드+후라이드", BigDecimal.valueOf(19000), true, List.of(new MenuProduct(2, 강정치킨)), 추천메뉴);
+    신메뉴 = MenuSteps.createMenu(menu).jsonPath().getUUID("id");
+
+    orderLineItem = new OrderLineItem(신메뉴, BigDecimal.valueOf(19000), 2);
   }
 
   @DisplayName("주문 매장식사 등록")
   @Test
   void createOrderEatIn() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), 테이블_1번);
 
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
-
-    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), orderTableResponse.jsonPath().getUUID("id"));
     ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
 
     assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -55,15 +54,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 포장 등록")
   @Test
   void createOrderTakeOut() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(OrderType.TAKEOUT, List.of(orderLineItem));
     ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
@@ -75,15 +66,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 배달 등록")
   @Test
   void createOrderDelivery() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
     ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
@@ -95,15 +78,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 타입 null 에러")
   @Test
   void orderTypeNull() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(null, List.of(orderLineItem));
     ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
@@ -123,16 +98,8 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("노출되지 않은 메뉴는 선택하면 에러")
   @Test
   void menuDisplayHideSelect() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-    MenuSteps.chageDisplayHide(menuResponse.jsonPath().getUUID("id"));
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
+    MenuSteps.chageDisplayHide(신메뉴);
 
     Order order = new Order(OrderType.TAKEOUT, List.of(orderLineItem));
     ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
@@ -143,22 +110,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 배달 수락")
   @Test
   void orderDeliveryAccept() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    UUID 배달주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
+    orderAccept(배달주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
@@ -168,22 +125,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 매장식사 수락")
   @Test
   void orderEatInAccept() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), 테이블_1번);
+    UUID 매장식사주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
-
-    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), orderTableResponse.jsonPath().getUUID("id"));
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
-
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
+    orderAccept(매장식사주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
@@ -193,22 +140,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 포장 수락")
   @Test
   void orderTakeOutAccept() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(OrderType.TAKEOUT, List.of(orderLineItem));
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    UUID 포장주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
+    orderAccept(포장주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
@@ -218,23 +155,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 배달 서빙")
   @Test
   void orderDeliveryServe() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    UUID 배달주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderServe(orderResponse.jsonPath().getUUID("id"));
+    orderAcceptToServe(배달주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
@@ -244,23 +170,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 매장식사 서빙")
   @Test
   void orderEatInServe() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), 테이블_1번);
+    UUID 매장식사주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
-
-    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), orderTableResponse.jsonPath().getUUID("id"));
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
-
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderServe(orderResponse.jsonPath().getUUID("id"));
+    orderAcceptToServe(매장식사주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
@@ -270,23 +185,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 포장 서빙")
   @Test
   void orderTakeOutServe() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(OrderType.TAKEOUT, List.of(orderLineItem));
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    UUID 포장주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderServe(orderResponse.jsonPath().getUUID("id"));
+    orderAcceptToServe(포장주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
@@ -296,24 +200,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 배달 배달 시작")
   @Test
   void orderDeliveryStart() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    UUID 배달주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderServe(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderDeliveryStart(orderResponse.jsonPath().getUUID("id"));
+    orderAcceptToDeliveryStart(배달주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
@@ -323,25 +215,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 배달 배달 완료")
   @Test
   void orderDeliveryComplete() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    UUID 배달주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderServe(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderDeliveryStart(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderDeliveryComplete(orderResponse.jsonPath().getUUID("id"));
+    orderAcceptToDeliveryComplete(배달주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
@@ -351,26 +230,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 완료(배달)")
   @Test
   void orderCompleteDelivery() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    UUID 배달주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderServe(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderDeliveryStart(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderDeliveryComplete(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.ordercomplete(orderResponse.jsonPath().getUUID("id"));
+    orderDeliveryAcceptToComplete(배달주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
@@ -380,26 +245,14 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 완료(매장식사)")
   @Test
   void orderCompleteEatIn() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    ExtractableResponse<Response> orderTableSitResponse = OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
+    ExtractableResponse<Response> orderTableSitResponse = OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     assertThat(orderTableSitResponse.jsonPath().getBoolean("occupied")).isEqualTo(true);
 
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
+    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), 테이블_1번);
+    UUID 매장식사주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
-
-    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), orderTableResponse.jsonPath().getUUID("id"));
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
-
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderServe(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.ordercomplete(orderResponse.jsonPath().getUUID("id"));
+    orderNotDeliveryAcceptToComplete(매장식사주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
@@ -410,27 +263,44 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 완료(포장)")
   @Test
   void orderCompleteTakeOut() {
-    ExtractableResponse<Response> orderTableResponse = OrderTableSteps.createOrderTable("1번");
-
-    assertThat(orderTableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderTableSteps.chageOrderTableSit(orderTableResponse.jsonPath().getUUID("id"));
-
-    ExtractableResponse<Response> menuResponse = MenuSteps.createMenu(신메뉴);
-
-    OrderLineItem orderLineItem = new OrderLineItem(menuResponse.jsonPath().getUUID("id"), BigDecimal.valueOf(19000), 2);
+    OrderTableSteps.chageOrderTableSit(테이블_1번);
 
     Order order = new Order(OrderType.TAKEOUT, List.of(orderLineItem));
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    UUID 포장주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
 
-    assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
-    OrderSteps.orderAccept(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.orderServe(orderResponse.jsonPath().getUUID("id"));
-    OrderSteps.ordercomplete(orderResponse.jsonPath().getUUID("id"));
+    orderNotDeliveryAcceptToComplete(포장주문);
 
     ExtractableResponse<Response> result = OrderSteps.getOrder();
 
     assertThat(result.jsonPath().getList("status")).containsExactly("COMPLETED");
+  }
+
+  private void orderNotDeliveryAcceptToComplete(UUID orderId) {
+    orderAcceptToServe(orderId);
+    OrderSteps.ordercomplete(orderId);
+  }
+
+  private void orderDeliveryAcceptToComplete(UUID orderId) {
+    orderAcceptToDeliveryComplete(orderId);
+    OrderSteps.ordercomplete(orderId);
+  }
+
+  private void orderAcceptToDeliveryComplete(UUID orderId) {
+    orderAcceptToDeliveryStart(orderId);
+    OrderSteps.orderDeliveryComplete(orderId);
+  }
+
+  private void orderAcceptToDeliveryStart(UUID orderId) {
+    orderAcceptToServe(orderId);
+    OrderSteps.orderDeliveryStart(orderId);
+  }
+
+  private void orderAcceptToServe(UUID orderId) {
+    orderAccept(orderId);
+    OrderSteps.orderServe(orderId);
+  }
+
+  private void orderAccept(UUID orderId) {
+    OrderSteps.orderAccept(orderId);
   }
 }
