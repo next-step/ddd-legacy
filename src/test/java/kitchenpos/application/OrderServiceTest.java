@@ -19,6 +19,7 @@ import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
@@ -418,6 +419,40 @@ class OrderServiceTest {
     // when & then
     assertThatIllegalStateException()
         .isThrownBy(() -> orderService.create(order));
+  }
+
+  @DisplayName("주문 ID를 입력받아 주문을 접수할 수 있다.")
+  @Test
+  void givenValidOrder_whenAccept_thenOrder() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderTable orderTable = new OrderTable();
+    orderTable.setId(UUID.randomUUID());
+    orderTable.setOccupied(false);
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.EAT_IN);
+    order.setStatus(OrderStatus.WAITING);
+    order.setOrderTableId(orderTable.getId());
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+    // when
+    Order acceptedOrder = orderService.accept(order.getId());
+
+    // then
+    assertThat(acceptedOrder.getId()).isEqualTo(order.getId());
+    assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
   }
 
 }
