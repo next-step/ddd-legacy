@@ -41,8 +41,15 @@ public class Menu {
     @Transient
     private UUID menuGroupId;
 
-    public Menu() {
+    public Menu(String name, BigDecimal price, boolean displayed, List<MenuProduct> menuProducts, UUID menuGroupId) {
+        this.name = name;
+        this.price = price;
+        this.displayed = displayed;
+        this.menuProducts = menuProducts;
+        this.menuGroupId = menuGroupId;
     }
+
+    public Menu() {}
 
     public UUID getId() {
         return id;
