@@ -6,6 +6,7 @@ import static kitchenpos.fixtures.MenuFixtures.createMenuProduct;
 import static kitchenpos.fixtures.MenuFixtures.createProduct;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -15,12 +16,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+import kitchenpos.application.OrderService;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
@@ -59,6 +62,12 @@ class OrderRestControllerIntegrationTest {
   @Autowired
   private OrderTableRepository orderTableRepository;
 
+  @Autowired
+  private OrderRepository orderRepository;
+
+  @Autowired
+  private OrderService orderService;
+
   @AfterEach
   void tearDown() {
   }
@@ -85,6 +94,23 @@ class OrderRestControllerIntegrationTest {
         .andExpect(jsonPath("$.orderTable.id").exists())
         .andExpect(jsonPath("$.orderTable.numberOfGuests").value(5))
         .andExpect(jsonPath("$.orderTable.occupied").value(true));
+  }
+
+  @DisplayName("주문 접수 요청에 HTTP 200과 함께 접수완료된 주문을 반환한다")
+  @Test
+  void givenValidOrder_whenAccept_thenStatus200WithAcceptedOrder() throws Exception {
+    // given
+    Order savedOrder = orderService.create(createEatInOrder());
+
+    mvc.perform(
+            put("/api/orders/{orderId}/accept", savedOrder.getId())
+                .accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.id").exists())
+        .andExpect(jsonPath("$.type").value(OrderType.EAT_IN.name()))
+        .andExpect(jsonPath("$.status").value(OrderStatus.ACCEPTED.name()));
   }
 
   private Order createEatInOrder() {
