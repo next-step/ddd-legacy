@@ -248,4 +248,29 @@ class OrderServiceTest {
         .isThrownBy(() -> orderService.create(order));
   }
 
+  @DisplayName("배달 주문인 경우 주문상품수량이 0개 보다 작을 수 없다.")
+  @Test
+  void givenNotValidQuantityTakeOut_whenCreate_thenIllegalArgumentException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(-1);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.TAKEOUT);
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> orderService.create(order));
+  }
+
 }
