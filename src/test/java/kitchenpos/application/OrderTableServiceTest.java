@@ -128,6 +128,26 @@ class OrderTableServiceTest {
         .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
   }
 
+  @DisplayName("주문테이블 ID와 손님 수를 입력받아 손님 수를 변경할 수 있다.")
+  @Test
+  void givenChangeOrderTable_whenChangeNumberOfGuests_thenReturnOrderTable() {
+    // given
+    OrderTable orderTable = createOrderTable("3번", 3, true);
+    given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+
+    OrderTable requestOrderTable = new OrderTable();
+    requestOrderTable.setNumberOfGuests(4);
+
+    // when
+    OrderTable clearedOrderTable = orderTableService.changeNumberOfGuests(orderTable.getId(), requestOrderTable);
+
+    // then
+    assertThat(clearedOrderTable.getId()).isNotNull();
+    assertThat(clearedOrderTable.getName()).isEqualTo("3번");
+    assertThat(clearedOrderTable.getNumberOfGuests()).isEqualTo(4);
+    assertThat(clearedOrderTable.isOccupied()).isEqualTo(true);
+  }
+
   private static OrderTable createInitOrderTable() {
     return createOrderTable("1번", 0, false);
   }
