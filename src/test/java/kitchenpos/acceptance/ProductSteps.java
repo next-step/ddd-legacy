@@ -1,6 +1,7 @@
 package kitchenpos.acceptance;
 
-import io.restassured.RestAssured;
+import static kitchenpos.acceptance.BaseRestAssured.given;
+
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashMap;
@@ -15,8 +16,7 @@ public class ProductSteps {
     params.put("name", name);
     params.put("price", price);
 
-    return RestAssured
-        .given().log().all()
+    return given()
         .body(params)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().post("/api/products")
@@ -27,8 +27,7 @@ public class ProductSteps {
     Map<String, Object> params = new HashMap<>();
     params.put("price", price);
 
-    return RestAssured
-        .given().log().all()
+    return given()
         .body(params)
         .contentType(MediaType.APPLICATION_JSON_VALUE)
         .when().put("/api/products/{productId}/price", productId)
@@ -36,8 +35,7 @@ public class ProductSteps {
   }
 
   public static ExtractableResponse<Response> getProducts() {
-    return RestAssured
-        .given().log().all()
+    return given()
         .when().get("/api/products")
         .then().log().all().extract();
   }
