@@ -273,4 +273,30 @@ class OrderServiceTest {
         .isThrownBy(() -> orderService.create(order));
   }
 
+  @DisplayName("주문상품 메뉴가 진열 중이 아니면 주문을 생성할 수 없다.")
+  @Test
+  void givenHiddenMenu_whenCreate_thenIllegalArgumentException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(false);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.TAKEOUT);
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> orderService.create(order));
+  }
+
 }
