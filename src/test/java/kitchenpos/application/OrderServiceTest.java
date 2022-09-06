@@ -640,4 +640,32 @@ class OrderServiceTest {
     assertThatIllegalStateException()
         .isThrownBy(() -> orderService.serve(order.getId()));
   }
+
+  @DisplayName("주문이 제공완료 상태인 경우에는 배송 중 상태로 변경할 수 없다.")
+  @Test
+  void givenServedOrder_whenStartDelivery_thenIllegalStateException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setMenu(menu);
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.EAT_IN);
+    order.setStatus(OrderStatus.SERVED);
+    order.setDeliveryAddress("서울시 강남구");
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+    // when & then
+    assertThatIllegalStateException()
+        .isThrownBy(() -> orderService.serve(order.getId()));
+  }
 }
