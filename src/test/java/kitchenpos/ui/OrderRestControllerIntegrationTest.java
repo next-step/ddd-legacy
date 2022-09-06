@@ -70,6 +70,7 @@ class OrderRestControllerIntegrationTest {
 
   @AfterEach
   void tearDown() {
+    orderRepository.deleteAll();
   }
 
   @DisplayName("유효한 주문생성 요청에 HTTP 201 상태값과 함께 생성된 주문건을 반환한다")
