@@ -75,4 +75,10 @@ public class OrderTableService {
     public List<OrderTable> findAll() {
         return orderTableRepository.findAll();
     }
+
+    @Transactional(readOnly = true)
+    public OrderTable findById(UUID orderTableId) {
+        return orderTableRepository.findById(orderTableId)
+                .orElseThrow();
+    }
 }

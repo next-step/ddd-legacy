@@ -47,4 +47,9 @@ public class OrderTableRestController {
     public ResponseEntity<List<OrderTable>> findAll() {
         return ResponseEntity.ok(orderTableService.findAll());
     }
+
+    @GetMapping("/{orderTableId}")
+    public ResponseEntity<OrderTable> findById(@PathVariable final UUID orderTableId) {
+        return ResponseEntity.ok(orderTableService.findById(orderTableId));
+    }
 }

@@ -35,4 +35,16 @@ public class OrderFlowAssertions {
         assertThat(response.jsonPath().getString("status")).isEqualTo("WAITING");
         assertThat(response.jsonPath().getString("deliveryAddress")).isNotBlank();
     }
+
+    static void 홀_주문_생성_확인됨(ExtractableResponse<Response> response) {
+        생성_확인됨(response);
+        assertThat(response.jsonPath().getString("type")).isEqualTo("EAT_IN");
+        assertThat(response.jsonPath().getString("status")).isEqualTo("WAITING");
+        assertThat(response.jsonPath().getString("orderTable.id")).isNotBlank();
+    }
+
+    static void 비워진_상태_확인됨(ExtractableResponse<Response> response) {
+        assertThat(response.jsonPath().getBoolean("occupied")).isFalse();
+        assertThat(response.jsonPath().getInt("numberOfGuests")).isZero();
+    }
 }

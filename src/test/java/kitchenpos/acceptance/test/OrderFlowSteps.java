@@ -220,4 +220,69 @@ class OrderFlowSteps {
                 .then().log().all()
                 .extract();
     }
+
+    static ExtractableResponse<Response> 주문_테이블을_조회한다(String orderTableId) {
+        return RestAssured.given().log().all()
+                .when()
+                .get("/api/order-tables/{orderTableId}", orderTableId)
+                .then().log().all()
+                .extract();
+    }
+
+    static ExtractableResponse<Response> 주문_테이블을_생성한다(String name) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", name);
+
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .post("/api/order-tables")
+                .then().log().all()
+                .extract();
+    }
+
+    static ExtractableResponse<Response> 주문_테이블을_점유한다(String orderTableId) {
+        return RestAssured.given().log().all()
+                .when()
+                .put("/api/order-tables/{orderTableId}/sit", orderTableId)
+                .then().log().all()
+                .extract();
+    }
+
+    static ExtractableResponse<Response> 주문_테이블을_비운다(String orderTableId) {
+        return RestAssured.given().log().all()
+                .when()
+                .put("/api/order-tables/{orderTableId}/clear", orderTableId)
+                .then().log().all()
+                .extract();
+    }
+
+    static ExtractableResponse<Response> 주문_테이블_손님_수를_설정한다(String orderTableId, int numberOfGuests) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("numberOfGuests", numberOfGuests);
+
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .put("/api/order-tables/{orderTableId}/number-of-guests", orderTableId)
+                .then().log().all()
+                .extract();
+    }
+
+    static ExtractableResponse<Response> 홀_주문을_생성한다(String orderTableId, List<OrderLineItemRequest> orderLineItems) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("type", "EAT_IN");
+        params.put("orderTableId", orderTableId);
+        params.put("orderLineItems", orderLineItems);
+
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(params)
+                .when()
+                .post("/api/orders")
+                .then().log().all()
+                .extract();
+    }
 }

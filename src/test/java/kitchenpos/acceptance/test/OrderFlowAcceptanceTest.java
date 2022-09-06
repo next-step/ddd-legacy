@@ -8,14 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static kitchenpos.acceptance.test.OrderFlowAssertions.*;
-import static kitchenpos.acceptance.test.OrderFlowAssertions.요청에_성공함;
 import static kitchenpos.acceptance.test.OrderFlowSteps.*;
 
 class OrderFlowAcceptanceTest extends AcceptanceTest {
 
-    @DisplayName("배송 주문 시나리오")
+    @DisplayName("배송/홀 주문 시나리오")
     @Test
-    void deliveryOrderFlow() {
+    void orderFlowTest() {
         // 상품 3개를 생성한다.
         var 후라이드_치킨_response = 상품을_생성한다("후라이드 치킨", 10_000);
         생성_확인됨(후라이드_치킨_response);
@@ -75,6 +74,31 @@ class OrderFlowAcceptanceTest extends AcceptanceTest {
         요청에_성공함(배송을_시작한다(배송_주문_id));
         요청에_성공함(배송을_완료한다(배송_주문_id));
         요청에_성공함(주문을_완료한다(배송_주문_id));
+
+        // 홀 주문을 위해 테이블을 생성하고 점유한 뒤 손님 수를 설정한다.
+        var 주문_테이블_response = 주문_테이블을_생성한다("1번 테이블");
+        생성_확인됨(주문_테이블_response);
+        String 주문_테이블_id = 주문_테이블_response.jsonPath().getString("id");
+
+        요청에_실패함(주문_테이블_손님_수를_설정한다(주문_테이블_id, 3));
+        요청에_성공함(주문_테이블을_점유한다(주문_테이블_id));
+        요청에_성공함(주문_테이블_손님_수를_설정한다(주문_테이블_id, 3));
+
+        // 홀 주문을 진행한다. 모든 주문이 완료되야만 주문 테이블이 비워진다.
+        List<OrderLineItemRequest> 홀_주문_상품_리스트 = new ArrayList<>();
+        홀_주문_상품_리스트.add(주문_상품을_생성한다(후라이드_양념_세트_메뉴_id, 2, 40_000));
+        var 홀_주문_response = 홀_주문을_생성한다(주문_테이블_id, 홀_주문_상품_리스트);
+        홀_주문_생성_확인됨(홀_주문_response);
+        String 홀_주문_id = 홀_주문_response.jsonPath().getString("id");
+
+        요청에_실패함(주문_테이블을_비운다(주문_테이블_id));
+        요청에_성공함(주문을_수락한다(홀_주문_id));
+        요청에_성공함(주문_물품이_모두_준비됨(홀_주문_id));
+        요청에_성공함(주문을_완료한다(홀_주문_id));
+        비워진_상태_확인됨(주문_테이블을_조회한다(주문_테이블_id));
     }
+
+
+
 
 }
