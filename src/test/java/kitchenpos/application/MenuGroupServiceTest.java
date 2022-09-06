@@ -1,56 +1,37 @@
 package kitchenpos.application;
 
 
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import java.util.List;
-import java.util.UUID;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.fake.InMemoryMenuGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
+
 @DisplayName("메뉴 그룹 테스트")
 class MenuGroupServiceTest {
 
-    @Mock
-    private MenuGroupRepository menuGroupRepository;
-
-    @InjectMocks
     private MenuGroupService menuGroupService;
-
-    private MenuGroup menuGroup1;
-    private MenuGroup menuGroup2;
 
     @BeforeEach
     void setUp() {
-        menuGroup1 = new MenuGroup();
-        menuGroup1.setName("그룹1");
-        menuGroup1.setId(UUID.randomUUID());
+        menuGroupService = new MenuGroupService(new InMemoryMenuGroupRepository());
 
-        menuGroup2 = new MenuGroup();
-        menuGroup2.setName("그룹2");
-        menuGroup2.setId(UUID.randomUUID());
     }
 
     @DisplayName("메뉴 그룹을 생성 할때 이름은 필수 이다.")
     @ParameterizedTest
     @NullAndEmptySource
     void name_is_Not_Empty(String name) {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(name);
+        MenuGroup menuGroup = createMenuGroup(name);
 
         assertThatIllegalArgumentException().isThrownBy(() ->
                 menuGroupService.create(menuGroup)
@@ -61,19 +42,15 @@ class MenuGroupServiceTest {
     @Test
     void create() {
         //given
-        MenuGroup resultMenu = menuGroup1;
-
-        given(menuGroupRepository.save(any())).willReturn(menuGroup1);
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName("그룹1");
+        MenuGroup menuGroup = createMenuGroup("그룹1");
 
         //when
         final MenuGroup createMenuGroup = menuGroupService.create(menuGroup);
 
         //then
         assertAll(
-                () -> assertThat(createMenuGroup.getName()).isEqualTo(resultMenu.getName()),
-                () -> assertThat(createMenuGroup.getId()).isEqualTo(resultMenu.getId())
+                () -> assertThat(createMenuGroup.getName()).isEqualTo(menuGroup.getName()),
+                () -> assertThat(createMenuGroup.getId()).isNotNull()
         );
     }
 
@@ -81,15 +58,16 @@ class MenuGroupServiceTest {
     @Test
     void findMenuGroup() {
         //given
-        List<MenuGroup> resultMenuGroup = List.of(menuGroup1, menuGroup2);
-        given(menuGroupRepository.findAll()).willReturn(resultMenuGroup);
+        menuGroupService.create(createMenuGroup("세트1"));
+        menuGroupService.create(createMenuGroup("세트2"));
 
         //when
         final List<MenuGroup> menuGroups = menuGroupService.findAll();
 
+        //then
         assertAll(
                 () -> assertThat(menuGroups.size()).isEqualTo(2),
-                () -> assertThat(menuGroups).contains(menuGroup1, menuGroup2)
+                () -> assertThat(menuGroups).extracting("name").containsExactly("세트1", "세트2")
         );
     }
 

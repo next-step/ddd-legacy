@@ -3,15 +3,18 @@ package kitchenpos.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.stream.Stream;
 import kitchenpos.domain.MenuGroup;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -43,35 +46,29 @@ class MenuGroupAcceptTest {
             then 등록된 메뉴가 조회 된다.
      */
     @DisplayName("메뉴 그룹 관리한다.")
-    @TestFactory
-    Stream<DynamicTest> menuGroupManage() {
-        MenuGroup menuGroup1 = new MenuGroup();
-        menuGroup1.setName("세트1");
-        MenuGroup menuGroup2 = new MenuGroup();
-        menuGroup2.setName("세트2");
+    @Test
+    void menuGroupManage() {
+        MenuGroup 세트1 = createMenuGroup("세트1");
+        MenuGroup 세트2 = createMenuGroup("세트2");
 
-        return Stream.of(
-        dynamicTest("2개의 메뉴 그룹을 등록 한다.", () -> {
-            final ExtractableResponse<Response> 세트1_메뉴그룹을_등록 = 메뉴그룹_등록을_요청(menuGroup1);
-            final ExtractableResponse<Response> 세트2_메뉴그룹을_등록 = 메뉴그룹_등록을_요청(menuGroup2);
+        final ExtractableResponse<Response> 세트1_메뉴그룹을_등록 = 메뉴그룹_등록을_요청(세트1);
+        final ExtractableResponse<Response> 세트2_메뉴그룹을_등록 = 메뉴그룹_등록을_요청(세트2);
 
-            assertAll(
-                () -> assertThat(세트1_메뉴그룹을_등록.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(세트2_메뉴그룹을_등록.statusCode()).isEqualTo(HttpStatus.CREATED.value())
-            );
-        })
-        ,dynamicTest("등록된 메뉴가 조회 된다.", () -> {
+        메뉴가_등록됨(세트1_메뉴그룹을_등록);
+        메뉴가_등록됨(세트2_메뉴그룹을_등록);
 
-            final ExtractableResponse<Response> 등록된_메뉴그룹 = 메뉴그룹들을_조회();
-            assertAll(
-                    () -> assertThat(등록된_메뉴그룹.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(등록된_메뉴그룹.jsonPath().getList(".", MenuGroup.class))
-                            .extracting("name")
-                            .containsExactly(menuGroup1.getName(), menuGroup2.getName())
-            );
-        }));
+        final ExtractableResponse<Response> 등록된_메뉴그룹들 = 메뉴그룹들을_조회();
+
+        assertAll(
+                () -> assertThat(등록된_메뉴그룹들.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(등록된_메뉴그룹들.jsonPath().getList(".", MenuGroup.class)).extracting("name").containsExactly(세트1.getName(), 세트2.getName())
+        );
+
     }
 
+    private void 메뉴가_등록됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
 
 
     @DisplayName("메뉴 그룹의 이름이 없으면 생성이 되지 않는다")
@@ -79,8 +76,7 @@ class MenuGroupAcceptTest {
     @NullAndEmptySource
     void noNameMenuGroup(String menuGroupName) {
         //given
-        MenuGroup 이름없는_메뉴_그룹 = new MenuGroup();
-        이름없는_메뉴_그룹.setName(menuGroupName);
+        MenuGroup 이름없는_메뉴_그룹 = createMenuGroup(menuGroupName);
 
         //when
         final ExtractableResponse<Response> createMenuGroup = 메뉴그룹_등록을_요청(이름없는_메뉴_그룹);
