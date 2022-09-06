@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -185,6 +186,36 @@ class OrderServiceTest {
     order.setId(UUID.randomUUID());
     order.setType(OrderType.EAT_IN);
     order.setOrderLineItems(orderLineItems);
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> orderService.create(order));
+  }
+
+  @DisplayName("주문상품 메뉴가 존재하지 않으면 주문을 생성할 수 없다.")
+  @Test
+  void givenNoFoundMenu_whenCreate_thenIllegalArgumentException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderTable orderTable = new OrderTable();
+    orderTable.setId(UUID.randomUUID());
+    orderTable.setOccupied(true);
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.EAT_IN);
+    order.setOrderTableId(orderTable.getId());
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(menuRepository.findAllByIdIn(anyList())).willReturn(Collections.emptyList());
 
     // when & then
     assertThatIllegalArgumentException()
