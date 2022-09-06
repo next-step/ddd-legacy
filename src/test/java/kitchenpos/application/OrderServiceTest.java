@@ -23,6 +23,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -168,6 +170,21 @@ class OrderServiceTest {
     Order order = new Order();
     order.setId(UUID.randomUUID());
     order.setType(null );
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> orderService.create(order));
+  }
+
+  @DisplayName("주문상품들은 비어있을 수 없다.")
+  @NullAndEmptySource
+  @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
+  void givenEmptyOrderItems_whenCreate_thenIllegalArgumentException(List<OrderLineItem> orderLineItems) {
+    // given
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.EAT_IN);
+    order.setOrderLineItems(orderLineItems);
 
     // when & then
     assertThatIllegalArgumentException()
