@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -385,6 +386,38 @@ class OrderServiceTest {
     // when & then
     assertThatThrownBy(() -> orderService.create(order))
         .isInstanceOf(NoSuchElementException.class);
+  }
+
+  @DisplayName("매장식사 주문인 경우 주문테이블이 사용 중이어야 한다.")
+  @Test
+  void givenNotOccupied_whenCreate_thenIllegalArgumentException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderTable orderTable = new OrderTable();
+    orderTable.setId(UUID.randomUUID());
+    orderTable.setOccupied(false);
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.EAT_IN);
+    order.setOrderTableId(orderTable.getId());
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
+    given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+    given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+
+    // when & then
+    assertThatIllegalStateException()
+        .isThrownBy(() -> orderService.create(order));
   }
 
 }
