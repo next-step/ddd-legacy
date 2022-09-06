@@ -612,4 +612,32 @@ class OrderServiceTest {
     assertThat(servedOrder.getId()).isEqualTo(order.getId());
     assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
   }
+
+  @DisplayName("주문타입이 배달인 경우에만 진행할 수 있다.")
+  @Test
+  void givenNotDeliveryOrder_whenStartDelivery_thenIllegalStateException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setMenu(menu);
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.EAT_IN);
+    order.setStatus(OrderStatus.SERVED);
+    order.setDeliveryAddress("서울시 강남구");
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+    // when & then
+    assertThatIllegalStateException()
+        .isThrownBy(() -> orderService.serve(order.getId()));
+  }
 }
