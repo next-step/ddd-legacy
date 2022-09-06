@@ -112,8 +112,6 @@ public class MenuAcceptanceTest extends AcceptanceTest {
   void chageMenuPrice() {
     ExtractableResponse<Response> response = MenuSteps.createMenu(신메뉴);
 
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
     MenuSteps.chagePrice(response.jsonPath().getUUID("id"), 20000);
     ExtractableResponse<Response> result = MenuSteps.getMenus();
 
@@ -126,8 +124,6 @@ public class MenuAcceptanceTest extends AcceptanceTest {
   void chageMenuPriceNegative() {
     ExtractableResponse<Response> response = MenuSteps.createMenu(신메뉴);
 
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
     ExtractableResponse<Response> result = MenuSteps.chagePrice(response.jsonPath().getUUID("id"), -1);
 
     assertThat(result.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -137,8 +133,6 @@ public class MenuAcceptanceTest extends AcceptanceTest {
   @Test
   void chageMenuPriceMenuProduceTotalCompare() {
     ExtractableResponse<Response> response = MenuSteps.createMenu(신메뉴);
-
-    assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
     ExtractableResponse<Response> result = MenuSteps.chagePrice(response.jsonPath().getUUID("id"), 50000);
 
