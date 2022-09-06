@@ -7,6 +7,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -174,7 +176,7 @@ class OrderServiceTest {
     // given
     Order order = new Order();
     order.setId(UUID.randomUUID());
-    order.setType(null );
+    order.setType(null);
 
     // when & then
     assertThatIllegalArgumentException()
@@ -184,7 +186,8 @@ class OrderServiceTest {
   @DisplayName("주문상품들은 비어있을 수 없다.")
   @NullAndEmptySource
   @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
-  void givenEmptyOrderItems_whenCreate_thenIllegalArgumentException(List<OrderLineItem> orderLineItems) {
+  void givenEmptyOrderItems_whenCreate_thenIllegalArgumentException(
+      List<OrderLineItem> orderLineItems) {
     // given
     Order order = new Order();
     order.setId(UUID.randomUUID());
@@ -484,5 +487,39 @@ class OrderServiceTest {
     // when & then
     assertThatIllegalStateException()
         .isThrownBy(() -> orderService.accept(order.getId()));
+  }
+
+  @DisplayName("배달 주문건인 경우 라이더스에게 주문ID, 메뉴가격, 배송지 정보를 통해 배달을 요청한다.")
+  @Test
+  void givenDelivery_whenAccept_thenOrder() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setMenu(menu);
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.DELIVERY);
+    order.setStatus(OrderStatus.WAITING);
+    order.setDeliveryAddress("서울시 강남구");
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+    // when
+    Order acceptedOrder = orderService.accept(order.getId());
+
+    // then
+    assertThat(acceptedOrder.getId()).isEqualTo(order.getId());
+    assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    verify(kitchenridersClient, times(1))
+        .requestDelivery(order.getId(), BigDecimal.valueOf(23000).multiply(BigDecimal.valueOf(3)),
+            "서울시 강남구");
   }
 }
