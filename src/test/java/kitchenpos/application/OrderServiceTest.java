@@ -455,4 +455,34 @@ class OrderServiceTest {
     assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
   }
 
+  @DisplayName("주문이 대기 중이 아닌 경우에는 접수할 수 없다.")
+  @Test
+  void givenNotWaiting_whenAccept_thenIllegalStateException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderTable orderTable = new OrderTable();
+    orderTable.setId(UUID.randomUUID());
+    orderTable.setOccupied(false);
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.EAT_IN);
+    order.setStatus(OrderStatus.ACCEPTED);
+    order.setOrderTableId(orderTable.getId());
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+    // when & then
+    assertThatIllegalStateException()
+        .isThrownBy(() -> orderService.accept(order.getId()));
+  }
 }
