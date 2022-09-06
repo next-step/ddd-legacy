@@ -5,6 +5,7 @@ import static kitchenpos.fixtures.MenuFixtures.createMenuGroup;
 import static kitchenpos.fixtures.MenuFixtures.createMenuProduct;
 import static kitchenpos.fixtures.MenuFixtures.createProduct;
 import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -186,6 +187,23 @@ class OrderRestControllerIntegrationTest {
         .andExpect(jsonPath("$.id").exists())
         .andExpect(jsonPath("$.type").value(OrderType.DELIVERY.name()))
         .andExpect(jsonPath("$.status").value(OrderStatus.COMPLETED.name()));
+  }
+
+  @DisplayName("주문 조회 요청에 응답으로 HTTP 200과 생성된 주문건들을 반환한다")
+  @Test
+  void givenOrders_whenFindAll_thenStatus200WithOrders() throws Exception {
+    orderService.create(createEatInOrder());
+    orderService.create(createDeliveryOrder());
+
+    mvc.perform(
+            get("/api/orders")
+                .accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$", hasSize(2)))
+        .andExpect(jsonPath("$[0].type").value(OrderType.EAT_IN.name()))
+        .andExpect(jsonPath("$[1].type").value(OrderType.DELIVERY.name()));
   }
 
   private Order createEatInOrder() {
