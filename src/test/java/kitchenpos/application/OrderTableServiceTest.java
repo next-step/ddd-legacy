@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -12,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -47,6 +50,19 @@ class OrderTableServiceTest {
     assertThat(createdOrderTable.getName()).isEqualTo("1번");
     assertThat(createdOrderTable.getNumberOfGuests()).isEqualTo(0);
     assertThat(createdOrderTable.isOccupied()).isEqualTo(false);
+  }
+
+  @DisplayName("주문테이블 이름은 비어있을 수 없다.")
+  @NullAndEmptySource
+  @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
+  void givenEmptyName_whenCreate_thenIllegalArgumentException(String name) {
+    // given
+    OrderTable requestOrderTable = new OrderTable();
+    requestOrderTable.setName(name);
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> orderTableService.create(requestOrderTable));
   }
 
   private static OrderTable createInitOrderTable() {
