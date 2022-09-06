@@ -282,7 +282,7 @@ class OrderServiceTest {
 
   @DisplayName("주문상품 메뉴가 진열 중이 아니면 주문을 생성할 수 없다.")
   @Test
-  void givenHiddenMenu_whenCreate_thenIllegalArgumentException() {
+  void givenHiddenMenu_whenCreate_thenIllegalStateException() {
     Menu menu = new Menu();
     menu.setId(UUID.randomUUID());
     menu.setDisplayed(false);
@@ -302,7 +302,7 @@ class OrderServiceTest {
     given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
 
     // when & then
-    assertThatIllegalArgumentException()
+    assertThatIllegalStateException()
         .isThrownBy(() -> orderService.create(order));
   }
 
