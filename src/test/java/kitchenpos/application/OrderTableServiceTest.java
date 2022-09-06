@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
@@ -63,6 +64,23 @@ class OrderTableServiceTest {
     // when & then
     assertThatIllegalArgumentException()
         .isThrownBy(() -> orderTableService.create(requestOrderTable));
+  }
+
+  @DisplayName("주문테이블 ID를 입력받아 주문테이블 사용 중 처리할 수 있다.")
+  @Test
+  void givenOrderTableId_whenSit_thenReturnOrderTable() {
+    // given
+    OrderTable orderTable = createInitOrderTable();
+    given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+
+    // when
+    OrderTable createdOrderTable = orderTableService.sit(orderTable.getId());
+
+    // then
+    assertThat(createdOrderTable.getId()).isNotNull();
+    assertThat(createdOrderTable.getName()).isEqualTo("1번");
+    assertThat(createdOrderTable.getNumberOfGuests()).isEqualTo(0);
+    assertThat(createdOrderTable.isOccupied()).isEqualTo(true);
   }
 
   private static OrderTable createInitOrderTable() {
