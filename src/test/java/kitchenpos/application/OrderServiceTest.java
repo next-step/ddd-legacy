@@ -786,4 +786,31 @@ class OrderServiceTest {
     assertThatIllegalStateException()
         .isThrownBy(() -> orderService.complete(order.getId()));
   }
+
+  @DisplayName("테이크아웃 주문인 경우 제공완료 상태가 아니면 주문을 완료할 수 없다.")
+  @Test
+  void givenTakeOutOrder_whenComplete_thenIllegalStateException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setMenu(menu);
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.TAKEOUT);
+    order.setStatus(OrderStatus.ACCEPTED);
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+    // when & then
+    assertThatIllegalStateException()
+        .isThrownBy(() -> orderService.complete(order.getId()));
+  }
 }
