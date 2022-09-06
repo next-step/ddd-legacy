@@ -148,6 +148,20 @@ class OrderTableServiceTest {
     assertThat(clearedOrderTable.isOccupied()).isEqualTo(true);
   }
 
+  @DisplayName("주문테이블 변경 손님 수는 0원 보다 작을 수 없다.")
+  @Test
+  void givenNegativeNumberOfGuest_whenChangeNumberOfGuests_thenIllegalArgumentException() {
+    // given
+    OrderTable orderTable = createOrderTable("3번", 3, true);
+
+    OrderTable requestOrderTable = new OrderTable();
+    requestOrderTable.setNumberOfGuests(-1);
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), requestOrderTable));
+  }
+
   private static OrderTable createInitOrderTable() {
     return createOrderTable("1번", 0, false);
   }
