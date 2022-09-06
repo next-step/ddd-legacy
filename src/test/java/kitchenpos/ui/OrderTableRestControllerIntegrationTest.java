@@ -105,4 +105,30 @@ class OrderTableRestControllerIntegrationTest {
     ;
   }
 
+  @DisplayName("주문 테이블 손님 수 변경 요청에 HTTP 200과 함께 변경된 주문테이블을 반환한다")
+  @Test
+  void givenValidOrderTable_whenChangeNumberOfGuest_thenStatus200WithOrderTable() throws Exception {
+    OrderTable requestOrderTable = new OrderTable();
+    requestOrderTable.setName("1번");
+    OrderTable orderTable = orderTableService.create(requestOrderTable);
+    orderTableService.sit(orderTable.getId());
+
+    OrderTable changeOrderTable = new OrderTable();
+    changeOrderTable.setNumberOfGuests(4);
+
+    mvc.perform(
+            put("/api/order-tables/{orderTableId}/number-of-guests", orderTable.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(changeOrderTable)))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.id").exists())
+        .andExpect(jsonPath("$.name").value("1번"))
+        .andExpect(jsonPath("$.numberOfGuests").value(4))
+        .andExpect(jsonPath("$.occupied").value(true))
+    ;
+  }
+
 }
