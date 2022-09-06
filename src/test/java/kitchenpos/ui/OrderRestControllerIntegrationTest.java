@@ -113,6 +113,23 @@ class OrderRestControllerIntegrationTest {
         .andExpect(jsonPath("$.status").value(OrderStatus.ACCEPTED.name()));
   }
 
+  @DisplayName("주문 제공 요청에 HTTP 200과 함께 제공완료된 주문을 반환한다")
+  @Test
+  void givenValidOrder_whenServe_thenStatus200WithServedOrder() throws Exception {
+    Order savedOrder = orderService.create(createEatInOrder());
+    orderService.accept(savedOrder.getId());
+
+    mvc.perform(
+            put("/api/orders/{orderId}/serve", savedOrder.getId())
+                .accept(MediaType.APPLICATION_JSON))
+        .andDo(print())
+        .andExpect(status().isOk())
+        .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(jsonPath("$.id").exists())
+        .andExpect(jsonPath("$.type").value(OrderType.EAT_IN.name()))
+        .andExpect(jsonPath("$.status").value(OrderStatus.SERVED.name()));
+  }
+
   private Order createEatInOrder() {
     MenuGroup menuGroup = createMenuGroup("추천메뉴");
 
