@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -96,12 +97,47 @@ class OrderTableServiceTest {
         .isInstanceOf(NoSuchElementException.class);
   }
 
+  @DisplayName("주문테이블 ID를 입력받아 주문테이블을 정리할 수 있다")
+  @Test
+  void givenOrderTableId_whenClear_thenReturnOrderTable() {
+    // given
+    OrderTable orderTable = createOrderTable("5번", 4, true);
+    given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+    given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
+
+    // when
+    OrderTable clearedOrderTable = orderTableService.clear(orderTable.getId());
+
+    // then
+    assertThat(clearedOrderTable.getId()).isNotNull();
+    assertThat(clearedOrderTable.getName()).isEqualTo("5번");
+    assertThat(clearedOrderTable.getNumberOfGuests()).isEqualTo(0);
+    assertThat(clearedOrderTable.isOccupied()).isEqualTo(false);
+  }
+
+  @DisplayName("주문테이블에 포함된 주문 건 중 주문완료 처리가 안된 주문건이 존재할 경우 정리할 수 없다.")
+  @Test
+  void givenOrderTableId_whenClear_thenIllegalStateException() {
+    // given
+    OrderTable orderTable = createOrderTable("5번", 4, true);
+    given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+    given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
+
+    // when & then
+    assertThatIllegalStateException()
+        .isThrownBy(() -> orderTableService.clear(orderTable.getId()));
+  }
+
   private static OrderTable createInitOrderTable() {
+    return createOrderTable("1번", 0, false);
+  }
+
+  private static OrderTable createOrderTable(String name, int numberOfGuests, boolean occupied) {
     final OrderTable orderTable = new OrderTable();
     orderTable.setId(UUID.randomUUID());
-    orderTable.setName("1번");
-    orderTable.setNumberOfGuests(0);
-    orderTable.setOccupied(false);
+    orderTable.setName(name);
+    orderTable.setNumberOfGuests(numberOfGuests);
+    orderTable.setOccupied(occupied);
     return orderTable;
   }
 }
