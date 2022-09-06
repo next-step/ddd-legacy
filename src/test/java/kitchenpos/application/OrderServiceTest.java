@@ -886,4 +886,46 @@ class OrderServiceTest {
     assertThat(completedOrder.getOrderTable().getNumberOfGuests()).isEqualTo(0);
     assertThat(completedOrder.getOrderTable().isOccupied()).isEqualTo(false);
   }
+
+  @DisplayName("생성된 주문 목록을 조회할 수 있다.")
+  @Test
+  void givenOrders_whenFindAll_thenReturnOrder() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderTable orderTable = new OrderTable();
+    orderTable.setId(UUID.randomUUID());
+    orderTable.setOccupied(true);
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.EAT_IN);
+    order.setStatus(OrderStatus.WAITING);
+    order.setOrderTableId(orderTable.getId());
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    Order order2 = new Order();
+    order2.setId(UUID.randomUUID());
+    order2.setType(OrderType.DELIVERY);
+    order2.setStatus(OrderStatus.DELIVERED);
+    order2.setDeliveryAddress("서울시 강남구");
+    order2.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findAll()).willReturn(List.of(order, order2));
+
+    // when
+    List<Order> orders = orderService.findAll();
+
+    // then
+    assertThat(orders).hasSize(2);
+    assertThat(orders).extracting(Order::getType).contains(OrderType.DELIVERY, OrderType.EAT_IN);
+    assertThat(orders).extracting(Order::getStatus).contains(OrderStatus.DELIVERED, OrderStatus.WAITING);
+  }
 }
