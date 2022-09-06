@@ -28,4 +28,11 @@ public class OrderFlowAssertions {
     static void 총_개수가_일치한다(ExtractableResponse<Response> response, int expected) {
         assertThat(response.jsonPath().getList("")).hasSize(expected);
     }
+
+    static void 배송_주문_생성_확인됨(ExtractableResponse<Response> response) {
+        생성_확인됨(response);
+        assertThat(response.jsonPath().getString("type")).isEqualTo("DELIVERY");
+        assertThat(response.jsonPath().getString("status")).isEqualTo("WAITING");
+        assertThat(response.jsonPath().getString("deliveryAddress")).isNotBlank();
+    }
 }
