@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -160,6 +161,39 @@ class OrderTableServiceTest {
     // when & then
     assertThatIllegalArgumentException()
         .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), requestOrderTable));
+  }
+
+  @DisplayName("주문테이블이 사용 중 상태가 아니면 처리할 수 없다.")
+  @Test
+  void givenNotOccupied_whenChangeNumberOfGuests_thenIllegalArgumentException() {
+    // given
+    OrderTable orderTable = createOrderTable("3번", 3, false);
+    given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+
+    OrderTable requestOrderTable = new OrderTable();
+    requestOrderTable.setNumberOfGuests(4);
+
+    // when & then
+    assertThatIllegalStateException()
+        .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), requestOrderTable));
+  }
+
+  @DisplayName("생성된 주문테이블 목록을 조회할 수 있다.")
+  @Test
+  void givenOrderTables_whenFindAll_thenReturnOrderTables() {
+    // given
+    OrderTable orderTable1 = createOrderTable("1번", 3, true);
+    OrderTable orderTable2 = createOrderTable("2번", 4, true);
+
+    given(orderTableRepository.findAll()).willReturn(List.of(orderTable1, orderTable2));
+
+    // when
+    List<OrderTable> orders = orderTableService.findAll();
+
+    // then
+    assertThat(orders).hasSize(2);
+    assertThat(orders).extracting(OrderTable::getName).contains("1번", "2번");
+    assertThat(orders).extracting(OrderTable::getNumberOfGuests).contains(3, 4);
   }
 
   private static OrderTable createInitOrderTable() {
