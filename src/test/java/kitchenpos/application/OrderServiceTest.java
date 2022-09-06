@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
@@ -158,6 +159,19 @@ class OrderServiceTest {
     assertThat(createdOrder.getOrderLineItems()).hasSize(1);
     assertThat(createdOrder.getOrderLineItems()).extracting(OrderLineItem::getMenuId)
         .contains(menu.getId());
+  }
+
+  @DisplayName("주문타입이 올바르지 않으면 주문을 생성할 수 없다.")
+  @Test
+  void givenNotValidType_whenCreate_thenIllegalArgumentException() {
+    // given
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(null );
+
+    // when & then
+    assertThatIllegalArgumentException()
+        .isThrownBy(() -> orderService.create(order));
   }
 
 }
