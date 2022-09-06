@@ -758,4 +758,32 @@ class OrderServiceTest {
     assertThat(servedOrder.getId()).isEqualTo(order.getId());
     assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
   }
+
+  @DisplayName("배송주문인 경우 배송완료 상태가 아니면 주문을 완료할 수 없다.")
+  @Test
+  void givenNotDelivered_whenComplete_thenIllegalStateException() {
+    Menu menu = new Menu();
+    menu.setId(UUID.randomUUID());
+    menu.setDisplayed(true);
+    menu.setPrice(BigDecimal.valueOf(23000));
+
+    OrderLineItem orderLineItem = new OrderLineItem();
+    orderLineItem.setMenuId(menu.getId());
+    orderLineItem.setMenu(menu);
+    orderLineItem.setPrice(BigDecimal.valueOf(23000));
+    orderLineItem.setQuantity(3);
+
+    Order order = new Order();
+    order.setId(UUID.randomUUID());
+    order.setType(OrderType.DELIVERY);
+    order.setStatus(OrderStatus.SERVED);
+    order.setDeliveryAddress("서울시 강남구");
+    order.setOrderLineItems(List.of(orderLineItem));
+
+    given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+    // when & then
+    assertThatIllegalStateException()
+        .isThrownBy(() -> orderService.complete(order.getId()));
+  }
 }
