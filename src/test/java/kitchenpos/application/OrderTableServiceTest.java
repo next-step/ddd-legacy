@@ -2,9 +2,11 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.OrderRepository;
@@ -81,6 +83,17 @@ class OrderTableServiceTest {
     assertThat(createdOrderTable.getName()).isEqualTo("1번");
     assertThat(createdOrderTable.getNumberOfGuests()).isEqualTo(0);
     assertThat(createdOrderTable.isOccupied()).isEqualTo(true);
+  }
+
+  @DisplayName("주문테이블이 존재하지 않을 경우 처리할 수 없다.")
+  @Test
+  void givenNotFoundOrderTable_whenSit_thenNoSuchElementException() {
+    // given
+    OrderTable orderTable = createInitOrderTable();
+
+    // when & then
+    assertThatThrownBy(() -> orderTableService.sit(orderTable.getId()))
+        .isInstanceOf(NoSuchElementException.class);
   }
 
   private static OrderTable createInitOrderTable() {
