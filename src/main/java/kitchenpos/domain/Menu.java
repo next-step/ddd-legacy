@@ -44,6 +44,23 @@ public class Menu {
     public Menu() {
     }
 
+    public Menu(BigDecimal price) {
+        this.price = price;
+    }
+
+    public Menu(String name, BigDecimal price, boolean displayed, List<MenuProduct> menuProducts, UUID menuGroupId) {
+        this(null, name, price, displayed, menuProducts, menuGroupId);
+    }
+
+    public Menu(UUID id, String name, BigDecimal price, boolean displayed, List<MenuProduct> menuProducts, UUID menuGroupId) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.displayed = displayed;
+        this.menuProducts = menuProducts;
+        this.menuGroupId = menuGroupId;
+    }
+
     public UUID getId() {
         return id;
     }
