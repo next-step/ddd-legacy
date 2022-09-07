@@ -12,7 +12,7 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -39,11 +38,19 @@ class MenuServiceTest {
     private MenuGroupRepository menuGroupRepository;
     @Mock
     private ProductRepository productRepository;
-    @Mock
-    private PurgomalumClient purgomalumClient;
+    private final ProfanityChecker profanityChecker = new TestProfanityChecker();
 
-    @InjectMocks
     private MenuService testService;
+
+    @BeforeEach
+    void setUp() {
+        this.testService = new MenuService(
+                menuRepository,
+                menuGroupRepository,
+                productRepository,
+                profanityChecker
+        );
+    }
 
     @Nested
     @DisplayName("메뉴 등록")
@@ -253,7 +260,6 @@ class MenuServiceTest {
             productInRepo.setPrice(new BigDecimal(2000));
             given(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).willReturn(List.of(productInRepo));
             given(productRepository.findById(productId)).willReturn(Optional.of(productInRepo));
-            given(purgomalumClient.containsProfanity("나쁜말")).willReturn(true);
 
             // when
             assertThatThrownBy(() -> testService.create(request))
@@ -282,7 +288,6 @@ class MenuServiceTest {
             productInRepo.setPrice(new BigDecimal(2000));
             given(productRepository.findAllByIdIn(List.of(menuProduct.getProductId()))).willReturn(List.of(productInRepo));
             given(productRepository.findById(productId)).willReturn(Optional.of(productInRepo));
-            given(purgomalumClient.containsProfanity(any())).willReturn(false);
             given(menuRepository.save(any())).willAnswer((invocation -> invocation.getArgument(0)));
 
             // when

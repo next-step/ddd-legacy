@@ -9,7 +9,7 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -33,11 +32,18 @@ class ProductServiceTest {
     private ProductRepository productRepository;
     @Mock
     private MenuRepository menuRepository;
-    @Mock
-    private PurgomalumClient purgomalumClient;
+    private final ProfanityChecker profanityChecker = new TestProfanityChecker();
 
-    @InjectMocks
     private ProductService testService;
+
+    @BeforeEach
+    void setUp() {
+        this.testService = new ProductService(
+                productRepository,
+                menuRepository,
+                profanityChecker
+        );
+    }
 
     @DisplayName("상품 등록")
     @Nested
@@ -78,8 +84,6 @@ class ProductServiceTest {
             request.setPrice(new BigDecimal(1000));
             request.setName("심한말");
 
-            given(purgomalumClient.containsProfanity("심한말")).willReturn(true);
-
             // when
             assertThatThrownBy(() -> testService.create(request))
                     // then
@@ -94,7 +98,6 @@ class ProductServiceTest {
             request.setPrice(new BigDecimal(1000));
             request.setName("상품1");
 
-            given(purgomalumClient.containsProfanity("상품1")).willReturn(false);
             //// 서비스에서 생성한 상품 객체를 그대로 반환
             given(productRepository.save(any())).willAnswer((invocationOnMock) -> invocationOnMock.getArgument(0));
 
