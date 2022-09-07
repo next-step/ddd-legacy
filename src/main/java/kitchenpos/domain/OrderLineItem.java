@@ -33,6 +33,11 @@ public class OrderLineItem {
     }
 
     public OrderLineItem(long quantity, UUID menuId, BigDecimal price) {
+        this(null, quantity, menuId, price);
+    }
+
+    public OrderLineItem(Menu menu, long quantity, UUID menuId, BigDecimal price) {
+        this.menu = menu;
         this.quantity = quantity;
         this.menuId = menuId;
         this.price = price;
