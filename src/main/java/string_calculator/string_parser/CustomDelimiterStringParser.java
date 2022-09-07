@@ -16,7 +16,9 @@ public class CustomDelimiterStringParser extends StringParser {
     @Override
     protected String[] tokens(String string) {
         final Matcher matcher = pattern.matcher(string);
-        assert matcher.matches();
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("입력값이 //(.)\n(.*) 패턴과 일치하지 않습니다");
+        }
         return matcher.group(2).split(this.delimiter);
     }
 }
