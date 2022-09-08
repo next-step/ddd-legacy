@@ -37,6 +37,7 @@ public class ProductService {
             throw new IllegalArgumentException();
         }
         final String name = request.getName();
+        // FIXME: 상품 이름이 빈 스트링인지 검증 필요
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
             throw new IllegalArgumentException();
         }
