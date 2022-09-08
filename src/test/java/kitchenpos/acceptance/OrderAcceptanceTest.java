@@ -27,15 +27,40 @@ public class OrderAcceptanceTest extends AcceptanceTest {
 
   private OrderLineItem orderLineItem;
 
+  private Order orderEatIn;
+  private Order orderTakeOut;
+  private Order orderDelivery;
+
   @BeforeEach
   void init() {
     추천메뉴 = MenuGroupSteps.createMenuGroup("추천메뉴").jsonPath().getUUID("id");
     강정치킨 = ProductSteps.createProduct("강정치킨", 17000).jsonPath().getUUID("id");
     테이블_1번 = OrderTableSteps.createOrderTable("1번").jsonPath().getUUID("id");
-    Menu menu = new Menu("후라이드+후라이드", BigDecimal.valueOf(19000), true, List.of(new MenuProduct(2, 강정치킨)), 추천메뉴);
+
+    Menu menu = new Menu();
+    menu.setName("후라이드+후라이드");
+    menu.setPrice(BigDecimal.valueOf(19000));
+    menu.setDisplayed(true);
+    menu.setMenuProducts(List.of(new MenuProduct(2, 강정치킨)));
+    menu.setMenuGroupId(추천메뉴);
+
     신메뉴 = MenuSteps.createMenu(menu).jsonPath().getUUID("id");
 
     orderLineItem = new OrderLineItem(신메뉴, BigDecimal.valueOf(19000), 2);
+
+    orderEatIn = new Order();
+    orderEatIn.setType(OrderType.EAT_IN);
+    orderEatIn.setOrderLineItems(List.of(orderLineItem));
+    orderEatIn.setOrderTableId(테이블_1번);
+
+    orderTakeOut = new Order();
+    orderTakeOut.setType(OrderType.TAKEOUT);
+    orderTakeOut.setOrderLineItems(List.of(orderLineItem));
+
+    orderDelivery = new Order();
+    orderDelivery.setType(OrderType.DELIVERY);
+    orderDelivery.setOrderLineItems(List.of(orderLineItem));
+    orderDelivery.setDeliveryAddress("경기도 남양주시");
   }
 
   @DisplayName("주문 매장식사 등록")
@@ -43,9 +68,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   void createOrderEatIn() {
     OrderTableSteps.chageOrderTableSit(테이블_1번);
 
-    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), 테이블_1번);
-
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(orderEatIn);
 
     assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     assertThat(orderResponse.jsonPath().getString("status")).isEqualTo("WAITING");
@@ -54,10 +77,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 포장 등록")
   @Test
   void createOrderTakeOut() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(OrderType.TAKEOUT, List.of(orderLineItem));
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(orderTakeOut);
 
     assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     assertThat(orderResponse.jsonPath().getString("status")).isEqualTo("WAITING");
@@ -66,10 +86,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 배달 등록")
   @Test
   void createOrderDelivery() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(orderDelivery);
 
     assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     assertThat(orderResponse.jsonPath().getString("status")).isEqualTo("WAITING");
@@ -78,10 +95,8 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 타입 null 에러")
   @Test
   void orderTypeNull() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(null, List.of(orderLineItem));
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    orderTakeOut.setType(null);
+    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(orderTakeOut);
 
     assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
   }
@@ -89,8 +104,8 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 아이템 null 에러")
   @Test
   void orderLineItemNull() {
-    Order order = new Order(OrderType.TAKEOUT, null);
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    orderTakeOut.setOrderLineItems(null);
+    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(orderTakeOut);
 
     assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
   }
@@ -101,8 +116,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     OrderTableSteps.chageOrderTableSit(테이블_1번);
     MenuSteps.chageDisplayHide(신메뉴);
 
-    Order order = new Order(OrderType.TAKEOUT, List.of(orderLineItem));
-    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(order);
+    ExtractableResponse<Response> orderResponse = OrderSteps.createOrder(orderTakeOut);
 
     assertThat(orderResponse.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
   }
@@ -110,10 +124,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 배달 수락")
   @Test
   void orderDeliveryAccept() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    UUID 배달주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 배달주문 = OrderSteps.createOrder(orderDelivery).jsonPath().getUUID("id");
 
     orderAccept(배달주문);
 
@@ -127,8 +138,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   void orderEatInAccept() {
     OrderTableSteps.chageOrderTableSit(테이블_1번);
 
-    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), 테이블_1번);
-    UUID 매장식사주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 매장식사주문 = OrderSteps.createOrder(orderEatIn).jsonPath().getUUID("id");
 
     orderAccept(매장식사주문);
 
@@ -140,10 +150,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 포장 수락")
   @Test
   void orderTakeOutAccept() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(OrderType.TAKEOUT, List.of(orderLineItem));
-    UUID 포장주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 포장주문 = OrderSteps.createOrder(orderTakeOut).jsonPath().getUUID("id");
 
     orderAccept(포장주문);
 
@@ -155,10 +162,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 배달 서빙")
   @Test
   void orderDeliveryServe() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    UUID 배달주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 배달주문 = OrderSteps.createOrder(orderDelivery).jsonPath().getUUID("id");
 
     orderAcceptToServe(배달주문);
 
@@ -172,8 +176,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   void orderEatInServe() {
     OrderTableSteps.chageOrderTableSit(테이블_1번);
 
-    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), 테이블_1번);
-    UUID 매장식사주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 매장식사주문 = OrderSteps.createOrder(orderEatIn).jsonPath().getUUID("id");
 
     orderAcceptToServe(매장식사주문);
 
@@ -185,10 +188,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 포장 서빙")
   @Test
   void orderTakeOutServe() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(OrderType.TAKEOUT, List.of(orderLineItem));
-    UUID 포장주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 포장주문 = OrderSteps.createOrder(orderTakeOut).jsonPath().getUUID("id");
 
     orderAcceptToServe(포장주문);
 
@@ -200,10 +200,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 배달 배달 시작")
   @Test
   void orderDeliveryStart() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    UUID 배달주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 배달주문 = OrderSteps.createOrder(orderDelivery).jsonPath().getUUID("id");
 
     orderAcceptToDeliveryStart(배달주문);
 
@@ -215,10 +212,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 배달 배달 완료")
   @Test
   void orderDeliveryComplete() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    UUID 배달주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 배달주문 = OrderSteps.createOrder(orderDelivery).jsonPath().getUUID("id");
 
     orderAcceptToDeliveryComplete(배달주문);
 
@@ -230,10 +224,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 완료(배달)")
   @Test
   void orderCompleteDelivery() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(OrderType.DELIVERY, List.of(orderLineItem), "경기도 남양주시");
-    UUID 배달주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 배달주문 = OrderSteps.createOrder(orderDelivery).jsonPath().getUUID("id");
 
     orderDeliveryAcceptToComplete(배달주문);
 
@@ -249,8 +240,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
 
     assertThat(orderTableSitResponse.jsonPath().getBoolean("occupied")).isEqualTo(true);
 
-    Order order = new Order(OrderType.EAT_IN, List.of(orderLineItem), 테이블_1번);
-    UUID 매장식사주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 매장식사주문 = OrderSteps.createOrder(orderEatIn).jsonPath().getUUID("id");
 
     orderNotDeliveryAcceptToComplete(매장식사주문);
 
@@ -263,10 +253,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   @DisplayName("주문 완료(포장)")
   @Test
   void orderCompleteTakeOut() {
-    OrderTableSteps.chageOrderTableSit(테이블_1번);
-
-    Order order = new Order(OrderType.TAKEOUT, List.of(orderLineItem));
-    UUID 포장주문 = OrderSteps.createOrder(order).jsonPath().getUUID("id");
+    UUID 포장주문 = OrderSteps.createOrder(orderTakeOut).jsonPath().getUUID("id");
 
     orderNotDeliveryAcceptToComplete(포장주문);
 

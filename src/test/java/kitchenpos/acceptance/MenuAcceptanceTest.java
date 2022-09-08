@@ -28,7 +28,12 @@ public class MenuAcceptanceTest extends AcceptanceTest {
 
     강정치킨 = ProductSteps.createProduct("강정치킨", 17000).jsonPath().getUUID("id");
 
-    신메뉴 = new Menu("후라이드+후라이드", BigDecimal.valueOf(19000), true, List.of(new MenuProduct(2, 강정치킨)), 추천메뉴);
+    신메뉴 = new Menu();
+    신메뉴.setName("후라이드+후라이드");
+    신메뉴.setPrice(BigDecimal.valueOf(19000));
+    신메뉴.setDisplayed(true);
+    신메뉴.setMenuProducts(List.of(new MenuProduct(2, 강정치킨)));
+    신메뉴.setMenuGroupId(추천메뉴);
   }
 
   @DisplayName("메뉴 등록")
