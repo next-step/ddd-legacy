@@ -41,7 +41,7 @@ public class StringCalculator {
         Set<String> currentDelimiterSet = new HashSet<>(delimiterSet);
         List<String> customDelimiterList = extractCustomDelimiter(text);
 
-        if (customDelimiterList != null) {
+        if (customDelimiterList.isEmpty()) {
             currentDelimiterSet.addAll(customDelimiterList);
         }
 
@@ -74,7 +74,7 @@ public class StringCalculator {
             }
             return customDelimiterList;
         }
-        return null;
+        return new ArrayList<>();
     }
 
     private boolean isValidInput(List<String> targetStrList) {
