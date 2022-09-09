@@ -33,16 +33,25 @@ class MenuServiceTest {
 
     private MenuService menuService;
     private FakePurgomalumClient purgomalumClient;
+    private MenuRepository menuRepository;
+    private MenuGroupRepository menuGroupRepository;
+    private ProductRepository productRepository;
 
     @BeforeEach
     void setup() {
         purgomalumClient = new FakePurgomalumClient();
-        menuService = new MenuService(new FakeMenuRepository(), new FakeMenuGroupRepository(), new FakeProductRepository(), purgomalumClient);
+        menuRepository = new FakeMenuRepository();
+        menuGroupRepository = new FakeMenuGroupRepository();
+        productRepository = new FakeProductRepository();
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
 
     @DisplayName("메뉴를 생성 할 수 있다.")
     @Test
     void create_menu() {
+        menuGroupRepository.save(TestFixture.createFirstMenuGroup());
+        TestFixture.createFirstMenuProducts().stream()
+                        .forEach(menuProduct -> productRepository.save(menuProduct.getProduct()));
         final Menu menu = TestFixture.createFirstMenu();
 
         final Menu result = menuService.create(menu);
@@ -81,6 +90,8 @@ class MenuServiceTest {
     @DisplayName("메뉴의 속한 상품의 가격보다 등록하려는 가격이 크다면 IllegalArgumentException를 발생시킨다")
     @Test
     void create_menu_with_lower_price() {
+        menuGroupRepository.save(TestFixture.createFirstMenuGroup());
+
         Product product_price_1 = TestFixture.createFirstProduct();
         product_price_1.setPrice(BigDecimal.ONE);
 
@@ -94,6 +105,8 @@ class MenuServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void create_menu_with_null_and_empty_name(final String name) {
+        menuGroupRepository.save(TestFixture.createFirstMenuGroup());
+
         Menu menu = TestFixture.createFirstMenu();
         menu.setName(name);
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -105,6 +118,7 @@ class MenuServiceTest {
     void create_menu_with_purgomalum() {
         final Menu menu = TestFixture.createFirstMenu();
 
+        menuGroupRepository.save(TestFixture.createFirstMenuGroup());
         purgomalumClient.changeProfanity(true);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -115,6 +129,8 @@ class MenuServiceTest {
     @Test
     void create_menu_with_not_exist_product() {
         final Menu menu = TestFixture.createFirstMenu();
+        menuGroupRepository.save(TestFixture.createFirstMenuGroup());
+
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(menu));
     }
@@ -125,6 +141,8 @@ class MenuServiceTest {
     void create_menu_with_null_and_empty_menu_products(final List<MenuProduct> menuProducts) {
         Menu menu = TestFixture.createFirstMenu();
         menu.setMenuProducts(menuProducts);
+
+        menuGroupRepository.save(TestFixture.createFirstMenuGroup());
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(menu));
@@ -137,6 +155,8 @@ class MenuServiceTest {
         List<MenuProduct> menuProducts = TestFixture.createFirstMenuProducts();
         menuProducts.stream()
                 .forEach(menuProduct -> menuProduct.setQuantity(quantity));
+
+        menuGroupRepository.save(TestFixture.createFirstMenuGroup());
 
         Menu menu = TestFixture.createFirstMenu();
         menu.setMenuProducts(menuProducts);
@@ -156,6 +176,8 @@ class MenuServiceTest {
     @DisplayName("가격을 수정할 수 있다")
     @Test
     void change_price() {
+        menuRepository.save(TestFixture.createFirstMenu());
+
         final BigDecimal updatePrice = BigDecimal.valueOf(9);
         Menu updateMenu = TestFixture.createFirstMenu();
         updateMenu.setPrice(updatePrice);
@@ -168,6 +190,8 @@ class MenuServiceTest {
     @DisplayName("메뉴에 속한 개별 상품의 가격보다 변경하려는 가격이 크다면 IllegalArgumentException을 발생시킨다")
     @Test
     void change_price_bigger_than_contains_products() {
+        menuRepository.save(TestFixture.createFirstMenu());
+
         final BigDecimal updatePrice = BigDecimal.valueOf(10000);
         Menu updateMenu = TestFixture.createFirstMenu();
         updateMenu.setPrice(updatePrice);
@@ -180,6 +204,7 @@ class MenuServiceTest {
     @Test
     void hide() {
         final Menu menu = TestFixture.createFirstMenu();
+        menuRepository.save(menu);
 
         final Menu result = menuService.hide(menu.getId());
         assertThat(result.isDisplayed()).isFalse();
@@ -190,6 +215,7 @@ class MenuServiceTest {
     void show() {
         Menu menu = TestFixture.createFirstMenu();
         menu.setDisplayed(false);
+        menuRepository.save(menu);
 
         final Menu result = menuService.display(menu.getId());
         assertThat(result.isDisplayed()).isTrue();
@@ -198,9 +224,13 @@ class MenuServiceTest {
     @DisplayName("생성된 메뉴를 조회할 수 있다")
     @Test
     void select_all_menus() {
+        menuRepository.save(TestFixture.createFirstMenu());
+        menuRepository.save(TestFixture.createSecondMenu());
+
         final List<Menu> defaultMenus = List.of(TestFixture.createFirstMenu(), TestFixture.createSecondMenu());
 
         final List<Menu> results = menuService.findAll();
-        assertThat(defaultMenus).isEqualTo(results);
+        assertThat(results).isNotEmpty();
+        assertThat(defaultMenus.size()).isEqualTo(results.size());
     }
 }
