@@ -1,13 +1,20 @@
 package calculator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
-    private List<String> delimiterList = List.of(",", ":");
+    private static final Set<String> delimiters = Set.of(",", ":");
+    private static String extractCustomDelimiterPatternStr = "//(.+)\n(.*)";
+    private static Pattern extractCustomDelimiterPattern;
+
+    private Pattern getExtractCustomDelimiterPattern() {
+        if (extractCustomDelimiterPattern == null) {
+            extractCustomDelimiterPattern = Pattern.compile(extractCustomDelimiterPatternStr);
+        }
+        return extractCustomDelimiterPattern;
+    }
 
     public int add(String text) {
         if (isEmptyInput(text)) {
@@ -31,14 +38,14 @@ public class StringCalculator {
     }
 
     private String makeDelimiter(String text) {
-        List<String> curDelimiterList = new ArrayList<>(delimiterList);
+        Set<String> currentDelimiters = new HashSet<>(delimiters);
         List<String> customDelimiters = extractCustomDelimiter(text);
 
         if (customDelimiters != null) {
-            curDelimiterList.addAll(customDelimiters);
+            currentDelimiters.addAll(customDelimiters);
         }
 
-        return String.join("|", curDelimiterList);
+        return String.join("|", currentDelimiters);
     }
 
     private List<String> makeTargetStrList(String text, String delimiter) {
@@ -57,7 +64,7 @@ public class StringCalculator {
 
     private List<String> extractCustomDelimiter(String text) {
         // 커스텀 delimiter가 사이에 여러개 들어올경우를 생각해서 만듦
-        Matcher m = Pattern.compile("//(.+)\n(.*)").matcher(text);
+        Matcher m = getExtractCustomDelimiterPattern().matcher(text);
         if (m.find()) {
             String customDelimiterStr = m.group(1);
             List<String> customDelimiterList = new ArrayList<>();
