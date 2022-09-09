@@ -2,11 +2,10 @@ package kitchenpos.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 import static kitchenpos.acceptance.MenuGroupSteps.메뉴그룹_등록_요청;
@@ -42,10 +41,10 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> 메뉴그룹_등록_요청함(final String name) {
-        Map<String, String> params = new HashMap<>();
-        params.put("name", name);
+        final MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName(name);
 
-        return 메뉴그룹_등록_요청(given(), params);
+        return 메뉴그룹_등록_요청(given(), menuGroup);
     }
 
     private ExtractableResponse<Response> 메뉴그룹_목록_조회_요청함() {
