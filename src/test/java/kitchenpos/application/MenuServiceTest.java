@@ -17,10 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MenuServiceTest extends IntegrationTest {
 
@@ -31,36 +32,14 @@ class MenuServiceTest extends IntegrationTest {
     @BeforeEach
     void setup() {
         menuGroup = menuGroupRepository.save(FixtureFactory.createMenuGroup("추천메뉴"));
-        productList = productRepository.saveAll(List.of(FixtureFactory.createProduct("양념치킨", BigDecimal.valueOf(16000)),
-                FixtureFactory.createProduct("후라이드치킨", BigDecimal.valueOf(16000)),
-                FixtureFactory.createProduct("간장치킨", BigDecimal.valueOf(16000))
-            )
-        );
-    }
-
-    private List<MenuProduct> toMenuProductList(List<Product> products) {
-        return products.stream()
-            .map(product -> {
-                    MenuProduct menuProduct = new MenuProduct();
-                    menuProduct.setProduct(product);
-                    menuProduct.setProductId(product.getId());
-                    menuProduct.setQuantity(1L);
-                    return menuProduct;
-                }
-            )
-            .collect(Collectors.toList());
+        productList = productRepository.saveAll(List.of(FixtureFactory.createProduct("양념치킨", BigDecimal.valueOf(16000)), FixtureFactory.createProduct("후라이드치킨", BigDecimal.valueOf(16000)), FixtureFactory.createProduct("간장치킨", BigDecimal.valueOf(16000))));
     }
 
     @Test
     @Transactional
     @DisplayName("메뉴를 모두 확인할 수 있다.")
     void find_all_menus() {
-        List<Menu> menus = menuRepository.saveAll(List.of(
-                FixtureFactory.createMenu("후라이드치킨 + 양념치킨", BigDecimal.valueOf(17000), true, menuGroup, toMenuProductList(productList.subList(0, 1))),
-                FixtureFactory.createMenu("후라이드치킨 + 후라이드치킨", BigDecimal.valueOf(16000), true, menuGroup, toMenuProductList(productList.subList(1, 2))),
-                FixtureFactory.createMenu("후라이드치킨 + 간장치킨", BigDecimal.valueOf(19000), true, menuGroup, toMenuProductList(productList.subList(2, 3)))
-            )
-        );
+        List<Menu> menus = menuRepository.saveAll(List.of(FixtureFactory.createMenu("후라이드치킨 + 양념치킨", BigDecimal.valueOf(17000), true, menuGroup, toMenuProductList(productList.subList(0, 1))), FixtureFactory.createMenu("후라이드치킨 + 후라이드치킨", BigDecimal.valueOf(16000), true, menuGroup, toMenuProductList(productList.subList(1, 2))), FixtureFactory.createMenu("후라이드치킨 + 간장치킨", BigDecimal.valueOf(19000), true, menuGroup, toMenuProductList(productList.subList(2, 3)))));
 
         List<Menu> allMenus = menuService.findAll();
         assertThat(allMenus).usingRecursiveComparison().isEqualTo(menus);
@@ -88,7 +67,9 @@ class MenuServiceTest extends IntegrationTest {
         @DisplayName("메뉴는 반드시 제품을 하나 포함해야 한다.")
         void create_without_product() {
             Menu menu = FixtureFactory.createMenu("메뉴", BigDecimal.valueOf(10000), false, menuGroup, null);
-            assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
+            assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("메뉴는 반드시 제품을 하나 포함해야 합니다.");
         }
 
         @Test
@@ -97,7 +78,9 @@ class MenuServiceTest extends IntegrationTest {
             List<MenuProduct> menuProducts = toMenuProductList(productList);
             menuProducts.get(0).setQuantity(-1L);
             Menu menu = FixtureFactory.createMenu("메뉴", BigDecimal.valueOf(10000), false, menuGroup, menuProducts);
-            assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
+            assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("제품의 수량은 음수일 수 없습니다.");
         }
 
         @Test
@@ -108,7 +91,9 @@ class MenuServiceTest extends IntegrationTest {
 
             Menu menu = FixtureFactory.createMenu("메뉴", BigDecimal.valueOf(10000), false, menuGroup, menuProducts);
 
-            assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
+            assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("메뉴를 구성하는 제품들과 가게에 존재하는 제품이 일치해야 합니다.");
         }
 
         @Test
@@ -117,12 +102,12 @@ class MenuServiceTest extends IntegrationTest {
 
             List<MenuProduct> menuProducts = toMenuProductList(productList);
 
-            double productPriceSum = menuProducts.stream()
-                .mapToDouble(s -> s.getProduct().getPrice().doubleValue())
-                .sum();
-
+            double productPriceSum = menuProducts.stream().mapToDouble(s -> s.getProduct().getPrice().doubleValue()).sum();
             Menu menu = FixtureFactory.createMenu("메뉴", BigDecimal.valueOf(productPriceSum + 1), false, menuGroup, menuProducts);
-            assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
+
+            assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("메뉴의 가격은 제품들의 가격의 합보다 클 수 없습니다.");
         }
 
         @ParameterizedTest
@@ -131,7 +116,9 @@ class MenuServiceTest extends IntegrationTest {
         void create_invalid_name(String name) {
             Menu menu = FixtureFactory.createMenu(name, BigDecimal.valueOf(10000), false, menuGroup, toMenuProductList(productList));
 
-            assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
+            assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("메뉴명은 공백이거나 비속어일 수 없습니다.");
         }
 
     }
@@ -149,7 +136,7 @@ class MenuServiceTest extends IntegrationTest {
             menuService.display(savedMenu.getId());
             Menu shownMenu = menuRepository.findById(menu.getId()).orElseThrow(IllegalArgumentException::new);
 
-            assertThat(shownMenu.isDisplayed()).isTrue();
+            assertTrue(shownMenu.isDisplayed());
         }
 
         @Test
@@ -157,14 +144,14 @@ class MenuServiceTest extends IntegrationTest {
         void show_expensive_menu() {
             List<MenuProduct> menuProducts = toMenuProductList(productList);
 
-            double productPriceSum = menuProducts.stream()
-                .mapToDouble(s -> s.getProduct().getPrice().doubleValue())
-                .sum();
+            double productPriceSum = menuProducts.stream().mapToDouble(s -> s.getProduct().getPrice().doubleValue()).sum();
 
             Menu menu = FixtureFactory.createMenu("메뉴", BigDecimal.valueOf(productPriceSum + 100), false, menuGroup, menuProducts);
             Menu savedMenu = menuRepository.save(menu);
 
-            assertThrows(IllegalStateException.class, () -> menuService.display(savedMenu.getId()));
+            assertThatThrownBy(() -> menuService.display(savedMenu.getId()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("메뉴의 가격은 제품들의 가격의 합보다 클 수 없습니다.");
         }
 
         @Test
@@ -176,7 +163,7 @@ class MenuServiceTest extends IntegrationTest {
             menuService.hide(savedMenu.getId());
             Menu hiddenMenu = menuRepository.findById(menu.getId()).orElseThrow(IllegalArgumentException::new);
 
-            assertThat(hiddenMenu.isDisplayed()).isFalse();
+            assertFalse(hiddenMenu.isDisplayed());
         }
     }
 
@@ -209,7 +196,9 @@ class MenuServiceTest extends IntegrationTest {
             BigDecimal changedPrice = BigDecimal.valueOf(-1);
             savedMenu.setPrice(changedPrice);
 
-            assertThrows(IllegalArgumentException.class, () -> menuService.changePrice(savedMenu.getId(), savedMenu));
+            assertThatThrownBy(() -> menuService.changePrice(savedMenu.getId(), savedMenu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("가격은 음수일 수 없습니다.");
         }
 
         @Test
@@ -217,9 +206,7 @@ class MenuServiceTest extends IntegrationTest {
         void change_expensive_price() {
             List<MenuProduct> menuProducts = toMenuProductList(productList);
 
-            double productPriceSum = menuProducts.stream()
-                .mapToDouble(s -> s.getProduct().getPrice().doubleValue())
-                .sum();
+            double productPriceSum = menuProducts.stream().mapToDouble(s -> s.getProduct().getPrice().doubleValue()).sum();
 
             Menu menu = FixtureFactory.createMenu("메뉴", BigDecimal.valueOf(productPriceSum), true, menuGroup, menuProducts);
             Menu savedMenu = menuRepository.save(menu);
@@ -227,7 +214,9 @@ class MenuServiceTest extends IntegrationTest {
             BigDecimal changedPrice = BigDecimal.valueOf(productPriceSum + 100);
             savedMenu.setPrice(changedPrice);
 
-            assertThrows(IllegalArgumentException.class, () -> menuService.changePrice(savedMenu.getId(), savedMenu));
+            assertThatThrownBy(() -> menuService.changePrice(savedMenu.getId(), savedMenu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("메뉴의 가격은 제품들의 가격의 합보다 클 수 없습니다.");
         }
 
     }

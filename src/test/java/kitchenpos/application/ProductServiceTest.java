@@ -2,6 +2,8 @@ package kitchenpos.application;
 
 import kitchenpos.FixtureFactory;
 import kitchenpos.IntegrationTest;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,19 +17,23 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ProductServiceTest extends IntegrationTest {
 
     @Test
     void find_all_product_test() {
-        List<Product> productList = new ArrayList<>();
-        productList.add(FixtureFactory.createProduct("양념 치킨", BigDecimal.valueOf(16000)));
-        productList.add(FixtureFactory.createProduct("후라이드 치킨", BigDecimal.valueOf(16000)));
-        productList.add(FixtureFactory.createProduct("간장 치킨", BigDecimal.valueOf(16000)));
+        List<Product> productList = productRepository.saveAll(List.of(
+            FixtureFactory.createProduct("양념 치킨", BigDecimal.valueOf(17000)),
+            FixtureFactory.createProduct("후라이드 치킨", BigDecimal.valueOf(16000)),
+            FixtureFactory.createProduct("간장 치킨", BigDecimal.valueOf(18000)))
+        );
 
-        productRepository.saveAll(productList);
         List<Product> foundProducts = productService.findAll();
-        assertThat(foundProducts.size()).isEqualTo(productList.size());
+
+        assertThat(foundProducts).usingRecursiveComparison().ignoringFields("price").isEqualTo(productList);
+        // price cannot be compared due to big decimal precision
     }
 
     @Nested
@@ -41,8 +47,11 @@ public class ProductServiceTest extends IntegrationTest {
             product.setName("name");
             product.setPrice(BigDecimal.ONE);
             Product createdProduct = productService.create(product);
-            assertThat(createdProduct.getName()).isEqualTo(product.getName());
-            assertThat(createdProduct.getPrice()).isEqualTo(product.getPrice());
+
+            assertAll(
+                () -> assertThat(createdProduct.getName()).isEqualTo(product.getName()),
+                () -> assertThat(createdProduct.getPrice()).isEqualTo(product.getPrice())
+            );
         }
 
         @Test
@@ -52,9 +61,9 @@ public class ProductServiceTest extends IntegrationTest {
             product.setPrice(BigDecimal.valueOf(-1));
 
             assertThatThrownBy(
-                () -> productService.create(product)
-            ).isInstanceOf(IllegalArgumentException.class);
-
+                () -> productService.create(product))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("가격은 음수일 수 없습니다.");
         }
 
         @ParameterizedTest
@@ -65,9 +74,9 @@ public class ProductServiceTest extends IntegrationTest {
             product.setName(name);
 
             assertThatThrownBy(
-                () -> productService.create(product)
-            ).isInstanceOf(IllegalArgumentException.class);
-
+                () -> productService.create(product))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("제품명은 공백이거나 비속어가 포함될 수 없습니다.");
         }
     }
 
@@ -97,14 +106,23 @@ public class ProductServiceTest extends IntegrationTest {
             savedProduct.setPrice(BigDecimal.valueOf(-10));
 
             assertThatThrownBy(
-                () -> productService.changePrice(savedProduct.getId(), savedProduct)
-            ).isInstanceOf(IllegalArgumentException.class);
+                () -> productService.changePrice(savedProduct.getId(), savedProduct))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("가격은 음수일 수 없습니다.");
         }
 
         @Test
-        @DisplayName("가격이 인상되면, 고객에게 가려진다 ")
-        void change_higher_price() {
+        @DisplayName("메뉴의 가격이 제품의 총합보다 크면, 고객에게 가려진다 ")
+        void change_price_to_higher() {
+            MenuGroup menuGroup = menuGroupRepository.save(FixtureFactory.createMenuGroup("추천메뉴"));
+            Product product = productRepository.save(FixtureFactory.createProduct("양념 치킨", BigDecimal.valueOf(16000)));
+            Menu menu = menuRepository.save(FixtureFactory.createMenu("메뉴", BigDecimal.valueOf(16000), true, menuGroup, toMenuProductList(List.of(product))));
 
+            product.setPrice(BigDecimal.valueOf(10000));
+            productService.changePrice(product.getId(), product);
+
+            Menu hiddenMenu = menuRepository.findById(menu.getId()).orElseThrow(IllegalArgumentException::new);
+            assertFalse(hiddenMenu.isDisplayed());
         }
     }
 

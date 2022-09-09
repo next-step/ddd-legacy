@@ -21,7 +21,7 @@ public class MenuGroupService {
     public MenuGroup create(final MenuGroup request) {
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("분류명은 비어있을 수 없습니다.");
         }
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());

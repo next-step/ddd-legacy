@@ -34,7 +34,7 @@ class MenuGroupServiceTest extends IntegrationTest {
         menuGroupRepository.saveAll(menuGroups);
 
         List<MenuGroup> foundMenuGroups = menuGroupService.findAll();
-        assertThat(foundMenuGroups.size()).isEqualTo(menuGroups.size());
+        assertThat(foundMenuGroups).usingRecursiveComparison().isEqualTo(menuGroups);
     }
 
     @Test
@@ -56,7 +56,8 @@ class MenuGroupServiceTest extends IntegrationTest {
         menuGroup.setName(name);
 
         assertThatThrownBy(
-            () -> menuGroupService.create(menuGroup)
-        ).isInstanceOf(IllegalArgumentException.class);
+            () -> menuGroupService.create(menuGroup))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessageContaining("분류명은 비어있을 수 없습니다.");
     }
 }

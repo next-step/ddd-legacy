@@ -106,10 +106,8 @@ class OrderTableServiceTest extends IntegrationTest {
             FixtureFactory.createOrderTable("테이블3", INITIAL_NUMBER_OF_GUESTS, INITIAL_OCCUPIED)
         ));
 
-        //when
         List<OrderTable> foundOrderTables = orderTableService.findAll();
 
-        //then
         assertThat(foundOrderTables).usingRecursiveComparison().isEqualTo(orderTables);
     }
 

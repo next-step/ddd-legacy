@@ -88,4 +88,18 @@ public class IntegrationTest {
             .collect(Collectors.toList());
     }
 
+    protected List<MenuProduct> toMenuProductList(List<Product> products) {
+        return products.stream()
+            .map(product -> {
+                    MenuProduct menuProduct = new MenuProduct();
+                    menuProduct.setProduct(product);
+                    menuProduct.setProductId(product.getId());
+                    menuProduct.setQuantity(1L);
+                    return menuProduct;
+                }
+            )
+            .collect(Collectors.toList());
+    }
+
+
 }
