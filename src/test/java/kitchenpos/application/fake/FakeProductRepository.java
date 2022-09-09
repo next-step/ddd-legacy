@@ -15,7 +15,8 @@ public class FakeProductRepository implements ProductRepository {
         if (fakeRepository.containsKey(product.getId())) {
             throw new IllegalArgumentException("duplicate primary key");
         }
-        return fakeRepository.put(product.getId(), product);
+        fakeRepository.put(product.getId(), product);
+        return product;
     }
 
     @Override

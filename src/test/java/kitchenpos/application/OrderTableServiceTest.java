@@ -1,51 +1,46 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fake.FakeOrderRepository;
+import kitchenpos.application.fake.FakeOrderTableRepository;
 import kitchenpos.application.support.TestFixture;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
 
-
-    @Mock
+    private OrderTableService orderTableService;
     private OrderTableRepository orderTableRepository;
-    @Mock
     private OrderRepository orderRepository;
 
-    @InjectMocks
-    private OrderTableService orderTableService;
+    @BeforeEach
+    void setup() {
+        orderTableRepository = new FakeOrderTableRepository();
+        orderRepository = new FakeOrderRepository();
+        orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+    }
 
     @DisplayName("주문 테이블 생성이 가능하다")
     @Test
     void create_order_table() {
         final OrderTable orderTable = TestFixture.createFirstOrderTable();
 
-        given(orderTableRepository.save(Mockito.any(OrderTable.class)))
-                .willReturn(orderTable);
-
         final OrderTable result = orderTableService.create(orderTable);
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(TestFixture.FIRST_ORDER_TABLE_ID);
         assertThat(result.getName()).isEqualTo(TestFixture.FIRST_ORDER_TABLE_NAME);
         assertThat(result.getNumberOfGuests()).isEqualTo(TestFixture.FIRST_ORDER_TABLE_GUEST);
         assertThat(result.isOccupied()).isFalse();
@@ -66,9 +61,7 @@ class OrderTableServiceTest {
     @Test
     void sit() {
         final OrderTable orderTable = TestFixture.createFirstOrderTable();
-
-        given(orderTableRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(orderTable));
+        orderTableRepository.save(orderTable);
 
         final OrderTable result = orderTableService.sit(TestFixture.FIRST_ORDER_TABLE_ID);
         assertThat(result).isNotNull();
@@ -80,9 +73,7 @@ class OrderTableServiceTest {
     void clear() {
         OrderTable orderTable = TestFixture.createFirstOrderTable();
         orderTable.setNumberOfGuests(5);
-
-        given(orderTableRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(orderTable));
+        orderTableRepository.save(orderTable);
 
         final OrderTable result = orderTableService.clear(TestFixture.FIRST_ORDER_TABLE_ID);
         assertThat(result).isNotNull();
@@ -95,9 +86,7 @@ class OrderTableServiceTest {
     void change_number_of_guest() {
         OrderTable orderTable = TestFixture.createFirstOrderTable();
         orderTable.setOccupied(true);
-
-        given(orderTableRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(orderTable));
+        orderTableRepository.save(orderTable);
 
         final int changeGuest = 3;
         OrderTable updateOrderTable = TestFixture.createFirstOrderTable();
@@ -125,12 +114,11 @@ class OrderTableServiceTest {
     @DisplayName("비어있는 테이블의 손님 숫자를 변경하면 IllegalStateException를 발생시킨다")
     @Test
     void change_number_of_guest_in_occupied() {
-        given(orderTableRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstOrderTable()));
-
         final int changeGuest = 3;
         OrderTable orderTable = TestFixture.createFirstOrderTable();
         orderTable.setNumberOfGuests(changeGuest);
+
+        orderTableRepository.save(orderTable);
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
@@ -142,13 +130,13 @@ class OrderTableServiceTest {
         final OrderTable firstOrderTable = TestFixture.createFirstOrderTable();
         final OrderTable secondOrderTable = TestFixture.createSecondOrderTable();
 
-        final List<OrderTable> orderTables = Arrays.asList(firstOrderTable, secondOrderTable);
+        orderTableRepository.save(firstOrderTable);
+        orderTableRepository.save(secondOrderTable);
 
-        given(orderTableRepository.findAll())
-                .willReturn(orderTables);
+        final List<OrderTable> orderTables = Arrays.asList(firstOrderTable, secondOrderTable);
 
         final List<OrderTable> result = orderTableService.findAll();
         assertThat(result).isNotEmpty();
-        assertThat(result).isEqualTo(orderTables);
+        assertThat(result.size()).isEqualTo(orderTables.size());
     }
 }

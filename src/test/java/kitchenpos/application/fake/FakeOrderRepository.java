@@ -14,7 +14,8 @@ public class FakeOrderRepository implements OrderRepository {
         if (fakePersistence.containsKey(order.getId())) {
             throw new IllegalArgumentException("duplicate primary key");
         }
-        return fakePersistence.put(order.getId(), order);
+        fakePersistence.put(order.getId(), order);
+        return order;
     }
 
     @Override

@@ -15,7 +15,8 @@ public class FakeMenuRepository implements MenuRepository {
         if (fakePersistence.containsKey(menu.getId())) {
             throw new IllegalArgumentException("duplicate primary key");
         }
-        return fakePersistence.put(menu.getId(), menu);
+        fakePersistence.put(menu.getId(), menu);
+        return menu;
     }
 
     @Override

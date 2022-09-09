@@ -1,8 +1,12 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fake.FakeMenuGroupRepository;
+import kitchenpos.application.fake.FakeMenuRepository;
+import kitchenpos.application.fake.FakeProductRepository;
 import kitchenpos.application.fake.FakePurgomalumClient;
 import kitchenpos.application.support.TestFixture;
 import kitchenpos.domain.*;
+import kitchenpos.infra.purgomalum.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,36 +31,19 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
 
-    private MenuRepository menuRepository;
-    private MenuGroupRepository menuGroupRepository;
-    private ProductRepository productRepository;
-    private FakePurgomalumClient purgomalumClient;
-
     private MenuService menuService;
+    private FakePurgomalumClient purgomalumClient;
 
     @BeforeEach
     void setup() {
-        menuRepository = Mockito.mock(MenuRepository.class);
-        menuGroupRepository = Mockito.mock(MenuGroupRepository.class);
-        productRepository = Mockito.mock(ProductRepository.class);
         purgomalumClient = new FakePurgomalumClient();
-        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+        menuService = new MenuService(new FakeMenuRepository(), new FakeMenuGroupRepository(), new FakeProductRepository(), purgomalumClient);
     }
 
     @DisplayName("메뉴를 생성 할 수 있다.")
     @Test
     void create_menu() {
         final Menu menu = TestFixture.createFirstMenu();
-
-        given(menuGroupRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstMenuGroup()));
-        given(productRepository.findAllByIdIn(Mockito.any()))
-                .willReturn(List.of(TestFixture.createFirstProduct()));
-        given(productRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstProduct()));
-        purgomalumClient.changeProfanity(false);
-        given(menuRepository.save(Mockito.any(Menu.class)))
-                .willReturn(menu);
 
         final Menu result = menuService.create(menu);
         assertThat(result).isNotNull();
@@ -94,15 +81,8 @@ class MenuServiceTest {
     @DisplayName("메뉴의 속한 상품의 가격보다 등록하려는 가격이 크다면 IllegalArgumentException를 발생시킨다")
     @Test
     void create_menu_with_lower_price() {
-        given(menuGroupRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstMenuGroup()));
-        given(productRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(TestFixture.createFirstMenuProducts());
-        
         Product product_price_1 = TestFixture.createFirstProduct();
         product_price_1.setPrice(BigDecimal.ONE);
-        given(productRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(product_price_1));
 
         Menu menu_price_10 = TestFixture.createFirstMenu();
 
@@ -114,9 +94,6 @@ class MenuServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void create_menu_with_null_and_empty_name(final String name) {
-        given(menuGroupRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstMenuGroup()));
-
         Menu menu = TestFixture.createFirstMenu();
         menu.setName(name);
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -128,12 +105,6 @@ class MenuServiceTest {
     void create_menu_with_purgomalum() {
         final Menu menu = TestFixture.createFirstMenu();
 
-        given(menuGroupRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstMenuGroup()));
-        given(productRepository.findAllByIdIn(Mockito.any()))
-                .willReturn(List.of(TestFixture.createFirstProduct()));
-        given(productRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstProduct()));
         purgomalumClient.changeProfanity(true);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -143,11 +114,6 @@ class MenuServiceTest {
     @DisplayName("메뉴에 속할 상품이 등록되어 있지 않은 상품이라면 메뉴 생성이 불가능하다")
     @Test
     void create_menu_with_not_exist_product() {
-        given(menuGroupRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createSecondMenuGroup()));
-        given(productRepository.findAllByIdIn(Mockito.any()))
-                .willReturn(List.of());
-
         final Menu menu = TestFixture.createFirstMenu();
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(menu));
@@ -157,9 +123,6 @@ class MenuServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void create_menu_with_null_and_empty_menu_products(final List<MenuProduct> menuProducts) {
-        given(menuGroupRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstMenuGroup()));
-
         Menu menu = TestFixture.createFirstMenu();
         menu.setMenuProducts(menuProducts);
 
@@ -171,11 +134,6 @@ class MenuServiceTest {
     @ValueSource(longs = {-1, 0})
     @ParameterizedTest
     void create_menu_with_zero_quantity_menu_product(final long quantity) {
-        given(menuGroupRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstMenuGroup()));
-        given(productRepository.findAllByIdIn(Mockito.any()))
-                .willReturn(List.of(TestFixture.createFirstProduct()));
-
         List<MenuProduct> menuProducts = TestFixture.createFirstMenuProducts();
         menuProducts.stream()
                 .forEach(menuProduct -> menuProduct.setQuantity(quantity));
@@ -190,9 +148,6 @@ class MenuServiceTest {
     @DisplayName("메뉴 그룹에 속하지 않는다면 NoSuchElementException을 발생시킨다")
     @Test
     void create_menu_must_contain_one_menu() {
-        given(menuGroupRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.empty());
-
         final Menu menu = TestFixture.createFirstMenu();
         assertThatExceptionOfType(NoSuchElementException.class)
                 .isThrownBy(() -> menuService.create(menu));
@@ -201,9 +156,6 @@ class MenuServiceTest {
     @DisplayName("가격을 수정할 수 있다")
     @Test
     void change_price() {
-        given(menuRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstMenu()));
-
         final BigDecimal updatePrice = BigDecimal.valueOf(9);
         Menu updateMenu = TestFixture.createFirstMenu();
         updateMenu.setPrice(updatePrice);
@@ -216,9 +168,6 @@ class MenuServiceTest {
     @DisplayName("메뉴에 속한 개별 상품의 가격보다 변경하려는 가격이 크다면 IllegalArgumentException을 발생시킨다")
     @Test
     void change_price_bigger_than_contains_products() {
-        given(menuRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(TestFixture.createFirstMenu()));
-
         final BigDecimal updatePrice = BigDecimal.valueOf(10000);
         Menu updateMenu = TestFixture.createFirstMenu();
         updateMenu.setPrice(updatePrice);
@@ -231,8 +180,6 @@ class MenuServiceTest {
     @Test
     void hide() {
         final Menu menu = TestFixture.createFirstMenu();
-        given(menuRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(menu));
 
         final Menu result = menuService.hide(menu.getId());
         assertThat(result.isDisplayed()).isFalse();
@@ -241,10 +188,8 @@ class MenuServiceTest {
     @DisplayName("메뉴를 공개 할 수 있다.")
     @Test
     void show() {
-        final Menu menu = TestFixture.createFirstMenu();
+        Menu menu = TestFixture.createFirstMenu();
         menu.setDisplayed(false);
-        given(menuRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(menu));
 
         final Menu result = menuService.display(menu.getId());
         assertThat(result.isDisplayed()).isTrue();
@@ -254,8 +199,6 @@ class MenuServiceTest {
     @Test
     void select_all_menus() {
         final List<Menu> defaultMenus = List.of(TestFixture.createFirstMenu(), TestFixture.createSecondMenu());
-        given(menuRepository.findAll())
-                .willReturn(defaultMenus);
 
         final List<Menu> results = menuService.findAll();
         assertThat(defaultMenus).isEqualTo(results);
