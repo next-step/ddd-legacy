@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FakeMenuGroupRepository implements MenuGroupRepository {
-    private Map<UUID, MenuGroup> fakePersistence = new HashMap<>();
+    private final Map<UUID, MenuGroup> fakePersistence = new HashMap<>();
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {

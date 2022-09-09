@@ -1,14 +1,13 @@
 package kitchenpos.application.fake;
 
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class FakeMenuRepository implements MenuRepository {
-    private Map<UUID, Menu> fakePersistence = new HashMap<>();
+    private final Map<UUID, Menu> fakePersistence = new HashMap<>();
 
     @Override
     public Menu save(Menu menu) {

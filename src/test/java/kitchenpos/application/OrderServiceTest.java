@@ -6,7 +6,6 @@ import kitchenpos.application.fake.FakeOrderTableRepository;
 import kitchenpos.application.support.TestFixture;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
-import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,20 +14,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -124,7 +116,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT", "EAT_IN"})
     void serve(final OrderType orderType) {
-        Order order = TestFixture.createOrderWithTypeAndStatus(orderType,OrderStatus.ACCEPTED);
+        Order order = TestFixture.createOrderWithTypeAndStatus(orderType, OrderStatus.ACCEPTED);
         orderRepository.save(order);
 
         final Order result = orderService.serve(order.getId());
@@ -272,7 +264,7 @@ class OrderServiceTest {
 
             OrderTable orderTable = TestFixture.createOrderTableWithOccupied(false);
             orderTableRepository.save(orderTable);
-            
+
             assertThatExceptionOfType(IllegalStateException.class)
                     .isThrownBy(() -> orderService.create(order));
         }

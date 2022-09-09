@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class FakeOrderTableRepository implements OrderTableRepository {
 
-    private Map<UUID, OrderTable> fakePersistence = new HashMap<>();
+    private final Map<UUID, OrderTable> fakePersistence = new HashMap<>();
 
     @Override
     public OrderTable save(OrderTable orderTable) {
