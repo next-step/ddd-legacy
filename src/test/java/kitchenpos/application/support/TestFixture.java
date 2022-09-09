@@ -1,6 +1,7 @@
 package kitchenpos.application.support;
 
 import kitchenpos.domain.*;
+import org.aspectj.weaver.ast.Or;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -10,214 +11,373 @@ import java.util.stream.Collectors;
 
 public class TestFixture {
     // menuGroup field
-    public final static UUID FIRST_MENU_GROUP_ID = UUID.randomUUID();
-    public final static String FIRST_MENU_GROUP_NAME = "첫번째 메뉴그룹";
-    public final static UUID SECOND_MENU_GROUP_ID = UUID.randomUUID();
-    public final static String SECOND_MENU_GROUP_NAME = "두번째 메뉴그룹";
+    public final static UUID DEFAULT_MENU_GROUP_ID = UUID.randomUUID();
+    public final static String DEFAULT_MENU_GROUP_NAME = "메뉴그룹";
 
     // product field
-    public final static UUID FIRST_PRODUCT_ID = UUID.randomUUID();
-    public final static String FIRST_PRODUCT_NAME = "후라이드 치킨";
-    public final static BigDecimal FIRST_PRODUCT_PRICE = BigDecimal.TEN;
-    public final static UUID SECOND_PRODUCT_ID = UUID.randomUUID();
-    public final static String SECOND_PRODUCT_NAME = "후라이드 치킨";
-    public final static BigDecimal SECOND_PRODUCT_PRICE = BigDecimal.ONE;
+    public final static UUID PRODUCT_ID = UUID.randomUUID();
+    public final static String PRODUCT_NAME = "후라이드 치킨";
+    public final static BigDecimal PRODUCT_PRICE = BigDecimal.TEN;
 
     // menu field
-    public static final UUID FIRST_MENU_ID = UUID.randomUUID();
-    public static final String FIRST_MENU_NAME = "첫번째메뉴";
-    public static final BigDecimal FIRST_MENU_PRICE = BigDecimal.TEN;
-    public static final UUID SECOND_MENU_ID = UUID.randomUUID();
-    public static final String SECOND_MENU_NAME = "두번째메뉴";
-    public static final BigDecimal SECOND_MENU_PRICE = BigDecimal.ONE;
+    public static final UUID MENU_ID = UUID.randomUUID();
+    public static final String MENU_NAME = "첫번째메뉴";
+    public static final BigDecimal MENU_PRICE = BigDecimal.TEN;
 
     // order table fields
-    public static final UUID FIRST_ORDER_TABLE_ID = UUID.randomUUID();
-    public static final String FIRST_ORDER_TABLE_NAME = "1번 테이블";
-    public static final int FIRST_ORDER_TABLE_GUEST = 0;
-    public static final UUID SECOND_ORDER_TABLE_ID = UUID.randomUUID();
-    public static final String SECOND_ORDER_TABLE_NAME = "1번 테이블";
-    public static final int SECOND_ORDER_TABLE_GUEST = 0;
+    public static final UUID ORDER_TABLE_ID = UUID.randomUUID();
+    public static final String ORDER_TABLE_NAME = "1번 테이블";
+    public static final int ORDER_TABLE_GUEST = 0;
+    public static final boolean ORDER_TABLE_OCCUPIED = true;
 
     // order fields
-    public final static UUID FIRST_ORDER_ID = UUID.randomUUID();
-    public final static Long FIRST_ORDER_LINE_ITEM_ID = 1L;
-    public final static BigDecimal FIRST_ORDER_PRICE = BigDecimal.TEN;
-    public final static int FIRST_ORDER_QUANTITY = 1;
-    public final static UUID SECOND_ORDER_ID = UUID.randomUUID();
-    public final static Long SECOND_ORDER_LINE_ITEM_ID = 2L;
-    public final static BigDecimal SECOND_ORDER_PRICE = BigDecimal.TEN;
-    public final static int SECOND_ORDER_QUANTITY = 1;
-    public final static String ADDRESS = "서울특별시";
+    public final static UUID ORDER_ID = UUID.randomUUID();
+    public final static OrderStatus ORDER_STATUS = OrderStatus.WAITING;
+    public final static String ORDER_ADDRESS = "서울특별시";
 
-    public static MenuGroup createFirstMenuGroup() {
+    public static MenuGroup createGeneralMenuGroup() {
         MenuGroup menuGroup = new MenuGroup();
 
-        menuGroup.setId(FIRST_MENU_GROUP_ID);
-        menuGroup.setName(FIRST_MENU_GROUP_NAME);
+        menuGroup.setId(DEFAULT_MENU_GROUP_ID);
+        menuGroup.setName(DEFAULT_MENU_GROUP_NAME);
 
         return menuGroup;
     }
 
-    public static MenuGroup createSecondMenuGroup() {
+    public static MenuGroup createMenuGroupWithName(final String name) {
         MenuGroup menuGroup = new MenuGroup();
 
-        menuGroup.setId(SECOND_MENU_GROUP_ID);
-        menuGroup.setName(SECOND_MENU_GROUP_NAME);
+        menuGroup.setId(UUID.randomUUID());
+        menuGroup.setName(name);
 
         return menuGroup;
     }
 
-
-    public static List<MenuProduct> createFirstMenuProducts() {
-        MenuProduct defaultMenuProduct = new MenuProduct();
-        Product product = createFirstProduct();
-        defaultMenuProduct.setProductId(product.getId());
-        defaultMenuProduct.setQuantity(1);
-        defaultMenuProduct.setProduct(product);
-
-        return List.of(defaultMenuProduct);
-    }
-
-    public static List<MenuProduct> createSecondMenuProducts() {
-        MenuProduct defaultMenuProduct = new MenuProduct();
-        Product product = createSecondProduct();
-        defaultMenuProduct.setProductId(product.getId());
-        defaultMenuProduct.setQuantity(1);
-        defaultMenuProduct.setProduct(product);
-
-        return List.of(defaultMenuProduct);
-    }
-
-    public static Product createFirstProduct() {
-        Product product = new Product();
-
-        product.setId(FIRST_PRODUCT_ID);
-        product.setName(FIRST_PRODUCT_NAME);
-        product.setPrice(FIRST_PRODUCT_PRICE);
-
-        return product;
-    }
-
-    public static Product createSecondProduct() {
-        Product product = new Product();
-
-        product.setId(SECOND_PRODUCT_ID);
-        product.setName(SECOND_PRODUCT_NAME);
-        product.setPrice(SECOND_PRODUCT_PRICE);
-
-        return product;
-    }
-
-    public static OrderTable createFirstOrderTable() {
-        OrderTable orderTable = new OrderTable();
-
-        orderTable.setId(FIRST_ORDER_TABLE_ID);
-        orderTable.setName(FIRST_ORDER_TABLE_NAME);
-        orderTable.setNumberOfGuests(FIRST_ORDER_TABLE_GUEST);
-
-        return orderTable;
-    }
-
-    public static OrderTable createSecondOrderTable() {
-        OrderTable orderTable = new OrderTable();
-
-        orderTable.setId(SECOND_ORDER_TABLE_ID);
-        orderTable.setName(SECOND_ORDER_TABLE_NAME);
-        orderTable.setNumberOfGuests(SECOND_ORDER_TABLE_GUEST);
-
-        return orderTable;
-    }
-
-    public static Menu createFirstMenu() {
+    public static Menu createGeneralMenu() {
         Menu menu = new Menu();
 
-        menu.setId(FIRST_MENU_ID);
-        menu.setName(FIRST_MENU_NAME);
-        menu.setPrice(FIRST_MENU_PRICE);
-        MenuGroup menuGroup = createFirstMenuGroup();
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuProducts(createFirstMenuProducts());
+        menu.setId(MENU_ID);
+        menu.setName(MENU_NAME);
+        menu.setPrice(MENU_PRICE);
         menu.setDisplayed(true);
+
+        MenuGroup menuGroup = createGeneralMenuGroup();
+        menu.setMenuGroupId(menuGroup.getId());
+        menu.setMenuGroup(menuGroup);
+
+        menu.setMenuProducts(createMenuProducts());
 
         return menu;
     }
 
-    public static Menu createSecondMenu() {
+    public static Menu createMenuWithName(final String name) {
         Menu menu = new Menu();
 
-        menu.setId(SECOND_MENU_ID);
-        menu.setName(SECOND_MENU_NAME);
-        menu.setPrice(SECOND_MENU_PRICE);
-        MenuGroup menuGroup = createSecondMenuGroup();
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuProducts(createSecondMenuProducts());
+        menu.setId(MENU_ID);
+        menu.setName(name);
+        menu.setPrice(MENU_PRICE);
         menu.setDisplayed(true);
+
+        MenuGroup menuGroup = createGeneralMenuGroup();
+        menu.setMenuGroupId(menuGroup.getId());
+        menu.setMenuGroup(menuGroup);
+
+        menu.setMenuProducts(createMenuProducts());
 
         return menu;
     }
 
-    public static Order createFirstOrder(final OrderType orderType) {
+    public static Menu createMenuWithPrice(final Long price) {
+        Menu menu = new Menu();
+
+        menu.setId(MENU_ID);
+        menu.setName(MENU_NAME);
+        if (price != null) {
+            menu.setPrice(BigDecimal.valueOf(price));
+        }
+        menu.setDisplayed(true);
+
+        MenuGroup menuGroup = createGeneralMenuGroup();
+        menu.setMenuGroupId(menuGroup.getId());
+        menu.setMenuGroup(menuGroup);
+
+        menu.setMenuProducts(createMenuProducts());
+        return menu;
+    }
+
+    public static Menu createMenuWithDisplayed(final boolean displayed) {
+        Menu menu = new Menu();
+
+        menu.setId(MENU_ID);
+        menu.setName(MENU_NAME);
+        menu.setPrice(MENU_PRICE);
+        menu.setDisplayed(displayed);
+
+        MenuGroup menuGroup = createGeneralMenuGroup();
+        menu.setMenuGroupId(menuGroup.getId());
+        menu.setMenuGroup(menuGroup);
+
+        menu.setMenuProducts(createMenuProducts());
+
+        return menu;
+    }
+
+    public static Menu createMenuWithMenuGroup(final MenuGroup menuGroup) {
+        Menu menu = new Menu();
+
+        menu.setId(MENU_ID);
+        menu.setName(MENU_NAME);
+        menu.setPrice(MENU_PRICE);
+        menu.setDisplayed(true);
+
+        if (menuGroup != null) {
+            menu.setMenuGroupId(menuGroup.getId());
+            menu.setMenuGroup(menuGroup);
+        }
+
+        menu.setMenuProducts(createMenuProducts());
+
+        return menu;
+    }
+
+    public static Menu createMenuWithMenuProducts(final List<MenuProduct> menuProducts) {
+        Menu menu = new Menu();
+
+        menu.setId(MENU_ID);
+        menu.setName(MENU_NAME);
+        menu.setPrice(MENU_PRICE);
+        menu.setDisplayed(true);
+
+        MenuGroup menuGroup = createGeneralMenuGroup();
+        menu.setMenuGroupId(menuGroup.getId());
+        menu.setMenuGroup(menuGroup);
+
+        menu.setMenuProducts(menuProducts);
+
+        return menu;
+    }
+
+    public static List<MenuProduct> createMenuProducts() {
+        MenuProduct menuProduct = new MenuProduct();
+
+        Product product = createGeneralProduct();
+        menuProduct.setProductId(product.getId());
+        menuProduct.setProduct(product);
+        menuProduct.setSeq(1L);
+        menuProduct.setQuantity(1);
+
+        return List.of(menuProduct);
+    }
+
+    public static List<MenuProduct> createMenuProductsWithProduct(Product product) {
+        MenuProduct menuProduct = new MenuProduct();
+
+        menuProduct.setProductId(product.getId());
+        menuProduct.setProduct(product);
+        menuProduct.setSeq(1L);
+        menuProduct.setQuantity(1);
+
+        return List.of(menuProduct);
+    }
+
+    public static List<MenuProduct> createMenuProductsWithQuantity(final int quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+
+        Product product = createGeneralProduct();
+        menuProduct.setProductId(product.getId());
+        menuProduct.setProduct(product);
+        menuProduct.setSeq(1L);
+        menuProduct.setQuantity(quantity);
+
+        return List.of(menuProduct);
+    }
+
+    public static Product createGeneralProduct() {
+        Product product = new Product();
+
+        product.setId(PRODUCT_ID);
+        product.setName(PRODUCT_NAME);
+        product.setPrice(PRODUCT_PRICE);
+
+        return product;
+    }
+
+    public static Product createProductWithName(final String name) {
+        Product product = new Product();
+
+        product.setId(PRODUCT_ID);
+        product.setName(name);
+        product.setPrice(PRODUCT_PRICE);
+
+        return product;
+    }
+
+    public static Product createProductWithPrice(final Long price) {
+        Product product = new Product();
+
+        product.setId(PRODUCT_ID);
+        product.setName(PRODUCT_NAME);
+        if (price != null) {
+            product.setPrice(BigDecimal.valueOf(price));
+        }
+
+        return product;
+    }
+
+    public static Order createOrderWithOrderType(final OrderType orderType) {
         Order order = new Order();
 
-        order.setId(FIRST_ORDER_ID);
-
-        OrderTable orderTable = createFirstOrderTable();
-        order.setOrderTable(orderTable);
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderLineItems(createFirstOrderLineItems());
+        order.setId(ORDER_ID);
+        order.setStatus(ORDER_STATUS);
         order.setType(orderType);
-        order.setDeliveryAddress(ADDRESS);
-        order.setStatus(OrderStatus.WAITING);
+
+        OrderTable orderTable = createGeneralOrderTable();
+        order.setOrderTableId(orderTable.getId());
+        order.setOrderTable(orderTable);
+
+        order.setOrderLineItems(createGeneralOrderLineItems());
+        order.setDeliveryAddress(ORDER_ADDRESS);
 
         return order;
     }
 
-    public static List<OrderLineItem> createFirstOrderLineItems() {
-        OrderLineItem orderLineItem = new OrderLineItem();
-
-        final Menu menu = createFirstMenu();
-        orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(FIRST_ORDER_PRICE);
-        orderLineItem.setQuantity(FIRST_ORDER_QUANTITY);
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setSeq(FIRST_ORDER_LINE_ITEM_ID);
-
-        return List.of(orderLineItem);
-    }
-
-    public static Order createSecondOrder(final OrderType orderType) {
+    public static Order createOrderWithTypeAndStatus(final OrderType orderType, final OrderStatus orderStatus) {
         Order order = new Order();
 
-        order.setId(SECOND_ORDER_ID);
-
-        OrderTable orderTable = createSecondOrderTable();
-        order.setOrderTable(orderTable);
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderLineItems(createSecondOrderLineItems());
+        order.setId(ORDER_ID);
+        order.setStatus(orderStatus);
         order.setType(orderType);
-        order.setDeliveryAddress(ADDRESS);
-        order.setStatus(OrderStatus.WAITING);
+
+        OrderTable orderTable = createGeneralOrderTable();
+        order.setOrderTableId(orderTable.getId());
+        order.setOrderTable(orderTable);
+
+        order.setOrderLineItems(createGeneralOrderLineItems());
+        order.setDeliveryAddress(ORDER_ADDRESS);
 
         return order;
     }
 
-    public static List<OrderLineItem> createSecondOrderLineItems() {
+    public static Order createOrderWithAddress(final String address) {
+        Order order = new Order();
+
+        order.setId(ORDER_ID);
+        order.setStatus(OrderStatus.WAITING);
+        order.setType(OrderType.DELIVERY);
+        order.setDeliveryAddress(address);
+
+        OrderTable orderTable = createGeneralOrderTable();
+        order.setOrderTableId(orderTable.getId());
+        order.setOrderTable(orderTable);
+
+        order.setOrderLineItems(createGeneralOrderLineItems());
+        order.setDeliveryAddress(ORDER_ADDRESS);
+
+        return order;
+    }
+
+    public static Order createOrderWithOrderLineItems(final List<OrderLineItem> orderLineItems) {
+        Order order = new Order();
+
+        order.setId(ORDER_ID);
+        order.setStatus(OrderStatus.WAITING);
+        order.setType(OrderType.DELIVERY);
+        order.setDeliveryAddress(ORDER_ADDRESS);
+
+        OrderTable orderTable = createGeneralOrderTable();
+        order.setOrderTableId(orderTable.getId());
+        order.setOrderTable(orderTable);
+
+        order.setOrderLineItems(orderLineItems);
+
+        return order;
+    }
+
+    public static Order createOrderWithTypeAndOrderLineItems(final OrderType orderType, final List<OrderLineItem> orderLineItems) {
+        Order order = new Order();
+
+        order.setId(ORDER_ID);
+        order.setStatus(OrderStatus.WAITING);
+        order.setType(orderType);
+        order.setDeliveryAddress(ORDER_ADDRESS);
+
+        OrderTable orderTable = createGeneralOrderTable();
+        order.setOrderTableId(orderTable.getId());
+        order.setOrderTable(orderTable);
+
+        order.setOrderLineItems(orderLineItems);
+
+        return order;
+    }
+
+    public static List<OrderLineItem> createGeneralOrderLineItems() {
         OrderLineItem orderLineItem = new OrderLineItem();
 
-        final Menu menu = createSecondMenu();
+        orderLineItem.setSeq(1L);
+        Menu menu = createGeneralMenu();
         orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(SECOND_ORDER_PRICE);
-        orderLineItem.setQuantity(SECOND_ORDER_QUANTITY);
         orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setSeq(SECOND_ORDER_LINE_ITEM_ID);
+        orderLineItem.setQuantity(1L);
+        orderLineItem.setPrice(BigDecimal.TEN);
 
         return List.of(orderLineItem);
     }
 
-    public static List<Order> createAllTypeOrders() {
-        return Arrays.stream(OrderType.values())
-                .map(TestFixture::createFirstOrder)
-                .collect(Collectors.toList());
+    public static List<OrderLineItem> createGeneralOrderLineItemsWithQuantity(final int quantity) {
+        OrderLineItem orderLineItem = new OrderLineItem();
+
+        orderLineItem.setSeq(1L);
+        Menu menu = createGeneralMenu();
+        orderLineItem.setMenu(menu);
+        orderLineItem.setMenuId(menu.getId());
+        orderLineItem.setQuantity(quantity);
+        orderLineItem.setPrice(BigDecimal.ONE);
+
+        return List.of(orderLineItem);
     }
+
+    public static OrderTable createGeneralOrderTable() {
+        OrderTable orderTable = new OrderTable();
+
+        orderTable.setId(ORDER_TABLE_ID);
+        orderTable.setName(ORDER_TABLE_NAME);
+        orderTable.setOccupied(ORDER_TABLE_OCCUPIED);
+        orderTable.setNumberOfGuests(ORDER_TABLE_GUEST);
+
+        return orderTable;
+    }
+
+    public static OrderTable createOrderTableWithName(final String name) {
+        OrderTable orderTable = new OrderTable();
+
+        orderTable.setId(ORDER_TABLE_ID);
+        orderTable.setName(name);
+        orderTable.setOccupied(ORDER_TABLE_OCCUPIED);
+        orderTable.setNumberOfGuests(ORDER_TABLE_GUEST);
+
+        return orderTable;
+    }
+
+    public static OrderTable createOrderTableWithOccupied(final boolean occupied) {
+        OrderTable orderTable = new OrderTable();
+
+        orderTable.setId(ORDER_TABLE_ID);
+        orderTable.setName(ORDER_TABLE_NAME);
+        orderTable.setOccupied(occupied);
+        orderTable.setNumberOfGuests(ORDER_TABLE_GUEST);
+
+        return orderTable;
+    }
+
+    public static OrderTable createOrderTableWithGuest(final int guest) {
+        OrderTable orderTable = new OrderTable();
+
+        orderTable.setId(ORDER_TABLE_ID);
+        orderTable.setName(ORDER_TABLE_NAME);
+        orderTable.setOccupied(ORDER_TABLE_OCCUPIED);
+        orderTable.setNumberOfGuests(guest);
+
+        return orderTable;
+    }
+
 }

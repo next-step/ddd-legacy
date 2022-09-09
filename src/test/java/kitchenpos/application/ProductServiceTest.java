@@ -47,12 +47,12 @@ class ProductServiceTest {
     @DisplayName("상품 생성이 가능하다")
     @Test
     void create_product() {
-        final Product product = TestFixture.createFirstProduct();
+        final Product product = TestFixture.createGeneralProduct();
 
         final Product result = productService.create(product);
         assertThat(result).isNotNull();
-        assertThat(result.getName()).isEqualTo(TestFixture.FIRST_PRODUCT_NAME);
-        assertThat(result.getPrice()).isEqualTo(TestFixture.FIRST_PRODUCT_PRICE);
+        assertThat(result.getName()).isEqualTo(TestFixture.PRODUCT_NAME);
+        assertThat(result.getPrice()).isEqualTo(TestFixture.PRODUCT_PRICE);
     }
 
     @DisplayName("가격이 비어있거나 음수이면 IllegalArgumentException를 발생시킨다")
@@ -60,11 +60,7 @@ class ProductServiceTest {
     @NullSource
     @ValueSource(longs = -1)
     void create_product_by_negative_number(final Long price) {
-        Product product = TestFixture.createFirstProduct();
-        BigDecimal wrapPrice = Optional.ofNullable(price)
-                .map(BigDecimal::new)
-                .orElse(null);
-        product.setPrice(wrapPrice);
+        Product product = TestFixture.createProductWithPrice(price);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productService.create(product));
@@ -74,8 +70,7 @@ class ProductServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void create_product_with_null_and_empty_name(final String name) {
-        Product product = TestFixture.createFirstProduct();
-        product.setName(name);
+        Product product = TestFixture.createProductWithName(name);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productService.create(product));
@@ -84,7 +79,7 @@ class ProductServiceTest {
     @DisplayName("상품의 이름은 비속어가 포함될 수 없다")
     @Test
     void create_product_with_profanity() {
-        final Product product = TestFixture.createFirstProduct();
+        final Product product = TestFixture.createGeneralProduct();
         purgomalumClient.changeProfanity(true);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -94,17 +89,15 @@ class ProductServiceTest {
     @DisplayName("생성된 상품의 가격을 변경할 수 있다")
     @Test
     void change_price() {
-        final Product originProduct = TestFixture.createFirstProduct();
+        final Product originProduct = TestFixture.createGeneralProduct();
         productRepository.save(originProduct);
 
-        final BigDecimal changedPrice = BigDecimal.valueOf(15000L);
-        Product updateProduct = TestFixture.createFirstProduct();
-        updateProduct.setPrice(changedPrice);
+        Product updateProduct = TestFixture.createProductWithPrice(15000L);
 
-        final Product result = productService.changePrice(TestFixture.FIRST_PRODUCT_ID, updateProduct);
+        final Product result = productService.changePrice(originProduct.getId(), updateProduct);
 
         assertThat(result).isNotNull();
-        assertThat(result.getPrice()).isEqualTo(changedPrice);
+        assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(15000L));
     }
 
     @DisplayName("가격을 변경할 때 가격이 Null이거나 음수라면 IllegalArgumentException를 발생시킨다")
@@ -112,25 +105,19 @@ class ProductServiceTest {
     @NullSource
     @ValueSource(longs = -1)
     void change_price_by_negative_number(final Long price) {
-        Product updateProduct = TestFixture.createFirstProduct();
-        BigDecimal wrapPrice = Optional.ofNullable(price)
-                .map(BigDecimal::new)
-                .orElse(null);
-        updateProduct.setPrice(wrapPrice);
+        Product updateProduct = TestFixture.createProductWithPrice(price);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> productService.changePrice(TestFixture.FIRST_PRODUCT_ID, updateProduct));
+                .isThrownBy(() -> productService.changePrice(updateProduct.getId(), updateProduct));
     }
 
     @DisplayName("생성된 상품을 조회 가능하다")
     @Test
     void select_all_products() {
-        final Product firstProduct = TestFixture.createFirstProduct();
-        final Product secondChicken = TestFixture.createSecondProduct();
-        productRepository.save(firstProduct);
-        productRepository.save(secondChicken);
-
-        final List<Product> chickens = Arrays.asList(firstProduct, secondChicken);
+        final Product firstProduct = TestFixture.createProductWithName("첫번째 상품");
+        final Product secondProduct = TestFixture.createProductWithName("두번째 상품");
+        productService.create(firstProduct);
+        productService.create(secondProduct);
 
         final List<Product> products = productService.findAll();
         assertThat(products).isNotEmpty();

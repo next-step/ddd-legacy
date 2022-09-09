@@ -38,8 +38,7 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     @ValueSource(strings = {"menu Group", "proper name", "test name"})
     void create_menu_group(final String name) {
-        MenuGroup menuGroup = TestFixture.createFirstMenuGroup();
-        menuGroup.setName(name);
+        MenuGroup menuGroup = TestFixture.createMenuGroupWithName(name);
 
         final MenuGroup result = menuGroupService.create(menuGroup);
 
@@ -50,8 +49,7 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void create_menu_group_whit_null_or_empty_name(final String name) {
-        final MenuGroup menuGroup = TestFixture.createFirstMenuGroup();
-        menuGroup.setName(name);
+        final MenuGroup menuGroup = TestFixture.createMenuGroupWithName(name);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuGroupService.create(menuGroup));
@@ -60,8 +58,8 @@ class MenuGroupServiceTest {
     @DisplayName("생성된 메뉴 그룹은 조회가 가능하다")
     @Test
     void select_all_menu_group() {
-        final MenuGroup firstMenuGroup = TestFixture.createFirstMenuGroup();
-        final MenuGroup secondMenuGroup = TestFixture.createSecondMenuGroup();
+        final MenuGroup firstMenuGroup = TestFixture.createMenuGroupWithName("첫메뉴");
+        final MenuGroup secondMenuGroup = TestFixture.createMenuGroupWithName("두번째메뉴");
 
         menuGroupService.create(firstMenuGroup);
         menuGroupService.create(secondMenuGroup);

@@ -54,33 +54,28 @@ class OrderServiceTest {
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT", "EAT_IN"})
     void create_order_with_null_and_empty_order_type(final OrderType orderType) {
-        final Order order = TestFixture.createFirstOrder(orderType);
+        final Order order = TestFixture.createOrderWithOrderType(orderType);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderService.create(order));
     }
 
-    // TODO change
     @DisplayName("주문을 생성 할 때 주문할 메뉴의 항목은 Null이거나 비어있다면 IllegalArgumentException을 발생시킨다")
     @ParameterizedTest
     @NullAndEmptySource
     void create_order_with_null_and_empty_menu(final List<OrderLineItem> orderLineItems) {
-        List<Order> orders = TestFixture.createAllTypeOrders();
-        orders.stream().forEach(order -> {
-            order.setOrderLineItems(orderLineItems);
-            assertThatExceptionOfType(IllegalArgumentException.class)
-                    .isThrownBy(() -> orderService.create(order));
-        });
+        Order order = TestFixture.createOrderWithOrderLineItems(orderLineItems);
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> orderService.create(order));
     }
 
     @DisplayName("비공개 상태의 메뉴를 주문한다면 IllegalStateException를 발생시킨다")
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT", "EAT_IN"})
     void create_order_with_none_display_menu(final OrderType orderType) {
-        final Order order = TestFixture.createFirstOrder(orderType);
+        final Order order = TestFixture.createOrderWithOrderType(orderType);
 
-        Menu menu = TestFixture.createFirstMenu();
-        menu.setDisplayed(false);
+        Menu menu = TestFixture.createMenuWithDisplayed(false);
         menuRepository.save(menu);
 
         assertThatExceptionOfType(IllegalStateException.class)
@@ -91,10 +86,9 @@ class OrderServiceTest {
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT", "EAT_IN"})
     void create_order_with_not_match_total_price(final OrderType orderType) {
-        final Order order = TestFixture.createFirstOrder(orderType);
+        final Order order = TestFixture.createOrderWithOrderType(orderType);
 
-        Menu menu = TestFixture.createFirstMenu();
-        menu.setPrice(menu.getPrice().multiply(BigDecimal.valueOf(2)));
+        Menu menu = TestFixture.createMenuWithPrice(5000L);
         menuRepository.save(menu);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -106,7 +100,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT", "EAT_IN"})
     void accept(final OrderType orderType) {
-        final Order order = TestFixture.createFirstOrder(orderType);
+        final Order order = TestFixture.createOrderWithOrderType(orderType);
         orderRepository.save(order);
 
         final Order result = orderService.accept(order.getId());
@@ -119,8 +113,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "COMPLETED", "DELIVERED", "DELIVERING", "SERVED"})
     void accept_by_not_watting_status(final OrderStatus orderStatus) {
-        Order order = TestFixture.createFirstOrder(OrderType.DELIVERY);
-        order.setStatus(orderStatus);
+        Order order = TestFixture.createOrderWithTypeAndStatus(OrderType.DELIVERY, orderStatus);
         orderRepository.save(order);
 
         assertThatExceptionOfType(IllegalStateException.class)
@@ -131,8 +124,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT", "EAT_IN"})
     void serve(final OrderType orderType) {
-        Order order = TestFixture.createFirstOrder(orderType);
-        order.setStatus(OrderStatus.ACCEPTED);
+        Order order = TestFixture.createOrderWithTypeAndStatus(orderType,OrderStatus.ACCEPTED);
         orderRepository.save(order);
 
         final Order result = orderService.serve(order.getId());
@@ -144,8 +136,7 @@ class OrderServiceTest {
     @ParameterizedTest
     @EnumSource(value = OrderStatus.class, names = {"WAITING", "COMPLETED", "DELIVERED", "DELIVERING", "SERVED"})
     void serve_with_not_accept_status(final OrderStatus orderStatus) {
-        Order order = TestFixture.createFirstOrder(OrderType.DELIVERY);
-        order.setStatus(orderStatus);
+        Order order = TestFixture.createOrderWithTypeAndStatus(OrderType.DELIVERY, orderStatus);
         orderRepository.save(order);
 
         assertThatExceptionOfType(IllegalStateException.class)
@@ -161,8 +152,7 @@ class OrderServiceTest {
         @ParameterizedTest
         @NullAndEmptySource
         void create_delivery_order_without_address(final String address) {
-            Order order = TestFixture.createFirstOrder(orderType);
-            order.setDeliveryAddress(address);
+            Order order = TestFixture.createOrderWithAddress(address);
 
             assertThatExceptionOfType(IllegalArgumentException.class)
                     .isThrownBy(() -> orderService.create(order));
@@ -172,8 +162,7 @@ class OrderServiceTest {
         @DisplayName("주문 배송 완료 처리를 할 수 있다")
         @Test
         void complete_delivery() {
-            Order order = TestFixture.createFirstOrder(orderType);
-            order.setStatus(OrderStatus.DELIVERING);
+            Order order = TestFixture.createOrderWithTypeAndStatus(orderType, OrderStatus.DELIVERING);
             orderRepository.save(order);
 
             final Order result = orderService.completeDelivery(order.getId());
@@ -186,8 +175,7 @@ class OrderServiceTest {
         @ParameterizedTest
         @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "COMPLETED", "DELIVERED", "SERVED"})
         void complete_delivery_with_not_deliverd_status(final OrderStatus orderStatus) {
-            Order order = TestFixture.createFirstOrder(orderType);
-            order.setStatus(orderStatus);
+            Order order = TestFixture.createOrderWithTypeAndStatus(orderType, orderStatus);
             orderRepository.save(order);
 
             assertThatExceptionOfType(IllegalStateException.class)
@@ -198,10 +186,8 @@ class OrderServiceTest {
         @DisplayName("주문 수량이 음수라면 IllegalArgumentException를 발생시킨다")
         @Test
         void create_order_lower_than_zero_quantity() {
-            Order order = TestFixture.createFirstOrder(orderType);
-            order.getOrderLineItems()
-                    .stream()
-                    .forEach(orderLineItem -> orderLineItem.setQuantity(-1));
+            List<OrderLineItem> orderLineItems = TestFixture.createGeneralOrderLineItemsWithQuantity(-1);
+            Order order = TestFixture.createOrderWithOrderLineItems(orderLineItems);
 
             assertThatExceptionOfType(IllegalArgumentException.class)
                     .isThrownBy(() -> orderService.create(order));
@@ -211,8 +197,7 @@ class OrderServiceTest {
         @DisplayName("메뉴 제공 상태일 때 배달이 가능하다")
         @Test
         void start_delivery() {
-            Order order = TestFixture.createFirstOrder(orderType);
-            order.setStatus(OrderStatus.SERVED);
+            Order order = TestFixture.createOrderWithTypeAndStatus(orderType, OrderStatus.SERVED);
             orderRepository.save(order);
 
             final Order result = orderService.startDelivery(order.getId());
@@ -224,8 +209,7 @@ class OrderServiceTest {
         @DisplayName("배달 상태일 때 배달 완료 처리가 가능하다")
         @Test
         void complete_delivering() {
-            Order order = TestFixture.createFirstOrder(orderType);
-            order.setStatus(OrderStatus.DELIVERING);
+            Order order = TestFixture.createOrderWithTypeAndStatus(orderType, OrderStatus.DELIVERING);
             orderRepository.save(order);
 
             final Order result = orderService.completeDelivery(order.getId());
@@ -243,10 +227,8 @@ class OrderServiceTest {
         @DisplayName("주문 수량이 음수라면 IllegalArgumentException를 발생시킨다")
         @Test
         void create_order_lower_than_zero_quantity() {
-            Order order = TestFixture.createFirstOrder(orderType);
-            order.getOrderLineItems()
-                    .stream()
-                    .forEach(orderLineItem -> orderLineItem.setQuantity(-1));
+            List<OrderLineItem> orderLineItems = TestFixture.createGeneralOrderLineItemsWithQuantity(-1);
+            Order order = TestFixture.createOrderWithTypeAndOrderLineItems(orderType, orderLineItems);
 
             assertThatExceptionOfType(IllegalArgumentException.class)
                     .isThrownBy(() -> orderService.create(order));
@@ -255,8 +237,7 @@ class OrderServiceTest {
         @DisplayName("제공 상태일때 완료 처리가 가능하다")
         @Test
         void complete_eat_in_order() {
-            Order order = TestFixture.createFirstOrder(orderType);
-            order.setStatus(OrderStatus.SERVED);
+            Order order = TestFixture.createOrderWithTypeAndStatus(orderType, OrderStatus.SERVED);
             orderRepository.save(order);
 
             final Order result = orderService.complete(order.getId());
@@ -274,8 +255,8 @@ class OrderServiceTest {
         @DisplayName("주문 테이블이 존재하지 않으면 NoSuchElementException를 발생시킨다")
         @Test
         void create_eat_in_order_with_no_such_order_table() {
-            final Order order = TestFixture.createFirstOrder(orderType);
-            menuRepository.save(TestFixture.createFirstMenu());
+            final Order order = TestFixture.createOrderWithOrderType(orderType);
+            menuRepository.save(TestFixture.createGeneralMenu());
 
             assertThatExceptionOfType(NoSuchElementException.class)
                     .isThrownBy(() -> orderService.create(order));
@@ -285,12 +266,11 @@ class OrderServiceTest {
         @DisplayName("주문 테이블이 비어있지 않다면 IllegalStateException를 발생시킨다")
         @Test
         void create_eat_in_order_with_empty_order_table() {
-            menuRepository.save(TestFixture.createFirstMenu());
+            menuRepository.save(TestFixture.createGeneralMenu());
 
-            final Order order = TestFixture.createFirstOrder(orderType);
+            final Order order = TestFixture.createOrderWithOrderType(orderType);
 
-            OrderTable orderTable = TestFixture.createFirstOrderTable();
-            orderTable.setOccupied(false);
+            OrderTable orderTable = TestFixture.createOrderTableWithOccupied(false);
             orderTableRepository.save(orderTable);
             
             assertThatExceptionOfType(IllegalStateException.class)
@@ -300,8 +280,7 @@ class OrderServiceTest {
         @DisplayName("매장 주문이거나, 포장 주문일 경우 상품 제공 상태일때 완료 처리가 가능하다")
         @Test
         void complete_take_out_order() {
-            Order order = TestFixture.createFirstOrder(orderType);
-            order.setStatus(OrderStatus.SERVED);
+            Order order = TestFixture.createOrderWithTypeAndStatus(orderType, OrderStatus.SERVED);
             orderRepository.save(order);
 
             final Order result = orderService.complete(order.getId());
