@@ -1,8 +1,13 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fake.FakeMenuRepository;
+import kitchenpos.application.fake.FakeOrderRepository;
+import kitchenpos.application.fake.FakeOrderTableRepository;
 import kitchenpos.application.support.TestFixture;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
+import org.aspectj.weaver.ast.Or;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,18 +32,22 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
-    private final String ADDRESS = "서울특별시";
-    @Mock
+
     private OrderRepository orderRepository;
-    @Mock
     private MenuRepository menuRepository;
-    @Mock
     private OrderTableRepository orderTableRepository;
-    @Mock
     private KitchenridersClient kitchenridersClient;
 
-    @InjectMocks
     private OrderService orderService;
+
+    @BeforeEach
+    void setup() {
+        orderRepository = new FakeOrderRepository();
+        menuRepository = new FakeMenuRepository();
+        orderTableRepository = new FakeOrderTableRepository();
+        kitchenridersClient = new KitchenridersClient();
+        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
+    }
 
 
     @DisplayName("주문을 생성할 때 주문 타입이 Null이라면 IllegalArgumentException을 발생시킨다")
@@ -70,13 +79,9 @@ class OrderServiceTest {
     void create_order_with_none_display_menu(final OrderType orderType) {
         final Order order = TestFixture.createFirstOrder(orderType);
 
-        given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(List.of(TestFixture.createFirstMenu()));
-
         Menu menu = TestFixture.createFirstMenu();
         menu.setDisplayed(false);
-        given(menuRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(menu));
+        menuRepository.save(menu);
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> orderService.create(order));
@@ -88,13 +93,9 @@ class OrderServiceTest {
     void create_order_with_not_match_total_price(final OrderType orderType) {
         final Order order = TestFixture.createFirstOrder(orderType);
 
-        given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                .willReturn(List.of(TestFixture.createFirstMenu()));
-
         Menu menu = TestFixture.createFirstMenu();
         menu.setPrice(menu.getPrice().multiply(BigDecimal.valueOf(2)));
-        given(menuRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(menu));
+        menuRepository.save(menu);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderService.create(order));
@@ -106,8 +107,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT", "EAT_IN"})
     void accept(final OrderType orderType) {
         final Order order = TestFixture.createFirstOrder(orderType);
-        given(orderRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         final Order result = orderService.accept(order.getId());
         assertThat(result).isNotNull();
@@ -121,8 +121,7 @@ class OrderServiceTest {
     void accept_by_not_watting_status(final OrderStatus orderStatus) {
         Order order = TestFixture.createFirstOrder(OrderType.DELIVERY);
         order.setStatus(orderStatus);
-        given(orderRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> orderService.accept(order.getId()));
@@ -134,9 +133,7 @@ class OrderServiceTest {
     void serve(final OrderType orderType) {
         Order order = TestFixture.createFirstOrder(orderType);
         order.setStatus(OrderStatus.ACCEPTED);
-
-        given(orderRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         final Order result = orderService.serve(order.getId());
         assertThat(result).isNotNull();
@@ -149,9 +146,7 @@ class OrderServiceTest {
     void serve_with_not_accept_status(final OrderStatus orderStatus) {
         Order order = TestFixture.createFirstOrder(OrderType.DELIVERY);
         order.setStatus(orderStatus);
-
-        given(orderRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(order));
+        orderRepository.save(order);
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> orderService.serve(order.getId()));
@@ -169,11 +164,6 @@ class OrderServiceTest {
             Order order = TestFixture.createFirstOrder(orderType);
             order.setDeliveryAddress(address);
 
-            given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                    .willReturn(List.of(TestFixture.createFirstMenu()));
-            given(menuRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.of(TestFixture.createFirstMenu()));
-
             assertThatExceptionOfType(IllegalArgumentException.class)
                     .isThrownBy(() -> orderService.create(order));
         }
@@ -184,9 +174,7 @@ class OrderServiceTest {
         void complete_delivery() {
             Order order = TestFixture.createFirstOrder(orderType);
             order.setStatus(OrderStatus.DELIVERING);
-
-            given(orderRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             final Order result = orderService.completeDelivery(order.getId());
             assertThat(result).isNotNull();
@@ -200,9 +188,7 @@ class OrderServiceTest {
         void complete_delivery_with_not_deliverd_status(final OrderStatus orderStatus) {
             Order order = TestFixture.createFirstOrder(orderType);
             order.setStatus(orderStatus);
-
-            given(orderRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             assertThatExceptionOfType(IllegalStateException.class)
                     .isThrownBy(() -> orderService.completeDelivery(order.getId()));
@@ -217,9 +203,6 @@ class OrderServiceTest {
                     .stream()
                     .forEach(orderLineItem -> orderLineItem.setQuantity(-1));
 
-            given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                    .willReturn(List.of(TestFixture.createFirstMenu()));
-
             assertThatExceptionOfType(IllegalArgumentException.class)
                     .isThrownBy(() -> orderService.create(order));
         }
@@ -230,9 +213,7 @@ class OrderServiceTest {
         void start_delivery() {
             Order order = TestFixture.createFirstOrder(orderType);
             order.setStatus(OrderStatus.SERVED);
-
-            given(orderRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             final Order result = orderService.startDelivery(order.getId());
             assertThat(result).isNotNull();
@@ -245,9 +226,7 @@ class OrderServiceTest {
         void complete_delivering() {
             Order order = TestFixture.createFirstOrder(orderType);
             order.setStatus(OrderStatus.DELIVERING);
-
-            given(orderRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             final Order result = orderService.completeDelivery(order.getId());
             assertThat(result).isNotNull();
@@ -269,9 +248,6 @@ class OrderServiceTest {
                     .stream()
                     .forEach(orderLineItem -> orderLineItem.setQuantity(-1));
 
-            given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                    .willReturn(List.of(TestFixture.createFirstMenu()));
-
             assertThatExceptionOfType(IllegalArgumentException.class)
                     .isThrownBy(() -> orderService.create(order));
         }
@@ -281,9 +257,7 @@ class OrderServiceTest {
         void complete_eat_in_order() {
             Order order = TestFixture.createFirstOrder(orderType);
             order.setStatus(OrderStatus.SERVED);
-
-            given(orderRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             final Order result = orderService.complete(order.getId());
             assertThat(result).isNotNull();
@@ -301,13 +275,7 @@ class OrderServiceTest {
         @Test
         void create_eat_in_order_with_no_such_order_table() {
             final Order order = TestFixture.createFirstOrder(orderType);
-
-            given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                    .willReturn(List.of(TestFixture.createFirstMenu()));
-            given(menuRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.of(TestFixture.createFirstMenu()));
-            given(orderTableRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.empty());
+            menuRepository.save(TestFixture.createFirstMenu());
 
             assertThatExceptionOfType(NoSuchElementException.class)
                     .isThrownBy(() -> orderService.create(order));
@@ -317,17 +285,14 @@ class OrderServiceTest {
         @DisplayName("주문 테이블이 비어있지 않다면 IllegalStateException를 발생시킨다")
         @Test
         void create_eat_in_order_with_empty_order_table() {
+            menuRepository.save(TestFixture.createFirstMenu());
+
             final Order order = TestFixture.createFirstOrder(orderType);
 
-            given(menuRepository.findAllByIdIn(Mockito.any(List.class)))
-                    .willReturn(List.of(TestFixture.createFirstMenu()));
-            given(menuRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.of(TestFixture.createFirstMenu()));
             OrderTable orderTable = TestFixture.createFirstOrderTable();
             orderTable.setOccupied(false);
-            given(orderTableRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.of(orderTable));
-
+            orderTableRepository.save(orderTable);
+            
             assertThatExceptionOfType(IllegalStateException.class)
                     .isThrownBy(() -> orderService.create(order));
         }
@@ -337,9 +302,7 @@ class OrderServiceTest {
         void complete_take_out_order() {
             Order order = TestFixture.createFirstOrder(orderType);
             order.setStatus(OrderStatus.SERVED);
-
-            given(orderRepository.findById(Mockito.any(UUID.class)))
-                    .willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             final Order result = orderService.complete(order.getId());
             assertThat(result).isNotNull();
