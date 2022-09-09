@@ -29,8 +29,8 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     void setUp() {
         super.setup();
 
-        final UUID 후라이드치킨 = 제품이_등록됨(given(), "후라이드 치킨", 15_000);
-        final UUID 콜라 = 제품이_등록됨(given(), "콜라", 2_000);
+        final UUID 후라이드치킨 = 제품이_등록됨(given(), "후라이드 치킨", 15_000L);
+        final UUID 콜라 = 제품이_등록됨(given(), "콜라", 2_000L);
         final UUID 세트메뉴 = 메뉴그룹이_등록됨(given(), "세트메뉴");
         Map<String, Object> 후라이드치킨_1개 = 메뉴상품을_구성함(후라이드치킨, 1);
         Map<String, Object> 콜라_1개 = 메뉴상품을_구성함(콜라, 1);
