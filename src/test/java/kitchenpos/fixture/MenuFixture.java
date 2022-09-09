@@ -1,4 +1,4 @@
-package kitchenpos.application.stub;
+package kitchenpos.fixture;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-public class MenuStub {
+public class MenuFixture {
 
     private static final String DEFAULT_NAME = "후라이드 치킨";
     private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(15_000);
@@ -20,8 +20,8 @@ public class MenuStub {
         menu.setName(DEFAULT_NAME);
         menu.setPrice(DEFAULT_PRICE);
         menu.setDisplayed(DEFAULT_DISPLAYED);
-        menu.setMenuGroup(MenuGroupStub.createDefault());
-        menu.setMenuProducts(List.of(MenuProductStub.createDefault()));
+        menu.setMenuGroup(MenuGroupFixture.createDefault());
+        menu.setMenuProducts(List.of(MenuProductFixture.createDefault()));
         return menu;
     }
 

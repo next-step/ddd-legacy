@@ -1,4 +1,4 @@
-package kitchenpos.application.stub;
+package kitchenpos.fixture;
 
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderStatus;
@@ -8,12 +8,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public class OrderStub {
+public class OrderFixture {
 
     public static Order createRequest(final OrderType type) {
         final Order request = new Order();
         request.setType(type);
-        request.setOrderLineItems(List.of(OrderLineItemStub.createRequest()));
+        request.setOrderLineItems(List.of(OrderLineItemFixture.createRequest()));
 
         if (type != null) {
             setAdditionalInfo(request);
@@ -24,7 +24,7 @@ public class OrderStub {
     private static void setAdditionalInfo(final Order request) {
         switch (request.getType()) {
             case EAT_IN:
-                request.setOrderTableId(OrderTableStub.createUsedTable().getId());
+                request.setOrderTableId(OrderTableFixture.createUsedTable().getId());
                 break;
             case TAKEOUT:
                 break;
@@ -38,12 +38,12 @@ public class OrderStub {
         final Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(type);
-        order.setOrderLineItems(List.of(OrderLineItemStub.createDefault()));
+        order.setOrderLineItems(List.of(OrderLineItemFixture.createDefault()));
         order.setOrderDateTime(LocalDateTime.now());
         order.setStatus(status);
         switch (type) {
             case EAT_IN:
-                order.setOrderTable(OrderTableStub.createUsedTable());
+                order.setOrderTable(OrderTableFixture.createUsedTable());
                 break;
             case TAKEOUT:
                 break;

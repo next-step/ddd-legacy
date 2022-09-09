@@ -1,10 +1,10 @@
-package kitchenpos.application.stub;
+package kitchenpos.fixture;
 
 import kitchenpos.domain.OrderTable;
 
 import java.util.UUID;
 
-public class OrderTableStub {
+public class OrderTableFixture {
 
     public static OrderTable createUsedTable() {
         final OrderTable orderTable = new OrderTable();

@@ -1,11 +1,11 @@
-package kitchenpos.application.stub;
+package kitchenpos.fixture;
 
 import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class ProductStub {
+public class ProductFixture {
 
     private static final String DEFAULT_NAME = "후라이드 치킨";
     private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(15_000);

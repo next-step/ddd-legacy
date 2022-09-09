@@ -1,9 +1,9 @@
 package kitchenpos.application;
 
-import kitchenpos.application.stub.MenuGroupStub;
-import kitchenpos.application.stub.MenuProductStub;
-import kitchenpos.application.stub.MenuStub;
-import kitchenpos.application.stub.ProductStub;
+import kitchenpos.fixture.MenuGroupFixture;
+import kitchenpos.fixture.MenuProductFixture;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
@@ -54,7 +54,7 @@ class ProductServiceTest {
         @Test
         void createdProduct() {
             // given
-            final Product request = ProductStub.createRequest("후라이드 치킨", BigDecimal.valueOf(15_000));
+            final Product request = ProductFixture.createRequest("후라이드 치킨", BigDecimal.valueOf(15_000));
 
             given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
             given(productRepository.save(any())).will(AdditionalAnswers.returnsFirstArg());
@@ -74,7 +74,7 @@ class ProductServiceTest {
         @Test
         void null_name() {
             // given
-            final Product request = ProductStub.createRequest(null, BigDecimal.valueOf(15_000));
+            final Product request = ProductFixture.createRequest(null, BigDecimal.valueOf(15_000));
 
             // then
             assertThatThrownBy(() -> productService.create(request)).isInstanceOf(IllegalArgumentException.class);
@@ -84,7 +84,7 @@ class ProductServiceTest {
         @Test
         void negative_name() {
             // given
-            final Product request = ProductStub.createRequest("후라이드 치킨", BigDecimal.valueOf(15_000));
+            final Product request = ProductFixture.createRequest("후라이드 치킨", BigDecimal.valueOf(15_000));
 
             given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
 
@@ -96,7 +96,7 @@ class ProductServiceTest {
         @Test
         void negative_price() {
             // given
-            final Product request = ProductStub.createRequest("후라이드 치킨", BigDecimal.valueOf(-15_000));
+            final Product request = ProductFixture.createRequest("후라이드 치킨", BigDecimal.valueOf(-15_000));
 
             // then
             assertThatThrownBy(() -> productService.create(request)).isInstanceOf(IllegalArgumentException.class);
@@ -111,7 +111,7 @@ class ProductServiceTest {
         @Test
         void changePrice() {
             // given
-            Product request = ProductStub.create("후라이드 치킨", BigDecimal.valueOf(20_000));
+            Product request = ProductFixture.create("후라이드 치킨", BigDecimal.valueOf(20_000));
 
             given(productRepository.findById(any())).willReturn(Optional.of(request));
             given(menuRepository.findAllByProductId(any())).willReturn(Collections.emptyList());
@@ -127,7 +127,7 @@ class ProductServiceTest {
         @Test
         void negative_price() {
             // given
-            Product request = ProductStub.create("후라이드 치킨", BigDecimal.valueOf(-15_000));
+            Product request = ProductFixture.create("후라이드 치킨", BigDecimal.valueOf(-15_000));
 
             // then
             assertThatThrownBy(() -> productService.changePrice(request.getId(), request)).isInstanceOf(IllegalArgumentException.class);
@@ -137,12 +137,12 @@ class ProductServiceTest {
         @Test
         void hideMenu() {
             // given
-            final Product request = ProductStub.create("후라이드 치킨", BigDecimal.valueOf(10_000));
-            final Menu menu = MenuStub.create("후라이드 치킨",
+            final Product request = ProductFixture.create("후라이드 치킨", BigDecimal.valueOf(10_000));
+            final Menu menu = MenuFixture.create("후라이드 치킨",
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault(),
-                    List.of(MenuProductStub.of(request)));
+                    MenuGroupFixture.createDefault(),
+                    List.of(MenuProductFixture.of(request)));
 
             given(productRepository.findById(any())).willReturn(Optional.of(request));
             given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));

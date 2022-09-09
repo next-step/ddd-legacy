@@ -1,9 +1,9 @@
 package kitchenpos.application;
 
-import kitchenpos.application.stub.MenuGroupStub;
-import kitchenpos.application.stub.MenuProductStub;
-import kitchenpos.application.stub.MenuStub;
-import kitchenpos.application.stub.ProductStub;
+import kitchenpos.fixture.MenuGroupFixture;
+import kitchenpos.fixture.MenuProductFixture;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
@@ -58,15 +58,15 @@ class MenuServiceTest {
         @Test
         void createdMenu() {
             // given
-            final Menu request = MenuStub.createRequest(
+            final Menu request = MenuFixture.createRequest(
                     "후라이드 치킨",
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault().getId(),
-                    List.of(MenuProductStub.createRequest(1L))
+                    MenuGroupFixture.createDefault().getId(),
+                    List.of(MenuProductFixture.createRequest(1L))
             );
-            final Product product = ProductStub.createDefault();
-            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupStub.createDefault()));
+            final Product product = ProductFixture.createDefault();
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupFixture.createDefault()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
             given(productRepository.findById(any())).willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(anyString())).willReturn(Boolean.FALSE);
@@ -89,12 +89,12 @@ class MenuServiceTest {
         @Test
         void negative_price() {
             // given
-            final Menu request = MenuStub.createRequest(
+            final Menu request = MenuFixture.createRequest(
                     "후라이드 치킨",
                     BigDecimal.valueOf(-15_000),
                     true,
-                    MenuGroupStub.createDefault().getId(),
-                    List.of(MenuProductStub.createRequest(1L))
+                    MenuGroupFixture.createDefault().getId(),
+                    List.of(MenuProductFixture.createRequest(1L))
             );
 
             // then
@@ -105,12 +105,12 @@ class MenuServiceTest {
         @Test
         void not_contain_menuGroup() {
             // given
-            final Menu request = MenuStub.createRequest(
+            final Menu request = MenuFixture.createRequest(
                     "후라이드 치킨",
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault().getId(),
-                    List.of(MenuProductStub.createRequest(1L))
+                    MenuGroupFixture.createDefault().getId(),
+                    List.of(MenuProductFixture.createRequest(1L))
             );
             given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
 
@@ -122,14 +122,14 @@ class MenuServiceTest {
         @Test
         void empty_menuProduct() {
             // given
-            final Menu request = MenuStub.createRequest(
+            final Menu request = MenuFixture.createRequest(
                     "후라이드 치킨",
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault().getId(),
+                    MenuGroupFixture.createDefault().getId(),
                     Collections.emptyList()
             );
-            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupStub.createDefault()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupFixture.createDefault()));
 
             // then
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
@@ -139,14 +139,14 @@ class MenuServiceTest {
         @Test
         void null_menuProduct() {
             // given
-            final Menu request = MenuStub.createRequest(
+            final Menu request = MenuFixture.createRequest(
                     "후라이드 치킨",
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault().getId(),
+                    MenuGroupFixture.createDefault().getId(),
                     null
             );
-            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupStub.createDefault()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupFixture.createDefault()));
 
             // then
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
@@ -156,14 +156,14 @@ class MenuServiceTest {
         @Test
         void not_created_product() {
             // given
-            final Menu request = MenuStub.createRequest(
+            final Menu request = MenuFixture.createRequest(
                     "후라이드 치킨",
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault().getId(),
-                    List.of(MenuProductStub.createRequest(1L))
+                    MenuGroupFixture.createDefault().getId(),
+                    List.of(MenuProductFixture.createRequest(1L))
             );
-            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupStub.createDefault()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupFixture.createDefault()));
             given(productRepository.findAllByIdIn(any())).willReturn(Collections.emptyList());
 
             // then
@@ -174,15 +174,15 @@ class MenuServiceTest {
         @Test
         void negative_menuProduct_quantity() {
             // given
-            final Menu request = MenuStub.createRequest(
+            final Menu request = MenuFixture.createRequest(
                     "후라이드 치킨",
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault().getId(),
-                    List.of(MenuProductStub.createRequest(-1L))
+                    MenuGroupFixture.createDefault().getId(),
+                    List.of(MenuProductFixture.createRequest(-1L))
             );
-            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupStub.createDefault()));
-            given(productRepository.findAllByIdIn(any())).willReturn(List.of(ProductStub.createDefault()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupFixture.createDefault()));
+            given(productRepository.findAllByIdIn(any())).willReturn(List.of(ProductFixture.createDefault()));
 
             // then
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
@@ -192,15 +192,15 @@ class MenuServiceTest {
         @Test
         void over_than_product_price() {
             // given
-            final Menu request = MenuStub.createRequest(
+            final Menu request = MenuFixture.createRequest(
                     "후라이드 치킨",
                     BigDecimal.valueOf(30_000),
                     true,
-                    MenuGroupStub.createDefault().getId(),
-                    List.of(MenuProductStub.createRequest(1L))
+                    MenuGroupFixture.createDefault().getId(),
+                    List.of(MenuProductFixture.createRequest(1L))
             );
-            final Product product = ProductStub.createDefault();
-            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupStub.createDefault()));
+            final Product product = ProductFixture.createDefault();
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupFixture.createDefault()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
             given(productRepository.findById(any())).willReturn(Optional.of(product));
 
@@ -212,15 +212,15 @@ class MenuServiceTest {
         @Test
         void null_name() {
             // given
-            final Menu request = MenuStub.createRequest(
+            final Menu request = MenuFixture.createRequest(
                     null,
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault().getId(),
-                    List.of(MenuProductStub.createRequest(1L))
+                    MenuGroupFixture.createDefault().getId(),
+                    List.of(MenuProductFixture.createRequest(1L))
             );
-            final Product product = ProductStub.createDefault();
-            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupStub.createDefault()));
+            final Product product = ProductFixture.createDefault();
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuGroupFixture.createDefault()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
             given(productRepository.findById(any())).willReturn(Optional.of(product));
 
@@ -232,16 +232,16 @@ class MenuServiceTest {
         @Test
         void invalid_name() {
             // given
-            final Menu request = MenuStub.create(
+            final Menu request = MenuFixture.create(
                     "비속어",
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault(),
-                    List.of(MenuProductStub.createDefault())
+                    MenuGroupFixture.createDefault(),
+                    List.of(MenuProductFixture.createDefault())
             );
             given(menuGroupRepository.findById(any())).willReturn(Optional.of(request.getMenuGroup()));
-            given(productRepository.findAllByIdIn(any())).willReturn(List.of(ProductStub.createDefault()));
-            given(productRepository.findById(any())).willReturn(Optional.of(ProductStub.createDefault()));
+            given(productRepository.findAllByIdIn(any())).willReturn(List.of(ProductFixture.createDefault()));
+            given(productRepository.findById(any())).willReturn(Optional.of(ProductFixture.createDefault()));
             given(purgomalumClient.containsProfanity(anyString())).willReturn(Boolean.TRUE);
 
             // then
@@ -257,19 +257,19 @@ class MenuServiceTest {
         @Test
         void changed_price() {
             // given
-            final Menu request = MenuStub.create(
+            final Menu request = MenuFixture.create(
                     "후라이드 치킨",
                     BigDecimal.valueOf(10_000),
                     true,
-                    MenuGroupStub.createDefault(),
-                    List.of(MenuProductStub.createDefault())
+                    MenuGroupFixture.createDefault(),
+                    List.of(MenuProductFixture.createDefault())
             );
-            final Menu findMenu = MenuStub.create(
+            final Menu findMenu = MenuFixture.create(
                     "후라이드 치킨",
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault(),
-                    List.of(MenuProductStub.createDefault())
+                    MenuGroupFixture.createDefault(),
+                    List.of(MenuProductFixture.createDefault())
             );
             given(menuRepository.findById(any())).willReturn(Optional.of(findMenu));
 
@@ -285,12 +285,12 @@ class MenuServiceTest {
         @Test
         void null_price() {
             // given
-            final Menu request = MenuStub.create(
+            final Menu request = MenuFixture.create(
                     "후라이드 치킨",
                     null,
                     true,
-                    MenuGroupStub.createDefault(),
-                    List.of(MenuProductStub.createDefault())
+                    MenuGroupFixture.createDefault(),
+                    List.of(MenuProductFixture.createDefault())
             );
 
             // then
@@ -301,12 +301,12 @@ class MenuServiceTest {
         @Test
         void negative_price() {
             // given
-            final Menu request = MenuStub.create(
+            final Menu request = MenuFixture.create(
                     "후라이드 치킨",
                     BigDecimal.valueOf(-1),
                     true,
-                    MenuGroupStub.createDefault(),
-                    List.of(MenuProductStub.createDefault())
+                    MenuGroupFixture.createDefault(),
+                    List.of(MenuProductFixture.createDefault())
             );
 
             // then
@@ -317,19 +317,19 @@ class MenuServiceTest {
         @Test
         void over_than_product_price() {
             // given
-            final Menu request = MenuStub.create(
+            final Menu request = MenuFixture.create(
                     "후라이드 치킨",
                     BigDecimal.valueOf(30_000),
                     true,
-                    MenuGroupStub.createDefault(),
-                    List.of(MenuProductStub.createDefault())
+                    MenuGroupFixture.createDefault(),
+                    List.of(MenuProductFixture.createDefault())
             );
-            final Menu findMenu = MenuStub.create(
+            final Menu findMenu = MenuFixture.create(
                     "후라이드 치킨",
                     BigDecimal.valueOf(15_000),
                     true,
-                    MenuGroupStub.createDefault(),
-                    List.of(MenuProductStub.createDefault())
+                    MenuGroupFixture.createDefault(),
+                    List.of(MenuProductFixture.createDefault())
             );
             given(menuRepository.findById(any())).willReturn(Optional.of(findMenu));
 
@@ -346,12 +346,12 @@ class MenuServiceTest {
         @Test
         void displayed() {
             // given
-            final Menu menu = MenuStub.create(
+            final Menu menu = MenuFixture.create(
                     "후라이드 치킨",
                     BigDecimal.valueOf(15_000),
                     false,
-                    MenuGroupStub.createDefault(),
-                    List.of(MenuProductStub.createDefault())
+                    MenuGroupFixture.createDefault(),
+                    List.of(MenuProductFixture.createDefault())
             );
             given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -366,13 +366,13 @@ class MenuServiceTest {
         @Test
         void over_than_product_price() {
             // given
-            final Menu menu = MenuStub.create(
+            final Menu menu = MenuFixture.create(
                     "후라이드 치킨",
                     BigDecimal.valueOf(30_000),
                     false,
-                    MenuGroupStub.createDefault(),
-                    List.of(MenuProductStub.create(
-                            ProductStub.create("후라이드 치킨", BigDecimal.valueOf(10_000)),
+                    MenuGroupFixture.createDefault(),
+                    List.of(MenuProductFixture.create(
+                            ProductFixture.create("후라이드 치킨", BigDecimal.valueOf(10_000)),
                             1L
                     ))
             );
@@ -387,12 +387,12 @@ class MenuServiceTest {
     @Test
     void hideMenu() {
         // given
-        final Menu menu = MenuStub.create(
+        final Menu menu = MenuFixture.create(
                 "후라이드 치킨",
                 BigDecimal.valueOf(15_000),
                 true,
-                MenuGroupStub.createDefault(),
-                List.of(MenuProductStub.createDefault())
+                MenuGroupFixture.createDefault(),
+                List.of(MenuProductFixture.createDefault())
         );
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 

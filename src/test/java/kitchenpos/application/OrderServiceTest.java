@@ -1,9 +1,9 @@
 package kitchenpos.application;
 
-import kitchenpos.application.stub.MenuStub;
-import kitchenpos.application.stub.OrderLineItemStub;
-import kitchenpos.application.stub.OrderStub;
-import kitchenpos.application.stub.OrderTableStub;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.OrderLineItemFixture;
+import kitchenpos.fixture.OrderFixture;
+import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
@@ -19,8 +19,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.AdditionalAnswers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,7 +33,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -63,7 +60,7 @@ class OrderServiceTest {
         @Test
         void null_type() {
             // given
-            final Order request = OrderStub.createRequest(null);
+            final Order request = OrderFixture.createRequest(null);
 
             // then
             assertThatThrownBy(() -> orderService.create(request)).isInstanceOf(IllegalArgumentException.class);
@@ -73,7 +70,7 @@ class OrderServiceTest {
         @Test
         void null_orderLineItems() {
             // given
-            final Order request = OrderStub.createRequest(OrderType.EAT_IN);
+            final Order request = OrderFixture.createRequest(OrderType.EAT_IN);
             request.setOrderLineItems(null);
 
             // then
@@ -84,7 +81,7 @@ class OrderServiceTest {
         @Test
         void empty_orderLineItems() {
             // given
-            final Order request = OrderStub.createRequest(OrderType.EAT_IN);
+            final Order request = OrderFixture.createRequest(OrderType.EAT_IN);
             request.setOrderLineItems(Collections.emptyList());
 
             // then
@@ -95,7 +92,7 @@ class OrderServiceTest {
         @Test
         void contain_not_created_menu() {
             // given
-            final Order request = OrderStub.createRequest(OrderType.EAT_IN);
+            final Order request = OrderFixture.createRequest(OrderType.EAT_IN);
             given(menuRepository.findAllByIdIn(any())).willReturn(Collections.emptyList());
 
             // then
@@ -106,8 +103,8 @@ class OrderServiceTest {
         @Test
         void contain_hidden_menu() {
             // given
-            final Order request = OrderStub.createRequest(OrderType.EAT_IN);
-            final Menu menu = MenuStub.createDefault();
+            final Order request = OrderFixture.createRequest(OrderType.EAT_IN);
+            final Menu menu = MenuFixture.createDefault();
             menu.setDisplayed(false);
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
             given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -120,11 +117,11 @@ class OrderServiceTest {
         @Test
         void same_menuPrice_and_orderLineItemsPrice() {
             // given
-            final Order request = OrderStub.createRequest(OrderType.EAT_IN);
-            final OrderLineItem orderLineItemRequest = OrderLineItemStub.createRequest();
+            final Order request = OrderFixture.createRequest(OrderType.EAT_IN);
+            final OrderLineItem orderLineItemRequest = OrderLineItemFixture.createRequest();
             orderLineItemRequest.setPrice(BigDecimal.valueOf(10_000));
             request.setOrderLineItems(List.of(orderLineItemRequest));
-            final Menu menu = MenuStub.createDefault();
+            final Menu menu = MenuFixture.createDefault();
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
             given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -140,9 +137,9 @@ class OrderServiceTest {
             @Test
             void create() {
                 // given
-                final Order request = OrderStub.createRequest(OrderType.EAT_IN);
-                final OrderTable orderTable = OrderTableStub.createUsedTable();
-                final Menu menu = MenuStub.createDefault();
+                final Order request = OrderFixture.createRequest(OrderType.EAT_IN);
+                final OrderTable orderTable = OrderTableFixture.createUsedTable();
+                final Menu menu = MenuFixture.createDefault();
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
                 given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
@@ -165,9 +162,9 @@ class OrderServiceTest {
             @Test
             void not_occupied_table() {
                 // given
-                final Order request = OrderStub.createRequest(OrderType.EAT_IN);
-                final OrderTable orderTable = OrderTableStub.create("1번", 0, false);
-                final Menu menu = MenuStub.createDefault();
+                final Order request = OrderFixture.createRequest(OrderType.EAT_IN);
+                final OrderTable orderTable = OrderTableFixture.create("1번", 0, false);
+                final Menu menu = MenuFixture.createDefault();
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
                 given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
@@ -185,9 +182,9 @@ class OrderServiceTest {
             @Test
             void create() {
                 // given
-                final Order request = OrderStub.createRequest(OrderType.TAKEOUT);
-                final OrderTable orderTable = OrderTableStub.createUsedTable();
-                final Menu menu = MenuStub.createDefault();
+                final Order request = OrderFixture.createRequest(OrderType.TAKEOUT);
+                final OrderTable orderTable = OrderTableFixture.createUsedTable();
+                final Menu menu = MenuFixture.createDefault();
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
                 given(orderRepository.save(any())).will(AdditionalAnswers.returnsFirstArg());
@@ -209,11 +206,11 @@ class OrderServiceTest {
             @Test
             void negative_menu_quantity() {
                 // given
-                final Order request = OrderStub.createRequest(OrderType.TAKEOUT);
-                final OrderLineItem orderLineItemRequest = OrderLineItemStub.createRequest();
+                final Order request = OrderFixture.createRequest(OrderType.TAKEOUT);
+                final OrderLineItem orderLineItemRequest = OrderLineItemFixture.createRequest();
                 orderLineItemRequest.setQuantity(-1L);
                 request.setOrderLineItems(List.of(orderLineItemRequest));
-                given(menuRepository.findAllByIdIn(any())).willReturn(List.of(MenuStub.createDefault()));
+                given(menuRepository.findAllByIdIn(any())).willReturn(List.of(MenuFixture.createDefault()));
 
                 // then
                 assertThatThrownBy(() -> orderService.create(request)).isInstanceOf(IllegalArgumentException.class);
@@ -228,9 +225,9 @@ class OrderServiceTest {
             @Test
             void create() {
                 // given
-                final Order request = OrderStub.createRequest(OrderType.DELIVERY);
-                final OrderTable orderTable = OrderTableStub.createUsedTable();
-                final Menu menu = MenuStub.createDefault();
+                final Order request = OrderFixture.createRequest(OrderType.DELIVERY);
+                final OrderTable orderTable = OrderTableFixture.createUsedTable();
+                final Menu menu = MenuFixture.createDefault();
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
                 given(orderRepository.save(any())).will(AdditionalAnswers.returnsFirstArg());
@@ -253,11 +250,11 @@ class OrderServiceTest {
             @Test
             void negative_menu_quantity() {
                 // given
-                final Order request = OrderStub.createRequest(OrderType.DELIVERY);
-                final OrderLineItem orderLineItemRequest = OrderLineItemStub.createRequest();
+                final Order request = OrderFixture.createRequest(OrderType.DELIVERY);
+                final OrderLineItem orderLineItemRequest = OrderLineItemFixture.createRequest();
                 orderLineItemRequest.setQuantity(-1L);
                 request.setOrderLineItems(List.of(orderLineItemRequest));
-                given(menuRepository.findAllByIdIn(any())).willReturn(List.of(MenuStub.createDefault()));
+                given(menuRepository.findAllByIdIn(any())).willReturn(List.of(MenuFixture.createDefault()));
 
                 // then
                 assertThatThrownBy(() -> orderService.create(request)).isInstanceOf(IllegalArgumentException.class);
@@ -267,9 +264,9 @@ class OrderServiceTest {
             @Test
             void null_address() {
                 // given
-                final Order request = OrderStub.createRequest(OrderType.DELIVERY);
+                final Order request = OrderFixture.createRequest(OrderType.DELIVERY);
                 request.setDeliveryAddress(null);
-                final Menu menu = MenuStub.createDefault();
+                final Menu menu = MenuFixture.createDefault();
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -281,9 +278,9 @@ class OrderServiceTest {
             @Test
             void empty_address() {
                 // given
-                final Order request = OrderStub.createRequest(OrderType.DELIVERY);
+                final Order request = OrderFixture.createRequest(OrderType.DELIVERY);
                 request.setDeliveryAddress("");
-                final Menu menu = MenuStub.createDefault();
+                final Menu menu = MenuFixture.createDefault();
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -301,7 +298,7 @@ class OrderServiceTest {
         @Test
         void accept() {
             // given
-            final Order order = OrderStub.create(OrderType.EAT_IN, OrderStatus.WAITING);
+            final Order order = OrderFixture.create(OrderType.EAT_IN, OrderStatus.WAITING);
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // when
@@ -315,7 +312,7 @@ class OrderServiceTest {
         @Test
         void order_status_not_waiting() {
             // given
-            final Order order = OrderStub.create(OrderType.EAT_IN, OrderStatus.ACCEPTED);
+            final Order order = OrderFixture.create(OrderType.EAT_IN, OrderStatus.ACCEPTED);
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // then
@@ -331,7 +328,7 @@ class OrderServiceTest {
         @Test
         void serve() {
             // given
-            final Order order = OrderStub.create(OrderType.EAT_IN, OrderStatus.ACCEPTED);
+            final Order order = OrderFixture.create(OrderType.EAT_IN, OrderStatus.ACCEPTED);
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // when
@@ -345,7 +342,7 @@ class OrderServiceTest {
         @Test
         void order_status_not_accepted() {
             // given
-            final Order order = OrderStub.create(OrderType.EAT_IN, OrderStatus.SERVED);
+            final Order order = OrderFixture.create(OrderType.EAT_IN, OrderStatus.SERVED);
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // then
@@ -361,7 +358,7 @@ class OrderServiceTest {
         @Test
         void startDelivery() {
             // given
-            final Order order = OrderStub.create(OrderType.DELIVERY, OrderStatus.SERVED);
+            final Order order = OrderFixture.create(OrderType.DELIVERY, OrderStatus.SERVED);
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // when
@@ -375,7 +372,7 @@ class OrderServiceTest {
         @Test
         void order_type_not_delivery() {
             // given
-            final Order order = OrderStub.create(OrderType.EAT_IN, OrderStatus.SERVED);
+            final Order order = OrderFixture.create(OrderType.EAT_IN, OrderStatus.SERVED);
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // then
@@ -386,7 +383,7 @@ class OrderServiceTest {
         @Test
         void order_status_not_served() {
             // given
-            final Order order = OrderStub.create(OrderType.DELIVERY, OrderStatus.ACCEPTED);
+            final Order order = OrderFixture.create(OrderType.DELIVERY, OrderStatus.ACCEPTED);
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // then
@@ -402,7 +399,7 @@ class OrderServiceTest {
         @Test
         void completedDelivery() {
             // given
-            final Order order = OrderStub.create(OrderType.DELIVERY, OrderStatus.DELIVERING);
+            final Order order = OrderFixture.create(OrderType.DELIVERY, OrderStatus.DELIVERING);
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // when
@@ -416,7 +413,7 @@ class OrderServiceTest {
         @Test
         void order_status_not_delivering() {
             // given
-            final Order order = OrderStub.create(OrderType.DELIVERY, OrderStatus.SERVED);
+            final Order order = OrderFixture.create(OrderType.DELIVERY, OrderStatus.SERVED);
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // then
@@ -436,7 +433,7 @@ class OrderServiceTest {
             @Test
             void completed() {
                 // given
-                final Order order = OrderStub.create(OrderType.EAT_IN, OrderStatus.SERVED);
+                final Order order = OrderFixture.create(OrderType.EAT_IN, OrderStatus.SERVED);
                 given(orderRepository.findById(any())).willReturn(Optional.of(order));
                 given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
 
@@ -455,7 +452,7 @@ class OrderServiceTest {
             @Test
             void order_status_not_served() {
                 // given
-                final Order order = OrderStub.create(OrderType.EAT_IN, OrderStatus.ACCEPTED);
+                final Order order = OrderFixture.create(OrderType.EAT_IN, OrderStatus.ACCEPTED);
                 given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
                 // then
@@ -471,7 +468,7 @@ class OrderServiceTest {
             @Test
             void completed() {
                 // given
-                final Order order = OrderStub.create(OrderType.TAKEOUT, OrderStatus.SERVED);
+                final Order order = OrderFixture.create(OrderType.TAKEOUT, OrderStatus.SERVED);
                 given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
                 // when
@@ -485,7 +482,7 @@ class OrderServiceTest {
             @Test
             void order_status_not_served() {
                 // given
-                final Order order = OrderStub.create(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
+                final Order order = OrderFixture.create(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
                 given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
                 // then
@@ -501,7 +498,7 @@ class OrderServiceTest {
             @Test
             void completed() {
                 // given
-                final Order order = OrderStub.create(OrderType.DELIVERY, OrderStatus.DELIVERED);
+                final Order order = OrderFixture.create(OrderType.DELIVERY, OrderStatus.DELIVERED);
                 given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
                 // when
@@ -515,7 +512,7 @@ class OrderServiceTest {
             @Test
             void order_status_not_delivered() {
                 // given
-                final Order order = OrderStub.create(OrderType.DELIVERY, OrderStatus.DELIVERING);
+                final Order order = OrderFixture.create(OrderType.DELIVERY, OrderStatus.DELIVERING);
                 given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
                 // then

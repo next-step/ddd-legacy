@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.application.stub.MenuGroupStub;
+import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +35,7 @@ class MenuGroupServiceTest {
         @Test
         void createdMenuGroup() {
             // given
-            final MenuGroup request = MenuGroupStub.createRequest("추천메뉴");
+            final MenuGroup request = MenuGroupFixture.createRequest("추천메뉴");
             given(menuGroupRepository.save(any())).will(AdditionalAnswers.returnsFirstArg());
 
             // when
@@ -52,7 +52,7 @@ class MenuGroupServiceTest {
         @Test
         void null_name() {
             // given
-            final MenuGroup request = MenuGroupStub.createRequest(null);
+            final MenuGroup request = MenuGroupFixture.createRequest(null);
 
             // then
             assertThatThrownBy(() -> menuGroupService.create(request)).isInstanceOf(IllegalArgumentException.class);

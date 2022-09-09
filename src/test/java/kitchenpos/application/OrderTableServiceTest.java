@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.application.stub.OrderTableStub;
+import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
@@ -84,7 +84,7 @@ class OrderTableServiceTest {
     @Test
     void sit() {
         // given
-        final OrderTable menu = OrderTableStub.create("1번 테이블", 0, false);
+        final OrderTable menu = OrderTableFixture.create("1번 테이블", 0, false);
         given(orderTableRepository.findById(any())).willReturn(Optional.of(menu));
 
         // when
@@ -102,7 +102,7 @@ class OrderTableServiceTest {
         @Test
         void clearedOrderTable() {
             // given
-            final OrderTable menu = OrderTableStub.create("1번 테이블", 5, true);
+            final OrderTable menu = OrderTableFixture.create("1번 테이블", 5, true);
             given(orderTableRepository.findById(any())).willReturn(Optional.of(menu));
             given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
 
@@ -120,7 +120,7 @@ class OrderTableServiceTest {
         @Test
         void not_completed_order_status() {
             // given
-            final OrderTable menu = OrderTableStub.create("1번 테이블", 5, true);
+            final OrderTable menu = OrderTableFixture.create("1번 테이블", 5, true);
             given(orderTableRepository.findById(any())).willReturn(Optional.of(menu));
             given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
 
@@ -137,8 +137,8 @@ class OrderTableServiceTest {
         @Test
         void changedNumberOfGuests() {
             // given
-            final OrderTable request =  OrderTableStub.create(null, 5, false);
-            final OrderTable menu = OrderTableStub.create("1번 테이블", 0, true);
+            final OrderTable request =  OrderTableFixture.create(null, 5, false);
+            final OrderTable menu = OrderTableFixture.create("1번 테이블", 0, true);
             menu.setId(request.getId());
             given(orderTableRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -153,7 +153,7 @@ class OrderTableServiceTest {
         @Test
         void negative_numberOfGuests() {
             // given
-            final OrderTable request =  OrderTableStub.create(null, -1, false);
+            final OrderTable request =  OrderTableFixture.create(null, -1, false);
 
             // then
             assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(request.getId(), request))
@@ -164,8 +164,8 @@ class OrderTableServiceTest {
         @Test
         void not_occupied_table() {
             // given
-            final OrderTable request =  OrderTableStub.create(null, 5, false);
-            final OrderTable menu = OrderTableStub.create("1번 테이블", 0, false);
+            final OrderTable request =  OrderTableFixture.create(null, 5, false);
+            final OrderTable menu = OrderTableFixture.create("1번 테이블", 0, false);
             menu.setId(request.getId());
             given(orderTableRepository.findById(any())).willReturn(Optional.of(menu));
 

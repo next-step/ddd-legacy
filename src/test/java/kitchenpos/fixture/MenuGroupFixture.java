@@ -1,10 +1,10 @@
-package kitchenpos.application.stub;
+package kitchenpos.fixture;
 
 import kitchenpos.domain.MenuGroup;
 
 import java.util.UUID;
 
-public class MenuGroupStub {
+public class MenuGroupFixture {
 
     private static final String DEFAULT_NAME = "추천메뉴";
 
