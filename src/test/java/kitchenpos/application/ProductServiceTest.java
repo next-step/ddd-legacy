@@ -1,10 +1,14 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fake.FakeMenuRepository;
+import kitchenpos.application.fake.FakeProductRepository;
+import kitchenpos.application.fake.FakePurgomalumClient;
 import kitchenpos.application.support.TestFixture;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.purgomalum.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,30 +31,26 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
-    @Mock
     private ProductRepository productRepository;
-    @Mock
     private MenuRepository menuRepository;
-    @Mock
-    private PurgomalumClient purgomalumClient;
+    private FakePurgomalumClient purgomalumClient;
 
-    @InjectMocks
     private ProductService productService;
 
+    @BeforeEach
+    void setup() {
+        productRepository = new FakeProductRepository();
+        menuRepository = new FakeMenuRepository();
+        purgomalumClient = new FakePurgomalumClient();
+        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+    }
     @DisplayName("상품 생성이 가능하다")
     @Test
     void create_product() {
         final Product product = TestFixture.createFirstProduct();
 
-        given(purgomalumClient.containsProfanity(Mockito.anyString()))
-                .willReturn(false);
-        given(productRepository.save(Mockito.any(Product.class)))
-                .willReturn(product);
-
-
         final Product result = productService.create(product);
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(TestFixture.FIRST_PRODUCT_ID);
         assertThat(result.getName()).isEqualTo(TestFixture.FIRST_PRODUCT_NAME);
         assertThat(result.getPrice()).isEqualTo(TestFixture.FIRST_PRODUCT_PRICE);
     }
@@ -85,9 +85,7 @@ class ProductServiceTest {
     @Test
     void create_product_with_profanity() {
         final Product product = TestFixture.createFirstProduct();
-
-        given(purgomalumClient.containsProfanity(Mockito.anyString()))
-                .willReturn(true);
+        purgomalumClient.changeProfanity(true);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productService.create(product));
@@ -97,12 +95,7 @@ class ProductServiceTest {
     @Test
     void change_price() {
         final Product originProduct = TestFixture.createFirstProduct();
-
-        given(productRepository.findById(Mockito.any(UUID.class)))
-                .willReturn(Optional.of(originProduct));
-
-        given(menuRepository.findAllByProductId(Mockito.any(UUID.class)))
-                .willReturn(new ArrayList<>());
+        productRepository.save(originProduct);
 
         final BigDecimal changedPrice = BigDecimal.valueOf(15000L);
         Product updateProduct = TestFixture.createFirstProduct();
@@ -134,14 +127,13 @@ class ProductServiceTest {
     void select_all_products() {
         final Product firstProduct = TestFixture.createFirstProduct();
         final Product secondChicken = TestFixture.createSecondProduct();
+        productRepository.save(firstProduct);
+        productRepository.save(secondChicken);
 
         final List<Product> chickens = Arrays.asList(firstProduct, secondChicken);
-        given(productRepository.findAll())
-                .willReturn(chickens);
 
         final List<Product> products = productService.findAll();
         assertThat(products).isNotEmpty();
         assertThat(products.size()).isEqualTo(2);
-        assertThat(products).isEqualTo(chickens);
     }
 }
