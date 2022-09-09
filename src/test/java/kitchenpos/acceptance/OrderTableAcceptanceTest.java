@@ -2,13 +2,12 @@ package kitchenpos.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import kitchenpos.domain.OrderTable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static kitchenpos.acceptance.OrderTableSteps.*;
@@ -80,10 +79,10 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> 테이블_등록_요청함(final String name) {
-        final Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
+        final OrderTable orderTable = new OrderTable();
+        orderTable.setName(name);
 
-        return 테이블_등록_요청(given(), params);
+        return 테이블_등록_요청(given(), orderTable);
     }
 
     private UUID 테이블이_등록됨(final String name) {
@@ -95,10 +94,10 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     }
 
     private ExtractableResponse<Response> 테이블에_앉은_손님인원을_수정_요청함(final UUID id, final int numberOfGuests) {
-        final Map<String, Object> params = new HashMap<>();
-        params.put("numberOfGuests", numberOfGuests);
+        final OrderTable orderTable = new OrderTable();
+        orderTable.setNumberOfGuests(numberOfGuests);
 
-        return 테이블에_앉은_손님인원을_수정_요청(given(), id, params);
+        return 테이블에_앉은_손님인원을_수정_요청(given(), id, orderTable);
     }
 
     private ExtractableResponse<Response> 손님이_테이블에서_일어남을_요청함(final UUID id) {
@@ -114,36 +113,26 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     }
 
     private void 테이블에_손님이_앉음(final ExtractableResponse<Response> response, final UUID id) {
-        final List<Map> list = response.jsonPath().get();
-        for (Map map : list) {
-            compareOccupied(map, id, true);
-        }
+        final List<OrderTable> orderTables = response.jsonPath().getList("", OrderTable.class);
+        orderTables.stream()
+                .filter(it -> id.equals(it.getId()))
+                .forEach(it -> assertThat(it.isOccupied()).isTrue());
     }
 
     private void 테이블_손님인원이_조회됨(final ExtractableResponse<Response> response, final UUID id, final int numberOfGuests) {
-        final List<Map> list = response.jsonPath().get();
-        for (Map map : list) {
-            compareNumberOfGuests(map, id, numberOfGuests);
-        }
+        final List<OrderTable> orderTables = response.jsonPath().getList("", OrderTable.class);
+        orderTables.stream()
+                .filter(it -> id.equals(it.getId()))
+                .forEach(it -> assertThat(it.getNumberOfGuests()).isEqualTo(numberOfGuests));
     }
 
     private void 테이블이_비어있음(final ExtractableResponse<Response> response, final UUID id) {
-        final List<Map> list = response.jsonPath().get();
-        for (Map map : list) {
-            compareOccupied(map, id, false);
-            compareNumberOfGuests(map, id, 0);
-        }
-    }
-
-    private void compareOccupied(final Map map, final UUID id, final boolean occupied) {
-        if (id.toString().equals(map.get("id"))) {
-            assertThat((boolean) map.get("occupied")).isEqualTo(occupied);
-        }
-    }
-
-    private void compareNumberOfGuests(final Map map, final UUID id, final int numberOfGuests) {
-        if (id.toString().equals(map.get("id"))) {
-            assertThat((int) map.get("numberOfGuests")).isEqualTo(numberOfGuests);
-        }
+        final List<OrderTable> orderTables = response.jsonPath().getList("", OrderTable.class);
+        orderTables.stream()
+                .filter(it -> id.equals(it.getId()))
+                .forEach(it -> {
+                    assertThat(it.isOccupied()).isFalse();
+                    assertThat(it.getNumberOfGuests()).isEqualTo(0);
+                });
     }
 }
