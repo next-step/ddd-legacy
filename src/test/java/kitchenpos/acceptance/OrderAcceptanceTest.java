@@ -2,6 +2,7 @@ package kitchenpos.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import kitchenpos.domain.MenuProduct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,10 +33,10 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         final UUID 후라이드치킨 = 제품이_등록됨(given(), "후라이드 치킨", 15_000L);
         final UUID 콜라 = 제품이_등록됨(given(), "콜라", 2_000L);
         final UUID 세트메뉴 = 메뉴그룹이_등록됨(given(), "세트메뉴");
-        Map<String, Object> 후라이드치킨_1개 = 메뉴상품을_구성함(후라이드치킨, 1);
-        Map<String, Object> 콜라_1개 = 메뉴상품을_구성함(콜라, 1);
-        List<Map> 후라이트치킨_콜라 = List.of(후라이드치킨_1개, 콜라_1개);
-        후라이드_치킨_세트 = 메뉴가_등록됨(given(), "후라이드 치킨 세트", 17_000, 세트메뉴, true, 후라이트치킨_콜라);
+        MenuProduct 후라이드치킨_1개 = 메뉴상품을_구성함(후라이드치킨, 1);
+        MenuProduct 콜라_1개 = 메뉴상품을_구성함(콜라, 1);
+        List<MenuProduct> 후라이트치킨_콜라 = List.of(후라이드치킨_1개, 콜라_1개);
+        후라이드_치킨_세트 = 메뉴가_등록됨(given(), "후라이드 치킨 세트", 17_000L, 세트메뉴, true, 후라이트치킨_콜라);
 
         일번_테이블 = 테이블이_등록됨(given(), "1번");
         테이블에_손님이_앉음을_요청(given(), 일번_테이블);

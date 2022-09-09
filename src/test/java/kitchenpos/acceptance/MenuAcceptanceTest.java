@@ -2,18 +2,19 @@ package kitchenpos.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuProduct;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
+import static kitchenpos.acceptance.MenuGroupSteps.메뉴그룹이_등록됨;
 import static kitchenpos.acceptance.MenuSteps.*;
 import static kitchenpos.acceptance.ProductSteps.제품이_등록됨;
-import static kitchenpos.acceptance.MenuGroupSteps.메뉴그룹이_등록됨;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("메뉴 관련 기능")
@@ -23,8 +24,8 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     private UUID 양념치킨;
     private UUID 콜라;
     private UUID 세트메뉴;
-    private List<Map> 후라이드치킨_콜라;
-    private List<Map> 양념치킨_콜라;
+    private List<MenuProduct> 후라이드치킨_콜라;
+    private List<MenuProduct> 양념치킨_콜라;
 
     @BeforeEach
     void setUp() {
@@ -35,11 +36,11 @@ public class MenuAcceptanceTest extends AcceptanceTest {
         콜라 = 제품이_등록됨(given(), "콜라", 2_000L);
         세트메뉴 = 메뉴그룹이_등록됨(given(), "세트메뉴");
 
-        Map<String, Object> 콜라_2개 = 메뉴상품을_구성함(콜라, 2);
-        Map<String, Object> 후라이드치킨_1개 = 메뉴상품을_구성함(후라이드치킨, 1);
+        MenuProduct 콜라_2개 = 메뉴상품을_구성함(콜라, 2);
+        MenuProduct 후라이드치킨_1개 = 메뉴상품을_구성함(후라이드치킨, 1);
         후라이드치킨_콜라 = List.of(후라이드치킨_1개, 콜라_2개);
 
-        Map<String, Object> 앙념치킨_1개 = 메뉴상품을_구성함(양념치킨, 1);
+        MenuProduct 앙념치킨_1개 = 메뉴상품을_구성함(양념치킨, 1);
         양념치킨_콜라 = List.of(앙념치킨_1개, 콜라_2개);
     }
 
@@ -47,7 +48,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void addMenu() {
         // when
-        메뉴_등록_요청함("후라이드 치킨 세트", 19_000, 세트메뉴, true, 후라이드치킨_콜라);
+        메뉴_등록_요청함("후라이드 치킨 세트", 19_000L, 세트메뉴, true, 후라이드치킨_콜라);
 
         // then
         var 메뉴_목록 = 메뉴_목록_조회_요청함();
@@ -58,21 +59,21 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void updatePrice() {
         // given
-        UUID 후라이드_치킨_세트 = 메뉴가_등록됨("후라이드 치킨 세트", 19_000, 세트메뉴, true, 후라이드치킨_콜라);
+        UUID 후라이드_치킨_세트 = 메뉴가_등록됨("후라이드 치킨 세트", 19_000L, 세트메뉴, true, 후라이드치킨_콜라);
 
         // when
-        메뉴의_가격_수정_요청함(후라이드_치킨_세트, 15_000);
+        메뉴의_가격_수정_요청함(후라이드_치킨_세트, 15_000L);
 
         // then
         var 메뉴_목록 = 메뉴_목록_조회_요청함();
-        메뉴의_가격이_변경됨(메뉴_목록, 후라이드_치킨_세트, 15_000);
+        메뉴의_가격이_변경됨(메뉴_목록, 후라이드_치킨_세트, 15_000L);
     }
 
     @DisplayName("메뉴를 표시한다.")
     @Test
     void displayMenu() {
         // given
-        UUID 후라이드_치킨_세트 = 메뉴가_등록됨("후라이드 치킨 세트", 19_000, 세트메뉴, false, 후라이드치킨_콜라);
+        UUID 후라이드_치킨_세트 = 메뉴가_등록됨("후라이드 치킨 세트", 19_000L, 세트메뉴, false, 후라이드치킨_콜라);
 
         // when
         메뉴_표시를_요청함(후라이드_치킨_세트);
@@ -86,7 +87,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void hideMenu() {
         // given
-        UUID 후라이드_치킨_세트 = 메뉴가_등록됨("후라이드 치킨 세트", 19_000, 세트메뉴, true, 후라이드치킨_콜라);
+        UUID 후라이드_치킨_세트 = 메뉴가_등록됨("후라이드 치킨 세트", 19_000L, 세트메뉴, true, 후라이드치킨_콜라);
 
         // when
         메뉴_숨김을_요청함(후라이드_치킨_세트);
@@ -100,8 +101,8 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void showMenus() {
         // given
-        메뉴가_등록됨("후라이드 치킨 세트", 19_000, 세트메뉴, true, 후라이드치킨_콜라);
-        메뉴가_등록됨("양념 치킨 세트", 20_000, 세트메뉴, true, 양념치킨_콜라);
+        메뉴가_등록됨("후라이드 치킨 세트", 19_000L, 세트메뉴, true, 후라이드치킨_콜라);
+        메뉴가_등록됨("양념 치킨 세트", 20_000L, 세트메뉴, true, 양념치킨_콜라);
 
         // when
         var 메뉴_목록 = 메뉴_목록_조회_요청함();
@@ -110,26 +111,26 @@ public class MenuAcceptanceTest extends AcceptanceTest {
         메뉴가_조회됨(메뉴_목록, "후라이드 치킨 세트", "양념 치킨 세트");
     }
 
-    private ExtractableResponse<Response> 메뉴_등록_요청함(final String name, final int price, final UUID menuGroupId, final boolean displayed, final List<Map> menuProducts) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("price", price);
-        params.put("menuGroupId", menuGroupId);
-        params.put("displayed", displayed);
-        params.put("menuProducts", menuProducts);
+    private ExtractableResponse<Response> 메뉴_등록_요청함(final String name, final Long price, final UUID menuGroupId, final boolean displayed, final List<MenuProduct> menuProducts) {
+        final Menu menu = new Menu();
+        menu.setName(name);
+        menu.setPrice(BigDecimal.valueOf(price));
+        menu.setMenuGroupId(menuGroupId);
+        menu.setDisplayed(displayed);
+        menu.setMenuProducts(menuProducts);
 
-        return 메뉴_등록_요청(given(), params);
+        return 메뉴_등록_요청(given(), menu);
     }
 
     private ExtractableResponse<Response> 메뉴_목록_조회_요청함() {
         return 메뉴_목록_조회_요청(given());
     }
 
-    private ExtractableResponse<Response> 메뉴의_가격_수정_요청함(final UUID id, final int price) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("price", String.valueOf(price));
+    private ExtractableResponse<Response> 메뉴의_가격_수정_요청함(final UUID id, final Long price) {
+        Menu menu = new Menu();
+        menu.setPrice(BigDecimal.valueOf(price));
 
-        return 메뉴_가격_수정_요청(given(), id, params);
+        return 메뉴_가격_수정_요청(given(), id, menu);
     }
 
     private ExtractableResponse<Response> 메뉴_표시를_요청함(final UUID id) {
@@ -140,41 +141,29 @@ public class MenuAcceptanceTest extends AcceptanceTest {
         return 메뉴_숨김을_요청(given(), id);
     }
 
-    private UUID 메뉴가_등록됨(final String name, final int price, final UUID menuGroupId, final boolean displayed, final List<Map> menuProducts) {
+    private UUID 메뉴가_등록됨(final String name, final Long price, final UUID menuGroupId, final boolean displayed, final List<MenuProduct> menuProducts) {
         return 메뉴_등록_요청함(name, price, menuGroupId, displayed, menuProducts).jsonPath().getUUID("id");
     }
 
-    private void 메뉴의_가격이_변경됨(final ExtractableResponse<Response> response, final UUID id, final int price) {
-        List<Map> list = response.jsonPath().get();
-        for (Map map : list) {
-            comparePrice(map, id, price);
-        }
-    }
-
-    private void comparePrice(final Map map, final UUID id, final int price) {
-        if (id.toString().equals(map.get("id"))) {
-            assertThat(Math.round((Float) map.get("price"))).isEqualTo(price);
-        }
+    private void 메뉴의_가격이_변경됨(final ExtractableResponse<Response> response, final UUID id, final Long price) {
+        List<Menu> menus = response.jsonPath().getList("", Menu.class);
+        menus.stream()
+                .filter(it -> id.equals(it.getId()))
+                .forEach(it -> assertThat(it.getPrice().longValue()).isEqualTo(price));
     }
 
     private void 메뉴가_표시됨(final ExtractableResponse<Response> response, final UUID id) {
-        List<Map> list = response.jsonPath().get();
-        for (Map map : list) {
-            compareDisplayed(map, id, true);
-        }
+        List<Menu> menus = response.jsonPath().getList("", Menu.class);
+        menus.stream()
+                .filter(it -> id.equals(it.getId()))
+                .forEach(it -> assertThat(it.isDisplayed()).isTrue());
     }
 
     private void 메뉴가_숨겨짐(final ExtractableResponse<Response> response, final UUID id) {
-        List<Map> list = response.jsonPath().get();
-        for (Map map : list) {
-            compareDisplayed(map, id, false);
-        }
-    }
-
-    private void compareDisplayed(final Map map, final UUID id, final boolean displayed) {
-        if (id.toString().equals(map.get("id"))) {
-            assertThat((boolean) map.get("displayed")).isEqualTo(displayed);
-        }
+        List<Menu> menus = response.jsonPath().getList("", Menu.class);
+        menus.stream()
+                .filter(it -> id.equals(it.getId()))
+                .forEach(it -> assertThat(it.isDisplayed()).isFalse());
     }
 
     private void 메뉴가_조회됨(final ExtractableResponse<Response> response, final String... names) {

@@ -3,18 +3,19 @@ package kitchenpos.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuProduct;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.HashMap;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class MenuSteps {
 
-    public static ExtractableResponse<Response> 메뉴_등록_요청(final RequestSpecification given, final Map<String, Object> params) {
-        return given.body(params)
+    public static ExtractableResponse<Response> 메뉴_등록_요청(final RequestSpecification given, final Menu menu) {
+        return given.body(menu)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/api/menus")
                 .then().log().all()
@@ -24,24 +25,24 @@ public class MenuSteps {
 
     public static UUID 메뉴가_등록됨(final RequestSpecification given,
                                final String name,
-                               final int price,
+                               final Long price,
                                final UUID menuGroupId,
                                final boolean displayed,
-                               final List<Map> menuProducts) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", name);
-        params.put("price", price);
-        params.put("menuGroupId", menuGroupId);
-        params.put("displayed", displayed);
-        params.put("menuProducts", menuProducts);
+                               final List<MenuProduct> menuProducts) {
+        final Menu menu = new Menu();
+        menu.setName(name);
+        menu.setPrice(BigDecimal.valueOf(price));
+        menu.setMenuGroupId(menuGroupId);
+        menu.setDisplayed(displayed);
+        menu.setMenuProducts(menuProducts);
 
-        return 메뉴_등록_요청(given, params).jsonPath().getUUID("id");
+        return 메뉴_등록_요청(given, menu).jsonPath().getUUID("id");
     }
 
-    public static Map<String, Object> 메뉴상품을_구성함(final UUID productId, final int quantity) {
-        Map<String, Object> menuProduct = new HashMap<>();
-        menuProduct.put("productId", productId);
-        menuProduct.put("quantity", quantity);
+    public static MenuProduct 메뉴상품을_구성함(final UUID productId, final int quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProductId(productId);
+        menuProduct.setQuantity(quantity);
         return menuProduct;
     }
 
@@ -53,8 +54,8 @@ public class MenuSteps {
                 .extract();
     }
 
-    public static ExtractableResponse<Response> 메뉴_가격_수정_요청(final RequestSpecification given, final UUID id, final Map<String, Object> params) {
-        return given.body(params)
+    public static ExtractableResponse<Response> 메뉴_가격_수정_요청(final RequestSpecification given, final UUID id, final Menu menu) {
+        return given.body(menu)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/api/menus/{id}/price", id)
                 .then().log().all()
