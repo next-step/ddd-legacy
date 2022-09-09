@@ -7,7 +7,7 @@ import kitchenpos.domain.MenuRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class FakeMenuRepository implements MenuRepository {
+public class FakeMenuRepository implements MenuRepository {
     private Map<UUID, Menu> fakePersistence = new HashMap<>();
 
     @Override

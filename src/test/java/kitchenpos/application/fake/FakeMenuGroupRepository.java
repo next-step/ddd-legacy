@@ -6,7 +6,7 @@ import kitchenpos.domain.MenuGroupRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class FakeMenuGroupRepository implements MenuGroupRepository {
+public class FakeMenuGroupRepository implements MenuGroupRepository {
     private Map<UUID, MenuGroup> fakePersistence = new HashMap<>();
 
     @Override
@@ -14,7 +14,8 @@ class FakeMenuGroupRepository implements MenuGroupRepository {
         if (fakePersistence.containsKey(menuGroup.getId())) {
             throw new IllegalArgumentException("duplicate primary key");
         }
-        return fakePersistence.put(menuGroup.getId(), menuGroup);
+        fakePersistence.put(menuGroup.getId(), menuGroup);
+        return menuGroup;
     }
 
     @Override
