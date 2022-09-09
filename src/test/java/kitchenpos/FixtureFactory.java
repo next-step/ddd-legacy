@@ -1,11 +1,9 @@
 package kitchenpos;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.Product;
+import kitchenpos.domain.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,16 +38,63 @@ public class FixtureFactory {
         return menuGroup;
     }
 
-    public static List<MenuProduct> createMenuProducts() {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(UUID.randomUUID());
-        menuProduct.setQuantity(2);
-        Product product = FixtureFactory.createProduct("양념 치킨", BigDecimal.valueOf(16000));
-        menuProduct.setProduct(product);
-        menuProduct.setProductId(product.getId());
-
-        return List.of(menuProduct);
-
-
+    public static OrderTable createOrderTable(String name) {
+        return createOrderTable(name, 0, false);
     }
+
+    public static OrderTable createOrderTable(String name, int numberOfGuests, boolean occupied) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName(name);
+        orderTable.setNumberOfGuests(numberOfGuests);
+        orderTable.setOccupied(occupied);
+        return orderTable;
+    }
+
+    public static OrderLineItem createOrderLineItem(Menu menu, BigDecimal price, long quantity) {
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setMenuId(menu.getId());
+        orderLineItem.setMenu(menu);
+        orderLineItem.setPrice(price);
+        orderLineItem.setQuantity(quantity);
+        return orderLineItem;
+    }
+
+    public static Order createEatInOrder(OrderStatus orderStatus, OrderTable orderTable, List<OrderLineItem> orderLineItems) {
+        return createOrder(OrderType.EAT_IN, orderStatus, null, orderTable, orderTable.getId(), orderLineItems);
+    }
+
+    public static Order createEatInOrder(OrderTable orderTable, List<OrderLineItem> orderLineItems) {
+        return createOrder(OrderType.EAT_IN, OrderStatus.WAITING, null, orderTable, orderTable.getId(), orderLineItems);
+    }
+
+    public static Order createDeliveryOrder(String deliveryAddress, OrderStatus orderStatus, List<OrderLineItem> orderLineItems) {
+        return createOrder(OrderType.DELIVERY, orderStatus, deliveryAddress, null, null, orderLineItems);
+    }
+
+    public static Order createDeliveryOrder(String deliveryAddress, List<OrderLineItem> orderLineItems) {
+        return createOrder(OrderType.DELIVERY, OrderStatus.WAITING, deliveryAddress, null, null, orderLineItems);
+    }
+
+    public static Order createTakeOutOrder(OrderStatus orderStatus, List<OrderLineItem> orderLineItems) {
+        return createOrder(OrderType.TAKEOUT, orderStatus, null, null, null, orderLineItems);
+    }
+
+    public static Order createTakeOutOrder(List<OrderLineItem> orderLineItems) {
+        return createOrder(OrderType.TAKEOUT, OrderStatus.WAITING, null, null, null, orderLineItems);
+    }
+
+    public static Order createOrder(OrderType orderType, OrderStatus orderStatus, String address, OrderTable orderTable, UUID orderTableId, List<OrderLineItem> orderLineItems) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderTableId(orderTableId);
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setDeliveryAddress(address);
+        order.setOrderTable(orderTable);
+        order.setOrderLineItems(orderLineItems);
+        return order;
+    }
+
 }

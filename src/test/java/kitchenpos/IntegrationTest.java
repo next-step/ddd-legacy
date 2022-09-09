@@ -1,18 +1,17 @@
 package kitchenpos;
 
-import kitchenpos.application.MenuGroupService;
-import kitchenpos.application.MenuService;
-import kitchenpos.application.ProductService;
-import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuProductRepository;
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.application.*;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
 
@@ -32,6 +31,12 @@ public class IntegrationTest {
     protected MenuGroupService menuGroupService;
 
     @Autowired
+    protected OrderTableService orderTableService;
+
+    @Autowired
+    protected OrderService orderService;
+
+    @Autowired
     protected MenuRepository menuRepository;
 
     @Autowired
@@ -43,16 +48,44 @@ public class IntegrationTest {
     @Autowired
     protected MenuProductRepository menuProductRepository;
 
+    @Autowired
+    protected OrderTableRepository orderTableRepository;
+
+    @Autowired
+    protected OrderRepository orderRepository;
+
+    @Autowired
+    protected OrderLineRepository orderLineRepository;
+
 
     @BeforeEach
     void setup() {
         Mockito.when(purgomalumClient.containsProfanity(any())).thenReturn(false);
+
+
+        orderLineRepository.deleteAllInBatch();
+        orderRepository.deleteAllInBatch();
+        orderTableRepository.deleteAllInBatch();
 
         menuProductRepository.deleteAllInBatch();
         menuRepository.deleteAllInBatch();
         productRepository.deleteAllInBatch();
         menuGroupRepository.deleteAllInBatch();
 
+
+    }
+
+    protected List<MenuProduct> toMenuProductList(Product... products) {
+        return Stream.of(products)
+            .map(product -> {
+                    MenuProduct menuProduct = new MenuProduct();
+                    menuProduct.setProduct(product);
+                    menuProduct.setProductId(product.getId());
+                    menuProduct.setQuantity(1L);
+                    return menuProduct;
+                }
+            )
+            .collect(Collectors.toList());
     }
 
 }
