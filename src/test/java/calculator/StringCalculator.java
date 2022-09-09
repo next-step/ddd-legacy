@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
-    private static final Set<String> delimiters = Set.of(",", ":");
+    private static final Set<String> delimiterSet = Set.of(",", ":");
     private static String extractCustomDelimiterPatternStr = "//(.+)\n(.*)";
     private static Pattern extractCustomDelimiterPattern;
 
@@ -38,14 +38,14 @@ public class StringCalculator {
     }
 
     private String makeDelimiter(String text) {
-        Set<String> currentDelimiters = new HashSet<>(delimiters);
-        List<String> customDelimiters = extractCustomDelimiter(text);
+        Set<String> currentDelimiterSet = new HashSet<>(delimiterSet);
+        List<String> customDelimiterList = extractCustomDelimiter(text);
 
-        if (customDelimiters != null) {
-            currentDelimiters.addAll(customDelimiters);
+        if (customDelimiterList != null) {
+            currentDelimiterSet.addAll(customDelimiterList);
         }
 
-        return String.join("|", currentDelimiters);
+        return String.join("|", currentDelimiterSet);
     }
 
     private List<String> makeTargetStrList(String text, String delimiter) {
