@@ -85,7 +85,7 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     private void 제품의_가격이_변경됨(final ExtractableResponse<Response> response, final UUID id, final Long price) {
         List<Product> products = response.jsonPath().getList("", Product.class);
         products.stream()
-                .filter(it -> id.toString().equals(it.getId()))
-                .forEach(it -> assertThat(it.getPrice()).isEqualTo(BigDecimal.valueOf(price)));
+                .filter(it -> id.equals(it.getId()))
+                .forEach(it -> assertThat(it.getPrice().longValue()).isEqualTo(price));
     }
 }
