@@ -8,6 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -57,23 +59,12 @@ class OrderTableServiceTest {
             });
         }
 
-        @DisplayName("이름은 Null 일 수 없습니다.")
-        @Test
-        void null_name() {
+        @ParameterizedTest(name = "이름은 비어있을 수 없다. name={0}")
+        @NullAndEmptySource
+        void null_or_empty_name(String name) {
             // given
             final OrderTable request = new OrderTable();
-            request.setName(null);
-
-            // then
-            assertThatThrownBy(() -> orderTableService.create(request)).isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("이름은 공란일 수 없습니다.")
-        @Test
-        void empty_name() {
-            // given
-            final OrderTable request = new OrderTable();
-            request.setName("");
+            request.setName(name);
 
             // then
             assertThatThrownBy(() -> orderTableService.create(request)).isInstanceOf(IllegalArgumentException.class);
