@@ -33,11 +33,11 @@ class OrderTableServiceTest {
     @InjectMocks
     private OrderTableService orderTableService;
 
-    @DisplayName("테이블을 등록한다.")
+    @DisplayName("테이블 등록")
     @Nested
     class createTest {
 
-        @DisplayName("테이블이 등록된다.")
+        @DisplayName("등록 성공")
         @Test
         void createdOrderTable() {
             // given
@@ -57,7 +57,7 @@ class OrderTableServiceTest {
             });
         }
 
-        @DisplayName("테이블의 이름은 Null 일 수 없습니다.")
+        @DisplayName("이름은 Null 일 수 없습니다.")
         @Test
         void null_name() {
             // given
@@ -68,7 +68,7 @@ class OrderTableServiceTest {
             assertThatThrownBy(() -> orderTableService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("테이블의 이름은 공란일 수 없습니다.")
+        @DisplayName("이름은 공란일 수 없습니다.")
         @Test
         void empty_name() {
             // given
@@ -98,7 +98,7 @@ class OrderTableServiceTest {
     @Nested
     class clearTest {
 
-        @DisplayName("테이블을 비운다.")
+        @DisplayName("테이블 비우기 성공")
         @Test
         void clearedOrderTable() {
             // given
@@ -116,7 +116,7 @@ class OrderTableServiceTest {
             });
         }
 
-        @DisplayName("테이블의 주문상태가 완료이여야만 한다.")
+        @DisplayName("주문상태가 완료이여야만 한다.")
         @Test
         void not_completed_order_status() {
             // given
@@ -133,7 +133,7 @@ class OrderTableServiceTest {
     @Nested
     class ChangeNumberOfGuests {
 
-        @DisplayName("손님의 인원이 변경된다.")
+        @DisplayName("변경 성공")
         @Test
         void changedNumberOfGuests() {
             // given
