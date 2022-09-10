@@ -344,6 +344,56 @@ public class OrderServiceTest {
         );
     }
 
+    @Test
+    @DisplayName("배달 주문을 시작을 할 수 있다")
+    void startDelivery() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.SERVED, "집주소")).getId();
+
+        // when
+        Order order = orderService.startDelivery(orderId);
+
+        // then
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+
+    }
+
+    @Test
+    @DisplayName("주문이 존재하지 않으면 배달 주문을 시작할 수 없다")
+    void notStartDeliveryByOrderIsNull() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.SERVED)).getId();
+
+        // then
+        assertThatIllegalStateException().isThrownBy(() ->
+                orderService.startDelivery(orderId)
+        );
+    }
+
+    @Test
+    @DisplayName("주문 타입이 배달이 아닌 경우 배달 주문을 시작할 수 없다")
+    void notStartDeliveryByOrderTypeIsNotDelievery() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.SERVED)).getId();
+
+        // then
+        assertThatIllegalStateException().isThrownBy(() ->
+                orderService.startDelivery(orderId)
+        );
+    }
+
+    @Test
+    @DisplayName("주문 상태가 음식이 제공되지 않은 상태면 배달 시작을 할 수 없다.")
+    void notStartDeliveryByOrderStatusNotServed() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING, "집주소")).getId();
+
+        // then
+        assertThatIllegalStateException().isThrownBy(() ->
+                orderService.startDelivery(orderId)
+        );
+    }
+
     private Order createOrderRequest(final OrderType orderType) {
         return createOrderRequest(orderType, List.of(
                 createOrderLineRequest()
