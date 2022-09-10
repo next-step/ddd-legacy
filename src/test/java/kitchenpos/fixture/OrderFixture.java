@@ -3,7 +3,6 @@ package kitchenpos.fixture;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,6 +12,7 @@ import static kitchenpos.domain.OrderType.*;
 import static kitchenpos.fixture.OrderLineFixture.orderLineItem;
 
 public class OrderFixture {
+
     public static Order order(final OrderStatus status, final String deliveryAddress) {
         final Order order = new Order();
         order.setId(UUID.randomUUID());
