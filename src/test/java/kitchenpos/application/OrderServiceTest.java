@@ -52,7 +52,7 @@ class OrderServiceTest {
     @InjectMocks
     private OrderService orderService;
 
-    @DisplayName("주문을 등록한다.")
+    @DisplayName("주문을 등록")
     @Nested
     class CreateTest {
 
@@ -133,7 +133,7 @@ class OrderServiceTest {
         @Nested
         class EatIn {
 
-            @DisplayName("주문이 등록된다.")
+            @DisplayName("등록 성공")
             @Test
             void create() {
                 // given
@@ -178,7 +178,7 @@ class OrderServiceTest {
         @Nested
         class Takeout {
 
-            @DisplayName("주문이 등록된다.")
+            @DisplayName("등록 성공")
             @Test
             void create() {
                 // given
@@ -221,7 +221,7 @@ class OrderServiceTest {
         @Nested
         class Delivery {
 
-            @DisplayName("주문이 등록된다.")
+            @DisplayName("등록 성공")
             @Test
             void create() {
                 // given
@@ -294,7 +294,7 @@ class OrderServiceTest {
     @Nested
     class AcceptTest {
 
-        @DisplayName("주문이 승인된다.")
+        @DisplayName("승인 성공")
         @Test
         void accept() {
             // given
@@ -324,7 +324,7 @@ class OrderServiceTest {
     @Nested
     class ServeTest {
 
-        @DisplayName("주문한 제품이 서빙된다.")
+        @DisplayName("서빙 성공")
         @Test
         void serve() {
             // given
@@ -354,7 +354,7 @@ class OrderServiceTest {
     @Nested
     class StartDeliveryTest {
 
-        @DisplayName("주문한 제품이 배송된다.")
+        @DisplayName("배송 성공")
         @Test
         void startDelivery() {
             // given
@@ -395,7 +395,7 @@ class OrderServiceTest {
     @Nested
     class CompleteDeliveryTest {
 
-        @DisplayName("주문한 제품이 배송된다.")
+        @DisplayName("배송 완료 성공")
         @Test
         void completedDelivery() {
             // given
@@ -429,7 +429,7 @@ class OrderServiceTest {
         @Nested
         class EatIn {
 
-            @DisplayName("주문을 완료한다.")
+            @DisplayName("완료 성공")
             @Test
             void completed() {
                 // given
@@ -464,7 +464,7 @@ class OrderServiceTest {
         @Nested
         class Takeout {
 
-            @DisplayName("주문을 완료한다.")
+            @DisplayName("완료 성공")
             @Test
             void completed() {
                 // given
@@ -494,7 +494,7 @@ class OrderServiceTest {
         @Nested
         class Delivery {
 
-            @DisplayName("주문을 완료한다.")
+            @DisplayName("완료 성공")
             @Test
             void completed() {
                 // given
