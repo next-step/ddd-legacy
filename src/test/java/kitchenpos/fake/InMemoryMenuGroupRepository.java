@@ -10,7 +10,7 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 
 public class InMemoryMenuGroupRepository implements MenuGroupRepository {
-    Map<UUID, MenuGroup> database  = new HashMap<>();
+    Map<UUID, MenuGroup> database = new HashMap<>();
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {

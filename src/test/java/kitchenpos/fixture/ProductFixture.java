@@ -24,4 +24,11 @@ public class ProductFixture {
         return product;
     }
 
+    public static Product changeProduct(Product product, BigDecimal changePrice) {
+        Product change = createProduct(changePrice);
+        product.setId(product.getId());
+        product.setName(product.getName());
+        return change;
+    }
+
 }
