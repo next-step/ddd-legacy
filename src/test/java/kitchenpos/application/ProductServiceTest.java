@@ -46,11 +46,11 @@ class ProductServiceTest {
     private ProductService productService;
 
 
-    @DisplayName("제품을 등록한다.")
+    @DisplayName("제품 등록")
     @Nested
     class CreateTest {
 
-        @DisplayName("제품이 등록된다.")
+        @DisplayName("등록 성공")
         @Test
         void createdProduct() {
             // given
@@ -70,7 +70,7 @@ class ProductServiceTest {
             });
         }
 
-        @DisplayName("제품의 이름은 비어있을 수 없다.")
+        @DisplayName("이름은 비어있을 수 없다.")
         @Test
         void null_name() {
             // given
@@ -80,11 +80,11 @@ class ProductServiceTest {
             assertThatThrownBy(() -> productService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("제품의 이름은 욕설, 외설 및 기타 워치않는 용어에 해당할 수 없다.")
+        @DisplayName("이름은 욕설, 외설 및 기타 원치않는 용어에 해당할 수 없다.")
         @Test
         void negative_name() {
             // given
-            final Product request = ProductFixture.createRequest("후라이드 치킨", BigDecimal.valueOf(15_000));
+            final Product request = ProductFixture.createRequest("욕설", BigDecimal.valueOf(15_000));
 
             given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
 
@@ -92,7 +92,7 @@ class ProductServiceTest {
             assertThatThrownBy(() -> productService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("제품의 가격은 0원 이상이여야 한다.")
+        @DisplayName("가격은 0원 이상이여야 한다.")
         @Test
         void negative_price() {
             // given
@@ -103,11 +103,11 @@ class ProductServiceTest {
         }
     }
 
-    @DisplayName("제품의 가격을 수정한다.")
+    @DisplayName("제품의 가격 수정")
     @Nested
     class ChangePriceTest {
 
-        @DisplayName("제품의 가격이 수정된다.")
+        @DisplayName("수정 성공")
         @Test
         void changePrice() {
             // given
@@ -123,7 +123,7 @@ class ProductServiceTest {
             assertThat(product.getPrice()).isEqualTo(BigDecimal.valueOf(20_000));
         }
 
-        @DisplayName("수정할 가격은 0원 이상이여야 한다.")
+        @DisplayName("가격은 0원 이상이여야 한다.")
         @Test
         void negative_price() {
             // given
