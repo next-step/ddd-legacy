@@ -25,6 +25,8 @@ public class OrderAcceptanceTest extends AcceptanceTest {
   private UUID 테이블_1번;
   private UUID 신메뉴;
 
+  private MenuProduct menuProduct;
+
   private OrderLineItem orderLineItem;
 
   private Order orderEatIn;
@@ -37,11 +39,15 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     강정치킨 = ProductSteps.createProduct("강정치킨", 17000).jsonPath().getUUID("id");
     테이블_1번 = OrderTableSteps.createOrderTable("1번").jsonPath().getUUID("id");
 
+    menuProduct = new MenuProduct();
+    menuProduct.setQuantity(2);
+    menuProduct.setProductId(강정치킨);
+
     Menu menu = new Menu();
     menu.setName("후라이드+후라이드");
     menu.setPrice(BigDecimal.valueOf(19000));
     menu.setDisplayed(true);
-    menu.setMenuProducts(List.of(new MenuProduct(2, 강정치킨)));
+    menu.setMenuProducts(List.of(menuProduct));
     menu.setMenuGroupId(추천메뉴);
 
     신메뉴 = MenuSteps.createMenu(menu).jsonPath().getUUID("id");

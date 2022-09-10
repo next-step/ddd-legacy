@@ -21,6 +21,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
   private UUID 강정치킨;
 
   private Menu 신메뉴;
+  private MenuProduct 메뉴_강정치킨;
 
   @BeforeEach
   void init() {
@@ -28,11 +29,15 @@ public class MenuAcceptanceTest extends AcceptanceTest {
 
     강정치킨 = ProductSteps.createProduct("강정치킨", 17000).jsonPath().getUUID("id");
 
+    메뉴_강정치킨 = new MenuProduct();
+    메뉴_강정치킨.setQuantity(2);
+    메뉴_강정치킨.setProductId(강정치킨);
+
     신메뉴 = new Menu();
     신메뉴.setName("후라이드+후라이드");
     신메뉴.setPrice(BigDecimal.valueOf(19000));
     신메뉴.setDisplayed(true);
-    신메뉴.setMenuProducts(List.of(new MenuProduct(2, 강정치킨)));
+    신메뉴.setMenuProducts(List.of(메뉴_강정치킨));
     신메뉴.setMenuGroupId(추천메뉴);
   }
 
@@ -88,7 +93,8 @@ public class MenuAcceptanceTest extends AcceptanceTest {
   @DisplayName("메뉴상품 중 수량이 음수이면 에러")
   @Test
   void menuProductQuantityNegative() {
-    신메뉴.setMenuProducts(List.of(new MenuProduct(-1, 강정치킨)));
+    메뉴_강정치킨.setQuantity(-1);
+    신메뉴.setMenuProducts(List.of(메뉴_강정치킨));
     ExtractableResponse<Response> response = MenuSteps.createMenu(신메뉴);
 
     assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
