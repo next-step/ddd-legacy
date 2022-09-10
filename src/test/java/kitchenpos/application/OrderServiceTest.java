@@ -18,6 +18,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -66,23 +68,12 @@ class OrderServiceTest {
             assertThatThrownBy(() -> orderService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 내역은 null 일 수 없다.")
-        @Test
-        void null_orderLineItems() {
+        @ParameterizedTest(name = "주문 내역은 비어있을 수 없다. orderLineItems={0}")
+        @NullAndEmptySource
+        void null_or_empty_orderLineItems(List<OrderLineItem> orderLineItems) {
             // given
             final Order request = OrderFixture.createRequest(OrderType.EAT_IN);
-            request.setOrderLineItems(null);
-
-            // then
-            assertThatThrownBy(() -> orderService.create(request)).isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("주문 내역은 비어있을 수 없다.")
-        @Test
-        void empty_orderLineItems() {
-            // given
-            final Order request = OrderFixture.createRequest(OrderType.EAT_IN);
-            request.setOrderLineItems(Collections.emptyList());
+            request.setOrderLineItems(orderLineItems);
 
             // then
             assertThatThrownBy(() -> orderService.create(request)).isInstanceOf(IllegalArgumentException.class);
@@ -260,26 +251,12 @@ class OrderServiceTest {
                 assertThatThrownBy(() -> orderService.create(request)).isInstanceOf(IllegalArgumentException.class);
             }
 
-            @DisplayName("주소지가 null 일 수 없다.")
-            @Test
-            void null_address() {
+            @ParameterizedTest(name = "주소지가 비어있을 수 없다. deliveryAddress={0}")
+            @NullAndEmptySource
+            void null_or_empty_address(String deliveryAddress) {
                 // given
                 final Order request = OrderFixture.createRequest(OrderType.DELIVERY);
-                request.setDeliveryAddress(null);
-                final Menu menu = MenuFixture.createDefault();
-                given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-                given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-
-                // then
-                assertThatThrownBy(() -> orderService.create(request)).isInstanceOf(IllegalArgumentException.class);
-            }
-
-            @DisplayName("주소지가 공란 일 수 없다.")
-            @Test
-            void empty_address() {
-                // given
-                final Order request = OrderFixture.createRequest(OrderType.DELIVERY);
-                request.setDeliveryAddress("");
+                request.setDeliveryAddress(deliveryAddress);
                 final Menu menu = MenuFixture.createDefault();
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
