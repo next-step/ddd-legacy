@@ -50,11 +50,11 @@ class MenuServiceTest {
     @InjectMocks
     MenuService menuService;
 
-    @DisplayName("메뉴를 등록한다.")
+    @DisplayName("메뉴 등록")
     @Nested
     class CreateTest {
 
-        @DisplayName("메뉴가 등록된다.")
+        @DisplayName("등록 성공")
         @Test
         void createdMenu() {
             // given
@@ -85,7 +85,7 @@ class MenuServiceTest {
             });
         }
 
-        @DisplayName("메뉴의 가격은 0원 이상이여야 한다.")
+        @DisplayName("가격은 0원 이상이여야 한다.")
         @Test
         void negative_price() {
             // given
@@ -101,7 +101,7 @@ class MenuServiceTest {
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴는 메뉴그룹에 속해야 한다.")
+        @DisplayName("메뉴그룹에 속해야 한다.")
         @Test
         void not_contain_menuGroup() {
             // given
@@ -118,7 +118,7 @@ class MenuServiceTest {
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(NoSuchElementException.class);
         }
 
-        @DisplayName("메뉴의 구성품목은 비어있을 수 없다.")
+        @DisplayName("구성품목은 비어있을 수 없다.")
         @Test
         void empty_menuProduct() {
             // given
@@ -135,7 +135,7 @@ class MenuServiceTest {
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴의 구성품목은 null 일 수 없다.")
+        @DisplayName("구성품목은 null 일 수 없다.")
         @Test
         void null_menuProduct() {
             // given
@@ -152,7 +152,7 @@ class MenuServiceTest {
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴의 구성품목은 등록된 제품만 가능하다.")
+        @DisplayName("구성품목은 등록된 제품만 가능하다.")
         @Test
         void not_created_product() {
             // given
@@ -170,7 +170,7 @@ class MenuServiceTest {
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴의 구성품목의 개수는 0개 이상이여야 한다.")
+        @DisplayName("구성품목의 개수는 0개 이상이여야 한다.")
         @Test
         void negative_menuProduct_quantity() {
             // given
@@ -188,7 +188,7 @@ class MenuServiceTest {
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴의 가격은 (구성품목의 가격 * 개수)의 총합보다 클 수 없다.")
+        @DisplayName("가격은 (구성품목의 가격 * 개수)의 총합보다 클 수 없다.")
         @Test
         void over_than_product_price() {
             // given
@@ -208,7 +208,7 @@ class MenuServiceTest {
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴의 이름은 비어있을 수 없다.")
+        @DisplayName("이름은 비어있을 수 없다.")
         @Test
         void null_name() {
             // given
@@ -228,7 +228,7 @@ class MenuServiceTest {
             assertThatThrownBy(() -> menuService.create(request)).isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("메뉴의 이름은 욕설, 외설 및 기타 원치 않는 용어에 해당할 수 없다.")
+        @DisplayName("이름은 욕설, 외설 및 기타 원치 않는 용어에 해당할 수 없다.")
         @Test
         void invalid_name() {
             // given
@@ -249,11 +249,11 @@ class MenuServiceTest {
         }
     }
 
-    @DisplayName("메뉴의 가격을 수정한다.")
+    @DisplayName("메뉴의 가격 수정")
     @Nested
     class ChangePriceTest {
 
-        @DisplayName("메뉴의 가격이 수정된다.")
+        @DisplayName("수정 성공")
         @Test
         void changed_price() {
             // given
@@ -338,11 +338,11 @@ class MenuServiceTest {
         }
     }
 
-    @DisplayName("메뉴를 개시한다.")
+    @DisplayName("메뉴 개시")
     @Nested
     class displayTest {
 
-        @DisplayName("메뉴가 개시된다.")
+        @DisplayName("개시 성공")
         @Test
         void displayed() {
             // given
