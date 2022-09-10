@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
     private static final Set<String> delimiterSet = Set.of(",", ":");
-    private static String extractCustomDelimiterPatternStr = "//(.+)\n(.*)";
+    private static final String extractCustomDelimiterPatternStr = "//(.+)\n(.*)";
     private static Pattern extractCustomDelimiterPattern;
 
     private Pattern getExtractCustomDelimiterPattern() {
@@ -41,9 +41,7 @@ public class StringCalculator {
         Set<String> currentDelimiterSet = new HashSet<>(delimiterSet);
         List<String> customDelimiterList = extractCustomDelimiter(text);
 
-        if (customDelimiterList.isEmpty()) {
-            currentDelimiterSet.addAll(customDelimiterList);
-        }
+        currentDelimiterSet.addAll(customDelimiterList);
 
         return String.join("|", currentDelimiterSet);
     }
@@ -63,27 +61,21 @@ public class StringCalculator {
     }
 
     private List<String> extractCustomDelimiter(String text) {
-        // 커스텀 delimiter가 사이에 여러개 들어올경우를 생각해서 만듦
         Matcher m = getExtractCustomDelimiterPattern().matcher(text);
         if (m.find()) {
             String customDelimiterStr = m.group(1);
             List<String> customDelimiterList = new ArrayList<>();
-            // 커스텀 delimiter가 +나 *이 들어올경우 그대로 split을 안되게 작업을 해줘야하나 생략함
+            // TODO 커스텀 delimiter가 +나 *이 들어올경우 그대로 split을 안되게 작업을 해줘야하나 생략함
             for (int i = 0; i < customDelimiterStr.length(); i++) {
                 customDelimiterList.add(customDelimiterStr.charAt(i) + "");
             }
             return customDelimiterList;
         }
-        return new ArrayList<>();
+        return List.of();
     }
 
     private boolean isValidInput(List<String> targetStrList) {
-        for (String str : targetStrList) {
-            if (!isPositiveDigit(str)) {
-                return false;
-            }
-        }
-        return true;
+        return targetStrList.stream().allMatch(v -> isPositiveDigit(v));
     }
 
     private boolean isPositiveDigit(String str) {
