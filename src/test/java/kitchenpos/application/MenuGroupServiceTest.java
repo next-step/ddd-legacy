@@ -27,11 +27,11 @@ class MenuGroupServiceTest {
     @InjectMocks
     private MenuGroupService menuGroupService;
 
-    @DisplayName("메뉴그룹을 등록한다.")
+    @DisplayName("메뉴그룹 등록")
     @Nested
     class CreateTest {
 
-        @DisplayName("메뉴그룹이 등록된다.")
+        @DisplayName("등록 성공")
         @Test
         void createdMenuGroup() {
             // given
