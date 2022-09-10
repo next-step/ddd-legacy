@@ -351,10 +351,10 @@ public class OrderServiceTest {
         final UUID orderId = orderRepository.save(order(OrderStatus.SERVED, "집주소")).getId();
 
         // when
-        Order order = orderService.startDelivery(orderId);
+        final Order result = orderService.startDelivery(orderId);
 
         // then
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING);
 
     }
 
@@ -393,6 +393,135 @@ public class OrderServiceTest {
                 orderService.startDelivery(orderId)
         );
     }
+
+    @Test
+    @DisplayName("주문에 대해 배달을 완료할 수 있다")
+    void completeDelivery() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.DELIVERING, "집주소")).getId();
+
+        // when
+        final Order result = orderService.completeDelivery(orderId);
+
+        // then
+        assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("주문이 존재하지 않으면 배달을 완료할 수 없다")
+    void notCompleteDeliveryByOrderIsNull(final UUID input) {
+        // then
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() ->
+                orderService.completeDelivery(input)
+        );
+    }
+
+    @Test
+    @DisplayName("주문 상태가 배달 중이 아니라면 배달을 완료할 수 없다")
+    void notCompleteDeliveryByOrderTypeIsNotDelivery() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING, "집주소")).getId();
+
+        // then
+        assertThatIllegalStateException().isThrownBy(() ->
+                orderService.completeDelivery(orderId)
+        );
+    }
+
+    @Test
+    @DisplayName("배달 주문을 완료한다")
+    void completeByDeliveryOrder() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.DELIVERED, "집주소")).getId();
+
+        // when
+        Order result = orderService.complete(orderId);
+
+        // then
+        assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("주문 타입이 배달인 경우, 주문 상태가 배달 완료가 아닌 경우에는 주문을 완료할 수 없다")
+    void notCompleteByDeliveryOrderByOrderStatusNotDelivered() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING, "집주소")).getId();
+
+        // then
+        assertThatIllegalStateException().isThrownBy(
+                () -> orderService.complete(orderId)
+        );
+    }
+
+    @Test
+    @DisplayName("테이크 아웃 주문을 완료한다")
+    void completeByTakeOutOrder() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.SERVED)).getId();
+
+        // when
+        Order result = orderService.complete(orderId);
+
+        // then
+        assertAll(
+                () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                () -> assertThat(result.getOrderTable()).isNull()
+        );
+    }
+
+    @Test
+    @DisplayName("테이크 아웃 주문 상태가 음식 제공이 아니라면 주문을 완료할 수 없다")
+    void notCompleteByTakeOutOrderByOrderStatusNotServed() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING)).getId();
+
+        // then
+        assertThatIllegalStateException().isThrownBy(
+                () -> orderService.complete(orderId)
+        );
+    }
+
+
+    @Test
+    @DisplayName("매장식사 주문을 완료한다")
+    void completeByTakeInOrder() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.SERVED, orderTable())).getId();
+
+        // when
+        Order result = orderService.complete(orderId);
+
+        // then
+        assertAll(
+                () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                () -> assertThat(result.getOrderTable().getNumberOfGuests()).isZero(),
+                () -> assertThat(result.getOrderTable().isOccupied()).isFalse()
+        );
+    }
+
+    @Test
+    @DisplayName("매장식사 주문 상태가 음식 제공이 아니라면 주문을 완료할 수 없다")
+    void notCompleteByTakeInOrderByOrderStatusNotServed() {
+        // given
+        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING, orderTable())).getId();
+
+        // then
+        assertThatIllegalStateException().isThrownBy(
+                () -> orderService.complete(orderId)
+        );
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("주문이 존재하지 않으면 배달 주문을 시작할 수 없다")
+    void notCompleteIsNotOrderId(final UUID input) {
+        // then
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() ->
+                orderService.complete(input)
+        );
+    }
+
 
     private Order createOrderRequest(final OrderType orderType) {
         return createOrderRequest(orderType, List.of(
