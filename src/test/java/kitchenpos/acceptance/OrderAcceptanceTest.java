@@ -3,18 +3,21 @@ package kitchenpos.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.HashMap;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 import static kitchenpos.acceptance.MenuGroupSteps.메뉴그룹이_등록됨;
-import static kitchenpos.acceptance.MenuSteps.*;
+import static kitchenpos.acceptance.MenuSteps.메뉴가_등록됨;
+import static kitchenpos.acceptance.MenuSteps.메뉴상품을_구성함;
 import static kitchenpos.acceptance.OrderSteps.*;
 import static kitchenpos.acceptance.OrderTableSteps.*;
 import static kitchenpos.acceptance.ProductSteps.제품이_등록됨;
@@ -46,7 +49,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @DisplayName("매장에서 치킨을 식사한다.")
     @Test
     void scenario_eat_in() {
-        final var 주문내역 = 주문내역을_구성함(후라이드_치킨_세트, 17_000, 2);
+        final var 주문내역 = 주문내역을_구성함(후라이드_치킨_세트, 17_000L, 2);
         final var 주문내역_목록 = 주문내역_목록을_구성함(주문내역);
 
         final UUID 매장식사_주문 = 매장식사_주문이_등록됨(일번_테이블, 주문내역_목록);
@@ -70,7 +73,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @DisplayName("치킨을 포장해서 가져간다.")
     @Test
     void scenario_takeout() {
-        final var 주문내역 = 주문내역을_구성함(후라이드_치킨_세트, 17_000, 2);
+        final var 주문내역 = 주문내역을_구성함(후라이드_치킨_세트, 17_000L, 2);
         final var 주문내역_목록 = 주문내역_목록을_구성함(주문내역);
 
         final UUID 포장_주문 = 포장_식사_주문이_등록됨(주문내역_목록);
@@ -94,7 +97,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @DisplayName("치킨을 배달시켜 받는다.")
     @Test
     void scenario_delivery() {
-        final var 주문내역 = 주문내역을_구성함(후라이드_치킨_세트, 17_000, 2);
+        final var 주문내역 = 주문내역을_구성함(후라이드_치킨_세트, 17_000L, 2);
         final var 주문내역_목록 = 주문내역_목록을_구성함(주문내역);
         final String 주소지 = "서울특별시 송파구";
 
@@ -128,12 +131,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void showOrders() {
         // given
-        final var 배달주문내역 = 주문내역을_구성함(후라이드_치킨_세트, 17_000, 2);
+        final var 배달주문내역 = 주문내역을_구성함(후라이드_치킨_세트, 17_000L, 2);
         final var 배달주문내역_목록 = 주문내역_목록을_구성함(배달주문내역);
         final String 주소지 = "서울특별시 송파구";
         final UUID 배달_주문 = 배달_주문이_등록됨(주소지, 배달주문내역_목록);
 
-        final var 포장주문내역 = 주문내역을_구성함(후라이드_치킨_세트, 17_000, 2);
+        final var 포장주문내역 = 주문내역을_구성함(후라이드_치킨_세트, 17_000L, 2);
         final var 포장주문내역_목록 = 주문내역_목록을_구성함(포장주문내역);
         final UUID 포장_주문 = 포장_식사_주문이_등록됨(포장주문내역_목록);
 
@@ -144,41 +147,51 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         주문이_조회됨(주문목록, 배달_주문, 포장_주문);
     }
 
-    private ExtractableResponse<Response> 주문_등록을_요청함(final String type, final UUID orderTableId, final String deliveryAddress, final List<Map> orderLineItems) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("type", type);
+    private ExtractableResponse<Response> 주문_등록을_요청함(final String type, final UUID orderTableId, final String deliveryAddress, final List<OrderLineItem> orderLineItems) {
+        final Order order = new Order();
+        order.setType(orderType(type));
         if (Objects.nonNull(orderTableId)) {
-            params.put("orderTableId", orderTableId);
+            order.setOrderTableId(orderTableId);
         }
         if (Objects.nonNull(deliveryAddress)) {
-            params.put("deliveryAddress", deliveryAddress);
+            order.setDeliveryAddress(deliveryAddress);
         }
-        params.put("orderLineItems", orderLineItems);
+        order.setOrderLineItems(orderLineItems);
 
-        return 주문_등록_요청(given(), params);
+        return 주문_등록_요청(given(), order);
     }
 
-    private UUID 매장식사_주문이_등록됨(final UUID orderTableId, final List<Map> orderLineItems) {
+    private OrderType orderType(String type) {
+        if (type.equals(매장식사)) {
+            return OrderType.EAT_IN;
+        }
+        if (type.equals(포장)) {
+            return OrderType.TAKEOUT;
+        }
+        return OrderType.DELIVERY;
+    }
+
+    private UUID 매장식사_주문이_등록됨(final UUID orderTableId, final List<OrderLineItem> orderLineItems) {
         return 주문_등록을_요청함(매장식사, orderTableId, null, orderLineItems).jsonPath().getUUID("id");
     }
 
-    private UUID 포장_식사_주문이_등록됨(final List<Map> orderLineItems) {
+    private UUID 포장_식사_주문이_등록됨(final List<OrderLineItem> orderLineItems) {
         return 주문_등록을_요청함(포장, null, null, orderLineItems).jsonPath().getUUID("id");
     }
 
-    private UUID 배달_주문이_등록됨(final String deliveryAddress, final List<Map> orderLineItems) {
+    private UUID 배달_주문이_등록됨(final String deliveryAddress, final List<OrderLineItem> orderLineItems) {
         return 주문_등록을_요청함(배달, null, deliveryAddress, orderLineItems).jsonPath().getUUID("id");
     }
 
-    private Map<String, Object> 주문내역을_구성함(final UUID menuId, final int price, final int quantity) {
-        Map<String, Object> orderLineItem = new HashMap<>();
-        orderLineItem.put("menuId", menuId);
-        orderLineItem.put("price", price);
-        orderLineItem.put("quantity", quantity);
+    private OrderLineItem 주문내역을_구성함(final UUID menuId, final Long price, final int quantity) {
+        final OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItem.setMenuId(menuId);
+        orderLineItem.setPrice(BigDecimal.valueOf(price));
+        orderLineItem.setQuantity(quantity);
         return orderLineItem;
     }
 
-    private List<Map> 주문내역_목록을_구성함(final Map... orderLineItems) {
+    private List<OrderLineItem> 주문내역_목록을_구성함(final OrderLineItem... orderLineItems) {
         return List.of(orderLineItems);
     }
 
@@ -211,15 +224,9 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     }
 
     private void 주문의_상태가_변경됨(final ExtractableResponse<Response> response, final UUID id, final String status) {
-        List<Map> list = response.jsonPath().get();
-        for (Map map : list) {
-            compareStatus(map, id, status);
-        }
-    }
-
-    private void compareStatus(final Map map, final UUID id, final String status) {
-        if (id.toString().equals(map.get("id"))) {
-            assertThat((String) map.get("status")).isEqualTo(status);
-        }
+        List<Order> orders = response.jsonPath().getList("", Order.class);
+        orders.stream()
+                .filter(it -> id.equals(it.getId()))
+                .forEach(it -> assertThat(it.getStatus().name()).isEqualTo(status));
     }
 }

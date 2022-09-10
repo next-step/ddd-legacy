@@ -3,10 +3,10 @@ package kitchenpos.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import kitchenpos.domain.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
-import java.util.Map;
 import java.util.UUID;
 
 public class OrderSteps {
@@ -22,8 +22,8 @@ public class OrderSteps {
     public static final String 배송완료 = "DELIVERED";
     public static final String 완료 = "COMPLETED";
 
-    public static ExtractableResponse<Response> 주문_등록_요청(final RequestSpecification given, final Map<String, Object> params) {
-        return given.body(params)
+    public static ExtractableResponse<Response> 주문_등록_요청(final RequestSpecification given, final Order order) {
+        return given.body(order)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().post("/api/orders")
                 .then().log().all()
