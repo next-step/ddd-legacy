@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
 
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
@@ -120,6 +121,51 @@ class OrderTableServiceTest {
             // when & then
             assertThatIllegalStateException()
                 .isThrownBy(() -> testTarget.clear(orderTable.getId()));
+        }
+    }
+
+    @DisplayName("주문 테이블 손님 수 변경 테스트")
+    @Nested
+    class ChangeNumberOfGuestsTest {
+
+        @DisplayName("주문 테이블의 손님 수를 변경 할 수 있다.")
+        @Test
+        void test01() {
+            // given
+            var request = new OrderTable();
+            request.setNumberOfGuests(2);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.create(1));
+
+            // when
+            OrderTable actual = testTarget.changeNumberOfGuests(orderTable.getId(), request);
+
+            // then
+            assertThat(actual.getNumberOfGuests()).isEqualTo(request.getNumberOfGuests());
+        }
+
+        @DisplayName("주문 테이블의 손님 수를 0명 미만으로 변경 할 수 없다.")
+        @Test
+        void test02() {
+            // given
+            var request = new OrderTable();
+            request.setNumberOfGuests(-1);
+
+            // when & then
+            assertThatIllegalArgumentException()
+                .isThrownBy(() -> testTarget.changeNumberOfGuests(any(), request));
+        }
+
+        @DisplayName("빈 주문 테이블의 손님 수를 변경 할 수 없다.")
+        @Test
+        void test03() {
+            // given
+            OrderTable request = new OrderTable();
+            request.setNumberOfGuests(1);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.create(false));
+
+            // when & then
+            assertThatIllegalStateException()
+                .isThrownBy(() -> testTarget.changeNumberOfGuests(orderTable.getId(), request));
         }
     }
 
