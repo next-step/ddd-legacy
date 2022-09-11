@@ -3,6 +3,8 @@ package kitchenpos.fixture;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
+import java.util.UUID;
+
 public class MenuProductFixture {
 
     private static final Long DEFAULT_SEQ = 1L;
@@ -17,8 +19,12 @@ public class MenuProductFixture {
     }
 
     public static MenuProduct createRequest(final Long quantity) {
+        return createRequest(ProductFixture.createDefault().getId(), quantity);
+    }
+
+    public static MenuProduct createRequest(final UUID productId, final Long quantity) {
         final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(ProductFixture.createDefault().getId());
+        menuProduct.setProductId(productId);
         menuProduct.setQuantity(quantity);
         return menuProduct;
     }

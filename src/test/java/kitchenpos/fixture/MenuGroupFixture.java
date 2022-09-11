@@ -9,9 +9,13 @@ public class MenuGroupFixture {
     private static final String DEFAULT_NAME = "추천메뉴";
 
     public static MenuGroup createDefault() {
+        return create(DEFAULT_NAME);
+    }
+
+    public static MenuGroup create(final String name) {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName(DEFAULT_NAME);
+        menuGroup.setName(name);
         return menuGroup;
     }
 
