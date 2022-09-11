@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 
+import java.util.List;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
@@ -166,6 +167,29 @@ class OrderTableServiceTest {
             // when & then
             assertThatIllegalStateException()
                 .isThrownBy(() -> testTarget.changeNumberOfGuests(orderTable.getId(), request));
+        }
+    }
+
+    @DisplayName("주문 테이블 목록 조회 테스트")
+    @Nested
+    class FindAllTest {
+
+        @DisplayName("주문 테이블 목록을 조회 할 수 있다.")
+        @Test
+        void test01() {
+            // given
+            OrderTable orderTable1 = orderTableRepository.save(OrderTableFixture.create());
+            OrderTable orderTable2 = orderTableRepository.save(OrderTableFixture.create());
+
+            // when
+            List<OrderTable> actual = testTarget.findAll();
+
+            // then
+            assertThat(actual)
+                .map(OrderTable::getId)
+                .anyMatch(orderTableId -> orderTableId.equals(orderTable1.getId()))
+                .anyMatch(orderTableId -> orderTableId.equals(orderTable2.getId()));
+
         }
     }
 

@@ -24,4 +24,8 @@ public class OrderTableFixture {
     public static OrderTable create(int numberOfGuests) {
         return create(numberOfGuests, true);
     }
+
+    public static OrderTable create() {
+        return create(DEFAULT_ORDER_TABLE_NUMBER_OF_GUESTS);
+    }
 }
