@@ -9,6 +9,9 @@ import kitchenpos.domain.Product;
 
 public class MenuFixture {
 
+    private static final String DEFAULT_MENU_NAME = "default menu name";
+    private static final int DEFAULT_MENU_QUANTITY = 1;
+
     public static Menu create(
         String name,
         int price,
@@ -21,9 +24,21 @@ public class MenuFixture {
         menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(price));
         menu.setDisplayed(displayed);
-        menu.setMenuGroup(MenuGroupFixture.create("default menu group name"));
+        menu.setMenuGroup(MenuGroupFixture.create());
         menu.setMenuProducts(List.of(MenuProductFixture.create(product, quantity)));
         return menu;
+    }
+
+    public static Menu create() {
+        Product product = ProductFixture.create();
+        int price = product.getPrice().intValue() * DEFAULT_MENU_QUANTITY;
+        return create(
+            DEFAULT_MENU_NAME,
+            price,
+            product,
+            DEFAULT_MENU_QUANTITY,
+            true
+        );
     }
 
     private static class MenuProductFixture {
