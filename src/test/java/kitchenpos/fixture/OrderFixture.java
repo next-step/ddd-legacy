@@ -2,6 +2,7 @@ package kitchenpos.fixture;
 
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
 
 import java.time.LocalDateTime;
@@ -35,6 +36,10 @@ public class OrderFixture {
     }
 
     public static Order create(final OrderType type, final OrderStatus status) {
+        return create(type, status, OrderTableFixture.createUsedTable());
+    }
+
+    public static Order create(final OrderType type, final OrderStatus status, final OrderTable orderTable) {
         final Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(type);
@@ -43,7 +48,7 @@ public class OrderFixture {
         order.setStatus(status);
         switch (type) {
             case EAT_IN:
-                order.setOrderTable(OrderTableFixture.createUsedTable());
+                order.setOrderTable(orderTable);
                 break;
             case TAKEOUT:
                 break;
