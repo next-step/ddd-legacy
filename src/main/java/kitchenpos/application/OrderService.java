@@ -1,13 +1,25 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
-import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.OrderType;
+import kitchenpos.domain.RiderAgencyClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -15,18 +27,18 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final OrderTableRepository orderTableRepository;
-    private final KitchenridersClient kitchenridersClient;
+    private final RiderAgencyClient agencyClient;
 
     public OrderService(
         final OrderRepository orderRepository,
         final MenuRepository menuRepository,
         final OrderTableRepository orderTableRepository,
-        final KitchenridersClient kitchenridersClient
+        final RiderAgencyClient riderAgencyClient
     ) {
         this.orderRepository = orderRepository;
         this.menuRepository = menuRepository;
         this.orderTableRepository = orderTableRepository;
-        this.kitchenridersClient = kitchenridersClient;
+        this.agencyClient = riderAgencyClient;
     }
 
     @Transactional
@@ -106,7 +118,7 @@ public class OrderService {
                     .getPrice()
                     .multiply(BigDecimal.valueOf(orderLineItem.getQuantity()));
             }
-            kitchenridersClient.requestDelivery(orderId, sum, order.getDeliveryAddress());
+            agencyClient.requestDelivery(orderId, sum, order.getDeliveryAddress());
         }
         order.setStatus(OrderStatus.ACCEPTED);
         return order;

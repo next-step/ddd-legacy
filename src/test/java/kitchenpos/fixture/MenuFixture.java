@@ -25,6 +25,14 @@ public class MenuFixture {
         return menu;
     }
 
+    public static Menu create(final boolean displayed) {
+        return create(DEFAULT_NAME, DEFAULT_PRICE, displayed, MenuGroupFixture.createDefault(), List.of(MenuProductFixture.createDefault()));
+    }
+
+    public static Menu create(final Long price) {
+        return create(DEFAULT_NAME, BigDecimal.valueOf(price), true, MenuGroupFixture.createDefault(), List.of(MenuProductFixture.createDefault()));
+    }
+
     public static Menu create(final String name,
                               final BigDecimal price,
                               final boolean displayed,

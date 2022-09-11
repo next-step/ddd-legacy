@@ -1,6 +1,7 @@
 package kitchenpos.fixture;
 
 import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
@@ -12,25 +13,41 @@ import java.util.UUID;
 public class OrderFixture {
 
     public static Order createRequest(final OrderType type) {
+        return createRequest(type, List.of(OrderLineItemFixture.createRequest()));
+    }
+
+    public static Order createRequest(final OrderType type, final List<OrderLineItem> orderLineItems) {
+        return createRequest(type, OrderTableFixture.createUsedTable().getId(), orderLineItems);
+    }
+
+    public static Order createRequest(final OrderType type, final UUID orderTableId, final List<OrderLineItem> orderLineItems) {
+        return createRequest(type, orderTableId, "서울특별시", orderLineItems);
+    }
+
+    public static Order createRequest(final OrderType type, final String deliveryAddress, final List<OrderLineItem> orderLineItems) {
+        return createRequest(type, OrderTableFixture.createUsedTable().getId(), deliveryAddress, orderLineItems);
+    }
+
+    public static Order createRequest(final OrderType type, final UUID orderTableId, final String deliveryAddress, final List<OrderLineItem> orderLineItems) {
         final Order request = new Order();
         request.setType(type);
-        request.setOrderLineItems(List.of(OrderLineItemFixture.createRequest()));
+        request.setOrderLineItems(orderLineItems);
 
         if (type != null) {
-            setAdditionalInfo(request);
+            setAdditionalInfo(request, orderTableId, deliveryAddress);
         }
         return request;
     }
 
-    private static void setAdditionalInfo(final Order request) {
+    private static void setAdditionalInfo(final Order request, final UUID orderTableId, final String deliveryAddress) {
         switch (request.getType()) {
             case EAT_IN:
-                request.setOrderTableId(OrderTableFixture.createUsedTable().getId());
+                request.setOrderTableId(orderTableId);
                 break;
             case TAKEOUT:
                 break;
             case DELIVERY:
-                request.setDeliveryAddress("서울특별시");
+                request.setDeliveryAddress(deliveryAddress);
                 break;
         }
     }
