@@ -18,6 +18,10 @@ public class ProductFixture {
         return product;
     }
 
+    public static Product create(final String name, final Long price) {
+        return create(name, BigDecimal.valueOf(price));
+    }
+
     public static Product create(final String name, final BigDecimal price) {
         final Product product = new Product();
         product.setId(UUID.randomUUID());
@@ -26,9 +30,23 @@ public class ProductFixture {
         return product;
     }
 
+    public static Product createRequest(final String name, final Long price) {
+        return createRequest(name, BigDecimal.valueOf(price));
+    }
+
     public static Product createRequest(final String name, final BigDecimal price) {
         final Product product = new Product();
         product.setName(name);
+        product.setPrice(price);
+        return product;
+    }
+
+    public static Product createPriceRequest(final Long price) {
+        return createPriceRequest(BigDecimal.valueOf(price));
+    }
+
+    public static Product createPriceRequest(final BigDecimal price) {
+        final Product product = new Product();
         product.setPrice(price);
         return product;
     }
