@@ -158,9 +158,53 @@ public class OrderServiceTest extends IntegrationTest {
                 .isExactlyInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("주문 생성요청의 메뉴 수량은 음수일 수 없다.")
+        @DisplayName("배달 주문 생성요청의 메뉴 수량은 음수일 수 없다.")
         @Test
-        void nonMatchMenuException() {
+        void deliveryOrderQuantityException() {
+            // given
+            OrderLineItem orderLineItem = OrderLineIterm(
+                햄버거_콜라_세트메뉴.getId(),
+                햄버거_콜라_세트메뉴.getPrice(),
+                -1
+            );
+
+            Order request = Order(
+                테이블_1번.getId(),
+                DELIVERY,
+                "서울특별시 최현구",
+                orderLineItem
+            );
+
+            // when, then
+            assertThatThrownBy(() -> orderService.create(request))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("포장 주문 생성요청의 메뉴 수량은 음수일 수 없다.")
+        @Test
+        void takeOutOrderQuantityException() {
+            // given
+            OrderLineItem orderLineItem = OrderLineIterm(
+                햄버거_콜라_세트메뉴.getId(),
+                햄버거_콜라_세트메뉴.getPrice(),
+                -1
+            );
+
+            Order request = Order(
+                테이블_1번.getId(),
+                TAKEOUT,
+                "서울특별시 최현구",
+                orderLineItem
+            );
+
+            // when, then
+            assertThatThrownBy(() -> orderService.create(request))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("매장 주문 생성요청의 메뉴 수량은 음수일 수도 있다.")
+        @Test
+        void eatInOrderQuantity() {
             // given
             OrderLineItem orderLineItem = OrderLineIterm(
                 햄버거_콜라_세트메뉴.getId(),
@@ -176,8 +220,7 @@ public class OrderServiceTest extends IntegrationTest {
             );
 
             // when, then
-            assertThatThrownBy(() -> orderService.create(request))
-                .isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThat(orderService.create(request)).isNotNull();
         }
 
         @DisplayName("주문 생성요청의 메뉴 금액과 실제 메뉴 금액이 일치해야한다.")

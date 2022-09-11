@@ -50,8 +50,10 @@ public class OrderService {
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
-            if (quantity < 0) {
-                throw new IllegalArgumentException();
+            if (type != OrderType.EAT_IN) {
+                if (quantity < 0) {
+                    throw new IllegalArgumentException();
+                }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                 .orElseThrow(NoSuchElementException::new);
