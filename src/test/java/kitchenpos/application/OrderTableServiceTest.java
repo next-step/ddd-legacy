@@ -9,6 +9,7 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.helper.InMemoryOrderRepository;
 import kitchenpos.helper.InMemoryOrderTableRepository;
+import kitchenpos.helper.OrderTableFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -57,6 +58,25 @@ class OrderTableServiceTest {
             // when & then
             assertThatIllegalArgumentException()
                 .isThrownBy(() -> testTarget.create(request));
+        }
+    }
+
+    @DisplayName("주문 테이블 착석 테스트")
+    @Nested
+    class SitTest {
+
+        @DisplayName("주문 테이블에 손님이 착석 할 수 있다.")
+        @Test
+        void test01() {
+            // given
+            var orderTable = OrderTableFixture.create(false);
+            orderTableRepository.save(orderTable);
+
+            // when
+            OrderTable actual = testTarget.sit(orderTable.getId());
+
+            // then
+            assertThat(actual.isOccupied()).isTrue();
         }
     }
 
