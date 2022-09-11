@@ -94,7 +94,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("메뉴의 가격이 변경된다.")
+    @DisplayName("상품의 가격이 변경된다.")
     void changePrice() {
         // given
         Product product = productService.create(createProduct(BigDecimal.valueOf(1_000)));
