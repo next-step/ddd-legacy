@@ -19,6 +19,7 @@ public class InMemoryProductRepository extends InMemoryCrudRepository<Product, U
         return ids.stream()
                 .map(storage::get)
                 .filter(Objects::nonNull)
+                .distinct()
                 .collect(Collectors.toList());
     }
 }
