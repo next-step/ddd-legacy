@@ -4,6 +4,7 @@ import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryProductRepository implements ProductRepository {
     private final Map<UUID, Product> products = new HashMap<>();
@@ -15,7 +16,7 @@ public class InMemoryProductRepository implements ProductRepository {
 
     @Override
     public Optional<Product> findById(UUID productId) {
-        return Optional.empty();
+        return Optional.ofNullable(products.get(productId));
     }
 
     @Override
@@ -26,6 +27,6 @@ public class InMemoryProductRepository implements ProductRepository {
 
     @Override
     public List<Product> findAll() {
-        return null;
+        return new ArrayList<>(products.values());
     }
 }
