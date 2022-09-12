@@ -20,6 +20,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 class OrderTableServiceTest {
 
@@ -41,8 +43,7 @@ class OrderTableServiceTest {
         @Test
         void test01() {
             // given
-            var request = new OrderTable();
-            request.setName("1번 테이블");
+            OrderTable request = OrderTableFixture.request("1번 테이블");
 
             // when
             OrderTable actual = testTarget.create(request);
@@ -57,9 +58,10 @@ class OrderTableServiceTest {
         }
 
         @DisplayName("주문 테이블 이름은 비어 있을 수 없다.")
-        @Test
-        void test02() {
-            var request = new OrderTable();
+        @ParameterizedTest
+        @NullAndEmptySource
+        void test02(String name) {
+            OrderTable request = OrderTableFixture.request(name);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -75,8 +77,7 @@ class OrderTableServiceTest {
         @Test
         void test01() {
             // given
-            var orderTable = OrderTableFixture.create(false);
-            orderTableRepository.save(orderTable);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE);
 
             // when
             OrderTable actual = testTarget.sit(orderTable.getId());
@@ -94,8 +95,7 @@ class OrderTableServiceTest {
         @Test
         void test01() {
             // given
-            OrderTable orderTable = OrderTableFixture.create(1, true);
-            orderTableRepository.save(orderTable);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
 
             // when
             OrderTable actual = testTarget.clear(orderTable.getId());
@@ -111,8 +111,7 @@ class OrderTableServiceTest {
         @Test
         void test02() {
             // given
-            OrderTable orderTable = OrderTableFixture.create(1, true);
-            orderTableRepository.save(orderTable);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
             orderRepository.save(OrderFixture.create(
                 OrderType.EAT_IN,
                 OrderStatus.WAITING,
@@ -133,9 +132,8 @@ class OrderTableServiceTest {
         @Test
         void test01() {
             // given
-            var request = new OrderTable();
-            request.setNumberOfGuests(2);
-            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.create(1));
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+            OrderTable request = OrderTableFixture.request(orderTable.getNumberOfGuests() + 1);
 
             // when
             OrderTable actual = testTarget.changeNumberOfGuests(orderTable.getId(), request);
@@ -148,8 +146,7 @@ class OrderTableServiceTest {
         @Test
         void test02() {
             // given
-            var request = new OrderTable();
-            request.setNumberOfGuests(-1);
+            OrderTable request = OrderTableFixture.request(-1);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -160,9 +157,8 @@ class OrderTableServiceTest {
         @Test
         void test03() {
             // given
-            OrderTable request = new OrderTable();
-            request.setNumberOfGuests(1);
-            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.create(false));
+            OrderTable request = OrderTableFixture.request(1);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE);
 
             // when & then
             assertThatIllegalStateException()
@@ -178,8 +174,8 @@ class OrderTableServiceTest {
         @Test
         void test01() {
             // given
-            OrderTable orderTable1 = orderTableRepository.save(OrderTableFixture.create());
-            OrderTable orderTable2 = orderTableRepository.save(OrderTableFixture.create());
+            OrderTable orderTable1 = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+            OrderTable orderTable2 = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE);
 
             // when
             List<OrderTable> actual = testTarget.findAll();
@@ -189,7 +185,6 @@ class OrderTableServiceTest {
                 .map(OrderTable::getId)
                 .anyMatch(orderTableId -> orderTableId.equals(orderTable1.getId()))
                 .anyMatch(orderTableId -> orderTableId.equals(orderTable2.getId()));
-
         }
     }
 
