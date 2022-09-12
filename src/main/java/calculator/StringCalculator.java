@@ -40,7 +40,8 @@ public class StringCalculator {
         int calculatorValue = 0;
         for (String number : sumStrings) {
             PositiveNumber positiveNumber = new PositiveNumber(number);
-            calculatorValue = positiveNumber.add(calculatorValue);
+            positiveNumber = positiveNumber.add(number, calculatorValue);
+            calculatorValue = positiveNumber.positiveNumber();
         }
         return calculatorValue;
     }
