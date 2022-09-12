@@ -34,8 +34,7 @@ class MenuGroupServiceTest {
         @Test
         void test01() {
             // given
-            var request = new MenuGroup();
-            request.setName("치킨");
+            MenuGroup request = MenuGroupFixture.request("치킨");
 
             // when
             MenuGroup actual = testTarget.create(request);
@@ -52,8 +51,7 @@ class MenuGroupServiceTest {
         @NullAndEmptySource
         void test02(String name) {
             // given
-            var request = new MenuGroup();
-            request.setName(name);
+            MenuGroup request = MenuGroupFixture.request(name);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -69,10 +67,8 @@ class MenuGroupServiceTest {
         @Test
         void test01() {
             // given
-            MenuGroup menuGroup1 = MenuGroupFixture.create("치킨");
-            MenuGroup menuGroup2 = MenuGroupFixture.create("피자");
-            menuGroupRepository.save(menuGroup1);
-            menuGroupRepository.save(menuGroup2);
+            MenuGroup menuGroup1 = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
+            MenuGroup menuGroup2 = menuGroupRepository.save(MenuGroupFixture.PIZZA);
 
             // when
             List<MenuGroup> actual = testTarget.findAll();

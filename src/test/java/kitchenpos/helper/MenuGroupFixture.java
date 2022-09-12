@@ -5,16 +5,20 @@ import kitchenpos.domain.MenuGroup;
 
 public class MenuGroupFixture {
 
-    private static final String DEFAULT_MENU_GROUP_NAME = "default menu group name";
+    public static final MenuGroup CHICKEN = create("치킨");
 
-    public static MenuGroup create(String name) {
+    public static final MenuGroup PIZZA = create("피자");
+
+    private static MenuGroup create(String name) {
         var menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
         menuGroup.setName(name);
         return menuGroup;
     }
 
-    public static MenuGroup create() {
-        return create(DEFAULT_MENU_GROUP_NAME);
+    public static MenuGroup request(String name) {
+        var menuGroup = new MenuGroup();
+        menuGroup.setName(name);
+        return menuGroup;
     }
 }
