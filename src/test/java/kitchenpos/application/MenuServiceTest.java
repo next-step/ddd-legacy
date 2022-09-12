@@ -8,7 +8,10 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import kitchenpos.application.fixture.MenuFixture;
+import kitchenpos.application.fixture.MenuGroupFixture;
+import kitchenpos.application.fixture.MenuProductFixture;
+import kitchenpos.application.fixture.ProductFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -51,24 +54,10 @@ class MenuServiceTest {
 
   @BeforeEach
   void setUp() {
-    product = new Product();
-    product.setId(UUID.randomUUID());
-    product.setName("강정치킨");
-    product.setPrice(BigDecimal.valueOf(17000));
-
-    menuGroup = new MenuGroup();
-    menuGroup.setId(UUID.randomUUID());
-    menuGroup.setName("추천메뉴");
-
-    menuProduct = new MenuProduct();
-    menuProduct.setQuantity(2);
-    menuProduct.setProduct(product);
-
-    menu = new Menu();
-    menu.setName("후라이드+후라이드");
-    menu.setPrice(BigDecimal.valueOf(19000));
-    menu.setDisplayed(true);
-    menu.setMenuProducts(List.of(menuProduct));
+    menu = MenuFixture.createMenu();
+    product = ProductFixture.createProduct();
+    menuGroup = MenuGroupFixture.createMenuGroup();
+    menuProduct = MenuProductFixture.createMenuProduct();
   }
 
   @DisplayName("메뉴 등록")

@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import kitchenpos.application.fixture.OrderTableFixture;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
@@ -34,8 +35,7 @@ class OrderTableServiceTest {
 
   @BeforeEach
   void setUp() {
-    orderTable = new OrderTable();
-    orderTable.setName("1번");
+    orderTable = OrderTableFixture.createOrderTable();
   }
 
   @DisplayName("주문 테이블 등록")
@@ -94,8 +94,6 @@ class OrderTableServiceTest {
   @DisplayName("주문 테이블 손님수가 음수이면 에러")
   @Test
   void chageOrderTableNumberOfGuestsNegative() {
-    orderTable.setOccupied(true);
-
     OrderTable chageOrderTable = new OrderTable();
     chageOrderTable.setNumberOfGuests(-1);
 
@@ -106,6 +104,7 @@ class OrderTableServiceTest {
   @Test
   void chageOrderTableNumberOfGuestsNotSit() {
     when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+    orderTable.setOccupied(false);
 
     OrderTable chageOrderTable = new OrderTable();
     chageOrderTable.setNumberOfGuests(2);

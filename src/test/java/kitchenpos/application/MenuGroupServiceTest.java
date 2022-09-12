@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import kitchenpos.application.fixture.MenuGroupFixture;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,12 +26,16 @@ class MenuGroupServiceTest {
   @InjectMocks
   private MenuGroupService menuGroupService;
 
+  private MenuGroup menuGroup;
+
+  @BeforeEach
+  void setUp() {
+    menuGroup = MenuGroupFixture.createMenuGroup();
+  }
+
   @DisplayName("메뉴 그룹 등록")
   @Test
   void createMenuGroup() {
-    MenuGroup menuGroup = new MenuGroup();
-    menuGroup.setName("추천메뉴");
-
     when(menuGroupRepository.save(any())).thenReturn(menuGroup);
 
     MenuGroup result = menuGroupService.create(menuGroup);
@@ -40,7 +46,6 @@ class MenuGroupServiceTest {
   @DisplayName("메뉴 그룹 이름 null 등록 에러")
   @Test
   void createMenuGroupNameNull() {
-    MenuGroup menuGroup = new MenuGroup();
     menuGroup.setName(null);
 
     assertThatThrownBy(() -> menuGroupService.create(menuGroup)).isInstanceOf(IllegalArgumentException.class);
@@ -49,7 +54,6 @@ class MenuGroupServiceTest {
   @DisplayName("메뉴 그룹 이름 빈값 등록 에러")
   @Test
   void createMenuGroupNameEnpty() {
-    MenuGroup menuGroup = new MenuGroup();
     menuGroup.setName("");
 
     assertThatThrownBy(() -> menuGroupService.create(menuGroup)).isInstanceOf(IllegalArgumentException.class);

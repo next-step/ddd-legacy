@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import kitchenpos.application.fixture.ProductFixture;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -41,10 +41,7 @@ class ProductServiceTest {
 
   @BeforeEach
   void setUp() {
-    product = new Product();
-    product.setId(UUID.randomUUID());
-    product.setName("강정치킨");
-    product.setPrice(BigDecimal.valueOf(17000));
+    product = ProductFixture.createProduct();
   }
 
   @DisplayName("상품 등록")

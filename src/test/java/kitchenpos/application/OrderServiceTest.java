@@ -5,21 +5,19 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import kitchenpos.application.fixture.MenuFixture;
+import kitchenpos.application.fixture.OrderFixture;
+import kitchenpos.application.fixture.OrderTableFixture;
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
-import kitchenpos.domain.Product;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -48,14 +46,8 @@ class OrderServiceTest {
   @InjectMocks
   private OrderService orderService;
 
-  private MenuGroup 추천메뉴;
-  private Product 강정치킨;
   private OrderTable 테이블_1번;
   private Menu menu;
-
-  private MenuProduct menuProduct;
-
-  private OrderLineItem orderLineItem;
 
   private Order orderEatIn;
   private Order orderTakeOut;
@@ -63,49 +55,15 @@ class OrderServiceTest {
 
   @BeforeEach
   void setUp() {
-    추천메뉴 = new MenuGroup();
-    추천메뉴.setName("추천메뉴");
+    테이블_1번 = OrderTableFixture.createOrderTable();
 
-    강정치킨 = new Product();
-    강정치킨.setName("강정치킨");
-    강정치킨.setPrice(BigDecimal.valueOf(17000));
+    menu = MenuFixture.createMenu();
 
-    테이블_1번 = new OrderTable();
-    테이블_1번.setName("1번");
-    테이블_1번.setOccupied(true);
+    orderEatIn = OrderFixture.createOrderEatIn();
 
-    menuProduct = new MenuProduct();
-    menuProduct.setQuantity(2);
-    menuProduct.setProduct(강정치킨);
+    orderTakeOut = OrderFixture.createOrderTakeOut();
 
-    menu = new Menu();
-    menu.setName("후라이드+후라이드");
-    menu.setPrice(BigDecimal.valueOf(19000));
-    menu.setDisplayed(true);
-    menu.setMenuProducts(List.of(menuProduct));
-    menu.setMenuGroup(추천메뉴);
-
-    orderLineItem = new OrderLineItem();
-    orderLineItem.setMenu(menu);
-    orderLineItem.setPrice(BigDecimal.valueOf(19000));
-    orderLineItem.setQuantity(2);
-
-    orderEatIn = new Order();
-    orderEatIn.setType(OrderType.EAT_IN);
-    orderEatIn.setOrderLineItems(List.of(orderLineItem));
-    orderEatIn.setOrderTable(테이블_1번);
-    orderEatIn.setStatus(OrderStatus.WAITING);
-
-    orderTakeOut = new Order();
-    orderTakeOut.setType(OrderType.TAKEOUT);
-    orderTakeOut.setOrderLineItems(List.of(orderLineItem));
-    orderTakeOut.setStatus(OrderStatus.WAITING);
-
-    orderDelivery = new Order();
-    orderDelivery.setType(OrderType.DELIVERY);
-    orderDelivery.setOrderLineItems(List.of(orderLineItem));
-    orderDelivery.setDeliveryAddress("경기도 남양주시");
-    orderDelivery.setStatus(OrderStatus.WAITING);
+    orderDelivery = OrderFixture.createOrderDelivery();
   }
 
   @DisplayName("주문 매장식사 등록")
