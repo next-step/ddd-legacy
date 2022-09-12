@@ -20,6 +20,8 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static kitchenpos.fixture.domain.ProductFixture.product;
+import static kitchenpos.fixture.request.ProductRequestFixture.changeProductPriceRequest;
+import static kitchenpos.fixture.request.ProductRequestFixture.createProductRequest;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -149,41 +151,5 @@ public class ProductServiceTest {
         assertThatIllegalArgumentException().isThrownBy(() ->
                 productService.create(request)
         );
-    }
-
-    private Product createProductRequest() {
-        return createProductRequest(3_000L);
-    }
-
-    private Product createProductRequest(final Long price) {
-        return createProductRequest(BigDecimal.valueOf(price));
-    }
-
-    private Product createProductRequest(final BigDecimal price) {
-        final Product product = new Product();
-        product.setName("명란닭가슴살꼬치");
-        product.setPrice(price);
-        return product;
-    }
-
-    private Product createProductRequest(final String name) {
-        final Product product = new Product();
-        product.setName(name);
-        product.setPrice(BigDecimal.valueOf(3_000L));
-        return product;
-    }
-
-    private Product changeProductPriceRequest() {
-        return changeProductPriceRequest(10_000L);
-    }
-
-    private Product changeProductPriceRequest(final BigDecimal price) {
-        final Product product = new Product();
-        product.setPrice(price);
-        return product;
-    }
-
-    private Product changeProductPriceRequest(final Long price) {
-        return changeProductPriceRequest(BigDecimal.valueOf(price));
     }
 }
