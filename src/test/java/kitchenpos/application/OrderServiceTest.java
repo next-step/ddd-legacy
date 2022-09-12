@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.OrderFixture;
 import kitchenpos.infra.FakeKitchenRidersClient;
 import kitchenpos.infra.Kitchenrider;
 import kitchenpos.infra.KitchenridersClient;
@@ -20,7 +21,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.menu;
-import static kitchenpos.fixture.OrderFixture.order;
+import static kitchenpos.fixture.OrderFixture.eatInOrder;
 import static kitchenpos.fixture.OrderTableFixture.orderTable;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -54,7 +55,7 @@ public class OrderServiceTest {
     @DisplayName("주문 목록을 조회할 수 있다")
     void findOrders() {
         // given
-        orderRepository.save(order(OrderStatus.ACCEPTED));
+        orderRepository.save(OrderFixture.takeOutOrder(OrderStatus.ACCEPTED));
 
         // when
         final List<Order> result = orderService.findAll();
@@ -67,7 +68,7 @@ public class OrderServiceTest {
     @DisplayName("주문을 받을 수 있다")
     void acceptOrder() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING)).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.takeOutOrder(OrderStatus.WAITING)).getId();
 
         // when
         final Order result = orderService.accept(orderId);
@@ -89,7 +90,7 @@ public class OrderServiceTest {
     @DisplayName("주문 상태가 기다리는 중이 아니라면 주문을 받을 수 없다")
     void notAcceptOrderByOrderStatusNotWaiting() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.COMPLETED)).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.takeOutOrder(OrderStatus.COMPLETED)).getId();
 
         // then
         assertThatIllegalStateException().isThrownBy(() ->
@@ -101,7 +102,7 @@ public class OrderServiceTest {
     @DisplayName("배달 주문 수락 시 배달정보(주문 번호, 가격, 주소)를 배달 기사에게 전달한다")
     void acceptDeliveryOrder() {
         // given
-        final Order order = orderRepository.save(order(OrderStatus.WAITING, "집주소"));
+        final Order order = orderRepository.save(OrderFixture.deliveryOrder(OrderStatus.WAITING, "집주소"));
         final FakeKitchenRidersClient kitchenridersClient = (FakeKitchenRidersClient) this.kitchenridersClient;
 
         // when
@@ -320,7 +321,7 @@ public class OrderServiceTest {
     @DisplayName("주문에 대해 음식을 내어줄 수 있다다")
     void serve() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.ACCEPTED)).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.takeOutOrder(OrderStatus.ACCEPTED)).getId();
 
         // when
         Order result = orderService.serve(orderId);
@@ -336,7 +337,7 @@ public class OrderServiceTest {
     @DisplayName("주문 상태가 받은 상태가 아니라면 음식을 내어줄 수 없다")
     void notServeByNotOrderStatusAccepted() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING)).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.takeOutOrder(OrderStatus.WAITING)).getId();
 
         // then
         assertThatIllegalStateException().isThrownBy(
@@ -348,7 +349,7 @@ public class OrderServiceTest {
     @DisplayName("배달 주문을 시작을 할 수 있다")
     void startDelivery() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.SERVED, "집주소")).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.deliveryOrder(OrderStatus.SERVED, "집주소")).getId();
 
         // when
         final Order result = orderService.startDelivery(orderId);
@@ -362,7 +363,7 @@ public class OrderServiceTest {
     @DisplayName("주문이 존재하지 않으면 배달 주문을 시작할 수 없다")
     void notStartDeliveryByOrderIsNull() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.SERVED)).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.takeOutOrder(OrderStatus.SERVED)).getId();
 
         // then
         assertThatIllegalStateException().isThrownBy(() ->
@@ -374,7 +375,7 @@ public class OrderServiceTest {
     @DisplayName("주문 타입이 배달이 아닌 경우 배달 주문을 시작할 수 없다")
     void notStartDeliveryByOrderTypeIsNotDelievery() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.SERVED)).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.takeOutOrder(OrderStatus.SERVED)).getId();
 
         // then
         assertThatIllegalStateException().isThrownBy(() ->
@@ -386,7 +387,7 @@ public class OrderServiceTest {
     @DisplayName("주문 상태가 음식이 제공되지 않은 상태면 배달 시작을 할 수 없다.")
     void notStartDeliveryByOrderStatusNotServed() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING, "집주소")).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.deliveryOrder(OrderStatus.WAITING, "집주소")).getId();
 
         // then
         assertThatIllegalStateException().isThrownBy(() ->
@@ -398,7 +399,7 @@ public class OrderServiceTest {
     @DisplayName("주문에 대해 배달을 완료할 수 있다")
     void completeDelivery() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.DELIVERING, "집주소")).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.deliveryOrder(OrderStatus.DELIVERING, "집주소")).getId();
 
         // when
         final Order result = orderService.completeDelivery(orderId);
@@ -421,7 +422,7 @@ public class OrderServiceTest {
     @DisplayName("주문 상태가 배달 중이 아니라면 배달을 완료할 수 없다")
     void notCompleteDeliveryByOrderTypeIsNotDelivery() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING, "집주소")).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.deliveryOrder(OrderStatus.WAITING, "집주소")).getId();
 
         // then
         assertThatIllegalStateException().isThrownBy(() ->
@@ -433,7 +434,7 @@ public class OrderServiceTest {
     @DisplayName("배달 주문을 완료한다")
     void completeByDeliveryOrder() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.DELIVERED, "집주소")).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.deliveryOrder(OrderStatus.DELIVERED, "집주소")).getId();
 
         // when
         Order result = orderService.complete(orderId);
@@ -446,7 +447,7 @@ public class OrderServiceTest {
     @DisplayName("주문 타입이 배달인 경우, 주문 상태가 배달 완료가 아닌 경우에는 주문을 완료할 수 없다")
     void notCompleteByDeliveryOrderByOrderStatusNotDelivered() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING, "집주소")).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.deliveryOrder(OrderStatus.WAITING, "집주소")).getId();
 
         // then
         assertThatIllegalStateException().isThrownBy(
@@ -458,7 +459,7 @@ public class OrderServiceTest {
     @DisplayName("테이크 아웃 주문을 완료한다")
     void completeByTakeOutOrder() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.SERVED)).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.takeOutOrder(OrderStatus.SERVED)).getId();
 
         // when
         Order result = orderService.complete(orderId);
@@ -474,7 +475,7 @@ public class OrderServiceTest {
     @DisplayName("테이크 아웃 주문 상태가 음식 제공이 아니라면 주문을 완료할 수 없다")
     void notCompleteByTakeOutOrderByOrderStatusNotServed() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING)).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.takeOutOrder(OrderStatus.WAITING)).getId();
 
         // then
         assertThatIllegalStateException().isThrownBy(
@@ -487,7 +488,7 @@ public class OrderServiceTest {
     @DisplayName("매장식사 주문을 완료한다")
     void completeByTakeInOrder() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.SERVED, orderTable())).getId();
+        final UUID orderId = orderRepository.save(eatInOrder(OrderStatus.SERVED, orderTable())).getId();
 
         // when
         Order result = orderService.complete(orderId);
@@ -504,7 +505,7 @@ public class OrderServiceTest {
     @DisplayName("매장식사 주문 상태가 음식 제공이 아니라면 주문을 완료할 수 없다")
     void notCompleteByTakeInOrderByOrderStatusNotServed() {
         // given
-        final UUID orderId = orderRepository.save(order(OrderStatus.WAITING, orderTable())).getId();
+        final UUID orderId = orderRepository.save(eatInOrder(OrderStatus.WAITING, orderTable())).getId();
 
         // then
         assertThatIllegalStateException().isThrownBy(

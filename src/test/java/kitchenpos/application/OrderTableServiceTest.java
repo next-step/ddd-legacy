@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static kitchenpos.fixture.OrderFixture.order;
+import static kitchenpos.fixture.OrderFixture.eatInOrder;
 import static kitchenpos.fixture.OrderTableFixture.orderTable;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -126,7 +126,7 @@ public class OrderTableServiceTest {
     void clearOrderTableNotOrder() {
         // given
         final OrderTable orderTable = orderTableRepository.save(orderTable());
-        orderRepository.save(order(OrderStatus.WAITING, orderTable));
+        orderRepository.save(eatInOrder(OrderStatus.WAITING, orderTable));
 
         // when
         assertThatIllegalStateException()

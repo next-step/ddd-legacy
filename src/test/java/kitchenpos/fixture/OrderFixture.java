@@ -13,7 +13,7 @@ import static kitchenpos.fixture.OrderLineFixture.orderLineItem;
 
 public class OrderFixture {
 
-    public static Order order(final OrderStatus status, final String deliveryAddress) {
+    public static Order deliveryOrder(final OrderStatus status, final String deliveryAddress) {
         final Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(DELIVERY);
@@ -24,7 +24,7 @@ public class OrderFixture {
         return order;
     }
 
-    public static Order order(final OrderStatus status) {
+    public static Order takeOutOrder(final OrderStatus status) {
         final Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(TAKEOUT);
@@ -34,7 +34,7 @@ public class OrderFixture {
         return order;
     }
 
-    public static Order order(final OrderStatus status, final OrderTable orderTable) {
+    public static Order eatInOrder(final OrderStatus status, final OrderTable orderTable) {
         final Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(EAT_IN);
