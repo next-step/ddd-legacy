@@ -23,6 +23,8 @@ import java.util.UUID;
 import static kitchenpos.fixture.domain.MenuFixture.menu;
 import static kitchenpos.fixture.domain.OrderFixture.eatInOrder;
 import static kitchenpos.fixture.domain.OrderTableFixture.orderTable;
+import static kitchenpos.fixture.request.OrderLineItemRequestFixture.createOrderLineRequest;
+import static kitchenpos.fixture.request.OrderRequestFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -128,7 +130,9 @@ public class OrderServiceTest {
     @DisplayName("배달 주문을 할 수 있다")
     void createDeliveryOrder() {
         // given
-        final Order request = createDeliveryOrderRequest();
+        final Order request = createDeliveryOrderRequest(
+                List.of(createOrderLineRequest(menuId))
+        );
 
         // when
         final Order result = orderService.create(request);
@@ -148,7 +152,9 @@ public class OrderServiceTest {
     @DisplayName("배달 주문을 한 경우 주문한 수량이 0 미만인 경우에는 주문을 할 수 없다")
     void notCreateDeliveryOrder() {
         // given
-        final Order request = createDeliveryOrderRequest(-1);
+        final Order request = createDeliveryOrderRequest(
+                List.of(createOrderLineRequest(menuId, -1))
+        );
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->
@@ -161,7 +167,10 @@ public class OrderServiceTest {
     @DisplayName("배달지가 빈칸이면 주문을 할 수 없다")
     void notCreateDeliveryOrderByNotDeliveryAddress(final String input) {
         // given
-        final Order request = createDeliveryOrderRequest(input);
+        final Order request = createDeliveryOrderRequest(
+                input,
+                List.of(createOrderLineRequest(menuId))
+        );
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->
@@ -173,7 +182,9 @@ public class OrderServiceTest {
     @DisplayName("테이크 아웃 주문을 할 수 있다")
     void createTakeOutOrder() {
         // given
-        final Order request = createTakeOutOrderRequest();
+        final Order request = createTakeOutOrderRequest(
+                List.of(createOrderLineRequest(menuId))
+        );
 
         // when
         final Order result = orderService.create(request);
@@ -193,7 +204,9 @@ public class OrderServiceTest {
     @DisplayName("테이크 아웃을 한 경우 주문한 수량이 0 미만인 경우에는 주문을 할 수 없다")
     void notCreateTakeOutOrder() {
         // given
-        final Order request = createTakeOutOrderRequest(-1);
+        final Order request = createTakeOutOrderRequest(
+                List.of(createOrderLineRequest(menuId, -1))
+        );
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->
@@ -205,7 +218,10 @@ public class OrderServiceTest {
     @DisplayName("매장 식사 주문을 할 수 있다")
     void createEatInOrder() {
         // given
-        final Order request = createEatInOrderRequest(occupiedOrderTableId);
+        final Order request = createEatInOrderRequest(
+                occupiedOrderTableId,
+                List.of(createOrderLineRequest(menuId))
+        );
 
         // when
         final Order result = orderService.create(request);
@@ -226,7 +242,7 @@ public class OrderServiceTest {
     @DisplayName("매장 식사인 경우 존재하지 않는 테이블에서 주문을 할 수 없다")
     void notCreateEatInOrderByNotExistTable(final UUID input) {
         // given
-        final Order request = createEatInOrderRequest(input);
+        final Order request = createEatInOrderRequest(input, List.of(createOrderLineRequest(menuId)));
 
         // then
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() ->
@@ -238,7 +254,7 @@ public class OrderServiceTest {
     @DisplayName("테이블이 비어있다면 주문을 할 수 없다")
     void notCreateEatInOrderByNotOccupiedOrderTable() {
         // given
-        final Order request = createEatInOrderRequest(notOccupiedOrderTableId);
+        final Order request = createEatInOrderRequest(notOccupiedOrderTableId, List.of(createOrderLineRequest(menuId)));
 
         // then
         assertThatIllegalStateException().isThrownBy(() ->
@@ -251,7 +267,7 @@ public class OrderServiceTest {
     @DisplayName("주문 타입이 없다면 주문을 할 수 없다")
     void notCreateOrderNotOrderType(final OrderType input) {
         // given
-        final Order request = createOrderRequest(input);
+        final Order request = createOrderRequest(input, List.of(createOrderLineRequest(menuId)));
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->
@@ -293,7 +309,7 @@ public class OrderServiceTest {
         // given
         final Order request = createOrderRequest(
                 OrderType.TAKEOUT,
-                List.of(createOrderLineRequest(19_000L))
+                List.of(createOrderLineRequest(menuId, 19_000L))
         );
 
         // then
@@ -523,90 +539,4 @@ public class OrderServiceTest {
         );
     }
 
-
-    private Order createOrderRequest(final OrderType orderType) {
-        return createOrderRequest(orderType, List.of(
-                createOrderLineRequest()
-        ));
-    }
-
-    private Order createOrderRequest(final OrderType orderType, final List<OrderLineItem> orderLineItems) {
-        final Order order = new Order();
-        order.setType(orderType);
-        order.setOrderLineItems(orderLineItems);
-        return order;
-    }
-
-
-    private Order createEatInOrderRequest(final UUID orderTableId) {
-        final Order order = new Order();
-        order.setType(OrderType.EAT_IN);
-        order.setOrderLineItems(
-                List.of(
-                        createOrderLineRequest()
-                )
-        );
-        order.setOrderTableId(orderTableId);
-        return order;
-    }
-
-    private Order createTakeOutOrderRequest() {
-        return createDeliveryOrderRequest(1);
-    }
-
-    private Order createTakeOutOrderRequest(final int quantity) {
-        final Order order = new Order();
-        order.setType(OrderType.TAKEOUT);
-        order.setOrderLineItems(List.of(
-                createOrderLineRequest(quantity)
-        ));
-        return order;
-    }
-
-
-    private Order createDeliveryOrderRequest() {
-        return createDeliveryOrderRequest(1, "집주소");
-    }
-
-    private Order createDeliveryOrderRequest(final int quantity) {
-        return createDeliveryOrderRequest(quantity, "집주소");
-    }
-
-    private Order createDeliveryOrderRequest(final String deliveryAddress) {
-        return createDeliveryOrderRequest(1, deliveryAddress);
-    }
-
-    private Order createDeliveryOrderRequest(final int quantity, final String deliveryAddress) {
-        final Order order = new Order();
-        order.setType(OrderType.DELIVERY);
-        order.setOrderLineItems(List.of(
-                createOrderLineRequest(quantity)
-        ));
-        order.setDeliveryAddress(deliveryAddress);
-        return order;
-    }
-
-    private OrderLineItem createOrderLineRequest() {
-        return createOrderLineRequest(1, menuId, 20_000L);
-    }
-
-    private OrderLineItem createOrderLineRequest(final UUID menuId) {
-        return createOrderLineRequest(1, menuId, 20_000L);
-    }
-
-    private OrderLineItem createOrderLineRequest(final Long price) {
-        return createOrderLineRequest(1, menuId, price);
-    }
-
-    private OrderLineItem createOrderLineRequest(final int quantity) {
-        return createOrderLineRequest(quantity, menuId, 20_000L);
-    }
-
-    private OrderLineItem createOrderLineRequest(final int quantity, final UUID menuId, final Long price) {
-        final OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setQuantity(quantity);
-        orderLineItem.setPrice(BigDecimal.valueOf(price));
-        orderLineItem.setMenuId(menuId);
-        return orderLineItem;
-    }
 }
