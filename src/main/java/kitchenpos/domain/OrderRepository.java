@@ -1,9 +1,11 @@
 package kitchenpos.domain;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import java.util.List;
 import java.util.UUID;
+import org.springframework.data.repository.CrudRepository;
 
-public interface OrderRepository extends JpaRepository<Order, UUID> {
+public interface OrderRepository extends CrudRepository<Order, UUID> {
+    List<Order> findAll();
+
     boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status);
 }
