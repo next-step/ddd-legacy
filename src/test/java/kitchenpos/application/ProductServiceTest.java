@@ -116,9 +116,9 @@ class ProductServiceTest {
         @Test
         void test03() {
             // given
-            Product product = productRepository.save(ProductFixture.HOT_SPICY_CHICKEN);
-            Menu menu1 = menuRepository.save(MenuFixture.create("양념 치킨 한마리", 6000, product, 1, true));
-            Menu menu2 = menuRepository.save(MenuFixture.create("양념 치킨 두마리", 9000, product, 2, true));
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN);
+            Menu menu1 = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+            Menu menu2 = menuRepository.save(MenuFixture.TWO_FRIED_CHICKEN);
 
             Product request = ProductFixture.request(4500);
 
