@@ -19,6 +19,8 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.domain.OrderFixture.eatInOrder;
 import static kitchenpos.fixture.domain.OrderTableFixture.orderTable;
+import static kitchenpos.fixture.request.OrderTableRequestFixture.changeNumberOfGuestsRequest;
+import static kitchenpos.fixture.request.OrderTableRequestFixture.createOrderTableRequest;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -186,25 +188,5 @@ public class OrderTableServiceTest {
         assertThatIllegalStateException().isThrownBy(() ->
                 orderTableService.changeNumberOfGuests(orderTableId, request)
         );
-    }
-
-    private OrderTable changeNumberOfGuestsRequest() {
-        return changeNumberOfGuestsRequest(2);
-    }
-
-    private OrderTable changeNumberOfGuestsRequest(int numberOfGuests) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setNumberOfGuests(numberOfGuests);
-        return orderTable;
-    }
-
-    private OrderTable createOrderTableRequest() {
-        return createOrderTableRequest("1번");
-    }
-
-    private OrderTable createOrderTableRequest(String name) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setName(name);
-        return orderTable;
     }
 }
