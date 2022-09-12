@@ -20,6 +20,7 @@ import static kitchenpos.fixture.domain.MenuFixture.menu;
 import static kitchenpos.fixture.domain.MenuGroupFixture.menuGroup;
 import static kitchenpos.fixture.domain.MenuProductFixture.menuProduct;
 import static kitchenpos.fixture.domain.ProductFixture.product;
+import static kitchenpos.fixture.request.MenuRequestFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -213,22 +214,6 @@ class MenuServiceTest {
         );
     }
 
-    private Menu createMenuChangePriceRequest() {
-        return createMenuChangePriceRequest(13_000L);
-    }
-
-    private Menu createMenuChangePriceRequest(Long price) {
-        Menu menu = new Menu();
-        menu.setPrice(BigDecimal.valueOf(price));
-        return menu;
-    }
-
-    private Menu createMenuChangePriceRequest(BigDecimal price) {
-        Menu menu = new Menu();
-        menu.setPrice(price);
-        return menu;
-    }
-
     @Test
     @DisplayName("메뉴가 존재하지 않으면 가격을 변경할 수 없다")
     void changePriceButNotExistedMenu() {
@@ -308,48 +293,5 @@ class MenuServiceTest {
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() ->
                 menuService.display(null)
         );
-    }
-
-    private Menu createMenuRequest(
-            final String name,
-            final long price,
-            final UUID menuGroupId,
-            final boolean displayed,
-            final MenuProduct... menuProducts
-    ) {
-        return createMenuRequest(name, BigDecimal.valueOf(price), menuGroupId, displayed, menuProducts);
-    }
-
-    private Menu createMenuRequest(
-            final String name,
-            final BigDecimal price,
-            final UUID menuGroupId,
-            final boolean displayed,
-            final MenuProduct... menuProducts
-    ) {
-        return createMenuRequest(name, price, menuGroupId, displayed, Arrays.asList(menuProducts));
-    }
-
-    private Menu createMenuRequest(
-            final String name,
-            final BigDecimal price,
-            final UUID menuGroupId,
-            final boolean displayed,
-            final List<MenuProduct> menuProducts
-    ) {
-        final Menu menu = new Menu();
-        menu.setName(name);
-        menu.setPrice(price);
-        menu.setMenuGroupId(menuGroupId);
-        menu.setDisplayed(displayed);
-        menu.setMenuProducts(menuProducts);
-        return menu;
-    }
-
-    private static MenuProduct createMenuProductRequest(final UUID productId, final long quantity) {
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(productId);
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
     }
 }
