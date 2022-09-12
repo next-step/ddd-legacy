@@ -11,6 +11,7 @@ import kitchenpos.repository.InMemoryOrderRepository;
 import kitchenpos.repository.InMemoryOrderTableRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -21,10 +22,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import static kitchenpos.domain.OrderStatus.ACCEPTED;
+import static kitchenpos.domain.OrderStatus.DELIVERING;
 import static kitchenpos.fixture.domain.MenuFixture.menu;
 import static kitchenpos.fixture.domain.OrderFixture.eatInOrder;
 import static kitchenpos.fixture.domain.OrderTableFixture.orderTable;
-import static kitchenpos.fixture.request.OrderLineItemRequestFixture.createOrderLineRequest;
 import static kitchenpos.fixture.request.OrderRequestFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -101,29 +103,54 @@ public class OrderServiceTest {
         );
     }
 
-    @Test
-    @DisplayName("배달 주문 수락 시 배달정보(주문 번호, 가격, 주소)를 배달 기사에게 전달한다")
-    void acceptDeliveryOrder() {
-        // given
-        final Order order = orderRepository.save(OrderFixture.deliveryOrder(OrderStatus.WAITING, "집주소"));
-        final FakeKitchenRidersClient kitchenridersClient = (FakeKitchenRidersClient) this.kitchenridersClient;
+    @Nested
+    @DisplayName("배달 주문을")
+    class deliveryOrder {
 
-        // when
-        orderService.accept(order.getId());
-        final Kitchenrider kitchenRider = kitchenridersClient.findKitchenRider(order.getId());
+        private Order order;
+        private FakeKitchenRidersClient kitchenRiders;
 
-        // then
-        assertAll(
-                () -> assertThat(kitchenRider.getOrderId()).isEqualTo(order.getId()),
-                () -> assertThat(kitchenRider.getAmount()).isEqualTo(getAmount(order)),
-                () -> assertThat(kitchenRider.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress())
-        );
-    }
+        @BeforeEach
+        void beforeEach() {
+            order = orderRepository.save(OrderFixture.deliveryOrder(OrderStatus.WAITING, "집주소"));
+            kitchenRiders = (FakeKitchenRidersClient) kitchenridersClient;
+        }
 
-    private BigDecimal getAmount(final Order order) {
-        return order.getOrderLineItems().stream().map(orderLineItem ->
-                orderLineItem.getPrice().multiply(BigDecimal.valueOf(orderLineItem.getQuantity()))
-        ).reduce(BigDecimal.ZERO, BigDecimal::add);
+        @Test
+        @DisplayName("수락한다")
+        void acceptDeliveryOrder() {
+            // when
+            Order result = orderService.accept(order.getId());
+
+            // then
+            assertThat(result.getStatus()).isEqualTo(ACCEPTED);
+        }
+
+
+        @Nested
+        @DisplayName("배달 주문 후에는")
+        class AfterAcceptDeliveryOrder {
+            @Test
+            @DisplayName("배달정보(주문 번호, 가격, 주소)를 배달 기사에게 전달한다")
+            void acceptDeliveryOrder() {
+                // when
+                orderService.accept(order.getId());
+                final Kitchenrider kitchenRider = kitchenRiders.findKitchenRider(order.getId());
+
+                // then
+                assertAll(
+                        () -> assertThat(kitchenRider.getOrderId()).isEqualTo(order.getId()),
+                        () -> assertThat(kitchenRider.getAmount()).isEqualTo(getAmount(order)),
+                        () -> assertThat(kitchenRider.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress())
+                );
+            }
+
+            private BigDecimal getAmount(final Order order) {
+                return order.getOrderLineItems().stream().map(orderLineItem ->
+                        orderLineItem.getPrice().multiply(BigDecimal.valueOf(orderLineItem.getQuantity()))
+                ).reduce(BigDecimal.ZERO, BigDecimal::add);
+            }
+        }
     }
 
 
@@ -372,7 +399,7 @@ public class OrderServiceTest {
         final Order result = orderService.startDelivery(orderId);
 
         // then
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        assertThat(result.getStatus()).isEqualTo(DELIVERING);
 
     }
 
@@ -416,7 +443,7 @@ public class OrderServiceTest {
     @DisplayName("주문에 대해 배달을 완료할 수 있다")
     void completeDelivery() {
         // given
-        final UUID orderId = orderRepository.save(OrderFixture.deliveryOrder(OrderStatus.DELIVERING, "집주소")).getId();
+        final UUID orderId = orderRepository.save(OrderFixture.deliveryOrder(DELIVERING, "집주소")).getId();
 
         // when
         final Order result = orderService.completeDelivery(orderId);
