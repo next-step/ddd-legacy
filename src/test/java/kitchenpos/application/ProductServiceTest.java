@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fixture.request.ProductRequestFixture;
 import kitchenpos.infra.FakePurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.repository.InMemoryMenuRepository;
@@ -112,7 +113,7 @@ public class ProductServiceTest {
     @DisplayName("상품을 추가할 수 있다")
     void addProduct() {
         // given
-        final Product request = createProductRequest();
+        final Product request = ProductRequestFixture.createProductRequest();
 
         // when
         final Product result = productService.create(request);
@@ -131,7 +132,7 @@ public class ProductServiceTest {
     @DisplayName("가격이 없거나, 가격이 0원 이하이면 상품을 추가할 수 없다")
     void createMenuNotPrice(final BigDecimal input) {
         // given
-        final Product request = createProductRequest(input);
+        final Product request = ProductRequestFixture.createProductRequest(input);
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->

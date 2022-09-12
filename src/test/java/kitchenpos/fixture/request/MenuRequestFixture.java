@@ -4,24 +4,23 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public class MenuRequestFixture {
 
 
-    public static Menu createMenuChangePriceRequest() {
-        return createMenuChangePriceRequest(13_000L);
+    public static Menu changePriceMenuRequest() {
+        return changePriceMenuRequest(13_000L);
     }
 
-    public static Menu createMenuChangePriceRequest(Long price) {
+    public static Menu changePriceMenuRequest(Long price) {
         Menu menu = new Menu();
         menu.setPrice(BigDecimal.valueOf(price));
         return menu;
     }
 
-    public static Menu createMenuChangePriceRequest(BigDecimal price) {
+    public static Menu changePriceMenuRequest(BigDecimal price) {
         Menu menu = new Menu();
         menu.setPrice(price);
         return menu;
@@ -44,7 +43,7 @@ public class MenuRequestFixture {
             final boolean displayed,
             final MenuProduct... menuProducts
     ) {
-        return createMenuRequest(name, price, menuGroupId, displayed, Arrays.asList(menuProducts));
+        return createMenuRequest(name, price, menuGroupId, displayed, List.of(menuProducts));
     }
 
     public static Menu createMenuRequest(

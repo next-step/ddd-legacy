@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.fixture.domain.OrderFixture;
+import kitchenpos.fixture.request.OrderLineItemRequestFixture;
 import kitchenpos.infra.FakeKitchenRidersClient;
 import kitchenpos.infra.Kitchenrider;
 import kitchenpos.infra.KitchenridersClient;
@@ -131,7 +132,7 @@ public class OrderServiceTest {
     void createDeliveryOrder() {
         // given
         final Order request = createDeliveryOrderRequest(
-                List.of(createOrderLineRequest(menuId))
+                List.of(OrderLineItemRequestFixture.createOrderLineRequest(menuId))
         );
 
         // when
@@ -153,7 +154,7 @@ public class OrderServiceTest {
     void notCreateDeliveryOrder() {
         // given
         final Order request = createDeliveryOrderRequest(
-                List.of(createOrderLineRequest(menuId, -1))
+                List.of(OrderLineItemRequestFixture.createOrderLineRequest(menuId, -1))
         );
 
         // then
@@ -169,7 +170,7 @@ public class OrderServiceTest {
         // given
         final Order request = createDeliveryOrderRequest(
                 input,
-                List.of(createOrderLineRequest(menuId))
+                List.of(OrderLineItemRequestFixture.createOrderLineRequest(menuId))
         );
 
         // then
@@ -183,7 +184,7 @@ public class OrderServiceTest {
     void createTakeOutOrder() {
         // given
         final Order request = createTakeOutOrderRequest(
-                List.of(createOrderLineRequest(menuId))
+                List.of(OrderLineItemRequestFixture.createOrderLineRequest(menuId))
         );
 
         // when
@@ -205,7 +206,7 @@ public class OrderServiceTest {
     void notCreateTakeOutOrder() {
         // given
         final Order request = createTakeOutOrderRequest(
-                List.of(createOrderLineRequest(menuId, -1))
+                List.of(OrderLineItemRequestFixture.createOrderLineRequest(menuId, -1))
         );
 
         // then
@@ -220,7 +221,7 @@ public class OrderServiceTest {
         // given
         final Order request = createEatInOrderRequest(
                 occupiedOrderTableId,
-                List.of(createOrderLineRequest(menuId))
+                List.of(OrderLineItemRequestFixture.createOrderLineRequest(menuId))
         );
 
         // when
@@ -242,7 +243,7 @@ public class OrderServiceTest {
     @DisplayName("매장 식사인 경우 존재하지 않는 테이블에서 주문을 할 수 없다")
     void notCreateEatInOrderByNotExistTable(final UUID input) {
         // given
-        final Order request = createEatInOrderRequest(input, List.of(createOrderLineRequest(menuId)));
+        final Order request = createEatInOrderRequest(input, List.of(OrderLineItemRequestFixture.createOrderLineRequest(menuId)));
 
         // then
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() ->
@@ -254,7 +255,7 @@ public class OrderServiceTest {
     @DisplayName("테이블이 비어있다면 주문을 할 수 없다")
     void notCreateEatInOrderByNotOccupiedOrderTable() {
         // given
-        final Order request = createEatInOrderRequest(notOccupiedOrderTableId, List.of(createOrderLineRequest(menuId)));
+        final Order request = createEatInOrderRequest(notOccupiedOrderTableId, List.of(OrderLineItemRequestFixture.createOrderLineRequest(menuId)));
 
         // then
         assertThatIllegalStateException().isThrownBy(() ->
@@ -267,7 +268,7 @@ public class OrderServiceTest {
     @DisplayName("주문 타입이 없다면 주문을 할 수 없다")
     void notCreateOrderNotOrderType(final OrderType input) {
         // given
-        final Order request = createOrderRequest(input, List.of(createOrderLineRequest(menuId)));
+        final Order request = createOrderRequest(input, List.of(OrderLineItemRequestFixture.createOrderLineRequest(menuId)));
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->
@@ -294,7 +295,7 @@ public class OrderServiceTest {
         // given
         final Order request = createOrderRequest(
                 OrderType.TAKEOUT,
-                List.of(createOrderLineRequest(hideMenuId))
+                List.of(OrderLineItemRequestFixture.createOrderLineRequest(hideMenuId))
         );
 
         // then
@@ -309,7 +310,7 @@ public class OrderServiceTest {
         // given
         final Order request = createOrderRequest(
                 OrderType.TAKEOUT,
-                List.of(createOrderLineRequest(menuId, 19_000L))
+                List.of(OrderLineItemRequestFixture.createOrderLineRequest(menuId, 19_000L))
         );
 
         // then
@@ -324,7 +325,7 @@ public class OrderServiceTest {
         // given
         final Order request = createOrderRequest(
                 OrderType.TAKEOUT,
-                List.of(createOrderLineRequest((UUID) null))
+                List.of(OrderLineItemRequestFixture.createOrderLineRequest((UUID) null))
         );
 
         // then

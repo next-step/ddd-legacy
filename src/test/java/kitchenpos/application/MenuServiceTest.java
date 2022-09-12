@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.request.MenuRequestFixture;
 import kitchenpos.infra.FakePurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.repository.InMemoryMenuGroupRepository;
@@ -89,7 +90,7 @@ class MenuServiceTest {
     @DisplayName("가격이 없거나, 가격이 0원 이하이면 메뉴를 추가할 수 없다.")
     void createMenuNotPrice(BigDecimal input) {
         // given
-        final Menu request = createMenuRequest(
+        final Menu request = MenuRequestFixture.createMenuRequest(
                 "돈코츠 라멘", input, menuGroupId, true, createMenuProductRequest(product.getId(), 2L)
         );
 
@@ -191,7 +192,7 @@ class MenuServiceTest {
     void changePrice() {
         // given
         final UUID menuId = menuRepository.save(menu()).getId();
-        final Menu request = createMenuChangePriceRequest();
+        final Menu request = changePriceMenuRequest();
 
         // when
         final Menu result = menuService.changePrice(menuId, request);
@@ -207,7 +208,7 @@ class MenuServiceTest {
     void changePriceButNotPrice(BigDecimal input) {
         // given
         final UUID menuId = menuRepository.save(menu()).getId();
-        final Menu request = createMenuChangePriceRequest(input);
+        final Menu request = changePriceMenuRequest(input);
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->
@@ -219,7 +220,7 @@ class MenuServiceTest {
     @DisplayName("메뉴가 존재하지 않으면 가격을 변경할 수 없다")
     void changePriceButNotExistedMenu() {
         // given
-        final Menu request = createMenuChangePriceRequest();
+        final Menu request = changePriceMenuRequest();
 
         // then
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() ->
@@ -232,7 +233,7 @@ class MenuServiceTest {
     void changePriceButSumLessThenPrice() {
         // given
         final UUID menuId = menuRepository.save(menu()).getId();
-        final Menu request = createMenuChangePriceRequest(50_000L);
+        final Menu request = changePriceMenuRequest(50_000L);
 
         // then
         assertThatIllegalArgumentException().isThrownBy(() ->

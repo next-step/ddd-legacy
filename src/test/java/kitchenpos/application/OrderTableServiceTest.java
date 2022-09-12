@@ -4,6 +4,7 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.fixture.request.OrderTableRequestFixture;
 import kitchenpos.repository.InMemoryOrderRepository;
 import kitchenpos.repository.InMemoryOrderTableRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,7 +54,7 @@ public class OrderTableServiceTest {
     @DisplayName("테이블을 추가할 수 있다")
     void createOrderTables() {
         // given
-        final OrderTable request = createOrderTableRequest();
+        final OrderTable request = OrderTableRequestFixture.createOrderTableRequest();
 
         // when
         final OrderTable result = orderTableService.create(request);
