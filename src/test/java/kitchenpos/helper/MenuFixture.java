@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.Product;
 
 public class MenuFixture {
 
@@ -38,17 +37,19 @@ public class MenuFixture {
         return menu;
     }
 
-    private static class MenuProductFixture {
-
-        public static final MenuProduct ONE_FRIED_CHICKEN = create(ProductFixture.FRIED_CHICKEN, 1);
-
-        public static final MenuProduct TWO_FRIED_CHICKEN = create(ProductFixture.FRIED_CHICKEN, 2);
-
-        private static MenuProduct create(Product product, int quantity) {
-            var menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(quantity);
-            return menuProduct;
-        }
+    public static Menu request(
+        int price,
+        UUID menuGroupId,
+        String name,
+        boolean displayed,
+        MenuProduct... menuProducts
+    ) {
+        var request = new Menu();
+        request.setPrice(BigDecimal.valueOf(price));
+        request.setMenuGroupId(menuGroupId);
+        request.setName(name);
+        request.setDisplayed(displayed);
+        request.setMenuProducts(List.of(menuProducts));
+        return request;
     }
 }
