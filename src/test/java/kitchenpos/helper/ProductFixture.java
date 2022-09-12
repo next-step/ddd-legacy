@@ -6,10 +6,11 @@ import kitchenpos.domain.Product;
 
 public class ProductFixture {
 
-    private static final String DEFAULT_PRODUCT_NAME = "default product name";
-    private static final int DEFAULT_PRODUCT_PRICE = 1000;
+    public static final Product FRIED_CHICKEN = create("후라이드 치킨", 6000);
 
-    public static Product create(String name, int price) {
+    public static final Product HOT_SPICY_CHICKEN = create("양념 치킨", 6000);
+
+    private static Product create(String name, int price) {
         var product = new Product();
         product.setId(UUID.randomUUID());
         product.setName(name);
@@ -17,11 +18,16 @@ public class ProductFixture {
         return product;
     }
 
-    public static Product create(int price) {
-        return create(DEFAULT_PRODUCT_NAME, price);
+    public static Product request(String name, int price) {
+        var product = new Product();
+        product.setName(name);
+        product.setPrice(BigDecimal.valueOf(price));
+        return product;
     }
 
-    public static Product create() {
-        return create(DEFAULT_PRODUCT_PRICE);
+    public static Product request(int price) {
+        var product = new Product();
+        product.setPrice(BigDecimal.valueOf(price));
+        return product;
     }
 }

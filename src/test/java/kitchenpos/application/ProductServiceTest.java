@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import java.math.BigDecimal;
 import java.util.List;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
@@ -44,9 +43,7 @@ class ProductServiceTest {
         @Test
         void test01() {
             // given
-            var request = new Product();
-            request.setName("양념 치킨");
-            request.setPrice(BigDecimal.valueOf(6000));
+            Product request = ProductFixture.request("양념 치킨", 6000);
 
             // when
             Product actual = testTarget.create(request);
@@ -63,9 +60,7 @@ class ProductServiceTest {
         @Test
         void test02() {
             // given
-            var request = new Product();
-            request.setName("양념 치킨");
-            request.setPrice(BigDecimal.valueOf(-1));
+            Product request = ProductFixture.request("양념 치킨", -1);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -78,9 +73,7 @@ class ProductServiceTest {
         @NullAndEmptySource
         void test03(String name) {
             // given
-            var request = new Product();
-            request.setName(name);
-            request.setPrice(BigDecimal.valueOf(6000));
+            Product request = ProductFixture.request(name, 6000);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -96,10 +89,8 @@ class ProductServiceTest {
         @Test
         void test01() {
             // given
-            Product product = ProductFixture.create(6000);
-            productRepository.save(product);
-            var request = new Product();
-            request.setPrice(BigDecimal.valueOf(4500));
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN);
+            Product request = ProductFixture.request(6000);
 
             // when
             Product actual = testTarget.changePrice(product.getId(), request);
@@ -113,10 +104,8 @@ class ProductServiceTest {
         @Test
         void test02() {
             // given
-            Product product = ProductFixture.create(6000);
-            productRepository.save(product);
-            Product request = new Product();
-            request.setPrice(BigDecimal.valueOf(-1));
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN);
+            Product request = ProductFixture.request(-1);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -127,16 +116,11 @@ class ProductServiceTest {
         @Test
         void test03() {
             // given
-            Product product = ProductFixture.create("양념 치킨", 6000);
-            productRepository.save(product);
+            Product product = productRepository.save(ProductFixture.HOT_SPICY_CHICKEN);
+            Menu menu1 = menuRepository.save(MenuFixture.create("양념 치킨 한마리", 6000, product, 1, true));
+            Menu menu2 = menuRepository.save(MenuFixture.create("양념 치킨 두마리", 9000, product, 2, true));
 
-            Menu menu1 = MenuFixture.create("양념 치킨 한마리", 6000, product, 1, true);
-            Menu menu2 = MenuFixture.create("양념 치킨 두마리", 9000, product, 2, true);
-            menuRepository.save(menu1);
-            menuRepository.save(menu2);
-
-            var request = new Product();
-            request.setPrice(BigDecimal.valueOf(4500));
+            Product request = ProductFixture.request(4500);
 
             // when
             testTarget.changePrice(product.getId(), request);
@@ -157,10 +141,8 @@ class ProductServiceTest {
         @Test
         void test01() {
             // given
-            Product product1 = ProductFixture.create();
-            Product product2 = ProductFixture.create();
-            productRepository.save(product1);
-            productRepository.save(product2);
+            Product product1 = productRepository.save(ProductFixture.FRIED_CHICKEN);
+            Product product2 = productRepository.save(ProductFixture.HOT_SPICY_CHICKEN);
 
             // when
             List<Product> actual = testTarget.findAll();

@@ -30,7 +30,7 @@ public class MenuFixture {
     }
 
     public static Menu create() {
-        Product product = ProductFixture.create();
+        Product product = ProductFixture.FRIED_CHICKEN;
         int price = product.getPrice().intValue() * DEFAULT_MENU_QUANTITY;
         return create(
             DEFAULT_MENU_NAME,
