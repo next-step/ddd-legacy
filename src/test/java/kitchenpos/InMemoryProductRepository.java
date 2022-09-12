@@ -3,11 +3,11 @@ package kitchenpos;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class InMemoryProductRepository implements ProductRepository {
+    private final Map<UUID, Product> products = new HashMap<>();
+
     @Override
     public List<Product> findAllByIdIn(List<UUID> ids) {
         return null;
@@ -20,7 +20,8 @@ public class InMemoryProductRepository implements ProductRepository {
 
     @Override
     public Product save(Product product) {
-        return null;
+        products.put(product.getId(), product);
+        return product;
     }
 
     @Override
