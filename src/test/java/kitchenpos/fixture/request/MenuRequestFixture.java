@@ -62,11 +62,4 @@ public class MenuRequestFixture {
         menu.setMenuProducts(menuProducts);
         return menu;
     }
-
-    public static MenuProduct createMenuProductRequest(final UUID productId, final long quantity) {
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(productId);
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
-    }
 }

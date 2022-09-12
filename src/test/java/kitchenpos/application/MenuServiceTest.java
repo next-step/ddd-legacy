@@ -20,6 +20,7 @@ import static kitchenpos.fixture.domain.MenuFixture.menu;
 import static kitchenpos.fixture.domain.MenuGroupFixture.menuGroup;
 import static kitchenpos.fixture.domain.MenuProductFixture.menuProduct;
 import static kitchenpos.fixture.domain.ProductFixture.product;
+import static kitchenpos.fixture.request.MenuProductRequestFixture.createMenuProductRequest;
 import static kitchenpos.fixture.request.MenuRequestFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
