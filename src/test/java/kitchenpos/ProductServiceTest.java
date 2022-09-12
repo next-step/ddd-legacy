@@ -14,10 +14,10 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import racingcar.Car;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -81,13 +81,16 @@ public class ProductServiceTest {
     @DisplayName("상품의 가격을 수정할 수 있다.")
     @Test
     public void changePrice() {
-        final Product request = new Product();
-        request.setName("황금올리브");
-        request.setPrice(BigDecimal.valueOf(20000L));
-        final Product create = productService.create(request);
-        create.setPrice(BigDecimal.valueOf(30000L));
+        final Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setName("황금올리브");
+        product.setPrice(BigDecimal.valueOf(20000L));
+        productRepository.save(product);
 
-        Product actual = productService.changePrice(create.getId(), create);
+        final Product request = new Product();
+        request.setPrice(BigDecimal.valueOf(30000L));
+
+        Product actual = productService.changePrice(product.getId(), request);
 
         assertThat(actual.getId()).isNotNull();
         assertThat(actual.getName()).isEqualTo("황금올리브");
@@ -98,14 +101,17 @@ public class ProductServiceTest {
     @NullSource
     @ValueSource(strings = "-1000")
     public void changePrice_input_null_and_negative(BigDecimal price) {
+        final Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setName("황금올리브");
+        product.setPrice(BigDecimal.valueOf(20000L));
+        productRepository.save(product);
+
         final Product request = new Product();
-        request.setName("황금올리브");
-        request.setPrice(BigDecimal.valueOf(20000L));
-        final Product create = productService.create(request);
-        create.setPrice(price);
+        request.setPrice(price);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> productService.changePrice(create.getId(), create));
+                .isThrownBy(() -> productService.changePrice(product.getId(), request));
     }
 
     // Menu '가'는 상품 'A','B','C'로 구성되어있다.
@@ -121,10 +127,11 @@ public class ProductServiceTest {
     @DisplayName("상품 목록을 조회한다.")
     @Test
     public void findAll() {
-        final Product request = new Product();
-        request.setName("황금올리브");
-        request.setPrice(BigDecimal.valueOf(20000L));
-        productService.create(request);
+        final Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setName("황금올리브");
+        product.setPrice(BigDecimal.valueOf(20000L));
+        productRepository.save(product);
 
         List<Product> products = productService.findAll();
 
