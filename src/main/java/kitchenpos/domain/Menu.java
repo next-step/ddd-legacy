@@ -41,8 +41,7 @@ public class Menu {
     @Transient
     private UUID menuGroupId;
 
-    public Menu() {
-    }
+    public Menu() {}
 
     public UUID getId() {
         return id;

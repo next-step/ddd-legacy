@@ -32,6 +32,12 @@ public class OrderLineItem {
     public OrderLineItem() {
     }
 
+    public OrderLineItem(UUID menuId, BigDecimal price, long quantity) {
+        this.menuId = menuId;
+        this.price = price;
+        this.quantity = quantity;
+    }
+
     public Long getSeq() {
         return seq;
     }
