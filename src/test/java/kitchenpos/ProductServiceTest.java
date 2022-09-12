@@ -4,6 +4,7 @@ import kitchenpos.application.ProductService;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.factory.ProductFactory;
 import kitchenpos.infra.ProfanityClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +18,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -43,9 +43,7 @@ public class ProductServiceTest {
     @DisplayName("상품을 등록할 수 있다.")
     @Test
     public void create() {
-        final Product request = new Product();
-        request.setName("황금올리브");
-        request.setPrice(BigDecimal.valueOf(20000L));
+        final Product request = ProductFactory.of("황금올리브", BigDecimal.valueOf(20000L));
 
         final Product actual = productService.create(request);
 
@@ -58,21 +56,18 @@ public class ProductServiceTest {
     @NullSource
     @ValueSource(strings = "-1")
     public void create_input_null_and_negative(BigDecimal price) {
-        final Product request = new Product();
-        request.setName("황금올리브");
-        request.setPrice(price);
+        final Product request = ProductFactory.of(price);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productService.create(request));
     }
 
+
     @ParameterizedTest(name = "상품 등록 시, 이름은 필수로 입력되 비속어가 포함되어있으면 안된다.")
     @NullSource
     @ValueSource(strings = {"욕설이 포함된 이름", "비속어가 포함된 이름"})
     public void create_input_null_and_profanity(String name) {
-        final Product request = new Product();
-        request.setName(name);
-        request.setPrice(BigDecimal.valueOf(20000L));
+        final Product request = ProductFactory.of(name);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> productService.create(request));
@@ -81,30 +76,25 @@ public class ProductServiceTest {
     @DisplayName("상품의 가격을 수정할 수 있다.")
     @Test
     public void changePrice() {
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName("황금올리브");
-        product.setPrice(BigDecimal.valueOf(20000L));
-        productRepository.save(product);
+        final Product product = ProductFactory.of("황금올리브", BigDecimal.valueOf(20000L));
+        Product create = productRepository.save(product);
 
         final Product request = new Product();
         request.setPrice(BigDecimal.valueOf(30000L));
 
-        Product actual = productService.changePrice(product.getId(), request);
+        Product actual = productService.changePrice(create.getId(), request);
 
         assertThat(actual.getId()).isNotNull();
         assertThat(actual.getName()).isEqualTo("황금올리브");
         assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(30000L));
     }
 
+
     @ParameterizedTest(name = "상품 수정시 시, 가격은 필수로 입력되어야 하며 0원 이상이어야 한다. ")
     @NullSource
     @ValueSource(strings = "-1000")
     public void changePrice_input_null_and_negative(BigDecimal price) {
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName("황금올리브");
-        product.setPrice(BigDecimal.valueOf(20000L));
+        final Product product = ProductFactory.getDefaultProduct();
         productRepository.save(product);
 
         final Product request = new Product();
@@ -127,10 +117,7 @@ public class ProductServiceTest {
     @DisplayName("상품 목록을 조회한다.")
     @Test
     public void findAll() {
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName("황금올리브");
-        product.setPrice(BigDecimal.valueOf(20000L));
+        final Product product = ProductFactory.getDefaultProduct();
         productRepository.save(product);
 
         List<Product> products = productService.findAll();
