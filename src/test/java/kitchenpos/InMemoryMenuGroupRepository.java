@@ -3,11 +3,11 @@ package kitchenpos;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class InMemoryMenuGroupRepository implements MenuGroupRepository {
+    private final Map<UUID, MenuGroup> menuGroups = new HashMap<>();
+
     @Override
     public Optional<MenuGroup> findById(UUID menuGroupId) {
         return Optional.empty();
@@ -15,11 +15,17 @@ public class InMemoryMenuGroupRepository implements MenuGroupRepository {
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
-        return null;
+        if (Objects.isNull(menuGroup.getId())) {
+            menuGroup.setId(UUID.randomUUID());
+            menuGroups.put(menuGroup.getId(), menuGroup);
+        } else {
+            menuGroups.put(menuGroup.getId(), menuGroup);
+        }
+        return menuGroup;
     }
 
     @Override
     public List<MenuGroup> findAll() {
-        return null;
+        return new ArrayList<>(menuGroups.values());
     }
 }
