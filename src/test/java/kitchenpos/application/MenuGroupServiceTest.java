@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import java.util.List;
 
 import static kitchenpos.fixture.domain.MenuGroupFixture.menuGroup;
+import static kitchenpos.fixture.request.MenuGroupRequestFixture.createRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -44,11 +45,6 @@ class MenuGroupServiceTest {
         );
     }
 
-    private static MenuGroup createRequest(String name) {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(name);
-        return menuGroup;
-    }
 
     @ParameterizedTest
     @NullAndEmptySource
