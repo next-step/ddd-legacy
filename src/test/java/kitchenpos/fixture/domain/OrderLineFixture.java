@@ -1,11 +1,11 @@
-package kitchenpos.fixture;
+package kitchenpos.fixture.domain;
 
 import kitchenpos.domain.OrderLineItem;
 
 import java.math.BigDecimal;
 import java.util.Random;
 
-import static kitchenpos.fixture.MenuFixture.menu;
+import static kitchenpos.fixture.domain.MenuFixture.menu;
 
 public class OrderLineFixture {
     public static OrderLineItem orderLineItem() {

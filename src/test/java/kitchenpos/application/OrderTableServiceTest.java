@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static kitchenpos.fixture.OrderFixture.eatInOrder;
-import static kitchenpos.fixture.OrderTableFixture.orderTable;
+import static kitchenpos.fixture.domain.OrderFixture.eatInOrder;
+import static kitchenpos.fixture.domain.OrderTableFixture.orderTable;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 

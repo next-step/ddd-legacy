@@ -16,10 +16,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static kitchenpos.fixture.MenuFixture.menu;
-import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
-import static kitchenpos.fixture.MenuProductFixture.menuProduct;
-import static kitchenpos.fixture.ProductFixture.product;
+import static kitchenpos.fixture.domain.MenuFixture.menu;
+import static kitchenpos.fixture.domain.MenuGroupFixture.menuGroup;
+import static kitchenpos.fixture.domain.MenuProductFixture.menuProduct;
+import static kitchenpos.fixture.domain.ProductFixture.product;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 

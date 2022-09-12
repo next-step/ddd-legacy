@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.fixture.OrderFixture;
+import kitchenpos.fixture.domain.OrderFixture;
 import kitchenpos.infra.FakeKitchenRidersClient;
 import kitchenpos.infra.Kitchenrider;
 import kitchenpos.infra.KitchenridersClient;
@@ -20,9 +20,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static kitchenpos.fixture.MenuFixture.menu;
-import static kitchenpos.fixture.OrderFixture.eatInOrder;
-import static kitchenpos.fixture.OrderTableFixture.orderTable;
+import static kitchenpos.fixture.domain.MenuFixture.menu;
+import static kitchenpos.fixture.domain.OrderFixture.eatInOrder;
+import static kitchenpos.fixture.domain.OrderTableFixture.orderTable;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 

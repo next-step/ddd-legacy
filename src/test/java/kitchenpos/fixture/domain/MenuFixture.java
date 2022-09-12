@@ -1,4 +1,4 @@
-package kitchenpos.fixture;
+package kitchenpos.fixture.domain;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static kitchenpos.fixture.MenuGroupFixture.menuGroup;
-import static kitchenpos.fixture.MenuProductFixture.menuProduct;
+import static kitchenpos.fixture.domain.MenuGroupFixture.menuGroup;
+import static kitchenpos.fixture.domain.MenuProductFixture.menuProduct;
 
 public class MenuFixture {
 

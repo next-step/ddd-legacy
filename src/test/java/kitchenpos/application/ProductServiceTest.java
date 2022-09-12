@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static kitchenpos.fixture.ProductFixture.product;
+import static kitchenpos.fixture.domain.ProductFixture.product;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 

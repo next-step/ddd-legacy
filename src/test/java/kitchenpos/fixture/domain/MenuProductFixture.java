@@ -1,11 +1,11 @@
-package kitchenpos.fixture;
+package kitchenpos.fixture.domain;
 
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 import java.util.Random;
 
-import static kitchenpos.fixture.ProductFixture.product;
+import static kitchenpos.fixture.domain.ProductFixture.product;
 
 public class MenuProductFixture {
     public static MenuProduct menuProduct() {

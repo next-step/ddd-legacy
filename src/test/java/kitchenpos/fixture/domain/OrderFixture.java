@@ -1,4 +1,4 @@
-package kitchenpos.fixture;
+package kitchenpos.fixture.domain;
 
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderStatus;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static kitchenpos.domain.OrderType.*;
-import static kitchenpos.fixture.OrderLineFixture.orderLineItem;
+import static kitchenpos.fixture.domain.OrderLineFixture.orderLineItem;
 
 public class OrderFixture {
 
