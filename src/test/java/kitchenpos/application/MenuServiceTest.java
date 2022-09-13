@@ -197,7 +197,7 @@ class MenuServiceTest {
         Menu request = createMenu(BigDecimal.valueOf(4_000));
 
         assertThatIllegalArgumentException().isThrownBy(() ->
-            menuService.changePrice(createMenu.getId(), request)
+                menuService.changePrice(createMenu.getId(), request)
         );
     }
 
