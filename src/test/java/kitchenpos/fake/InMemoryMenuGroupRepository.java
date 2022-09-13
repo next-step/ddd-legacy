@@ -10,21 +10,22 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 
 public class InMemoryMenuGroupRepository implements MenuGroupRepository {
-    Map<UUID, MenuGroup> database = new HashMap<>();
+    private Map<UUID, MenuGroup> menuGroups = new HashMap<>();
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
-        database.put(menuGroup.getId(), menuGroup);
-        return database.get(menuGroup.getId());
+        menuGroup.setId(UUID.randomUUID());
+        menuGroups.put(menuGroup.getId(), menuGroup);
+        return menuGroups.get(menuGroup.getId());
     }
 
     @Override
     public List<MenuGroup> findAll() {
-        return new ArrayList<>(database.values());
+        return new ArrayList<>(menuGroups.values());
     }
 
     @Override
     public Optional<MenuGroup> findById(UUID id) {
-        return Optional.of(database.get(id));
+        return Optional.ofNullable(menuGroups.get(id));
     }
 }

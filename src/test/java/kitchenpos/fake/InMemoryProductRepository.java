@@ -11,29 +11,29 @@ import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 
 public class InMemoryProductRepository implements ProductRepository {
-    Map<UUID, Product> database = new HashMap<>();
+    private Map<UUID, Product> products = new HashMap<>();
 
     @Override
     public List<Product> findAllByIdIn(List<UUID> ids) {
         return ids.stream()
-                .map((id) -> database.get(id))
+                .map((id) -> products.get(id))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Product save(Product product) {
         product.setId(UUID.randomUUID());
-        database.put(product.getId(), product);
-        return database.get(product.getId());
+        products.put(product.getId(), product);
+        return products.get(product.getId());
     }
 
     @Override
     public Optional<Product> findById(UUID productId) {
-        return Optional.ofNullable(database.get(productId));
+        return Optional.ofNullable(products.get(productId));
     }
 
     @Override
     public List<Product> findAll() {
-        return new ArrayList<>(database.values());
+        return new ArrayList<>(products.values());
     }
 }

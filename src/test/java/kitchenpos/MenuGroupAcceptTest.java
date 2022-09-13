@@ -1,21 +1,16 @@
-package kitchenpos.application;
+package kitchenpos;
 
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.stream.Stream;
 import kitchenpos.domain.MenuGroup;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,7 +56,9 @@ class MenuGroupAcceptTest {
 
         assertAll(
                 () -> assertThat(등록된_메뉴그룹들.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(등록된_메뉴그룹들.jsonPath().getList(".", MenuGroup.class)).extracting("name").containsExactly(세트1.getName(), 세트2.getName())
+                () -> assertThat(등록된_메뉴그룹들.jsonPath().getList(".", MenuGroup.class))
+                        .extracting("name")
+                        .containsExactly(세트1.getName(), 세트2.getName())
         );
 
     }

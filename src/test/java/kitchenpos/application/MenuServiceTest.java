@@ -8,6 +8,7 @@ import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -74,7 +75,8 @@ class MenuServiceTest {
     void menu_has_menuGroup() {
         Menu request = createMenu();
 
-        request.setMenuGroup(createMenuGroup("세트1"));
+
+        request.setMenuGroup(createMenuGroup("세트2"));
 
         assertThatExceptionOfType(NoSuchElementException.class)
                 .isThrownBy(() -> menuService.create(request)
@@ -228,7 +230,7 @@ class MenuServiceTest {
 
         final Menu saveMenu = menuRepository.save(menu);
 
-        assertThatIllegalArgumentException().isThrownBy(()->
+        assertThatIllegalStateException().isThrownBy(()->
                 menuService.display(saveMenu.getId())
         );
     }
@@ -276,7 +278,7 @@ class MenuServiceTest {
         final List<Menu> menus = menuService.findAll();
 
         assertThat(menus).extracting("id")
-                .containsExactly(createMenu1.getId(), createMenu2.getId());
+                .contains(createMenu1.getId(), createMenu2.getId());
     }
 
 
@@ -286,8 +288,6 @@ class MenuServiceTest {
         request.setMenuProducts(menuProducts);
         return menuService.create(request);
     }
-
-
 
 
     private static Stream<BigDecimal> bigDecimalZeroAndNull() {

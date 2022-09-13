@@ -28,6 +28,7 @@ public class MenuFixture {
     public static Menu createMenu(MenuGroup menuGroup) {
         Menu menu = createMenu();
         menu.setMenuGroup(menuGroup);
+        menu.setMenuGroupId(menuGroup.getId());
         return menu;
     }
 
