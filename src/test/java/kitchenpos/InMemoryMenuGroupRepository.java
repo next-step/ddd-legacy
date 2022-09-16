@@ -10,7 +10,7 @@ public class InMemoryMenuGroupRepository implements MenuGroupRepository {
 
     @Override
     public Optional<MenuGroup> findById(UUID menuGroupId) {
-        return Optional.empty();
+        return Optional.ofNullable(menuGroups.get(menuGroupId));
     }
 
     @Override
