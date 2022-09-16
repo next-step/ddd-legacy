@@ -10,13 +10,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
@@ -62,5 +67,130 @@ public class MenuServiceTest {
         assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(22000L));
         assertThat(actual.isDisplayed()).isEqualTo(false);
         assertThat(actual.getMenuProducts()).hasSize(2);
+    }
+
+    @DisplayName("메뉴는 특정 메뉴 그룹에 속해있다.")
+    @Test
+    public void create_menu_in_menu_group() {
+        Product 황금올리브 = productRepository.save(ProductFactory.of("황금올리브", 20000L));
+        Product 호가든 = productRepository.save(ProductFactory.of("호가든", 5000L));
+
+        List<MenuProduct> menuProducts = List.of(MenuProductFactory.of(황금올리브), MenuProductFactory.of(호가든));
+
+        Menu request = new Menu();
+        request.setMenuGroupId(null);
+        request.setName("치맥세트");
+        request.setPrice(BigDecimal.valueOf(22000L));
+        request.setMenuProducts(menuProducts);
+
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> menuService.create(request));
+    }
+
+    @ParameterizedTest(name = "메뉴 등록 시, 가격은 필수로 입력되어야 하며 0원 이상이어야 한다.")
+    @NullSource
+    @ValueSource(strings = "-1")
+    public void create_input_null_and_negative(BigDecimal price) {
+        MenuGroup menuGroup = MenuGroupFactory.getDefaultMenuGroup();
+        MenuGroup createMenuGroup = menuGroupRepository.save(menuGroup);
+
+        Product 황금올리브 = productRepository.save(ProductFactory.of("황금올리브", 20000L));
+        Product 호가든 = productRepository.save(ProductFactory.of("호가든", 5000L));
+
+        List<MenuProduct> menuProducts = List.of(MenuProductFactory.of(황금올리브), MenuProductFactory.of(호가든));
+
+        Menu request = new Menu();
+        request.setMenuGroupId(createMenuGroup.getId());
+        request.setName("치맥세트");
+        request.setPrice(price);
+        request.setMenuProducts(menuProducts);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.create(request));
+    }
+
+    @ParameterizedTest(name = "메뉴 등록 시, 이름은 필수로 입력되 비속어가 포함되어있으면 안된다.")
+    @NullSource
+    @ValueSource(strings = {"욕설이 포함된 이름", "비속어가 포함된 이름"})
+    public void create_input_null_and_profanity(String name) {
+        MenuGroup menuGroup = MenuGroupFactory.getDefaultMenuGroup();
+        MenuGroup createMenuGroup = menuGroupRepository.save(menuGroup);
+
+        Product 황금올리브 = productRepository.save(ProductFactory.of("황금올리브", 20000L));
+        Product 호가든 = productRepository.save(ProductFactory.of("호가든", 5000L));
+
+        List<MenuProduct> menuProducts = List.of(MenuProductFactory.of(황금올리브), MenuProductFactory.of(호가든));
+
+        Menu request = new Menu();
+        request.setMenuGroupId(createMenuGroup.getId());
+        request.setName(name);
+        request.setPrice(BigDecimal.valueOf(22000L));
+        request.setMenuProducts(menuProducts);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.create(request));
+    }
+
+    @DisplayName("메뉴 등록 시, 메뉴에 속한 상품들의 총 가격이 메뉴 가격 보다 더 비싸야한다.")
+    @Test
+    public void create_products_expensive_then_price() {
+        MenuGroup menuGroup = MenuGroupFactory.getDefaultMenuGroup();
+        MenuGroup createMenuGroup = menuGroupRepository.save(menuGroup);
+
+        Product 황금올리브 = productRepository.save(ProductFactory.of("황금올리브", 20000L));
+        Product 호가든 = productRepository.save(ProductFactory.of("호가든", 5000L));
+
+        List<MenuProduct> menuProducts = List.of(MenuProductFactory.of(황금올리브), MenuProductFactory.of(호가든,2));
+
+        Menu request = new Menu();
+        request.setMenuGroupId(createMenuGroup.getId());
+        request.setName("치맥세트");
+        request.setPrice(BigDecimal.valueOf(31000L));
+        request.setMenuProducts(menuProducts);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.create(request));
+    }
+
+    @ParameterizedTest(name = "메뉴 등록 시, 메뉴에 속한 상품의 갯수가 음수일 수 없다.")
+    @ValueSource(strings = "-1")
+    public void create_negative_product_quantity(int quantity) {
+        MenuGroup menuGroup = MenuGroupFactory.getDefaultMenuGroup();
+        MenuGroup createMenuGroup = menuGroupRepository.save(menuGroup);
+
+        Product 황금올리브 = productRepository.save(ProductFactory.of("황금올리브", 20000L));
+        Product 호가든 = productRepository.save(ProductFactory.of("호가든", 5000L));
+
+        List<MenuProduct> menuProducts = List.of(MenuProductFactory.of(황금올리브), MenuProductFactory.of(호가든,quantity));
+
+        Menu request = new Menu();
+        request.setMenuGroupId(createMenuGroup.getId());
+        request.setName("치맥세트");
+        request.setPrice(BigDecimal.valueOf(28000L));
+        request.setMenuProducts(menuProducts);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.create(request));
+    }
+
+    @DisplayName("메뉴 등록 시, 등록되어있는 상품만 메뉴 등록 가능하다.")
+    @Test
+    public void create_exist_product() {
+        MenuGroup menuGroup = MenuGroupFactory.getDefaultMenuGroup();
+        MenuGroup createMenuGroup = menuGroupRepository.save(menuGroup);
+
+        Product 황금올리브 = ProductFactory.of("황금올리브", 20000L);
+        Product 호가든 = ProductFactory.of("호가든", 5000L);
+
+        List<MenuProduct> menuProducts = List.of(MenuProductFactory.of(황금올리브), MenuProductFactory.of(호가든,2));
+
+        Menu request = new Menu();
+        request.setMenuGroupId(createMenuGroup.getId());
+        request.setName("치맥세트");
+        request.setPrice(BigDecimal.valueOf(28000L));
+        request.setMenuProducts(menuProducts);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.create(request));
     }
 }

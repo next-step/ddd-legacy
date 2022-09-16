@@ -17,8 +17,16 @@ public class ProductFactory {
         return ProductFactory.of(DEFAULT_NAME, price);
     }
 
+    public static Product of(long price) {
+        return ProductFactory.of(DEFAULT_NAME, BigDecimal.valueOf(price));
+    }
+
     public static Product of(String name) {
         return ProductFactory.of(name, BigDecimal.valueOf(DEFAULT_PRICE));
+    }
+
+    public static Product of(String name, long price) {
+        return ProductFactory.of(name, BigDecimal.valueOf(price));
     }
 
     public static Product of(String name, BigDecimal price) {
