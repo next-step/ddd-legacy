@@ -40,6 +40,6 @@ class InMemoryMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAll() {
-        return null;
+        return new ArrayList<>(menus.values());
     }
 }
