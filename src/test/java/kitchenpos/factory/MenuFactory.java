@@ -58,4 +58,8 @@ public class MenuFactory {
         menu.setMenuProducts(menuProducts);
         return menu;
     }
+
+    public static Menu of(MenuGroup createMenuGroup) {
+        return MenuFactory.of(createMenuGroup, DEFAULT_MENU_PRICE);
+    }
 }

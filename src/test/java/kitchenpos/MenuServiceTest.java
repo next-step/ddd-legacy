@@ -121,7 +121,8 @@ public class MenuServiceTest {
     @DisplayName("메뉴 등록 시, 등록되어있는 상품만 메뉴 등록 가능하다.")
     @Test
     public void create_exist_product() {
-        final Menu request = createMenu(createMenuProduct());
+        final MenuGroup createMenuGroup = createMenuGroup();
+        final Menu request = MenuFactory.of(createMenuGroup);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(request));
@@ -172,9 +173,10 @@ public class MenuServiceTest {
     }
 
     @ParameterizedTest(name = "메뉴에 속한 상품들의 총 가격보다 메뉴의 가격이 더 비싸다면 진열이 불가능하다.")
-    @ValueSource(strings = "31000")
+    @ValueSource(strings = "100000")
     public void display_products_expensive_then_price(long price) {
         final Menu request = createMenuAndSave();
+        request.setPrice(BigDecimal.valueOf(price));
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> menuService.display(request.getId()));
