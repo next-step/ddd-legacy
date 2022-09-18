@@ -8,6 +8,10 @@ docker compose -p kitchenpos up -d
 ```
 
 ## 요구 사항
+### 상품
+### 메뉴
+### 주문
+### 주문 테이블
 
 ## 용어 사전
 
