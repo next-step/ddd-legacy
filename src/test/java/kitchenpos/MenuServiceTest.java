@@ -193,4 +193,36 @@ public class MenuServiceTest {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(request));
     }
+
+    /*
+    - [ ] 메뉴의 가격을 수정한다.
+    - [ ] 수정할 가격은 필수로 입력되어야 한다.
+    - [ ] 메뉴에 속한 상품들의 총 가격보다 변경하려는 메뉴의 가격이 더 비싸다면 수정이 불가능하다
+     */
+
+    @DisplayName("메뉴 가격을 수정 할 수 있다.")
+    @Test
+    public void update() {
+        MenuGroup menuGroup = MenuGroupFactory.getDefaultMenuGroup();
+        MenuGroup createMenuGroup = menuGroupRepository.save(menuGroup);
+
+        Product 황금올리브 = ProductFactory.of("황금올리브", 20000L);
+        Product 호가든 = ProductFactory.of("호가든", 5000L);
+
+        List<MenuProduct> menuProducts = List.of(MenuProductFactory.of(황금올리브), MenuProductFactory.of(호가든,2));
+
+        final Menu menu = new Menu();
+        menu.setMenuGroupId(createMenuGroup.getId());
+        menu.setName("치맥세트");
+        menu.setPrice(BigDecimal.valueOf(28000L));
+        menu.setMenuProducts(menuProducts);
+
+        final Menu request = menuRepository.save(menu);
+        request.setPrice(BigDecimal.valueOf(27000L));
+
+        Menu actual = menuService.changePrice(request.getId(), request);
+
+        assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(27000L));
+    }
+
 }

@@ -35,7 +35,7 @@ class InMemoryMenuRepository implements MenuRepository {
 
     @Override
     public Optional<Menu> findById(UUID menuId) {
-        return Optional.empty();
+        return Optional.ofNullable(menus.get(menuId));
     }
 
     @Override
