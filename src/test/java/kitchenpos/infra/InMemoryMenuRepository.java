@@ -1,4 +1,4 @@
-package kitchenpos.domain;
+package kitchenpos.infra;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,10 +7,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuRepository;
 
 public class InMemoryMenuRepository implements MenuRepository {
 
-  private static Map<UUID, Menu> store = new HashMap<>();
+  private static final Map<UUID, Menu> store = new HashMap<>();
 
   @Override
   public Menu save(Menu menu) {

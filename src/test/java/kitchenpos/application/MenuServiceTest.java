@@ -25,7 +25,7 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.domain.ProfanityClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -57,7 +57,7 @@ class MenuServiceTest {
   private ProductRepository productRepository;
 
   @Mock
-  private PurgomalumClient purgomalumClient;
+  private ProfanityClient profanityClient;
 
   @BeforeEach
   void setUp() {
@@ -65,7 +65,7 @@ class MenuServiceTest {
         menuRepository,
         menuGroupRepository,
         productRepository,
-        purgomalumClient
+        profanityClient
     );
   }
 
@@ -105,7 +105,7 @@ class MenuServiceTest {
       given(productRepository.findAllByIdIn(productIds)).willReturn(products);
       given(productRepository.findById(product1.getId())).willReturn(Optional.of(product1));
       given(productRepository.findById(product2.getId())).willReturn(Optional.of(product2));
-      given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
+      given(profanityClient.containsProfanity(anyString())).willReturn(false);
       given(menuRepository.save(any(Menu.class))).willReturn(menu);
 
       // when
@@ -356,7 +356,7 @@ class MenuServiceTest {
       given(productRepository.findAllByIdIn(productIds)).willReturn(products);
       given(productRepository.findById(product1.getId())).willReturn(Optional.of(product1));
       given(productRepository.findById(product2.getId())).willReturn(Optional.of(product2));
-      given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
+      given(profanityClient.containsProfanity(anyString())).willReturn(true);
 
       // when & then
       assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
