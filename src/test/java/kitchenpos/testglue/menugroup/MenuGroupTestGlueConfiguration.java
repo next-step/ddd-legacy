@@ -2,32 +2,36 @@ package kitchenpos.testglue.menugroup;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 import kitchenpos.application.MenuGroupService;
-import kitchenpos.application.ProductService;
 import kitchenpos.application.fixture.MenuGroupMother;
-import kitchenpos.application.fixture.ProductMother;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
 import kitchenpos.util.testglue.TestGlueConfiguration;
 import kitchenpos.util.testglue.TestGlueOperation;
 import kitchenpos.util.testglue.TestGlueSupport;
+import kitchenpos.util.testglue.test.TestGlueResponse;
 
 @TestGlueConfiguration
-public class menuGroupTestGlueConfiguration extends TestGlueSupport {
+public class MenuGroupTestGlueConfiguration extends TestGlueSupport {
 
 	private final MenuGroupService menuGroupService;
 	private final MenuGroupRepository menuGroupRepository;
 
-	public menuGroupTestGlueConfiguration(
+	public MenuGroupTestGlueConfiguration(
 		MenuGroupService menuGroupService,
 		MenuGroupRepository menuGroupRepository
 	) {
 		this.menuGroupService = menuGroupService;
 		this.menuGroupRepository = menuGroupRepository;
+	}
+
+	@TestGlueOperation("{} 메뉴 그룹을 생성하고")
+	public void create_menu_group(String name) {
+		MenuGroup menuGroup = MenuGroupMother.findByName(name);
+		MenuGroup savedMenuGroup = menuGroupService.create(menuGroup);
+
+		put(name, savedMenuGroup);
 	}
 
 	@TestGlueOperation("{} 메뉴그룹 데이터를 만들고")
@@ -39,18 +43,18 @@ public class menuGroupTestGlueConfiguration extends TestGlueSupport {
 
 	@TestGlueOperation("{} 메뉴그룹 생성을 요청하면")
 	public void create_request(String name) {
-		try {
-			MenuGroup menuGroup = getAsType(name, MenuGroup.class);
 
-			MenuGroup savedMenuGroup = menuGroupService.create(menuGroup);
-			put(name, savedMenuGroup);
-		} catch (Exception ignore) {
-		}
+		MenuGroup menuGroup = getAsType(name, MenuGroup.class);
+
+		TestGlueResponse<MenuGroup> response = createResponse(() -> menuGroupService.create(menuGroup));
+		put(name, response);
 	}
 
 	@TestGlueOperation("{} 메뉴그룹이 생성된다")
 	public void create(String name) {
-		MenuGroup menuGroup = getAsType(name, MenuGroup.class);
+		TestGlueResponse<MenuGroup> response = getAsType(name, TestGlueResponse.class);
+
+		MenuGroup menuGroup = response.getData();
 
 		Optional<MenuGroup> savedMenuGroup = menuGroupRepository.findById(menuGroup.getId());
 		assertThat(savedMenuGroup).isNotEmpty();
@@ -58,9 +62,8 @@ public class menuGroupTestGlueConfiguration extends TestGlueSupport {
 
 	@TestGlueOperation("{} 메뉴그룹 생성에 실패한다")
 	public void create_fail(String name) {
-		MenuGroup menuGroup = getAsType(name, MenuGroup.class);
+		TestGlueResponse<MenuGroup> response = getAsType(name, TestGlueResponse.class);
 
-		Optional<MenuGroup> savedMenuGroup = menuGroupRepository.findById(menuGroup.getId());
-		assertThat(savedMenuGroup).isEmpty();
+		assertThat(response.isOk()).isFalse();
 	}
 }

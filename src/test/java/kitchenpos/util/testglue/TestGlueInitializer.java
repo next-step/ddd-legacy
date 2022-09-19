@@ -1,7 +1,7 @@
 package kitchenpos.util.testglue;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Map;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -54,13 +54,18 @@ public class TestGlueInitializer implements ApplicationContextAware {
 			testGlueOperationContext.put(description, parameters -> {
 				try {
 					method.invoke(bean, parameters);
-				} catch (IllegalAccessException | InvocationTargetException e) {
+				} catch (Exception e) {
 					Throwable cause = e.getCause();
 					if (cause instanceof AssertionError) {
 						throw (AssertionError) cause;
 					}
 
-					throw new RuntimeException(e);
+					throw new RuntimeException(String.format(
+						"[메서드 실행 실패]\nmethod name : %s\ndescription : %s\nparameters : %s",
+						method.getName(),
+						description,
+						Arrays.toString(parameters)
+					), e);
 				}
 			});
 		}

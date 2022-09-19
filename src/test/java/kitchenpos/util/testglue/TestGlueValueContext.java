@@ -18,7 +18,7 @@ public class TestGlueValueContext {
 	public <T> T getAsType(String key, Class<T> type) {
 		Object o = storage.get(key);
 		if (o == null) {
-			throw new IllegalArgumentException(String.format("Cannot found key : %s", key));
+			return null;
 		}
 
 		return type.cast(o);

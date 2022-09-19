@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @EnableTestGlue
 @SpringBootTest
-public class ProductServiceTest_changePrice {
+class ProductServiceTest_changePrice {
 
 	@Autowired
 	private TestGlue testGlue;
@@ -18,9 +18,9 @@ public class ProductServiceTest_changePrice {
 	@Test
 	void changePrice() {
 		testGlue.builder()
-			.given("'정상상품' 을 생성하고")
-			.when("'정상상품' 가격을 '2000' 으로 변경하면")
-			.then("'정상상품' 가격은 변경된다")
+			.given("'정상상품' 상품을 생성하고")
+			.when("'정상상품' 상품 가격을 '2000' 으로 변경하면")
+			.then("'정상상품' 상품 가격은 변경된다")
 			.assertStart();
 	}
 
@@ -28,9 +28,9 @@ public class ProductServiceTest_changePrice {
 	@Test
 	void changePrice_emptyPrice_null() {
 		testGlue.builder()
-			.given("'정상상품' 을 생성하고")
-			.when("'정상상품' 가격을 'null' 으로 변경하면")
-			.then("'정상상품' 가격 변경에 실패한다")
+			.given("'정상상품' 상품을 생성하고")
+			.when("'정상상품' 상품 가격을 'null' 으로 변경하면")
+			.then("'정상상품' 상품 가격 변경에 실패한다")
 			.assertStart();
 	}
 
@@ -38,9 +38,9 @@ public class ProductServiceTest_changePrice {
 	@Test
 	void changePrice_emptyPrice_blank() {
 		testGlue.builder()
-			.given("'정상상품' 을 생성하고")
-			.when("'정상상품' 가격을 '' 으로 변경하면")
-			.then("'정상상품' 가격 변경에 실패한다")
+			.given("'정상상품' 상품을 생성하고")
+			.when("'정상상품' 상품 가격을 '' 으로 변경하면")
+			.then("'정상상품' 상품 가격 변경에 실패한다")
 			.assertStart();
 	}
 
@@ -48,18 +48,18 @@ public class ProductServiceTest_changePrice {
 	@Test
 	void changePrice_price_less_then_zero() {
 		testGlue.builder()
-			.given("'정상상품' 을 생성하고")
-			.when("'정상상품' 가격을 '-10000' 으로 변경하면")
-			.then("'정상상품' 가격 변경에 실패한다")
+			.given("'정상상품' 상품을 생성하고")
+			.when("'정상상품' 상품 가격을 '-10000' 으로 변경하면")
+			.then("'정상상품' 상품 가격 변경에 실패한다")
 			.assertStart();
 	}
 
-	@DisplayName("존재하지 않는 상품을 변경할 순 없다..]")
+	@DisplayName("존재하지 않는 상품을 변경할 순 없다.")
 	@Test
 	void changePrice_no_exist() {
 		testGlue.builder()
-			.when("'존재하지 않는 상품' 가격을 '10000' 으로 변경하면")
-			.then("존재하지 않는 상품 가격 변경에 실패한다")
+			.when("존재하지 않는 상품 상품 가격을 '10000' 으로 변경하면")
+			.then("존재하지 않는 상품 상품 가격 변경에 실패한다")
 			.assertStart();
 	}
 

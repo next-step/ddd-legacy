@@ -15,6 +15,9 @@ public class ProductMother {
 		values.put("가격이 빈 상품", 가격이_빈_상품());
 		values.put("가격이 음수인 상품", 가격이_음수인_상품());
 		values.put("존재하지 않는 상품", 존재하지_않는_상품());
+		values.put("상품1", 상품("상품1"));
+		values.put("상품2", 상품("상품2"));
+		values.put("상품3", 상품("상품3"));
 	}
 
 	public static Product findByName(String name) {
@@ -50,6 +53,14 @@ public class ProductMother {
 		product.setId(UUID.randomUUID());
 		product.setPrice(BigDecimal.valueOf(10000));
 		product.setName("존재하지 않는 상품");
+
+		return product;
+	}
+
+	private static Product 상품(String name) {
+		Product product = new Product();
+		product.setPrice(BigDecimal.valueOf(3000));
+		product.setName(name);
 
 		return product;
 	}
