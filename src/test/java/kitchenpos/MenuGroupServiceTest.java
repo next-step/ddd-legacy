@@ -1,23 +1,18 @@
 package kitchenpos;
 
 import kitchenpos.application.MenuGroupService;
-import kitchenpos.application.ProductService;
 import kitchenpos.domain.*;
 import kitchenpos.factory.MenuGroupFactory;
-import kitchenpos.factory.ProductFactory;
-import kitchenpos.infra.ProfanityClient;
+import kitchenpos.fakeobject.InMemoryMenuGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +40,7 @@ public class MenuGroupServiceTest {
         MenuGroup menuGroup = menuGroupService.create(request);
 
         assertThat(menuGroup.getId()).isNotNull();
-        assertThat(menuGroup.getName()).isEqualTo("치킨세트");
+        assertThat(menuGroup.getName()).isEqualTo("치킨");
     }
 
     @NullAndEmptySource
