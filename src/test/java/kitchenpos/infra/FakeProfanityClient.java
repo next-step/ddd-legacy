@@ -10,6 +10,6 @@ public class FakeProfanityClient implements ProfanityClient {
   @Override
   public boolean containsProfanity(String text) {
     return profanities.stream()
-        .anyMatch(text::contains);
+        .anyMatch(it -> text.toLowerCase().contains(it));
   }
 }

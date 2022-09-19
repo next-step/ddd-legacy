@@ -28,7 +28,7 @@ public class InMemoryMenuRepository implements MenuRepository {
   @Override
   public List<Menu> findAllByIdIn(List<UUID> ids) {
     return ids.stream()
-        .map(it -> store.get(it))
+        .map(store::get)
         .collect(Collectors.toList());
   }
 
@@ -36,7 +36,7 @@ public class InMemoryMenuRepository implements MenuRepository {
   public List<Menu> findAllByProductId(UUID productId) {
     return store.values().stream()
         .filter(it -> it.getMenuProducts().stream()
-            .anyMatch(product -> product.getProductId().equals(productId)))
+            .anyMatch(menuProduct -> menuProduct.getProduct().getId().equals(productId)))
         .collect(Collectors.toList());
   }
 

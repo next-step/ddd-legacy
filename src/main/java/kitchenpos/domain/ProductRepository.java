@@ -13,4 +13,8 @@ public interface ProductRepository {
   List<Product> findAllByIdIn(List<UUID> ids);
 
   List<Product> findAll();
+
+  void deleteAll();
+
+  void saveAll(List<Product> products);
 }

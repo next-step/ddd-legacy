@@ -36,4 +36,14 @@ public class InMemoryProductRepository implements ProductRepository {
   public List<Product> findAll() {
     return new ArrayList<>(store.values());
   }
+
+  @Override
+  public void deleteAll() {
+    store.clear();
+  }
+
+  @Override
+  public void saveAll(List<Product> products) {
+    products.forEach(it -> store.put(it.getId(), it));
+  }
 }
