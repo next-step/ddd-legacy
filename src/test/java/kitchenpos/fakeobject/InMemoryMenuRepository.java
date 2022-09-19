@@ -1,4 +1,4 @@
-package kitchenpos;
+package kitchenpos.fakeobject;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
@@ -6,7 +6,7 @@ import kitchenpos.domain.MenuRepository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-class InMemoryMenuRepository implements MenuRepository {
+public class InMemoryMenuRepository implements MenuRepository {
     private final Map<UUID, Menu> menus = new HashMap<>();
 
     @Override
