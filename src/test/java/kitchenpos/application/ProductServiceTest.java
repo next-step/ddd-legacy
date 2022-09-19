@@ -52,10 +52,7 @@ class ProductServiceTest {
   @Test
   void givenProduct_whenCreate_thenReturnProduct() {
     // given
-    Product product = new Product();
-    product.setId(UUID.randomUUID());
-    product.setName("후라이드치킨");
-    product.setPrice(BigDecimal.valueOf(11000));
+    Product product = creationRequestProduct("후라이드치킨", BigDecimal.valueOf(11000));
     given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
     given(productRepository.save(any(Product.class))).willReturn(product);
 
@@ -69,16 +66,12 @@ class ProductServiceTest {
   }
 
 
-
   @DisplayName("상품 가격은 0원 보다 작을 수 없다")
   @MethodSource("provideBigDecimalsForNullAndNegative")
   @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
   void givenNotValidPrice_whenCreate_thenIllegalArgumentException(BigDecimal price) {
     // given
-    Product product = new Product();
-    product.setId(UUID.randomUUID());
-    product.setName("후라이드치킨");
-    product.setPrice(price);
+    Product product = creationRequestProduct("후라이드치킨", price);
 
     // when & then
     assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
@@ -100,10 +93,7 @@ class ProductServiceTest {
   @Test
   void givenProfanityName_whenCreate_thenIllegalArgumentException() {
     // given
-    Product product = new Product();
-    product.setId(UUID.randomUUID());
-    product.setName("Shit");
-    product.setPrice(BigDecimal.valueOf(11000));
+    Product product = creationRequestProduct("Shit", BigDecimal.valueOf(11000));
     given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
 
     // when & then
@@ -114,10 +104,7 @@ class ProductServiceTest {
   @Test
   void givenChangePrice_whenChangePrice_thenReturnChangedProduct() {
     // given
-    Product product = new Product();
-    product.setId(UUID.randomUUID());
-    product.setName("후라이드치킨");
-    product.setPrice(BigDecimal.valueOf(11000));
+    Product product = creationRequestProduct("후라이드치킨", BigDecimal.valueOf(11000));
 
     given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
 
@@ -150,10 +137,7 @@ class ProductServiceTest {
   @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
   void givenNotValidPrice_whenChangePrice_thenIllegalArgumentException(BigDecimal price) {
     // given
-    Product product = new Product();
-    product.setId(UUID.randomUUID());
-    product.setName("후라이드치킨");
-    product.setPrice(BigDecimal.valueOf(11000));
+    Product product = creationRequestProduct("후라이드치킨", BigDecimal.valueOf(11000));
 
     Product changePriceProduct = new Product();
     changePriceProduct.setPrice(price);
@@ -180,17 +164,11 @@ class ProductServiceTest {
   @Test
   void givenProduct_whenFindAll_thenReturnProducts() {
     // given
-    Product product1 = new Product();
-    product1.setId(UUID.randomUUID());
-    product1.setName("후라이드치킨");
-    product1.setPrice(BigDecimal.valueOf(11000));
-
-    Product product2 = new Product();
-    product2.setId(UUID.randomUUID());
-    product2.setName("양념치킨");
-    product2.setPrice(BigDecimal.valueOf(12000));
-
-    given(productRepository.findAll()).willReturn(List.of(product1, product2));
+    given(productRepository.findAll()).willReturn(
+        List.of(
+            creationRequestProduct("후라이드치킨", BigDecimal.valueOf(11000)),
+            creationRequestProduct("양념치킨", BigDecimal.valueOf(12000)))
+    );
 
     // when
     List<Product> products = productService.findAll();
@@ -207,5 +185,13 @@ class ProductServiceTest {
         null,
         Arguments.of(BigDecimal.valueOf(-1))
     );
+  }
+
+  private static Product creationRequestProduct(String name, BigDecimal price) {
+    Product product = new Product();
+    product.setId(UUID.randomUUID());
+    product.setName(name);
+    product.setPrice(price);
+    return product;
   }
 }
