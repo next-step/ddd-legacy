@@ -4,16 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
+import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.infra.InMemoryOrderRepository;
+import kitchenpos.infra.InMemoryOrderTableRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,19 +22,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+@DisplayName("주문테이블 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
 
+  private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
+  private final OrderRepository orderRepository = new InMemoryOrderRepository();
+
   private OrderTableService orderTableService;
-
-  @Mock
-  private OrderTableRepository orderTableRepository;
-
-  @Mock
-  private OrderRepository orderRepository;
 
   @BeforeEach
   void setUp() {
@@ -50,7 +48,6 @@ class OrderTableServiceTest {
       // given
       OrderTable requestOrderTable = new OrderTable();
       requestOrderTable.setName("1번");
-      given(orderTableRepository.save(any(OrderTable.class))).willReturn(createInitOrderTable());
 
       // when
       OrderTable createdOrderTable = orderTableService.create(requestOrderTable);
@@ -58,8 +55,8 @@ class OrderTableServiceTest {
       // then
       assertThat(createdOrderTable.getId()).isNotNull();
       assertThat(createdOrderTable.getName()).isEqualTo("1번");
-      assertThat(createdOrderTable.getNumberOfGuests()).isEqualTo(0);
-      assertThat(createdOrderTable.isOccupied()).isEqualTo(false);
+      assertThat(createdOrderTable.getNumberOfGuests()).isZero();
+      assertThat(createdOrderTable.isOccupied()).isFalse();
     }
 
     @DisplayName("주문테이블 이름은 비어있을 수 없다.")
@@ -85,7 +82,7 @@ class OrderTableServiceTest {
     void givenOrderTableId_whenSit_thenReturnOrderTable() {
       // given
       OrderTable orderTable = createInitOrderTable();
-      given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+      orderTableRepository.save(orderTable);
 
       // when
       OrderTable createdOrderTable = orderTableService.sit(orderTable.getId());
@@ -93,8 +90,8 @@ class OrderTableServiceTest {
       // then
       assertThat(createdOrderTable.getId()).isNotNull();
       assertThat(createdOrderTable.getName()).isEqualTo("1번");
-      assertThat(createdOrderTable.getNumberOfGuests()).isEqualTo(0);
-      assertThat(createdOrderTable.isOccupied()).isEqualTo(true);
+      assertThat(createdOrderTable.getNumberOfGuests()).isZero();
+      assertThat(createdOrderTable.isOccupied()).isTrue();
     }
 
     @DisplayName("주문테이블이 존재하지 않을 경우 처리할 수 없다.")
@@ -118,8 +115,7 @@ class OrderTableServiceTest {
     void givenOrderTableId_whenClear_thenReturnOrderTable() {
       // given
       OrderTable orderTable = creationRequestOrderTable("5번", 4, true);
-      given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
-      given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
+      orderTableRepository.save(orderTable);
 
       // when
       OrderTable clearedOrderTable = orderTableService.clear(orderTable.getId());
@@ -135,9 +131,14 @@ class OrderTableServiceTest {
     @Test
     void givenOrderTableId_whenClear_thenIllegalStateException() {
       // given
-      OrderTable orderTable = creationRequestOrderTable("5번", 4, true);
-      given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
-      given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
+      OrderTable requestOrderTable = creationRequestOrderTable("5번", 4, true);
+      OrderTable orderTable = orderTableRepository.save(requestOrderTable);
+
+      Order order = new Order();
+      order.setId(UUID.randomUUID());
+      order.setOrderTable(orderTable);
+      order.setStatus(OrderStatus.SERVED);
+      orderRepository.save(order);
 
       // when & then
       assertThatIllegalStateException()
@@ -154,7 +155,7 @@ class OrderTableServiceTest {
     void givenChangeOrderTable_whenChangeNumberOfGuests_thenReturnOrderTable() {
       // given
       OrderTable orderTable = creationRequestOrderTable("3번", 3, true);
-      given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+      orderTableRepository.save(orderTable);
 
       OrderTable requestOrderTable = new OrderTable();
       requestOrderTable.setNumberOfGuests(4);
@@ -190,7 +191,7 @@ class OrderTableServiceTest {
     void givenNotOccupied_whenChangeNumberOfGuests_thenIllegalArgumentException() {
       // given
       OrderTable orderTable = creationRequestOrderTable("3번", 3, false);
-      given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+      orderTableRepository.save(orderTable);
 
       OrderTable requestOrderTable = new OrderTable();
       requestOrderTable.setNumberOfGuests(4);
@@ -210,10 +211,10 @@ class OrderTableServiceTest {
     @Test
     void givenOrderTables_whenFindAll_thenReturnOrderTables() {
       // given
-      OrderTable orderTable1 = creationRequestOrderTable("1번", 3, true);
-      OrderTable orderTable2 = creationRequestOrderTable("2번", 4, true);
-
-      given(orderTableRepository.findAll()).willReturn(List.of(orderTable1, orderTable2));
+      orderTableRepository.saveAll(List.of(
+          creationRequestOrderTable("1번", 3, true),
+          creationRequestOrderTable("2번", 4, true)
+      ));
 
       // when
       List<OrderTable> orders = orderTableService.findAll();
