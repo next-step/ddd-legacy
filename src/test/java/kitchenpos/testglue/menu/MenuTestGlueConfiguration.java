@@ -1,6 +1,8 @@
 package kitchenpos.testglue.menu;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -87,8 +89,17 @@ public class MenuTestGlueConfiguration extends TestGlueSupport {
 		assertThat(response.isOk()).isFalse();
 	}
 
+	@TestGlueOperation("{} 메뉴 가격을 {} 로 변경하고")
+	public void changePrice_exist_menu_given(String name, String price) {
+		changePrice_exist_menu_when(name, price);
+		TestGlueResponse<Menu> changePriceResponse = getAsType("changePriceResponse", TestGlueResponse.class);
+		Menu menu = changePriceResponse.getData();
+
+		put(name, menu);
+	}
+
 	@TestGlueOperation("{} 메뉴 가격을 {} 로 변경하면")
-	public void changePrice_exist_menu(String name, String price) {
+	public void changePrice_exist_menu_when(String name, String price) {
 		put("changePrice", toLong(price));
 
 		Menu menu = getAsType(name, Menu.class);
@@ -104,6 +115,20 @@ public class MenuTestGlueConfiguration extends TestGlueSupport {
 		menu.setPrice(toBigDecimal(price));
 		TestGlueResponse<Menu> response = createResponse(() -> menuService.changePrice(UUID.randomUUID(), menu));
 		put("changePriceResponse", response);
+	}
+
+	@TestGlueOperation("{} 메뉴를 전시상태로 변경하면")
+	public void changeDisplay_true(String name) {
+		Menu menu = getAsType(name, Menu.class);
+		TestGlueResponse<Menu> response = createResponse(() -> menuService.display(menu.getId()));
+		put("response", response);
+	}
+
+	@TestGlueOperation("{} 메뉴를 미전시상태로 변경하면")
+	public void changeDisplay_false(String name) {
+		Menu menu = getAsType(name, Menu.class);
+		TestGlueResponse<Menu> response = createResponse(() -> menuService.hide(menu.getId()));
+		put("response", response);
 	}
 
 	@TestGlueOperation("{} 메뉴 가격 변경에 실패한다")
@@ -122,6 +147,30 @@ public class MenuTestGlueConfiguration extends TestGlueSupport {
 	public void notExistMenu_changePrice() {
 		TestGlueResponse<Menu> changePriceResponse = getAsType("changePriceResponse", TestGlueResponse.class);
 		assertThat(changePriceResponse.isOk()).isFalse();
+	}
+
+	@TestGlueOperation("{} 메뉴가 전시상태로 변경된다")
+	public void changeDisplay_true_response(String name) {
+		TestGlueResponse<Menu> changePriceResponse = getAsType("response", TestGlueResponse.class);
+		Menu menu = menuRepository.findById(getAsType(name, Menu.class).getId()).orElseThrow();
+
+		assertAll(
+			() -> assertThat(changePriceResponse.isOk()).isTrue(),
+			() -> assertThat(menu.isDisplayed()).isTrue()
+		);
+
+	}
+
+	@TestGlueOperation("{} 메뉴가 미전시상태로 변경된다")
+	public void changeDisplay_false_response(String name) {
+		TestGlueResponse<Menu> changePriceResponse = getAsType("response", TestGlueResponse.class);
+		Menu menu = menuRepository.findById(getAsType(name, Menu.class).getId()).orElseThrow();
+
+		assertAll(
+			() -> assertThat(changePriceResponse.isOk()).isTrue(),
+			() -> assertThat(menu.isDisplayed()).isFalse()
+		);
+
 	}
 
 	private Long toLong(String price) {

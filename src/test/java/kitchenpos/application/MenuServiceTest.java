@@ -146,14 +146,52 @@ class MenuServiceTest {
 	@DisplayName("변경하고자 하는 가격이 현재 가격과 같아선 안된다.")
 	@Test
 	void changePrice() {
-
+		testGlue.builder()
+			.given("'추천메뉴그룹' 메뉴 그룹을 생성하고")
+			.given("'상품1' 상품을 생성하고")
+			.given("'추천메뉴그룹'에 속하고 '상품1' '3'개를 이용해 '추천메뉴' 메뉴 데이터를 만들고")
+			.given("'추천메뉴' 메뉴를 생성하고")
+			.when("'추천메뉴' 메뉴 가격을 '-10000' 로 변경하면")
+			.then("'추천메뉴' 메뉴 가격 변경에 실패한다")
+			.assertStart();
 	}
 
+	@DisplayName("상품을 전시상태로 변경한다.")
 	@Test
 	void display() {
+		testGlue.builder()
+			.given("'추천메뉴그룹' 메뉴 그룹을 생성하고")
+			.given("'상품1' 상품을 생성하고")
+			.given("'추천메뉴그룹'에 속하고 '상품1' '3'개를 이용해 '추천메뉴' 메뉴 데이터를 만들고")
+			.given("'추천메뉴' 메뉴를 생성하고")
+			.when("'추천메뉴' 메뉴를 전시상태로 변경하면")
+			.then("'추천메뉴' 메뉴가 전시상태로 변경된다")
+			.assertStart();
 	}
 
+	@DisplayName("상품을 전시상태로 변경에 실패한다.")
+	@Test
+	void display_fail() {
+		testGlue.builder()
+			.given("'추천메뉴그룹' 메뉴 그룹을 생성하고")
+			.given("'상품1' 상품을 생성하고")
+			.given("'추천메뉴그룹'에 속하고 '상품1' '3'개를 이용해 '추천메뉴' 메뉴 데이터를 만들고")
+			.given("'추천메뉴' 메뉴를 생성하고")
+			.when("'추천메뉴' 메뉴를 전시상태로 변경하면")
+			.then("'추천메뉴' 메뉴가 전시상태로 변경된다")
+			.assertStart();
+	}
+
+	@DisplayName("상품을 미전시상태로 변경한다.")
 	@Test
 	void hide() {
+		testGlue.builder()
+			.given("'추천메뉴그룹' 메뉴 그룹을 생성하고")
+			.given("'상품1' 상품을 생성하고")
+			.given("'추천메뉴그룹'에 속하고 '상품1' '3'개를 이용해 '추천메뉴' 메뉴 데이터를 만들고")
+			.given("'추천메뉴' 메뉴를 생성하고")
+			.when("'추천메뉴' 메뉴를 미전시상태로 변경하면")
+			.then("'추천메뉴' 메뉴가 미전시상태로 변경된다")
+			.assertStart();
 	}
 }

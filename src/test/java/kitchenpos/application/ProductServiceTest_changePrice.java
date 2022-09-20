@@ -63,15 +63,16 @@ class ProductServiceTest_changePrice {
 			.assertStart();
 	}
 
-	@DisplayName("상품의 가격을 변경한 뒤, 상품을 들고있는 메뉴들의 가격 제약조건은 성립되어야 한다.")
-	@Test
-	void changePrice_menu_constraint() {
-		// todo 메뉴 테스트 작성 후
-	}
-
 	@DisplayName("상품의 가격을 변경한 뒤, 상품을 들고있는 메뉴들의 가격 제약조건은 성립되어야 한다. 만족하지 않는다면 메뉴를 미전시 상태로 바꾼다.")
 	@Test
-	void changePrice_menu_constraint_no_display() {
-		// todo 메뉴 테스트 작성 후
+	void changePrice_menu_constraint() {
+		testGlue.builder()
+			.given("'추천메뉴그룹' 메뉴 그룹을 생성하고")
+			.given("'상품1' 상품을 생성하고")
+			.given("'추천메뉴그룹'에 속하고 '상품1' '3'개를 이용해 '추천메뉴' 메뉴 데이터를 만들고")
+			.given("'추천메뉴' 메뉴를 생성하고")
+			.when("'상품1' 상품 가격을 '1000' 으로 변경하면")
+			.then("'추천메뉴' 메뉴가 미전시상태로 변경된다")
+			.assertStart();
 	}
 }

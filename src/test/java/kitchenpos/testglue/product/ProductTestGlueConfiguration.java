@@ -73,7 +73,7 @@ public class ProductTestGlueConfiguration extends TestGlueSupport {
 		put("changedPrice", bigDecimalPrice);
 
 		TestGlueResponse<Product> response = createResponse(() -> productService.changePrice(product.getId(), product));
-		put("changePriceResponse", response);
+		put("response", response);
 	}
 
 	@TestGlueOperation("존재하지 않는 상품 상품 가격을 {} 으로 변경하면")
@@ -82,12 +82,12 @@ public class ProductTestGlueConfiguration extends TestGlueSupport {
 		product.setPrice(toBigDecimal(price));
 		TestGlueResponse<Product> response = createResponse(() -> productService.changePrice(UUID.randomUUID(), product));
 
-		put("changePriceResponse", response);
+		put("response", response);
 	}
 
 	@TestGlueOperation("{} 상품 가격은 변경된다")
 	public void changePrice_result(String name) {
-		TestGlueResponse<Product> changePriceResponse = getAsType("changePriceResponse", TestGlueResponse.class);
+		TestGlueResponse<Product> changePriceResponse = getAsType("response", TestGlueResponse.class);
 		assertThat(changePriceResponse.isOk()).isTrue();
 
 		Product product = getAsType(name, Product.class);
@@ -99,7 +99,7 @@ public class ProductTestGlueConfiguration extends TestGlueSupport {
 
 	@TestGlueOperation("{} 상품 가격 변경에 실패한다")
 	public void changePrice_result_fail(String name) {
-		TestGlueResponse<Product> changePriceResponse = getAsType("changePriceResponse", TestGlueResponse.class);
+		TestGlueResponse<Product> changePriceResponse = getAsType("response", TestGlueResponse.class);
 		assertThat(changePriceResponse.isOk()).isFalse();
 
 		Product product = getAsType(name, Product.class);
@@ -110,7 +110,7 @@ public class ProductTestGlueConfiguration extends TestGlueSupport {
 
 	@TestGlueOperation("존재하지 않는 상품 상품 가격 변경에 실패한다")
 	public void notExistProduct_changePrice_result() {
-		TestGlueResponse<Product> changePriceResponse = getAsType("changePriceResponse", TestGlueResponse.class);
+		TestGlueResponse<Product> changePriceResponse = getAsType("response", TestGlueResponse.class);
 		assertThat(changePriceResponse.isOk()).isFalse();
 	}
 
