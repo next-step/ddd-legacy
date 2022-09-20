@@ -211,10 +211,10 @@ class OrderTableServiceTest {
     @Test
     void givenOrderTables_whenFindAll_thenReturnOrderTables() {
       // given
-      orderTableRepository.saveAll(List.of(
+      List.of(
           creationRequestOrderTable("1번", 3, true),
           creationRequestOrderTable("2번", 4, true)
-      ));
+      ).forEach(orderTableRepository::save);
 
       // when
       List<OrderTable> orders = orderTableService.findAll();

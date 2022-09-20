@@ -30,11 +30,6 @@ public class InMemoryOrderTableRepository implements OrderTableRepository {
   }
 
   @Override
-  public void saveAll(List<OrderTable> orderTables) {
-    orderTables.forEach(this::save);
-  }
-
-  @Override
   public void deleteAll() {
     store.clear();
   }

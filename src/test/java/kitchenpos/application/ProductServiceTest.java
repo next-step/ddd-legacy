@@ -167,12 +167,10 @@ class ProductServiceTest {
     @DisplayName("상품조회 - 등록된 상품 목록을 조회할 수 있다.")
     @Test
     void givenProduct_whenFindAll_thenReturnProducts() {
-      productRepository.saveAll(
-          List.of(
-              creationRequestProduct("후라이드치킨", BigDecimal.valueOf(11000)),
-              creationRequestProduct("양념치킨", BigDecimal.valueOf(12000))
-          )
-      );
+      List.of(
+          creationRequestProduct("후라이드치킨", BigDecimal.valueOf(11000)),
+          creationRequestProduct("양념치킨", BigDecimal.valueOf(12000))
+      ).forEach(productRepository::save);
 
       // when
       List<Product> products = productService.findAll();

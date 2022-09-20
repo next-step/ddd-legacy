@@ -102,7 +102,8 @@ class ProductRestControllerIntegrationTest {
     product2.setName("양념치킨");
     product2.setPrice(BigDecimal.valueOf(12000));
 
-    productRepository.saveAll(List.of(product1, product2));
+    List.of(product1, product2)
+            .forEach(productRepository::save);
 
     mvc.perform(get("/api/products").accept(MediaType.APPLICATION_JSON))
         .andDo(print())

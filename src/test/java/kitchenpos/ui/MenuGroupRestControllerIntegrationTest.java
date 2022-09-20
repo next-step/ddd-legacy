@@ -71,7 +71,8 @@ class MenuGroupRestControllerIntegrationTest {
     menuGroup2.setId(UUID.randomUUID());
     menuGroup2.setName("점심특선");
 
-    menuGroupRepository.saveAll(List.of(menuGroup1, menuGroup2));
+    List.of(menuGroup1, menuGroup2)
+        .forEach(menuGroupRepository::save);
 
     mvc.perform(get("/api/menu-groups").accept(MediaType.APPLICATION_JSON))
         .andDo(print())

@@ -68,10 +68,8 @@ class MenuGroupServiceTest {
     @Test
     void givenMenuGroups_whenFindAll_thenReturnMenuGroups() {
       // given
-      menuGroupRepository.saveAll(List.of(
-          creationRequestMenuGroup("추천메뉴"),
-          creationRequestMenuGroup("점심특선메뉴")
-      ));
+      List.of(creationRequestMenuGroup("추천메뉴"), creationRequestMenuGroup("점심특선메뉴"))
+          .forEach(menuGroupRepository::save);
 
       // when
       List<MenuGroup> menuGroups = menuGroupService.findAll();

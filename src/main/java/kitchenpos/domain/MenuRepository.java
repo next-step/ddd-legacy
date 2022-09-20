@@ -15,4 +15,6 @@ public interface MenuRepository {
   List<Menu> findAllByProductId(UUID productId);
 
   List<Menu> findAll();
+
+  void deleteAll();
 }

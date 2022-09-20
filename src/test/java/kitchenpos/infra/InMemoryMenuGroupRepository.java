@@ -30,11 +30,6 @@ public class InMemoryMenuGroupRepository implements MenuGroupRepository {
   }
 
   @Override
-  public void saveAll(List<MenuGroup> menuGroups) {
-    menuGroups.forEach(this::save);
-  }
-
-  @Override
   public void deleteAll() {
     store.clear();
   }

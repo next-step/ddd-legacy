@@ -46,4 +46,9 @@ public class InMemoryMenuRepository implements MenuRepository {
   public List<Menu> findAll() {
     return new ArrayList<>(store.values());
   }
+
+  @Override
+  public void deleteAll() {
+    store.clear();
+  }
 }

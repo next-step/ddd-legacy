@@ -42,8 +42,4 @@ public class InMemoryProductRepository implements ProductRepository {
     store.clear();
   }
 
-  @Override
-  public void saveAll(List<Product> products) {
-    products.forEach(it -> store.put(it.getId(), it));
-  }
 }
