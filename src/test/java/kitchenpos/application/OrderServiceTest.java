@@ -4,17 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
@@ -25,7 +18,11 @@ import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
-import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.domain.RidersClient;
+import kitchenpos.infra.FakeRidersClient;
+import kitchenpos.infra.InMemoryMenuRepository;
+import kitchenpos.infra.InMemoryOrderRepository;
+import kitchenpos.infra.InMemoryOrderTableRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,26 +30,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @DisplayName("주문서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
+  private final OrderRepository orderRepository = new InMemoryOrderRepository();
+  private final MenuRepository menuRepository = new InMemoryMenuRepository();
+  private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
+  private final RidersClient ridersClient = new FakeRidersClient();
+
   private OrderService orderService;
-
-  @Mock
-  private OrderRepository orderRepository;
-
-  @Mock
-  private MenuRepository menuRepository;
-
-  @Mock
-  private OrderTableRepository orderTableRepository;
-
-  @Mock
-  private KitchenridersClient kitchenridersClient;
 
   @BeforeEach
   void setUp() {
@@ -60,7 +49,7 @@ class OrderServiceTest {
         orderRepository,
         menuRepository,
         orderTableRepository,
-        kitchenridersClient
+        ridersClient
     );
   }
 
@@ -75,30 +64,17 @@ class OrderServiceTest {
       @DisplayName("유효한 매장 주문정보를 입력하면 생성된 주문을 반환한다")
       @Test
       void givenValidEatInOrder_whenCreate_thenReturnOrder() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(true);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.EAT_IN);
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
-        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
-        given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
-        given(orderRepository.save(any(Order.class))).willReturn(order);
+        Order order = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
         // when
         Order createdOrder = orderService.create(order);
@@ -106,23 +82,22 @@ class OrderServiceTest {
         // then
         assertThat(createdOrder.getId()).isNotNull();
         assertThat(createdOrder.getType()).isEqualTo(OrderType.EAT_IN);
-        assertThat(createdOrder.getOrderTableId()).isEqualTo(orderTable.getId());
+        assertThat(createdOrder.getOrderTable().getId()).isEqualTo(orderTable.getId());
         assertThat(createdOrder.getOrderLineItems()).hasSize(1);
-        assertThat(createdOrder.getOrderLineItems()).extracting(OrderLineItem::getMenuId)
-            .contains(menu.getId());
+        assertThat(createdOrder.getOrderLineItems()).extracting(OrderLineItem::getMenu)
+            .contains(menu);
       }
 
       @DisplayName("주문타입이 올바르지 않으면 주문을 생성할 수 없다.")
       @Test
       void givenNotValidType_whenCreate_thenIllegalArgumentException() {
         // given
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(null);
+        Order creationRequestOrder = new Order();
+        creationRequestOrder.setType(null);
 
         // when & then
         assertThatIllegalArgumentException()
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(creationRequestOrder));
       }
 
       @DisplayName("주문상품들은 비어있을 수 없다.")
@@ -132,7 +107,6 @@ class OrderServiceTest {
           List<OrderLineItem> orderLineItems) {
         // given
         Order order = new Order();
-        order.setId(UUID.randomUUID());
         order.setType(OrderType.EAT_IN);
         order.setOrderLineItems(orderLineItems);
 
@@ -144,27 +118,13 @@ class OrderServiceTest {
       @DisplayName("주문상품 메뉴가 존재하지 않으면 주문을 생성할 수 없다.")
       @Test
       void givenNoFoundMenu_whenCreate_thenIllegalArgumentException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(true);
-
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.EAT_IN);
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(Collections.emptyList());
+        Order order = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(OrderFixtures.createRequestOrderLineItem(UUID.randomUUID(), BigDecimal.valueOf(23000), 3)));
 
         // when & then
         assertThatIllegalArgumentException()
@@ -174,29 +134,14 @@ class OrderServiceTest {
       @DisplayName("주문테이블이 존재하지 않으면 주문을 생성할 수 없다.")
       @Test
       void givenEmptyTable_whenCreate_thenIllegalArgumentException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(true);
-
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.EAT_IN);
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
-        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
-        given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.empty());
+        Order order = OrderFixtures.createRequestEatInOrder(
+            UUID.randomUUID(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
         // when & then
         assertThatThrownBy(() -> orderService.create(order))
@@ -206,29 +151,17 @@ class OrderServiceTest {
       @DisplayName("주문테이블이 사용 중이어야 한다.")
       @Test
       void givenNotOccupied_whenCreate_thenIllegalArgumentException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(false);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 0, false));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.EAT_IN);
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
-        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
-        given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+        Order order = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
         // when & then
         assertThatIllegalStateException()
@@ -243,28 +176,19 @@ class OrderServiceTest {
       @DisplayName("주문 ID를 입력받아 주문을 접수할 수 있다.")
       @Test
       void givenValidOrder_whenAccept_thenOrder() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(false);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        Order requestEatInOrder = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.EAT_IN);
-        order.setStatus(OrderStatus.WAITING);
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+        Order order = orderService.create(requestEatInOrder);
 
         // when
         Order acceptedOrder = orderService.accept(order.getId());
@@ -277,28 +201,20 @@ class OrderServiceTest {
       @DisplayName("주문이 대기 중이 아닌 경우에는 접수할 수 없다.")
       @Test
       void givenNotWaiting_whenAccept_thenIllegalStateException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(false);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        Order requestEatInOrder = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.EAT_IN);
-        order.setStatus(OrderStatus.ACCEPTED);
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+        Order order = orderService.create(requestEatInOrder);
+        orderService.accept(order.getId());
 
         // when & then
         assertThatIllegalStateException()
@@ -314,25 +230,20 @@ class OrderServiceTest {
       @DisplayName("주문 ID를 입력받아 서빙할 수 있다")
       @Test
       void givenServeOrder_whenServe_thenOrder() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.DELIVERY);
-        order.setStatus(OrderStatus.ACCEPTED);
-        order.setDeliveryAddress("서울시 강남구");
-        order.setOrderLineItems(List.of(orderLineItem));
+        Order requestEatInOrder = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
-        given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+        Order order = orderService.create(requestEatInOrder);
+        orderService.accept(order.getId());
 
         // when
         Order servedOrder = orderService.serve(order.getId());
@@ -345,25 +256,21 @@ class OrderServiceTest {
       @DisplayName("주문이 접수상태일 경우만 서빙완료 할 수 있다")
       @Test
       void givenNotAcceptOrder_whenServe_thenIllegalStateException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.DELIVERY);
-        order.setStatus(OrderStatus.WAITING);
-        order.setDeliveryAddress("서울시 강남구");
-        order.setOrderLineItems(List.of(orderLineItem));
+        Order requestEatInOrder = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
-        given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+        Order order = orderService.create(requestEatInOrder);
+        orderService.accept(order.getId());
+        orderService.serve(order.getId());
 
         // when & then
         assertThatIllegalStateException()
@@ -375,60 +282,24 @@ class OrderServiceTest {
     @DisplayName("주문을 완료할 때")
     class WhenOrderComplete {
 
-      @DisplayName("매장식사 주문인 경우 제공완료 상태가 아니면 주문을 완료할 수 없다.")
-      @Test
-      void givenEatInOrder_whenComplete_thenIllegalStateException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
-
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(false);
-
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setOrderTableId(orderTable.getId());
-        order.setType(OrderType.EAT_IN);
-        order.setStatus(OrderStatus.ACCEPTED);
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
-
-        // when & then
-        assertThatIllegalStateException()
-            .isThrownBy(() -> orderService.complete(order.getId()));
-      }
-
       @DisplayName("주문 ID를 입력받아 주문완료 상태로 변경할 수 있다.")
       @Test
       void givenValidOrder_whenComplete_thenOrder() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.DELIVERY);
-        order.setStatus(OrderStatus.DELIVERED);
-        order.setDeliveryAddress("서울시 강남구");
-        order.setOrderLineItems(List.of(orderLineItem));
+        Order requestEatInOrder = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
-        given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+        Order order = orderService.create(requestEatInOrder);
+        orderService.accept(order.getId());
+        orderService.serve(order.getId());
 
         // when
         Order servedOrder = orderService.complete(order.getId());
@@ -436,6 +307,57 @@ class OrderServiceTest {
         // then
         assertThat(servedOrder.getId()).isEqualTo(order.getId());
         assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+      }
+
+      @DisplayName("매장식사 주문인 경우 제공완료 상태가 아니면 주문을 완료할 수 없다.")
+      @Test
+      void givenEatInOrder_whenComplete_thenIllegalStateException() {
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
+
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
+
+        Order requestEatInOrder = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
+
+        Order order = orderService.create(requestEatInOrder);
+
+        // when & then
+        assertThatIllegalStateException()
+            .isThrownBy(() -> orderService.complete(order.getId()));
+      }
+
+      @DisplayName("매장식사 주문인 경우 주문테이블에 포함된 주문 건이 모두 완료된 상태라면 주문테이블을 정리한다.")
+      @Test
+      void givenValidEatInOrder_whenComplete_thenIllegalStateException() {
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
+
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
+
+        Order requestEatInOrder = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
+
+        Order order = orderService.create(requestEatInOrder);
+        orderService.accept(order.getId());
+        orderService.serve(order.getId());
+
+        // when
+        Order completedOrder = orderService.complete(order.getId());
+
+        // then
+        assertThat(completedOrder.getId()).isEqualTo(order.getId());
+        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(completedOrder.getOrderTable().getNumberOfGuests()).isZero();
+        assertThat(completedOrder.getOrderTable().isOccupied()).isFalse();
       }
     }
 
@@ -446,48 +368,32 @@ class OrderServiceTest {
       @DisplayName("생성된 주문 목록을 조회할 수 있다.")
       @Test
       void givenOrders_whenFindAll_thenReturnOrder() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(true);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        Order requestEatInOrder = OrderFixtures.createRequestEatInOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.EAT_IN);
-        order.setStatus(OrderStatus.WAITING);
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        Order order2 = new Order();
-        order2.setId(UUID.randomUUID());
-        order2.setType(OrderType.DELIVERY);
-        order2.setStatus(OrderStatus.DELIVERED);
-        order2.setDeliveryAddress("서울시 강남구");
-        order2.setOrderLineItems(List.of(orderLineItem));
-
-        given(orderRepository.findAll()).willReturn(List.of(order, order2));
+        orderService.create(requestEatInOrder);
+        orderService.create(requestEatInOrder);
 
         // when
         List<Order> orders = orderService.findAll();
 
         // then
         assertThat(orders).hasSize(2);
-        assertThat(orders).extracting(Order::getType).contains(OrderType.DELIVERY, OrderType.EAT_IN);
-        assertThat(orders).extracting(Order::getStatus).contains(OrderStatus.DELIVERED, OrderStatus.WAITING);
+        assertThat(orders).extracting(Order::getType).contains(OrderType.EAT_IN);
+        assertThat(orders).extracting(Order::getStatus).contains(OrderStatus.WAITING);
       }
     }
 
   }
-
 
   @Nested
   @DisplayName("포장 주문")
@@ -500,86 +406,54 @@ class OrderServiceTest {
       @DisplayName("유효한 포장 주문정보를 입력하면 생성된 주문을 반환한다")
       @Test
       void givenValidTakeOutOrder_whenCreate_thenReturnOrder() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.TAKEOUT);
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
-        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
-        given(orderRepository.save(any(Order.class))).willReturn(order);
+        Order requestTakeoutOrder = OrderFixtures.createRequestTakeout(
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
         // when
-        Order createdOrder = orderService.create(order);
+        Order createdOrder = orderService.create(requestTakeoutOrder);
 
         // then
         assertThat(createdOrder.getId()).isNotNull();
         assertThat(createdOrder.getType()).isEqualTo(OrderType.TAKEOUT);
         assertThat(createdOrder.getOrderLineItems()).hasSize(1);
-        assertThat(createdOrder.getOrderLineItems()).extracting(OrderLineItem::getMenuId)
-            .contains(menu.getId());
+        assertThat(createdOrder.getOrderLineItems()).extracting(OrderLineItem::getMenu)
+            .contains(menu);
       }
 
       @DisplayName("주문상품 메뉴가 진열 중이 아니면 주문을 생성할 수 없다.")
       @Test
       void givenHiddenMenu_whenCreate_thenIllegalStateException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(false);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), false));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.TAKEOUT);
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
-        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+        Order requestTakeoutOrder = OrderFixtures.createRequestTakeout(
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
         // when & then
         assertThatIllegalStateException()
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(requestTakeoutOrder));
       }
 
       @DisplayName("주문상품 가격과 메뉴가격이 일치하지 않으면 주문을 생성할 수 없다.")
       @Test
       void givenNotValidMenuPrice_whenCreate_thenIllegalArgumentException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(24000));
-        orderLineItem.setQuantity(3);
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.TAKEOUT);
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
-        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+        Order requestTakeoutOrder = OrderFixtures.createRequestTakeout(
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(24000), 3)));
 
         // when & then
         assertThatIllegalArgumentException()
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(requestTakeoutOrder));
       }
     }
 
@@ -590,69 +464,19 @@ class OrderServiceTest {
       @DisplayName("포장 주문인 경우 제공완료 상태가 아니면 주문을 완료할 수 없다.")
       @Test
       void givenTakeOutOrder_whenComplete_thenIllegalStateException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        Order requestTakeoutOrder = OrderFixtures.createRequestTakeout(
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.TAKEOUT);
-        order.setStatus(OrderStatus.ACCEPTED);
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+        Order order = orderService.create(requestTakeoutOrder);
 
         // when & then
         assertThatIllegalStateException()
             .isThrownBy(() -> orderService.complete(order.getId()));
-      }
-
-      @DisplayName("매장식사 주문인 경우 주문테이블에 포함된 주문 건이 모두 완료된 상태라면 주문테이블을 정리한다.")
-      @Test
-      void givenValidEatInOrder_whenComplete_thenIllegalStateException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
-
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setNumberOfGuests(5);
-        orderTable.setOccupied(true);
-
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setOrderTableId(orderTable.getId());
-        order.setOrderTable(orderTable);
-        order.setType(OrderType.EAT_IN);
-        order.setStatus(OrderStatus.SERVED);
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
-        given(orderRepository.existsByOrderTableAndStatusNot(any(), any()))
-            .willReturn(false);
-
-        // when
-        Order completedOrder = orderService.complete(order.getId());
-
-        // then
-        assertThat(completedOrder.getId()).isEqualTo(order.getId());
-        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-        assertThat(completedOrder.getOrderTable().getNumberOfGuests()).isEqualTo(0);
-        assertThat(completedOrder.getOrderTable().isOccupied()).isEqualTo(false);
       }
 
     }
@@ -670,90 +494,76 @@ class OrderServiceTest {
       @DisplayName("유효한 배달 주문정보를 입력하면 생성된 주문을 반환한다")
       @Test
       void givenValidDeliveryOrder_whenCreate_thenReturnOrder() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.DELIVERY);
-        order.setOrderLineItems(List.of(orderLineItem));
-        order.setDeliveryAddress("서울시 강남구");
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
-        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
-        given(orderRepository.save(any(Order.class))).willReturn(order);
+        Order creationRequestOrder = OrderFixtures.createRequestDeliveryOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)),
+            "서울시 강남구"
+        );
 
         // when
-        Order createdOrder = orderService.create(order);
+        Order createdOrder = orderService.create(creationRequestOrder);
 
         // then
         assertThat(createdOrder.getId()).isNotNull();
         assertThat(createdOrder.getType()).isEqualTo(OrderType.DELIVERY);
         assertThat(createdOrder.getDeliveryAddress()).isEqualTo("서울시 강남구");
         assertThat(createdOrder.getOrderLineItems()).hasSize(1);
-        assertThat(createdOrder.getOrderLineItems()).extracting(OrderLineItem::getMenuId)
-            .contains(menu.getId());
+        assertThat(createdOrder.getOrderLineItems()).extracting(OrderLineItem::getMenu)
+            .contains(menu);
       }
 
       @DisplayName("주문상품수량이 0개 보다 작을 수 없다.")
       @Test
       void givenNotValidQuantityDelivery_whenCreate_thenIllegalArgumentException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(-1);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.DELIVERY);
-        order.setOrderLineItems(List.of(orderLineItem));
-        order.setDeliveryAddress("서울시 강남구");
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
+        Order creationRequestOrder = OrderFixtures.createRequestDeliveryOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), -1)),
+            "서울시 강남구"
+        );
 
         // when & then
         assertThatIllegalArgumentException()
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(creationRequestOrder));
       }
 
       @DisplayName("배달주소가 비어있을 수 없다.")
       @NullAndEmptySource
       @ParameterizedTest(name = "{displayName}: [{index}] {argumentsWithNames}")
-      void givenEmptyDeliveryAddress_whenCreate_thenIllegalArgumentException(String deliveryAddress) {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+      void givenEmptyDeliveryAddress_whenCreate_thenIllegalArgumentException(
+          String deliveryAddress) {
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.DELIVERY);
-        order.setOrderLineItems(List.of(orderLineItem));
-        order.setDeliveryAddress(deliveryAddress);
-
-        given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(menu));
-        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+        Order creationRequestOrder = OrderFixtures.createRequestDeliveryOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)),
+            null
+        );
 
         // when & then
         assertThatIllegalArgumentException()
-            .isThrownBy(() -> orderService.create(order));
+            .isThrownBy(() -> orderService.create(creationRequestOrder));
       }
 
       @Nested
@@ -763,25 +573,23 @@ class OrderServiceTest {
         @DisplayName("주문 ID를 입력받아 주문건을 배송 중 상태로 변경한다.")
         @Test
         void givenValidDeliveryOrder_whenStartDelivery_thenOrder() {
-          Menu menu = new Menu();
-          menu.setId(UUID.randomUUID());
-          menu.setDisplayed(true);
-          menu.setPrice(BigDecimal.valueOf(23000));
+          // given
+          Menu menu = menuRepository.save(
+              OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-          OrderLineItem orderLineItem = new OrderLineItem();
-          orderLineItem.setMenuId(menu.getId());
-          orderLineItem.setMenu(menu);
-          orderLineItem.setPrice(BigDecimal.valueOf(23000));
-          orderLineItem.setQuantity(3);
+          OrderTable orderTable = orderTableRepository.save(
+              OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-          Order order = new Order();
-          order.setId(UUID.randomUUID());
-          order.setType(OrderType.DELIVERY);
-          order.setStatus(OrderStatus.SERVED);
-          order.setDeliveryAddress("서울시 강남구");
-          order.setOrderLineItems(List.of(orderLineItem));
+          Order creationRequestOrder = OrderFixtures.createRequestDeliveryOrder(
+              orderTable.getId(),
+              List.of(
+                  OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)),
+              "서울시 강남구"
+          );
 
-          given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+          Order order = orderService.create(creationRequestOrder);
+          orderService.accept(order.getId());
+          orderService.serve(order.getId());
 
           // when
           Order servedOrder = orderService.startDelivery(order.getId());
@@ -794,81 +602,71 @@ class OrderServiceTest {
         @DisplayName("주문타입이 배달인 경우에만 진행할 수 있다.")
         @Test
         void givenNotDeliveryOrder_whenStartDelivery_thenIllegalStateException() {
-          Menu menu = new Menu();
-          menu.setId(UUID.randomUUID());
-          menu.setDisplayed(true);
-          menu.setPrice(BigDecimal.valueOf(23000));
+          // given
+          Menu menu = menuRepository.save(
+              OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-          OrderLineItem orderLineItem = new OrderLineItem();
-          orderLineItem.setMenuId(menu.getId());
-          orderLineItem.setMenu(menu);
-          orderLineItem.setPrice(BigDecimal.valueOf(23000));
-          orderLineItem.setQuantity(3);
+          OrderTable orderTable = orderTableRepository.save(
+              OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-          Order order = new Order();
-          order.setId(UUID.randomUUID());
-          order.setType(OrderType.EAT_IN);
-          order.setStatus(OrderStatus.SERVED);
-          order.setDeliveryAddress("서울시 강남구");
-          order.setOrderLineItems(List.of(orderLineItem));
+          Order creationRequestOrder = OrderFixtures.createRequestEatInOrder(
+              orderTable.getId(),
+              List.of(
+                  OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3))
+          );
 
-          given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+          Order order = orderService.create(creationRequestOrder);
 
           // when & then
           assertThatIllegalStateException()
-              .isThrownBy(() -> orderService.serve(order.getId()));
+              .isThrownBy(() -> orderService.startDelivery(order.getId()));
         }
 
-        @DisplayName("주문이 제공완료 상태인 경우에는 배송 중 상태로 변경할 수 없다.")
+        @DisplayName("배달 주문이 준비되지 않은 경우에 배송을 시작할 수 없다.")
         @Test
         void givenServedOrder_whenStartDelivery_thenIllegalStateException() {
-          Menu menu = new Menu();
-          menu.setId(UUID.randomUUID());
-          menu.setDisplayed(true);
-          menu.setPrice(BigDecimal.valueOf(23000));
+          // given
+          Menu menu = menuRepository.save(
+              OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-          OrderLineItem orderLineItem = new OrderLineItem();
-          orderLineItem.setMenuId(menu.getId());
-          orderLineItem.setMenu(menu);
-          orderLineItem.setPrice(BigDecimal.valueOf(23000));
-          orderLineItem.setQuantity(3);
+          OrderTable orderTable = orderTableRepository.save(
+              OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-          Order order = new Order();
-          order.setId(UUID.randomUUID());
-          order.setType(OrderType.EAT_IN);
-          order.setStatus(OrderStatus.SERVED);
-          order.setDeliveryAddress("서울시 강남구");
-          order.setOrderLineItems(List.of(orderLineItem));
+          Order creationRequestOrder = OrderFixtures.createRequestDeliveryOrder(
+              orderTable.getId(),
+              List.of(
+                  OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)),
+              "서울시 강남구"
+          );
 
-          given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+          Order order = orderService.create(creationRequestOrder);
 
           // when & then
           assertThatIllegalStateException()
-              .isThrownBy(() -> orderService.serve(order.getId()));
+              .isThrownBy(() -> orderService.startDelivery(order.getId()));
         }
 
         @DisplayName("주문 ID를 입력받아 주문건을 배송완료 상태로 변경한다.")
         @Test
         void givenValidOrder_whenCompleteDelivery_thenOrder() {
-          Menu menu = new Menu();
-          menu.setId(UUID.randomUUID());
-          menu.setDisplayed(true);
-          menu.setPrice(BigDecimal.valueOf(23000));
+          // given
+          Menu menu = menuRepository.save(
+              OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-          OrderLineItem orderLineItem = new OrderLineItem();
-          orderLineItem.setMenuId(menu.getId());
-          orderLineItem.setMenu(menu);
-          orderLineItem.setPrice(BigDecimal.valueOf(23000));
-          orderLineItem.setQuantity(3);
+          OrderTable orderTable = orderTableRepository.save(
+              OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-          Order order = new Order();
-          order.setId(UUID.randomUUID());
-          order.setType(OrderType.DELIVERY);
-          order.setStatus(OrderStatus.DELIVERING);
-          order.setDeliveryAddress("서울시 강남구");
-          order.setOrderLineItems(List.of(orderLineItem));
+          Order creationRequestOrder = OrderFixtures.createRequestDeliveryOrder(
+              orderTable.getId(),
+              List.of(
+                  OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)),
+              "서울시 강남구"
+          );
 
-          given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+          Order order = orderService.create(creationRequestOrder);
+          orderService.accept(order.getId());
+          orderService.serve(order.getId());
+          orderService.startDelivery(order.getId());
 
           // when
           Order servedOrder = orderService.completeDelivery(order.getId());
@@ -881,25 +679,23 @@ class OrderServiceTest {
         @DisplayName("주문이 배송 중인 경우에만 배송완료 상태로 변경 가능하다.")
         @Test
         void givenNotDeliveringOrder_whenStartDelivery_thenIllegalStateException() {
-          Menu menu = new Menu();
-          menu.setId(UUID.randomUUID());
-          menu.setDisplayed(true);
-          menu.setPrice(BigDecimal.valueOf(23000));
+          // given
+          Menu menu = menuRepository.save(
+              OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-          OrderLineItem orderLineItem = new OrderLineItem();
-          orderLineItem.setMenuId(menu.getId());
-          orderLineItem.setMenu(menu);
-          orderLineItem.setPrice(BigDecimal.valueOf(23000));
-          orderLineItem.setQuantity(3);
+          OrderTable orderTable = orderTableRepository.save(
+              OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-          Order order = new Order();
-          order.setId(UUID.randomUUID());
-          order.setType(OrderType.DELIVERY);
-          order.setStatus(OrderStatus.SERVED);
-          order.setDeliveryAddress("서울시 강남구");
-          order.setOrderLineItems(List.of(orderLineItem));
+          Order creationRequestOrder = OrderFixtures.createRequestDeliveryOrder(
+              orderTable.getId(),
+              List.of(
+                  OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)),
+              "서울시 강남구"
+          );
 
-          given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+          Order order = orderService.create(creationRequestOrder);
+          orderService.accept(order.getId());
+          orderService.serve(order.getId());
 
           // when & then
           assertThatIllegalStateException()
@@ -915,25 +711,21 @@ class OrderServiceTest {
       @DisplayName("라이더스에게 주문ID, 메뉴가격, 배송지 정보를 통해 배달을 요청한다.")
       @Test
       void givenDelivery_whenRequestDelivery_thenOrder() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.DELIVERY);
-        order.setStatus(OrderStatus.WAITING);
-        order.setDeliveryAddress("서울시 강남구");
-        order.setOrderLineItems(List.of(orderLineItem));
+        Order creationRequestOrder = OrderFixtures.createRequestDeliveryOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)),
+            "서울시 강남구"
+        );
 
-        given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+        Order order = orderService.create(creationRequestOrder);
 
         // when
         Order acceptedOrder = orderService.accept(order.getId());
@@ -941,9 +733,6 @@ class OrderServiceTest {
         // then
         assertThat(acceptedOrder.getId()).isEqualTo(order.getId());
         assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
-        verify(kitchenridersClient, times(1))
-            .requestDelivery(order.getId(), BigDecimal.valueOf(23000).multiply(BigDecimal.valueOf(3)),
-                "서울시 강남구");
       }
     }
 
@@ -954,25 +743,24 @@ class OrderServiceTest {
       @DisplayName("배송주문인 경우 배송완료 상태가 아니면 주문을 완료할 수 없다.")
       @Test
       void givenNotDelivered_whenComplete_thenIllegalStateException() {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(23000));
+        // given
+        Menu menu = menuRepository.save(
+            OrderFixtures.createRequestMenu("후라이드치킨", BigDecimal.valueOf(23000), true));
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(BigDecimal.valueOf(23000));
-        orderLineItem.setQuantity(3);
+        OrderTable orderTable = orderTableRepository.save(
+            OrderFixtures.createRequestOrderTable("1번", 5, true));
 
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(OrderType.DELIVERY);
-        order.setStatus(OrderStatus.SERVED);
-        order.setDeliveryAddress("서울시 강남구");
-        order.setOrderLineItems(List.of(orderLineItem));
+        Order creationRequestOrder = OrderFixtures.createRequestDeliveryOrder(
+            orderTable.getId(),
+            List.of(
+                OrderFixtures.createRequestOrderLineItem(menu.getId(), BigDecimal.valueOf(23000), 3)),
+            "서울시 강남구"
+        );
 
-        given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+        Order order = orderService.create(creationRequestOrder);
+        orderService.accept(order.getId());
+        orderService.serve(order.getId());
+        orderService.startDelivery(order.getId());
 
         // when & then
         assertThatIllegalStateException()
@@ -980,5 +768,4 @@ class OrderServiceTest {
       }
     }
   }
-
 }

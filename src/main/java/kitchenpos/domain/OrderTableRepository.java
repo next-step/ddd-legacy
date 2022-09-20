@@ -12,4 +12,7 @@ public interface OrderTableRepository {
 
   List<OrderTable> findAll();
 
+  void saveAll(List<OrderTable> orderTables);
+
+  void deleteAll();
 }

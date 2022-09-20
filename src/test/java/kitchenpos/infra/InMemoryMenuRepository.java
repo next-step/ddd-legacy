@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ public class InMemoryMenuRepository implements MenuRepository {
   public List<Menu> findAllByIdIn(List<UUID> ids) {
     return ids.stream()
         .map(store::get)
+        .filter(Objects::nonNull)
         .collect(Collectors.toList());
   }
 

@@ -35,4 +35,9 @@ public class InMemoryOrderRepository implements OrderRepository {
   public List<Order> findAll() {
     return new ArrayList<>(store.values());
   }
+
+  @Override
+  public void deleteAll() {
+    store.clear();
+  }
 }

@@ -13,4 +13,6 @@ public interface OrderRepository {
   Optional<Order> findById(UUID orderId);
 
   List<Order> findAll();
+
+  void deleteAll();
 }
