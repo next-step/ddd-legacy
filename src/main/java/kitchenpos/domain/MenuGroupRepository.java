@@ -11,4 +11,8 @@ public interface MenuGroupRepository {
   List<MenuGroup> findAll();
 
   Optional<MenuGroup> findById(UUID menuGroupId);
+
+  void saveAll(List<MenuGroup> menuGroups);
+
+  void deleteAll();
 }

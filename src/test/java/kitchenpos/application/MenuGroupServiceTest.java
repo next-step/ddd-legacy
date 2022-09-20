@@ -2,13 +2,12 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.infra.InMemoryMenuGroupRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,17 +16,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @DisplayName("메뉴그룹 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
 
-  private MenuGroupService menuGroupService;
+  private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
 
-  @Mock
-  private MenuGroupRepository menuGroupRepository;
+  private MenuGroupService menuGroupService;
 
   @BeforeEach
   void setUp() {
@@ -43,7 +40,6 @@ class MenuGroupServiceTest {
     void givenValidMenuGroup_whenCreate_thenMenuGroup() {
       // given
       MenuGroup menuGroup = creationRequestMenuGroup("추천메뉴");
-      given(menuGroupRepository.save(any(MenuGroup.class))).willReturn(menuGroup);
 
       // when
       MenuGroup createdMenuGroup = menuGroupService.create(menuGroup);
@@ -72,12 +68,10 @@ class MenuGroupServiceTest {
     @Test
     void givenMenuGroups_whenFindAll_thenReturnMenuGroups() {
       // given
-      given(menuGroupRepository.findAll()).willReturn(
-          List.of(
-              creationRequestMenuGroup("추천메뉴"),
-              creationRequestMenuGroup("점심특선메뉴")
-          )
-      );
+      menuGroupRepository.saveAll(List.of(
+          creationRequestMenuGroup("추천메뉴"),
+          creationRequestMenuGroup("점심특선메뉴")
+      ));
 
       // when
       List<MenuGroup> menuGroups = menuGroupService.findAll();
@@ -89,10 +83,10 @@ class MenuGroupServiceTest {
   }
 
   private static MenuGroup creationRequestMenuGroup(String name) {
-    MenuGroup menuGroup1 = new MenuGroup();
-    menuGroup1.setId(UUID.randomUUID());
-    menuGroup1.setName(name);
-    return menuGroup1;
+    MenuGroup menuGroup = new MenuGroup();
+    menuGroup.setId(UUID.randomUUID());
+    menuGroup.setName(name);
+    return menuGroup;
   }
 
 }
