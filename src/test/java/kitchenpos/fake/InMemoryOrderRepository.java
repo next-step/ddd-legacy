@@ -35,6 +35,7 @@ public class InMemoryOrderRepository implements OrderRepository {
     @Override
     public Order save(Order order) {
         order.setId(UUID.randomUUID());
-        return orders.put(order.getId(), order);
+        orders.put(order.getId(), order);
+        return orders.get(order.getId());
     }
 }
