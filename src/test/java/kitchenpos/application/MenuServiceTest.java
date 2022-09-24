@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -339,6 +340,27 @@ class MenuServiceTest {
             // when & then
             assertThatExceptionOfType(NoSuchElementException.class)
                 .isThrownBy(() -> testTarget.hide(menuId));
+        }
+    }
+
+    @DisplayName("메뉴 목록 조회 테스트")
+    @Nested
+    class FindAllTest {
+
+        @DisplayName("메뉴 목록을 조회 할 수 있다.")
+        @Test
+        void test01() {
+            // given
+            Menu menu1 = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+            Menu menu2 = menuRepository.save(MenuFixture.TWO_FRIED_CHICKEN);
+
+            // when
+            List<Menu> actual = testTarget.findAll();
+
+            // then
+            assertThat(actual)
+                .anyMatch(menu -> menu.getId().equals(menu1.getId()))
+                .anyMatch(menu -> menu.getId().equals(menu2.getId()));
         }
     }
 
