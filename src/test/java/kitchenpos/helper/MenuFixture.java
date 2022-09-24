@@ -57,4 +57,10 @@ public class MenuFixture {
         request.setMenuProducts(List.of(menuProducts));
         return request;
     }
+
+    public static Menu request(BigDecimal price) {
+        var request = new Menu();
+        request.setPrice(price);
+        return request;
+    }
 }

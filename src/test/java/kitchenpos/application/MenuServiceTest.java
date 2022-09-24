@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Stream;
+import javax.validation.constraints.Null;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -29,10 +31,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class MenuServiceTest {
+
+    private static final String PROVIDE_NEGATIVE_PRICE = "kitchenpos.application.MenuServiceTest#provideNegativePrice";
 
     private final MenuRepository menuRepository = new InMemoryMenuRepository();
     private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
@@ -218,5 +224,69 @@ class MenuServiceTest {
             assertThatIllegalArgumentException()
                 .isThrownBy(() -> testTarget.create(request));
         }
+    }
+
+    @DisplayName("메뉴 가격 변경 테스트")
+    @Nested
+    class ChangePriceTest {
+
+        @DisplayName("메뉴의 가격을 변경 할 수 있다.")
+        @Test
+        void test01() {
+            // given
+            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+            Menu request = MenuFixture.request(BigDecimal.valueOf(5000));
+
+            // when
+            Menu actual = testTarget.changePrice(menu.getId(), request);
+
+            // then
+            assertThat(actual.getPrice()).isEqualTo(request.getPrice());
+        }
+
+        @DisplayName("메뉴 가격은 0원 이상이어야 한다.")
+        @ParameterizedTest
+        @MethodSource(PROVIDE_NEGATIVE_PRICE)
+        @Null
+        void test02(BigDecimal price) {
+            // given
+            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+            Menu request = MenuFixture.request(price);
+
+            // when & then
+            assertThatIllegalArgumentException()
+                .isThrownBy(() -> testTarget.changePrice(menu.getId(), request));
+        }
+
+
+        @DisplayName("존재하지 않는 메뉴의 가격을 변경 할 수 없다.")
+        @Test
+        void test03() {
+            // given
+            UUID menuId = UUID.randomUUID();
+            Menu request = MenuFixture.request(BigDecimal.valueOf(5000));
+
+            // when & then
+            assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> testTarget.changePrice(menuId, request));
+        }
+
+        @DisplayName("메뉴의 가격은 메뉴 상품 가격의 합보다 클 수 없다.")
+        @Test
+        void test04() {
+            // given
+            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+            Menu request = MenuFixture.request(BigDecimal.valueOf(7000));
+
+            // when & then
+            assertThatIllegalArgumentException()
+                .isThrownBy(() -> testTarget.changePrice(menu.getId(), request));
+        }
+    }
+
+    private static Stream<Arguments> provideNegativePrice() {
+        return Stream.of(
+            Arguments.of(BigDecimal.valueOf(-1))
+        );
     }
 }
