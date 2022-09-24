@@ -284,6 +284,35 @@ class MenuServiceTest {
         }
     }
 
+    @DisplayName("메뉴 노출 테스트")
+    @Nested
+    class DisplayTest {
+
+        @DisplayName("메뉴를 노출 시킬 수 있다.")
+        @Test
+        void test01() {
+            // given
+            Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU);
+
+            // when
+            Menu actual = testTarget.display(menu.getId());
+
+            // then
+            assertThat(actual.isDisplayed()).isTrue();
+        }
+
+        @DisplayName("존재하지 않는 메뉴를 노출 시킬 수 없다.")
+        @Test
+        void test02() {
+            // given
+            UUID menuId = UUID.randomUUID();
+
+            // when & then
+            assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> testTarget.display(menuId));
+        }
+    }
+
     private static Stream<Arguments> provideNegativePrice() {
         return Stream.of(
             Arguments.of(BigDecimal.valueOf(-1))

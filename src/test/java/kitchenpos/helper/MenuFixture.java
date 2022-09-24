@@ -25,6 +25,14 @@ public class MenuFixture {
         List.of(MenuProductFixture.TWO_FRIED_CHICKEN)
     );
 
+    public static final Menu NO_DISPLAYED_MENU = create(
+        "양념 치킨 한마리",
+        6000,
+        false,
+        MenuGroupFixture.CHICKEN,
+        List.of(MenuProductFixture.ONE_HOT_SPICY_CHICKEN)
+    );
+
     private static Menu create(
         String name,
         int price,
