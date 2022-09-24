@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 
 public class MenuFixture {
@@ -12,6 +13,7 @@ public class MenuFixture {
         "후라이드 치킨 한마리",
         6000,
         true,
+        MenuGroupFixture.CHICKEN,
         List.of(MenuProductFixture.ONE_FRIED_CHICKEN)
     );
 
@@ -19,6 +21,7 @@ public class MenuFixture {
         "후라이드 치킨 두마리",
         9000,
         true,
+        MenuGroupFixture.CHICKEN,
         List.of(MenuProductFixture.TWO_FRIED_CHICKEN)
     );
 
@@ -26,6 +29,7 @@ public class MenuFixture {
         String name,
         int price,
         boolean displayed,
+        MenuGroup menuGroup,
         List<MenuProduct> menuProducts
     ) {
         final Menu menu = new Menu();
@@ -33,6 +37,7 @@ public class MenuFixture {
         menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(price));
         menu.setDisplayed(displayed);
+        menu.setMenuGroup(menuGroup);
         menu.setMenuProducts(menuProducts);
         return menu;
     }
