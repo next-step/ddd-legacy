@@ -313,6 +313,35 @@ class MenuServiceTest {
         }
     }
 
+    @DisplayName("메뉴 감추기 테스트")
+    @Nested
+    class HideTest {
+
+        @DisplayName("메뉴를 감출 수 있다.")
+        @Test
+        void test01() {
+            // given
+            Menu menu = menuRepository.save(MenuFixture.DISPLAYED_MENU);
+
+            // when
+            Menu actual = testTarget.hide(menu.getId());
+
+            // then
+            assertThat(actual.isDisplayed()).isFalse();
+        }
+
+        @DisplayName("존재하지 않는 메뉴를 감출 수 없다.")
+        @Test
+        void test02() {
+            // given
+            UUID menuId = UUID.randomUUID();
+
+            // when & then
+            assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> testTarget.hide(menuId));
+        }
+    }
+
     private static Stream<Arguments> provideNegativePrice() {
         return Stream.of(
             Arguments.of(BigDecimal.valueOf(-1))

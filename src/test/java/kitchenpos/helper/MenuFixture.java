@@ -33,6 +33,8 @@ public class MenuFixture {
         List.of(MenuProductFixture.ONE_HOT_SPICY_CHICKEN)
     );
 
+    public static final Menu DISPLAYED_MENU = ONE_FRIED_CHICKEN;
+
     private static Menu create(
         String name,
         int price,
