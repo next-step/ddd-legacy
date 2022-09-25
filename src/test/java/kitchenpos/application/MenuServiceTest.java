@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
@@ -74,7 +73,6 @@ class MenuServiceTest {
     @Test
     void menu_has_menuGroup() {
         Menu request = createMenu();
-
 
         request.setMenuGroup(createMenuGroup("세트2"));
 
@@ -230,14 +228,14 @@ class MenuServiceTest {
 
         final Menu saveMenu = menuRepository.save(menu);
 
-        assertThatIllegalStateException().isThrownBy(()->
+        assertThatIllegalStateException().isThrownBy(() ->
                 menuService.display(saveMenu.getId())
         );
     }
 
     @Test
     @DisplayName("등록된 메뉴를 표시 한다.")
-    void display(){
+    void display() {
         Menu createMenu = 등록된_메뉴(등록된_메뉴그룹, BigDecimal.valueOf(2_000), List.of(createMenuProduct(등록된_상품, 3)));
 
         Menu displayMenu = menuService.display(createMenu.getId());

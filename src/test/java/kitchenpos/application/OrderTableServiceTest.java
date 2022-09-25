@@ -46,9 +46,9 @@ class OrderTableServiceTest {
         final OrderTable orderTable = orderTableService.create(request);
 
         assertAll(
-            () -> assertThat(orderTable.isOccupied()).isFalse(),
-            () -> assertThat(orderTable.getName()).isEqualTo(request.getName()),
-            () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(0)
+                () -> assertThat(orderTable.isOccupied()).isFalse(),
+                () -> assertThat(orderTable.getName()).isEqualTo(request.getName()),
+                () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(0)
         );
     }
 
@@ -60,7 +60,7 @@ class OrderTableServiceTest {
         request.setName(name);
 
         assertThatIllegalArgumentException().isThrownBy(() ->
-            orderTableService.create(request)
+                orderTableService.create(request)
         );
     }
 
@@ -124,7 +124,7 @@ class OrderTableServiceTest {
         request.setNumberOfGuests(-1);
 
         assertThatIllegalArgumentException().isThrownBy(() ->
-            orderTableService.changeNumberOfGuests(생성된_주문_테이블.getId(), request)
+                orderTableService.changeNumberOfGuests(생성된_주문_테이블.getId(), request)
         );
 
     }
@@ -177,7 +177,6 @@ class OrderTableServiceTest {
         assertThat(orderTalTables).hasSize(2);
         assertThat(orderTalTables).extracting("name").contains("주문테이블1", "주문테이블2");
     }
-
 
 
     private OrderTable 주문테이블이_생성됨(OrderTable orderTable) {
