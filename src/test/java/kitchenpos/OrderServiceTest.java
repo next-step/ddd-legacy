@@ -307,6 +307,36 @@ public class OrderServiceTest {
         assertThat(actual.getId()).isNotNull();
     }
 
+    @Test
+    @DisplayName("포장 주문을 완료한다.")
+    public void order_takeout_complete() {
+        Order order = new Order();
+        order.setType(OrderType.TAKEOUT);
+        order.setOrderLineItems(List.of(OrderLineItemFactory.of(createMenuAndSave(true))));
+
+        Order create = orderService.create(order);
+        Order accept = orderService.accept(create.getId());
+        Order serve = orderService.serve(accept.getId());
+
+        Order actual = orderService.complete(serve.getId());
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("포장 주문 시, 메뉴가 제공돼야 주문을 완료할 수 있다.")
+    public void order_takeout_still_accept() {
+        Order order = new Order();
+        order.setType(OrderType.TAKEOUT);
+        order.setOrderLineItems(List.of(OrderLineItemFactory.of(createMenuAndSave(true))));
+
+        Order create = orderService.create(order);
+        Order accept = orderService.accept(create.getId());
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> orderService.complete(accept.getId()));
+    }
+
+
     private BigDecimal getPrice(Order order) {
         BigDecimal sum = BigDecimal.ZERO;
         for (final OrderLineItem orderLineItem : order.getOrderLineItems()) {
