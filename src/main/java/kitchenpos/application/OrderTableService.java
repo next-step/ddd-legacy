@@ -52,7 +52,7 @@ public class OrderTableService {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("주문이 완료되지 않은 테이블은 빈 테이블로 변경할 수 없습니다.");
         }
         orderTable.setNumberOfGuests(0);
         orderTable.setOccupied(false);
