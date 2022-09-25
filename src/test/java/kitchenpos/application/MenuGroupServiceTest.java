@@ -67,7 +67,7 @@ class MenuGroupServiceTest {
         //then
         assertAll(
                 () -> assertThat(menuGroups.size()).isEqualTo(2),
-                () -> assertThat(menuGroups).extracting("name").containsExactly("세트1", "세트2")
+                () -> assertThat(menuGroups).extracting("name").contains("세트1", "세트2")
         );
     }
 
