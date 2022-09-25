@@ -2,6 +2,7 @@ package kitchenpos.application.fake;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
+import org.assertj.core.util.Lists;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,10 +18,7 @@ public class FakeMenuRepository implements MenuRepository {
 
     @Override
     public Menu save(Menu menu) {
-        UUID uuid = UUID.randomUUID();
-        menu.setId(uuid);
-
-        memoryMap.put(uuid, menu);
+        memoryMap.put(menu.getId(), menu);
         return menu;
     }
 
@@ -38,7 +36,7 @@ public class FakeMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAllByProductId(UUID productId) {
-        List<Menu> menus = new ArrayList<>(memoryMap.values());
+        List<Menu> menus = Lists.newArrayList(memoryMap.values());
 
         return menus.stream()
                 .filter(menu -> menu.containProduct(productId))
@@ -47,6 +45,6 @@ public class FakeMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAll() {
-        return new ArrayList<>(memoryMap.values());
+        return Lists.newArrayList(memoryMap.values());
     }
 }
