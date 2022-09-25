@@ -12,7 +12,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class ProductServiceTest extends IntegrationTest {
+
+    private static final Product PRODUCT = FixtureFactory.createProduct("후라이드", BigDecimal.valueOf(16000));
 
     @Test
     void find_all_product_test() {
@@ -43,14 +44,13 @@ public class ProductServiceTest extends IntegrationTest {
         @Test
         @DisplayName("성공적으로 만든다.")
         void create_product_test() {
-            Product product = FixtureFactory.createProduct("양념 치킨", BigDecimal.valueOf(16000));
-            product.setName("name");
-            product.setPrice(BigDecimal.ONE);
-            Product createdProduct = productService.create(product);
+            PRODUCT.setName("name");
+            PRODUCT.setPrice(BigDecimal.ONE);
+            Product createdProduct = productService.create(PRODUCT);
 
             assertAll(
-                () -> assertThat(createdProduct.getName()).isEqualTo(product.getName()),
-                () -> assertThat(createdProduct.getPrice()).isEqualTo(product.getPrice())
+                () -> assertThat(createdProduct.getName()).isEqualTo(PRODUCT.getName()),
+                () -> assertThat(createdProduct.getPrice()).isEqualTo(PRODUCT.getPrice())
             );
         }
 
@@ -87,8 +87,7 @@ public class ProductServiceTest extends IntegrationTest {
         @Test
         @DisplayName("성공적으로 변경한다.")
         void changePrice() {
-            Product product = FixtureFactory.createProduct("양념 치킨", BigDecimal.valueOf(16000));
-            Product savedProduct = productRepository.save(product);
+            Product savedProduct = productRepository.save(PRODUCT);
             BigDecimal priceToChange = BigDecimal.TEN;
             savedProduct.setPrice(priceToChange);
             productService.changePrice(savedProduct.getId(), savedProduct);
@@ -101,8 +100,7 @@ public class ProductServiceTest extends IntegrationTest {
         @Test
         @DisplayName("가격은 음수일 수 없다.")
         void change_negative_price() {
-            Product product = FixtureFactory.createProduct("양념 치킨", BigDecimal.valueOf(16000));
-            Product savedProduct = productRepository.save(product);
+            Product savedProduct = productRepository.save(PRODUCT);
             savedProduct.setPrice(BigDecimal.valueOf(-10));
 
             assertThatThrownBy(
@@ -115,16 +113,15 @@ public class ProductServiceTest extends IntegrationTest {
         @DisplayName("메뉴의 가격이 제품의 총합보다 크면, 고객에게 가려진다 ")
         void change_price_to_higher() {
             MenuGroup menuGroup = menuGroupRepository.save(FixtureFactory.createMenuGroup("추천메뉴"));
-            Product product = productRepository.save(FixtureFactory.createProduct("양념 치킨", BigDecimal.valueOf(16000)));
-            Menu menu = menuRepository.save(FixtureFactory.createMenu("메뉴", BigDecimal.valueOf(16000), true, menuGroup, toMenuProductList(List.of(product))));
 
-            product.setPrice(BigDecimal.valueOf(10000));
-            productService.changePrice(product.getId(), product);
+            Product savedProduct = productRepository.save(PRODUCT);
+            Menu menu = menuRepository.save(FixtureFactory.createMenu("메뉴", BigDecimal.valueOf(16000), true, menuGroup, toMenuProductList(List.of(savedProduct))));
+
+            savedProduct.setPrice(BigDecimal.valueOf(10000));
+            productService.changePrice(savedProduct.getId(), savedProduct);
 
             Menu hiddenMenu = menuRepository.findById(menu.getId()).orElseThrow(IllegalArgumentException::new);
             assertFalse(hiddenMenu.isDisplayed());
         }
     }
-
-
 }

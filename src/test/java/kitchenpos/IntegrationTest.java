@@ -62,7 +62,6 @@ public class IntegrationTest {
     void setup() {
         Mockito.when(purgomalumClient.containsProfanity(any())).thenReturn(false);
 
-
         orderLineRepository.deleteAllInBatch();
         orderRepository.deleteAllInBatch();
         orderTableRepository.deleteAllInBatch();
@@ -100,6 +99,5 @@ public class IntegrationTest {
             )
             .collect(Collectors.toList());
     }
-
 
 }
