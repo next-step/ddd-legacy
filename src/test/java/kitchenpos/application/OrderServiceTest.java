@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
@@ -13,12 +12,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Stream;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
@@ -26,7 +27,6 @@ import kitchenpos.fake.FakeKitchenridersClient;
 import kitchenpos.fake.InMemoryMenuRepository;
 import kitchenpos.fake.InMemoryOrderRepository;
 import kitchenpos.fake.InMemoryOrderTableRepository;
-import kitchenpos.fixture.MenuFixture;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -110,7 +110,6 @@ public class OrderServiceTest {
     void createdMenuRegisteredOrder() {
         Order request = createDeliveryOrder();
         OrderLineItem orderLineItem = new OrderLineItem();
-
         request.setOrderLineItems(List.of(orderLineItem));
 
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -199,8 +198,277 @@ public class OrderServiceTest {
         assertAll(
                 () -> assertThat(createOrder.getId()).isNotNull(),
                 () -> assertThat(createOrder.getOrderTable().getId()).isEqualTo(orderTable.getId()),
-                () -> assertThat(createOrder.getType()).isEqualTo(OrderType.EAT_IN)
+                () -> assertThat(createOrder.getType()).isEqualTo(OrderType.EAT_IN),
+                () -> assertThat(createOrder.getStatus()).isEqualTo(OrderStatus.WAITING)
         );
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 주문을 수락 할수 없다.")
+    void accept_is_existOrder() {
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> orderService.accept(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("주문 상태가 대기 상태가 아닌 경우 수락을 할 수 없다.")
+    void accept_before_status_is_waiting() {
+        Order createOrder = createEatInOrder();
+        createOrder.setStatus(OrderStatus.ACCEPTED);
+        Order createdOrder = orderRepository.save(createOrder);
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.accept(createdOrder.getId()));
+    }
+
+    @Test
+    @DisplayName("주문을 수락 한다.")
+    void accept() {
+        final Order createdOrder = 매장주문이_등록되어_있음();
+
+        final Order acceptOrder = orderService.accept(createdOrder.getId());
+
+        assertThat(acceptOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @Test
+    @DisplayName("존재 하지 않은 주문은 주문 제공 할 수 없다.")
+    void serve_is_exist_order() {
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> orderService.serve(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("주문 상태가 접수 상태가 아닌 경우 주문 제공을 할 수 없다.")
+    void serve_before_status_is_accepted() {
+        final Order createdOrder = 매장주문이_등록되어_있음();
+
+        assertThatIllegalStateException().isThrownBy(() ->
+                orderService.serve(createdOrder.getId())
+        );
+    }
+
+    @Test
+    @DisplayName("주문을 제공 한다.")
+    void serve() {
+        Order createdOrder = 주문접수된_배달주문();
+
+        final Order serve = orderService.serve(createdOrder.getId());
+
+        assertThat(serve.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
+
+    @Test
+    @DisplayName("주문이 등록 되어 있는 주문만 배달이 가능 하다.")
+    void startDelivery_is_not_noSearchOrder() {
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> orderService.startDelivery(UUID.randomUUID()));
+    }
+
+
+    @Test
+    @DisplayName("주문 유형이 배달이 아니면 배달중 상태로 변경이 불가능 하다.")
+    void startDelivery_is_orderType_is_not_delivered() {
+        Order createdOrder = 매장주문이_등록되어_있음();
+
+        assertThatIllegalStateException().isThrownBy(() ->
+                orderService.startDelivery(createdOrder.getId())
+        );
+    }
+
+    @Test
+    @DisplayName("주문 제공 상태가 아니면 배달중 상태로 변경이 불 가능하다.")
+    void startDelivery_is_beforeState_is_served() {
+        Order createdOrder = 배달주문이_등록되어_있음();
+
+        assertThatIllegalStateException().isThrownBy(() ->
+                orderService.startDelivery(createdOrder.getId())
+        );
+    }
+
+    @Test
+    @DisplayName("주문 제공 상태가 아니면 배달중 상태로 변경이 불가능하다.")
+    void startDelivery() {
+        Order createdOrder = 주문제공된_배달주문();
+
+        final Order order = orderService.startDelivery(createdOrder.getId());
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+    }
+
+    @Test
+    @DisplayName("주문이 등록 되어 있는 주문만 배달완료가 가능 하다.")
+    void completeDelivery_is_not_noSearchOrder() {
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()));
+    }
+
+
+    @Test
+    @DisplayName("주문 유형이 배달이 아니면 배달완료 상태로 변경이 불가능 하다.")
+    void completeDelivery_is_orderType_is_not_delivered() {
+        Order createdOrder = 매장주문이_등록되어_있음();
+
+        assertThatIllegalStateException().isThrownBy(() ->
+                orderService.startDelivery(createdOrder.getId())
+        );
+    }
+
+    @Test
+    @DisplayName("배달중 상태가 아니면 배달 완료 상태로 변경이 불가능하다.")
+    void completeDelivery_is_beforeState_is_served() {
+        Order createdOrder = 배달주문이_등록되어_있음();
+
+        assertThatIllegalStateException().isThrownBy(() ->
+                orderService.startDelivery(createdOrder.getId())
+        );
+    }
+
+    @Test
+    @DisplayName("배달 완료 상태로 변경 된다.")
+    void completeDelivery() {
+        Order createdOrder = 배달시작된_배달주문();
+
+        final Order order = orderService.completeDelivery(createdOrder.getId());
+
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+    }
+
+    @Test
+    @DisplayName("주문이 등록 되어 있는 주문만 주문 완료 가능 하다.")
+    void complete_is_not_noSearchOrder() {
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> orderService.complete(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("배달 주문은 배달 완료 상태에서만 주문 완료가 가능하다.")
+    void deliveryOrder_complete_is_beforeState_is_delivered() {
+        Order createdOrder = 배달주문이_등록되어_있음();
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.complete(createdOrder.getId()));
+    }
+
+    @Test
+    @DisplayName("포장 주문은 주문은 주문 제공 상태에서만 가능하다.")
+    void takeOutOrder_is_beforeState_is_delivered() {
+        Order createdOrder = 포장주문이_등록되어_있음();
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.complete(createdOrder.getId()));
+    }
+
+    @Test
+    @DisplayName("매장 주문은 주문은 주문 제공 상태에서만 가능하다.")
+    void eatIn_is_beforeState_is_delivered() {
+        Order createdOrder = 매장주문이_등록되어_있음();
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.complete(createdOrder.getId()));
+    }
+
+
+    @Test
+    @DisplayName("배달 주문을 완료한다.")
+    void deliveryOrderComplete() {
+        final Order 배달완료된_배달주문 = 배달완료된_배달주문();
+
+        final Order completeOrder = orderService.complete(배달완료된_배달주문.getId());
+
+        assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("포장주문을 완료한다.")
+    void takeInOrderComplete() {
+        Order order = 포장주문이_등록되어_있음();
+        주문을_주문제공_상태까지_진행(order);
+
+        final Order completeOrder = orderService.complete(order.getId());
+
+        assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("매장주문을 완료한다.")
+    void eatInOrderComplete() {
+        Order order = 매장주문이_등록되어_있음();
+        주문을_주문제공_상태까지_진행(order);
+
+        final Order completeOrder = orderService.complete(order.getId());
+
+        assertAll(
+                () -> assertThat(completeOrder.getOrderTable().getNumberOfGuests()).isEqualTo(0),
+                () -> assertThat(completeOrder.getOrderTable().isOccupied()).isFalse(),
+                () -> assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED)
+        );
+    }
+
+    @Test
+    @DisplayName("주문이 조회됨")
+    void findAll() {
+        Order deliveryOrder = 배달주문이_등록되어_있음();
+        Order takeOutOrder = 포장주문이_등록되어_있음();
+        Order eatInOrder = 매장주문이_등록되어_있음();
+
+        final List<Order> orders = orderService.findAll();
+
+        assertAll(
+                () -> assertThat(orders).hasSize(3),
+                () -> assertThat(orders)
+                        .extracting("type")
+                        .contains(OrderType.EAT_IN, OrderType.DELIVERY, OrderType.TAKEOUT)
+        );
+    }
+
+    private static Order 주문접수된_배달주문() {
+        Order createdOrder = 배달주문이_등록되어_있음();
+        return orderService.accept(createdOrder.getId());
+    }
+
+    private static Order 주문제공된_배달주문() {
+        Order createdOrder = 주문접수된_배달주문();
+        return orderService.serve(createdOrder.getId());
+    }
+
+    private static Order 주문을_주문제공_상태까지_진행(Order order) {
+        orderService.accept(order.getId());
+        return orderService.serve(order.getId());
+    }
+
+    private static Order 배달시작된_배달주문() {
+        Order createdOrder = 주문제공된_배달주문();
+        return orderService.startDelivery(createdOrder.getId());
+    }
+
+    private static Order 배달완료된_배달주문() {
+        Order createdOrder = 배달시작된_배달주문();
+        return orderService.completeDelivery(createdOrder.getId());
+    }
+
+    private static Order 매장주문이_등록되어_있음() {
+        Order request = createEatInOrder();
+        return createdOrder(request);
+    }
+
+    private static Order 배달주문이_등록되어_있음() {
+        Order request = createDeliveryOrder();
+        request.setDeliveryAddress("배달 주소");
+        return createdOrder(request);
+    }
+
+    private static Order 포장주문이_등록되어_있음() {
+        Order request = createTakeOutOrder();
+        return createdOrder(request);
+    }
+
+    private static Order createdOrder(Order request) {
+        request.setOrderLineItems(Collections.singletonList(createOrderLineItem()));
+        OrderTable orderTable = createOrderTable();
+        request.setOrderTable(orderTable);
+        request.setOrderTableId(orderTable.getId());
+        return orderService.create(request);
     }
 
 
@@ -226,9 +494,6 @@ public class OrderServiceTest {
         return orderLineItem;
     }
 
-    private static Stream<Order> notEatInOrder() {
-        return Stream.of(createDeliveryOrder(), createTakeOutOrder());
-    }
 
     private static OrderLineItem createOrderLineItem(long quantity) {
         OrderLineItem orderLineItem = createOrderLineItem();
@@ -253,4 +518,9 @@ public class OrderServiceTest {
         order.setType(OrderType.EAT_IN);
         return order;
     }
+
+    private static Stream<Order> notEatInOrder() {
+        return Stream.of(createDeliveryOrder(), createTakeOutOrder());
+    }
+
 }

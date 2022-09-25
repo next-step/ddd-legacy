@@ -10,16 +10,16 @@ import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
+import org.springframework.util.ObjectUtils;
 
 public class InMemoryOrderRepository implements OrderRepository {
 
     private Map<UUID, Order> orders = new HashMap<>();
 
     @Override
-    public boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status) {
+    public boolean existsByOrderTableAndStatusNot(final OrderTable orderTable, OrderStatus status) {
         return orders.values().stream()
-                .anyMatch((order) -> order.getOrderTableId().equals(orderTable.getId())
-                        && !order.getStatus().equals(status));
+                .anyMatch((order) -> !ObjectUtils.isEmpty(order.getOrderTable()) && !order.getStatus().equals(status));
     }
 
     @Override
