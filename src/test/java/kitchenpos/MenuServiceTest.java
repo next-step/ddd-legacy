@@ -77,7 +77,7 @@ public class MenuServiceTest {
     @ParameterizedTest(name = "메뉴 등록 시, 가격은 필수로 입력되어야 하며 0원 이상이어야 한다.")
     @NullSource
     @ValueSource(strings = "-1")
-    public void create_input_null_and_negative(BigDecimal price) {
+    public void create_input_null_and_negative(long price) {
         final MenuGroup createMenuGroup = createMenuGroup();
         final List<MenuProduct> menuProducts = createMenuProduct();
 

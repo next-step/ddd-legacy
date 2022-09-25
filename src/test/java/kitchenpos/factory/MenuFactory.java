@@ -9,13 +9,17 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class MenuFactory {
-    static final Product 황금올리브 = ProductFactory.of("황금올리브", 20000L);
-    static final Product 호가든 = ProductFactory.of("호가든", 5000L);
-    public static final String DEFAULT_MENU_NAME = "치맥세트";
-    public static final long DEFAULT_MENU_PRICE = 28000L;
+    private static final Product 황금올리브 = ProductFactory.of("황금올리브", 20000L);
+    private static final Product 호가든 = ProductFactory.of("호가든", 5000L);
+    private static final String DEFAULT_MENU_NAME = "치맥세트";
+    private static final long DEFAULT_MENU_PRICE = 28000L;
 
     public static Menu getDefaultMenu(MenuGroup createMenuGroup, List<MenuProduct> menuProducts) {
-        return MenuFactory.of(createMenuGroup, menuProducts, DEFAULT_MENU_PRICE);
+        return MenuFactory.of(createMenuGroup, menuProducts, DEFAULT_MENU_PRICE, false);
+    }
+
+    public static Menu getDefaultMenu(MenuGroup createMenuGroup, List<MenuProduct> menuProducts, boolean displayed) {
+        return MenuFactory.of(createMenuGroup, menuProducts, DEFAULT_MENU_PRICE, displayed);
     }
 
     public static Menu of(MenuGroup createMenuGroup, long price) {
@@ -36,17 +40,21 @@ public class MenuFactory {
         return menu;
     }
 
-
     public static Menu of(MenuGroup createMenuGroup, List<MenuProduct> menuProducts, long price) {
-        return MenuFactory.of(createMenuGroup, menuProducts, BigDecimal.valueOf(price));
+        return MenuFactory.of(createMenuGroup, menuProducts, BigDecimal.valueOf(price), false);
     }
 
-    public static Menu of(MenuGroup createMenuGroup, List<MenuProduct> menuProducts, BigDecimal price) {
+    public static Menu of(MenuGroup createMenuGroup, List<MenuProduct> menuProducts, long price, boolean displayed) {
+        return MenuFactory.of(createMenuGroup, menuProducts, BigDecimal.valueOf(price), displayed);
+    }
+
+    public static Menu of(MenuGroup createMenuGroup, List<MenuProduct> menuProducts, BigDecimal price, boolean displayed) {
         final Menu menu = new Menu();
         menu.setMenuGroupId(createMenuGroup.getId());
         menu.setName(DEFAULT_MENU_NAME);
         menu.setPrice(price);
         menu.setMenuProducts(menuProducts);
+        menu.setDisplayed(displayed);
         return menu;
     }
 
