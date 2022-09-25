@@ -126,7 +126,7 @@ class ProductServiceTest {
     private static Product getProduct(String name, Long price) {
         return getProduct(name, getPrice(price));
     }
-    
+
     private static Product getProduct(String name, BigDecimal price) {
         return new Product(name, price);
     }
