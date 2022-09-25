@@ -59,4 +59,8 @@ public class MenuProduct {
     public void setProductId(final UUID productId) {
         this.productId = productId;
     }
+
+    public boolean isSameProductId(UUID productId) {
+        return this.productId.equals(productId);
+    };
 }

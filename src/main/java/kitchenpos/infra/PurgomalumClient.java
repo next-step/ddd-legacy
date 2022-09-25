@@ -1,5 +1,6 @@
 package kitchenpos.infra;
 
+import kitchenpos.domain.ProfanityClient;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -8,7 +9,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 @Component
-public class PurgomalumClient {
+public class PurgomalumClient implements ProfanityClient {
     private final RestTemplate restTemplate;
 
     public PurgomalumClient(final RestTemplateBuilder restTemplateBuilder) {

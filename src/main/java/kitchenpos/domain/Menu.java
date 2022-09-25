@@ -99,4 +99,10 @@ public class Menu {
     public void setMenuGroupId(final UUID menuGroupId) {
         this.menuGroupId = menuGroupId;
     }
+
+    public boolean containProduct(UUID productId) {
+        return menuProducts.stream()
+                .anyMatch(menuProduct -> menuProduct.isSameProductId(productId));
+
+    }
 }
