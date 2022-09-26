@@ -24,7 +24,6 @@ public class OrderServiceTest {
 
     private MenuRepository menuRepository;
     private ProductRepository productRepository;
-    private ProfanityClient profanityClient;
     private OrderRepository orderRepository;
     private OrderTableRepository orderTableRepository;
     private RidersClient ridersClient;
@@ -37,7 +36,6 @@ public class OrderServiceTest {
     public void setUp() {
         menuGroupRepository = new InMemoryMenuGroupRepository();
         productRepository = new InMemoryProductRepository();
-        profanityClient = new FakeProfanityClient();
         menuRepository = new InMemoryMenuRepository();
         orderRepository = new InMemoryOrderRepository();
         orderTableRepository = new InMemoryOrderTableRepository();
@@ -334,6 +332,56 @@ public class OrderServiceTest {
 
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> orderService.complete(accept.getId()));
+    }
+
+    // 매장 주문
+    @Test
+    @DisplayName("매장 주문 시, 손님은 해당 테이블에 앉아야 한다. (점유하고 있어야 한다.)")
+    public void order_eat_in_guest_sit() {
+        final OrderTable orderTable = orderTableRepository.save(OrderTableFactory.of(false));
+
+        final Order order = new Order();
+        order.setType(OrderType.EAT_IN);
+        order.setOrderLineItems(List.of(OrderLineItemFactory.of(createMenuAndSave(true))));
+        order.setOrderTableId(orderTable.getId());
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> orderService.create(order));
+    }
+
+    @Test
+    @DisplayName("메뉴가 제공되었을 때, 주문을 완료할 수 있다.")
+    public void complete_status_be_served() {
+        final OrderTable orderTable = orderTableRepository.save(OrderTableFactory.of(false));
+
+        final Order order = new Order();
+        order.setType(OrderType.EAT_IN);
+        order.setOrderLineItems(List.of(OrderLineItemFactory.of(createMenuAndSave(true))));
+        order.setStatus(OrderStatus.ACCEPTED);
+        order.setOrderTableId(orderTable.getId());
+
+        Order request = orderRepository.save(order);
+
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> orderService.complete(request.getId()));
+    }
+
+    @Test
+    @DisplayName("주문이 모두 완료된 테이블이 있다면 비어있는 상태로 정리한다.")
+    public void order_served() {
+        final OrderTable orderTable = orderTableRepository.save(OrderTableFactory.of(false));
+        final Order order = new Order();
+        order.setType(OrderType.EAT_IN);
+        order.setOrderLineItems(List.of(OrderLineItemFactory.of(createMenuAndSave(true))));
+        order.setStatus(OrderStatus.SERVED);
+        order.setOrderTable(orderTable);
+        order.setOrderTableId(orderTable.getId());
+        Order request = orderRepository.save(order);
+
+        Order actual = orderService.complete(request.getId());
+
+        assertThat(actual.getOrderTable().getNumberOfGuests()).isZero();
+        assertThat(actual.getOrderTable().isOccupied()).isFalse();
     }
 
 
