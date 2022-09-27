@@ -23,11 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 class MenuGroupServiceTest {
-    @SpyBean
-    private MenuGroupService menuGroupService;
-
     @Autowired
-    private MenuGroupRepository menuGroupRepository;
+    private MenuGroupService menuGroupService;
 
     @DisplayName("이름이 없을 경우 예외 발생한다.")
     @NullAndEmptySource
@@ -61,7 +58,12 @@ class MenuGroupServiceTest {
     @DisplayName("DB에 데이터가 존재할 경우 조회 데이터가 1개 이상이다.")
     @Test
     public void findAll_data_exist() {
-        //given & when
+        //given
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName("test");
+        menuGroupService.create(menuGroup);
+
+        // when
         List<MenuGroup> list = menuGroupService.findAll();
 
         //then
