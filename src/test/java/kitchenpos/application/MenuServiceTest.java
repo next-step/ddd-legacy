@@ -1,7 +1,11 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fakeobject.FakeMenuGroupRepository;
+import kitchenpos.application.fakeobject.FakeMenuRepository;
+import kitchenpos.application.fakeobject.FakeProductRepository;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,24 +30,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.from;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Transactional
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
 class MenuServiceTest {
-    @SpyBean
     private MenuService menuService;
 
-    @Autowired
-    private MenuRepository menuRepository;
+    private FakeMenuRepository fakeMenuRepository;
 
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
+    private FakeMenuGroupRepository fakeMenuGroupRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+    private FakeProductRepository fakeProductRepository;
 
     @MockBean
     private PurgomalumClient purgomalumClient;
+
+    @BeforeEach
+    void setUp() {
+        this.fakeMenuRepository = new FakeMenuRepository();
+        this.fakeMenuGroupRepository = new FakeMenuGroupRepository();
+        this.fakeProductRepository = new FakeProductRepository();
+        this.menuService = new MenuService(fakeMenuRepository, fakeMenuGroupRepository, fakeProductRepository, purgomalumClient);
+    }
 
     @DisplayName("가격정보가 없는 경우 메뉴 추가 실패한다.")
     @MethodSource("provideNullOrMinusBigDecimal")
@@ -170,19 +175,6 @@ class MenuServiceTest {
         //when & then
         assertThrows(NoSuchElementException.class, () -> menuService.changePrice(menuId, menu));
     }
-
-//    @DisplayName("메뉴 가격이 유효하지 않을 경우 가격 변경에 실패한다.")
-//    @MethodSource("provideValidMenuIdAndInvalidPrice")
-//    @ParameterizedTest
-//    public void changePrice_invalid_price(BigDecimal price, UUID menuId) {
-//        //given
-//        Menu menu = new Menu();
-//        menu.setPrice(price);
-//        menu.setId(menuId);
-//
-//        //when & then
-//        assertThrows(IllegalArgumentException.class, () -> menuService.changePrice(menuId, menu));
-//    }
 
     @DisplayName("메뉴가 존재하고, 가격이 유효할 경우 가격 변경에 성공한다.")
     @MethodSource("provideValidMenuIdAndValidPrice")

@@ -5,28 +5,39 @@ import kitchenpos.domain.MenuGroupRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class FakeMenuGroupRepository implements MenuGroupRepository {
-    private List<MenuGroup> menuGroups;
+    private List<MenuGroup> menuGroupList;
 
     public FakeMenuGroupRepository() {
-        this.menuGroups = new ArrayList<>();
+        this.menuGroupList = new ArrayList<>();
 
         for (int i = 1; i <= 5; i++) {
-            menuGroups.add(MenuGroup.of("test" + i));
+            menuGroupList.add(MenuGroup.of(UUID.fromString("5e9879b7-6112-4791-a4ce-f22e94af875" + i), "test" + i));
         }
     }
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
         menuGroup.setId(UUID.randomUUID());
-        menuGroups.add(menuGroup);
+        menuGroupList.add(menuGroup);
         return menuGroup;
     }
 
     @Override
     public List<MenuGroup> findAll() {
-        return menuGroups;
+        return menuGroupList;
+    }
+
+    @Override
+    public Optional<MenuGroup> findById(UUID menuGroupId) {
+        for (MenuGroup menuGroup : menuGroupList) {
+            if (menuGroup.getId().equals(menuGroupId)) {
+                return Optional.of(menuGroup);
+            }
+        }
+        return Optional.empty();
     }
 }

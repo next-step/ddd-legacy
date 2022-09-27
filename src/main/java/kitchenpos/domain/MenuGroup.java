@@ -19,12 +19,13 @@ public class MenuGroup {
     public MenuGroup() {
     }
 
-    private MenuGroup(String name) {
+    private MenuGroup(UUID id, String name) {
+        this.id = id;
         this.name = name;
     }
 
-    public static MenuGroup of(String name) {
-        return new MenuGroup(name);
+    public static MenuGroup of(UUID id, String name) {
+        return new MenuGroup(id, name);
     }
 
     public UUID getId() {
