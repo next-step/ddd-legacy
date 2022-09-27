@@ -1,13 +1,15 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fakeobject.FakeMenuGroupRepository;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.SpyBean;
@@ -19,12 +21,16 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Transactional
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
 class MenuGroupServiceTest {
-    @Autowired
+    private FakeMenuGroupRepository fakeMenuGroupRepository;
+
     private MenuGroupService menuGroupService;
+
+    @BeforeEach
+    void setUp() {
+        this.fakeMenuGroupRepository = new FakeMenuGroupRepository();
+        this.menuGroupService = new MenuGroupService(fakeMenuGroupRepository);
+    }
 
     @DisplayName("이름이 없을 경우 예외 발생한다.")
     @NullAndEmptySource

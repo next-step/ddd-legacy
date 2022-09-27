@@ -19,6 +19,14 @@ public class MenuGroup {
     public MenuGroup() {
     }
 
+    private MenuGroup(String name) {
+        this.name = name;
+    }
+
+    public static MenuGroup of(String name) {
+        return new MenuGroup(name);
+    }
+
     public UUID getId() {
         return id;
     }
