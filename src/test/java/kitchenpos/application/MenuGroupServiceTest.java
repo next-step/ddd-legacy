@@ -43,11 +43,11 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     public void create_name_exist(String name) {
         //given
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(name);
+        MenuGroup menuGroupCreateRequest = new MenuGroup();
+        menuGroupCreateRequest.setName(name);
 
         //when
-        MenuGroup result = menuGroupService.create(menuGroup);
+        MenuGroup result = menuGroupService.create(menuGroupCreateRequest);
 
         //then
         assertThat(result)
@@ -59,9 +59,9 @@ class MenuGroupServiceTest {
     @Test
     public void findAll_data_exist() {
         //given
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName("test");
-        menuGroupService.create(menuGroup);
+        MenuGroup menuGroupCreateRequest = new MenuGroup();
+        menuGroupCreateRequest.setName("test");
+        menuGroupService.create(menuGroupCreateRequest);
 
         // when
         List<MenuGroup> list = menuGroupService.findAll();
