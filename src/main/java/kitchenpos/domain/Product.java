@@ -51,4 +51,12 @@ public class Product {
     public void setPrice(final BigDecimal price) {
         this.price = price;
     }
+
+    public void changePrice(long price) {
+        changePrice(BigDecimal.valueOf(price));
+    }
+
+    public void changePrice(BigDecimal price) {
+        this.price = price;
+    }
 }

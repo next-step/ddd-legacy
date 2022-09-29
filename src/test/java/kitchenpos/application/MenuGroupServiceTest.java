@@ -1,7 +1,6 @@
 package kitchenpos.application;
 
 import kitchenpos.application.fake.FakeMenuGroupRepository;
-import kitchenpos.application.fake.FakeMenuRepository;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.assertj.core.util.Lists;
@@ -14,7 +13,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 class MenuGroupServiceTest {
     private final MenuGroupRepository menuGroupRepository = new FakeMenuGroupRepository();
@@ -39,7 +37,6 @@ class MenuGroupServiceTest {
 
         assertThatThrownBy(() -> service.create(menuGroup))
                 .isInstanceOf(IllegalArgumentException.class);
-
     }
 
     @Test
@@ -54,6 +51,5 @@ class MenuGroupServiceTest {
 
         List<MenuGroup> menuGroups = service.findAll();
         assertThat(menuGroups).containsAll(savedMenuGroups);
-
     }
 }

@@ -105,4 +105,20 @@ public class Menu {
                 .anyMatch(menuProduct -> menuProduct.isSameProductId(productId));
 
     }
+
+    public void changedPrice(long price) {
+        changedPrice(BigDecimal.valueOf(price));
+    }
+
+    public void changedPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public void display() {
+        this.displayed = true;
+    }
+
+    public void hide() {
+        this.displayed = false;
+    }
 }

@@ -4,7 +4,6 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import org.assertj.core.util.Lists;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
