@@ -1,17 +1,19 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.application.fakeobject.FakeOrderRepository;
+import kitchenpos.application.fakeobject.FakeOrderTableRepository;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderType;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -19,18 +21,20 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Transactional
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
-    @SpyBean
     private OrderTableService orderTableService;
 
-    @Autowired
-    private OrderTableRepository orderTableRepository;
+    private FakeOrderTableRepository fakeOrderTableRepository;
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private FakeOrderRepository fakeOrderRepository;
+
+    @BeforeEach
+    void setUp() {
+        this.fakeOrderTableRepository = new FakeOrderTableRepository();
+        this.fakeOrderRepository = new FakeOrderRepository();
+        this.orderTableService = new OrderTableService(fakeOrderTableRepository, fakeOrderRepository);
+    }
 
     @DisplayName("이름이 없으면 주문테이블 추가 실패한다.")
     @Test
@@ -83,12 +87,15 @@ class OrderTableServiceTest {
     public void clear_not_completed_order_table() {
         //given
         OrderTable orderTable = makeRandomOrderTable();
-        orderTableRepository.save(orderTable);
+        fakeOrderTableRepository.save(orderTable);
 
         Order order = makeRandomOrder();
         order.setStatus(OrderStatus.WAITING);
         order.setOrderTable(orderTable);
-        orderRepository.save(order);
+        order.setOrderTableId(orderTable.getId());
+        fakeOrderRepository.save(order);
+
+        fakeOrderRepository.setOrderTablesOnOrder(fakeOrderTableRepository.findAll());
 
         //when & then
         assertThrows(IllegalStateException.class, () -> orderTableService.clear(orderTable.getId()));
@@ -99,12 +106,14 @@ class OrderTableServiceTest {
     public void clear_completed_order_table() {
         //given
         OrderTable orderTable = makeRandomOrderTable();
-        orderTableRepository.save(orderTable);
+        fakeOrderTableRepository.save(orderTable);
 
         Order order = makeRandomOrder();
         order.setStatus(OrderStatus.COMPLETED);
         order.setOrderTable(orderTable);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
+
+        fakeOrderRepository.setOrderTablesOnOrder(fakeOrderTableRepository.findAll());
 
         //when & then
         assertThat(orderTableService.clear(orderTable.getId()))
@@ -140,7 +149,7 @@ class OrderTableServiceTest {
         //given
         OrderTable orderTable = makeRandomOrderTable();
         orderTable.setOccupied(false);
-        orderTableRepository.save(orderTable);
+        fakeOrderTableRepository.save(orderTable);
 
         //when & then
         assertThrows(IllegalStateException.class, () -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable));
@@ -152,7 +161,7 @@ class OrderTableServiceTest {
         //given
         OrderTable orderTable = makeRandomOrderTable();
         orderTable.setOccupied(true);
-        orderTableRepository.save(orderTable);
+        fakeOrderTableRepository.save(orderTable);
 
         //when & then
         assertThat(orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable))
