@@ -40,7 +40,7 @@ public class InputProvider {
     }
 
     public static Stream<List<UUID>> provideValidProductIdList() {
-        return Stream.of(List.of(UUID.fromString("0ac16db7-1b02-4a87-b9c1-e7d8f226c48d")));
+        return Stream.of(List.of(UUID.fromString("0ac16db7-1b02-4a87-b9c1-e7d8f226c481")));
     }
 
     public static Stream<List<UUID>> provideInvalidProductIdList() {

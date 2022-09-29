@@ -3,7 +3,8 @@ package kitchenpos.application;
 import kitchenpos.application.fakeobject.FakeMenuGroupRepository;
 import kitchenpos.application.fakeobject.FakeMenuRepository;
 import kitchenpos.application.fakeobject.FakeProductRepository;
-import kitchenpos.domain.*;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuProduct;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,14 +12,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.from;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
     private MenuService menuService;
 
@@ -38,8 +36,7 @@ class MenuServiceTest {
     private FakeMenuGroupRepository fakeMenuGroupRepository;
 
     private FakeProductRepository fakeProductRepository;
-
-    @MockBean
+    @Mock
     private PurgomalumClient purgomalumClient;
 
     @BeforeEach
@@ -184,6 +181,7 @@ class MenuServiceTest {
         Menu menu = new Menu();
         menu.setPrice(price);
         menu.setId(menuId);
+        fakeMenuRepository.setMenuProductsOnMenu(fakeProductRepository.findAll());
 
         //when & then
         assertThat(menuService.changePrice(menuId, menu)).isNotNull();
@@ -202,6 +200,7 @@ class MenuServiceTest {
     @ParameterizedTest
     public void display_exist_menu(UUID menuId) {
         //given
+        fakeMenuRepository.setMenuProductsOnMenu(fakeProductRepository.findAll());
         Menu menu = menuService.display(menuId);
 
         //when & then

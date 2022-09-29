@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.PurgomalumClientImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
