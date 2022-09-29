@@ -1,22 +1,19 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.MenuRepository;
+import kitchenpos.application.fakeobject.FakeMenuRepository;
+import kitchenpos.application.fakeobject.FakeProductRepository;
 import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -25,21 +22,23 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Transactional
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
-    @SpyBean
     private ProductService productService;
 
-    @Autowired
-    private ProductRepository productRepository;
+    private FakeProductRepository fakeProductRepository;
 
-    @Autowired
-    private MenuRepository menuRepository;
+    private FakeMenuRepository fakeMenuRepository;
 
-    @MockBean
+    @Mock
     private PurgomalumClient purgomalumClient;
+
+    @BeforeEach
+    void setUp() {
+        this.fakeMenuRepository = new FakeMenuRepository();
+        this.fakeProductRepository = new FakeProductRepository();
+        this.productService = new ProductService(fakeProductRepository, fakeMenuRepository, purgomalumClient);
+    }
 
     @DisplayName("가격 정보가 없거나 음수일 경우 상품 추가 실패한다.")
     @MethodSource("kitchenpos.application.InputProvider#provideNullOrMinusPrice")
@@ -115,6 +114,7 @@ class ProductServiceTest {
         Product product = new Product();
         product.setPrice(price);
         product.setId(productId);
+        fakeMenuRepository.setMenuProductsOnMenu(fakeProductRepository.findAll());
 
         //when & then
         assertThat(productService.changePrice(productId, product)).isNotNull();
