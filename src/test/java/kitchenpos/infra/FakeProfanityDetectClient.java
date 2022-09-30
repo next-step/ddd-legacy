@@ -2,7 +2,7 @@ package kitchenpos.infra;
 
 import java.util.Arrays;
 
-class FakeProfanityDetectClient implements ProfanityDetectClient {
+public class FakeProfanityDetectClient implements ProfanityDetectClient {
 
     public static final String[] PROFANITY_WORDS = {
             "holiday", "bed", "anxious", "everyday", "reach",

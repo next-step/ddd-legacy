@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-class FakeMenuRepository implements MenuRepository {
+public class FakeMenuRepository implements MenuRepository {
 
     private final Map<UUID, Menu> menus = new HashMap<>();
 
