@@ -8,9 +8,9 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -47,7 +47,7 @@ class MenuServiceTest {
         this.menuService = new MenuService(fakeMenuRepository, fakeMenuGroupRepository, fakeProductRepository, purgomalumClient);
     }
 
-    @DisplayName("가격정보가 없는 경우 메뉴 추가 실패한다.")
+    @DisplayName("가격정보가 없거나 유효하지 않은 가격을 설정했을 경우 메뉴 추가 실패한다.")
     @MethodSource("provideNullOrMinusBigDecimal")
     @ParameterizedTest
     public void create_menu_group_not_exist(BigDecimal price) {
@@ -60,12 +60,12 @@ class MenuServiceTest {
     }
 
     @DisplayName("메뉴 그룹이 없는 경우 메뉴 추가 실패한다.")
-    @MethodSource("provideValidPriceAndNonExistMenuGroupId")
+    @MethodSource("kitchenpos.application.InputProvider#provideInvalidMenuGroupId")
     @ParameterizedTest
-    public void create_menu_group_not_exist(BigDecimal price, UUID menuGroupId) {
+    public void create_menu_group_not_exist(UUID menuGroupId) {
         //given
         Menu menu = new Menu();
-        menu.setPrice(price);
+        menu.setPrice(BigDecimal.ONE);
         menu.setMenuGroupId(menuGroupId);
 
         //when & then
@@ -73,27 +73,26 @@ class MenuServiceTest {
     }
 
     @DisplayName("메뉴 상품이 없는 경우 추가 실패한다.")
-    @MethodSource("provideValidPriceAndExistMenuGroupIdAndEmptyMenuProductList")
-    @ParameterizedTest
-    public void create_empty_menuProductList(BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProductList) {
+    @Test
+    public void create_empty_menuProductList() {
         //given
         Menu menu = new Menu();
-        menu.setPrice(price);
-        menu.setMenuGroupId(menuGroupId);
-        menu.setMenuProducts(menuProductList);
+        menu.setPrice(BigDecimal.valueOf(100));
+        menu.setMenuGroupId(fakeMenuGroupRepository.findAll().get(0).getId());
+        menu.setMenuProducts(new ArrayList<>());
 
         //when & then
         assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
     }
 
     @DisplayName("메뉴 상품이 존재하지 않는 경우 추가 실패한다.")
-    @MethodSource("provideValidPriceAndExistMenuGroupIdAndNonExistProductList")
+    @MethodSource("kitchenpos.application.InputProvider#provideInvalidProductListWithInvalidQuantity")
     @ParameterizedTest
-    public void create_non_exist_menuProductList(BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProductList) {
+    public void create_non_exist_menuProductList(List<MenuProduct> menuProductList) {
         //given
         Menu menu = new Menu();
-        menu.setPrice(price);
-        menu.setMenuGroupId(menuGroupId);
+        menu.setPrice(BigDecimal.valueOf(100));
+        menu.setMenuGroupId(fakeMenuGroupRepository.findAll().get(0).getId());
         menu.setMenuProducts(menuProductList);
 
         //when & then
@@ -101,13 +100,13 @@ class MenuServiceTest {
     }
 
     @DisplayName("메뉴 상품 수량이 음수인 경우 추가 실패한다.")
-    @MethodSource("provideValidPriceAndExistMenuGroupIdAndInvalidQuantityMenuProductList")
+    @MethodSource("kitchenpos.application.InputProvider#provideValidProductListWithInvalidQuantity")
     @ParameterizedTest
-    public void create_invalid_quantity_menuProductList(BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProductList) {
+    public void create_invalid_quantity_menuProductList(List<MenuProduct> menuProductList) {
         //given
         Menu menu = new Menu();
-        menu.setPrice(price);
-        menu.setMenuGroupId(menuGroupId);
+        menu.setPrice(BigDecimal.ONE);
+        menu.setMenuGroupId(fakeMenuGroupRepository.findAll().get(0).getId());
         menu.setMenuProducts(menuProductList);
 
         //when & then
@@ -115,13 +114,13 @@ class MenuServiceTest {
     }
 
     @DisplayName("메뉴 상품 금액 총합이 메뉴의 금액보다 낮을 경우 추가 실패한다.")
-    @MethodSource("provideValidPriceAndExistMenuGroupIdAndValidQuantityMenuProductListAndHighPrice")
+    @MethodSource("kitchenpos.application.InputProvider#provideValidProductListWithValidQuantity")
     @ParameterizedTest
-    public void create_high_price_menuProductList(BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProductList) {
+    public void create_high_price_menuProductList(List<MenuProduct> menuProductList) {
         //given
         Menu menu = new Menu();
-        menu.setPrice(price);
-        menu.setMenuGroupId(menuGroupId);
+        menu.setPrice(BigDecimal.valueOf(Long.MAX_VALUE));
+        menu.setMenuGroupId(fakeMenuGroupRepository.findAll().get(0).getId());
         menu.setMenuProducts(menuProductList);
 
         //when & then
@@ -129,13 +128,13 @@ class MenuServiceTest {
     }
 
     @DisplayName("메뉴가 존재할 경우 추가 실패한다.")
-    @MethodSource("provideValidPriceAndExistMenuGroupIdAndValidQuantityMenuProductListAndValidPrice")
+    @MethodSource("kitchenpos.application.InputProvider#provideValidProductListWithValidQuantity")
     @ParameterizedTest
-    public void create_exist_name_menuProductList(BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProductList) {
+    public void create_exist_name_menuProductList(List<MenuProduct> menuProductList) {
         //given
         Menu menu = new Menu();
-        menu.setPrice(price);
-        menu.setMenuGroupId(menuGroupId);
+        menu.setPrice(BigDecimal.ONE);
+        menu.setMenuGroupId(fakeMenuGroupRepository.findAll().get(0).getId());
         menu.setMenuProducts(menuProductList);
         menu.setName("asdf");
         Mockito.when(purgomalumClient.containsProfanity(menu.getName())).thenReturn(true);
@@ -145,13 +144,13 @@ class MenuServiceTest {
     }
 
     @DisplayName("메뉴가 존재하지 않을 경우 추가 성공한다.")
-    @MethodSource("provideValidPriceAndExistMenuGroupIdAndValidQuantityMenuProductListAndValidPrice")
+    @MethodSource("kitchenpos.application.InputProvider#provideValidProductListWithValidQuantity")
     @ParameterizedTest
-    public void create_non_exist_name_menuProductList(BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProductList) {
+    public void create_non_exist_name_menuProductList(List<MenuProduct> menuProductList) {
         //given
         Menu menu = new Menu();
-        menu.setPrice(price);
-        menu.setMenuGroupId(menuGroupId);
+        menu.setPrice(BigDecimal.ONE);
+        menu.setMenuGroupId(fakeMenuGroupRepository.findAll().get(0).getId());
         menu.setMenuProducts(menuProductList);
         menu.setName("asdf");
         Mockito.when(purgomalumClient.containsProfanity(menu.getName())).thenReturn(false);
@@ -161,12 +160,12 @@ class MenuServiceTest {
     }
 
     @DisplayName("메뉴가 존재하지 않을 경우 가격 변경에 실패한다.")
-    @MethodSource("provideInvalidMenuIdAndValidPrice")
+    @MethodSource("kitchenpos.application.InputProvider#provideInvalidMenuId")
     @ParameterizedTest
-    public void changePrice_non_exist_menu(BigDecimal price, UUID menuId) {
+    public void changePrice_non_exist_menu(UUID menuId) {
         //given
         Menu menu = new Menu();
-        menu.setPrice(price);
+        menu.setPrice(BigDecimal.ONE);
         menu.setId(menuId);
 
         //when & then
@@ -174,17 +173,16 @@ class MenuServiceTest {
     }
 
     @DisplayName("메뉴가 존재하고, 가격이 유효할 경우 가격 변경에 성공한다.")
-    @MethodSource("provideValidMenuIdAndValidPrice")
-    @ParameterizedTest
-    public void changePrice_exist_menu_valid_price(BigDecimal price, UUID menuId) {
+    @Test
+    public void changePrice_exist_menu_valid_price() {
         //given
         Menu menu = new Menu();
-        menu.setPrice(price);
-        menu.setId(menuId);
+        menu.setPrice(BigDecimal.ONE);
+        menu.setId(fakeMenuRepository.findAll().get(0).getId());
         fakeMenuRepository.setMenuProductsOnMenu(fakeProductRepository.findAll());
 
         //when & then
-        assertThat(menuService.changePrice(menuId, menu)).isNotNull();
+        assertThat(menuService.changePrice(menu.getId(), menu)).isNotNull();
     }
 
     @DisplayName("메뉴가 존재하지 않으면 전시 불가.")
@@ -230,100 +228,5 @@ class MenuServiceTest {
 
     public static Stream<BigDecimal> provideNullOrMinusBigDecimal() {
         return Stream.of(null, BigDecimal.valueOf(-1));
-    }
-
-    public static Stream<Arguments> provideValidPriceAndNonExistMenuGroupId() {
-        Stream<BigDecimal> validPriceStream = InputProvider.provideValidPrice();
-        return validPriceStream.map(
-                v -> Arguments.of(v, new UUID(1, 2))
-        );
-    }
-
-    public static Stream<Arguments> provideValidPriceAndExistMenuGroupIdAndEmptyMenuProductList() {
-        Stream<BigDecimal> validPriceStream = InputProvider.provideValidPrice();
-        Stream<UUID> validMenuGroupIdStream = InputProvider.provideValidMenuGroupId();
-        return validPriceStream.flatMap(
-                price -> validMenuGroupIdStream.map(menuGroupId -> Arguments.of(price, menuGroupId, new ArrayList<>()))
-        );
-    }
-
-    public static Stream<Arguments> provideValidPriceAndExistMenuGroupIdAndNonExistProductList() {
-        Stream<BigDecimal> validPriceStream = InputProvider.provideValidPrice();
-        Stream<UUID> validMenuGroupIdStream = InputProvider.provideValidMenuGroupId();
-        Stream<List<MenuProduct>> notExistMenuProductStream = InputProvider.provideInvalidProductListWithInvalidQuantity();
-
-        return validPriceStream.flatMap(
-                price -> validMenuGroupIdStream.flatMap(
-                        menuGroupId -> notExistMenuProductStream.map(
-                            nonExistMenuProduct -> Arguments.of(price, menuGroupId, nonExistMenuProduct)
-                        )
-                )
-        );
-    }
-
-    public static Stream<Arguments> provideValidPriceAndExistMenuGroupIdAndInvalidQuantityMenuProductList() {
-        Stream<BigDecimal> validPriceStream = InputProvider.provideValidPrice();
-        Stream<UUID> validMenuGroupIdStream = InputProvider.provideValidMenuGroupId();
-        Stream<List<MenuProduct>> existMenuProductStream = InputProvider.provideValidProductListWithInvalidQuantity();
-
-        return validPriceStream.flatMap(
-                price -> validMenuGroupIdStream.flatMap(
-                        menuGroupId -> existMenuProductStream.map(
-                                existMenuProduct -> Arguments.of(price, menuGroupId, existMenuProduct)
-                        )
-                )
-        );
-    }
-
-    public static Stream<Arguments> provideValidPriceAndExistMenuGroupIdAndValidQuantityMenuProductListAndHighPrice() {
-        Stream<BigDecimal> validPriceStream = InputProvider.provideHighPrice();
-        Stream<UUID> validMenuGroupIdStream = InputProvider.provideValidMenuGroupId();
-        Stream<List<MenuProduct>> existMenuProductStream = InputProvider.provideValidProductListWithValidQuantity();
-
-        return validPriceStream.flatMap(
-                price -> validMenuGroupIdStream.flatMap(
-                        menuGroupId -> existMenuProductStream.map(
-                                existMenuProduct -> Arguments.of(price, menuGroupId, existMenuProduct)
-                        )
-                )
-        );
-    }
-
-    public static Stream<Arguments> provideValidPriceAndExistMenuGroupIdAndValidQuantityMenuProductListAndValidPrice() {
-        Stream<BigDecimal> validPriceStream = InputProvider.provideValidPrice();
-        Stream<UUID> validMenuGroupIdStream = InputProvider.provideValidMenuGroupId();
-        Stream<List<MenuProduct>> existMenuProductStream = InputProvider.provideValidProductListWithValidQuantity();
-
-        return validPriceStream.flatMap(
-                price -> validMenuGroupIdStream.flatMap(
-                        menuGroupId -> existMenuProductStream.map(
-                                existMenuProduct -> Arguments.of(price, menuGroupId, existMenuProduct)
-                        )
-                )
-        );
-    }
-
-    public static Stream<Arguments> provideValidMenuIdAndInvalidPrice() {
-        Stream<BigDecimal> invalidPriceStream = InputProvider.provideInvalidPrice();
-        Stream<UUID> validMenuId = InputProvider.provideValidMenuId();
-        return invalidPriceStream.flatMap(
-                invalidPrice -> validMenuId.map(menuId -> Arguments.of(invalidPrice, menuId))
-        );
-    }
-
-    public static Stream<Arguments> provideInvalidMenuIdAndValidPrice() {
-        Stream<BigDecimal> validPriceStream = InputProvider.provideValidPrice();
-        Stream<UUID> invalidMenuId = InputProvider.provideInvalidMenuId();
-        return validPriceStream.flatMap(
-                validPrice -> invalidMenuId.map(menuId -> Arguments.of(validPrice, menuId))
-        );
-    }
-
-    public static Stream<Arguments> provideValidMenuIdAndValidPrice() {
-        Stream<BigDecimal> validPriceStream = InputProvider.provideValidPrice();
-        Stream<UUID> validMenuId = InputProvider.provideValidMenuId();
-        return validPriceStream.flatMap(
-                validPrice -> validMenuId.map(menuId -> Arguments.of(validPrice, menuId))
-        );
     }
 }

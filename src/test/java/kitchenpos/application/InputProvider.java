@@ -110,4 +110,8 @@ public class InputProvider {
     public static Stream<UUID> provideNonExistOrderId() {
         return Stream.of(new UUID(1, 2));
     }
+
+    public static Stream<UUID> provideInvalidMenuGroupId() {
+        return Stream.of(new UUID(1, 2));
+    }
 }
