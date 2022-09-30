@@ -84,11 +84,12 @@ public class FakeMenuRepository implements MenuRepository {
         return result;
     }
 
-    @Override
-    public void saveAll(List<Menu> menuList) {
+    public List<Menu> saveAll(Iterable<Menu> menuList) {
+        List<Menu> result = new ArrayList<>();
         for (Menu menu : menuList) {
-            save(menu);
+            result.add(save(menu));
         }
+        return result;
     }
 
     public void setMenuProductsOnMenu(List<Product> productList) {
