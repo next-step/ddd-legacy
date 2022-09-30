@@ -27,6 +27,7 @@ import kitchenpos.fake.FakePugomalumClinet;
 import kitchenpos.fake.InMemoryMenuGroupRepository;
 import kitchenpos.fake.InMemoryMenuRepository;
 import kitchenpos.fake.InMemoryProductRepository;
+import kitchenpos.infra.DefaultPurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -51,7 +52,7 @@ class MenuServiceTest {
         menuRepository = new InMemoryMenuRepository();
         ProductRepository productRepository = new InMemoryProductRepository();
         MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
-        PurgomalumClient purgomalumClient = new FakePugomalumClinet(new RestTemplateBuilder());
+        PurgomalumClient purgomalumClient = new FakePugomalumClinet();
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
 
         등록된_메뉴그룹 = menuGroupRepository.save(createMenuGroup("세트1"));

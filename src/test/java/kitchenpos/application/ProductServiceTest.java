@@ -38,7 +38,7 @@ class ProductServiceTest {
         menuRepository = new InMemoryMenuRepository();
         productService = new ProductService(new InMemoryProductRepository()
                 , menuRepository
-                , new FakePugomalumClinet(new RestTemplateBuilder()));
+                , new FakePugomalumClinet());
     }
 
 
