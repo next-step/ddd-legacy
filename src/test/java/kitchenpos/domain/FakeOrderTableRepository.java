@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-class FakeOrderTableRepository implements OrderTableRepository {
+public class FakeOrderTableRepository implements OrderTableRepository {
 
     private final Map<UUID, OrderTable> orderTables = new HashMap<>();
 
