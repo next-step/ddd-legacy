@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -17,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -94,45 +92,29 @@ class ProductServiceTest {
     }
 
     @DisplayName("상품이 존재하지 않을 경우 가격변경에 실패한다.")
-    @MethodSource("provideNonExistProductIdAndPrice")
+    @MethodSource("kitchenpos.application.InputProvider#provideNonExistProductId")
     @ParameterizedTest
-    public void changePrice_non_exist_product(BigDecimal price, UUID productId) {
+    public void changePrice_non_exist_product(UUID productId) {
         //given
         Product product = new Product();
-        product.setPrice(price);
-        product.setId(productId);
+        product.setPrice(BigDecimal.ONE);
+        product.setId(fakeProductRepository.findAll().get(0).getId());
 
         //when & then
         assertThrows(NoSuchElementException.class, () -> productService.changePrice(productId, product));
     }
 
     @DisplayName("상품 이름이 존재할 경우 상품 추가 성공한다.")
-    @MethodSource("provideExistProductIdAndPrice")
+    @MethodSource("kitchenpos.application.InputProvider#provideExistProductId")
     @ParameterizedTest
-    public void changePrice_exist_product(BigDecimal price, UUID productId) {
+    public void changePrice_exist_product(UUID productId) {
         //given
         Product product = new Product();
-        product.setPrice(price);
+        product.setPrice(BigDecimal.ONE);
         product.setId(productId);
         fakeMenuRepository.setMenuProductsOnMenu(fakeProductRepository.findAll());
 
         //when & then
         assertThat(productService.changePrice(productId, product)).isNotNull();
-    }
-
-    public static Stream<Arguments> provideExistProductIdAndPrice() {
-        Stream<UUID> nonExistProductId = InputProvider.provideExistProductId();
-        Stream<BigDecimal> validPrice = InputProvider.provideValidPrice();
-        return nonExistProductId.flatMap(
-                productId -> validPrice.map(price -> Arguments.of(price, productId))
-        );
-    }
-
-    public static Stream<Arguments> provideNonExistProductIdAndPrice() {
-        Stream<UUID> nonExistProductId = InputProvider.provideNonExistProductId();
-        Stream<BigDecimal> validPrice = InputProvider.provideValidPrice();
-        return nonExistProductId.flatMap(
-                productId -> validPrice.map(price -> Arguments.of(price, productId))
-        );
     }
 }
