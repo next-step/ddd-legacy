@@ -1,9 +1,6 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.infra.JpaMenuRepository;
-import kitchenpos.infra.JpaOrderRepository;
-import kitchenpos.infra.JpaOrderTableRepository;
 import kitchenpos.infra.KitchenridersClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,15 +12,15 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderService {
-    private final JpaOrderRepository orderRepository;
-    private final JpaMenuRepository menuRepository;
-    private final JpaOrderTableRepository orderTableRepository;
+    private final OrderRepository orderRepository;
+    private final MenuRepository menuRepository;
+    private final OrderTableRepository orderTableRepository;
     private final KitchenridersClient kitchenridersClient;
 
     public OrderService(
-        final JpaOrderRepository orderRepository,
-        final JpaMenuRepository menuRepository,
-        final JpaOrderTableRepository orderTableRepository,
+        final OrderRepository orderRepository,
+        final MenuRepository menuRepository,
+        final OrderTableRepository orderTableRepository,
         final KitchenridersClient kitchenridersClient
     ) {
         this.orderRepository = orderRepository;

@@ -1,19 +1,20 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fakeobject.FakeMenuGroupRepository;
+import kitchenpos.application.fakeobject.FakeMenuRepository;
+import kitchenpos.application.fakeobject.FakeOrderRepository;
+import kitchenpos.application.fakeobject.FakeOrderTableRepository;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,27 +25,29 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Transactional
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
-    @SpyBean
     private OrderService orderService;
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private FakeOrderRepository fakeOrderRepository;
 
-    @Autowired
-    private MenuRepository menuRepository;
+    private FakeMenuRepository fakeMenuRepository;
 
-    @Autowired
-    private OrderTableRepository orderTableRepository;
+    private FakeOrderTableRepository fakeOrderTableRepository;
 
-    @MockBean
+    private FakeMenuGroupRepository fakeMenuGroupRepository;
+
+    @Mock
     private KitchenridersClient kitchenridersClient;
 
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
+    @BeforeEach
+    void setUp() {
+        this.fakeOrderTableRepository = new FakeOrderTableRepository();
+        this.fakeOrderRepository = new FakeOrderRepository();
+        this.fakeMenuRepository = new FakeMenuRepository();
+        this.fakeMenuGroupRepository = new FakeMenuGroupRepository();
+        this.orderService = new OrderService(fakeOrderRepository, fakeMenuRepository, fakeOrderTableRepository, kitchenridersClient);
+    }
 
     @DisplayName("주문 타입 정보가 없을 경우 주문 실패")
     @Test
@@ -184,7 +187,7 @@ class OrderServiceTest {
         Order order = makeRandomOrder();
         order.setType(OrderType.EAT_IN);
         order.setStatus(OrderStatus.COMPLETED);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThrows(IllegalStateException.class, () -> orderService.accept(order.getId()));
@@ -197,7 +200,7 @@ class OrderServiceTest {
         Order order = makeRandomOrder();
         order.setType(OrderType.EAT_IN);
         order.setStatus(OrderStatus.WAITING);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThat(orderService.accept(order.getId()))
@@ -219,7 +222,7 @@ class OrderServiceTest {
         Order order = makeRandomOrder();
         order.setType(OrderType.EAT_IN);
         order.setStatus(OrderStatus.WAITING);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThrows(IllegalStateException.class, () -> orderService.serve(order.getId()));
@@ -232,7 +235,7 @@ class OrderServiceTest {
         Order order = makeRandomOrder();
         order.setType(OrderType.EAT_IN);
         order.setStatus(OrderStatus.ACCEPTED);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThat(orderService.serve(order.getId()))
@@ -253,7 +256,7 @@ class OrderServiceTest {
         //given
         Order order = makeRandomOrder();
         order.setType(OrderType.EAT_IN);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThrows(IllegalStateException.class, () -> orderService.startDelivery(order.getId()));
@@ -266,7 +269,7 @@ class OrderServiceTest {
         Order order = makeRandomOrder();
         order.setType(OrderType.DELIVERY);
         order.setStatus(OrderStatus.WAITING);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThrows(IllegalStateException.class, () -> orderService.startDelivery(order.getId()));
@@ -279,7 +282,7 @@ class OrderServiceTest {
         Order order = makeRandomOrder();
         order.setType(OrderType.DELIVERY);
         order.setStatus(OrderStatus.SERVED);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThat(orderService.startDelivery(order.getId()))
@@ -300,7 +303,7 @@ class OrderServiceTest {
         //given
         Order order = makeRandomOrder();
         order.setType(OrderType.EAT_IN);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThrows(IllegalStateException.class, () -> orderService.completeDelivery(order.getId()));
@@ -313,7 +316,7 @@ class OrderServiceTest {
         Order order = makeRandomOrder();
         order.setType(OrderType.DELIVERY);
         order.setStatus(OrderStatus.DELIVERING);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThat(orderService.completeDelivery(order.getId()))
@@ -335,7 +338,7 @@ class OrderServiceTest {
         Order order = makeRandomOrder();
         order.setType(OrderType.DELIVERY);
         order.setStatus(OrderStatus.WAITING);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThrows(IllegalStateException.class, () -> orderService.complete(order.getId()));
@@ -348,7 +351,7 @@ class OrderServiceTest {
         Order order = makeRandomOrder();
         order.setType(OrderType.DELIVERY);
         order.setStatus(OrderStatus.DELIVERED);
-        orderRepository.save(order);
+        fakeOrderRepository.save(order);
 
         //when & then
         assertThat(orderService.complete(order.getId()))
@@ -383,23 +386,21 @@ class OrderServiceTest {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
         menuGroup.setName("test");
-        menuGroupRepository.save(menuGroup);
+        fakeMenuGroupRepository.save(menuGroup);
 
-        List<Menu> menuList = new ArrayList<>();
         List<OrderLineItem> orderLineItemList = makeRandomOrderLineItems();
         for (OrderLineItem orderLineItem : orderLineItemList) {
             Menu menu = new Menu();
-            menu.setId(orderLineItem.getMenuId());
             menu.setName("asdf");
             menu.setMenuGroupId(menuGroup.getId());
             menu.setMenuGroup(menuGroup);
             menu.setPrice(BigDecimal.valueOf(1000));
             menu.setDisplayed(true);
-            menuList.add(menu);
+            fakeMenuRepository.save(menu);
             orderLineItem.setPrice(menu.getPrice());
             orderLineItem.setMenu(menu);
+            orderLineItem.setMenuId(menu.getId());
         }
-        menuRepository.saveAll(menuList);
         return orderLineItemList;
     }
 
@@ -415,7 +416,7 @@ class OrderServiceTest {
         List<OrderLineItem> orderLineItems = makeExistOrderLineItems();
         for (OrderLineItem orderLineItem : orderLineItems) {
             orderLineItem.getMenu().setDisplayed(false);
-            menuRepository.save(orderLineItem.getMenu());
+            fakeMenuRepository.save(orderLineItem.getMenu());
         }
         return orderLineItems;
     }
@@ -433,12 +434,12 @@ class OrderServiceTest {
         orderTable.setId(UUID.randomUUID());
         orderTable.setName("test");
         orderTable.setOccupied(true);
-        return orderTableRepository.save(orderTable);
+        return fakeOrderTableRepository.save(orderTable);
     }
 
     private OrderTable makeNotOccupiedOrderTable() {
         OrderTable orderTable = makeOccupiedOrderTable();
         orderTable.setOccupied(false);
-        return orderTableRepository.save(orderTable);
+        return fakeOrderTableRepository.save(orderTable);
     }
 }
