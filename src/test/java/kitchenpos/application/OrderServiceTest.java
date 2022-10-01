@@ -138,7 +138,7 @@ class OrderServiceTest {
         Order order = Order.ofTakeOut(orderLineItems);
 
         assertThatThrownBy(() -> service.create(order))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @ParameterizedTest
@@ -165,7 +165,7 @@ class OrderServiceTest {
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
-        OrderTable orderTable = createOrderTable("테이블1", false);
+        OrderTable orderTable = orderTableRepository.save(createOrderTable("테이블1", false));
 
         Order order = Order.ofEatIt(orderLineItems, orderTable);
         assertThatThrownBy(() -> service.create(order))
