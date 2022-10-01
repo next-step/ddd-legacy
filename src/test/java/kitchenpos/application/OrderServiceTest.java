@@ -46,8 +46,8 @@ class OrderServiceTest {
     @DisplayName("`주문`은 `메뉴`와 주문을 받을 방법을 배달로 선택 하여 주문할 수 있다.")
     void create_delivery() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         ArrayList<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -66,8 +66,8 @@ class OrderServiceTest {
     @DisplayName("`주문`은 `메뉴`와 주문을 받을 방법을 포장으로 선택 하여 주문할 수 있다.")
     void create_takeout() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -83,13 +83,12 @@ class OrderServiceTest {
     @Test
     @DisplayName("`주문`은 `메뉴`와 주문을 받을 방법을 매장으로 선택 하여 주문할 수 있다.")
     void create_eat_it() {
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
-        OrderTable orderTable = createOrderTable("테이블1");
-
+        OrderTable orderTable = orderTableRepository.save(createOrderTable("테이블1"));
         Order order = Order.ofEatIt(orderLineItems, orderTable);
 
         Order savedOrder = service.create(order);
@@ -102,9 +101,8 @@ class OrderServiceTest {
     @Test
     @DisplayName("매장 주문이 아닐 때 주문한 메뉴의 수량이 0이하면 주문할 수 없다.")
     void create_not_quantity_zero() {
-
-        Menu menu1 = createMenu("메뉴 이름1", false);
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu(("메뉴 이름2")));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, -1), new OrderLineItem(menu2, 1));
 
@@ -116,12 +114,11 @@ class OrderServiceTest {
     @Test
     @DisplayName("`메뉴`가 노출 중이 아니라면 주문할 수 없다.")
     void create_not_hide_menu() {
-        Menu menu1 = createMenu("메뉴 이름1", false);
-        Menu menu2 = createMenu("메뉴 이름2");
-
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1", false));
+        Menu menu2 = menuRepository.save(createMenu(("메뉴 이름2")));
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
-        OrderTable orderTable = createOrderTable("테이블1");
+        OrderTable orderTable = orderTableRepository.save(createOrderTable("테이블1"));
 
         Order order = Order.ofEatIt(orderLineItems, orderTable);
         assertThatThrownBy(() -> service.create(order))
@@ -132,8 +129,8 @@ class OrderServiceTest {
     @DisplayName("고객이 주문한 메뉴의 가격과 실제 메뉴의 가격이 다른 경우 주문할 수 없다.")
     void create_not_different_price() {
 
-        Menu menu1 = createMenu("메뉴 이름1", false);
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2, BigDecimal.valueOf(100L)),
                 new OrderLineItem(menu2, 1));
@@ -149,8 +146,8 @@ class OrderServiceTest {
     @NullAndEmptySource()
     void create_not_empty_address(String address) {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         ArrayList<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -163,8 +160,8 @@ class OrderServiceTest {
     @Test
     @DisplayName("매장 주문일 때 `주문 테이블`이 사용할 수 있는 상태가 아니라면 주문할 수 없다.")
     void create_order_table() {
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -178,8 +175,8 @@ class OrderServiceTest {
     @Test
     @DisplayName("식당에서 `주문`을 수락할 수 있다.")
     void accept() {
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -195,8 +192,8 @@ class OrderServiceTest {
     @Test
     @DisplayName("주문 대기인 `주문`만 수락할 수 있다.")
     void accept_status() {
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -213,8 +210,8 @@ class OrderServiceTest {
     @DisplayName("식당에서 `주문`을 제공할 수 있는 상태로 변경할 수 있다.")
     void serve() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -232,8 +229,8 @@ class OrderServiceTest {
     @DisplayName("주문 수락 상태가 아니라면 제공 상태로 변경할 수 없다.")
     void serve_status() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -249,8 +246,8 @@ class OrderServiceTest {
     @DisplayName("`주문`을 배달 시작할 수 있다.")
     void startDelivery() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -270,8 +267,8 @@ class OrderServiceTest {
     @DisplayName("배달 주문이 아니라면 배달을 시작할 수 없다.")
     void startDelivery_type() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -289,8 +286,8 @@ class OrderServiceTest {
     @DisplayName("제공 상태가 아니라면 배달을 시작할 수 없다.")
     void startDelivery_satatus() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -308,8 +305,8 @@ class OrderServiceTest {
     @DisplayName("`주문`을 배달 완료할 수 있다.")
     void completeDelivery() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -330,8 +327,8 @@ class OrderServiceTest {
     @DisplayName("배달 중 상태가 아니라면 배달을 완료 할 수 없다.")
     void completeDelivery_status() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -347,8 +344,8 @@ class OrderServiceTest {
     @DisplayName("`주문`을 완료할 수 있다.")
     void complete() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -371,8 +368,8 @@ class OrderServiceTest {
     @DisplayName("배달 주문일 때 배달 완료 상태가 아니라면 주문을 완료할 수 없다.")
     void complete_delivery_status() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -391,8 +388,8 @@ class OrderServiceTest {
     @DisplayName("포장 주문일 때 제공 상태가 아니라면 주문을 완료할 수 없다.")
     void complete_takeout_serve() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -412,12 +409,12 @@ class OrderServiceTest {
     @DisplayName("매장 주문일 때 제공 상태가 아니라면 주문을 완료할 수 없다.")
     void complete_eat_it_serve() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
-        OrderTable orderTable = createOrderTable("테이블1");
+        OrderTable orderTable = orderTableRepository.save(createOrderTable("테이블1"));
         Order order = Order.ofEatIt(orderLineItems, orderTable);
 
         Order savedOrder = service.create(order);
@@ -434,12 +431,12 @@ class OrderServiceTest {
     @Test
     @DisplayName("매장 주문이라면 `주문 테이블`의 자리를 비운다.")
     void complete_order_table() {
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
-        OrderTable orderTable = createOrderTable("테이블1");
+        OrderTable orderTable = orderTableRepository.save(createOrderTable("테이블1"));
         Order order = Order.ofEatIt(orderLineItems, orderTable);
 
         Order savedOrder = service.create(order);
@@ -458,8 +455,8 @@ class OrderServiceTest {
     @DisplayName("주문 내역을 조회할 수 있다.")
     void findAll() {
 
-        Menu menu1 = createMenu("메뉴 이름1");
-        Menu menu2 = createMenu("메뉴 이름2");
+        Menu menu1 = menuRepository.save(createMenu("메뉴 이름1"));
+        Menu menu2 = menuRepository.save(createMenu("메뉴 이름2"));
 
         List<OrderLineItem> orderLineItems = Lists.newArrayList(new OrderLineItem(menu1, 2), new OrderLineItem(menu2, 1));
 
@@ -522,7 +519,8 @@ class OrderServiceTest {
         if(!displayed) {
             menu.hide();
         }
-        return menuRepository.save(menu);
+
+        return menu;
     }
 
 
@@ -536,7 +534,8 @@ class OrderServiceTest {
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(name);
         orderTable.setOccupied(occupied);
-        return orderTableRepository.save(orderTable);
+
+        return orderTable;
     }
 
 }

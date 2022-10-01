@@ -16,7 +16,6 @@ public class FakeOrderRepository implements OrderRepository {
 
     private final Map<UUID, Order> memoryMap = new HashMap<>();
 
-
     @Override
     public Order save(Order order) {
         memoryMap.put(order.getId(), order);
