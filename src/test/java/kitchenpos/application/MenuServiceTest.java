@@ -90,7 +90,7 @@ class MenuServiceTest {
 
     @ParameterizedTest
     @DisplayName("메뉴을 등록 할 때 이름은 비어있거나 욕설이 포함될 수 없다.")
-    @MethodSource("nameMethodSource")
+    @MethodSource("emptyOrProfanityNameMethodSource")
     void create_not_empty_name(String name) {
 
         MenuGroup menuGroup = createMenuGroup("메뉴 그룹 이름");
@@ -401,7 +401,7 @@ class MenuServiceTest {
         return menu;
     }
 
-    static Stream<String> nameMethodSource() {
+    static Stream<String> emptyOrProfanityNameMethodSource() {
         return Stream.of("비속어", null);
     }
 }

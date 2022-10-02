@@ -48,7 +48,7 @@ class ProductServiceTest {
 
     @ParameterizedTest
     @DisplayName("상품을 등록 할 때 가격은 비어있거나 0이하의 수를 입력할 수 없다.")
-    @MethodSource("priceMethodSource")
+    @MethodSource("emptyOrNegativePriceMethodSource")
     void create_price_not_empty_or_zero(Long price) {
         Product product = getProduct("상품 이름", price);
 
@@ -59,7 +59,7 @@ class ProductServiceTest {
 
     @ParameterizedTest
     @DisplayName("상품을 등록 할 때 이름은 비어있거나 욕설이 포함될 수 없다.")
-    @MethodSource("nameMethodSource")
+    @MethodSource("emptyOrProfanityNameMethodSource")
     void create_name_not_empty(String name) {
         Product product = getProduct(name, 1000L);
 
@@ -139,11 +139,11 @@ class ProductServiceTest {
         return BigDecimal.valueOf(price);
     }
 
-    static Stream<Long> priceMethodSource() {
+    static Stream<Long> emptyOrNegativePriceMethodSource() {
         return Stream.of(-1L, null);
     }
 
-    static Stream<String> nameMethodSource() {
+    static Stream<String> emptyOrProfanityNameMethodSource() {
         return Stream.of("비속어", null);
     }
 }

@@ -135,7 +135,7 @@ class OrderTableServiceTest {
 
     @ParameterizedTest
     @DisplayName("고객의 수는 0이하의 수를 입력할 수 없다.")
-    @MethodSource("numberOfGuestMethodSource")
+    @MethodSource("negativeNumberOfGuestMethodSource")
     void changeNumberOfGuests_not_zero(int numberOfGuests) {
 
         String name = "테이블1";
@@ -196,7 +196,7 @@ class OrderTableServiceTest {
         return orderTable;
     }
 
-    static Stream<Integer> numberOfGuestMethodSource() {
+    static Stream<Integer> negativeNumberOfGuestMethodSource() {
         return Stream.of(-1);
     }
 }
