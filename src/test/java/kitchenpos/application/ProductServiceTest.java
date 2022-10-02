@@ -82,14 +82,15 @@ class ProductServiceTest {
         assertThat(updateProduct.getPrice()).isEqualTo(savedProduct.getPrice());
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("상품의 가격을 수정 할 때 가격은 비어있거나 0이하의 수를 입력할 수 없다.")
-    void change_price_not_empty_or_zero() {
+    @MethodSource("emptyOrNegativePriceMethodSource")
+    void change_price_not_empty_or_zero(Long price) {
 
         Product product = getProduct("상품 이름", 1000L);
         Product savedProduct = service.create(product);
 
-        BigDecimal changedPrice = BigDecimal.valueOf(-1L);
+        BigDecimal changedPrice = getPrice(price);
         savedProduct.setPrice(changedPrice);
 
         assertThatThrownBy(() -> service.changePrice(savedProduct.getId(), savedProduct))
