@@ -3,7 +3,7 @@ package kitchenpos.application;
 import kitchenpos.application.fake.FakeMenuRepository;
 import kitchenpos.application.fake.FakeOrderRepository;
 import kitchenpos.application.fake.FakeOrderTableRepository;
-import kitchenpos.application.fake.FakeRidersClient;
+import kitchenpos.application.fake.DummyRidersClient;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
@@ -38,7 +38,7 @@ class OrderServiceTest {
     private final OrderRepository orderRepository = new FakeOrderRepository();
     private final MenuRepository menuRepository = new FakeMenuRepository();
     private final OrderTableRepository orderTableRepository = new FakeOrderTableRepository();
-    private final RidersClient ridersClient = new FakeRidersClient();
+    private final RidersClient ridersClient = new DummyRidersClient();
 
     private final OrderService service = new OrderService(orderRepository, menuRepository, orderTableRepository, ridersClient);
 
