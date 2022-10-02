@@ -49,6 +49,33 @@ public class Order {
     public Order() {
     }
 
+    public static Order ofDelivery(List<OrderLineItem> orderLineItems, String deliveryAddress) {
+        Order order = new Order();
+        order.type = OrderType.DELIVERY;
+        order.orderLineItems = orderLineItems;
+        order.deliveryAddress = deliveryAddress;
+
+        return order;
+    }
+
+    public static Order ofTakeOut(List<OrderLineItem> orderLineItems) {
+        Order order = new Order();
+        order.type = OrderType.TAKEOUT;
+        order.orderLineItems = orderLineItems;
+
+        return order;
+    }
+
+    public static Order ofEatIt(List<OrderLineItem> orderLineItems, OrderTable orderTable) {
+        Order order = new Order();
+        order.type = OrderType.EAT_IN;
+        order.orderLineItems = orderLineItems;
+        order.orderTable = orderTable;
+        order.orderTableId = orderTable.getId();
+
+        return order;
+    }
+
     public UUID getId() {
         return id;
     }

@@ -28,6 +28,11 @@ public class MenuProduct {
     public MenuProduct() {
     }
 
+    public MenuProduct(UUID productId, long quantity) {
+        this.productId = productId;
+        this.quantity = quantity;
+    }
+
     public Long getSeq() {
         return seq;
     }
@@ -59,4 +64,8 @@ public class MenuProduct {
     public void setProductId(final UUID productId) {
         this.productId = productId;
     }
+
+    public boolean isSameProductId(UUID productId) {
+        return this.productId.equals(productId);
+    };
 }
