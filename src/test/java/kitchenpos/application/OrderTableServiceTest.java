@@ -20,7 +20,6 @@ public class OrderTableServiceTest {
     private OrderTableRepository orderTableRepository;
     private OrderRepository orderRepository;
 
-    @InjectMocks
     private OrderTableService orderTableService;
 
     @BeforeEach

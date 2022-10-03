@@ -31,7 +31,6 @@ public class ProductServiceTest {
     private ProductRepository productRepository;
     private ProfanityClient profanityClient;
 
-    @InjectMocks
     private ProductService productService;
 
     @BeforeEach

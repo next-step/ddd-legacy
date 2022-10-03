@@ -36,7 +36,6 @@ public class MenuServiceTest {
     private ProductRepository productRepository;
     private ProfanityClient profanityClient;
 
-    @InjectMocks
     private MenuService menuService;
 
     @BeforeEach

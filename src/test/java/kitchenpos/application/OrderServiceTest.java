@@ -26,7 +26,6 @@ public class OrderServiceTest {
     private RidersClient ridersClient;
     private MenuGroupRepository menuGroupRepository;
 
-    @InjectMocks
     private OrderService orderService;
 
     @BeforeEach

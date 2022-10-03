@@ -22,7 +22,6 @@ public class MenuGroupServiceTest {
 
     private MenuGroupRepository menuGroupRepository;
 
-    @InjectMocks
     private MenuGroupService menuGroupService;
 
     @BeforeEach
