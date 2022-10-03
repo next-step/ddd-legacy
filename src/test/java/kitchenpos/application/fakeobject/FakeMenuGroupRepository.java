@@ -1,8 +1,5 @@
 package kitchenpos.application.fakeobject;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 
@@ -13,7 +10,6 @@ import java.util.UUID;
 
 public class FakeMenuGroupRepository implements MenuGroupRepository {
     private List<MenuGroup> menuGroupList;
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     public FakeMenuGroupRepository() {
         this.menuGroupList = new ArrayList<>();
@@ -28,12 +24,8 @@ public class FakeMenuGroupRepository implements MenuGroupRepository {
         if (menuGroup.getId() != null) {
             for (MenuGroup menuGroupItem : menuGroupList) {
                 if (menuGroupItem.getId().equals(menuGroup.getId())) {
-                    try {
-                        menuGroupItem = objectMapper.readValue(objectMapper.writeValueAsString(menuGroup), MenuGroup.class);
-                        return menuGroupItem;
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                    menuGroupItem = menuGroup;
+                    return menuGroupItem;
                 }
             }
         }

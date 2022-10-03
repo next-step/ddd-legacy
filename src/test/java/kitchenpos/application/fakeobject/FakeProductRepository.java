@@ -1,8 +1,5 @@
 package kitchenpos.application.fakeobject;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 
@@ -14,7 +11,6 @@ import java.util.UUID;
 
 public class FakeProductRepository implements ProductRepository {
     private List<Product> productList = new ArrayList<>();
-    private ObjectMapper objectMapper = new ObjectMapper();
 
     public FakeProductRepository() {
         for (int i = 1; i <= 5; i++) {
@@ -56,12 +52,7 @@ public class FakeProductRepository implements ProductRepository {
         if (product.getId() != null) {
             for (Product productItem : productList) {
                 if (productItem.getId().equals(product.getId())) {
-                    try {
-                        productItem = objectMapper.readValue(objectMapper.writeValueAsString(product), Product.class);
-                        return productItem;
-                    } catch (JsonProcessingException e) {
-                        e.printStackTrace();
-                    }
+                    return productItem = product;
                 }
             }
         }
