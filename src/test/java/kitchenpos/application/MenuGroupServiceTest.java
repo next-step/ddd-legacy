@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -18,21 +17,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(MockitoExtension.class)
-public class MenuGroupServiceTest {
+class MenuGroupServiceTest {
 
     private MenuGroupRepository menuGroupRepository;
-
     private MenuGroupService menuGroupService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         menuGroupRepository = new InMemoryMenuGroupRepository();
         menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
     @DisplayName("메뉴그룹을 만들 수 있다.")
     @Test
-    public void create(){
+    void create() {
         final MenuGroup request = MenuGroupFactory.getDefaultMenuGroup();
 
         MenuGroup menuGroup = menuGroupService.create(request);
@@ -43,7 +41,7 @@ public class MenuGroupServiceTest {
 
     @NullAndEmptySource
     @ParameterizedTest(name = "메뉴그룹을 생성 시, 메뉴 이름은 필수로 입력되어야 한다.")
-    public void create_input_null_and_empty(String name){
+    void create_input_null_and_empty(String name) {
         final MenuGroup request = MenuGroupFactory.of(name);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -52,7 +50,7 @@ public class MenuGroupServiceTest {
 
     @DisplayName("메뉴그룹을 조회할 수 있다.")
     @Test
-    public void findAll(){
+    void findAll() {
         final MenuGroup menuGroup = MenuGroupFactory.getDefaultMenuGroup();
         menuGroupRepository.save(menuGroup);
 
@@ -60,5 +58,4 @@ public class MenuGroupServiceTest {
 
         assertThat(menuGroups).hasSize(1);
     }
-
 }

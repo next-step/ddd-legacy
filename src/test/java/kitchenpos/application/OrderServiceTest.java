@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -17,7 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(MockitoExtension.class)
-public class OrderServiceTest {
+class OrderServiceTest {
 
     private MenuRepository menuRepository;
     private ProductRepository productRepository;
@@ -25,7 +24,6 @@ public class OrderServiceTest {
     private OrderTableRepository orderTableRepository;
     private RidersClient ridersClient;
     private MenuGroupRepository menuGroupRepository;
-
     private OrderService orderService;
 
     @BeforeEach
@@ -166,6 +164,7 @@ public class OrderServiceTest {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderService.create(order));
     }
+
     @Test
     @DisplayName("배달 주문 시, 주소는 필수로 입력되어야 한다.")
     public void order_delivery_input_address() {

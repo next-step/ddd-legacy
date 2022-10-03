@@ -1,14 +1,10 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
 import factory.MenuFactory;
 import factory.MenuGroupFactory;
 import factory.MenuProductFactory;
 import factory.ProductFactory;
-import kitchenpos.domain.FakeProfanityClient;
-import kitchenpos.domain.InMemoryMenuGroupRepository;
-import kitchenpos.domain.InMemoryMenuRepository;
-import kitchenpos.domain.InMemoryProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.ProfanityClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -28,18 +23,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(MockitoExtension.class)
-public class MenuServiceTest {
+class MenuServiceTest {
 
-    public static final int DEFAULT_QUANTITY = 2;
+    private static final int DEFAULT_QUANTITY = 2;
     private MenuRepository menuRepository;
     private MenuGroupRepository menuGroupRepository;
     private ProductRepository productRepository;
     private ProfanityClient profanityClient;
-
     private MenuService menuService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         menuRepository = new InMemoryMenuRepository();
         menuGroupRepository = new InMemoryMenuGroupRepository();
         productRepository = new InMemoryProductRepository();
@@ -49,7 +43,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴를 등록할 수 있다.")
     @Test
-    public void create() {
+    void create() {
         final Menu request = createMenu(createMenuProduct());
 
         final Menu actual = menuService.create(request);
@@ -63,7 +57,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴는 특정 메뉴 그룹에 속해있다.")
     @Test
-    public void create_menu_in_menu_group() {
+    void create_menu_in_menu_group() {
         final List<MenuProduct> menuProducts = createMenuProduct();
 
         final Menu request = MenuFactory.of(menuProducts);
@@ -75,7 +69,7 @@ public class MenuServiceTest {
     @ParameterizedTest(name = "메뉴 등록 시, 가격은 필수로 입력되어야 하며 0원 이상이어야 한다.")
     @NullSource
     @ValueSource(strings = "-1000")
-    public void create_input_null_and_negative(BigDecimal price) {
+    void create_input_null_and_negative(BigDecimal price) {
         final MenuGroup createMenuGroup = createMenuGroup();
         final List<MenuProduct> menuProducts = createMenuProduct();
 
@@ -88,7 +82,7 @@ public class MenuServiceTest {
     @ParameterizedTest(name = "메뉴 등록 시, 이름은 필수로 입력되 비속어가 포함되어있으면 안된다.")
     @NullSource
     @ValueSource(strings = {"욕설이 포함된 이름", "비속어가 포함된 이름"})
-    public void create_input_null_and_profanity(String name) {
+    void create_input_null_and_profanity(String name) {
         final MenuGroup createMenuGroup = createMenuGroup();
         final List<MenuProduct> menuProducts = createMenuProduct();
 
@@ -100,7 +94,7 @@ public class MenuServiceTest {
 
     @ParameterizedTest(name = "메뉴 등록 시, 메뉴에 속한 상품들의 총 가격이 메뉴 가격 보다 더 비싸야한다.")
     @ValueSource(strings = "100000")
-    public void create_products_expensive_then_price(long price) {
+    void create_products_expensive_then_price(long price) {
         final MenuGroup createMenuGroup = createMenuGroup();
         final List<MenuProduct> menuProducts = createMenuProduct();
         final Menu menu = MenuFactory.of(createMenuGroup, menuProducts, price);
@@ -113,7 +107,7 @@ public class MenuServiceTest {
 
     @ParameterizedTest(name = "메뉴 등록 시, 메뉴에 속한 상품의 갯수가 음수일 수 없다.")
     @ValueSource(strings = "-1")
-    public void create_negative_product_quantity(int quantity) {
+    void create_negative_product_quantity(int quantity) {
         final Menu request = createMenu(createMenuProduct(quantity));
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -122,7 +116,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴 등록 시, 등록되어있는 상품만 메뉴 등록 가능하다.")
     @Test
-    public void create_exist_product() {
+    void create_exist_product() {
         final MenuGroup createMenuGroup = createMenuGroup();
         final Menu request = MenuFactory.of(createMenuGroup);
 
@@ -132,7 +126,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴 가격을 수정 할 수 있다.")
     @Test
-    public void update() {
+    void update() {
         final Menu request = createMenuAndSave();
         request.setPrice(BigDecimal.valueOf(27000L));
 
@@ -143,7 +137,7 @@ public class MenuServiceTest {
 
     @ParameterizedTest(name = "메뉴 가격 수정 시, 가격은 필수로 입력되어야 한다.")
     @NullSource
-    public void update_input_null(BigDecimal price) {
+    void update_input_null(BigDecimal price) {
         final Menu request = createMenuAndSave();
         request.setPrice(price);
 
@@ -153,7 +147,7 @@ public class MenuServiceTest {
 
     @ParameterizedTest(name = "메뉴 가격 수정 시, 메뉴에 속한 상품들의 총 가격보다 변경하려는 메뉴의 가격이 더 비싸다면 수정이 불가능하다.")
     @ValueSource(strings = "31000")
-    public void update_products_expensive_then_price(long price) {
+    void update_products_expensive_then_price(long price) {
         final MenuGroup createMenuGroup = createMenuGroup();
         final Menu menu = MenuFactory.of(createMenuGroup, price);
 
@@ -166,7 +160,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴는 진열이 가능하다.")
     @Test
-    public void display() {
+    void display() {
         final Menu request = createMenuAndSave();
 
         final Menu actual = menuService.display(request.getId());
@@ -176,7 +170,7 @@ public class MenuServiceTest {
 
     @ParameterizedTest(name = "메뉴에 속한 상품들의 총 가격보다 메뉴의 가격이 더 비싸다면 진열이 불가능하다.")
     @ValueSource(strings = "100000")
-    public void display_products_expensive_then_price(long price) {
+    void display_products_expensive_then_price(long price) {
         final Menu request = createMenuAndSave();
         request.setPrice(BigDecimal.valueOf(price));
 
@@ -186,7 +180,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴를 숨길 수 있다.")
     @Test
-    public void hide() {
+    void hide() {
         final Menu request = createMenuAndSave();
 
         final Menu actual = menuService.hide(request.getId());
@@ -196,7 +190,7 @@ public class MenuServiceTest {
 
     @DisplayName("메뉴를 조회할 수 있다.")
     @Test
-    public void findAll() {
+    void findAll() {
         final Menu menu = createMenu(createMenuProduct());
         menuRepository.save(menu);
 

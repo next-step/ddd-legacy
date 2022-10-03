@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -15,15 +14,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @ExtendWith(MockitoExtension.class)
-public class OrderTableServiceTest {
+class OrderTableServiceTest {
 
     private OrderTableRepository orderTableRepository;
     private OrderRepository orderRepository;
-
     private OrderTableService orderTableService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         orderTableRepository = new InMemoryOrderTableRepository();
         orderRepository = new InMemoryOrderRepository();
         orderTableService = new OrderTableService(orderTableRepository, orderRepository);
@@ -31,7 +29,7 @@ public class OrderTableServiceTest {
 
     @DisplayName("주문 테이블을 생성할 수 있다.")
     @Test
-    public void create() {
+    void create() {
         final OrderTable request = OrderTableFactory.of();
 
         final OrderTable orderTable = orderTableService.create(request);
@@ -41,7 +39,7 @@ public class OrderTableServiceTest {
 
     @DisplayName("주문 테이블 생성 시, 이름은 필수로 입력되어야 한다.")
     @Test
-    public void create_input_name() {
+    void create_input_name() {
         final OrderTable request = new OrderTable();
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -50,7 +48,7 @@ public class OrderTableServiceTest {
 
     @DisplayName("손님은 테이블에 앉을 수 있다.")
     @Test
-    public void sit() {
+    void sit() {
         final OrderTable orderTable = OrderTableFactory.of();
         final OrderTable request = orderTableRepository.save(orderTable);
 
@@ -61,7 +59,7 @@ public class OrderTableServiceTest {
 
     @DisplayName("테이블을 청소한다. (정보를 초기화 한다)")
     @Test
-    public void clear() {
+    void clear() {
         final OrderTable orderTable = OrderTableFactory.of();
         final OrderTable request = orderTableRepository.save(orderTable);
 
@@ -79,7 +77,7 @@ public class OrderTableServiceTest {
 
     @DisplayName("테이블을 청소 시, 완료되지 않는 주문이 없어야 한다.")
     @Test
-    public void clear_order_status_is_completed() {
+    void clear_order_status_is_completed() {
         final OrderTable orderTable = OrderTableFactory.of();
         final OrderTable request = orderTableRepository.save(orderTable);
 
@@ -95,7 +93,7 @@ public class OrderTableServiceTest {
 
     @DisplayName("주문 테이블의 손님 숫자를 수정한다.")
     @Test
-    public void changeNumberOfGuests() {
+    void changeNumberOfGuests() {
         final OrderTable orderTable = OrderTableFactory.of(true);
 
         final OrderTable request = orderTableRepository.save(orderTable);
@@ -108,7 +106,7 @@ public class OrderTableServiceTest {
 
     @DisplayName("손님 수 변경 시, 음수 일수 없다.")
     @Test
-    public void changeNumberOfGuests_negative() {
+    void changeNumberOfGuests_negative() {
         final OrderTable orderTable = OrderTableFactory.of();
 
         final OrderTable request = orderTableRepository.save(orderTable);
@@ -120,7 +118,7 @@ public class OrderTableServiceTest {
 
     @DisplayName("손님 수 변경 시, 사용중인 테이블이 아닐경우 변경할 수 없다")
     @Test
-    public void changeNumberOfGuests_occupied() {
+    void changeNumberOfGuests_occupied() {
         final OrderTable orderTable = OrderTableFactory.of(false);
 
         final OrderTable request = orderTableRepository.save(orderTable);
@@ -132,7 +130,7 @@ public class OrderTableServiceTest {
 
     @DisplayName("주문 테이블을 조회할 수 있다.")
     @Test
-    public void findAll() {
+    void findAll() {
         final OrderTable orderTable = OrderTableFactory.of();
         orderTableRepository.save(orderTable);
 
