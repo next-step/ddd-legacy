@@ -44,6 +44,10 @@ public class MenuFactory {
         return MenuFactory.of(createMenuGroup, menuProducts, BigDecimal.valueOf(price), false);
     }
 
+    public static Menu of(MenuGroup createMenuGroup, List<MenuProduct> menuProducts, BigDecimal price) {
+        return MenuFactory.of(createMenuGroup, menuProducts, price, false);
+    }
+
     public static Menu of(MenuGroup createMenuGroup, List<MenuProduct> menuProducts, long price, boolean displayed) {
         return MenuFactory.of(createMenuGroup, menuProducts, BigDecimal.valueOf(price), displayed);
     }

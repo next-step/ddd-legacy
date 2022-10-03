@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import factory.*;
 import kitchenpos.domain.*;
-import kitchenpos.factory.*;
 import kitchenpos.infra.RidersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -158,11 +157,11 @@ public class OrderServiceTest {
 
     // 배달 주문
     @Test
-    @DisplayName("배달 주문 시, 주문하는 메뉴의 수량이 존재해야한다.")
+    @DisplayName("배달 주문 시, 주문하는 메뉴의 수량은 음수일 수 없다.")
     public void create_quantity_delivery() {
         Order order = new Order();
         order.setType(OrderType.DELIVERY);
-        order.setOrderLineItems(List.of(OrderLineItemFactory.of(createMenuAndSave(true), 0)));
+        order.setOrderLineItems(List.of(OrderLineItemFactory.of(createMenuAndSave(true), -1)));
         order.setDeliveryAddress("집주소");
 
         assertThatExceptionOfType(IllegalArgumentException.class)
