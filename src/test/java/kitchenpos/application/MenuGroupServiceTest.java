@@ -15,14 +15,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MenuGroupServiceTest {
-    private FakeMenuGroupRepository fakeMenuGroupRepository;
-
     private MenuGroupService menuGroupService;
 
     @BeforeEach
     void setUp() {
-        this.fakeMenuGroupRepository = new FakeMenuGroupRepository();
-        this.menuGroupService = new MenuGroupService(fakeMenuGroupRepository);
+        this.menuGroupService = new MenuGroupService(new FakeMenuGroupRepository());
     }
 
     @DisplayName("이름이 없을 경우 예외 발생한다.")
@@ -42,8 +39,7 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     public void create_name_exist(String name) {
         //given
-        MenuGroup menuGroupCreateRequest = new MenuGroup();
-        menuGroupCreateRequest.setName(name);
+        MenuGroup menuGroupCreateRequest = createMenuGroupByName(name);
 
         //when
         MenuGroup result = menuGroupService.create(menuGroupCreateRequest);
@@ -58,8 +54,7 @@ class MenuGroupServiceTest {
     @Test
     public void findAll_data_exist() {
         //given
-        MenuGroup menuGroupCreateRequest = new MenuGroup();
-        menuGroupCreateRequest.setName("test");
+        MenuGroup menuGroupCreateRequest = createMenuGroupByName("menu");
         menuGroupService.create(menuGroupCreateRequest);
 
         // when
@@ -68,5 +63,11 @@ class MenuGroupServiceTest {
         //then
         assertThat(list)
                 .isNotEmpty();
+    }
+
+    private MenuGroup createMenuGroupByName(String name) {
+        final MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName(name);
+        return menuGroup;
     }
 }

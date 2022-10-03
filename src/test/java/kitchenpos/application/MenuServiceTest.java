@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.from;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MenuServiceTest {
@@ -176,7 +177,11 @@ class MenuServiceTest {
         fakeMenuRepository.setMenuProductsOnMenu(fakeProductRepository.findAll());
 
         //when & then
-        assertThat(menuService.changePrice(menu.getId(), menu)).isNotNull();
+        Menu result = menuService.changePrice(menu.getId(), menu);
+        assertAll(
+                () -> assertThat(result).isNotNull(),
+                () -> assertThat(result.getPrice()).isEqualTo(BigDecimal.ONE)
+        );
     }
 
     @DisplayName("메뉴가 존재하지 않으면 전시 불가.")
