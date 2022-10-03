@@ -2,16 +2,12 @@ package kitchenpos.application;
 
 import kitchenpos.application.fakeobject.FakeMenuRepository;
 import kitchenpos.application.fakeobject.FakeProductRepository;
+import kitchenpos.application.fakeobject.FakePurgomalumClient;
 import kitchenpos.domain.Product;
-import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.NoSuchElementException;
@@ -20,7 +16,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
     private ProductService productService;
 
@@ -28,14 +23,14 @@ class ProductServiceTest {
 
     private FakeMenuRepository fakeMenuRepository;
 
-    @Mock
-    private PurgomalumClient purgomalumClient;
+    private FakePurgomalumClient fakePurgomalumClient;
 
     @BeforeEach
     void setUp() {
         this.fakeMenuRepository = new FakeMenuRepository();
         this.fakeProductRepository = new FakeProductRepository();
-        this.productService = new ProductService(fakeProductRepository, fakeMenuRepository, purgomalumClient);
+        this.fakePurgomalumClient = new FakePurgomalumClient();
+        this.productService = new ProductService(fakeProductRepository, fakeMenuRepository, fakePurgomalumClient);
     }
 
     @DisplayName("가격 정보가 없거나 음수일 경우 상품 추가 실패한다.")
@@ -50,21 +45,20 @@ class ProductServiceTest {
         assertThrows(IllegalArgumentException.class, () -> productService.create(product));
     }
 
-    @DisplayName("상품 이름이 이미 존재할 경우 상품 추가 실패한다.")
+    @DisplayName("상품 이름에 욕설 존재할 경우 상품 추가 실패한다.")
     @MethodSource("kitchenpos.application.InputProvider#provideValidPrice")
     @ParameterizedTest
     public void create_exist_name(BigDecimal price) {
         //given
         Product product = new Product();
         product.setPrice(price);
-        product.setName("test");
-        Mockito.when(purgomalumClient.containsProfanity(product.getName())).thenReturn(true);
+        product.setName("욕설");
 
         //when & then
         assertThrows(IllegalArgumentException.class, () -> productService.create(product));
     }
 
-    @DisplayName("상품 이름이 존재하지 않고 유효한 가격일 경우 상품 추가 성공한다.")
+    @DisplayName("유효한 가격일 경우 상품 추가 성공한다.")
     @MethodSource("kitchenpos.application.InputProvider#provideValidPrice")
     @ParameterizedTest
     public void create_non_exist_name(BigDecimal price) {
@@ -72,7 +66,6 @@ class ProductServiceTest {
         Product product = new Product();
         product.setPrice(price);
         product.setName("test");
-        Mockito.when(purgomalumClient.containsProfanity(product.getName())).thenReturn(false);
 
         //when & then
         assertThat(productService.create(product)).isNotNull();

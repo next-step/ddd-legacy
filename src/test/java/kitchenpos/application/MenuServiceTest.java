@@ -3,18 +3,14 @@ package kitchenpos.application;
 import kitchenpos.application.fakeobject.FakeMenuGroupRepository;
 import kitchenpos.application.fakeobject.FakeMenuRepository;
 import kitchenpos.application.fakeobject.FakeProductRepository;
+import kitchenpos.application.fakeobject.FakePurgomalumClient;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
-import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.from;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
     private MenuService menuService;
 
@@ -36,15 +31,16 @@ class MenuServiceTest {
     private FakeMenuGroupRepository fakeMenuGroupRepository;
 
     private FakeProductRepository fakeProductRepository;
-    @Mock
-    private PurgomalumClient purgomalumClient;
+
+    private FakePurgomalumClient fakePurgomalumClient;
 
     @BeforeEach
     void setUp() {
         this.fakeMenuRepository = new FakeMenuRepository();
         this.fakeMenuGroupRepository = new FakeMenuGroupRepository();
         this.fakeProductRepository = new FakeProductRepository();
-        this.menuService = new MenuService(fakeMenuRepository, fakeMenuGroupRepository, fakeProductRepository, purgomalumClient);
+        this.fakePurgomalumClient = new FakePurgomalumClient();
+        this.menuService = new MenuService(fakeMenuRepository, fakeMenuGroupRepository, fakeProductRepository, fakePurgomalumClient);
     }
 
     @DisplayName("가격정보가 없거나 유효하지 않은 가격을 설정했을 경우 메뉴 추가 실패한다.")
@@ -127,7 +123,7 @@ class MenuServiceTest {
         assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
     }
 
-    @DisplayName("메뉴가 존재할 경우 추가 실패한다.")
+    @DisplayName("메뉴에 욕설이 존재할 경우 메뉴 추가 실패한다..")
     @MethodSource("kitchenpos.application.InputProvider#provideValidProductListWithValidQuantity")
     @ParameterizedTest
     public void create_exist_name_menuProductList(List<MenuProduct> menuProductList) {
@@ -136,8 +132,7 @@ class MenuServiceTest {
         menu.setPrice(BigDecimal.ONE);
         menu.setMenuGroupId(fakeMenuGroupRepository.findAll().get(0).getId());
         menu.setMenuProducts(menuProductList);
-        menu.setName("asdf");
-        Mockito.when(purgomalumClient.containsProfanity(menu.getName())).thenReturn(true);
+        menu.setName("욕설");
 
         //when & then
         assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
@@ -153,7 +148,6 @@ class MenuServiceTest {
         menu.setMenuGroupId(fakeMenuGroupRepository.findAll().get(0).getId());
         menu.setMenuProducts(menuProductList);
         menu.setName("asdf");
-        Mockito.when(purgomalumClient.containsProfanity(menu.getName())).thenReturn(false);
 
         //when & then
         assertThat(menuService.create(menu)).isNotNull();
