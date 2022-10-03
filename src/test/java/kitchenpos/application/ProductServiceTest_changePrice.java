@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.configuration.TestIsolationSupport;
 import kitchenpos.util.testglue.EnableTestGlue;
 import kitchenpos.util.testglue.TestGlue;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @EnableTestGlue
 @SpringBootTest
-class ProductServiceTest_changePrice {
+class ProductServiceTest_changePrice extends TestIsolationSupport {
 
 	@Autowired
 	private TestGlue testGlue;

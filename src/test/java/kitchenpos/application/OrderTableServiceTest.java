@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.configuration.TestIsolationSupport;
 import kitchenpos.util.testglue.EnableTestGlue;
 import kitchenpos.util.testglue.TestGlue;
 import org.junit.jupiter.api.DisplayName;
@@ -9,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @EnableTestGlue
 @SpringBootTest
-class OrderTableServiceTest {
+class OrderTableServiceTest extends TestIsolationSupport {
 
 	@Autowired
 	private TestGlue testGlue;
@@ -42,9 +43,43 @@ class OrderTableServiceTest {
 			.assertStart();
 	}
 
+	@DisplayName("주문 테이블 초기화를 요청하면, 주문 테이블은 초기화 된다.")
 	@Test
 	void clear() {
-		//todo 주문 로직이 구현되고 할 것.
+		홀_주문을_생성하고()
+			.given("'홀주문' 주문을 수락하고")
+			.given("'홀주문' 주문을 서빙하고")
+			.given("'홀주문' 주문을 종료하고")
+			.when("'테이블1' 주문 테이블을 정리하면")
+			.then("주문 테이블은 초기화 된다")
+			.assertStart();
+	}
+
+	@DisplayName("주문 테이블에 연관된 주문이 COMPLETED 상태가 아니면, 초기화 할 수 없다.")
+	@Test
+	void clea_fail() {
+		홀_주문을_생성하고()
+			.given("'홀주문' 주문을 수락하고")
+			.given("'홀주문' 주문을 서빙하고")
+			.when("'테이블1' 주문 테이블을 정리하면")
+			.then("주문 테이블 초기화에 실패한다")
+			.assertStart();
+	}
+
+	private TestGlue.Builder 추천_메뉴를_생성하고() {
+		return testGlue.builder()
+			.given("'추천메뉴그룹' 메뉴 그룹을 생성하고")
+			.given("'상품1' 상품을 생성하고")
+			.given("'추천메뉴그룹'에 속하고 '상품1' '3'개를 이용해 '추천메뉴' 메뉴 데이터를 만들고")
+			.given("'추천메뉴' 메뉴를 생성하고");
+	}
+
+	private TestGlue.Builder 홀_주문을_생성하고() {
+		return 추천_메뉴를_생성하고()
+			.given("'추천메뉴' 메뉴 '4' 개로 '추천메뉴주문정보' 주문메뉴정보를 생성하고")
+			.given("'테이블1' 주문 테이블을 생성하고")
+			.given("'테이블1' 주문 테이블에 손님이 앉고")
+			.when("'테이블1' 주문 테이블과 '추천메뉴주문정보' 주문메뉴 정보로 '홀주문' 주문을 생성하고");
 	}
 
 	@DisplayName("주문 테이블 손님의 수를 변경할 수 있다.")

@@ -2,7 +2,9 @@ package kitchenpos.util.testglue;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.stereotype.Component;
 
+@Component
 public class TestGlueValueContext {
 
 	private final Map<String, Object> storage;
@@ -22,5 +24,9 @@ public class TestGlueValueContext {
 		}
 
 		return type.cast(o);
+	}
+
+	public void clear() {
+		storage.clear();
 	}
 }

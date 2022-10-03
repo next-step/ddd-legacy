@@ -2,6 +2,7 @@ package kitchenpos.util.testglue;
 
 import java.util.function.Supplier;
 import kitchenpos.util.testglue.test.TestGlueResponse;
+import org.junit.jupiter.api.BeforeEach;
 
 public class TestGlueSupport implements TestGlueContextAware {
 
@@ -18,6 +19,11 @@ public class TestGlueSupport implements TestGlueContextAware {
 	@Override
 	public void testGlueContext(TestGlueValueContext testGlueValueContext) {
 		this.testGlueValueContext = testGlueValueContext;
+	}
+
+	@BeforeEach
+	void setUp() {
+		testGlueValueContext.clear();
 	}
 
 	public TestGlueResponse<?> createResponse(Runnable runnable) {

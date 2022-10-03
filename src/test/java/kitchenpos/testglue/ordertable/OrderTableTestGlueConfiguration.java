@@ -117,4 +117,33 @@ public class OrderTableTestGlueConfiguration extends TestGlueSupport {
 
 		assertThat(orderTable.getNumberOfGuests()).isEqualTo(Integer.parseInt(number));
 	}
+
+	@TestGlueOperation("{} 주문 테이블을 정리하면")
+	public void clear(String name) {
+		OrderTable orderTable = getAsType(name, OrderTable.class);
+
+		TestGlueResponse<OrderTable> response = createResponse(() -> orderTableService.clear(orderTable.getId()));
+
+		put("orderTableResponse", response);
+	}
+
+	@TestGlueOperation("주문 테이블은 초기화 된다")
+	public void clearResponse() {
+		TestGlueResponse<OrderTable> response = getAsType("orderTableResponse", TestGlueResponse.class);
+
+		assertThat(response.isOk()).isTrue();
+
+		OrderTable orderTable = orderTableRepository.findById(response.getData().getId())
+			.orElseThrow(EntityNotFoundException::new);
+
+		assertThat(orderTable.isOccupied()).isFalse();
+		assertThat(orderTable.getNumberOfGuests()).isZero();
+	}
+
+	@TestGlueOperation("주문 테이블 초기화에 실패한다")
+	public void clear_fail() {
+		TestGlueResponse<OrderTable> response = getAsType("orderTableResponse", TestGlueResponse.class);
+
+		assertThat(response.isOk()).isFalse();
+	}
 }

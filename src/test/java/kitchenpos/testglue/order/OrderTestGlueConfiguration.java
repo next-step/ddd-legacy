@@ -67,7 +67,7 @@ public class OrderTestGlueConfiguration extends TestGlueSupport {
 
 		Order order = OrderMother
 			.findCreatorByName(orderName)
-			.create(orderLineItems, orderTable.getId());
+			.create(orderLineItems, orderTable == null ? null : orderTable.getId());
 
 		TestGlueResponse<Order> response = createResponse(() -> orderService.create(order));
 
@@ -235,6 +235,13 @@ public class OrderTestGlueConfiguration extends TestGlueSupport {
 		TestGlueResponse<Order> response = createResponse(() -> orderService.complete(order.getId()));
 
 		put("orderResponse", response);
+	}
+
+	@TestGlueOperation("{} 주문을 종료하고")
+	public void complete2(String orderName) {
+		Order order = getAsType(orderName, Order.class);
+
+		put(orderName, orderService.complete(order.getId()));
 	}
 
 	@TestGlueOperation("주문 완료에 실패한다")
