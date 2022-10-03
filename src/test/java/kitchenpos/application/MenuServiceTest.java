@@ -57,7 +57,7 @@ class MenuServiceTest {
         등록된_상품 = productRepository.save(createProduct());
     }
 
-    @DisplayName("메뉴의 가격은 0원 이상 이어야 한다.")
+    @DisplayName("메뉴를 생성할때 메뉴의 가격은 0원 이상 이어야 한다.")
     @ParameterizedTest
     @MethodSource("bigDecimalZeroAndNull")
     void price_is_less_then_zero(BigDecimal price) {
@@ -68,7 +68,7 @@ class MenuServiceTest {
                 );
     }
 
-    @DisplayName("메뉴의 등록된 메뉴 그룹이 존재 해야 한다.")
+    @DisplayName("메뉴를 생성할때 메뉴의 가격은 0원 미만일수 없다.")
     @Test
     void menu_has_menuGroup() {
         Menu request = createMenu();
@@ -80,7 +80,7 @@ class MenuServiceTest {
                 );
     }
 
-    @DisplayName("메뉴의 상품은 하나 이상 필요하다.")
+    @DisplayName("메뉴를 생성할때 메뉴의 상품은 하나 이상 필요하다.")
     @Test
     void menu_in_menuProduct() {
         Menu request = createMenu(등록된_메뉴그룹);
@@ -90,7 +90,7 @@ class MenuServiceTest {
 
     }
 
-    @DisplayName("메뉴의 상품은 등록 되어 있는 상품 이어야 한다.")
+    @DisplayName("메뉴를 생성할때 메뉴의 상품은 등록 되어 있는 상품 이어야 한다.")
     @Test
     void menu_in_saved_product() {
         // given
@@ -106,7 +106,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(request));
     }
 
-    @DisplayName("메뉴의 상품은 수량이 0보다 작으면 안된다.")
+    @DisplayName("메뉴를 생성할때 메뉴의 상품은 수량이 0보다 작으면 안된다.")
     @Test
     void meunProduct_quantity_no_less_than_zero() {
         // given
@@ -119,7 +119,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(request));
     }
 
-    @DisplayName("메뉴의 가격이 상품의 합계 보다 크면 안된다.")
+    @DisplayName("메뉴를 생성할때 메뉴의 가격이 상품의 합계 보다 크면 안된다.")
     @Test
     void menuPrice_less_then_product_sum() {
         //given
@@ -134,7 +134,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(request));
     }
 
-    @DisplayName("메뉴이름에는 비속어가 아니어야 한다.")
+    @DisplayName("메뉴를 생성할때 메뉴이름에는 비속어가 아니어야 한다.")
     @Test
     void menu_name_is_no_purgomalum() {
         Menu request = createMenu(등록된_메뉴그룹, "비속어");
