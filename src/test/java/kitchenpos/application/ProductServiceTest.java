@@ -25,8 +25,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 
+@DisplayName("상품 테스트")
 class ProductServiceTest {
 
     private ProductService productService;
