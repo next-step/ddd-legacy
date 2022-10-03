@@ -25,6 +25,11 @@ public class MenuProduct {
     @Transient
     private UUID productId;
 
+    public MenuProduct(long quantity, UUID productId) {
+        this.quantity = quantity;
+        this.productId = productId;
+    }
+
     public MenuProduct() {
     }
 

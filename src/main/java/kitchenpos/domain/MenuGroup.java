@@ -16,6 +16,10 @@ public class MenuGroup {
     @Column(name = "name", nullable = false)
     private String name;
 
+    public MenuGroup(final String name) {
+        this.name = name;
+    }
+
     public MenuGroup() {
     }
 
