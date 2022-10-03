@@ -28,29 +28,32 @@ public class OrderFixture {
 
     public static Order request(
         OrderType orderType,
-        OrderLineItem orderLineItem,
+        List<OrderLineItem> orderLineItems,
         UUID orderTableId
     ) {
         var order = new Order();
         order.setType(orderType);
-        order.setOrderLineItems(List.of(orderLineItem));
+        order.setOrderLineItems(orderLineItems);
         order.setOrderTableId(orderTableId);
         return order;
     }
 
     public static Order request(
         OrderType orderType,
-        OrderLineItem orderLineItem,
+        List<OrderLineItem> orderLineItems,
         String deliveryAddress
     ) {
         var order = new Order();
         order.setType(orderType);
-        order.setOrderLineItems(List.of(orderLineItem));
+        order.setOrderLineItems(orderLineItems);
         order.setDeliveryAddress(deliveryAddress);
         return order;
     }
 
-    public static Order request(OrderType orderType, List<OrderLineItem> orderLineItems) {
+    public static Order request(
+        OrderType orderType,
+        List<OrderLineItem> orderLineItems
+    ) {
         var order = new Order();
         order.setType(orderType);
         order.setOrderLineItems(orderLineItems);

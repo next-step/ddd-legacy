@@ -53,224 +53,437 @@ class OrderServiceTest {
         );
     }
 
-    @DisplayName("주문 등록 테스트")
+    @DisplayName("매장 주문 테스트")
     @Nested
-    class CreateTest {
+    class EatInOrderTest {
 
-        @DisplayName("매장 주문을 등록 할 수 있다.")
-        @Test
-        void test01() {
-            // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
-            Order request = OrderFixture.request(
-                OrderType.EAT_IN,
-                OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()),
-                orderTable.getId()
-            );
+        @DisplayName("주문 등록 테스트")
+        @Nested
+        class CreateTest {
 
-            // when
-            Order actual = testTarget.create(request);
+            @DisplayName("매장 주문을 등록 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+                Order request = OrderFixture.request(
+                    OrderType.EAT_IN,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    orderTable.getId()
+                );
 
-            // then
-            assertAll(
-                () -> assertThat(actual.getId()).isNotNull(),
-                () -> assertThat(actual.getType()).isEqualTo(OrderType.EAT_IN),
-                () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING),
-                () -> assertThat(actual.getOrderTable().getId()).isEqualTo(orderTable.getId()),
-                () -> assertThat(actual.getOrderTable().isOccupied()).isTrue(),
-                () -> assertThat(actual.getOrderLineItems())
-                    .singleElement()
-                    .matches(orderLineItem -> orderLineItem.getMenu().getId().equals(menu.getId()))
-                    .matches(orderLineItem -> orderLineItem.getQuantity() == 1L)
-            );
+                // when
+                Order actual = testTarget.create(request);
+
+                // then
+                assertAll(
+                    () -> assertThat(actual.getId()).isNotNull(),
+                    () -> assertThat(actual.getType()).isEqualTo(OrderType.EAT_IN),
+                    () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING),
+                    () -> assertThat(actual.getOrderTable().getId()).isEqualTo(orderTable.getId()),
+                    () -> assertThat(actual.getOrderTable().isOccupied()).isTrue(),
+                    () -> assertThat(actual.getOrderLineItems())
+                        .singleElement()
+                        .matches(
+                            orderLineItem -> orderLineItem.getMenu().getId().equals(menu.getId()))
+                        .matches(orderLineItem -> orderLineItem.getQuantity() == 1L)
+                );
+            }
+
+            @DisplayName("주문 타입없이 주문을 등록 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+                Order request = OrderFixture.request(
+                    null,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    orderTable.getId()
+                );
+
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("주문 아이템없이 주문을 등록 할 수 없다.")
+            @Test
+            void test03() {
+                // given
+                Order request = OrderFixture.request(
+                    OrderType.EAT_IN,
+                    Collections.emptyList()
+                );
+
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("존재하지 않는 메뉴를 주문 할 수 없다.")
+            @Test
+            void test04() {
+                // given
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+                Order request = OrderFixture.request(
+                    OrderType.EAT_IN,
+                    List.of(OrderLineItemFixture.request(UUID.randomUUID(), 1,
+                        BigDecimal.valueOf(6000))),
+                    orderTable.getId()
+                );
+
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("감춰진 메뉴를 주문 할 수 없다.")
+            @Test
+            void test05() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU);
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+                Order request = OrderFixture.request(
+                    OrderType.EAT_IN,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    orderTable.getId()
+                );
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("매장 주문의 경우, 존재하지 않는 주문 테이블에 주문을 등록 할 수 없다.")
+            @Test
+            void test06() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Order request = OrderFixture.request(
+                    OrderType.EAT_IN,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    UUID.randomUUID()
+                );
+
+                // when & then
+                assertThatExceptionOfType(NoSuchElementException.class)
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("매장 주문의 경우, 빈 테이블이 아닌 경우 주문을 등록 할 수 없다.")
+            @Test
+            void test07() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE);
+                Order request = OrderFixture.request(
+                    OrderType.EAT_IN,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    orderTable.getId()
+                );
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("메뉴의 가격과 주문 아이템의 가격이 다른 경우, 주문 할 수 없다.")
+            @Test
+            void test08() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+                BigDecimal orderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
+                Order request = OrderFixture.request(
+                    OrderType.EAT_IN,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, orderItemPrice)),
+                    orderTable.getId()
+                );
+
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
         }
 
-        @DisplayName("배달 주문을 등록 할 수 있다.")
-        @Test
-        void test02() {
-            // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-            Order request = OrderFixture.request(
-                OrderType.DELIVERY,
-                OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()),
-                "delivery address"
-            );
+    }
 
-            // when
-            Order actual = testTarget.create(request);
+    @DisplayName("배달 주문 테스트")
+    @Nested
+    class DeliveryOrderTest {
 
-            // then
-            assertAll(
-                () -> assertThat(actual.getId()).isNotNull(),
-                () -> assertThat(actual.getType()).isEqualTo(OrderType.DELIVERY),
-                () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING),
-                () -> assertThat(actual.getDeliveryAddress()).isEqualTo("delivery address"),
-                () -> assertThat(actual.getOrderLineItems())
-                    .singleElement()
-                    .matches(orderLineItem -> orderLineItem.getMenu().getId().equals(menu.getId()))
-                    .matches(orderLineItem -> orderLineItem.getQuantity() == 1L)
-            );
-        }
+        @DisplayName("주문 등록 테스트")
+        @Nested
+        class CreatTest {
 
-        @DisplayName("포장 주문을 등록 할 수 있다.")
-        @Test
-        void test03() {
-            // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-            Order request = OrderFixture.request(
-                OrderType.TAKEOUT,
-                List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()))
-            );
+            @DisplayName("배달 주문을 등록 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Order request = OrderFixture.request(
+                    OrderType.DELIVERY,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    "delivery address"
+                );
 
-            // when
-            Order actual = testTarget.create(request);
+                // when
+                Order actual = testTarget.create(request);
 
-            // then
-            assertAll(
-                () -> assertThat(actual.getId()).isNotNull(),
-                () -> assertThat(actual.getType()).isEqualTo(OrderType.TAKEOUT),
-                () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING),
-                () -> assertThat(actual.getOrderLineItems())
-                    .singleElement()
-                    .matches(orderLineItem -> orderLineItem.getMenu().getId().equals(menu.getId()))
-                    .matches(orderLineItem -> orderLineItem.getQuantity() == 1L)
-            );
-        }
+                // then
+                assertAll(
+                    () -> assertThat(actual.getId()).isNotNull(),
+                    () -> assertThat(actual.getType()).isEqualTo(OrderType.DELIVERY),
+                    () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING),
+                    () -> assertThat(actual.getDeliveryAddress()).isEqualTo("delivery address"),
+                    () -> assertThat(actual.getOrderLineItems())
+                        .singleElement()
+                        .matches(
+                            orderLineItem -> orderLineItem.getMenu().getId().equals(menu.getId()))
+                        .matches(orderLineItem -> orderLineItem.getQuantity() == 1L)
+                );
+            }
 
-        @DisplayName("주문 타입없이 주문을 등록 할 수 없다.")
-        @Test
-        void test04() {
-            // given
-            Order request = new Order();
+            @DisplayName("주문 타입없이 주문을 등록 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Order request = OrderFixture.request(
+                    null,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    "delivery address"
+                );
 
-            // when & then
-            assertThatIllegalArgumentException()
-                .isThrownBy(() -> testTarget.create(request));
-        }
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
 
-        @DisplayName("주문 아이템없이 주문을 등록 할 수 없다.")
-        @Test
-        void test05() {
-            // given
-            Order request = OrderFixture.request(
-                OrderType.TAKEOUT,
-                Collections.emptyList()
-            );
+            @DisplayName("주문 아이템없이 주문을 등록 할 수 없다.")
+            @Test
+            void test03() {
+                // given
+                Order request = OrderFixture.request(
+                    OrderType.DELIVERY,
+                    Collections.emptyList(),
+                    "delivery address"
+                );
 
-            // when & then
-            assertThatIllegalArgumentException()
-                .isThrownBy(() -> testTarget.create(request));
-        }
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
 
-        @DisplayName("존재하지 않는 메뉴를 주문 할 수 없다.")
-        @Test
-        void test06() {
-            // given
-            Order request = OrderFixture.request(
-                OrderType.TAKEOUT,
-                List.of(OrderLineItemFixture.request(UUID.randomUUID(), 1, BigDecimal.valueOf(6000)))
-            );
+            @DisplayName("존재하지 않는 메뉴를 주문 할 수 없다.")
+            @Test
+            void test04() {
+                // given
+                Order request = OrderFixture.request(
+                    OrderType.DELIVERY,
+                    List.of(OrderLineItemFixture.request(UUID.randomUUID(), 1,
+                        BigDecimal.valueOf(6000))),
+                    "delivery address"
+                );
 
-            // when & then
-            assertThatIllegalArgumentException()
-                .isThrownBy(() -> testTarget.create(request));
-        }
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
 
-        @DisplayName("매장 주문이 아닌 경우, 주문 아이템의 수량은 0 보다 많아야 한다.")
-        @Test
-        void test07() {
-            // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-            Order request = OrderFixture.request(
-                OrderType.TAKEOUT,
-                List.of(OrderLineItemFixture.request(menu.getId(), -1, menu.getPrice()))
-            );
+            @DisplayName("주문 아이템의 수량은 0 이상이어야 한다.")
+            @Test
+            void test05() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Order request = OrderFixture.request(
+                    OrderType.DELIVERY,
+                    List.of(OrderLineItemFixture.request(menu.getId(), -1, menu.getPrice())),
+                    "delivery address"
+                );
 
-            // when & then
-            assertThatIllegalArgumentException()
-                .isThrownBy(() -> testTarget.create(request));
-        }
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
 
-        @DisplayName("감춰진 메뉴를 주문 할 수 없다.")
-        @Test
-        void test08() {
-            // given
-            Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU);
-            Order request = OrderFixture.request(
-                OrderType.TAKEOUT,
-                List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()))
-            );
+            @DisplayName("감춰진 메뉴를 주문 할 수 없다.")
+            @Test
+            void test06() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU);
+                Order request = OrderFixture.request(
+                    OrderType.DELIVERY,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    "delivery address"
+                );
 
-            // when & then
-            assertThatIllegalStateException()
-                .isThrownBy(() -> testTarget.create(request));
-        }
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
 
-        @DisplayName("메뉴의 가격과 주문 아이템의 가격이 다른 경우, 주문 할 수 없다.")
-        @Test
-        void test09() {
-            // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-            BigDecimal orderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
-            Order request = OrderFixture.request(
-                OrderType.TAKEOUT,
-                List.of(OrderLineItemFixture.request(menu.getId(), 1, orderItemPrice))
-            );
+            @DisplayName("배달 주문의 경우, 배달 주소가 없는 경우 주문 할 수 없다.")
+            @ParameterizedTest
+            @NullAndEmptySource
+            void test07(String deliveryAddress) {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Order request = OrderFixture.request(
+                    OrderType.DELIVERY,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    deliveryAddress
+                );
 
-            // when & then
-            assertThatIllegalArgumentException()
-                .isThrownBy(() -> testTarget.create(request));
-        }
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
 
-        @DisplayName("배달 주문의 경우, 배달 주소가 없는 경우 주문 할 수 없다.")
-        @ParameterizedTest
-        @NullAndEmptySource
-        void test10(String deliveryAddress) {
-            // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-            Order request = OrderFixture.request(
-                OrderType.DELIVERY,
-                OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()),
-                deliveryAddress
-            );
+            @DisplayName("메뉴의 가격과 주문 아이템의 가격이 다른 경우, 주문 할 수 없다.")
+            @Test
+            void test08() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                BigDecimal orderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
+                Order request = OrderFixture.request(
+                    OrderType.DELIVERY,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, orderItemPrice)),
+                    "delivery address"
+                );
 
-            // when & then
-            assertThatIllegalArgumentException()
-                .isThrownBy(() -> testTarget.create(request));
-        }
-
-        @DisplayName("매장 주문의 경우, 존재하지 않는 주문 테이블에 주문을 등록 할 수 없다.")
-        @Test
-        void test11() {
-            // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-            Order request = OrderFixture.request(
-                OrderType.EAT_IN,
-                OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()),
-                UUID.randomUUID()
-            );
-
-            // when & then
-            assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> testTarget.create(request));
-        }
-
-        @DisplayName("매장 주문의 경우, 빈 테이블이 아닌 경우 주문을 등록 할 수 없다.")
-        @Test
-        void test12() {
-            // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE);
-            Order request = OrderFixture.request(
-                OrderType.EAT_IN,
-                OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()),
-                orderTable.getId()
-            );
-
-            // when & then
-            assertThatIllegalStateException()
-                .isThrownBy(() -> testTarget.create(request));
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
         }
     }
+
+    @DisplayName("포장 주문 테스트")
+    @Nested
+    class TakeOutOrderTest {
+
+        @DisplayName("주문 등록 테스트")
+        @Nested
+        class CreateTest {
+
+            @DisplayName("포장 주문을 등록 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Order request = OrderFixture.request(
+                    OrderType.TAKEOUT,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()))
+                );
+
+                // when
+                Order actual = testTarget.create(request);
+
+                // then
+                assertAll(
+                    () -> assertThat(actual.getId()).isNotNull(),
+                    () -> assertThat(actual.getType()).isEqualTo(OrderType.TAKEOUT),
+                    () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING),
+                    () -> assertThat(actual.getOrderLineItems())
+                        .singleElement()
+                        .matches(
+                            orderLineItem -> orderLineItem.getMenu().getId().equals(menu.getId()))
+                        .matches(orderLineItem -> orderLineItem.getQuantity() == 1L)
+                );
+            }
+
+            @DisplayName("주문 타입없이 주문을 등록 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Order request = OrderFixture.request(
+                    null,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()))
+                );
+
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("주문 아이템없이 주문을 등록 할 수 없다.")
+            @Test
+            void test03() {
+                // given
+                Order request = OrderFixture.request(
+                    OrderType.TAKEOUT,
+                    Collections.emptyList()
+                );
+
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("존재하지 않는 메뉴를 주문 할 수 없다.")
+            @Test
+            void test04() {
+                // given
+                Order request = OrderFixture.request(
+                    OrderType.TAKEOUT,
+                    List.of(OrderLineItemFixture.request(UUID.randomUUID(), 1, BigDecimal.valueOf(6000)))
+                );
+
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("주문 아이템의 수량은 0 이상이어야 한다.")
+            @Test
+            void test05() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Order request = OrderFixture.request(
+                    OrderType.TAKEOUT,
+                    List.of(OrderLineItemFixture.request(menu.getId(), -1, menu.getPrice()))
+                );
+
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("감춰진 메뉴를 주문 할 수 없다.")
+            @Test
+            void test06() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU);
+                Order request = OrderFixture.request(
+                    OrderType.TAKEOUT,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()))
+                );
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+
+            @DisplayName("메뉴의 가격과 주문 아이템의 가격이 다른 경우, 주문 할 수 없다.")
+            @Test
+            void test07() {
+                // given
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                BigDecimal orderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
+                Order request = OrderFixture.request(
+                    OrderType.TAKEOUT,
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, orderItemPrice))
+                );
+
+                // when & then
+                assertThatIllegalArgumentException()
+                    .isThrownBy(() -> testTarget.create(request));
+            }
+        }
+    }
+
 }
