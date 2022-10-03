@@ -1,12 +1,10 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import factory.MenuFactory;
+import factory.MenuGroupFactory;
+import factory.MenuProductFactory;
 import factory.ProductFactory;
-import kitchenpos.domain.FakeProfanityClient;
-import kitchenpos.domain.InMemoryMenuRepository;
-import kitchenpos.domain.InMemoryProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.ProfanityClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -110,17 +108,35 @@ class ProductServiceTest {
     @DisplayName("상품 수정 시, 해당 상품이 포함된 메뉴의 가격이 메뉴에 속한 상품들의 총 가격보다 비싸다면 메뉴 진열이 불가능하다.")
     @Test
     void changePrice_expansive_then_menu_price() {
-        // 메뉴 테스트 코드 작성할때 같이 작성.
+        final Product request = saveProduct(ProductFactory.of("황금올리브", BigDecimal.valueOf(15000L)));
+        final Product 맥주 = saveProduct(ProductFactory.of("하이네켄", BigDecimal.valueOf(5000L)));
+        final Product 사이드 = saveProduct(ProductFactory.of("치즈볼", BigDecimal.valueOf(4000L)));
+        MenuGroup menuGroup = MenuGroupFactory.getDefaultMenuGroup();
+        List<MenuProduct> menuProducts = List.of(
+                MenuProductFactory.of(request),
+                MenuProductFactory.of(맥주),
+                MenuProductFactory.of(사이드)
+        );
+        Menu menu = MenuFactory.getDefaultMenu(menuGroup, menuProducts, true);
+        menuRepository.save(menu);
+        request.setPrice(BigDecimal.valueOf(20000L));
+
+        productService.changePrice(request.getId(), request);
+
+        assertThat(menu.isDisplayed()).isFalse();
     }
 
     @DisplayName("상품 목록을 조회한다.")
     @Test
     void findAll() {
-        final Product product = ProductFactory.getDefaultProduct();
-        productRepository.save(product);
+        saveProduct(ProductFactory.getDefaultProduct());
 
         List<Product> products = productService.findAll();
 
         assertThat(products).hasSize(1);
+    }
+
+    Product saveProduct(Product product) {
+        return productRepository.save(product);
     }
 }
