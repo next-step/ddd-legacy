@@ -51,7 +51,7 @@ class MenuServiceTest {
         assertThat(actual.getId()).isNotNull();
         assertThat(actual.getName()).isEqualTo("치맥세트");
         assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(28000L));
-        assertThat(actual.isDisplayed()).isEqualTo(false);
+        assertThat(actual.isDisplayed()).isFalse();
         assertThat(actual.getMenuProducts()).hasSize(2);
     }
 
