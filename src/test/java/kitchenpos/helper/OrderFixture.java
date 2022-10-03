@@ -26,15 +26,34 @@ public class OrderFixture {
         return order;
     }
 
-    private static class OrderLineItemFixture {
+    public static Order request(
+        OrderType orderType,
+        OrderLineItem orderLineItem,
+        UUID orderTableId
+    ) {
+        var order = new Order();
+        order.setType(orderType);
+        order.setOrderLineItems(List.of(orderLineItem));
+        order.setOrderTableId(orderTableId);
+        return order;
+    }
 
-        private static final int DEFAULT_ORDER_LINE_ITEM_QUANTITY = 1;
+    public static Order request(
+        OrderType orderType,
+        OrderLineItem orderLineItem,
+        String deliveryAddress
+    ) {
+        var order = new Order();
+        order.setType(orderType);
+        order.setOrderLineItems(List.of(orderLineItem));
+        order.setDeliveryAddress(deliveryAddress);
+        return order;
+    }
 
-        public static OrderLineItem create() {
-            var orderLineItem = new OrderLineItem();
-            orderLineItem.setMenu(MenuFixture.ONE_FRIED_CHICKEN);
-            orderLineItem.setQuantity(DEFAULT_ORDER_LINE_ITEM_QUANTITY);
-            return orderLineItem;
-        }
+    public static Order request(OrderType orderType, List<OrderLineItem> orderLineItems) {
+        var order = new Order();
+        order.setType(orderType);
+        order.setOrderLineItems(orderLineItems);
+        return order;
     }
 }
