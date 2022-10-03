@@ -26,6 +26,31 @@ public class OrderFixture {
         return order;
     }
 
+    public static Order create(
+        OrderType orderType,
+        OrderStatus orderStatus,
+        String deliveryAddress
+    ) {
+        var order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderLineItems(List.of(OrderLineItemFixture.create()));
+        order.setDeliveryAddress(deliveryAddress);
+        return order;
+    }
+
+    public static Order create(OrderType orderType, OrderStatus orderStatus) {
+        var order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderLineItems(List.of(OrderLineItemFixture.create()));
+        return order;
+    }
+
     public static Order request(
         OrderType orderType,
         List<OrderLineItem> orderLineItems,

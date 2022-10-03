@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.verify;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -31,15 +32,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
     private final OrderRepository orderRepository = new InMemoryOrderRepository();
     private final MenuRepository menuRepository = new InMemoryMenuRepository();
     private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
-    private final KitchenridersClient kitchenridersClient = new KitchenridersClient();
+    @Mock
+    private KitchenridersClient kitchenridersClient;
 
     private OrderService testTarget;
 
@@ -208,6 +214,44 @@ class OrderServiceTest {
             }
         }
 
+        @DisplayName("주문 수락 테스트")
+        @Nested
+        class AcceptTest {
+
+            @DisplayName("주문을 수락 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.EAT_IN,
+                    OrderStatus.WAITING,
+                    OrderTableFixture.OCCUPIED_TABLE
+                ));
+
+                // when
+                Order actual = testTarget.accept(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.ACCEPTED);
+            }
+
+            @DisplayName("주문이 대기 상태가 아닌 경우, 수락 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.EAT_IN,
+                    OrderStatus.ACCEPTED,
+                    OrderTableFixture.OCCUPIED_TABLE
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.accept(order.getId()));
+            }
+        }
+
     }
 
     @DisplayName("배달 주문 테스트")
@@ -359,6 +403,46 @@ class OrderServiceTest {
                     .isThrownBy(() -> testTarget.create(request));
             }
         }
+
+        @DisplayName("주문 수락 테스트")
+        @Nested
+        class AcceptTest {
+
+            @DisplayName("주문을 수락 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.DELIVERY,
+                    OrderStatus.WAITING,
+                    "delivery address"
+                ));
+
+                // when
+                Order actual = testTarget.accept(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.ACCEPTED);
+                verify(kitchenridersClient)
+                    .requestDelivery(order.getId(), BigDecimal.valueOf(6000), "delivery address");
+            }
+
+            @DisplayName("주문이 대기 상태가 아닌 경우, 수락 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.DELIVERY,
+                    OrderStatus.ACCEPTED,
+                    "delivery address"
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.accept(order.getId()));
+            }
+        }
     }
 
     @DisplayName("포장 주문 테스트")
@@ -482,6 +566,43 @@ class OrderServiceTest {
                 // when & then
                 assertThatIllegalArgumentException()
                     .isThrownBy(() -> testTarget.create(request));
+            }
+        }
+
+
+        @DisplayName("주문 수락 테스트")
+        @Nested
+        class AcceptTest {
+
+            @DisplayName("주문을 수락 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.TAKEOUT,
+                    OrderStatus.WAITING
+                ));
+
+                // when
+                Order actual = testTarget.accept(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.ACCEPTED);
+            }
+
+            @DisplayName("주문이 대기 상태가 아닌 경우, 수락 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.TAKEOUT,
+                    OrderStatus.ACCEPTED
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.accept(order.getId()));
             }
         }
     }
