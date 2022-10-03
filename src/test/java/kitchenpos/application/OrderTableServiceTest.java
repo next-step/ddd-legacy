@@ -1,24 +1,14 @@
-package kitchenpos;
+package kitchenpos.application;
 
-import kitchenpos.application.OrderTableService;
-import kitchenpos.application.ProductService;
 import kitchenpos.domain.*;
-import kitchenpos.factory.OrderLineItemFactory;
-import kitchenpos.factory.OrderTableFactory;
-import kitchenpos.factory.ProductFactory;
-import kitchenpos.fakeobject.*;
-import kitchenpos.infra.ProfanityClient;
+import factory.OrderTableFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;

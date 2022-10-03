@@ -1,4 +1,4 @@
-package kitchenpos.fakeobject;
+package kitchenpos.domain;
 
 
 import java.util.List;

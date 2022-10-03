@@ -1,4 +1,4 @@
-package kitchenpos.fakeobject;
+package kitchenpos.domain;
 
 import kitchenpos.infra.ProfanityClient;
 

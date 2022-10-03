@@ -1,4 +1,4 @@
-package kitchenpos.factory;
+package factory;
 
 import kitchenpos.domain.Product;
 

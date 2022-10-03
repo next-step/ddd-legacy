@@ -1,10 +1,8 @@
-package kitchenpos;
+package kitchenpos.application;
 
-import kitchenpos.application.OrderService;
+import factory.*;
 import kitchenpos.domain.*;
 import kitchenpos.factory.*;
-import kitchenpos.fakeobject.*;
-import kitchenpos.infra.ProfanityClient;
 import kitchenpos.infra.RidersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

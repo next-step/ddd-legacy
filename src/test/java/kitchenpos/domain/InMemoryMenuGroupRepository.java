@@ -1,7 +1,4 @@
-package kitchenpos.fakeobject;
-
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
+package kitchenpos.domain;
 
 import java.util.*;
 

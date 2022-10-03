@@ -1,13 +1,12 @@
-package kitchenpos;
+package kitchenpos.application;
 
-import kitchenpos.application.ProductService;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.factory.ProductFactory;
-import kitchenpos.fakeobject.FakeProfanityClient;
-import kitchenpos.fakeobject.InMemoryMenuRepository;
-import kitchenpos.fakeobject.InMemoryProductRepository;
+import factory.ProductFactory;
+import kitchenpos.domain.FakeProfanityClient;
+import kitchenpos.domain.InMemoryMenuRepository;
+import kitchenpos.domain.InMemoryProductRepository;
 import kitchenpos.infra.ProfanityClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

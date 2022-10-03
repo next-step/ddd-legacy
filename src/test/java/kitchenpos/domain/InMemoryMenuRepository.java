@@ -1,8 +1,4 @@
-package kitchenpos.fakeobject;
-
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Order;
+package kitchenpos.domain;
 
 import java.util.*;
 import java.util.stream.Collectors;

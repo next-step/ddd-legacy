@@ -1,9 +1,4 @@
-package kitchenpos.fakeobject;
-
-import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
+package kitchenpos.domain;
 
 import java.util.ArrayList;
 import java.util.UUID;

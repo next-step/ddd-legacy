@@ -1,7 +1,4 @@
-package kitchenpos.fakeobject;
-
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+package kitchenpos.domain;
 
 import java.util.List;
 import java.util.UUID;
