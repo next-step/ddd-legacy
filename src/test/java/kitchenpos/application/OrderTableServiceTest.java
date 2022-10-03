@@ -108,9 +108,8 @@ class OrderTableServiceTest {
         Order order = makeRandomOrder();
         order.setStatus(OrderStatus.COMPLETED);
         order.setOrderTable(orderTable);
+        order.setOrderTableId(orderTable.getId());
         fakeOrderRepository.save(order);
-
-        fakeOrderRepository.setOrderTablesOnOrder(fakeOrderTableRepository.findAll());
 
         //when & then
         assertThat(orderTableService.clear(orderTable.getId()))

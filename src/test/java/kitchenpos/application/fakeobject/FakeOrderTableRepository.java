@@ -3,48 +3,41 @@ package kitchenpos.application.fakeobject;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class FakeOrderTableRepository implements OrderTableRepository {
-    private List<OrderTable> orderTableList = new ArrayList<>();
+    private Map<UUID, OrderTable> orderTableMap = new HashMap<>();
 
     public FakeOrderTableRepository() {
         for (int i = 1; i <= 5; i++) {
             OrderTable orderTable = new OrderTable();
-            orderTable.setId(UUID.fromString("3faec3ab-5217-405d-aaa2-804f87697f8" + i));
-            orderTableList.add(orderTable);
+            UUID id = UUID.fromString("3faec3ab-5217-405d-aaa2-804f87697f8" + i);
+            orderTable.setId(id);
+            orderTableMap.put(id, orderTable);
         }
     }
 
     @Override
     public Optional<OrderTable> findById(UUID orderTableId) {
-        for (OrderTable orderTable : orderTableList) {
-            if (orderTableId.equals(orderTable.getId())) {
-                return Optional.of(orderTable);
-            }
+        if (orderTableMap.containsKey(orderTableId)) {
+            return Optional.of(orderTableMap.get(orderTableId));
         }
         return Optional.empty();
     }
 
     @Override
     public List<OrderTable> findAll() {
-        return orderTableList;
+        return new ArrayList<>(orderTableMap.values());
     }
 
     @Override
     public OrderTable save(OrderTable orderTable) {
-        if (orderTable.getId() != null) {
-            for (OrderTable orderTableItem : orderTableList) {
-                if (orderTableItem.getId().equals(orderTable.getId())) {
-                    return orderTableItem = orderTable;
-                }
-            }
+        if (orderTable.getId() != null && orderTableMap.containsKey(orderTable.getId())) {
+            orderTableMap.put(orderTable.getId(), orderTable);
+            return orderTable;
         }
         orderTable.setId(UUID.randomUUID());
-        orderTableList.add(orderTable);
+        orderTableMap.put(orderTable.getId(), orderTable);
         return orderTable;
     }
 }

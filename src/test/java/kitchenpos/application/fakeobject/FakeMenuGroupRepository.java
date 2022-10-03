@@ -3,48 +3,42 @@ package kitchenpos.application.fakeobject;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public class FakeMenuGroupRepository implements MenuGroupRepository {
-    private List<MenuGroup> menuGroupList;
+    private Map<UUID, MenuGroup> menuGroupMap;
 
     public FakeMenuGroupRepository() {
-        this.menuGroupList = new ArrayList<>();
+        this.menuGroupMap = new HashMap<>();
 
         for (int i = 1; i <= 5; i++) {
-            menuGroupList.add(MenuGroup.of(UUID.fromString("5e9879b7-6112-4791-a4ce-f22e94af875" + i), "test" + i));
+            UUID id = UUID.fromString("5e9879b7-6112-4791-a4ce-f22e94af875" + i);
+            menuGroupMap.put(id, MenuGroup.of(id, "test" + i));
         }
     }
 
     @Override
     public MenuGroup save(MenuGroup menuGroup) {
         if (menuGroup.getId() != null) {
-            for (MenuGroup menuGroupItem : menuGroupList) {
-                if (menuGroupItem.getId().equals(menuGroup.getId())) {
-                    menuGroupItem = menuGroup;
-                    return menuGroupItem;
-                }
+            if (menuGroupMap.containsKey(menuGroup.getId())) {
+                menuGroupMap.put(menuGroup.getId(), menuGroup);
+                return menuGroup;
             }
         }
         menuGroup.setId(UUID.randomUUID());
-        menuGroupList.add(menuGroup);
+        menuGroupMap.put(menuGroup.getId(), menuGroup);
         return menuGroup;
     }
 
     @Override
     public List<MenuGroup> findAll() {
-        return menuGroupList;
+        return new ArrayList<>(menuGroupMap.values());
     }
 
     @Override
     public Optional<MenuGroup> findById(UUID menuGroupId) {
-        for (MenuGroup menuGroup : menuGroupList) {
-            if (menuGroup.getId().equals(menuGroupId)) {
-                return Optional.of(menuGroup);
-            }
+        if (menuGroupMap.containsKey(menuGroupId)) {
+            return Optional.of(menuGroupMap.get(menuGroupId));
         }
         return Optional.empty();
     }
