@@ -53,7 +53,6 @@ public class MenuTestGlueConfiguration extends TestGlueSupport {
 		Menu menuRequest = MenuMother.findCreatorByName(name).create(name, menuGroup, List.of(menuProduct));
 
 		put(name, menuRequest);
-
 	}
 
 	@TestGlueOperation("{} 메뉴를 생성하고")
@@ -125,10 +124,17 @@ public class MenuTestGlueConfiguration extends TestGlueSupport {
 	}
 
 	@TestGlueOperation("{} 메뉴를 미전시상태로 변경하면")
-	public void changeDisplay_false(String name) {
+	public void changeDisplay_false1(String name) {
 		Menu menu = getAsType(name, Menu.class);
 		TestGlueResponse<Menu> response = createResponse(() -> menuService.hide(menu.getId()));
 		put("response", response);
+	}
+
+	@TestGlueOperation("{} 메뉴를 미전시상태로 변경하고")
+	public void changeDisplay_false2(String name) {
+		Menu menu = getAsType(name, Menu.class);
+		menuService.hide(menu.getId());
+		put(name, menu);
 	}
 
 	@TestGlueOperation("{} 메뉴 가격 변경에 실패한다")
@@ -170,7 +176,13 @@ public class MenuTestGlueConfiguration extends TestGlueSupport {
 			() -> assertThat(changePriceResponse.isOk()).isTrue(),
 			() -> assertThat(menu.isDisplayed()).isFalse()
 		);
+	}
 
+	@TestGlueOperation("{} 메뉴를 삭제하고")
+	public void deleteMenu(String name) {
+		// 제거가 어려움으로 UUID를 변경하여 비슷한 효과를 낸다.
+		Menu menu = getAsType(name, Menu.class);
+		menu.setId(UUID.randomUUID());
 	}
 
 	private Long toLong(String price) {

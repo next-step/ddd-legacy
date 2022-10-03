@@ -53,7 +53,7 @@ class OrderTableServiceTest {
 		testGlue.builder()
 			.given("'테이블1' 주문 테이블을 생성하고")
 			.given("'테이블1' 주문 테이블에 손님이 앉고")
-			.when("손님의 수를 '4' 로 변경하면")
+			.when("'테이블1' 주문 테이블 손님의 수를 '4' 로 변경하면")
 			.then("'테이블1' 의 손님의 수가 '4'로 변경된다")
 			.assertStart();
 	}
@@ -63,7 +63,7 @@ class OrderTableServiceTest {
 	void changeNumberOfGuests_notOccupied() {
 		testGlue.builder()
 			.given("'테이블1' 주문 테이블을 생성하고")
-			.when("손님의 수를 '4' 로 변경하면")
+			.when("'테이블1' 주문 테이블 손님의 수를 '4' 로 변경하면")
 			.then("주문 테이블 변경에 실패한다")
 			.assertStart();
 	}

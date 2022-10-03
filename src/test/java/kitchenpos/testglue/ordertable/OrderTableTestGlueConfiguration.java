@@ -35,7 +35,9 @@ public class OrderTableTestGlueConfiguration extends TestGlueSupport {
 
 	@TestGlueOperation("{} 주문 테이블을 생성하고")
 	public void createOrderTable2(String name) {
-		createOrderTable1(name);
+		OrderTable orderTable = OrderTableMother.create(name);
+
+		put(name, orderTableService.create(orderTable));
 	}
 
 	@TestGlueOperation("{} 주문 테이블이 생성된다")
@@ -64,16 +66,19 @@ public class OrderTableTestGlueConfiguration extends TestGlueSupport {
 
 	@TestGlueOperation("{} 주문 테이블에 손님이 앉으면")
 	public void sitOrderTable1(String name) {
-		TestGlueResponse<OrderTable> response = getAsType("orderTableResponse", TestGlueResponse.class);
+		OrderTable orderTable = getAsType(name, OrderTable.class);
 
-		UUID id = response.getData().getId();
+		UUID id = orderTable.getId();
 
 		put("orderTableResponse", createResponse(() -> orderTableService.sit(id)));
 	}
 
 	@TestGlueOperation("{} 주문 테이블에 손님이 앉고")
 	public void sitOrderTable2(String name) {
-		sitOrderTable1(name);
+		OrderTable orderTable = getAsType(name, OrderTable.class);
+		UUID id = orderTable.getId();
+
+		put(name, orderTableService.sit(id));
 	}
 
 	@TestGlueOperation("{} 주문 테이블이 occupied상태가 된다.")
@@ -87,11 +92,11 @@ public class OrderTableTestGlueConfiguration extends TestGlueSupport {
 		assertThat(orderTable.isOccupied()).isTrue();
 	}
 
-	@TestGlueOperation("손님의 수를 {} 로 변경하면")
-	public void changeNumberOfGuests(String number) {
-		TestGlueResponse<OrderTable> response = getAsType("orderTableResponse", TestGlueResponse.class);
+	@TestGlueOperation("{} 주문 테이블 손님의 수를 {} 로 변경하면")
+	public void changeNumberOfGuests(String name, String number) {
+		OrderTable orderTable = getAsType(name, OrderTable.class);
 
-		UUID id = response.getData().getId();
+		UUID id = orderTable.getId();
 
 		OrderTable orderTableDto = new OrderTable();
 		orderTableDto.setNumberOfGuests(Integer.parseInt(number));

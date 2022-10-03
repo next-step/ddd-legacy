@@ -17,9 +17,10 @@ public class OrderMother {
 	private static Map<String, CreateOrder> creators = new HashMap<>();
 
 	static {
-		creators.put("배달주문", ((orderLineItems, orderTableId) -> 주문_request(DELIVERY, orderLineItems, "", orderTableId)));
-		creators.put("홀주문", ((orderLineItems, orderTableId) -> 주문_request(EAT_IN, orderLineItems, "", orderTableId)));
-		creators.put("포장주문", ((orderLineItems, orderTableId) -> 주문_request(TAKEOUT, orderLineItems, "", orderTableId)));
+		creators.put("배달주문", ((orderLineItems, orderTableId) -> 주문_request(DELIVERY, orderLineItems, "a", orderTableId)));
+		creators.put("주소가 없는 배달주문", ((orderLineItems, orderTableId) -> 주문_request(DELIVERY, orderLineItems, "", orderTableId)));
+		creators.put("홀주문", ((orderLineItems, orderTableId) -> 주문_request(EAT_IN, orderLineItems, "a", orderTableId)));
+		creators.put("포장주문", ((orderLineItems, orderTableId) -> 주문_request(TAKEOUT, orderLineItems, "a", orderTableId)));
 	}
 
 	public static CreateOrder findCreatorByName(String name) {
