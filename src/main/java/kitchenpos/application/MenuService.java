@@ -105,10 +105,12 @@ public class MenuService {
         }
         final Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(NoSuchElementException::new);
+
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             final BigDecimal sum = menuProduct.getProduct()
                     .getPrice()
                     .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
+
             if (price.compareTo(sum) > 0) {
                 throw new IllegalArgumentException();
             }

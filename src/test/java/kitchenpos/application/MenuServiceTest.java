@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,18 +25,17 @@ class MenuServiceTest {
     @Autowired
     private MenuService sut;
 
-    @Sql({"/insert-menu-group.sql", "/insert-product.sql"})
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("매뉴를 생성할 수 있다.")
     @Test
     void create() {
+        final long quantity = 1L;
         final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
-        final String name = "치킨 세트";
-        final BigDecimal price = new BigDecimal("20.00");
-
-        final boolean displayed = true;
-        final long quantity = 3L;
         final List<MenuProduct> menuProducts = List.of(new MenuProduct(quantity, productId));
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        final String name = "치킨세트";
+        final BigDecimal price = new BigDecimal("20");
+        final boolean displayed = true;
+        final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
         Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
@@ -44,18 +44,17 @@ class MenuServiceTest {
         assertThat(response.getName()).isEqualTo(name);
     }
 
-    @Sql({"/insert-menu-group.sql", "/insert-product.sql"})
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("매뉴의 가격은 비어있을 수 없다.")
     @NullSource
     @ParameterizedTest
     void createWithEmptyPrice(final BigDecimal price) {
+        final long quantity = 1L;
         final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
-        final String name = "치킨 세트";
-
-        final boolean displayed = true;
-        final long quantity = 3L;
         final List<MenuProduct> menuProducts = List.of(new MenuProduct(quantity, productId));
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        final String name = "치킨세트";
+        final boolean displayed = true;
+        final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
         Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
@@ -63,18 +62,17 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/insert-menu-group.sql", "/insert-product.sql"})
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("매뉴의 가격은 0보다 크거나 같다.")
     @Test
     void createWithLessThanZeroPrice() {
+        final long quantity = 1L;
         final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
-        final String name = "치킨 세트";
-        final BigDecimal price = new BigDecimal("-1");
-
-        final boolean displayed = true;
-        final long quantity = 3L;
         final List<MenuProduct> menuProducts = List.of(new MenuProduct(quantity, productId));
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        final String name = "치킨세트";
+        final BigDecimal price = new BigDecimal("-1");
+        final boolean displayed = true;
+        final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
         Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
@@ -82,7 +80,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql("/insert-product.sql")
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴는 메뉴그룹을 필수값으로 갖는다.")
     @Test
     void createWithNoneMenugroup() {
@@ -101,18 +99,18 @@ class MenuServiceTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
-    @Sql("/insert-menu-group.sql")
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴는 메뉴상품을 필수값으로 갖는다.")
     @Test
     void createWithNoneMenuProduct() {
-        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
+        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b11");
         final String name = "치킨 세트";
-        final BigDecimal price = new BigDecimal("20.00");
+        final BigDecimal price = new BigDecimal("20");
 
         final boolean displayed = true;
         final long quantity = 3L;
         final List<MenuProduct> menuProducts = List.of(new MenuProduct(quantity, productId));
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
         Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
@@ -120,18 +118,17 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/insert-menu-group.sql", "/insert-product.sql"})
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴 상품의 갯수는 0보다 크거나 같은 값이다.")
     @Test
     void createWithLessThanZero() {
-        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
-        final String name = "치킨 세트";
-        final BigDecimal price = new BigDecimal("20.00");
-
-        final boolean displayed = true;
         final long quantity = -1L;
+        final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
         final List<MenuProduct> menuProducts = List.of(new MenuProduct(quantity, productId));
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        final String name = "치킨세트";
+        final BigDecimal price = new BigDecimal("20");
+        final boolean displayed = true;
+        final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
         Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
@@ -139,37 +136,36 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/insert-menu-group.sql", "/insert-product.sql"})
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴 가격은 상품의 충 가격 보다 작아야 한다.")
     @Test
     void createWithBigPrice() {
+        final long quantity = 1L;
         final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
-        final String name = "치킨 세트";
-        final BigDecimal price = new BigDecimal("20000");
-
-        final boolean displayed = true;
-        final long quantity = -1L;
         final List<MenuProduct> menuProducts = List.of(new MenuProduct(quantity, productId));
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        final String name = "치킨 세트";
+        final BigDecimal price = new BigDecimal("50000");
+        final boolean displayed = true;
+        final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
         Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
+
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/insert-menu-group.sql", "/insert-product.sql"})
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴 이름은 비어있을 수 없다.")
     @NullSource
     @ParameterizedTest
     void createWithEmptyName(final String name) {
+        final long quantity = 1L;
         final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
-        final BigDecimal price = new BigDecimal("20.00");
-
-        final boolean displayed = true;
-        final long quantity = -1L;
         final List<MenuProduct> menuProducts = List.of(new MenuProduct(quantity, productId));
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        final BigDecimal price = new BigDecimal("20");
+        final boolean displayed = true;
+        final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
         Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
@@ -177,22 +173,75 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/insert-menu-group.sql", "/insert-product.sql"})
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴 이름은 비속어를 포함할 수 없다.")
     @ParameterizedTest
     @ValueSource(strings = {"fuck, goddamn"})
     void createWithPurgomalum(final String name) {
+        final long quantity = 1L;
         final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
-        final BigDecimal price = new BigDecimal("20.00");
-
-        final boolean displayed = true;
-        final long quantity = -1L;
         final List<MenuProduct> menuProducts = List.of(new MenuProduct(quantity, productId));
-        final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
+        final BigDecimal price = new BigDecimal("20");
+        final boolean displayed = true;
+        final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
         Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
+    @DisplayName("메뉴 가격을 변경할 수 있다.")
+    @Test
+    void changePrice() {
+        final UUID menuId = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
+        Menu request = new Menu(new BigDecimal("14000"));
+
+        final Menu response = sut.changePrice(menuId, request);
+
+        assertThat(response.getPrice()).isEqualTo(new BigDecimal("14000"));
+    }
+
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
+    @DisplayName("메뉴의 가격이 메뉴 상품 가격의 합보다 크면 숨김 상품이 된다.")
+    @Test
+    void changePriceWithBigPrice() {
+        final UUID menuId = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
+        Menu request = new Menu(new BigDecimal("20000"));
+
+        assertThatThrownBy(() -> sut.changePrice(menuId, request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
+    @DisplayName("메뉴를 비공개에서 공개로 설정할 수 있다.")
+    @Test
+    void display() {
+        final UUID hideMenuId = UUID.fromString("e1254913-8608-46aa-b23a-a07c1dcbc648");
+
+        final Menu response = sut.display(hideMenuId);
+
+        assertThat(response.isDisplayed()).isTrue();
+    }
+
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
+    @DisplayName("메뉴를 비공개에서 공개로 설정할 수 있다.")
+    @Test
+    void hide() {
+        final UUID menuId = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
+
+        final Menu response = sut.hide(menuId);
+
+        assertThat(response.isDisplayed()).isFalse();
+    }
+
+    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
+    @DisplayName("상품을 여러개 조회할 수 있다.")
+    @Test
+    void findAll() {
+        final List<Menu> response = sut.findAll();
+
+        assertThat(response).hasSize(2);
     }
 }

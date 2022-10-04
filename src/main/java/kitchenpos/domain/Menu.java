@@ -60,6 +60,10 @@ public class Menu {
         this.menuGroupId = menuGroupId;
     }
 
+    public Menu(final BigDecimal price) {
+        this.price = price;
+    }
+
     public Menu() {
     }
 
