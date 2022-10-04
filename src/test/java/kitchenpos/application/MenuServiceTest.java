@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,12 +19,12 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@Sql({"/truncate-menu-integration.sql", "/insert-menu-integration.sql"})
 @SpringBootTest
 class MenuServiceTest {
     @Autowired
     private MenuService sut;
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("매뉴를 생성할 수 있다.")
     @Test
     void create() {
@@ -44,7 +43,6 @@ class MenuServiceTest {
         assertThat(response.getName()).isEqualTo(name);
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("매뉴의 가격은 비어있을 수 없다.")
     @NullSource
     @ParameterizedTest
@@ -62,7 +60,6 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("매뉴의 가격은 0보다 크거나 같다.")
     @Test
     void createWithLessThanZeroPrice() {
@@ -80,7 +77,6 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴는 메뉴그룹을 필수값으로 갖는다.")
     @Test
     void createWithNoneMenugroup() {
@@ -99,7 +95,6 @@ class MenuServiceTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴는 메뉴상품을 필수값으로 갖는다.")
     @Test
     void createWithNoneMenuProduct() {
@@ -118,7 +113,6 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴 상품의 갯수는 0보다 크거나 같은 값이다.")
     @Test
     void createWithLessThanZero() {
@@ -136,7 +130,6 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴 가격은 상품의 충 가격 보다 작아야 한다.")
     @Test
     void createWithBigPrice() {
@@ -150,12 +143,11 @@ class MenuServiceTest {
 
         Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
-
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
+    
     @DisplayName("메뉴 이름은 비어있을 수 없다.")
     @NullSource
     @ParameterizedTest
@@ -173,7 +165,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
+    
     @DisplayName("메뉴 이름은 비속어를 포함할 수 없다.")
     @ParameterizedTest
     @ValueSource(strings = {"fuck, goddamn"})
@@ -191,7 +183,6 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴 가격을 변경할 수 있다.")
     @Test
     void changePrice() {
@@ -203,7 +194,6 @@ class MenuServiceTest {
         assertThat(response.getPrice()).isEqualTo(new BigDecimal("14000"));
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴의 가격이 메뉴 상품 가격의 합보다 크면 숨김 상품이 된다.")
     @Test
     void changePriceWithBigPrice() {
@@ -214,7 +204,6 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴를 비공개에서 공개로 설정할 수 있다.")
     @Test
     void display() {
@@ -225,7 +214,6 @@ class MenuServiceTest {
         assertThat(response.isDisplayed()).isTrue();
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("메뉴를 비공개에서 공개로 설정할 수 있다.")
     @Test
     void hide() {
@@ -236,7 +224,6 @@ class MenuServiceTest {
         assertThat(response.isDisplayed()).isFalse();
     }
 
-    @Sql({"/truncate-menu.sql", "/insert-menu.sql"})
     @DisplayName("상품을 여러개 조회할 수 있다.")
     @Test
     void findAll() {
