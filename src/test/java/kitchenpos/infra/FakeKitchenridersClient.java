@@ -3,7 +3,7 @@ package kitchenpos.infra;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-class FakeKitchenridersClient implements KitchenridersClient {
+public class FakeKitchenridersClient implements KitchenridersClient {
 
     @Override
     public void requestDelivery(
