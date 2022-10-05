@@ -16,7 +16,6 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-@ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
 
     private MenuGroupRepository menuGroupRepository;
