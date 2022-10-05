@@ -7,9 +7,9 @@ public class FakeKitchenridersClient implements KitchenridersClient {
 
     @Override
     public void requestDelivery(
-            UUID orderId,
-            BigDecimal amount,
-            String deliveryAddress
+        UUID orderId,
+        BigDecimal amount,
+        String deliveryAddress
     ) {
         // Do nothing.
     }

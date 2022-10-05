@@ -25,10 +25,10 @@ class FakeKitchenridersClientTest {
 
         // then
         Assertions.assertThatNoException()
-                .isThrownBy(() -> this.fakeKitchenridersClient.requestDelivery(
-                        orderId,
-                        BigDecimal.valueOf(amount),
-                        deliveryAddress
-                ));
+            .isThrownBy(() -> this.fakeKitchenridersClient.requestDelivery(
+                orderId,
+                BigDecimal.valueOf(amount),
+                deliveryAddress
+            ));
     }
 }

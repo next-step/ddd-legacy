@@ -33,17 +33,17 @@ public class FakeMenuRepository implements MenuRepository {
     @Override
     public List<Menu> findAllByIdIn(List<UUID> ids) {
         return ids.stream()
-                .map(this.menus::get)
-                .collect(Collectors.toUnmodifiableList());
+            .map(this.menus::get)
+            .collect(Collectors.toUnmodifiableList());
     }
 
     @Override
     public List<Menu> findAllByProductId(UUID productId) {
         return this.menus.values()
+            .stream()
+            .filter(menu -> menu.getMenuProducts()
                 .stream()
-                .filter(menu -> menu.getMenuProducts()
-                        .stream()
-                        .anyMatch(menuProduct -> menuProduct.getProductId() == productId))
-                .collect(Collectors.toUnmodifiableList());
+                .anyMatch(menuProduct -> menuProduct.getProductId() == productId))
+            .collect(Collectors.toUnmodifiableList());
     }
 }

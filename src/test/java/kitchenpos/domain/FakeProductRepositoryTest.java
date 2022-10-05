@@ -20,8 +20,8 @@ class FakeProductRepositoryTest {
 
     @DisplayName("상품이 저장되어야 한다.")
     @ValueSource(strings = {
-            "sweeten", "ambitious", "strict", "mind", "shut",
-            "persuade", "explain", "introduction", "lipstick", "cork",
+        "sweeten", "ambitious", "strict", "mind", "shut",
+        "persuade", "explain", "introduction", "lipstick", "cork",
     })
     @ParameterizedTest
     void kcxwngjb(final String name) {
@@ -47,7 +47,7 @@ class FakeProductRepositoryTest {
 
         // when
         final Product foundProduct = this.fakeProductRepository.findById(savedProduct.getId())
-                .orElse(null);
+            .orElse(null);
 
         // then
         assertThat(foundProduct).isEqualTo(product);
@@ -63,7 +63,7 @@ class FakeProductRepositoryTest {
 
         // when
         final Product foundProduct = this.fakeProductRepository.findById(UUID.randomUUID())
-                .orElse(null);
+            .orElse(null);
 
         // then
         assertThat(foundProduct).isNull();
@@ -81,18 +81,18 @@ class FakeProductRepositoryTest {
 
     @DisplayName("모두 조회시 저장된 수 만큼 조회되어야 한다.")
     @ValueSource(ints = {
-            11, 28, 8, 24, 22,
-            24, 26, 4, 15, 31,
+        11, 28, 8, 24, 22,
+        24, 26, 4, 15, 31,
     })
     @ParameterizedTest
     void omtpiqil(final int size) {
         // given
         IntStream.range(0, size)
-                .forEach(n -> {
-                    final Product product = new Product();
-                    product.setId(UUID.randomUUID());
-                    this.fakeProductRepository.save(product);
-                });
+            .forEach(n -> {
+                final Product product = new Product();
+                product.setId(UUID.randomUUID());
+                this.fakeProductRepository.save(product);
+            });
 
         // when
         final List<Product> products = this.fakeProductRepository.findAll();
@@ -106,22 +106,22 @@ class FakeProductRepositoryTest {
     void rjphmfyb() {
         // given
         final List<Product> products = IntStream.range(0, 10)
-                .mapToObj(n -> {
-                    final Product product = new Product();
-                    product.setId(UUID.randomUUID());
-                    return this.fakeProductRepository.save(product);
-                })
-                .collect(Collectors.toUnmodifiableList());
+            .mapToObj(n -> {
+                final Product product = new Product();
+                product.setId(UUID.randomUUID());
+                return this.fakeProductRepository.save(product);
+            })
+            .collect(Collectors.toUnmodifiableList());
 
         final int[] indices = {3, 6, 9};
 
         final List<Product> productsToBeFound = Arrays.stream(indices)
-                .mapToObj(products::get)
-                .collect(Collectors.toUnmodifiableList());
+            .mapToObj(products::get)
+            .collect(Collectors.toUnmodifiableList());
 
         final List<UUID> ids = productsToBeFound.stream()
-                .map(Product::getId)
-                .collect(Collectors.toUnmodifiableList());
+            .map(Product::getId)
+            .collect(Collectors.toUnmodifiableList());
 
         // when
         final List<Product> foundProducts = this.fakeProductRepository.findAllByIdIn(ids);

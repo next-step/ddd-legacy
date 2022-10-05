@@ -31,8 +31,8 @@ class OrderTableServiceTest {
     // SUT
 
     private final OrderTableService orderTableService = new OrderTableService(
-            orderTableRepository,
-            orderRepository
+        orderTableRepository,
+        orderRepository
     );
 
     @DisplayName("생성")
@@ -41,8 +41,8 @@ class OrderTableServiceTest {
 
         @DisplayName("유효한 이름으로 주문 테이블을 생성할 수 있다.")
         @ValueSource(strings = {
-                "time", "large", "bottom", "tidy", "left",
-                "poem", "tremble", "poverty", "great", "urge",
+            "time", "large", "bottom", "tidy", "left",
+            "poem", "tremble", "poverty", "great", "urge",
         })
         @ParameterizedTest
         void mmgcjzyv(final String name) {
@@ -67,7 +67,7 @@ class OrderTableServiceTest {
 
             // when / then
             assertThatIllegalArgumentException().isThrownBy(() ->
-                    orderTableService.create(requestOrderTable));
+                orderTableService.create(requestOrderTable));
         }
 
         @DisplayName("주문 테이블이 생성되었을 때 손님 수는 0명이어야 한다.")
@@ -121,9 +121,9 @@ class OrderTableServiceTest {
             assertThat(sitOrderTable.isOccupied()).isTrue();
 
             final OrderTable foundOrderTable = orderTableRepository.findById(
-                            savedOrderTable.getId()
-                    )
-                    .orElse(null);
+                    savedOrderTable.getId()
+                )
+                .orElse(null);
             assertThat(foundOrderTable).isNotNull();
             assertThat(foundOrderTable.isOccupied()).isTrue();
         }
@@ -146,9 +146,9 @@ class OrderTableServiceTest {
             assertThat(sitOrderTable.isOccupied()).isTrue();
 
             final OrderTable foundOrderTable = orderTableRepository.findById(
-                            savedOrderTable.getId()
-                    )
-                    .orElse(null);
+                    savedOrderTable.getId()
+                )
+                .orElse(null);
             assertThat(foundOrderTable).isNotNull();
             assertThat(foundOrderTable.isOccupied()).isTrue();
         }
@@ -171,9 +171,9 @@ class OrderTableServiceTest {
             assertThat(clearedOrderTable.isOccupied()).isFalse();
 
             final OrderTable foundOrderTable = orderTableRepository.findById(
-                            savedOrderTable.getId()
-                    )
-                    .orElse(null);
+                    savedOrderTable.getId()
+                )
+                .orElse(null);
             assertThat(foundOrderTable).isNotNull();
             assertThat(foundOrderTable.isOccupied()).isFalse();
         }
@@ -196,9 +196,9 @@ class OrderTableServiceTest {
             assertThat(clearedOrderTable.isOccupied()).isFalse();
 
             final OrderTable foundOrderTable = orderTableRepository.findById(
-                            savedOrderTable.getId()
-                    )
-                    .orElse(null);
+                    savedOrderTable.getId()
+                )
+                .orElse(null);
             assertThat(foundOrderTable).isNotNull();
             assertThat(foundOrderTable.isOccupied()).isFalse();
         }
@@ -225,19 +225,19 @@ class OrderTableServiceTest {
             // when / then
             if (orderStatus == OrderStatus.COMPLETED) {
                 final OrderTable clearedOrderTable = orderTableService.clear(
-                        savedOrderTable.getId());
+                    savedOrderTable.getId());
 
                 assertThat(clearedOrderTable.isOccupied()).isFalse();
 
                 final OrderTable foundOrderTable = orderTableRepository.findById(
-                                savedOrderTable.getId()
-                        )
-                        .orElse(null);
+                        savedOrderTable.getId()
+                    )
+                    .orElse(null);
                 assertThat(foundOrderTable).isNotNull();
                 assertThat(foundOrderTable.isOccupied()).isFalse();
             } else {
                 assertThatIllegalStateException().isThrownBy(()
-                        -> orderTableService.clear(savedOrderTable.getId()));
+                    -> orderTableService.clear(savedOrderTable.getId()));
             }
         }
 
@@ -259,9 +259,9 @@ class OrderTableServiceTest {
             assertThat(clearedOrderTable.getNumberOfGuests()).isZero();
 
             final OrderTable foundOrderTable = orderTableRepository.findById(
-                            savedOrderTable.getId()
-                    )
-                    .orElse(null);
+                    savedOrderTable.getId()
+                )
+                .orElse(null);
             assertThat(foundOrderTable).isNotNull();
             assertThat(foundOrderTable.getNumberOfGuests()).isZero();
         }
@@ -273,8 +273,8 @@ class OrderTableServiceTest {
 
         @DisplayName("주문 테이블이 점유중이면 손님 수를 변경할 수 있다.")
         @ValueSource(ints = {
-                21, 31, 25, 1, 2,
-                32, 3, 22, 27, 4,
+            21, 31, 25, 1, 2,
+            32, 3, 22, 27, 4,
         })
         @ParameterizedTest
         void nnmzyebr(final int numberOfGuest) {
@@ -291,17 +291,17 @@ class OrderTableServiceTest {
 
             // when
             final OrderTable updatedOrderTable = orderTableService.changeNumberOfGuests(
-                    savedOrderTable.getId(),
-                    requestOrderTable
+                savedOrderTable.getId(),
+                requestOrderTable
             );
 
             // then
             assertThat(updatedOrderTable.getNumberOfGuests()).isEqualTo(numberOfGuest);
 
             final OrderTable foundOrderTable = orderTableRepository.findById(
-                            savedOrderTable.getId()
-                    )
-                    .orElse(null);
+                    savedOrderTable.getId()
+                )
+                .orElse(null);
             assertThat(foundOrderTable).isNotNull();
             assertThat(foundOrderTable.getNumberOfGuests()).isEqualTo(numberOfGuest);
         }
@@ -322,17 +322,17 @@ class OrderTableServiceTest {
 
             // when / then
             assertThatIllegalStateException().isThrownBy(() ->
-                    orderTableService.changeNumberOfGuests(
-                            savedOrderTable.getId(),
-                            requestOrderTable
-                    )
+                orderTableService.changeNumberOfGuests(
+                    savedOrderTable.getId(),
+                    requestOrderTable
+                )
             );
         }
 
         @DisplayName("손님 수를 음수로 변경할 수 없다.")
         @ValueSource(ints = {
-                -32, -19, -22, -1, -4,
-                -29, -10, -28, -5, -9,
+            -32, -19, -22, -1, -4,
+            -29, -10, -28, -5, -9,
         })
         @ParameterizedTest
         void dmheokln(final int numberOfGuest) {
@@ -349,10 +349,10 @@ class OrderTableServiceTest {
 
             // when / then
             assertThatIllegalArgumentException().isThrownBy(() ->
-                    orderTableService.changeNumberOfGuests(
-                            savedOrderTable.getId(),
-                            requestOrderTable
-                    )
+                orderTableService.changeNumberOfGuests(
+                    savedOrderTable.getId(),
+                    requestOrderTable
+                )
             );
         }
     }
@@ -363,18 +363,18 @@ class OrderTableServiceTest {
 
         @DisplayName("주문 테이블을 생성한 후 모두 조회할 수 있다.")
         @ValueSource(ints = {
-                22, 25, 3, 28, 32,
-                21, 31, 4, 15, 28,
+            22, 25, 3, 28, 32,
+            21, 31, 4, 15, 28,
         })
         @ParameterizedTest
         void lcuceevi(final int size) {
             // given
             IntStream.range(0, size)
-                    .forEach(n -> {
-                        final OrderTable orderTable = new OrderTable();
-                        orderTable.setName(String.valueOf(n));
-                        orderTableService.create(orderTable);
-                    });
+                .forEach(n -> {
+                    final OrderTable orderTable = new OrderTable();
+                    orderTable.setName(String.valueOf(n));
+                    orderTableService.create(orderTable);
+                });
 
             // when
             final List<OrderTable> orderTables = orderTableService.findAll();

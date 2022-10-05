@@ -47,10 +47,10 @@ class OrderServiceTest {
     // SUT
 
     private final OrderService orderService = new OrderService(
-            orderRepository,
-            menuRepository,
-            orderTableRepository,
-            kitchenridersClient
+        orderRepository,
+        menuRepository,
+        orderTableRepository,
+        kitchenridersClient
     );
 
     @DisplayName("생성")
@@ -129,7 +129,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("주문 항목이 설정되지 않거나 비어 있으면 안된다.")
@@ -149,7 +149,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("숨겨진 메뉴가 포함되어 있으면 안된다.")
@@ -184,7 +184,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("메뉴의 가격과 주문 항목의 가격이 다르면 안된다.")
@@ -217,7 +217,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("매장 주문인 경우 주문 테이블이 설정되지 않으면 안된다.")
@@ -246,7 +246,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("설정된 주문 테이블이 점유중인 상태가 아니면 안된다.")
@@ -281,7 +281,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
         }
 
@@ -345,7 +345,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("주문 항목이 설정되지 않거나 비어 있으면 안된다.")
@@ -359,7 +359,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("주문에 포함된 메뉴의 수량이 음수이면 안된다.")
@@ -388,7 +388,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("숨겨진 메뉴가 포함되어 있으면 안된다.")
@@ -417,7 +417,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("메뉴의 가격과 주문 항목의 가격이 다르면 안된다.")
@@ -444,7 +444,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
         }
 
@@ -510,7 +510,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("주문 항목이 설정되지 않거나 비어 있으면 안된다.")
@@ -525,7 +525,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("주문에 포함된 메뉴의 수량이 음수이면 안된다.")
@@ -555,7 +555,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("숨겨진 메뉴가 포함되어 있으면 안된다.")
@@ -585,7 +585,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("메뉴의 가격과 주문 항목의 가격이 다르면 안된다.")
@@ -613,7 +613,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
 
             @DisplayName("배달 주소가 설정되지 않거나 비어 있으면 안된다.")
@@ -643,7 +643,7 @@ class OrderServiceTest {
 
                 // when / then
                 assertThatIllegalArgumentException().isThrownBy(() ->
-                        orderService.create(requestOrder));
+                    orderService.create(requestOrder));
             }
         }
     }
@@ -676,16 +676,16 @@ class OrderServiceTest {
                 assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
 
                 final Order foundOrder = orderRepository.findById(order.getId())
-                        .orElse(null);
+                    .orElse(null);
                 assertThat(foundOrder).isNotNull();
                 assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
             }
 
             @DisplayName("대기중이 아닌 매장 주문은 접수할 수 없다.")
             @EnumSource(
-                    value = OrderStatus.class,
-                    names = {"WAITING"},
-                    mode = Mode.EXCLUDE
+                value = OrderStatus.class,
+                names = {"WAITING"},
+                mode = Mode.EXCLUDE
             )
             @ParameterizedTest
             void pyqaiydd(OrderStatus status) {
@@ -701,7 +701,7 @@ class OrderServiceTest {
 
                 // when
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.accept(order.getId()));
+                    orderService.accept(order.getId()));
             }
         }
 
@@ -725,16 +725,16 @@ class OrderServiceTest {
                 assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
 
                 final Order foundOrder = orderRepository.findById(order.getId())
-                        .orElse(null);
+                    .orElse(null);
                 assertThat(foundOrder).isNotNull();
                 assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
             }
 
             @DisplayName("대기중이 아닌 포장 주문은 접수할 수 없다.")
             @EnumSource(
-                    value = OrderStatus.class,
-                    names = {"WAITING"},
-                    mode = Mode.EXCLUDE
+                value = OrderStatus.class,
+                names = {"WAITING"},
+                mode = Mode.EXCLUDE
             )
             @ParameterizedTest
             void lpyuuakk(OrderStatus status) {
@@ -746,7 +746,7 @@ class OrderServiceTest {
 
                 // when
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.accept(order.getId()));
+                    orderService.accept(order.getId()));
             }
         }
 
@@ -785,16 +785,16 @@ class OrderServiceTest {
                 assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
 
                 final Order foundOrder = orderRepository.findById(order.getId())
-                        .orElse(null);
+                    .orElse(null);
                 assertThat(foundOrder).isNotNull();
                 assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
             }
 
             @DisplayName("아직 접수되지 않은 배달 주문은 서빙할 수 없다.")
             @EnumSource(
-                    value = OrderStatus.class,
-                    names = {"WAITING"},
-                    mode = Mode.EXCLUDE
+                value = OrderStatus.class,
+                names = {"WAITING"},
+                mode = Mode.EXCLUDE
             )
             @ParameterizedTest
             void cajdjhvw(OrderStatus status) {
@@ -806,7 +806,7 @@ class OrderServiceTest {
 
                 // when
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.accept(order.getId()));
+                    orderService.accept(order.getId()));
             }
         }
     }
@@ -839,16 +839,16 @@ class OrderServiceTest {
                 assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
 
                 final Order foundOrder = orderRepository.findById(order.getId())
-                        .orElse(null);
+                    .orElse(null);
                 assertThat(foundOrder).isNotNull();
                 assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
             }
 
             @DisplayName("아직 접수되지 않은 매장 주문은 서빙할 수 없다.")
             @EnumSource(
-                    value = OrderStatus.class,
-                    names = {"ACCEPTED"},
-                    mode = Mode.EXCLUDE
+                value = OrderStatus.class,
+                names = {"ACCEPTED"},
+                mode = Mode.EXCLUDE
             )
             @ParameterizedTest
             void noddcjmr(OrderStatus status) {
@@ -864,7 +864,7 @@ class OrderServiceTest {
 
                 // when
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.serve(order.getId()));
+                    orderService.serve(order.getId()));
             }
         }
 
@@ -888,16 +888,16 @@ class OrderServiceTest {
                 assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
 
                 final Order foundOrder = orderRepository.findById(order.getId())
-                        .orElse(null);
+                    .orElse(null);
                 assertThat(foundOrder).isNotNull();
                 assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
             }
 
             @DisplayName("아직 접수되지 않은 포장 주문은 서빙할 수 없다.")
             @EnumSource(
-                    value = OrderStatus.class,
-                    names = {"ACCEPTED"},
-                    mode = Mode.EXCLUDE
+                value = OrderStatus.class,
+                names = {"ACCEPTED"},
+                mode = Mode.EXCLUDE
             )
             @ParameterizedTest
             void udxuochl(OrderStatus status) {
@@ -909,7 +909,7 @@ class OrderServiceTest {
 
                 // when
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.serve(order.getId()));
+                    orderService.serve(order.getId()));
             }
         }
 
@@ -933,16 +933,16 @@ class OrderServiceTest {
                 assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
 
                 final Order foundOrder = orderRepository.findById(order.getId())
-                        .orElse(null);
+                    .orElse(null);
                 assertThat(foundOrder).isNotNull();
                 assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
             }
 
             @DisplayName("아직 접수되지 않은 배달 주문은 서빙할 수 없다.")
             @EnumSource(
-                    value = OrderStatus.class,
-                    names = {"ACCEPTED"},
-                    mode = Mode.EXCLUDE
+                value = OrderStatus.class,
+                names = {"ACCEPTED"},
+                mode = Mode.EXCLUDE
             )
             @ParameterizedTest
             void liajxqwm(OrderStatus status) {
@@ -954,7 +954,7 @@ class OrderServiceTest {
 
                 // when
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.serve(order.getId()));
+                    orderService.serve(order.getId()));
             }
         }
     }
@@ -979,16 +979,16 @@ class OrderServiceTest {
             assertThat(deliveryStartedOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
 
             final Order foundOrder = orderRepository.findById(order.getId())
-                    .orElse(null);
+                .orElse(null);
             assertThat(foundOrder).isNotNull();
             assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
         }
 
         @DisplayName("아직 서빙되지 않은 배달 주문의 배달을 시작할 수 없다.")
         @EnumSource(
-                value = OrderStatus.class,
-                names = {"SERVED"},
-                mode = Mode.EXCLUDE
+            value = OrderStatus.class,
+            names = {"SERVED"},
+            mode = Mode.EXCLUDE
         )
         @ParameterizedTest
         void wtqmylrr(OrderStatus status) {
@@ -1000,7 +1000,7 @@ class OrderServiceTest {
 
             // when
             assertThatIllegalStateException().isThrownBy(() ->
-                    orderService.startDelivery(order.getId()));
+                orderService.startDelivery(order.getId()));
         }
 
         @DisplayName("매장 주문은 배달을 시작할 수 없다.")
@@ -1019,7 +1019,7 @@ class OrderServiceTest {
 
             // when
             assertThatIllegalStateException().isThrownBy(() ->
-                    orderService.startDelivery(order.getId()));
+                orderService.startDelivery(order.getId()));
         }
 
         @DisplayName("포장 주문은 배달을 시작할 수 없다.")
@@ -1034,7 +1034,7 @@ class OrderServiceTest {
 
             // when
             assertThatIllegalStateException().isThrownBy(() ->
-                    orderService.startDelivery(order.getId()));
+                orderService.startDelivery(order.getId()));
         }
     }
 
@@ -1058,16 +1058,16 @@ class OrderServiceTest {
             assertThat(deliveryCompletedOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
 
             final Order foundOrder = orderRepository.findById(order.getId())
-                    .orElse(null);
+                .orElse(null);
             assertThat(foundOrder).isNotNull();
             assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
         }
 
         @DisplayName("배달중이지 않은 배달 주문의 배달은 완료할 수 없다.")
         @EnumSource(
-                value = OrderStatus.class,
-                names = {"DELIVERING"},
-                mode = Mode.EXCLUDE
+            value = OrderStatus.class,
+            names = {"DELIVERING"},
+            mode = Mode.EXCLUDE
         )
         @ParameterizedTest
         void tuhynphr(OrderStatus status) {
@@ -1079,7 +1079,7 @@ class OrderServiceTest {
 
             // when
             assertThatIllegalStateException().isThrownBy(() ->
-                    orderService.completeDelivery(order.getId()));
+                orderService.completeDelivery(order.getId()));
         }
     }
 
@@ -1111,7 +1111,7 @@ class OrderServiceTest {
                 assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
 
                 final Order foundOrder = orderRepository.findById(order.getId())
-                        .orElse(null);
+                    .orElse(null);
                 assertThat(foundOrder).isNotNull();
                 assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
             }
@@ -1139,7 +1139,7 @@ class OrderServiceTest {
                 assertThat(completedOrder.getOrderTable().isOccupied()).isFalse();
 
                 final Order foundOrder = orderRepository.findById(order.getId())
-                        .orElse(null);
+                    .orElse(null);
                 assertThat(foundOrder).isNotNull();
                 assertThat(foundOrder.getOrderTable().getNumberOfGuests()).isZero();
                 assertThat(foundOrder.getOrderTable().isOccupied()).isFalse();
@@ -1147,9 +1147,9 @@ class OrderServiceTest {
 
             @DisplayName("아직 서빙되지 않은 매장 주문은 완료할 수 없다.")
             @EnumSource(
-                    value = OrderStatus.class,
-                    names = {"SERVED"},
-                    mode = Mode.EXCLUDE
+                value = OrderStatus.class,
+                names = {"SERVED"},
+                mode = Mode.EXCLUDE
             )
             @ParameterizedTest
             void sqqhfkvo(OrderStatus status) {
@@ -1165,7 +1165,7 @@ class OrderServiceTest {
 
                 // when
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.complete(order.getId()));
+                    orderService.complete(order.getId()));
             }
         }
 
@@ -1189,16 +1189,16 @@ class OrderServiceTest {
                 assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
 
                 final Order foundOrder = orderRepository.findById(order.getId())
-                        .orElse(null);
+                    .orElse(null);
                 assertThat(foundOrder).isNotNull();
                 assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
             }
 
             @DisplayName("아직 서빙되지 않은 포장 주문은 완료할 수 없다.")
             @EnumSource(
-                    value = OrderStatus.class,
-                    names = {"SERVED"},
-                    mode = Mode.EXCLUDE
+                value = OrderStatus.class,
+                names = {"SERVED"},
+                mode = Mode.EXCLUDE
             )
             @ParameterizedTest
             void zqjjmsos(OrderStatus status) {
@@ -1210,7 +1210,7 @@ class OrderServiceTest {
 
                 // when
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.complete(order.getId()));
+                    orderService.complete(order.getId()));
             }
         }
 
@@ -1234,16 +1234,16 @@ class OrderServiceTest {
                 assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
 
                 final Order foundOrder = orderRepository.findById(order.getId())
-                        .orElse(null);
+                    .orElse(null);
                 assertThat(foundOrder).isNotNull();
                 assertThat(foundOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
             }
 
             @DisplayName("아직 배달되지 않은 배달 주문은 완료할 수 없다.")
             @EnumSource(
-                    value = OrderStatus.class,
-                    names = {"DELIVERED"},
-                    mode = Mode.EXCLUDE
+                value = OrderStatus.class,
+                names = {"DELIVERED"},
+                mode = Mode.EXCLUDE
             )
             @ParameterizedTest
             void zqjjmsos(OrderStatus status) {
@@ -1255,7 +1255,7 @@ class OrderServiceTest {
 
                 // when
                 assertThatIllegalStateException().isThrownBy(() ->
-                        orderService.complete(order.getId()));
+                    orderService.complete(order.getId()));
             }
         }
     }
@@ -1266,18 +1266,18 @@ class OrderServiceTest {
 
         @DisplayName("존재하는 주문을 모두 조회할 수 있다.")
         @ValueSource(ints = {
-                19, 10, 26, 14, 21,
-                4, 22, 20, 12, 15,
+            19, 10, 26, 14, 21,
+            4, 22, 20, 12, 15,
         })
         @ParameterizedTest
         void cissfqiu(final int size) {
             // given
             IntStream.range(0, size)
-                    .forEach(n -> {
-                        final Order order = new Order();
-                        order.setId(UUID.randomUUID());
-                        orderRepository.save(order);
-                    });
+                .forEach(n -> {
+                    final Order order = new Order();
+                    order.setId(UUID.randomUUID());
+                    orderRepository.save(order);
+                });
 
             // when
             final List<Order> orders = orderService.findAll();

@@ -19,9 +19,9 @@ public class PurgomalumClient implements ProfanityDetectClient {
 
     public boolean containsProfanity(final String text) {
         final URI url = UriComponentsBuilder.fromUriString(ENDPOINT)
-                .queryParam("text", text)
-                .build()
-                .toUri();
+            .queryParam("text", text)
+            .build()
+            .toUri();
         return Boolean.parseBoolean(restTemplate.getForObject(url, String.class));
     }
 }

@@ -35,9 +35,9 @@ class ProductServiceTest {
     // SUT
 
     private final ProductService productService = new ProductService(
-            productRepository,
-            menuRepository,
-            profanityDetectClient
+        productRepository,
+        menuRepository,
+        profanityDetectClient
     );
 
     @DisplayName("생성")
@@ -46,8 +46,8 @@ class ProductServiceTest {
 
         @DisplayName("유효한 이름으로 상품을 생성할 수 있다.")
         @ValueSource(strings = {
-                "stand", "dissatisfy", "funeral", "omit", "bind",
-                "somehow", "photography", "skin", "collect", "steer",
+            "stand", "dissatisfy", "funeral", "omit", "bind",
+            "somehow", "photography", "skin", "collect", "steer",
         })
         @ParameterizedTest
         void tvjjmpqr(final String name) {
@@ -74,16 +74,16 @@ class ProductServiceTest {
 
             // when / then
             assertThatIllegalArgumentException().isThrownBy(() ->
-                    productService.create(requestProduct));
+                productService.create(requestProduct));
         }
 
         @DisplayName("이름은 비속어를 포함할 수 없다.")
         @ValueSource(strings = {
-                "holiday", "bed", "anxious", "everyday", "reach",
-                "private holiday", "courage bed", "about anxious", "knee everyday", "number reach",
-                "holiday roll", "bed avenue", "anxious needle", "everyday chairman", "reach cape",
-                "interrupt holiday sauce", "explore bed radio", "return anxious motherly",
-                "entertain everyday cause", "separate reach they",
+            "holiday", "bed", "anxious", "everyday", "reach",
+            "private holiday", "courage bed", "about anxious", "knee everyday", "number reach",
+            "holiday roll", "bed avenue", "anxious needle", "everyday chairman", "reach cape",
+            "interrupt holiday sauce", "explore bed radio", "return anxious motherly",
+            "entertain everyday cause", "separate reach they",
         })
         @ParameterizedTest
         void pldkawhd(final String name) {
@@ -94,13 +94,13 @@ class ProductServiceTest {
 
             // when / then
             assertThatIllegalArgumentException().isThrownBy(() ->
-                    productService.create(requestProduct));
+                productService.create(requestProduct));
         }
 
         @DisplayName("유효한 가격으로 상품을 생성할 수 있다.")
         @ValueSource(longs = {
-                804678989, 1239447717, 1147921460, 703315726, 656698661,
-                1125669271, 154820142, 944887592, 1003898244, 1390965447,
+            804678989, 1239447717, 1147921460, 703315726, 656698661,
+            1125669271, 154820142, 944887592, 1003898244, 1390965447,
         })
         @ParameterizedTest
         void yarzrqyy(final long price) {
@@ -120,8 +120,8 @@ class ProductServiceTest {
 
         @DisplayName("가격은 음수일 수 없다.")
         @ValueSource(longs = {
-                -249426902, -914958484, -1150897566, -2145517978, -1890425103,
-                -1846707062, -445918517, -2056206535, -923533520, -167058921,
+            -249426902, -914958484, -1150897566, -2145517978, -1890425103,
+            -1846707062, -445918517, -2056206535, -923533520, -167058921,
         })
         @ParameterizedTest
         void sugigycp(final long price) {
@@ -134,7 +134,7 @@ class ProductServiceTest {
 
             // when / then
             assertThatIllegalArgumentException().isThrownBy(() ->
-                    productService.create(requestProduct));
+                productService.create(requestProduct));
         }
     }
 
@@ -144,8 +144,8 @@ class ProductServiceTest {
 
         @DisplayName("상품 가격을 변경할 수 있다.")
         @ValueSource(longs = {
-                1745026271, 506427010, 579969879, 848846764, 113279252,
-                1218368086, 972223887, 799241116, 791758769, 22362211,
+            1745026271, 506427010, 579969879, 848846764, 113279252,
+            1218368086, 972223887, 799241116, 791758769, 22362211,
         })
         @ParameterizedTest
         void lxjtpjbl(final long price) {
@@ -163,23 +163,23 @@ class ProductServiceTest {
 
             // when
             final Product updatedProduct = productService.changePrice(
-                    savedProduct.getId(),
-                    requestProduct
+                savedProduct.getId(),
+                requestProduct
             );
 
             // then
             assertThat(updatedProduct.getPrice()).isEqualTo(bigDecimalPrice);
 
             final Product foundProduct = productRepository.findById(savedProduct.getId())
-                    .orElse(null);
+                .orElse(null);
             assertThat(foundProduct).isNotNull();
             assertThat(foundProduct.getPrice()).isEqualTo(bigDecimalPrice);
         }
 
         @DisplayName("상품 가격을 음수로 변경할 수 없다.")
         @ValueSource(longs = {
-                -1739790547, -2133620232, -1606999432, -860456090, -1109350517,
-                -2048064491, -1910998867, -668602241, -244925836, -131156125,
+            -1739790547, -2133620232, -1606999432, -860456090, -1109350517,
+            -2048064491, -1910998867, -668602241, -244925836, -131156125,
         })
         @ParameterizedTest
         void cdfltrvq(final long price) {
@@ -197,8 +197,8 @@ class ProductServiceTest {
 
             // when / then
             assertThatIllegalArgumentException().isThrownBy(() -> productService.changePrice(
-                    savedProduct.getId(),
-                    requestProduct
+                savedProduct.getId(),
+                requestProduct
             ));
         }
 
@@ -249,7 +249,7 @@ class ProductServiceTest {
 
             // then
             final Menu foundMenu = menuRepository.findById(savedMenu.getId())
-                    .orElse(null);
+                .orElse(null);
             assertThat(foundMenu).isNotNull();
             assertThat(foundMenu.isDisplayed()).isFalse();
         }
@@ -301,7 +301,7 @@ class ProductServiceTest {
 
             // then
             final Menu foundMenu = menuRepository.findById(savedMenu.getId())
-                    .orElse(null);
+                .orElse(null);
             assertThat(foundMenu).isNotNull();
             assertThat(foundMenu.isDisplayed()).isTrue();
         }
@@ -313,19 +313,19 @@ class ProductServiceTest {
 
         @DisplayName("상품을 생성한 후 모두 조회할 수 있다.")
         @ValueSource(ints = {
-                6, 18, 7, 23, 30,
-                8, 2, 21, 31, 20,
+            6, 18, 7, 23, 30,
+            8, 2, 21, 31, 20,
         })
         @ParameterizedTest
         void gmucnnhq(final int size) {
             // given
             IntStream.range(0, size)
-                    .forEach(n -> {
-                        final Product product = new Product();
-                        product.setName(String.valueOf(n));
-                        product.setPrice(BigDecimal.valueOf(10000));
-                        productService.create(product);
-                    });
+                .forEach(n -> {
+                    final Product product = new Product();
+                    product.setName(String.valueOf(n));
+                    product.setPrice(BigDecimal.valueOf(10000));
+                    productService.create(product);
+                });
 
             // when
             final List<Product> products = productService.findAll();

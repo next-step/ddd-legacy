@@ -17,8 +17,8 @@ class FakeMenuGroupRepositoryTest {
 
     @DisplayName("메뉴 그룹이 저장되어야 한다.")
     @ValueSource(strings = {
-            "best", "silver", "university", "FALSE", "caution",
-            "appearance", "ready", "card", "official", "bath",
+        "best", "silver", "university", "FALSE", "caution",
+        "appearance", "ready", "card", "official", "bath",
     })
     @ParameterizedTest
     void fhiwvslb(String name) {
@@ -45,8 +45,8 @@ class FakeMenuGroupRepositoryTest {
 
         // when
         final MenuGroup foundMenuGroup = this.fakeMenuGroupRepository.findById(
-                        savedMenuGroup.getId())
-                .orElse(null);
+                savedMenuGroup.getId())
+            .orElse(null);
 
         // then
         assertThat(foundMenuGroup).isEqualTo(menuGroup);
@@ -63,7 +63,7 @@ class FakeMenuGroupRepositoryTest {
 
         // when
         final MenuGroup foundMenuGroup = this.fakeMenuGroupRepository.findById(UUID.randomUUID())
-                .orElse(null);
+            .orElse(null);
 
         // then
         assertThat(foundMenuGroup).isNull();
@@ -81,8 +81,8 @@ class FakeMenuGroupRepositoryTest {
 
     @DisplayName("모두 조회시 저장된 수 만큼 조회되어야 한다.")
     @ValueSource(ints = {
-            5, 22, 26, 10, 27,
-            31, 18, 21, 15, 30,
+        5, 22, 26, 10, 27,
+        31, 18, 21, 15, 30,
     })
     @ParameterizedTest
     void ijzolgpe(int size) {

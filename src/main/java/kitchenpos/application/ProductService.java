@@ -22,9 +22,9 @@ public class ProductService {
     private final ProfanityDetectClient profanityDetectClient;
 
     public ProductService(
-            final ProductRepository productRepository,
-            final MenuRepository menuRepository,
-            final ProfanityDetectClient profanityDetectClient
+        final ProductRepository productRepository,
+        final MenuRepository menuRepository,
+        final ProfanityDetectClient profanityDetectClient
     ) {
         this.productRepository = productRepository;
         this.menuRepository = menuRepository;
@@ -39,8 +39,8 @@ public class ProductService {
         }
         final String name = request.getName();
         if (Objects.isNull(name)
-                || name.isEmpty()
-                || profanityDetectClient.containsProfanity(name)) {
+            || name.isEmpty()
+            || profanityDetectClient.containsProfanity(name)) {
             throw new IllegalArgumentException();
         }
         final Product product = new Product();
@@ -57,15 +57,15 @@ public class ProductService {
             throw new IllegalArgumentException();
         }
         final Product product = productRepository.findById(productId)
-                .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(NoSuchElementException::new);
         product.setPrice(price);
         final List<Menu> menus = menuRepository.findAllByProductId(productId);
         for (final Menu menu : menus) {
             BigDecimal sum = BigDecimal.ZERO;
             for (final MenuProduct menuProduct : menu.getMenuProducts()) {
                 final BigDecimal subtotal = menuProduct.getProduct()
-                        .getPrice()
-                        .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
+                    .getPrice()
+                    .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
                 sum = sum.add(subtotal);
             }
             if (menu.getPrice().compareTo(sum) > 0) {

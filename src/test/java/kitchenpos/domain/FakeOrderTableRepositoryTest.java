@@ -18,8 +18,8 @@ class FakeOrderTableRepositoryTest {
 
     @DisplayName("주문 테이블이 저장되어야 한다.")
     @ValueSource(strings = {
-            "limit", "ear", "stage", "influence", "surprise",
-            "harvest", "court", "break", "grow", "tour",
+        "limit", "ear", "stage", "influence", "surprise",
+        "harvest", "court", "break", "grow", "tour",
     })
     @ParameterizedTest
     void njsxplzb(final String name) {
@@ -45,8 +45,8 @@ class FakeOrderTableRepositoryTest {
 
         // when
         final OrderTable foundOrderTable = this.fakeOrderTableRepository
-                .findById(savedOrderTable.getId())
-                .orElse(null);
+            .findById(savedOrderTable.getId())
+            .orElse(null);
 
         // then
         assertThat(foundOrderTable).isEqualTo(orderTable);
@@ -62,7 +62,7 @@ class FakeOrderTableRepositoryTest {
 
         // when
         final OrderTable foundOrderTable = this.fakeOrderTableRepository.findById(UUID.randomUUID())
-                .orElse(null);
+            .orElse(null);
 
         // then
         assertThat(foundOrderTable).isNull();
@@ -80,18 +80,18 @@ class FakeOrderTableRepositoryTest {
 
     @DisplayName("모두 조회시 저장된 수 만큼 조회되어야 한다.")
     @ValueSource(ints = {
-            19, 20, 17, 23, 21,
-            26, 4, 11, 24, 7,
+        19, 20, 17, 23, 21,
+        26, 4, 11, 24, 7,
     })
     @ParameterizedTest
     void rlqonpkw(int size) {
         // given
         IntStream.range(0, size)
-                .forEach(n -> {
-                    final OrderTable orderTable = new OrderTable();
-                    orderTable.setId(UUID.randomUUID());
-                    this.fakeOrderTableRepository.save(orderTable);
-                });
+            .forEach(n -> {
+                final OrderTable orderTable = new OrderTable();
+                orderTable.setId(UUID.randomUUID());
+                this.fakeOrderTableRepository.save(orderTable);
+            });
 
         // when
         final List<OrderTable> orderTables = this.fakeOrderTableRepository.findAll();

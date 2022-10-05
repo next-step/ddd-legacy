@@ -22,8 +22,8 @@ class FakeMenuRepositoryTest {
 
     @DisplayName("메뉴가 저장되어야 한다.")
     @ValueSource(strings = {
-            "run", "low", "possession", "cousin", "sailor",
-            "matter", "car", "few", "broadcast", "loose",
+        "run", "low", "possession", "cousin", "sailor",
+        "matter", "car", "few", "broadcast", "loose",
     })
     @ParameterizedTest
     void tduwowoa(String name) {
@@ -50,7 +50,7 @@ class FakeMenuRepositoryTest {
 
         // when
         final Menu foundMenu = this.fakeMenuRepository.findById(savedMenu.getId())
-                .orElse(null);
+            .orElse(null);
 
         // then
         assertThat(foundMenu).isEqualTo(menu);
@@ -67,7 +67,7 @@ class FakeMenuRepositoryTest {
 
         // when
         final Menu foundMenu = this.fakeMenuRepository.findById(UUID.randomUUID())
-                .orElse(null);
+            .orElse(null);
 
         // then
         assertThat(foundMenu).isNull();
@@ -85,8 +85,8 @@ class FakeMenuRepositoryTest {
 
     @DisplayName("모두 조회시 저장된 수 만큼 조회되어야 한다.")
     @ValueSource(ints = {
-            31, 30, 26, 29, 19,
-            20, 31, 22, 12, 27,
+        31, 30, 26, 29, 19,
+        20, 31, 22, 12, 27,
     })
     @ParameterizedTest
     void kqowhpcf(int size) {
@@ -110,22 +110,22 @@ class FakeMenuRepositoryTest {
     void xztanlka() {
         // given
         final List<Menu> menus = IntStream.range(0, 10)
-                .mapToObj(n -> {
-                    final Menu menu = new Menu();
-                    menu.setId(UUID.randomUUID());
-                    return this.fakeMenuRepository.save(menu);
-                })
-                .collect(Collectors.toUnmodifiableList());
+            .mapToObj(n -> {
+                final Menu menu = new Menu();
+                menu.setId(UUID.randomUUID());
+                return this.fakeMenuRepository.save(menu);
+            })
+            .collect(Collectors.toUnmodifiableList());
 
         final int[] indices = {3, 6, 9};
 
         final List<Menu> menusToBeFound = Arrays.stream(indices)
-                .mapToObj(menus::get)
-                .collect(Collectors.toUnmodifiableList());
+            .mapToObj(menus::get)
+            .collect(Collectors.toUnmodifiableList());
 
         final List<UUID> ids = menusToBeFound.stream()
-                .map(Menu::getId)
-                .collect(Collectors.toUnmodifiableList());
+            .map(Menu::getId)
+            .collect(Collectors.toUnmodifiableList());
 
         // when
         final List<Menu> foundMenus = this.fakeMenuRepository.findAllByIdIn(ids);
@@ -139,29 +139,29 @@ class FakeMenuRepositoryTest {
     void emocchhz() {
         // given
         final UUID[] productIds = {
-                UUID.randomUUID(),
-                UUID.randomUUID(),
-                UUID.randomUUID(),
+            UUID.randomUUID(),
+            UUID.randomUUID(),
+            UUID.randomUUID(),
         };
 
         final List<Menu> menus = IntStream.range(0, 10)
-                .mapToObj(n -> {
-                    final List<MenuProduct> menuProducts = new ArrayList<>();
-                    final MenuProduct menuProduct = new MenuProduct();
-                    menuProduct.setProductId(productIds[n % 3]);
-                    menuProducts.add(menuProduct);
+            .mapToObj(n -> {
+                final List<MenuProduct> menuProducts = new ArrayList<>();
+                final MenuProduct menuProduct = new MenuProduct();
+                menuProduct.setProductId(productIds[n % 3]);
+                menuProducts.add(menuProduct);
 
-                    final Menu menu = new Menu();
-                    menu.setId(UUID.randomUUID());
-                    menu.setMenuProducts(menuProducts);
-                    return this.fakeMenuRepository.save(menu);
-                })
-                .collect(Collectors.toUnmodifiableList());
+                final Menu menu = new Menu();
+                menu.setId(UUID.randomUUID());
+                menu.setMenuProducts(menuProducts);
+                return this.fakeMenuRepository.save(menu);
+            })
+            .collect(Collectors.toUnmodifiableList());
 
         final List<Menu> menusToBeFound = IntStream.range(0, 10)
-                .filter(n -> (n % 3) == 1)
-                .mapToObj(menus::get)
-                .collect(Collectors.toUnmodifiableList());
+            .filter(n -> (n % 3) == 1)
+            .mapToObj(menus::get)
+            .collect(Collectors.toUnmodifiableList());
 
         // when
         final List<Menu> foundMenus = this.fakeMenuRepository.findAllByProductId(productIds[1]);

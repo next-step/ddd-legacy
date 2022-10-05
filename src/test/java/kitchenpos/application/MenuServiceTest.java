@@ -43,10 +43,10 @@ class MenuServiceTest {
     // SUT
 
     private final MenuService menuService = new MenuService(
-            menuRepository,
-            menuGroupRepository,
-            productRepository,
-            profanityDetectClient
+        menuRepository,
+        menuGroupRepository,
+        productRepository,
+        profanityDetectClient
     );
 
     @DisplayName("생성")
@@ -55,8 +55,8 @@ class MenuServiceTest {
 
         @DisplayName("메뉴를 생성할 수 있다.")
         @ValueSource(strings = {
-                "get", "dead", "drink", "preference", "purple",
-                "account", "angle", "seem", "strike", "per",
+            "get", "dead", "drink", "preference", "purple",
+            "account", "angle", "seem", "strike", "per",
         })
         @ParameterizedTest
         void oxxpvzbb(final String name) {
@@ -121,11 +121,11 @@ class MenuServiceTest {
 
         @DisplayName("메뉴 이름은 비속어를 포함할 수 없다.")
         @ValueSource(strings = {
-                "holiday", "bed", "anxious", "everyday", "reach",
-                "private holiday", "courage bed", "about anxious", "knee everyday", "number reach",
-                "holiday roll", "bed avenue", "anxious needle", "everyday chairman", "reach cape",
-                "interrupt holiday sauce", "explore bed radio", "return anxious motherly",
-                "entertain everyday cause", "separate reach they",
+            "holiday", "bed", "anxious", "everyday", "reach",
+            "private holiday", "courage bed", "about anxious", "knee everyday", "number reach",
+            "holiday roll", "bed avenue", "anxious needle", "everyday chairman", "reach cape",
+            "interrupt holiday sauce", "explore bed radio", "return anxious motherly",
+            "entertain everyday cause", "separate reach they",
         })
         @ParameterizedTest
         void tncdtxzy(final String name) {
@@ -185,8 +185,8 @@ class MenuServiceTest {
 
         @DisplayName("가격은 음수일 수 없다.")
         @ValueSource(longs = {
-                -1558837739, -1658360731, -2027227346, -2034904425, -964948430,
-                -1795738562, -360013043, -1258878092, -1850806317, -669728729,
+            -1558837739, -1658360731, -2027227346, -2034904425, -964948430,
+            -1795738562, -360013043, -1258878092, -1850806317, -669728729,
         })
         @ParameterizedTest
         void hwjpzyir(final Long price) {
@@ -268,7 +268,7 @@ class MenuServiceTest {
 
             // when / then
             assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() ->
-                    menuService.create(requestMenu));
+                menuService.create(requestMenu));
         }
 
         @DisplayName("메뉴에 포함된 상품이 없을 수 없다.")
@@ -292,8 +292,8 @@ class MenuServiceTest {
 
         @DisplayName("메뉴에 포함된 각 상품별 수량은 음수일 수 없다.")
         @ValueSource(longs = {
-                -19, -24, -31, -27, -1,
-                -10, -22, -12, -28, -13,
+            -19, -24, -31, -27, -1,
+            -10, -22, -12, -28, -13,
         })
         @ParameterizedTest
         void ncxhikqf(final long quantity) {
@@ -375,7 +375,7 @@ class MenuServiceTest {
             assertThat(updatedMenu.getPrice()).isEqualTo(price);
 
             final Menu foundMenu = menuRepository.findById(menu.getId())
-                    .orElse(null);
+                .orElse(null);
             assertThat(foundMenu).isNotNull();
             assertThat(foundMenu.getPrice()).isEqualTo(price);
         }
@@ -408,7 +408,7 @@ class MenuServiceTest {
 
             // when / then
             assertThatIllegalArgumentException().isThrownBy(() ->
-                    menuService.changePrice(menu.getId(), requestMenu));
+                menuService.changePrice(menu.getId(), requestMenu));
         }
 
         @DisplayName("가격은 비어있을 수 없다.")
@@ -440,7 +440,7 @@ class MenuServiceTest {
 
             // when / then
             assertThatIllegalArgumentException().isThrownBy(() ->
-                    menuService.changePrice(menu.getId(), requestMenu));
+                menuService.changePrice(menu.getId(), requestMenu));
         }
 
         @DisplayName("가격을 메뉴에 포함된 모든 상품 가격 합보다 큰 값으로 바꿀 수 없다.")
@@ -483,7 +483,7 @@ class MenuServiceTest {
 
             // when / then
             assertThatIllegalArgumentException().isThrownBy(() ->
-                    menuService.changePrice(menu.getId(), requestMenu));
+                menuService.changePrice(menu.getId(), requestMenu));
         }
     }
 
@@ -534,7 +534,7 @@ class MenuServiceTest {
             assertThat(displayedMenu.isDisplayed()).isTrue();
 
             final Menu foundMenu = menuRepository.findById(menu.getId())
-                    .orElse(null);
+                .orElse(null);
             assertThat(foundMenu).isNotNull();
             assertThat(foundMenu.isDisplayed()).isTrue();
         }
@@ -582,7 +582,7 @@ class MenuServiceTest {
             assertThat(displayedMenu.isDisplayed()).isTrue();
 
             final Menu foundMenu = menuRepository.findById(menu.getId())
-                    .orElse(null);
+                .orElse(null);
             assertThat(foundMenu).isNotNull();
             assertThat(foundMenu.isDisplayed()).isTrue();
         }
@@ -649,7 +649,7 @@ class MenuServiceTest {
             assertThat(hidedMenu.isDisplayed()).isFalse();
 
             final Menu foundMenu = menuRepository.findById(menu.getId())
-                    .orElse(null);
+                .orElse(null);
             assertThat(foundMenu).isNotNull();
             assertThat(foundMenu.isDisplayed()).isFalse();
         }
@@ -671,7 +671,7 @@ class MenuServiceTest {
             assertThat(hidedMenu.isDisplayed()).isFalse();
 
             final Menu foundMenu = menuRepository.findById(menu.getId())
-                    .orElse(null);
+                .orElse(null);
             assertThat(foundMenu).isNotNull();
             assertThat(foundMenu.isDisplayed()).isFalse();
         }
@@ -683,19 +683,19 @@ class MenuServiceTest {
 
         @DisplayName("존재하는 메뉴를 모두 조회할 수 있다.")
         @ValueSource(ints = {
-                19, 13, 14, 27, 7,
-                2, 18, 17, 26, 12,
+            19, 13, 14, 27, 7,
+            2, 18, 17, 26, 12,
         })
         @ParameterizedTest
         void uzcwotkw(final int size) {
             // given
             IntStream.range(0, size)
-                    .forEach(n -> {
-                        final Menu menu = new Menu();
-                        menu.setId(UUID.randomUUID());
-                        menu.setName("lot");
-                        menuRepository.save(menu);
-                    });
+                .forEach(n -> {
+                    final Menu menu = new Menu();
+                    menu.setId(UUID.randomUUID());
+                    menu.setName("lot");
+                    menuRepository.save(menu);
+                });
 
             // when
             final List<Menu> menus = menuService.findAll();

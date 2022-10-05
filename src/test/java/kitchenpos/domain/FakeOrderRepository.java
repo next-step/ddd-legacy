@@ -32,10 +32,10 @@ public class FakeOrderRepository implements OrderRepository {
     @Override
     public boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status) {
         return this.orders.values()
-                .stream()
-                .anyMatch(order -> (
-                        (order.getOrderTableId() == orderTable.getId())
-                                && (order.getStatus() != status)
-                ));
+            .stream()
+            .anyMatch(order -> (
+                (order.getOrderTableId() == orderTable.getId())
+                    && (order.getStatus() != status)
+            ));
     }
 }

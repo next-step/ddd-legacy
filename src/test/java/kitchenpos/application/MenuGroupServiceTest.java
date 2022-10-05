@@ -22,13 +22,13 @@ class MenuGroupServiceTest {
     // SUT
 
     private final MenuGroupService menuGroupService = new MenuGroupService(
-            this.menuGroupRepository
+        this.menuGroupRepository
     );
 
     @DisplayName("유효한 이름으로 메뉴 그룹을 생성할 수 있다.")
     @ValueSource(strings = {
-            "study", "castle", "organize", "madden", "wall",
-            "it", "next", "direct", "ticket", "piece",
+        "study", "castle", "organize", "madden", "wall",
+        "it", "next", "direct", "ticket", "piece",
     })
     @ParameterizedTest
     void djyjmigp(final String name) {
@@ -53,24 +53,24 @@ class MenuGroupServiceTest {
 
         // when / then
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> this.menuGroupService.create(requestMenuGroup));
+            .isThrownBy(() -> this.menuGroupService.create(requestMenuGroup));
     }
 
     @DisplayName("메뉴 그룹을 모두 조회할 수 있다.")
     @ValueSource(ints = {
-            6, 21, 31, 9, 5,
-            2, 7, 17, 18, 28,
+        6, 21, 31, 9, 5,
+        2, 7, 17, 18, 28,
     })
     @ParameterizedTest
     void cpgksbnc(final int size) {
         // given
         IntStream.range(0, size)
-                .forEach(n -> {
-                    final MenuGroup menuGroup = new MenuGroup();
-                    menuGroup.setId(UUID.randomUUID());
-                    menuGroup.setName(String.valueOf(n));
-                    this.menuGroupRepository.save(menuGroup);
-                });
+            .forEach(n -> {
+                final MenuGroup menuGroup = new MenuGroup();
+                menuGroup.setId(UUID.randomUUID());
+                menuGroup.setName(String.valueOf(n));
+                this.menuGroupRepository.save(menuGroup);
+            });
 
         // when
         final List<MenuGroup> menuGroups = this.menuGroupService.findAll();
@@ -81,18 +81,18 @@ class MenuGroupServiceTest {
 
     @DisplayName("메뉴 그룹을 생성한 후 모두 조회할 수 있다.")
     @ValueSource(ints = {
-            6, 21, 31, 9, 5,
-            2, 7, 17, 18, 28,
+        6, 21, 31, 9, 5,
+        2, 7, 17, 18, 28,
     })
     @ParameterizedTest
     void gakhgird(final int size) {
         // given
         IntStream.range(0, size)
-                .forEach(n -> {
-                    final MenuGroup menuGroup = new MenuGroup();
-                    menuGroup.setName(String.valueOf(n));
-                    this.menuGroupService.create(menuGroup);
-                });
+            .forEach(n -> {
+                final MenuGroup menuGroup = new MenuGroup();
+                menuGroup.setName(String.valueOf(n));
+                this.menuGroupService.create(menuGroup);
+            });
 
         // when
         final List<MenuGroup> menuGroups = this.menuGroupService.findAll();

@@ -41,7 +41,7 @@ class FakeOrderRepositoryTest {
 
         // when
         final Order foundOrder = this.fakeOrderRepository.findById(savedOrder.getId())
-                .orElse(null);
+            .orElse(null);
 
         // then
         assertThat(foundOrder).isEqualTo(order);
@@ -57,7 +57,7 @@ class FakeOrderRepositoryTest {
 
         // when
         final Order foundOrder = this.fakeOrderRepository.findById(UUID.randomUUID())
-                .orElse(null);
+            .orElse(null);
 
         // then
         assertThat(foundOrder).isNull();
@@ -75,18 +75,18 @@ class FakeOrderRepositoryTest {
 
     @DisplayName("모두 조회시 저장된 수 만큼 조회되어야 한다.")
     @ValueSource(ints = {
-            6, 3, 21, 1, 21,
-            9, 20, 20, 5, 27,
+        6, 3, 21, 1, 21,
+        9, 20, 20, 5, 27,
     })
     @ParameterizedTest
     void mzetglfh(final int size) {
         // given
         IntStream.range(0, size)
-                .forEach(n -> {
-                    final Order order = new Order();
-                    order.setId(UUID.randomUUID());
-                    this.fakeOrderRepository.save(order);
-                });
+            .forEach(n -> {
+                final Order order = new Order();
+                order.setId(UUID.randomUUID());
+                this.fakeOrderRepository.save(order);
+            });
 
         // when
         final List<Order> orders = this.fakeOrderRepository.findAll();
@@ -110,8 +110,8 @@ class FakeOrderRepositoryTest {
 
         // when
         final boolean result = this.fakeOrderRepository.existsByOrderTableAndStatusNot(
-                orderTable,
-                orderStatus
+            orderTable,
+            orderStatus
         );
 
         // then
@@ -137,8 +137,8 @@ class FakeOrderRepositoryTest {
 
         // when
         final boolean result = this.fakeOrderRepository.existsByOrderTableAndStatusNot(
-                orderTable,
-                orderStatus
+            orderTable,
+            orderStatus
         );
 
         // then

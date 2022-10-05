@@ -33,8 +33,8 @@ public class FakeProductRepository implements ProductRepository {
     @Override
     public List<Product> findAllByIdIn(final List<UUID> ids) {
         return this.products.values()
-                .stream()
-                .filter(product -> ids.contains(product.getId()))
-                .collect(Collectors.toUnmodifiableList());
+            .stream()
+            .filter(product -> ids.contains(product.getId()))
+            .collect(Collectors.toUnmodifiableList());
     }
 }
