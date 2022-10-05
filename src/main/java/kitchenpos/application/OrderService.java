@@ -84,9 +84,11 @@ public class OrderService {
         if (type == OrderType.EAT_IN) {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
-            if (!orderTable.isOccupied()) {
+            // 이부분은 점유상황일 경우 먹고가기가 불가능한부분이라 조건문 수정 + occupied true
+            if (orderTable.isOccupied()) {
                 throw new IllegalStateException();
             }
+            orderTable.setOccupied(true);
             order.setOrderTable(orderTable);
         }
         return orderRepository.save(order);
