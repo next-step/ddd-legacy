@@ -13,7 +13,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-
+@Sql("/truncate-all.sql")
 @SpringBootTest
 class MenuGroupServiceTest {
     @Autowired
@@ -41,7 +41,6 @@ class MenuGroupServiceTest {
         );
     }
 
-    @Sql("/truncate-menu-group.sql")
     @DisplayName("메뉴 그룹은 여러개 조회할 수 있다.")
     @Test
     void findAll() {

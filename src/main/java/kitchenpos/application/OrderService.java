@@ -40,9 +40,6 @@ public class OrderService {
             throw new IllegalArgumentException();
         }
 
-        System.out.println(">>>> orderLineItemRequest : " + orderLineItemRequests);
-
-
         final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
                 .map(OrderLineItem::getMenuId)

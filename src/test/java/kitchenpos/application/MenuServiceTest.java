@@ -19,7 +19,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-@Sql({"/truncate-menu-integration.sql", "/insert-menu-integration.sql"})
+@Sql({"/truncate-all.sql", "/insert-menu-integration.sql"})
 @SpringBootTest
 class MenuServiceTest {
     @Autowired
