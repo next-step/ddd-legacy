@@ -7,13 +7,21 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
+import static kitchenpos.domain.OrderStatus.ACCEPTED;
+import static kitchenpos.domain.OrderStatus.COMPLETED;
+import static kitchenpos.domain.OrderStatus.DELIVERED;
+import static kitchenpos.domain.OrderStatus.DELIVERING;
+import static kitchenpos.domain.OrderStatus.SERVED;
 import static kitchenpos.domain.OrderType.DELIVERY;
 import static kitchenpos.domain.OrderType.EAT_IN;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -141,5 +149,138 @@ class OrderServiceTest {
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문을 수락할 수 있다.")
+    @Test
+    void accept() {
+        final UUID orderId = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8");
+
+        final Order response = sut.accept(orderId);
+
+        assertThat(response.getStatus()).isEqualTo(ACCEPTED);
+    }
+
+    @DisplayName("주문을 요청해야 수락할 수 있다.")
+    @Test
+    void acceptWithNoOrder() {
+        final UUID orderId = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd9");
+
+        assertThatThrownBy(() -> sut.accept(orderId))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("주문을 제공할 수 있다.")
+    @Test
+    void serve() {
+        final UUID orderId = UUID.fromString("79d78f38-3bff-457c-bb72-26319c985fd8");
+
+        final Order response = sut.serve(orderId);
+
+        assertThat(response.getStatus()).isEqualTo(SERVED);
+    }
+
+    @DisplayName("주문을 수락해야 제공할 수 있다.")
+    @Test
+    void acceptWithNoAcceptedOrder() {
+        final UUID orderId = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd9");
+
+        assertThatThrownBy(() -> sut.serve(orderId))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("배달 주문 시작요청을 할 수 있다.")
+    @Test
+    void startDelivery() {
+        final UUID orderId = UUID.fromString("89d78f38-3bff-457c-bb72-26319c985fd8");
+
+        final Order response = sut.startDelivery(orderId);
+
+        assertThat(response.getStatus()).isEqualTo(DELIVERING);
+    }
+
+    @DisplayName("배달 주문이 아니라면 요청할 수 없다.")
+    @Test
+    void startDeliveryWithNoDelivery() {
+        final UUID orderId = UUID.fromString("79d78f38-3bff-457c-bb72-26319c985fd8");
+
+        assertThatThrownBy(() -> sut.startDelivery(orderId))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문이 제공할 수 있는 상태여야 한다.")
+    @Test
+    void startDeliveryWithNoServedOrder() {
+        final UUID orderId = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8");
+
+        assertThatThrownBy(() -> sut.startDelivery(orderId))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("배달 주문 완료 요청을 할 수 있다.")
+    @Test
+    void completeDelivery() {
+        final UUID orderId = UUID.fromString("99d78f38-3bff-457c-bb72-26319c985fd8");
+
+        final Order response = sut.completeDelivery(orderId);
+
+        assertThat(response.getStatus()).isEqualTo(DELIVERED);
+    }
+
+    @DisplayName("베달 중 상태가 아니라면 요청할 수 없다.")
+    @Test
+    void completeDeliveryWithNoDelivering() {
+        final UUID orderId = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8");
+
+        assertThatThrownBy(() -> sut.completeDelivery(orderId))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("주문을 완료할 수 있다.")
+    @Test
+    void complete() {
+        final UUID orderId = UUID.fromString("09d78f38-3bff-457c-bb72-26319c985fd8");
+
+        final Order response = sut.complete(orderId);
+
+        assertThat(response.getStatus()).isEqualTo(COMPLETED);
+    }
+
+    @DisplayName("배달 주문은 배달이 완료되어야 한다.")
+    @Test
+    void completeWithNoDelivered() {
+        final UUID orderId = UUID.fromString("99d78f38-3bff-457c-bb72-26319c985fd8");
+
+        assertThatThrownBy(() -> sut.complete(orderId))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("포장 주문과 매장 주문은 제공할 수 있는 상태여야 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"19d78f38-3bff-457c-bb72-26319c985fd8", "29d78f38-3bff-457c-bb72-26319c985fd8"})
+    void completeWithNoServed(final String strId) {
+        final UUID orderId = UUID.fromString(strId);
+
+        assertThatThrownBy(() -> sut.complete(orderId))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("매장 주문의 경우 주문이 완료되면 테이블을 비워야 한다.")
+    @Test
+    void completeWith() {
+        final UUID orderId = UUID.fromString("39d78f38-3bff-457c-bb72-26319c985fd8");
+
+        final Order response = sut.complete(orderId);
+
+        assertThat(response.getOrderTable().isOccupied()).isFalse();
+        assertThat(response.getOrderTable().getNumberOfGuests()).isEqualTo(0);
+    }
+
+    @DisplayName("주문을 여러개 조회할 수 있다.")
+    @Test
+    void findAll() {
+        final List<Order> response = sut.findAll();
+
+        assertThat(response).hasSize(8);
     }
 }
