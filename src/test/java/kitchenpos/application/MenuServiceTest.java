@@ -36,7 +36,7 @@ class MenuServiceTest {
         final boolean displayed = true;
         final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
-        Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
+        final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
         final Menu response = sut.create(request);
 
@@ -54,7 +54,7 @@ class MenuServiceTest {
         final boolean displayed = true;
         final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
-        Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
+        final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -71,7 +71,7 @@ class MenuServiceTest {
         final boolean displayed = true;
         final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
-        Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
+        final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -89,7 +89,7 @@ class MenuServiceTest {
         final List<MenuProduct> menuProducts = List.of(new MenuProduct(quantity, productId));
         final UUID menuGroupId = UUID.fromString("f1860abc-2ea1-411b-bd4a-baa44f0d5580");
 
-        Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
+        final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(NoSuchElementException.class);
@@ -107,7 +107,7 @@ class MenuServiceTest {
         final List<MenuProduct> menuProducts = List.of(new MenuProduct(quantity, productId));
         final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
-        Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
+        final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -124,7 +124,7 @@ class MenuServiceTest {
         final boolean displayed = true;
         final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
-        Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
+        final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -141,7 +141,7 @@ class MenuServiceTest {
         final boolean displayed = true;
         final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
-        Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
+        final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -159,7 +159,7 @@ class MenuServiceTest {
         final boolean displayed = true;
         final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
-        Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
+        final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -168,7 +168,7 @@ class MenuServiceTest {
     
     @DisplayName("메뉴 이름은 비속어를 포함할 수 없다.")
     @ParameterizedTest
-    @ValueSource(strings = {"fuck, goddamn"})
+    @ValueSource(strings = "fuck, goddamn")
     void createWithPurgomalum(final String name) {
         final long quantity = 1L;
         final UUID productId = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
@@ -177,7 +177,7 @@ class MenuServiceTest {
         final boolean displayed = true;
         final UUID menuGroupId = UUID.fromString("cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded");
 
-        Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
+        final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
         assertThatThrownBy(() -> sut.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -187,7 +187,7 @@ class MenuServiceTest {
     @Test
     void changePrice() {
         final UUID menuId = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
-        Menu request = new Menu(new BigDecimal("14000"));
+        final Menu request = new Menu(new BigDecimal("14000"));
 
         final Menu response = sut.changePrice(menuId, request);
 
@@ -198,7 +198,7 @@ class MenuServiceTest {
     @Test
     void changePriceWithBigPrice() {
         final UUID menuId = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
-        Menu request = new Menu(new BigDecimal("20000"));
+        final Menu request = new Menu(new BigDecimal("20000"));
 
         assertThatThrownBy(() -> sut.changePrice(menuId, request))
                 .isInstanceOf(IllegalArgumentException.class);
