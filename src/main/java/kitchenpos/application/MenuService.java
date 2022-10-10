@@ -19,7 +19,7 @@ public class MenuService {
     public MenuService(
         final MenuRepository menuRepository,
         final MenuGroupRepository menuGroupRepository,
-        final ProductRepository productRepository,
+        final ProductJpaRepository productRepository,
         final PurgomalumClient purgomalumClient
     ) {
         this.menuRepository = menuRepository;
