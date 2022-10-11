@@ -286,6 +286,24 @@ class OrderServiceTest {
             }
         }
 
+        @DisplayName("배달 시작 테스트")
+        @Nested
+        class StartDeliveryTest {
+
+            @DisplayName("매장 주문은 배달을 시작 할 수 없다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.eatInOrder(
+                    OrderStatus.SERVED,
+                    OrderTableFixture.OCCUPIED_TABLE
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.startDelivery(order.getId()));
+            }
+        }
     }
 
     @DisplayName("배달 주문 테스트")
@@ -512,6 +530,42 @@ class OrderServiceTest {
                     .isThrownBy(() -> testTarget.serve(order.getId()));
             }
         }
+
+        @DisplayName("배달 시작 테스트")
+        @Nested
+        class StartDeliveryTest {
+
+            @DisplayName("서빙된 주문을 배달 시작 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.deliveryOrder(
+                    OrderStatus.SERVED,
+                    "delivery address"
+                ));
+
+                // when
+                Order actual = testTarget.startDelivery(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.DELIVERING);
+            }
+
+            @DisplayName("서빙된 주문이 아닌 경우, 배달 시작 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.deliveryOrder(
+                    OrderStatus.ACCEPTED,
+                    "delivery address"
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.startDelivery(order.getId()));
+            }
+        }
     }
 
     @DisplayName("포장 주문 테스트")
@@ -696,6 +750,22 @@ class OrderServiceTest {
                 // when & then
                 assertThatIllegalStateException()
                     .isThrownBy(() -> testTarget.serve(order.getId()));
+            }
+        }
+
+        @DisplayName("배달 시작 테스트")
+        @Nested
+        class StartDeliveryTest {
+
+            @DisplayName("포장 주문은 배달을 시작 할 수 없다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.takeoutOrder(OrderStatus.SERVED));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.startDelivery(order.getId()));
             }
         }
     }
