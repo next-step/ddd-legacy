@@ -11,14 +11,13 @@ import kitchenpos.domain.OrderType;
 
 public class OrderFixture {
 
-    public static Order create(
-        OrderType orderType,
+    public static Order eatInOrder(
         OrderStatus orderStatus,
         OrderTable orderTable
     ) {
         var order = new Order();
         order.setId(UUID.randomUUID());
-        order.setType(orderType);
+        order.setType(OrderType.EAT_IN);
         order.setStatus(orderStatus);
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(List.of(OrderLineItemFixture.create()));
@@ -26,14 +25,13 @@ public class OrderFixture {
         return order;
     }
 
-    public static Order create(
-        OrderType orderType,
+    public static Order deliveryOrder(
         OrderStatus orderStatus,
         String deliveryAddress
     ) {
         var order = new Order();
         order.setId(UUID.randomUUID());
-        order.setType(orderType);
+        order.setType(OrderType.DELIVERY);
         order.setStatus(orderStatus);
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(List.of(OrderLineItemFixture.create()));
@@ -41,10 +39,10 @@ public class OrderFixture {
         return order;
     }
 
-    public static Order create(OrderType orderType, OrderStatus orderStatus) {
+    public static Order takeoutOrder(OrderStatus orderStatus) {
         var order = new Order();
         order.setId(UUID.randomUUID());
-        order.setType(orderType);
+        order.setType(OrderType.TAKEOUT);
         order.setStatus(orderStatus);
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(List.of(OrderLineItemFixture.create()));

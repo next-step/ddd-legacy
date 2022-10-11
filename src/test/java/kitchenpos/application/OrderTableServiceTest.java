@@ -11,7 +11,6 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.domain.OrderType;
 import kitchenpos.helper.InMemoryOrderRepository;
 import kitchenpos.helper.InMemoryOrderTableRepository;
 import kitchenpos.helper.OrderFixture;
@@ -112,11 +111,7 @@ class OrderTableServiceTest {
         void test02() {
             // given
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
-            orderRepository.save(OrderFixture.create(
-                OrderType.EAT_IN,
-                OrderStatus.WAITING,
-                orderTable
-            ));
+            orderRepository.save(OrderFixture.eatInOrder(OrderStatus.WAITING, orderTable));
 
             // when & then
             assertThatIllegalStateException()

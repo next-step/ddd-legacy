@@ -222,8 +222,7 @@ class OrderServiceTest {
             @Test
             void test01() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.EAT_IN,
+                Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.WAITING,
                     OrderTableFixture.OCCUPIED_TABLE
                 ));
@@ -240,8 +239,7 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.EAT_IN,
+                Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.ACCEPTED,
                     OrderTableFixture.OCCUPIED_TABLE
                 ));
@@ -260,8 +258,7 @@ class OrderServiceTest {
             @Test
             void test01() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.EAT_IN,
+                Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.ACCEPTED,
                     OrderTableFixture.OCCUPIED_TABLE
                 ));
@@ -278,8 +275,7 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.EAT_IN,
+                Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.WAITING,
                     OrderTableFixture.OCCUPIED_TABLE
                 ));
@@ -450,8 +446,7 @@ class OrderServiceTest {
             @Test
             void test01() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.DELIVERY,
+                Order order = orderRepository.save(OrderFixture.deliveryOrder(
                     OrderStatus.WAITING,
                     "delivery address"
                 ));
@@ -470,8 +465,7 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.DELIVERY,
+                Order order = orderRepository.save(OrderFixture.deliveryOrder(
                     OrderStatus.ACCEPTED,
                     "delivery address"
                 ));
@@ -491,8 +485,7 @@ class OrderServiceTest {
             @Test
             void test01() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.DELIVERY,
+                Order order = orderRepository.save(OrderFixture.deliveryOrder(
                     OrderStatus.ACCEPTED,
                     "delivery address"
                 ));
@@ -509,8 +502,7 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.DELIVERY,
+                Order order = orderRepository.save(OrderFixture.deliveryOrder(
                     OrderStatus.WAITING,
                     "delivery address"
                 ));
@@ -655,10 +647,7 @@ class OrderServiceTest {
             @Test
             void test01() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.TAKEOUT,
-                    OrderStatus.WAITING
-                ));
+                Order order = orderRepository.save(OrderFixture.takeoutOrder(OrderStatus.WAITING));
 
                 // when
                 Order actual = testTarget.accept(order.getId());
@@ -672,10 +661,7 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.TAKEOUT,
-                    OrderStatus.ACCEPTED
-                ));
+                Order order = orderRepository.save(OrderFixture.takeoutOrder(OrderStatus.ACCEPTED));
 
                 // when & then
                 assertThatIllegalStateException()
@@ -691,10 +677,7 @@ class OrderServiceTest {
             @Test
             void test01() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.TAKEOUT,
-                    OrderStatus.ACCEPTED
-                ));
+                Order order = orderRepository.save(OrderFixture.takeoutOrder(OrderStatus.ACCEPTED));
 
                 // when
                 Order actual = testTarget.serve(order.getId());
@@ -708,10 +691,7 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
-                Order order = orderRepository.save(OrderFixture.create(
-                    OrderType.TAKEOUT,
-                    OrderStatus.WAITING
-                ));
+                Order order = orderRepository.save(OrderFixture.takeoutOrder(OrderStatus.WAITING));
 
                 // when & then
                 assertThatIllegalStateException()
