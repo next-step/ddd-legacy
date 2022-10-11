@@ -304,6 +304,45 @@ class OrderServiceTest {
                     .isThrownBy(() -> testTarget.startDelivery(order.getId()));
             }
         }
+
+        @DisplayName("주문 완료 테스트")
+        @Nested
+        class CompleteTest {
+
+            @DisplayName("서빙된 주문을 완료 시킬 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.eatInOrder(
+                    OrderStatus.SERVED,
+                    OrderTableFixture.OCCUPIED_TABLE
+                ));
+
+                // when
+                Order actual = testTarget.complete(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.COMPLETED);
+                assertThat(actual.getOrderTable())
+                    .matches(table -> table.getNumberOfGuests() == 0)
+                    .matches(table -> !table.isOccupied());
+            }
+
+            @DisplayName("서빙되지 않은 주문을 완료 시킬 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.eatInOrder(
+                    OrderStatus.ACCEPTED,
+                    OrderTableFixture.OCCUPIED_TABLE
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.complete(order.getId()));
+            }
+        }
     }
 
     @DisplayName("배달 주문 테스트")
@@ -602,6 +641,42 @@ class OrderServiceTest {
                     .isThrownBy(() -> testTarget.completeDelivery(order.getId()));
             }
         }
+
+        @DisplayName("주문 완료 테스트")
+        @Nested
+        class CompleteTest {
+
+            @DisplayName("배달 완료된 주문을 완료 시킬 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.deliveryOrder(
+                    OrderStatus.DELIVERED,
+                    "delivery address"
+                ));
+
+                // when
+                Order actual = testTarget.complete(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.COMPLETED);
+            }
+
+            @DisplayName("배달 완료되지 않은 주문을 완료 시킬 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.deliveryOrder(
+                    OrderStatus.DELIVERING,
+                    "delivery address"
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.complete(order.getId()));
+            }
+        }
     }
 
     @DisplayName("포장 주문 테스트")
@@ -802,6 +877,36 @@ class OrderServiceTest {
                 // when & then
                 assertThatIllegalStateException()
                     .isThrownBy(() -> testTarget.startDelivery(order.getId()));
+            }
+        }
+
+        @DisplayName("주문 완료 테스트")
+        @Nested
+        class CompleteTest {
+
+            @DisplayName("서빙된 주문을 완료 시킬 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.takeoutOrder(OrderStatus.SERVED));
+
+                // when
+                Order actual = testTarget.complete(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.COMPLETED);
+            }
+
+            @DisplayName("서빙되지 않은 주문을 완료 시킬 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.takeoutOrder(OrderStatus.ACCEPTED));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.complete(order.getId()));
             }
         }
     }
