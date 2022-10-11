@@ -3,6 +3,7 @@ package kitchenpos.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
@@ -176,7 +177,7 @@ class MenuServiceTest {
                 menuGroup.getId(),
                 "후라이드 치킨",
                 true,
-                MenuProductFixture.request(product.getId(), 0)
+                MenuProductFixture.request(product.getId(), -1)
             );
 
             // when & then
@@ -311,6 +312,17 @@ class MenuServiceTest {
             // when & then
             assertThatExceptionOfType(NoSuchElementException.class)
                 .isThrownBy(() -> testTarget.display(menuId));
+        }
+
+        @DisplayName("메뉴 가격이 메뉴 상품 가격의 총합보다 큰 메뉴를 노출 시킬 수 없다.")
+        @Test
+        void test03() {
+            // given
+            Menu menu = menuRepository.save(MenuFixture.PRICE_EXCEED_MENU);
+
+            // when & then
+            assertThatIllegalStateException()
+                .isThrownBy(() -> testTarget.display(menu.getId()));
         }
     }
 

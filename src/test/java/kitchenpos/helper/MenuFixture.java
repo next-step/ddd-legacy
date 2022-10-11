@@ -35,6 +35,14 @@ public class MenuFixture {
 
     public static final Menu DISPLAYED_MENU = ONE_FRIED_CHICKEN;
 
+    public static final Menu PRICE_EXCEED_MENU = create(
+        "양념 치킨 한마리",
+        7000,
+        false,
+        MenuGroupFixture.CHICKEN,
+        List.of(MenuProductFixture.ONE_HOT_SPICY_CHICKEN)
+    );
+
     private static Menu create(
         String name,
         int price,
