@@ -252,6 +252,44 @@ class OrderServiceTest {
             }
         }
 
+        @DisplayName("주문 서빙 테스트")
+        @Nested
+        class ServeTest {
+
+            @DisplayName("주문을 서빙 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.EAT_IN,
+                    OrderStatus.ACCEPTED,
+                    OrderTableFixture.OCCUPIED_TABLE
+                ));
+
+                // when
+                Order actual = testTarget.serve(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.SERVED);
+            }
+
+            @DisplayName("수락 상태가 아닌 주문을 서빙 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.EAT_IN,
+                    OrderStatus.WAITING,
+                    OrderTableFixture.OCCUPIED_TABLE
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.serve(order.getId()));
+            }
+        }
+
     }
 
     @DisplayName("배달 주문 테스트")
@@ -443,6 +481,45 @@ class OrderServiceTest {
                     .isThrownBy(() -> testTarget.accept(order.getId()));
             }
         }
+
+
+        @DisplayName("주문 서빙 테스트")
+        @Nested
+        class ServeTest {
+
+            @DisplayName("주문을 서빙 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.DELIVERY,
+                    OrderStatus.ACCEPTED,
+                    "delivery address"
+                ));
+
+                // when
+                Order actual = testTarget.serve(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.SERVED);
+            }
+
+            @DisplayName("수락 상태가 아닌 주문을 서빙 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.DELIVERY,
+                    OrderStatus.WAITING,
+                    "delivery address"
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.serve(order.getId()));
+            }
+        }
     }
 
     @DisplayName("포장 주문 테스트")
@@ -603,6 +680,42 @@ class OrderServiceTest {
                 // when & then
                 assertThatIllegalStateException()
                     .isThrownBy(() -> testTarget.accept(order.getId()));
+            }
+        }
+
+        @DisplayName("주문 서빙 테스트")
+        @Nested
+        class ServeTest {
+
+            @DisplayName("주문을 서빙 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.TAKEOUT,
+                    OrderStatus.ACCEPTED
+                ));
+
+                // when
+                Order actual = testTarget.serve(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.SERVED);
+            }
+
+            @DisplayName("수락 상태가 아닌 주문을 서빙 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.create(
+                    OrderType.TAKEOUT,
+                    OrderStatus.WAITING
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.serve(order.getId()));
             }
         }
     }
