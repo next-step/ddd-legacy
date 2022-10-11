@@ -911,4 +911,33 @@ class OrderServiceTest {
         }
     }
 
+    @DisplayName("주문 목록 조회 테스트")
+    @Nested
+    class FindAllTest {
+
+        @DisplayName("주문 목록을 조회 할 수 있다.")
+        @Test
+        void test01() {
+            // given
+            Order order1 = orderRepository.save(OrderFixture.eatInOrder(
+                OrderStatus.SERVED,
+                OrderTableFixture.OCCUPIED_TABLE
+            ));
+            Order order2 = orderRepository.save(OrderFixture.deliveryOrder(
+                OrderStatus.DELIVERING,
+                "delivery address"
+            ));
+            Order order3 = orderRepository.save(OrderFixture.takeoutOrder(OrderStatus.ACCEPTED));
+
+            // when
+            List<Order> actual = testTarget.findAll();
+
+            // then
+            assertThat(actual)
+                .anyMatch(o -> o.getId() == order1.getId())
+                .anyMatch(o -> o.getId() == order2.getId())
+                .anyMatch(o -> o.getId() == order3.getId());
+        }
+    }
+
 }
