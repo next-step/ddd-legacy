@@ -566,6 +566,42 @@ class OrderServiceTest {
                     .isThrownBy(() -> testTarget.startDelivery(order.getId()));
             }
         }
+
+        @DisplayName("배달 완료 테스트")
+        @Nested
+        class CompleteDeliveryTest {
+
+            @DisplayName("배달중인 주문을 배달 완료 할 수 있다.")
+            @Test
+            void test01() {
+                // given
+                Order order = orderRepository.save(OrderFixture.deliveryOrder(
+                    OrderStatus.DELIVERING,
+                    "delivery address"
+                ));
+
+                // when
+                Order actual = testTarget.completeDelivery(order.getId());
+
+                // then
+                assertThat(actual.getStatus())
+                    .isEqualTo(OrderStatus.DELIVERED);
+            }
+
+            @DisplayName("배달중이 아닌 주문을 배달 완료 할 수 없다.")
+            @Test
+            void test02() {
+                // given
+                Order order = orderRepository.save(OrderFixture.deliveryOrder(
+                    OrderStatus.SERVED,
+                    "delivery address"
+                ));
+
+                // when & then
+                assertThatIllegalStateException()
+                    .isThrownBy(() -> testTarget.completeDelivery(order.getId()));
+            }
+        }
     }
 
     @DisplayName("포장 주문 테스트")
