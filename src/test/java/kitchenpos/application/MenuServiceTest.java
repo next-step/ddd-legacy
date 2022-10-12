@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
-import javax.validation.constraints.Null;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -39,8 +38,6 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class MenuServiceTest {
-
-    private static final String PROVIDE_NEGATIVE_PRICE = "kitchenpos.application.MenuServiceTest#provideNegativePrice";
 
     private MenuRepository menuRepository;
     private MenuGroupRepository menuGroupRepository;
@@ -252,8 +249,7 @@ class MenuServiceTest {
 
         @DisplayName("메뉴 가격은 0원 이상이어야 한다.")
         @ParameterizedTest
-        @MethodSource(PROVIDE_NEGATIVE_PRICE)
-        @Null
+        @MethodSource("kitchenpos.application.MenuServiceTest#provideNegativeAndNullPrice")
         void test02(BigDecimal price) {
             // given
             Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
@@ -263,7 +259,6 @@ class MenuServiceTest {
             assertThatIllegalArgumentException()
                 .isThrownBy(() -> testTarget.changePrice(menu.getId(), request));
         }
-
 
         @DisplayName("존재하지 않는 메뉴의 가격을 변경 할 수 없다.")
         @Test
@@ -380,9 +375,10 @@ class MenuServiceTest {
         }
     }
 
-    private static Stream<Arguments> provideNegativePrice() {
+    private static Stream<Arguments> provideNegativeAndNullPrice() {
         return Stream.of(
-            Arguments.of(BigDecimal.valueOf(-1))
+            Arguments.of(BigDecimal.valueOf(-1)),
+            null
         );
     }
 }
