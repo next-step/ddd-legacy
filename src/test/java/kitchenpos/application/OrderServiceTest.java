@@ -23,7 +23,7 @@ import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
-import kitchenpos.infra.FakeKitchenridersClient;
+import kitchenpos.infra.DummyKitchenridersClient;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -42,7 +42,7 @@ class OrderServiceTest {
 
     private final OrderTableRepository orderTableRepository = new FakeOrderTableRepository();
 
-    private final KitchenridersClient kitchenridersClient = new FakeKitchenridersClient();
+    private final KitchenridersClient kitchenridersClient = new DummyKitchenridersClient();
 
     // SUT
 
