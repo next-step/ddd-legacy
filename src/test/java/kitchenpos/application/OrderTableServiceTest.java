@@ -24,13 +24,15 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 class OrderTableServiceTest {
 
-    private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
-    private final OrderRepository orderRepository = new InMemoryOrderRepository();
+    private OrderTableRepository orderTableRepository;
+    private OrderRepository orderRepository;
 
     private OrderTableService testTarget;
 
     @BeforeEach
     void setUp() {
+        orderTableRepository = new InMemoryOrderTableRepository();
+        orderRepository = new InMemoryOrderRepository();
         testTarget = new OrderTableService(orderTableRepository, orderRepository);
     }
 

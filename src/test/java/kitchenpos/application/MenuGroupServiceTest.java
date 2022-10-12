@@ -17,12 +17,13 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 class MenuGroupServiceTest {
 
-    private final InMemoryMenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+    private InMemoryMenuGroupRepository menuGroupRepository;
 
     private MenuGroupService testTarget;
 
     @BeforeEach
     void setUp() {
+        menuGroupRepository = new InMemoryMenuGroupRepository();
         testTarget = new MenuGroupService(menuGroupRepository);
     }
 

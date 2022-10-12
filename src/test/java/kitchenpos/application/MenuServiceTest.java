@@ -42,15 +42,19 @@ class MenuServiceTest {
 
     private static final String PROVIDE_NEGATIVE_PRICE = "kitchenpos.application.MenuServiceTest#provideNegativePrice";
 
-    private final MenuRepository menuRepository = new InMemoryMenuRepository();
-    private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
-    private final ProductRepository productRepository = new InMemoryProductRepository();
-    private final ProfanityClient profanityClient = new InMemoryProfanityClient();
+    private MenuRepository menuRepository;
+    private MenuGroupRepository menuGroupRepository;
+    private ProductRepository productRepository;
+    private ProfanityClient profanityClient;
 
     private MenuService testTarget;
 
     @BeforeEach
     void setUp() {
+        menuRepository = new InMemoryMenuRepository();
+        menuGroupRepository = new InMemoryMenuGroupRepository();
+        productRepository = new InMemoryProductRepository();
+        profanityClient = new InMemoryProfanityClient();
         testTarget = new MenuService(
             menuRepository,
             menuGroupRepository,

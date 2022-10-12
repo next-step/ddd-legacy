@@ -41,9 +41,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
-    private final OrderRepository orderRepository = new InMemoryOrderRepository();
-    private final MenuRepository menuRepository = new InMemoryMenuRepository();
-    private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
+    private OrderRepository orderRepository;
+    private MenuRepository menuRepository;
+    private OrderTableRepository orderTableRepository;
     @Mock
     private KitchenridersClient kitchenridersClient;
 
@@ -51,6 +51,9 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
+        orderRepository = new InMemoryOrderRepository();
+        menuRepository = new InMemoryMenuRepository();
+        orderTableRepository = new InMemoryOrderTableRepository();
         testTarget = new OrderService(
             orderRepository,
             menuRepository,

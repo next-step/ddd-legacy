@@ -25,13 +25,16 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class ProductServiceTest {
 
-    private final ProductRepository productRepository = new InMemoryProductRepository();
-    private final MenuRepository menuRepository = new InMemoryMenuRepository();
-    private final ProfanityClient purgomalumClient = new InMemoryProfanityClient();
+    private ProductRepository productRepository;
+    private MenuRepository menuRepository;
+    private ProfanityClient purgomalumClient;
     private ProductService testTarget;
 
     @BeforeEach
     void setUp() {
+        productRepository = new InMemoryProductRepository();
+        menuRepository = new InMemoryMenuRepository();
+        purgomalumClient = new InMemoryProfanityClient();
         testTarget = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
