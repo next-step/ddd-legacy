@@ -15,6 +15,7 @@ import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
@@ -104,10 +105,12 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
+                OrderType nullOrderType = null;
+
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
                 Order request = OrderFixture.request(
-                    null,
+                    nullOrderType,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
                     orderTable.getId()
                 );
@@ -121,10 +124,8 @@ class OrderServiceTest {
             @Test
             void test03() {
                 // given
-                Order request = OrderFixture.request(
-                    OrderType.EAT_IN,
-                    Collections.emptyList()
-                );
+                List<OrderLineItem> emptyOrderLineItems = Collections.emptyList();
+                Order request = OrderFixture.request(OrderType.EAT_IN, emptyOrderLineItems);
 
                 // when & then
                 assertThatIllegalArgumentException()
@@ -135,11 +136,12 @@ class OrderServiceTest {
             @Test
             void test04() {
                 // given
+                UUID unregisteredMenuId = UUID.randomUUID();
+
                 OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
-                    List.of(OrderLineItemFixture.request(UUID.randomUUID(), 1,
-                        BigDecimal.valueOf(6000))),
+                    List.of(OrderLineItemFixture.request(unregisteredMenuId, 1, BigDecimal.valueOf(6000))),
                     orderTable.getId()
                 );
 
@@ -152,11 +154,12 @@ class OrderServiceTest {
             @Test
             void test05() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU.get());
+                Menu noDisplayedMenu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU.get());
+
                 OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
-                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    List.of(OrderLineItemFixture.request(noDisplayedMenu.getId(), 1, noDisplayedMenu.getPrice())),
                     orderTable.getId()
                 );
 
@@ -169,11 +172,13 @@ class OrderServiceTest {
             @Test
             void test06() {
                 // given
+                UUID unregisteredOrderTableId = UUID.randomUUID();
+
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
-                    UUID.randomUUID()
+                    unregisteredOrderTableId
                 );
 
                 // when & then
@@ -181,16 +186,17 @@ class OrderServiceTest {
                     .isThrownBy(() -> testTarget.create(request));
             }
 
-            @DisplayName("매장 주문의 경우, 빈 테이블이 아닌 경우 주문을 등록 할 수 없다.")
+            @DisplayName("매장 주문의 경우, 빈 테이블에 주문을 등록 할 수 없다.")
             @Test
             void test07() {
                 // given
+                OrderTable emptyOrderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE.get());
+
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
-                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE.get());
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
-                    orderTable.getId()
+                    emptyOrderTable.getId()
                 );
 
                 // when & then
@@ -204,10 +210,11 @@ class OrderServiceTest {
                 // given
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
-                BigDecimal orderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
+                BigDecimal invalidOrderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
+
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
-                    List.of(OrderLineItemFixture.request(menu.getId(), 1, orderItemPrice)),
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, invalidOrderItemPrice)),
                     orderTable.getId()
                 );
 
@@ -388,9 +395,11 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
+                OrderType nullOrderType = null;
+
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
-                    null,
+                    nullOrderType,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
                     "delivery address"
                 );
@@ -404,9 +413,11 @@ class OrderServiceTest {
             @Test
             void test03() {
                 // given
+                List<OrderLineItem> emptyOrderLineItems = Collections.emptyList();
+
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
-                    Collections.emptyList(),
+                    emptyOrderLineItems,
                     "delivery address"
                 );
 
@@ -419,10 +430,11 @@ class OrderServiceTest {
             @Test
             void test04() {
                 // given
+                UUID unregisteredMenuId = UUID.randomUUID();
+
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
-                    List.of(OrderLineItemFixture.request(UUID.randomUUID(), 1,
-                        BigDecimal.valueOf(6000))),
+                    List.of(OrderLineItemFixture.request(unregisteredMenuId, 1, BigDecimal.valueOf(6000))),
                     "delivery address"
                 );
 
@@ -435,10 +447,12 @@ class OrderServiceTest {
             @Test
             void test05() {
                 // given
+                int invalidQuantity = -1;
+
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
-                    List.of(OrderLineItemFixture.request(menu.getId(), -1, menu.getPrice())),
+                    List.of(OrderLineItemFixture.request(menu.getId(), invalidQuantity, menu.getPrice())),
                     "delivery address"
                 );
 
@@ -451,10 +465,11 @@ class OrderServiceTest {
             @Test
             void test06() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU.get());
+                Menu noDisplayedMenu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU.get());
+
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
-                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
+                    List.of(OrderLineItemFixture.request(noDisplayedMenu.getId(), 1, noDisplayedMenu.getPrice())),
                     "delivery address"
                 );
 
@@ -466,13 +481,13 @@ class OrderServiceTest {
             @DisplayName("배달 주문의 경우, 배달 주소가 없는 경우 주문 할 수 없다.")
             @ParameterizedTest
             @NullAndEmptySource
-            void test07(String deliveryAddress) {
+            void test07(String invalidDeliveryAddress) {
                 // given
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
-                    deliveryAddress
+                    invalidDeliveryAddress
                 );
 
                 // when & then
@@ -485,10 +500,11 @@ class OrderServiceTest {
             void test08() {
                 // given
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
-                BigDecimal orderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
+                BigDecimal invalidOrderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
+
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
-                    List.of(OrderLineItemFixture.request(menu.getId(), 1, orderItemPrice)),
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, invalidOrderItemPrice)),
                     "delivery address"
                 );
 
@@ -720,9 +736,11 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
+                OrderType nullOrderType = null;
+
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
-                    null,
+                    nullOrderType,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()))
                 );
 
@@ -735,10 +753,8 @@ class OrderServiceTest {
             @Test
             void test03() {
                 // given
-                Order request = OrderFixture.request(
-                    OrderType.TAKEOUT,
-                    Collections.emptyList()
-                );
+                List<OrderLineItem> emptyOrderLineItems = Collections.emptyList();
+                Order request = OrderFixture.request(OrderType.TAKEOUT, emptyOrderLineItems);
 
                 // when & then
                 assertThatIllegalArgumentException()
@@ -749,9 +765,11 @@ class OrderServiceTest {
             @Test
             void test04() {
                 // given
+                UUID unregisteredMenuId = UUID.randomUUID();
+
                 Order request = OrderFixture.request(
                     OrderType.TAKEOUT,
-                    List.of(OrderLineItemFixture.request(UUID.randomUUID(), 1, BigDecimal.valueOf(6000)))
+                    List.of(OrderLineItemFixture.request(unregisteredMenuId, 1, BigDecimal.valueOf(6000)))
                 );
 
                 // when & then
@@ -763,10 +781,12 @@ class OrderServiceTest {
             @Test
             void test05() {
                 // given
+                int invalidQuantity = -1;
+
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     OrderType.TAKEOUT,
-                    List.of(OrderLineItemFixture.request(menu.getId(), -1, menu.getPrice()))
+                    List.of(OrderLineItemFixture.request(menu.getId(), invalidQuantity, menu.getPrice()))
                 );
 
                 // when & then
@@ -778,10 +798,11 @@ class OrderServiceTest {
             @Test
             void test06() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU.get());
+                Menu noDisplayedMenu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU.get());
+
                 Order request = OrderFixture.request(
                     OrderType.TAKEOUT,
-                    List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()))
+                    List.of(OrderLineItemFixture.request(noDisplayedMenu.getId(), 1, noDisplayedMenu.getPrice()))
                 );
 
                 // when & then
@@ -794,10 +815,11 @@ class OrderServiceTest {
             void test07() {
                 // given
                 Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
-                BigDecimal orderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
+                BigDecimal invalidOrderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
+
                 Order request = OrderFixture.request(
                     OrderType.TAKEOUT,
-                    List.of(OrderLineItemFixture.request(menu.getId(), 1, orderItemPrice))
+                    List.of(OrderLineItemFixture.request(menu.getId(), 1, invalidOrderItemPrice))
                 );
 
                 // when & then

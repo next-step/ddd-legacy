@@ -71,13 +71,7 @@ class MenuServiceTest {
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
             Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
 
-            Menu request = MenuFixture.request(
-                6000,
-                menuGroup.getId(),
-                "후라이드 치킨",
-                true,
-                MenuProductFixture.request(product.getId(), 1)
-            );
+            Menu request = MenuFixture.createMenuRequest(menuGroup.getId(), product.getId());
 
             // when
             Menu actual = testTarget.create(request);
@@ -102,13 +96,8 @@ class MenuServiceTest {
         @Test
         void test02() {
             // given
-            Menu request = MenuFixture.request(
-                -1,
-                MenuGroupFixture.CHICKEN.getId(),
-                "후라이드 치킨",
-                true,
-                MenuProductFixture.request(ProductFixture.FRIED_CHICKEN.get().getId(), 1)
-            );
+            int invalidPrice = -1;
+            Menu request = MenuFixture.createMenuRequest(invalidPrice);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -119,13 +108,10 @@ class MenuServiceTest {
         @Test
         void test03() {
             // given
-            Menu request = MenuFixture.request(
-                6000,
-                UUID.randomUUID(),
-                "후라이드 치킨",
-                true,
-                MenuProductFixture.request(ProductFixture.FRIED_CHICKEN.get().getId(), 1)
-            );
+            UUID unregisteredMenuGroupId = UUID.randomUUID();
+
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
+            Menu request = MenuFixture.createMenuRequest(unregisteredMenuGroupId, product.getId());
 
             // when & then
             assertThatExceptionOfType(NoSuchElementException.class)
@@ -136,13 +122,10 @@ class MenuServiceTest {
         @Test
         void test04() {
             // given
+            MenuProduct[] noMenuProducts = new MenuProduct[0];
+
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
-            Menu request = MenuFixture.request(
-                6000,
-                menuGroup.getId(),
-                "후라이드 치킨",
-                true
-            );
+            Menu request = MenuFixture.createMenuRequest(menuGroup.getId(), noMenuProducts);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -153,14 +136,10 @@ class MenuServiceTest {
         @Test
         void test05() {
             // given
+            UUID unregisteredProductId = UUID.randomUUID();
+
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
-            Menu request = MenuFixture.request(
-                6000,
-                menuGroup.getId(),
-                "후라이드 치킨",
-                true,
-                MenuProductFixture.request(UUID.randomUUID(), 1)
-            );
+            Menu request = MenuFixture.createMenuRequest(menuGroup.getId(), unregisteredProductId);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -171,14 +150,13 @@ class MenuServiceTest {
         @Test
         void test06() {
             // given
+            int invalidMenuProductQuantity = -1;
+
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
             Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
-            Menu request = MenuFixture.request(
-                6000,
+            Menu request = MenuFixture.createMenuRequest(
                 menuGroup.getId(),
-                "후라이드 치킨",
-                true,
-                MenuProductFixture.request(product.getId(), -1)
+                MenuProductFixture.request(product.getId(), invalidMenuProductQuantity)
             );
 
             // when & then
@@ -192,14 +170,9 @@ class MenuServiceTest {
             // given
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
             Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
-            BigDecimal menuPrice = product.getPrice().add(BigDecimal.ONE);
-            Menu request = MenuFixture.request(
-                menuPrice.intValue(),
-                menuGroup.getId(),
-                "후라이드 치킨",
-                true,
-                MenuProductFixture.request(product.getId(), 1)
-            );
+            int invalidMenuPrice = product.getPrice().add(BigDecimal.ONE).intValue();
+
+            Menu request = MenuFixture.createMenuRequest(invalidMenuPrice, menuGroup.getId(), product.getId());
 
             // when & then
             assertThatIllegalArgumentException()
@@ -210,18 +183,12 @@ class MenuServiceTest {
         @ParameterizedTest
         @ValueSource(strings = {"욕설이 포함됨", "비속어가 포함됨"})
         @NullAndEmptySource
-        void test08(String name) {
+        void test08(String invalidName) {
             // given
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
             Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
 
-            Menu request = MenuFixture.request(
-                6000,
-                menuGroup.getId(),
-                name,
-                true,
-                MenuProductFixture.request(product.getId(), 1)
-            );
+            Menu request = MenuFixture.createMenuRequest(invalidName, menuGroup.getId(), product.getId());
 
             // when
             assertThatIllegalArgumentException()
@@ -238,7 +205,7 @@ class MenuServiceTest {
         void test01() {
             // given
             Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
-            Menu request = MenuFixture.request(BigDecimal.valueOf(5000));
+            Menu request = MenuFixture.changePriceRequest(5000);
 
             // when
             Menu actual = testTarget.changePrice(menu.getId(), request);
@@ -250,10 +217,10 @@ class MenuServiceTest {
         @DisplayName("메뉴 가격은 0원 이상이어야 한다.")
         @ParameterizedTest
         @MethodSource("kitchenpos.application.MenuServiceTest#provideNegativeAndNullPrice")
-        void test02(BigDecimal price) {
+        void test02(BigDecimal invalidPrice) {
             // given
             Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
-            Menu request = MenuFixture.request(price);
+            Menu request = MenuFixture.changePriceRequest(invalidPrice);
 
             // when & then
             assertThatIllegalArgumentException()
@@ -264,20 +231,21 @@ class MenuServiceTest {
         @Test
         void test03() {
             // given
-            UUID menuId = UUID.randomUUID();
-            Menu request = MenuFixture.request(BigDecimal.valueOf(5000));
+            UUID unregisteredMenuId = UUID.randomUUID();
+            Menu request = MenuFixture.changePriceRequest(5000);
 
             // when & then
             assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> testTarget.changePrice(menuId, request));
+                .isThrownBy(() -> testTarget.changePrice(unregisteredMenuId, request));
         }
 
         @DisplayName("메뉴의 가격은 메뉴 상품 가격의 합보다 클 수 없다.")
         @Test
         void test04() {
             // given
+            int invalidPrice = 7000;
             Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
-            Menu request = MenuFixture.request(BigDecimal.valueOf(7000));
+            Menu request = MenuFixture.changePriceRequest(invalidPrice);
 
             // when & then
             assertThatIllegalArgumentException()

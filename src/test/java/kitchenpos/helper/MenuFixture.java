@@ -72,7 +72,7 @@ public class MenuFixture {
         );
     }
 
-    public static Menu request(
+    public static Menu createMenuRequest(
         int price,
         UUID menuGroupId,
         String name,
@@ -88,9 +88,55 @@ public class MenuFixture {
         return request;
     }
 
-    public static Menu request(BigDecimal price) {
+    public static Menu createMenuRequest(int price, UUID menuGroupId, UUID productId) {
+        return createMenuRequest(
+            price,
+            menuGroupId,
+            "후라이드 치킨",
+            true,
+            MenuProductFixture.request(productId, 1)
+        );
+    }
+
+    public static Menu createMenuRequest(UUID menuGroupId, UUID productId) {
+        return createMenuRequest(6000, menuGroupId, productId);
+    }
+
+    public static Menu createMenuRequest(int price) {
+        return createMenuRequest(
+            price,
+            MenuGroupFixture.CHICKEN.getId(),
+            ProductFixture.FRIED_CHICKEN.get().getId()
+        );
+    }
+
+    public static Menu createMenuRequest(String name, UUID menuGroupId, UUID productId) {
+        return createMenuRequest(
+            6000,
+            menuGroupId,
+            name,
+            true,
+            MenuProductFixture.request(productId, 1)
+        );
+    }
+
+    public static Menu createMenuRequest(UUID menuGroupId, MenuProduct... menuProducts) {
+        return createMenuRequest(
+            6000,
+            menuGroupId,
+            "후라이드 치킨",
+            true,
+            menuProducts
+        );
+    }
+
+    public static Menu changePriceRequest(BigDecimal price) {
         var request = new Menu();
         request.setPrice(price);
         return request;
+    }
+
+    public static Menu changePriceRequest(int price) {
+        return changePriceRequest(BigDecimal.valueOf(price));
     }
 }
