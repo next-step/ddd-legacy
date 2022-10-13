@@ -69,7 +69,7 @@ class MenuServiceTest {
         void test01() {
             // given
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
-            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN);
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
 
             Menu request = MenuFixture.request(
                 6000,
@@ -94,7 +94,7 @@ class MenuServiceTest {
                     .matches(menuProduct -> menuProduct.getQuantity() == 1)
                     .extracting(MenuProduct::getProduct)
                     .extracting(Product::getId)
-                    .matches(productId -> productId.equals(ProductFixture.FRIED_CHICKEN.getId()))
+                    .matches(productId -> productId.equals(product.getId()))
             );
         }
 
@@ -107,7 +107,7 @@ class MenuServiceTest {
                 MenuGroupFixture.CHICKEN.getId(),
                 "후라이드 치킨",
                 true,
-                MenuProductFixture.request(ProductFixture.FRIED_CHICKEN.getId(), 1)
+                MenuProductFixture.request(ProductFixture.FRIED_CHICKEN.get().getId(), 1)
             );
 
             // when & then
@@ -124,7 +124,7 @@ class MenuServiceTest {
                 UUID.randomUUID(),
                 "후라이드 치킨",
                 true,
-                MenuProductFixture.request(ProductFixture.FRIED_CHICKEN.getId(), 1)
+                MenuProductFixture.request(ProductFixture.FRIED_CHICKEN.get().getId(), 1)
             );
 
             // when & then
@@ -172,7 +172,7 @@ class MenuServiceTest {
         void test06() {
             // given
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
-            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN);
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
             Menu request = MenuFixture.request(
                 6000,
                 menuGroup.getId(),
@@ -191,7 +191,7 @@ class MenuServiceTest {
         void test07() {
             // given
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
-            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN);
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
             BigDecimal menuPrice = product.getPrice().add(BigDecimal.ONE);
             Menu request = MenuFixture.request(
                 menuPrice.intValue(),
@@ -213,7 +213,7 @@ class MenuServiceTest {
         void test08(String name) {
             // given
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.CHICKEN);
-            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN);
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
 
             Menu request = MenuFixture.request(
                 6000,
@@ -237,7 +237,7 @@ class MenuServiceTest {
         @Test
         void test01() {
             // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
             Menu request = MenuFixture.request(BigDecimal.valueOf(5000));
 
             // when
@@ -252,7 +252,7 @@ class MenuServiceTest {
         @MethodSource("kitchenpos.application.MenuServiceTest#provideNegativeAndNullPrice")
         void test02(BigDecimal price) {
             // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
             Menu request = MenuFixture.request(price);
 
             // when & then
@@ -276,7 +276,7 @@ class MenuServiceTest {
         @Test
         void test04() {
             // given
-            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+            Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
             Menu request = MenuFixture.request(BigDecimal.valueOf(7000));
 
             // when & then
@@ -293,7 +293,7 @@ class MenuServiceTest {
         @Test
         void test01() {
             // given
-            Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU);
+            Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU.get());
 
             // when
             Menu actual = testTarget.display(menu.getId());
@@ -317,7 +317,7 @@ class MenuServiceTest {
         @Test
         void test03() {
             // given
-            Menu menu = menuRepository.save(MenuFixture.PRICE_EXCEED_MENU);
+            Menu menu = menuRepository.save(MenuFixture.PRICE_EXCEED_MENU.get());
 
             // when & then
             assertThatIllegalStateException()
@@ -333,7 +333,7 @@ class MenuServiceTest {
         @Test
         void test01() {
             // given
-            Menu menu = menuRepository.save(MenuFixture.DISPLAYED_MENU);
+            Menu menu = menuRepository.save(MenuFixture.DISPLAYED_MENU.get());
 
             // when
             Menu actual = testTarget.hide(menu.getId());
@@ -362,8 +362,8 @@ class MenuServiceTest {
         @Test
         void test01() {
             // given
-            Menu menu1 = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-            Menu menu2 = menuRepository.save(MenuFixture.TWO_FRIED_CHICKEN);
+            Menu menu1 = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
+            Menu menu2 = menuRepository.save(MenuFixture.TWO_FRIED_CHICKEN.get());
 
             // when
             List<Menu> actual = testTarget.findAll();

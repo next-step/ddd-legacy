@@ -74,8 +74,8 @@ class OrderServiceTest {
             @Test
             void test01() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
@@ -104,8 +104,8 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
                 Order request = OrderFixture.request(
                     null,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
@@ -135,7 +135,7 @@ class OrderServiceTest {
             @Test
             void test04() {
                 // given
-                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
                     List.of(OrderLineItemFixture.request(UUID.randomUUID(), 1,
@@ -152,8 +152,8 @@ class OrderServiceTest {
             @Test
             void test05() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU);
-                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU.get());
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
@@ -169,7 +169,7 @@ class OrderServiceTest {
             @Test
             void test06() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
@@ -185,8 +185,8 @@ class OrderServiceTest {
             @Test
             void test07() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE.get());
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
@@ -202,8 +202,8 @@ class OrderServiceTest {
             @Test
             void test08() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
                 BigDecimal orderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
                 Order request = OrderFixture.request(
                     OrderType.EAT_IN,
@@ -227,7 +227,7 @@ class OrderServiceTest {
                 // given
                 Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.WAITING,
-                    OrderTableFixture.OCCUPIED_TABLE
+                    OrderTableFixture.OCCUPIED_TABLE.get()
                 ));
 
                 // when
@@ -244,7 +244,7 @@ class OrderServiceTest {
                 // given
                 Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.ACCEPTED,
-                    OrderTableFixture.OCCUPIED_TABLE
+                    OrderTableFixture.OCCUPIED_TABLE.get()
                 ));
 
                 // when & then
@@ -263,7 +263,7 @@ class OrderServiceTest {
                 // given
                 Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.ACCEPTED,
-                    OrderTableFixture.OCCUPIED_TABLE
+                    OrderTableFixture.OCCUPIED_TABLE.get()
                 ));
 
                 // when
@@ -280,7 +280,7 @@ class OrderServiceTest {
                 // given
                 Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.WAITING,
-                    OrderTableFixture.OCCUPIED_TABLE
+                    OrderTableFixture.OCCUPIED_TABLE.get()
                 ));
 
                 // when & then
@@ -299,7 +299,7 @@ class OrderServiceTest {
                 // given
                 Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.SERVED,
-                    OrderTableFixture.OCCUPIED_TABLE
+                    OrderTableFixture.OCCUPIED_TABLE.get()
                 ));
 
                 // when & then
@@ -318,7 +318,7 @@ class OrderServiceTest {
                 // given
                 Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.SERVED,
-                    OrderTableFixture.OCCUPIED_TABLE
+                    OrderTableFixture.OCCUPIED_TABLE.get()
                 ));
 
                 // when
@@ -338,7 +338,7 @@ class OrderServiceTest {
                 // given
                 Order order = orderRepository.save(OrderFixture.eatInOrder(
                     OrderStatus.ACCEPTED,
-                    OrderTableFixture.OCCUPIED_TABLE
+                    OrderTableFixture.OCCUPIED_TABLE.get()
                 ));
 
                 // when & then
@@ -360,7 +360,7 @@ class OrderServiceTest {
             @Test
             void test01() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
@@ -388,7 +388,7 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     null,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
@@ -435,7 +435,7 @@ class OrderServiceTest {
             @Test
             void test05() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
                     List.of(OrderLineItemFixture.request(menu.getId(), -1, menu.getPrice())),
@@ -451,7 +451,7 @@ class OrderServiceTest {
             @Test
             void test06() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU);
+                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU.get());
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
@@ -468,7 +468,7 @@ class OrderServiceTest {
             @NullAndEmptySource
             void test07(String deliveryAddress) {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice())),
@@ -484,7 +484,7 @@ class OrderServiceTest {
             @Test
             void test08() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 BigDecimal orderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
                 Order request = OrderFixture.request(
                     OrderType.DELIVERY,
@@ -694,7 +694,7 @@ class OrderServiceTest {
             @Test
             void test01() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     OrderType.TAKEOUT,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()))
@@ -720,7 +720,7 @@ class OrderServiceTest {
             @Test
             void test02() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     null,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()))
@@ -763,7 +763,7 @@ class OrderServiceTest {
             @Test
             void test05() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 Order request = OrderFixture.request(
                     OrderType.TAKEOUT,
                     List.of(OrderLineItemFixture.request(menu.getId(), -1, menu.getPrice()))
@@ -778,7 +778,7 @@ class OrderServiceTest {
             @Test
             void test06() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU);
+                Menu menu = menuRepository.save(MenuFixture.NO_DISPLAYED_MENU.get());
                 Order request = OrderFixture.request(
                     OrderType.TAKEOUT,
                     List.of(OrderLineItemFixture.request(menu.getId(), 1, menu.getPrice()))
@@ -793,7 +793,7 @@ class OrderServiceTest {
             @Test
             void test07() {
                 // given
-                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
+                Menu menu = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN.get());
                 BigDecimal orderItemPrice = menu.getPrice().add(BigDecimal.valueOf(1000));
                 Order request = OrderFixture.request(
                     OrderType.TAKEOUT,
@@ -924,7 +924,7 @@ class OrderServiceTest {
             // given
             Order order1 = orderRepository.save(OrderFixture.eatInOrder(
                 OrderStatus.SERVED,
-                OrderTableFixture.OCCUPIED_TABLE
+                OrderTableFixture.OCCUPIED_TABLE.get()
             ));
             Order order2 = orderRepository.save(OrderFixture.deliveryOrder(
                 OrderStatus.DELIVERING,

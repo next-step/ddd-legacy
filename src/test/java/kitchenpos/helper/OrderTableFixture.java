@@ -1,13 +1,14 @@
 package kitchenpos.helper;
 
 import java.util.UUID;
+import java.util.function.Supplier;
 import kitchenpos.domain.OrderTable;
 
 public class OrderTableFixture {
 
-    public static final OrderTable OCCUPIED_TABLE = create("1번 테이블", 1, true);
+    public static final Supplier<OrderTable> OCCUPIED_TABLE = () -> create("1번 테이블", 1, true);
 
-    public static final OrderTable EMPTY_TABLE = create("2번 테이블", 0, false);
+    public static final Supplier<OrderTable> EMPTY_TABLE = () -> create("2번 테이블", 0, false);
 
     private static OrderTable create(String name, int numberOfGuests, boolean occupied) {
         var orderTable = new OrderTable();

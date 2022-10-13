@@ -1,15 +1,17 @@
 package kitchenpos.helper;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 
 public class MenuFixture {
 
-    public static final Menu ONE_FRIED_CHICKEN = create(
+    public static final Supplier<Menu> ONE_FRIED_CHICKEN = () -> menu(
         "후라이드 치킨 한마리",
         6000,
         true,
@@ -17,7 +19,7 @@ public class MenuFixture {
         List.of(MenuProductFixture.ONE_FRIED_CHICKEN)
     );
 
-    public static final Menu TWO_FRIED_CHICKEN = create(
+    public static final Supplier<Menu> TWO_FRIED_CHICKEN = () -> menu(
         "후라이드 치킨 두마리",
         9000,
         true,
@@ -25,7 +27,7 @@ public class MenuFixture {
         List.of(MenuProductFixture.TWO_FRIED_CHICKEN)
     );
 
-    public static final Menu NO_DISPLAYED_MENU = create(
+    public static final Supplier<Menu> NO_DISPLAYED_MENU = () -> menu(
         "양념 치킨 한마리",
         6000,
         false,
@@ -33,9 +35,9 @@ public class MenuFixture {
         List.of(MenuProductFixture.ONE_HOT_SPICY_CHICKEN)
     );
 
-    public static final Menu DISPLAYED_MENU = ONE_FRIED_CHICKEN;
+    public static final Supplier<Menu> DISPLAYED_MENU = ONE_FRIED_CHICKEN;
 
-    public static final Menu PRICE_EXCEED_MENU = create(
+    public static final Supplier<Menu> PRICE_EXCEED_MENU = () -> menu(
         "양념 치킨 한마리",
         7000,
         false,
@@ -43,7 +45,7 @@ public class MenuFixture {
         List.of(MenuProductFixture.ONE_HOT_SPICY_CHICKEN)
     );
 
-    private static Menu create(
+    private static Menu menu(
         String name,
         int price,
         boolean displayed,
@@ -58,6 +60,16 @@ public class MenuFixture {
         menu.setMenuGroup(menuGroup);
         menu.setMenuProducts(menuProducts);
         return menu;
+    }
+
+    public static Menu menu(MenuProduct... menuProducts) {
+        return menu(
+            "후라이드 치킨",
+            6000,
+            true,
+            MenuGroupFixture.CHICKEN,
+            Arrays.asList(menuProducts)
+        );
     }
 
     public static Menu request(

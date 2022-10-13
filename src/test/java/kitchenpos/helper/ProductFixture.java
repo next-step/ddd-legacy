@@ -2,15 +2,16 @@ package kitchenpos.helper;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.function.Supplier;
 import kitchenpos.domain.Product;
 
 public class ProductFixture {
 
-    public static final Product FRIED_CHICKEN = create("후라이드 치킨", 6000);
+    public static final Supplier<Product> FRIED_CHICKEN = () -> product("후라이드 치킨", 6000);
 
-    public static final Product HOT_SPICY_CHICKEN = create("양념 치킨", 6000);
+    public static final Supplier<Product> HOT_SPICY_CHICKEN = () -> product("양념 치킨", 6000);
 
-    private static Product create(String name, int price) {
+    private static Product product(String name, int price) {
         var product = new Product();
         product.setId(UUID.randomUUID());
         product.setName(name);

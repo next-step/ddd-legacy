@@ -10,7 +10,7 @@ public class OrderLineItemFixture {
 
     public static OrderLineItem create() {
         var orderLineItem = new OrderLineItem();
-        orderLineItem.setMenu(MenuFixture.ONE_FRIED_CHICKEN);
+        orderLineItem.setMenu(MenuFixture.ONE_FRIED_CHICKEN.get());
         orderLineItem.setQuantity(DEFAULT_ORDER_LINE_ITEM_QUANTITY);
         return orderLineItem;
     }

@@ -78,7 +78,7 @@ class OrderTableServiceTest {
         @Test
         void test01() {
             // given
-            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE.get());
 
             // when
             OrderTable actual = testTarget.sit(orderTable.getId());
@@ -96,7 +96,7 @@ class OrderTableServiceTest {
         @Test
         void test01() {
             // given
-            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
 
             // when
             OrderTable actual = testTarget.clear(orderTable.getId());
@@ -112,7 +112,7 @@ class OrderTableServiceTest {
         @Test
         void test02() {
             // given
-            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
             orderRepository.save(OrderFixture.eatInOrder(OrderStatus.WAITING, orderTable));
 
             // when & then
@@ -129,7 +129,7 @@ class OrderTableServiceTest {
         @Test
         void test01() {
             // given
-            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
             OrderTable request = OrderTableFixture.request(orderTable.getNumberOfGuests() + 1);
 
             // when
@@ -155,7 +155,7 @@ class OrderTableServiceTest {
         void test03() {
             // given
             OrderTable request = OrderTableFixture.request(1);
-            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE.get());
 
             // when & then
             assertThatIllegalStateException()
@@ -171,8 +171,8 @@ class OrderTableServiceTest {
         @Test
         void test01() {
             // given
-            OrderTable orderTable1 = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE);
-            OrderTable orderTable2 = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE);
+            OrderTable orderTable1 = orderTableRepository.save(OrderTableFixture.OCCUPIED_TABLE.get());
+            OrderTable orderTable2 = orderTableRepository.save(OrderTableFixture.EMPTY_TABLE.get());
 
             // when
             List<OrderTable> actual = testTarget.findAll();

@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import static kitchenpos.helper.MenuFixture.menu;
+import static kitchenpos.helper.MenuProductFixture.menuProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -13,7 +15,6 @@ import kitchenpos.domain.ProfanityClient;
 import kitchenpos.helper.InMemoryMenuRepository;
 import kitchenpos.helper.InMemoryProductRepository;
 import kitchenpos.helper.InMemoryProfanityClient;
-import kitchenpos.helper.MenuFixture;
 import kitchenpos.helper.ProductFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -92,7 +93,7 @@ class ProductServiceTest {
         @Test
         void test01() {
             // given
-            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN);
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
             Product request = ProductFixture.request(6000);
 
             // when
@@ -107,7 +108,7 @@ class ProductServiceTest {
         @Test
         void test02() {
             // given
-            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN);
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
             Product request = ProductFixture.request(-1);
 
             // when & then
@@ -119,9 +120,9 @@ class ProductServiceTest {
         @Test
         void test03() {
             // given
-            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN);
-            Menu menu1 = menuRepository.save(MenuFixture.ONE_FRIED_CHICKEN);
-            Menu menu2 = menuRepository.save(MenuFixture.TWO_FRIED_CHICKEN);
+            Product product = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
+            Menu menu1 = menuRepository.save(menu(menuProduct(product, 1)));
+            Menu menu2 = menuRepository.save(menu(menuProduct(product, 2)));
 
             Product request = ProductFixture.request(4500);
 
@@ -144,8 +145,8 @@ class ProductServiceTest {
         @Test
         void test01() {
             // given
-            Product product1 = productRepository.save(ProductFixture.FRIED_CHICKEN);
-            Product product2 = productRepository.save(ProductFixture.HOT_SPICY_CHICKEN);
+            Product product1 = productRepository.save(ProductFixture.FRIED_CHICKEN.get());
+            Product product2 = productRepository.save(ProductFixture.HOT_SPICY_CHICKEN.get());
 
             // when
             List<Product> actual = testTarget.findAll();
