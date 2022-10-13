@@ -54,7 +54,6 @@ public class Menu {
                 final List<MenuProduct> menuProducts, final UUID menuGroupId) {
         this.name = name;
         this.price = price;
-        this.menuGroup = menuGroup;
         this.displayed = displayed;
         this.menuProducts = menuProducts;
         this.menuGroupId = menuGroupId;
