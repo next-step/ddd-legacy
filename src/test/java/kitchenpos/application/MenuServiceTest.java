@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.IntegrationTest;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
 import org.junit.jupiter.api.DisplayName;
@@ -7,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.math.BigDecimal;
@@ -20,11 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Sql({"/truncate-all.sql", "/insert-menu-integration.sql"})
-@SpringBootTest
-class MenuServiceTest {
-    @Autowired
-    private MenuService sut;
-
+class MenuServiceTest extends IntegrationTest {
     @DisplayName("매뉴를 생성할 수 있다.")
     @Test
     void create() {
@@ -38,7 +33,7 @@ class MenuServiceTest {
 
         final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
-        final Menu response = sut.create(request);
+        final Menu response = menuService.create(request);
 
         assertThat(response.getName()).isEqualTo(name);
     }
@@ -56,7 +51,7 @@ class MenuServiceTest {
 
         final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> menuService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -73,7 +68,7 @@ class MenuServiceTest {
 
         final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> menuService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -91,7 +86,7 @@ class MenuServiceTest {
 
         final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> menuService.create(request))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -109,7 +104,7 @@ class MenuServiceTest {
 
         final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> menuService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -126,7 +121,7 @@ class MenuServiceTest {
 
         final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> menuService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -143,11 +138,11 @@ class MenuServiceTest {
 
         final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> menuService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    
+
     @DisplayName("메뉴 이름은 비어있을 수 없다.")
     @NullSource
     @ParameterizedTest
@@ -161,11 +156,11 @@ class MenuServiceTest {
 
         final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> menuService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    
+
     @DisplayName("메뉴 이름은 비속어를 포함할 수 없다.")
     @ParameterizedTest
     @ValueSource(strings = "fuck, goddamn")
@@ -179,7 +174,7 @@ class MenuServiceTest {
 
         final Menu request = new Menu(name, price, displayed, menuProducts, menuGroupId);
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> menuService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -189,7 +184,7 @@ class MenuServiceTest {
         final UUID menuId = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
         final Menu request = new Menu(new BigDecimal("14000"));
 
-        final Menu response = sut.changePrice(menuId, request);
+        final Menu response = menuService.changePrice(menuId, request);
 
         assertThat(response.getPrice()).isEqualTo(new BigDecimal("14000"));
     }
@@ -200,7 +195,7 @@ class MenuServiceTest {
         final UUID menuId = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
         final Menu request = new Menu(new BigDecimal("20000"));
 
-        assertThatThrownBy(() -> sut.changePrice(menuId, request))
+        assertThatThrownBy(() -> menuService.changePrice(menuId, request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -209,7 +204,7 @@ class MenuServiceTest {
     void display() {
         final UUID hideMenuId = UUID.fromString("e1254913-8608-46aa-b23a-a07c1dcbc648");
 
-        final Menu response = sut.display(hideMenuId);
+        final Menu response = menuService.display(hideMenuId);
 
         assertThat(response.isDisplayed()).isTrue();
     }
@@ -219,7 +214,7 @@ class MenuServiceTest {
     void hide() {
         final UUID menuId = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
 
-        final Menu response = sut.hide(menuId);
+        final Menu response = menuService.hide(menuId);
 
         assertThat(response.isDisplayed()).isFalse();
     }
@@ -227,7 +222,7 @@ class MenuServiceTest {
     @DisplayName("상품을 여러개 조회할 수 있다.")
     @Test
     void findAll() {
-        final List<Menu> response = sut.findAll();
+        final List<Menu> response = menuService.findAll();
 
         assertThat(response).hasSize(2);
     }

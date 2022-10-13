@@ -1,11 +1,11 @@
 package kitchenpos.application;
 
+import kitchenpos.IntegrationTest;
 import kitchenpos.domain.OrderTable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -19,9 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 @Sql({"/truncate-all.sql", "/insert-order-table-integration.sql"})
 @SpringBootTest
-class OrderTableServiceTest {
-    @Autowired
-    private OrderTableService sut;
+class OrderTableServiceTest extends IntegrationTest {
 
     @DisplayName("주문 테이블을 생성할 수 있다.")
     @Test
@@ -29,7 +27,7 @@ class OrderTableServiceTest {
         final String name = "주문-테이블-이름";
         final OrderTable request = new OrderTable(name);
 
-        final OrderTable response = sut.create(request);
+        final OrderTable response = orderTableService.create(request);
 
         assertAll(
                 () -> assertThat(response.getName()).isEqualTo(name),
@@ -43,7 +41,7 @@ class OrderTableServiceTest {
     void createWithEmptyName(final String name) {
         final OrderTable request = new OrderTable(name);
 
-        assertThatThrownBy( () -> sut.create(request))
+        assertThatThrownBy(() -> orderTableService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -52,7 +50,7 @@ class OrderTableServiceTest {
     void sit() {
         final UUID orderTableId = UUID.fromString("8d710043-29b6-420e-8452-233f5a035520");
 
-        final OrderTable response = sut.sit(orderTableId);
+        final OrderTable response = orderTableService.sit(orderTableId);
 
         assertThat(response.isOccupied()).isTrue();
     }
@@ -62,7 +60,7 @@ class OrderTableServiceTest {
     void clear() {
         final UUID orderTableId = UUID.fromString("8d710043-29b6-420e-8452-233f5a035521");
 
-        final OrderTable response = sut.clear(orderTableId);
+        final OrderTable response = orderTableService.clear(orderTableId);
 
         assertThat(response.isOccupied()).isFalse();
     }
@@ -72,7 +70,7 @@ class OrderTableServiceTest {
     void clearWithNotCompleted() {
         final UUID orderTableId = UUID.fromString("8d710043-29b6-420e-8452-233f5a035522");
 
-        assertThatThrownBy(() -> sut.clear(orderTableId))
+        assertThatThrownBy(() -> orderTableService.clear(orderTableId))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -82,7 +80,7 @@ class OrderTableServiceTest {
         final UUID orderTableId = UUID.fromString("8d710043-29b6-420e-8452-233f5a035521");
         final OrderTable request = new OrderTable(5);
 
-        final OrderTable response = sut.changeNumberOfGuests(orderTableId, request);
+        final OrderTable response = orderTableService.changeNumberOfGuests(orderTableId, request);
 
         assertThat(response.getNumberOfGuests()).isEqualTo(5);
     }
@@ -93,7 +91,7 @@ class OrderTableServiceTest {
         final UUID orderTableId = UUID.fromString("8d710043-29b6-420e-8452-233f5a035521");
         final OrderTable request = new OrderTable(-1);
 
-        assertThatThrownBy(() -> sut.changeNumberOfGuests(orderTableId, request))
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -103,7 +101,7 @@ class OrderTableServiceTest {
         final UUID orderTableId = UUID.fromString("8d710043-29b6-420e-8452-233f5a035523");
         final OrderTable request = new OrderTable(5);
 
-        assertThatThrownBy(() -> sut.changeNumberOfGuests(orderTableId, request))
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -113,16 +111,15 @@ class OrderTableServiceTest {
         final UUID orderTableId = UUID.fromString("8d710043-29b6-420e-8452-233f5a035520");
         final OrderTable request = new OrderTable(5);
 
-        assertThatThrownBy(() -> sut.changeNumberOfGuests(orderTableId, request))
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
                 .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("주문테이블을 여러개 조회할 수 있다.")
     @Test
     void findAll() {
-        final List<OrderTable> response = sut.findAll();
+        final List<OrderTable> response = orderTableService.findAll();
 
         assertThat(response).hasSize(3);
     }
-
 }

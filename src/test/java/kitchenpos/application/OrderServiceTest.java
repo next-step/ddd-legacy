@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.IntegrationTest;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderType;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
 
@@ -29,10 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Sql({"/truncate-all.sql", "/insert-order-integration.sql"})
 @SpringBootTest
-class OrderServiceTest {
-    @Autowired
-    private OrderService sut;
-
+class OrderServiceTest extends IntegrationTest {
     @DisplayName("주문을 생성할 수 있다.")
     @Test
     void create() {
@@ -42,7 +39,7 @@ class OrderServiceTest {
         final String deliveryAddress = "주소";
         final Order request = new Order(type, orderLineItems, deliveryAddress, "8d710043-29b6-420e-8452-233f5a035520");
 
-        final Order response = sut.create(request);
+        final Order response = orderService.create(request);
 
         assertThat(response).isNotNull();
     }
@@ -56,7 +53,7 @@ class OrderServiceTest {
         final String deliveryAddress = "주소";
         final Order request = new Order(type, orderLineItems, deliveryAddress, "8d710043-29b6-420e-8452-233f5a035520");
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -68,7 +65,7 @@ class OrderServiceTest {
         final String deliveryAddress = "주소";
         final Order request = new Order(type, orderLineItems, deliveryAddress, "8d710043-29b6-420e-8452-233f5a035520");
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -82,7 +79,7 @@ class OrderServiceTest {
         final String deliveryAddress = "주소";
         final Order request = new Order(type, orderLineItems, deliveryAddress, "8d710043-29b6-420e-8452-233f5a035520");
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -95,7 +92,7 @@ class OrderServiceTest {
         final String deliveryAddress = "주소";
         final Order request = new Order(type, orderLineItems, deliveryAddress, "8d710043-29b6-420e-8452-233f5a035520");
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -108,7 +105,7 @@ class OrderServiceTest {
         final String deliveryAddress = "주소";
         final Order request = new Order(type, orderLineItems, deliveryAddress, "8d710043-29b6-420e-8452-233f5a035520");
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -121,7 +118,7 @@ class OrderServiceTest {
         final String deliveryAddress = "주소";
         final Order request = new Order(type, orderLineItems, deliveryAddress, "8d710043-29b6-420e-8452-233f5a035520");
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -134,7 +131,7 @@ class OrderServiceTest {
         final String deliveryAddress = null;
         final Order request = new Order(type, orderLineItems, deliveryAddress, "8d710043-29b6-420e-8452-233f5a035520");
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -147,7 +144,7 @@ class OrderServiceTest {
         final String deliveryAddress = "주소";
         final Order request = new Order(type, orderLineItems, deliveryAddress, "8d710043-29b6-420e-8452-233f5a035521");
 
-        assertThatThrownBy(() -> sut.create(request))
+        assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -156,7 +153,7 @@ class OrderServiceTest {
     void accept() {
         final UUID orderId = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8");
 
-        final Order response = sut.accept(orderId);
+        final Order response = orderService.accept(orderId);
 
         assertThat(response.getStatus()).isEqualTo(ACCEPTED);
     }
@@ -166,7 +163,7 @@ class OrderServiceTest {
     void acceptWithNoOrder() {
         final UUID orderId = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd9");
 
-        assertThatThrownBy(() -> sut.accept(orderId))
+        assertThatThrownBy(() -> orderService.accept(orderId))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -175,7 +172,7 @@ class OrderServiceTest {
     void serve() {
         final UUID orderId = UUID.fromString("79d78f38-3bff-457c-bb72-26319c985fd8");
 
-        final Order response = sut.serve(orderId);
+        final Order response = orderService.serve(orderId);
 
         assertThat(response.getStatus()).isEqualTo(SERVED);
     }
@@ -185,7 +182,7 @@ class OrderServiceTest {
     void acceptWithNoAcceptedOrder() {
         final UUID orderId = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd9");
 
-        assertThatThrownBy(() -> sut.serve(orderId))
+        assertThatThrownBy(() -> orderService.serve(orderId))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
@@ -194,7 +191,7 @@ class OrderServiceTest {
     void startDelivery() {
         final UUID orderId = UUID.fromString("89d78f38-3bff-457c-bb72-26319c985fd8");
 
-        final Order response = sut.startDelivery(orderId);
+        final Order response = orderService.startDelivery(orderId);
 
         assertThat(response.getStatus()).isEqualTo(DELIVERING);
     }
@@ -204,7 +201,7 @@ class OrderServiceTest {
     void startDeliveryWithNoDelivery() {
         final UUID orderId = UUID.fromString("79d78f38-3bff-457c-bb72-26319c985fd8");
 
-        assertThatThrownBy(() -> sut.startDelivery(orderId))
+        assertThatThrownBy(() -> orderService.startDelivery(orderId))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -213,7 +210,7 @@ class OrderServiceTest {
     void startDeliveryWithNoServedOrder() {
         final UUID orderId = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8");
 
-        assertThatThrownBy(() -> sut.startDelivery(orderId))
+        assertThatThrownBy(() -> orderService.startDelivery(orderId))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -222,7 +219,7 @@ class OrderServiceTest {
     void completeDelivery() {
         final UUID orderId = UUID.fromString("99d78f38-3bff-457c-bb72-26319c985fd8");
 
-        final Order response = sut.completeDelivery(orderId);
+        final Order response = orderService.completeDelivery(orderId);
 
         assertThat(response.getStatus()).isEqualTo(DELIVERED);
     }
@@ -232,7 +229,7 @@ class OrderServiceTest {
     void completeDeliveryWithNoDelivering() {
         final UUID orderId = UUID.fromString("69d78f38-3bff-457c-bb72-26319c985fd8");
 
-        assertThatThrownBy(() -> sut.completeDelivery(orderId))
+        assertThatThrownBy(() -> orderService.completeDelivery(orderId))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -241,7 +238,7 @@ class OrderServiceTest {
     void complete() {
         final UUID orderId = UUID.fromString("09d78f38-3bff-457c-bb72-26319c985fd8");
 
-        final Order response = sut.complete(orderId);
+        final Order response = orderService.complete(orderId);
 
         assertThat(response.getStatus()).isEqualTo(COMPLETED);
     }
@@ -251,7 +248,7 @@ class OrderServiceTest {
     void completeWithNoDelivered() {
         final UUID orderId = UUID.fromString("99d78f38-3bff-457c-bb72-26319c985fd8");
 
-        assertThatThrownBy(() -> sut.complete(orderId))
+        assertThatThrownBy(() -> orderService.complete(orderId))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -261,7 +258,7 @@ class OrderServiceTest {
     void completeWithNoServed(final String strId) {
         final UUID orderId = UUID.fromString(strId);
 
-        assertThatThrownBy(() -> sut.complete(orderId))
+        assertThatThrownBy(() -> orderService.complete(orderId))
                 .isInstanceOf(IllegalStateException.class);
     }
 
@@ -270,7 +267,7 @@ class OrderServiceTest {
     void completeWith() {
         final UUID orderId = UUID.fromString("39d78f38-3bff-457c-bb72-26319c985fd8");
 
-        final Order response = sut.complete(orderId);
+        final Order response = orderService.complete(orderId);
 
         assertThat(response.getOrderTable().isOccupied()).isFalse();
         assertThat(response.getOrderTable().getNumberOfGuests()).isEqualTo(0);
@@ -279,7 +276,7 @@ class OrderServiceTest {
     @DisplayName("주문을 여러개 조회할 수 있다.")
     @Test
     void findAll() {
-        final List<Order> response = sut.findAll();
+        final List<Order> response = orderService.findAll();
 
         assertThat(response).hasSize(8);
     }
