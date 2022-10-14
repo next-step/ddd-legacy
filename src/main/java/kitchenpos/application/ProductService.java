@@ -1,30 +1,34 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
-import kitchenpos.infra.PurgomalumClient;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
+import kitchenpos.infra.ProfanityDetectClient;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ProductService {
+
     private final ProductRepository productRepository;
     private final MenuRepository menuRepository;
-    private final PurgomalumClient purgomalumClient;
+    private final ProfanityDetectClient profanityDetectClient;
 
     public ProductService(
         final ProductRepository productRepository,
         final MenuRepository menuRepository,
-        final PurgomalumClient purgomalumClient
+        final ProfanityDetectClient profanityDetectClient
     ) {
         this.productRepository = productRepository;
         this.menuRepository = menuRepository;
-        this.purgomalumClient = purgomalumClient;
+        this.profanityDetectClient = profanityDetectClient;
     }
 
     @Transactional
@@ -34,7 +38,9 @@ public class ProductService {
             throw new IllegalArgumentException();
         }
         final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
+        if (Objects.isNull(name)
+            || name.isEmpty()
+            || profanityDetectClient.containsProfanity(name)) {
             throw new IllegalArgumentException();
         }
         final Product product = new Product();
@@ -57,9 +63,10 @@ public class ProductService {
         for (final Menu menu : menus) {
             BigDecimal sum = BigDecimal.ZERO;
             for (final MenuProduct menuProduct : menu.getMenuProducts()) {
-                sum = menuProduct.getProduct()
+                final BigDecimal subtotal = menuProduct.getProduct()
                     .getPrice()
                     .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
+                sum = sum.add(subtotal);
             }
             if (menu.getPrice().compareTo(sum) > 0) {
                 menu.setDisplayed(false);
