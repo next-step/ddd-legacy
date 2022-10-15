@@ -39,6 +39,7 @@ public class OrderService {
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
             throw new IllegalArgumentException();
         }
+
         final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
                 .map(OrderLineItem::getMenuId)
@@ -84,7 +85,7 @@ public class OrderService {
         if (type == OrderType.EAT_IN) {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
-            if (!orderTable.isOccupied()) {
+            if (orderTable.isOccupied()) {
                 throw new IllegalStateException();
             }
             order.setOrderTable(orderTable);

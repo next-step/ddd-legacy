@@ -1,6 +1,15 @@
 package kitchenpos.domain;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +49,19 @@ public class Menu {
 
     @Transient
     private UUID menuGroupId;
+
+    public Menu(final String name, final BigDecimal price, final boolean displayed,
+                final List<MenuProduct> menuProducts, final UUID menuGroupId) {
+        this.name = name;
+        this.price = price;
+        this.displayed = displayed;
+        this.menuProducts = menuProducts;
+        this.menuGroupId = menuGroupId;
+    }
+
+    public Menu(final BigDecimal price) {
+        this.price = price;
+    }
 
     public Menu() {
     }

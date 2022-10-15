@@ -46,6 +46,17 @@ public class Order {
     @Transient
     private UUID orderTableId;
 
+    public Order(final OrderType type, final List<OrderLineItem> orderLineItems, final String deliveryAddress, final UUID orderTableId) {
+        this.type = type;
+        this.orderLineItems = orderLineItems;
+        this.deliveryAddress = deliveryAddress;
+        this.orderTableId = orderTableId;
+    }
+
+    public Order(final OrderType type, final List<OrderLineItem> orderLineItems, final String deliveryAddress, final String orderTableId) {
+        this(type, orderLineItems, deliveryAddress, UUID.fromString(orderTableId));
+    }
+
     public Order() {
     }
 

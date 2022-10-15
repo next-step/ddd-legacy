@@ -1,6 +1,15 @@
 package kitchenpos.domain;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -14,9 +23,9 @@ public class OrderLineItem {
 
     @ManyToOne(optional = false)
     @JoinColumn(
-        name = "menu_id",
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_order_line_item_to_menu")
+            name = "menu_id",
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_order_line_item_to_menu")
     )
     private Menu menu;
 
@@ -28,6 +37,16 @@ public class OrderLineItem {
 
     @Transient
     private BigDecimal price;
+
+    public OrderLineItem(final long quantity, final String menuId, final BigDecimal price) {
+        this(quantity, UUID.fromString(menuId), price);
+    }
+
+    public OrderLineItem(final long quantity, final UUID menuId, final BigDecimal price) {
+        this.quantity = quantity;
+        this.menuId = menuId;
+        this.price = price;
+    }
 
     public OrderLineItem() {
     }
@@ -70,5 +89,16 @@ public class OrderLineItem {
 
     public void setPrice(final BigDecimal price) {
         this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderLineItem{" +
+                "seq=" + seq +
+                ", menu=" + menu +
+                ", quantity=" + quantity +
+                ", menuId=" + menuId +
+                ", price=" + price +
+                '}';
     }
 }

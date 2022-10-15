@@ -22,6 +22,14 @@ public class OrderTable {
     @Column(name = "occupied", nullable = false)
     private boolean occupied;
 
+    public OrderTable(final int numberOfGuests) {
+        this.numberOfGuests = numberOfGuests;
+    }
+
+    public OrderTable(final String name) {
+        this.name = name;
+    }
+
     public OrderTable() {
     }
 
