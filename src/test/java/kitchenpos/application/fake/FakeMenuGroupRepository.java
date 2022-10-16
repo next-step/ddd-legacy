@@ -18,6 +18,11 @@ public class FakeMenuGroupRepository implements MenuGroupRepository {
     }
 
     @Override
+    public Optional<MenuGroup> findById(UUID id) {
+        return Optional.ofNullable(menuGroupMap.get(id));
+    }
+
+    @Override
     public List<MenuGroup> findAll() {
         return new ArrayList<>(menuGroupMap.values());
     }
