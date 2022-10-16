@@ -12,18 +12,18 @@ import java.util.stream.Collectors;
 @Service
 public class MenuService {
     private final MenuRepository menuRepository;
-    private final MenuGroupRepository menuGroupRepository;
+    private final MenuGroupJpaRepository menuGroupJpaRepository;
     private final ProductRepository productRepository;
     private final PurgomalumClient purgomalumClient;
 
     public MenuService(
         final MenuRepository menuRepository,
-        final MenuGroupRepository menuGroupRepository,
+        final MenuGroupJpaRepository menuGroupJpaRepository,
         final ProductJpaRepository productRepository,
         final PurgomalumClient purgomalumClient
     ) {
         this.menuRepository = menuRepository;
-        this.menuGroupRepository = menuGroupRepository;
+        this.menuGroupJpaRepository = menuGroupJpaRepository;
         this.productRepository = productRepository;
         this.purgomalumClient = purgomalumClient;
     }
@@ -34,7 +34,7 @@ public class MenuService {
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException();
         }
-        final MenuGroup menuGroup = menuGroupRepository.findById(request.getMenuGroupId())
+        final MenuGroup menuGroup = menuGroupJpaRepository.findById(request.getMenuGroupId())
             .orElseThrow(NoSuchElementException::new);
         final List<MenuProduct> menuProductRequests = request.getMenuProducts();
         if (Objects.isNull(menuProductRequests) || menuProductRequests.isEmpty()) {
