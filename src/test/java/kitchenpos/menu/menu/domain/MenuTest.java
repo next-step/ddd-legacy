@@ -60,6 +60,16 @@ class MenuTest {
                 .hasMessageContaining("메뉴 가격을 입력해주세요.");
     }
 
+    @DisplayName("메뉴 가격을 변경할 수 있다.")
+    @Test
+    void changeMenuPrice() {
+        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
+        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
+        assertThatThrownBy(() -> menu.changePrice(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("가격을 입력해주세요");
+    }
+
     private static MenuGroup createMenuGroup(UUID id, String menuGroupName) {
         return new MenuGroup(id, new Name(menuGroupName, false));
     }
