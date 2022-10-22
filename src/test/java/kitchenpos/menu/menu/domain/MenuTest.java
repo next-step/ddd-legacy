@@ -60,7 +60,7 @@ class MenuTest {
                 .hasMessageContaining("메뉴 가격을 입력해주세요.");
     }
 
-    @DisplayName("메뉴 가격을 변경할 수 있다.")
+    @DisplayName("메뉴 가격은 필수로 입력받는다.")
     @Test
     void changeMenuPrice() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
@@ -68,6 +68,16 @@ class MenuTest {
         assertThatThrownBy(() -> menu.changePrice(null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격을 입력해주세요");
+    }
+
+    @DisplayName("메뉴 가격은 0원보다 크다.")
+    @Test
+    void changeMinimumPrice() {
+        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
+        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
+        assertThatThrownBy(()  -> menu.changePrice(new Price(BigDecimal.valueOf(-1))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("가격은 0원보다 커야합니다.");
     }
 
     private static MenuGroup createMenuGroup(UUID id, String menuGroupName) {
