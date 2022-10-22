@@ -44,8 +44,19 @@ public class Menu {
     @Transient
     private UUID menuGroupId;
 
-    public Menu(MenuGroup menuGroup) {
+    public Menu(MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+        validateMenuProducts(menuProducts);
         validateMenuGroup(menuGroup);
+        this.menuProducts = menuProducts;
+        this.menuGroup = menuGroup;
+    }
+
+    private void validateMenuProducts(List<MenuProduct> menuProducts) {
+        for (MenuProduct menuProduct : menuProducts) {
+            if (BigDecimal.ZERO.compareTo(menuProduct.getQuantity().getQuantity()) > 0) {
+                throw new IllegalArgumentException("수량은 0보다 커야합니다.");
+            }
+        }
     }
 
     private static void validateMenuGroup(MenuGroup menuGroup) {

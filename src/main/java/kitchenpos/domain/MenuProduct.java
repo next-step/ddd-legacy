@@ -1,5 +1,7 @@
 package kitchenpos.domain;
 
+import kitchenpos.menu.menu.domain.Quantity;
+
 import javax.persistence.*;
 import java.util.UUID;
 
@@ -19,13 +21,16 @@ public class MenuProduct {
     )
     private Product product;
 
-    @Column(name = "quantity", nullable = false)
-    private long quantity;
+    @Embedded
+    private Quantity quantity;
 
     @Transient
     private UUID productId;
 
-    public MenuProduct() {
+    protected MenuProduct() {}
+
+    public MenuProduct(Quantity quantity) {
+        this.quantity = quantity;
     }
 
     public Long getSeq() {
@@ -44,19 +49,7 @@ public class MenuProduct {
         this.product = product;
     }
 
-    public long getQuantity() {
+    public Quantity getQuantity() {
         return quantity;
-    }
-
-    public void setQuantity(final long quantity) {
-        this.quantity = quantity;
-    }
-
-    public UUID getProductId() {
-        return productId;
-    }
-
-    public void setProductId(final UUID productId) {
-        this.productId = productId;
     }
 }
