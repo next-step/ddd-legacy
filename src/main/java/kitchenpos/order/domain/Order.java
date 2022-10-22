@@ -49,9 +49,16 @@ public class Order {
     @Transient
     private UUID orderTableId;
 
-    public Order(OrderType type) {
+    public Order(OrderType type, List<OrderLineItem> orderLineItems) {
+        validateOrderLineItems(orderLineItems);
         validateType(type);
         this.type = type;
+    }
+
+    private void validateOrderLineItems(List<OrderLineItem> orderLineItems) {
+        if (Objects.isNull(orderLineItems)) {
+            throw new IllegalArgumentException("주문 항목은 비어 있을 수 없습니다.");
+        }
     }
 
     private static void validateType(OrderType type) {

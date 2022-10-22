@@ -1,6 +1,8 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.infra.KitchenridersClient;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
@@ -71,7 +73,7 @@ public class OrderService {
             orderLineItem.setQuantity(quantity);
             orderLineItems.add(orderLineItem);
         }
-        Order order = new Order(type);
+        Order order = new Order(type, orderLineItems);
         order.setId(UUID.randomUUID());
         order.setStatus(OrderStatus.WAITING);
         order.setOrderDateTime(LocalDateTime.now());

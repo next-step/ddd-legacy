@@ -68,7 +68,7 @@ public class OrderCrudService {
             orderLineItem.setQuantity(quantity);
             orderLineItems.add(orderLineItem);
         }
-        Order order = new Order(type);
+        Order order = new Order(type, orderLineItems);
         order.setId(UUID.randomUUID());
         order.setStatus(OrderStatus.WAITING);
         order.setOrderDateTime(LocalDateTime.now());
