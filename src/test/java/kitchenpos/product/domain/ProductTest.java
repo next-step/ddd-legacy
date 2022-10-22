@@ -35,4 +35,12 @@ class ProductTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("상품명은 필수입니다.");
     }
+
+    @DisplayName("상품명은 비속어를 사용할 수 없다.")
+    @Test
+    void profanity() {
+        assertThatThrownBy(() -> new Product(new Name("상품명", true), new Price(BigDecimal.ONE)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("비속어를 포함할 수 없습니다.");
+    }
 }
