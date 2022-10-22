@@ -18,4 +18,12 @@ class ProductTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
     }
+
+    @DisplayName("상품 가격은 필수이다.")
+    @Test
+    void requireProductPrice() {
+        assertThatThrownBy(() -> new Product(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("상품 가격을 입력해주세요.");
+    }
 }

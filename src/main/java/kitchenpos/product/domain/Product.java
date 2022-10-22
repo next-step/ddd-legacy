@@ -20,6 +20,14 @@ public class Product {
     private Price price;
 
     public Product(Price price) {
+        validate(price);
+        this.price = price;
+    }
+
+    private void validate(Price price) {
+        if (price == null) {
+            throw new IllegalArgumentException("상품 가격을 입력해주세요.");
+        }
     }
 
     public UUID getId() {
