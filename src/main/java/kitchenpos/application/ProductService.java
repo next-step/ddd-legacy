@@ -4,6 +4,8 @@ import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
+import kitchenpos.menu.menu.domain.Price;
+import kitchenpos.product.domain.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,18 +33,13 @@ public class ProductService {
 
     @Transactional
     public Product create(final Product request) {
-        final BigDecimal price = request.getPrice();
-        if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
-        }
         final String name = request.getName();
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
             throw new IllegalArgumentException();
         }
-        final Product product = new Product();
+        final Product product = new Product(new Price(request.getPrice()));
         product.setId(UUID.randomUUID());
         product.setName(name);
-        product.setPrice(price);
         return productRepository.save(product);
     }
 
@@ -54,7 +51,8 @@ public class ProductService {
         }
         final Product product = productRepository.findById(productId)
             .orElseThrow(NoSuchElementException::new);
-        product.setPrice(price);
+        //TODO price Type변경
+//        product.setPrice(price);
         final List<Menu> menus = menuRepository.findAllByProductId(productId);
         for (final Menu menu : menus) {
             BigDecimal sum = BigDecimal.ZERO;

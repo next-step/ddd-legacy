@@ -1,6 +1,7 @@
 package kitchenpos.domain;
 
 import kitchenpos.menu.menu.domain.Quantity;
+import kitchenpos.product.domain.Product;
 
 import javax.persistence.*;
 import java.util.UUID;

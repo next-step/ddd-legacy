@@ -1,9 +1,8 @@
-package kitchenpos.domain;
+package kitchenpos.product.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import kitchenpos.menu.menu.domain.Price;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -17,10 +16,10 @@ public class Product {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    @Embedded
+    private Price price;
 
-    public Product() {
+    public Product(Price price) {
     }
 
     public UUID getId() {
@@ -40,10 +39,6 @@ public class Product {
     }
 
     public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(final BigDecimal price) {
-        this.price = price;
+        return this.price.getPrice();
     }
 }
