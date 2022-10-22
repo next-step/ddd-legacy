@@ -137,4 +137,12 @@ public class Menu {
             throw new IllegalArgumentException("가격을 입력해주세요");
         }
     }
+
+    public void hide() {
+        this.displayed = false;
+    }
+
+    public void display() {
+        this.displayed = true;
+    }
 }

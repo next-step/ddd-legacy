@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("메뉴")
@@ -78,6 +79,17 @@ class MenuTest {
         assertThatThrownBy(()  -> menu.changePrice(new Price(BigDecimal.valueOf(-1))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
+    }
+
+    @DisplayName("메뉴를 숨길 수 있다.")
+    @Test
+    void hideMenu() {
+        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
+        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
+        menu.display();
+        assertThat(menu.isDisplayed()).isTrue();
+        menu.hide();
+        assertThat(menu.isDisplayed()).isFalse();
     }
 
     private static MenuGroup createMenuGroup(UUID id, String menuGroupName) {
