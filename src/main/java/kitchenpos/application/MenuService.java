@@ -7,6 +7,7 @@ import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
+import kitchenpos.menu.menu.domain.Price;
 import kitchenpos.menu.menu.domain.Quantity;
 import kitchenpos.menu.menu.dto.MenuProductRequest;
 import kitchenpos.menu.menu.dto.MenuRequest;
@@ -40,9 +41,6 @@ public class MenuService {
     @Transactional
     public Menu create(final MenuRequest request) {
         final BigDecimal price = request.getPrice();
-        if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
-        }
         final MenuGroup menuGroup = menuGroupRepository.findById(request.getMenuGroupId())
             .orElseThrow(NoSuchElementException::new);
         final List<MenuProductRequest> menuProductRequests = request.getMenuProducts();
@@ -78,10 +76,9 @@ public class MenuService {
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
             throw new IllegalArgumentException();
         }
-        final Menu menu = new Menu(menuGroup, menuProducts);
+        final Menu menu = new Menu(menuGroup, menuProducts, new Price(price));
         menu.setId(UUID.randomUUID());
         menu.setName(name);
-        menu.setPrice(price);
         menu.setDisplayed(request.isDisplayed());
         menu.setMenuProducts(menuProducts);
         return menuRepository.save(menu);
@@ -103,7 +100,8 @@ public class MenuService {
                 throw new IllegalArgumentException();
             }
         }
-        menu.setPrice(price);
+        //TODO price 타입 변경
+//        menu.setPrice(price);
         return menu;
     }
 

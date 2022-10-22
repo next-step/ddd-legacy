@@ -18,8 +18,8 @@ public class Menu {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    @Embedded
+    private Price price;
 
     @ManyToOne(optional = false)
     @JoinColumn(
@@ -44,9 +44,10 @@ public class Menu {
     @Transient
     private UUID menuGroupId;
 
-    public Menu(MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+    public Menu(MenuGroup menuGroup, List<MenuProduct> menuProducts, Price price) {
         validateMenuProducts(menuProducts);
         validateMenuGroup(menuGroup);
+        this.price = price;
         this.menuProducts = menuProducts;
         this.menuGroup = menuGroup;
     }
@@ -82,11 +83,7 @@ public class Menu {
     }
 
     public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(final BigDecimal price) {
-        this.price = price;
+        return this.price.getPrice();
     }
 
     public MenuGroup getMenuGroup() {
