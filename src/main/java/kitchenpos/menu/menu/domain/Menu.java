@@ -6,6 +6,7 @@ import kitchenpos.menu.menugroup.domain.MenuGroup;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "menu")
@@ -53,6 +54,9 @@ public class Menu {
     }
 
     private void validateMenuProducts(List<MenuProduct> menuProducts) {
+        if (Objects.isNull(menuProducts) || menuProducts.isEmpty()) {
+            throw new IllegalArgumentException("메뉴 상품 목록은 비어 있을 수 없습니다.");
+        }
         for (MenuProduct menuProduct : menuProducts) {
             if (BigDecimal.ZERO.compareTo(menuProduct.getQuantity().getQuantity()) > 0) {
                 throw new IllegalArgumentException("수량은 0보다 커야합니다.");
