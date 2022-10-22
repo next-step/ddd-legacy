@@ -52,7 +52,7 @@ class MenuTest {
     }
 
     private static MenuGroup createMenuGroup(UUID id, String menuGroupName) {
-        return new MenuGroup(id, new Name(menuGroupName));
+        return new MenuGroup(id, new Name(menuGroupName, false));
     }
 
     private static List<MenuProduct> createMenuProducts(final MenuProduct... menuProducts) {

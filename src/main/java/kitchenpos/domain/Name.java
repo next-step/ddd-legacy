@@ -8,11 +8,21 @@ import java.util.Objects;
 public class Name {
 
     @Column(name = "name", nullable = false)
-    private final String name;
+    private String name;
 
-    public Name(String name) {
+    protected Name() {
+    }
+
+    public Name(String name, boolean isProfanity) {
+        validateProfanity(isProfanity);
         validateNullAndEmpty(name);
         this.name = name;
+    }
+
+    private void validateProfanity(boolean isProfanity) {
+        if (isProfanity) {
+            throw new IllegalArgumentException("비속어를 포함할 수 없습니다.");
+        }
     }
 
     private static void validateNullAndEmpty(String name) {

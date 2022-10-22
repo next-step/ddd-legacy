@@ -1,5 +1,6 @@
 package kitchenpos.product.domain;
 
+import kitchenpos.domain.Name;
 import kitchenpos.menu.menu.domain.Price;
 
 import javax.persistence.*;
@@ -19,14 +20,21 @@ public class Product {
     @Embedded
     private Price price;
 
-    public Product(Price price) {
-        validate(price);
+    public Product(Name name, Price price) {
+        validatePrice(price);
+        validateName(name);
         this.price = price;
     }
 
-    private void validate(Price price) {
+    private void validatePrice(Price price) {
         if (price == null) {
             throw new IllegalArgumentException("상품 가격을 입력해주세요.");
+        }
+    }
+
+    private void validateName(Name name) {
+        if (name == null) {
+            throw new IllegalArgumentException("상품명은 필수입니다.");
         }
     }
 

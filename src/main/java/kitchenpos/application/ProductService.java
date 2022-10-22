@@ -1,6 +1,8 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Name;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
@@ -22,9 +24,9 @@ public class ProductService {
     private final PurgomalumClient purgomalumClient;
 
     public ProductService(
-        final ProductRepository productRepository,
-        final MenuRepository menuRepository,
-        final PurgomalumClient purgomalumClient
+            final ProductRepository productRepository,
+            final MenuRepository menuRepository,
+            final PurgomalumClient purgomalumClient
     ) {
         this.productRepository = productRepository;
         this.menuRepository = menuRepository;
@@ -34,10 +36,7 @@ public class ProductService {
     @Transactional
     public Product create(final Product request) {
         final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
-        }
-        final Product product = new Product(new Price(request.getPrice()));
+        final Product product = new Product(new Name(name, purgomalumClient.containsProfanity(name)), new Price(request.getPrice()));
         product.setId(UUID.randomUUID());
         product.setName(name);
         return productRepository.save(product);
@@ -50,7 +49,7 @@ public class ProductService {
             throw new IllegalArgumentException();
         }
         final Product product = productRepository.findById(productId)
-            .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(NoSuchElementException::new);
         //TODO price Type변경
 //        product.setPrice(price);
         final List<Menu> menus = menuRepository.findAllByProductId(productId);

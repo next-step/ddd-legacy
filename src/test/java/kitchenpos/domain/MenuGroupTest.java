@@ -17,14 +17,14 @@ class MenuGroupTest {
     @DisplayName("메뉴 그룹 생성")
     @ValueSource(strings = {"치킨"})
     void constructor(String name) {
-        assertThatNoException().isThrownBy(() -> new MenuGroup(UUID.randomUUID(), new Name(name)));
+        assertThatNoException().isThrownBy(() -> new MenuGroup(UUID.randomUUID(), new Name(name, false)));
     }
 
     @DisplayName("메뉴명은 공백일 수 없다.")
     @ParameterizedTest
     @NullAndEmptySource
     void menuNameNotNullAndEmpty(String name) {
-        assertThatThrownBy(() -> new MenuGroup(UUID.randomUUID(), new Name(name)))
+        assertThatThrownBy(() -> new MenuGroup(UUID.randomUUID(), new Name(name, false)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
     }
