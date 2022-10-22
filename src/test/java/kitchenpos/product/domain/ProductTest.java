@@ -43,4 +43,13 @@ class ProductTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("비속어를 포함할 수 없습니다.");
     }
+
+    @DisplayName("상품 가격을 0원보다 작은 가격으로 변경 할 수 없다.")
+    @Test
+    void changeMinimumPrice() {
+        Product product = new Product(new Name("상품명", false), new Price(BigDecimal.ONE));
+        assertThatThrownBy(() -> product.changePrice(BigDecimal.valueOf(-1)))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("가격은 0원보다 커야합니다.");
+    }
 }

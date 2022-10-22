@@ -57,4 +57,8 @@ public class Product {
     public BigDecimal getPrice() {
         return this.price.getPrice();
     }
+
+    public void changePrice(BigDecimal price) {
+        this.price = new Price(price);
+    }
 }
