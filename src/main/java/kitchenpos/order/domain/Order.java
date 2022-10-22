@@ -1,8 +1,11 @@
-package kitchenpos.domain;
+package kitchenpos.order.domain;
+
+import kitchenpos.domain.OrderTable;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "orders")
@@ -46,7 +49,15 @@ public class Order {
     @Transient
     private UUID orderTableId;
 
-    public Order() {
+    public Order(OrderType type) {
+        validateType(type);
+        this.type = type;
+    }
+
+    private static void validateType(OrderType type) {
+        if (Objects.isNull(type)) {
+            throw new IllegalArgumentException("주문 타입을 입력해주세요.");
+        }
     }
 
     public UUID getId() {

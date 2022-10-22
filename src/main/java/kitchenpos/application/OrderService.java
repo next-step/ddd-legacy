@@ -2,6 +2,10 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.order.domain.Order;
+import kitchenpos.order.domain.OrderLineItem;
+import kitchenpos.order.domain.OrderStatus;
+import kitchenpos.order.domain.OrderType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +36,6 @@ public class OrderService {
     @Transactional
     public Order create(final Order request) {
         final OrderType type = request.getType();
-        if (Objects.isNull(type)) {
-            throw new IllegalArgumentException();
-        }
         final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
             throw new IllegalArgumentException();
@@ -68,9 +69,8 @@ public class OrderService {
             orderLineItem.setQuantity(quantity);
             orderLineItems.add(orderLineItem);
         }
-        Order order = new Order();
+        Order order = new Order(type);
         order.setId(UUID.randomUUID());
-        order.setType(type);
         order.setStatus(OrderStatus.WAITING);
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(orderLineItems);
