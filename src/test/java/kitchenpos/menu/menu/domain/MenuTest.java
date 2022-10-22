@@ -92,6 +92,16 @@ class MenuTest {
         assertThat(menu.isDisplayed()).isFalse();
     }
 
+    @DisplayName("메뉴를 보여줄 수 있다.")
+    @Test
+    void displayMenu                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   () {
+        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
+        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
+        assertThat(menu.isDisplayed()).isFalse();
+        menu.display();
+        assertThat(menu.isDisplayed()).isTrue();
+    }
+
     private static MenuGroup createMenuGroup(UUID id, String menuGroupName) {
         return new MenuGroup(id, new Name(menuGroupName, false));
     }
