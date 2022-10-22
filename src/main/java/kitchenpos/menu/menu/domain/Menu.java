@@ -1,5 +1,6 @@
-package kitchenpos.domain;
+package kitchenpos.menu.menu.domain;
 
+import kitchenpos.domain.MenuProduct;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 
 import javax.persistence.*;
@@ -43,7 +44,14 @@ public class Menu {
     @Transient
     private UUID menuGroupId;
 
-    public Menu() {
+    public Menu(MenuGroup menuGroup) {
+        validateMenuGroup(menuGroup);
+    }
+
+    private static void validateMenuGroup(MenuGroup menuGroup) {
+        if (menuGroup == null) {
+            throw new IllegalArgumentException("메뉴 그룹이 없습니다.");
+        }
     }
 
     public UUID getId() {
