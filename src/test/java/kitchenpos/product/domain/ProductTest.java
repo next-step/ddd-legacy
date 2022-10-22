@@ -52,4 +52,13 @@ class ProductTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
     }
+
+    @DisplayName("상품 가격을 필수로 입력받는다.")
+    @Test
+    void changeEmptyPrice() {
+        Product product = new Product(new Name("상품명", false), new Price(BigDecimal.ONE));
+        assertThatThrownBy(() -> product.changePrice(null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("null 일 수 없습니다.");
+    }
 }
