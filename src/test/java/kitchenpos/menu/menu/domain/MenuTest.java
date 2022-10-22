@@ -51,6 +51,15 @@ class MenuTest {
                 .hasMessageContaining("메뉴 상품 목록은 비어 있을 수 없습니다.");
     }
 
+    @DisplayName("메뉴 생성 시 메뉴 가격을 필수로 입력받는다.")
+    @Test
+    void requireMenuPrice() {
+        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
+        assertThatThrownBy(() -> new Menu(menuGroup, createMenuProducts(new MenuProduct(new Quantity(BigDecimal.ONE))), null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("메뉴 가격을 입력해주세요.");
+    }
+
     private static MenuGroup createMenuGroup(UUID id, String menuGroupName) {
         return new MenuGroup(id, new Name(menuGroupName, false));
     }

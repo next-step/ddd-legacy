@@ -48,9 +48,16 @@ public class Menu {
     public Menu(MenuGroup menuGroup, List<MenuProduct> menuProducts, Price price) {
         validateMenuProducts(menuProducts);
         validateMenuGroup(menuGroup);
+        validateMenuPrice(price);
         this.price = price;
         this.menuProducts = menuProducts;
         this.menuGroup = menuGroup;
+    }
+
+    private void validateMenuPrice(Price price) {
+        if (price == null) {
+            throw new IllegalArgumentException("메뉴 가격을 입력해주세요.");
+        }
     }
 
     private void validateMenuProducts(List<MenuProduct> menuProducts) {
