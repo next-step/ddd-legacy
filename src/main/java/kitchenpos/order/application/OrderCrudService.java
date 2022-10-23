@@ -52,9 +52,7 @@ public class OrderCrudService {
             if (!menu.isDisplayed()) {
                 throw new IllegalStateException();
             }
-            if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
-                throw new IllegalArgumentException();
-            }
+            validatePrice(orderLineItemRequest, menu);
             final OrderLineItem orderLineItem = new OrderLineItem(menu);
             orderLineItem.setMenu(menu);
             orderLineItem.setQuantity(quantity);
@@ -75,6 +73,12 @@ public class OrderCrudService {
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(orderLineItems);
         return orderRepository.save(order);
+    }
+
+    private static void validatePrice(OrderLineItemRequest orderLineItemRequest, Menu menu) {
+        if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
+            throw new IllegalArgumentException("메뉴의 가격과 메뉴 항목의 가격은 같다.");
+        }
     }
 
     private void validateMenuSize(List<OrderLineItemRequest> orderLineItemRequests) {
