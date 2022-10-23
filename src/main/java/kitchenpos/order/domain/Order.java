@@ -150,6 +150,9 @@ public class Order {
         if (this.type != OrderType.DELIVERY) {
             throw new IllegalArgumentException("주문 타입이 DELIVERY일 경우에만 배송 시작을 할 수 있습니다.");
         }
+        if (this.status != OrderStatus.SERVED) {
+            throw new IllegalArgumentException("주문 상태가 SERVED일 경우에만 배송 시작을 할 수 있다.");
+        }
         this.status = OrderStatus.DELIVERING;
     }
 }

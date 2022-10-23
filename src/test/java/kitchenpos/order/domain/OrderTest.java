@@ -93,6 +93,17 @@ class OrderTest {
                 .hasMessageContaining("주문 타입이 DELIVERY일 경우에만 배송 시작을 할 수 있습니다.");
     }
 
+    @DisplayName("주문 상태가 SERVED일 경우에만 배송 시작을 할 수 있다.")
+    @Test
+    void delivering_fail_served() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.DELIVERY, orderLineItems);
+        order.accept();
+        assertThatThrownBy(order::delivering)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("주문 상태가 SERVED일 경우에만 배송 시작을 할 수 있다.");
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         OrderLineItem orderLineItem = new OrderLineItem();
