@@ -54,4 +54,8 @@ public class OrderTable {
     public void setOccupied(final boolean occupied) {
         this.occupied = occupied;
     }
+
+    public void occupied() {
+        this.occupied = true;
+    }
 }
