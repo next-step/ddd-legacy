@@ -1,10 +1,12 @@
-package kitchenpos.application;
+package kitchenpos.ordertable.application;
 
 import kitchenpos.domain.Name;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.order.domain.OrderStatus;
-import kitchenpos.ordertable.OrderTable;
+import kitchenpos.ordertable.domain.NumberOfGuests;
+import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.ordertable.dto.OrderTableRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +26,9 @@ public class OrderTableService {
     }
 
     @Transactional
-    public OrderTable create(final OrderTable request) {
-        final String name = request.getName();
-        if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
-        final OrderTable orderTable = new OrderTable(new Name("주문테이블명", false));
+    public OrderTable create(final OrderTableRequest request) {
+        final OrderTable orderTable = new OrderTable(new Name(request.getName(), false), new NumberOfGuests(request.getNumberOfGuests()));
         orderTable.setId(UUID.randomUUID());
-        orderTable.setNumberOfGuests(0);
         orderTable.setOccupied(false);
         return orderTableRepository.save(orderTable);
     }
@@ -51,7 +48,7 @@ public class OrderTableService {
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
             throw new IllegalStateException();
         }
-        orderTable.setNumberOfGuests(0);
+        orderTable.changeNumberOfGuests(0);
         orderTable.setOccupied(false);
         return orderTable;
     }
@@ -67,7 +64,7 @@ public class OrderTableService {
         if (!orderTable.isOccupied()) {
             throw new IllegalStateException();
         }
-        orderTable.setNumberOfGuests(numberOfGuests);
+        orderTable.changeNumberOfGuests(numberOfGuests);
         return orderTable;
     }
 

@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.OrderRepository;
-import kitchenpos.ordertable.OrderTable;
+import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.infra.KitchenridersClient;
 import kitchenpos.menu.menu.domain.Menu;
@@ -171,7 +171,7 @@ public class OrderService {
         if (type == OrderType.EAT_IN) {
             final OrderTable orderTable = order.getOrderTable();
             if (!orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
-                orderTable.setNumberOfGuests(0);
+                orderTable.changeNumberOfGuests(0);
                 orderTable.setOccupied(false);
             }
         }

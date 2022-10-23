@@ -1,11 +1,8 @@
-package kitchenpos.ordertable;
+package kitchenpos.ordertable.domain;
 
 import kitchenpos.domain.Name;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Table(name = "order_table")
@@ -15,16 +12,22 @@ public class OrderTable {
     @Id
     private UUID id;
 
+    @Embedded
     private Name name;
 
-    @Column(name = "number_of_guests", nullable = false)
-    private int numberOfGuests;
+    @Embedded
+    private NumberOfGuests numberOfGuests;
 
     @Column(name = "occupied", nullable = false)
     private boolean occupied;
 
-    public OrderTable(Name name) {
+    protected OrderTable() {
+
+    }
+
+    public OrderTable(Name name, NumberOfGuests numberOfGuests) {
         this.name = name;
+        this.numberOfGuests = numberOfGuests;
     }
 
     public UUID getId() {
@@ -40,11 +43,7 @@ public class OrderTable {
     }
 
     public int getNumberOfGuests() {
-        return numberOfGuests;
-    }
-
-    public void setNumberOfGuests(final int numberOfGuests) {
-        this.numberOfGuests = numberOfGuests;
+        return this.numberOfGuests.getNumber();
     }
 
     public boolean isOccupied() {
@@ -61,5 +60,9 @@ public class OrderTable {
 
     public void vacant() {
         this.occupied = false;
+    }
+
+    public void changeNumberOfGuests(int numberOfGuests) {
+        this.numberOfGuests = new NumberOfGuests(numberOfGuests);
     }
 }

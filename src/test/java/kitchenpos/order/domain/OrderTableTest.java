@@ -1,7 +1,8 @@
 package kitchenpos.order.domain;
 
 import kitchenpos.domain.Name;
-import kitchenpos.ordertable.OrderTable;
+import kitchenpos.ordertable.domain.NumberOfGuests;
+import kitchenpos.ordertable.domain.OrderTable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,14 +17,14 @@ class OrderTableTest {
     @DisplayName("주문 테이블 생성 시 주문 테이블명을 입력받는다.")
     @Test
     void createOrderTable() {
-        assertThatNoException().isThrownBy(() -> orderTable("주문테이블명"));
+        assertThatNoException().isThrownBy(() -> orderTable("주문테이블명", 1));
     }
 
     @DisplayName("주문 테이블 생성 시 주문 테이블명은 필수이다.")
     @ParameterizedTest
     @NullAndEmptySource
     void createOrderTable(String name) {
-        assertThatThrownBy(() -> orderTable(name))
+        assertThatThrownBy(() -> orderTable(name, 1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
     }
@@ -32,7 +33,7 @@ class OrderTableTest {
     @ParameterizedTest
     @ValueSource(strings = {"테이블"})
     void change(String name) {
-        OrderTable orderTable = orderTable(name);
+        OrderTable orderTable = orderTable(name, 1);
         assertThat(orderTable.isOccupied()).isFalse();
         orderTable.occupied();
         assertThat(orderTable.isOccupied()).isTrue();
@@ -42,7 +43,7 @@ class OrderTableTest {
     @ParameterizedTest
     @ValueSource(strings = {"테이블"})
     void vacant(String name) {
-        OrderTable orderTable = orderTable(name);
+        OrderTable orderTable = orderTable(name, 1);
         assertThat(orderTable.isOccupied()).isFalse();
         orderTable.occupied();
         assertThat(orderTable.isOccupied()).isTrue();
@@ -50,7 +51,17 @@ class OrderTableTest {
         assertThat(orderTable.isOccupied()).isFalse();
     }
 
-    private static OrderTable orderTable(String name) {
-        return new OrderTable(new Name(name, false));
+    @DisplayName("주문 테이블의 착석 인원 변경 시 0명보다 작을 수 없다.")
+    @Test
+    void validateGuestsNumber() {
+        OrderTable orderTable = orderTable("주문테이블명", 1);
+        assertThatThrownBy(() -> orderTable.changeNumberOfGuests(-1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("주문 테이블의 착석 인원 변경 시 0명보다 작을 수 없다.");
     }
+
+    private static OrderTable orderTable(String name, int numberOfGuests) {
+        return new OrderTable(new Name(name, false), new NumberOfGuests(numberOfGuests));
+    }
+
 }
