@@ -1,10 +1,10 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.Name;
-import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
+import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
 import kitchenpos.menu.menugroup.dto.MenuGroupRequest;
+import kitchenpos.menu.menugroup.infra.PurgomalumClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +13,7 @@ import java.util.UUID;
 
 @Service
 public class MenuGroupService {
+
     private final MenuGroupRepository menuGroupRepository;
     private final PurgomalumClient purgomalumClient;
 

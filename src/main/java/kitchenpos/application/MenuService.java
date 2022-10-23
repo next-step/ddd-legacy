@@ -1,9 +1,7 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.menu.menu.domain.Price;
@@ -11,6 +9,8 @@ import kitchenpos.menu.menu.domain.Quantity;
 import kitchenpos.menu.menu.dto.MenuProductRequest;
 import kitchenpos.menu.menu.dto.MenuRequest;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
+import kitchenpos.menu.menugroup.infra.JpaMenuGroupRepository;
+import kitchenpos.menu.menugroup.infra.PurgomalumClient;
 import kitchenpos.product.domain.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,18 +22,18 @@ import java.util.stream.Collectors;
 @Service
 public class MenuService {
     private final MenuRepository menuRepository;
-    private final MenuGroupRepository menuGroupRepository;
+    private final JpaMenuGroupRepository jpaMenuGroupRepository;
     private final ProductRepository productRepository;
     private final PurgomalumClient purgomalumClient;
 
     public MenuService(
-        final MenuRepository menuRepository,
-        final MenuGroupRepository menuGroupRepository,
-        final ProductRepository productRepository,
-        final PurgomalumClient purgomalumClient
+            final MenuRepository menuRepository,
+            final JpaMenuGroupRepository jpaMenuGroupRepository,
+            final ProductRepository productRepository,
+            final PurgomalumClient purgomalumClient
     ) {
         this.menuRepository = menuRepository;
-        this.menuGroupRepository = menuGroupRepository;
+        this.jpaMenuGroupRepository = jpaMenuGroupRepository;
         this.productRepository = productRepository;
         this.purgomalumClient = purgomalumClient;
     }
@@ -41,8 +41,8 @@ public class MenuService {
     @Transactional
     public Menu create(final MenuRequest request) {
         final BigDecimal price = request.getPrice();
-        final MenuGroup menuGroup = menuGroupRepository.findById(request.getMenuGroupId())
-            .orElseThrow(NoSuchElementException::new);
+        final MenuGroup menuGroup = jpaMenuGroupRepository.findById(request.getMenuGroupId())
+                .orElseThrow(NoSuchElementException::new);
         final List<MenuProductRequest> menuProductRequests = request.getMenuProducts();
         if (Objects.isNull(menuProductRequests) || menuProductRequests.isEmpty()) {
             throw new IllegalArgumentException();
@@ -60,7 +60,7 @@ public class MenuService {
         for (final MenuProductRequest menuProductRequest : menuProductRequests) {
             Quantity quantity = new Quantity(menuProductRequest.getQuantity());
             final Product product = productRepository.findById(menuProductRequest.getProductId())
-                .orElseThrow(NoSuchElementException::new);
+                    .orElseThrow(NoSuchElementException::new);
             sum = sum.add(
                     product.getPrice()
                             .multiply(BigDecimal.valueOf(quantity.getQuantity())));
@@ -90,7 +90,7 @@ public class MenuService {
             throw new IllegalArgumentException();
         }
         final Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(NoSuchElementException::new);
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             final BigDecimal sum = menuProduct.getProduct()
                     .getPrice()
@@ -107,7 +107,7 @@ public class MenuService {
     @Transactional
     public Menu display(final UUID menuId) {
         final Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(NoSuchElementException::new);
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             final BigDecimal sum = menuProduct.getProduct()
                     .getPrice()
@@ -123,7 +123,7 @@ public class MenuService {
     @Transactional
     public Menu hide(final UUID menuId) {
         final Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(NoSuchElementException::new);
         menu.setDisplayed(false);
         return menu;
     }
