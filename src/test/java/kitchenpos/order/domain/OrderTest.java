@@ -60,6 +60,16 @@ class OrderTest {
                 .hasMessageContaining("ACCEPTED 상태만 SERVED 상태로 변경가능합니다");
     }
 
+    @DisplayName("주문에 대해 제공할 수 있다.")
+    @Test
+    void served_success() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        order.accept();
+        order.served();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         OrderLineItem orderLineItem = new OrderLineItem();
