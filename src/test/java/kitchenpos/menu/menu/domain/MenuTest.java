@@ -115,6 +115,16 @@ class MenuTest {
         assertThat(menu.isDisplayed()).isFalse();
     }
 
+    @DisplayName("메뉴의 가격이 메뉴 상품의 합보다 클 수 없다.")
+    @Test
+    void menuPriceOverSumMenuPrice() {
+        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
+        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.valueOf(11)));
+        assertThatThrownBy(() -> menu.display())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("메뉴의 가격이 메뉴 상품의 합보다 클 수 없다.");
+    }
+
     private static MenuGroup createMenuGroup(UUID id, String menuGroupName) {
         return new MenuGroup(id, new Name(menuGroupName, false));
     }

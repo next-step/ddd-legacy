@@ -159,6 +159,9 @@ public class Menu {
     }
 
     public void display() {
+        if (this.price.getPrice().compareTo(sumMenuProducts()) > 0) {
+            throw new IllegalArgumentException("메뉴의 가격이 메뉴 상품의 합보다 클 수 없다.");
+        }
         this.displayed = true;
     }
 }
