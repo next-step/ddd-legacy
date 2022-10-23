@@ -1,8 +1,9 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Name;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.order.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
+import kitchenpos.ordertable.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +29,8 @@ public class OrderTableService {
         if (Objects.isNull(name) || name.isEmpty()) {
             throw new IllegalArgumentException();
         }
-        final OrderTable orderTable = new OrderTable();
+        final OrderTable orderTable = new OrderTable(new Name("주문테이블명", false));
         orderTable.setId(UUID.randomUUID());
-        orderTable.setName(name);
         orderTable.setNumberOfGuests(0);
         orderTable.setOccupied(false);
         return orderTableRepository.save(orderTable);

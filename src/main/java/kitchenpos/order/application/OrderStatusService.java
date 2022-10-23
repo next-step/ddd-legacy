@@ -1,7 +1,7 @@
 package kitchenpos.order.application;
 
 import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderTable;
+import kitchenpos.ordertable.OrderTable;
 import kitchenpos.infra.KitchenridersClient;
 import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;

@@ -1,4 +1,6 @@
-package kitchenpos.domain;
+package kitchenpos.ordertable;
+
+import kitchenpos.domain.Name;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,8 +15,7 @@ public class OrderTable {
     @Id
     private UUID id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    private Name name;
 
     @Column(name = "number_of_guests", nullable = false)
     private int numberOfGuests;
@@ -22,7 +23,8 @@ public class OrderTable {
     @Column(name = "occupied", nullable = false)
     private boolean occupied;
 
-    public OrderTable() {
+    public OrderTable(Name name) {
+        this.name = name;
     }
 
     public UUID getId() {
@@ -34,11 +36,7 @@ public class OrderTable {
     }
 
     public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
+        return this.name.getName();
     }
 
     public int getNumberOfGuests() {
