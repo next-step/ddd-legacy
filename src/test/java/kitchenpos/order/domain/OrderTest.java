@@ -128,9 +128,9 @@ class OrderTest {
                 .hasMessageContaining("주문 상태가 DELIVERING일 경우에만 배송을 완료할 수 있다.");
     }
 
-    @DisplayName("주문 타입이 DELIVERY가 아니면 주문을 완료할 수 없다.")
+    @DisplayName("주문 상태가 DELIVERED가 아니면 주문을 완료할 수 없다.")
     @Test
-    void completed_success() {
+    void completed_fail_delivered() {
         List<OrderLineItem> orderLineItems = orderLineItems();
         Order order = new Order(OrderType.DELIVERY, orderLineItems);
         order.accept();
@@ -138,7 +138,7 @@ class OrderTest {
         order.delivering();
         assertThatThrownBy(order::completed)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("주문 타입이 DELIVERY가 아니면 주문을 완료할 수 없다.");
+                .hasMessageContaining("주문 상태가 DELIVERED가 아니면 주문을 완료할 수 없다.");
     }
 
     private static List<OrderLineItem> orderLineItems() {

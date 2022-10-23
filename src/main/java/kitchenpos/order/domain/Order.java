@@ -158,6 +158,9 @@ public class Order {
 
     public void completed() {
         if (this.status != OrderStatus.DELIVERED) {
+            throw new IllegalArgumentException("주문 상태가 DELIVERED가 아니면 주문을 완료할 수 없다.");
+        }
+        if (this.type != OrderType.DELIVERY) {
             throw new IllegalArgumentException("주문 타입이 DELIVERY가 아니면 주문을 완료할 수 없다.");
         }
         this.status = OrderStatus.COMPLETED;
