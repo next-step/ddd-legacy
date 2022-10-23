@@ -148,9 +148,7 @@ public class Menu {
     public void changePrice(Price price) {
         validateMenuPrice(price);
         hideMenu(price);
-        if (price == null) {
-            throw new IllegalArgumentException("가격을 입력해주세요");
-        }
+        this.price = price;
     }
 
     private void hideMenu(Price price) {

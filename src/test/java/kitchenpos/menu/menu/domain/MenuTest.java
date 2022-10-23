@@ -64,12 +64,23 @@ class MenuTest {
 
     @DisplayName("메뉴 가격은 필수로 입력받는다.")
     @Test
-    void changeMenuPrice() {
+    void changeMenuPrice_fail() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
         Menu menu = createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
         assertThatThrownBy(() -> menu.changePrice(null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격을 입력해주세요");
+    }
+
+    @DisplayName("메뉴 가격을 변경할 수 있다.")
+    @Test
+    void changeMenuPrice() {
+        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
+        Menu menu = createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
+        assertThat(menu.getPrice()).isEqualTo(BigDecimal.TEN);
+        menu.changePrice(new Price(BigDecimal.valueOf(20)));
+        assertThat(menu.getPrice()).isEqualTo(BigDecimal.valueOf(20));
+
     }
 
     @DisplayName("메뉴 가격은 0원보다 크다.")
