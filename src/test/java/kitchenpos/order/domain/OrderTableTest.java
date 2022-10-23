@@ -72,6 +72,12 @@ class OrderTableTest {
                 .hasMessageContaining("주문 테이블이 공석일 경우 착석 인원을 변경 할 수 없다.");
     }
 
+    @DisplayName("주문 테이블을 생성할 수 있다.")
+    @Test
+    void createProduct() {
+        assertThatNoException().isThrownBy(() -> orderTable("주문테이블명", 1));
+    }
+
     private static OrderTable orderTable(String name, int numberOfGuests) {
         return new OrderTable(new Name(name, false), new NumberOfGuests(numberOfGuests));
     }
