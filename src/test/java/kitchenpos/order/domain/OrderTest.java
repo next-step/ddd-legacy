@@ -106,7 +106,7 @@ class OrderTest {
 
     @DisplayName("배송을 완료할 수 있다.")
     @Test
-    void completed_success() {
+    void delivered_success() {
         List<OrderLineItem> orderLineItems = orderLineItems();
         Order order = new Order(OrderType.DELIVERY, orderLineItems);
         order.accept();
@@ -118,7 +118,7 @@ class OrderTest {
 
     @DisplayName("주문 상태가 DELIVERING일 경우에만 배송을 완료할 수 있다.")
     @Test
-    void completed_fail() {
+    void delivered_fail() {
         List<OrderLineItem> orderLineItems = orderLineItems();
         Order order = new Order(OrderType.DELIVERY, orderLineItems);
         order.accept();
@@ -126,6 +126,19 @@ class OrderTest {
         assertThatThrownBy(order::delivered)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 상태가 DELIVERING일 경우에만 배송을 완료할 수 있다.");
+    }
+
+    @DisplayName("주문 타입이 DELIVERY가 아니면 주문을 완료할 수 없다.")
+    @Test
+    void completed_success() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.DELIVERY, orderLineItems);
+        order.accept();
+        order.served();
+        order.delivering();
+        assertThatThrownBy(order::completed)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("주문 타입이 DELIVERY가 아니면 주문을 완료할 수 없다.");
     }
 
     private static List<OrderLineItem> orderLineItems() {
