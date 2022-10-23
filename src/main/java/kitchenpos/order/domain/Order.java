@@ -196,4 +196,11 @@ public class Order {
         }
         this.status = OrderStatus.DELIVERED;
     }
+
+    public void vacant() {
+        if (this.status != OrderStatus.COMPLETED) {
+            throw new IllegalArgumentException("주문 테이블 공석으로 변경 시 주문 상태가 완료일때만 변경 가능하다.");
+        }
+        this.orderTable.vacant();
+    }
 }

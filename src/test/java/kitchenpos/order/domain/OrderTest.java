@@ -1,23 +1,14 @@
 package kitchenpos.order.domain;
 
-import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Name;
-import kitchenpos.menu.menu.domain.Menu;
-import kitchenpos.menu.menu.domain.Price;
-import kitchenpos.menu.menu.domain.Quantity;
-import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.ordertable.domain.NumberOfGuests;
 import kitchenpos.ordertable.domain.OrderTable;
-import kitchenpos.product.domain.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
+import static kitchenpos.order.domain.OrderFixture.orderLineItems;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -220,23 +211,5 @@ class OrderTest {
         order.delivered();
         order.completed();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-    }
-
-    private static List<OrderLineItem> orderLineItems() {
-        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
-        menu.display();
-        List<OrderLineItem> orderLineItems = new ArrayList<>();
-        OrderLineItem orderLineItem = new OrderLineItem(menu);
-        orderLineItems.add(orderLineItem);
-        return orderLineItems;
-    }
-
-    private static MenuGroup createMenuGroup(UUID id, String menuGroupName) {
-        return new MenuGroup(id, new Name(menuGroupName, false));
-    }
-
-    private static List<MenuProduct> createMenuProducts(final MenuProduct... menuProducts) {
-        return Arrays.asList(menuProducts);
     }
 }
