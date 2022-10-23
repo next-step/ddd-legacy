@@ -28,10 +28,10 @@ public class Order {
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(
-        name = "order_id",
-        nullable = false,
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_order_line_item_to_orders")
+            name = "order_id",
+            nullable = false,
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_order_line_item_to_orders")
     )
     private List<OrderLineItem> orderLineItems;
 
@@ -40,9 +40,9 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(
-        name = "order_table_id",
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_orders_to_order_table")
+            name = "order_table_id",
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_orders_to_order_table")
     )
     private OrderTable orderTable;
 
@@ -53,11 +53,18 @@ public class Order {
 
     }
 
-    public Order(OrderType type, List<OrderLineItem> orderLineItems) {
+    public Order(OrderType type, List<OrderLineItem> orderLineItems, OrderTable orderTable) {
         validateOrderLineItems(orderLineItems);
         validateType(type);
+        validateOrderTable(orderTable);
         this.type = type;
         this.status = OrderStatus.WAITING;
+    }
+
+    private void validateOrderTable(OrderTable orderTable) {
+        if (orderTable.isOccupied()) {
+            throw new IllegalArgumentException("매장 주문에서 착석된 테이블을 선택할 수 없다.");
+        }
     }
 
     private void validateOrderLineItems(List<OrderLineItem> orderLineItems) {

@@ -1,7 +1,6 @@
 package kitchenpos.order.application;
 
 import kitchenpos.domain.OrderRepository;
-import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
@@ -9,6 +8,7 @@ import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderStatus;
 import kitchenpos.order.domain.OrderType;
+import kitchenpos.ordertable.domain.OrderTable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,7 +68,12 @@ public class OrderCrudService {
             orderLineItem.setQuantity(quantity);
             orderLineItems.add(orderLineItem);
         }
-        Order order = new Order(type, orderLineItems);
+        OrderTable orderTable = null;
+        if (type == OrderType.EAT_IN) {
+            orderTable = orderTableRepository.findById(request.getOrderTableId())
+                    .orElseThrow(NoSuchElementException::new);
+        }
+        Order order = new Order(type, orderLineItems, orderTable);
         order.setId(UUID.randomUUID());
         order.setStatus(OrderStatus.WAITING);
         order.setOrderDateTime(LocalDateTime.now());
@@ -79,14 +84,6 @@ public class OrderCrudService {
                 throw new IllegalArgumentException();
             }
             order.setDeliveryAddress(deliveryAddress);
-        }
-        if (type == OrderType.EAT_IN) {
-            final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
-                    .orElseThrow(NoSuchElementException::new);
-            if (!orderTable.isOccupied()) {
-                throw new IllegalStateException();
-            }
-            order.setOrderTable(orderTable);
         }
         return orderRepository.save(order);
     }

@@ -28,6 +28,7 @@ public class OrderTable {
     public OrderTable(Name name, NumberOfGuests numberOfGuests) {
         this.name = name;
         this.numberOfGuests = numberOfGuests;
+        this.occupied = false;
     }
 
     public UUID getId() {

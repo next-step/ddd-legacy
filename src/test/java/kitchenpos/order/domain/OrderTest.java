@@ -1,5 +1,8 @@
 package kitchenpos.order.domain;
 
+import kitchenpos.domain.Name;
+import kitchenpos.ordertable.domain.NumberOfGuests;
+import kitchenpos.ordertable.domain.OrderTable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +19,7 @@ class OrderTest {
     @Test
     void requireOrderType() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        assertThatThrownBy(() -> new Order(null, orderLineItems))
+        assertThatThrownBy(() -> new Order(null, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 타입을 입력해주세요.");
     }
@@ -24,7 +27,7 @@ class OrderTest {
     @DisplayName("주문 항목은 비어 있을 수 없다.")
     @Test
     void orderLineItemsNotNull() {
-        assertThatThrownBy(() -> new Order(OrderType.TAKEOUT, null))
+        assertThatThrownBy(() -> new Order(OrderType.TAKEOUT, null, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 항목은 비어 있을 수 없습니다.");
     }
@@ -33,7 +36,7 @@ class OrderTest {
     @Test
     void acceptSuccess() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
@@ -42,7 +45,7 @@ class OrderTest {
     @Test
     void acceptFail() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
         assertThatThrownBy(order::accept)
@@ -54,7 +57,7 @@ class OrderTest {
     @Test
     void served_fail() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         assertThatThrownBy(order::served)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("ACCEPTED 상태만 SERVED 상태로 변경가능합니다");
@@ -64,7 +67,7 @@ class OrderTest {
     @Test
     void served_success() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         order.served();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
@@ -74,7 +77,7 @@ class OrderTest {
     @Test
     void delivering_success() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.DELIVERY, orderLineItems);
+        Order order = new Order(OrderType.DELIVERY, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         order.served();
         order.delivering();
@@ -85,7 +88,7 @@ class OrderTest {
     @Test
     void delivering_fail_delivering() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         order.served();
         assertThatThrownBy(order::delivering)
@@ -97,7 +100,7 @@ class OrderTest {
     @Test
     void delivering_fail_served() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.DELIVERY, orderLineItems);
+        Order order = new Order(OrderType.DELIVERY, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         assertThatThrownBy(order::delivering)
                 .isInstanceOf(IllegalArgumentException.class)
@@ -108,7 +111,7 @@ class OrderTest {
     @Test
     void delivered_success() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.DELIVERY, orderLineItems);
+        Order order = new Order(OrderType.DELIVERY, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         order.served();
         order.delivering();
@@ -120,7 +123,7 @@ class OrderTest {
     @Test
     void delivered_fail() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.DELIVERY, orderLineItems);
+        Order order = new Order(OrderType.DELIVERY, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         order.served();
         assertThatThrownBy(order::delivered)
@@ -132,7 +135,7 @@ class OrderTest {
     @Test
     void completed_fail_delivered() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.DELIVERY, orderLineItems);
+        Order order = new Order(OrderType.DELIVERY, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         order.served();
         order.delivering();
@@ -145,7 +148,7 @@ class OrderTest {
     @Test
     void completed_takeout() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         order.served();
         order.completed();
@@ -156,11 +159,22 @@ class OrderTest {
     @Test
     void completed_eatIn() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.EAT_IN, orderLineItems);
+        Order order = new Order(OrderType.EAT_IN, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)));
         order.accept();
         order.served();
         order.completed();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("매장 주문에서 착석된 테이블을 선택할 수 없다.")
+    @Test
+    void validateMenuSize() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        OrderTable orderTable = new OrderTable(new Name("테이블명", false), new NumberOfGuests(1));
+        orderTable.occupied();
+        assertThatThrownBy(() -> new Order(OrderType.DELIVERY, orderLineItems, orderTable))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("매장 주문에서 착석된 테이블을 선택할 수 없다.");
     }
 
     private static List<OrderLineItem> orderLineItems() {
