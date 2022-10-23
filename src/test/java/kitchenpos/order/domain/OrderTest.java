@@ -50,6 +50,16 @@ class OrderTest {
                 .hasMessageContaining("WAITING 상태만 접수가능합니다.");
     }
 
+    @DisplayName("접수 상태가 아니면 제공할 수 없다.")
+    @Test
+    void served_fail() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        assertThatThrownBy(order::served)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("ACCEPTED 상태만 SERVED 상태로 변경가능합니다");
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         OrderLineItem orderLineItem = new OrderLineItem();
