@@ -78,6 +78,15 @@ class OrderTableTest {
         assertThatNoException().isThrownBy(() -> orderTable("주문테이블명", 1));
     }
 
+    @DisplayName("주문 테이블의 착석 인원을 변경 할 수 있다.")
+    @Test
+    void changeNumberOfGuests() {
+        OrderTable orderTable = orderTable("주문테이블명", 1);
+        orderTable.occupied();
+        orderTable.changeNumberOfGuests(10);
+        assertThat(orderTable.getNumberOfGuests()).isEqualTo(10);
+    }
+
     private static OrderTable orderTable(String name, int numberOfGuests) {
         return new OrderTable(new Name(name, false), new NumberOfGuests(numberOfGuests));
     }
