@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("상품")
@@ -60,5 +61,11 @@ class ProductTest {
         assertThatThrownBy(() -> product.changePrice(null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 일 수 없습니다.");
+    }
+
+    @DisplayName("상품을 생성할 수 있다.")
+    @Test
+    void createProduct() {
+        assertThatNoException().isThrownBy(() -> new Product(new Name("상품명", false), new Price(BigDecimal.ONE)));
     }
 }
