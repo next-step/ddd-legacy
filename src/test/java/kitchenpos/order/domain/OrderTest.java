@@ -209,6 +209,19 @@ class OrderTest {
                 .hasMessageContaining("배달 주문이면 배송지가 없을 수 없다.");
     }
 
+    @DisplayName("주문을 완료할 수 있다.")
+    @Test
+    void orderComplete() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.DELIVERY, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)), new DeliveryAddress("주소"));
+        order.accept();
+        order.served();
+        order.delivering();
+        order.delivered();
+        order.completed();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
         Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
