@@ -58,4 +58,8 @@ public class OrderTable {
     public void occupied() {
         this.occupied = true;
     }
+
+    public void vacant() {
+        this.occupied = false;
+    }
 }
