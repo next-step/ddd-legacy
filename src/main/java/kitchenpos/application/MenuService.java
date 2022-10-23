@@ -8,7 +8,7 @@ import kitchenpos.menu.menu.domain.Quantity;
 import kitchenpos.menu.menu.dto.MenuProductRequest;
 import kitchenpos.menu.menu.dto.MenuRequest;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
-import kitchenpos.menu.menugroup.infra.JpaMenuGroupRepository;
+import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
 import kitchenpos.menu.menugroup.infra.PurgomalumClient;
 import kitchenpos.product.domain.Product;
 import kitchenpos.product.domain.ProductRepository;
@@ -22,18 +22,18 @@ import java.util.stream.Collectors;
 @Service
 public class MenuService {
     private final MenuRepository menuRepository;
-    private final JpaMenuGroupRepository jpaMenuGroupRepository;
+    private final MenuGroupRepository menuGroupRepository;
     private final ProductRepository productRepository;
     private final PurgomalumClient purgomalumClient;
 
     public MenuService(
             final MenuRepository menuRepository,
-            final JpaMenuGroupRepository jpaMenuGroupRepository,
+            final MenuGroupRepository menuGroupRepository,
             final ProductRepository productRepository,
             final PurgomalumClient purgomalumClient
     ) {
         this.menuRepository = menuRepository;
-        this.jpaMenuGroupRepository = jpaMenuGroupRepository;
+        this.menuGroupRepository = menuGroupRepository;
         this.productRepository = productRepository;
         this.purgomalumClient = purgomalumClient;
     }
@@ -41,7 +41,7 @@ public class MenuService {
     @Transactional
     public Menu create(final MenuRequest request) {
         final BigDecimal price = request.getPrice();
-        final MenuGroup menuGroup = jpaMenuGroupRepository.findById(request.getMenuGroupId())
+        final MenuGroup menuGroup = menuGroupRepository.findById(request.getMenuGroupId())
                 .orElseThrow(NoSuchElementException::new);
         final List<MenuProductRequest> menuProductRequests = request.getMenuProducts();
         if (Objects.isNull(menuProductRequests) || menuProductRequests.isEmpty()) {

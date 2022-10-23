@@ -14,6 +14,11 @@ public class InMemoryMenuGroupRepository implements MenuGroupRepository {
     }
 
     @Override
+    public Optional<MenuGroup> findById(final UUID id) {
+        return Optional.ofNullable(menuGroups.get(id));
+    }
+
+    @Override
     public MenuGroup save(final MenuGroup menuGroup) {
         menuGroups.put(menuGroup.getId(), menuGroup);
         return menuGroup;
