@@ -53,6 +53,7 @@ public class Order {
         validateOrderLineItems(orderLineItems);
         validateType(type);
         this.type = type;
+        this.status = OrderStatus.WAITING;
     }
 
     private void validateOrderLineItems(List<OrderLineItem> orderLineItems) {

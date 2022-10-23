@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("주문")
@@ -30,15 +31,14 @@ class OrderTest {
                 .hasMessageContaining("주문 항목은 비어 있을 수 없습니다.");
     }
 
-    @DisplayName("WAITING 상태가 아니면 접수를 받을 수 없다.")
+    @DisplayName("주문을 수락 할 수 있다.")
     @Test
-    void accept() {
+    void acceptSuccess() {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItems.add(orderLineItem);
         Order order = new Order(OrderType.TAKEOUT, orderLineItems);
-        assertThatThrownBy(() -> order.accept())
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("WAITING 상태만 접수가능합니다.");
+        order.accept();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 }

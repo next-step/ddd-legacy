@@ -75,7 +75,6 @@ public class OrderService {
         }
         Order order = new Order(type, orderLineItems);
         order.setId(UUID.randomUUID());
-        order.setStatus(OrderStatus.WAITING);
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(orderLineItems);
         if (type == OrderType.DELIVERY) {
