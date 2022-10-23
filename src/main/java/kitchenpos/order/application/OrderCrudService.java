@@ -4,10 +4,7 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
-import kitchenpos.order.domain.Order;
-import kitchenpos.order.domain.OrderLineItem;
-import kitchenpos.order.domain.OrderStatus;
-import kitchenpos.order.domain.OrderType;
+import kitchenpos.order.domain.*;
 import kitchenpos.ordertable.domain.OrderTable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,18 +70,15 @@ public class OrderCrudService {
             orderTable = orderTableRepository.findById(request.getOrderTableId())
                     .orElseThrow(NoSuchElementException::new);
         }
-        Order order = new Order(type, orderLineItems, orderTable);
+        DeliveryAddress deliveryAddress = null;
+        if (type == OrderType.DELIVERY) {
+            deliveryAddress = new DeliveryAddress(request.getDeliveryAddress());
+        }
+        Order order = new Order(type, orderLineItems, orderTable, deliveryAddress);
         order.setId(UUID.randomUUID());
         order.setStatus(OrderStatus.WAITING);
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(orderLineItems);
-        if (type == OrderType.DELIVERY) {
-            final String deliveryAddress = request.getDeliveryAddress();
-            if (Objects.isNull(deliveryAddress) || deliveryAddress.isEmpty()) {
-                throw new IllegalArgumentException();
-            }
-            order.setDeliveryAddress(deliveryAddress);
-        }
         return orderRepository.save(order);
     }
 

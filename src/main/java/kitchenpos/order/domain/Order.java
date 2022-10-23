@@ -35,8 +35,8 @@ public class Order {
     )
     private List<OrderLineItem> orderLineItems;
 
-    @Column(name = "delivery_address")
-    private String deliveryAddress;
+    @Embedded
+    private DeliveryAddress deliveryAddress;
 
     @ManyToOne
     @JoinColumn(
@@ -53,12 +53,20 @@ public class Order {
 
     }
 
-    public Order(OrderType type, List<OrderLineItem> orderLineItems, OrderTable orderTable) {
+    public Order(OrderType type, List<OrderLineItem> orderLineItems, OrderTable orderTable, DeliveryAddress deliveryAddress) {
         validateOrderLineItems(orderLineItems);
         validateType(type);
-        validateOrderTable(orderTable);
         this.type = type;
+        validateOrderTable(orderTable);
+        validateDeliveryAddress(deliveryAddress);
         this.status = OrderStatus.WAITING;
+        this.deliveryAddress = deliveryAddress;
+    }
+
+    private void validateDeliveryAddress(DeliveryAddress deliveryAddress) {
+        if (this.type.equals(OrderType.DELIVERY) && deliveryAddress == null) {
+            throw new IllegalArgumentException("배달 주문이면 배송지가 없을 수 없다.");
+        }
     }
 
     private void validateOrderTable(OrderTable orderTable) {
@@ -125,11 +133,7 @@ public class Order {
     }
 
     public String getDeliveryAddress() {
-        return deliveryAddress;
-    }
-
-    public void setDeliveryAddress(final String deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
+        return this.deliveryAddress.getAddress();
     }
 
     public OrderTable getOrderTable() {
