@@ -12,8 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("메뉴")
 class MenuTest {
@@ -144,7 +143,14 @@ class MenuTest {
         assertThatThrownBy(() -> createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.ZERO)), new Quantity(1))), new Price(BigDecimal.valueOf(11))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("상품 가격의 총합은 0원보다 크다.");
+    }
 
+    //    메뉴 생성 시 메뉴명 / 메뉴 가격 / 메뉴 그룹 아이디 / 메뉴 전시 여부 / 메뉴 상품 목록을 입력 받는다.
+    @DisplayName("주문 생성 시 주문 타입 / 주문 테이블 아이디 / 주문 항목 목록을 입력 받는다.")
+    @Test
+    void createMenu() {
+        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
+        assertThatNoException().isThrownBy(() -> createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.ONE)), new Quantity(1))), new Price(BigDecimal.valueOf(11))));
     }
 
     private static Menu createMenu(MenuGroup menuGroup, List<MenuProduct> menuProducts, Price price) {
