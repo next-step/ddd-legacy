@@ -15,9 +15,7 @@ class OrderTest {
     @DisplayName("주문 타입은 null 일 수 없다.")
     @Test
     void requireOrderType() {
-        List<OrderLineItem> orderLineItems = new ArrayList<>();
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItems.add(orderLineItem);
+        List<OrderLineItem> orderLineItems = orderLineItems();
         assertThatThrownBy(() -> new Order(null, orderLineItems))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 타입을 입력해주세요.");
@@ -34,11 +32,28 @@ class OrderTest {
     @DisplayName("주문을 수락 할 수 있다.")
     @Test
     void acceptSuccess() {
-        List<OrderLineItem> orderLineItems = new ArrayList<>();
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItems.add(orderLineItem);
+        List<OrderLineItem> orderLineItems = orderLineItems();
         Order order = new Order(OrderType.TAKEOUT, orderLineItems);
         order.accept();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @DisplayName("WAITING 상태가 아니면 접수를 받을 수 없다.")
+    @Test
+    void acceptFail() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        order.accept();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        assertThatThrownBy(order::accept)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("WAITING 상태만 접수가능합니다.");
+    }
+
+    private static List<OrderLineItem> orderLineItems() {
+        List<OrderLineItem> orderLineItems = new ArrayList<>();
+        OrderLineItem orderLineItem = new OrderLineItem();
+        orderLineItems.add(orderLineItem);
+        return orderLineItems;
     }
 }
