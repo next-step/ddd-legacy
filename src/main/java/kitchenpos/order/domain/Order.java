@@ -155,4 +155,8 @@ public class Order {
         }
         this.status = OrderStatus.DELIVERING;
     }
+
+    public void completed() {
+        this.status = OrderStatus.COMPLETED;
+    }
 }

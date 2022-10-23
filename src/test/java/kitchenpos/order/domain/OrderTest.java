@@ -104,6 +104,18 @@ class OrderTest {
                 .hasMessageContaining("주문 상태가 SERVED일 경우에만 배송 시작을 할 수 있다.");
     }
 
+    @DisplayName("배송을 완료할 수 있다.")
+    @Test
+    void completed_success() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.DELIVERY, orderLineItems);
+        order.accept();
+        order.served();
+        order.delivering();
+        order.completed();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         OrderLineItem orderLineItem = new OrderLineItem();
