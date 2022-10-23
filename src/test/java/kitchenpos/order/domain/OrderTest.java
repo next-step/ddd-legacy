@@ -70,6 +70,17 @@ class OrderTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
+    @DisplayName("배송을 시작할 수 있다.")
+    @Test
+    void delivering_success() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        order.accept();
+        order.served();
+        order.delivering();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         OrderLineItem orderLineItem = new OrderLineItem();

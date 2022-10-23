@@ -145,4 +145,8 @@ public class Order {
         }
         this.status = OrderStatus.SERVED;
     }
+
+    public void delivering() {
+        this.status = OrderStatus.DELIVERING;
+    }
 }
