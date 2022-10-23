@@ -8,6 +8,9 @@ public class OrderLineItemRequest {
     private UUID menuId;
     private BigDecimal price;
 
+    protected OrderLineItemRequest() {
+    }
+
     public OrderLineItemRequest(BigDecimal price) {
         this.price = price;
     }
