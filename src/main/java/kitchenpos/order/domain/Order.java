@@ -71,6 +71,11 @@ public class Order {
         if (Objects.isNull(orderLineItems)) {
             throw new IllegalArgumentException("주문 항목은 비어 있을 수 없습니다.");
         }
+        for (OrderLineItem orderLineItem : orderLineItems) {
+            if (!orderLineItem.getMenu().isDisplayed()) {
+                throw new IllegalArgumentException("안보이는 메뉴가 주문될 수 없다.");
+            }
+        }
     }
 
     private static void validateType(OrderType type) {

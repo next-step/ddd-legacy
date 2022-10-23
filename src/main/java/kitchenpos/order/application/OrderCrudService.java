@@ -63,7 +63,7 @@ public class OrderCrudService {
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
                 throw new IllegalArgumentException();
             }
-            final OrderLineItem orderLineItem = new OrderLineItem();
+            final OrderLineItem orderLineItem = new OrderLineItem(menu);
             orderLineItem.setMenu(menu);
             orderLineItem.setQuantity(quantity);
             orderLineItems.add(orderLineItem);

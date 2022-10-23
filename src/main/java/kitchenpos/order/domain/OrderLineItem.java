@@ -31,7 +31,12 @@ public class OrderLineItem {
     @Transient
     private BigDecimal price;
 
-    public OrderLineItem() {
+    protected OrderLineItem() {
+
+    }
+
+    public OrderLineItem(Menu menu) {
+        this.menu = menu;
     }
 
     public Long getSeq() {
