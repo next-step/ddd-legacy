@@ -112,8 +112,20 @@ class OrderTest {
         order.accept();
         order.served();
         order.delivering();
-        order.completed();
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        order.delivered();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+    }
+
+    @DisplayName("주문 상태가 DELIVERING일 경우에만 배송을 완료할 수 있다.")
+    @Test
+    void completed_fail() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.DELIVERY, orderLineItems);
+        order.accept();
+        order.served();
+        assertThatThrownBy(order::delivered)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("주문 상태가 DELIVERING일 경우에만 배송을 완료할 수 있다.");
     }
 
     private static List<OrderLineItem> orderLineItems() {

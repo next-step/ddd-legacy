@@ -159,4 +159,11 @@ public class Order {
     public void completed() {
         this.status = OrderStatus.COMPLETED;
     }
+
+    public void delivered() {
+        if (this.status != OrderStatus.DELIVERING) {
+            throw new IllegalArgumentException("주문 상태가 DELIVERING일 경우에만 배송을 완료할 수 있다.");
+        }
+        this.status = OrderStatus.DELIVERED;
+    }
 }
