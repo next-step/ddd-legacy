@@ -55,9 +55,21 @@ class OrderTableTest {
     @Test
     void validateGuestsNumber() {
         OrderTable orderTable = orderTable("주문테이블명", 1);
+        orderTable.occupied();
+        assertThat(orderTable.isOccupied()).isTrue();
         assertThatThrownBy(() -> orderTable.changeNumberOfGuests(-1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 테이블의 착석 인원 변경 시 0명보다 작을 수 없다.");
+    }
+
+    @DisplayName("주문 테이블이 공석일 경우 착석 인원을 변경 할 수 없다.")
+    @Test
+    void validateOccupied() {
+        OrderTable orderTable = orderTable("주문테이블명", 1);
+        assertThat(orderTable.isOccupied()).isFalse();
+        assertThatThrownBy(() -> orderTable.changeNumberOfGuests(1))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("주문 테이블이 공석일 경우 착석 인원을 변경 할 수 없다.");
     }
 
     private static OrderTable orderTable(String name, int numberOfGuests) {
