@@ -147,6 +147,9 @@ public class Order {
     }
 
     public void delivering() {
+        if (this.type != OrderType.DELIVERY) {
+            throw new IllegalArgumentException("주문 타입이 DELIVERY일 경우에만 배송 시작을 할 수 있습니다.");
+        }
         this.status = OrderStatus.DELIVERING;
     }
 }

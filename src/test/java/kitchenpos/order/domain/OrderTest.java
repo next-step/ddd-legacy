@@ -74,11 +74,23 @@ class OrderTest {
     @Test
     void delivering_success() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        Order order = new Order(OrderType.DELIVERY, orderLineItems);
         order.accept();
         order.served();
         order.delivering();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+    }
+
+    @DisplayName("주문 타입이 DELIVERING일 경우에만 배송 시작을 할 수 있다.")
+    @Test
+    void delivering_fail_delivering() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        order.accept();
+        order.served();
+        assertThatThrownBy(order::delivering)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("주문 타입이 DELIVERY일 경우에만 배송 시작을 할 수 있습니다.");
     }
 
     private static List<OrderLineItem> orderLineItems() {
