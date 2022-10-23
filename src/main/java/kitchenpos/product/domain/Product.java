@@ -20,6 +20,8 @@ public class Product {
     @Embedded
     private Price price;
 
+    protected Product(){}
+
     public Product(Name name, Price price) {
         validatePrice(price);
         validateName(name);
