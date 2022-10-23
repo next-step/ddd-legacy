@@ -74,6 +74,18 @@ class OrderCrudServiceTest {
                 .hasMessageContaining("메뉴의 수량과 주문 항목의 수량은 같다.");
     }
 
+    @DisplayName("주문 타입은 배송 / 포장 / 매장 중 한 가지를 갖는다.")
+    @Test
+    void orderType() {
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(BigDecimal.TEN);
+        orderLineItemRequests.add(orderLineItemRequest);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null);
+        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("주문 타입을 입력해주세요.");
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
         Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
