@@ -141,6 +141,28 @@ class OrderTest {
                 .hasMessageContaining("주문 상태가 DELIVERED가 아니면 주문을 완료할 수 없다.");
     }
 
+    @DisplayName("주문 타입이 TAKEOUT이고 주문상태가 SERVED일 경우 주문을 완료할 수 있다.")
+    @Test
+    void completed_takeout() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.TAKEOUT, orderLineItems);
+        order.accept();
+        order.served();
+        order.completed();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("주문 타입이 EAT_IN이고 주문상태가 SERVED일 경우 주문을 완료할 수 있다.")
+    @Test
+    void completed_eatIn() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        Order order = new Order(OrderType.EAT_IN, orderLineItems);
+        order.accept();
+        order.served();
+        order.completed();
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         OrderLineItem orderLineItem = new OrderLineItem();
