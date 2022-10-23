@@ -9,8 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static kitchenpos.order.domain.OrderFixture.orderLineItems;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("주문")
 class OrderTest {
@@ -211,5 +210,12 @@ class OrderTest {
         order.delivered();
         order.completed();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("주문 생성 시 주문 타입 / 주문 테이블 아이디 / 주문 항목 목록을 입력 받는다.")
+    @Test
+    void createOrder() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        assertThatNoException().isThrownBy(() -> new Order(OrderType.DELIVERY, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)), new DeliveryAddress("주소")));
     }
 }
