@@ -21,7 +21,7 @@ class MenuTest {
     @DisplayName("메뉴 그룹에 속해 있다.")
     @Test
     void requireMenuGroup() {
-        assertThatThrownBy(() -> new Menu(null, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.ONE)))
+        assertThatThrownBy(() -> createMenu(null, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.ONE)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴 그룹이 없습니다.");
     }
@@ -30,7 +30,7 @@ class MenuTest {
     @Test
     void quantityCount() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        assertThatThrownBy(() -> new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.valueOf(-1)))), new Price(BigDecimal.ONE)))
+        assertThatThrownBy(() -> createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.valueOf(-1)))), new Price(BigDecimal.ONE)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("수량은 0보다 작을 수 없습니다.");
     }
@@ -39,7 +39,7 @@ class MenuTest {
     @Test
     void menuPriceOverZero() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        assertThatThrownBy(() -> new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.valueOf(-1))))
+        assertThatThrownBy(() -> createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.valueOf(-1))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
     }
@@ -48,7 +48,7 @@ class MenuTest {
     @Test
     void menuProductsNotEmpty() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        assertThatThrownBy(() -> new Menu(menuGroup, null, new Price(BigDecimal.ONE)))
+        assertThatThrownBy(() -> createMenu(menuGroup, null, new Price(BigDecimal.ONE)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴 상품 목록은 비어 있을 수 없습니다.");
     }
@@ -57,7 +57,7 @@ class MenuTest {
     @Test
     void requireMenuPrice() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        assertThatThrownBy(() -> new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), null))
+        assertThatThrownBy(() -> createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴 가격을 입력해주세요.");
     }
@@ -66,7 +66,7 @@ class MenuTest {
     @Test
     void changeMenuPrice() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
+        Menu menu = createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
         assertThatThrownBy(() -> menu.changePrice(null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격을 입력해주세요");
@@ -76,7 +76,7 @@ class MenuTest {
     @Test
     void changeMinimumPrice() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
+        Menu menu = createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
         assertThatThrownBy(() -> menu.changePrice(new Price(BigDecimal.valueOf(-1))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
@@ -86,7 +86,7 @@ class MenuTest {
     @Test
     void hideMenu() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
+        Menu menu = createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
         menu.display();
         assertThat(menu.isDisplayed()).isTrue();
         menu.hide();
@@ -97,7 +97,7 @@ class MenuTest {
     @Test
     void displayMenu() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
+        Menu menu = createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.TEN));
         assertThat(menu.isDisplayed()).isFalse();
         menu.display();
         assertThat(menu.isDisplayed()).isTrue();
@@ -107,7 +107,7 @@ class MenuTest {
     @Test
     void displayMenuByPrice() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.ONE));
+        Menu menu = createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.ONE));
         menu.display();
         assertThat(menu.isDisplayed()).isTrue();
         assertThat(menu.sumMenuProducts()).isEqualTo(BigDecimal.TEN);
@@ -119,10 +119,24 @@ class MenuTest {
     @Test
     void menuPriceOverSumMenuPrice() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.valueOf(11)));
+        Menu menu = createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.valueOf(11)));
         assertThatThrownBy(() -> menu.display())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴의 가격이 메뉴 상품의 합보다 클 수 없다.");
+    }
+
+    @DisplayName("상품 가격의 총합은 0원보다 크다.")
+    @Test
+    void sumMenuProductsOverZero() {
+        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
+        assertThatThrownBy(() -> createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.ZERO)), new Quantity(BigDecimal.ONE))), new Price(BigDecimal.valueOf(11))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("상품 가격의 총합은 0원보다 크다.");
+
+    }
+
+    private static Menu createMenu(MenuGroup menuGroup, List<MenuProduct> menuProducts, Price price) {
+        return new Menu(menuGroup, menuProducts, price);
     }
 
     private static MenuGroup createMenuGroup(UUID id, String menuGroupName) {

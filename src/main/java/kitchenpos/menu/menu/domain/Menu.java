@@ -72,6 +72,11 @@ public class Menu {
                 throw new IllegalArgumentException("수량은 0보다 커야합니다.");
             }
         }
+        for (MenuProduct menuProduct : menuProducts) {
+            if (BigDecimal.ZERO.compareTo(menuProduct.menuProductPrice()) >= 0) {
+                throw new IllegalArgumentException("상품 가격의 총합은 0원보다 크다.");
+            }
+        }
     }
 
     private static void validateMenuGroup(MenuGroup menuGroup) {
