@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("상품")
 class ProductTest {
@@ -67,5 +66,13 @@ class ProductTest {
     @Test
     void createProduct() {
         assertThatNoException().isThrownBy(() -> new Product(new Name("상품명", false), new Price(BigDecimal.ONE)));
+    }
+
+    @DisplayName("상품 가격을 변경할 수 있다.")
+    @Test
+    void changePrice() {
+        Product product = new Product(new Name("상품명", false), new Price(BigDecimal.ONE));
+        product.changePrice(BigDecimal.TEN);
+        assertThat(product.getPrice()).isEqualTo(BigDecimal.TEN);
     }
 }
