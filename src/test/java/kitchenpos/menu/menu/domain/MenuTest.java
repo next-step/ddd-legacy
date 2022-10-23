@@ -109,6 +109,7 @@ class MenuTest {
     void displayMenu() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
         Menu menu = createMenu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
+        menu.hide();
         assertThat(menu.isDisplayed()).isFalse();
         menu.display();
         assertThat(menu.isDisplayed()).isTrue();

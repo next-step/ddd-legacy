@@ -5,6 +5,7 @@ import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryMenuRepository implements MenuRepository {
     private final Map<UUID, Menu> menus = new HashMap<>();
@@ -17,7 +18,10 @@ public class InMemoryMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAllByIdIn(List<UUID> ids) {
-        return null;
+        return menus.values()
+                .stream()
+                .filter(menu -> ids.contains(menu.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override

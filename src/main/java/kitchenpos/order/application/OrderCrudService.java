@@ -5,6 +5,8 @@ import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.order.domain.*;
+import kitchenpos.order.dto.OrderLineItemRequest;
+import kitchenpos.order.dto.OrderRequest;
 import kitchenpos.ordertable.domain.OrderTable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,22 +32,15 @@ public class OrderCrudService {
     }
 
     @Transactional
-    public Order create(final Order request) {
+    public Order create(final OrderRequest request) {
         final OrderType type = request.getType();
-        final List<OrderLineItem> orderLineItemRequests = request.getOrderLineItems();
+        final List<OrderLineItemRequest> orderLineItemRequests = request.getOrderLineItems();
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
             throw new IllegalArgumentException();
         }
-        final List<Menu> menus = menuRepository.findAllByIdIn(
-                orderLineItemRequests.stream()
-                        .map(OrderLineItem::getMenuId)
-                        .collect(Collectors.toList())
-        );
-        if (menus.size() != orderLineItemRequests.size()) {
-            throw new IllegalArgumentException();
-        }
+        validateMenuSize(orderLineItemRequests);
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
-        for (final OrderLineItem orderLineItemRequest : orderLineItemRequests) {
+        for (final OrderLineItemRequest orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
             if (type != OrderType.EAT_IN) {
                 if (quantity < 0) {
@@ -80,6 +75,17 @@ public class OrderCrudService {
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(orderLineItems);
         return orderRepository.save(order);
+    }
+
+    private void validateMenuSize(List<OrderLineItemRequest> orderLineItemRequests) {
+        final List<Menu> menus = menuRepository.findAllByIdIn(
+                orderLineItemRequests.stream()
+                        .map(OrderLineItemRequest::getMenuId)
+                        .collect(Collectors.toList())
+        );
+        if (menus.size() != orderLineItemRequests.size()) {
+            throw new IllegalArgumentException("메뉴의 수량과 주문 항목의 수량은 같다.");
+        }
     }
 
     @Transactional(readOnly = true)

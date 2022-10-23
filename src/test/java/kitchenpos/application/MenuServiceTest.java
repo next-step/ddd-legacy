@@ -3,11 +3,9 @@ package kitchenpos.application;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Name;
 import kitchenpos.menu.menu.application.InMemoryMenuRepository;
-import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.menu.menu.domain.Price;
 import kitchenpos.menu.menu.domain.Quantity;
-import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
 import kitchenpos.menu.menugroup.infra.PurgomalumClient;
 import kitchenpos.product.application.InMemoryProductRepository;
@@ -18,10 +16,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.domain.MenuFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("메뉴 서비스")
@@ -47,17 +44,5 @@ class MenuServiceTest {
     void findMenus() {
         menuRepository.save(createMenu(createMenuGroup(UUID.randomUUID(), "메뉴그룹명"), createMenuProducts(new MenuProduct(new Product(new Name("상품명", false), new Price(BigDecimal.TEN)), new Quantity(1L))), new Price(BigDecimal.TEN)));
         assertThat(menuService.findAll()).hasSize(1);
-    }
-
-    private static Menu createMenu(MenuGroup menuGroup, List<MenuProduct> menuProducts, Price price) {
-        return new Menu(menuGroup, menuProducts, price);
-    }
-
-    private static MenuGroup createMenuGroup(UUID id, String menuGroupName) {
-        return new MenuGroup(id, new Name(menuGroupName, false));
-    }
-
-    private static List<MenuProduct> createMenuProducts(final MenuProduct... menuProducts) {
-        return Arrays.asList(menuProducts);
     }
 }

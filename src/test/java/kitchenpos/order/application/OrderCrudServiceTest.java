@@ -13,6 +13,8 @@ import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderType;
+import kitchenpos.order.dto.OrderLineItemRequest;
+import kitchenpos.order.dto.OrderRequest;
 import kitchenpos.ordertable.domain.NumberOfGuests;
 import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.product.domain.Product;
@@ -26,7 +28,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.domain.MenuFixture.createMenu;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("주문 서비스")
 class OrderCrudServiceTest {
@@ -42,6 +46,7 @@ class OrderCrudServiceTest {
         menuRepository = new InMemoryMenuRepository();
         orderTableRepository = new InMemoryOrderTableRepository();
         orderCrudService = new OrderCrudService(orderRepository, menuRepository, orderTableRepository);
+        menuRepository.save(createMenu(createMenuGroup(UUID.randomUUID(), "메뉴그룹명"), createMenuProducts(new MenuProduct(new Product(new Name("상품명", false), new Price(BigDecimal.TEN)), new Quantity(1L))), new Price(BigDecimal.TEN)));
     }
 
     @DisplayName("주문 내역을 조회할 수 있다.")
@@ -51,6 +56,22 @@ class OrderCrudServiceTest {
         OrderTable orderTable = new OrderTable(new Name("테이블명", false), new NumberOfGuests(1));
         orderRepository.save(new Order(OrderType.EAT_IN, orderLineItems, orderTable, null));
         assertThat(orderCrudService.findAll()).hasSize(1);
+    }
+
+    @DisplayName("메뉴의 수량과 주문 항목의 수량은 같다.")
+    @Test
+    void menuSize() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        OrderTable orderTable = new OrderTable(new Name("테이블명", false), new NumberOfGuests(1));
+        orderRepository.save(new Order(OrderType.EAT_IN, orderLineItems, orderTable, null));
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(BigDecimal.TEN);
+        orderLineItemRequests.add(orderLineItemRequest);
+        orderLineItemRequests.add(orderLineItemRequest);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
+        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("메뉴의 수량과 주문 항목의 수량은 같다.");
     }
 
     private static List<OrderLineItem> orderLineItems() {

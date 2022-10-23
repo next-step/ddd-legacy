@@ -70,7 +70,7 @@ public class Order {
     }
 
     private void validateOrderTable(OrderTable orderTable) {
-        if (orderTable.isOccupied()) {
+        if (orderTable != null && orderTable.isOccupied()) {
             throw new IllegalArgumentException("매장 주문에서 착석된 테이블을 선택할 수 없다.");
         }
     }

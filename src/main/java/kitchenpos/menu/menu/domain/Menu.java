@@ -52,6 +52,7 @@ public class Menu {
         validateMenuProducts(menuProducts);
         validateMenuGroup(menuGroup);
         validateMenuPrice(price);
+        this.displayed = true;
         this.price = price;
         this.menuProducts = menuProducts;
         this.menuGroup = menuGroup;
