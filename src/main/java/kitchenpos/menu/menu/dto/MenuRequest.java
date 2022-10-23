@@ -1,7 +1,5 @@
 package kitchenpos.menu.menu.dto;
 
-import kitchenpos.domain.MenuProduct;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +12,10 @@ public class MenuRequest {
     private String name;
     private boolean isDisplayed;
 
+    public MenuRequest(UUID menuGroupId, List<MenuProductRequest> menuProductRequests) {
+        this.menuGroupId = menuGroupId;
+        this.menuProducts = menuProductRequests;
+    }
 
     public BigDecimal getPrice() {
         return this.price;

@@ -52,9 +52,7 @@ public class MenuService {
                         .map(MenuProductRequest::getProductId)
                         .collect(Collectors.toList())
         );
-        if (products.size() != menuProductRequests.size()) {
-            throw new IllegalArgumentException();
-        }
+        validateProductSize(menuProductRequests, products);
         final List<MenuProduct> menuProducts = new ArrayList<>();
         BigDecimal sum = BigDecimal.ZERO;
         for (final MenuProductRequest menuProductRequest : menuProductRequests) {
@@ -81,6 +79,12 @@ public class MenuService {
         menu.setDisplayed(request.isDisplayed());
         menu.setMenuProducts(menuProducts);
         return menuRepository.save(menu);
+    }
+
+    private static void validateProductSize(List<MenuProductRequest> menuProductRequests, List<Product> products) {
+        if (products.size() != menuProductRequests.size()) {
+            throw new IllegalArgumentException("상품의 수량과 메뉴 상품의 수량은 다를 수 없다.");
+        }
     }
 
     @Transactional
