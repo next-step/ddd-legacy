@@ -65,7 +65,7 @@ public class MenuService {
                 product.getPrice()
                     .multiply(quantity.getQuantity())
             );
-            final MenuProduct menuProduct = new MenuProduct(quantity);
+            final MenuProduct menuProduct = new MenuProduct(product, quantity);
             menuProduct.setProduct(product);
             menuProducts.add(menuProduct);
         }

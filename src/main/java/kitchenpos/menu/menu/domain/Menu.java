@@ -120,6 +120,14 @@ public class Menu {
         return menuProducts;
     }
 
+    public BigDecimal sumMenuProducts() {
+        BigDecimal menuProductsPrice = BigDecimal.ZERO;
+        for (MenuProduct menuProduct : this.menuProducts) {
+            menuProductsPrice = menuProductsPrice.add(menuProduct.menuProductPrice());
+        }
+        return menuProductsPrice;
+    }
+
     public void setMenuProducts(final List<MenuProduct> menuProducts) {
         this.menuProducts = menuProducts;
     }
@@ -133,8 +141,16 @@ public class Menu {
     }
 
     public void changePrice(Price price) {
+        validateMenuPrice(price);
+        hideMenu(price);
         if (price == null) {
             throw new IllegalArgumentException("가격을 입력해주세요");
+        }
+    }
+
+    private void hideMenu(Price price) {
+        if (price.getPrice().compareTo(sumMenuProducts()) > 0) {
+            hide();
         }
     }
 
