@@ -58,7 +58,7 @@ public class ProductService {
             for (final MenuProduct menuProduct : menu.getMenuProducts()) {
                 sum = menuProduct.getProduct()
                         .getPrice()
-                        .multiply(menuProduct.getQuantity().getQuantity());
+                        .multiply(BigDecimal.valueOf(menuProduct.getQuantity().getQuantity()));
             }
             if (menu.getPrice().compareTo(sum) > 0) {
                 menu.setDisplayed(false);

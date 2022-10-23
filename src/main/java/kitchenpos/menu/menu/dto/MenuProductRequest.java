@@ -1,14 +1,13 @@
 package kitchenpos.menu.menu.dto;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 public class MenuProductRequest {
 
-    private BigDecimal quantity;
+    private long quantity;
     private UUID productId;
 
-    public BigDecimal getQuantity() {
+    public long getQuantity() {
         return this.quantity;
     }
 

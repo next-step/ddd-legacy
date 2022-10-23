@@ -68,7 +68,7 @@ public class Menu {
             throw new IllegalArgumentException("메뉴 상품 목록은 비어 있을 수 없습니다.");
         }
         for (MenuProduct menuProduct : menuProducts) {
-            if (BigDecimal.ZERO.compareTo(menuProduct.getQuantity().getQuantity()) > 0) {
+            if (menuProduct.getQuantity().getQuantity() <= 0) {
                 throw new IllegalArgumentException("수량은 0보다 커야합니다.");
             }
         }

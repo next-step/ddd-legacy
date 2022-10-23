@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
-import kitchenpos.product.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.menu.menu.domain.Menu;
@@ -12,6 +11,7 @@ import kitchenpos.menu.menu.domain.Quantity;
 import kitchenpos.menu.menu.dto.MenuProductRequest;
 import kitchenpos.menu.menu.dto.MenuRequest;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
+import kitchenpos.product.domain.Product;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,9 +48,9 @@ public class MenuService {
             throw new IllegalArgumentException();
         }
         final List<Product> products = productRepository.findAllByIdIn(
-            menuProductRequests.stream()
-                .map(MenuProductRequest::getProductId)
-                .collect(Collectors.toList())
+                menuProductRequests.stream()
+                        .map(MenuProductRequest::getProductId)
+                        .collect(Collectors.toList())
         );
         if (products.size() != menuProductRequests.size()) {
             throw new IllegalArgumentException();
@@ -62,9 +62,8 @@ public class MenuService {
             final Product product = productRepository.findById(menuProductRequest.getProductId())
                 .orElseThrow(NoSuchElementException::new);
             sum = sum.add(
-                product.getPrice()
-                    .multiply(quantity.getQuantity())
-            );
+                    product.getPrice()
+                            .multiply(BigDecimal.valueOf(quantity.getQuantity())));
             final MenuProduct menuProduct = new MenuProduct(product, quantity);
             menuProduct.setProduct(product);
             menuProducts.add(menuProduct);
@@ -95,7 +94,7 @@ public class MenuService {
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             final BigDecimal sum = menuProduct.getProduct()
                     .getPrice()
-                    .multiply(menuProduct.getQuantity().getQuantity());
+                    .multiply(BigDecimal.valueOf(menuProduct.getQuantity().getQuantity()));
             if (price.compareTo(sum) > 0) {
                 throw new IllegalArgumentException();
             }
@@ -112,7 +111,7 @@ public class MenuService {
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             final BigDecimal sum = menuProduct.getProduct()
                     .getPrice()
-                    .multiply(menuProduct.getQuantity().getQuantity());
+                    .multiply(BigDecimal.valueOf(menuProduct.getQuantity().getQuantity()));
             if (menu.getPrice().compareTo(sum) > 0) {
                 throw new IllegalStateException();
             }

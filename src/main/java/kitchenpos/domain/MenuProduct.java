@@ -37,7 +37,7 @@ public class MenuProduct {
     }
 
     public BigDecimal menuProductPrice() {
-        return this.quantity.getQuantity().multiply(this.product.getPrice());
+        return BigDecimal.valueOf(this.quantity.getQuantity()).multiply(this.product.getPrice());
     }
 
     public Long getSeq() {
