@@ -77,7 +77,7 @@ public class Order {
     }
 
     private void validateOrderLineItems(List<OrderLineItem> orderLineItems) {
-        if (Objects.isNull(orderLineItems)) {
+        if (Objects.isNull(orderLineItems) || orderLineItems.size() == 0) {
             throw new IllegalArgumentException("주문 항목은 비어 있을 수 없습니다.");
         }
         for (OrderLineItem orderLineItem : orderLineItems) {

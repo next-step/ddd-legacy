@@ -11,8 +11,12 @@ import kitchenpos.ordertable.domain.OrderTableRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,9 +39,6 @@ public class OrderCrudService {
     public Order create(final OrderRequest request) {
         final OrderType type = request.getType();
         final List<OrderLineItemRequest> orderLineItemRequests = request.getOrderLineItems();
-        if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
-            throw new IllegalArgumentException();
-        }
         validateMenuSize(orderLineItemRequests);
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItemRequest orderLineItemRequest : orderLineItemRequests) {
@@ -52,7 +53,7 @@ public class OrderCrudService {
             if (!menu.isDisplayed()) {
                 throw new IllegalStateException();
             }
-            validatePrice(orderLineItemRequest, menu);
+            validatePrice(orderLineItemRequest, menu.getPrice());
             final OrderLineItem orderLineItem = new OrderLineItem(menu);
             orderLineItem.setMenu(menu);
             orderLineItem.setQuantity(quantity);
@@ -75,8 +76,8 @@ public class OrderCrudService {
         return orderRepository.save(order);
     }
 
-    private static void validatePrice(OrderLineItemRequest orderLineItemRequest, Menu menu) {
-        if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
+    private static void validatePrice(OrderLineItemRequest orderLineItemRequest, BigDecimal menuPrice) {
+        if (menuPrice.compareTo(orderLineItemRequest.getPrice()) != 0) {
             throw new IllegalArgumentException("메뉴의 가격과 메뉴 항목의 가격은 같다.");
         }
     }

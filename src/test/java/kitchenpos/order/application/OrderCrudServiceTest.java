@@ -101,6 +101,16 @@ class OrderCrudServiceTest {
                 .hasMessageContaining("메뉴의 가격과 메뉴 항목의 가격은 같다.");
     }
 
+    @DisplayName("주문 항목은 비어 있을 수 없다.")
+    @Test
+    void orderLineItemsNotNull() {
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
+        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("주문 항목은 비어 있을 수 없습니다.");
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
         Menu menu = new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, createMenuProducts(new MenuProduct(new Product(UUID.randomUUID(), new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
