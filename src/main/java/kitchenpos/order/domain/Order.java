@@ -130,4 +130,11 @@ public class Order {
     public void setOrderTableId(final UUID orderTableId) {
         this.orderTableId = orderTableId;
     }
+
+    public void accept() {
+        if (this.status != OrderStatus.WAITING) {
+            throw new IllegalArgumentException("WAITING 상태만 접수가능합니다.");
+        }
+        this.status = OrderStatus.ACCEPTED;
+    }
 }
