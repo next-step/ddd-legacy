@@ -1,6 +1,6 @@
 package kitchenpos.order.application;
 
-import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.common.infra.KitchenridersClient;
 import kitchenpos.order.domain.*;
 import kitchenpos.ordertable.domain.OrderTable;
 import org.springframework.stereotype.Service;

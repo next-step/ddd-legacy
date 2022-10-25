@@ -1,4 +1,4 @@
-package kitchenpos.utils;
+package kitchenpos.common.utils;
 
 import static java.util.Arrays.stream;
 

@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.domain.MenuFixture.createMenu;
+import static kitchenpos.menu.menu.domain.MenuFixture.createMenu;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

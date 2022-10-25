@@ -3,7 +3,7 @@ package kitchenpos.product.application;
 import kitchenpos.application.FakePurgomalumClient;
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.menu.menu.application.InMemoryMenuRepository;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.product.domain.Product;

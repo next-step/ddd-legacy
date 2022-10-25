@@ -2,7 +2,7 @@ package kitchenpos.menu.menu.application;
 
 import kitchenpos.common.vo.Price;
 import kitchenpos.common.vo.Quantity;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;

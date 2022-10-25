@@ -1,6 +1,9 @@
-package kitchenpos.order.domain;
+package kitchenpos.ordertable.domain;
 
 import kitchenpos.common.vo.Name;
+import kitchenpos.order.domain.Order;
+import kitchenpos.order.domain.OrderLineItem;
+import kitchenpos.order.domain.OrderType;
 import kitchenpos.order.vo.DeliveryAddress;
 import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.ordertable.vo.NumberOfGuests;

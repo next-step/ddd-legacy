@@ -2,7 +2,7 @@ package kitchenpos.product.application;
 
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
@@ -50,8 +50,7 @@ public class ProductService {
         }
         final Product product = productRepository.findById(productId)
                 .orElseThrow(NoSuchElementException::new);
-        //TODO price Type변경
-//        product.setPrice(price);
+        product.changePrice(price);
         final List<Menu> menus = menuRepository.findAllByProductId(productId);
         for (final Menu menu : menus) {
             BigDecimal sum = BigDecimal.ZERO;

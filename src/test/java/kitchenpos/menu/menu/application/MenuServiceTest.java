@@ -1,9 +1,11 @@
-package kitchenpos.application;
+package kitchenpos.menu.menu.application;
 
+import kitchenpos.application.FakePurgomalumClient;
+import kitchenpos.application.InMemoryMenuGroupRepository;
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
 import kitchenpos.common.vo.Quantity;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.menu.menu.application.InMemoryMenuRepository;
 import kitchenpos.menu.menu.application.MenuService;
 import kitchenpos.menu.menu.domain.MenuProduct;
@@ -24,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.domain.MenuFixture.*;
+import static kitchenpos.menu.menu.domain.MenuFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
