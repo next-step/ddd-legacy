@@ -18,7 +18,7 @@ public class OrderFixture {
 
     public static List<OrderLineItem> orderLineItems() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
+        Menu menu = new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, createMenuProducts(new MenuProduct(new Product(UUID.randomUUID(), new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
         menu.display();
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         OrderLineItem orderLineItem = new OrderLineItem(menu);

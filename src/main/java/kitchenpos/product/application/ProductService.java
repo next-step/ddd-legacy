@@ -1,13 +1,14 @@
 package kitchenpos.product.application;
 
+import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
-import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.product.domain.Product;
 import kitchenpos.product.domain.ProductRepository;
+import kitchenpos.product.dto.request.ProductRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +35,9 @@ public class ProductService {
     }
 
     @Transactional
-    public Product create(final Product request) {
+    public Product create(final ProductRequest request) {
         final String name = request.getName();
-        final Product product = new Product(new Name(name, purgomalumClient.containsProfanity(name)), new Price(request.getPrice()));
-        product.setId(UUID.randomUUID());
-        product.setName(name);
+        final Product product = new Product(request.getId(), new Name(name, purgomalumClient.containsProfanity(name)), new Price(request.getPrice()));
         return productRepository.save(product);
     }
 

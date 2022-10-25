@@ -2,8 +2,6 @@ package kitchenpos.menu.menu.domain;
 
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
-import kitchenpos.menu.menu.domain.Menu;
-import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 
 import java.util.Arrays;
@@ -12,8 +10,8 @@ import java.util.UUID;
 
 public class MenuFixture {
 
-    public static Menu createMenu(MenuGroup menuGroup, List<MenuProduct> menuProducts, Price price) {
-        return new Menu(menuGroup, menuProducts, price);
+    public static Menu createMenu(MenuGroup menuGroup, Name name, List<MenuProduct> menuProducts, Price price) {
+        return new Menu(UUID.randomUUID(), name, menuGroup, menuProducts, price);
     }
 
     public static MenuGroup createMenuGroup(UUID id, String menuGroupName) {

@@ -14,8 +14,7 @@ public class Product {
     @Id
     private UUID id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    private Name name;
 
     @Embedded
     private Price price;
@@ -23,10 +22,12 @@ public class Product {
     protected Product() {
     }
 
-    public Product(Name name, Price price) {
+    public Product(UUID id, Name name, Price price) {
         validatePrice(price);
         validateName(name);
         this.price = price;
+        this.id = id;
+        this.name = name;
     }
 
     private void validatePrice(Price price) {
@@ -47,14 +48,6 @@ public class Product {
 
     public void setId(final UUID id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
     }
 
     public BigDecimal getPrice() {

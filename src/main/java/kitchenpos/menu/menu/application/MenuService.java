@@ -1,8 +1,9 @@
 package kitchenpos.menu.menu.application;
 
+import kitchenpos.common.infra.PurgomalumClient;
+import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
 import kitchenpos.common.vo.Quantity;
-import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
@@ -69,13 +70,8 @@ public class MenuService {
         if (price.compareTo(sum) > 0) {
             throw new IllegalArgumentException();
         }
-        final String name = request.getName();
-        if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
-        }
-        final Menu menu = new Menu(menuGroup, menuProducts, new Price(price));
+        final Menu menu = new Menu(UUID.randomUUID(), new Name(request.getName(), purgomalumClient.containsProfanity(request.getName())), menuGroup, menuProducts, new Price(price));
         menu.setId(UUID.randomUUID());
-        menu.setName(name);
         menu.setMenuProducts(menuProducts);
         return menuRepository.save(menu);
     }

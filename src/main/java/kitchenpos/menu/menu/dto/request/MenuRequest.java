@@ -12,9 +12,11 @@ public class MenuRequest {
     private String name;
     private boolean isDisplayed;
 
-    public MenuRequest(UUID menuGroupId, List<MenuProductRequest> menuProductRequests) {
+    public MenuRequest(UUID menuGroupId, String name, BigDecimal price, List<MenuProductRequest> menuProductRequests) {
+        this.name = name;
         this.menuGroupId = menuGroupId;
         this.menuProducts = menuProductRequests;
+        this.price = price;
     }
 
     public BigDecimal getPrice() {

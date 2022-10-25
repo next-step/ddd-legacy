@@ -46,7 +46,8 @@ class OrderCrudServiceTest {
         menuRepository = new InMemoryMenuRepository();
         orderTableRepository = new InMemoryOrderTableRepository();
         orderCrudService = new OrderCrudService(orderRepository, menuRepository, orderTableRepository);
-        menuRepository.save(createMenu(createMenuGroup(UUID.randomUUID(), "메뉴그룹명"), createMenuProducts(new MenuProduct(new Product(new Name("상품명", false), new Price(BigDecimal.TEN)), new Quantity(1L))), new Price(BigDecimal.TEN)));
+        List<MenuProduct> menuProducts = createMenuProducts(new MenuProduct(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)), new Quantity(1L)));
+        menuRepository.save(createMenu(createMenuGroup(UUID.randomUUID(), "메뉴그룹명"), new Name("메뉴명", false), menuProducts, new Price(BigDecimal.TEN)));
     }
 
     @DisplayName("주문 내역을 조회할 수 있다.")
@@ -100,7 +101,7 @@ class OrderCrudServiceTest {
 
     private static List<OrderLineItem> orderLineItems() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = new Menu(menuGroup, createMenuProducts(new MenuProduct(new Product(new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
+        Menu menu = new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, createMenuProducts(new MenuProduct(new Product(UUID.randomUUID(), new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
         menu.display();
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         OrderLineItem orderLineItem = new OrderLineItem(menu);

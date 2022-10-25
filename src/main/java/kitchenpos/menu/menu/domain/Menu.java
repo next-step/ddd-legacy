@@ -1,5 +1,6 @@
 package kitchenpos.menu.menu.domain;
 
+import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 
@@ -16,8 +17,7 @@ public class Menu {
     @Id
     private UUID id;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+    private Name name;
 
     @Embedded
     private Price price;
@@ -48,14 +48,16 @@ public class Menu {
     protected Menu() {
     }
 
-    public Menu(MenuGroup menuGroup, List<MenuProduct> menuProducts, Price price) {
+    public Menu(UUID id, Name name, MenuGroup menuGroup, List<MenuProduct> menuProducts, Price price) {
         validateMenuProducts(menuProducts);
         validateMenuGroup(menuGroup);
         validateMenuPrice(price);
+        this.id = id;
         this.displayed = true;
         this.price = price;
         this.menuProducts = menuProducts;
         this.menuGroup = menuGroup;
+        this.name = name;
     }
 
     private void validateMenuPrice(Price price) {
@@ -92,14 +94,6 @@ public class Menu {
 
     public void setId(final UUID id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
     }
 
     public BigDecimal getPrice() {

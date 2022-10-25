@@ -7,6 +7,11 @@ public class MenuProductRequest {
     private long quantity;
     private UUID productId;
 
+    public MenuProductRequest(UUID id, long quantity) {
+        this.productId = id;
+        this.quantity = quantity;
+    }
+
     public long getQuantity() {
         return this.quantity;
     }
