@@ -70,12 +70,11 @@ class MenuServiceTest {
     void productSize() {
         MenuGroup menuGroup = menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴그룹명", false)));
         List<MenuProductRequest> menuProductRequests = new ArrayList<>();
-        MenuProductRequest menuProductRequest = new MenuProductRequest(product.getId(), 1);
+        MenuProductRequest menuProductRequest = new MenuProductRequest(UUID.randomUUID(), 1);
         menuProductRequests.add(menuProductRequest);
         MenuRequest menuRequest = new MenuRequest(menuGroup.getId(), "메뉴명", BigDecimal.TEN, menuProductRequests);
         assertThatThrownBy(() -> menuService.create(menuRequest))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("상품의 수량과 메뉴 상품의 수량은 다를 수 없다.");
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴 그룹에 속해 있다.")
