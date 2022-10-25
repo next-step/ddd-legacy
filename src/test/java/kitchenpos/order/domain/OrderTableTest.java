@@ -1,8 +1,9 @@
 package kitchenpos.order.domain;
 
-import kitchenpos.domain.Name;
-import kitchenpos.ordertable.domain.NumberOfGuests;
+import kitchenpos.common.vo.Name;
+import kitchenpos.order.vo.DeliveryAddress;
 import kitchenpos.ordertable.domain.OrderTable;
+import kitchenpos.ordertable.vo.NumberOfGuests;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

@@ -1,7 +1,7 @@
 package kitchenpos.product.domain;
 
-import kitchenpos.domain.Name;
-import kitchenpos.menu.menu.domain.Price;
+import kitchenpos.common.vo.Name;
+import kitchenpos.common.vo.Price;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -20,7 +20,8 @@ public class Product {
     @Embedded
     private Price price;
 
-    protected Product(){}
+    protected Product() {
+    }
 
     public Product(Name name, Price price) {
         validatePrice(price);

@@ -1,5 +1,6 @@
 package kitchenpos.order.domain;
 
+import kitchenpos.order.vo.DeliveryAddress;
 import kitchenpos.ordertable.domain.OrderTable;
 
 import javax.persistence.*;

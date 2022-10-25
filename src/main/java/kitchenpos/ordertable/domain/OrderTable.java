@@ -1,6 +1,7 @@
 package kitchenpos.ordertable.domain;
 
-import kitchenpos.domain.Name;
+import kitchenpos.common.vo.Name;
+import kitchenpos.ordertable.vo.NumberOfGuests;
 
 import javax.persistence.*;
 import java.util.UUID;

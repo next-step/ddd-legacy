@@ -1,16 +1,17 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.Name;
+import kitchenpos.common.vo.Name;
+import kitchenpos.common.vo.Price;
+import kitchenpos.common.vo.Quantity;
+import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.menu.menu.application.InMemoryMenuRepository;
+import kitchenpos.menu.menu.application.MenuService;
+import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
-import kitchenpos.menu.menu.domain.Price;
-import kitchenpos.menu.menu.domain.Quantity;
-import kitchenpos.menu.menu.dto.MenuProductRequest;
-import kitchenpos.menu.menu.dto.MenuRequest;
+import kitchenpos.menu.menu.dto.request.MenuProductRequest;
+import kitchenpos.menu.menu.dto.request.MenuRequest;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
-import kitchenpos.menu.menugroup.infra.PurgomalumClient;
 import kitchenpos.product.application.InMemoryProductRepository;
 import kitchenpos.product.domain.Product;
 import kitchenpos.product.domain.ProductRepository;

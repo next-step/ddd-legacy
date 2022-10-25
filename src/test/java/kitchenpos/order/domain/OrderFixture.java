@@ -1,10 +1,10 @@
 package kitchenpos.order.domain;
 
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.Name;
+import kitchenpos.common.vo.Name;
+import kitchenpos.common.vo.Price;
+import kitchenpos.common.vo.Quantity;
 import kitchenpos.menu.menu.domain.Menu;
-import kitchenpos.menu.menu.domain.Price;
-import kitchenpos.menu.menu.domain.Quantity;
+import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.product.domain.Product;
 
