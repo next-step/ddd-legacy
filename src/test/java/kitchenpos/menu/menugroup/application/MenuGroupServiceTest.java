@@ -12,6 +12,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
+@Transactional
 @DisplayName("메뉴 그룹 서비스")
 class MenuGroupServiceTest {
 
@@ -49,6 +51,13 @@ class MenuGroupServiceTest {
         assertThatThrownBy(() -> menuGroupService.create(new MenuGroupRequest(name)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
+    }
+
+    @DisplayName("메뉴 그룹 목록을 조회할 수 있다.")
+    @Test
+    void findAll() {
+        menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴그룹명", false)));
+        assertThat(menuGroupService.findAll().size()).isEqualTo(1);
     }
 
 }
