@@ -1,13 +1,15 @@
 package kitchenpos.order.application;
 
+import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
 import kitchenpos.common.vo.Quantity;
-import kitchenpos.menu.menu.application.InMemoryMenuRepository;
+import kitchenpos.menu.menu.application.MenuService;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
+import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
 import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderRepository;
@@ -18,9 +20,13 @@ import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.ordertable.domain.OrderTableRepository;
 import kitchenpos.ordertable.vo.NumberOfGuests;
 import kitchenpos.product.domain.Product;
+import kitchenpos.product.domain.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -33,31 +39,52 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("주문 서비스")
+@SpringBootTest
+@Transactional
 class OrderCrudServiceTest {
 
+    @Autowired
     private OrderRepository orderRepository;
-    private MenuRepository menuRepository;
+
+    @Autowired
     private OrderTableRepository orderTableRepository;
+    @Autowired
+    private MenuRepository menuRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private MenuGroupRepository menuGroupRepository;
+
+    @Autowired
     private OrderCrudService orderCrudService;
 
+    @Autowired
+    private PurgomalumClient purgomalumClient;
+
+    @Autowired
+    private MenuService menuService;
+
     private Menu menu;
+    private OrderTable orderTable;
 
     @BeforeEach
     void setUp() {
-        orderRepository = new InMemoryOrderRepository();
-        menuRepository = new InMemoryMenuRepository();
-        orderTableRepository = new InMemoryOrderTableRepository();
+        orderTable = new OrderTable(UUID.randomUUID(), new Name("테이블명", false), new NumberOfGuests(1));
         orderCrudService = new OrderCrudService(orderRepository, menuRepository, orderTableRepository);
-        List<MenuProduct> menuProducts = createMenuProducts(new MenuProduct(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)), new Quantity(1L)));
-        menu = menuRepository.save(createMenu(createMenuGroup(UUID.randomUUID(), "메뉴그룹명"), new Name("메뉴명", false), menuProducts, new Price(BigDecimal.TEN)));
+        orderTableRepository.save(orderTable);
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+        Product product = productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)));
+        MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID(), "메뉴그룹명"));
+        menu = menuRepository.save(createMenu(menuGroup, new Name("메뉴명", false), createMenuProducts(new MenuProduct(product, new Quantity(1L))), new Price(BigDecimal.TEN)));
     }
 
     @DisplayName("주문 내역을 조회할 수 있다.")
     @Test
     void findOrders() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        OrderTable orderTable = new OrderTable(new Name("테이블명", false), new NumberOfGuests(1));
-        orderRepository.save(new Order(OrderType.EAT_IN, orderLineItems, orderTable, null));
+        orderRepository.save(new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems, orderTable, null));
         assertThat(orderCrudService.findAll()).hasSize(1);
     }
 
@@ -65,8 +92,7 @@ class OrderCrudServiceTest {
     @Test
     void menuSize() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        OrderTable orderTable = new OrderTable(new Name("테이블명", false), new NumberOfGuests(1));
-        orderRepository.save(new Order(OrderType.EAT_IN, orderLineItems, orderTable, null));
+        orderRepository.save(new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems, orderTable, null));
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
@@ -133,6 +159,19 @@ class OrderCrudServiceTest {
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("매장 주문이 아닐 경우 수량은 0개보다 적을 수 없다.");
+    }
+
+    @DisplayName("안보이는 메뉴가 주문될 수 없다.")
+    @Test
+    void asdfdsf() {
+        menuService.hide(menu.getId());
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
+        orderLineItemRequests.add(orderLineItemRequest);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
+        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("안보이는 메뉴가 주문될 수 없다.");
     }
 
     private static List<OrderLineItem> orderLineItems() {

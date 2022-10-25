@@ -5,8 +5,7 @@ import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderType;
 import kitchenpos.order.vo.DeliveryAddress;
-import kitchenpos.ordertable.domain.OrderTable;
-import kitchenpos.ordertable.vo.NumberOfGuests;
+ import kitchenpos.ordertable.vo.NumberOfGuests;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,6 +13,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
+import java.util.UUID;
 
 import static kitchenpos.order.domain.OrderFixture.orderLineItems;
 import static org.assertj.core.api.Assertions.*;
@@ -98,14 +98,14 @@ class OrderTableTest {
     @Test
     void vacant_status() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(OrderType.DELIVERY, orderLineItems, new OrderTable(new Name("테이블명", false), new NumberOfGuests(1)), new DeliveryAddress("주소"));
+        Order order = new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems, new OrderTable(UUID.randomUUID(), new Name("테이블명", false), new NumberOfGuests(1)), new DeliveryAddress("주소"));
         assertThatThrownBy(() -> order.vacant())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 테이블 공석으로 변경 시 주문 상태가 완료일때만 변경 가능하다.");
     }
 
     private static OrderTable orderTable(String name, int numberOfGuests) {
-        return new OrderTable(new Name(name, false), new NumberOfGuests(numberOfGuests));
+        return new OrderTable(UUID.randomUUID(), new Name(name, false), new NumberOfGuests(numberOfGuests));
     }
 
 }

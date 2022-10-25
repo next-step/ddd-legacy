@@ -55,7 +55,7 @@ public class Order {
 
     }
 
-    public Order(OrderType type, List<OrderLineItem> orderLineItems, OrderTable orderTable, DeliveryAddress deliveryAddress) {
+    public Order(UUID id, OrderType type, List<OrderLineItem> orderLineItems, OrderTable orderTable, DeliveryAddress deliveryAddress) {
         validateOrderLineItems(orderLineItems);
         validateType(type);
         this.type = type;
@@ -63,6 +63,8 @@ public class Order {
         validateDeliveryAddress(deliveryAddress);
         this.status = OrderStatus.WAITING;
         this.deliveryAddress = deliveryAddress;
+        this.id = id;
+        this.orderDateTime = LocalDateTime.now();
     }
 
     private void validateDeliveryAddress(DeliveryAddress deliveryAddress) {

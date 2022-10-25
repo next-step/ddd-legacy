@@ -26,7 +26,7 @@ public class OrderTableService {
 
     @Transactional
     public OrderTable create(final OrderTableRequest request) {
-        final OrderTable orderTable = new OrderTable(new Name(request.getName(), false), new NumberOfGuests(request.getNumberOfGuests()));
+        final OrderTable orderTable = new OrderTable(request.getId(), new Name(request.getName(), false), new NumberOfGuests(request.getNumberOfGuests()));
         orderTable.setId(UUID.randomUUID());
         orderTable.setOccupied(false);
         return orderTableRepository.save(orderTable);

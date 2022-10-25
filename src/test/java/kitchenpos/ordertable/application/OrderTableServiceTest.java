@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("주문 테이블")
@@ -35,7 +37,7 @@ class OrderTableServiceTest {
     }
 
     private static OrderTable orderTable(String name, int numberOfGuests) {
-        return new OrderTable(new Name(name, false), new NumberOfGuests(numberOfGuests));
+        return new OrderTable(UUID.randomUUID(), new Name(name, false), new NumberOfGuests(numberOfGuests));
     }
 
 }

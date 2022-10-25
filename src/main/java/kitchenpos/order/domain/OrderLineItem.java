@@ -36,8 +36,15 @@ public class OrderLineItem {
     }
 
     public OrderLineItem(Menu menu, Quantity quantity) {
+        validate(menu);
         this.quantity = quantity;
         this.menu = menu;
+    }
+
+    private static void validate(Menu menu) {
+        if (!menu.isDisplayed()) {
+            throw new IllegalStateException("안보이는 메뉴가 주문될 수 없다.");
+        }
     }
 
     public Long getSeq() {

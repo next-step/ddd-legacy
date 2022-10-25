@@ -46,13 +46,8 @@ public class OrderCrudService {
             final long quantity = orderLineItemRequest.getQuantity();
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                     .orElseThrow(NoSuchElementException::new);
-            if (!menu.isDisplayed()) {
-                throw new IllegalStateException();
-            }
             validatePrice(orderLineItemRequest, menu.getPrice());
-            final OrderLineItem orderLineItem = new OrderLineItem(menu, new Quantity(quantity));
-            orderLineItem.setMenu(menu);
-            orderLineItems.add(orderLineItem);
+            orderLineItems.add(new OrderLineItem(menu, new Quantity(quantity)));
         }
         OrderTable orderTable = null;
         if (type == OrderType.EAT_IN) {
@@ -63,7 +58,7 @@ public class OrderCrudService {
         if (type == OrderType.DELIVERY) {
             deliveryAddress = new DeliveryAddress(request.getDeliveryAddress());
         }
-        Order order = new Order(type, orderLineItems, orderTable, deliveryAddress);
+        Order order = new Order(UUID.randomUUID(), type, orderLineItems, orderTable, deliveryAddress);
         order.setId(UUID.randomUUID());
         order.setStatus(OrderStatus.WAITING);
         order.setOrderDateTime(LocalDateTime.now());

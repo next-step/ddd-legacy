@@ -26,7 +26,8 @@ public class OrderTable {
 
     }
 
-    public OrderTable(Name name, NumberOfGuests numberOfGuests) {
+    public OrderTable(UUID id, Name name, NumberOfGuests numberOfGuests) {
+        this.id = id;
         this.name = name;
         this.numberOfGuests = numberOfGuests;
         this.occupied = false;
