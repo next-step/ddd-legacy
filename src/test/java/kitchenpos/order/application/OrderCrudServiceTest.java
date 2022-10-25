@@ -111,6 +111,18 @@ class OrderCrudServiceTest {
                 .hasMessageContaining("주문 항목은 비어 있을 수 없습니다.");
     }
 
+    @DisplayName("주문 타입은 필수값으로 입력받는다.")
+    @Test
+    void validateType() {
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN);
+        orderLineItemRequests.add(orderLineItemRequest);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null);
+        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("주문 타입을 입력해주세요.");
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
         Menu menu = new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, createMenuProducts(new MenuProduct(new Product(UUID.randomUUID(), new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
