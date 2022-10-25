@@ -4,6 +4,7 @@ import kitchenpos.order.vo.DeliveryAddress;
 import kitchenpos.ordertable.domain.OrderTable;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -79,6 +80,13 @@ public class Order {
     private void validateOrderLineItems(List<OrderLineItem> orderLineItems) {
         if (Objects.isNull(orderLineItems) || orderLineItems.size() == 0) {
             throw new IllegalArgumentException("주문 항목은 비어 있을 수 없습니다.");
+        }
+        if (this.type != OrderType.EAT_IN) {
+            for (OrderLineItem orderLineItem : orderLineItems) {
+                if (orderLineItem.getQuantity() < 0) {
+                    throw new IllegalArgumentException("매장 주문이 아닐 경우 수량은 0개보다 적을 수 없다.");
+                }
+            }
         }
         for (OrderLineItem orderLineItem : orderLineItems) {
             if (!orderLineItem.getMenu().isDisplayed()) {

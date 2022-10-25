@@ -32,7 +32,7 @@ class MenuTest {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
         assertThatThrownBy(() -> createMenu(menuGroup, "메뉴명", false, createMenuProducts(new MenuProduct(new Product(UUID.randomUUID(), new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(-1))), new Price(BigDecimal.ONE)))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("수량은 0보다 작을 수 없습니다.");
+                .hasMessageContaining("수량은 0보다 커야합니다.");
     }
 
     @DisplayName("메뉴 가격이 0원보다 작을 수 없다.")

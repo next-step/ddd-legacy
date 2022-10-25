@@ -11,9 +11,10 @@ public class OrderLineItemRequest {
     protected OrderLineItemRequest() {
     }
 
-    public OrderLineItemRequest(UUID menuId, BigDecimal price) {
+    public OrderLineItemRequest(UUID menuId, BigDecimal price, long quantity) {
         this.menuId = menuId;
         this.price = price;
+        this.quantity = quantity;
     }
 
     public long getQuantity() {

@@ -68,7 +68,7 @@ class OrderCrudServiceTest {
         OrderTable orderTable = new OrderTable(new Name("테이블명", false), new NumberOfGuests(1));
         orderRepository.save(new Order(OrderType.EAT_IN, orderLineItems, orderTable, null));
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN);
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
         orderLineItemRequests.add(orderLineItemRequest);
         OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
@@ -81,7 +81,7 @@ class OrderCrudServiceTest {
     @Test
     void orderType() {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN);
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
         OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null);
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
@@ -93,7 +93,7 @@ class OrderCrudServiceTest {
     @Test
     void validatePrice() {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.ONE);
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.ONE, 1);
         orderLineItemRequests.add(orderLineItemRequest);
         OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
@@ -115,7 +115,7 @@ class OrderCrudServiceTest {
     @Test
     void validateType() {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN);
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
         OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null);
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
@@ -123,12 +123,24 @@ class OrderCrudServiceTest {
                 .hasMessageContaining("주문 타입을 입력해주세요.");
     }
 
+    @DisplayName("매장 주문이 아닐 경우 수량은 0개보다 적을 수 없다.")
+    @Test
+    void asdf() {
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, -1);
+        orderLineItemRequests.add(orderLineItemRequest);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
+        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("매장 주문이 아닐 경우 수량은 0개보다 적을 수 없다.");
+    }
+
     private static List<OrderLineItem> orderLineItems() {
         MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
         Menu menu = new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, createMenuProducts(new MenuProduct(new Product(UUID.randomUUID(), new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
         menu.display();
         List<OrderLineItem> orderLineItems = new ArrayList<>();
-        OrderLineItem orderLineItem = new OrderLineItem(menu);
+        OrderLineItem orderLineItem = new OrderLineItem(menu, new Quantity(1));
         orderLineItems.add(orderLineItem);
         return orderLineItems;
     }

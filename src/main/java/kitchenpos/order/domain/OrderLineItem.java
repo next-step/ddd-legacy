@@ -1,5 +1,6 @@
 package kitchenpos.order.domain;
 
+import kitchenpos.common.vo.Quantity;
 import kitchenpos.menu.menu.domain.Menu;
 
 import javax.persistence.*;
@@ -16,14 +17,13 @@ public class OrderLineItem {
 
     @ManyToOne(optional = false)
     @JoinColumn(
-        name = "menu_id",
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_order_line_item_to_menu")
+            name = "menu_id",
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_order_line_item_to_menu")
     )
     private Menu menu;
 
-    @Column(name = "quantity", nullable = false)
-    private long quantity;
+    private Quantity quantity;
 
     @Transient
     private UUID menuId;
@@ -35,7 +35,8 @@ public class OrderLineItem {
 
     }
 
-    public OrderLineItem(Menu menu) {
+    public OrderLineItem(Menu menu, Quantity quantity) {
+        this.quantity = quantity;
         this.menu = menu;
     }
 
@@ -55,13 +56,6 @@ public class OrderLineItem {
         this.menu = menu;
     }
 
-    public long getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(final long quantity) {
-        this.quantity = quantity;
-    }
 
     public UUID getMenuId() {
         return menuId;
@@ -77,5 +71,9 @@ public class OrderLineItem {
 
     public void setPrice(final BigDecimal price) {
         this.price = price;
+    }
+
+    public long getQuantity() {
+        return quantity.getQuantity();
     }
 }

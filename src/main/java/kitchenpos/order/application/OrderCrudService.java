@@ -1,5 +1,6 @@
 package kitchenpos.order.application;
 
+import kitchenpos.common.vo.Quantity;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.order.domain.*;
@@ -43,20 +44,14 @@ public class OrderCrudService {
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItemRequest orderLineItemRequest : orderLineItemRequests) {
             final long quantity = orderLineItemRequest.getQuantity();
-            if (type != OrderType.EAT_IN) {
-                if (quantity < 0) {
-                    throw new IllegalArgumentException();
-                }
-            }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
                     .orElseThrow(NoSuchElementException::new);
             if (!menu.isDisplayed()) {
                 throw new IllegalStateException();
             }
             validatePrice(orderLineItemRequest, menu.getPrice());
-            final OrderLineItem orderLineItem = new OrderLineItem(menu);
+            final OrderLineItem orderLineItem = new OrderLineItem(menu, new Quantity(quantity));
             orderLineItem.setMenu(menu);
-            orderLineItem.setQuantity(quantity);
             orderLineItems.add(orderLineItem);
         }
         OrderTable orderTable = null;

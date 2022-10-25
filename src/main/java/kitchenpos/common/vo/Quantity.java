@@ -14,14 +14,7 @@ public class Quantity {
     }
 
     public Quantity(long quantity) {
-        validateQuantity(quantity);
         this.quantity = quantity;
-    }
-
-    private static void validateQuantity(long quantity) {
-        if (quantity < 0) {
-            throw new IllegalArgumentException("수량은 0보다 작을 수 없습니다.");
-        }
     }
 
     public long getQuantity() {
