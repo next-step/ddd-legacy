@@ -40,6 +40,8 @@ class OrderCrudServiceTest {
     private OrderTableRepository orderTableRepository;
     private OrderCrudService orderCrudService;
 
+    private Menu menu;
+
     @BeforeEach
     void setUp() {
         orderRepository = new InMemoryOrderRepository();
@@ -47,7 +49,7 @@ class OrderCrudServiceTest {
         orderTableRepository = new InMemoryOrderTableRepository();
         orderCrudService = new OrderCrudService(orderRepository, menuRepository, orderTableRepository);
         List<MenuProduct> menuProducts = createMenuProducts(new MenuProduct(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)), new Quantity(1L)));
-        menuRepository.save(createMenu(createMenuGroup(UUID.randomUUID(), "메뉴그룹명"), new Name("메뉴명", false), menuProducts, new Price(BigDecimal.TEN)));
+        menu = menuRepository.save(createMenu(createMenuGroup(UUID.randomUUID(), "메뉴그룹명"), new Name("메뉴명", false), menuProducts, new Price(BigDecimal.TEN)));
     }
 
     @DisplayName("주문 내역을 조회할 수 있다.")
@@ -66,7 +68,7 @@ class OrderCrudServiceTest {
         OrderTable orderTable = new OrderTable(new Name("테이블명", false), new NumberOfGuests(1));
         orderRepository.save(new Order(OrderType.EAT_IN, orderLineItems, orderTable, null));
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(BigDecimal.TEN);
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN);
         orderLineItemRequests.add(orderLineItemRequest);
         orderLineItemRequests.add(orderLineItemRequest);
         OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
@@ -79,7 +81,7 @@ class OrderCrudServiceTest {
     @Test
     void orderType() {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(BigDecimal.TEN);
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN);
         orderLineItemRequests.add(orderLineItemRequest);
         OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null);
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
@@ -91,7 +93,7 @@ class OrderCrudServiceTest {
     @Test
     void validatePrice() {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(BigDecimal.ONE);
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.ONE);
         orderLineItemRequests.add(orderLineItemRequest);
         OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))

@@ -11,7 +11,8 @@ public class OrderLineItemRequest {
     protected OrderLineItemRequest() {
     }
 
-    public OrderLineItemRequest(BigDecimal price) {
+    public OrderLineItemRequest(UUID menuId, BigDecimal price) {
+        this.menuId = menuId;
         this.price = price;
     }
 
