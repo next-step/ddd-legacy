@@ -8,6 +8,10 @@ public class OrderTableRequest {
     private int numberOfGuests;
     private UUID id;
 
+    public OrderTableRequest(String name) {
+        this.name = name;
+    }
+
     public String getName() {
         return this.name;
     }
