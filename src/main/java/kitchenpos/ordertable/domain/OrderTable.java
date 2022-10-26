@@ -65,10 +65,10 @@ public class OrderTable {
         this.occupied = false;
     }
 
-    public void changeNumberOfGuests(int numberOfGuests) {
+    public void changeNumberOfGuests(NumberOfGuests numberOfGuests) {
         if (!this.occupied) {
-            throw new IllegalArgumentException("주문 테이블이 공석일 경우 착석 인원을 변경 할 수 없다.");
+            throw new IllegalStateException("주문 테이블이 공석일 경우 착석 인원을 변경 할 수 없다.");
         }
-        this.numberOfGuests = new NumberOfGuests(numberOfGuests);
+        this.numberOfGuests = numberOfGuests;
     }
 }

@@ -3,6 +3,7 @@ package kitchenpos.order.application;
 import kitchenpos.common.infra.KitchenridersClient;
 import kitchenpos.order.domain.*;
 import kitchenpos.ordertable.domain.OrderTable;
+import kitchenpos.ordertable.vo.NumberOfGuests;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,7 +100,7 @@ public class OrderStatusService {
         if (type == OrderType.EAT_IN) {
             final OrderTable orderTable = order.getOrderTable();
             if (!orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
-                orderTable.changeNumberOfGuests(0);
+                orderTable.changeNumberOfGuests(new NumberOfGuests(0));
                 orderTable.setOccupied(false);
             }
         }

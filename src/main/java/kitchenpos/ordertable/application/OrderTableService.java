@@ -6,6 +6,7 @@ import kitchenpos.order.domain.OrderStatus;
 import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.ordertable.domain.OrderTableRepository;
 import kitchenpos.ordertable.dto.OrderTableRequest;
+import kitchenpos.ordertable.dto.request.ChangeNumberOfGuestRequest;
 import kitchenpos.ordertable.vo.NumberOfGuests;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,23 +48,16 @@ public class OrderTableService {
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
             throw new IllegalStateException();
         }
-        orderTable.changeNumberOfGuests(0);
+        orderTable.changeNumberOfGuests(new NumberOfGuests(0));
         orderTable.setOccupied(false);
         return orderTable;
     }
 
     @Transactional
-    public OrderTable changeNumberOfGuests(final UUID orderTableId, final OrderTable request) {
-        final int numberOfGuests = request.getNumberOfGuests();
-        if (numberOfGuests < 0) {
-            throw new IllegalArgumentException();
-        }
+    public OrderTable changeNumberOfGuests(final UUID orderTableId, final ChangeNumberOfGuestRequest request) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
                 .orElseThrow(NoSuchElementException::new);
-        if (!orderTable.isOccupied()) {
-            throw new IllegalStateException();
-        }
-        orderTable.changeNumberOfGuests(numberOfGuests);
+        orderTable.changeNumberOfGuests(new NumberOfGuests(request.getNumberOfGuests()));
         return orderTable;
     }
 
