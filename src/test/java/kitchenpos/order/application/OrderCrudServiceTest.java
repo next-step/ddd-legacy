@@ -97,7 +97,7 @@ class OrderCrudServiceTest {
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
         orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, "주소");
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴의 수량과 주문 항목의 수량은 같다.");
@@ -109,7 +109,7 @@ class OrderCrudServiceTest {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null, "주소");
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 타입을 입력해주세요.");
@@ -121,7 +121,7 @@ class OrderCrudServiceTest {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.ONE, 1);
         orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, "주소");
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴의 가격과 메뉴 항목의 가격은 같다.");
@@ -131,7 +131,7 @@ class OrderCrudServiceTest {
     @Test
     void orderLineItemsNotNull() {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, "주소");
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 항목은 비어 있을 수 없습니다.");
@@ -143,7 +143,7 @@ class OrderCrudServiceTest {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null, "주소");
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 타입을 입력해주세요.");
@@ -155,7 +155,7 @@ class OrderCrudServiceTest {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, -1);
         orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, "주소");
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("매장 주문이 아닐 경우 수량은 0개보다 적을 수 없다.");
@@ -168,10 +168,22 @@ class OrderCrudServiceTest {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, "주소");
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("안보이는 메뉴가 주문될 수 없다.");
+    }
+
+    @DisplayName("배달 주문이면 배송지가 없을 수 없다.")
+    @Test
+    void delivery() {
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
+        orderLineItemRequests.add(orderLineItemRequest);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.DELIVERY, null);
+        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("null 이나 공백일 수 없습니다.");
     }
 
     private static List<OrderLineItem> orderLineItems() {

@@ -12,9 +12,10 @@ public class OrderRequest {
     private UUID id;
     private String deliveryAddress;
 
-    public OrderRequest(List<OrderLineItemRequest> orderLineItemRequests, OrderType type) {
+    public OrderRequest(List<OrderLineItemRequest> orderLineItemRequests, OrderType type, String deliveryAddress) {
         this.orderLineItems = orderLineItemRequests;
         this.type = type;
+        this.deliveryAddress = deliveryAddress;
     }
 
     public OrderType getType() {
