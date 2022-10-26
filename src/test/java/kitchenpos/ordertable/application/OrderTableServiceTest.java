@@ -85,6 +85,18 @@ class OrderTableServiceTest {
         assertThat(orderTable.getNumberOfGuests()).isEqualTo(10);
     }
 
+    @DisplayName("주문 테이블의 착석 인원 변경 시 0명보다 작을 수 없다.")
+    @Test
+    void asdge() {
+        OrderTable orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
+        orderTableService.sit(orderTable.getId());
+        assertThat(orderTable.getNumberOfGuests()).isEqualTo(1);
+        ChangeNumberOfGuestRequest request = new ChangeNumberOfGuestRequest(-1);
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("주문 테이블의 착석 인원 변경 시 0명보다 작을 수 없다.");
+    }
+
     private static OrderTable orderTable(String name, int numberOfGuests) {
         return new OrderTable(UUID.randomUUID(), new Name(name, false), new NumberOfGuests(numberOfGuests));
     }
