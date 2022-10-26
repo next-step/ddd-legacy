@@ -36,6 +36,14 @@ class OrderTableServiceTest {
         assertThat(orderTableService.findAll()).hasSize(1);
     }
 
+    @DisplayName("주문 테이블의 착석여부를 착석으로 변경할 수 있다.")
+    @Test
+    void fisdfndAll() {
+        OrderTable orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
+        orderTableService.sit(orderTable.getId());
+        assertThat(orderTable.isOccupied()).isTrue();
+    }
+
     private static OrderTable orderTable(String name, int numberOfGuests) {
         return new OrderTable(UUID.randomUUID(), new Name(name, false), new NumberOfGuests(numberOfGuests));
     }
