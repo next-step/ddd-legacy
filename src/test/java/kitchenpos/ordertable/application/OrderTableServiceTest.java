@@ -97,6 +97,17 @@ class OrderTableServiceTest {
                 .hasMessageContaining("주문 테이블의 착석 인원 변경 시 0명보다 작을 수 없다.");
     }
 
+    @DisplayName("주문 테이블이 공석일 경우 착석 인원을 변경 할 수 없다.")
+    @Test
+    void asdgesds() {
+        OrderTable orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
+        assertThat(orderTable.isOccupied()).isFalse();
+        ChangeNumberOfGuestRequest request = new ChangeNumberOfGuestRequest(10);
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("주문 테이블이 공석일 경우 착석 인원을 변경 할 수 없다.");
+    }
+
     private static OrderTable orderTable(String name, int numberOfGuests) {
         return new OrderTable(UUID.randomUUID(), new Name(name, false), new NumberOfGuests(numberOfGuests));
     }
