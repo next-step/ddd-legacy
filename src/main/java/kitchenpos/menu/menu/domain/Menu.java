@@ -77,7 +77,7 @@ public class Menu {
         }
         BigDecimal sum = BigDecimal.ZERO;
         for (MenuProduct menuProduct : menuProducts) {
-            sum.add(menuProduct.sum());
+            sum = sum.add(menuProduct.sum());
         }
         if (BigDecimal.ZERO.compareTo(sum) >= 0) {
             throw new IllegalArgumentException("상품 가격의 총합은 0원보다 크다.");

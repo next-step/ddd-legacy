@@ -4,7 +4,7 @@ import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
 import kitchenpos.common.vo.Quantity;
-import kitchenpos.menu.menu.application.MenuService;
+import kitchenpos.menu.menu.application.MenuCreateService;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
@@ -64,7 +64,7 @@ class OrderCrudServiceTest {
     private PurgomalumClient purgomalumClient;
 
     @Autowired
-    private MenuService menuService;
+    private MenuCreateService menuCreateService;
 
     private Menu menu;
     private OrderTable orderTable;
@@ -74,7 +74,7 @@ class OrderCrudServiceTest {
         orderTable = new OrderTable(UUID.randomUUID(), new Name("테이블명", false), new NumberOfGuests(1));
         orderCrudService = new OrderCrudService(orderRepository, menuRepository, orderTableRepository);
         orderTableRepository.save(orderTable);
-        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+        menuCreateService = new MenuCreateService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
         Product product = productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)));
         MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID(), "메뉴그룹명"));
         menu = menuRepository.save(createMenu(menuGroup, new Name("메뉴명", false), createMenuProducts(new MenuProduct(product, new Quantity(1L))), new Price(BigDecimal.TEN)));
@@ -164,7 +164,7 @@ class OrderCrudServiceTest {
     @DisplayName("안보이는 메뉴가 주문될 수 없다.")
     @Test
     void asdfdsf() {
-        menuService.hide(menu.getId());
+        menuCreateService.hide(menu.getId());
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);

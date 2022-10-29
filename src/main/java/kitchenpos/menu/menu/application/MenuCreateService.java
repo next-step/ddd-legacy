@@ -21,13 +21,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class MenuService {
+public class MenuCreateService {
     private final MenuRepository menuRepository;
     private final MenuGroupRepository menuGroupRepository;
     private final ProductRepository productRepository;
     private final PurgomalumClient purgomalumClient;
 
-    public MenuService(
+    public MenuCreateService(
             final MenuRepository menuRepository,
             final MenuGroupRepository menuGroupRepository,
             final ProductRepository productRepository,
@@ -79,27 +79,6 @@ public class MenuService {
         if (products.size() != menuProductRequests.size()) {
             throw new IllegalArgumentException("상품의 수량과 메뉴 상품의 수량은 다를 수 없다.");
         }
-    }
-
-    @Transactional
-    public Menu changePrice(final UUID menuId, final MenuRequest request) {
-        final BigDecimal price = request.getPrice();
-        if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
-        }
-        final Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(NoSuchElementException::new);
-        for (final MenuProduct menuProduct : menu.getMenuProducts()) {
-            final BigDecimal sum = menuProduct.getProduct()
-                    .getPrice()
-                    .multiply(BigDecimal.valueOf(menuProduct.getQuantity().getQuantity()));
-            if (price.compareTo(sum) > 0) {
-                throw new IllegalArgumentException();
-            }
-        }
-        //TODO price 타입 변경
-//        menu.setPrice(price);
-        return menu;
     }
 
     @Transactional
