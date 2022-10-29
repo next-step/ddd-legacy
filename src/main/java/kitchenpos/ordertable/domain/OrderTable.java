@@ -62,6 +62,7 @@ public class OrderTable {
     }
 
     public void vacant() {
+        changeNumberOfGuests(new NumberOfGuests(0));
         this.occupied = false;
     }
 
