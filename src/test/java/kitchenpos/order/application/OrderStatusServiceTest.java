@@ -135,6 +135,15 @@ class OrderStatusServiceTest {
                 .hasMessageContaining("주문 상태가 DELIVERING이 아니면 주문을 완료할 수 없다.");
     }
 
+    @DisplayName("주문을 완료할 수 있다.")
+    @Test
+    void asdasdsdasdasdffasf() {
+        orderStatusService.accept(매장주문.getId());
+        orderStatusService.serve(매장주문.getId());
+        orderStatusService.complete(매장주문.getId());
+        assertThat(매장주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
     private Menu menu(Product product, MenuGroup menuGroup) {
         return new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, menuProducts(new MenuProduct(product, new Quantity(1))), new Price(BigDecimal.TEN));
     }
