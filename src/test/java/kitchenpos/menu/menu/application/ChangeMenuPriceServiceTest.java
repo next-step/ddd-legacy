@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
@@ -50,7 +51,7 @@ class ChangeMenuPriceServiceTest {
         changeMenuPriceService = new ChangeMenuPriceService(menuRepository);
         product = productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)));
         MenuGroup 메뉴그룹 = 메뉴그룹생성();
-        menu = 메뉴생성(메뉴그룹);
+        menu = 메뉴생성(메뉴그룹, BigDecimal.ONE);
     }
 
     @DisplayName("메뉴 가격은 필수로 입력받는다.")
@@ -69,10 +70,18 @@ class ChangeMenuPriceServiceTest {
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
     }
 
-    private Menu 메뉴생성(MenuGroup 메뉴그룹) {
+    @DisplayName("메뉴 가격을 변경할 수 있다.")
+    @Test
+    void changePrice() {
+        assertThat(menu.getPrice()).isEqualTo(BigDecimal.ONE);
+        changeMenuPriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(BigDecimal.valueOf(7)));
+        assertThat(menu.getPrice()).isEqualTo(BigDecimal.valueOf(7));
+    }
+
+    private Menu 메뉴생성(MenuGroup 메뉴그룹, BigDecimal menuPrice) {
         List<MenuProduct> menuProducts = new ArrayList<>();
         menuProducts.add(new MenuProduct(product, new Quantity(1)));
-        return menuRepository.save(new Menu(UUID.randomUUID(), new Name("메뉴명", false), 메뉴그룹, menuProducts, new Price(BigDecimal.ONE)));
+        return menuRepository.save(new Menu(UUID.randomUUID(), new Name("메뉴명", false), 메뉴그룹, menuProducts, new Price(menuPrice)));
     }
 
     private MenuGroup 메뉴그룹생성() {
