@@ -61,7 +61,7 @@ public class OrderStatusService {
     public Order completeDelivery(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
                 .orElseThrow(NoSuchElementException::new);
-        order.completed();
+        order.delivered();
         return order;
     }
 
