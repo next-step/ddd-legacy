@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -110,8 +109,18 @@ class MenuCreateServiceTest {
                 .hasMessageContaining("null 일 수 없습니다.");
     }
 
+    @DisplayName("메뉴를 생성할 수 있다.")
+    @Test
+    void create() {
+        assertThatNoException().isThrownBy(() -> menuCreateService.create(메뉴()));
+    }
+
     private MenuRequest 메뉴가격Null() {
         return new MenuRequest(menuGroup.getId(), "메뉴명", null, 메뉴상품());
+    }
+
+    private MenuRequest 메뉴() {
+        return new MenuRequest(menuGroup.getId(), "메뉴명", BigDecimal.TEN, 메뉴상품());
     }
 
     private List<MenuProductRequest> getMenuProductRequests(UUID product) {
