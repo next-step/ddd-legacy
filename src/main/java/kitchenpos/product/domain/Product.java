@@ -24,7 +24,6 @@ public class Product {
 
     public Product(UUID id, Name name, Price price) {
         validatePrice(price);
-        validateName(name);
         this.price = price;
         this.id = id;
         this.name = name;
@@ -33,12 +32,6 @@ public class Product {
     private void validatePrice(Price price) {
         if (price == null) {
             throw new IllegalArgumentException("상품 가격을 입력해주세요.");
-        }
-    }
-
-    private void validateName(Name name) {
-        if (name == null) {
-            throw new IllegalArgumentException("상품명은 필수입니다.");
         }
     }
 

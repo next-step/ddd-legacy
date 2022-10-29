@@ -37,7 +37,11 @@ public class ProductService {
     @Transactional
     public Product create(final ProductRequest request) {
         final String name = request.getName();
-        final Product product = new Product(request.getId(), new Name(name, purgomalumClient.containsProfanity(name)), new Price(request.getPrice()));
+        boolean isProfanity = false;
+        if (!Objects.isNull(name) && !name.isEmpty()) {
+            isProfanity = purgomalumClient.containsProfanity(name);
+        }
+        final Product product = new Product(request.getId(), new Name(name, isProfanity), new Price(request.getPrice()));
         return productRepository.save(product);
     }
 
