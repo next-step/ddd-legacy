@@ -75,10 +75,12 @@ public class Menu {
                 throw new IllegalArgumentException("수량은 0보다 커야합니다.");
             }
         }
+        BigDecimal sum = BigDecimal.ZERO;
         for (MenuProduct menuProduct : menuProducts) {
-            if (BigDecimal.ZERO.compareTo(menuProduct.menuProductPrice()) >= 0) {
-                throw new IllegalArgumentException("상품 가격의 총합은 0원보다 크다.");
-            }
+            sum.add(menuProduct.sum());
+        }
+        if (BigDecimal.ZERO.compareTo(sum) >= 0) {
+            throw new IllegalArgumentException("상품 가격의 총합은 0원보다 크다.");
         }
     }
 
@@ -123,7 +125,7 @@ public class Menu {
     public BigDecimal sumMenuProducts() {
         BigDecimal menuProductsPrice = BigDecimal.ZERO;
         for (MenuProduct menuProduct : this.menuProducts) {
-            menuProductsPrice = menuProductsPrice.add(menuProduct.menuProductPrice());
+            menuProductsPrice = menuProductsPrice.add(menuProduct.sum());
         }
         return menuProductsPrice;
     }

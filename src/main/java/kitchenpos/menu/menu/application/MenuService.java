@@ -41,7 +41,7 @@ public class MenuService {
 
     @Transactional
     public Menu create(final MenuRequest request) {
-        final BigDecimal price = request.getPrice();
+        Price price = new Price(request.getPrice());
         final MenuGroup menuGroup = menuGroupRepository.findById(request.getMenuGroupId())
                 .orElseThrow(NoSuchElementException::new);
         final List<MenuProductRequest> menuProductRequests = request.getMenuProducts();
@@ -54,26 +54,25 @@ public class MenuService {
                         .collect(Collectors.toList())
         );
         validateProductSize(menuProductRequests, products);
+        final List<MenuProduct> menuProducts = getMenuProducts(price, menuProductRequests);
+        final Menu menu = new Menu(UUID.randomUUID(), new Name(request.getName(), purgomalumClient.containsProfanity(request.getName())), menuGroup, menuProducts, price);
+        menu.setId(UUID.randomUUID());
+        menu.setMenuProducts(menuProducts);
+        return menuRepository.save(menu);
+    }
+
+    private List<MenuProduct> getMenuProducts(Price price, List<MenuProductRequest> menuProductRequests) {
         final List<MenuProduct> menuProducts = new ArrayList<>();
         BigDecimal sum = BigDecimal.ZERO;
         for (final MenuProductRequest menuProductRequest : menuProductRequests) {
             Quantity quantity = new Quantity(menuProductRequest.getQuantity());
             final Product product = productRepository.findById(menuProductRequest.getProductId())
                     .orElseThrow(NoSuchElementException::new);
-            sum = sum.add(
-                    product.getPrice()
-                            .multiply(BigDecimal.valueOf(quantity.getQuantity())));
             final MenuProduct menuProduct = new MenuProduct(product, quantity);
             menuProduct.setProduct(product);
             menuProducts.add(menuProduct);
         }
-        if (price.compareTo(sum) > 0) {
-            throw new IllegalArgumentException();
-        }
-        final Menu menu = new Menu(UUID.randomUUID(), new Name(request.getName(), purgomalumClient.containsProfanity(request.getName())), menuGroup, menuProducts, new Price(price));
-        menu.setId(UUID.randomUUID());
-        menu.setMenuProducts(menuProducts);
-        return menuRepository.save(menu);
+        return menuProducts;
     }
 
     private static void validateProductSize(List<MenuProductRequest> menuProductRequests, List<Product> products) {

@@ -102,9 +102,28 @@ class MenuServiceTest {
                 .hasMessageContaining("메뉴 상품 목록은 비어있을 수 없다.");
     }
 
+    @DisplayName("메뉴 가격을 필수로 입력받는다.")
+    @Test
+    void menuProduasdcts() {
+        assertThatThrownBy(() -> menuService.create(메뉴가격Null()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("null 일 수 없습니다.");
+    }
+
+    private MenuRequest 메뉴가격Null() {
+        return new MenuRequest(menuGroup.getId(), "메뉴명", null, 메뉴상품());
+    }
+
     private List<MenuProductRequest> getMenuProductRequests(UUID product) {
         List<MenuProductRequest> menuProductRequests = new ArrayList<>();
         MenuProductRequest menuProductRequest = new MenuProductRequest(product, 1);
+        menuProductRequests.add(menuProductRequest);
+        return menuProductRequests;
+    }
+
+    private List<MenuProductRequest> 메뉴상품() {
+        List<MenuProductRequest> menuProductRequests = new ArrayList<>();
+        MenuProductRequest menuProductRequest = new MenuProductRequest(product.getId(), 1);
         menuProductRequests.add(menuProductRequest);
         return menuProductRequests;
     }
