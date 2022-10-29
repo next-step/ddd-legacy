@@ -36,8 +36,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static kitchenpos.menu.menu.MenuFixture.createMenu;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("주문 서비스")
 @SpringBootTest
@@ -193,6 +192,16 @@ class OrderCrudServiceTest {
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
+    }
+
+    @DisplayName("주문을 생성할 수 있다.")
+    @Test
+    void create() {
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
+        orderLineItemRequests.add(orderLineItemRequest);
+        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, null);
+        assertThatNoException().isThrownBy(() -> orderCrudService.create(orderRequest));
     }
 
     private static List<OrderLineItem> orderLineItems() {
