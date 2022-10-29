@@ -84,7 +84,7 @@ class OrderCrudServiceTest {
     @Test
     void findOrders() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        orderRepository.save(new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems, orderTable, null));
+        orderRepository.save(order(orderLineItems));
         assertThat(orderCrudService.findAll()).hasSize(1);
     }
 
@@ -92,7 +92,7 @@ class OrderCrudServiceTest {
     @Test
     void menuSize() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        orderRepository.save(new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems, orderTable, null));
+        orderRepository.save(order(orderLineItems));
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
@@ -101,6 +101,10 @@ class OrderCrudServiceTest {
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴의 수량과 주문 항목의 수량은 같다.");
+    }
+
+    private Order order(List<OrderLineItem> orderLineItems) {
+        return new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems, orderTable, null);
     }
 
     @DisplayName("주문 타입은 배송 / 포장 / 매장 중 한 가지를 갖는다.")

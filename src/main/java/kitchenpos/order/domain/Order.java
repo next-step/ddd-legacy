@@ -165,7 +165,7 @@ public class Order {
 
     public void accept() {
         if (this.status != OrderStatus.WAITING) {
-            throw new IllegalArgumentException("WAITING 상태만 접수가능합니다.");
+            throw new IllegalStateException("WAITING 상태만 접수가능합니다.");
         }
         this.status = OrderStatus.ACCEPTED;
     }
