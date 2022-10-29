@@ -5,6 +5,7 @@ import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
 import kitchenpos.common.vo.Quantity;
 import kitchenpos.menu.menu.application.MenuCreateService;
+import kitchenpos.menu.menu.application.MenuDisplayService;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
@@ -34,7 +35,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.menu.menu.domain.MenuFixture.createMenu;
+import static kitchenpos.menu.menu.MenuFixture.createMenu;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -66,6 +67,9 @@ class OrderCrudServiceTest {
     @Autowired
     private MenuCreateService menuCreateService;
 
+    @Autowired
+    private MenuDisplayService menuDisplayService;
+
     private Menu menu;
     private OrderTable orderTable;
 
@@ -73,6 +77,7 @@ class OrderCrudServiceTest {
     void setUp() {
         orderTable = new OrderTable(UUID.randomUUID(), new Name("테이블명", false), new NumberOfGuests(1));
         orderCrudService = new OrderCrudService(orderRepository, menuRepository, orderTableRepository);
+        menuDisplayService = new MenuDisplayService(menuRepository);
         orderTableRepository.save(orderTable);
         menuCreateService = new MenuCreateService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
         Product product = productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)));
@@ -168,7 +173,7 @@ class OrderCrudServiceTest {
     @DisplayName("안보이는 메뉴가 주문될 수 없다.")
     @Test
     void asdfdsf() {
-        menuCreateService.hide(menu.getId());
+        menuDisplayService.hide(menu.getId());
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);

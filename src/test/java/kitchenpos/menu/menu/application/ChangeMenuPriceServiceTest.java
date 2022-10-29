@@ -50,7 +50,7 @@ class ChangeMenuPriceServiceTest {
     void setUp() {
         changeMenuPriceService = new ChangeMenuPriceService(menuRepository);
         product = productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)));
-        MenuGroup 메뉴그룹 = 메뉴그룹생성();
+        MenuGroup 메뉴그룹 = menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴 그룹명", false)));
         menu = 메뉴생성(메뉴그룹, BigDecimal.ONE);
     }
 

@@ -1,7 +1,9 @@
-package kitchenpos.menu.menu.domain;
+package kitchenpos.menu.menu;
 
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
+import kitchenpos.menu.menu.domain.Menu;
+import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 
 import java.util.Arrays;

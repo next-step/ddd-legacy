@@ -2,6 +2,7 @@ package kitchenpos.menu.menu.ui;
 
 import kitchenpos.menu.menu.application.MenuCreateService;
 import kitchenpos.menu.menu.application.ChangeMenuPriceService;
+import kitchenpos.menu.menu.application.MenuDisplayService;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.dto.request.ChangeMenuPriceRequest;
 import kitchenpos.menu.menu.dto.request.MenuRequest;
@@ -17,10 +18,13 @@ import java.util.UUID;
 public class MenuRestController {
     private final MenuCreateService menuCreateService;
     private final ChangeMenuPriceService changeMenuPriceService;
+    private final MenuDisplayService menuDisplayService;
 
-    public MenuRestController(final MenuCreateService menuCreateService, final ChangeMenuPriceService changeMenuPriceService) {
+    public MenuRestController(final MenuCreateService menuCreateService, final ChangeMenuPriceService changeMenuPriceService, final MenuDisplayService menuDisplayService) {
         this.menuCreateService = menuCreateService;
         this.changeMenuPriceService = changeMenuPriceService;
+        this.menuDisplayService = menuDisplayService;
+
     }
 
     @PostMapping
@@ -37,12 +41,12 @@ public class MenuRestController {
 
     @PutMapping("/{menuId}/display")
     public ResponseEntity<Menu> display(@PathVariable final UUID menuId) {
-        return ResponseEntity.ok(menuCreateService.display(menuId));
+        return ResponseEntity.ok(menuDisplayService.display(menuId));
     }
 
     @PutMapping("/{menuId}/hide")
     public ResponseEntity<Menu> hide(@PathVariable final UUID menuId) {
-        return ResponseEntity.ok(menuCreateService.hide(menuId));
+        return ResponseEntity.ok(menuDisplayService.hide(menuId));
     }
 
     @GetMapping
