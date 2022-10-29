@@ -195,7 +195,7 @@ public class Order {
         if (this.type != OrderType.DELIVERY && this.status != OrderStatus.SERVED) {
             throw new IllegalStateException("주문 상태가 SERVED가 아니면 주문을 완료할 수 없다.");
         }
-        this.status = OrderStatus.DELIVERED;
+        this.status = OrderStatus.COMPLETED;
     }
 
     private boolean takeOut() {
