@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
@@ -58,5 +59,14 @@ class ChangePriceServiceTest {
         assertThatThrownBy(() -> changePriceService.changePrice(product.getId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 일 수 없습니다.");
+    }
+
+    @DisplayName("상품 가격을 변경할 수 있다.")
+    @Test
+    void casdhangePrice() {
+        ChangePriceRequest request = new ChangePriceRequest(BigDecimal.TEN);
+        assertThat(product.getPrice()).isEqualTo(BigDecimal.ONE);
+        changePriceService.changePrice(product.getId(), request);
+        assertThat(product.getPrice()).isEqualTo(BigDecimal.TEN);
     }
 }
