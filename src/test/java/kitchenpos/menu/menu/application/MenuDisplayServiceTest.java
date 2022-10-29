@@ -1,6 +1,5 @@
 package kitchenpos.menu.menu.application;
 
-import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
 import kitchenpos.common.vo.Quantity;
@@ -45,12 +44,14 @@ class MenuDisplayServiceTest {
 
     private static Product 상품;
     private Menu 메뉴;
+    private Menu 메뉴가격이_메뉴상품합_보다큼;
 
     @BeforeEach
     void setUp() {
         상품 = productRepository.save(product());
         MenuGroup 메뉴그룹 = menuGroupRepository.save(menuGroup());
-        메뉴 = menuRepository.save(menu(메뉴그룹));
+        메뉴가격이_메뉴상품합_보다큼 = menuRepository.save(메뉴가격이_메뉴상품합_보다큼(메뉴그룹));
+        메뉴 = menuRepository.save(메뉴(메뉴그룹));
     }
 
     @DisplayName("메뉴를 보일 수 있다.")
@@ -66,10 +67,10 @@ class MenuDisplayServiceTest {
     @DisplayName("메뉴의 가격이 메뉴 상품의 합보다 클 수 없다.")
     @Test
     void displaysd() {
-        assertThat(메뉴.isDisplayed()).isTrue();
-        menuDisplayService.hide(메뉴.getId());
-        assertThat(메뉴.isDisplayed()).isFalse();
-        assertThatThrownBy(() -> menuDisplayService.display(메뉴.getId()))
+        assertThat(메뉴가격이_메뉴상품합_보다큼.isDisplayed()).isTrue();
+        menuDisplayService.hide(메뉴가격이_메뉴상품합_보다큼.getId());
+        assertThat(메뉴가격이_메뉴상품합_보다큼.isDisplayed()).isFalse();
+        assertThatThrownBy(() -> menuDisplayService.display(메뉴가격이_메뉴상품합_보다큼.getId()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴의 가격이 메뉴 상품의 합보다 클 수 없다.");
     }
@@ -86,8 +87,12 @@ class MenuDisplayServiceTest {
         return new MenuGroup(UUID.randomUUID(), new Name("메뉴 그룹명", false));
     }
 
-    private static Menu menu(MenuGroup 메뉴그룹) {
+    private static Menu 메뉴가격이_메뉴상품합_보다큼(MenuGroup 메뉴그룹) {
         return new Menu(UUID.randomUUID(), new Name("메뉴명", false), 메뉴그룹, menuProducts(), new Price(BigDecimal.valueOf(11)));
+    }
+
+    private static Menu 메뉴(MenuGroup 메뉴그룹) {
+        return new Menu(UUID.randomUUID(), new Name("메뉴명", false), 메뉴그룹, menuProducts(), new Price(BigDecimal.valueOf(10)));
     }
 
     private static List<MenuProduct> menuProducts() {
