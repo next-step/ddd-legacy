@@ -65,6 +65,8 @@ public class Order {
         this.deliveryAddress = deliveryAddress;
         this.id = id;
         this.orderDateTime = LocalDateTime.now();
+        this.orderLineItems = orderLineItems;
+        this.orderTable = orderTable;
     }
 
     private void validateDeliveryAddress(DeliveryAddress deliveryAddress) {

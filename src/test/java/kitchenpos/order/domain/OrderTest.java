@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.order.domain.OrderFixture.orderLineItems;
+import static kitchenpos.order.OrderFixture.orderLineItems;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("주문")

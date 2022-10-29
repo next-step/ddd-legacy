@@ -5,7 +5,7 @@ import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderType;
 import kitchenpos.order.vo.DeliveryAddress;
- import kitchenpos.ordertable.vo.NumberOfGuests;
+import kitchenpos.ordertable.vo.NumberOfGuests;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.order.domain.OrderFixture.orderLineItems;
+import static kitchenpos.order.OrderFixture.orderLineItems;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("주문 테이블")

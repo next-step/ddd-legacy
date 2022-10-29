@@ -38,7 +38,6 @@ public class OrderStatusService {
             }
             kitchenridersClient.requestDelivery(orderId, sum, order.getDeliveryAddress());
         }
-        order.setStatus(OrderStatus.ACCEPTED);
         return order;
     }
 
