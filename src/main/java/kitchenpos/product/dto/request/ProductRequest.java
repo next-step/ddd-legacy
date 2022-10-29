@@ -8,6 +8,12 @@ public class ProductRequest {
     private UUID id;
     private BigDecimal price;
 
+    public ProductRequest(UUID id, String name, BigDecimal price) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+    }
+
     public String getName() {
         return this.name;
     }

@@ -8,6 +8,7 @@ import kitchenpos.menu.menu.application.InMemoryMenuRepository;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.product.domain.Product;
 import kitchenpos.product.domain.ProductRepository;
+import kitchenpos.product.dto.request.ProductRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("상품 서비스")
 class ProductServiceTest {
@@ -38,5 +40,14 @@ class ProductServiceTest {
     void findProducts() {
         productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)));
         assertThat(productService.findAll()).hasSize(1);
+    }
+
+    @DisplayName("상품 가격은 필수이다.")
+    @Test
+    void requireProductPrice() {
+        ProductRequest request = new ProductRequest(UUID.randomUUID(), "상품명", null);
+        assertThatThrownBy(() -> productService.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("null 일 수 없습니다.");
     }
 }
