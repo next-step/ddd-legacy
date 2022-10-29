@@ -23,9 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("상품 서비스")
-class ProductServiceTest {
+class ProductCrudServiceTest {
 
-    private ProductService productService;
+    private ProductCrudService productCrudService;
     private ProductRepository productRepository;
     private MenuRepository menuRepository;
     private PurgomalumClient purgomalumClient;
@@ -35,21 +35,21 @@ class ProductServiceTest {
         productRepository = new InMemoryProductRepository();
         menuRepository = new InMemoryMenuRepository();
         purgomalumClient = new FakePurgomalumClient();
-        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+        productCrudService = new ProductCrudService(productRepository, menuRepository, purgomalumClient);
     }
 
     @DisplayName("상품 목록을 조회할 수 있다.")
     @Test
     void findProducts() {
         productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)));
-        assertThat(productService.findAll()).hasSize(1);
+        assertThat(productCrudService.findAll()).hasSize(1);
     }
 
     @DisplayName("상품 가격은 필수이다.")
     @Test
     void requireProductPrice() {
         ProductRequest request = new ProductRequest(UUID.randomUUID(), "상품명", null);
-        assertThatThrownBy(() -> productService.create(request))
+        assertThatThrownBy(() -> productCrudService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 일 수 없습니다.");
     }
@@ -59,7 +59,7 @@ class ProductServiceTest {
     @NullAndEmptySource
     void requireProductName(String name) {
         ProductRequest request = new ProductRequest(UUID.randomUUID(), name, BigDecimal.TEN);
-        assertThatThrownBy(() -> productService.create(request))
+        assertThatThrownBy(() -> productCrudService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
     }
@@ -69,7 +69,7 @@ class ProductServiceTest {
     @ValueSource(strings = {"비속어", "욕설"})
     void profanity(String name) {
         ProductRequest request = new ProductRequest(UUID.randomUUID(), name, BigDecimal.TEN);
-        assertThatThrownBy(() -> productService.create(request))
+        assertThatThrownBy(() -> productCrudService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("비속어를 포함할 수 없습니다.");
     }
@@ -79,7 +79,7 @@ class ProductServiceTest {
     @ValueSource(strings = {"-1"})
     void negative(BigDecimal price) {
         ProductRequest request = new ProductRequest(UUID.randomUUID(), "상품명", price);
-        assertThatThrownBy(() -> productService.create(request))
+        assertThatThrownBy(() -> productCrudService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
     }

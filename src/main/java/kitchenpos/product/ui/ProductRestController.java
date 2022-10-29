@@ -1,6 +1,6 @@
 package kitchenpos.product.ui;
 
-import kitchenpos.product.application.ProductService;
+import kitchenpos.product.application.ProductCrudService;
 import kitchenpos.product.domain.Product;
 import kitchenpos.product.dto.request.ProductRequest;
 import org.springframework.http.ResponseEntity;
@@ -13,26 +13,26 @@ import java.util.UUID;
 @RequestMapping("/api/products")
 @RestController
 public class ProductRestController {
-    private final ProductService productService;
+    private final ProductCrudService productCrudService;
 
-    public ProductRestController(final ProductService productService) {
-        this.productService = productService;
+    public ProductRestController(final ProductCrudService productCrudService) {
+        this.productCrudService = productCrudService;
     }
 
     @PostMapping
     public ResponseEntity<Product> create(@RequestBody final ProductRequest request) {
-        final Product response = productService.create(request);
+        final Product response = productCrudService.create(request);
         return ResponseEntity.created(URI.create("/api/products/" + response.getId()))
                 .body(response);
     }
 
     @PutMapping("/{productId}/price")
     public ResponseEntity<Product> changePrice(@PathVariable final UUID productId, @RequestBody final Product request) {
-        return ResponseEntity.ok(productService.changePrice(productId, request));
+        return ResponseEntity.ok(productCrudService.changePrice(productId, request));
     }
 
     @GetMapping
     public ResponseEntity<List<Product>> findAll() {
-        return ResponseEntity.ok(productService.findAll());
+        return ResponseEntity.ok(productCrudService.findAll());
     }
 }
