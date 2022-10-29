@@ -172,7 +172,7 @@ public class Order {
 
     public void served() {
         if (this.status != OrderStatus.ACCEPTED) {
-            throw new IllegalArgumentException("ACCEPTED 상태만 SERVED 상태로 변경가능합니다");
+            throw new IllegalStateException("ACCEPTED 상태만 SERVED 상태로 변경가능합니다");
         }
         this.status = OrderStatus.SERVED;
     }

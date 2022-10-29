@@ -51,11 +51,11 @@ class OrderStatusServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
-    @DisplayName("주문에 대해 제공할 수 있다.")
+    @DisplayName("접수 상태가 아니면 제공할 수 없다.")
     @Test
     void served() {
-        orderStatusService.accept(order.getId());
-        orderStatusService.serve(order.getId());
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
+        assertThatThrownBy(() -> orderStatusService.serve(order.getId()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("ACCEPTED 상태만 SERVED 상태로 변경가능합니다");
     }
 }
