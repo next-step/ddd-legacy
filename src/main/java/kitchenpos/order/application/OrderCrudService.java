@@ -14,10 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,6 +37,9 @@ public class OrderCrudService {
     public Order create(final OrderRequest request) {
         final OrderType type = request.getType();
         final List<OrderLineItemRequest> orderLineItemRequests = request.getOrderLineItems();
+        if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
+            throw new IllegalArgumentException("주문 항목은 비어 있을 수 없습니다.");
+        }
         validateMenuSize(orderLineItemRequests);
         final List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (final OrderLineItemRequest orderLineItemRequest : orderLineItemRequests) {

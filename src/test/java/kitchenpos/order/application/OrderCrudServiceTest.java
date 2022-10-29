@@ -47,8 +47,9 @@ class OrderCrudServiceTest {
 
     @Autowired
     private OrderTableRepository orderTableRepository;
+
     @Autowired
-    private static MenuRepository menuRepository;
+    private MenuRepository menuRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -88,18 +89,42 @@ class OrderCrudServiceTest {
     @DisplayName("메뉴의 수량과 주문 항목의 수량은 같다.")
     @Test
     void menuSize() {
-        OrderRequest orderRequest = 메뉴수량_주문항목_수량_다름();
+        OrderRequest orderRequest = 메뉴수량_주문항목수량_다름();
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴의 수량과 주문 항목의 수량은 같다.");
     }
 
-    private OrderRequest 메뉴수량_주문항목_수량_다름() {
+    private OrderRequest 메뉴수량_주문항목수량_다름() {
         List<OrderLineItem> orderLineItems = orderLineItems();
         orderRepository.save(order(orderLineItems));
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
+        orderLineItemRequests.add(orderLineItemRequest);
+        return new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, "주소", orderTable.getId());
+    }
+
+    private OrderRequest 메뉴가격_메뉴항목_가격_다름() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        orderRepository.save(order(orderLineItems));
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.valueOf(11), 1);
+        orderLineItemRequests.add(orderLineItemRequest);
+        return new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, "주소", orderTable.getId());
+    }
+
+    private OrderRequest 주문항목_비어있음() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        orderRepository.save(order(orderLineItems));
+        return new OrderRequest(null, OrderType.TAKEOUT, "주소", orderTable.getId());
+    }
+
+    private OrderRequest 메뉴수량_주문항목수량_같음() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        orderRepository.save(order(orderLineItems));
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
         return new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, "주소", orderTable.getId());
     }
@@ -126,7 +151,7 @@ class OrderCrudServiceTest {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.ONE, 1);
         orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = 메뉴수량_주문항목_수량_다름();
+        OrderRequest orderRequest = 메뉴가격_메뉴항목_가격_다름();
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴의 가격과 메뉴 항목의 가격은 같다.");
@@ -136,7 +161,7 @@ class OrderCrudServiceTest {
     @Test
     void orderLineItemsNotNull() {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderRequest orderRequest = 메뉴수량_주문항목_수량_다름();
+        OrderRequest orderRequest = 주문항목_비어있음();
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 항목은 비어 있을 수 없습니다.");
@@ -160,10 +185,19 @@ class OrderCrudServiceTest {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, -1);
         orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = 메뉴수량_주문항목_수량_다름();
+        OrderRequest orderRequest = 포장주문_수량0개미만();
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("매장 주문이 아닐 경우 수량은 0개보다 적을 수 없다.");
+    }
+
+    private OrderRequest 포장주문_수량0개미만() {
+        List<OrderLineItem> orderLineItems = orderLineItems();
+        orderRepository.save(order(orderLineItems));
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, -1);
+        orderLineItemRequests.add(orderLineItemRequest);
+        return new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, "주소", orderTable.getId());
     }
 
     @DisplayName("안보이는 메뉴가 주문될 수 없다.")
@@ -173,7 +207,7 @@ class OrderCrudServiceTest {
         final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
         OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
         orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = 메뉴수량_주문항목_수량_다름();
+        OrderRequest orderRequest = 메뉴수량_주문항목수량_같음();
         assertThatThrownBy(() -> orderCrudService.create(orderRequest))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("안보이는 메뉴가 주문될 수 없다.");
@@ -214,9 +248,11 @@ class OrderCrudServiceTest {
                 .hasMessageContaining("매장 주문에서 착석된 테이블을 선택할 수 없다.");
     }
 
-    private static List<OrderLineItem> orderLineItems() {
-        MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, createMenuProducts(new MenuProduct(new Product(UUID.randomUUID(), new Name("productName", false), new Price(BigDecimal.TEN)), new Quantity(1))), new Price(BigDecimal.TEN));
+    private List<OrderLineItem> orderLineItems() {
+        MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID(), "메뉴 그룹명"));
+        Product product = new Product(UUID.randomUUID(), new Name("productName", false), new Price(BigDecimal.TEN));
+        productRepository.save(product);
+        Menu menu = new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, createMenuProducts(new MenuProduct(product, new Quantity(1))), new Price(BigDecimal.TEN));
         menu.display();
         menuRepository.save(menu);
         List<OrderLineItem> orderLineItems = new ArrayList<>();
