@@ -132,7 +132,7 @@ class OrderStatusServiceTest {
         orderStatusService.serve(배달주문.getId());
         assertThatThrownBy(() -> orderStatusService.completeDelivery(배달주문.getId()))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("주문 상태가 DELIVERING이 아니면 주문을 완료할 수 없다.");
+                .hasMessageContaining("주문 상태가 DELIVERING일 경우에만 배송을 완료할 수 있다.");
     }
 
     @DisplayName("주문을 완료할 수 있다.")
