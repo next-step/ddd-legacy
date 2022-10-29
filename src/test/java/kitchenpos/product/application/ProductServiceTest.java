@@ -73,4 +73,14 @@ class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("비속어를 포함할 수 없습니다.");
     }
+
+    @DisplayName("상품 가격은 0원보다 작을 수 없다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"-1"})
+    void negative(BigDecimal price) {
+        ProductRequest request = new ProductRequest(UUID.randomUUID(), "상품명", price);
+        assertThatThrownBy(() -> productService.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("가격은 0원보다 커야합니다.");
+    }
 }
