@@ -2,6 +2,7 @@ package kitchenpos.order.application;
 
 import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderRepository;
+import kitchenpos.order.domain.OrderStatus;
 import kitchenpos.order.domain.OrderType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.UUID;
 
 import static kitchenpos.order.domain.OrderFixture.orderLineItems;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @Transactional
@@ -40,5 +42,12 @@ class OrderStatusServiceTest {
         assertThatThrownBy(() -> orderStatusService.accept(order.getId()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("WAITING 상태만 접수가능합니다.");
+    }
+
+    @DisplayName("WAITING 상태가 아니면 접수를 받을 수 없다.")
+    @Test
+    void accept() {
+        orderStatusService.accept(order.getId());
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 }
