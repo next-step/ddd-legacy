@@ -79,7 +79,7 @@ class OrderTableServiceTest {
     @Test
     void findAll() {
         orderTableRepository.save(orderTable("주문테이블명", 1));
-        assertThat(orderTableService.findAll()).hasSize(1);
+        assertThat(orderTableService.findAll()).hasSize(2);
     }
 
     @DisplayName("주문 테이블의 착석여부를 착석으로 변경할 수 있다.")
