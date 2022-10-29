@@ -43,7 +43,7 @@ docker compose -p kitchenpos up -d
         - [x] 주문 상태가 DELIVERING일 경우에만 배송을 완료할 수 있다.
     - [x] 주문을 완료할 수 있다.
         - [x] 주문 타입이 DELIVERY이고 주문 상태가 DELIVERED가 아니면 주문을 완료할 수 없다.
-        - [ ] 주문 타입이 TAKEOUT 또는 EAT_IN이고 주문상태가 SERVED아니면 주문을 완료할 수 없다.
+        - [x] 주문 타입이 TAKEOUT 또는 EAT_IN이고 주문상태가 SERVED아니면 주문을 완료할 수 없다.
     - [ ] 주문 내역을 조회할 수 있다.
 
 ### 메뉴
