@@ -150,7 +150,7 @@ class OrderStatusServiceTest {
         orderStatusService.accept(배달주문.getId());
         assertThatThrownBy(() -> orderStatusService.complete(배달주문.getId()))
                 .isInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("주문 상태가 DELIVERING이 아니면 주문을 완료할 수 없다.");
+                .hasMessageContaining("주문 상태가 DELIVERED가 아니면 주문을 완료할 수 없다.");
     }
 
     @DisplayName("주문 타입이 TAKEOUT 또는 EAT_IN이고 주문상태가 SERVED아니면 주문을 완료할 수 없다.")

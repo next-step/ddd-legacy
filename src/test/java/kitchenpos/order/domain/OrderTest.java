@@ -50,7 +50,7 @@ class OrderTest {
         order.accept();
         assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
         assertThatThrownBy(order::accept)
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("WAITING 상태만 접수가능합니다.");
     }
 
@@ -60,7 +60,7 @@ class OrderTest {
         List<OrderLineItem> orderLineItems = orderLineItems();
         Order order = new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems, new OrderTable(UUID.randomUUID(), new Name("테이블명", false), new NumberOfGuests(1)), new DeliveryAddress("주소"));
         assertThatThrownBy(order::served)
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("ACCEPTED 상태만 SERVED 상태로 변경가능합니다");
     }
 
@@ -93,7 +93,7 @@ class OrderTest {
         order.accept();
         order.served();
         assertThatThrownBy(order::delivering)
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("주문 타입이 DELIVERY일 경우에만 배송 시작을 할 수 있습니다.");
     }
 
@@ -104,7 +104,7 @@ class OrderTest {
         Order order = new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems, new OrderTable(UUID.randomUUID(), new Name("테이블명", false), new NumberOfGuests(1)), new DeliveryAddress("주소"));
         order.accept();
         assertThatThrownBy(order::delivering)
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("주문 상태가 SERVED일 경우에만 배송 시작을 할 수 있다.");
     }
 
@@ -128,7 +128,7 @@ class OrderTest {
         order.accept();
         order.served();
         assertThatThrownBy(order::delivered)
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("주문 상태가 DELIVERING일 경우에만 배송을 완료할 수 있다.");
     }
 
@@ -141,7 +141,7 @@ class OrderTest {
         order.served();
         order.delivering();
         assertThatThrownBy(order::completed)
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("주문 상태가 DELIVERED가 아니면 주문을 완료할 수 없다.");
     }
 
