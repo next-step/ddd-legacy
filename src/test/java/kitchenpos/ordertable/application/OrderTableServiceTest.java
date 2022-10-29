@@ -18,8 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("주문 테이블")
 @SpringBootTest
@@ -72,6 +71,13 @@ class OrderTableServiceTest {
         assertThatThrownBy(() -> orderTableService.create(orderTableRequest))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
+    }
+
+    @DisplayName("주문 테이블을 생성할 수 있다.")
+    @Test
+    void create() {
+        OrderTableRequest orderTableRequest = new OrderTableRequest("주문테이블");
+        assertThatNoException().isThrownBy(() -> orderTableService.create(orderTableRequest));
     }
 
     @DisplayName("주문 테이블의 착석 인원을 변경 할 수 있다.")
