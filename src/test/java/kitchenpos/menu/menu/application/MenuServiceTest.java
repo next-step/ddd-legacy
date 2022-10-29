@@ -69,9 +69,7 @@ class MenuServiceTest {
     @Test
     void productSize() {
         MenuGroup menuGroup = menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴그룹명", false)));
-        List<MenuProductRequest> menuProductRequests = new ArrayList<>();
-        MenuProductRequest menuProductRequest = new MenuProductRequest(UUID.randomUUID(), 1);
-        menuProductRequests.add(menuProductRequest);
+        List<MenuProductRequest> menuProductRequests = getMenuProductRequests(UUID.randomUUID());
         MenuRequest menuRequest = new MenuRequest(menuGroup.getId(), "메뉴명", BigDecimal.TEN, menuProductRequests);
         assertThatThrownBy(() -> menuService.create(menuRequest))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -80,12 +78,26 @@ class MenuServiceTest {
     @DisplayName("메뉴 그룹에 속해 있다.")
     @Test
     void menuGroup() {
-        List<MenuProductRequest> menuProductRequests = new ArrayList<>();
-        MenuProductRequest menuProductRequest = new MenuProductRequest(product.getId(), 1);
-        menuProductRequests.add(menuProductRequest);
+        List<MenuProductRequest> menuProductRequests = getMenuProductRequests(product.getId());
         MenuRequest menuRequest = new MenuRequest(UUID.randomUUID(), "메뉴명", BigDecimal.TEN, menuProductRequests);
         assertThatThrownBy(() -> menuService.create(menuRequest))
                 .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @DisplayName("메뉴 가격이 0원보다 작을 수 없다.")
+    @Test
+    void price() {
+        MenuRequest menuRequest = new MenuRequest(menuGroup.getId(), "메뉴명", BigDecimal.valueOf(-1), getMenuProductRequests(product.getId()));
+        assertThatThrownBy(() -> menuService.create(menuRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("가격은 0원보다 커야합니다.");
+    }
+
+    private List<MenuProductRequest> getMenuProductRequests(UUID product) {
+        List<MenuProductRequest> menuProductRequests = new ArrayList<>();
+        MenuProductRequest menuProductRequest = new MenuProductRequest(product, 1);
+        menuProductRequests.add(menuProductRequest);
+        return menuProductRequests;
     }
 }
 
