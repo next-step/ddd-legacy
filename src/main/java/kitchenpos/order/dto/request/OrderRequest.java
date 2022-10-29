@@ -11,11 +11,13 @@ public class OrderRequest {
     private List<OrderLineItemRequest> orderLineItems;
     private UUID id;
     private String deliveryAddress;
+    private UUID orderTableId;
 
-    public OrderRequest(List<OrderLineItemRequest> orderLineItemRequests, OrderType type, String deliveryAddress) {
+    public OrderRequest(List<OrderLineItemRequest> orderLineItemRequests, OrderType type, String deliveryAddress, UUID orderTableId) {
         this.orderLineItems = orderLineItemRequests;
         this.type = type;
         this.deliveryAddress = deliveryAddress;
+        this.orderTableId = orderTableId;
     }
 
     public OrderType getType() {
@@ -27,7 +29,7 @@ public class OrderRequest {
     }
 
     public UUID getOrderTableId() {
-        return this.id;
+        return this.orderTableId;
     }
 
     public String getDeliveryAddress() {
