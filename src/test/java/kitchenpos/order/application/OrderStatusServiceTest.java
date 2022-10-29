@@ -50,4 +50,12 @@ class OrderStatusServiceTest {
         orderStatusService.accept(order.getId());
         assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
+
+    @DisplayName("주문에 대해 제공할 수 있다.")
+    @Test
+    void served() {
+        orderStatusService.accept(order.getId());
+        orderStatusService.serve(order.getId());
+        assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
 }
