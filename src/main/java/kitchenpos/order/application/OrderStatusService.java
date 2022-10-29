@@ -69,20 +69,8 @@ public class OrderStatusService {
     public Order complete(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
                 .orElseThrow(NoSuchElementException::new);
-        final OrderType type = order.getType();
-        final OrderStatus status = order.getStatus();
-        if (type == OrderType.DELIVERY) {
-            if (status != OrderStatus.DELIVERED) {
-                throw new IllegalStateException();
-            }
-        }
-        if (type == OrderType.TAKEOUT || type == OrderType.EAT_IN) {
-            if (status != OrderStatus.SERVED) {
-                throw new IllegalStateException();
-            }
-        }
-        order.setStatus(OrderStatus.COMPLETED);
-        if (type == OrderType.EAT_IN) {
+        order.completed();
+        if (order.getType() == OrderType.EAT_IN) {
             final OrderTable orderTable = order.getOrderTable();
             if (!orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
                 orderTable.changeNumberOfGuests(new NumberOfGuests(0));

@@ -190,10 +190,10 @@ public class Order {
     }
 
     public void completed() {
-        if (this.status != OrderStatus.DELIVERING && !takeOut()) {
+        if (this.type == OrderType.DELIVERY && this.status != OrderStatus.DELIVERED) {
             throw new IllegalStateException("주문 상태가 DELIVERING이 아니면 주문을 완료할 수 없다.");
         }
-        if (this.type != OrderType.DELIVERY && !takeOut()) {
+        if (this.type != OrderType.DELIVERY && this.status != OrderStatus.SERVED) {
             throw new IllegalStateException("주문 타입이 DELIVERY가 아니면 주문을 완료할 수 없다.");
         }
         this.status = OrderStatus.COMPLETED;
