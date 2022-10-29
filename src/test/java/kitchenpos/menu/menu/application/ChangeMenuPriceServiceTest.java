@@ -61,6 +61,14 @@ class ChangeMenuPriceServiceTest {
                 .hasMessageContaining("null 일 수 없습니다.");
     }
 
+    @DisplayName("메뉴 가격은 0원보다 크다.")
+    @Test
+    void nasdame() {
+        assertThatThrownBy(() -> changeMenuPriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(BigDecimal.valueOf(-1))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("가격은 0원보다 커야합니다.");
+    }
+
     private Menu 메뉴생성(MenuGroup 메뉴그룹) {
         List<MenuProduct> menuProducts = new ArrayList<>();
         menuProducts.add(new MenuProduct(product, new Quantity(1)));
