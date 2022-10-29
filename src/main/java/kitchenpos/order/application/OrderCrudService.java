@@ -41,14 +41,7 @@ public class OrderCrudService {
             throw new IllegalArgumentException("주문 항목은 비어 있을 수 없습니다.");
         }
         validateMenuSize(orderLineItemRequests);
-        final List<OrderLineItem> orderLineItems = new ArrayList<>();
-        for (final OrderLineItemRequest orderLineItemRequest : orderLineItemRequests) {
-            final long quantity = orderLineItemRequest.getQuantity();
-            final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
-                    .orElseThrow(NoSuchElementException::new);
-            validatePrice(orderLineItemRequest, menu.getPrice());
-            orderLineItems.add(new OrderLineItem(menu, new Quantity(quantity)));
-        }
+        final List<OrderLineItem> orderLineItems = createOrderLineItems(orderLineItemRequests);
         OrderTable orderTable = null;
         if (type == OrderType.EAT_IN) {
             orderTable = orderTableRepository.findById(request.getOrderTableId())
@@ -58,12 +51,20 @@ public class OrderCrudService {
         if (type == OrderType.DELIVERY) {
             deliveryAddress = new DeliveryAddress(request.getDeliveryAddress());
         }
-        Order order = new Order(UUID.randomUUID(), type, orderLineItems, orderTable, deliveryAddress);
-        order.setId(UUID.randomUUID());
-        order.setStatus(OrderStatus.WAITING);
-        order.setOrderDateTime(LocalDateTime.now());
-        order.setOrderLineItems(orderLineItems);
+        Order order = new Order(UUID.randomUUID(), type, orderLineItems, orderTable, deliveryAddress, LocalDateTime.now(), OrderStatus.WAITING);
         return orderRepository.save(order);
+    }
+
+    private List<OrderLineItem> createOrderLineItems(List<OrderLineItemRequest> orderLineItemRequests) {
+        final List<OrderLineItem> orderLineItems = new ArrayList<>();
+        for (final OrderLineItemRequest orderLineItemRequest : orderLineItemRequests) {
+            final long quantity = orderLineItemRequest.getQuantity();
+            final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
+                    .orElseThrow(NoSuchElementException::new);
+            validatePrice(orderLineItemRequest, menu.getPrice());
+            orderLineItems.add(new OrderLineItem(menu, new Quantity(quantity)));
+        }
+        return orderLineItems;
     }
 
     private static void validatePrice(OrderLineItemRequest orderLineItemRequest, BigDecimal menuPrice) {

@@ -3,6 +3,7 @@ package kitchenpos.ordertable.domain;
 import kitchenpos.common.vo.Name;
 import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;
+import kitchenpos.order.domain.OrderStatus;
 import kitchenpos.order.domain.OrderType;
 import kitchenpos.order.vo.DeliveryAddress;
 import kitchenpos.ordertable.vo.NumberOfGuests;
@@ -12,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -98,7 +100,7 @@ class OrderTableTest {
     @Test
     void vacant_status() {
         List<OrderLineItem> orderLineItems = orderLineItems();
-        Order order = new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems, new OrderTable(UUID.randomUUID(), new Name("테이블명", false), new NumberOfGuests(1)), new DeliveryAddress("주소"));
+        Order order = new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems, new OrderTable(UUID.randomUUID(), new Name("테이블명", false), new NumberOfGuests(1)), new DeliveryAddress("주소"), LocalDateTime.now(), OrderStatus.WAITING);
         assertThatThrownBy(() -> order.vacant())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 테이블 공석으로 변경 시 주문 상태가 완료일때만 변경 가능하다.");

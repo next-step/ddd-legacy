@@ -8,10 +8,7 @@ import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
-import kitchenpos.order.domain.Order;
-import kitchenpos.order.domain.OrderLineItem;
-import kitchenpos.order.domain.OrderRepository;
-import kitchenpos.order.domain.OrderType;
+import kitchenpos.order.domain.*;
 import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.ordertable.domain.OrderTableRepository;
 import kitchenpos.ordertable.dto.OrderTableRequest;
@@ -29,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -72,7 +70,7 @@ class OrderTableServiceTest {
         OrderLineItem orderLineItem = new OrderLineItem(menu, new Quantity(1));
         orderLineItems.add(orderLineItem);
         orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
-        orderRepository.save(new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems, orderTable, null));
+        orderRepository.save(new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems, orderTable, null, LocalDateTime.now(), OrderStatus.WAITING));
     }
 
     @DisplayName("주문 테이블 목록을 조회할 수 있다.")

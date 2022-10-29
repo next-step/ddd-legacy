@@ -9,10 +9,7 @@ import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
-import kitchenpos.order.domain.Order;
-import kitchenpos.order.domain.OrderLineItem;
-import kitchenpos.order.domain.OrderRepository;
-import kitchenpos.order.domain.OrderType;
+import kitchenpos.order.domain.*;
 import kitchenpos.order.dto.request.OrderLineItemRequest;
 import kitchenpos.order.dto.request.OrderRequest;
 import kitchenpos.ordertable.application.OrderTableService;
@@ -29,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -130,7 +128,7 @@ class OrderCrudServiceTest {
     }
 
     private Order order(List<OrderLineItem> orderLineItems) {
-        return new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems, orderTable, null);
+        return new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems, orderTable, null, LocalDateTime.now(), OrderStatus.WAITING);
     }
 
     @DisplayName("주문 타입은 배송 / 포장 / 매장 중 한 가지를 갖는다.")

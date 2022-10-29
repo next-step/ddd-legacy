@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -179,11 +180,11 @@ class OrderStatusServiceTest {
     }
 
     public Order 배달주문생성(List<OrderLineItem> orderLineItems) {
-        return new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems, null, new DeliveryAddress("배송지"));
+        return new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems, null, new DeliveryAddress("배송지"), LocalDateTime.now(), OrderStatus.WAITING);
     }
 
     public Order 매장주문생성(List<OrderLineItem> orderLineItems) {
-        return new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems, null, null);
+        return new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems, null, null, LocalDateTime.now(), OrderStatus.WAITING);
     }
 
 }
