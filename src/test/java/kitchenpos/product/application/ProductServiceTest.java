@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -61,5 +62,15 @@ class ProductServiceTest {
         assertThatThrownBy(() -> productService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
+    }
+
+    @DisplayName("상품명은 비속어를 사용할 수 없다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"비속어", "욕설"})
+    void profanity(String name) {
+        ProductRequest request = new ProductRequest(UUID.randomUUID(), name, BigDecimal.TEN);
+        assertThatThrownBy(() -> productService.create(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("비속어를 포함할 수 없습니다.");
     }
 }
