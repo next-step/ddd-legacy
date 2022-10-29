@@ -46,7 +46,7 @@ public class MenuService {
                 .orElseThrow(NoSuchElementException::new);
         final List<MenuProductRequest> menuProductRequests = request.getMenuProducts();
         if (Objects.isNull(menuProductRequests) || menuProductRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("메뉴 상품 목록은 비어있을 수 없다.");
         }
         final List<Product> products = productRepository.findAllByIdIn(
                 menuProductRequests.stream()

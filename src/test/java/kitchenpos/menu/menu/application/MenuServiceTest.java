@@ -93,6 +93,15 @@ class MenuServiceTest {
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
     }
 
+    @DisplayName("메뉴 상품 목록은 비어 있을 수 없다.")
+    @Test
+    void menuProducts() {
+        MenuRequest menuRequest = new MenuRequest(menuGroup.getId(), "메뉴명", BigDecimal.valueOf(2), null);
+        assertThatThrownBy(() -> menuService.create(menuRequest))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("메뉴 상품 목록은 비어있을 수 없다.");
+    }
+
     private List<MenuProductRequest> getMenuProductRequests(UUID product) {
         List<MenuProductRequest> menuProductRequests = new ArrayList<>();
         MenuProductRequest menuProductRequest = new MenuProductRequest(product, 1);
