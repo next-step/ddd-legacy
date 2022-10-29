@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @Transactional
 @DisplayName("메뉴 가격 변경")
-class ChangeMenuPriceServiceTest {
+class MenuChangePriceServiceTest {
 
     @Autowired
     private MenuRepository menuRepository;
@@ -41,14 +41,14 @@ class ChangeMenuPriceServiceTest {
     private ProductRepository productRepository;
 
     @Autowired
-    private ChangeMenuPriceService changeMenuPriceService;
+    private MenuChangePriceService menuChangePriceService;
 
     private Product product;
     private Menu menu;
 
     @BeforeEach
     void setUp() {
-        changeMenuPriceService = new ChangeMenuPriceService(menuRepository);
+        menuChangePriceService = new MenuChangePriceService(menuRepository);
         product = productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)));
         MenuGroup 메뉴그룹 = menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴 그룹명", false)));
         menu = 메뉴생성(메뉴그룹, BigDecimal.ONE);
@@ -57,7 +57,7 @@ class ChangeMenuPriceServiceTest {
     @DisplayName("메뉴 가격은 필수로 입력받는다.")
     @Test
     void name() {
-        assertThatThrownBy(() -> changeMenuPriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(null)))
+        assertThatThrownBy(() -> menuChangePriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(null)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 일 수 없습니다.");
     }
@@ -65,7 +65,7 @@ class ChangeMenuPriceServiceTest {
     @DisplayName("메뉴 가격은 0원보다 크다.")
     @Test
     void nasdame() {
-        assertThatThrownBy(() -> changeMenuPriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(BigDecimal.valueOf(-1))))
+        assertThatThrownBy(() -> menuChangePriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(BigDecimal.valueOf(-1))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
     }
@@ -74,8 +74,16 @@ class ChangeMenuPriceServiceTest {
     @Test
     void changePrice() {
         assertThat(menu.getPrice()).isEqualTo(BigDecimal.ONE);
-        changeMenuPriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(BigDecimal.valueOf(7)));
+        menuChangePriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(BigDecimal.valueOf(7)));
         assertThat(menu.getPrice()).isEqualTo(BigDecimal.valueOf(7));
+    }
+
+    @DisplayName("메뉴의 가격이 메뉴 상품의 합보다 크면 메뉴를 숨긴다.")
+    @Test
+    void changePricasde() {
+        assertThat(menu.isDisplayed()).isTrue();
+        menuChangePriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(BigDecimal.valueOf(20)));
+        assertThat(menu.isDisplayed()).isFalse();
     }
 
     private Menu 메뉴생성(MenuGroup 메뉴그룹, BigDecimal menuPrice) {

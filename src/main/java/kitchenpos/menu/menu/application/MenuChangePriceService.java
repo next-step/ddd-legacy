@@ -11,10 +11,10 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @Service
-public class ChangeMenuPriceService {
+public class MenuChangePriceService {
     private final MenuRepository menuRepository;
 
-    public ChangeMenuPriceService(final MenuRepository menuRepository) {
+    public MenuChangePriceService(final MenuRepository menuRepository) {
         this.menuRepository = menuRepository;
     }
 

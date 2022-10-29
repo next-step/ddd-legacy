@@ -1,7 +1,7 @@
 package kitchenpos.menu.menu.ui;
 
 import kitchenpos.menu.menu.application.MenuCreateService;
-import kitchenpos.menu.menu.application.ChangeMenuPriceService;
+import kitchenpos.menu.menu.application.MenuChangePriceService;
 import kitchenpos.menu.menu.application.MenuDisplayService;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.dto.request.ChangeMenuPriceRequest;
@@ -17,12 +17,12 @@ import java.util.UUID;
 @RestController
 public class MenuRestController {
     private final MenuCreateService menuCreateService;
-    private final ChangeMenuPriceService changeMenuPriceService;
+    private final MenuChangePriceService menuChangePriceService;
     private final MenuDisplayService menuDisplayService;
 
-    public MenuRestController(final MenuCreateService menuCreateService, final ChangeMenuPriceService changeMenuPriceService, final MenuDisplayService menuDisplayService) {
+    public MenuRestController(final MenuCreateService menuCreateService, final MenuChangePriceService menuChangePriceService, final MenuDisplayService menuDisplayService) {
         this.menuCreateService = menuCreateService;
-        this.changeMenuPriceService = changeMenuPriceService;
+        this.menuChangePriceService = menuChangePriceService;
         this.menuDisplayService = menuDisplayService;
 
     }
@@ -36,7 +36,7 @@ public class MenuRestController {
 
     @PutMapping("/{menuId}/price")
     public ResponseEntity<Menu> changePrice(@PathVariable final UUID menuId, @RequestBody final ChangeMenuPriceRequest request) {
-        return ResponseEntity.ok(changeMenuPriceService.changePrice(menuId, request));
+        return ResponseEntity.ok(menuChangePriceService.changePrice(menuId, request));
     }
 
     @PutMapping("/{menuId}/display")
