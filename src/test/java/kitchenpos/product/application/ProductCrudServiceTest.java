@@ -19,8 +19,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("상품 서비스")
 class ProductCrudServiceTest {
@@ -82,5 +81,12 @@ class ProductCrudServiceTest {
         assertThatThrownBy(() -> productCrudService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
+    }
+
+    @DisplayName("상품을 생성할 수 있다.")
+    @Test
+    void create() {
+        ProductRequest request = new ProductRequest(UUID.randomUUID(), "상품명", BigDecimal.ONE);
+        assertThatNoException().isThrownBy(() -> productCrudService.create(request));
     }
 }
