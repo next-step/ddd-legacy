@@ -40,12 +40,6 @@ class MenuDisplayServiceTest {
     private ProductRepository productRepository;
 
     @Autowired
-    private PurgomalumClient purgomalumClient;
-
-    @Autowired
-    private MenuCreateService menuCreateService;
-
-    @Autowired
     private MenuDisplayService menuDisplayService;
 
     private Product 상품;
@@ -58,6 +52,16 @@ class MenuDisplayServiceTest {
         menuProducts.add(new MenuProduct(상품, new Quantity(1)));
         MenuGroup 메뉴그룹 = menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴 그룹명", false)));
         메뉴 = menuRepository.save(new Menu(UUID.randomUUID(), new Name("메뉴명", false), 메뉴그룹, menuProducts, new Price(BigDecimal.TEN)));
+    }
+
+    @DisplayName("메뉴를 보일 수 있다.")
+    @Test
+    void display() {
+        assertThat(메뉴.isDisplayed()).isTrue();
+        menuDisplayService.hide(메뉴.getId());
+        assertThat(메뉴.isDisplayed()).isFalse();
+        menuDisplayService.display(메뉴.getId());
+        assertThat(메뉴.isDisplayed()).isTrue();
     }
 
     @DisplayName("메뉴를 숨길 수 있다.")
