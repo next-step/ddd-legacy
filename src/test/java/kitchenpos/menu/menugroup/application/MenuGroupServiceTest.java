@@ -16,8 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -38,19 +37,16 @@ class MenuGroupServiceTest {
         menuGroupService = new MenuGroupService(menuGroupRepository, purgomalumClient);
     }
 
+    @DisplayName("메뉴 그룹을 생성할 수 있다.")
+    @Test
+    void constructor() {
+        assertThatNoException().isThrownBy(() -> menuGroupService.create(new MenuGroupRequest("메뉴명")));
+    }
+
     @Test
     void name() {
         menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴그룹명", false)));
         assertThat(menuGroupService.findAll()).hasSize(1);
-    }
-
-    @DisplayName("메뉴명은 null 또는 공백일 수 없다.")
-    @ParameterizedTest
-    @NullAndEmptySource
-    void menuName(String name) {
-        assertThatThrownBy(() -> menuGroupService.create(new MenuGroupRequest(name)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("null 이나 공백일 수 없습니다.");
     }
 
     @DisplayName("메뉴 그룹 목록을 조회할 수 있다.")
