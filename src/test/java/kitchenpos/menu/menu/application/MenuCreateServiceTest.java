@@ -3,6 +3,7 @@ package kitchenpos.menu.menu.application;
 import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
+import kitchenpos.menu.menu.MenuRequestFixture;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.menu.menu.dto.request.MenuProductRequest;
 import kitchenpos.menu.menu.dto.request.MenuRequest;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import static kitchenpos.menu.menu.MenuRequestFixture.*;
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
@@ -67,27 +69,21 @@ class MenuCreateServiceTest {
     @DisplayName("상품의 수량과 메뉴 상품의 수량은 다를 수 없다.")
     @Test
     void productSize() {
-        MenuGroup menuGroup = menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴그룹명", false)));
-        List<MenuProductRequest> menuProductRequests = getMenuProductRequests(UUID.randomUUID());
-        MenuRequest menuRequest = new MenuRequest(menuGroup.getId(), "메뉴명", BigDecimal.TEN, menuProductRequests);
-        assertThatThrownBy(() -> menuCreateService.create(menuRequest))
+        assertThatThrownBy(() -> menuCreateService.create(MenuRequestFixture.상품수량_메뉴상품_수량_다름(menuGroup, product)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴 그룹에 속해 있다.")
     @Test
     void menuGroup() {
-        List<MenuProductRequest> menuProductRequests = getMenuProductRequests(product.getId());
-        MenuRequest menuRequest = new MenuRequest(UUID.randomUUID(), "메뉴명", BigDecimal.TEN, menuProductRequests);
-        assertThatThrownBy(() -> menuCreateService.create(menuRequest))
+        assertThatThrownBy(() -> menuCreateService.create(다른메뉴그룹ID(menuGroup, product)))
                 .isInstanceOf(NoSuchElementException.class);
     }
 
     @DisplayName("메뉴 가격이 0원보다 작을 수 없다.")
     @Test
     void price() {
-        MenuRequest menuRequest = new MenuRequest(menuGroup.getId(), "메뉴명", BigDecimal.valueOf(-1), getMenuProductRequests(product.getId()));
-        assertThatThrownBy(() -> menuCreateService.create(menuRequest))
+        assertThatThrownBy(() -> menuCreateService.create(메뉴가격_음수(menuGroup, product)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
     }
@@ -95,8 +91,7 @@ class MenuCreateServiceTest {
     @DisplayName("메뉴 상품 목록은 비어 있을 수 없다.")
     @Test
     void menuProducts() {
-        MenuRequest menuRequest = new MenuRequest(menuGroup.getId(), "메뉴명", BigDecimal.valueOf(2), null);
-        assertThatThrownBy(() -> menuCreateService.create(menuRequest))
+        assertThatThrownBy(() -> menuCreateService.create(MenuRequestFixture.메뉴상품_NULL(menuGroup, product)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴 상품 목록은 비어있을 수 없다.");
     }
@@ -104,7 +99,7 @@ class MenuCreateServiceTest {
     @DisplayName("메뉴 가격을 필수로 입력받는다.")
     @Test
     void menuProduasdcts() {
-        assertThatThrownBy(() -> menuCreateService.create(메뉴가격Null()))
+        assertThatThrownBy(() -> menuCreateService.create(메뉴가격_NULL(menuGroup, product)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 일 수 없습니다.");
     }
@@ -112,29 +107,7 @@ class MenuCreateServiceTest {
     @DisplayName("메뉴를 생성할 수 있다.")
     @Test
     void create() {
-        assertThatNoException().isThrownBy(() -> menuCreateService.create(메뉴()));
-    }
-
-    private MenuRequest 메뉴가격Null() {
-        return new MenuRequest(menuGroup.getId(), "메뉴명", null, 메뉴상품());
-    }
-
-    private MenuRequest 메뉴() {
-        return new MenuRequest(menuGroup.getId(), "메뉴명", BigDecimal.TEN, 메뉴상품());
-    }
-
-    private List<MenuProductRequest> getMenuProductRequests(UUID product) {
-        List<MenuProductRequest> menuProductRequests = new ArrayList<>();
-        MenuProductRequest menuProductRequest = new MenuProductRequest(product, 1);
-        menuProductRequests.add(menuProductRequest);
-        return menuProductRequests;
-    }
-
-    private List<MenuProductRequest> 메뉴상품() {
-        List<MenuProductRequest> menuProductRequests = new ArrayList<>();
-        MenuProductRequest menuProductRequest = new MenuProductRequest(product.getId(), 1);
-        menuProductRequests.add(menuProductRequest);
-        return menuProductRequests;
+        assertThatNoException().isThrownBy(() -> menuCreateService.create(메뉴(menuGroup, product)));
     }
 }
 

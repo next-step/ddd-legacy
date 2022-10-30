@@ -91,8 +91,4 @@ class MenuChangePriceServiceTest {
         menuProducts.add(new MenuProduct(product, new Quantity(1)));
         return menuRepository.save(new Menu(UUID.randomUUID(), new Name("메뉴명", false), 메뉴그룹, menuProducts, new Price(menuPrice)));
     }
-
-    private MenuGroup 메뉴그룹생성() {
-        return menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴 그룹명", false)));
-    }
 }
