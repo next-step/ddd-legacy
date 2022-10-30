@@ -5,8 +5,11 @@ import kitchenpos.common.vo.Price;
 import kitchenpos.common.vo.Quantity;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuProduct;
-import kitchenpos.menu.menugroup.domain.MenuGroup;
+import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;
+import kitchenpos.order.domain.OrderType;
+import kitchenpos.order.vo.DeliveryAddress;
+import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.product.domain.Product;
 
 import java.math.BigDecimal;
@@ -17,30 +20,34 @@ import java.util.UUID;
 
 public class OrderFixture {
 
-    public static List<OrderLineItem> orderLineItems() {
-        MenuGroup menuGroup = menuGroup(UUID.randomUUID(), "메뉴 그룹명");
-        Menu menu = menu(menuGroup);
-        menu.display();
+    public static List<OrderLineItem> orderLineItems(Menu menu) {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         OrderLineItem orderLineItem = new OrderLineItem(menu, new Quantity(1));
         orderLineItems.add(orderLineItem);
         return orderLineItems;
     }
 
-    private static Menu menu(MenuGroup menuGroup) {
-        return new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, menuProducts(new MenuProduct(product(), new Quantity(1))), new Price(BigDecimal.TEN));
+    public static Order deliveryOrder(Menu menu) {
+        return new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems(menu), null, new DeliveryAddress("주소"));
+    }
+    public static Order takeoutOrder(Menu menu) {
+        return new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems(menu), null, null);
     }
 
-    private static Product product() {
-        return new Product(UUID.randomUUID(), new Name("productName", false), new Price(BigDecimal.TEN));
+    public static Order eatInOrder(Menu menu, OrderTable orderTable) {
+        return new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems(menu), orderTable, null);
     }
 
-    private static MenuGroup menuGroup(UUID id, String name) {
-        return new MenuGroup(id, new Name(name, false));
+    public static Order 주문타입NULL(Menu menu, OrderTable orderTable) {
+        return new Order(UUID.randomUUID(), null, orderLineItems(menu), orderTable, null);
     }
 
-    private static List<MenuProduct> menuProducts(final MenuProduct... menuProducts) {
-        return Arrays.asList(menuProducts);
+    public static Order 주문항목NULL(Menu menu) {
+        return new Order(UUID.randomUUID(), OrderType.TAKEOUT, null, null, null);
+    }
+
+    public static Order 배송지없는배달주문(Menu menu) {
+        return new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems(menu), null, null);
     }
 }
 

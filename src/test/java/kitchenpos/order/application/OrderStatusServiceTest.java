@@ -180,11 +180,11 @@ class OrderStatusServiceTest {
     }
 
     public Order 배달주문생성(List<OrderLineItem> orderLineItems) {
-        return new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems, null, new DeliveryAddress("배송지"), LocalDateTime.now(), OrderStatus.WAITING);
+        return new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems, null, new DeliveryAddress("배송지"));
     }
 
     public Order 매장주문생성(List<OrderLineItem> orderLineItems) {
-        return new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems, null, null, LocalDateTime.now(), OrderStatus.WAITING);
+        return new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems, null, null);
     }
 
 }

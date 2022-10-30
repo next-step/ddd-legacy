@@ -70,7 +70,7 @@ class OrderTableServiceTest {
         OrderLineItem orderLineItem = new OrderLineItem(menu, new Quantity(1));
         orderLineItems.add(orderLineItem);
         orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
-        orderRepository.save(new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems, orderTable, null, LocalDateTime.now(), OrderStatus.WAITING));
+        orderRepository.save(new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems, orderTable, null));
     }
 
     @DisplayName("주문 테이블 목록을 조회할 수 있다.")

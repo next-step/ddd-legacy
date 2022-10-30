@@ -54,7 +54,7 @@ public class Order {
 
     }
 
-    public Order(UUID id, OrderType type, List<OrderLineItem> orderLineItems, OrderTable orderTable, DeliveryAddress deliveryAddress, LocalDateTime now, OrderStatus waiting) {
+    public Order(UUID id, OrderType type, List<OrderLineItem> orderLineItems, OrderTable orderTable, DeliveryAddress deliveryAddress) {
         validateOrderLineItems(orderLineItems);
         validateType(type);
         this.type = type;

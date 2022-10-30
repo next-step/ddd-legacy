@@ -128,7 +128,7 @@ class OrderCrudServiceTest {
     }
 
     private Order order(List<OrderLineItem> orderLineItems) {
-        return new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems, orderTable, null, LocalDateTime.now(), OrderStatus.WAITING);
+        return new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems, orderTable, null);
     }
 
     @DisplayName("주문 타입은 배송 / 포장 / 매장 중 한 가지를 갖는다.")

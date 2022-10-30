@@ -2,13 +2,17 @@ package kitchenpos.menu.menu;
 
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
+import kitchenpos.common.vo.Quantity;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import static kitchenpos.product.ProductFixture.product;
 
 public class MenuFixture {
 
@@ -16,11 +20,17 @@ public class MenuFixture {
         return new Menu(UUID.randomUUID(), name, menuGroup, menuProducts, price);
     }
 
-    public static MenuGroup createMenuGroup(UUID id, String menuGroupName) {
-        return new MenuGroup(id, new Name(menuGroupName, false));
+    public static List<MenuProduct> menuProducts() {
+        return List.of(new MenuProduct(product(BigDecimal.ONE), new Quantity(1)));
     }
 
-    public static List<MenuProduct> createMenuProducts(final MenuProduct... menuProducts) {
-        return Arrays.asList(menuProducts);
+    public static Menu menu(MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+        return new Menu(UUID.randomUUID(), new Name("메뉴", false), menuGroup, menuProducts, new Price(BigDecimal.ONE));
+    }
+
+    public static Menu 안보이는메뉴(MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+        Menu menu = menu(menuGroup, menuProducts);
+        menu.hide();
+        return menu;
     }
 }

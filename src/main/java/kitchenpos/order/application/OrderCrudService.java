@@ -51,7 +51,7 @@ public class OrderCrudService {
         if (type == OrderType.DELIVERY) {
             deliveryAddress = new DeliveryAddress(request.getDeliveryAddress());
         }
-        Order order = new Order(UUID.randomUUID(), type, orderLineItems, orderTable, deliveryAddress, LocalDateTime.now(), OrderStatus.WAITING);
+        Order order = new Order(UUID.randomUUID(), type, orderLineItems, orderTable, deliveryAddress);
         return orderRepository.save(order);
     }
 
