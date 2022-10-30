@@ -1,9 +1,9 @@
 package calculator;
 
-import kitchenpos.utils.StringUtils;
+import kitchenpos.common.utils.StringUtils;
 
-import static kitchenpos.utils.NumberUtils.fromStringArrayConvertToPositiveNumberArray;
-import static kitchenpos.utils.NumberUtils.sum;
+import static kitchenpos.common.utils.NumberUtils.fromStringArrayConvertToPositiveNumberArray;
+import static kitchenpos.common.utils.NumberUtils.sum;
 
 public class StringCalculator {
 
