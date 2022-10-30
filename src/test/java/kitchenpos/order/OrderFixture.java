@@ -5,6 +5,7 @@ import kitchenpos.common.vo.Price;
 import kitchenpos.common.vo.Quantity;
 import kitchenpos.menu.menu.domain.Menu;
 import kitchenpos.menu.menu.domain.MenuProduct;
+import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.order.domain.Order;
 import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderType;
@@ -30,6 +31,7 @@ public class OrderFixture {
     public static Order deliveryOrder(Menu menu) {
         return new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems(menu), null, new DeliveryAddress("주소"));
     }
+
     public static Order takeoutOrder(Menu menu) {
         return new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems(menu), null, null);
     }
@@ -48,6 +50,10 @@ public class OrderFixture {
 
     public static Order 배송지없는배달주문(Menu menu) {
         return new Order(UUID.randomUUID(), OrderType.DELIVERY, orderLineItems(menu), null, null);
+    }
+
+    public static Order order(List<OrderLineItem> orderLineItems, OrderTable orderTable) {
+        return new Order(UUID.randomUUID(), OrderType.EAT_IN, orderLineItems, orderTable, null);
     }
 }
 

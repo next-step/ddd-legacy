@@ -17,8 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static kitchenpos.menu.menu.MenuFixture.menuProducts;
-import static kitchenpos.menu.menu.MenuFixture.메뉴가격이_메뉴상품합_보다큼;
+import static kitchenpos.menu.menu.MenuFixture.*;
 import static kitchenpos.menu.menugroup.MenuGroupFixture.menuGroup;
 import static kitchenpos.product.ProductFixture.product;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,13 +43,14 @@ class MenuDisplayServiceTest {
     private static Product product;
     private Menu menu;
     private Menu 메뉴가격이_메뉴상품합_보다큼;
+    private MenuGroup menuGroup;
 
     @BeforeEach
     void setUp() {
         product = productRepository.save(product(UUID.randomUUID(), BigDecimal.ONE));
-        MenuGroup 메뉴그룹 = menuGroupRepository.save(menuGroup());
-        menu = menuRepository.save(MenuFixture.menu(메뉴그룹, menuProducts(product.getId())));
-        메뉴가격이_메뉴상품합_보다큼 = menuRepository.save(메뉴가격이_메뉴상품합_보다큼(메뉴그룹, menuProducts(product.getId())));
+        menuGroup = menuGroupRepository.save(menuGroup(UUID.randomUUID()));
+        menu = menuRepository.save(menu(menuGroup, menuProducts(product.getId())));
+        메뉴가격이_메뉴상품합_보다큼 = menuRepository.save(메뉴가격이_메뉴상품합_보다큼(menuGroup, menuProducts(product.getId())));
     }
 
     @DisplayName("메뉴를 보일 수 있다.")

@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class MenuGroupFixture {
 
-    public static MenuGroup menuGroup() {
-        return new MenuGroup(UUID.randomUUID(), new Name("메뉴그룹", false));
+    public static MenuGroup menuGroup(UUID id) {
+        return new MenuGroup(id, new Name("메뉴그룹", false));
     }
 }

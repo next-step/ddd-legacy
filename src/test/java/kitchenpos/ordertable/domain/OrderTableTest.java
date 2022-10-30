@@ -105,7 +105,7 @@ class OrderTableTest {
     @ParameterizedTest
     @CsvSource({"주문테이블명, 1, 10"})
     void vacant_status(String name, int numberOfGuests) {
-        assertThatThrownBy(() -> order(name, numberOfGuests, orderLineItems(menu(menuGroup(), menuProducts(UUID.randomUUID())))).vacant())
+        assertThatThrownBy(() -> order(name, numberOfGuests, orderLineItems(menu(menuGroup(UUID.randomUUID()), menuProducts(UUID.randomUUID())))).vacant())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 테이블 공석으로 변경 시 주문 상태가 완료일때만 변경 가능하다.");
     }
