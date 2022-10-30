@@ -115,6 +115,16 @@ class OrderStatusServiceTest {
                 .hasMessageContaining("주문 상태가 SERVED일 경우에만 배송 시작을 할 수 있다.");
     }
 
+    @DisplayName("배송을 완료할 수 있다.")
+    @Test
+    void sdasdasdff() {
+        orderStatusService.accept(배달주문.getId());
+        orderStatusService.serve(배달주문.getId());
+        orderStatusService.startDelivery(배달주문.getId());
+        orderStatusService.completeDelivery(배달주문.getId());
+        assertThat(배달주문.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+    }
+
     private Menu menu(Product product, MenuGroup menuGroup) {
         return new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, menuProducts(new MenuProduct(product, new Quantity(1))), new Price(BigDecimal.TEN));
     }
