@@ -106,6 +106,15 @@ class OrderStatusServiceTest {
                 .hasMessageContaining("주문 타입이 DELIVERY일 경우에만 배송 시작을 할 수 있습니다.");
     }
 
+    @DisplayName("주문 상태가 SERVED일 경우에만 배송 시작을 할 수 있다.")
+    @Test
+    void sdasdf() {
+        orderStatusService.accept(배달주문.getId());
+        assertThatThrownBy(() -> orderStatusService.startDelivery(배달주문.getId()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("주문 상태가 SERVED일 경우에만 배송 시작을 할 수 있다.");
+    }
+
     private Menu menu(Product product, MenuGroup menuGroup) {
         return new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, menuProducts(new MenuProduct(product, new Quantity(1))), new Price(BigDecimal.TEN));
     }
