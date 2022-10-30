@@ -61,10 +61,7 @@ public class OrderStatusService {
     public Order completeDelivery(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
                 .orElseThrow(NoSuchElementException::new);
-        if (order.getStatus() != OrderStatus.DELIVERING) {
-            throw new IllegalStateException();
-        }
-        order.setStatus(OrderStatus.DELIVERED);
+        order.completed();
         return order;
     }
 
