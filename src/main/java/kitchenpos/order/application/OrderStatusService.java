@@ -53,13 +53,7 @@ public class OrderStatusService {
     public Order startDelivery(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
                 .orElseThrow(NoSuchElementException::new);
-        if (order.getType() != OrderType.DELIVERY) {
-            throw new IllegalStateException();
-        }
-        if (order.getStatus() != OrderStatus.SERVED) {
-            throw new IllegalStateException();
-        }
-        order.setStatus(OrderStatus.DELIVERING);
+        order.delivering();
         return order;
     }
 

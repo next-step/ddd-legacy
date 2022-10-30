@@ -96,6 +96,16 @@ class OrderStatusServiceTest {
         assertThat(배달주문.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     }
 
+    @DisplayName("주문 타입이 DELIVERY일 경우에만 배송 시작을 할 수 있다.")
+    @Test
+    void asdf() {
+        orderStatusService.accept(매장주문.getId());
+        orderStatusService.serve(매장주문.getId());
+        assertThatThrownBy(() -> orderStatusService.startDelivery(매장주문.getId()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("주문 타입이 DELIVERY일 경우에만 배송 시작을 할 수 있습니다.");
+    }
+
     private Menu menu(Product product, MenuGroup menuGroup) {
         return new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, menuProducts(new MenuProduct(product, new Quantity(1))), new Price(BigDecimal.TEN));
     }
