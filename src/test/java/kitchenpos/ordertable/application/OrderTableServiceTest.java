@@ -1,19 +1,16 @@
 package kitchenpos.ordertable.application;
 
-import kitchenpos.common.vo.Name;
-import kitchenpos.common.vo.Price;
-import kitchenpos.common.vo.Quantity;
+import kitchenpos.menu.menu.MenuFixture;
 import kitchenpos.menu.menu.domain.Menu;
-import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
-import kitchenpos.order.domain.*;
+import kitchenpos.order.domain.OrderRepository;
+import kitchenpos.ordertable.OrderTableFixture;
 import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.ordertable.domain.OrderTableRepository;
 import kitchenpos.ordertable.dto.OrderTableRequest;
 import kitchenpos.ordertable.dto.request.ChangeNumberOfGuestRequest;
-import kitchenpos.ordertable.vo.NumberOfGuests;
 import kitchenpos.product.domain.Product;
 import kitchenpos.product.domain.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,11 +23,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.menu.menu.MenuFixture.menu;
+import static kitchenpos.menu.menugroup.MenuGroupFixture.menuGroup;
+import static kitchenpos.order.OrderFixture.eatInOrder;
+import static kitchenpos.ordertable.OrderTableRequestFixture.orderTableRequest;
+import static kitchenpos.product.ProductFixture.product;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("주문 테이블")
@@ -60,30 +59,22 @@ class OrderTableServiceTest {
 
     @BeforeEach
     void setUp() {
-        List<OrderLineItem> orderLineItems = new ArrayList<>();
-        List<MenuProduct> menuProducts = new ArrayList<>();
-        Product product = productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.ONE)));
-        MenuProduct menuProduct = new MenuProduct(product, new Quantity(1));
-        menuProducts.add(menuProduct);
-        MenuGroup menuGroup = menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴그룹", false)));
-        Menu menu = menuRepository.save(new Menu(UUID.randomUUID(), new Name("메뉴명", false), menuGroup, menuProducts, new Price(BigDecimal.ONE)));
-        OrderLineItem orderLineItem = new OrderLineItem(menu, new Quantity(1));
-        orderLineItems.add(orderLineItem);
-        orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
-        orderRepository.save(new Order(UUID.randomUUID(), OrderType.TAKEOUT, orderLineItems, orderTable, null));
+        Product product = productRepository.save(product(UUID.randomUUID(), BigDecimal.ONE));
+        MenuGroup menuGroup = menuGroupRepository.save(menuGroup(UUID.randomUUID()));
+        Menu menu = menuRepository.save(menu(menuGroup, MenuFixture.menuProducts(product.getId())));
+        orderTable = orderTableRepository.save(OrderTableFixture.orderTable());
+        orderRepository.save(eatInOrder(menu, orderTable));
     }
 
     @DisplayName("주문 테이블 목록을 조회할 수 있다.")
     @Test
     void findAll() {
-        orderTableRepository.save(orderTable("주문테이블명", 1));
-        assertThat(orderTableService.findAll()).hasSize(2);
+        assertThat(orderTableService.findAll()).hasSize(1);
     }
 
     @DisplayName("주문 테이블의 착석여부를 착석으로 변경할 수 있다.")
     @Test
     void fisdfndAll() {
-        OrderTable orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
         orderTableService.sit(orderTable.getId());
         assertThat(orderTable.isOccupied()).isTrue();
     }
@@ -91,7 +82,6 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블의 착석여부를 공석으로 변경할 수 있다.")
     @Test
     void fisdfnasdfdAll() {
-        OrderTable orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
         assertThat(orderTable.isOccupied()).isFalse();
         orderTableService.sit(orderTable.getId());
         assertThat(orderTable.isOccupied()).isTrue();
@@ -101,8 +91,7 @@ class OrderTableServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void createOrderTable(String name) {
-        OrderTableRequest orderTableRequest = new OrderTableRequest(name);
-        assertThatThrownBy(() -> orderTableService.create(orderTableRequest))
+        assertThatThrownBy(() -> orderTableService.create(new OrderTableRequest(name)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
     }
@@ -110,14 +99,12 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블을 생성할 수 있다.")
     @Test
     void create() {
-        OrderTableRequest orderTableRequest = new OrderTableRequest("주문테이블");
-        assertThatNoException().isThrownBy(() -> orderTableService.create(orderTableRequest));
+        assertThatNoException().isThrownBy(() -> orderTableService.create(orderTableRequest()));
     }
 
     @DisplayName("주문 테이블의 착석 인원을 변경 할 수 있다.")
     @Test
     void changeNumberOfGuests() {
-        OrderTable orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
         orderTableService.sit(orderTable.getId());
         assertThat(orderTable.getNumberOfGuests()).isEqualTo(1);
         ChangeNumberOfGuestRequest request = new ChangeNumberOfGuestRequest(10);
@@ -128,7 +115,6 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블의 착석 인원 변경 시 0명보다 작을 수 없다.")
     @Test
     void asdge() {
-        OrderTable orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
         orderTableService.sit(orderTable.getId());
         assertThat(orderTable.getNumberOfGuests()).isEqualTo(1);
         ChangeNumberOfGuestRequest request = new ChangeNumberOfGuestRequest(-1);
@@ -140,7 +126,6 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블이 공석일 경우 착석 인원을 변경 할 수 없다.")
     @Test
     void asdgesds() {
-        OrderTable orderTable = orderTableRepository.save(orderTable("주문테이블명", 1));
         assertThat(orderTable.isOccupied()).isFalse();
         ChangeNumberOfGuestRequest request = new ChangeNumberOfGuestRequest(10);
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
@@ -156,9 +141,4 @@ class OrderTableServiceTest {
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("주문 테이블 공석으로 변경 시 주문 상태가 완료일때만 변경 가능하다.");
     }
-
-    private static OrderTable orderTable(String name, int numberOfGuests) {
-        return new OrderTable(UUID.randomUUID(), new Name(name, false), new NumberOfGuests(numberOfGuests));
-    }
-
 }
