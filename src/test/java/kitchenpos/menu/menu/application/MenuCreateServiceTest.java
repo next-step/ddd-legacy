@@ -3,10 +3,7 @@ package kitchenpos.menu.menu.application;
 import kitchenpos.common.infra.PurgomalumClient;
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
-import kitchenpos.menu.menu.MenuRequestFixture;
 import kitchenpos.menu.menu.domain.MenuRepository;
-import kitchenpos.menu.menu.dto.request.MenuProductRequest;
-import kitchenpos.menu.menu.dto.request.MenuRequest;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
 import kitchenpos.product.domain.Product;
@@ -19,8 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -60,16 +55,14 @@ class MenuCreateServiceTest {
     @DisplayName("메뉴 목록을 조회할 수 있다.")
     @Test
     void findMenus() {
-        List<MenuProductRequest> menuProductRequests = new ArrayList<>();
-        menuProductRequests.add(new MenuProductRequest(product.getId(), 1));
-        menuCreateService.create(new MenuRequest(menuGroup.getId(), "메뉴명", BigDecimal.TEN, menuProductRequests));
+        menuCreateService.create(메뉴(menuGroup, product));
         assertThat(menuCreateService.findAll()).hasSize(1);
     }
 
     @DisplayName("상품의 수량과 메뉴 상품의 수량은 다를 수 없다.")
     @Test
     void productSize() {
-        assertThatThrownBy(() -> menuCreateService.create(MenuRequestFixture.상품수량_메뉴상품_수량_다름(menuGroup, product)))
+        assertThatThrownBy(() -> menuCreateService.create(상품수량_메뉴상품_수량_다름(menuGroup, product)))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -91,7 +84,7 @@ class MenuCreateServiceTest {
     @DisplayName("메뉴 상품 목록은 비어 있을 수 없다.")
     @Test
     void menuProducts() {
-        assertThatThrownBy(() -> menuCreateService.create(MenuRequestFixture.메뉴상품_NULL(menuGroup, product)))
+        assertThatThrownBy(() -> menuCreateService.create(메뉴상품_NULL(menuGroup, product)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴 상품 목록은 비어있을 수 없다.");
     }
