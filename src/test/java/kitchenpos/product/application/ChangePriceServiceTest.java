@@ -54,7 +54,7 @@ class ChangePriceServiceTest {
 
     @DisplayName("상품가격 변경 시 상품 가격을 필수로 입력받는다.")
     @Test
-    void changePrice() {
+    void changePrice_notNull() {
         ChangePriceRequest request = new ChangePriceRequest(null);
         assertThatThrownBy(() -> changePriceService.changePrice(product.getId(), request))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -63,7 +63,7 @@ class ChangePriceServiceTest {
 
     @DisplayName("상품 가격을 변경할 수 있다.")
     @Test
-    void casdhangePrice() {
+    void changePrice() {
         ChangePriceRequest request = new ChangePriceRequest(BigDecimal.TEN);
         assertThat(product.getPrice()).isEqualTo(BigDecimal.ONE);
         changePriceService.changePrice(product.getId(), request);
