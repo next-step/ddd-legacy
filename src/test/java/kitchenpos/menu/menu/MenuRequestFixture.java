@@ -50,5 +50,4 @@ public class MenuRequestFixture {
         menuProductRequests.add(menuProductRequest);
         return menuProductRequests;
     }
-
 }

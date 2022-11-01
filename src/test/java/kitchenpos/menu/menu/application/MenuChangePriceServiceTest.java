@@ -2,11 +2,11 @@ package kitchenpos.menu.menu.application;
 
 import kitchenpos.common.vo.Name;
 import kitchenpos.common.vo.Price;
-import kitchenpos.common.vo.Quantity;
+import kitchenpos.menu.menu.MenuFixture;
 import kitchenpos.menu.menu.domain.Menu;
-import kitchenpos.menu.menu.domain.MenuProduct;
 import kitchenpos.menu.menu.domain.MenuRepository;
 import kitchenpos.menu.menu.dto.request.ChangeMenuPriceRequest;
+import kitchenpos.menu.menugroup.MenuGroupFixture;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
 import kitchenpos.product.domain.Product;
@@ -19,8 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,8 +48,8 @@ class MenuChangePriceServiceTest {
     void setUp() {
         menuChangePriceService = new MenuChangePriceService(menuRepository);
         product = productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)));
-        MenuGroup 메뉴그룹 = menuGroupRepository.save(new MenuGroup(UUID.randomUUID(), new Name("메뉴 그룹명", false)));
-        menu = 메뉴생성(메뉴그룹, BigDecimal.ONE);
+        MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup(UUID.randomUUID()));
+        menu = menuRepository.save(MenuFixture.menu(menuGroup, MenuFixture.menuProducts(product.getId())));
     }
 
     @DisplayName("메뉴 가격은 필수로 입력받는다.")
@@ -84,11 +82,5 @@ class MenuChangePriceServiceTest {
         assertThat(menu.isDisplayed()).isTrue();
         menuChangePriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(BigDecimal.valueOf(20)));
         assertThat(menu.isDisplayed()).isFalse();
-    }
-
-    private Menu 메뉴생성(MenuGroup 메뉴그룹, BigDecimal menuPrice) {
-        List<MenuProduct> menuProducts = new ArrayList<>();
-        menuProducts.add(new MenuProduct(product, new Quantity(1)));
-        return menuRepository.save(new Menu(UUID.randomUUID(), new Name("메뉴명", false), 메뉴그룹, menuProducts, new Price(menuPrice)));
     }
 }
