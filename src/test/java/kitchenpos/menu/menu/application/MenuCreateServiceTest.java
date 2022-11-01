@@ -75,7 +75,7 @@ class MenuCreateServiceTest {
 
     @DisplayName("메뉴 가격이 0원보다 작을 수 없다.")
     @Test
-    void price() {
+    void 메뉴가격_양수() {
         assertThatThrownBy(() -> menuCreateService.create(메뉴가격_음수(menuGroup, product)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
@@ -83,7 +83,7 @@ class MenuCreateServiceTest {
 
     @DisplayName("메뉴 상품 목록은 비어 있을 수 없다.")
     @Test
-    void menuProducts() {
+    void 메뉴생성_상품목록_필수() {
         assertThatThrownBy(() -> menuCreateService.create(메뉴상품_NULL(menuGroup, product)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴 상품 목록은 비어있을 수 없다.");
@@ -91,7 +91,7 @@ class MenuCreateServiceTest {
 
     @DisplayName("메뉴 가격을 필수로 입력받는다.")
     @Test
-    void menuProduasdcts() {
+    void 메뉴생성_가격필수() {
         assertThatThrownBy(() -> menuCreateService.create(메뉴가격_NULL(menuGroup, product)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 일 수 없습니다.");
@@ -99,7 +99,7 @@ class MenuCreateServiceTest {
 
     @DisplayName("메뉴를 생성할 수 있다.")
     @Test
-    void create() {
+    void 메뉴생성() {
         assertThatNoException().isThrownBy(() -> menuCreateService.create(메뉴(menuGroup, product)));
     }
 }

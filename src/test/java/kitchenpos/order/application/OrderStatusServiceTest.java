@@ -68,7 +68,7 @@ class OrderStatusServiceTest {
 
     @DisplayName("WAITING 상태가 아니면 접수를 받을 수 없다.")
     @Test
-    void name() {
+    void WAILTING상태만_접수가능() {
         orderStatusService.accept(eatInOrder.getId());
         assertThatThrownBy(() -> orderStatusService.accept(eatInOrder.getId()))
                 .isInstanceOf(IllegalStateException.class)
@@ -101,7 +101,7 @@ class OrderStatusServiceTest {
 
     @DisplayName("주문 타입이 DELIVERY일 경우에만 배송 시작을 할 수 있다.")
     @Test
-    void asdf() {
+    void 주문타입_DELIVERY_배송시작() {
         orderStatusService.accept(eatInOrder.getId());
         orderStatusService.serve(eatInOrder.getId());
         assertThatThrownBy(() -> orderStatusService.startDelivery(eatInOrder.getId()))
@@ -111,7 +111,7 @@ class OrderStatusServiceTest {
 
     @DisplayName("주문 상태가 SERVED일 경우에만 배송 시작을 할 수 있다.")
     @Test
-    void sdasdf() {
+    void SERVED_배송시작() {
         orderStatusService.accept(deliveryOrder.getId());
         assertThatThrownBy(() -> orderStatusService.startDelivery(deliveryOrder.getId()))
                 .isInstanceOf(IllegalStateException.class)
@@ -120,7 +120,7 @@ class OrderStatusServiceTest {
 
     @DisplayName("배송을 완료할 수 있다.")
     @Test
-    void sdasdasdff() {
+    void 배송완료() {
         orderStatusService.accept(deliveryOrder.getId());
         orderStatusService.serve(deliveryOrder.getId());
         orderStatusService.startDelivery(deliveryOrder.getId());
@@ -130,7 +130,7 @@ class OrderStatusServiceTest {
 
     @DisplayName("주문 상태가 DELIVERING일 경우에만 배송을 완료할 수 있다.")
     @Test
-    void sdasdasdffasf() {
+    void DELIVERING_배송완료() {
         orderStatusService.accept(deliveryOrder.getId());
         orderStatusService.serve(deliveryOrder.getId());
         assertThatThrownBy(() -> orderStatusService.completeDelivery(deliveryOrder.getId()))
@@ -140,7 +140,7 @@ class OrderStatusServiceTest {
 
     @DisplayName("주문을 완료할 수 있다.")
     @Test
-    void asdasdsdasdasdffasf() {
+    void 주문완료() {
         orderStatusService.accept(eatInOrder.getId());
         orderStatusService.serve(eatInOrder.getId());
         orderStatusService.complete(eatInOrder.getId());
@@ -149,7 +149,7 @@ class OrderStatusServiceTest {
 
     @DisplayName("주문 타입이 DELIVERY이고 주문 상태가 DELIVERED가 아니면 주문을 완료할 수 없다.")
     @Test
-    void asdasdsdasdasdfasdfasf() {
+    void DELIVERY_DELIVERED_주문완료() {
         orderStatusService.accept(deliveryOrder.getId());
         assertThatThrownBy(() -> orderStatusService.complete(deliveryOrder.getId()))
                 .isInstanceOf(IllegalStateException.class)
@@ -158,7 +158,7 @@ class OrderStatusServiceTest {
 
     @DisplayName("주문 타입이 TAKEOUT 또는 EAT_IN이고 주문상태가 SERVED아니면 주문을 완료할 수 없다.")
     @Test
-    void asdasdsdasdasf() {
+    void SERVED_주문완료() {
         orderStatusService.accept(eatInOrder.getId());
         assertThatThrownBy(() -> orderStatusService.complete(eatInOrder.getId()))
                 .isInstanceOf(IllegalStateException.class)

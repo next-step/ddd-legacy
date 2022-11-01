@@ -101,7 +101,7 @@ class OrderCrudServiceTest {
 
     @DisplayName("메뉴의 가격과 메뉴 항목의 가격은 같다.")
     @Test
-    void validatePrice() {
+    void 메뉴가격_메뉴항목가격_같음() {
         assertThatThrownBy(() -> orderCrudService.create(메뉴가격_메뉴항목_가격_다름(menu, orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴의 가격과 메뉴 항목의 가격은 같다.");
@@ -117,7 +117,7 @@ class OrderCrudServiceTest {
 
     @DisplayName("주문 타입은 필수값으로 입력받는다.")
     @Test
-    void validateType() {
+    void 주문타입필수() {
         assertThatThrownBy(() -> orderCrudService.create(주문타입_NULL(menu, orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 타입을 입력해주세요.");
@@ -134,7 +134,7 @@ class OrderCrudServiceTest {
 
     @DisplayName("안보이는 메뉴가 주문될 수 없다.")
     @Test
-    void asdfdsf() {
+    void 숨김메뉴_주문불가() {
         menuDisplayService.hide(menu.getId());
         assertThatThrownBy(() -> orderCrudService.create(orderRequest(menu, orderTable)))
                 .isInstanceOf(IllegalStateException.class)
@@ -143,7 +143,7 @@ class OrderCrudServiceTest {
 
     @DisplayName("배달 주문이면 배송지가 없을 수 없다.")
     @Test
-    void delivery() {
+    void 배달주문_배송지필수() {
         assertThatThrownBy(() -> orderCrudService.create(배달주문_주소없음(menu, orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
@@ -157,7 +157,7 @@ class OrderCrudServiceTest {
 
     @DisplayName("매장 주문에서 착석된 테이블을 선택할 수 없다.")
     @Test
-    void createdf() {
+    void 착석테이블_선택불가() {
         orderTableService.sit(orderTable.getId());
         assertThatThrownBy(() -> orderCrudService.create(매장주문(menu, orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)

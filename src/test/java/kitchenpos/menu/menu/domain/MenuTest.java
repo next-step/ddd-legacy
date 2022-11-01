@@ -1,24 +1,15 @@
 package kitchenpos.menu.menu.domain;
 
-import kitchenpos.common.vo.Name;
-
 import kitchenpos.common.vo.Price;
-import kitchenpos.common.vo.Quantity;
-import kitchenpos.menu.menu.MenuFixture;
-import kitchenpos.menu.menu.MenuRequestFixture;
-import kitchenpos.menu.menugroup.MenuGroupFixture;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
-import kitchenpos.product.domain.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import static kitchenpos.menu.menu.MenuFixture.*;
-import static kitchenpos.menu.menugroup.MenuGroupFixture.*;
+import static kitchenpos.menu.menugroup.MenuGroupFixture.menuGroup;
 import static org.assertj.core.api.Assertions.*;
 
 @DisplayName("메뉴")

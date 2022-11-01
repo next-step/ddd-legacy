@@ -54,7 +54,7 @@ class MenuChangePriceServiceTest {
 
     @DisplayName("메뉴 가격은 필수로 입력받는다.")
     @Test
-    void name() {
+    void 가격_필수() {
         assertThatThrownBy(() -> menuChangePriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(null)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 일 수 없습니다.");
@@ -62,7 +62,7 @@ class MenuChangePriceServiceTest {
 
     @DisplayName("메뉴 가격은 0원보다 크다.")
     @Test
-    void nasdame() {
+    void 가격_양수() {
         assertThatThrownBy(() -> menuChangePriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(BigDecimal.valueOf(-1))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("가격은 0원보다 커야합니다.");
@@ -78,7 +78,7 @@ class MenuChangePriceServiceTest {
 
     @DisplayName("메뉴의 가격이 메뉴 상품의 합보다 크면 메뉴를 숨긴다.")
     @Test
-    void changePricasde() {
+    void 메뉴가격_메뉴상품합보다작으면_메뉴숨김() {
         assertThat(menu.isDisplayed()).isTrue();
         menuChangePriceService.changePrice(menu.getId(), new ChangeMenuPriceRequest(BigDecimal.valueOf(20)));
         assertThat(menu.isDisplayed()).isFalse();

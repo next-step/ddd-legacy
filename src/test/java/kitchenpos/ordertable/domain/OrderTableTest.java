@@ -33,7 +33,7 @@ class OrderTableTest {
     @DisplayName("주문 테이블 생성 시 주문 테이블명은 필수이다.")
     @ParameterizedTest
     @NullAndEmptySource
-    void createOrderTable(String name) {
+    void 주문테이블명_필수(String name) {
         assertThatThrownBy(() -> orderTable(name, 1))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
@@ -42,7 +42,7 @@ class OrderTableTest {
     @DisplayName("주문 테이블의 착석여부를 착석으로 변경할 수 있다.")
     @ParameterizedTest
     @CsvSource({"주문테이블명, 1"})
-    void change(String name, int numberOfGuests) {
+    void 착석변경(String name, int numberOfGuests) {
         OrderTable orderTable = orderTable(name, numberOfGuests);
         assertThat(orderTable.isOccupied()).isFalse();
         orderTable.occupied();
@@ -64,7 +64,7 @@ class OrderTableTest {
     @DisplayName("주문 테이블의 착석 인원 변경 시 0명보다 작을 수 없다.")
     @ParameterizedTest
     @CsvSource({"주문테이블명, 1, -1"})
-    void validateGuestsNumber(String name, int numberOfGuests, int changeNumberOfGuests) {
+    void 착석인원변경_0명이상(String name, int numberOfGuests, int changeNumberOfGuests) {
         OrderTable orderTable = orderTable(name, numberOfGuests);
         orderTable.occupied();
         assertThat(orderTable.isOccupied()).isTrue();
@@ -76,7 +76,7 @@ class OrderTableTest {
     @DisplayName("주문 테이블이 공석일 경우 착석 인원을 변경 할 수 없다.")
     @ParameterizedTest
     @CsvSource({"주문테이블명, 1, 1"})
-    void validateOccupied(String name, int numberOfGuests, int changeNumberOfGuests) {
+    void 공석_착석인원변경_불가(String name, int numberOfGuests, int changeNumberOfGuests) {
         OrderTable orderTable = orderTable(name, numberOfGuests);
         assertThat(orderTable.isOccupied()).isFalse();
         assertThatThrownBy(() -> orderTable.changeNumberOfGuests(new NumberOfGuests(changeNumberOfGuests)))
@@ -87,7 +87,7 @@ class OrderTableTest {
     @DisplayName("주문 테이블을 생성할 수 있다.")
     @ParameterizedTest
     @CsvSource({"주문테이블명, 1"})
-    void createProduct(String name, int numberOfGuests) {
+    void 주문테이블_생성(String name, int numberOfGuests) {
         assertThatNoException().isThrownBy(() -> orderTable(name, numberOfGuests));
     }
 
@@ -104,7 +104,7 @@ class OrderTableTest {
     @DisplayName("주문 테이블 공석으로 변경 시 주문 상태가 완료일때만 변경 가능하다.")
     @ParameterizedTest
     @CsvSource({"주문테이블명, 1, 10"})
-    void vacant_status(String name, int numberOfGuests) {
+    void 주문완료시_공석변경(String name, int numberOfGuests) {
         assertThatThrownBy(() -> order(name, numberOfGuests, orderLineItems(menu(menuGroup(UUID.randomUUID()), menuProducts(UUID.randomUUID())))).vacant())
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 테이블 공석으로 변경 시 주문 상태가 완료일때만 변경 가능하다.");

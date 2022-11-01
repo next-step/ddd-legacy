@@ -1,7 +1,6 @@
 package kitchenpos.menu.menugroup.domain;
 
 import kitchenpos.common.vo.Name;
-import kitchenpos.menu.menugroup.domain.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;

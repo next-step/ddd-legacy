@@ -74,14 +74,14 @@ class OrderTableServiceTest {
 
     @DisplayName("주문 테이블의 착석여부를 착석으로 변경할 수 있다.")
     @Test
-    void fisdfndAll() {
+    void 착석변경() {
         orderTableService.sit(orderTable.getId());
         assertThat(orderTable.isOccupied()).isTrue();
     }
 
     @DisplayName("주문 테이블의 착석여부를 공석으로 변경할 수 있다.")
     @Test
-    void fisdfnasdfdAll() {
+    void 공석변경() {
         assertThat(orderTable.isOccupied()).isFalse();
         orderTableService.sit(orderTable.getId());
         assertThat(orderTable.isOccupied()).isTrue();
@@ -90,7 +90,7 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블 생성 시 주문 테이블명은 필수이다.")
     @ParameterizedTest
     @NullAndEmptySource
-    void createOrderTable(String name) {
+    void 테이블명_필수(String name) {
         assertThatThrownBy(() -> orderTableService.create(new OrderTableRequest(name)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
@@ -114,7 +114,7 @@ class OrderTableServiceTest {
 
     @DisplayName("주문 테이블의 착석 인원 변경 시 0명보다 작을 수 없다.")
     @Test
-    void asdge() {
+    void 착석인원변경_음수불가() {
         orderTableService.sit(orderTable.getId());
         assertThat(orderTable.getNumberOfGuests()).isEqualTo(1);
         ChangeNumberOfGuestRequest request = new ChangeNumberOfGuestRequest(-1);
@@ -125,7 +125,7 @@ class OrderTableServiceTest {
 
     @DisplayName("주문 테이블이 공석일 경우 착석 인원을 변경 할 수 없다.")
     @Test
-    void asdgesds() {
+    void 공석_착석인원변경_불가() {
         assertThat(orderTable.isOccupied()).isFalse();
         ChangeNumberOfGuestRequest request = new ChangeNumberOfGuestRequest(10);
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
@@ -135,7 +135,7 @@ class OrderTableServiceTest {
 
     @DisplayName("주문 테이블 공석으로 변경 시 주문 상태가 완료일때만 변경 가능하다.")
     @Test
-    void asdgesdsasd() {
+    void 주문상태완료_공석변경() {
         orderTableService.sit(orderTable.getId());
         assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
                 .isInstanceOf(IllegalStateException.class)

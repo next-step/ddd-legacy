@@ -65,7 +65,7 @@ class MenuDisplayServiceTest {
 
     @DisplayName("메뉴의 가격이 메뉴 상품의 합보다 클 수 없다.")
     @Test
-    void displaysd() {
+    void 메뉴가격_메뉴상품합보다크면_노출불가() {
         assertThat(메뉴가격이_메뉴상품합_보다큼.isDisplayed()).isTrue();
         menuDisplayService.hide(메뉴가격이_메뉴상품합_보다큼.getId());
         assertThat(메뉴가격이_메뉴상품합_보다큼.isDisplayed()).isFalse();

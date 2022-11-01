@@ -66,7 +66,7 @@ class ProductCrudServiceTest {
     @DisplayName("상품명은 비속어를 사용할 수 없다.")
     @ParameterizedTest
     @ValueSource(strings = {"비속어", "욕설"})
-    void profanity(String name) {
+    void 비속어_포함_불가(String name) {
         ProductRequest request = new ProductRequest(UUID.randomUUID(), name, BigDecimal.TEN);
         assertThatThrownBy(() -> productCrudService.create(request))
                 .isInstanceOf(IllegalArgumentException.class)
