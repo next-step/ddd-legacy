@@ -10,11 +10,9 @@ import kitchenpos.menu.menugroup.MenuGroupFixture;
 import kitchenpos.menu.menugroup.domain.MenuGroup;
 import kitchenpos.menu.menugroup.domain.MenuGroupRepository;
 import kitchenpos.order.OrderFixture;
+import kitchenpos.order.OrderRequestFixture;
 import kitchenpos.order.domain.OrderLineItem;
 import kitchenpos.order.domain.OrderRepository;
-import kitchenpos.order.domain.OrderType;
-import kitchenpos.order.dto.request.OrderLineItemRequest;
-import kitchenpos.order.dto.request.OrderRequest;
 import kitchenpos.ordertable.application.OrderTableService;
 import kitchenpos.ordertable.domain.OrderTable;
 import kitchenpos.ordertable.domain.OrderTableRepository;
@@ -29,7 +27,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,8 +68,7 @@ class OrderCrudServiceTest {
 
     @BeforeEach
     void setUp() {
-        orderTable = new OrderTable(UUID.randomUUID(), new Name("테이블명", false), new NumberOfGuests(1));
-        orderTableRepository.save(orderTable);
+        orderTable = orderTableRepository.save(new OrderTable(UUID.randomUUID(), new Name("테이블명", false), new NumberOfGuests(1)));
         Product product = productRepository.save(new Product(UUID.randomUUID(), new Name("상품명", false), new Price(BigDecimal.TEN)));
         MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.menuGroup(UUID.randomUUID()));
         menu = menuRepository.save(createMenu(menuGroup, new Name("메뉴명", false), MenuFixture.menuProducts(product.getId()), new Price(BigDecimal.TEN)));
@@ -98,11 +94,7 @@ class OrderCrudServiceTest {
     @DisplayName("주문 타입은 배송 / 포장 / 매장 중 한 가지를 갖는다.")
     @Test
     void orderType() {
-        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
-        orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null, "주소", orderTable.getId());
-        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+        assertThatThrownBy(() -> orderCrudService.create(주문타입_NULL(menu, orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 타입을 입력해주세요.");
     }
@@ -110,11 +102,7 @@ class OrderCrudServiceTest {
     @DisplayName("메뉴의 가격과 메뉴 항목의 가격은 같다.")
     @Test
     void validatePrice() {
-        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.ONE, 1);
-        orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = 메뉴가격_메뉴항목_가격_다름(menu, orderTable);
-        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+        assertThatThrownBy(() -> orderCrudService.create(메뉴가격_메뉴항목_가격_다름(menu, orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("메뉴의 가격과 메뉴 항목의 가격은 같다.");
     }
@@ -122,9 +110,7 @@ class OrderCrudServiceTest {
     @DisplayName("주문 항목은 비어 있을 수 없다.")
     @Test
     void orderLineItemsNotNull() {
-        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderRequest orderRequest = 주문항목_비어있음(orderTable);
-        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+        assertThatThrownBy(() -> orderCrudService.create(주문항목_비어있음(orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 항목은 비어 있을 수 없습니다.");
     }
@@ -132,23 +118,15 @@ class OrderCrudServiceTest {
     @DisplayName("주문 타입은 필수값으로 입력받는다.")
     @Test
     void validateType() {
-        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
-        orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, null, "주소", orderTable.getId());
-        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+        assertThatThrownBy(() -> orderCrudService.create(주문타입_NULL(menu, orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("주문 타입을 입력해주세요.");
     }
 
     @DisplayName("매장 주문이 아닐 경우 수량은 0개보다 적을 수 없다.")
     @Test
-    void asdf() {
-        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, -1);
-        orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = 포장주문_수량0개미만(menu, orderTable);
-        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+    void 포장주문_수량0개미만() {
+        assertThatThrownBy(() -> orderCrudService.create(OrderRequestFixture.포장주문_수량0개미만(menu, orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("매장 주문이 아닐 경우 수량은 0개보다 적을 수 없다.");
     }
@@ -158,11 +136,7 @@ class OrderCrudServiceTest {
     @Test
     void asdfdsf() {
         menuDisplayService.hide(menu.getId());
-        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
-        orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = 메뉴수량_주문항목수량_같음(menu, orderTable);
-        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+        assertThatThrownBy(() -> orderCrudService.create(orderRequest(menu, orderTable)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("안보이는 메뉴가 주문될 수 없다.");
     }
@@ -170,11 +144,7 @@ class OrderCrudServiceTest {
     @DisplayName("배달 주문이면 배송지가 없을 수 없다.")
     @Test
     void delivery() {
-        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
-        orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.DELIVERY, null, orderTable.getId());
-        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+        assertThatThrownBy(() -> orderCrudService.create(배달주문_주소없음(menu, orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("null 이나 공백일 수 없습니다.");
     }
@@ -182,25 +152,15 @@ class OrderCrudServiceTest {
     @DisplayName("주문을 생성할 수 있다.")
     @Test
     void create() {
-        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
-        orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, null, orderTable.getId());
-        assertThatNoException().isThrownBy(() -> orderCrudService.create(orderRequest));
+        assertThatNoException().isThrownBy(() -> orderCrudService.create(orderRequest(menu, orderTable)));
     }
 
     @DisplayName("매장 주문에서 착석된 테이블을 선택할 수 없다.")
     @Test
     void createdf() {
         orderTableService.sit(orderTable.getId());
-        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
-        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
-        orderLineItemRequests.add(orderLineItemRequest);
-        OrderRequest orderRequest = new OrderRequest(orderLineItemRequests, OrderType.EAT_IN, null, orderTable.getId());
-        assertThatThrownBy(() -> orderCrudService.create(orderRequest))
+        assertThatThrownBy(() -> orderCrudService.create(매장주문(menu, orderTable)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("매장 주문에서 착석된 테이블을 선택할 수 없다.");
     }
-
-
 }

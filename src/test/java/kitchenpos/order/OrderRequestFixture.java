@@ -44,6 +44,34 @@ public class OrderRequestFixture {
         orderLineItemRequests.add(orderLineItemRequest);
         return new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, "주소", orderTable.getId());
     }
+
+    public static OrderRequest orderRequest(Menu menu, OrderTable orderTable) {
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
+        orderLineItemRequests.add(orderLineItemRequest);
+        return new OrderRequest(orderLineItemRequests, OrderType.TAKEOUT, null, orderTable.getId());
+    }
+
+    public static OrderRequest 배달주문_주소없음(Menu menu, OrderTable orderTable) {
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
+        orderLineItemRequests.add(orderLineItemRequest);
+        return new OrderRequest(orderLineItemRequests, OrderType.DELIVERY, null, orderTable.getId());
+    }
+
+    public static OrderRequest 매장주문(Menu menu, OrderTable orderTable) {
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
+        orderLineItemRequests.add(orderLineItemRequest);
+        return new OrderRequest(orderLineItemRequests, OrderType.EAT_IN, null, orderTable.getId());
+    }
+
+    public static OrderRequest 주문타입_NULL(Menu menu, OrderTable orderTable) {
+        final List<OrderLineItemRequest> orderLineItemRequests = new ArrayList<>();
+        OrderLineItemRequest orderLineItemRequest = new OrderLineItemRequest(menu.getId(), BigDecimal.TEN, 1);
+        orderLineItemRequests.add(orderLineItemRequest);
+        return new OrderRequest(orderLineItemRequests, null, null, orderTable.getId());
+    }
 }
 
 
