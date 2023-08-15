@@ -2,7 +2,6 @@ package racingcar;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -44,7 +43,7 @@ class CarTest {
     class Move {
         @DisplayName("[성공] 랜덤값이 4이상이면 자동차가 이동한다.")
         @ParameterizedTest
-        @ValueSource(ints = {4,5,6,7,8,9})
+        @ValueSource(ints = {4, 5, 6, 7, 8, 9})
         void carMove(int input) {
             //given
             Car car = new Car("carname");
@@ -56,7 +55,7 @@ class CarTest {
 
         @DisplayName("[성공] 랜덤값이 4미만이면 자동차가 이동하지 않는다.")
         @ParameterizedTest
-        @ValueSource(ints = {0,1,2,3})
+        @ValueSource(ints = {0, 1, 2, 3})
         void carNotMove(int input) {
             //given
             Car car = new Car("carname");
