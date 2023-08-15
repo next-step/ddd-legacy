@@ -5,7 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 public class CarTest {
     @DisplayName("자동차는 이름을 가지고 있다")
@@ -33,7 +34,7 @@ public class CarTest {
     }
 
     @DisplayName("자동차는 무작위 값이 3 이하인 경우 정지한다")
-    @ValueSource(ints = {0,1,2,3})
+    @ValueSource(ints = {0, 1, 2, 3})
     @ParameterizedTest
     void test4(int condition) {
         final Car car = new Car("boon");
@@ -41,5 +42,13 @@ public class CarTest {
         car.move(new NumberMoveCondition(condition));
 
         assertThat(car.getPosition()).isEqualTo(0);
+    }
+
+    @DisplayName("자동차는 정지한다")
+    @Test
+    void stop() {
+        Car car = new Car("boon");
+        car.move(new StopMoveCondition());
+        assertThat(car.getPosition()).isZero();
     }
 }
