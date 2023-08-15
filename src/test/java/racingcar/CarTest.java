@@ -43,28 +43,26 @@ class CarTest {
     @DisplayName("자동차 이동")
     @Nested
     class Move {
-        @DisplayName("[성공] 랜덤 값이 4이상이면 이동한다.")
-        @ParameterizedTest
-        @ValueSource(ints = {4,5,6,7,8,9})
-        void carMoveWhenBiggerThanFour(int input){
+        @DisplayName("[성공] 전략이 성공하면 자동차가 이동한다.")
+        @Test
+        void carMove(){
             //given
-            Car car = new Car("name", new FixMoveStrategy(input));
+            Car car = new Car("carname");
             //when
-            car.move();
+            car.move(()-> true);
             //then
-            assertThat(car.getPosition).isEqualTo(1);
+            assertThat(car.getPosition()).isEqualTo(1);
         }
 
-        @DisplayName("[성공] 랜덤 값이 4미만이면 이동하지 않는다.")
-        @ParameterizedTest
-        @ValueSource(ints = {0,1,2,3})
-        void carMoveWhenBiggerThanFour(int input){
+        @DisplayName("[성공] 전략이 실패하면 자동차가 이동하지 않는다.")
+        @Test
+        void carNotMove(){
             //given
-            Car car = new Car("name", new FixMoveStrategy(input));
+            Car car = new Car("carname");
             //when
-            car.move();
+            car.move(() -> false);
             //then
-            assertThat(car.getPosition).isEqualTo(0);
+            assertThat(car.getPosition()).isEqualTo(0);
         }
     }
 
