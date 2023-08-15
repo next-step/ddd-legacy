@@ -28,7 +28,7 @@ public class CarTest {
     @Test
     void move() {
         Car car = new Car("Jason");
-        car.move(new NumberMoveCondition(4));
+        car.move(new NumMoveCondition(4));
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
@@ -37,7 +37,7 @@ public class CarTest {
     @ParameterizedTest
     void stop(final int condition) {
         Car car = new Car("Jason");
-        car.move(new NumberMoveCondition(condition));
+        car.move(new NumMoveCondition(condition));
         assertThat(car.getPosition()).isZero();
     }
 

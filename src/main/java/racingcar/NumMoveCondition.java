@@ -1,9 +1,9 @@
 package racingcar;
 
-class NumberMoveCondition implements MoveCondition {
+class NumMoveCondition implements MoveCondition {
     private final int condition;
 
-    public NumberMoveCondition(int condition) {
+    public NumMoveCondition(int condition) {
         this.condition = condition;
     }
 
