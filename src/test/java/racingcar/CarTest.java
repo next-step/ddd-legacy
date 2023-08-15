@@ -1,15 +1,12 @@
 package racingcar;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class CarTest {
 
@@ -25,14 +22,14 @@ class CarTest {
     @ValueSource(strings = {"1", "22", "333", "4444"})
     void carNameShorterThanFive(String input) {
         assertThatThrownBy(() -> new Car(input))
-                .isInstanceOf(IllegalAccessException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("[실패] 자동차 이름이 공백이거나 null일 수 없다.")
-    @Test
+    @ParameterizedTest
     @NullAndEmptySource
-    void carNameNullAndEmptySource(String input) {
+    void carNameNullAndEmpty(String input) {
         assertThatThrownBy(() -> new Car(input))
-                .isInstanceOf(IllegalAccessException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
