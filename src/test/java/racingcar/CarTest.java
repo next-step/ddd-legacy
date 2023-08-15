@@ -25,17 +25,17 @@ public class CarTest {
     void test3() {
         final Car car = new Car("boon");
 
-        car.move();
+        car.move(4);
 
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
-    @DisplayName("자동차는 무작위 값이 3 미만인 경우 정지한다")
+    @DisplayName("자동차는 무작위 값이 3 이하인 경우 정지한다")
     @Test
     void test4() {
         final Car car = new Car("boon");
 
-        car.move();
+        car.move(3);
 
         assertThat(car.getPosition()).isEqualTo(0);
     }

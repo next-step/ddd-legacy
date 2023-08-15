@@ -21,6 +21,12 @@ class Car {
         }
     }
 
+    public void move(int condition) {
+        if (condition >= 4) {
+            position++;
+        }
+    }
+
     public String getName() {
         return name;
     }
