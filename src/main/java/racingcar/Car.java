@@ -3,7 +3,7 @@ package racingcar;
 import org.springframework.util.StringUtils;
 
 public class Car {
-    private CarName name;
+    private final CarName name;
     private int position;
 
     public Car(String name) {
@@ -26,7 +26,7 @@ public class Car {
     }
 
     class CarName {
-        private String name;
+        private final String name;
 
         public CarName(String name) {
             validate(name);

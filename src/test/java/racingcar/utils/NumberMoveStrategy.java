@@ -3,7 +3,7 @@ package racingcar.utils;
 import racingcar.MoveStrategy;
 
 public class NumberMoveStrategy implements MoveStrategy {
-    private int factor;
+    private final int factor;
 
     public NumberMoveStrategy(int factor) {
         this.factor = factor;
