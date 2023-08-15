@@ -2,6 +2,8 @@ package racingcar;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -25,17 +27,18 @@ public class CarTest {
     void test3() {
         final Car car = new Car("boon");
 
-        car.move(4);
+        car.move(new NumberMoveCondition(4));
 
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
     @DisplayName("자동차는 무작위 값이 3 이하인 경우 정지한다")
-    @Test
-    void test4() {
+    @ValueSource(ints = {0,1,2,3})
+    @ParameterizedTest
+    void test4(int condition) {
         final Car car = new Car("boon");
 
-        car.move(3);
+        car.move(new NumberMoveCondition(condition));
 
         assertThat(car.getPosition()).isEqualTo(0);
     }
