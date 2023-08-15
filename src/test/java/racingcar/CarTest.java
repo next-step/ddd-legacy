@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import racingcar.utils.NumberMoveStrategy;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -41,24 +42,26 @@ class CarTest {
     @DisplayName("자동차 이동")
     @Nested
     class Move {
-        @DisplayName("[성공] 전략이 성공하면 자동차가 이동한다.")
-        @Test
-        void carMove() {
+        @DisplayName("[성공] 랜덤값이 4이상이면 자동차가 이동한다.")
+        @ParameterizedTest
+        @ValueSource(ints = {4,5,6,7,8,9})
+        void carMove(int input) {
             //given
             Car car = new Car("carname");
             //when
-            car.move(() -> true);
+            car.move(new NumberMoveStrategy(input));
             //then
             assertThat(car.getPosition()).isEqualTo(1);
         }
 
-        @DisplayName("[성공] 전략이 실패하면 자동차가 이동하지 않는다.")
-        @Test
-        void carNotMove() {
+        @DisplayName("[성공] 랜덤값이 4미만이면 자동차가 이동하지 않는다.")
+        @ParameterizedTest
+        @ValueSource(ints = {0,1,2,3})
+        void carNotMove(int input) {
             //given
             Car car = new Car("carname");
             //when
-            car.move(() -> false);
+            car.move(new NumberMoveStrategy(input));
             //then
             assertThat(car.getPosition()).isEqualTo(0);
         }
