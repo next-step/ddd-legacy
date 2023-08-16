@@ -15,10 +15,6 @@ public class StringCalculator {
             return 0;
         }
 
-        if (str.length() == 1) {
-            return Integer.parseInt(str);
-        }
-
         String[] numbers = extractNumbers(str);
         return Arrays.stream(numbers)
                 .map(Number::fromString)
