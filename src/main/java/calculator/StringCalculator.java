@@ -6,14 +6,20 @@ import java.util.stream.Stream;
 
 public class StringCalculator {
 	private static final int DEFAULT_VALUE = 0;
+
+	private final String text;
 	private CalculatorDelimiter delimiter;
 	private List<NumberForCalculator> numberForCalculators;
 
-	public int add(String text) {
-		if (isNullValue(text)) {
+	public StringCalculator(String text) {
+		this.text = text;
+	}
+
+	public int add() {
+		if (isNullValue()) {
 			return DEFAULT_VALUE;
 		}
-		String[] splittingText = getSplittingText(text);
+		String[] splittingText = getSplittingText();
 		numberForCalculators = Stream.of(splittingText)
 			.map(NumberForCalculator::new)
 			.collect(Collectors.toList());
@@ -23,11 +29,11 @@ public class StringCalculator {
 			.sum();
 	}
 
-	private boolean isNullValue(String text) {
+	private boolean isNullValue() {
 		return text == null || text.isEmpty();
 	}
 
-	private String[] getSplittingText(String text) {
+	private String[] getSplittingText() {
 		delimiter = new CalculatorDelimiter(text);
 		return delimiter.splittingText();
 	}
