@@ -14,7 +14,7 @@ class CarTest {
     @DisplayName("자동차 이름")
     @Nested
     class Name {
-        @DisplayName("[성공] 자동차 이름운 5글자 이하이다.")
+        @DisplayName("[성공] 자동차 이름은 5글자 이하이다.")
         @ParameterizedTest
         @ValueSource(strings = {"1", "22", "333", "4444", "55555"})
         void carNameShorterThanFive(String input) {
