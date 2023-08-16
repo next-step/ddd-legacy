@@ -37,7 +37,7 @@ public class Car {
             if (!StringUtils.hasText(name)) {
                 throw new IllegalArgumentException();
             }
-            if (name.length() < 5) {
+            if (name.length() > 5) {
                 throw new IllegalArgumentException();
             }
         }
