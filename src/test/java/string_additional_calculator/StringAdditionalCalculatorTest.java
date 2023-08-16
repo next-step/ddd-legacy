@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @DisplayName("StringAdditionalCalculator 클래스")
 class StringAdditionalCalculatorTest {
 
-    private final StringAdditionalCalculator stringAdditionalCalculator = new StringAdditionalCalculator();
+    private final StringAdditionalCalculator stringAdditionalCalculator = new StringAdditionalCalculator(new ExpressionSeparator());
 
     @DisplayName("쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열을 전달하는 경우 구분자를 기준으로 분리한 각 숫자의 합을 반환한다.")
     @Test
@@ -43,12 +43,12 @@ class StringAdditionalCalculatorTest {
     @Test
     void invalidCustomSeparate() {
         // given
-        final String expression = "//;e\\n1;e2;e3";
+        final String expression = "//두개\\n1;e2;e3";
 
         // when then
         assertThatThrownBy(() -> stringAdditionalCalculator.calculate(expression))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("커스텀 구분자는 1글자여야 합니다. expression: //;e\\n1;e2;e3, separator: ;e");
+                .hasMessage("커스텀 구분자는 1글자여야 합니다. separator: 두개");
     }
 
 
