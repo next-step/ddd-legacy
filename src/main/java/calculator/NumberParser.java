@@ -1,31 +1,27 @@
 package calculator;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class NumberParser {
     private static final String REGEX = "//(.)\n(.*)";
     private static final Pattern PATTERN = Pattern.compile(REGEX);
     private static final String DEFAULT_REGEX = "[,:]";
 
-    public static List<PositiveNumber> parse(String str) {
-        String[] numbers = extractNumbers(str);
-        return Arrays.stream(numbers)
-                .map(PositiveNumber::fromString)
-                .collect(Collectors.toList());
+    public static PositiveNumbers parse(String str) {
+        List<String> numbers = extractNumbers(str);
+        return PositiveNumbers.fromString(numbers);
     }
 
-    private static String[] extractNumbers(String str) {
+    private static List<String> extractNumbers(String str) {
         Matcher m = PATTERN.matcher(str);
         if (m.find()) {
             String customDelimiter = m.group(1);
-            return m.group(2)
-                    .split(customDelimiter);
+            String[] numbers = m.group(2).split(customDelimiter);
+            return List.of(numbers);
         }
 
-        return str.split(DEFAULT_REGEX);
+        return List.of(str.split(DEFAULT_REGEX));
     }
 }

@@ -1,7 +1,5 @@
 package calculator;
 
-import java.util.List;
-
 public class StringCalculator {
 
     public int run(String str) {
@@ -9,9 +7,7 @@ public class StringCalculator {
             return 0;
         }
 
-        List<PositiveNumber> positiveNumbers = NumberParser.parse(str);
-        return positiveNumbers.stream()
-                .reduce(new PositiveNumber(0), PositiveNumber::plus)
-                .getValue();
+        PositiveNumbers positiveNumbers = NumberParser.parse(str);
+        return positiveNumbers.sum();
     }
 }
