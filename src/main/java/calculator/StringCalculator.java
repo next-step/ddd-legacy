@@ -10,6 +10,6 @@ public class StringCalculator {
         }
 
         final PositiveIntegers positiveIntegers = parser.parse(input);
-        return positiveIntegers.sum().getValue();
+        return positiveIntegers.sumAll().getValue();
     }
 }

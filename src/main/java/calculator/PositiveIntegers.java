@@ -9,7 +9,7 @@ public class PositiveIntegers {
         this.integers = integers;
     }
 
-    public PositiveInteger sum() {
+    public PositiveInteger sumAll() {
         return integers.stream().reduce(PositiveInteger.zero(), PositiveInteger::sum);
     }
 }
