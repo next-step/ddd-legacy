@@ -39,7 +39,7 @@ public class StringCalculator {
         return text.split(DEFAULT_DELIMITER);
     }
 
-    public List<Integer> parseStringListToNumberList(final String[] stringNumbers) {
+    private List<Integer> parseStringListToNumberList(final String[] stringNumbers) {
 
         List<Integer> numbers = new ArrayList<>();
         for (String s : stringNumbers) {
