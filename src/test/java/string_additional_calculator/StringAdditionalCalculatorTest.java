@@ -55,9 +55,9 @@ class StringAdditionalCalculatorTest {
     @DisplayName("문자열 계산기에 숫자 이외의 값을 전달하는 경우 RuntimeException 예외를 throw 한다.")
     @ParameterizedTest
     @CsvSource(value = {
-            "1:2:한글사랑|문자열 계산기에 상수는 숫자 이외의 값은 전달할 수 없습니다. expression: 1:2:한글사랑, numbers: [1, 2, 한글사랑]",
-            "1:2:@|문자열 계산기에 상수는 숫자 이외의 값은 전달할 수 없습니다. expression: 1:2:@, numbers: [1, 2, @]",
-            "//;\\n1;2;eng|문자열 계산기에 상수는 숫자 이외의 값은 전달할 수 없습니다. expression: //;\\n1;2;eng, numbers: [1, 2, eng]"
+            "1:2:한글사랑|문자열 계산기에 상수는 숫자 이외의 값은 전달할 수 없습니다. number: 한글사랑",
+            "1:2:@|문자열 계산기에 상수는 숫자 이외의 값은 전달할 수 없습니다. number: @",
+            "//;\\n1;2;eng|문자열 계산기에 상수는 숫자 이외의 값은 전달할 수 없습니다. number: eng"
     }, delimiter = '|')
     void givenNonNumberValue(String expression, String exceptionMessage) {
         // when then
@@ -69,8 +69,8 @@ class StringAdditionalCalculatorTest {
     @DisplayName("문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외를 throw 한다.")
     @ParameterizedTest
     @CsvSource(value = {
-            "-1,2:3|문자열 계산기에 상수는 음수가 될 수 없습니다. expression: -1,2:3, numbers: [-1, 2, 3]",
-            "//;\\n-1;2;3|문자열 계산기에 상수는 음수가 될 수 없습니다. expression: //;\\n-1;2;3, numbers: [-1, 2, 3]"
+            "-1,2:3|문자열 계산기에 상수는 음수가 될 수 없습니다. number: -1",
+            "//;\\n-1;2;3|문자열 계산기에 상수는 음수가 될 수 없습니다. number: -1"
     }, delimiter = '|')
     void invalidNumber(String expression, String exceptionMessage) {
         // when then

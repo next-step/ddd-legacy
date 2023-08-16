@@ -1,6 +1,5 @@
 package string_additional_calculator;
 
-import java.util.Arrays;
 import java.util.regex.Pattern;
 
 class StringAdditionalCalculator {
@@ -11,19 +10,12 @@ class StringAdditionalCalculator {
 
     public int calculate(String expression) {
         String[] stringNumbers = extractNumbers(expression);
-        int result = 0;
+        Constant result = Constant.ZERO;
         for (String stringNumber : stringNumbers) {
-            try {
-                int number = Integer.parseInt(stringNumber);
-                if (number < 0) {
-                    throw new RuntimeException(String.format("문자열 계산기에 상수는 음수가 될 수 없습니다. expression: %s, numbers: %s", expression, Arrays.toString(stringNumbers)));
-                }
-                result += number;
-            } catch (NumberFormatException e) {
-                throw new RuntimeException(String.format("문자열 계산기에 상수는 숫자 이외의 값은 전달할 수 없습니다. expression: %s, numbers: %s", expression, Arrays.toString(stringNumbers)));
-            }
+            Constant constant = Constant.from(stringNumber);
+            result = result.sum(constant);
         }
-        return result;
+        return result.getValue();
     }
 
     private String[] extractNumbers(String expression) {
