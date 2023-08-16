@@ -14,7 +14,8 @@ public class StringCalculator {
 
         String[] numbers = str.split("[,:]");
         return Arrays.stream(numbers)
-                .mapToInt(Integer::parseInt)
-                .sum();
+                .map(Number::fromString)
+                .reduce(new Number(0), Number::plus)
+                .getValue();
     }
 }

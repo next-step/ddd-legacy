@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class StringCalculatorTest {
 
@@ -15,14 +16,20 @@ class StringCalculatorTest {
     @NullAndEmptySource
     void nullOrEmpty(String str) {
         StringCalculator calculator = new StringCalculator();
-        assertThat(calculator.run(str)).isZero();
+
+        int actual = calculator.run(str);
+
+        assertThat(actual).isZero();
     }
 
     @DisplayName("숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다")
     @Test
     void singleNumber() {
         StringCalculator calculator = new StringCalculator();
-        assertThat(calculator.run("123")).isEqualTo(123);
+
+        int actual = calculator.run("123");
+
+        assertThat(actual).isEqualTo(123);
     }
 
     @DisplayName("기본 구분자를 사용하여 계산 결과를 반환한다")
@@ -37,5 +44,23 @@ class StringCalculatorTest {
         int actual = calculator.run(str);
 
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @DisplayName("음수 하나를 문자열로 입력할 경우 예외가 발생한다")
+    @Test
+    void singleNegativeNumber() {
+        StringCalculator calculator = new StringCalculator();
+
+        assertThatThrownBy(() -> calculator.run("-1"))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("음수가 포함된 경우 예외가 발생한다")
+    @Test
+    void negativeNumber() {
+        StringCalculator calculator = new StringCalculator();
+
+        assertThatThrownBy(() -> calculator.run("1,2,-3"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
