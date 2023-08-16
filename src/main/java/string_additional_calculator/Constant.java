@@ -5,7 +5,7 @@ public class Constant {
 
     private final int value;
 
-    public Constant(int value) {
+    private Constant(int value) {
         if (value < 0) {
             throw new RuntimeException(String.format("문자열 계산기에 상수는 음수가 될 수 없습니다. number: %s", value));
         }
@@ -25,11 +25,11 @@ public class Constant {
         }
     }
 
-    public int getValue() {
-        return this.value;
-    }
-
     public Constant sum(Constant constant) {
         return new Constant(this.value + constant.value);
+    }
+
+    public int getValue() {
+        return this.value;
     }
 }
