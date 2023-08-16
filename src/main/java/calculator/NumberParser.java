@@ -9,9 +9,9 @@ public class NumberParser {
     private static final Pattern PATTERN = Pattern.compile(REGEX);
     private static final String DEFAULT_REGEX = "[,:]";
 
-    public static PositiveNumbers parse(String str) {
+    public static Numbers parse(String str) {
         List<String> numbers = extractNumbers(str);
-        return PositiveNumbers.fromString(numbers);
+        return Numbers.fromString(numbers);
     }
 
     private static List<String> extractNumbers(String str) {

@@ -2,28 +2,28 @@ package calculator;
 
 import java.util.Objects;
 
-public class PositiveNumber {
+public class Number {
     private static final int ZERO = 0;
 
     private final int value;
 
-    public PositiveNumber(int value) {
+    public Number(int value) {
         if (value < ZERO) {
             throw new IllegalArgumentException("숫자는 음수가 될 수 없습니다");
         }
         this.value = value;
     }
 
-    public static PositiveNumber fromString(String s) {
+    public static Number fromString(String s) {
         try {
-            return new PositiveNumber(Integer.parseInt(s));
+            return new Number(Integer.parseInt(s));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("숫자가 아닌 문자열이 포함되어 있습니다", e);
         }
     }
 
-    public PositiveNumber plus(PositiveNumber positiveNumber) {
-        return new PositiveNumber(this.value + positiveNumber.value);
+    public Number plus(Number number) {
+        return new Number(this.value + number.value);
     }
 
     public int getValue() {
@@ -34,7 +34,7 @@ public class PositiveNumber {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PositiveNumber that = (PositiveNumber) o;
+        Number that = (Number) o;
         return value == that.value;
     }
 
