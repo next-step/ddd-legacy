@@ -1,7 +1,7 @@
 package stringcalculator;
 
 public class Positive {
-    private int number;
+    private final int number;
 
     public Positive(String text) {
         this.number = Integer.parseInt(text);

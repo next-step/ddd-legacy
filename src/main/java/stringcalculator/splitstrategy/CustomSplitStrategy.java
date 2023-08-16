@@ -1,6 +1,5 @@
 package stringcalculator.splitstrategy;
 
-import org.springframework.boot.convert.Delimiter;
 import stringcalculator.SplitStrategy;
 
 import java.util.regex.Matcher;
