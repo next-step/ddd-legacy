@@ -45,21 +45,6 @@ class CarTest {
     @Test
     void stop() {
         final var car = new Car("dana");
-
-        // (1) 람다 사용
-        // car.move(() -> false);
-
-        // (2) 익명객체를 사용한다.
-        /*
-        car.move(new MoveCondition() {
-            @Override
-            public boolean movable() {
-                return false;
-            }
-        });
-        */
-
-        // (3) 가짜객체를 사용한다.
         car.move(new StopMoveCondition());
         assertThat(car.getPosition()).isZero();
     }
