@@ -18,6 +18,10 @@ public class ExpressionSeparator {
         return DEFAULT_PATTERN.split(expression);
     }
 
+    private boolean hasCustomSeparator(String expression) {
+        return CUSTOM_PATTERN.matcher(expression).matches();
+    }
+
     private String[] separateByCustomSeparator(String expression) {
         String[] splitExpression = expression.split(CUSTOM_SEPARATE_SUFFIX);
         String separator = splitExpression[CUSTOM_SEPARATOR_INDEX].substring(CUSTOM_SEPARATE_PREFIX.length());
@@ -34,10 +38,6 @@ public class ExpressionSeparator {
                     )
             );
         }
-    }
-
-    private boolean hasCustomSeparator(String expression) {
-        return CUSTOM_PATTERN.matcher(expression).matches();
     }
 
 
