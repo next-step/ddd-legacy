@@ -20,7 +20,7 @@ public class Numbers {
 
     public int sum() {
         return numbers.stream()
-                .reduce(new Number(0), Number::plus)
+                .reduce(Number.ZERO, Number::plus)
                 .getValue();
     }
 }

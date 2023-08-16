@@ -3,12 +3,13 @@ package calculator;
 import java.util.Objects;
 
 public class Number {
-    private static final int ZERO = 0;
+    public static final Number ZERO = new Number(0);
+    private static final int ZERO_VALUE = 0;
 
     private final int value;
 
     public Number(int value) {
-        if (value < ZERO) {
+        if (value < ZERO_VALUE) {
             throw new IllegalArgumentException("숫자는 음수가 될 수 없습니다");
         }
         this.value = value;
