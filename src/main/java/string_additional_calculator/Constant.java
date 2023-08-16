@@ -6,10 +6,14 @@ public class Constant {
     private final int value;
 
     private Constant(int value) {
-        if (value < 0) {
+        if (isNegativeNumber(value)) {
             throw new RuntimeException(String.format("문자열 계산기에 상수는 음수가 될 수 없습니다. number: %s", value));
         }
         this.value = value;
+    }
+
+    private static boolean isNegativeNumber(int value) {
+        return value < 0;
     }
 
     public static Constant from(String stringNumber) {
