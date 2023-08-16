@@ -14,33 +14,14 @@ public class StringCalculator {
 		if (isNullValue(text)) {
 			return ZERO_OF_STRING_CALCULATOR;
 		}
-		if (isSingleText(text)) {
-			getNumeric(text);
-		}
-
 		return Stream.of(splittingText(text))
-			.mapToInt(this::getNumeric)
+			.map(CalculatorNumber::new)
+			.mapToInt(CalculatorNumber::getNumber)
 			.sum();
 	}
 
 	private boolean isNullValue(String text) {
 		return text == null || text.isEmpty();
-	}
-
-	private boolean isSingleText(String text) {
-		return text.length() == 1;
-	}
-
-	private int getNumeric(String text) {
-		try {
-			int number = Integer.parseInt(text);
-			if (Integer.signum(number) == -1) {
-				throw new RuntimeException("숫자가 음수입니다.");
-			}
-			return number;
-		} catch (NumberFormatException e) {
-			throw new RuntimeException("숫자가 아닌 값이 존재 합니다.");
-		}
 	}
 
 	private String[] splittingText(String text) {
