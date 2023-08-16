@@ -33,7 +33,11 @@ public class StringCalculator {
 
 	private int getNumeric(String text) {
 		try {
-			return Integer.parseInt(text);
+			int number = Integer.parseInt(text);
+			if (Integer.signum(number) == -1) {
+				throw new RuntimeException("숫자가 음수입니다.");
+			}
+			return number;
 		} catch (NumberFormatException e) {
 			throw new RuntimeException("숫자가 아닌 값이 존재 합니다.");
 		}
