@@ -14,6 +14,10 @@ public class Operand {
         return new Operand(number + other.number);
     }
 
+    public int getNumber() {
+        return number;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

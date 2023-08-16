@@ -8,7 +8,7 @@ public class Separator {
     private static final String DEFAULT_DELIMITER = ",|:";
     private static final String CUSTOM_DELIMITER_PATTERN = "//(.)\n(.*)";
 
-    public int[] separate(String expression) {
+    public Operand[] separate(String expression) {
         validate(expression);
         String delimiter = DEFAULT_DELIMITER;
 
@@ -27,9 +27,10 @@ public class Separator {
         }
     }
 
-    private int[] split(String expression, String delimiter) {
+    private Operand[] split(String expression, String delimiter) {
         return Arrays.stream(expression.split(delimiter))
                 .mapToInt(Integer::parseInt)
-                .toArray();
+                .mapToObj(Operand::new)
+                .toArray(Operand[]::new);
     }
 }
