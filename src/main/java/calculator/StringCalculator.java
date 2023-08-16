@@ -1,19 +1,25 @@
 package calculator;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StringCalculator {
 	private static final int DEFAULT_VALUE = 0;
 	private CalculatorDelimiter delimiter;
+	private List<NumberForCalculator> numberForCalculators;
 
 	public int add(String text) {
 		if (isNullValue(text)) {
 			return DEFAULT_VALUE;
 		}
 		String[] splittingText = getSplittingText(text);
-		return Stream.of(splittingText)
-			.map(CalculatorNumber::new)
-			.mapToInt(CalculatorNumber::getNumber)
+		numberForCalculators = Stream.of(splittingText)
+			.map(NumberForCalculator::new)
+			.collect(Collectors.toList());
+
+		return numberForCalculators.stream()
+			.mapToInt(NumberForCalculator::getNumber)
 			.sum();
 	}
 

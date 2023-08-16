@@ -1,9 +1,9 @@
 package calculator;
 
-public class CalculatorNumber {
+public class NumberForCalculator {
 	private final int number;
 
-	public CalculatorNumber(String text) {
+	public NumberForCalculator(String text) {
 		try {
 			int number = Integer.parseInt(text);
 			checkingNegative(number);
