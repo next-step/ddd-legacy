@@ -4,7 +4,7 @@ public class StringCalculator {
 
     public int run(String str) {
         if (str == null || str.isEmpty()) {
-            return 0;
+            return Number.ZERO.getValue();
         }
 
         Numbers numbers = NumberParser.parse(str);
