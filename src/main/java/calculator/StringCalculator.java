@@ -7,14 +7,15 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
     private static final String DEFAULT_DELIMITER = "[,:]";
+    private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
 
     public int add(final String text) {
 
-        if (text == null || text.length() == 0) {
+        if (text == null || text.isEmpty()) {
             return 0;
         }
 
-        String[] stringNumbers = parseStringToNumberList(text);
+        String[] stringNumbers = parseStringToNumbers(text);
         if (stringNumbers.length == 0) {
             return 0;
         }
@@ -22,16 +23,16 @@ public class StringCalculator {
         return calculateSumOfNumbers(parseStringListToNumberList(stringNumbers));
     }
 
-    private int calculateSumOfNumbers(List<Integer> numberList) {
+    private int calculateSumOfNumbers(List<Integer> numbers) {
         int total = 0;
-        for (Integer number : numberList) {
+        for (Integer number : numbers) {
             total += number;
         }
         return total;
     }
 
-    private String[] parseStringToNumberList(final String text) {
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+    private String[] parseStringToNumbers(final String text) {
+        Matcher m = pattern.matcher(text);
         if (m.find()) {
             return m.group(2).trim().split(m.group(1));
         }
@@ -42,16 +43,16 @@ public class StringCalculator {
     private List<Integer> parseStringListToNumberList(final String[] stringNumbers) {
 
         List<Integer> numbers = new ArrayList<>();
-        for (String s : stringNumbers) {
-            if (isEmptyString(s)) {
+        for (String stringNumber : stringNumbers) {
+            if (isEmptyString(stringNumber)) {
                 continue;
             }
 
-            if (isNegativeNumber(s)) {
+            if (!isPositiveInteger(stringNumber)) {
                 throw new RuntimeException("음수를 입력함");
             }
 
-            numbers.add(parseNumber(s));
+            numbers.add(parseNumber(stringNumber));
         }
 
         return numbers;
@@ -71,7 +72,7 @@ public class StringCalculator {
         return number;
     }
 
-    private static boolean isNegativeNumber(String s) {
-        return s.startsWith("-");
+    private static boolean isPositiveInteger(String s) {
+        return !s.startsWith("-");
     }
 }
