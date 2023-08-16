@@ -9,9 +9,9 @@ public class StringCalculator {
             return 0;
         }
 
-        List<Number> numbers = NumberParser.parse(str);
-        return numbers.stream()
-                .reduce(new Number(0), Number::plus)
+        List<PositiveNumber> positiveNumbers = NumberParser.parse(str);
+        return positiveNumbers.stream()
+                .reduce(new PositiveNumber(0), PositiveNumber::plus)
                 .getValue();
     }
 }

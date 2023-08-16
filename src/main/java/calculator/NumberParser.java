@@ -11,10 +11,10 @@ public class NumberParser {
     private static final Pattern PATTERN = Pattern.compile(REGEX);
     private static final String DEFAULT_REGEX = "[,:]";
 
-    public static List<Number> parse(String str) {
+    public static List<PositiveNumber> parse(String str) {
         String[] numbers = extractNumbers(str);
         return Arrays.stream(numbers)
-                .map(Number::fromString)
+                .map(PositiveNumber::fromString)
                 .collect(Collectors.toList());
     }
 

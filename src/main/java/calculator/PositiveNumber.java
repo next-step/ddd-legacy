@@ -1,25 +1,25 @@
 package calculator;
 
-public class Number {
+public class PositiveNumber {
     private final int value;
 
-    public Number(int value) {
+    public PositiveNumber(int value) {
         if (value < 0) {
             throw new IllegalArgumentException("숫자는 음수가 될 수 없습니다");
         }
         this.value = value;
     }
 
-    public static Number fromString(String s) {
+    public static PositiveNumber fromString(String s) {
         try {
-            return new Number(Integer.parseInt(s));
+            return new PositiveNumber(Integer.parseInt(s));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("숫자가 아닌 문자열이 포함되어 있습니다", e);
         }
     }
 
-    public Number plus(Number number) {
-        return new Number(this.value + number.value);
+    public PositiveNumber plus(PositiveNumber positiveNumber) {
+        return new PositiveNumber(this.value + positiveNumber.value);
     }
 
     public int getValue() {
