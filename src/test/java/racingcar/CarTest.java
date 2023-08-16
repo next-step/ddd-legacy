@@ -18,7 +18,7 @@ class CarTest {
     @DisplayName("자동차의 이름이 5글자를 넘으면 예외가 발생한다")
     @Test
     void max_length_of_name() {
-        assertThatThrownBy(() -> new Car("동해물과백두산이"))
+        assertThatThrownBy(() -> new Car("동해물과백두산"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
