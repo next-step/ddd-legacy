@@ -6,11 +6,15 @@ class StringAdditionalCalculator {
     private final Pattern defaultSeparatePattern = Pattern.compile("[,:]");
 
     public int calculate(String expression) {
-        String[] numbers = defaultSeparatePattern.split(expression);
+        String[] numbers = extractNumbers(expression);
         int result = 0;
         for (String number : numbers) {
             result += Integer.parseInt(number);
         }
         return result;
+    }
+
+    private String[] extractNumbers(String expression) {
+        return defaultSeparatePattern.split(expression);
     }
 }
