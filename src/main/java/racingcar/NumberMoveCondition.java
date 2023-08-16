@@ -1,6 +1,6 @@
 package racingcar;
 
-class NumberMoveCondition implements MoveCondition {
+public class NumberMoveCondition implements MoveCondition {
 
     private final int condition;
 
