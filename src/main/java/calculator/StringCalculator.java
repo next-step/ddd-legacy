@@ -1,5 +1,7 @@
 package calculator;
 
+import java.util.Arrays;
+
 public class StringCalculator {
     private static final int ZERO_OF_STRING_CALCULATOR = 0;
 
@@ -10,7 +12,10 @@ public class StringCalculator {
         if (isSingleText(text)) {
             getNumeric(text);
         }
-        return getNumeric(text);
+
+        return Arrays.stream(splittingText(text))
+            .mapToInt(this::getNumeric)
+            .sum();
     }
 
     private boolean isNullValue(String text) {
@@ -25,8 +30,12 @@ public class StringCalculator {
         try {
             return Integer.parseInt(text);
         } catch (NumberFormatException e) {
-            throw new RuntimeException("숫자가 아닌 값이 존재합니다.");
+            throw new RuntimeException("숫자가 아닌 값이 존재 합니다.");
         }
+    }
+
+    private String[] splittingText(String text) {
+        return text.split(",");
     }
 
 }
