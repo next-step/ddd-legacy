@@ -9,7 +9,7 @@ public class StringCalculator {
             return 0;
         }
 
-        final Integers integers = parser.parse(input);
-        return integers.sum();
+        final PositiveIntegers positiveIntegers = parser.parse(input);
+        return positiveIntegers.sum().getValue();
     }
 }

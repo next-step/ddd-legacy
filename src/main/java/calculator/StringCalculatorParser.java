@@ -8,23 +8,24 @@ import java.util.stream.Collectors;
 
 public class StringCalculatorParser {
 
-    private final Pattern defaultDelimiterPattern = Pattern.compile("[,:]");
-    private final Pattern customDelimiterPattern = Pattern.compile("//(.)\n(.*)");
+    private static final Pattern DEFAULT_DELIMITER_PATTERN = Pattern.compile("[,:]");
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
-    public Integers parse(final String input) {
-        List<Integer> integers =
-                Arrays.stream(splitByDelimiters(input)).map(Integer::parseInt).collect(Collectors.toList());
+    public PositiveIntegers parse(final String input) {
+        List<PositiveInteger> integers = Arrays.stream(splitByDelimiters(input)).map(Integer::parseInt)
+                .map(PositiveInteger::new)
+                .collect(Collectors.toList());
 
-        return new Integers(integers);
+        return new PositiveIntegers(integers);
     }
 
     private String[] splitByDelimiters(final String input) {
-        final Matcher customDelimiterMatcher = customDelimiterPattern.matcher(input);
+        final Matcher customDelimiterMatcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
         if (customDelimiterMatcher.find()) {
             final String customDelimiter = customDelimiterMatcher.group(1);
             return customDelimiterMatcher.group(2).split(customDelimiter);
         }
 
-        return input.split(defaultDelimiterPattern.pattern());
+        return input.split(DEFAULT_DELIMITER_PATTERN.pattern());
     }
 }
