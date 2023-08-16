@@ -24,6 +24,7 @@ public class SplitStrategies {
                 .filter(strategy -> strategy.canSplit(text))
                 .findAny()
                 .map(strategy -> strategy.split(text))
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(() -> new RuntimeException(
+                        StringCalculatorExceptionMessage.CANNOT_CALCULATE.getMessage()));
     }
 }

@@ -6,7 +6,7 @@ public class Positive {
     public Positive(String text) {
         this.number = Integer.parseInt(text);
         if (this.number < 0) {
-            throw new RuntimeException();
+            throw new RuntimeException(StringCalculatorExceptionMessage.IS_NEGATIVE.getMessage());
         }
     }
 

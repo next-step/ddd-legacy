@@ -12,10 +12,10 @@ public class CarName {
 
     private void validate(String name) {
         if (!StringUtils.hasText(name)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(RacingCarExceptionMessage.NAME_EMPTY.getMessage());
         }
         if (name.length() > 5) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(RacingCarExceptionMessage.NAME_BIGGER_THAN_FIVE.getMessage());
         }
     }
 

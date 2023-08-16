@@ -8,7 +8,10 @@ public class Positives {
     private final List<Positive> positives;
 
     public Positives(String[] stringNumbers) {
-        this.positives = Arrays.stream(stringNumbers).map(Positive::new).collect(Collectors.toList());
+        this.positives = Arrays
+                .stream(stringNumbers)
+                .map(Positive::new)
+                .collect(Collectors.toList());
     }
 
     public int getSum() {
