@@ -11,12 +11,6 @@ public class Car {
         this.name = name;
     }
 
-    public void move(final int condition) {
-        if (condition >= 4) {
-            position++;
-        }
-    }
-
     public void move(final MoveCondition condition) {
         if (condition.movable()) {
             position++;
@@ -27,15 +21,7 @@ public class Car {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getPosition() {
         return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
     }
 }
