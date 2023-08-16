@@ -63,4 +63,14 @@ class StringCalculatorTest {
         assertThatThrownBy(() -> calculator.run("1,2,-3"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @DisplayName("커스텀 구분자를 사용하여 계산 결과를 반환한다")
+    @Test
+    void customDelimiter() {
+        StringCalculator calculator = new StringCalculator();
+
+        int actual = calculator.run("//;\n1;2;3");
+
+        assertThat(actual).isEqualTo(6);
+    }
 }
