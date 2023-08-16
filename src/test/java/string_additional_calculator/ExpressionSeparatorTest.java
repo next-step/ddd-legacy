@@ -28,7 +28,7 @@ class ExpressionSeparatorTest {
     @Test
     void useCustomSeparate() {
         // given
-        final String customSeparateString = "//;\\n";
+        final String customSeparateString = "//;\n";
         final String expression = "1;2;3";
 
         // when
@@ -42,7 +42,7 @@ class ExpressionSeparatorTest {
     @Test
     void invalidCustomSeparate() {
         // given
-        final String customSeparateString = "//;;\\n";
+        final String customSeparateString = "//;;\n";
         final String expression = "1;;2;;3";
 
         // when then
@@ -55,7 +55,7 @@ class ExpressionSeparatorTest {
     @Test
     void emptyCustomSeparate() {
         // given
-        final String customSeparateString = "//\\n";
+        final String customSeparateString = "//\n";
         final String expression = "1;;2;;3";
 
         // when then

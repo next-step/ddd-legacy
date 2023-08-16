@@ -30,7 +30,7 @@ class StringAdditionalCalculatorTest {
     @Test
     void customSeparate() {
         // given
-        final String expression = "//;\\n1;2;3";
+        final String expression = "//;\n1;2;3";
 
         // when
         int result = stringAdditionalCalculator.calculate(expression);
@@ -43,7 +43,7 @@ class StringAdditionalCalculatorTest {
     @Test
     void invalidCustomSeparate() {
         // given
-        final String expression = "//두개\\n1;e2;e3";
+        final String expression = "//두개\n1;e2;e3";
 
         // when then
         assertThatThrownBy(() -> stringAdditionalCalculator.calculate(expression))
@@ -57,7 +57,6 @@ class StringAdditionalCalculatorTest {
     @CsvSource(value = {
             "1:2:한글사랑|문자열 계산기에 상수는 숫자 이외의 값은 전달할 수 없습니다. number: 한글사랑",
             "1:2:@|문자열 계산기에 상수는 숫자 이외의 값은 전달할 수 없습니다. number: @",
-            "//;\\n1;2;eng|문자열 계산기에 상수는 숫자 이외의 값은 전달할 수 없습니다. number: eng"
     }, delimiter = '|')
     void givenNonNumberValue(String expression, String exceptionMessage) {
         // when then
@@ -70,7 +69,8 @@ class StringAdditionalCalculatorTest {
     @ParameterizedTest
     @CsvSource(value = {
             "-1,2:3|문자열 계산기에 상수는 음수가 될 수 없습니다. number: -1",
-            "//;\\n-1;2;3|문자열 계산기에 상수는 음수가 될 수 없습니다. number: -1"
+            "1,-2:3|문자열 계산기에 상수는 음수가 될 수 없습니다. number: -2",
+            "1,2:-3|문자열 계산기에 상수는 음수가 될 수 없습니다. number: -3"
     }, delimiter = '|')
     void invalidNumber(String expression, String exceptionMessage) {
         // when then

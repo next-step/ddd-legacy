@@ -1,15 +1,16 @@
 package string_additional_calculator;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ExpressionSeparator {
     private static final String CUSTOM_SEPARATE_PREFIX = "//";
-    private static final String CUSTOM_SEPARATE_SUFFIX = "\\\\n";
+    private static final String CUSTOM_SEPARATE_SUFFIX = "\n";
     private static final Pattern CUSTOM_PATTERN = Pattern.compile(String.format("%s(.*)%s(.*)", CUSTOM_SEPARATE_PREFIX, CUSTOM_SEPARATE_SUFFIX));
     private static final Pattern DEFAULT_PATTERN = Pattern.compile("[,:]");
-    private static final int CUSTOM_SEPARATOR_INDEX = 0;
+    private static final int CUSTOM_SEPARATOR_INDEX = 1;
     private static final int CUSTOM_SEPARATE_VALID_LENGTH = 1;
-    private static final int CUSTOM_CONSTANTS_INDEX = 1;
+    private static final int CUSTOM_CONSTANTS_INDEX = 2;
 
     public String[] separate(String expression) {
         if (this.hasCustomSeparator(expression)) {
@@ -23,10 +24,11 @@ public class ExpressionSeparator {
     }
 
     private String[] separateByCustomSeparator(String expression) {
-        String[] splitExpression = expression.split(CUSTOM_SEPARATE_SUFFIX);
-        String separator = splitExpression[CUSTOM_SEPARATOR_INDEX].substring(CUSTOM_SEPARATE_PREFIX.length());
+        Matcher expressionMatcher = CUSTOM_PATTERN.matcher(expression);
+        expressionMatcher.find();
+        String separator = expressionMatcher.group(CUSTOM_SEPARATOR_INDEX);
         this.validateCustomSeparator(separator);
-        return splitExpression[CUSTOM_CONSTANTS_INDEX].split(separator);
+        return expressionMatcher.group(CUSTOM_CONSTANTS_INDEX).split(separator);
     }
 
     private void validateCustomSeparator(String separator) {
@@ -39,6 +41,4 @@ public class ExpressionSeparator {
             );
         }
     }
-
-
 }
