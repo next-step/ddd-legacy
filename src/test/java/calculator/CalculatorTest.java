@@ -19,6 +19,15 @@ class CalculatorTest {
         assertThat(Calculator.add(separate)).isEqualTo(0);
     }
 
+    @DisplayName("숫자 한자리도 정상 반환한다.")
+    @Test
+    void singleValueTest() {
+        Separator separator = new Separator();
+        List<String> separate = separator.separate("5");
+        assertThat(separate).contains("5");
+        assertThat(Calculator.add(separate)).isEqualTo(5);
+    }
+
     @DisplayName("쉼표 구분자를 처리하여 1,2 -> 3")
     @Test
     void addDelimitersTest1() {
@@ -59,6 +68,15 @@ class CalculatorTest {
     void runtimeExceptionTest2() {
         Separator separator = new Separator();
         assertThatThrownBy(() -> separator.separate("-1,23")).isInstanceOf(RuntimeException.class);
+    }
+
+    @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @Test
+    void customDelimiter() {
+        Separator separator = new Separator();
+        List<String> separate = separator.separate("//!\n131!313");
+        assertThat(separate).containsExactly("131", "313");
+        assertThat(Calculator.add(separate)).isEqualTo(444);
     }
 }
 

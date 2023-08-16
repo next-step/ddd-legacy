@@ -4,16 +4,29 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Separator {
     private final Set<Character> delimiters = new HashSet<>(List.of(':', ','));
 
+    Pattern pattern = Pattern.compile("//(.)\\n");
+
     public List<String> separate(String target) {
         List<String> numbers = new ArrayList<>();
         StringBuilder numberBuilder = new StringBuilder();
-
+        target = replaceIfMatchPattern(target);
         searchNumbersFromTarget(target, numbers, numberBuilder);
         return numbers;
+    }
+
+    private String replaceIfMatchPattern(String target) {
+        Matcher matcher = pattern.matcher(target);
+        if (matcher.find()) {
+            delimiters.add(matcher.group(1).charAt(0));
+            target = target.replaceFirst(matcher.group(), "");
+        }
+        return target;
     }
 
     private void searchNumbersFromTarget(String target, List<String> nums, StringBuilder numberBuilder) {
