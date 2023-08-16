@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StringCalculator {
-	private static final int DEFAULT_VALUE = 0;
+	private static final String DEFAULT_VALUE = "0";
 
 	private final String text;
 	private CalculatorDelimiter delimiter;
@@ -13,28 +13,24 @@ public class StringCalculator {
 
 	public StringCalculator(String text) {
 		this.text = text;
+		delimiter = new CalculatorDelimiter(text);
+		if (isNullValue()) {
+			numberForCalculators = List.of(new NumberForCalculator(DEFAULT_VALUE));
+			return;
+		}
+		numberForCalculators = Stream.of(delimiter.splittingText())
+			.map(NumberForCalculator::new)
+			.collect(Collectors.toList());
 	}
 
 	public int add() {
-		if (isNullValue()) {
-			return DEFAULT_VALUE;
-		}
-		String[] splittingText = getSplittingText();
-		numberForCalculators = Stream.of(splittingText)
-			.map(NumberForCalculator::new)
-			.collect(Collectors.toList());
-
 		return numberForCalculators.stream()
 			.mapToInt(NumberForCalculator::getNumber)
 			.sum();
 	}
 
 	private boolean isNullValue() {
-		return text == null || text.isEmpty();
+		return text == null || text.isBlank();
 	}
 
-	private String[] getSplittingText() {
-		delimiter = new CalculatorDelimiter(text);
-		return delimiter.splittingText();
-	}
 }

@@ -53,8 +53,7 @@ class StringCalculatorTest {
 	@DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
 	@Test
 	void negative() {
-		StringCalculator calculator = new StringCalculator("-1");
 		assertThatExceptionOfType(RuntimeException.class)
-			.isThrownBy(() -> calculator.add());
+			.isThrownBy(() -> new StringCalculator("-1"));
 	}
 }
