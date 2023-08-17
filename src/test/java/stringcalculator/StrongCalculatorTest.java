@@ -2,6 +2,7 @@ package stringcalculator;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -14,12 +15,22 @@ public class StrongCalculatorTest {
         int result = stringCalculator.calculate("");
         assertThat(result).isZero();
     }
+
+    @DisplayName("null 입력하면 결과는 0이다.")
+    @Test
+    void nullString_thenZero() {
+        StringCalculator stringCalculator = new StringCalculator();
+        int result = stringCalculator.calculate(null);
+        assertThat(result).isZero();
+    }
+
+
 }
 
 class StringCalculator {
 
     public int calculate(String str) {
-        if ("".equals(str)) {
+        if (StringUtils.isBlank(str)) {
             return 0;
         }
         return 1;
