@@ -8,12 +8,13 @@ import java.util.stream.Collectors;
 
 public class StringCalculator {
     private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
-    private static final List<Integer> EMPTY_NUMBERS = List.of(0);
+    private static final int ZERO = 0;
+    private static final List<Integer> EMPTY_NUMBERS = List.of(ZERO);
 
     public int add(final String expression) {
         final List<Integer> numbers = extractNumbers(expression);
 
-        validate(numbers);
+        validateNegative(numbers);
 
         return numbers.stream()
                 .mapToInt(e -> e)
@@ -41,8 +42,8 @@ public class StringCalculator {
         }
     }
 
-    private void validate(final List<Integer> numbers) {
-        if (numbers.stream().anyMatch(e -> e < 0)) {
+    private void validateNegative(final List<Integer> numbers) {
+        if (numbers.stream().anyMatch(e -> e < ZERO)) {
             throw new RuntimeException();
         }
     }
