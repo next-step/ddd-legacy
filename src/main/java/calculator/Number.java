@@ -41,7 +41,7 @@ public class Number {
         if (!(o instanceof Number))
             return false;
         Number number = (Number)o;
-        return Objects.equals(value, number.value);
+        return value.equals(number);
     }
 
     @Override

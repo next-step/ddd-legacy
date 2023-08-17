@@ -9,22 +9,23 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class NumberTest {
 
+    @DisplayName("숫자가 아닌 값이 입력 되었을 경우 오류가 발생 한다.")
     @ParameterizedTest
     @ValueSource(strings = {"*,d,아,$"})
-    @DisplayName("숫자가 아닌 값이 입력 되었을 경우")
     void noneNumber(String input) {
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> Number.of(input));
     }
 
+    @DisplayName("음수가 입력 되었을 경우 오류가 발생 한다.")
     @ParameterizedTest
     @ValueSource(strings = {"-1,-2,-99"})
-    @DisplayName("음수가 입력 되었을 경우")
     void negativeNumber(String input) {
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> Number.of(input));
     }
 
+    @DisplayName("숫자 합산이 정상 적으로 되었다.")
     @ParameterizedTest
     @CsvSource(value = {"1,3,4", "99,2,101", "47,31,78"})
     void plus(String argument1, String argument2, String result) {
@@ -32,6 +33,6 @@ class NumberTest {
         Number number2 = Number.of(argument2);
         Number number3 = Number.of(result);
         assertThat(number1.plus(number2))
-            .isEqualTo(number3);
+            .isSameAs(number3);
     }
 }
