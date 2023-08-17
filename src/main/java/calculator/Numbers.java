@@ -1,5 +1,6 @@
 package calculator;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -12,15 +13,11 @@ public class Numbers {
         this.numbers = numbers;
     }
 
-    public static Numbers from(List<String> rawNumbers) {
-        List<Number> numbers = rawNumbers.stream()
+    public static Numbers from(String... rawNumbers) {
+        List<Number> numbers = Arrays.stream(rawNumbers)
                 .map(Number::from)
                 .collect(Collectors.toList());
         return new Numbers(numbers);
-    }
-
-    public static Numbers from(String... rawNumber) {
-        return from(List.of(rawNumber));
     }
 
     public int sum() {
