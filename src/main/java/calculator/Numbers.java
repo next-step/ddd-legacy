@@ -19,6 +19,10 @@ public class Numbers {
         return new Numbers(numbers);
     }
 
+    public static Numbers from(String... rawNumber) {
+        return from(List.of(rawNumber));
+    }
+
     public int sum() {
         return numbers.stream()
                 .reduce(Number.ZERO, Number::plus)

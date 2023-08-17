@@ -3,8 +3,6 @@ package calculator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NumberParserTest {
@@ -13,7 +11,7 @@ class NumberParserTest {
     @Test
     void parse() {
         String str = "1,2:3";
-        Numbers expected = Numbers.from(List.of("1", "2", "3"));
+        Numbers expected = Numbers.from("1", "2", "3");
 
         Numbers actual = NumberParser.parse(str);
 
@@ -24,7 +22,7 @@ class NumberParserTest {
     @Test
     void parseWithCustomDelimiter() {
         String str = "//;\n1;2;3";
-        Numbers expected = Numbers.from(List.of("1", "2", "3"));
+        Numbers expected = Numbers.from("1", "2", "3");
 
         Numbers actual = NumberParser.parse(str);
 
