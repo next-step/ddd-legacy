@@ -2,6 +2,7 @@ package calculator.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import calculator.fixture.PositiveStringNumbrersFixture;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -15,12 +16,12 @@ class PositiveNumberExtractorTest {
     @DisplayName("문자식에서 숫자를 추출한다")
     @ParameterizedTest
     @MethodSource
-    void testExtractNumbers(String expression, List<String> numbers) {
+    void testExtractNumbers(String expression, List<PositiveStringNumber> numbers) {
         // given
         PositiveNumberExtractor sut = new PositiveNumberExtractor();
 
         // when
-        List<String> actual = sut.extractNumbers(expression);
+        List<PositiveStringNumber> actual = sut.extractNumbers(expression);
 
         // then
         assertThat(actual).containsExactlyElementsOf(numbers);
@@ -29,10 +30,11 @@ class PositiveNumberExtractorTest {
     private static Stream<Arguments> testExtractNumbers() {
         return Stream.of(
             Arguments.of("", Collections.emptyList()),
-            Arguments.of("1,2,3", List.of("1", "2", "3")),
-            Arguments.of("1:2:3", List.of("1", "2", "3")),
-            Arguments.of("1:2:3", List.of("1", "2", "3")),
-            Arguments.of("//;\n1;2;3", List.of("1", "2", "3"))
+            Arguments.of("1,2,3", PositiveStringNumbrersFixture.create("1", "2", "3")),
+            Arguments.of("1,2,3", PositiveStringNumbrersFixture.create("1", "2", "3")),
+            Arguments.of("1:2:3", PositiveStringNumbrersFixture.create("1", "2", "3")),
+            Arguments.of("1:2:3", PositiveStringNumbrersFixture.create("1", "2", "3")),
+            Arguments.of("//;\n1;2;3", PositiveStringNumbrersFixture.create("1", "2", "3"))
         );
     }
 }

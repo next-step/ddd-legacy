@@ -14,7 +14,7 @@ public class PositiveNumberExtractor {
     public static final int NUMBERS_GROUP_SEQ = 2;
     private static final String DEFAULT_DELIMITERS = ",|:";
 
-    public List<String> extractNumbers(String expression) {
+    public List<PositiveStringNumber> extractNumbers(String expression) {
         if (expression == null || expression.isBlank()) {
             return Collections.emptyList();
         }
@@ -23,10 +23,12 @@ public class PositiveNumberExtractor {
         if (matcher.find()) {
             String customDelimiter = matcher.group(CUSTOM_DELIMITER_SEQ);
             return Arrays.stream(matcher.group(NUMBERS_GROUP_SEQ).split(customDelimiter))
+                .map(PositiveStringNumber::new)
                 .collect(Collectors.toList());
         }
 
         return Arrays.stream(expression.split(DEFAULT_DELIMITERS))
+            .map(PositiveStringNumber::new)
             .collect(Collectors.toList());
     }
 }
