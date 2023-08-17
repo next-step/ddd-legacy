@@ -33,6 +33,6 @@ class NumberTest {
         Number number2 = Number.of(argument2);
         Number number3 = Number.of(result);
         assertThat(number1.plus(number2))
-            .isSameAs(number3);
+            .isEqualTo(number3);
     }
 }
