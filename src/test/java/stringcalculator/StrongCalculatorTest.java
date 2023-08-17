@@ -9,6 +9,8 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.platform.commons.util.StringUtils;
 
+import java.util.Arrays;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class StrongCalculatorTest {
@@ -43,6 +45,14 @@ public class StrongCalculatorTest {
         assertThat(result).isEqualTo(expected);
     }
 
+    @DisplayName("두개 이상의 숫자를 컴마나 콜론으로 구분해서 입력할 경우 숫자들의 합을 반환한다.")
+    @CsvSource(value = {"1,2:3=6", "2,4,8=14", "3:6:9=18"}, delimiter = '=')
+    @ParameterizedTest
+    void strings_sum(String input, Integer expected) {
+        int result = stringCalculator.calculate(input);
+        assertThat(result).isEqualTo(expected);
+    }
+
 
 }
 
@@ -58,7 +68,9 @@ class StringCalculator {
             return convertNumber(numbers[0]);
         }
 
-        return convertNumber(numbers[0]) + convertNumber(numbers[1]);
+        return Arrays.stream(numbers)
+                .mapToInt(this::convertNumber)
+                .sum();
     }
 
     private int convertNumber(String number) {
