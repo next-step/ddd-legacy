@@ -13,8 +13,7 @@ public class Number {
 
     public static Number of(String text) {
         try {
-            BigInteger resultNumber = BigInteger.valueOf(Integer.parseInt(text));
-            return new Number(resultNumber);
+            return new Number(new BigInteger(text));
         } catch (NumberFormatException e) {
             throw new RuntimeException("숫자가 아닌 값이 존재 합니다.");
         }
