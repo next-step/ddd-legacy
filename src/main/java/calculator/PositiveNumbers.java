@@ -9,23 +9,15 @@ public class PositiveNumbers {
 
     public PositiveNumbers(final String[] stringNumbers) {
         this.numbers = Arrays.stream(stringNumbers)
-                .filter(stringNumber -> !isEmptyString(stringNumber))
+                .filter(stringNumber -> !stringNumber.isEmpty())
                 .map(PositiveNumber::new)
                 .collect(Collectors.toList());
     }
 
-    private boolean isEmptyString(String stringNumber) {
-        return stringNumber.length() == 0;
-    }
-
-    public int sum() {
+    public PositiveNumber sum() {
         return this.numbers
                 .stream()
-                .mapToInt(PositiveNumber::getNumber)
-                .sum();
-    }
-
-    public boolean isEmpty() {
-        return this.numbers.isEmpty();
+                .reduce(PositiveNumber::plus)
+                .orElse(new PositiveNumber(0));
     }
 }

@@ -3,6 +3,10 @@ package calculator;
 public class PositiveNumber {
     private final int number;
 
+    public PositiveNumber(int number) {
+        this.number = number;
+    }
+
     public PositiveNumber(String stringNumber) {
         if (!isPositiveNumber(stringNumber)) {
             throw new RuntimeException("음수를 입력함");
@@ -17,6 +21,10 @@ public class PositiveNumber {
 
     private boolean isPositiveNumber(String stringNumber) {
         return !stringNumber.startsWith("-");
+    }
+
+    public PositiveNumber plus(PositiveNumber other) {
+        return new PositiveNumber(this.number + other.number);
     }
 
     public int getNumber() {

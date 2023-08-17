@@ -14,7 +14,7 @@ public class StringCalculator {
 
         String[] stringNumbers = parseStringToNumbers(text);
         PositiveNumbers positiveNumbers = new PositiveNumbers(stringNumbers);
-        return positiveNumbers.sum();
+        return positiveNumbers.sum().getNumber();
     }
 
     private String[] parseStringToNumbers(final String text) {
