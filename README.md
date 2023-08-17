@@ -4,7 +4,7 @@
 
 ```sh
 cd docker
-docker compose -p kitchenpos up -d
+sudo docker compose -p kitchenpos up -d
 ```
 
 ## 요구 사항
