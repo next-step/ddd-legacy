@@ -4,22 +4,27 @@ import java.util.Objects;
 
 public class PositiveStringNumber {
 
-    public static final int POSITIVE_BOUNDARY = 0;
-    private final String value;
+    public static final PositiveStringNumber ZERO = new PositiveStringNumber(0);
+    private static final int POSITIVE_BOUNDARY = 0;
+    private final int value;
 
-    public PositiveStringNumber(String value) {
-        validatePositiveStringNumber(value);
+    private PositiveStringNumber(int value) {
+        if (value < POSITIVE_BOUNDARY) {
+            throw new RuntimeException("덧셈에는 양수만 허용됩니다. value = " + value);
+        }
         this.value = value;
     }
 
-    private void validatePositiveStringNumber(String value) {
+    public static PositiveStringNumber of(String value) {
         try {
-            if (Integer.parseInt(value) < POSITIVE_BOUNDARY) {
-                throw new RuntimeException("덧셈에는 양수만 허용됩니다. value = " + value);
-            }
+            return new PositiveStringNumber(Integer.parseInt(value));
         } catch (NumberFormatException e) {
             throw new RuntimeException("덧셈에는 숫자만 허용됩니다. value = " + value);
         }
+    }
+
+    public PositiveStringNumber add(PositiveStringNumber other) {
+        return new PositiveStringNumber(this.value + other.value);
     }
 
     @Override

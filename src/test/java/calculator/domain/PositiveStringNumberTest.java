@@ -14,7 +14,7 @@ class PositiveStringNumberTest {
     @ValueSource(strings = {"0", "1", "2", "3", "4", "5"})
     void testInitPositiveStringNumber(String value) {
         // when // then
-        assertDoesNotThrow(() -> new PositiveStringNumber(value));
+        assertDoesNotThrow(() -> PositiveStringNumber.of(value));
     }
 
     @DisplayName("잘못된 값으로 양수 문자열 숫자 객체를 생성하면 예외를 발생시킨다")
@@ -22,6 +22,6 @@ class PositiveStringNumberTest {
     @ValueSource(strings = {"-2", "-1", "a", "A", "-"})
     void testInitPositiveStringNumberIfNotValidValue(String value) {
         // when // then
-        assertThrows(RuntimeException.class, () -> new PositiveStringNumber(value));
+        assertThrows(RuntimeException.class, () -> PositiveStringNumber.of(value));
     }
 }

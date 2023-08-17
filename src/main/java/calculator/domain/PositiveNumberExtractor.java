@@ -23,12 +23,12 @@ public class PositiveNumberExtractor {
         if (matcher.find()) {
             String customDelimiter = matcher.group(CUSTOM_DELIMITER_SEQ);
             return Arrays.stream(matcher.group(NUMBERS_GROUP_SEQ).split(customDelimiter))
-                .map(PositiveStringNumber::new)
+                .map(PositiveStringNumber::of)
                 .collect(Collectors.toList());
         }
 
         return Arrays.stream(expression.split(DEFAULT_DELIMITERS))
-            .map(PositiveStringNumber::new)
+            .map(PositiveStringNumber::of)
             .collect(Collectors.toList());
     }
 }

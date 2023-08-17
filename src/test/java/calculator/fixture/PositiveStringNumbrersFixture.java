@@ -12,7 +12,7 @@ public class PositiveStringNumbrersFixture {
 
     public static List<PositiveStringNumber> create(String... values) {
         return Arrays.stream(values)
-            .map(PositiveStringNumber::new)
+            .map(PositiveStringNumber::of)
             .collect(Collectors.toList());
     }
 }
