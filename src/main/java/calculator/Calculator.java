@@ -1,8 +1,13 @@
 package calculator;
 
 class Calculator {
+    private final NumberStrings numberStrings;
 
-    public static int add(NumberStrings numberStrings) {
+    public Calculator(final String target) {
+        numberStrings = Separator.separate(new TargetString(target));
+    }
+
+    public int calculate() {
         if (numberStrings.isEmpty()) {
             return 0;
         }
