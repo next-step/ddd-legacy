@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class StrongCalculatorTest {
 
@@ -40,7 +41,7 @@ public class StrongCalculatorTest {
     }
 
     @DisplayName("숫자 두개를 컴마나 콜론으로 구분해서 입력할 경우 두 숫자의 합을 반환한다.")
-    @CsvSource(value = {"1,2=3","2,3=5","3,7=10","5,8=13","1:2=3","6:9=15"}, delimiter = '=')
+    @CsvSource(value = {"1,2=3", "2,3=5", "3,7=10", "5,8=13", "1:2=3", "6:9=15"}, delimiter = '=')
     @ParameterizedTest
     void two_string_sum(String input, Integer expected) {
         int result = stringCalculator.calculate(input);
@@ -63,6 +64,13 @@ public class StrongCalculatorTest {
         assertThat(result).isEqualTo(6);
     }
 
+    @DisplayName("음수가 입력될 시 예외가 발생한다.")
+    @ValueSource(strings = {"-1", "1:-2", "1,3,-5"})
+    @ParameterizedTest
+    void negative_then_exception(String input) {
+        assertThatThrownBy(() -> stringCalculator.calculate(input))
+                .isInstanceOf(RuntimeException.class);
+    }
 
 }
 
@@ -78,12 +86,11 @@ class StringCalculator {
         Matcher matcher = PATTERN.matcher(input);
         if (matcher.find()) {
             String customDelimiter = matcher.group(1);
-            String[] numbers= matcher.group(2).split(customDelimiter);
+            String[] numbers = matcher.group(2).split(customDelimiter);
             return sumStringArray(numbers);
         }
 
         String[] numbers = input.split(COMMA_OR_COLON);
-
         return sumStringArray(numbers);
     }
 
@@ -99,9 +106,17 @@ class StringCalculator {
 
     private int convertNumber(String number) {
         try {
-            return Integer.parseInt(number);
+            int result = Integer.parseInt(number);
+            validate(result);
+            return result;
         } catch (Exception e) {
             throw e;
+        }
+    }
+
+    private void validate(int number) {
+        if (number < 0) {
+            throw new RuntimeException("음수를 입력할 수 없습니다.");
         }
     }
 }
