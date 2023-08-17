@@ -8,6 +8,12 @@ public class StringCalculator {
 
         CalculatorInput calculatorInput = new CalculatorInput(calcInput);
         String[] parsedInput = calculatorInput.parse();
-        return 1;
+        Operands operands = new Operands(parsedInput);
+        return operands.sum();
+    }
+
+    public static void main(String[] args) {
+        StringCalculator calculator = new StringCalculator();
+        System.out.println(calculator.add("//$\n1,2$3"));
     }
 }
