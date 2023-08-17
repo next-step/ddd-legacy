@@ -11,7 +11,7 @@ public class StringAddCalculator {
         }
 
         return Arrays.stream(separator.separate(expression))
-                .reduce(new Operand(0), (operand, otherOperand) -> operand.plus(otherOperand))
+                .reduce(Operand.ZERO, (operand, otherOperand) -> operand.plus(otherOperand))
                 .getNumber();
     }
 }

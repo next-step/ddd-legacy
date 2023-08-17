@@ -1,6 +1,8 @@
 package stringaddcalculator;
 
 public class Operand {
+    public static final Operand ZERO = new Operand(0);
+
     private final int number;
 
     public Operand(int number) {
