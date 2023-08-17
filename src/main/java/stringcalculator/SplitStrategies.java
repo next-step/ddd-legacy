@@ -9,17 +9,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public class SplitStrategies {
-    private final List<SplitStrategy> strategies
+
+    private static final List<SplitStrategy> strategies
             = Arrays.asList(
             new NoneSplitStrategy()
             , new OneSplitStrategy()
             , new CommaAndColonSplitStrategy()
             , new CustomSplitStrategy());
 
-    public SplitStrategies() {
-    }
 
-    public String[] spilt(String text) {
+    public static String[] spilt(String text) {
         return strategies.stream()
                 .filter(strategy -> strategy.canSplit(text))
                 .findAny()
@@ -27,4 +26,5 @@ public class SplitStrategies {
                 .orElseThrow(() -> new RuntimeException(
                         StringCalculatorExceptionMessage.CANNOT_CALCULATE.getMessage()));
     }
+
 }
