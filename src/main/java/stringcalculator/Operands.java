@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Operands {
-    private List<Operand> operands;
+    private final List<Operand> operands;
 
     public Operands(String[] parsedInput) {
         operands = Arrays.stream(parsedInput)
@@ -14,6 +14,10 @@ public class Operands {
     }
 
     public int sum() {
-        return -1;
+        return operands.stream().map(Operand::getValue)
+                .collect(Collectors.toList())
+                .stream()
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 }

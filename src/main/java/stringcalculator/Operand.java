@@ -1,7 +1,7 @@
 package stringcalculator;
 
 public class Operand {
-    private int value;
+    private final int value;
 
     public int getValue() {
         return value;
