@@ -8,7 +8,7 @@ public class Numbers {
 
     private final List<Number> numbers;
 
-    public Numbers(List<Number> numbers) {
+    private Numbers(List<Number> numbers) {
         this.numbers = numbers;
     }
 
