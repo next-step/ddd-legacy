@@ -5,11 +5,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TargetString {
-    String target;
+    private String target;
+    private static final Pattern pattern = Pattern.compile("//(.)\\n");
 
-    final Pattern pattern = Pattern.compile("//(.)\\n");
-
-    public TargetString(String target) {
+    public TargetString(final String target) {
+        if (target == null) {
+            throw new IllegalArgumentException("값이 없습니다. 다시 입력해주세요");
+        }
         this.target = target;
     }
 
