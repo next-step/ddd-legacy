@@ -14,7 +14,7 @@ public class Numbers {
 
     public static Numbers fromString(List<String> strings) {
         List<Number> numbers = strings.stream()
-                .map(Number::fromString)
+                .map(Number::from)
                 .collect(Collectors.toList());
         return new Numbers(numbers);
     }

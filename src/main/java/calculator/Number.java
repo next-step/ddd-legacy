@@ -15,7 +15,7 @@ public class Number {
         this.value = value;
     }
 
-    public static Number fromString(String s) {
+    public static Number from(String s) {
         try {
             return new Number(Integer.parseInt(s));
         } catch (NumberFormatException e) {
