@@ -35,8 +35,8 @@ public class StrongCalculatorTest {
         assertThat(result).isEqualTo(1);
     }
 
-    @DisplayName("숫자 두개를 쉼표로 구분해서 입력할 경우 두 숫자의 합을 반환한다.")
-    @CsvSource(value = {"1,2=3","2,3=5","3,7=10","5,8=13"}, delimiter = '=')
+    @DisplayName("숫자 두개를 컴마나 콜론으로 구분해서 입력할 경우 두 숫자의 합을 반환한다.")
+    @CsvSource(value = {"1,2=3","2,3=5","3,7=10","5,8=13","1:2=3","6:9=15"}, delimiter = '=')
     @ParameterizedTest
     void two_string_sum(String input, Integer expected) {
         int result = stringCalculator.calculate(input);
@@ -53,7 +53,7 @@ class StringCalculator {
             return 0;
         }
 
-        String[] numbers = str.split(",");
+        String[] numbers = str.split(",|:");
         if (numbers.length == 1) {
             return convertNumber(numbers[0]);
         }
