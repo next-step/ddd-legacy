@@ -1,7 +1,7 @@
 package calculator;
 
 public class PositiveNumber {
-    private final Integer number;
+    private final int number;
 
     public PositiveNumber(String stringNumber) {
         if (!isPositiveNumber(stringNumber)) {
