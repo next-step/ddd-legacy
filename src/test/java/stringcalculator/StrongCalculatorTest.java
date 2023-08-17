@@ -10,6 +10,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.platform.commons.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -53,17 +55,39 @@ public class StrongCalculatorTest {
         assertThat(result).isEqualTo(expected);
     }
 
+    @DisplayName("//와 \n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @ValueSource(strings = {"//;\n1;2;3"})
+    @ParameterizedTest
+    void custom_delimiter_sum(String input) {
+        int result = stringCalculator.calculate(input);
+        assertThat(result).isEqualTo(6);
+    }
+
 
 }
 
 class StringCalculator {
+    private static final Pattern PATTERN = Pattern.compile("//(.)\n(.*)");
+    private static final String COMMA_OR_COLON = ",|:";
 
-    public int calculate(String str) {
-        if (StringUtils.isBlank(str)) {
+    public int calculate(String input) {
+        if (StringUtils.isBlank(input)) {
             return 0;
         }
 
-        String[] numbers = str.split(",|:");
+        Matcher matcher = PATTERN.matcher(input);
+        if (matcher.find()) {
+            String customDelimiter = matcher.group(1);
+            String[] numbers= matcher.group(2).split(customDelimiter);
+            return sumStringArray(numbers);
+        }
+
+        String[] numbers = input.split(COMMA_OR_COLON);
+
+        return sumStringArray(numbers);
+    }
+
+    private int sumStringArray(String[] numbers) {
         if (numbers.length == 1) {
             return convertNumber(numbers[0]);
         }
