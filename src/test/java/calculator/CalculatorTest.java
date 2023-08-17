@@ -2,10 +2,8 @@ package calculator;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.stream.Stream;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -54,5 +52,12 @@ class CalculatorTest {
             .hasMessage("숫자 변환에 실패 하였습니다.");
     }
 
-
+    @DisplayName("음수가 있을시 에러가 발생한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"1,-2,3", "-1:2:3", "//;\n1;2;-3", "-1"})
+    void test3(String input) {
+        assertThatThrownBy(() -> calculator.calc(input))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("음수는 변환할수 없습니다.");
+    }
 }

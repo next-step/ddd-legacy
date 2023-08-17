@@ -6,12 +6,24 @@ public class NumberParseUtilsImpl implements NumberParseUtils {
 
     @Override
     public int[] parse(String[] src) {
+        return Stream.of(src)
+            .mapToInt(this::parse)
+            .toArray();
+    }
+
+    private int parse(String src) {
         try {
-            return Stream.of(src)
-                .mapToInt(Integer::parseInt)
-                .toArray();
+            int result = Integer.parseInt(src);
+            validate(result);
+            return result;
         } catch (NumberFormatException e) {
             throw new RuntimeException("숫자 변환에 실패 하였습니다.");
+        }
+    }
+
+    private void validate(int result) {
+        if (result < 0) {
+            throw new RuntimeException("음수는 변환할수 없습니다.");
         }
     }
 }

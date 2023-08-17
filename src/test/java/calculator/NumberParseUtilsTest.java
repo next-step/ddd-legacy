@@ -50,4 +50,16 @@ class NumberParseUtilsTest {
             .isInstanceOf(RuntimeException.class)
             .hasMessage("숫자 변환에 실패 하였습니다.");
     }
+
+    @DisplayName("음수 입력이 있을시 에러를 발생시킨다.")
+    @Test
+    void test3() {
+        //given
+        String[] input = {"-1", "2", "3"};
+
+        //when && then
+        assertThatThrownBy(() -> numberParseUtils.parse(input))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("음수는 변환할수 없습니다.");
+    }
 }
