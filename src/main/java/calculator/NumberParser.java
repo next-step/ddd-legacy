@@ -13,7 +13,7 @@ public class NumberParser {
 
     public static Numbers parse(String str) {
         List<String> numbers = extractNumbers(str);
-        return Numbers.fromString(numbers);
+        return Numbers.from(numbers);
     }
 
     private static List<String> extractNumbers(String str) {

@@ -13,7 +13,7 @@ class NumberParserTest {
     @Test
     void parse() {
         String str = "1,2:3";
-        Numbers expected = Numbers.fromString(List.of("1", "2", "3"));
+        Numbers expected = Numbers.from(List.of("1", "2", "3"));
 
         Numbers actual = NumberParser.parse(str);
 
@@ -24,7 +24,7 @@ class NumberParserTest {
     @Test
     void parseWithCustomDelimiter() {
         String str = "//;\n1;2;3";
-        Numbers expected = Numbers.fromString(List.of("1", "2", "3"));
+        Numbers expected = Numbers.from(List.of("1", "2", "3"));
 
         Numbers actual = NumberParser.parse(str);
 

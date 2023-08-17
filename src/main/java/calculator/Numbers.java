@@ -12,8 +12,8 @@ public class Numbers {
         this.numbers = numbers;
     }
 
-    public static Numbers fromString(List<String> strings) {
-        List<Number> numbers = strings.stream()
+    public static Numbers from(List<String> rawNumbers) {
+        List<Number> numbers = rawNumbers.stream()
                 .map(Number::from)
                 .collect(Collectors.toList());
         return new Numbers(numbers);
