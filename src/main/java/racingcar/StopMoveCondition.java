@@ -1,8 +1,8 @@
 package racingcar;
 
 public class StopMoveCondition implements MoveCondition {
-	@Override
-	public boolean movable() {
-		return false;
-	}
+    @Override
+    public boolean movable() {
+        return false;
+    }
 }
