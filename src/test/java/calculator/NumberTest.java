@@ -11,7 +11,7 @@ class NumberTest {
     @DisplayName("음수로 생성하면 예외가 발생한다")
     @Test
     void negativeNumber() {
-        assertThatThrownBy(() -> new Number(-1))
+        assertThatThrownBy(() -> Number.fromString("-1"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -25,11 +25,11 @@ class NumberTest {
     @DisplayName("값을 더해 새로운 숫자를 만든다")
     @Test
     void plus() {
-        Number number1 = new Number(1);
-        Number number2 = new Number(2);
+        Number number1 = Number.fromString("1");
+        Number number2 = Number.fromString("2");
 
         Number actual = number1.plus(number2);
 
-        assertThat(actual).isEqualTo(new Number(3));
+        assertThat(actual).isEqualTo(Number.fromString("3"));
     }
 }

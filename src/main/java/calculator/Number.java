@@ -8,7 +8,7 @@ public class Number {
 
     private final int value;
 
-    public Number(int value) {
+    private Number(int value) {
         if (value < ZERO_VALUE) {
             throw new IllegalArgumentException("숫자는 음수가 될 수 없습니다");
         }
