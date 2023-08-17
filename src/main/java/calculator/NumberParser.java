@@ -1,6 +1,5 @@
 package calculator;
 
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,18 +11,16 @@ public class NumberParser {
     private static final int TARGET_TEXT_INDEX = 2;
 
     public static Numbers parse(String str) {
-        List<String> numbers = extractNumbers(str);
-        return Numbers.from(numbers);
+        return Numbers.from(extractNumbers(str));
     }
 
-    private static List<String> extractNumbers(String str) {
+    private static String[] extractNumbers(String str) {
         Matcher m = PATTERN.matcher(str);
         if (m.find()) {
             String customDelimiter = m.group(CUSTOM_DELIMITER_INDEX);
-            String[] numbers = m.group(TARGET_TEXT_INDEX).split(customDelimiter);
-            return List.of(numbers);
+            return m.group(TARGET_TEXT_INDEX).split(customDelimiter);
         }
 
-        return List.of(str.split(DEFAULT_DELIMITER_REGEX));
+        return str.split(DEFAULT_DELIMITER_REGEX);
     }
 }
