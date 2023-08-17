@@ -1,12 +1,11 @@
 package stringaddcalculator;
 
 public class Operand {
-    private static final String NEGATIVE_VALUE_EXCEPTION_MESSAGE = "Operand는 음수일 수 없습니다. 현재 값: ";
     private final int number;
 
     public Operand(int number) {
         if (number < 0) {
-            throw new IllegalArgumentException(NEGATIVE_VALUE_EXCEPTION_MESSAGE + number);
+            throw new NegativeOperandException(number);
         }
         this.number = number;
     }

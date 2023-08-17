@@ -9,7 +9,7 @@ class OperandTest {
     @Test
     void Operand는_음수일_수_없다() {
         assertThatThrownBy(() -> new Operand(-1))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test

@@ -6,7 +6,6 @@ import java.util.regex.Pattern;
 
 public class Separator {
     private static final Pattern COMPILED_PATTERN_BY_CUSTOM_DELIMITER = Pattern.compile(SeparatorConstants.CUSTOM_DELIMITER_PATTERN.getValue());
-    private static final String NULL_OR_EMPTY_EXPRESSION_EXCEPTION_MESSAGE = "식은 빈 문자열 또는 null을 입력할 수 없습니다. 현재 값: ";
 
     private static final int FIRST_CAPTURING_GROUP_INDEX = 1;
     private static final int SECOND_CAPTURING_GROUP_INDEX = 2;
@@ -26,7 +25,7 @@ public class Separator {
 
     private void validate(String expression) {
         if (expression == null || expression.isBlank()) {
-            throw new IllegalArgumentException(NULL_OR_EMPTY_EXPRESSION_EXCEPTION_MESSAGE + expression);
+            throw new NullOrEmptyExpressionException(expression);
         }
     }
 

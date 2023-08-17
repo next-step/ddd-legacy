@@ -30,7 +30,7 @@ class SeparatorTest {
     @ParameterizedTest
     void validate(final String expression) {
         assertThatThrownBy(() -> separator.separate(expression))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(RuntimeException.class);
     }
 
     @DisplayName("구분자를 커스텀할 수 있다")
