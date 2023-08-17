@@ -7,7 +7,7 @@
 
 ## 기능구현 목록표 
 -[X] 쉼표(,) 또는 콜론(:)을 구분자로하여 수식에서 숫자들을 추출하는 기능
-  -[ ] 숫자 이외의 값은 RuntimeException
-  -[ ] 음수는 RuntimeException
+  -[x] 숫자 이외의 값은 RuntimeException
+  -[x] 음수는 RuntimeException
 -[ ] 커스텀 구분자로하여 수식에서 숫자들을 추출하는 기능
 -[ ] 숫자들을 합산하는 기능
