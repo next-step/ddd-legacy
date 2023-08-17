@@ -7,12 +7,12 @@ import java.util.stream.Collectors;
 public class StringCalculator {
     private static final String DEFAULT_VALUE = "0";
     private final String text;
-    private final Delimiter delimiter;
+    private final Splitter splitter;
     private List<Number> numbers = new ArrayList<>();
 
     public StringCalculator(String text) {
         this.text = text;
-        delimiter = new Delimiter(text);
+        splitter = new Splitter(text);
 
     }
 
@@ -21,7 +21,7 @@ public class StringCalculator {
             numbers = List.of(Number.of(DEFAULT_VALUE));
             return;
         }
-        numbers = delimiter.splittingText()
+        numbers = splitter.splittingText()
             .map(Number::of)
             .collect(Collectors.toList());
     }

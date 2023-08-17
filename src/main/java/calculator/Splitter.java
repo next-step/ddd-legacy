@@ -6,12 +6,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-public class Delimiter {
+public class Splitter {
     private static final List<String> DELIMITER_OF_STANDARD = List.of(",", ":");
     private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
     private final String text;
 
-    public Delimiter(String text) {
+    public Splitter(String text) {
         this.text = text;
     }
 
@@ -37,10 +37,10 @@ public class Delimiter {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof Delimiter))
+        if (!(o instanceof Splitter))
             return false;
-        Delimiter delimiter = (Delimiter)o;
-        return Objects.equals(text, delimiter.text);
+        Splitter splitter = (Splitter)o;
+        return Objects.equals(text, splitter.text);
     }
 
     @Override
