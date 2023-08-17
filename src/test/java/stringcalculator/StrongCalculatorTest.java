@@ -33,6 +33,13 @@ public class StrongCalculatorTest {
         assertThat(result).isEqualTo(1);
     }
 
+    @DisplayName("숫자 두개를 쉼표로 구분해서 입력할 경우 두 숫자의 합을 반환한다.")
+    @Test
+    void two_string_sum() {
+        int result = stringCalculator.calculate("1,2");
+        assertThat(result).isEqualTo(3);
+    }
+
 
 }
 
@@ -42,6 +49,20 @@ class StringCalculator {
         if (StringUtils.isBlank(str)) {
             return 0;
         }
-        return Integer.parseInt(str);
+
+        String[] numbers = str.split(",");
+        if (numbers.length == 1) {
+            return convertNumber(numbers[0]);
+        }
+
+        return convertNumber(numbers[0]) + convertNumber(numbers[1]);
+    }
+
+    private int convertNumber(String number) {
+        try {
+            return Integer.parseInt(number);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }
