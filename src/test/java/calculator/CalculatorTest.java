@@ -39,7 +39,11 @@ class CalculatorTest {
             Arguments.of("1:2,3", 6),
             Arguments.of("1:2,3", 6),
             Arguments.of("//;\n1;2;3", 6),
-            Arguments.of("//!\n1!2!3", 6)
+            Arguments.of("//!\n1!2!3", 6),
+            Arguments.of("", 0),
+            Arguments.of(" ", 0),
+            Arguments.of("      ", 0),
+            Arguments.of(null, 0)
         );
     }
 
