@@ -7,13 +7,14 @@ import java.util.regex.Pattern;
 public class Separator {
     private static final String DEFAULT_DELIMITER = ",|:";
     private static final String CUSTOM_DELIMITER_PATTERN = "//(.)\n(.*)";
+    private static final Pattern COMPILED_PATTERN_BY_CUSTOM_DELIMITER = Pattern.compile(CUSTOM_DELIMITER_PATTERN);
     private static final String NULL_OR_EMPTY_EXPRESSION_EXCEPTION_MESSAGE = "식은 빈 문자열 또는 null을 입력할 수 없습니다. 현재 값: ";
 
     public Operand[] separate(String expression) {
         validate(expression);
         String delimiter = DEFAULT_DELIMITER;
 
-        Matcher matcher = Pattern.compile(CUSTOM_DELIMITER_PATTERN).matcher(expression);
+        Matcher matcher = COMPILED_PATTERN_BY_CUSTOM_DELIMITER.matcher(expression);
         if (matcher.find()) {
             delimiter = matcher.group(1);
             expression = matcher.group(2);
