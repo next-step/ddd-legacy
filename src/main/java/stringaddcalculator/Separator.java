@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 public class Separator {
     private static final String DEFAULT_DELIMITER = ",|:";
     private static final String CUSTOM_DELIMITER_PATTERN = "//(.)\n(.*)";
+    private static final String NULL_OR_EMPTY_EXPRESSION_EXCEPTION_MESSAGE = "식은 빈 문자열 또는 null을 입력할 수 없습니다. 현재 값: ";
 
     public Operand[] separate(String expression) {
         validate(expression);
@@ -23,7 +24,7 @@ public class Separator {
 
     private void validate(String expression) {
         if (expression == null || expression.isBlank()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(NULL_OR_EMPTY_EXPRESSION_EXCEPTION_MESSAGE + expression);
         }
     }
 
