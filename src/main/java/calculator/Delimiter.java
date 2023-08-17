@@ -1,27 +1,27 @@
 package calculator;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 public class Delimiter {
     private static final List<String> DELIMITER_OF_STANDARD = List.of(",", ":");
     private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
-
-    private String text;
+    private final String text;
 
     public Delimiter(String text) {
         this.text = text;
     }
 
-    public String[] splittingText() {
+    public Stream<String> splittingText() {
         Matcher matcher = getCustomDelimiterMatcher();
-
         if (matcher.find()) {
-            return matcher.group(2)
-                .split(matcher.group(1));
+            return Stream.of(matcher.group(2)
+                .split(matcher.group(1)));
         }
-        return text.split(getStandardDelimiter());
+        return Stream.of(text.split(getStandardDelimiter()));
     }
 
     private String getStandardDelimiter() {
@@ -31,5 +31,20 @@ public class Delimiter {
 
     private Matcher getCustomDelimiterMatcher() {
         return pattern.matcher(text);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Delimiter))
+            return false;
+        Delimiter delimiter = (Delimiter)o;
+        return Objects.equals(text, delimiter.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(text);
     }
 }

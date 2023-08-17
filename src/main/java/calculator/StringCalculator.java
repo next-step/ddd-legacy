@@ -1,32 +1,36 @@
 package calculator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class StringCalculator {
     private static final String DEFAULT_VALUE = "0";
-
     private final String text;
-    private Delimiter delimiter;
-    private List<Number> numbers;
+    private final Delimiter delimiter;
+    private List<Number> numbers = new ArrayList<>();
 
     public StringCalculator(String text) {
         this.text = text;
         delimiter = new Delimiter(text);
+
+    }
+
+    private void assignNumber() {
         if (isNullValue()) {
-            numbers = List.of(new Number(DEFAULT_VALUE));
+            numbers = List.of(Number.of(DEFAULT_VALUE));
             return;
         }
-        numbers = Stream.of(delimiter.splittingText())
-            .map(Number::new)
+        numbers = delimiter.splittingText()
+            .map(Number::of)
             .collect(Collectors.toList());
     }
 
     public int add() {
+        assignNumber();
         return numbers.stream()
-            .mapToInt(Number::getNumber)
-            .sum();
+            .reduce(Number.of(DEFAULT_VALUE), Number::plus)
+            .getValue();
     }
 
     private boolean isNullValue() {
