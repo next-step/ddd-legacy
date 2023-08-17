@@ -4,7 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.platform.commons.util.StringUtils;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -34,10 +36,11 @@ public class StrongCalculatorTest {
     }
 
     @DisplayName("숫자 두개를 쉼표로 구분해서 입력할 경우 두 숫자의 합을 반환한다.")
-    @Test
-    void two_string_sum() {
-        int result = stringCalculator.calculate("1,2");
-        assertThat(result).isEqualTo(3);
+    @CsvSource(value = {"1,2=3","2,3=5","3,7=10","5,8=13"}, delimiter = '=')
+    @ParameterizedTest
+    void two_string_sum(String input, Integer expected) {
+        int result = stringCalculator.calculate(input);
+        assertThat(result).isEqualTo(expected);
     }
 
 
