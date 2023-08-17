@@ -24,6 +24,14 @@ public class StrongCalculatorTest {
         assertThat(result).isZero();
     }
 
+    @DisplayName("숫자 문자열 하나 입력시 입력한 숫자 문자열을 반환한다.")
+    @Test
+    void one_string_sum() {
+        StringCalculator stringCalculator = new StringCalculator();
+        int result = stringCalculator.calculate("1");
+        assertThat(result).isEqualTo(1);
+    }
+
 
 }
 
@@ -33,6 +41,6 @@ class StringCalculator {
         if (StringUtils.isBlank(str)) {
             return 0;
         }
-        return 1;
+        return Integer.parseInt(str);
     }
 }
