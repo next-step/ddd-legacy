@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CalculatorDelimiter {
+public class Delimiter {
     private static final List<String> DELIMITER_OF_STANDARD = List.of(",", ":");
     private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
 
     private String text;
 
-    public CalculatorDelimiter(String text) {
+    public Delimiter(String text) {
         this.text = text;
     }
 

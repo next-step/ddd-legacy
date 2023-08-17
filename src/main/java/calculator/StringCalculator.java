@@ -8,24 +8,24 @@ public class StringCalculator {
     private static final String DEFAULT_VALUE = "0";
 
     private final String text;
-    private CalculatorDelimiter delimiter;
-    private List<NumberForCalculator> numberForCalculators;
+    private Delimiter delimiter;
+    private List<Number> numbers;
 
     public StringCalculator(String text) {
         this.text = text;
-        delimiter = new CalculatorDelimiter(text);
+        delimiter = new Delimiter(text);
         if (isNullValue()) {
-            numberForCalculators = List.of(new NumberForCalculator(DEFAULT_VALUE));
+            numbers = List.of(new Number(DEFAULT_VALUE));
             return;
         }
-        numberForCalculators = Stream.of(delimiter.splittingText())
-            .map(NumberForCalculator::new)
+        numbers = Stream.of(delimiter.splittingText())
+            .map(Number::new)
             .collect(Collectors.toList());
     }
 
     public int add() {
-        return numberForCalculators.stream()
-            .mapToInt(NumberForCalculator::getNumber)
+        return numbers.stream()
+            .mapToInt(Number::getNumber)
             .sum();
     }
 
