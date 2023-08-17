@@ -6,6 +6,8 @@ public class StringCalculator {
             return 0;
         }
 
+        CalculatorInput calculatorInput = new CalculatorInput(calcInput);
+        String[] parsedInput = calculatorInput.parse();
         return 1;
     }
 }
