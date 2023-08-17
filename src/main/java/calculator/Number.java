@@ -1,34 +1,51 @@
 package calculator;
 
-public class Number {
-    private final int number;
+import java.math.BigInteger;
+import java.util.Objects;
 
-    public Number(String text) {
+public class Number {
+    private final BigInteger value;
+
+    public Number(BigInteger number) {
+        checkingNegative(number);
+        this.value = number;
+    }
+
+    public static Number of(String text) {
         try {
-            int resultNumber = Integer.parseInt(text);
-            checkingNegative(resultNumber);
-            this.number = resultNumber;
+            BigInteger resultNumber = BigInteger.valueOf(Integer.parseInt(text));
+            return new Number(resultNumber);
         } catch (NumberFormatException e) {
             throw new RuntimeException("숫자가 아닌 값이 존재 합니다.");
         }
     }
 
-    public Number(int number) {
-        checkingNegative(number);
-        this.number = number;
-    }
-
-    private void checkingNegative(int number) {
-        if (Integer.signum(number) == -1) {
+    private void checkingNegative(BigInteger number) {
+        if (number.compareTo(BigInteger.ZERO) < 0) {
             throw new RuntimeException("숫자가 음수입니다.");
         }
     }
 
     public Number plus(Number number) {
-        return new Number(this.number + number.number);
+        return new Number(this.value.add(number.value));
     }
 
-    public int getNumber() {
-        return number;
+    public int getValue() {
+        return value.intValue();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Number))
+            return false;
+        Number number = (Number)o;
+        return Objects.equals(value, number.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }
