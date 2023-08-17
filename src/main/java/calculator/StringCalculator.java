@@ -2,10 +2,10 @@ package calculator;
 
 import java.util.Arrays;
 
-public class StringAdditionCalculator {
+public class StringCalculator {
     private final static String DELIMITER = "[,:]";
 
-    public static int calculate(String input) {
+    public int add(String input) {
         if (input == null || input.isEmpty()) {
             return 0;
         }
