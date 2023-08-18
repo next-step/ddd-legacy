@@ -14,10 +14,8 @@ public class Operands {
     }
 
     public int sum() {
-        return operands.stream().map(Operand::getValue)
-                .collect(Collectors.toList())
-                .stream()
-                .mapToInt(Integer::intValue)
+        return operands.stream()
+                .mapToInt(Operand::getValue)
                 .sum();
     }
 }
