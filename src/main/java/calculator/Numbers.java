@@ -14,10 +14,9 @@ public class Numbers {
     }
 
     public static Numbers from(String... rawNumbers) {
-        List<Number> numbers = Arrays.stream(rawNumbers)
+        return Arrays.stream(rawNumbers)
                 .map(Number::from)
-                .collect(Collectors.toList());
-        return new Numbers(numbers);
+                .collect(Collectors.collectingAndThen(Collectors.toList(), Numbers::new));
     }
 
     public int sum() {
