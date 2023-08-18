@@ -14,17 +14,17 @@ class CarTest {
     @DisplayName("자동차 이름")
     @Nested
     class Name {
-        @DisplayName("[성공] 자동차 이름이 5글자 이상이어야 한다.")
+        @DisplayName("[성공] 자동차 이름은 5글자 이하이다.")
         @ParameterizedTest
-        @ValueSource(strings = {"55555", "66666", "가나라다마사아자차카"})
-        void carNameLongerThanFive(String input) {
+        @ValueSource(strings = {"1", "22", "333", "4444", "55555"})
+        void carNameShorterThanFive(String input) {
             assertThatNoException().isThrownBy(() -> new Car(input));
         }
 
-        @DisplayName("[실패] 자동차 이름이 5글자 미만이면 안된다.")
+        @DisplayName("[실패] 자동차 이름은 5글자를 넘을 수 없다.")
         @ParameterizedTest
-        @ValueSource(strings = {"1", "22", "333", "4444"})
-        void carNameShorterThanFive(String input) {
+        @ValueSource(strings = {"666666", "7777777", "가나라다마사아자차카"})
+        void carNameLongerThanFive(String input) {
             assertThatThrownBy(() -> new Car(input))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -46,7 +46,7 @@ class CarTest {
         @ValueSource(ints = {4, 5, 6, 7, 8, 9})
         void carMove(int input) {
             //given
-            Car car = new Car("carname");
+            Car car = new Car("name");
             //when
             car.move(new NumberMoveStrategy(input));
             //then
@@ -58,7 +58,7 @@ class CarTest {
         @ValueSource(ints = {0, 1, 2, 3})
         void carNotMove(int input) {
             //given
-            Car car = new Car("carname");
+            Car car = new Car("name");
             //when
             car.move(new NumberMoveStrategy(input));
             //then
@@ -67,3 +67,4 @@ class CarTest {
     }
 
 }
+
