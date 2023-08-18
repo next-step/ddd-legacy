@@ -10,6 +10,26 @@ docker compose -p kitchenpos up -d
 ## 요구 사항
 
 - 메뉴
+  - [ ]메뉴는 상품과 메뉴상품이 먼저 등록 되어 있어야 한다.
+  - [ ]메뉴 가격 = 상품가격 * 메뉴그룹 갯수
+  - [ ]메뉴는 종류를 가저야 한다. ( ex : 추천메뉴, 신메뉴 등등)
+  - [ ]메뉴명은 비속어가 포함되어 있으면 안된다.
+  - [ ]메뉴는 활성/비활성화 상태를 변경 할 수 있다.
+  - [ ]상품 가격을 변경 할 수 있어야 한다.
+  - [ ]메뉴상품과 메뉴는 동시에 등록 되어야 한다.
+- 주문
+  - [ ]주문 종류는 배달, 포장, 매장식사( DELIVERY, TAKEOUT, EAT_IN )가 있다.
+  - [ ]메뉴에 등록된 것들만 주문 할 수 있다.
+  - [ ]각 주문은 종류별로 상태를 관리한다.
+    - DELIVERY : WAITING -> ACCEPTED -> SERVED -> DELIVERING -> DELIVERED -> COMPLETED
+    - TAKEOUT  : WAITING -> ACCEPTED -> SERVED -> COMPLETED
+    - EAT_IN   : WAITING -> ACCEPTED -> SERVED -> COMPLETED
+      - [ ]배달(DELIVERY)는 수락 ( ACCEPTED ) 할때 배달을 요청한다.
+      - [ ]매장식사(EAT_IN)은 완료 ( COMPLETED ) 할때, orderTable 의 손님수와, 자리를 비워준다.
+
+## 상세 기능 정의
+
+- 메뉴
     - [ ] 메뉴 그룹을 등록 한다.
         - 메뉴그룹 이름은 필수여야 한다.
     - [ ] 메뉴 그룹을 전체 조회 한다.
