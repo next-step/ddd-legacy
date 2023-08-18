@@ -1,17 +1,16 @@
 package calculator;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class Delimiter {
-    private final Set<Character> delimiters = new HashSet<>(List.of(':', ','));
+    private static final Set<Character> BASIC_DELIMITERS = Set.of(':', ',');
+    private volatile char newDelimiter = '\0';
 
-    public void addNewDelimiterIfExist(final TargetString targetString) {
-        targetString.getDelimiterOrNull().ifPresent(delimiters::add);
+    public Delimiter(final TargetString targetString) {
+        targetString.getDelimiterOrNull().ifPresent(delimiter -> newDelimiter = delimiter);
     }
 
     public boolean contains(char ch) {
-        return delimiters.contains(ch);
+        return BASIC_DELIMITERS.contains(ch) || ch == newDelimiter;
     }
 }
