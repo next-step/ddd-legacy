@@ -1,5 +1,7 @@
 package string_additional_calculator;
 
+import java.util.Objects;
+
 public class PositiveNumber {
     public static final PositiveNumber ZERO = new PositiveNumber(0);
 
@@ -35,5 +37,18 @@ public class PositiveNumber {
 
     public int getValue() {
         return this.value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PositiveNumber that = (PositiveNumber) o;
+        return value == that.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(value);
     }
 }
