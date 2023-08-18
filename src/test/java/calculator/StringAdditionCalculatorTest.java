@@ -1,6 +1,5 @@
 package calculator;
 
-import calculator.impl.CustomDivideConditionImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,16 +10,14 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
-/**
- * 문자열 덧셈 계산기 테스트
- */
-class StringSumCalculatorTest {
 
-    private StringSumCalculator calculator;
+class StringAdditionCalculatorTest {
+
+    private StringAdditionCalculator calculator;
 
     @BeforeEach
     void setUp() {
-        calculator = new StringSumCalculator();
+        calculator = new StringAdditionCalculator();
     }
 
     @DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")
