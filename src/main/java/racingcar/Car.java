@@ -11,15 +11,15 @@ public class Car {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
-
     public void move(final MoveCondition condition) {
         if (condition.movable()) {
             position++;
         }
 
+    }
+
+    public String getName() {
+        return name;
     }
 
     public int getPosition() {
