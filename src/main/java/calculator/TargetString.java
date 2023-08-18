@@ -24,7 +24,6 @@ public class TargetString {
         return Optional.empty();
     }
 
-
     public char[] toCharArray() {
         return target.toCharArray();
     }
