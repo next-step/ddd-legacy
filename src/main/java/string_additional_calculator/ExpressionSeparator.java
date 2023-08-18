@@ -32,7 +32,7 @@ public class ExpressionSeparator {
     }
 
     private void validateCustomSeparator(String separator) {
-        if (separator.length() != 1) {
+        if (separator.length() != CUSTOM_SEPARATE_VALID_LENGTH) {
             throw new IllegalArgumentException(
                     String.format("커스텀 구분자는 %d글자여야 합니다. separator: %s",
                             CUSTOM_SEPARATE_VALID_LENGTH,
