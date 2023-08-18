@@ -1,7 +1,6 @@
 package calculator.domain;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,21 +13,24 @@ public class PositiveNumberExtractor {
     public static final int NUMBERS_GROUP_SEQ = 2;
     private static final String DEFAULT_DELIMITERS = ",|:";
 
-    public List<PositiveStringNumber> extractNumbers(String expression) {
+    public PositiveStringNumbers extractNumbers(String expression) {
         if (expression == null || expression.isBlank()) {
-            return Collections.emptyList();
+            return PositiveStringNumbers.EMPTY_POSITIVE_STRING_NUMBERS;
         }
 
         Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(expression);
         if (matcher.find()) {
             String customDelimiter = matcher.group(CUSTOM_DELIMITER_SEQ);
-            return Arrays.stream(matcher.group(NUMBERS_GROUP_SEQ).split(customDelimiter))
-                .map(PositiveStringNumber::of)
-                .collect(Collectors.toList());
+            return convertToPositiveStringNumbers(matcher.group(NUMBERS_GROUP_SEQ), customDelimiter);
         }
 
-        return Arrays.stream(expression.split(DEFAULT_DELIMITERS))
+        return convertToPositiveStringNumbers(expression, DEFAULT_DELIMITERS);
+    }
+
+    private static PositiveStringNumbers convertToPositiveStringNumbers(String matcher, String customDelimiter) {
+        List<PositiveStringNumber> positiveStringNumbers = Arrays.stream(matcher.split(customDelimiter))
             .map(PositiveStringNumber::of)
             .collect(Collectors.toList());
+        return new PositiveStringNumbers(positiveStringNumbers);
     }
 }

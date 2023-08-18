@@ -1,7 +1,5 @@
 package calculator.domain;
 
-import java.util.List;
-
 public class StringAdderCalculator {
 
     private final PositiveNumberExtractor positiveNumberExtractor;
@@ -11,10 +9,8 @@ public class StringAdderCalculator {
     }
 
     public PositiveStringNumber calculate(String expression) {
-        List<PositiveStringNumber> positiveStringNumbers = positiveNumberExtractor.extractNumbers(expression);
+        PositiveStringNumbers positiveStringNumbers = positiveNumberExtractor.extractNumbers(expression);
 
-        return positiveStringNumbers.stream()
-            .reduce(PositiveStringNumber::add)
-            .orElse(PositiveStringNumber.ZERO);
+        return positiveStringNumbers.addAll();
     }
 }
