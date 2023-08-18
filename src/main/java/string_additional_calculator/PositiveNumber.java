@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class PositiveNumber {
     public static final PositiveNumber ZERO = new PositiveNumber(0);
+    private static final int MIN_VALUE = 0;
 
     private final int value;
 
@@ -15,7 +16,7 @@ public class PositiveNumber {
     }
 
     private static boolean isNegativeNumber(int value) {
-        return value < 0;
+        return value < MIN_VALUE;
     }
 
     public static PositiveNumber from(String stringNumber) {
