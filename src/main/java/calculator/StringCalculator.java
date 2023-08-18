@@ -26,11 +26,10 @@ public class StringCalculator {
             .collect(Collectors.toList());
     }
 
-    public int add() {
+    public Number add() {
         assignNumber();
         return numbers.stream()
-            .reduce(Number.of(DEFAULT_VALUE), Number::plus)
-            .getValue();
+            .reduce(Number.of(DEFAULT_VALUE), Number::plus);
     }
 
     private boolean isNullValue() {

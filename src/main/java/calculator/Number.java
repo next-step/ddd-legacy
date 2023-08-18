@@ -28,11 +28,7 @@ public class Number {
     public Number plus(Number number) {
         return new Number(this.value.add(number.value));
     }
-
-    public int getValue() {
-        return value.intValue();
-    }
-
+    
     @Override
     public boolean equals(Object o) {
         if (this == o)
