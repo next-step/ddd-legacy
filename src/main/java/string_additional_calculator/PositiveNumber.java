@@ -1,11 +1,11 @@
 package string_additional_calculator;
 
-public class Constant {
-    public static final Constant ZERO = new Constant(0);
+public class PositiveNumber {
+    public static final PositiveNumber ZERO = new PositiveNumber(0);
 
     private final int value;
 
-    private Constant(int value) {
+    private PositiveNumber(int value) {
         if (isNegativeNumber(value)) {
             throw new RuntimeException(String.format("문자열 계산기에 상수는 음수가 될 수 없습니다. number: %s", value));
         }
@@ -16,9 +16,9 @@ public class Constant {
         return value < 0;
     }
 
-    public static Constant from(String stringNumber) {
+    public static PositiveNumber from(String stringNumber) {
         validate(stringNumber);
-        return new Constant(Integer.parseInt(stringNumber));
+        return new PositiveNumber(Integer.parseInt(stringNumber));
     }
 
     private static void validate(String stringNumber) {
@@ -29,8 +29,8 @@ public class Constant {
         }
     }
 
-    public Constant sum(Constant constant) {
-        return new Constant(this.value + constant.value);
+    public PositiveNumber sum(PositiveNumber positiveNumber) {
+        return new PositiveNumber(this.value + positiveNumber.value);
     }
 
     public int getValue() {

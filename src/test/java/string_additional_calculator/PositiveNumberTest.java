@@ -8,17 +8,17 @@ import org.junit.jupiter.params.provider.CsvSource;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-@DisplayName("Constant 클래스")
-class ConstantTest {
+@DisplayName("PositiveNumber 클래스")
+class PositiveNumberTest {
 
-    @DisplayName("Constant의 from 정적 팩토리 메서드는 숫자로된 문자열을 전달하면 숫자 값을 가진 객체를 생성한다.")
+    @DisplayName("PositiveNumber의 from 정적 팩토리 메서드는 숫자로된 문자열을 전달하면 숫자 값을 가진 객체를 생성한다.")
     @Test
     void constant() {
         // when
-        final Constant constant = Constant.from("1");
+        final PositiveNumber positiveNumber = PositiveNumber.from("1");
 
         // then
-        assertThat(constant.getValue()).isEqualTo(1);
+        assertThat(positiveNumber.getValue()).isEqualTo(1);
     }
 
     @DisplayName("문자열 계산기의 상수를 숫자 이외의 값으로 생성하려고 하면 RuntimeException을 던진다.")
@@ -30,7 +30,7 @@ class ConstantTest {
     })
     void invalidValue(String value, String exceptionMessage) {
         // when then
-        assertThatThrownBy(() -> Constant.from(value))
+        assertThatThrownBy(() -> PositiveNumber.from(value))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage(exceptionMessage);
     }
@@ -44,7 +44,7 @@ class ConstantTest {
     })
     void invalidNegativeNumber(String value, String exceptionMessage) {
         // when then
-        assertThatThrownBy(() -> Constant.from(value))
+        assertThatThrownBy(() -> PositiveNumber.from(value))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage(exceptionMessage);
     }

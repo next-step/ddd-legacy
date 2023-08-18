@@ -9,10 +9,10 @@ class StringAdditionalCalculator {
 
     public int calculate(String expression) {
         String[] stringNumbers = expressionSeparator.separate(expression);
-        Constant result = Constant.ZERO;
+        PositiveNumber result = PositiveNumber.ZERO;
         for (String stringNumber : stringNumbers) {
-            Constant constant = Constant.from(stringNumber);
-            result = result.sum(constant);
+            PositiveNumber positiveNumber = PositiveNumber.from(stringNumber);
+            result = result.sum(positiveNumber);
         }
         return result.getValue();
     }
