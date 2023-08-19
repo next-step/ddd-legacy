@@ -1,5 +1,7 @@
 package stringcalculator;
 
+import java.util.Objects;
+
 public class Number {
     private static final int MIN_NUMBER_VALUE = 0;
     private final Integer value;
@@ -21,5 +23,13 @@ public class Number {
 
     public Integer getValue() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Number number = (Number) o;
+        return Objects.equals(value, number.value);
     }
 }

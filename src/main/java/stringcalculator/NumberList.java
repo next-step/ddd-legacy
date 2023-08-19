@@ -12,8 +12,8 @@ public class NumberList {
     }
 
     public static NumberList of(String[] numbers) {
-        List<Number> numbers1 = createNumberList(numbers);
-        return new NumberList(numbers1);
+        List<Number> numbersList = createNumberList(numbers);
+        return new NumberList(numbersList);
     }
 
     private static List<Number> createNumberList(String[] numbers) {
@@ -30,5 +30,9 @@ public class NumberList {
         return numberList.stream()
                 .mapToInt(Number::getValue)
                 .sum();
+    }
+
+    public Number get(int index) {
+        return numberList.get(index);
     }
 }
