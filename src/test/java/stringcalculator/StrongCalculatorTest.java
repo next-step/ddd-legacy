@@ -51,7 +51,7 @@ public class StrongCalculatorTest {
         assertThat(result).isEqualTo(expected);
     }
 
-    @DisplayName("//와 \n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @DisplayName("//와 \n 문자 사이에 커스텀 구분자를 지정하고 합을 반환한다.")
     @ValueSource(strings = {"//;\n1;2;3"})
     @ParameterizedTest
     void custom_delimiter_sum(String input) {
