@@ -4,6 +4,8 @@ import java.util.stream.Stream;
 
 public class NumberParseUtilsImpl implements NumberParseUtils {
 
+    private final static int ZERO = 0;
+
     @Override
     public int[] parse(String[] src) {
         return Stream.of(src)
@@ -22,7 +24,7 @@ public class NumberParseUtilsImpl implements NumberParseUtils {
     }
 
     private void validate(int result) {
-        if (result < 0) {
+        if (result < ZERO) {
             throw new RuntimeException("음수는 변환할수 없습니다.");
         }
     }
