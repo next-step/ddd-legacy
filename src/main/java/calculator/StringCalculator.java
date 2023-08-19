@@ -8,6 +8,7 @@ public class StringCalculator {
     private static final String DEFAULT_DELIMITER = ",|:";
     private static final int CUSTOM_DELIMITER_INDEX = 1;
     private static final int STRING_TO_SPLIT_INDEX = 2;
+    private static final int DEFAULT_OUTPUT = 0;
 
     private final Pattern customDelemiterPattern;
 
@@ -16,8 +17,7 @@ public class StringCalculator {
     }
 
     public int add(final String text) {
-        if (text == null) {return 0;}
-        if (text.isEmpty()) {return 0;}
+        if (isEmpty(text)) {return DEFAULT_OUTPUT;}
 
         String[] tokens = findTokens(text);
         int sum = 0;
@@ -29,6 +29,10 @@ public class StringCalculator {
         }
 
         return sum;
+    }
+
+    private boolean isEmpty(String text) {
+        return text == null || text.isEmpty();
     }
 
     private void validate(final int num) {
