@@ -33,7 +33,7 @@ public class CarTest {
     }
 
     @DisplayName("자동차는 무작위 값이 4 미만인 경우 정지한다")
-    @ValueSource(ints = {0,1,2,3})
+    @ValueSource(ints = {0, 1, 2, 3})
     @ParameterizedTest
     void stop(final int condition) {
         Car car = new Car("Jason");
