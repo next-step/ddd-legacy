@@ -2,41 +2,29 @@ package calculator;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public enum OperandParser {
-    BASIC_PARSER((String value) -> toList(value.split("[,:]"))),
-    CUSTOM_PARSER(OperandParser::parseCustomPattern);
+public class OperandParser {
+    private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
+    private static final String BASIC_PATTERN = "[,:]";
 
-    private static final String CUSTOM_PATTERN = "//(.)\n(.*)";
-    private final Function<String, Operands> parser;
-
-    OperandParser(Function<String, Operands> function) {
-        this.parser = function;
-    }
-
-
-    public static Operands extractOperands(String value) {
-        if (value.matches(CUSTOM_PATTERN)) {
-           return CUSTOM_PARSER.parser.apply(value);
+    public Operands extractOperands(String value) {
+        if (CUSTOM_PATTERN.matcher(value).find()) {
+            return parseCustomPattern(value);
         }
 
-        return BASIC_PARSER.parser.apply(value);
+        return parseBasicPattern(value);
     }
 
-    private static Operands toList(String[] tokens) {
-        List<Integer> token = Arrays.stream(tokens)
-                .mapToInt(Integer::parseInt)
-                .boxed()
-                .collect(Collectors.toList());
-        return new Operands(token);
+    private Operands parseBasicPattern(String value) {
+        String[] tokens = value.split(BASIC_PATTERN);
+        return toList(tokens);
     }
 
-    private static Operands parseCustomPattern(String value) {
-        Matcher matcher = Pattern.compile(CUSTOM_PATTERN).matcher(value);
+    private Operands parseCustomPattern(String value) {
+        Matcher matcher = CUSTOM_PATTERN.matcher(value);
         if (matcher.find()) {
             String customDelimiter = matcher.group(1);
             String[] tokens = matcher.group(2).split(customDelimiter);
@@ -45,4 +33,12 @@ public enum OperandParser {
         return new Operands();
     }
 
+    private Operands toList(String[] tokens) {
+        List<Operand> operands = Arrays.stream(tokens)
+                .mapToInt(Integer::parseInt)
+                .boxed()
+                .map(Operand::valueOf)
+                .collect(Collectors.toList());
+        return new Operands(operands);
+    }
 }
