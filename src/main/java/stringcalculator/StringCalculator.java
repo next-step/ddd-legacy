@@ -9,6 +9,10 @@ import java.util.regex.Pattern;
 public class StringCalculator {
     private static final Pattern PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final String COMMA_OR_COLON = ",|:";
+    private static final int CUSTOM_DELIMITER_NO = 1;
+    private static final int CUSTOM_DELIMITER_NUMBERS_NO = 2;
+    private static final int MIN_NUMBER_VALUE = 0;
+
 
     public int calculate(String input) {
         if (StringUtils.isBlank(input)) {
@@ -17,8 +21,8 @@ public class StringCalculator {
 
         Matcher matcher = PATTERN.matcher(input);
         if (matcher.find()) {
-            String customDelimiter = matcher.group(1);
-            String[] numbers = matcher.group(2).split(customDelimiter);
+            String customDelimiter = matcher.group(CUSTOM_DELIMITER_NO);
+            String[] numbers = matcher.group(CUSTOM_DELIMITER_NUMBERS_NO).split(customDelimiter);
             return sumStringArray(numbers);
         }
 
@@ -47,7 +51,7 @@ public class StringCalculator {
     }
 
     private void validate(int number) {
-        if (number < 0) {
+        if (number < MIN_NUMBER_VALUE) {
             throw new RuntimeException("음수를 입력할 수 없습니다.");
         }
     }
