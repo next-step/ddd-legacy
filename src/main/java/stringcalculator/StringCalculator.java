@@ -6,8 +6,8 @@ public class StringCalculator {
         if (text == null || text.trim().isEmpty()) {
             return 0;
         }
-        DelimitedNumbers delimitedNumbers = new DelimitedNumbers(text);
-        return delimitedNumbers.getNumbersStream()
+        StringParser stringParser = new StringParser(text);
+        return stringParser.getNumbersStream()
                 .mapToInt(number -> new PositiveNumber(number).getValue())
                 .sum();
     }

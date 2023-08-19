@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-public class DelimitedNumbers {
+public class StringParser {
 
     private static final String DEFAULT_DELIMITER_REGEX = ",|:";
 
@@ -17,7 +17,7 @@ public class DelimitedNumbers {
 
     private final String numbers;
 
-    public DelimitedNumbers(String text) {
+    public StringParser(String text) {
         this.delimiter = extractDelimiter(text);
         this.numbers = extractNumbers(text, delimiter);
     }
