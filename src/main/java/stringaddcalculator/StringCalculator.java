@@ -24,17 +24,17 @@ public class StringCalculator {
 
         Matcher m = pattern.matcher(text);
         if (m.find()) {
-            addByUniquePattern(m);
+            return addByUniquePattern(m);
         }
 
         String[] tokens = text.split(regex);
         return parseAdd(tokens);
     }
 
-    private void addByUniquePattern(Matcher m) {
+    private int addByUniquePattern(Matcher m) {
         String customDelimiter = m.group(ONE);
         String [] tokens = m.group(TWO).split(customDelimiter);
-        parseAdd(tokens);
+        return parseAdd(tokens);
     }
 
     private int parseAdd(String [] tokens) {
