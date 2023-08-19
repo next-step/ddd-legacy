@@ -9,7 +9,9 @@ import java.util.regex.Pattern;
 public class StringCalculator {
     private final static String DEFAULT_DELIMITER = "[,:]";
     private final static Pattern PATTERN = Pattern.compile("//(.)\n(.*)");
-    public static final int DEFAULT_NUMBER = 0;
+    private static final int DEFAULT_NUMBER = 0;
+    private static final int MATCHER_DELIMITER = 1;
+    private static final int MATCHER_NUMBERS = 2;
 
 
     public int add(String text) {
@@ -19,18 +21,20 @@ public class StringCalculator {
 
         Matcher matcher = PATTERN.matcher(text);
         if (matcher.find()) {
-            return calculate(matcher.group(1), matcher.group(2));
+            return calculate(getNumberSplit(matcher.group(MATCHER_DELIMITER), matcher.group(MATCHER_NUMBERS)));
         }
 
-        return calculate(DEFAULT_DELIMITER, text);
+        return calculate(getNumberSplit(DEFAULT_DELIMITER, text));
     }
 
-    private static int calculate(String delimiter, String numbers) {
-        String[] numberSplit = numbers.split(delimiter);
+    private static String[] getNumberSplit(String delimiter, String numbers) {
+        return numbers.split(delimiter);
+    }
 
-        validate(numberSplit);
+    private int calculate(String[] numberSplit1) {
+        validate(numberSplit1);
 
-        return Arrays.stream(numberSplit)
+        return Arrays.stream(numberSplit1)
                      .mapToInt(Integer::parseInt)
                      .sum();
     }
@@ -41,7 +45,7 @@ public class StringCalculator {
               .filter(n -> n < 0)
               .findAny()
               .ifPresent(n -> {
-                  throw new RuntimeException("음수가 포합되어있습니다. [" + n + "]");
+                  throw new RuntimeException("음수가 포함되어있습니다. [" + n + "]");
               });
     }
 }
