@@ -56,14 +56,14 @@ class StringCalculatorTest {
     @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @Test
     void negative() {
-        assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add("-1"));
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> calculator.add("-1,1"));
     }
 
     @DisplayName(value = "문자열 계산기에 숫자가 아닌 문자를 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @Test
     void noInt() {
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> calculator.add("ㅁ,1,2"));
     }
 

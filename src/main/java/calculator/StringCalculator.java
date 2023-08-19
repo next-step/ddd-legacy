@@ -1,5 +1,7 @@
 package calculator;
 
+import java.util.List;
+
 public class StringCalculator {
 
     public int add(String text) {
@@ -7,15 +9,15 @@ public class StringCalculator {
         Operation operation = new Operation();
 
         //선처리1: 입력이 없을 경우는 0
-        if(valid.isNull(text)){
+        if (valid.isNull(text)) {
             return 0;
         }
 
         //선처리2: 입력 문자열이 하나의 숫자인 경우 그대로 리턴.
-        if(valid.isInt(text)){
+        if (valid.isInt(text)) {
             int sum = Integer.parseInt(text);
-            if(sum < 0){
-                throw new RuntimeException("입력문자가 음수입니다.");
+            if (sum < 0) {
+                throw new IllegalArgumentException("입력문자가 음수입니다.");
             }
             return sum;
         }
@@ -25,10 +27,13 @@ public class StringCalculator {
         String operator = operation.getOperator();
 
         //가지고있는 구분자로 숫자 나누기
-        String[] tokens= removeOperText.split(operator);
+        String[] tokens = removeOperText.split(operator);
 
-        //나눈 숫자더하기. 과정에서 숫자가 아니거나 음수 발생시 에러처리
-        return operation.addition(tokens);
+        //문자리스트 숫자리스트로 변경. 과정에서 숫자가 아니거나 음수 발생시 에러처리
+        List<Integer> tokenToInt = operation.strListToIntList(tokens);
+
+        //리스트 덧셈
+        return operation.addition(tokenToInt);
 
     }
 
