@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
     private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
-    private static final String regex = ",|:";
+    private static final String regex = "[,|:]";
     private static final int ZERO = 0;
     private static final int ONE = 1;
     private static final int TWO = 2;
