@@ -12,6 +12,17 @@ public class StringCalculator {
             return Integer.parseInt(text);
         }
 
-        return 0;
+        String[] tokens = text.split(",|:");
+
+        int result = 0;
+
+        for (String value : tokens) {
+            int num = Integer.parseInt(value);
+            if (num < 0) {
+                throw new RuntimeException("음수 입력 안 됨");
+            }
+            result = result + num;
+        }
+        return result;
     }
 }
