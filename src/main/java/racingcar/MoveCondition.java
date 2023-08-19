@@ -1,6 +1,6 @@
 package racingcar;
 
-@FunctionalInterface // 람다를 이용할 수 있음
+@FunctionalInterface
 public interface MoveCondition {
     boolean movable();
 }
