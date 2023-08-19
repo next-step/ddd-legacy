@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -13,25 +14,10 @@ class StringAdditionalCalculatorTest {
 
     private final StringAdditionalCalculator stringAdditionalCalculator = new StringAdditionalCalculator(new ExpressionSeparator());
 
-    @DisplayName("식이 null인 경우 0을 반환한다.")
-    @Test
-    void expressionIsNull() {
-        // given
-        final String expression = null;
-
-        // when
-        PositiveNumber result = stringAdditionalCalculator.calculate(expression);
-
-        // then
-        assertThat(result).isEqualTo(PositiveNumber.ZERO);
-    }
-
-    @DisplayName("식이 빈 문자열인 경우 0을 반환한다.")
-    @Test
-    void expressionIsEmptyString() {
-        // given
-        final String expression = "";
-
+    @DisplayName("식이 null이거나 문자열인 경우 0을 반환한다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void expressionIsNull(String expression) {
         // when
         PositiveNumber result = stringAdditionalCalculator.calculate(expression);
 
