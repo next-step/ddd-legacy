@@ -20,10 +20,10 @@ class StringAdditionalCalculatorTest {
         final String expression = null;
 
         // when
-        int result = stringAdditionalCalculator.calculate(expression);
+        PositiveNumber result = stringAdditionalCalculator.calculate(expression);
 
         // then
-        assertThat(result).isZero();
+        assertThat(result).isEqualTo(PositiveNumber.ZERO);
     }
 
     @DisplayName("식이 빈 문자열인 경우 0을 반환한다.")
@@ -33,10 +33,10 @@ class StringAdditionalCalculatorTest {
         final String expression = "";
 
         // when
-        int result = stringAdditionalCalculator.calculate(expression);
+        PositiveNumber result = stringAdditionalCalculator.calculate(expression);
 
         // then
-        assertThat(result).isZero();
+        assertThat(result).isEqualTo(PositiveNumber.ZERO);
     }
 
     @DisplayName("쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열을 전달하는 경우 구분자를 기준으로 분리한 각 숫자의 합을 반환한다.")
@@ -46,10 +46,10 @@ class StringAdditionalCalculatorTest {
         final String expression = "1,2:3";
 
         // when
-        int result = stringAdditionalCalculator.calculate(expression);
+        PositiveNumber result = stringAdditionalCalculator.calculate(expression);
 
         // then
-        assertThat(result).isEqualTo(6);
+        assertThat(result).isEqualTo(PositiveNumber.from("6"));
     }
 
     @DisplayName("기본 구분자(쉼표, 콜론) 외에 커스텀 구분자를 지정할 수 있다.")
@@ -59,10 +59,10 @@ class StringAdditionalCalculatorTest {
         final String expression = "//;\n1;2;3";
 
         // when
-        int result = stringAdditionalCalculator.calculate(expression);
+        PositiveNumber result = stringAdditionalCalculator.calculate(expression);
 
         // then
-        assertThat(result).isEqualTo(6);
+        assertThat(result).isEqualTo(PositiveNumber.from("6"));
     }
 
     @DisplayName("커스텀 구분자는 한 글자만 가능하다")
