@@ -12,9 +12,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import javax.validation.constraints.Null;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -60,7 +58,7 @@ class MenuGroupServiceTest extends ApplicationTest {
         MenuGroup menuGroup1 = MenuGroupFixture.createDefault();
         MenuGroup menuGroup2 = MenuGroupFixture.createDefault();
         MenuGroup menuGroup3 = MenuGroupFixture.createDefault();
-        when(menuGroupRepository.findAll()).thenReturn(List.of(menuGroup1,menuGroup2,menuGroup3));
+        when(menuGroupRepository.findAll()).thenReturn(List.of(menuGroup1, menuGroup2, menuGroup3));
         //when
         List<MenuGroup> all = menuGroupService.findAll();
         //then
