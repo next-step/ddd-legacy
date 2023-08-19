@@ -57,5 +57,11 @@ class StringCalculatorTest {
                 .hasMessage("음수는 추가될 수 없습니다.");
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"//;\n"})
+    void 커스텀_지정자만_입력하면_0을_전달받는다(final String value) {
+        assertThat(calculator.add(value)).isZero();
+    }
+
 
 }
