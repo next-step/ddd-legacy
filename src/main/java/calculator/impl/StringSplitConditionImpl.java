@@ -8,4 +8,5 @@ public class StringSplitConditionImpl implements SplitCondition {
     public String[] split(String value) {
         return value.split(",|:");
     }
+
 }
