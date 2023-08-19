@@ -32,8 +32,10 @@ public final class DirtyText {
      * @throws IllegalArgumentException {@link #value}가 null일 때
      */
     public boolean isPositiveNumeric() {
+        checkNotNull(value, "value");
+
         try {
-            return 0 < Integer.parseInt(checkNotNull(value, "value"));
+            return 0 < Integer.parseInt(value);
         } catch (final NumberFormatException e) {
             return false;
         }
@@ -43,7 +45,9 @@ public final class DirtyText {
      * @throws IllegalArgumentException {@link #value}가 null일 때
      */
     public List<String> refine() {
-        return refiner.execute(checkNotNull(value, "value"));
+        checkNotNull(value, "value");
+
+        return refiner.execute(value);
     }
 
     public Optional<String> getValue() {

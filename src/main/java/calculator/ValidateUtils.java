@@ -6,12 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public final class ValidateUtils {
 
-    static String checkNotEmpty(final String value, final String name) {
-        checkArgument(StringUtils.isNotEmpty(value), "empty %s", name);
-
-        return value;
-    }
-
     static String checkEmpty(final String value, final String name) {
         checkArgument(StringUtils.isEmpty(value), "not empty %s", name);
 
