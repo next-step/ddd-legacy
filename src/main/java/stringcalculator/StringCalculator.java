@@ -2,7 +2,6 @@ package stringcalculator;
 
 import io.micrometer.core.instrument.util.StringUtils;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,33 +20,12 @@ public class StringCalculator {
         Matcher matcher = PATTERN.matcher(input);
         if (matcher.find()) {
             String customDelimiter = matcher.group(CUSTOM_DELIMITER_NO);
-            String[] numbers = matcher.group(CUSTOM_DELIMITER_NUMBERS_NO).split(customDelimiter);
-            return sumStringArray(numbers);
+            String[] numberStringArray = matcher.group(CUSTOM_DELIMITER_NUMBERS_NO).split(customDelimiter);
+            NumberList numberList = NumberList.of(numberStringArray);
+            return numberList.sum();
         }
-
-        String[] numbers = input.split(COMMA_OR_COLON);
-        return sumStringArray(numbers);
+        NumberList numberList = NumberList.of(input.split(COMMA_OR_COLON));
+        return numberList.sum();
     }
-
-    private int sumStringArray(String[] numbers) {
-        if (numbers.length == 1) {
-            Number number = convertNumber(numbers[0]);
-            return number.getValue();
-        }
-
-        return Arrays.stream(numbers)
-                .map(this::convertNumber)
-                .mapToInt(Number::getValue)
-                .sum();
-    }
-
-    private Number convertNumber(String number) {
-        try {
-            return Number.of(Integer.parseInt(number));
-        } catch (Exception e) {
-            throw e;
-        }
-    }
-
 
 }
