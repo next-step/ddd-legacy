@@ -13,7 +13,7 @@ class StringCalculatorTest {
 
     @BeforeEach
     void setUp() {
-        calculator = new StringCalculator();
+        calculator = new StringCalculator(new OperandParser());
     }
 
     @Test
