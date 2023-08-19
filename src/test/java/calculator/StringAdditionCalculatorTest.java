@@ -61,4 +61,11 @@ class StringAdditionCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> calculator.add("-1"));
     }
+
+    @DisplayName(value = "문자열이 숫자가 아닌 경우 RuntimeException 예외 처리를 한다.")
+    @Test
+    void integer_type_test() {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> calculator.add("A"));
+    }
 }
