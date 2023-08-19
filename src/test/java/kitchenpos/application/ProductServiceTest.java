@@ -149,7 +149,7 @@ class ProductServiceTest extends ApplicationTest {
             Product product2 = ProductFixture.create(BigDecimal.valueOf(1000));
             Menu menu = MenuFixture.create(
                     BigDecimal.valueOf(2000)
-                    , MenuProductFixture.createDefaulsWithProduct(product1, product2));
+                    , MenuProductFixture.createDefaultsWithProduct(product1, product2));
 
             when(productRepository.findById(product1.getId())).thenReturn(Optional.of(product1));
             when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));

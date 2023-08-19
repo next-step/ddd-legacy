@@ -11,7 +11,7 @@ import java.util.UUID;
 public class MenuFixture {
 
     private static final String DEFAULT_NAME = "기본메뉴";
-    private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(1000);
+    private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(10000);
 
     public static Menu create(String name, BigDecimal price, boolean displayed, MenuGroup menuGroup, List<MenuProduct> menuProducts){
         Menu menu = new Menu();
@@ -20,6 +20,7 @@ public class MenuFixture {
         menu.setPrice(price);
         menu.setDisplayed(displayed);
         menu.setMenuGroup(menuGroup);
+        menu.setMenuGroupId(menuGroup.getId());
         menu.setMenuProducts(menuProducts);
         return menu;
     }
@@ -31,6 +32,26 @@ public class MenuFixture {
                 , true
                 , MenuGroupFixture.createDefault()
                 , products
+        );
+    }
+
+    public static Menu create(String name, List<MenuProduct> products){
+        return create(
+                name
+                , DEFAULT_PRICE
+                , true
+                , MenuGroupFixture.createDefault()
+                , products
+        );
+    }
+
+    public static Menu createDefaultWithName(String name){
+        return create(
+                name
+                , DEFAULT_PRICE
+                , true
+                , MenuGroupFixture.createDefault()
+                , MenuProductFixture.createDefaults()
         );
     }
 }

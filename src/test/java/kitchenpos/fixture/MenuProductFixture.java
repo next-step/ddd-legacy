@@ -15,7 +15,7 @@ public class MenuProductFixture {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setProduct(product);
         menuProduct.setQuantity(quantity);
-        menuProduct.setProductId(UUID.randomUUID());
+        menuProduct.setProductId(product.getId());
         return menuProduct;
     }
 
@@ -25,7 +25,7 @@ public class MenuProductFixture {
                 .map(MenuProductFixture::createDefaultWithPrice)
                 .collect(Collectors.toList());
     }
-    public static List<MenuProduct> createDefaulsWithProduct(Product... products) {
+    public static List<MenuProduct> createDefaultsWithProduct(Product... products) {
         return Arrays.asList(products)
                 .stream()
                 .map(MenuProductFixture::createDefaultWithProduct)
@@ -38,4 +38,10 @@ public class MenuProductFixture {
         return create(product, DEFAULT_QUANTITY);
     }
 
+    public static List<MenuProduct> createDefaults() {
+        return createDefaultsWithProduct(
+                ProductFixture.createDefault(),
+                ProductFixture.createDefault()
+        );
+    }
 }
