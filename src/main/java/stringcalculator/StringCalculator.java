@@ -11,7 +11,6 @@ public class StringCalculator {
     private static final String COMMA_OR_COLON = ",|:";
     private static final int CUSTOM_DELIMITER_NO = 1;
     private static final int CUSTOM_DELIMITER_NUMBERS_NO = 2;
-    private static final int MIN_NUMBER_VALUE = 0;
 
 
     public int calculate(String input) {
@@ -32,27 +31,23 @@ public class StringCalculator {
 
     private int sumStringArray(String[] numbers) {
         if (numbers.length == 1) {
-            return convertNumber(numbers[0]);
+            Number number = convertNumber(numbers[0]);
+            return number.getValue();
         }
 
         return Arrays.stream(numbers)
-                .mapToInt(this::convertNumber)
+                .map(this::convertNumber)
+                .mapToInt(Number::getValue)
                 .sum();
     }
 
-    private int convertNumber(String number) {
+    private Number convertNumber(String number) {
         try {
-            int result = Integer.parseInt(number);
-            validate(result);
-            return result;
+            return Number.of(Integer.parseInt(number));
         } catch (Exception e) {
             throw e;
         }
     }
 
-    private void validate(int number) {
-        if (number < MIN_NUMBER_VALUE) {
-            throw new RuntimeException("음수를 입력할 수 없습니다.");
-        }
-    }
+
 }
