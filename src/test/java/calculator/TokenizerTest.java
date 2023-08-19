@@ -11,11 +11,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class TokenizerTest {
 
-    private TokenizerUtils tokenizerUtilsImpl;
+    private TokenizePolicy tokenizePolicyImpl;
 
     @BeforeEach
     public void init() {
-        tokenizerUtilsImpl = new TokenizerUtilsImpl();
+        tokenizePolicyImpl = new TokenizePolicyImpl();
     }
 
     @DisplayName(",를 통해 분리를 할수 있어야 한다")
@@ -24,7 +24,7 @@ public class TokenizerTest {
     void test1(String input, String[] expect) {
 
         //when
-        String[] result = tokenizerUtilsImpl.parse(input);
+        String[] result = tokenizePolicyImpl.parse(input);
 
         //then
         assertThat(result).containsExactly(expect);
@@ -44,7 +44,7 @@ public class TokenizerTest {
     void test2(String input, String[] expect) {
 
         //when
-        String[] result = tokenizerUtilsImpl.parse(input);
+        String[] result = tokenizePolicyImpl.parse(input);
 
         //then
         assertThat(result).containsExactly(expect);
@@ -64,7 +64,7 @@ public class TokenizerTest {
     void test3(String input, String[] expect) {
 
         //when
-        String[] result = tokenizerUtilsImpl.parse(input);
+        String[] result = tokenizePolicyImpl.parse(input);
 
         //then
         assertThat(result).containsExactly(expect);
@@ -84,7 +84,7 @@ public class TokenizerTest {
     void test4(String input, String[] expect) {
 
         //when
-        String[] result = tokenizerUtilsImpl.parse(input);
+        String[] result = tokenizePolicyImpl.parse(input);
 
         //then
         assertThat(result).containsExactly(expect);

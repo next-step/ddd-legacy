@@ -1,6 +1,6 @@
 package calculator;
 
-public interface NumberParseUtils {
+public interface NumberParsePolicy {
 
     int[] parse(String[] src);
 }

@@ -17,7 +17,7 @@ class CalculatorTest {
 
     @BeforeEach
     public void init() {
-        calculator = new Calculator(new NumberParseUtilsImpl(), new TokenizerUtilsImpl());
+        calculator = new Calculator(new NumberParsePolicyImpl(), new TokenizePolicyImpl());
     }
 
     @DisplayName("각 구분자에 의해 분리된 숫자를 더한 결과를 얻을수 있어야 한다.")

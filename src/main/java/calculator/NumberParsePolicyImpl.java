@@ -2,7 +2,7 @@ package calculator;
 
 import java.util.stream.Stream;
 
-public class NumberParseUtilsImpl implements NumberParseUtils {
+public class NumberParsePolicyImpl implements NumberParsePolicy {
 
 
     @Override

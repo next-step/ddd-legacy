@@ -3,7 +3,7 @@ package calculator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TokenizerUtilsImpl implements TokenizerUtils {
+public class TokenizePolicyImpl implements TokenizePolicy {
 
     private static final Pattern CUSTOM_SEPERATOR_PATTERN = Pattern.compile("//(.*)\\n(.*)");
     private static final String DEFAULT_SEPERATOR = "[,:]";

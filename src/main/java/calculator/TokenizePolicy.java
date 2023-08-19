@@ -1,6 +1,6 @@
 package calculator;
 
-public interface TokenizerUtils {
+public interface TokenizePolicy {
 
     String[] parse(String input);
 }
