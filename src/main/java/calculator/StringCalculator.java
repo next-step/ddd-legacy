@@ -13,7 +13,7 @@ public class StringCalculator {
         if (isEmpty(text)) {return DEFAULT_OUTPUT;}
         String[] tokens = parser.findTokens(text);
 
-        return new TokenSum(tokens).getSum();
+        return new NumberTokens(tokens).generateSum();
     }
 
     private boolean isEmpty(String text) {

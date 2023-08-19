@@ -1,13 +1,13 @@
 package calculator;
 
-public class TokenSum {
-    private final int sum;
+public class NumberTokens {
+    private final String[] tokens;
 
-    TokenSum(String[] tokens) {
-        sum = generateSum(tokens);
+    NumberTokens(String[] tokens) {
+        this.tokens = tokens;
     }
 
-    private int generateSum(String[] tokens) {
+    public int generateSum() {
         int sum = 0;
         for (String token : tokens) {
             int num = Integer.parseInt(token);
@@ -21,9 +21,5 @@ public class TokenSum {
         if (num < 0) {
             throw new RuntimeException();
         }
-    }
-
-    public int getSum() {
-        return sum;
     }
 }
