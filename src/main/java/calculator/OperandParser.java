@@ -1,5 +1,7 @@
 package calculator;
 
+import io.micrometer.core.instrument.util.StringUtils;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -35,6 +37,7 @@ public class OperandParser {
 
     private Operands toList(String[] tokens) {
         List<Operand> operands = Arrays.stream(tokens)
+                .filter(token -> !StringUtils.isEmpty(token))
                 .mapToInt(Integer::parseInt)
                 .boxed()
                 .map(Operand::valueOf)
