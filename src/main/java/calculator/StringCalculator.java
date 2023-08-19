@@ -9,36 +9,21 @@ public class StringCalculator {
     private static final int CUSTOM_DELIMITER_INDEX = 1;
     private static final int STRING_TO_SPLIT_INDEX = 2;
     private static final int DEFAULT_OUTPUT = 0;
-    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(CUSTOM_DELIMITER_REGEX);
+    private static final Pattern CUSTOM_DELIMITER_PATTREN = Pattern.compile(CUSTOM_DELIMITER_REGEX);
 
 
     public int add(final String text) {
         if (isEmpty(text)) {return DEFAULT_OUTPUT;}
 
-        String[] tokens = findTokens(text);
-        int sum = 0;
-
-        for (String token : tokens) {
-            int num = Integer.parseInt(token);
-            validate(num);
-            sum += num;
-        }
-
-        return sum;
+        return new TokenSum(findTokens(text)).getSum();
     }
 
     private boolean isEmpty(String text) {
         return text == null || text.isEmpty();
     }
 
-    private void validate(final int num) {
-        if (num < 0) {
-            throw new RuntimeException();
-        }
-    }
-
     private String[] findTokens(final String text) {
-        Matcher m = CUSTOM_DELIMITER_PATTERN.matcher(text);
+        Matcher m = CUSTOM_DELIMITER_PATTREN.matcher(text);
         if (m.find()) {
             String customDelimiter = m.group(CUSTOM_DELIMITER_INDEX);
             return m.group(STRING_TO_SPLIT_INDEX).split(customDelimiter);
