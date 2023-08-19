@@ -3,14 +3,13 @@ package calculator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class DefaultRefinerTest {
 
@@ -32,20 +31,15 @@ class DefaultRefinerTest {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
-
-    @DisplayName("soucre가 //;\n로 시작하면서 문자와 ; 이루어져 있으면 분할되어 문자 리스트를 반환한다.")
-    @Test
-    void execute_custom2_whitebox() {
-        // given
-        final String delimiter = ";";
-        final List<String> dummy = Arrays.asList("1", "b", "A");
-        final String inputText = createCustomText(delimiter, dummy);
-
+    @DisplayName("soucre가 //;\n로 시작하면서 문자와 ; 이루어져 있으면 분할되어 Numbers를 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = "//;\n1;3")
+    void execute_custom(final String given) {
         // when
-        final List<String> actual = refiner.execute(inputText);
+        final Numbers actual = refiner.execute(given);
 
         // then
-        final List<String> expected = ImmutableList.copyOf(dummy);
+        final Numbers expected = create(new Number(1), new Number(3));
         assertThat(actual)
             .usingRecursiveComparison()
             .isEqualTo(expected);
@@ -54,27 +48,23 @@ class DefaultRefinerTest {
     private String createCustomText(final String delimiter, final List<String> characters) {
         return String.format("//%s\n%s", delimiter, String.join(delimiter, characters));
     }
-    
-    @DisplayName("전략에 맞는 값을 반환한다.")
-    @Test
-    void execute_blackbox() {
-        // given
-        final String given1 = "B:1,6,K";
-        final String given2 = "//;\nA;C;3";
 
+    @DisplayName("source가 //;\n로 시작하지 않으면 기본 구분자로 분할되어 Numbers를 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = "1:-1,6")
+    void execute_default(final String given) {
         // when
-        final List<String> actual1 = refiner.execute(given1);
-        final List<String> actual2 = refiner.execute(given2);
+        final Numbers actual = refiner.execute(given);
 
         // then
-        final List<String> expected1 = Arrays.asList("B", "1", "6", "K");
-        final List<String> expected2 = Arrays.asList("A", "C", "3");
+        final Numbers expected = create(new Number(1), new Number(-1), new Number(6));
 
-        assertThat(actual1)
+        assertThat(actual)
             .usingRecursiveComparison()
-            .isEqualTo(expected1);
-        assertThat(actual2)
-            .usingRecursiveComparison()
-            .isEqualTo(expected2);
+            .isEqualTo(expected);
+    }
+
+    private Numbers create(final Number... numbers) {
+        return new Numbers(Arrays.asList(numbers));
     }
 }

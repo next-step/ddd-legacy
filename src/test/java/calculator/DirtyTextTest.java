@@ -57,39 +57,6 @@ class DirtyTextTest {
         assertThat(dirtyText.isEmpty()).isFalse();
     }
 
-    @DisplayName("유효하지 않은 파라미터를 전달한 경우 예외를 발생시킨다")
-    @ParameterizedTest
-    @NullSource
-    void isPositiveNumeric_parameter(final String value) {
-        // given
-        final DirtyText dirtyText = create(value);
-
-        // when & then
-        assertThatThrownBy(dirtyText::isPositiveNumeric)
-            .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @DisplayName("value가 양수면 true를 반환한다")
-    @ParameterizedTest
-    @ValueSource(strings = {"1"})
-    void isPositiveNumeric_positive(final String value) {
-        // given
-        final DirtyText dirtyText = create(value);
-
-        // when & then
-        assertThat(dirtyText.isPositiveNumeric()).isTrue();
-    }
-
-    @DisplayName("value가 0이거나 음수면 false를 반환한다")
-    @ParameterizedTest
-    @ValueSource(strings = {"0", "-1"})
-    void isPositiveNumeric_zero_negative(final String value) {
-        // given
-        final DirtyText dirtyText = create(value);
-
-        // when & then
-        assertThat(dirtyText.isPositiveNumeric()).isFalse();
-    }
 
     @DisplayName("유효하지 않은 파라미터를 전달한 경우 예외를 발생시킨다")
     @ParameterizedTest
