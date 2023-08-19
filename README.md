@@ -62,6 +62,7 @@ docker compose -p kitchenpos up -d
 | --- | --- | --- |
 
 ## 모델링
+![modeling drawio](https://github.com/next-step/ddd-legacy/assets/58926619/59ef3f82-8699-4401-a4d6-cd737515ade2)
 
 
 # 🚀 1단계 - 문자열 덧셈 계산기
