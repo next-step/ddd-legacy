@@ -135,6 +135,11 @@ class ProductServiceTest extends ApplicationTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
+        /**
+         * given 상품 2개를 모은 메뉴를 만든다
+         * when 상품 1개의 가격을 올린다.
+         * then 메뉴가 숨겨진다.
+         */
         @DisplayName("[성공] 상품 가격을 바꿀 때 메뉴가격이 구성상품 가격의 합보다 작으면 숨긴다. ")
         @Test
         void price_change_test_3() {
