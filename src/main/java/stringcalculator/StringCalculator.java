@@ -38,7 +38,7 @@ public class StringCalculator {
     private int sumByCustomDelimiter(String input) {
         Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
         if (matcher.find()) {
-            String customDelimiter = matcher.group(CUSTOM_DELIMITER.group());
+            String customDelimiter = Pattern.quote(matcher.group(CUSTOM_DELIMITER.group())); // 정규식에서 사용되는 특수문자를 문자열로 인식하도록 처리
             String[] tokens = matcher.group(NUMBERS.group()).split(customDelimiter);
             return sumTokens(tokens);
         }
