@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static stringcalculator.CustomDelimiterGroup.CUSTOM_DELIMITER;
+import static stringcalculator.CustomDelimiterGroup.NUMBERS;
+
 public class StringCalculator {
     private static final String DEFAULT_DELIMITERS = "[,:]";
     private static final String CUSTOM_DELIMITER_PREFIX = "//";
@@ -35,8 +38,8 @@ public class StringCalculator {
     private int sumByCustomDelimiter(String input) {
         Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
         if (matcher.find()) {
-            String customDelimiter = matcher.group(1);
-            String[] tokens = matcher.group(2).split(customDelimiter);
+            String customDelimiter = matcher.group(CUSTOM_DELIMITER.group());
+            String[] tokens = matcher.group(NUMBERS.group()).split(customDelimiter);
             return sumTokens(tokens);
         }
         return 0;
