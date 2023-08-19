@@ -1,16 +1,16 @@
 package calculator.vo;
 
-import calculator.DivideCondition;
+import calculator.SplitCondition;
 
 public class Sum {
-    private final DivideCondition condition;
+    private final SplitCondition condition;
 
-    public Sum(DivideCondition condition) {
+    public Sum(SplitCondition condition) {
         this.condition = condition;
     }
 
     public int run(String value) {
-        return new Integers(this.condition.divide(value)).getIntegers().stream()
+        return new Integers(this.condition.split(value)).getIntegers().stream()
                 .reduce(0, Integer::sum);
     }
 }
