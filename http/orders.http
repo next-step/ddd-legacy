@@ -1,19 +1,21 @@
+
+
 ###
 POST {{host}}/api/orders
 Content-Type: application/json
 
 {
-  "type": "EAT_IN",
-  "orderTableId": "8d710043-29b6-420e-8452-233f5a035520",
+  "type": "DELIVERY",
+  "deliveryAddress" : "seoul",
   "orderLineItems": [
     {
       "menuId": "f59b1e1c-b145-440a-aa6f-6095a0e2d63b",
       "price": 16000,
-      "quantity": 3
+      "quantity": 1
     }
   ]
 }
-
+#### DELIVERY
 ###
 PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/accept
 
@@ -28,6 +30,39 @@ PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/complete-delivery
 
 ###
 PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/complete
+
+###
+GET {{host}}/api/orders
+
+
+##### EAT_IN
+###
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{
+  "type": "EAT_IN",
+  "orderTableId": "8d710043-29b6-420e-8452-233f5a035520",
+  "orderLineItems": [
+    {
+      "menuId": "f59b1e1c-b145-440a-aa6f-6095a0e2d63b",
+      "price": 16000,
+      "quantity": -1
+    }
+  ]
+}
+
+###
+PUT {{host}}/api/orders/79cd4fe3-3d3c-4afa-a93d-9eeca9f77978/accept
+
+###
+PUT {{host}}/api/orders/79cd4fe3-3d3c-4afa-a93d-9eeca9f77978/serve
+
+###
+PUT {{host}}/api/orders/79cd4fe3-3d3c-4afa-a93d-9eeca9f77978/complete
+
+###
+PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/clear
 
 ###
 GET {{host}}/api/orders
