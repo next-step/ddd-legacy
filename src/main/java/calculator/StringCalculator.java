@@ -9,12 +9,8 @@ public class StringCalculator {
     private static final int CUSTOM_DELIMITER_INDEX = 1;
     private static final int STRING_TO_SPLIT_INDEX = 2;
     private static final int DEFAULT_OUTPUT = 0;
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(CUSTOM_DELIMITER_REGEX);
 
-    private final Pattern customDelemiterPattern;
-
-    public StringCalculator() {
-        customDelemiterPattern = Pattern.compile(CUSTOM_DELIMITER_REGEX);
-    }
 
     public int add(final String text) {
         if (isEmpty(text)) {return DEFAULT_OUTPUT;}
@@ -42,7 +38,7 @@ public class StringCalculator {
     }
 
     private String[] findTokens(final String text) {
-        Matcher m = customDelemiterPattern.matcher(text);
+        Matcher m = CUSTOM_DELIMITER_PATTERN.matcher(text);
         if (m.find()) {
             String customDelimiter = m.group(CUSTOM_DELIMITER_INDEX);
             return m.group(STRING_TO_SPLIT_INDEX).split(customDelimiter);
