@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class StringCalculatorTest {
     private StringCalculator calculator;
@@ -22,12 +23,12 @@ public class StringCalculatorTest {
         assertThat(calculator.add(text)).isZero();
     }
 
-//    @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
-//    @ParameterizedTest
-//    @ValueSource(strings = {"1"})
-//    void oneNumber(final String text) {
-//        assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
-//    }
+    @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"1"})
+    void oneNumber(final String text) {
+        assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
+    }
 //
 //    @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
 //    @ParameterizedTest
