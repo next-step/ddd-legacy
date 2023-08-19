@@ -1,75 +1,46 @@
 package calculator;
 
-import static calculator.ValidateUtils.checkNotEmpty;
 import static calculator.ValidateUtils.checkNotNull;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
+import java.util.List;
 import org.springframework.lang.Nullable;
 
 public class StringCalculator {
-
-    private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     public StringCalculator() {
     }
 
     public int add(@Nullable final String text) {
-        if (isEmpty(text)) {
+        final DirtyText dirtyText = new DirtyText(text);
+
+        if (dirtyText.isEmpty()) {
             return 0;
         }
 
-        if (isPositiveNumeric(text)) {
-            return Integer.parseInt(text);
+        if (dirtyText.isPositiveNumeric()) {
+            return Integer.parseInt(dirtyText.getValue()
+                .orElseThrow(() -> new IllegalStateException("dirtyText value is null")));
         }
 
-        final String[] tokens = parse(text);
+        final List<String> refinedTokens = dirtyText.refine();
 
-        checkHasNegativeInt(tokens);
+        checkHasNegativeInt(refinedTokens);
 
-        return sum(tokens);
+        return sum(refinedTokens);
     }
 
-
-    private boolean isEmpty(@Nullable final String text) {
-        return StringUtils.isEmpty(text);
-    }
-
-    private boolean isPositiveNumeric(final String text) {
-        checkNotEmpty(text, "text");
-
-        try {
-            return 0 < Integer.parseInt(text);
-        } catch (final NumberFormatException e) {
-            return false;
-        }
-    }
-
-
-    private String[] parse(final String rawText) {
-        checkNotEmpty(rawText, "rawText");
-
-        final Matcher matcher = CUSTOM_PATTERN.matcher(rawText);
-        if (matcher.find()) {
-            final String customDelimiter = matcher.group(1);
-            return matcher.group(2).split(customDelimiter);
-        }
-
-        return rawText.split(",|:");
-    }
-
-    private void checkHasNegativeInt(final String[] tokens) {
+    private void checkHasNegativeInt(final List<String> tokens) {
         checkNotNull(tokens, "tokens");
 
         for (final String token : tokens) {
             if (Integer.parseInt(token) < 0) {
-                throw new RuntimeException();
+                throw new RuntimeException(
+                    String.format("tokens have negative int. tokens: %s", tokens));
             }
         }
     }
 
-    private int sum(final String[] tokens) {
+    private int sum(final List<String> tokens) {
         checkNotNull(tokens, "tokens");
 
         int total = 0;
