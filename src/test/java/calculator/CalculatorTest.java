@@ -2,6 +2,7 @@ package calculator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -58,9 +59,9 @@ public class CalculatorTest {
 
     @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @ParameterizedTest
-    @ValueSource(strings = {"-1", "1,2:-3", "//;\n1;-2;3"})
-    void 음수테스트() {
-        assertThatThrownBy(() -> calculator.calculate("-1"))
+    @ValueSource(strings = {"-1", "1,-2", "1,2:-3", "//;\n1;-2;3"})
+    void 음수테스트(final String input) {
+        assertThatThrownBy(() -> calculator.calculate(input))
                 .isInstanceOf(RuntimeException.class);
     }
 

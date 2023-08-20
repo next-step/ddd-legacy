@@ -4,12 +4,11 @@ import java.util.Arrays;
 
 public class SplitCalculatorPolicy implements CalculatorPolicy {
 
-    private static final String PATTERN = "[0-9,:]+";
     private static final String SEPARATOR = ",|:";
 
     @Override
     public boolean isSupport(String text) {
-        return text.matches(PATTERN);
+        return text.contains(",") || text.contains(":");
     }
 
     @Override

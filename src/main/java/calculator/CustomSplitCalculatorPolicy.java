@@ -8,7 +8,7 @@ public class CustomSplitCalculatorPolicy implements CalculatorPolicy {
 
     private static final Pattern PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final int DELIMITER_INDEX = 1;
-    private static final int NUMBER_INDEX = 1;
+    private static final int NUMBER_INDEX = 2;
     private Matcher matcher;
 
     @Override
