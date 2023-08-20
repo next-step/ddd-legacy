@@ -16,7 +16,7 @@ public class StringCalculator {
         }
 
         return Arrays.stream(extractNumbersUsingDelimiter(text))
-            .mapToInt(Integer::parseInt)
+            .mapToInt(this::parsePositiveInt)
             .sum();
     }
 
@@ -31,6 +31,14 @@ public class StringCalculator {
 
     private boolean hasCustomDelimiter(Matcher m) {
         return m.find();
+    }
+
+    private int parsePositiveInt(String text) {
+        int textToInt = Integer.parseInt(text);
+        if (textToInt < 0) {
+            throw new IllegalArgumentException("음수는 입력할 수 없습니다.");
+        }
+        return textToInt;
     }
 
 }
