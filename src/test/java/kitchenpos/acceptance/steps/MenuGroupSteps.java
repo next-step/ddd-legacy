@@ -14,6 +14,7 @@ import java.util.UUID;
 
 public class MenuGroupSteps {
 
+    private static final String URI = "/api/menu-groups";
     public static ExtractableResponse<Response> 메뉴그룹_생성(String name) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
@@ -21,14 +22,14 @@ public class MenuGroupSteps {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
-                .when().post("/api/menu-groups/")
+                .when().post(URI)
                 .then().log().all().extract();
     }
 
     public static ExtractableResponse<Response> 메뉴그룹_전체_조회() {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().get("/api/menu-groups")
+                .when().get(URI)
                 .then().log().all().extract();
     }
 }
