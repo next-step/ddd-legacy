@@ -17,7 +17,7 @@ public class StringCalculator {
             return 0;
         }
 
-        if (NumberUtil.isNumber(text) && Integer.parseInt(text) > 0) {
+        if (isNumber(text) && Integer.parseInt(text) > 0) {
             return Integer.parseInt(text);
         }
 
@@ -35,7 +35,7 @@ public class StringCalculator {
 
     private void validateNumFormat(final List<String> nums) {
         for (String num : nums) {
-            if (!NumberUtil.isNumber(num) || Integer.parseInt(num) < 0) {
+            if (!isNumber(num) || Integer.parseInt(num) < 0) {
                 throw new IllegalArgumentException("숫자는 숫자 이외의 값 또는 음수를 전달할 수 없습니다.");
             }
         }
@@ -55,5 +55,14 @@ public class StringCalculator {
         }
         int endDelimiterIdx = text.indexOf(CUSTOM_DELIMITER_END);
         return text.substring(endDelimiterIdx + 1);
+    }
+
+    private boolean isNumber(String str) {
+        try {
+            Integer.parseInt(str);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 }
