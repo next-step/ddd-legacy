@@ -9,7 +9,8 @@ public class StringCalculator {
     private static final String regex = "[,|:]";
     private static final int ZERO = 0;
     private static final int ONE_LENGTH = 1;
-    private static final int TWO = 2;
+    private static final int CUSTOM_DELIMITER_CHARACTER = 1;
+    private static final int STRING_WITH_CUSTOM_DELIMITER = 2;
 
     private int result;
 
@@ -25,18 +26,18 @@ public class StringCalculator {
 
         String[] tokens = text.split(regex);
         if (tokens.length == ONE_LENGTH) {
-            return verifyLengthOne(tokens);
+            return parseOneValue(tokens);
         }
         return parseAdd(tokens);
     }
 
     private int addByUniquePattern(Matcher m) {
-        String customDelimiter = m.group(ONE_LENGTH);
-        String [] tokens = m.group(TWO).split(customDelimiter);
+        String customDelimiter = m.group(CUSTOM_DELIMITER_CHARACTER);
+        String [] tokens = m.group(STRING_WITH_CUSTOM_DELIMITER).split(customDelimiter);
         return parseAdd(tokens);
     }
 
-    private int verifyLengthOne(String[] token) {
+    private int parseOneValue(String[] token) {
         int value = Integer.parseInt(token[ZERO]);
         validateMinus(value);
         return value;
