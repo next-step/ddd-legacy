@@ -3,6 +3,7 @@ package stringCalculator;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,14 @@ class StringCalculatorTest {
     @ValueSource(strings = {"1"})
     void oneNumber(final String text) {
         assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
+    }
+
+    @DisplayName(value = "숫자가 아닌 하나의 문자열로 입력할 경우 해당 RunitmeException 예외를 throw 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"a", "ㄱ", "A", ",", ";"})
+    void oneIsNotNumber(final String text) {
+        Assertions.assertThatThrownBy(() -> calculator.add(text))
+            .isInstanceOf(RuntimeException.class);
     }
 
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
