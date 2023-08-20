@@ -42,7 +42,7 @@ class ProductServiceTest extends ApplicationTest {
 
     @DisplayName("이름")
     @Nested
-    class name {
+    class Name {
         @DisplayName("[예외] 상품의 이름은 공백일 수 없다.")
         @ParameterizedTest
         @NullSource
@@ -70,7 +70,7 @@ class ProductServiceTest extends ApplicationTest {
 
     @DisplayName("가격")
     @Nested
-    class price {
+    class Price {
         @DisplayName("[예외] 상품의 가격은 공백일 수 없다.")
         @ParameterizedTest
         @NullSource
@@ -110,10 +110,10 @@ class ProductServiceTest extends ApplicationTest {
 
     @DisplayName("가격 바꾸기")
     @Nested
-    class price_change {
+    class PriceChange {
         @DisplayName("[성공] 상품 가격을 바꾼다.")
         @Test
-        void price_change_test_1() {
+        void priceChange_test_1() {
             //given
             Product product = ProductFixture.create("떡볶이", BigDecimal.valueOf(1000));
             when(productRepository.findById(any())).thenReturn(Optional.of(product));
@@ -126,7 +126,7 @@ class ProductServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 상품 가격은 0원 이상이어야 한다.")
         @Test
-        void price_change_test_2() {
+        void priceChange_test_2() {
             //given
             Product product = ProductFixture.create("떡볶이", BigDecimal.valueOf(1000));
             //when
@@ -143,7 +143,7 @@ class ProductServiceTest extends ApplicationTest {
          */
         @DisplayName("[성공] 상품 가격을 바꿀 때 메뉴가격이 구성상품 가격의 합보다 작으면 숨긴다. ")
         @Test
-        void price_change_test_3() {
+        void priceChange_test_e() {
             //given
             Product product1 = ProductFixture.create(BigDecimal.valueOf(1000));
             Product product2 = ProductFixture.create(BigDecimal.valueOf(1000));

@@ -56,7 +56,7 @@ class MenuServiceTest extends ApplicationTest {
 
     @Nested
     @DisplayName("이름")
-    class name {
+    class Name {
         @DisplayName("[예외] 메뉴 이름은 공백일 수 없다")
         @ParameterizedTest
         @NullSource
@@ -100,7 +100,7 @@ class MenuServiceTest extends ApplicationTest {
 
     @Nested
     @DisplayName("등록")
-    class create {
+    class Create {
         @DisplayName("[성공] 메뉴를 등록한다.")
         @Test
         void create_test_1() {
@@ -210,7 +210,7 @@ class MenuServiceTest extends ApplicationTest {
 
     @Nested
     @DisplayName("보이기")
-    class display {
+    class Display {
         @DisplayName("[성공] 메뉴를 보인다.")
         @Test
         void display_test_1() {
@@ -263,7 +263,7 @@ class MenuServiceTest extends ApplicationTest {
 
     @Nested
     @DisplayName("숨기기")
-    class hide {
+    class Hide {
         @DisplayName("[성공] 메뉴를 숨긴다.")
         @Test
         void hide_test_1() {
@@ -298,7 +298,7 @@ class MenuServiceTest extends ApplicationTest {
 
     @Nested
     @DisplayName("가격 바꾸기")
-    class changePrice {
+    class ChangePrice {
         @DisplayName("[성공] 가격을 바꾼다.")
         @Test
         void changPrice_test_1() {
