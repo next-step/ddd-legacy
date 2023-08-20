@@ -1,5 +1,6 @@
 package calculator;
 
+import java.util.Collections;
 import java.util.List;
 
 public class PositiveNumbers {
@@ -18,6 +19,10 @@ public class PositiveNumbers {
         return numbers.stream()
                 .mapToInt(PositiveNumber::value)
                 .sum();
+    }
+
+    public List<PositiveNumber> unmodifiableNumbers() {
+        return Collections.unmodifiableList(numbers);
     }
 
 }
