@@ -3,19 +3,17 @@ package calculator;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 
-public final class Number {
+public final class PositiveNumber {
 
     private final int value;
 
-    public Number(final int value) {
-        this.value = value;
-    }
-    
-    public void checkIsNegative() {
+    public PositiveNumber(final int value) {
         if (value < 0) {
             throw new RuntimeException(
                 String.format("it is negative value: %s", value));
         }
+        
+        this.value = value;
     }
 
     public int getValue() {
@@ -30,7 +28,7 @@ public final class Number {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final Number number = (Number) o;
+        final PositiveNumber number = (PositiveNumber) o;
         return value == number.value;
     }
 

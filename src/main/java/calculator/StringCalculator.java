@@ -17,9 +17,7 @@ public class StringCalculator {
             return 0;
         }
 
-        final Numbers numbers = dirtyText.refine();
-
-        numbers.checkHasNegativeInt();
+        final PositiveNumbers numbers = dirtyText.refine();
 
         return numbers.sum();
     }

@@ -1,9 +1,9 @@
 package calculator;
 
-import static calculator.ValidateUtils.checkEmpty;
-import static calculator.ValidateUtils.checkNotNull;
+import static calculator.ParameterValidateUtils.checkNotNull;
 
 import javax.annotation.Nullable;
+import org.apache.commons.lang3.StringUtils;
 
 public final class DirtyText {
 
@@ -17,21 +17,13 @@ public final class DirtyText {
     }
 
     public boolean isEmpty() {
-        try {
-            checkEmpty(value, "value");
-
-            return true;
-        } catch (final IllegalArgumentException ignored) {
-            return false;
-        }
+        return StringUtils.isEmpty(value);
     }
 
     /**
      * @throws IllegalArgumentException {@link #value}가 null일 때
      */
-    public Numbers refine() {
-        checkNotNull(value, "value");
-
+    public PositiveNumbers refine() {
         return refiner.execute(value);
     }
 }

@@ -36,10 +36,10 @@ class DefaultRefinerTest {
     @ValueSource(strings = "//;\n1;3")
     void execute_custom(final String given) {
         // when
-        final Numbers actual = refiner.execute(given);
+        final PositiveNumbers actual = refiner.execute(given);
 
         // then
-        final Numbers expected = create(new Number(1), new Number(3));
+        final PositiveNumbers expected = create(new PositiveNumber(1), new PositiveNumber(3));
         assertThat(actual)
             .usingRecursiveComparison()
             .isEqualTo(expected);
@@ -54,17 +54,18 @@ class DefaultRefinerTest {
     @ValueSource(strings = "1:-1,6")
     void execute_default(final String given) {
         // when
-        final Numbers actual = refiner.execute(given);
+        final PositiveNumbers actual = refiner.execute(given);
 
         // then
-        final Numbers expected = create(new Number(1), new Number(-1), new Number(6));
+        final PositiveNumbers expected = create(new PositiveNumber(1), new PositiveNumber(-1),
+            new PositiveNumber(6));
 
         assertThat(actual)
             .usingRecursiveComparison()
             .isEqualTo(expected);
     }
 
-    private Numbers create(final Number... numbers) {
-        return new Numbers(Arrays.asList(numbers));
+    private PositiveNumbers create(final PositiveNumber... numbers) {
+        return new PositiveNumbers(Arrays.asList(numbers));
     }
 }

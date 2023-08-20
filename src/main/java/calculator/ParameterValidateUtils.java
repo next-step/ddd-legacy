@@ -4,18 +4,11 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * 해당 클래스는 순수한 파라미터 검사를 위해 만들어진 클래스이므로, 비즈니스 종속적인 곳에서는 사용하면 안된다.
  */
-public final class ValidateUtils {
-
-    static String checkEmpty(final String value, final String name) {
-        checkArgument(StringUtils.isEmpty(value), "not empty %s", name);
-
-        return value;
-    }
+public final class ParameterValidateUtils {
 
     static <T> T checkNotNull(final T value, final String name) {
         checkArgument(value != null, "null %s", name);
@@ -30,7 +23,7 @@ public final class ValidateUtils {
         return collection;
     }
 
-    private ValidateUtils() {
+    private ParameterValidateUtils() {
         throw new UnsupportedOperationException();
     }
 }

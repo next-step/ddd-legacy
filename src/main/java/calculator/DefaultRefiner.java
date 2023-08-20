@@ -1,6 +1,6 @@
 package calculator;
 
-import static calculator.ValidateUtils.checkNotNull;
+import static calculator.ParameterValidateUtils.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import java.util.Arrays;
@@ -15,23 +15,23 @@ public class DefaultRefiner implements Refiner {
     private static final Pattern CUSTOM_PATTERN = Pattern.compile(CUSTOM_REGEX);
 
     @Override
-    public Numbers execute(final String text) {
+    public PositiveNumbers execute(final String text) {
         checkNotNull(text, "text");
 
         final Matcher matcher = CUSTOM_PATTERN.matcher(text);
         if (matcher.find()) {
             final String customDelimiter = matcher.group(1);
 
-            return new Numbers(
+            return new PositiveNumbers(
                 Arrays.stream(matcher.group(2)
                         .split(customDelimiter))
-                    .map(token -> new Number(Integer.parseInt(token)))
+                    .map(token -> new PositiveNumber(Integer.parseInt(token)))
                     .collect(ImmutableList.toImmutableList()));
         }
 
-        return new Numbers(
+        return new PositiveNumbers(
             Arrays.stream(text.split(DEFAULT_REGEX))
-                .map(token -> new Number(Integer.parseInt(token)))
+                .map(token -> new PositiveNumber(Integer.parseInt(token)))
                 .collect(ImmutableList.toImmutableList()));
     }
 }
