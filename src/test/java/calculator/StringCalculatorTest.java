@@ -17,7 +17,8 @@ class StringCalculatorTest {
 
     @BeforeEach
     void setUp(){
-        stringCalculator = new StringCalculator();
+        Parser parser = new Parser();
+        stringCalculator = new StringCalculator(parser);
     }
 
 

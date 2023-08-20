@@ -1,43 +1,39 @@
 package calculator;
 
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StringCalculator {
+
+    private final Parser parser;
+
+    public StringCalculator(Parser parser) {
+        this.parser = parser;
+    }
 
     public int add(String text) {
 
         final int ZERO = 0;
-        int result = 0;
 
         if (text == null || text.isEmpty()) {
             return ZERO;
         }
 
         if(isNumber(text)){
-            result = Integer.parseInt(text);
+            return Integer.parseInt(text);
         }
 
-        if (text.contains(",") | text.contains(":")) {
-            String[] split = text.split(",|:");
-            result= Arrays.stream(split).mapToInt(Integer::parseInt).sum();
-        }
-
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
-        if(m.find()){
-
-            String customerDelimiter = m.group(1);
-            String[] split = m.group(2).split(customerDelimiter);
-            result =  Arrays.stream(split).mapToInt(Integer::parseInt).sum();
-        }
-        return result;
+        String[] parse = parser.toNumbers(text);
+        return Arrays.stream(parse).mapToInt(Integer::parseInt).sum();
     }
 
+
     private boolean isNumber(String text) {
+
+        final int ZERO = 0;
+
         try {
             int parseInt = Integer.parseInt(text);
-            if (parseInt < 0) {
+            if (parseInt < ZERO) {
                 throw new RuntimeException();
             }
         } catch (NumberFormatException numberFormatException) {
