@@ -9,22 +9,15 @@ public class StringCalculator {
             return 0;
         }
         Delimiter delimiter = new Delimiter(input);
-        List<Number> numbers = delimiter.extractNumbers(input);
-        return numbers.stream()
-            .peek(this::throwIfNegative)
-            .reduce(Number::add)
-            .orElse(Number.zero())
+        List<PositiveNumber> positiveNumbers = delimiter.extractNumbers(input);
+        return positiveNumbers.stream()
+            .reduce(PositiveNumber::add)
+            .orElse(PositiveNumber.ZERO)
             .getValue();
     }
 
     private boolean isBlank(String input) {
         return input == null || input.isEmpty();
-    }
-
-    private void throwIfNegative(Number number) {
-        if (number.isNegative()) {
-            throw new RuntimeException("음수는 입력할 수 없습니다.");
-        }
     }
 
 }

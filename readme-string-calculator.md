@@ -12,7 +12,7 @@
 | 한글명     | 영문명               | 설명                                     |
 |---------|-------------------|----------------------------------------|
 | 구분자     | delimiter         | 문자열에 포함된 숫자를 구분 해주는 문자                 |
-| 숫자      | number            | 사용자가 입력한 숫자                            |
+| 숫자      | positiveNumber            | 사용자가 입력한 숫자                            |
 | 문자열 계산기 | string calculator | 사용자가 입력한 문자열에 포함된 숫자들의 합을 계산해주는 계산기 |
 
 
@@ -28,13 +28,13 @@
 2. 숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.(예 : “1”)
 
   ```
-   int number = Integer.parseInt(text);
+   int positiveNumber = Integer.parseInt(text);
   ```
 
 3. 숫자 두개를 컴마(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다. (예 : “1,2”)
 
   ```
-   String[] numbers = text.split(",");
+   String[] positiveNumbers = text.split(",");
   ```
 
 4. 구분자를 컴마(,) 이외에 콜론(:)을 사용할 수 있다. (예 : “1,2:3” => 6)

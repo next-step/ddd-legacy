@@ -24,11 +24,11 @@ public class Delimiter {
         return value;
     }
 
-    public List<Number> extractNumbers(final String text) {
+    public List<PositiveNumber> extractNumbers(final String text) {
         String numberText = extractNumberText(text);
         String[] tokens = numberText.split(value);
         return Arrays.stream(tokens)
-            .map(Number::new)
+            .map(PositiveNumber::new)
             .collect(Collectors.toList());
     }
 
