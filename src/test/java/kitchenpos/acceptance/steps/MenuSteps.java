@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class MenuSteps {
 
-    private static final String URI = "/api/menus/";
+    private static final String URI = "/api/menus";
 
     public static ExtractableResponse<Response> 메뉴_생성(String name, BigDecimal price, UUID menuGroupId, List<MenuProduct> products) {
         Map<String, Object> params = new HashMap<>();
@@ -37,21 +37,21 @@ public class MenuSteps {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
-                .when().put(URI+"{menuId}/price", menuId)
+                .when().put(URI+"/{menuId}/price", menuId)
                 .then().log().all().extract();
     }
 
     public static ExtractableResponse<Response> 메뉴_보이기(UUID menuId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(URI+"{menuId}/display", menuId)
+                .when().put(URI+"/{menuId}/display", menuId)
                 .then().log().all().extract();
     }
 
     public static ExtractableResponse<Response> 메뉴_숨기기(UUID menuId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .when().put(URI+"{menuId}/hide", menuId)
+                .when().put(URI+"/{menuId}/hide", menuId)
                 .then().log().all().extract();
     }
 
