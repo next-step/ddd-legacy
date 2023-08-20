@@ -5,6 +5,8 @@ import java.util.Arrays;
 public class StringCalculator {
 
     private final Parser parser;
+    private static final int ZERO = 0;
+
 
     public StringCalculator(Parser parser) {
         this.parser = parser;
@@ -12,13 +14,11 @@ public class StringCalculator {
 
     public int add(String text) {
 
-        final int ZERO = 0;
-
-        if (text == null || text.isEmpty()) {
+        if (isNullAndEmpty(text)) {
             return ZERO;
         }
 
-        if(isNumber(text)){
+        if (isNumber(text)) {
             return Integer.parseInt(text);
         }
 
@@ -27,19 +27,25 @@ public class StringCalculator {
     }
 
 
+    private boolean isNullAndEmpty(String text) {
+        return text == null || text.isEmpty();
+    }
+
+
     private boolean isNumber(String text) {
-
-        final int ZERO = 0;
-
         try {
             int parseInt = Integer.parseInt(text);
-            if (parseInt < ZERO) {
-                throw new RuntimeException();
-            }
+            isNegative(parseInt);
         } catch (NumberFormatException numberFormatException) {
             return false;
         }
         return true;
+    }
+
+    private void isNegative(int parseInt) {
+        if (parseInt < ZERO) {
+            throw new RuntimeException();
+        }
     }
 
 }
