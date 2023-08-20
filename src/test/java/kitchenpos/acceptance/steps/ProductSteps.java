@@ -12,6 +12,8 @@ import java.util.UUID;
 
 public class ProductSteps {
 
+    private static final String URI = "/api/products";
+
     public static ExtractableResponse<Response> 상품_생성(String name, BigDecimal price) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
@@ -20,7 +22,7 @@ public class ProductSteps {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
-                .when().post("/api/products/")
+                .when().post(URI)
                 .then().log().all().extract();
     }
 
@@ -31,7 +33,7 @@ public class ProductSteps {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
-                .when().put("/api/products/{productId}/price", productId)
+                .when().put(URI + "{productId}/price", productId)
                 .then().log().all().extract();
     }
 }
