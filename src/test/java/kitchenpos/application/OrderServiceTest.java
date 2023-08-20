@@ -587,7 +587,7 @@ class OrderServiceTest extends ApplicationTest {
         }
     }
 
-    @DisplayName("주문 전체 목록을 조회한다.")
+    @DisplayName("[성공] 주문 전체 목록을 조회한다.")
     @Test
     void findAll() {
         //given
