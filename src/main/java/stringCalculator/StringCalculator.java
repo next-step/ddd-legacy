@@ -13,7 +13,7 @@ public class StringCalculator {
             return Integer.parseInt(text);
         }
 
-        return Arrays.stream(text.split(","))
+        return Arrays.stream(text.split(",|:"))
             .mapToInt(Integer::parseInt)
             .sum();
     }
