@@ -1,6 +1,6 @@
 package calculator;
 
-public class NullOrEmptyCalculateStrategy extends AbstractCalculateStrategy {
+public class NullOrEmptyCalculateStrategy implements CalculateStrategy {
 
     private static final int NULL_OR_EMPTY_RETURN_VALUE = 0;
 
