@@ -12,8 +12,6 @@ public class StringCalculator {
     private static final int CUSTOM_DELIMITER_CHARACTER = 1;
     private static final int STRING_WITH_CUSTOM_DELIMITER = 2;
 
-    private int result;
-
     public int add(String text) {
         if (Objects.isNull(text) || text.isEmpty()) {
             return ZERO;
@@ -44,6 +42,8 @@ public class StringCalculator {
     }
 
     private int parseAdd(String [] tokens) {
+        int result = 0;
+
         for (String value : tokens) {
             int number = Integer.parseInt(value);
             validateMinus(number);
