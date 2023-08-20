@@ -42,6 +42,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         orderTable = OrderTableSteps.주문테이블_생성("주문테이블").as(OrderTable.class);
     }
 
+    /**
+     * given 주문 테이블에 앉는다.
+     * and 주문 테이블 인원수를 바꾼다.
+     * when 매장 주문을 생성한다.
+     * then 매장 주문은 대기상태다.
+     */
     @DisplayName("[성공] 매장 주문 등록")
     @Test
     void createTest1() {
@@ -62,6 +68,11 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         );
     }
 
+
+    /**
+     * when 배달 주문을 생성한다.
+     * then 배달 주문은 대기상태다.
+     */
     @DisplayName("[성공] 배달 주문 등록")
     @Test
     void createTest2() {
@@ -78,6 +89,10 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    /**
+     * when 포장 주문을 생성한다.
+     * then 포장 주문은 대기 상태다.
+     */
     @DisplayName("[성공] 포장 주문 등록")
     @Test
     void createTest3() {
@@ -94,6 +109,11 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    /**
+     * given 주문을 생성한다.
+     * when 주문을 접수한다.
+     * then 주문은 접수상태다.
+     */
     @DisplayName("[성공] 주문접수")
     @Test
     void acceptTest1() {
@@ -110,6 +130,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    /**
+     * given 주문을 생성한다.
+     * and 주문을 접수한다.
+     * when 주문을 서빙한다.
+     * then 주문은 서빙완료 상태다.
+     */
     @DisplayName("[성공] 주문 서빙")
     @Test
     void serveTest1() {
@@ -127,7 +153,14 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         );
     }
 
-    @DisplayName("[성공] 배달주문 배달 시작")
+    /**
+     * given 배달 주문을 생성한다.
+     * and 배달 주문을 접수한다.
+     * and 배달 주무을 서빙한다.
+     * when 배달 요청한다.
+     * then 주문 상태는 '배달중'이다.
+     */
+    @DisplayName("[성공] 배달주문 배달 요청")
     @Test
     void startDeliveryTest1() {
         //given
@@ -145,8 +178,14 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         );
     }
 
-
-
+    /**
+     * given 배달 주문을 생성한다.
+     * and 배달 주문을 접수한다.
+     * and 배달 주무을 서빙한다.
+     * and 배달 요청한다.
+     * when 배달 완료한다.
+     * then 주문 상태는 '배달완료'이다.
+     */
     @DisplayName("[성공] 배달주문 배달 완료")
     @Test
     void completeDeliveryTest1() {
@@ -166,6 +205,14 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    /**
+     * given 배달 주문을 생성한다.
+     * and 배달 주문을 접수한다.
+     * and 배달 주무을 서빙한다.
+     * and 배달 요청한다.
+     * when 주문을 완료한다.
+     * then 주문 상태는 '주문완료'이다.
+     */
     @DisplayName("[성공] 배달주문 완료")
     @Test
     void completeTest1() {
@@ -186,6 +233,13 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    /**
+     * given 포장 주문을 생성한다.
+     * and 포장 주문을 접수한다.
+     * and 포장 주무을 서빙한다.
+     * when 주문을 완료한다.
+     * then 주문 상태는 '주문완료'이다.
+     */
     @DisplayName("[성공] 포장주문 완료")
     @Test
     void completeTest2() {
@@ -204,6 +258,15 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         );
     }
 
+    /**
+     * given 주문테이블에 앉는다.
+     * and 주문테이블의 인원수를 바꾼다.
+     * and 매장 주문을 생성한다.
+     * and 매장 주문을 접수한다.
+     * and 매장 주무을 서빙한다.
+     * when 주문을 완료한다.
+     * then 주문 상태는 '주문완료'이다.
+     */
     @DisplayName("[성공] 매장주문 완료")
     @Test
     void completeTest3() {
