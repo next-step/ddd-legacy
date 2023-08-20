@@ -42,10 +42,10 @@ public class OrderSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 매장_주문_생성(OrderTable orderTable, List<OrderLineItem> orderLineItems) {
+    public static ExtractableResponse<Response> 매장_주문_생성(UUID orderTableId, List<OrderLineItem> orderLineItems) {
         Map<String, Object> params = new HashMap<>();
         params.put("type", OrderType.EAT_IN);
-        params.put("orderTable", orderTable);
+        params.put("orderTableId", orderTableId);
         params.put("orderLineItems", orderLineItems);
 
         return RestAssured.given().log().all()

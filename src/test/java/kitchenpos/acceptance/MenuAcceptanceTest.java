@@ -23,7 +23,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@DisplayName("메뉴관리기능")
+@DisplayName("메뉴")
 public class MenuAcceptanceTest extends AcceptanceTest {
 
     private String NAME = "기본메뉴";
