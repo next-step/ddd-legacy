@@ -36,7 +36,7 @@ public class StringCalculator {
     private void validateNumFormat(final List<String> nums) {
         for (String num : nums) {
             if (!NumberUtil.isNumber(num) || Integer.parseInt(num) < 0) {
-                throw new RuntimeException("숫자는 숫자 이외의 값 또는 음수를 전달할 수 없습니다여야 합니다.");
+                throw new IllegalArgumentException("숫자는 숫자 이외의 값 또는 음수를 전달할 수 없습니다.");
             }
         }
     }
