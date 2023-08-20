@@ -1,10 +1,12 @@
 package calculator;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-public class CustomSplitCalculatorPolicy implements CalculatorPolicy {
+public class CustomSplitStingConvertor implements StingConvertor {
 
     private static final Pattern PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final int DELIMITER_INDEX = 1;
@@ -18,10 +20,12 @@ public class CustomSplitCalculatorPolicy implements CalculatorPolicy {
     }
 
     @Override
-    public int calculate(String text) {
+    public PositiveNumbers calculate(String text) {
         String customDelimiter = matcher.group(DELIMITER_INDEX);
-        return Arrays.stream(matcher.group(NUMBER_INDEX).split(customDelimiter))
-                .mapToInt(this::toPositive)
-                .sum();
+        List<PositiveNumber> numbers = Arrays.stream(matcher.group(NUMBER_INDEX).split(customDelimiter))
+                .map(PositiveNumber::new)
+                .collect(Collectors.toList());
+
+        return new PositiveNumbers(numbers);
     }
 }

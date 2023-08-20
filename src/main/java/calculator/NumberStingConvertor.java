@@ -1,6 +1,6 @@
 package calculator;
 
-public class NumberCalculatorPolicy implements CalculatorPolicy {
+public class NumberStingConvertor implements StingConvertor {
 
     private static final String PATTERN = "^(0|[-]?[1-9]\\d*)$";
 
@@ -10,7 +10,7 @@ public class NumberCalculatorPolicy implements CalculatorPolicy {
     }
 
     @Override
-    public int calculate(String text) {
-        return toPositive(text);
+    public PositiveNumbers calculate(String text) {
+        return new PositiveNumbers(new PositiveNumber(text));
     }
 }
