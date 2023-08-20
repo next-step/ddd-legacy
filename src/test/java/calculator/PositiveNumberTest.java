@@ -16,6 +16,20 @@ public class PositiveNumberTest {
                 .isInstanceOf(RuntimeException.class);
     }
 
+    @DisplayName("한글입력시 에러가 발생한다.")
+    @Test
+    void 한글입력불가능() {
+        assertThatThrownBy(() -> new PositiveNumber("가"))
+                .isInstanceOf(RuntimeException.class);
+    }
+
+    @DisplayName("영어입력시 에러가 발생한다.")
+    @Test
+    void 영어입력불가능() {
+        assertThatThrownBy(() -> new PositiveNumber("abc"))
+                .isInstanceOf(RuntimeException.class);
+    }
+
     @DisplayName("값 조회시 생성자에서 입력한 값이 들어있어야 한다.")
     @Test
     void 값검증() {
