@@ -51,4 +51,14 @@ class StringSeparatorTest {
 			.containsExactly("1", "2", "3");
 	}
 
+	@DisplayName("한 개의 숫자를 입력할 경우 해당 숫자만 갖는 리스트 반환 테스트")
+	@ParameterizedTest
+	@ValueSource(strings = {"1", "2", "3"})
+	void splitOnlyOneNumberTest(String target) {
+		StringSeparator stringSeparator = StringSeparator.from(target);
+
+		assertThat(stringSeparator.split())
+			.containsExactly(target);
+	}
+
 }
