@@ -25,6 +25,7 @@ dependencies {
     runtimeOnly 'mysql:mysql-connector-java'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'com.h2database:h2'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-restassured:5.2.0.RELEASE'
 }
 
 test {
