@@ -1,23 +1,16 @@
 package calculator;
 
-import java.util.List;
-
 public class StringCalculator {
 
-    private final List<CalculateStrategy> calculateStrategies = List.of(
-            new NullOrEmptyCalculateStrategy(),
-            new NumberPatternCalculateStrategy(),
-            new SeparatorCalculateStrategy(),
-            new CustomSeparatorCalculateStrategy()
-    );
+    private final CalculateStrategyManager calculateStrategyManager;
+
+    public StringCalculator() {
+        this.calculateStrategyManager = new CalculateStrategyManager();
+    }
 
     public int add(final String text) {
-        return calculateStrategies.stream()
-                .filter(strategy -> strategy.isTarget(text))
-                .findFirst()
-                .map(strategy -> strategy.calculate(text))
-                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 형식입니다."));
+        CalculateStrategy strategy = calculateStrategyManager.findStrategy(text);
+        return strategy.calculate(text);
     }
 
 }
-
