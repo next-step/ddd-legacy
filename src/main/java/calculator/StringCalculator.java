@@ -13,15 +13,11 @@ public class StringCalculator {
             return 0;
         }
 
-        if (isNumber(text) && Integer.parseInt(text) > 0) {
-            return Integer.parseInt(text);
-        }
-
         String customDelimiter = getCustomDelimiter(text);
         String customRemovedText = removeCustomDelimiter(text);
 
-        PositiveInteger positiveInteger = new PositiveInteger(customRemovedText, ",|:|" + customDelimiter);
-        return positiveInteger.sum();
+        PositiveInteger positiveIntegers = new PositiveInteger(customRemovedText, ",|:|" + customDelimiter);
+        return positiveIntegers.sum();
     }
 
     private String getCustomDelimiter(String text) {
