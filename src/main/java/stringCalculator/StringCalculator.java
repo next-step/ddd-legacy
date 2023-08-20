@@ -1,5 +1,7 @@
 package stringCalculator;
 
+import java.util.Arrays;
+
 public class StringCalculator {
 
     public int add(String text) {
@@ -11,7 +13,9 @@ public class StringCalculator {
             return Integer.parseInt(text);
         }
 
-        return 0;
+        return Arrays.stream(text.split(","))
+            .mapToInt(Integer::parseInt)
+            .sum();
     }
 
 }
