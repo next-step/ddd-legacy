@@ -8,7 +8,7 @@ public class StringCalculator {
     private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
     private static final String regex = "[,|:]";
     private static final int ZERO = 0;
-    private static final int ONE = 1;
+    private static final int ONE_LENGTH = 1;
     private static final int TWO = 2;
 
     private int result;
@@ -18,23 +18,28 @@ public class StringCalculator {
             return ZERO;
         }
 
-        if (text.length() == ONE) {
-            return Integer.parseInt(text);
-        }
-
         Matcher m = pattern.matcher(text);
         if (m.find()) {
             return addByUniquePattern(m);
         }
 
         String[] tokens = text.split(regex);
+        if (tokens.length == ONE_LENGTH) {
+            return verifyLengthOne(tokens);
+        }
         return parseAdd(tokens);
     }
 
     private int addByUniquePattern(Matcher m) {
-        String customDelimiter = m.group(ONE);
+        String customDelimiter = m.group(ONE_LENGTH);
         String [] tokens = m.group(TWO).split(customDelimiter);
         return parseAdd(tokens);
+    }
+
+    private int verifyLengthOne(String[] token) {
+        int value = Integer.parseInt(token[ZERO]);
+        validateMinus(value);
+        return value;
     }
 
     private int parseAdd(String [] tokens) {
