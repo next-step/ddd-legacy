@@ -16,7 +16,7 @@ public class StringCalculator {
         String customDelimiter = getCustomDelimiter(text);
         String customRemovedText = removeCustomDelimiter(text);
 
-        PositiveInteger positiveIntegers = new PositiveInteger(customRemovedText, ",|:|" + customDelimiter);
+        PositiveIntegers positiveIntegers = new PositiveIntegers(customRemovedText, ",|:|" + customDelimiter);
         return positiveIntegers.sum();
     }
 

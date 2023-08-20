@@ -5,14 +5,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class PositiveIntegerTest {
+class PositiveIntegersTest {
     @DisplayName("합을 계산한다.")
     @Test
     void sum() {
         String text = "1,2;3";
 
-        PositiveInteger positiveInteger = new PositiveInteger(text, ",|;");
+        PositiveIntegers positiveIntegers = new PositiveIntegers(text, ",|;");
 
-        assertThat(positiveInteger.sum()).isEqualTo(6);
+        assertThat(positiveIntegers.sum()).isEqualTo(6);
     }
 }

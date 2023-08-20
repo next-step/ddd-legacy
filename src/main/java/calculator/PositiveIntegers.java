@@ -7,10 +7,10 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
-public class PositiveInteger {
+public class PositiveIntegers {
     private final List<Integer> contents;
 
-    public PositiveInteger(String text, String delimiterRegex) {
+    public PositiveIntegers(String text, String delimiterRegex) {
         List<String> nums = Stream.of(text.split(delimiterRegex))
                                   .filter(StringUtils::hasText)
                                   .collect(toList());
