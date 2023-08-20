@@ -11,6 +11,8 @@ public class Delimiter {
 
     public static final String DEFAULT_DELIMITER = ",|:";
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
+    private static final int CUSTOM_DELIMITER_GROUP = 1;
+    private static final int NUMBER_TOKEN_GROUP = 2;
 
     public String value;
 
@@ -40,7 +42,6 @@ public class Delimiter {
     }
 
     private Optional<String> extractCustomDelimiter(final String text) {
-        final int CUSTOM_DELIMITER_GROUP = 1;
         Matcher customDelimiter = CUSTOM_DELIMITER_PATTERN.matcher(text);
 
         if (customDelimiter.find()) {
@@ -50,7 +51,6 @@ public class Delimiter {
     }
 
     private String extractNumberText(final String text) {
-        final int NUMBER_TOKEN_GROUP = 2;
         Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
         return matcher.find() ? matcher.group(NUMBER_TOKEN_GROUP) : text;
     }
