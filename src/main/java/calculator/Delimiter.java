@@ -14,25 +14,19 @@ public class Delimiter {
     private static final int CUSTOM_DELIMITER_GROUP = 1;
     private static final int NUMBER_TOKEN_GROUP = 2;
 
-    public String value;
-
-    public Delimiter(final String text) {
-        this.value = extractDelimiter(text);
+    private Delimiter() {
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public List<PositiveNumber> extractNumbers(final String text) {
+    public static List<PositiveNumber> extractNumbers(final String text) {
+        String delimiter = extractDelimiter(text);
         String numberText = extractNumberText(text);
-        String[] tokens = numberText.split(value);
+        String[] tokens = numberText.split(delimiter);
         return Arrays.stream(tokens)
             .map(PositiveNumber::new)
             .collect(Collectors.toList());
     }
 
-    private String extractDelimiter(final String text) {
+    private static String extractDelimiter(final String text) {
         if (text == null || text.isEmpty()) {
             return DEFAULT_DELIMITER;
         }
@@ -41,7 +35,7 @@ public class Delimiter {
             .orElse(DEFAULT_DELIMITER);
     }
 
-    private Optional<String> extractCustomDelimiter(final String text) {
+    private static Optional<String> extractCustomDelimiter(final String text) {
         Matcher customDelimiter = CUSTOM_DELIMITER_PATTERN.matcher(text);
 
         if (customDelimiter.find()) {
@@ -50,7 +44,7 @@ public class Delimiter {
         return Optional.empty();
     }
 
-    private String extractNumberText(final String text) {
+    private static String extractNumberText(final String text) {
         Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
         return matcher.find() ? matcher.group(NUMBER_TOKEN_GROUP) : text;
     }

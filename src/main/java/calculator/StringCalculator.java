@@ -8,8 +8,7 @@ public class StringCalculator {
         if (isBlank(input)) {
             return 0;
         }
-        Delimiter delimiter = new Delimiter(input);
-        List<PositiveNumber> positiveNumbers = delimiter.extractNumbers(input);
+        List<PositiveNumber> positiveNumbers = Delimiter.extractNumbers(input);
         return positiveNumbers.stream()
             .reduce(PositiveNumber::add)
             .orElse(PositiveNumber.ZERO)
