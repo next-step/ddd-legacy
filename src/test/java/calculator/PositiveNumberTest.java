@@ -1,12 +1,10 @@
 package calculator;
 
-import io.micrometer.core.annotation.TimedSet;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.jupiter.api.Assertions.*;
 
 class PositiveNumberTest {
     @DisplayName("양수로 생성하면 성공한다")
