@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 
 public class OrderLineItemFixture {
 
-    public OrderLineItem create(Menu menu, BigDecimal price, int quantity){
+    public static OrderLineItem create(Menu menu, BigDecimal price, int quantity) {
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItem.setMenu(menu);
         orderLineItem.setQuantity(1);

@@ -4,37 +4,38 @@ import kitchenpos.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class OrderFixture {
-    public Order create(OrderType type, OrderTable table, String address, List<OrderLineItem> orderItems) {
+    public static Order create(OrderType type, Optional<OrderTable> table, Optional<String> address, List<OrderLineItem> orderItems) {
         Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(type);
-        order.setOrderTable(table);
-        order.setOrderTableId(table.getId());
-        order.setDeliveryAddress(address);
+        order.setOrderTable(table.orElse(null));
+        order.setOrderTableId(table.map(OrderTable::getId).orElse(null));
+        order.setDeliveryAddress(address.orElse(null));
         order.setStatus(OrderStatus.WAITING);
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(orderItems);
         return order;
     }
 
-    public Order createDelivery(String address, List<OrderLineItem> orderLineItems) {
+    public static Order createDelivery(Optional<String> address, List<OrderLineItem> orderLineItems) {
         return create(OrderType.DELIVERY
-                , null
+                , Optional.empty()
                 , address
                 , orderLineItems);
     }
 
-    public Order createEatIn(OrderTable table, List<OrderLineItem> orderLineItems) {
+    public static Order createEatIn(Optional<OrderTable> orderTable, List<OrderLineItem> orderLineItems) {
         return create(OrderType.EAT_IN
-                , table
-                , null
+                , orderTable
+                , Optional.empty()
                 , orderLineItems);
     }
 
-    public Order createTakeOut(List<OrderLineItem> orderLineItems) {
-        return create(OrderType.TAKEOUT, null, null, orderLineItems);
+    public static Order createTakeOut(List<OrderLineItem> orderLineItems) {
+        return create(OrderType.TAKEOUT, Optional.empty(), Optional.empty(), orderLineItems);
     }
 }
