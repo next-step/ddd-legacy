@@ -21,7 +21,7 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("[성공] 메뉴그룹 등록")
     @Test
-    void create() {
+    void createTest1() {
         //when
         ExtractableResponse<Response> response = MenuGroupSteps.메뉴그룹_생성(NAME);
         //then
@@ -35,7 +35,7 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("[성공] 메뉴그룹 전체조회")
     @Test
-    void findAll_test_1() {
+    void findAllTest1() {
         //given
         Menu menu1 = MenuGroupSteps.메뉴그룹_생성(NAME).as(Menu.class);
         Menu menu2 = MenuGroupSteps.메뉴그룹_생성(NAME).as(Menu.class);

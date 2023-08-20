@@ -23,7 +23,7 @@ public class ProductAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("[성공] 상품 등록")
     @Test
-    void create() {
+    void createTest1() {
         //when
         ExtractableResponse<Response> response
                 = ProductSteps.상품_생성(NAME, PRICE);
@@ -42,7 +42,7 @@ public class ProductAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("[성공] 상품 가격 수정")
     @Test
-    void priceChange() {
+    void priceChangeTest1() {
         //given
         ExtractableResponse<Response> created
                 = ProductSteps.상품_생성(NAME, PRICE);
@@ -67,7 +67,7 @@ public class ProductAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("[성공] 상품 전체 조회")
     @Test
-    void findAll_test_1() {
+    void findAllTest1() {
         //given
         Product product1 = ProductSteps.상품_생성(NAME, PRICE).as(Product.class);
         Product product2 = ProductSteps.상품_생성(NAME, PRICE).as(Product.class);

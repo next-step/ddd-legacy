@@ -60,7 +60,7 @@ class MenuServiceTest extends ApplicationTest {
         @DisplayName("[예외] 메뉴 이름은 공백일 수 없다")
         @ParameterizedTest
         @NullSource
-        void name_test_1(String name) {
+        void nameTest1(String name) {
             //when
             Menu menu = MenuFixture.create(
                     name
@@ -103,7 +103,7 @@ class MenuServiceTest extends ApplicationTest {
     class Create {
         @DisplayName("[성공] 메뉴를 등록한다.")
         @Test
-        void create_test_1() {
+        void createTest1() {
             //given
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(1500)
@@ -130,7 +130,7 @@ class MenuServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록된 메뉴그룹만 지정할 수 있다.")
         @Test
-        void create_test_2() {
+        void createTest2() {
             //given
             MenuGroup newMenuGroup = MenuGroupFixture.createDefault();
             Menu menu = MenuFixture.create("메뉴"
@@ -149,7 +149,7 @@ class MenuServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록된 상품만 지정할 수 있다.")
         @Test
-        void create_test_3() {
+        void createTest3() {
             //given
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(1500)
@@ -170,7 +170,7 @@ class MenuServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 상품은 1개 이상이어야 한다. ")
         @Test
-        void create_test_4() {
+        void createTest4() {
         //given
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(1500)
@@ -187,7 +187,7 @@ class MenuServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 상품의 수량은 0개 이상이어야 한다.")
         @Test
-        void create_test_5() {
+        void createTest5() {
             //given
             MenuProduct menuProduct = MenuProductFixture.create(product1, -1);
             Menu menu = MenuFixture.create("메뉴"
@@ -213,7 +213,7 @@ class MenuServiceTest extends ApplicationTest {
     class Display {
         @DisplayName("[성공] 메뉴를 보인다.")
         @Test
-        void display_test_1() {
+        void displayTest1() {
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(900)
                     , false
@@ -230,7 +230,7 @@ class MenuServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 메뉴의 가격은 각 구성상품의 수량*가격보다 작아야 한다.")
         @Test
-        void display_test_2() {
+        void displayTest2() {
             //given
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(1200)
@@ -246,7 +246,7 @@ class MenuServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록된 메뉴만 보일 수 있다.")
         @Test
-        void display_test_3() {
+        void displayTest3() {
             //given
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(2000)
@@ -266,7 +266,7 @@ class MenuServiceTest extends ApplicationTest {
     class Hide {
         @DisplayName("[성공] 메뉴를 숨긴다.")
         @Test
-        void hide_test_1() {
+        void hideTest1() {
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(1500)
                     , true
@@ -281,7 +281,7 @@ class MenuServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록된 메뉴만 숨길 수 있다.")
         @Test
-        void hide_test_2() {
+        void hideTest2() {
             //given
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(1500)
@@ -301,7 +301,7 @@ class MenuServiceTest extends ApplicationTest {
     class ChangePrice {
         @DisplayName("[성공] 가격을 바꾼다.")
         @Test
-        void changPrice_test_1() {
+        void changPriceTest1() {
             //given
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(1500)
@@ -319,7 +319,7 @@ class MenuServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 가격은 없을 수 없다.")
         @Test
-        void changPrice_test_2() {
+        void changPriceTest2() {
             //given
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(1500)
@@ -352,7 +352,7 @@ class MenuServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 메뉴의 가격은 각 구성상품의 수량*가격보다 작아야 한다.")
         @Test
-        void changPrice_test_4() {
+        void changPriceTest4() {
             //given
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(1500)
@@ -372,7 +372,7 @@ class MenuServiceTest extends ApplicationTest {
 
     @DisplayName("[성공] 메뉴 전체를 조회한다.")
     @Test
-    void findAll_test_1() {
+    void findAllTest1() {
         //given
         Menu menu1 = MenuFixture.create("메뉴"
                 , BigDecimal.valueOf(1500)

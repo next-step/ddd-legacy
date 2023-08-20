@@ -44,7 +44,7 @@ public class OrderTableServiceTest extends ApplicationTest {
     class Create {
         @DisplayName("[성공] 주문 테이블을 만든다.")
         @Test
-        void create_test_1() {
+        void createTest1() {
             //given
             OrderTable orderTable = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, false, 0);
             when(orderTableRepository.save(any())).thenReturn(orderTable);
@@ -60,7 +60,7 @@ public class OrderTableServiceTest extends ApplicationTest {
         @DisplayName("[예외] 주문 테이블의 이름은 공백일 수 없다.")
         @ParameterizedTest
         @NullAndEmptySource
-        void create_test_2(String name) {
+        void createTest2(String name) {
             //when
             OrderTable orderTable = OrderTableFixture.create(name, false, 0);
             //then
@@ -74,7 +74,7 @@ public class OrderTableServiceTest extends ApplicationTest {
     class Sit {
         @DisplayName("[성공] 주문 테이블에 앉는다.")
         @Test
-        void sit_test_1() {
+        void sitTest1() {
             //given
             OrderTable orderTable = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, false, 1);
             when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
@@ -86,7 +86,7 @@ public class OrderTableServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록되지 않은 주문테이블엔 앉을 수 없다.")
         @Test
-        void sit_test_2() {
+        void sitTest2() {
             //then
             OrderTable orderTable = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, false, 1);
             when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
@@ -102,7 +102,7 @@ public class OrderTableServiceTest extends ApplicationTest {
     class Clear {
         @DisplayName("[성공] 주문 테이블을 치운다.")
         @Test
-        void clear_test_1() {
+        void clearTest1() {
             //given
             OrderTable orderTable = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, true, 1);
             when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
@@ -120,7 +120,7 @@ public class OrderTableServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록되지 않은 주문테이블은 치울 수 없다.")
         @Test
-        void clear_test_2() {
+        void clearTest2() {
             //given
             OrderTable orderTable = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, true, 1);
             //when
@@ -132,7 +132,7 @@ public class OrderTableServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 주문이 완료되지 않은 주문테이블은 치울 수 없다.")
         @Test
-        void clear_test_3() {
+        void clearTest3() {
             //given
             OrderTable orderTable = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, true, 1);
             when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
@@ -151,7 +151,7 @@ public class OrderTableServiceTest extends ApplicationTest {
     class ChangeNumberOfGuests {
         @DisplayName("[성공] 주문 테이블의 인원수를 바꾼다.")
         @Test
-        void change_test_1() {
+        void changeTest1() {
             //given
             OrderTable orderTable = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, true, 1);
             when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
@@ -167,7 +167,7 @@ public class OrderTableServiceTest extends ApplicationTest {
         @DisplayName("[예외] 주문 테이블의 인원 수는 0명 이상이다.")
         @ParameterizedTest
         @ValueSource(ints = {-1, -100})
-        void change_test_2(int numberOfGuests) {
+        void changeTest2(int numberOfGuests) {
             //when
             OrderTable orderTable = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, true, 1);
             //when
@@ -179,7 +179,7 @@ public class OrderTableServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록하지 않은 주문테이블의 인원수는 바꿀 수 없다.")
         @Test
-        void change_test_3() {
+        void changeTest3() {
             //given
             OrderTable orderTable = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, true, 1);
             when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
@@ -192,7 +192,7 @@ public class OrderTableServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 사용중이 아닌 주문테이블의 인원수는 바꿀 수 없다.")
         @Test
-        void change_test_4() {
+        void changeTest4() {
             //given
             OrderTable orderTable = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, false, 1);
             when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
@@ -206,7 +206,7 @@ public class OrderTableServiceTest extends ApplicationTest {
 
     @DisplayName("[성공] 주문 전체 목록을 조회한다.")
     @Test
-    void findAll_test_1() {
+    void findAllTest1() {
         //given
         OrderTable orderTable1 = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, true, 1);
         OrderTable orderTable2 = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, true, 1);

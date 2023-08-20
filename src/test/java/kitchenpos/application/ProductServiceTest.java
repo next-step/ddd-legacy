@@ -46,7 +46,7 @@ class ProductServiceTest extends ApplicationTest {
         @DisplayName("[예외] 상품의 이름은 공백일 수 없다.")
         @ParameterizedTest
         @NullSource
-        void name_test_1(String name) {
+        void nameTest1(String name) {
             //given
             Product product = ProductFixture.create(name);
             //then
@@ -57,7 +57,7 @@ class ProductServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 상품의 이름은 비속어일 수 없다.")
         @Test
-        void name_test_2() {
+        void nameTest2() {
             //given
             when(purgomalumClient.containsProfanity(any())).thenReturn(true);
             //when
@@ -74,7 +74,7 @@ class ProductServiceTest extends ApplicationTest {
         @DisplayName("[예외] 상품의 가격은 공백일 수 없다.")
         @ParameterizedTest
         @NullSource
-        void price_test_1(BigDecimal price) {
+        void priceTest1(BigDecimal price) {
             //given
             Product product = ProductFixture.create(price);
             //then
@@ -86,7 +86,7 @@ class ProductServiceTest extends ApplicationTest {
         @DisplayName("[예외] 상품의 가격은 0원 이상이다.")
         @ParameterizedTest
         @ValueSource(longs = {-1, -2})
-        void price_test_2(long price) {
+        void priceTest2(long price) {
             //given
             Product product = ProductFixture.create(BigDecimal.valueOf(price));
             //then
@@ -98,7 +98,7 @@ class ProductServiceTest extends ApplicationTest {
 
     @DisplayName("[성공] 상품을 등록한다.")
     @Test
-    void create_test_1() {
+    void createTest1() {
         //given
         Product product = ProductFixture.create("떡볶이", BigDecimal.valueOf(1000));
         when(productRepository.save(any())).thenReturn(product);
@@ -113,7 +113,7 @@ class ProductServiceTest extends ApplicationTest {
     class PriceChange {
         @DisplayName("[성공] 상품 가격을 바꾼다.")
         @Test
-        void priceChange_test_1() {
+        void priceChangeTest1() {
             //given
             Product product = ProductFixture.create("떡볶이", BigDecimal.valueOf(1000));
             when(productRepository.findById(any())).thenReturn(Optional.of(product));
@@ -126,7 +126,7 @@ class ProductServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 상품 가격은 0원 이상이어야 한다.")
         @Test
-        void priceChange_test_2() {
+        void priceChangeTest2() {
             //given
             Product product = ProductFixture.create("떡볶이", BigDecimal.valueOf(1000));
             //when
@@ -143,7 +143,7 @@ class ProductServiceTest extends ApplicationTest {
          */
         @DisplayName("[성공] 상품 가격을 바꿀 때 메뉴가격이 구성상품 가격의 합보다 작으면 숨긴다. ")
         @Test
-        void priceChange_test_e() {
+        void priceChangeTest3() {
             //given
             Product product1 = ProductFixture.create(BigDecimal.valueOf(1000));
             Product product2 = ProductFixture.create(BigDecimal.valueOf(1000));
@@ -165,18 +165,18 @@ class ProductServiceTest extends ApplicationTest {
 
     @DisplayName("[성공] 상품 전체 목록을 조회한다.")
     @Test
-    void findAll_test_1() {
+    void findAllTest1() {
         //given
         Product product1 = ProductFixture.create(BigDecimal.valueOf(1000));
         Product product2 = ProductFixture.create(BigDecimal.valueOf(1000));
         Product product3 = ProductFixture.create(BigDecimal.valueOf(1000));
-        when(productRepository.findAll()).thenReturn(List.of(product1,product2,product3));
+        when(productRepository.findAll()).thenReturn(List.of(product1, product2, product3));
         //when
         List<Product> results = productService.findAll();
         //then
         assertThat(results)
                 .hasSize(3)
-                .contains(product1,product2,product3);
+                .contains(product1, product2, product3);
 
     }
 }

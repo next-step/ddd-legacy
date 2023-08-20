@@ -65,7 +65,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[성공] 매장 주문을 만든다. 주문은 대기상태다. ")
             @Test
-            void create_eatIn_test_1() {
+            void createEatInTest1() {
                 //given
                 Order eatIn = OrderFixture.createEatIn(Optional.ofNullable(orderTable), List.of(orderLineItem));
                 when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
@@ -81,7 +81,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[예외] 매장 주문에는 등록된 주문테이블이 필요하다.")
             @Test
-            void create_eatIn_test_2() {
+            void createEatInTest2() {
                 //given
                 Order eatIn = OrderFixture.createEatIn(Optional.ofNullable(orderTable), List.of(orderLineItem));
 
@@ -96,7 +96,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[예외] 매장 주문을 만든다. 주문 테이블은 사용 중이어야 한다.")
             @Test
-            void create_eatIn_test_3() {
+            void createEatInTest3() {
                 //given
                 orderTable.setOccupied(false);
                 Order eatIn = OrderFixture.createEatIn(Optional.ofNullable(orderTable), List.of(orderLineItem));
@@ -119,7 +119,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[성공] 배달 주문을 만든다. 주문은 대기상태다. ")
             @Test
-            void create_delivery_test_1() {
+            void createDeliveryTest1() {
                 //given
                 Order delivery = OrderFixture.createDelivery(Optional.ofNullable(deliveryAddress), List.of(orderLineItem));
                 when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
@@ -135,7 +135,7 @@ class OrderServiceTest extends ApplicationTest {
             @DisplayName("[예외] 배달 주문에는 주소가 필요하다.")
             @ParameterizedTest
             @NullAndEmptySource
-            void create_delivery_test_2(String address) {
+            void createDeliveryTest2(String address) {
                 //given
                 Order delivery = OrderFixture.createDelivery(Optional.ofNullable(address), List.of(orderLineItem));
                 when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
@@ -147,7 +147,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[예외] 배달 주문을 만든다. 주문 메뉴 1항목의 수량은 0개 이상이다.")
             @Test
-            void create_delivery_test_4() {
+            void createDeliveryTest3() {
                 //given
                 orderLineItem.setQuantity(-1);
                 Order delivery = OrderFixture.createDelivery(
@@ -167,7 +167,7 @@ class OrderServiceTest extends ApplicationTest {
         class TakeOut {
             @DisplayName("[예외] 배달 주문을 만든다. 주문 메뉴 1항목의 수량은 0개 이상이다.")
             @Test
-            void create_takeout_test_4() {
+            void createTakeoutTest1() {
                 //given
                 orderLineItem.setQuantity(-1);
                 Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
@@ -181,7 +181,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 주문 타입이 필요하다.")
         @Test
-        void create_test_2() {
+        void createTest2() {
             //given
             Order order = OrderFixture.create(null
                     , Optional.of(orderTable)
@@ -196,7 +196,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 주문 메뉴는 1개 이상이어야 한다.")
         @Test
-        void create_test_3() {
+        void createTest3() {
             //given
             Order order = OrderFixture.createTakeOut(Collections.emptyList());
             //then
@@ -206,7 +206,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 주문 메뉴는 등록된 메뉴여야 한다.")
         @Test
-        void create_test_4() {
+        void createTest4() {
             //given
             Menu menu2 = MenuFixture.createDefaultWithNameAndPrice("메뉴2", BigDecimal.valueOf(2000));
             OrderLineItem orderLineItem2 = OrderLineItemFixture.create(menu2, BigDecimal.valueOf(2000), 1);
@@ -221,7 +221,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 주문 메뉴는 표기 상태여야 한다.")
         @Test
-        void create_test_5() {
+        void createTest5() {
             //given
             menu.setDisplayed(false);
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
@@ -235,7 +235,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 주문 메뉴의 가격은 원래 메뉴의 가격과 같아야 한다.")
         @Test
-        void create_test_6() {
+        void createTest6() {
             //given
             menu.setPrice(BigDecimal.valueOf(3000));
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
@@ -256,7 +256,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[성공] 주문을 접수한다. 상태가 접수로 바뀐다.")
         @Test
-        void accept_test_1() {
+        void acceptTest1() {
             //given
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
             when(orderRepository.findById(any())).thenReturn(Optional.of(takeOut));
@@ -269,7 +269,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 주문을 접수한다. 상태가 대기여야 한다.")
         @Test
-        void accept_test_2() {
+        void acceptTest2() {
             //given
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
             takeOut.setStatus(OrderStatus.ACCEPTED);
@@ -281,7 +281,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[성공] 배달 주문을 접수한다. 라이더를 부른다.")
         @Test
-        void accept_test_3() {
+        void acceptTest3() {
             //given
             Order delivery = OrderFixture.createDelivery(Optional.of(deliveryAddress), List.of(orderLineItem));
             when(orderRepository.findById(any())).thenReturn(Optional.of(delivery));
@@ -295,7 +295,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록되지 않은 주문은 접수할 수 없다.")
         @Test
-        void accept_test_4() {
+        void acceptTest4() {
             //given
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
             takeOut.setStatus(OrderStatus.ACCEPTED);
@@ -313,7 +313,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[성공] 주문을 서빙한다. 서빙 후 주문의 상태는 서빙완료다.")
         @Test
-        void serve_test_1() {
+        void serveTest1() {
             //given
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
             when(orderRepository.findById(any())).thenReturn(Optional.of(takeOut));
@@ -326,7 +326,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 주문을 서빙한다. 서빙 전 주문의 상태는 접수여야 한다.")
         @Test
-        void serve_test_2() {
+        void serveTest2() {
             //given
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
             when(orderRepository.findById(any())).thenReturn(Optional.of(takeOut));
@@ -337,7 +337,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록되지 않은 주문은 서빙할 수 없다.")
         @Test
-        void serve_test_3() {
+        void serveTest3() {
             //given
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
             takeOut.setStatus(OrderStatus.ACCEPTED);
@@ -354,7 +354,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[성공] 배달 주문을 배달한다. 배달 후 주문의 상태는 배달중이다.")
         @Test
-        void delivery_test_1() {
+        void deliveryTest1() {
             //given
             Order delivery = OrderFixture.createDelivery(Optional.ofNullable(deliveryAddress), List.of(orderLineItem));
             delivery.setStatus(OrderStatus.SERVED);
@@ -369,7 +369,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 매장 주문은 배달할 수 없다.")
         @Test
-        void delivery_test_2() {
+        void deliveryTest2() {
             //given
             Order eatIn = OrderFixture.createEatIn(Optional.of(orderTable), List.of(orderLineItem));
             eatIn.setStatus(OrderStatus.SERVED);
@@ -382,7 +382,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 포장 주문은 배달할 수 없다.")
         @Test
-        void delivery_test_3() {
+        void deliveryTest3() {
             //given
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
             takeOut.setStatus(OrderStatus.SERVED);
@@ -395,7 +395,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 배달 주문의 상태가 서빙완료일때만 배달할 수 있다.")
         @Test
-        void delivery_test_4() {
+        void deliveryTest4() {
             //given
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
             when(orderRepository.findById(any())).thenReturn(Optional.of(takeOut));
@@ -408,7 +408,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록된 주문만 배달할 수 있다.")
         @Test
-        void delivery_test_5() {
+        void deliveryTest5() {
             //given
             Order delivery = OrderFixture.createDelivery(Optional.ofNullable(deliveryAddress), List.of(orderLineItem));
             delivery.setStatus(OrderStatus.SERVED);
@@ -426,7 +426,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록된 주문만 배달할 수 있다.")
         @Test
-        void delivery_test_6() {
+        void deliveryTest6() {
             //given
             Order delivery = OrderFixture.createDelivery(Optional.ofNullable(deliveryAddress), List.of(orderLineItem));
             delivery.setStatus(OrderStatus.DELIVERING);
@@ -439,7 +439,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 배달 주문의 상태가 배달 중일때만 배달완료할 수 있다.")
         @Test
-        void delivery_test_7() {
+        void deliveryTest7() {
             //given
             Order delivery = OrderFixture.createDelivery(Optional.ofNullable(deliveryAddress), List.of(orderLineItem));
             when(orderRepository.findById(any())).thenReturn(Optional.of(delivery));
@@ -452,7 +452,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[성공] 배달 완료한다. 배달완료 후 주문 상태는 '배달완료'다")
         @Test
-        void delivery_test_8() {
+        void deliveryTest8() {
             //given
             Order delivery = OrderFixture.createDelivery(Optional.ofNullable(deliveryAddress), List.of(orderLineItem));
             delivery.setStatus(OrderStatus.DELIVERING);
@@ -472,7 +472,7 @@ class OrderServiceTest extends ApplicationTest {
 
         @DisplayName("[예외] 등록된 주문만 완료할 수 있다.")
         @Test
-        void complete_test_1() {
+        void completeTest1() {
             //given
             Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
             takeOut.setStatus(OrderStatus.SERVED);
@@ -489,7 +489,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[성공] 배달 주문을 완료한다.")
             @Test
-            void complete_delivery_test_1() {
+            void completeDeliveryTest1() {
                 //given
                 Order delivery = OrderFixture.createDelivery(Optional.ofNullable(deliveryAddress), List.of(orderLineItem));
                 delivery.setStatus(OrderStatus.DELIVERED);
@@ -503,7 +503,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[예외] 배달 주문 상태가 '배달완료'가 아니면 완료할 수 없다.")
             @Test
-            void complete_delivery_test_2() {
+            void completeDeliveryTest2() {
                 //given
                 Order delivery = OrderFixture.createDelivery(Optional.ofNullable(deliveryAddress), List.of(orderLineItem));
                 when(orderRepository.findById(any())).thenReturn(Optional.of(delivery));
@@ -523,7 +523,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[성공] 매장 주문을 완료한다. 주문 상태는 '주문완료'가 된다. 주문테이블을 치운다.")
             @Test
-            void complete_eatIn_test_1() {
+            void completeEatInTest1() {
                 //given
                 Order eatIn = OrderFixture.createEatIn(Optional.ofNullable(orderTable), List.of(orderLineItem));
                 eatIn.setStatus(OrderStatus.SERVED);
@@ -541,7 +541,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[예외] 매장 주문 상태가 '서빙완료'가 아니면 완료할 수 없다.")
             @Test
-            void complete_delivery_test_2() {
+            void completeDeliveryTest2() {
                 //given
                 Order eatIn = OrderFixture.createEatIn(Optional.ofNullable(orderTable), List.of(orderLineItem));
                 when(orderRepository.findById(any())).thenReturn(Optional.of(eatIn));
@@ -559,7 +559,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[성공] 포장 주문을 완료한다. 주문 상태는 '주문완료'가 된다. ")
             @Test
-            void complete_takeout_test_1() {
+            void completeTakeoutTest1() {
                 //given
                 Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
                 takeOut.setStatus(OrderStatus.SERVED);
@@ -574,7 +574,7 @@ class OrderServiceTest extends ApplicationTest {
 
             @DisplayName("[예외] 포장 주문 상태가 '서빙완료'가 아니면 완료할 수 없다.")
             @Test
-            void complete_takeout_test_2() {
+            void completeTakeoutTest2() {
                 //given
                 Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem));
                 when(orderRepository.findById(any())).thenReturn(Optional.of(takeOut));
@@ -589,7 +589,7 @@ class OrderServiceTest extends ApplicationTest {
 
     @DisplayName("[성공] 주문 전체 목록을 조회한다.")
     @Test
-    void findAll() {
+    void findAllTest1() {
         //given
         OrderLineItem orderLineItem1 = OrderLineItemFixture.create(menu, BigDecimal.valueOf(2000), 2);
 

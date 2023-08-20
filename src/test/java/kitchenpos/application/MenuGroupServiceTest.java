@@ -32,7 +32,7 @@ class MenuGroupServiceTest extends ApplicationTest {
 
     @DisplayName("[성공] 메뉴그룹을 생성한다.")
     @Test
-    void create_test_1() {
+    void createTest1() {
         //given
         MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
         when(menuGroupRepository.save(any())).thenReturn(menuGroup);
@@ -45,7 +45,7 @@ class MenuGroupServiceTest extends ApplicationTest {
     @DisplayName("[예외] 메뉴그룹 이름은 공백일 수 없다.")
     @ParameterizedTest
     @NullSource
-    void name_test_1(String name) {
+    void nameTest1(String name) {
         MenuGroup menuGroup = MenuGroupFixture.create(name);
         assertThatThrownBy(() -> menuGroupService.create(menuGroup))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -53,7 +53,7 @@ class MenuGroupServiceTest extends ApplicationTest {
 
     @DisplayName("[성공] 메뉴그룹 전체 목록을 조회한다.")
     @Test
-    void findAll_test_1() {
+    void findAllTest1() {
         //given
         MenuGroup menuGroup1 = MenuGroupFixture.createDefault();
         MenuGroup menuGroup2 = MenuGroupFixture.createDefault();

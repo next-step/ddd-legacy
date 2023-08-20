@@ -47,7 +47,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("메뉴 등록")
     @Test
-    void create() {
+    void createTest1() {
         //when
         ExtractableResponse<Response> response = MenuSteps.메뉴_생성(
                 NAME
@@ -74,7 +74,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("[성공] 메뉴 가격 수정")
     @Test
-    void change_price() {
+    void changePriceTest1() {
         //given
         Menu menu = MenuSteps.메뉴_생성(
                 NAME
@@ -99,7 +99,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("[실패] 메뉴 가격 수정 실패")
     @Test
-    void change_price_test_2() {
+    void changePriceTest2() {
         //given
         Menu menu = MenuSteps.메뉴_생성(
                 NAME
@@ -120,7 +120,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("[성공] 메뉴 보이기")
     @Test
-    void display_test_1() {
+    void displayTest1() {
         //given
         Menu menu = MenuSteps.메뉴_생성(
                 NAME
@@ -144,7 +144,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
      */
     @DisplayName("[성공] 메뉴 숨기기")
     @Test
-    void hide_test_1() {
+    void hideTest1() {
         //given
         Menu menu = MenuSteps.메뉴_생성(
                 NAME
@@ -164,7 +164,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("[성공] 메뉴 전체 조회")
     @Test
-    void findAll_test_1 (){
+    void findAllTest1(){
         //given
         Menu menu = MenuSteps.메뉴_생성(
                 NAME
