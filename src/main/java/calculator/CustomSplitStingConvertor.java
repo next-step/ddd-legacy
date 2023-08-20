@@ -11,16 +11,16 @@ public class CustomSplitStingConvertor implements StingConvertor {
     private static final Pattern PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final int DELIMITER_INDEX = 1;
     private static final int NUMBER_INDEX = 2;
-    private Matcher matcher;
 
     @Override
     public boolean isSupport(String text) {
-        matcher = PATTERN.matcher(text);
-        return matcher.find();
+        return PATTERN.matcher(text).find();
     }
 
     @Override
     public PositiveNumbers calculate(String text) {
+        Matcher matcher = PATTERN.matcher(text);
+        matcher.find();
         String customDelimiter = matcher.group(DELIMITER_INDEX);
         List<PositiveNumber> numbers = Arrays.stream(matcher.group(NUMBER_INDEX).split(customDelimiter))
                 .map(PositiveNumber::new)
