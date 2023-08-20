@@ -33,7 +33,16 @@ public class ProductSteps {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(params)
-                .when().put(URI + "{productId}/price", productId)
+                .when().put(URI + "/{productId}/price", productId)
+                .then().log().all().extract();
+    }
+
+    public static ExtractableResponse<Response> 상품_전체_조회() {
+
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when().get(URI)
                 .then().log().all().extract();
     }
 }
+
