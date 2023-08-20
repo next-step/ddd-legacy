@@ -1,4 +1,4 @@
-package calculator.util;
+package calculator.domain;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -8,7 +8,7 @@ public final class Separate {
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final String DELIMITER_PATTERN = "[,:]";
 
-    public static String[] parser(final String input) {
+    public String[] parser(final String input) {
         final Matcher customMatcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         if (customMatcher.find()) {
