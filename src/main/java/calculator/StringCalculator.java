@@ -16,7 +16,7 @@ public class StringCalculator {
                 .filter(strategy -> strategy.isTarget(text))
                 .findFirst()
                 .map(strategy -> strategy.calculate(text))
-                .orElseThrow(IllegalArgumentException::new);
+                .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 형식입니다."));
     }
 
 }
