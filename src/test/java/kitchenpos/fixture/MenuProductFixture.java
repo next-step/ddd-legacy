@@ -6,11 +6,11 @@ import kitchenpos.domain.Product;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MenuProductFixture {
     private static final long DEFAULT_QUANTITY = 1;
+
     public static MenuProduct create(Product product, long quantity) {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setProduct(product);
@@ -20,21 +20,22 @@ public class MenuProductFixture {
     }
 
     public static List<MenuProduct> createDefaultsWithPrice(BigDecimal... prices) {
-       return Arrays.asList(prices)
-                .stream()
+        return Arrays.stream(prices)
                 .map(MenuProductFixture::createDefaultWithPrice)
                 .collect(Collectors.toList());
     }
+
     public static List<MenuProduct> createDefaultsWithProduct(Product... products) {
-        return Arrays.asList(products)
-                .stream()
+        return Arrays.stream(products)
                 .map(MenuProductFixture::createDefaultWithProduct)
                 .collect(Collectors.toList());
     }
-    private static MenuProduct createDefaultWithPrice(BigDecimal price){
+
+    private static MenuProduct createDefaultWithPrice(BigDecimal price) {
         return create(ProductFixture.create(price), DEFAULT_QUANTITY);
     }
-    private static MenuProduct createDefaultWithProduct(Product product){
+
+    private static MenuProduct createDefaultWithProduct(Product product) {
         return create(product, DEFAULT_QUANTITY);
     }
 

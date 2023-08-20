@@ -11,7 +11,7 @@ import java.util.UUID;
 public class MenuFixture {
 
     private static final String DEFAULT_NAME = "기본메뉴";
-    private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(10000);
+    private static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(2000);
 
     public static Menu create(String name, BigDecimal price, boolean displayed, MenuGroup menuGroup, List<MenuProduct> menuProducts){
         Menu menu = new Menu();
@@ -45,10 +45,10 @@ public class MenuFixture {
         );
     }
 
-    public static Menu createDefaultWithName(String name){
+    public static Menu createDefaultWithNameAndPrice(String name, BigDecimal price){
         return create(
                 name
-                , DEFAULT_PRICE
+                , price
                 , true
                 , MenuGroupFixture.createDefault()
                 , MenuProductFixture.createDefaults()
