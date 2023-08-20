@@ -26,17 +26,20 @@ public class StringCalculator {
 
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
         if(m.find()){
+
             String customerDelimiter = m.group(1);
             String[] split = m.group(2).split(customerDelimiter);
             result =  Arrays.stream(split).mapToInt(Integer::parseInt).sum();
         }
-
         return result;
     }
 
     private boolean isNumber(String text) {
         try {
-            Integer.parseInt(text);
+            int parseInt = Integer.parseInt(text);
+            if (parseInt < 0) {
+                throw new RuntimeException();
+            }
         } catch (NumberFormatException numberFormatException) {
             return false;
         }
