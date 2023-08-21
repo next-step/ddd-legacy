@@ -13,8 +13,4 @@ public class PositiveNumber {
     public int getNumber() {
         return number;
     }
-
-    public PositiveNumber sum(PositiveNumber number) {
-        return new PositiveNumber(this.number + number.getNumber());
-    }
 }
