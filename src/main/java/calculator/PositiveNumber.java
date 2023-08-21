@@ -9,7 +9,7 @@ public class PositiveNumber {
 
     public PositiveNumber(final int value) {
         if (value < 0) {
-            throw new RuntimeException();
+            throw new NotPositiveNumberException();
         }
 
         this.value = value;

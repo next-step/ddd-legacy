@@ -18,7 +18,7 @@ class PositiveNumberTest {
     @DisplayName("음수로 양수를 생성하면 실패한다")
     @Test
     void test2() {
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(NotPositiveNumberException.class)
                 .isThrownBy(() -> new PositiveNumber(-1));
     }
 
