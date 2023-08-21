@@ -21,4 +21,15 @@ class PositiveNumberTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> new PositiveNumber(-1));
     }
+
+    @DisplayName("두개의 값을 더할 수 있다")
+    @Test
+    void test3(){
+        final PositiveNumber positiveNumber1 = new PositiveNumber(5);
+        final PositiveNumber positiveNumber2 = new PositiveNumber(3);
+        
+        final PositiveNumber result = positiveNumber1.plus(positiveNumber2);
+
+        assertThat(result).isEqualTo(new PositiveNumber(8));
+    }
 }

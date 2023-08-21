@@ -16,7 +16,8 @@ public class StringCalculator {
         final List<Integer> numbers = extractNumbers(expression);
 
         return PositiveNumbers.of(numbers)
-                .sum();
+                .sum()
+                .getValue();
     }
 
     private List<Integer> extractNumbers(final String expression) {

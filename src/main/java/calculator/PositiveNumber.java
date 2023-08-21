@@ -3,6 +3,8 @@ package calculator;
 import java.util.Objects;
 
 public class PositiveNumber {
+    public static final PositiveNumber ZERO = new PositiveNumber(0);
+
     private final int value;
 
     public PositiveNumber(final int value) {
@@ -11,6 +13,12 @@ public class PositiveNumber {
         }
 
         this.value = value;
+    }
+
+    public PositiveNumber plus(final PositiveNumber positiveNumber) {
+        return new PositiveNumber(
+                this.value + positiveNumber.value
+        );
     }
 
     public int getValue() {

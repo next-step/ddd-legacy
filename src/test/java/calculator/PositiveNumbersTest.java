@@ -51,8 +51,8 @@ class PositiveNumbersTest {
         );
         final PositiveNumbers positiveNumbers = new PositiveNumbers(numbers);
 
-        final int result = positiveNumbers.sum();
+        final PositiveNumber result = positiveNumbers.sum();
 
-        assertThat(result).isEqualTo(15);
+        assertThat(result).isEqualTo(new PositiveNumber(15));
     }
 }

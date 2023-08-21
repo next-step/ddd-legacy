@@ -19,10 +19,9 @@ public class PositiveNumbers {
         this.values = values;
     }
 
-    public int sum() {
+    public PositiveNumber sum() {
         return values.stream()
-                .mapToInt(PositiveNumber::getValue)
-                .sum();
+                .reduce(PositiveNumber.ZERO, PositiveNumber::plus);
     }
 
     public List<PositiveNumber> getValues() {
