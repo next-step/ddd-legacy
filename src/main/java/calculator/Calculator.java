@@ -13,28 +13,27 @@ public class Calculator {
     private static final Integer ZERO = 0;
 
     public Integer add(String text) {
-        ExpressionCustomizer expressionCustomizer = getUserInput(text);
+        ExpressionCustomizer expressionCustomizer = getExpressionCustomizer(text);
 
         var expression = expressionCustomizer.toExpression();
 
-        if (isValidExpression(expression) == false)
+        if (!isValidExpression(expression))
             return ZERO;
-
 
         List<Token> tokens = parseToken(expression);
 
-        if (isCalculable(tokens) == false)
+        if (!isCalculable(tokens))
             throw new IllegalArgumentException("계산할 수 없는 식입니다.");
 
         return calculate(tokens);
     }
 
-    private ExpressionCustomizer getUserInput(String text) {
+    private ExpressionCustomizer getExpressionCustomizer(String text) {
         if (text == null)
             return ExpressionCustomizer.of(null, null);
 
         // 사용자가 커스텀한 설정값이 있다면 이를 추출한다.
-        var mather = CustomRegex.CUSTOM_USER_SETTING.matcher(text);
+        var mather = CustomRegex.EXPRESSION_CUSTOMIZER.matcher(text);
         if (mather.find())
             return ExpressionCustomizer.of(mather.group(1), mather.group(2));
 
@@ -46,7 +45,10 @@ public class Calculator {
         if (expression == null || expression.isBlank())
             return false;
 
-        return Token.isAllTokens(expression) != false;
+        if (!Token.isAllTokens(expression))
+            return false;
+
+        return true;
     }
 
     private List<Token> parseToken(String expression) {
@@ -64,28 +66,39 @@ public class Calculator {
     }
 
     private boolean isCalculable(List<Token> tokens) {
-        // 빈 문자열 검증
         if (tokens.isEmpty())
             return false;
 
-        // 짝수번째 토큰은 숫자여야 한다.
         var evenIndexTokens = tokens.stream()
                 .filter(x -> tokens.indexOf(x) % 2 == 0)
                 .collect(Collectors.toList());
 
-        if (evenIndexTokens.stream().anyMatch(x -> x.getType() != TokenType.VALUE))
+        if (isAllValue(evenIndexTokens) == false)
             return false;
 
-        // 홀수번쨰 토큰은 연산자(+)여야 한다.
         var oddIndexTokens = tokens.stream()
                 .filter(x -> tokens.indexOf(x) % 2 != 0)
                 .collect(Collectors.toList());
 
-        if (oddIndexTokens.stream().anyMatch(x -> x.getType() != TokenType.OPERATOR))
+        if (isAllOperator(oddIndexTokens) == false)
             return false;
 
-        // 첫번째 값으로 음수가 와선 안된다.
-        var first = tokens.get(0);
-        return !(first instanceof ValueToken) || ((ValueToken) first).value >= 0;
+        if (isNegativeValue(tokens.get(0)))
+            return false;
+
+        return true;
     }
+
+    private Boolean isAllValue(List<Token> tokens) {
+        return tokens.stream().allMatch(x -> x.getType() == TokenType.VALUE);
+    }
+
+    private Boolean isAllOperator(List<Token> tokens) {
+        return tokens.stream().allMatch(x -> x.getType() == TokenType.OPERATOR);
+    }
+
+    private Boolean isNegativeValue(Token token) {
+        return token instanceof ValueToken && ((ValueToken) token).value < 0;
+    }
+
 }
