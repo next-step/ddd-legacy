@@ -9,12 +9,12 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("숫자문자 도메인 테스트")
-class StringNumberTest {
+class StringPositiveNumberTest {
 
 	@DisplayName("생성 테스트")
 	@Test
 	void createTest() {
-		assertThatCode(() -> StringNumber.from("1"))
+		assertThatCode(() -> StringPositiveNumber.from("1"))
 			.doesNotThrowAnyException();
 	}
 
@@ -23,10 +23,10 @@ class StringNumberTest {
 	@NullAndEmptySource
 	void parseIntNullOrEmptyTest(String value) {
 		//given
-		StringNumber stringNumber = StringNumber.from(value);
+		StringPositiveNumber stringPositiveNumber = StringPositiveNumber.from(value);
 
 		//when
-		int result = stringNumber.parseInt();
+		int result = stringPositiveNumber.parseInt();
 
 		//then
 		assertThat(result)
@@ -38,10 +38,10 @@ class StringNumberTest {
 	@ValueSource(strings = {"-1", "-2", "-3", "-4", "-5"})
 	void parseIntNegativeNumberTest(String value) {
 		//given
-		StringNumber stringNumber = StringNumber.from(value);
+		StringPositiveNumber stringPositiveNumber = StringPositiveNumber.from(value);
 
 		//when
-		Throwable thrown = catchThrowable(stringNumber::parseInt);
+		Throwable thrown = catchThrowable(stringPositiveNumber::parseInt);
 
 		//then
 		assertThat(thrown)
@@ -54,10 +54,10 @@ class StringNumberTest {
 	@ValueSource(strings = {"a", "b", "c", "d", "e"})
 	void parseIntNotNumberTest(String value) {
 		//given
-		StringNumber stringNumber = StringNumber.from(value);
+		StringPositiveNumber stringPositiveNumber = StringPositiveNumber.from(value);
 
 		//when
-		Throwable thrown = catchThrowable(stringNumber::parseInt);
+		Throwable thrown = catchThrowable(stringPositiveNumber::parseInt);
 
 		//then
 		assertThat(thrown)
@@ -69,10 +69,10 @@ class StringNumberTest {
 	@ValueSource(strings = {"1", "2", "3", "4", "5"})
 	void parseIntNumberTest(String value) {
 		//given
-		StringNumber stringNumber = StringNumber.from(value);
+		StringPositiveNumber stringPositiveNumber = StringPositiveNumber.from(value);
 
 		//when
-		int result = stringNumber.parseInt();
+		int result = stringPositiveNumber.parseInt();
 
 		//then
 		assertThat(result)

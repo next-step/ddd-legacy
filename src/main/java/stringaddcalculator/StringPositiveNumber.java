@@ -1,15 +1,15 @@
 package stringaddcalculator;
 
-public class StringNumber {
+public class StringPositiveNumber {
 
 	private final String value;
 
-	private StringNumber(String value) {
+	private StringPositiveNumber(String value) {
 		this.value = value;
 	}
 
-	public static StringNumber from(String value) {
-		return new StringNumber(value);
+	public static StringPositiveNumber from(String value) {
+		return new StringPositiveNumber(value);
 	}
 
 	public int parseInt() {

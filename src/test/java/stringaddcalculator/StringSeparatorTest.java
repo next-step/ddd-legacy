@@ -32,7 +32,7 @@ class StringSeparatorTest {
 
 	@DisplayName("기본 구분자 중 콜론을 통해 구분된 문자열 리스트 반환 테스트")
 	@ParameterizedTest
-	@CsvSource(value = {"1:2:3|1,2,3", "1:2|1,2", "1:1"}, delimiter = '|')
+	@CsvSource(value = {"1:2:3|1,2,3", "1:2|1,2", "1|1"}, delimiter = '|')
 	void splitByColonDelimiterTest(String target, String expected) {
 		StringSeparator stringSeparator = StringSeparator.from(target);
 

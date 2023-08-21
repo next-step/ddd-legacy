@@ -13,7 +13,7 @@ public class StringAddCalculator {
 			return 0;
 		}
 		List<String> split = StringSeparator.from(input).split();
-		StringNumbers stringNumbers = StringNumbers.fromStringCollection(split);
-		return stringNumbers.sum();
+		StringPositiveNumbers stringPositiveNumbers = StringPositiveNumbers.fromStringCollection(split);
+		return stringPositiveNumbers.sum();
 	}
 }
