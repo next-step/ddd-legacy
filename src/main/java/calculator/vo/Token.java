@@ -5,11 +5,10 @@ import calculator.type.TokenType;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
+
+import static calculator.CustomRegex.TOKEN_PATTERN;
 
 public interface Token {
-    Pattern TOKEN_PATTERN = Pattern.compile("(-?[1-9][0-9]*)|([,:])");
-
     static List<String> findAllTokens(String value) {
         var matcher = TOKEN_PATTERN.matcher(value);
 

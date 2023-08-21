@@ -1,7 +1,10 @@
 package calculator;
 
 import calculator.type.TokenType;
-import calculator.vo.*;
+import calculator.vo.ExpressionCustomizer;
+import calculator.vo.OperatorToken;
+import calculator.vo.Token;
+import calculator.vo.ValueToken;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +17,7 @@ public class Calculator {
 
         var expression = expressionCustomizer.toExpression();
 
-        if (validateExpression(expression) == false)
+        if (isValidExpression(expression) == false)
             return ZERO;
 
 
@@ -39,7 +42,7 @@ public class Calculator {
     }
 
 
-    private Boolean validateExpression(String expression) {
+    private Boolean isValidExpression(String expression) {
         if (expression == null || expression.isBlank())
             return false;
 

@@ -5,9 +5,11 @@ import java.util.regex.Pattern;
 
 public class CustomRegex {
 
-    static final Pattern DIGITS_PATTERN = Pattern.compile("^\\d+$");
+    public static final Pattern DIGITS_PATTERN = Pattern.compile("^\\d+$");
 
-    static final Pattern CUSTOM_USER_SETTING = Pattern.compile("//(.)\\n(.+)");
+    public static final Pattern CUSTOM_USER_SETTING = Pattern.compile("//(.)\\n(.+)");
+
+    public static final Pattern TOKEN_PATTERN = Pattern.compile("(-?[1-9][0-9]*)|([,:])");
 
     public static boolean isDigits(String value) {
         return DIGITS_PATTERN.matcher(value).matches();
