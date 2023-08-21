@@ -15,9 +15,9 @@ public class Number {
         this.value = value;
     }
 
-    public static Number from(String s) {
+    public static Number from(String stringValue) {
         try {
-            return new Number(Integer.parseInt(s));
+            return new Number(Integer.parseInt(stringValue));
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("숫자가 아닌 문자열이 포함되어 있습니다", e);
         }
