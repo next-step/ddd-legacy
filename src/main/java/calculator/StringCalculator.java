@@ -1,7 +1,6 @@
 package calculator;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -17,31 +16,25 @@ public class StringCalculator {
             return 0;
         }
 
-        List<Integer> numbers = extractNumbers(input);;
-        validatePositiveNumbers(numbers);
+        PositiveNumbers positiveNumbers = extractNumbers(input);
 
-        return numbers.stream()
-                .mapToInt(Integer::intValue)
-                .sum();
+        return positiveNumbers.addTotalPositiveNumbers()
+                .getNumber();
     }
 
-    private void validatePositiveNumbers(List<Integer> numbers) {
-        if (numbers.stream().allMatch(number -> number < 0)) {
-            throw new RuntimeException("입력 숫자는 양수여야 합니다.");
-        }
-    }
-
-    private List<Integer> extractNumbers(String input) {
+    private PositiveNumbers extractNumbers(String input) {
         Matcher customMatcher = CUSTOM_PATTERN.matcher(input);
         if (customMatcher.find()) {
             String customDelimiter = customMatcher.group(1);
             String[] numbers = customMatcher.group(2).split(customDelimiter);
-            return Arrays.stream(numbers)
+            return new PositiveNumbers(Arrays.stream(numbers)
                     .map(Integer::parseInt)
-                    .collect(Collectors.toList());
+                    .map(PositiveNumber::new)
+                    .collect(Collectors.toList()));
         }
-        return Arrays.stream(input.split(DEFAULT_DELIMITER))
+        return new PositiveNumbers(Arrays.stream(input.split(DEFAULT_DELIMITER))
                 .map(Integer::parseInt)
-                .collect(Collectors.toList());
+                .map(PositiveNumber::new)
+                .collect(Collectors.toList()));
     }
 }
