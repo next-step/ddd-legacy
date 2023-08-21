@@ -10,9 +10,9 @@ public class Calculator {
     private static final Integer ZERO = 0;
 
     public Integer add(String text) {
-        UserInput userInput = getUserInput(text);
+        ExpressionCustomizer expressionCustomizer = getUserInput(text);
 
-        var expression = userInput.toExpression();
+        var expression = expressionCustomizer.toExpression();
 
         if (validateExpression(expression) == false)
             return ZERO;
@@ -26,16 +26,16 @@ public class Calculator {
         return calculate(tokens);
     }
 
-    private UserInput getUserInput(String text) {
+    private ExpressionCustomizer getUserInput(String text) {
         if (text == null)
-            return UserInput.of(null, null);
+            return ExpressionCustomizer.of(null, null);
 
         // 사용자가 커스텀한 설정값이 있다면 이를 추출한다.
         var mather = CustomRegex.CUSTOM_USER_SETTING.matcher(text);
         if (mather.find())
-            return UserInput.of(mather.group(1), mather.group(2));
+            return ExpressionCustomizer.of(mather.group(1), mather.group(2));
 
-        return UserInput.of(null, text);
+        return ExpressionCustomizer.of(null, text);
     }
 
 

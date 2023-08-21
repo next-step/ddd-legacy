@@ -1,17 +1,17 @@
 package calculator.vo;
 
-public class UserInput {
+public class ExpressionCustomizer {
 
     private final String customOperator;
     private final String expression;
 
-    public UserInput(String customOperator, String expression) {
+    public ExpressionCustomizer(String customOperator, String expression) {
         this.customOperator = customOperator;
         this.expression = expression;
     }
 
-    public static UserInput of(String customOperator, String expression) {
-        return new UserInput(customOperator, expression);
+    public static ExpressionCustomizer of(String customOperator, String expression) {
+        return new ExpressionCustomizer(customOperator, expression);
     }
 
     public String toExpression() {
