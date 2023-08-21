@@ -22,7 +22,9 @@ public class CustomSeparatorCalculateStrategy extends AbstractCalculateStrategy 
 
     private Matcher getMatcher(final String text) {
         Matcher matcher = CUSTOM_SEPARATOR_PATTERN.matcher(text);
-        matcher.find();
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("커스텀 구분자 패턴에 일치하지 않습니다.");
+        }
         return matcher;
     }
 

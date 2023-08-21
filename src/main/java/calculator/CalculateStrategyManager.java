@@ -4,18 +4,14 @@ import java.util.List;
 
 public class CalculateStrategyManager {
 
-    private final List<CalculateStrategy> calculateStrategies;
+    private static final List<CalculateStrategy> calculateStrategies = List.of(
+            new NullOrEmptyCalculateStrategy(),
+            new NumberPatternCalculateStrategy(),
+            new SeparatorCalculateStrategy(),
+            new CustomSeparatorCalculateStrategy()
+    );
 
-    public CalculateStrategyManager() {
-        this.calculateStrategies = List.of(
-                new NullOrEmptyCalculateStrategy(),
-                new NumberPatternCalculateStrategy(),
-                new SeparatorCalculateStrategy(),
-                new CustomSeparatorCalculateStrategy()
-        );
-    }
-
-    public CalculateStrategy findStrategy(final String text) {
+    public static CalculateStrategy findStrategy(final String text) {
         return calculateStrategies.stream()
                 .filter(strategy -> strategy.isTarget(text))
                 .findFirst()
