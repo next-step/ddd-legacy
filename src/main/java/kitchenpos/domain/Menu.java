@@ -1,7 +1,9 @@
 package kitchenpos.domain;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -46,12 +48,28 @@ public class Menu {
         columnDefinition = "binary(16)",
         foreignKey = @ForeignKey(name = "fk_menu_product_to_menu")
     )
-    private List<MenuProduct> menuProducts;
-
+    private List<MenuProduct> menuProducts = new ArrayList<>();
     @Transient
     private UUID menuGroupId;
 
     public Menu() {
+    }
+
+    public Menu(UUID id, String name, BigDecimal price, MenuGroup menuGroup, boolean displayed,
+        List<MenuProduct> menuProducts) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.menuGroup = menuGroup;
+        this.displayed = displayed;
+        this.menuProducts = menuProducts;
+    }
+
+    public void addMMenuProduct(MenuProduct menuProduct) {
+        if (Objects.isNull(menuProduct)) {
+            throw new IllegalArgumentException();
+        }
+        menuProducts.add(menuProduct);
     }
 
     public UUID getId() {
