@@ -7,20 +7,23 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Calculator {
-    public Answer add(String text) {
+    private static final Integer ZERO = 0;
+
+    public Integer add(String text) {
         UserInput userInput = getUserInput(text);
 
         var expression = userInput.toExpression();
 
         if (validateExpression(expression) == false)
-            return Answer.empty();
+            return ZERO;
+
 
         List<Token> tokens = parseToken(expression);
 
         if (isCalculable(tokens) == false)
             throw new RuntimeException("계산할 수 없는 식입니다.");
 
-        return Answer.of(calculate(tokens));
+        return calculate(tokens);
     }
 
     private UserInput getUserInput(String text) {
