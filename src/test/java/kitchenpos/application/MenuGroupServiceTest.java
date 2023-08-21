@@ -36,21 +36,29 @@ class MenuGroupServiceTest {
     @DisplayName("입력한 메뉴그룹명으로 return 된다.")
     @Test
     void create() {
+        //given
         given(menuGroupRepository.save(any())).willReturn(한식);
-
+        //when
         MenuGroup returnMenuGroup = menuGroupService.create(한식);
-
+        //then
         assertThat(returnMenuGroup).isEqualTo(한식);
+    }
+
+    @DisplayName("입력한 메뉴그룹명이 Null인경우 오류가 발생한다.")
+    @Test
+    void createFail() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> menuGroupService.create(new MenuGroup()));
     }
 
     @DisplayName("등록된 전체 메뉴그룹이 조회된다.")
     @Test
     void findAll() {
-        given(menuGroupRepository.findAll())
-            .willReturn(List.of(한식, 양식));
-
+        //givne
+        given(menuGroupRepository.findAll()).willReturn(List.of(한식, 양식));
+        //when
         List<MenuGroup> menuGroups = menuGroupService.findAll();
-        
+        //then
         assertThat(menuGroups).containsOnly(한식, 양식);
     }
 }
