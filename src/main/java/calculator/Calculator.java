@@ -24,7 +24,7 @@ public class Calculator {
         List<Token> tokens = parseToken(expression);
 
         if (isCalculable(tokens) == false)
-            throw new RuntimeException("계산할 수 없는 식입니다.");
+            throw new IllegalArgumentException("계산할 수 없는 식입니다.");
 
         return calculate(tokens);
     }
