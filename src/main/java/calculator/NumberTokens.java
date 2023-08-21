@@ -1,5 +1,8 @@
 package calculator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class NumberTokens {
     private final String[] tokens;
 
@@ -8,18 +11,11 @@ public class NumberTokens {
     }
 
     public int generateSum() {
-        int sum = 0;
+        List<PositiveNumber> positiveNumberList = new ArrayList<>();
         for (String token : tokens) {
             int num = Integer.parseInt(token);
-            validate(num);
-            sum += num;
+            positiveNumberList.add(new PositiveNumber(num));
         }
-        return sum;
-    }
-
-    private void validate(final int num) {
-        if (num < 0) {
-            throw new RuntimeException();
-        }
+        return new PositiveNumbers(positiveNumberList).sum();
     }
 }
