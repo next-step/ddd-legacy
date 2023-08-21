@@ -1,7 +1,9 @@
 package calculator;
 
 public class Separator {
-    private Separator() { }
+    private Separator() {
+        throw new IllegalStateException("");
+    }
 
     public static NumberStrings separate(final TargetString targetString) {
         NumberAppender numberAppender = new NumberAppender(targetString);
