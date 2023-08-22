@@ -13,7 +13,7 @@ public class OrderTableSteps {
 
     private static final String URI = "/api/order-tables";
 
-    public static ExtractableResponse<Response> 주문테이블_생성(String name) {
+    public static ExtractableResponse<Response> 주문테이블을_생성한다(String name) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
 
@@ -24,21 +24,21 @@ public class OrderTableSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 주문테이블_앉기(UUID orderTableId) {
+    public static ExtractableResponse<Response> 주문테이블을_사용한다(UUID orderTableId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put(URI + "/{orderTableId}/sit", orderTableId)
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 주문_테이블_치우기(UUID orderTableId) {
+    public static ExtractableResponse<Response> 주문테이블을_치운다(UUID orderTableId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put(URI + "/{orderTableId}/clear", orderTableId)
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 주문테이블_인원수_변경(UUID orderTableId, int numberOfGuests) {
+    public static ExtractableResponse<Response> 인원수를_바꾼다(UUID orderTableId, int numberOfGuests) {
         Map<String, Object> params = new HashMap<>();
         params.put("numberOfGuests", numberOfGuests);
 
@@ -49,7 +49,7 @@ public class OrderTableSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 주문테이블_전체_조회() {
+    public static ExtractableResponse<Response> 주문테이블_전체를_조회한다() {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get(URI)

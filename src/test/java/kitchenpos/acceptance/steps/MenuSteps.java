@@ -16,7 +16,7 @@ public class MenuSteps {
 
     private static final String URI = "/api/menus";
 
-    public static ExtractableResponse<Response> 메뉴_생성(String name, BigDecimal price, UUID menuGroupId, List<MenuProduct> products) {
+    public static ExtractableResponse<Response> 메뉴를_생성한다(String name, BigDecimal price, UUID menuGroupId, List<MenuProduct> products) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("price", price);
@@ -30,7 +30,7 @@ public class MenuSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 메뉴_가격_수정(UUID menuId, BigDecimal price) {
+    public static ExtractableResponse<Response> 메뉴_가격을_수정한다(UUID menuId, BigDecimal price) {
         Map<String, Object> params = new HashMap<>();
         params.put("price", price);
 
@@ -41,21 +41,21 @@ public class MenuSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 메뉴_보이기(UUID menuId) {
+    public static ExtractableResponse<Response> 메뉴를_노출한다(UUID menuId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put(URI+"/{menuId}/display", menuId)
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 메뉴_숨기기(UUID menuId) {
+    public static ExtractableResponse<Response> 메뉴를_숨긴다(UUID menuId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put(URI+"/{menuId}/hide", menuId)
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 메뉴_전체_조회() {
+    public static ExtractableResponse<Response> 메뉴_전체를_조회한다() {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().get(URI)

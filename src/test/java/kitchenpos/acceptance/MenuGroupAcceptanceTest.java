@@ -4,7 +4,6 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import kitchenpos.AcceptanceTest;
 import kitchenpos.acceptance.steps.MenuGroupSteps;
-import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,7 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     @Test
     void createTest1() {
         //when
-        ExtractableResponse<Response> response = MenuGroupSteps.메뉴그룹_생성(NAME);
+        ExtractableResponse<Response> response = MenuGroupSteps.메뉴그룹을_생성한다(NAME);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -38,10 +37,10 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllTest1() {
         //given
-        MenuGroup menuGroup1 = MenuGroupSteps.메뉴그룹_생성(NAME).as(MenuGroup.class);
-        MenuGroup menuGroup2 = MenuGroupSteps.메뉴그룹_생성(NAME).as(MenuGroup.class);
+        MenuGroup menuGroup1 = MenuGroupSteps.메뉴그룹을_생성한다(NAME).as(MenuGroup.class);
+        MenuGroup menuGroup2 = MenuGroupSteps.메뉴그룹을_생성한다(NAME).as(MenuGroup.class);
         //when
-        ExtractableResponse<Response> response = MenuGroupSteps.메뉴그룹_전체_조회();
+        ExtractableResponse<Response> response = MenuGroupSteps.메뉴그룹_전체를_조회한다();
         //then
         assertAll(
                 () -> assertThat(response.statusCode())

@@ -14,7 +14,7 @@ public class ProductSteps {
 
     private static final String URI = "/api/products";
 
-    public static ExtractableResponse<Response> 상품_생성(String name, BigDecimal price) {
+    public static ExtractableResponse<Response> 상품을_생성한다(String name, BigDecimal price) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", name);
         params.put("price", price);
@@ -26,7 +26,7 @@ public class ProductSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 상품_가격_수정(UUID productId, BigDecimal price) {
+    public static ExtractableResponse<Response> 상품_가격을_바꾼다(UUID productId, BigDecimal price) {
         Map<String, Object> params = new HashMap<>();
         params.put("price", price);
 
@@ -37,7 +37,7 @@ public class ProductSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 상품_전체_조회() {
+    public static ExtractableResponse<Response> 상품_전체를_조회한다() {
 
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

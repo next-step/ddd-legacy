@@ -28,19 +28,19 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setup() {
-        MenuGroup menuGroup = MenuGroupSteps.메뉴그룹_생성("메뉴그룹").as(MenuGroup.class);
-        Product product = ProductSteps.상품_생성("상품", BigDecimal.valueOf(1000)).as(Product.class);
+        MenuGroup menuGroup = MenuGroupSteps.메뉴그룹을_생성한다("메뉴그룹").as(MenuGroup.class);
+        Product product = ProductSteps.상품을_생성한다("상품", BigDecimal.valueOf(1000)).as(Product.class);
         MenuProduct menuProduct = MenuProductFixture.create(product, 1);
-        menu = MenuSteps.메뉴_생성(NAME, BigDecimal.valueOf(900), menuGroup.getId(), List.of(menuProduct))
+        menu = MenuSteps.메뉴를_생성한다(NAME, BigDecimal.valueOf(900), menuGroup.getId(), List.of(menuProduct))
                 .as(Menu.class);
-        MenuSteps.메뉴_보이기(menu.getId());
+        MenuSteps.메뉴를_노출한다(menu.getId());
     }
 
     @DisplayName("[성공] 주문테이블 등록")
     @Test
     void createTest1() {
         //when
-        ExtractableResponse<Response> response = OrderTableSteps.주문테이블_생성(NAME);
+        ExtractableResponse<Response> response = OrderTableSteps.주문테이블을_생성한다(NAME);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -55,9 +55,9 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     void sitTest1() {
         //given
-        OrderTable orderTable = OrderTableSteps.주문테이블_생성(NAME).as(OrderTable.class);
+        OrderTable orderTable = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
         //when
-        ExtractableResponse<Response> response = OrderTableSteps.주문테이블_앉기(orderTable.getId());
+        ExtractableResponse<Response> response = OrderTableSteps.주문테이블을_사용한다(orderTable.getId());
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -71,11 +71,11 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     void changeNumberOfGuestsTest1() {
         //given
-        OrderTable orderTable = OrderTableSteps.주문테이블_생성(NAME).as(OrderTable.class);
-        OrderTableSteps.주문테이블_앉기(orderTable.getId());
+        OrderTable orderTable = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
+        OrderTableSteps.주문테이블을_사용한다(orderTable.getId());
         //when
         int numberOfGuests = 5;
-        ExtractableResponse<Response> response = OrderTableSteps.주문테이블_인원수_변경(orderTable.getId(), numberOfGuests);
+        ExtractableResponse<Response> response = OrderTableSteps.인원수를_바꾼다(orderTable.getId(), numberOfGuests);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -89,10 +89,10 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     void changeNumberOfGuestsTest2() {
         //given
-        OrderTable orderTable = OrderTableSteps.주문테이블_생성(NAME).as(OrderTable.class);
+        OrderTable orderTable = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
         //when
         int numberOfGuests = 5;
-        ExtractableResponse<Response> response = OrderTableSteps.주문테이블_인원수_변경(orderTable.getId(), numberOfGuests);
+        ExtractableResponse<Response> response = OrderTableSteps.인원수를_바꾼다(orderTable.getId(), numberOfGuests);
         //then
         assertThat(response.statusCode())
                 .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -102,18 +102,18 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     void clearTest1() {
         //given
-        OrderTable orderTable = OrderTableSteps.주문테이블_생성(NAME).as(OrderTable.class);
-        OrderTableSteps.주문테이블_앉기(orderTable.getId());
-        OrderTableSteps.주문테이블_인원수_변경(orderTable.getId(), 5);
+        OrderTable orderTable = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
+        OrderTableSteps.주문테이블을_사용한다(orderTable.getId());
+        OrderTableSteps.인원수를_바꾼다(orderTable.getId(), 5);
 
         OrderLineItem orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
-        Order order = OrderSteps.매장_주문_생성(orderTable.getId(), List.of(orderLineItem)).as(Order.class);
-        OrderSteps.주문_접수(order.getId());
-        OrderSteps.주문_서빙(order.getId());
-        OrderSteps.주문_완료(order.getId());
+        Order order = OrderSteps.매장주문을_생성한다(orderTable.getId(), List.of(orderLineItem)).as(Order.class);
+        OrderSteps.접수한다(order.getId());
+        OrderSteps.서빙한다(order.getId());
+        OrderSteps.주문을_완료한다(order.getId());
 
         //when
-        ExtractableResponse<Response> response = OrderTableSteps.주문_테이블_치우기(orderTable.getId());
+        ExtractableResponse<Response> response = OrderTableSteps.주문테이블을_치운다(orderTable.getId());
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -129,10 +129,10 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllTest1() {
         //given
-        OrderTable orderTable1 = OrderTableSteps.주문테이블_생성(NAME).as(OrderTable.class);
-        OrderTable orderTable2 = OrderTableSteps.주문테이블_생성(NAME).as(OrderTable.class);
+        OrderTable orderTable1 = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
+        OrderTable orderTable2 = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
         //when
-        ExtractableResponse<Response> response = OrderTableSteps.주문테이블_전체_조회();
+        ExtractableResponse<Response> response = OrderTableSteps.주문테이블_전체를_조회한다();
         //then
         assertAll(
                 () -> assertThat(response.statusCode())

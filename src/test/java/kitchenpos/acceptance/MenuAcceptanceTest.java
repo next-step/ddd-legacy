@@ -37,9 +37,9 @@ public class MenuAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     void setup() {
-        menuGroup = MenuGroupSteps.메뉴그룹_생성("메뉴그룹").as(MenuGroup.class);
-        product_1000 = ProductSteps.상품_생성("상품", BigDecimal.valueOf(1000)).as(Product.class);
-        product_2000 = ProductSteps.상품_생성("상품", BigDecimal.valueOf(2000)).as(Product.class);
+        menuGroup = MenuGroupSteps.메뉴그룹을_생성한다("메뉴그룹").as(MenuGroup.class);
+        product_1000 = ProductSteps.상품을_생성한다("상품", BigDecimal.valueOf(1000)).as(Product.class);
+        product_2000 = ProductSteps.상품을_생성한다("상품", BigDecimal.valueOf(2000)).as(Product.class);
         menuProduct_1000 = MenuProductFixture.create(product_1000, 1);
         menuProduct_2000 = MenuProductFixture.create(product_2000, 1);
     }
@@ -48,7 +48,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void createTest1() {
         //when
-        ExtractableResponse<Response> response = MenuSteps.메뉴_생성(
+        ExtractableResponse<Response> response = MenuSteps.메뉴를_생성한다(
                 NAME
                 , PRICE_1000
                 , menuGroup.getId()
@@ -75,14 +75,10 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void changePriceTest1() {
         //given
-        Menu menu = MenuSteps.메뉴_생성(
-                NAME
-                , PRICE_1000
-                , menuGroup.getId()
-                , List.of(menuProduct_1000)).as(Menu.class);
+        Menu menu = 메뉴를_생성한다();
         //then
         BigDecimal changePrice = BigDecimal.valueOf(900);
-        ExtractableResponse<Response> response = MenuSteps.메뉴_가격_수정(menu.getId(), changePrice);
+        ExtractableResponse<Response> response = MenuSteps.메뉴_가격을_수정한다(menu.getId(), changePrice);
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
@@ -90,6 +86,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                         .isEqualTo(changePrice)
         );
     }
+
 
     /**
      * given 메뉴를 생성한다.
@@ -100,14 +97,10 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void changePriceTest2() {
         //given
-        Menu menu = MenuSteps.메뉴_생성(
-                NAME
-                , PRICE_1000
-                , menuGroup.getId()
-                , List.of(menuProduct_1000)).as(Menu.class);
+        Menu menu = 메뉴를_생성한다();
         //then
         BigDecimal changePrice = BigDecimal.valueOf(1200);
-        ExtractableResponse<Response> response = MenuSteps.메뉴_가격_수정(menu.getId(), changePrice);
+        ExtractableResponse<Response> response = MenuSteps.메뉴_가격을_수정한다(menu.getId(), changePrice);
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
@@ -121,14 +114,10 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void displayTest1() {
         //given
-        Menu menu = MenuSteps.메뉴_생성(
-                NAME
-                , PRICE_1000
-                , menuGroup.getId()
-                , List.of(menuProduct_1000, menuProduct_2000)).as(Menu.class);
-        MenuSteps.메뉴_숨기기(menu.getId());
+        Menu menu = 메뉴를_생성한다();
+        MenuSteps.메뉴를_숨긴다(menu.getId());
         //then
-        ExtractableResponse<Response> response = MenuSteps.메뉴_보이기(menu.getId());
+        ExtractableResponse<Response> response = MenuSteps.메뉴를_노출한다(menu.getId());
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
@@ -145,14 +134,10 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void hideTest1() {
         //given
-        Menu menu = MenuSteps.메뉴_생성(
-                NAME
-                , PRICE_1000
-                , menuGroup.getId()
-                , List.of(menuProduct_1000, menuProduct_2000)).as(Menu.class);
+        Menu menu = 메뉴를_생성한다();
 
         //then
-        ExtractableResponse<Response> response = MenuSteps.메뉴_숨기기(menu.getId());
+        ExtractableResponse<Response> response = MenuSteps.메뉴를_숨긴다(menu.getId());
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
@@ -165,18 +150,10 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllTest1(){
         //given
-        Menu menu = MenuSteps.메뉴_생성(
-                NAME
-                , PRICE_1000
-                , menuGroup.getId()
-                , List.of(menuProduct_1000, menuProduct_2000)).as(Menu.class);
-        Menu menu2 = MenuSteps.메뉴_생성(
-                NAME
-                , PRICE_1000
-                , menuGroup.getId()
-                , List.of(menuProduct_1000, menuProduct_2000)).as(Menu.class);
+        Menu menu = 메뉴를_생성한다();
+        Menu menu2 = 메뉴를_생성한다();
         //when
-        ExtractableResponse<Response> response = MenuSteps.메뉴_전체_조회();
+        ExtractableResponse<Response> response = MenuSteps.메뉴_전체를_조회한다();
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
@@ -187,4 +164,12 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     }
 
 
+    private Menu 메뉴를_생성한다() {
+        Menu menu = MenuSteps.메뉴를_생성한다(
+                NAME
+                , PRICE_1000
+                , menuGroup.getId()
+                , List.of(menuProduct_1000, menuProduct_2000)).as(Menu.class);
+        return menu;
+    }
 }
