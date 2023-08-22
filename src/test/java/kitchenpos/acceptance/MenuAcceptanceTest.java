@@ -30,18 +30,18 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     private final static BigDecimal PRICE_1000 = BigDecimal.valueOf(1000);
 
     private MenuGroup menuGroup;
-    private Product product_1000;
-    private Product product_2000;
-    private MenuProduct menuProduct_1000;
-    private MenuProduct menuProduct_2000;
+    private Product product;
+    private Product product2;
+    private MenuProduct menuProduct;
+    private MenuProduct menuProduct2;
 
     @BeforeEach
     void setup() {
         menuGroup = MenuGroupSteps.메뉴그룹_생성("메뉴그룹").as(MenuGroup.class);
-        product_1000 = ProductSteps.상품_생성("상품", BigDecimal.valueOf(1000)).as(Product.class);
-        product_2000 = ProductSteps.상품_생성("상품", BigDecimal.valueOf(2000)).as(Product.class);
-        menuProduct_1000 = MenuProductFixture.create(product_1000, 1);
-        menuProduct_2000 = MenuProductFixture.create(product_2000, 1);
+        product = ProductSteps.상품_생성("상품", BigDecimal.valueOf(1000)).as(Product.class);
+        product2 = ProductSteps.상품_생성("상품", BigDecimal.valueOf(1000)).as(Product.class);
+        menuProduct = MenuProductFixture.create(product, 1);
+        menuProduct2 = MenuProductFixture.create(product2, 1);
     }
 
     @DisplayName("메뉴 등록")
@@ -52,7 +52,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                 NAME
                 , PRICE_1000
                 , menuGroup.getId()
-                , List.of(menuProduct_1000));
+                , List.of(menuProduct));
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value())
@@ -60,9 +60,9 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                 , () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class))
                         .isEqualTo(PRICE_1000)
                 , () -> assertThat(response.jsonPath().getList("menuProducts.product.id", UUID.class))
-                        .contains(menuProduct_1000.getProductId())
+                        .contains(menuProduct.getProductId())
                 , () -> assertThat(response.jsonPath().getList("menuProducts.quantity", long.class))
-                        .contains(menuProduct_1000.getQuantity())
+                        .contains(menuProduct.getQuantity())
         );
     }
 
@@ -79,7 +79,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                 NAME
                 , PRICE_1000
                 , menuGroup.getId()
-                , List.of(menuProduct_1000)).as(Menu.class);
+                , List.of(menuProduct)).as(Menu.class);
         //then
         BigDecimal changePrice = BigDecimal.valueOf(900);
         ExtractableResponse<Response> response = MenuSteps.메뉴_가격_수정(menu.getId(), changePrice);
@@ -104,7 +104,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                 NAME
                 , PRICE_1000
                 , menuGroup.getId()
-                , List.of(menuProduct_1000)).as(Menu.class);
+                , List.of(menuProduct)).as(Menu.class);
         //then
         BigDecimal changePrice = BigDecimal.valueOf(1200);
         ExtractableResponse<Response> response = MenuSteps.메뉴_가격_수정(menu.getId(), changePrice);
@@ -125,7 +125,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                 NAME
                 , PRICE_1000
                 , menuGroup.getId()
-                , List.of(menuProduct_1000, menuProduct_2000)).as(Menu.class);
+                , List.of(menuProduct, menuProduct2)).as(Menu.class);
         MenuSteps.메뉴_숨기기(menu.getId());
         //then
         ExtractableResponse<Response> response = MenuSteps.메뉴_보이기(menu.getId());
@@ -149,7 +149,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                 NAME
                 , PRICE_1000
                 , menuGroup.getId()
-                , List.of(menuProduct_1000, menuProduct_2000)).as(Menu.class);
+                , List.of(menuProduct, menuProduct2)).as(Menu.class);
 
         //then
         ExtractableResponse<Response> response = MenuSteps.메뉴_숨기기(menu.getId());
@@ -160,5 +160,31 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                         .isFalse()
         );
     }
+
+    @DisplayName("[성공] 메뉴 전체 조회")
+    @Test
+    void findAllTest1(){
+        //given
+        Menu menu = MenuSteps.메뉴_생성(
+                NAME
+                , PRICE_1000
+                , menuGroup.getId()
+                , List.of(menuProduct, menuProduct2)).as(Menu.class);
+        Menu menu2 = MenuSteps.메뉴_생성(
+                NAME
+                , PRICE_1000
+                , menuGroup.getId()
+                , List.of(menuProduct, menuProduct2)).as(Menu.class);
+        //when
+        ExtractableResponse<Response> response = MenuSteps.메뉴_전체_조회();
+        //then
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+                , () -> assertThat(response.jsonPath().getList("id", UUID.class))
+                        .hasSize(2)
+                        .contains(menu.getId(), menu2.getId())
+        );
+    }
+
 
 }
