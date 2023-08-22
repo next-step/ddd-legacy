@@ -12,4 +12,6 @@ public class PositiveIntegers {
     public PositiveInteger sumAll() {
         return integers.stream().reduce(PositiveInteger.zero(), PositiveInteger::sum);
     }
+
+    public PositiveInteger get(int index) { return integers.get(index); }
 }
