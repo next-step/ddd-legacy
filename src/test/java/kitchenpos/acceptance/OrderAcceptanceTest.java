@@ -3,7 +3,9 @@ package kitchenpos.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import kitchenpos.AcceptanceTest;
-import kitchenpos.acceptance.steps.*;
+import kitchenpos.acceptance.steps.MenuGroupSteps;
+import kitchenpos.acceptance.steps.MenuSteps;
+import kitchenpos.acceptance.steps.ProductSteps;
 import kitchenpos.domain.*;
 import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.fixture.OrderLineItemFixture;
@@ -16,6 +18,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.acceptance.steps.OrderSteps.*;
+import static kitchenpos.acceptance.steps.OrderTableSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -26,7 +30,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     private static final String DELIVER_ADDRESS = "배달주소";
 
     private Menu menu;
-    private OrderTable orderTable;
+    private UUID orderTableId;
     private OrderLineItem orderLineItem;
 
     @BeforeEach
@@ -39,7 +43,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
         MenuSteps.메뉴를_노출한다(menu.getId());
 
         orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
-        orderTable = OrderTableSteps.주문테이블을_생성한다("주문테이블").as(OrderTable.class);
+        orderTableId = 주문테이블을_생성한다("주문테이블").as(OrderTable.class).getId();
     }
 
     /**
@@ -52,11 +56,11 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void createTest1() {
         //given
-        OrderTableSteps.주문테이블을_사용한다(orderTable.getId());
-        OrderTableSteps.주문테이블의_인원수를_바꾼다(orderTable.getId(), 5);
+        주문테이블을_사용한다(orderTableId);
+        주문테이블의_인원수를_바꾼다(orderTableId, 5);
 
         //when
-        ExtractableResponse<Response> response = OrderSteps.매장주문을_생성한다(orderTable.getId(), List.of(orderLineItem));
+        ExtractableResponse<Response> response = 매장주문을_생성한다(orderTableId, List.of(orderLineItem));
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -77,7 +81,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void createTest2() {
         //when
-        ExtractableResponse<Response> response = OrderSteps.배달주문을_생성한다(DELIVER_ADDRESS, List.of(orderLineItem));
+        ExtractableResponse<Response> response = 배달주문을_생성한다(DELIVER_ADDRESS, List.of(orderLineItem));
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -97,7 +101,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void createTest3() {
         //when
-        ExtractableResponse<Response> response = OrderSteps.포장주문을_생성한다(List.of(orderLineItem));
+        ExtractableResponse<Response> response = 포장주문을_생성한다(List.of(orderLineItem));
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -118,9 +122,9 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void acceptTest1() {
         //given
-        Order order = OrderSteps.포장주문을_생성한다(List.of(orderLineItem)).as(Order.class);
+        UUID orderId = 포장주문을_생성하고_식별자를_반환한다();
         //when
-        ExtractableResponse<Response> response = OrderSteps.접수한다(order.getId());
+        ExtractableResponse<Response> response = 주문을_접수한다(orderId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -129,6 +133,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
                         .isEqualTo(OrderStatus.ACCEPTED.name())
         );
     }
+
 
     /**
      * given 주문을 생성한다.
@@ -140,10 +145,10 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void serveTest1() {
         //given
-        Order order = OrderSteps.포장주문을_생성한다(List.of(orderLineItem)).as(Order.class);
-        OrderSteps.접수한다(order.getId());
+        UUID orderId = 포장주문을_생성하고_식별자를_반환한다();
+        주문을_접수한다(orderId);
         //when
-        ExtractableResponse<Response> response = OrderSteps.서빙한다(order.getId());
+        ExtractableResponse<Response> response = 서빙한다(orderId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -164,11 +169,11 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void startDeliveryTest1() {
         //given
-        Order order = OrderSteps.배달주문을_생성한다(DELIVER_ADDRESS, List.of(orderLineItem)).as(Order.class);
-        OrderSteps.접수한다(order.getId());
-        OrderSteps.서빙한다(order.getId());
+        UUID orderId = 배달주문을_생성하고_식별자를_반환한다();
+        주문을_접수한다(orderId);
+        서빙한다(orderId);
         //when
-        ExtractableResponse<Response> response = OrderSteps.배달을_요청한다(order.getId());
+        ExtractableResponse<Response> response = 배달을_요청한다(orderId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -190,12 +195,12 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void completeDeliveryTest1() {
         //given
-        Order order = OrderSteps.배달주문을_생성한다(DELIVER_ADDRESS, List.of(orderLineItem)).as(Order.class);
-        OrderSteps.접수한다(order.getId());
-        OrderSteps.서빙한다(order.getId());
-        OrderSteps.배달을_요청한다(order.getId());
+        UUID orderId = 배달주문을_생성하고_식별자를_반환한다();
+        주문을_접수한다(orderId);
+        서빙한다(orderId);
+        배달을_요청한다(orderId);
         //when
-        ExtractableResponse<Response> response = OrderSteps.배달을_완료한다(order.getId());
+        ExtractableResponse<Response> response = 배달을_완료한다(orderId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -217,13 +222,13 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void completeTest1() {
         //given
-        Order order = OrderSteps.배달주문을_생성한다(DELIVER_ADDRESS, List.of(orderLineItem)).as(Order.class);
-        OrderSteps.접수한다(order.getId());
-        OrderSteps.서빙한다(order.getId());
-        OrderSteps.배달을_요청한다(order.getId());
-        OrderSteps.배달을_완료한다(order.getId());
+        UUID orderId = 배달주문을_생성하고_식별자를_반환한다();
+        주문을_접수한다(orderId);
+        서빙한다(orderId);
+        배달을_요청한다(orderId);
+        배달을_완료한다(orderId);
         //when
-        ExtractableResponse<Response> response = OrderSteps.주문을_완료한다(order.getId());
+        ExtractableResponse<Response> response = 주문을_완료한다(orderId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -244,11 +249,11 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void completeTest2() {
         //given
-        Order order = OrderSteps.포장주문을_생성한다( List.of(orderLineItem)).as(Order.class);
-        OrderSteps.접수한다(order.getId());
-        OrderSteps.서빙한다(order.getId());
+        UUID orderId = 포장주문을_생성하고_식별자를_반환한다();
+        주문을_접수한다(orderId);
+        서빙한다(orderId);
         //when
-        ExtractableResponse<Response> response = OrderSteps.주문을_완료한다(order.getId());
+        ExtractableResponse<Response> response = 주문을_완료한다(orderId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -271,13 +276,13 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void completeTest3() {
         //given
-        OrderTableSteps.주문테이블을_사용한다(orderTable.getId());
-        OrderTableSteps.주문테이블의_인원수를_바꾼다(orderTable.getId(), 5);
-        Order order = OrderSteps.매장주문을_생성한다(orderTable.getId(), List.of(orderLineItem)).as(Order.class);
-        OrderSteps.접수한다(order.getId());
-        OrderSteps.서빙한다(order.getId());
+        주문테이블을_사용한다(orderTableId);
+        주문테이블의_인원수를_바꾼다(orderTableId, 5);
+        UUID eatInOrderId = 매장주문을_생성하고_식별자를_반환한다();
+        주문을_접수한다(eatInOrderId);
+        서빙한다(eatInOrderId);
         //when
-        ExtractableResponse<Response> response = OrderSteps.주문을_완료한다(order.getId());
+        ExtractableResponse<Response> response = 주문을_완료한다(eatInOrderId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -291,17 +296,30 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllTest1() {
         //given
-        Order order1 = OrderSteps.포장주문을_생성한다(List.of(orderLineItem)).as(Order.class);
-        Order order2 = OrderSteps.배달주문을_생성한다(DELIVER_ADDRESS, List.of(orderLineItem)).as(Order.class);
+        UUID takeoutOrderId = 포장주문을_생성하고_식별자를_반환한다();
+        UUID deliveryOrderId = 배달주문을_생성하고_식별자를_반환한다();
+
         //when
-        ExtractableResponse<Response> response = OrderSteps.주문_전체를_조회한다();
+        ExtractableResponse<Response> response = 주문_전체를_조회한다();
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
                         .isEqualTo(HttpStatus.OK.value())
                 , () -> assertThat(response.jsonPath().getList("id", UUID.class))
                         .hasSize(2)
-                        .contains(order1.getId(), order2.getId())
+                        .contains(takeoutOrderId, deliveryOrderId)
         );
+    }
+
+    private UUID 포장주문을_생성하고_식별자를_반환한다() {
+        return 포장주문을_생성한다(List.of(orderLineItem)).as(Order.class).getId();
+    }
+
+    private UUID 배달주문을_생성하고_식별자를_반환한다() {
+        return 배달주문을_생성한다(DELIVER_ADDRESS, List.of(orderLineItem)).as(Order.class).getId();
+    }
+
+    private UUID 매장주문을_생성하고_식별자를_반환한다() {
+        return 매장주문을_생성한다(orderTableId, List.of(orderLineItem)).as(Order.class).getId();
     }
 }

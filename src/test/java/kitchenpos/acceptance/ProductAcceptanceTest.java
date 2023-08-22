@@ -3,7 +3,6 @@ package kitchenpos.acceptance;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import kitchenpos.AcceptanceTest;
-import kitchenpos.acceptance.steps.ProductSteps;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -11,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import java.math.BigDecimal;
 import java.util.UUID;
 
+import static kitchenpos.acceptance.steps.ProductSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -24,8 +24,7 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     @Test
     void createTest1() {
         //when
-        ExtractableResponse<Response> response
-                = ProductSteps.상품을_생성한다(NAME, PRICE);
+        ExtractableResponse<Response> response = 상품을_생성한다(NAME, PRICE);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -43,12 +42,12 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     @Test
     void priceChangeTest1() {
         //given
-        UUID productId = 상품을_생성한다();
+        UUID productId = 상품을_생성한_후_식별자를_반환한다();
 
         //when
         BigDecimal changePrice = BigDecimal.valueOf(500);
         ExtractableResponse<Response> response
-                = ProductSteps.상품_가격을_바꾼다(productId, BigDecimal.valueOf(500));
+                = 상품_가격을_바꾼다(productId, BigDecimal.valueOf(500));
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -67,11 +66,11 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllTest1() {
         //given
-        UUID productOneId = 상품을_생성한다();
-        UUID productTwoId = 상품을_생성한다();
+        UUID productOneId = 상품을_생성한_후_식별자를_반환한다();
+        UUID productTwoId = 상품을_생성한_후_식별자를_반환한다();
 
         //when
-        ExtractableResponse<Response> response = ProductSteps.상품_전체를_조회한다();
+        ExtractableResponse<Response> response = 상품_전체를_조회한다();
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
@@ -82,10 +81,9 @@ public class ProductAcceptanceTest extends AcceptanceTest {
 
     }
 
-    private static UUID 상품을_생성한다() {
+    private static UUID 상품을_생성한_후_식별자를_반환한다() {
         ExtractableResponse<Response> created
-                = ProductSteps.상품을_생성한다(NAME, PRICE);
-        UUID productId = created.response().jsonPath().getObject("id", UUID.class);
-        return productId;
+                = 상품을_생성한다(NAME, PRICE);
+        return created.response().jsonPath().getObject("id", UUID.class);
     }
 }

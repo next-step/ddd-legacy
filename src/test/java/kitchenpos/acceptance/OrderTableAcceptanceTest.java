@@ -111,7 +111,7 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
         주문테이블의_인원수를_바꾼다(orderTableId, 5);
 
         매장주문을_생성한다(orderTableId);
-        접수한다(orderTableId);
+        주문을_접수한다(orderTableId);
         서빙한다(orderTableId);
         주문을_완료한다(orderTableId);
 

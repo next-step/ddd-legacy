@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.acceptance.steps.MenuSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -75,10 +76,10 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void changePriceTest1() {
         //given
-        Menu menu = 메뉴를_생성한다();
+        UUID menuId = 메뉴를_생성하고_식별자를_반환한다();
         //then
         BigDecimal changePrice = BigDecimal.valueOf(900);
-        ExtractableResponse<Response> response = MenuSteps.메뉴_가격을_수정한다(menu.getId(), changePrice);
+        ExtractableResponse<Response> response = 메뉴_가격을_수정한다(menuId, changePrice);
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
@@ -97,14 +98,15 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void changePriceTest2() {
         //given
-        Menu menu = 메뉴를_생성한다();
+        UUID menuId = 메뉴를_생성하고_식별자를_반환한다();
         //then
         BigDecimal changePrice = BigDecimal.valueOf(1200);
-        ExtractableResponse<Response> response = MenuSteps.메뉴_가격을_수정한다(menu.getId(), changePrice);
+        ExtractableResponse<Response> response = 메뉴_가격을_수정한다(menuId, changePrice);
         //then
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
     }
+
     /**
      * given 메뉴를 생성한다. 메뉴를 숨긴다.
      * when 메뉴를 보이게 한다.
@@ -114,10 +116,10 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void displayTest1() {
         //given
-        Menu menu = 메뉴를_생성한다();
-        MenuSteps.메뉴를_숨긴다(menu.getId());
+        UUID menuId = 메뉴를_생성하고_식별자를_반환한다();
+        메뉴를_숨긴다(menuId);
         //then
-        ExtractableResponse<Response> response = MenuSteps.메뉴를_노출한다(menu.getId());
+        ExtractableResponse<Response> response = 메뉴를_노출한다(menuId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
@@ -125,6 +127,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                         .isTrue()
         );
     }
+
     /**
      * given 메뉴를 생성한다.
      * when 메뉴를 숨긴다.
@@ -134,10 +137,10 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void hideTest1() {
         //given
-        Menu menu = 메뉴를_생성한다();
+        UUID menuId = 메뉴를_생성하고_식별자를_반환한다();
 
         //then
-        ExtractableResponse<Response> response = MenuSteps.메뉴를_숨긴다(menu.getId());
+        ExtractableResponse<Response> response = 메뉴를_숨긴다(menuId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
@@ -148,28 +151,28 @@ public class MenuAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("[성공] 메뉴 전체 조회")
     @Test
-    void findAllTest1(){
+    void findAllTest1() {
         //given
-        Menu menu = 메뉴를_생성한다();
-        Menu menu2 = 메뉴를_생성한다();
+        UUID firstMenuId = 메뉴를_생성하고_식별자를_반환한다();
+        UUID secondMenuId = 메뉴를_생성하고_식별자를_반환한다();
         //when
-        ExtractableResponse<Response> response = MenuSteps.메뉴_전체를_조회한다();
+        ExtractableResponse<Response> response = 메뉴_전체를_조회한다();
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
                 , () -> assertThat(response.jsonPath().getList("id", UUID.class))
                         .hasSize(2)
-                        .contains(menu.getId(), menu2.getId())
+                        .contains(firstMenuId, secondMenuId)
         );
     }
 
 
-    private Menu 메뉴를_생성한다() {
+    private UUID 메뉴를_생성하고_식별자를_반환한다() {
         Menu menu = MenuSteps.메뉴를_생성한다(
                 NAME
                 , PRICE_1000
                 , menuGroup.getId()
                 , List.of(menuProduct_1000, menuProduct_2000)).as(Menu.class);
-        return menu;
+        return menu.getId();
     }
 }

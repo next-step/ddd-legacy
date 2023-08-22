@@ -54,7 +54,7 @@ public class OrderSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 접수한다(UUID orderId) {
+    public static ExtractableResponse<Response> 주문을_접수한다(UUID orderId) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put(URI + "/{orderId}/accept", orderId)
