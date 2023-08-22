@@ -23,8 +23,6 @@ import static org.mockito.Mockito.when;
 class MenuGroupServiceTest extends ApplicationTest {
 
     @Mock
-    private PurgomalumClient purgomalumClient;
-    @Mock
     private MenuGroupRepository menuGroupRepository;
 
     @InjectMocks
