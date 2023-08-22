@@ -33,10 +33,12 @@ public class ProductService {
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException();
         }
+
         final String name = request.getName();
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
             throw new IllegalArgumentException();
         }
+
         final Product product = new Product();
         product.setId(UUID.randomUUID());
         product.setName(name);
@@ -50,9 +52,11 @@ public class ProductService {
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException();
         }
+
         final Product product = productRepository.findById(productId)
             .orElseThrow(NoSuchElementException::new);
         product.setPrice(price);
+
         final List<Menu> menus = menuRepository.findAllByProductId(productId);
         for (final Menu menu : menus) {
             BigDecimal sum = BigDecimal.ZERO;
