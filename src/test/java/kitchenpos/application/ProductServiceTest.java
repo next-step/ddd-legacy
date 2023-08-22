@@ -8,6 +8,7 @@ import kitchenpos.testHelper.SpringBootTestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,4 +35,18 @@ class ProductServiceTest extends SpringBootTestHelper {
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
+
+    @DisplayName("등록할 상품의 이름은 반드시 있어야 한다")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void test2(String name) {
+        //given
+        Product request = new Product(name, BigDecimal.valueOf(1L));
+
+        //when && //then
+        assertThatThrownBy(
+            () -> productService.create(request)
+        ).isInstanceOf(IllegalArgumentException.class);
+
+    }
 }
