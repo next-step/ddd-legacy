@@ -38,7 +38,7 @@ public class OrderTableSteps {
                 .then().log().all().extract();
     }
 
-    public static ExtractableResponse<Response> 인원수를_바꾼다(UUID orderTableId, int numberOfGuests) {
+    public static ExtractableResponse<Response> 주문테이블의_인원수를_바꾼다(UUID orderTableId, int numberOfGuests) {
         Map<String, Object> params = new HashMap<>();
         params.put("numberOfGuests", numberOfGuests);
 

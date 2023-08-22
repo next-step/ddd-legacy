@@ -53,7 +53,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     void createTest1() {
         //given
         OrderTableSteps.주문테이블을_사용한다(orderTable.getId());
-        OrderTableSteps.인원수를_바꾼다(orderTable.getId(), 5);
+        OrderTableSteps.주문테이블의_인원수를_바꾼다(orderTable.getId(), 5);
 
         //when
         ExtractableResponse<Response> response = OrderSteps.매장주문을_생성한다(orderTable.getId(), List.of(orderLineItem));
@@ -272,7 +272,7 @@ public class OrderAcceptanceTest extends AcceptanceTest {
     void completeTest3() {
         //given
         OrderTableSteps.주문테이블을_사용한다(orderTable.getId());
-        OrderTableSteps.인원수를_바꾼다(orderTable.getId(), 5);
+        OrderTableSteps.주문테이블의_인원수를_바꾼다(orderTable.getId(), 5);
         Order order = OrderSteps.매장주문을_생성한다(orderTable.getId(), List.of(orderLineItem)).as(Order.class);
         OrderSteps.접수한다(order.getId());
         OrderSteps.서빙한다(order.getId());

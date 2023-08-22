@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.acceptance.steps.OrderSteps.*;
+import static kitchenpos.acceptance.steps.OrderTableSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -40,7 +42,7 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     void createTest1() {
         //when
-        ExtractableResponse<Response> response = OrderTableSteps.주문테이블을_생성한다(NAME);
+        ExtractableResponse<Response> response = 주문테이블을_생성한다(NAME);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -55,9 +57,9 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     void sitTest1() {
         //given
-        OrderTable orderTable = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
+        UUID orderTableId = 주문테이블을_생성_후_식별자를_반환한다();
         //when
-        ExtractableResponse<Response> response = OrderTableSteps.주문테이블을_사용한다(orderTable.getId());
+        ExtractableResponse<Response> response = 주문테이블을_사용한다(orderTableId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -67,15 +69,17 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
         );
     }
 
+
+
     @DisplayName("[성공] 주문테이블 인원수 변경")
     @Test
     void changeNumberOfGuestsTest1() {
         //given
-        OrderTable orderTable = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
-        OrderTableSteps.주문테이블을_사용한다(orderTable.getId());
+        UUID orderTableId = 주문테이블을_생성_후_식별자를_반환한다();
+        주문테이블을_사용한다(orderTableId);
         //when
         int numberOfGuests = 5;
-        ExtractableResponse<Response> response = OrderTableSteps.인원수를_바꾼다(orderTable.getId(), numberOfGuests);
+        ExtractableResponse<Response> response = 주문테이블의_인원수를_바꾼다(orderTableId, numberOfGuests);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -89,10 +93,10 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     void changeNumberOfGuestsTest2() {
         //given
-        OrderTable orderTable = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
+        UUID orderTableId = 주문테이블을_생성_후_식별자를_반환한다();
         //when
         int numberOfGuests = 5;
-        ExtractableResponse<Response> response = OrderTableSteps.인원수를_바꾼다(orderTable.getId(), numberOfGuests);
+        ExtractableResponse<Response> response = 주문테이블의_인원수를_바꾼다(orderTableId, numberOfGuests);
         //then
         assertThat(response.statusCode())
                 .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -102,18 +106,17 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     void clearTest1() {
         //given
-        OrderTable orderTable = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
-        OrderTableSteps.주문테이블을_사용한다(orderTable.getId());
-        OrderTableSteps.인원수를_바꾼다(orderTable.getId(), 5);
+        UUID orderTableId = 주문테이블을_생성_후_식별자를_반환한다();
+        주문테이블을_사용한다(orderTableId);
+        주문테이블의_인원수를_바꾼다(orderTableId, 5);
 
-        OrderLineItem orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
-        Order order = OrderSteps.매장주문을_생성한다(orderTable.getId(), List.of(orderLineItem)).as(Order.class);
-        OrderSteps.접수한다(order.getId());
-        OrderSteps.서빙한다(order.getId());
-        OrderSteps.주문을_완료한다(order.getId());
+        매장주문을_생성한다(orderTableId);
+        접수한다(orderTableId);
+        서빙한다(orderTableId);
+        주문을_완료한다(orderTableId);
 
         //when
-        ExtractableResponse<Response> response = OrderTableSteps.주문테이블을_치운다(orderTable.getId());
+        ExtractableResponse<Response> response = 주문테이블을_치운다(orderTableId);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -129,17 +132,26 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllTest1() {
         //given
-        OrderTable orderTable1 = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
-        OrderTable orderTable2 = OrderTableSteps.주문테이블을_생성한다(NAME).as(OrderTable.class);
+        UUID firstOrderTableId = 주문테이블을_생성_후_식별자를_반환한다();
+        UUID secondOrderTableId = 주문테이블을_생성_후_식별자를_반환한다();
         //when
-        ExtractableResponse<Response> response = OrderTableSteps.주문테이블_전체를_조회한다();
+        ExtractableResponse<Response> response = 주문테이블_전체를_조회한다();
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
                         .isEqualTo(HttpStatus.OK.value())
                 , () -> assertThat(response.jsonPath().getList("id", UUID.class))
                         .hasSize(2)
-                        .contains(orderTable1.getId(), orderTable2.getId())
+                        .contains(firstOrderTableId, secondOrderTableId)
         );
+    }
+
+    private static UUID 주문테이블을_생성_후_식별자를_반환한다() {
+        return 주문테이블을_생성한다(NAME).as(OrderTable.class).getId();
+    }
+
+    private void 매장주문을_생성한다(UUID orderTableId) {
+        OrderLineItem orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
+        OrderSteps.매장주문을_생성한다(orderTableId, List.of(orderLineItem)).as(Order.class);
     }
 }
