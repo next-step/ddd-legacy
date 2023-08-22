@@ -18,8 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("상품")
 public class ProductAcceptanceTest extends AcceptanceTest {
 
-    private String NAME = "상품";
-    private BigDecimal PRICE = BigDecimal.valueOf(1000);
+    private final static String NAME = "상품";
+    private final static BigDecimal PRICE = BigDecimal.valueOf(1000);
 
     @DisplayName("[성공] 상품 등록")
     @Test
