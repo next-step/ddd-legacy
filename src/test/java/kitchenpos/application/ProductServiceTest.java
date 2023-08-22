@@ -1,12 +1,16 @@
 package kitchenpos.application;
 
+import static kitchenpos.testHelper.fake.PurgomalumClientFake.Purgomalum.SLANG;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import kitchenpos.domain.Product;
 import kitchenpos.testHelper.SpringBootTestHelper;
+import kitchenpos.testHelper.fake.PurgomalumClientFake;
+import kitchenpos.testHelper.fake.PurgomalumClientFake.Purgomalum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -16,6 +20,9 @@ class ProductServiceTest extends SpringBootTestHelper {
 
     @Autowired
     ProductService productService;
+
+    @Autowired
+    PurgomalumClientFake purgomalumClient;
 
     @BeforeEach
     public void init() {
@@ -48,5 +55,18 @@ class ProductServiceTest extends SpringBootTestHelper {
             () -> productService.create(request)
         ).isInstanceOf(IllegalArgumentException.class);
 
+    }
+
+    @DisplayName("등록할 상품의 이름은 비속어를 넣을 수 없다")
+    @Test
+    void test3 (){
+        //given
+        purgomalumClient.setReturn(SLANG);
+        Product request = new Product("name", BigDecimal.valueOf(1L));
+
+        //when && //then
+        assertThatThrownBy(
+            () -> productService.create(request)
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 }
