@@ -79,4 +79,18 @@ class ProductServiceTest {
         assertThatThrownBy(() -> sut.create(product))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @DisplayName("새로운 상품을 등록할 때 이름에 비속어가 포함되면 예외가 발생한다.")
+    @Test
+    void createWithProfanityName() {
+        // given
+        Product product = ProductTestFixture.create()
+                .changeId(null)
+                .changeName("bastard") // `새끼` 라는 나쁜말 ^^
+                .getProduct();
+
+        // when then
+        assertThatThrownBy(() -> sut.create(product))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
