@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -13,30 +14,15 @@ class StringAdditionalCalculatorTest {
 
     private final StringAdditionalCalculator stringAdditionalCalculator = new StringAdditionalCalculator(new ExpressionSeparator());
 
-    @DisplayName("식이 null인 경우 0을 반환한다.")
-    @Test
-    void expressionIsNull() {
-        // given
-        final String expression = null;
-
+    @DisplayName("식이 null이거나 문자열인 경우 0을 반환한다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void expressionIsNull(String expression) {
         // when
-        int result = stringAdditionalCalculator.calculate(expression);
+        PositiveNumber result = stringAdditionalCalculator.calculate(expression);
 
         // then
-        assertThat(result).isZero();
-    }
-
-    @DisplayName("식이 빈 문자열인 경우 0을 반환한다.")
-    @Test
-    void expressionIsEmptyString() {
-        // given
-        final String expression = "";
-
-        // when
-        int result = stringAdditionalCalculator.calculate(expression);
-
-        // then
-        assertThat(result).isZero();
+        assertThat(result).isEqualTo(PositiveNumber.ZERO);
     }
 
     @DisplayName("쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열을 전달하는 경우 구분자를 기준으로 분리한 각 숫자의 합을 반환한다.")
@@ -46,10 +32,10 @@ class StringAdditionalCalculatorTest {
         final String expression = "1,2:3";
 
         // when
-        int result = stringAdditionalCalculator.calculate(expression);
+        PositiveNumber result = stringAdditionalCalculator.calculate(expression);
 
         // then
-        assertThat(result).isEqualTo(6);
+        assertThat(result).isEqualTo(PositiveNumber.from("6"));
     }
 
     @DisplayName("기본 구분자(쉼표, 콜론) 외에 커스텀 구분자를 지정할 수 있다.")
@@ -59,10 +45,10 @@ class StringAdditionalCalculatorTest {
         final String expression = "//;\n1;2;3";
 
         // when
-        int result = stringAdditionalCalculator.calculate(expression);
+        PositiveNumber result = stringAdditionalCalculator.calculate(expression);
 
         // then
-        assertThat(result).isEqualTo(6);
+        assertThat(result).isEqualTo(PositiveNumber.from("6"));
     }
 
     @DisplayName("커스텀 구분자는 한 글자만 가능하다")

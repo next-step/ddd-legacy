@@ -9,11 +9,11 @@ class StringAdditionalCalculator {
         this.expressionSeparator = expressionSeparator;
     }
 
-    public int calculate(String expression) {
+    public PositiveNumber calculate(String expression) {
         if (expression == null || expression.isEmpty()) {
-            return 0;
+            return PositiveNumber.ZERO;
         }
         PositiveNumbers positiveNumbers = PositiveNumbers.of(List.of(expressionSeparator.separate(expression)));
-        return positiveNumbers.totalSum().getValue();
+        return positiveNumbers.totalSum();
     }
 }
