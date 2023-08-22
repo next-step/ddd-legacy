@@ -11,13 +11,13 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-class NumberParseUtilsTest {
+class NumberParsePolicyTest {
 
-    private NumberParseUtils numberParseUtils;
+    private NumberParsePolicy numberParsePolicy;
 
     @BeforeEach
     public void init() {
-        numberParseUtils = new NumberParseUtilsImpl();
+        numberParsePolicy = new NumberParsePolicyImpl();
     }
 
     @DisplayName("String 배열에 대해 각각 Int 배열로 변환해주어야 한다.")
@@ -25,7 +25,7 @@ class NumberParseUtilsTest {
     @MethodSource("test1MethodSource")
     void test1(String[] input, Integer[] expect) {
         //when
-        int[] result = numberParseUtils.parse(input);
+        int[] result = numberParsePolicy.parse(input);
 
         //then
         assertThat(result).containsExactly(expect);
@@ -46,7 +46,7 @@ class NumberParseUtilsTest {
         String[] input = {"1l;", "2", "3"};
 
         //when && then
-        assertThatThrownBy(() -> numberParseUtils.parse(input))
+        assertThatThrownBy(() -> numberParsePolicy.parse(input))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("숫자 변환에 실패 하였습니다.");
     }
@@ -58,7 +58,7 @@ class NumberParseUtilsTest {
         String[] input = {"-1", "2", "3"};
 
         //when && then
-        assertThatThrownBy(() -> numberParseUtils.parse(input))
+        assertThatThrownBy(() -> numberParsePolicy.parse(input))
             .isInstanceOf(RuntimeException.class)
             .hasMessage("음수는 변환할수 없습니다.");
     }

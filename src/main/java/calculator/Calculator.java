@@ -4,12 +4,12 @@ import java.util.Arrays;
 
 public class Calculator {
 
-    private final NumberParseUtils numberParseUtils;
-    private final TokenizerUtils tokenizerUtils;
+    private final NumberParsePolicy numberParsePolicy;
+    private final TokenizePolicy tokenizePolicy;
 
-    public Calculator(NumberParseUtils numberParseUtils, TokenizerUtils tokenizerUtils) {
-        this.numberParseUtils = numberParseUtils;
-        this.tokenizerUtils = tokenizerUtils;
+    public Calculator(NumberParsePolicy numberParsePolicy, TokenizePolicy tokenizePolicy) {
+        this.numberParsePolicy = numberParsePolicy;
+        this.tokenizePolicy = tokenizePolicy;
     }
 
 
@@ -18,8 +18,8 @@ public class Calculator {
             return 0;
         }
 
-        String[] strings = tokenizerUtils.parse(input);
-        int[] numbers = numberParseUtils.parse(strings);
+        String[] strings = tokenizePolicy.parse(input);
+        int[] numbers = numberParsePolicy.parse(strings);
 
         return Arrays.stream(numbers)
             .sum();
