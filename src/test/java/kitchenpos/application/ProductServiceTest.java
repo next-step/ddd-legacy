@@ -145,18 +145,18 @@ class ProductServiceTest extends ApplicationTest {
         @Test
         void priceChangeTest3() {
             //given
-            Product product1 = ProductFixture.create(BigDecimal.valueOf(1000));
-            Product product2 = ProductFixture.create(BigDecimal.valueOf(1000));
+            Product product_1000 = ProductFixture.create(BigDecimal.valueOf(1000));
+            Product product_2000 = ProductFixture.create(BigDecimal.valueOf(2000));
             Menu menu = MenuFixture.create(
-                    BigDecimal.valueOf(2000)
-                    , MenuProductFixture.createDefaultsWithProduct(product1, product2));
+                    BigDecimal.valueOf(3000)
+                    , MenuProductFixture.createDefaultsWithProduct(product_1000, product_2000));
 
-            when(productRepository.findById(product1.getId())).thenReturn(Optional.of(product1));
+            when(productRepository.findById(product_1000.getId())).thenReturn(Optional.of(product_1000));
             when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
             assertThat(menu.isDisplayed()).isTrue();
             //when
-            product1.setPrice(BigDecimal.valueOf(1500));
-            productService.changePrice(product1.getId(), product1);
+            product_1000.setPrice(BigDecimal.valueOf(1500));
+            productService.changePrice(product_1000.getId(), product_1000);
             //then
             assertThat(menu.isDisplayed()).isFalse();
         }

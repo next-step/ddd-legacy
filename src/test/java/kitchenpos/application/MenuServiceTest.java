@@ -40,17 +40,17 @@ class MenuServiceTest extends ApplicationTest {
     @InjectMocks
     private MenuService menuService;
 
-    private Product product1;
-    private Product product2;
+    private Product product_1000;
+    private Product product_2000;
     private MenuGroup menuGroup;
     private List<MenuProduct> menuProducts;
 
     @BeforeEach
     void setup() {
-        product1 = ProductFixture.create(BigDecimal.valueOf(1000));
-        product2 = ProductFixture.create(BigDecimal.valueOf(1000));
+        product_1000 = ProductFixture.create(BigDecimal.valueOf(1000));
+        product_2000 = ProductFixture.create(BigDecimal.valueOf(2000));
         menuGroup = MenuGroupFixture.createDefault();
-        menuProducts = MenuProductFixture.createDefaultsWithProduct(product1, product2);
+        menuProducts = MenuProductFixture.createDefaultsWithProduct(product_1000, product_2000);
     }
 
 
@@ -160,7 +160,7 @@ class MenuServiceTest extends ApplicationTest {
             when(menuGroupRepository.findById(any()))
                     .thenReturn(Optional.of(menuGroup));
             when(productRepository.findAllByIdIn(any()))
-                    .thenReturn(List.of(product1, product2));
+                    .thenReturn(List.of(product_1000, product_2000));
             when(productRepository.findById(any()))
                     .thenReturn(Optional.empty());
             //then
@@ -189,7 +189,7 @@ class MenuServiceTest extends ApplicationTest {
         @Test
         void createTest5() {
             //given
-            MenuProduct menuProduct = MenuProductFixture.create(product1, -1);
+            MenuProduct menuProduct = MenuProductFixture.create(product_1000, -1);
             Menu menu = MenuFixture.create("메뉴"
                     , BigDecimal.valueOf(1500)
                     , true
@@ -200,7 +200,7 @@ class MenuServiceTest extends ApplicationTest {
             when(menuGroupRepository.findById(any()))
                     .thenReturn(Optional.of(menuGroup));
             when(productRepository.findAllByIdIn(any()))
-                    .thenReturn(List.of(product1));
+                    .thenReturn(List.of(product_1000));
 
             //then
             assertThatThrownBy(() -> menuService.create(menu))
@@ -374,10 +374,10 @@ class MenuServiceTest extends ApplicationTest {
         when(menuGroupRepository.findById(menuGroup.getId()))
                 .thenReturn(Optional.of(menuGroup));
         when(productRepository.findAllByIdIn(any()))
-                .thenReturn(List.of(product1, product2));
-        when(productRepository.findById(product1.getId()))
-                .thenReturn(Optional.of(product1));
-        when(productRepository.findById(product2.getId()))
-                .thenReturn(Optional.of(product1));
+                .thenReturn(List.of(product_1000, product_2000));
+        when(productRepository.findById(product_1000.getId()))
+                .thenReturn(Optional.of(product_1000));
+        when(productRepository.findById(product_2000.getId()))
+                .thenReturn(Optional.of(product_1000));
     }
 }

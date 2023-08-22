@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 import kitchenpos.AcceptanceTest;
 import kitchenpos.acceptance.steps.MenuGroupSteps;
 import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -37,8 +38,8 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllTest1() {
         //given
-        Menu menu1 = MenuGroupSteps.메뉴그룹_생성(NAME).as(Menu.class);
-        Menu menu2 = MenuGroupSteps.메뉴그룹_생성(NAME).as(Menu.class);
+        MenuGroup menuGroup1 = MenuGroupSteps.메뉴그룹_생성(NAME).as(MenuGroup.class);
+        MenuGroup menuGroup2 = MenuGroupSteps.메뉴그룹_생성(NAME).as(MenuGroup.class);
         //when
         ExtractableResponse<Response> response = MenuGroupSteps.메뉴그룹_전체_조회();
         //then
@@ -47,7 +48,7 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
                         .isEqualTo(HttpStatus.OK.value())
                 , () -> assertThat(response.jsonPath().getList("id", UUID.class))
                         .hasSize(2)
-                        .contains(menu1.getId(), menu2.getId())
+                        .contains(menuGroup1.getId(), menuGroup2.getId())
         );
     }
 }
