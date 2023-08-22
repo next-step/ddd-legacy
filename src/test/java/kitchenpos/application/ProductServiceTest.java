@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -156,5 +157,20 @@ class ProductServiceTest {
         // when then
         assertThatThrownBy(() -> sut.changePrice(product.getId(), changePriceRequest))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품의 가격을 변경할 때 상품이 존재하지 않으면 예외가 발생한다.")
+    @Test
+    void changePriceWithNonExistentProduct() {
+        // given
+        UUID id = UUID.randomUUID();
+        Product changePriceRequest = ProductTestFixture.create()
+                .changeId(id)
+                .changePrice(BigDecimal.valueOf(2000))
+                .getProduct();
+
+        // when then
+        assertThatThrownBy(() -> sut.changePrice(id, changePriceRequest))
+                .isInstanceOf(NoSuchElementException.class);
     }
 }
