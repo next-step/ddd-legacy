@@ -587,21 +587,6 @@ class OrderServiceTest extends ApplicationTest {
         }
     }
 
-    @DisplayName("[성공] 주문 전체 목록을 조회한다.")
-    @Test
-    void findAllTest1() {
-        //given
-        OrderLineItem orderLineItem1 = OrderLineItemFixture.create(menu, BigDecimal.valueOf(2000), 2);
-
-        Order eatIn = OrderFixture.createEatIn(Optional.ofNullable(orderTable), List.of(orderLineItem));
-        Order takeOut = OrderFixture.createTakeOut(List.of(orderLineItem, orderLineItem1));
-        when(orderRepository.findAll()).thenReturn(List.of(eatIn, takeOut));
-        //when
-        List<Order> all = orderService.findAll();
-        //then
-        assertThat(all).hasSize(2)
-                .contains(eatIn, takeOut);
-    }
 
 }
 

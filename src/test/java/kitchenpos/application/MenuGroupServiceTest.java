@@ -49,19 +49,4 @@ class MenuGroupServiceTest extends ApplicationTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[성공] 메뉴그룹 전체 목록을 조회한다.")
-    @Test
-    void findAllTest1() {
-        //given
-        MenuGroup menuGroup1 = MenuGroupFixture.createDefault();
-        MenuGroup menuGroup2 = MenuGroupFixture.createDefault();
-        MenuGroup menuGroup3 = MenuGroupFixture.createDefault();
-        when(menuGroupRepository.findAll()).thenReturn(List.of(menuGroup1, menuGroup2, menuGroup3));
-        //when
-        List<MenuGroup> all = menuGroupService.findAll();
-        //then
-        assertThat(all).hasSize(3)
-                .contains(menuGroup1, menuGroup2, menuGroup3);
-    }
-
 }

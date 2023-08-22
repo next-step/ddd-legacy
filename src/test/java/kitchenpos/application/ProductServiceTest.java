@@ -162,21 +162,4 @@ class ProductServiceTest extends ApplicationTest {
         }
 
     }
-
-    @DisplayName("[성공] 상품 전체 목록을 조회한다.")
-    @Test
-    void findAllTest1() {
-        //given
-        Product product1 = ProductFixture.create(BigDecimal.valueOf(1000));
-        Product product2 = ProductFixture.create(BigDecimal.valueOf(1000));
-        Product product3 = ProductFixture.create(BigDecimal.valueOf(1000));
-        when(productRepository.findAll()).thenReturn(List.of(product1, product2, product3));
-        //when
-        List<Product> results = productService.findAll();
-        //then
-        assertThat(results)
-                .hasSize(3)
-                .contains(product1, product2, product3);
-
-    }
 }

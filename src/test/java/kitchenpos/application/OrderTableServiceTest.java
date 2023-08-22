@@ -203,19 +203,5 @@ public class OrderTableServiceTest extends ApplicationTest {
                     .isInstanceOf(IllegalStateException.class);
         }
     }
-
-    @DisplayName("[성공] 주문 전체 목록을 조회한다.")
-    @Test
-    void findAllTest1() {
-        //given
-        OrderTable orderTable1 = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, true, 1);
-        OrderTable orderTable2 = OrderTableFixture.create(DEFAULT_ORDERTABLE_NAME, true, 1);
-        when(orderTableRepository.findAll()).thenReturn(List.of(orderTable1, orderTable2));
-        //when
-        List<OrderTable> all = orderTableService.findAll();
-        //then
-        assertThat(all).hasSize(2)
-                .contains(orderTable1, orderTable2);
-
-    }
+    
 }

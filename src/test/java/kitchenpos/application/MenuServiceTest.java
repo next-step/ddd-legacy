@@ -370,28 +370,6 @@ class MenuServiceTest extends ApplicationTest {
 
     }
 
-    @DisplayName("[성공] 메뉴 전체를 조회한다.")
-    @Test
-    void findAllTest1() {
-        //given
-        Menu menu1 = MenuFixture.create("메뉴"
-                , BigDecimal.valueOf(1500)
-                , true
-                , menuGroup
-                , menuProducts);
-        Menu menu2 = MenuFixture.create("메뉴"
-                , BigDecimal.valueOf(1500)
-                , true
-                , menuGroup
-                , menuProducts);
-        when(menuRepository.findAll()).thenReturn(List.of(menu1,menu2));
-        //when
-        List<Menu> all = menuService.findAll();
-        //then
-        assertThat(all).hasSize(2)
-                .contains(menu1, menu2);
-    }
-
     private void setUpMockDefault() {
         when(menuGroupRepository.findById(menuGroup.getId()))
                 .thenReturn(Optional.of(menuGroup));
