@@ -1,13 +1,17 @@
 package kitchenpos.application;
 
+import static kitchenpos.testHelper.fake.PurgomalumClientFake.Purgomalum.NORMAL;
 import static kitchenpos.testHelper.fake.PurgomalumClientFake.Purgomalum.SLANG;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
 import kitchenpos.domain.Product;
 import kitchenpos.testHelper.SpringBootTestHelper;
 import kitchenpos.testHelper.fake.PurgomalumClientFake;
 import kitchenpos.testHelper.fake.PurgomalumClientFake.Purgomalum;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,5 +72,24 @@ class ProductServiceTest extends SpringBootTestHelper {
         assertThatThrownBy(
             () -> productService.create(request)
         ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품 정보를 저장할수 있다")
+    @ParameterizedTest
+    @ValueSource(longs = {0L, 1L, 10L, 100L, 10_000L, 100_000L, 1_000_000L, 10_000_000L, 100_000_000L})
+    void test4 (long price){
+        //given
+        purgomalumClient.setReturn(NORMAL);
+        Product request = new Product("name", BigDecimal.valueOf(price));
+
+        //when
+        Product result = productService.create(request);
+
+        //then
+        assertAll(
+            () -> assertThat(result.getId()).isNotNull(),
+            () -> assertThat(result.getName()).isEqualTo(request.getName()),
+            () -> assertThat(result.getPrice()).isEqualTo(request.getPrice())
+        );
     }
 }
