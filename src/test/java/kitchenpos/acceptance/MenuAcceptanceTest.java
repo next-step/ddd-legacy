@@ -26,9 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("메뉴")
 public class MenuAcceptanceTest extends AcceptanceTest {
 
-    private String NAME = "기본메뉴";
-    private BigDecimal PRICE_1000 = BigDecimal.valueOf(1000);
-    private BigDecimal PRICE_2000= BigDecimal.valueOf(2000);
+    private final String NAME = "기본메뉴";
+    private final BigDecimal PRICE_1000 = BigDecimal.valueOf(1000);
 
     private MenuGroup menuGroup;
     private Product product;
