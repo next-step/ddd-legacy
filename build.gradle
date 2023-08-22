@@ -25,6 +25,12 @@ dependencies {
     runtimeOnly 'mysql:mysql-connector-java'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'com.h2database:h2'
+
+    // Object & String 편리한 검증을 위한 의존성 주입
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+
+    // Snake Case 편리한 변환을 위한 주입
+    testImplementation 'com.google.guava:guava:11.0.2'
 }
 
 test {
