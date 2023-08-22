@@ -1,12 +1,14 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.test_fixture.ProductTestFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -19,6 +21,9 @@ class ProductServiceTest {
 
     @Autowired
     private ProductService sut;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @DisplayName("새로운 상품을 등록할 수 있다.")
     @Test
@@ -92,5 +97,28 @@ class ProductServiceTest {
         // when then
         assertThatThrownBy(() -> sut.create(product))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품의 가격을 변경할 수 있다.")
+    @Test
+    void changePrice() {
+        // given
+        Product product = ProductTestFixture.create()
+                .changeId(UUID.randomUUID())
+                .getProduct();
+        productRepository.save(product);
+        Product changePriceRequest = ProductTestFixture.create()
+                .changeId(product.getId())
+                .changePrice(BigDecimal.valueOf(2000))
+                .getProduct();
+
+        // when
+        Product result = sut.changePrice(product.getId(), changePriceRequest);
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(product.getId());
+        assertThat(result.getName()).isEqualTo("테스트 상품");
+        assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(2000));
     }
 }
