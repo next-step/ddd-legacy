@@ -50,6 +50,7 @@ class MenuServiceTest {
         돈가스id = UUID.randomUUID();
         돈가스 = new Product(돈가스id, "돈가스", BigDecimal.valueOf(12000));
         김밥 = new Product(UUID.randomUUID(), "김밥", BigDecimal.valueOf(7000));
+
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
 
@@ -147,7 +148,7 @@ class MenuServiceTest {
             then(productRepository).should(times(1)).findAllByIdIn(any());
         }
 
-        @DisplayName("상품정보 전체 등록 검증에서는 통과 했으나, 개별 등록 조회에서 실패했을경우 ")
+        @DisplayName("상품정보 전체 등록 검증에서는 통과 했으나, 개별 등록 조회에서 실패했을경우 오류가 발생한다.")
         @Test
         void notExistsProductId() {
             //given
@@ -167,7 +168,7 @@ class MenuServiceTest {
             then(productRepository).should(times(1)).findById(돈가스.getId());
         }
 
-        @DisplayName("등록할 메뉴가격 > 계산된 금액(상품금액*메뉴상품 갯수) 인경우 오류")
+        @DisplayName("등록할 메뉴가격 > 계산된 금액(상품금액*메뉴상품 갯수) 인경우 오류가 발생한다.")
         @Test
         void overPrice() {
             //given
@@ -189,7 +190,7 @@ class MenuServiceTest {
             then(productRepository).should(times(1)).findById(김밥.getId());
         }
 
-        @DisplayName("메뉴이름 null 인 경우 오류")
+        @DisplayName("메뉴이름 null 인 경우 오류가 발생한다.")
         @Test
         void menuNameIsEmpty() {
             //given
@@ -211,7 +212,7 @@ class MenuServiceTest {
             then(productRepository).should(times(1)).findById(김밥.getId());
         }
 
-        @DisplayName("메뉴이름에 비속어가 포함되어 있으면 오류")
+        @DisplayName("메뉴이름에 비속어가 포함되어 있으면 오류가 발생한다.")
         @Test
         void wrongMenuName() {
             //given
