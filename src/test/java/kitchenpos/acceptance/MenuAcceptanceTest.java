@@ -45,7 +45,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
         menuProduct_2000 = MenuProductFixture.create(product_2000, 1);
     }
 
-    @DisplayName("메뉴 등록")
+    @DisplayName("[성공] 메뉴 등록")
     @Test
     void createTest1() {
         //when
