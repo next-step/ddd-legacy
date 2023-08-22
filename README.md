@@ -8,6 +8,21 @@
     - [x] 주문 테이블 요구사항 정리
     - [x] 주문에 대한 요구사항 정리
 
+## step3 요구사항
+- 통합 테스트 코드 작성
+  - [ ] 상품(Product Business Object) 에 대한 테스트 작성
+  - [ ] 메뉴(Menu Business Object) 에 대한 테스트 작성
+  - [ ] 메뉴 그룹(Menu Group Business Object) 에 대한 테스트 작성
+  - [ ] 주문 테이블(Order Table Business Object) 에 대한 테스트 작성
+  - [ ] 주문(Order Business Object) 에 대한 테스트 작성
+- Controller 테스트 코드 작성
+  - [ ] ProductRestController 테스트 작성
+  - [ ] MenuRestController 테스트 작성
+  - [ ] MenuGroupRestController 테스트 작성
+  - [ ] OrderTableRestController 테스트 작성
+  - [ ] OrderRestController 테스트 작성
+
+
 ## 퀵 스타트
 
 ```sh
@@ -20,7 +35,7 @@ docker compose -p kitchenpos up -d
 - **상품 (Product)**
    - 판매하는 상품을 의미한다.
    - [ ] 새로운 상품을 등록할 수 있다.
-     - [ ] 상품은 ( 상품고유ID, 상품 이름, 가격 ) 을 가진다.
+     - [x] 상품은 ( 상품고유ID, 상품 이름, 가격 ) 을 가진다.
      - [ ] 상품을 등록할 때 이름, 가격은 필수 값이다.
      - [ ] 상품의 가격은 0이상의 양수로만 등록가능하다.
        - [ ] 상품의 가격이 비어있거나 음수라면 사용자에게 등록 불가능함을 알려야한다.
