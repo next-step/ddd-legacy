@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.UUID;
 
+import static kitchenpos.acceptance.steps.MenuGroupSteps.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -23,7 +24,7 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     @Test
     void createTest1() {
         //when
-        ExtractableResponse<Response> response = MenuGroupSteps.메뉴그룹을_생성한다(NAME);
+        ExtractableResponse<Response> response = 메뉴그룹을_생성한다(NAME);
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
@@ -37,17 +38,21 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     @Test
     void findAllTest1() {
         //given
-        MenuGroup menuGroup1 = MenuGroupSteps.메뉴그룹을_생성한다(NAME).as(MenuGroup.class);
-        MenuGroup menuGroup2 = MenuGroupSteps.메뉴그룹을_생성한다(NAME).as(MenuGroup.class);
+        UUID firstMenuGroupId = 메뉴그룹을_생성_후_식별자를_반환한다();
+        UUID secondMenuGroupId = 메뉴그룹을_생성_후_식별자를_반환한다();
         //when
-        ExtractableResponse<Response> response = MenuGroupSteps.메뉴그룹_전체를_조회한다();
+        ExtractableResponse<Response> response = 메뉴그룹_전체를_조회한다();
         //then
         assertAll(
                 () -> assertThat(response.statusCode())
                         .isEqualTo(HttpStatus.OK.value())
                 , () -> assertThat(response.jsonPath().getList("id", UUID.class))
                         .hasSize(2)
-                        .contains(menuGroup1.getId(), menuGroup2.getId())
+                        .contains(firstMenuGroupId, secondMenuGroupId)
         );
+    }
+
+    private static UUID 메뉴그룹을_생성_후_식별자를_반환한다() {
+        return 메뉴그룹을_생성한다(NAME).as(MenuGroup.class).getId();
     }
 }
