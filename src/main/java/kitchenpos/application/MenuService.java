@@ -77,8 +77,6 @@ public class MenuService {
             menuProduct.setQuantity(quantity);
             menuProducts.add(menuProduct);
         }
-        //메뉴가격 > 계산금액 오류
-        //결론 메뉴가격은 <= 계산금액
         if (price.compareTo(sum) > 0) {
             throw new IllegalArgumentException();
         }

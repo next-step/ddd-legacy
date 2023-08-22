@@ -63,11 +63,29 @@ public class Menu {
         this.displayed = displayed;
     }
 
-    public void addMMenuProduct(MenuProduct menuProduct) {
+    public void addMenuProduct(MenuProduct menuProduct) {
         if (Objects.isNull(menuProduct)) {
             throw new IllegalArgumentException();
         }
         menuProducts.add(menuProduct);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Menu))
+            return false;
+        Menu menu = (Menu)o;
+        return displayed == menu.displayed && Objects.equals(id, menu.id) && Objects.equals(name,
+            menu.name) && Objects.equals(price, menu.price) && Objects.equals(menuGroup, menu.menuGroup)
+            && Objects.equals(menuProducts, menu.menuProducts) && Objects.equals(menuGroupId,
+            menu.menuGroupId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, price, menuGroup, displayed, menuProducts, menuGroupId);
     }
 
     public UUID getId() {
