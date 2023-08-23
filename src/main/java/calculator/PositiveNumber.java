@@ -12,11 +12,15 @@ public final class PositiveNumber {
             throw new RuntimeException(
                 String.format("it is negative value: %s", value));
         }
-        
+
         this.value = value;
     }
 
-    public int getValue() {
+    PositiveNumber sum(final PositiveNumber number) {
+        return new PositiveNumber(number.value + value);
+    }
+
+    int getValue() {
         return value;
     }
 
