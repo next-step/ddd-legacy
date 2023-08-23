@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class StringCalculator {
+    private static final String DEFAULT_PATTERN = "[,:]";
     private static final Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final int ZERO = 0;
     private static final List<Integer> EMPTY_NUMBERS = List.of(ZERO);
@@ -14,11 +15,9 @@ public class StringCalculator {
     public int add(final String expression) {
         final List<Integer> numbers = extractNumbers(expression);
 
-        validateNegative(numbers);
-
-        return numbers.stream()
-                .mapToInt(e -> e)
-                .sum();
+        return PositiveNumbers.of(numbers)
+                .sum()
+                .getValue();
     }
 
     private List<Integer> extractNumbers(final String expression) {
@@ -35,16 +34,10 @@ public class StringCalculator {
             return Arrays.stream(tokens)
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
-        } else {
-            return Arrays.stream(expression.split("[,:]"))
-                    .map(Integer::parseInt)
-                    .collect(Collectors.toList());
         }
-    }
 
-    private void validateNegative(final List<Integer> numbers) {
-        if (numbers.stream().anyMatch(e -> e < ZERO)) {
-            throw new RuntimeException();
-        }
+        return Arrays.stream(expression.split(DEFAULT_PATTERN))
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
     }
 }
