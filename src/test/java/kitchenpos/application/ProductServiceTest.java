@@ -12,12 +12,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("ProductService 클래스")
 @SpringBootTest
@@ -208,6 +210,36 @@ class ProductServiceTest {
         // then
         Menu menuWithProduct = menuRepository.findById(menu.getId()).get();
         assertFalse(menuWithProduct.isDisplayed());
+    }
+
+    @DisplayName("전체 상품의 정보를 조회할 수 있다")
+    @Test
+    void findAll() {
+        // given
+        Product product = ProductTestFixture.create()
+                .changeId(UUID.randomUUID())
+                .getProduct();
+        productRepository.save(product);
+        Product product2 = ProductTestFixture.create()
+                .changeId(UUID.randomUUID())
+                .getProduct();
+        productRepository.save(product2);
+
+        // when
+        List<Product> result = sut.findAll();
+
+        // then
+        assertThat(result)
+                .isNotNull()
+                .hasSize(2);
+        result.forEach(it -> assertProduct(it, "테스트 상품", BigDecimal.valueOf(1000.00)));
+    }
+
+    private void assertProduct(Product product, String name, BigDecimal price) {
+        assertThat(product).isNotNull();
+        assertThat(product.getId()).isNotNull();
+        assertThat(product.getName()).isEqualTo(name);
+        assertTrue(product.getPrice().compareTo(price) == 0);
     }
 
     private Menu createMenu(Product product) {
