@@ -18,7 +18,7 @@ class MenuGroupAcceptanceTest extends AcceptanceTest {
 
     /**
      * When : 메뉴그룹을 3개 생성하고
-     * Then : 전체 메뉴그룹을 조회하면 등록한 메뉴 그룹 찾을 수 있다.
+     * Then : 전체 메뉴그룹을 조회하면 등록한 메뉴그룹 찾을 수 있다.
      */
     @DisplayName("메뉴가 그룹 생성")
     @Test
