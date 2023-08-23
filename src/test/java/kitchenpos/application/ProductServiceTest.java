@@ -1,16 +1,15 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.test_fixture.MenuGroupTestFixture;
-import kitchenpos.test_fixture.MenuProductTestFixture;
-import kitchenpos.test_fixture.MenuTestFixture;
+import kitchenpos.integration_test_step.DatabaseCleanStep;
+import kitchenpos.integration_test_step.MenuIntegrationStep;
 import kitchenpos.test_fixture.ProductTestFixture;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -35,10 +34,15 @@ class ProductServiceTest {
     private MenuRepository menuRepository;
 
     @Autowired
-    private MenuGroupRepository menuGroupRepository;
+    private MenuIntegrationStep menuIntegrationStep;
 
     @Autowired
-    private EntityManager entityManager;
+    private DatabaseCleanStep databaseCleanStep;
+
+    @BeforeEach
+    void setUp() {
+        databaseCleanStep.clean();
+    }
 
 
     @DisplayName("새로운 상품을 등록할 수 있다.")
@@ -197,7 +201,7 @@ class ProductServiceTest {
                 .changeId(UUID.randomUUID())
                 .getProduct();
         productRepository.save(product);
-        Menu menu = this.createMenu(product);
+        Menu menu = menuIntegrationStep.createPersistMenu(product);
 
         Product changePriceRequest = ProductTestFixture.create()
                 .changeId(product.getId())
@@ -240,24 +244,6 @@ class ProductServiceTest {
         assertThat(product.getId()).isNotNull();
         assertThat(product.getName()).isEqualTo(name);
         assertTrue(product.getPrice().compareTo(price) == 0);
-    }
-
-    private Menu createMenu(Product product) {
-        MenuGroup menuGroup = MenuGroupTestFixture.create()
-                .changeId(UUID.randomUUID())
-                .getMenuGroup();
-        menuGroupRepository.save(menuGroup);
-        MenuProduct menuProduct = MenuProductTestFixture.create()
-                .changeProduct(product)
-                .getMenuProduct();
-        Menu menu = MenuTestFixture.create()
-                .changeId(UUID.randomUUID())
-                .changePrice(BigDecimal.valueOf(2000))
-                .changeMenuGroup(menuGroup)
-                .changeMenuProducts(menuProduct)
-                .changeDisplayed(true)
-                .getMenu();
-        return menuRepository.save(menu);
     }
 }
 
