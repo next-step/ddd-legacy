@@ -2,7 +2,7 @@ package calculator;
 
 public class PositiveNumber {
     public static final PositiveNumber ZERO = new PositiveNumber(0);
-    private int number;
+    private final int number;
 
     public PositiveNumber(int number) {
         if (number < 0) {
