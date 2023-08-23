@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,19 +44,15 @@ class DefaultRefinerTest {
             .isEqualTo(expected);
     }
 
-    private String createCustomText(final String delimiter, final List<String> characters) {
-        return String.format("//%s\n%s", delimiter, String.join(delimiter, characters));
-    }
-
     @DisplayName("source가 //;\n로 시작하지 않으면 기본 구분자로 분할되어 Numbers를 반환한다.")
     @ParameterizedTest
-    @ValueSource(strings = "1:-1,6")
+    @ValueSource(strings = "1:8,6")
     void execute_default(final String given) {
         // when
         final PositiveNumbers actual = refiner.execute(given);
 
         // then
-        final PositiveNumbers expected = create(new PositiveNumber(1), new PositiveNumber(-1),
+        final PositiveNumbers expected = create(new PositiveNumber(1), new PositiveNumber(8),
             new PositiveNumber(6));
 
         assertThat(actual)

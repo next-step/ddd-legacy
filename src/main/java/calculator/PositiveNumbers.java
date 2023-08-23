@@ -14,7 +14,8 @@ public final class PositiveNumbers {
 
     public int sum() {
         return numbers.stream()
-            .mapToInt(PositiveNumber::getValue)
-            .sum();
+            .reduce(PositiveNumber::sum)
+            .map(PositiveNumber::getValue)
+            .orElseThrow(() -> new IllegalStateException("can not reachable state"));
     }
 }
