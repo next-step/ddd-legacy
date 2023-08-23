@@ -267,7 +267,7 @@ class MenuServiceTest {
         return menu;
     }
 
-    private static MenuProduct createMenuProduct(Product product, long quantity) {
+    public static MenuProduct createMenuProduct(Product product, long quantity) {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setProduct(product);
         menuProduct.setQuantity(quantity);
