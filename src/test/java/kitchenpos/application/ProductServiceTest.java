@@ -14,12 +14,12 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kitchenpos.application.MenuServiceTest.createMenu;
+import static kitchenpos.application.MenuServiceTest.createMenuProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -33,7 +33,7 @@ class ProductServiceTest {
     @InjectMocks
     private ProductService sut;
 
-    private final UUID uuid = UUID.randomUUID();
+    private final static UUID uuid = UUID.randomUUID();
 
     @Test
     void 음식의_가격이_null이면_음식을_생성할_수_없다() {
@@ -135,13 +135,8 @@ class ProductServiceTest {
     void 음식의_가격을_수정했을_때_메뉴의_가격이_음식_가격의_합보다_커진다면_메뉴를_숨김_처리한다() {
         // given
         Product request = createProduct("햄버거", new BigDecimal("2000"));
-
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(request);
-
-        Menu menu = mock(Menu.class);
-        given(menu.getPrice()).willReturn(new BigDecimal("3000"));
-        given(menu.getMenuProducts()).willReturn(List.of(menuProduct));
+        MenuProduct menuProduct = createMenuProduct(request, 1L);
+        Menu menu = createMenu(new BigDecimal("3000"), "메뉴", uuid, List.of(menuProduct));
 
         given(productRepository.findById(any())).willReturn(Optional.of(new Product()));
         given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
@@ -150,13 +145,13 @@ class ProductServiceTest {
         sut.changePrice(UUID.randomUUID(), request);
 
         // then
-        verify(menu).setDisplayed(false);
+        assertThat(menu.isDisplayed()).isFalse();
     }
 
     public static Product createProduct(String name, BigDecimal price) {
-        Product request = new Product();
-        request.setName(name);
-        request.setPrice(price);
-        return request;
+        Product product = new Product();
+        product.setName(name);
+        product.setPrice(price);
+        return product;
     }
 }

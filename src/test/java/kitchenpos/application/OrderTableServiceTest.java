@@ -16,7 +16,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.*;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
@@ -28,7 +29,9 @@ class OrderTableServiceTest {
     @InjectMocks
     OrderTableService sut;
 
-    @ParameterizedTest
+    private final static UUID uuid = UUID.randomUUID();
+
+    @ParameterizedTest(name = "주문_테이블의_이름이_없으면_주문_테이블을_생성할_수_없다: name = {0}")
     @NullAndEmptySource
     void 주문_테이블의_이름이_없으면_주문_테이블을_생성할_수_없다(String name) {
         // given
@@ -55,15 +58,15 @@ class OrderTableServiceTest {
     @Test
     void 주문_테이블에_착석_처리를_할_수_있다() {
         // given
-        OrderTable orderTable = mock(OrderTable.class);
+        OrderTable orderTable = createOrderTable("테이블1", 3);
 
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         // when
-        sut.sit(UUID.randomUUID());
+        sut.sit(uuid);
 
         // then
-        verify(orderTable).setOccupied(true);
+        assertThat(orderTable.isOccupied()).isTrue();
     }
 
     @Test
@@ -75,22 +78,22 @@ class OrderTableServiceTest {
         given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
 
         // when & then
-        assertThatThrownBy(() -> sut.clear(UUID.randomUUID())).isExactlyInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> sut.clear(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
     @Test
     void 주문_테이블에_비움_처리를_할_수_있다() {
         // given
-        OrderTable orderTable = mock(OrderTable.class);
+        OrderTable orderTable = createOrderTable("테이블1", 3);
 
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         // when
-        sut.clear(UUID.randomUUID());
+        sut.clear(uuid);
 
         // then
-        verify(orderTable).setNumberOfGuests(0);
-        verify(orderTable).setOccupied(false);
+        assertThat(orderTable.getNumberOfGuests()).isZero();
+        assertThat(orderTable.isOccupied()).isFalse();
     }
 
     @Test
@@ -99,7 +102,7 @@ class OrderTableServiceTest {
         OrderTable request = createOrderTable("테이블1", -1);
 
         // when & then
-        assertThatThrownBy(() -> sut.changeNumberOfGuests(UUID.randomUUID(), request))
+        assertThatThrownBy(() -> sut.changeNumberOfGuests(uuid, request))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
@@ -108,13 +111,13 @@ class OrderTableServiceTest {
         // given
         OrderTable request = createOrderTable("테이블1", 3);
 
-        OrderTable orderTable = mock(OrderTable.class);
-        given(orderTable.isOccupied()).willReturn(false);
+        OrderTable orderTable = createOrderTable("테이블1", 3);
+        orderTable.setOccupied(false);
 
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         // when & then
-        assertThatThrownBy(() -> sut.changeNumberOfGuests(UUID.randomUUID(), request))
+        assertThatThrownBy(() -> sut.changeNumberOfGuests(uuid, request))
                 .isExactlyInstanceOf(IllegalStateException.class);
     }
 
@@ -122,23 +125,22 @@ class OrderTableServiceTest {
     void 주문_테이블의_손님의_숫자를_바꿀_수_있다() {
         // given
         OrderTable request = createOrderTable("테이블1", 3);
-
-        OrderTable orderTable = mock(OrderTable.class);
-        given(orderTable.isOccupied()).willReturn(true);
+        OrderTable orderTable = createOrderTable("테이블1", 3);
 
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         // when
-        sut.changeNumberOfGuests(UUID.randomUUID(), request);
+        sut.changeNumberOfGuests(uuid, request);
 
         // then
-        verify(orderTable).setNumberOfGuests(3);
+        assertThat(orderTable.getNumberOfGuests()).isEqualTo(3);
     }
 
     public static OrderTable createOrderTable(String name, int numberOfGuests) {
-        OrderTable request = new OrderTable();
-        request.setName(name);
-        request.setNumberOfGuests(numberOfGuests);
-        return request;
+        OrderTable orderTable = new OrderTable();
+        orderTable.setName(name);
+        orderTable.setNumberOfGuests(numberOfGuests);
+        orderTable.setOccupied(true);
+        return orderTable;
     }
 }
