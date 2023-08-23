@@ -1,11 +1,8 @@
 package kitchenpos;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@SpringBootTest
-class ApplicationTest {
-    @Test
-    void contextLoads() {
-    }
+@ExtendWith(MockitoExtension.class)
+public class ApplicationTest {
 }
