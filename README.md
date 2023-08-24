@@ -7,6 +7,9 @@ cd docker
 docker compose -p kitchenpos up -d
 ```
 
+## 요구사항
+
+
 ### 메뉴그룹
 #### 메뉴그룹 등록
 - [ ] 메뉴그룹 이름은 필수로 부여되야한다.
