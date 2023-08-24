@@ -10,6 +10,7 @@ import kitchenpos.integration_test_step.ProductIntegrationStep;
 import kitchenpos.test_fixture.MenuGroupTestFixture;
 import kitchenpos.test_fixture.MenuProductTestFixture;
 import kitchenpos.test_fixture.MenuTestFixture;
+import kitchenpos.test_fixture.ProductTestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -134,8 +135,6 @@ class MenuServiceTest {
         assertThrows(NoSuchElementException.class, () -> sut.create(menu));
     }
 
-
-
     @DisplayName("등록하려는 메뉴에 메뉴 상품이 비어있으면 예외가 발생한다.")
     @ParameterizedTest
     @NullAndEmptySource
@@ -145,6 +144,25 @@ class MenuServiceTest {
         Menu menu = MenuTestFixture.create()
                 .changeMenuGroup(menuGroup)
                 .changeMenuProducts(menuProducts)
+                .getMenu();
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
+    }
+
+    @DisplayName("등록하려는 메뉴에 상품이 존재하지 않으면 예외가 발생한다.")
+    @Test
+    void createWithNotExistProduct() {
+        // given
+        Product notPersistProduct = ProductTestFixture.create().getProduct();
+        MenuGroup menuGroup = menuGroupIntegrationStep.createPersistMenuGroup();
+        MenuProduct menuProduct = MenuProductTestFixture.create()
+                .changeProduct(notPersistProduct)
+                .getMenuProduct();
+        Menu menu = MenuTestFixture.create()
+                .changeMenuGroup(menuGroup)
+                .changeMenuProducts(Collections.singletonList(menuProduct))
+                .changePrice(menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
                 .getMenu();
 
         // when & then
