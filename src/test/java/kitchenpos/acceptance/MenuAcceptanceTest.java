@@ -74,6 +74,56 @@ public class MenuAcceptanceTest {
     }
 
     @Test
+    void 메뉴_보이기_설정__성공() throws Exception {
+        MockHttpServletResponse menuGroupCreatedResponse = 메뉴그룹_생성_요청(mockMvc, 추천_메뉴.getValue());
+        MockHttpServletResponse productCreatedResponse = 상품_생성_요청(mockMvc, 강정치킨.getValue());
+        String menuGroupId = extractMenuGroupId(menuGroupCreatedResponse);
+        String productId = extractProductId(productCreatedResponse);
+
+        Map<String, Object> createRequest = Map.of(
+                "name", "후라이드+후라이드",
+                "price", 19000,
+                "menuGroupId", menuGroupId,
+                "displayed", true,
+                "menuProducts", List.of(
+                        Map.of("productId", productId,
+                                "quantity", 2)
+                ));
+
+        MockHttpServletResponse createdResponse = 메뉴_생성_요청(mockMvc, createRequest);
+
+        String menuId = extractMenuId(createdResponse);
+        MockHttpServletResponse response = 메뉴_보이기_설정_요청(mockMvc, menuId);
+
+        메뉴_보이기_설정_성공함(response);
+    }
+
+    @Test
+    void 메뉴_숨기기_설정__성공() throws Exception {
+        MockHttpServletResponse menuGroupCreatedResponse = 메뉴그룹_생성_요청(mockMvc, 추천_메뉴.getValue());
+        MockHttpServletResponse productCreatedResponse = 상품_생성_요청(mockMvc, 강정치킨.getValue());
+        String menuGroupId = extractMenuGroupId(menuGroupCreatedResponse);
+        String productId = extractProductId(productCreatedResponse);
+
+        Map<String, Object> createRequest = Map.of(
+                "name", "후라이드+후라이드",
+                "price", 19000,
+                "menuGroupId", menuGroupId,
+                "displayed", true,
+                "menuProducts", List.of(
+                        Map.of("productId", productId,
+                                "quantity", 2)
+                ));
+
+        MockHttpServletResponse createdResponse = 메뉴_생성_요청(mockMvc, createRequest);
+
+        String menuId = extractMenuId(createdResponse);
+        MockHttpServletResponse response = 메뉴_숨기기_설정_요청(mockMvc, menuId);
+
+        메뉴_숨기기_설정_성공함(response);
+    }
+
+    @Test
     void 메뉴_전체조회() throws Exception {
         MockHttpServletResponse menuGroupCreatedResponse = 메뉴그룹_생성_요청(mockMvc, 추천_메뉴.getValue());
         MockHttpServletResponse productCreatedResponse = 상품_생성_요청(mockMvc, 강정치킨.getValue());
