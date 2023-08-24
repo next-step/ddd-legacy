@@ -20,6 +20,7 @@ import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
+public
 class OrderTableServiceTest {
     @Mock
     private OrderTableRepository orderTableRepository;
@@ -138,6 +139,7 @@ class OrderTableServiceTest {
 
     public static OrderTable createOrderTable(String name, int numberOfGuests) {
         OrderTable orderTable = new OrderTable();
+        orderTable.setId(uuid);
         orderTable.setName(name);
         orderTable.setNumberOfGuests(numberOfGuests);
         orderTable.setOccupied(true);
