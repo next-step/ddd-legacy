@@ -133,4 +133,21 @@ class MenuServiceTest {
         // when & then
         assertThrows(NoSuchElementException.class, () -> sut.create(menu));
     }
+
+
+
+    @DisplayName("등록하려는 메뉴에 메뉴 상품이 비어있으면 예외가 발생한다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void createNotHaveMenuProduct(List<MenuProduct> menuProducts) {
+        // given
+        MenuGroup menuGroup = menuGroupIntegrationStep.createPersistMenuGroup();
+        Menu menu = MenuTestFixture.create()
+                .changeMenuGroup(menuGroup)
+                .changeMenuProducts(menuProducts)
+                .getMenu();
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
+    }
 }
