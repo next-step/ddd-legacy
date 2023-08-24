@@ -5,6 +5,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class MenuGroupApi {
     private static final String API_MENU_GROUPS_URL = "/api/menu-groups";
+
+    private static final String MENU_GROUP_ID_EXTRACT_PATTERN_FROM_LOCATION = "/api/menu-groups/([a-fA-F0-9-]+)";
+    private static final Pattern MENU_GROUP_ID_EXTRACT_PATTERN = Pattern.compile(MENU_GROUP_ID_EXTRACT_PATTERN_FROM_LOCATION);
+    private static final int CAPTURING_MENU_GROUP_ID_INDEX = 1;
+
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static MockHttpServletResponse 메뉴그룹_생성_요청(MockMvc mockMvc, Map<String, Object> request) throws Exception {
@@ -38,6 +45,13 @@ public class MenuGroupApi {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         List<Object> menuGroups = objectMapper.readValue(response.getContentAsString(), List.class);
         assertThat(menuGroups).hasSize(expectedSize);
+    }
+    
+    public static String extractMenuGroupId(MockHttpServletResponse createdResponse) {
+        Matcher matcher = MENU_GROUP_ID_EXTRACT_PATTERN.matcher(createdResponse.getHeader("Location"));
+        matcher.find();
+        String menuGroupId = matcher.group(CAPTURING_MENU_GROUP_ID_INDEX);
+        return menuGroupId;
     }
 
 }
