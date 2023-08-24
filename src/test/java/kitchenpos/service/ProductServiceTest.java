@@ -56,4 +56,24 @@ class ProductServiceTest {
         assertThatThrownBy(() -> productService.changePrice(productId, product))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void 상품_생성_실패__이름이_null() {
+        Product product = new Product();
+        product.setPrice(new BigDecimal(0));
+        product.setName(null);
+
+        assertThatThrownBy(() -> productService.create(product))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 상품_생성_실패__이름에_욕설_포함() {
+        Product product = new Product();
+        product.setPrice(new BigDecimal(0));
+        product.setName("fuck");
+
+        assertThatThrownBy(() -> productService.create(product))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
