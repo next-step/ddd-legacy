@@ -1,6 +1,7 @@
 package kitchenpos.acceptance;
 
 import static kitchenpos.acceptance.MenuGroupApi.*;
+import static kitchenpos.acceptance.MenuGroupData.*;
 
 import java.util.Map;
 
@@ -20,7 +21,7 @@ public class MenuGroupAcceptanceTest {
 
     @Test
     void 메뉴그룹_생성__성공() throws Exception {
-        Map<String, Object> request = Map.of("name", "추천 메뉴");
+        Map<String, Object> request = 추천_메뉴.getValue();
 
         MockHttpServletResponse response = 메뉴그룹_생성_요청(mockMvc, request);
 
@@ -29,10 +30,10 @@ public class MenuGroupAcceptanceTest {
 
     @Test
     void 메뉴그룹_전체조회() throws Exception {
-        Map<String, Object> request = Map.of("name", "추천 메뉴");
+        Map<String, Object> request = 추천_메뉴.getValue();
         메뉴그룹_생성_요청(mockMvc, request);
 
-        Map<String, Object> request2 = Map.of("name", "금주의 할인 메뉴");
+        Map<String, Object> request2 = 금주의_할인_메뉴.getValue();
         메뉴그룹_생성_요청(mockMvc, request2);
 
         MockHttpServletResponse response = 메뉴그룹_전체조회_요청(mockMvc);
