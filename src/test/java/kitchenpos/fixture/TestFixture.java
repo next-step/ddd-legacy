@@ -3,6 +3,7 @@ package kitchenpos.fixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -28,5 +29,12 @@ public class TestFixture {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setQuantity(1);
         return menuProduct;
+    }
+
+    public static Product TEST_PRODUCT() {
+        Product product = new Product();
+        product.setPrice(new BigDecimal(5_000));
+        product.setName("핏자");
+        return product;
     }
 }
