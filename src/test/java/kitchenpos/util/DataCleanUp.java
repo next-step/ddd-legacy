@@ -26,11 +26,16 @@ public class DataCleanUp implements InitializingBean {
             .filter(entity -> entity.getJavaType().getAnnotation(Entity.class) != null)
             .map(entity -> {
                 Table tableAnnotation = entity.getJavaType().getAnnotation(Table.class);
-                if (tableAnnotation != null && tableAnnotation.name() != null && !tableAnnotation.name().isEmpty()) {
-                    return tableAnnotation.name();
-                } else {
+                if (tableAnnotation == null) {
                     return entity.getName();
                 }
+                if (tableAnnotation.name() == null) {
+                    return entity.getName();
+                }
+                if (tableAnnotation.name().isEmpty()) {
+                    return entity.getName();
+                }
+                return tableAnnotation.name();
             })
             .collect(Collectors.toList());
     }
