@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -43,14 +44,16 @@ class MenuGroupServiceTest {
 
     @Test
     @DisplayName("메뉴그룹은 식별키, 이름을 가진다.")
-    void menuGroupTest1() {
-        assertThat(menuGroup.getName()).isEqualTo(MENU_GROUP_NAME);
-        assertThat(menuGroup.getId()).isEqualTo(MENU_GROUP_ID);
+    void test1() {
+        assertAll(
+                () -> assertThat(menuGroup.getName()).isEqualTo(MENU_GROUP_NAME),
+                () -> assertThat(menuGroup.getId()).isEqualTo(MENU_GROUP_ID)
+        );
     }
 
     @Test
     @DisplayName("메뉴그룹을 등록한다.")
-    void menuGroupTest2() {
+    void test2() {
         // Given
         when(menuGroupRepository.save(any())).thenReturn(menuGroup);
 
@@ -64,7 +67,7 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     @DisplayName("메뉴그룹의 이름은 비어있거나 공백일 수 없다.")
-    void menuGroupTest3(String name) {
+    void test3(String name) {
         // Given
         MenuGroup menuGroup = new MenuGroup();
 
@@ -78,7 +81,7 @@ class MenuGroupServiceTest {
 
     @Test
     @DisplayName("메뉴그룹 전체 목록을 조회할 수 있다.")
-    void menuGroupTest4() {
+    void test4() {
         // Given
         List<MenuGroup> menuGroups = List.of(new MenuGroup(), new MenuGroup());
         when(menuGroupRepository.findAll()).thenReturn(menuGroups);
