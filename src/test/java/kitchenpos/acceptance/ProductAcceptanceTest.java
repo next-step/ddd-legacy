@@ -1,6 +1,7 @@
 package kitchenpos.acceptance;
 
 import static kitchenpos.acceptance.ProductApi.*;
+import static kitchenpos.acceptance.ProductData.*;
 
 import java.util.Map;
 
@@ -21,9 +22,7 @@ public class ProductAcceptanceTest {
 
     @Test
     void 상품_생성__성공() throws Exception {
-        Map<String, Object> request = Map.of(
-                "name", "강정치킨",
-                "price", 18000);
+        Map<String, Object> request = 강정치킨.getValue();
 
         MockHttpServletResponse response = 상품_생성_요청(mockMvc, request);
 
@@ -32,9 +31,7 @@ public class ProductAcceptanceTest {
 
     @Test
     void 상품_가격_변경__성공() throws Exception {
-        Map<String, Object> createRequest = Map.of(
-                "name", "강정치킨",
-                "price", 18000);
+        Map<String, Object> createRequest = 강정치킨.getValue();
         MockHttpServletResponse createdResponse = 상품_생성_요청(mockMvc, createRequest);
 
         String productId = extractProductId(createdResponse);
@@ -47,14 +44,10 @@ public class ProductAcceptanceTest {
 
     @Test
     void 상품_전체조회() throws Exception {
-        Map<String, Object> request = Map.of(
-                "name", "강정치킨",
-                "price", 18000);
+        Map<String, Object> request = 강정치킨.getValue();
         상품_생성_요청(mockMvc, request);
 
-        Map<String, Object> request2 = Map.of(
-                "name", "양념치킨",
-                "price", 17000);
+        Map<String, Object> request2 = 양념치킨.getValue();
         상품_생성_요청(mockMvc, request2);
 
         MockHttpServletResponse response = 상품_전체조회_요청(mockMvc);
