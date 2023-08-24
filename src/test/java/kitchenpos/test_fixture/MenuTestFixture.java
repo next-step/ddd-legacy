@@ -7,6 +7,7 @@ import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class MenuTestFixture {
@@ -93,7 +94,7 @@ public class MenuTestFixture {
         return this;
     }
 
-    public MenuTestFixture changeMenuProducts(MenuProduct menuProduct) {
+    public MenuTestFixture changeMenuProducts(List<MenuProduct> menuProduct) {
         Menu newMenu = new Menu();
         newMenu.setId(menu.getId());
         newMenu.setName(menu.getName());
@@ -101,7 +102,7 @@ public class MenuTestFixture {
         newMenu.setMenuGroup(menu.getMenuGroup());
         newMenu.setMenuGroupId(menu.getMenuGroupId());
         newMenu.setDisplayed(menu.isDisplayed());
-        newMenu.setMenuProducts(Collections.singletonList(menuProduct));
+        newMenu.setMenuProducts(menuProduct);
         this.menu = newMenu;
         return this;
     }
