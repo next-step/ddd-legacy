@@ -227,4 +227,24 @@ class MenuServiceTest {
         // when & then
         assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
     }
+
+    @DisplayName("등록하려는 메뉴의 이름에 비속어가 포함되면 예외가 발생한다.")
+    @Test
+    void createWithProfanityName() {
+        // given
+        Product product = productIntegrationStep.createPersistProduct();
+        MenuGroup menuGroup = menuGroupIntegrationStep.createPersistMenuGroup();
+        MenuProduct menuProduct = MenuProductTestFixture.create()
+                .changeProduct(product)
+                .getMenuProduct();
+        Menu menu = MenuTestFixture.create()
+                .changeMenuGroup(menuGroup)
+                .changeMenuProducts(Collections.singletonList(menuProduct))
+                .changeName("bastard") // `새끼` 라는 나쁜말 ^^
+                .changePrice(menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
+                .getMenu();
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
+    }
 }
