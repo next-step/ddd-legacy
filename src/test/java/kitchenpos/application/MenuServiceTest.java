@@ -7,16 +7,21 @@ import kitchenpos.domain.Product;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.integration_test_step.MenuGroupIntegrationStep;
 import kitchenpos.integration_test_step.ProductIntegrationStep;
+import kitchenpos.test_fixture.MenuGroupTestFixture;
 import kitchenpos.test_fixture.MenuProductTestFixture;
 import kitchenpos.test_fixture.MenuTestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -108,5 +113,24 @@ class MenuServiceTest {
 
         // when & then
         assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
+    }
+
+    @DisplayName("메뉴에 등록하려는 메뉴 그룹이 존재하지 않으면 예외가 발생한다.")
+    @Test
+    void createWithNotExistMenuGroup() {
+        // given
+        Product product = productIntegrationStep.createPersistProduct();
+        MenuGroup notPersistMenuGroup = MenuGroupTestFixture.create().getMenuGroup();
+        MenuProduct menuProduct = MenuProductTestFixture.create()
+                .changeProduct(product)
+                .getMenuProduct();
+        Menu menu = MenuTestFixture.create()
+                .changeMenuGroup(notPersistMenuGroup)
+                .changeMenuProducts(Collections.singletonList(menuProduct))
+                .changePrice(menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
+                .getMenu();
+
+        // when & then
+        assertThrows(NoSuchElementException.class, () -> sut.create(menu));
     }
 }
