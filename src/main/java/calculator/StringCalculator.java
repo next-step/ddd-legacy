@@ -2,6 +2,7 @@ package calculator;
 
 public class StringCalculator {
 
+
     public int inputText(String text) {
         if (ValidationUtils.checkNull(text)) {
             return 0;

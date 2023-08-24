@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 public class ValidationUtils {
 
     public static final int MIN_VALUE = 0;
+
     public static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
     public static final String DEFAULT_REGEX = ",|:";
     public static final int DELIMITER_GROUP = 1;
