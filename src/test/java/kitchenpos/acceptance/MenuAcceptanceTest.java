@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,7 +21,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 @DisplayName("메뉴관리")
-public class MenuAcceptanceTest extends AcceptanceTest {
+class MenuAcceptanceTest extends AcceptanceTest {
 
     private static final String MENU_PATH = "/api/menus";
 
@@ -29,144 +30,152 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     private static Map<String, Object> 김밥;
 
     @BeforeEach
-    void setup() {
+    void setBaseData() {
         menuGroup = 메뉴그룹을_등록_한다("분식").jsonPath().getMap(".");
         돈가스 = 상품_등록_한다("돈가스", 9000).jsonPath().getMap(".");
         김밥 = 상품_등록_한다("김밥", 3000).jsonPath().getMap(".");
     }
 
-    /**
-     * Given : 메뉴그룹을 등록하고
-     * Given : 상품을 등록하고
-     * When  : 등록된 메뉴그룹과 상품으로 메뉴를 등록하면
-     * Then  : 등록한 메뉴가 조회 된다.
-     */
-    @DisplayName("메뉴를 등록한다.")
-    @Test
-    void createMenu() {
-        //Given
-        Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12000, false);
-        메뉴그룹_추가(menu);
-        기등록_상품의_메뉴상품_추가(menu);
+    @Nested
+    @DisplayName("메뉴 등록 인수테스트")
+    class create {
+        /**
+         * Given : 메뉴그룹을 등록하고
+         * Given : 상품을 등록하고
+         * When  : 등록된 메뉴그룹과 상품으로 메뉴를 등록하면
+         * Then  : 등록한 메뉴가 조회 된다.
+         */
+        @DisplayName("메뉴를 등록한다.")
+        @Test
+        void createMenu() {
+            //Given
+            Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12000, false);
+            메뉴그룹_추가(menu);
+            기등록_상품의_메뉴상품_추가(menu);
 
-        //When
-        Map<String, Object> 등록_메뉴 = 메뉴_등록_한다(menu).jsonPath().getMap(".");
+            //When
+            Map<String, Object> 등록_메뉴 = 메뉴_등록_한다(menu).jsonPath().getMap(".");
 
-        //Then
-        List<String> 조회메뉴ids = 전체_메뉴를_조회_한다().jsonPath().getList("id");
-        assertThat(조회메뉴ids).contains((String)등록_메뉴.get("id"));
+            //Then
+            List<String> 조회메뉴ids = 전체_메뉴를_조회_한다().jsonPath().getList("id");
+            assertThat(조회메뉴ids).contains((String)등록_메뉴.get("id"));
+        }
+
+        /**
+         * Given : 메뉴그룹을 등록 하지 않고
+         * Given : 상품을 등록하고
+         * When  : 등록된  상품으로만 메뉴를 등록하면 ( 메뉴 그룹 X )
+         * Then  : INTERNAL_SERVER_ERROR 오류가 발생한다.
+         */
+        @DisplayName("메뉴그룹 없이 등록 요청")
+        @Test
+        void createMenu2() {
+            //Given
+            Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12000, false);
+            기등록_상품의_메뉴상품_추가(menu);
+
+            //When
+            //Then
+            assertThat(메뉴_등록_한다(menu).response().statusCode())
+                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        /**
+         * Given : 상품을 등록하고
+         * Given : 메뉴그룹을 등록하고
+         * When  : 등록된 메뉴그룹과 등록되지 않은 상품으로 메뉴를 등록하면
+         * Then  : INTERNAL_SERVER_ERROR 오류가 발생한다.
+         */
+        @DisplayName("등록되지 않은 상품으로 메뉴등록 요청")
+        @Test
+        void createMenu3() {
+            //Given
+            Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12000, false);
+            메뉴그룹_추가(menu);
+            등록하지_않은_상품의_메뉴상품_추가(menu);
+
+            //When
+            //Then
+            assertThat(메뉴_등록_한다(menu).response().statusCode())
+                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        /**
+         * Given : 상품을 등록하고
+         * Given : 메뉴그룹을 등록하고
+         * When  : 등록된 메뉴그룹과 상품과
+         *         상품가격*갯수 < 메뉴가격의  메뉴를 등록하면
+         * Then  : INTERNAL_SERVER_ERROR 오류가 발생한다.
+         */
+        @DisplayName("등록되지 않은 상품으로 메뉴등록 요청")
+        @Test
+        void createMenu4() {
+            //Given
+            Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12001, false);
+            메뉴그룹_추가(menu);
+            기등록_상품의_메뉴상품_추가(menu);
+
+            //When
+            //Then
+            assertThat(메뉴_등록_한다(menu).response().statusCode())
+                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
     }
 
-    /**
-     * Given : 메뉴그룹을 등록 하지 않고
-     * Given : 상품을 등록하고
-     * When  : 등록된  상품으로만 메뉴를 등록하면 ( 메뉴 그룹 X )
-     * Then  : INTERNAL_SERVER_ERROR 오류가 발생한다.
-     */
-    @DisplayName("메뉴그룹 없이 등록 요청")
-    @Test
-    void createMenu2() {
-        //Given
-        Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12000, false);
-        기등록_상품의_메뉴상품_추가(menu);
+    @Nested
+    @DisplayName("메뉴 가격변경 인수테스트")
+    class changePrice {
+        /**
+         * Given : 상품을 등록하고
+         * Given : 메뉴그룹을 등록하고
+         * Given : 등록된 메뉴그룹과 상품으로 메뉴를 등록하고
+         * When  : 가격변경을 하면
+         * Then  : 변경된 가격의 메뉴가 조회 된다.
+         */
+        @DisplayName("메뉴 가격변경")
+        @Test
+        void changePrice1() {
+            //Given
+            Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12000, false);
+            메뉴그룹_추가(menu);
+            기등록_상품의_메뉴상품_추가(menu);
+            String menuId = 메뉴_등록_한다(menu).jsonPath().getString("id");
 
-        //When
-        //Then
-        assertThat(메뉴_등록_한다(menu).response().statusCode())
-            .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
+            //When
+            메뉴_가격을_변경한다(menuId, 2999);
 
-    /**
-     * Given : 상품을 등록하고
-     * Given : 메뉴그룹을 등록하고
-     * When  : 등록된 메뉴그룹과 등록되지 않은 상품으로 메뉴를 등록하면
-     * Then  : INTERNAL_SERVER_ERROR 오류가 발생한다.
-     */
-    @DisplayName("등록되지 않은 상품으로 메뉴등록 요청")
-    @Test
-    void createMenu3() {
-        //Given
-        Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12000, false);
-        메뉴그룹_추가(menu);
-        등록하지_않은_상품의_메뉴상품_추가(menu);
+            //Then
+            assertThat(전체_메뉴를_조회_한다().jsonPath().getList("", Map.class)
+                .stream()
+                .filter(val -> val.get("id").equals(menuId))
+                .findFirst()
+                .orElseThrow()
+                .get("price")).isEqualTo(2999f);
+        }
 
-        //When
-        //Then
-        assertThat(메뉴_등록_한다(menu).response().statusCode())
-            .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
+        /**
+         * Given : 상품을 등록하고
+         * Given : 메뉴그룹을 등록하고
+         * Given : 등록된 메뉴그룹과 상품으로 메뉴를 등록하고
+         * When  : 1개라도 (상품가격*갯수) < 메뉴 조건을 만족하는 메뉴 가격을 변경하면
+         * Then  : INTERNAL_SERVER_ERROR 오류가 발생한다.
+         */
+        @DisplayName("메뉴 가격변경중 메뉴가격 검증 오류")
+        @Test
+        void changePrice2() {
+            //Given
+            Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12000, false);
+            메뉴그룹_추가(menu);
+            기등록_상품의_메뉴상품_추가(menu);
+            String menuId = 메뉴_등록_한다(menu).jsonPath().getString("id");
 
-    /**
-     * Given : 상품을 등록하고
-     * Given : 메뉴그룹을 등록하고
-     * When  : 등록된 메뉴그룹과 상품과
-     *         상품가격*갯수 < 메뉴가격의  메뉴를 등록하면
-     * Then  : INTERNAL_SERVER_ERROR 오류가 발생한다.
-     */
-    @DisplayName("등록되지 않은 상품으로 메뉴등록 요청")
-    @Test
-    void createMenu4() {
-        //Given
-        Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12001, false);
-        메뉴그룹_추가(menu);
-        기등록_상품의_메뉴상품_추가(menu);
+            //When
+            메뉴_가격을_변경한다(menuId, 3001);
 
-        //When
-        //Then
-        assertThat(메뉴_등록_한다(menu).response().statusCode())
-            .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    }
-
-    /**
-     * Given : 상품을 등록하고
-     * Given : 메뉴그룹을 등록하고
-     * Given : 등록된 메뉴그룹과 상품으로 메뉴를 등록하고
-     * When  : 가격변경을 하면
-     * Then  : 변경된 가격의 메뉴가 조회 된다.
-     */
-    @DisplayName("메뉴 가격변경")
-    @Test
-    void changePrice1() {
-        //Given
-        Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12000, false);
-        메뉴그룹_추가(menu);
-        기등록_상품의_메뉴상품_추가(menu);
-        String menuId = 메뉴_등록_한다(menu).jsonPath().getString("id");
-
-        //When
-        메뉴_가격을_변경한다(menuId, 2999);
-
-        //Then
-        assertThat(전체_메뉴를_조회_한다().jsonPath().getList("", Map.class)
-            .stream()
-            .filter(val -> val.get("id").equals(menuId))
-            .findFirst()
-            .orElseThrow()
-            .get("price")).isEqualTo(2999f);
-    }
-
-    /**
-     * Given : 상품을 등록하고
-     * Given : 메뉴그룹을 등록하고
-     * Given : 등록된 메뉴그룹과 상품으로 메뉴를 등록하고
-     * When  : 1개라도 (상품가격*갯수) < 메뉴 조건을 만족하는 메뉴 가격을 변경하면
-     * Then  : INTERNAL_SERVER_ERROR 오류가 발생한다.
-     */
-    @DisplayName("메뉴 가격변경중 메뉴가격 검증 오류")
-    @Test
-    void changePrice2() {
-        //Given
-        Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 12000, false);
-        메뉴그룹_추가(menu);
-        기등록_상품의_메뉴상품_추가(menu);
-        String menuId = 메뉴_등록_한다(menu).jsonPath().getString("id");
-
-        //When
-        메뉴_가격을_변경한다(menuId, 3001);
-
-        //Then
-        assertThat(메뉴_가격을_변경한다(menuId, 3001).response().statusCode())
-            .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+            //Then
+            assertThat(메뉴_가격을_변경한다(menuId, 3001).response().statusCode())
+                .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
     }
 
     /**
@@ -283,6 +292,18 @@ public class MenuAcceptanceTest extends AcceptanceTest {
         return menu;
     }
 
+    public static Map<String, Object> getMenuInput(String productId, long price) {
+        Map<String, Object> menuGroup = 메뉴그룹을_등록_한다("분식").jsonPath().getMap(".");
+        Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", price, false);
+        menu.put("menuGroupId", menuGroup.get("id"));
+        menu.put("menuProducts",
+            List.of(Map.of(
+                "productId", productId,
+                "quantity", 1)
+            ));
+        return menu;
+    }
+
     public static ExtractableResponse<Response> 메뉴_등록_한다(Map<String, Object> menu) {
         return RestAssured.given().log().all()
             .body(menu)
@@ -312,7 +333,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> 메뉴_DISPLAY_처리한다(String id) {
+    public static ExtractableResponse<Response> 메뉴_DISPLAY_처리한다(String id) {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
@@ -321,7 +342,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> 메뉴_숨김_처리한다(String id) {
+    public static ExtractableResponse<Response> 메뉴_숨김_처리한다(String id) {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
@@ -330,7 +351,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    private String getPath(String id, String detailPath) {
+    private static String getPath(String id, String detailPath) {
         return String.format("%s/%s/%s", MENU_PATH, id, detailPath);
     }
 

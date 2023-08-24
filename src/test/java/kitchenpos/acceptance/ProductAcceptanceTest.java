@@ -1,11 +1,9 @@
 package kitchenpos.acceptance;
 
 import static kitchenpos.acceptance.MenuAcceptanceTest.*;
-import static kitchenpos.acceptance.MenuGroupAcceptanceTest.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
@@ -77,7 +75,7 @@ class ProductAcceptanceTest extends AcceptanceTest {
     void changePrice2() {
         //Given
         String 돈가스id = 상품_등록_한다("돈가스", 9000).jsonPath().getString("id");
-        메뉴_등록_한다(getMenuInput(돈가스id));
+        메뉴_등록_한다(getMenuInput(돈가스id, 9000));
 
         //When
         상품_가격을_변경한다(돈가스id, 3000);
@@ -87,18 +85,6 @@ class ProductAcceptanceTest extends AcceptanceTest {
         assertThat(response.jsonPath().getList("price"))
             .containsOnly(3000f);
 
-    }
-
-    private Map<String, Object> getMenuInput(String productId) {
-        Map<String, Object> menuGroup = 메뉴그룹을_등록_한다("분식").jsonPath().getMap(".");
-        Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 4500, false);
-        menu.put("menuGroupId", menuGroup.get("id"));
-        menu.put("menuProducts",
-            List.of(Map.of(
-                "productId", productId,
-                "quantity", 1)
-            ));
-        return menu;
     }
 
     public static ExtractableResponse<Response> 상품_등록_한다(String name, long price) {

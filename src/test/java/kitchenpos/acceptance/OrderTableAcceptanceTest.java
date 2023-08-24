@@ -14,7 +14,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 @DisplayName("매장 테이블 관리")
-public class OrderTableAcceptanceTest extends AcceptanceTest {
+class OrderTableAcceptanceTest extends AcceptanceTest {
     private static final String ORDER_TABLE_PATH = "/api/order-tables";
 
     /**
@@ -44,11 +44,33 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
             .containsOnly(true);
     }
 
+    /**
+     * Given : 매장 테이블을 등록하고
+     * Given : 매장 테이블에 손님이 착석하고
+     * Given : 매장 테이블의 손님 수를 변경하고
+     * When  : 매장 테이블을 치우면
+     * Then  : 해당 매장 테이블이 처음 상태로 조회 된다.
+     */
     @DisplayName("매장 테이블을 치운다")
     @Test
     void clear() {
-        //Todo : 주문 인수테스트 작성후 추가 작성
+        //Given
+        String 매장_테이블_id = 매장_테이블을_등록_한다("장미").jsonPath().getString("id");
+        매장_테이블에_손님이_앉는다(매장_테이블_id);
+        매장_테이블의_손님_수_를_변경한다(매장_테이블_id, 8);
 
+        //When
+        매장_테이블을_치운다(매장_테이블_id);
+
+        //Then
+        Map<String, Object> 매장_테이블 = 매장_테이블_전체를_한다().jsonPath().getList("", Map.class)
+            .stream()
+            .filter(val -> val.get("id").equals(매장_테이블_id))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(매장_테이블.get("numberOfGuests")).isEqualTo(0);
+        assertThat(매장_테이블.get("occupied")).isEqualTo(false);
     }
 
     /**
@@ -91,7 +113,16 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> 매장_테이블에_손님이_앉는다(String id) {
+    public static ExtractableResponse<Response> 매장_테이블을_치운다(String id) {
+        return RestAssured.given().log().all()
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .put(String.format("%s/%s/%s", ORDER_TABLE_PATH, id, "clear"))
+            .then().log().all()
+            .extract();
+    }
+
+    public static ExtractableResponse<Response> 매장_테이블에_손님이_앉는다(String id) {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
@@ -100,7 +131,7 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
             .extract();
     }
 
-    private ExtractableResponse<Response> 매장_테이블을_등록_한다(String name) {
+    public static ExtractableResponse<Response> 매장_테이블을_등록_한다(String name) {
         return RestAssured.given().log().all()
             .body(Map.of("name", name))
             .contentType(MediaType.APPLICATION_JSON_VALUE)
