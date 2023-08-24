@@ -41,6 +41,16 @@ public class MenuProductTestFixture {
         return this;
     }
 
+    public MenuProductTestFixture changeQuantity(long quantity) {
+        MenuProduct newMenuProduct = new MenuProduct();
+        newMenuProduct.setSeq(menuProduct.getSeq());
+        newMenuProduct.setProduct(menuProduct.getProduct());
+        newMenuProduct.setProductId(menuProduct.getProductId());
+        newMenuProduct.setQuantity(quantity);
+        this.menuProduct = newMenuProduct;
+        return this;
+    }
+
     public MenuProduct getMenuProduct() {
         return this.menuProduct;
     }

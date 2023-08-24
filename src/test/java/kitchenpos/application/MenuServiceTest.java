@@ -169,6 +169,26 @@ class MenuServiceTest {
         assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
     }
 
+    @DisplayName("등록하려는 메뉴의 메뉴 상품 개수가 0보다 작으면 예외가 발생한다.")
+    @Test
+    void createWithNegativeNumberMenuProductQuantity() {
+        // given
+        Product product = productIntegrationStep.createPersistProduct();
+        MenuGroup menuGroup = menuGroupIntegrationStep.createPersistMenuGroup();
+        MenuProduct menuProduct = MenuProductTestFixture.create()
+                .changeProduct(product)
+                .changeQuantity(-1L)
+                .getMenuProduct();
+        Menu menu = MenuTestFixture.create()
+                .changeMenuGroup(menuGroup)
+                .changeMenuProducts(Collections.singletonList(menuProduct))
+                .changePrice(menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
+                .getMenu();
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
+    }
+
     @DisplayName("등록하려는 메뉴의 가격이 메뉴 상품의 가격 합보다 크면 예외가 발생한다.")
     @Test
     void createWithPriceHigherThanMenuProductPrice() {
@@ -187,4 +207,6 @@ class MenuServiceTest {
         // when & then
         assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
     }
+
+
 }
