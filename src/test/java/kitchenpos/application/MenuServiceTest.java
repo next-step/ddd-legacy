@@ -315,4 +315,22 @@ class MenuServiceTest {
         // when & then
         assertThrows(IllegalArgumentException.class, () -> sut.changePrice(persistMenu.getId(), updateMenu));
     }
+
+    @DisplayName("메뉴 가격 변경 시 메뉴의 가격이 0보다 작으면 예외가 발생한다.")
+    @Test
+    void changePriceWithNegativeNumberPrice() {
+        // given
+        Menu persistMenu = menuIntegrationStep.create();
+        Menu updateMenu = MenuTestFixture.create()
+                .changeId(persistMenu.getId())
+                .changeName(persistMenu.getName())
+                .changeMenuGroup(persistMenu.getMenuGroup())
+                .changeMenuProducts(persistMenu.getMenuProducts())
+                .changePrice(BigDecimal.valueOf(-1))
+                .changeDisplayed(persistMenu.isDisplayed())
+                .getMenu();
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> sut.changePrice(persistMenu.getId(), updateMenu));
+    }
 }
