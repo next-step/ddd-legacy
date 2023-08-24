@@ -333,4 +333,27 @@ class MenuServiceTest {
         // when & then
         assertThrows(IllegalArgumentException.class, () -> sut.changePrice(persistMenu.getId(), updateMenu));
     }
+
+    @DisplayName("메뉴 가격 변경 시 메뉴의 가격이 메뉴 상품의 가격 합보다 크면 예외가 발생한다.")
+    @Test
+    void changePriceWithPriceHigherThanMenuProductPrice() {
+        // given
+        Menu persistMenu = menuIntegrationStep.create();
+        BigDecimal persistMenuPrice = persistMenu.getMenuProducts().stream()
+                .map(it -> it.getProduct().getPrice().multiply(BigDecimal.valueOf(it.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        Menu updateMenu = MenuTestFixture.create()
+                .changeId(persistMenu.getId())
+                .changeName(persistMenu.getName())
+                .changeMenuGroup(persistMenu.getMenuGroup())
+                .changeMenuProducts(persistMenu.getMenuProducts())
+                .changePrice(persistMenuPrice.add(BigDecimal.ONE))
+                .changeDisplayed(persistMenu.isDisplayed())
+                .getMenu();
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> sut.changePrice(persistMenu.getId(), updateMenu));
+    }
+
+
 }
