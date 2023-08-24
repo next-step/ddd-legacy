@@ -28,6 +28,7 @@ public class OrderTableService {
         if (Objects.isNull(name) || name.isEmpty()) {
             throw new IllegalArgumentException();
         }
+
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(name);
@@ -48,9 +49,11 @@ public class OrderTableService {
     public OrderTable clear(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
+
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
             throw new IllegalStateException();
         }
+
         orderTable.setNumberOfGuests(0);
         orderTable.setOccupied(false);
         return orderTable;
@@ -62,11 +65,14 @@ public class OrderTableService {
         if (numberOfGuests < 0) {
             throw new IllegalArgumentException();
         }
+
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
+
         if (!orderTable.isOccupied()) {
             throw new IllegalStateException();
         }
+
         orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;
     }
