@@ -168,4 +168,23 @@ class MenuServiceTest {
         // when & then
         assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
     }
+
+    @DisplayName("등록하려는 메뉴의 가격이 메뉴 상품의 가격 합보다 크면 예외가 발생한다.")
+    @Test
+    void createWithPriceHigherThanMenuProductPrice() {
+        // given
+        Product product = productIntegrationStep.createPersistProduct();
+        MenuGroup menuGroup = menuGroupIntegrationStep.createPersistMenuGroup();
+        MenuProduct menuProduct = MenuProductTestFixture.create()
+                .changeProduct(product)
+                .getMenuProduct();
+        Menu menu = MenuTestFixture.create()
+                .changeMenuGroup(menuGroup)
+                .changeMenuProducts(Collections.singletonList(menuProduct))
+                .changePrice(menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())).add(BigDecimal.valueOf(1)))
+                .getMenu();
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
+    }
 }
