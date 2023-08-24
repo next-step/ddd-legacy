@@ -53,7 +53,7 @@ class OrderServiceTest {
         Product product = createProduct("햄버거", new BigDecimal("1000"));
         MenuProduct menuProduct = createMenuProduct(product, 1L);
 
-        menu = createMenu(new BigDecimal("2000"), "메뉴", uuid, List.of(menuProduct));
+        menu = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
         orderTable = createOrderTable("테이블1", 3);
         orderLineItem = createOrderLineItem(1L, menu.getPrice());
     }

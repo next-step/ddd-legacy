@@ -25,6 +25,7 @@ import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
+public
 class MenuServiceTest {
     @Mock
     private MenuRepository menuRepository;
@@ -52,7 +53,7 @@ class MenuServiceTest {
     @Test
     void 메뉴의_가격이_null이면_메뉴를_생성할_수_없다() {
         // given
-        Menu request = createMenu(null, "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(null, "메뉴", List.of(menuProduct));
 
         // when & then
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -61,7 +62,7 @@ class MenuServiceTest {
     @Test
     void 메뉴의_가격이_0미만이면_메뉴를_생성할_수_없다() {
         // given
-        Menu request = createMenu(new BigDecimal("-1"), "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("-1"), "메뉴", List.of(menuProduct));
 
         // when & then
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -70,7 +71,7 @@ class MenuServiceTest {
     @Test
     void 메뉴가_메뉴_그룹에_속해_있지_않으면_메뉴를_생성할_수_없다() {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
 
@@ -82,7 +83,7 @@ class MenuServiceTest {
     @NullAndEmptySource
     void 메뉴는_최소한_1개_이상의_음식으로_이루어져야_메뉴를_생성할_수_있다(List<MenuProduct> menuProducts) {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", uuid, menuProducts);
+        Menu request = createMenu(new BigDecimal("1000"), "메뉴", menuProducts);
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
 
@@ -93,7 +94,7 @@ class MenuServiceTest {
     @Test
     void 메뉴에_포함된_음식_중_하나라도_이미_생성된_상태가_아니라면_메뉴를_생성할_수_없다() {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
         given(productRepository.findAllByIdIn(any())).willReturn(emptyList());
@@ -107,7 +108,7 @@ class MenuServiceTest {
     void 메뉴에_들어가는_음식의_양이_0미만이면_메뉴를_생성할_수_없다() {
         // given
         MenuProduct menuProduct = createMenuProduct(product, -1L);
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
@@ -119,7 +120,7 @@ class MenuServiceTest {
     @Test
     void 메뉴의_가격이_음식_가격의_합보다_커진다면_메뉴를_생성할_수_없다() {
         // given
-        Menu request = createMenu(new BigDecimal("2000"), "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
@@ -132,7 +133,7 @@ class MenuServiceTest {
     @Test
     void 메뉴의_이름이_null이면_메뉴를_생성할_수_없다() {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), null, uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("1000"), null, List.of(menuProduct));
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
@@ -145,7 +146,7 @@ class MenuServiceTest {
     @Test
     void 음식의_이름에_비속어가_포함되어_있으면_메뉴를_생성할_수_없다() {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
@@ -159,7 +160,7 @@ class MenuServiceTest {
     @Test
     void 메뉴를_생성할_수_있다() {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
@@ -177,7 +178,7 @@ class MenuServiceTest {
     @Test
     void 메뉴의_가격이_null이면_메뉴의_가격을_수정할_수_없다() {
         // given
-        Menu request = createMenu(null, "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(null, "메뉴", List.of(menuProduct));
 
         // when & then
         assertThatThrownBy(() -> sut.changePrice(uuid, request)).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -186,7 +187,7 @@ class MenuServiceTest {
     @Test
     void 메뉴의_가격이_0미만이면_메뉴의_가격을_수정할_수_없다() {
         // given
-        Menu request = createMenu(new BigDecimal("-1"), "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("-1"), "메뉴", List.of(menuProduct));
 
         // when & then
         assertThatThrownBy(() -> sut.changePrice(uuid, request)).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -195,7 +196,7 @@ class MenuServiceTest {
     @Test
     void 메뉴의_가격이_음식_가격의_합보다_커진다면_메뉴의_가격을_수정할_수_없다() {
         // given
-        Menu request = createMenu(new BigDecimal("2000"), "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
 
         given(menuRepository.findById(any())).willReturn(Optional.of(request));
 
@@ -206,7 +207,7 @@ class MenuServiceTest {
     @Test
     void 메뉴의_가격을_수정할_수_있다() {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", uuid, List.of(menuProduct));
+        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
         given(menuRepository.findById(any())).willReturn(Optional.of(request));
 
@@ -220,7 +221,7 @@ class MenuServiceTest {
     @Test
     void 메뉴의_가격이_음식_가격의_합보다_커진다면_메뉴를_화면에_표시할_수_없다() {
         // given
-        Menu menu = createMenu(new BigDecimal("2000"), "메뉴", uuid, List.of(menuProduct));
+        Menu menu = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -231,7 +232,7 @@ class MenuServiceTest {
     @Test
     void 메뉴를_화면에_표시할_수_있다() {
         // given
-        Menu menu = createMenu(new BigDecimal("1000"), "메뉴", uuid, List.of(menuProduct));
+        Menu menu = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -245,7 +246,7 @@ class MenuServiceTest {
     @Test
     void 메뉴를_화면에서_숨길_수_있다() {
         // given
-        Menu menu = createMenu(new BigDecimal("1000"), "메뉴", uuid, List.of(menuProduct));
+        Menu menu = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -256,11 +257,11 @@ class MenuServiceTest {
         assertThat(menu.isDisplayed()).isFalse();
     }
 
-    public static Menu createMenu(BigDecimal price, String name, UUID menuGroupId, List<MenuProduct> menuProducts) {
+    public static Menu createMenu(BigDecimal price, String name, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setPrice(price);
         menu.setName(name);
-        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuGroupId(uuid);
         menu.setMenuProducts(menuProducts);
         menu.setDisplayed(true);
         return menu;

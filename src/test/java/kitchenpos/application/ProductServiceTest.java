@@ -136,7 +136,7 @@ public class ProductServiceTest {
         // given
         Product request = createProduct("햄버거", new BigDecimal("2000"));
         MenuProduct menuProduct = createMenuProduct(request, 1L);
-        Menu menu = createMenu(new BigDecimal("3000"), "메뉴", uuid, List.of(menuProduct));
+        Menu menu = createMenu(new BigDecimal("3000"), "메뉴", List.of(menuProduct));
 
         given(productRepository.findById(any())).willReturn(Optional.of(new Product()));
         given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
