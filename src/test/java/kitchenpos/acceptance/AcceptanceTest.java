@@ -10,6 +10,7 @@ import kitchenpos.util.DataCleanUp;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AcceptanceTest {
+
     @Autowired
     private DataCleanUp dataCleanUp;
 

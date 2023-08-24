@@ -3,6 +3,7 @@ package kitchenpos.acceptance;
 import java.util.Map;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -14,7 +15,12 @@ import io.restassured.response.Response;
 @DisplayName("메뉴 그룹 관리")
 class MenuGroupAcceptanceTest extends AcceptanceTest {
 
-    private static final String path = "/api/menu-groups";
+    private static final String MENU_GROUP_PATH = "/api/menu-groups";
+
+    @BeforeEach
+    void setup() {
+
+    }
 
     /**
      * When : 메뉴그룹을 3개 생성하고
@@ -34,12 +40,12 @@ class MenuGroupAcceptanceTest extends AcceptanceTest {
             .containsOnly("한식", "양식", "분식");
     }
 
-    public ExtractableResponse<Response> 메뉴그룹을_등록_한다(String name) {
+    public static ExtractableResponse<Response> 메뉴그룹을_등록_한다(String name) {
         return RestAssured.given().log().all()
             .body(Map.of("name", name))
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
-            .post(path)
+            .post(MENU_GROUP_PATH)
             .then().log().all()
             .extract();
     }
@@ -48,7 +54,7 @@ class MenuGroupAcceptanceTest extends AcceptanceTest {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
-            .get(path)
+            .get(MENU_GROUP_PATH)
             .then().log().all()
             .extract();
     }

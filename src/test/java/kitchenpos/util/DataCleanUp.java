@@ -1,51 +1,48 @@
 package kitchenpos.util;
 
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import javax.sql.DataSource;
+import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Table;
 
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DataCleanUp implements InitializingBean {
 
-    @Autowired
-    private DataSource dataSource;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     private List<String> tableNames;
 
     @Override
     public void afterPropertiesSet() {
-        tableNames = new ArrayList<>();
-        try {
-            DatabaseMetaData metaData = dataSource.getConnection().getMetaData();
-            ResultSet tables = metaData.getTables(null, "nextstep", null, new String[] {"TABLE"});
-            while (tables.next()) {
-                String tableName = tables.getString("TABLE_NAME");
-                tableNames.add(tableName);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException();
-        }
+        tableNames = entityManager.getMetamodel().getEntities().stream()
+            .filter(entity -> entity.getJavaType().getAnnotation(Entity.class) != null)
+            .map(entity -> {
+                Table tableAnnotation = entity.getJavaType().getAnnotation(Table.class);
+                if (tableAnnotation != null && tableAnnotation.name() != null && !tableAnnotation.name().isEmpty()) {
+                    return tableAnnotation.name();
+                } else {
+                    return entity.getName();
+                }
+            })
+            .collect(Collectors.toList());
     }
 
     @Transactional
     public void execute() {
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+        entityManager.flush();
+        entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
         for (String tableName : tableNames) {
-            jdbcTemplate.execute("TRUNCATE TABLE " + tableName);
+            entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
         }
-        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+        entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
     }
 
 }

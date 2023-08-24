@@ -1,8 +1,13 @@
 package kitchenpos.acceptance;
 
+import static kitchenpos.acceptance.MenuAcceptanceTest.*;
+import static kitchenpos.acceptance.MenuGroupAcceptanceTest.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
 import java.util.Map;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -14,7 +19,7 @@ import io.restassured.response.Response;
 @DisplayName("상품 관리")
 class ProductAcceptanceTest extends AcceptanceTest {
 
-    private static final String path = "/api/products";
+    private static final String PRODUCT_PATH = "/api/products";
 
     /**
      * When : 상품 3개 생성하고
@@ -30,47 +35,99 @@ class ProductAcceptanceTest extends AcceptanceTest {
 
         //then
         ExtractableResponse<Response> response = 전체_상품을_조회_한다();
-        Assertions.assertThat(response.jsonPath().getList("name"))
-            .containsOnly("돈가스", "김밥", "떡볶이");
-        Assertions.assertThat(response.jsonPath().getList("price"))
-            .containsOnly(9000f, 1000f, 3500f);
+
+        assertAll(
+            () -> assertThat(response.jsonPath().getList("name"))
+                .containsOnly("돈가스", "김밥", "떡볶이"),
+            () -> assertThat(response.jsonPath().getList("price"))
+                .containsOnly(9000f, 1000f, 3500f)
+        );
     }
 
     /**
      * Given : 상품 1개 등록하고
-     * Given : 등록한 상품으로 메뉴를 1개 등록하고
-     * When :  등록된 메뉴 가격보다 변경 할 상품가격 * 갯수가 작으면
-     * Then :  메뉴는 화면에 표시 되지 않는다.
+     * When :  해당 상품의 가격을 변경하면
+     * Then :  변경된 가격의 상품이 조회된다.
      */
     @DisplayName("상품 가격을 변경한다.")
     @Test
-    void changePrice() {
+    void changePrice1() {
+        //Give
+        String id = 상품_등록_한다("돈가스", 9000).jsonPath().getString("id");
 
+        //When
+        상품_가격을_변경한다(id, 4500);
+
+        //Then
+        ExtractableResponse<Response> response = 전체_상품을_조회_한다();
+        assertThat(response.jsonPath().getList("price"))
+            .containsOnly(4500f);
     }
 
     /**
      * Given : 상품 1개 등록하고
-     * Given : 등록한 상품으로 메뉴를 1개 등록하고
-     * When :  등록된 메뉴 가격보다  <= 변경 할 상품가격 * 갯수 조건을 만족하면
-     * Then :  메뉴의 화면 표시 값은 변경되지 않는다.
+     * Given : 메뉴를 등록하고
+     * When  : 메뉴에 등록된 상품 가격을 아래 조건에 맞게 변경하면
+     *         메뉴가격 > 상품가격 * 갯수
+     * Then :  상품 가격은 변경된다.
+     * Then :  메뉴의 화면에서 숨겨진다.
      */
+    @DisplayName("기등록된 메뉴의 상품 가격을 변경한다.")
+    @Test
+    void changePrice2() {
+        //Given
+        String 돈가스id = 상품_등록_한다("돈가스", 9000).jsonPath().getString("id");
+        메뉴_등록_한다(getMenuInput(돈가스id));
 
-    public ExtractableResponse<Response> 상품_등록_한다(String name, long price) {
+        //When
+        상품_가격을_변경한다(돈가스id, 3000);
+
+        //Then
+        ExtractableResponse<Response> response = 전체_상품을_조회_한다();
+        assertThat(response.jsonPath().getList("price"))
+            .containsOnly(3000f);
+
+    }
+
+    private Map<String, Object> getMenuInput(String productId) {
+        Map<String, Object> menuGroup = 메뉴그룹을_등록_한다("분식").jsonPath().getMap(".");
+        Map<String, Object> menu = 메뉴_기본_입력_스텝("돈가스_세트", 4500, false);
+        menu.put("menuGroupId", menuGroup.get("id"));
+        menu.put("menuProducts",
+            List.of(Map.of(
+                "productId", productId,
+                "quantity", 1)
+            ));
+        return menu;
+    }
+
+    public static ExtractableResponse<Response> 상품_등록_한다(String name, long price) {
         Map<String, Object> input = Map.of("name", name, "price", price);
         return RestAssured.given().log().all()
             .body(input)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
-            .post(path)
+            .post(PRODUCT_PATH)
             .then().log().all()
             .extract();
     }
 
-    public ExtractableResponse<Response> 전체_상품을_조회_한다() {
+    private ExtractableResponse<Response> 상품_가격을_변경한다(String id, long price) {
+        return RestAssured.given().log().all()
+            .body(Map.of("price", price))
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .when()
+            .put(String.format("%s/%s/%s", PRODUCT_PATH, id, "price"))
+            .then().log().all()
+            .extract();
+
+    }
+
+    private ExtractableResponse<Response> 전체_상품을_조회_한다() {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .when()
-            .get(path)
+            .get(PRODUCT_PATH)
             .then().log().all()
             .extract();
     }
