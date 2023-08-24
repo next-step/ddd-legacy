@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.13.RELEASE'
     id 'org.flywaydb.flyway' version '8.2.0'
     id 'java'
+    id 'jacoco'
 }
 
 group = 'camp.nextstep.edu'
@@ -12,6 +13,51 @@ description = 'Kitchenpos project with domain-driven design'
 
 repositories {
     mavenCentral()
+}
+
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+private excludedClassFilesForReport(classDirectories) {
+    classDirectories.setFrom(
+            files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: [
+                        "**/Q*",
+                        "**/*Dto*",
+                        "**/*Application*",
+                        "**/*Config*"
+                ])
+            })
+    )
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+        xml.enabled false
+        csv.enabled false
+
+        html.destination file("${buildDir}/jacoco/index.html")
+    }
+
+    excludedClassFilesForReport(classDirectories)
+
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    excludedClassFilesForReport(classDirectories)
+    violationRules {
+
+        rule {
+            enabled = true
+
+            limit {
+                minimum = 0.80
+            }
+        }
+    }
 }
 
 dependencies {
