@@ -6,6 +6,7 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.integration_test_step.MenuGroupIntegrationStep;
+import kitchenpos.integration_test_step.MenuIntegrationStep;
 import kitchenpos.integration_test_step.ProductIntegrationStep;
 import kitchenpos.test_fixture.MenuGroupTestFixture;
 import kitchenpos.test_fixture.MenuProductTestFixture;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -33,6 +35,9 @@ class MenuServiceTest {
 
     @Autowired
     private MenuService sut;
+
+    @Autowired
+    private MenuIntegrationStep menuIntegrationStep;
 
     @Autowired
     private ProductIntegrationStep productIntegrationStep;
@@ -246,5 +251,29 @@ class MenuServiceTest {
 
         // when & then
         assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
+    }
+
+    @DisplayName("메뉴를 등록할 때 전시 여부를 결정할 수 있다")
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void createWithDisplayed(boolean displayed) {
+        // given
+        Product product = productIntegrationStep.createPersistProduct();
+        MenuGroup menuGroup = menuGroupIntegrationStep.createPersistMenuGroup();
+        MenuProduct menuProduct = MenuProductTestFixture.create()
+                .changeProduct(product)
+                .getMenuProduct();
+        Menu menu = MenuTestFixture.create()
+                .changeMenuGroup(menuGroup)
+                .changeMenuProducts(Collections.singletonList(menuProduct))
+                .changeDisplayed(displayed)
+                .changePrice(menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
+                .getMenu();
+
+        // when
+        Menu result = sut.create(menu);
+
+        // then
+        assertThat(result.isDisplayed()).isEqualTo(displayed);
     }
 }
