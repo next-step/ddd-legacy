@@ -297,4 +297,22 @@ class MenuServiceTest {
         // then
         assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(999));
     }
+
+    @DisplayName("메뉴 가격 변경 시 메뉴의 가격이 null이면 예외가 발생한다.")
+    @Test
+    void changePriceWithNullPrice() {
+        // given
+        Menu persistMenu = menuIntegrationStep.create();
+        Menu updateMenu = MenuTestFixture.create()
+                .changeId(persistMenu.getId())
+                .changeName(persistMenu.getName())
+                .changeMenuGroup(persistMenu.getMenuGroup())
+                .changeMenuProducts(persistMenu.getMenuProducts())
+                .changePrice(null)
+                .changeDisplayed(persistMenu.isDisplayed())
+                .getMenu();
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> sut.changePrice(persistMenu.getId(), updateMenu));
+    }
 }
