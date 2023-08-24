@@ -71,4 +71,42 @@ class MenuServiceTest {
                 .containsAnyOf(menuProduct.getSeq());
         assertThat(result.isDisplayed()).isTrue();
     }
+
+    @DisplayName("메뉴의 가격이 null이면 예외가 발생한다.")
+    @Test
+    void createWithNullPrice() {
+        // given
+        Product product = productIntegrationStep.createPersistProduct();
+        MenuGroup menuGroup = menuGroupIntegrationStep.createPersistMenuGroup();
+        MenuProduct menuProduct = MenuProductTestFixture.create()
+                .changeProduct(product)
+                .getMenuProduct();
+        Menu menu = MenuTestFixture.create()
+                .changeMenuGroup(menuGroup)
+                .changeMenuProducts(Collections.singletonList(menuProduct))
+                .changePrice(null)
+                .getMenu();
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
+    }
+
+    @DisplayName("메뉴의 가격이 0보다 작은 음수면 예외가 발생한다.")
+    @Test
+    void createWithNegativeNumberPrice() {
+        // given
+        Product product = productIntegrationStep.createPersistProduct();
+        MenuGroup menuGroup = menuGroupIntegrationStep.createPersistMenuGroup();
+        MenuProduct menuProduct = MenuProductTestFixture.create()
+                .changeProduct(product)
+                .getMenuProduct();
+        Menu menu = MenuTestFixture.create()
+                .changeMenuGroup(menuGroup)
+                .changeMenuProducts(Collections.singletonList(menuProduct))
+                .changePrice(BigDecimal.valueOf(-1))
+                .getMenu();
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () -> sut.create(menu));
+    }
 }
