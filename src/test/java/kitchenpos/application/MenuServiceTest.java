@@ -276,4 +276,25 @@ class MenuServiceTest {
         // then
         assertThat(result.isDisplayed()).isEqualTo(displayed);
     }
+
+    @DisplayName("메뉴의 가격을 변경할 수 있다.")
+    @Test
+    void changePrice() {
+        // given
+        Menu persistMenu = menuIntegrationStep.create();
+        Menu updateMenu = MenuTestFixture.create()
+                .changeId(persistMenu.getId())
+                .changeName(persistMenu.getName())
+                .changeMenuGroup(persistMenu.getMenuGroup())
+                .changeMenuProducts(persistMenu.getMenuProducts())
+                .changePrice(persistMenu.getPrice().subtract(BigDecimal.valueOf(1)))
+                .changeDisplayed(persistMenu.isDisplayed())
+                .getMenu();
+
+        // when
+        Menu result = sut.changePrice(persistMenu.getId(), updateMenu);
+
+        // then
+        assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(999));
+    }
 }
