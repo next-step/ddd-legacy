@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.test_fixture.MenuGroupTestFixture;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,9 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -19,6 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class MenuGroupServiceTest {
     @Autowired
     private MenuGroupService sut;
+
+    @Autowired
+    private MenuGroupRepository menuGroupRepository;
 
     @Autowired
     private DatabaseCleanStep databaseCleanStep;
@@ -55,5 +62,33 @@ class MenuGroupServiceTest {
 
         // when & then
         assertThrows(IllegalArgumentException.class, () -> sut.create(menuGroup));
+    }
+
+    @DisplayName("전체 메뉴 그룹을 조회할 수 있다.")
+    @Test
+    void findAll() {
+        // given
+        MenuGroup menuGroup = MenuGroupTestFixture.create()
+                .changeId(UUID.randomUUID())
+                .getMenuGroup();
+        menuGroupRepository.save(menuGroup);
+        MenuGroup menuGroup2 = MenuGroupTestFixture.create()
+                .changeId(UUID.randomUUID())
+                .getMenuGroup();
+        menuGroupRepository.save(menuGroup2);
+
+        // when
+        List<MenuGroup> result = sut.findAll();
+
+        // then
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(2);
+        result.forEach(it -> assertMenuGroup(it, "테스트 메뉴 그룹"));
+    }
+
+    private void assertMenuGroup(MenuGroup menuGroup, String name) {
+        assertThat(menuGroup).isNotNull();
+        assertThat(menuGroup.getId()).isNotNull();
+        assertThat(menuGroup.getName()).isEqualTo(name);
     }
 }
