@@ -29,7 +29,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class OrderServiceTest {
+public class OrderServiceTest {
     @Mock
     private OrderRepository orderRepository;
     @Mock
@@ -55,7 +55,7 @@ class OrderServiceTest {
 
         menu = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
         orderTable = createOrderTable("테이블1", 3);
-        orderLineItem = createOrderLineItem(1L, menu.getPrice());
+        orderLineItem = createOrderLineItem(1L, menu.getPrice(), menu);
     }
 
     @Test
@@ -93,7 +93,7 @@ class OrderServiceTest {
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT"})
     void 포장_및_배달_주문의_경우_주문할_메뉴의_양이_0이상이_아니라면_주문을_생성할_수_없다(OrderType orderType) {
         // given
-        OrderLineItem orderLineItem = createOrderLineItem(-1L, menu.getPrice());
+        OrderLineItem orderLineItem = createOrderLineItem(-1L, menu.getPrice(), menu);
         Order request = createOrder(orderType, List.of(orderLineItem), "주소지");
 
         given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
@@ -119,7 +119,7 @@ class OrderServiceTest {
     @Test
     void 메뉴의_현재_가격과_주문시점의_메뉴_가격이_다르면_주문을_생성할_수_없다() {
         // given
-        OrderLineItem orderLineItem = createOrderLineItem(1L, new BigDecimal("3000"));
+        OrderLineItem orderLineItem = createOrderLineItem(1L, new BigDecimal("3000"), menu);
         Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), "주소지");
 
         given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
@@ -370,23 +370,25 @@ class OrderServiceTest {
         assertThat(orderTable.isOccupied()).isFalse();
     }
 
-    private Order createOngoingOrder(OrderType orderType, OrderStatus orderStatus) {
-        Order request = new Order();
-        request.setType(orderType);
-        request.setStatus(orderStatus);
-        return request;
+    public static Order createOngoingOrder(OrderType orderType, OrderStatus orderStatus) {
+        Order order = new Order();
+        order.setId(uuid);
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        return order;
     }
 
-    private Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress) {
-        Order request = new Order();
-        request.setType(orderType);
-        request.setOrderLineItems(orderLineItems);
-        request.setDeliveryAddress(deliveryAddress);
-        request.setOrderTableId(uuid);
-        return request;
+    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress) {
+        Order order = new Order();
+        order.setId(uuid);
+        order.setType(orderType);
+        order.setOrderLineItems(orderLineItems);
+        order.setDeliveryAddress(deliveryAddress);
+        order.setOrderTableId(uuid);
+        return order;
     }
 
-    private OrderLineItem createOrderLineItem(long quantity, BigDecimal price) {
+    public static OrderLineItem createOrderLineItem(long quantity, BigDecimal price, Menu menu) {
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItem.setMenu(menu);
         orderLineItem.setQuantity(quantity);
