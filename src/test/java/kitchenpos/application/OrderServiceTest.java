@@ -106,7 +106,7 @@ class OrderServiceTest {
         }
 
         @DisplayName("매장식사가 아닌경우에, 주문메뉴 양이 0보다 작으면 주문을 생성하지 못한다.")
-        @ParameterizedTest
+        @ParameterizedTest(name = "주문종류가 매장식사가 아닌 경우")
         @EnumSource(mode = EXCLUDE, names = "EAT_IN")
         void negativeOfOrderLineQuantity(OrderType orderType) {
             //given
@@ -353,7 +353,7 @@ class OrderServiceTest {
         }
 
         @DisplayName("주문 상태가 WAITING 이 아니면 수락 하지 못한다.")
-        @ParameterizedTest
+        @ParameterizedTest(name = "주문 상태가 대기가 아닌경우")
         @EnumSource(mode = EXCLUDE, names = "WAITING")
         void notCorrectOrderStatus(OrderStatus orderStatus) {
             //given
@@ -423,7 +423,7 @@ class OrderServiceTest {
         }
 
         @DisplayName("주문 상태가 ACCEPTED 가 아니면 서빙 하지 못한다.")
-        @ParameterizedTest
+        @ParameterizedTest(name = "주문 상태가 수락이 아닌 경우")
         @EnumSource(mode = EXCLUDE, names = "ACCEPTED")
         void orderStatusNotAccept(OrderStatus orderStatus) {
             //given
@@ -472,7 +472,7 @@ class OrderServiceTest {
         }
 
         @DisplayName("주문 종류가 배달이 아니면 배달 시작을 하지 못한다.")
-        @ParameterizedTest
+        @ParameterizedTest(name = "주문 종류가 배달이 아닌 경우")
         @EnumSource(mode = EXCLUDE, names = "DELIVERY")
         void orderStatusNotAccept(OrderType orderType) {
             //given
@@ -488,7 +488,7 @@ class OrderServiceTest {
         }
 
         @DisplayName("주문 상태가 SERVED가 아니면 배달 시작을 하지 못한다.")
-        @ParameterizedTest
+        @ParameterizedTest(name = "주문 상태가 서빙이 아닌 경우")
         @EnumSource(mode = EXCLUDE, names = "SERVED")
         void orderStatusNotAccept(OrderStatus orderStatus) {
             //given
@@ -540,7 +540,7 @@ class OrderServiceTest {
         }
 
         @DisplayName("주문 상태가 DELIVERING가 아니면 배달 종료를 하지 못한다.")
-        @ParameterizedTest
+        @ParameterizedTest(name = "주문 상태가 배달 중이 아닌 겨우")
         @EnumSource(mode = EXCLUDE, names = "DELIVERING")
         void orderStatusNotAccept(OrderStatus orderStatus) {
             //given
@@ -589,7 +589,7 @@ class OrderServiceTest {
         }
 
         @DisplayName("주문구분이 배달인데, 주문 상태가 DELIVERED가 아니면 주문을 완료하지 못한다.")
-        @ParameterizedTest
+        @ParameterizedTest(name = "주문 상태가 배달 완료가 아닌 경우")
         @EnumSource(mode = EXCLUDE, names = "DELIVERED")
         void orderStatusNotDELIVERED(OrderStatus orderStatus) {
             //given
@@ -606,7 +606,7 @@ class OrderServiceTest {
         }
 
         @DisplayName("주문구분이 포장인데, 주문 상태가 SERVED가 아니면 주문을 완료 하지 못한다.")
-        @ParameterizedTest
+        @ParameterizedTest(name = "주문 상태가 서빙이 아닌 경우")
         @EnumSource(mode = EXCLUDE, names = "SERVED")
         void orderStatusNotSERVED1(OrderStatus orderStatus) {
             //given
@@ -623,7 +623,7 @@ class OrderServiceTest {
         }
 
         @DisplayName("주문구분이 매장식사인데, 주문 상태가 SERVED가 아니면 주문을 완료하지 못한다.")
-        @ParameterizedTest
+        @ParameterizedTest(name = "주문 상태가 서빙이 아닌 경우 모두")
         @EnumSource(mode = EXCLUDE, names = "SERVED")
         void orderStatusNotSERVED2(OrderStatus orderStatus) {
             //given
