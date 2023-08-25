@@ -430,4 +430,14 @@ class MenuServiceTest {
         // then
         assertThat(result.isDisplayed()).isFalse();
     }
+
+    @DisplayName("숨긴 상태를 변경하려는 메뉴는 존재하는 메뉴여야 한다.")
+    @Test
+    void hideWithNotExistMenu() {
+        // given
+        Menu notPersistMenu = MenuTestFixture.create().getMenu();
+
+        // when & then
+        assertThrows(NoSuchElementException.class, () -> sut.hide(notPersistMenu.getId()));
+    }
 }
