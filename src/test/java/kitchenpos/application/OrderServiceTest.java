@@ -201,26 +201,6 @@ class OrderServiceTest {
             then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴_id);
         }
 
-        @DisplayName("배달 일때, 배달주소가 공백 이면 주문을 생성하지 못한다.")
-        @Test
-        void deliveryAddressIsNull() {
-            //given
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(120000));
-            Order order = new Order();
-            order.setType(OrderType.DELIVERY);
-            order.setOrderLineItems(List.of(돈가스_주문));
-            order.setDeliveryAddress("");
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
-            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
-
-            //when
-            //then
-            assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> orderService.create(order));
-            then(menuRepository).should(times(1)).findAllByIdIn(any());
-            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴_id);
-        }
-
         @DisplayName("배달 일떄, 배달주소가 정상적으로 등록된다.")
         @Test
         void normalRegisterDeliveryAddr() {

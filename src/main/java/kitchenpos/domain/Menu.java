@@ -77,15 +77,12 @@ public class Menu {
         if (!(o instanceof Menu))
             return false;
         Menu menu = (Menu)o;
-        return displayed == menu.displayed && Objects.equals(id, menu.id) && Objects.equals(name,
-            menu.name) && Objects.equals(price, menu.price) && Objects.equals(menuGroup, menu.menuGroup)
-            && Objects.equals(menuProducts, menu.menuProducts) && Objects.equals(menuGroupId,
-            menu.menuGroupId);
+        return Objects.equals(id, menu.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, price, menuGroup, displayed, menuProducts, menuGroupId);
+        return Objects.hash(id);
     }
 
     public UUID getId() {
