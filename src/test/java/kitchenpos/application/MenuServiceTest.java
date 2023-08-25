@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.math.BigDecimal;
@@ -41,14 +42,15 @@ class MenuServiceTest {
     private MenuService menuService;
     private Product 돈가스;
     private Product 김밥;
-    private UUID 돈가스id;
+    private UUID 돈가스_id;
+    private Menu 돈가스_세트_메뉴_request;
 
     @BeforeEach
     void setUp() {
-        돈가스id = UUID.randomUUID();
-        돈가스 = new Product(돈가스id, "돈가스", BigDecimal.valueOf(12000));
-        김밥 = new Product(UUID.randomUUID(), "김밥", BigDecimal.valueOf(7000));
-
+        돈가스_id = UUID.randomUUID();
+        돈가스 = new Product(돈가스_id, "돈가스", BigDecimal.valueOf(7000));
+        김밥 = new Product(UUID.randomUUID(), "김밥", BigDecimal.valueOf(5000));
+        돈가스_세트_메뉴_request = new Menu(UUID.randomUUID(), "돈가스세트", new BigDecimal(120000), new MenuGroup(), true);
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
 
@@ -84,13 +86,13 @@ class MenuServiceTest {
         @Test
         void notExistsMenuGroup() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", new BigDecimal(10), new MenuGroup(), true);
+
             given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
 
             //when
             //then
             assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> menuService.create(돈가스_세트));
+                .isThrownBy(() -> menuService.create(돈가스_세트_메뉴_request));
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(0)).findAllByIdIn(any());
         }
@@ -99,13 +101,12 @@ class MenuServiceTest {
         @Test
         void notExistsMenuProduct() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", new BigDecimal(10), new MenuGroup(), true);
             given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
 
             //when
             //then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(돈가스_세트));
+                .isThrownBy(() -> menuService.create(돈가스_세트_메뉴_request));
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(0)).findAllByIdIn(any());
         }
@@ -114,16 +115,15 @@ class MenuServiceTest {
         @Test
         void wrongProductCount() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            돈가스_세트.addMenuProduct(new MenuProduct(돈가스, 10));
-            돈가스_세트.addMenuProduct(new MenuProduct(김밥, 10));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(돈가스, 10));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(김밥, 10));
             given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(돈가스));
 
             //when
             //then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(돈가스_세트));
+                .isThrownBy(() -> menuService.create(돈가스_세트_메뉴_request));
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(any());
         }
@@ -132,16 +132,15 @@ class MenuServiceTest {
         @Test
         void quantityUnderZero() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            돈가스_세트.addMenuProduct(new MenuProduct(돈가스, -1));
-            돈가스_세트.addMenuProduct(new MenuProduct(김밥, 4));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(돈가스, -1));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(김밥, 4));
             given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(돈가스, 김밥));
 
             //when
             //then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(돈가스_세트));
+                .isThrownBy(() -> menuService.create(돈가스_세트_메뉴_request));
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(any());
         }
@@ -150,9 +149,8 @@ class MenuServiceTest {
         @Test
         void notExistsProductId() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            돈가스_세트.addMenuProduct(new MenuProduct(돈가스, 5));
-            돈가스_세트.addMenuProduct(new MenuProduct(김밥, 5));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(돈가스, 5));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(김밥, 5));
             given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(돈가스, 김밥));
             given(productRepository.findById(돈가스.getId())).willReturn(Optional.empty());
@@ -160,7 +158,7 @@ class MenuServiceTest {
             //when
             //then
             assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> menuService.create(돈가스_세트));
+                .isThrownBy(() -> menuService.create(돈가스_세트_메뉴_request));
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(List.of(돈가스.getId(), 김밥.getId()));
             then(productRepository).should(times(1)).findById(돈가스.getId());
@@ -214,9 +212,8 @@ class MenuServiceTest {
         @Test
         void wrongMenuName() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", BigDecimal.valueOf(1000), new MenuGroup(), true);
-            돈가스_세트.addMenuProduct(new MenuProduct(돈가스, 5));
-            돈가스_세트.addMenuProduct(new MenuProduct(김밥, 5));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(돈가스, 10));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(김밥, 10));
             given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(돈가스, 김밥));
             given(productRepository.findById(돈가스.getId())).willReturn(Optional.of(돈가스));
@@ -226,7 +223,7 @@ class MenuServiceTest {
             //when
             //then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(돈가스_세트));
+                .isThrownBy(() -> menuService.create(돈가스_세트_메뉴_request));
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(List.of(돈가스.getId(), 김밥.getId()));
             then(productRepository).should(times(1)).findById(돈가스.getId());
@@ -238,22 +235,24 @@ class MenuServiceTest {
         @Test
         void normalCreate() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", BigDecimal.valueOf(1000), new MenuGroup(), true);
-            돈가스_세트.addMenuProduct(new MenuProduct(돈가스, 5));
-            돈가스_세트.addMenuProduct(new MenuProduct(김밥, 5));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(돈가스, 10));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(김밥, 10));
             given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(돈가스, 김밥));
             given(productRepository.findById(돈가스.getId())).willReturn(Optional.of(돈가스));
             given(productRepository.findById(김밥.getId())).willReturn(Optional.of(김밥));
             given(purgomalumClient.containsProfanity(any())).willReturn(false);
-            given(menuRepository.save(any())).willReturn(돈가스_세트);
+            given(menuRepository.save(any())).willReturn(돈가스_세트_메뉴_request);
 
             //when
+            Menu retunMenu = menuService.create(돈가스_세트_메뉴_request);
+
             //then
-            Menu retunMenu = menuService.create(돈가스_세트);
-            assertThat(retunMenu.getName()).isEqualTo(돈가스_세트.getName());
-            assertThat(retunMenu.getPrice()).isEqualTo(돈가스_세트.getPrice());
-            assertThat(retunMenu.isDisplayed()).isEqualTo(돈가스_세트.isDisplayed());
+            assertAll(
+                () -> assertThat(retunMenu.getName()).isEqualTo(돈가스_세트_메뉴_request.getName()),
+                () -> assertThat(retunMenu.getPrice()).isEqualTo(돈가스_세트_메뉴_request.getPrice()),
+                () -> assertThat(retunMenu.isDisplayed()).isEqualTo(돈가스_세트_메뉴_request.isDisplayed())
+            );
 
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(List.of(돈가스.getId(), 김밥.getId()));
@@ -277,7 +276,7 @@ class MenuServiceTest {
             //when
             //then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.changePrice(돈가스id, 돈가스_세트));
+                .isThrownBy(() -> menuService.changePrice(돈가스_id, 돈가스_세트));
         }
 
         @DisplayName("가격이 0보다 작으면 가격 변경이 불가능 하다.")
@@ -289,35 +288,33 @@ class MenuServiceTest {
             //when
             //then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.changePrice(돈가스id, 돈가스_세트));
+                .isThrownBy(() -> menuService.changePrice(돈가스_id, 돈가스_세트));
         }
 
         @DisplayName("기 등록된 메뉴가 아니라면 가격 변경이 불가능 하다.")
         @Test
         void notExistsMenu() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", new BigDecimal(10000), new MenuGroup(), true);
-            given(menuRepository.findById(돈가스id)).willReturn(Optional.empty());
+            given(menuRepository.findById(돈가스_id)).willReturn(Optional.empty());
 
             //when
             //then
             assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> menuService.changePrice(돈가스id, 돈가스_세트));
+                .isThrownBy(() -> menuService.changePrice(돈가스_id, 돈가스_세트_메뉴_request));
         }
 
         @DisplayName("기등록된 메뉴가격 > 계산된 금액(상품금액*메뉴상품 갯수) 인경우 가격 변경이 불가능 하다.")
         @Test
         void overPrice() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", BigDecimal.valueOf(1200000), new MenuGroup(), true);
-            돈가스_세트.addMenuProduct(new MenuProduct(돈가스, 5));
-            돈가스_세트.addMenuProduct(new MenuProduct(김밥, 5));
-            given(menuRepository.findById(돈가스id)).willReturn(Optional.of(돈가스_세트));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(돈가스, 5));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(김밥, 5));
+            given(menuRepository.findById(돈가스_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
 
             //when
             //then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.changePrice(돈가스id, 돈가스_세트));
+                .isThrownBy(() -> menuService.changePrice(돈가스_id, 돈가스_세트_메뉴_request));
         }
 
         @DisplayName("입력한 메뉴 가격으로 정상 변경되었다.")
@@ -327,11 +324,11 @@ class MenuServiceTest {
             Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", BigDecimal.valueOf(1000), new MenuGroup(), true);
             돈가스_세트.addMenuProduct(new MenuProduct(돈가스, 5));
             돈가스_세트.addMenuProduct(new MenuProduct(김밥, 5));
-            given(menuRepository.findById(돈가스id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findById(돈가스_id)).willReturn(Optional.of(돈가스_세트));
 
             //when
             //then
-            Menu returnMenu = menuService.changePrice(돈가스id, 돈가스_세트);
+            Menu returnMenu = menuService.changePrice(돈가스_id, 돈가스_세트);
             assertThat(returnMenu.getPrice()).isSameAs(돈가스_세트.getPrice());
         }
 
@@ -344,10 +341,10 @@ class MenuServiceTest {
         @Test
         void notExistsMenu() {
             ///given
-            given(menuRepository.findById(돈가스id)).willReturn(Optional.empty());
+            given(menuRepository.findById(돈가스_id)).willReturn(Optional.empty());
 
             assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> menuService.display(돈가스id));
+                .isThrownBy(() -> menuService.display(돈가스_id));
         }
 
         @DisplayName("화면표시 처리할 메뉴의 메뉴가격 > 계산된 금액(상품금액*메뉴상품 갯수) 인경우 화면에 표시 처리를 하지 못한다.")
@@ -357,26 +354,25 @@ class MenuServiceTest {
             Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", BigDecimal.valueOf(1200000), new MenuGroup(), true);
             돈가스_세트.addMenuProduct(new MenuProduct(돈가스, 5));
             돈가스_세트.addMenuProduct(new MenuProduct(김밥, 5));
-            given(menuRepository.findById(돈가스id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findById(돈가스_id)).willReturn(Optional.of(돈가스_세트));
 
             //when
             //then
             assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> menuService.display(돈가스id));
+                .isThrownBy(() -> menuService.display(돈가스_id));
         }
 
         @DisplayName("메뉴가 정상 (화면표시) 된다.")
         @Test
         void normalDisplay() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", BigDecimal.valueOf(1000), new MenuGroup(), true);
-            돈가스_세트.addMenuProduct(new MenuProduct(돈가스, 5));
-            돈가스_세트.addMenuProduct(new MenuProduct(김밥, 5));
-            given(menuRepository.findById(돈가스id)).willReturn(Optional.of(돈가스_세트));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(돈가스, 100));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(김밥, 100));
+            given(menuRepository.findById(돈가스_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
 
             //when
             //then
-            Menu returnMenu = menuService.display(돈가스id);
+            Menu returnMenu = menuService.display(돈가스_id);
             assertThat(returnMenu.isDisplayed()).isTrue();
         }
     }
@@ -388,24 +384,23 @@ class MenuServiceTest {
         @Test
         void notExistsMenu() {
             ///given
-            given(menuRepository.findById(돈가스id)).willReturn(Optional.empty());
+            given(menuRepository.findById(돈가스_id)).willReturn(Optional.empty());
 
             assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> menuService.hide(돈가스id));
+                .isThrownBy(() -> menuService.hide(돈가스_id));
         }
 
         @DisplayName("메뉴가 정상 (화면표시) 된다.")
         @Test
         void normalDisplay() {
             //given
-            Menu 돈가스_세트 = new Menu(UUID.randomUUID(), "돈가스세트", BigDecimal.valueOf(1000), new MenuGroup(), false);
-            돈가스_세트.addMenuProduct(new MenuProduct(돈가스, 5));
-            돈가스_세트.addMenuProduct(new MenuProduct(김밥, 5));
-            given(menuRepository.findById(돈가스id)).willReturn(Optional.of(돈가스_세트));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(돈가스, 10));
+            돈가스_세트_메뉴_request.addMenuProduct(new MenuProduct(김밥, 10));
+            given(menuRepository.findById(돈가스_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
 
             //when
             //then
-            Menu returnMenu = menuService.hide(돈가스id);
+            Menu returnMenu = menuService.hide(돈가스_id);
             assertThat(returnMenu.isDisplayed()).isFalse();
         }
     }

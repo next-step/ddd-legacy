@@ -45,13 +45,17 @@ class OrderServiceTest {
     @Mock
     private KitchenridersClient kitchenridersClient;
     private OrderService orderService;
-    private UUID 돈가스_세트_메뉴id;
-    private UUID 김밥_세트_메뉴id;
+    private UUID 돈가스_세트_메뉴_id;
+    private UUID 김밥_세트_메뉴_id;
+    private Menu 돈가스_세트_메뉴_request;
+    private Menu 김밥_세트_메뉴_reqeust;
 
     @BeforeEach
     void setUp() {
-        돈가스_세트_메뉴id = UUID.randomUUID();
-        김밥_세트_메뉴id = UUID.randomUUID();
+        돈가스_세트_메뉴_id = UUID.randomUUID();
+        김밥_세트_메뉴_id = UUID.randomUUID();
+        돈가스_세트_메뉴_request = new Menu(돈가스_세트_메뉴_id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
+        김밥_세트_메뉴_reqeust = new Menu(김밥_세트_메뉴_id, "김밥_세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
 
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
@@ -88,14 +92,12 @@ class OrderServiceTest {
         @Test
         void notExistsMenu() {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            Menu 김밥_세트 = new Menu(김밥_세트_메뉴id, "김밥_세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(12000));
-            OrderLineItem 김밥_주문 = new OrderLineItem(김밥_세트, 1, 김밥_세트_메뉴id, BigDecimal.valueOf(10000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(12000));
+            OrderLineItem 김밥_주문 = new OrderLineItem(김밥_세트_메뉴_reqeust, 1, 김밥_세트_메뉴_id, BigDecimal.valueOf(10000));
             Order order = new Order();
             order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문, 김밥_주문));
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
 
             //when
             //then
@@ -108,12 +110,11 @@ class OrderServiceTest {
         @EnumSource(mode = EXCLUDE, names = "EAT_IN")
         void negativeOfOrderLineQuantity(OrderType orderType) {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, -1, 돈가스_세트_메뉴id, BigDecimal.valueOf(12000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, -1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(12000));
             Order order = new Order();
             order.setType(orderType);
             order.setOrderLineItems(List.of(돈가스_주문));
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
 
             //when
             //then
@@ -125,60 +126,58 @@ class OrderServiceTest {
         @Test
         void singleOrderLineMenuNotExists() {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(12000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(12000));
             Order order = new Order();
             order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
-            given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.empty());
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
+            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.empty());
 
             //when
             //then
             assertThatExceptionOfType(NoSuchElementException.class)
                 .isThrownBy(() -> orderService.create(order));
             then(menuRepository).should(times(1)).findAllByIdIn(any());
-            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
+            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴_id);
         }
 
         @DisplayName("주문메뉴에 있는 메뉴의 표시(display)가 false 인경우, 주문을 생성하지 못한다.")
         @Test
         void falseOfDisplayed() {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), false);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(12000));
+            돈가스_세트_메뉴_request.setDisplayed(false);
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(120000));
             Order order = new Order();
             order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
-            given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
+            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
 
             //when
             //then
             assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> orderService.create(order));
             then(menuRepository).should(times(1)).findAllByIdIn(any());
-            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
+            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴_id);
         }
 
         @DisplayName("메뉴가격과 주문메뉴 가격이 다른경우 주문을 생성하지 못한다.")
         @Test
         void differentPrice() {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(12001));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(12001));
             Order order = new Order();
             order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
-            given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
+            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
 
             //when
             //then
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderService.create(order));
             then(menuRepository).should(times(1)).findAllByIdIn(any());
-            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
+            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴_id);
         }
 
         @DisplayName("배달 일때, 배달주소가 null 이면 주문을 생성하지 못한다.")
@@ -186,56 +185,53 @@ class OrderServiceTest {
         @NullAndEmptySource
         void deliveryAddressIsNull(String address) {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(120000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(120000));
             Order order = new Order();
             order.setType(OrderType.DELIVERY);
             order.setOrderLineItems(List.of(돈가스_주문));
             order.setDeliveryAddress(address);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
-            given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
+            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
 
             //when
             //then
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderService.create(order));
             then(menuRepository).should(times(1)).findAllByIdIn(any());
-            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
+            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴_id);
         }
 
         @DisplayName("배달 일때, 배달주소가 공백 이면 주문을 생성하지 못한다.")
         @Test
         void deliveryAddressIsNull() {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(120000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(120000));
             Order order = new Order();
             order.setType(OrderType.DELIVERY);
             order.setOrderLineItems(List.of(돈가스_주문));
             order.setDeliveryAddress("");
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
-            given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
+            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
 
             //when
             //then
             assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> orderService.create(order));
             then(menuRepository).should(times(1)).findAllByIdIn(any());
-            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
+            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴_id);
         }
 
         @DisplayName("배달 일떄, 배달주소가 정상적으로 등록된다.")
         @Test
         void normalRegisterDeliveryAddr() {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(120000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(120000));
             Order order = new Order();
             order.setType(OrderType.DELIVERY);
             order.setOrderLineItems(List.of(돈가스_주문));
             order.setDeliveryAddress("addr");
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
-            given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
+            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
             given(orderRepository.save(any())).willReturn(order);
 
             //when
@@ -249,13 +245,12 @@ class OrderServiceTest {
         @Test
         void notExistsOrderTable() {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(120000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(120000));
             Order order = new Order();
             order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
-            given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
+            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
             given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
             //when
@@ -263,7 +258,7 @@ class OrderServiceTest {
             assertThatExceptionOfType(NoSuchElementException.class)
                 .isThrownBy(() -> orderService.create(order));
             then(menuRepository).should(times(1)).findAllByIdIn(any());
-            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
+            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴_id);
             then(orderTableRepository).should(times(1)).findById(any());
         }
 
@@ -271,13 +266,12 @@ class OrderServiceTest {
         @Test
         void notSit() {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(120000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(120000));
             Order order = new Order();
             order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
-            given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
+            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
             given(orderTableRepository.findById(any())).willReturn(
                 Optional.of(new OrderTable(UUID.randomUUID(), "가_테이블")));
 
@@ -286,7 +280,7 @@ class OrderServiceTest {
             assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> orderService.create(order));
             then(menuRepository).should(times(1)).findAllByIdIn(any());
-            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
+            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴_id);
             then(orderTableRepository).should(times(1)).findById(any());
         }
 
@@ -295,16 +289,15 @@ class OrderServiceTest {
         void normalEatIn() {
             //given
             UUID orderTableId = UUID.randomUUID();
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(120000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(120000));
             OrderTable orderTable = new OrderTable(orderTableId, "가_테이블");
             orderTable.setOccupied(true);
             Order order = new Order();
             order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
             order.setOrderTable(orderTable);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
-            given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
+            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
             given(orderTableRepository.findById(any())).willReturn(
                 Optional.of(orderTable));
             given(orderRepository.save(any())).willReturn(order);
@@ -321,15 +314,14 @@ class OrderServiceTest {
         @Test
         void normalCreate() {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(120000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(120000));
             Order order = new Order();
             UUID orderId = UUID.randomUUID();
             order.setId(orderId);
             order.setType(OrderType.TAKEOUT);
             order.setOrderLineItems(List.of(돈가스_주문));
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
-            given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트_메뉴_request));
+            given(menuRepository.findById(돈가스_세트_메뉴_id)).willReturn(Optional.of(돈가스_세트_메뉴_request));
             given(orderRepository.save(any())).willReturn(order);
 
             //when
@@ -338,7 +330,7 @@ class OrderServiceTest {
             //then
             assertThat(realReturn.getId()).isEqualTo(order.getId());
             then(menuRepository).should(times(1)).findAllByIdIn(any());
-            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
+            then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴_id);
             then(orderRepository).should(times(1)).save(any());
         }
 
@@ -380,8 +372,7 @@ class OrderServiceTest {
         @Test
         void requestDelivery() {
             //given
-            Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
-            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(120000));
+            OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트_메뉴_request, 1, 돈가스_세트_메뉴_id, BigDecimal.valueOf(120000));
             UUID orderId = UUID.randomUUID();
             Order order = new Order();
             order.setStatus(OrderStatus.WAITING);

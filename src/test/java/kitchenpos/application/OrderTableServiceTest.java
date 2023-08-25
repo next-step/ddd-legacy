@@ -30,17 +30,19 @@ class OrderTableServiceTest {
     private OrderRepository orderRepository;
     private OrderTableService orderTableService;
     private UUID 가_테이블id;
+    private OrderTable 가_테이블;
 
     @BeforeEach
     void setUp() {
         가_테이블id = UUID.randomUUID();
+        가_테이블 = new OrderTable(가_테이블id, "가");
         orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 
     @Nested
     @DisplayName("매장 테이블을 등록한다.")
     class create {
-        @DisplayName("가격이 null이면 매장 테이블 등록이 불가능 하다.")
+        @DisplayName("매장 테이블 이름이 null 이거나 빈값이면 매장 테이블 등록이 불가능 하다.")
         @ParameterizedTest
         @NullAndEmptySource
         void priceIsNull(String name) {
@@ -53,23 +55,10 @@ class OrderTableServiceTest {
                 .isThrownBy(() -> orderTableService.create(가_테이블));
         }
 
-        @DisplayName("가격이 0보다 작으면 매장 테이블 등록이 불가능 하다.")
-        @Test
-        void priceIsUnderZero() {
-            //given
-            OrderTable 가_테이블 = new OrderTable(가_테이블id, "");
-
-            //when
-            //then
-            assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> orderTableService.create(가_테이블));
-        }
-
         @DisplayName("매장 테이블이 정상 등록된다.")
         @Test
         void normalCreate() {
             //given
-            OrderTable 가_테이블 = new OrderTable(가_테이블id, "가");
             given(orderTableRepository.save(any())).willReturn(가_테이블);
 
             //when
@@ -100,7 +89,6 @@ class OrderTableServiceTest {
         @Test
         void normalSit() {
             //given
-            OrderTable 가_테이블 = new OrderTable(가_테이블id, "가");
             given(orderTableRepository.findById(가_테이블id)).willReturn(Optional.of(가_테이블));
 
             //when
@@ -130,7 +118,6 @@ class OrderTableServiceTest {
         @Test
         void notCompletedOrder() {
             //given
-            OrderTable 가_테이블 = new OrderTable(가_테이블id, "가");
             given(orderTableRepository.findById(가_테이블id)).willReturn(Optional.of(가_테이블));
             given(orderRepository.existsByOrderTableAndStatusNot(any(), any()))
                 .willReturn(true);
@@ -145,7 +132,6 @@ class OrderTableServiceTest {
         @Test
         void normalClear() {
             //given
-            OrderTable 가_테이블 = new OrderTable(가_테이블id, "가");
             가_테이블.setNumberOfGuests(3);
             given(orderTableRepository.findById(가_테이블id)).willReturn(Optional.of(가_테이블));
             given(orderRepository.existsByOrderTableAndStatusNot(any(), any()))
@@ -196,7 +182,6 @@ class OrderTableServiceTest {
             int changedGuest = 3;
             OrderTable 변경_요청_테이블 = new OrderTable();
             변경_요청_테이블.setNumberOfGuests(changedGuest);
-            OrderTable 가_테이블 = new OrderTable(가_테이블id, "가");
             given(orderTableRepository.findById(가_테이블id)).willReturn(Optional.of(가_테이블));
 
             //when
@@ -212,7 +197,6 @@ class OrderTableServiceTest {
             int changedGuest = 3;
             OrderTable 변경_요청_테이블 = new OrderTable();
             변경_요청_테이블.setNumberOfGuests(changedGuest);
-            OrderTable 가_테이블 = new OrderTable(가_테이블id, "가");
             가_테이블.setOccupied(true);
             given(orderTableRepository.findById(가_테이블id)).willReturn(Optional.of(가_테이블));
 
@@ -227,7 +211,6 @@ class OrderTableServiceTest {
     @Test
     void findAll() {
         //given
-        OrderTable 가_테이블 = new OrderTable(가_테이블id, "가");
         OrderTable 나_테이블 = new OrderTable(가_테이블id, "가");
         given(orderTableRepository.findAll()).willReturn(List.of(가_테이블, 나_테이블));
 
