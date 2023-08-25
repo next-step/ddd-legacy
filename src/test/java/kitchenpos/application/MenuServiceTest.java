@@ -355,5 +355,23 @@ class MenuServiceTest {
         assertThrows(IllegalArgumentException.class, () -> sut.changePrice(persistMenu.getId(), updateMenu));
     }
 
+    @DisplayName("메뉴 가격 변경 요청 시 가격 변경하려는 메뉴는 존재하는 메뉴여야 한다.")
+    @Test
+    void changePriceWithNotExistMenu() {
+        // given
+        Menu notPersistMenu = MenuTestFixture.create().getMenu();
+        Menu updateMenu = MenuTestFixture.create()
+                .changeId(notPersistMenu.getId())
+                .changeName(notPersistMenu.getName())
+                .changeMenuGroup(notPersistMenu.getMenuGroup())
+                .changeMenuProducts(notPersistMenu.getMenuProducts())
+                .changePrice(notPersistMenu.getPrice().subtract(BigDecimal.valueOf(1)))
+                .changeDisplayed(notPersistMenu.isDisplayed())
+                .getMenu();
+
+        // when & then
+        assertThrows(NoSuchElementException.class, () -> sut.changePrice(notPersistMenu.getId(), updateMenu));
+    }
+
 
 }
