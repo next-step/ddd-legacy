@@ -40,8 +40,9 @@ docker compose -p kitchenpos up -d
   - [ ] 노출한 메뉴를 숨긴다.
   - [ ] 모든 메뉴를 가져온다.
 - 주문 (Orders)
+  - 주문 유형에는 배달(Delivery), 포장(Takeout), 매장 식사(Eat in)가 있다.
+  - 주문 상태에는 대기(Waiting), 승낙(Accepted), 제공(Served), 배달중(Delivering), 배달 완료(Delivered), 완료(Completed)가 있다
   - [ ] 새로운 주문을 등록한다.
-    - [ ] 주문 유형에는 배달(Delivery), 포장(Takeout), 매장 식사(Eat in)가 있다.
     - [ ] 주문 유형은 비어있을 수 없다.
     - [ ] 주문할 메뉴는 1개 이상 있어야 한다.
     - [ ] 주문 유형이 매장 식사가 아닌 경우, 주문할 메뉴의 수량은 0개 이상이어야 한다. (논의 필요)
@@ -50,7 +51,6 @@ docker compose -p kitchenpos up -d
     - [ ] 주문 유형이 배달인 경우, 배달 주소가 있어야 한다.
     - [ ] 주문 유형이 매장 식사인 경우, 입장 가능한(Not occupied) 주문 테이블이 있어야한다.
   - [ ] 들어온 주문을 승낙한다.
-    - [ ] 주문 상태에는 대기(Waiting), 승낙(Accepted), 제공(Served), 배달중(Delivering), 배달 완료(Delivered), 완료(Completed)가 있다
     - [ ] 주문 상태가 대기 상태이여야 한다.
     - [ ] 주문 유형이 배달이면, 배달 업체에 배달 요청을 한다.
       - [ ] 주문 식별자, 메뉴에 등록된 상품들의 가격과 수량을 곱한 값의 합, 배달 주소를 배달 업체에 전달한다.
