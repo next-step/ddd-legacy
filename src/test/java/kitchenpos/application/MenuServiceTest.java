@@ -1,9 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.Product;
+import kitchenpos.domain.*;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.integration_test_step.MenuGroupIntegrationStep;
 import kitchenpos.integration_test_step.MenuIntegrationStep;
@@ -47,6 +44,8 @@ class MenuServiceTest {
 
     @Autowired
     private DatabaseCleanStep databaseCleanStep;
+    @Autowired
+    private MenuRepository menuRepository;
 
     @BeforeEach
     void setUp() {
@@ -395,4 +394,29 @@ class MenuServiceTest {
         // when & then
         assertThrows(NoSuchElementException.class, () -> sut.display(notPersistMenu.getId()));
     }
+
+    @DisplayName("메뉴를 사용자에게 전시하려고 할 때 (메뉴의 가격 > 가지고 있는 상품의 총 가격) 이라면, 메뉴는 노출시킬 수 없다.")
+    @Test
+    void displayWithPriceHigherThanMenuProductPrice() {
+        // given
+        Product product = productIntegrationStep.createPersistProduct();
+        MenuGroup menuGroup = menuGroupIntegrationStep.createPersistMenuGroup();
+        MenuProduct menuProduct = MenuProductTestFixture.create()
+                .changeProduct(product)
+                .getMenuProduct();
+        BigDecimal menuPrice = menuProduct.getProduct().getPrice()
+                .multiply(BigDecimal.valueOf(menuProduct.getQuantity()))
+                .add(BigDecimal.valueOf(1));
+        Menu menu = MenuTestFixture.create()
+                .changeMenuGroup(menuGroup)
+                .changeMenuProducts(Collections.singletonList(menuProduct))
+                .changePrice(menuPrice)
+                .getMenu();
+        menuRepository.save(menu);
+
+        // when & then
+        assertThrows(IllegalStateException.class, () -> sut.display(menu.getId()));
+    }
+
+
 }
