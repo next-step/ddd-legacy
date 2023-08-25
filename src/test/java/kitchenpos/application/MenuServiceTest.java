@@ -55,7 +55,7 @@ class MenuServiceTest {
     @Nested
     @DisplayName("메뉴 등록")
     class create {
-        @DisplayName("가격이 null이면 오류")
+        @DisplayName("가격이 null이면 등록이 불가능 하다.")
         @ParameterizedTest
         @NullSource
         void priceIsNull(BigDecimal price) {
@@ -68,7 +68,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(돈가스_세트));
         }
 
-        @DisplayName("가격이 0보다 작으면 오류")
+        @DisplayName("가격이 0보다 작으면 등록이 불가능 하다.")
         @Test
         void priceIsUnderZero() {
             //given
@@ -80,7 +80,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(돈가스_세트));
         }
 
-        @DisplayName("메뉴 그룹이 등록이 안되어 있는 경우에 오류")
+        @DisplayName("메뉴 그룹이 등록이 안되어 있는 경우에 등록이 불가능 하다.")
         @Test
         void notExistsMenuGroup() {
             //given
@@ -95,7 +95,7 @@ class MenuServiceTest {
             then(productRepository).should(times(0)).findAllByIdIn(any());
         }
 
-        @DisplayName("입력 값에 메뉴상품이 없는경우에 오류")
+        @DisplayName("입력 값에 메뉴상품이 없는경우에 등록이 불가능 하다.")
         @Test
         void notExistsMenuProduct() {
             //given
@@ -110,7 +110,7 @@ class MenuServiceTest {
             then(productRepository).should(times(0)).findAllByIdIn(any());
         }
 
-        @DisplayName("요청한 상품정보들이, 기 등록 되어 있지 않으면 오류")
+        @DisplayName("요청한 상품정보들이, 기 등록 되어 있지 않으면 등록이 불가능하다.")
         @Test
         void wrongProductCount() {
             //given
@@ -128,7 +128,7 @@ class MenuServiceTest {
             then(productRepository).should(times(1)).findAllByIdIn(any());
         }
 
-        @DisplayName("요청한 메뉴상품의 수량이 0보다 작으면 오류가 발생한다.")
+        @DisplayName("요청한 메뉴상품의 수량이 0보다 작으면 등록이 불가능 하다.")
         @Test
         void quantityUnderZero() {
             //given
@@ -146,7 +146,7 @@ class MenuServiceTest {
             then(productRepository).should(times(1)).findAllByIdIn(any());
         }
 
-        @DisplayName("상품정보 전체 등록 검증에서는 통과 했으나, 개별 등록 조회에서 실패했을경우 오류가 발생한다.")
+        @DisplayName("상품정보 전체 등록 검증에서는 통과 했으나, 개별 등록 조회에서 실패했을경우 등록이 불가능 하다.")
         @Test
         void notExistsProductId() {
             //given
@@ -166,7 +166,7 @@ class MenuServiceTest {
             then(productRepository).should(times(1)).findById(돈가스.getId());
         }
 
-        @DisplayName("등록할 메뉴가격 > 계산된 금액(상품금액*메뉴상품 갯수) 인경우 오류가 발생한다.")
+        @DisplayName("등록할 메뉴가격 > 계산된 금액(상품금액*메뉴상품 갯수) 인경우 등록이 불가능 하다.")
         @Test
         void overPrice() {
             //given
@@ -188,7 +188,7 @@ class MenuServiceTest {
             then(productRepository).should(times(1)).findById(김밥.getId());
         }
 
-        @DisplayName("메뉴이름 null 인 경우 오류가 발생한다.")
+        @DisplayName("메뉴이름 null 인 경우 등록이 불가능 하다.")
         @Test
         void menuNameIsEmpty() {
             //given
@@ -210,7 +210,7 @@ class MenuServiceTest {
             then(productRepository).should(times(1)).findById(김밥.getId());
         }
 
-        @DisplayName("메뉴이름에 비속어가 포함되어 있으면 오류가 발생한다.")
+        @DisplayName("메뉴이름에 비속어가 포함되어 있으면 등록이 불가능 하다.")
         @Test
         void wrongMenuName() {
             //given
@@ -234,7 +234,7 @@ class MenuServiceTest {
             then(purgomalumClient).should(times(1)).containsProfanity(any());
         }
 
-        @DisplayName("정상 등록")
+        @DisplayName("메뉴가 정상 등록 된다.")
         @Test
         void normalCreate() {
             //given
@@ -267,7 +267,7 @@ class MenuServiceTest {
     @Nested
     @DisplayName("메뉴 가격 변경")
     class changePrice {
-        @DisplayName("가격이 null이면 오류")
+        @DisplayName("가격이 null이면 가격 변경이 불가능 하다.")
         @ParameterizedTest
         @NullSource
         void priceIsNull(BigDecimal price) {
@@ -280,7 +280,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.changePrice(돈가스id, 돈가스_세트));
         }
 
-        @DisplayName("가격이 0보다 작으면 오류")
+        @DisplayName("가격이 0보다 작으면 가격 변경이 불가능 하다.")
         @Test
         void priceIsUnderZero() {
             //given
@@ -292,7 +292,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.changePrice(돈가스id, 돈가스_세트));
         }
 
-        @DisplayName("기 등록된 메뉴가 아니라면 오류")
+        @DisplayName("기 등록된 메뉴가 아니라면 가격 변경이 불가능 하다.")
         @Test
         void notExistsMenu() {
             //given
@@ -305,7 +305,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.changePrice(돈가스id, 돈가스_세트));
         }
 
-        @DisplayName("기등록된 메뉴가격 > 계산된 금액(상품금액*메뉴상품 갯수) 인경우 오류")
+        @DisplayName("기등록된 메뉴가격 > 계산된 금액(상품금액*메뉴상품 갯수) 인경우 가격 변경이 불가능 하다.")
         @Test
         void overPrice() {
             //given
@@ -320,7 +320,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.changePrice(돈가스id, 돈가스_세트));
         }
 
-        @DisplayName("입력한 가격으로 정상 변경되었다.")
+        @DisplayName("입력한 메뉴 가격으로 정상 변경되었다.")
         @Test
         void normalChangePrice() {
             //given
@@ -340,7 +340,7 @@ class MenuServiceTest {
     @Nested
     @DisplayName("메뉴 (화면에) 표시")
     class display {
-        @DisplayName("기등록 메뉴가 아니었을때 오류가 발생한다.")
+        @DisplayName("기등록 메뉴가 아니었을때 화면에 표시 처리를 하지 못한다.")
         @Test
         void notExistsMenu() {
             ///given
@@ -350,7 +350,7 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.display(돈가스id));
         }
 
-        @DisplayName("화면표시 처리할 메뉴의 메뉴가격 > 계산된 금액(상품금액*메뉴상품 갯수) 인경우 오류")
+        @DisplayName("화면표시 처리할 메뉴의 메뉴가격 > 계산된 금액(상품금액*메뉴상품 갯수) 인경우 화면에 표시 처리를 하지 못한다.")
         @Test
         void overPrice() {
             //given
@@ -384,7 +384,7 @@ class MenuServiceTest {
     @Nested
     @DisplayName("메뉴 (화면에) 표시 하지 않는다.")
     class hide {
-        @DisplayName("기등록 메뉴가 아니었을때 오류가 발생한다.")
+        @DisplayName("기등록 메뉴가 아니었을때 화면에 숨김 처리를 하지 못한다.")
         @Test
         void notExistsMenu() {
             ///given

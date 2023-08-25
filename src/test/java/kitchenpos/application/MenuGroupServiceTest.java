@@ -30,7 +30,7 @@ class MenuGroupServiceTest {
         menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
-    @DisplayName("입력한 메뉴그룹명으로 return 된다.")
+    @DisplayName("입력한 메뉴그룹명으로 응답 받는다.")
     @Test
     void create() {
         //given
@@ -41,7 +41,7 @@ class MenuGroupServiceTest {
         assertThat(returnMenuGroup).isEqualTo(한식);
     }
 
-    @DisplayName("입력한 메뉴그룹명이 Null인경우 오류가 발생한다.")
+    @DisplayName("입력한 메뉴그룹명이 Null인경우 정상 등록 하지 못한다.")
     @Test
     void createFail() {
         assertThatExceptionOfType(IllegalArgumentException.class)

@@ -52,7 +52,7 @@ class ProductServiceTest {
     @Nested
     @DisplayName("상품 등록 검증")
     class create {
-        @DisplayName("가격이 null이면 오류가 발생한다.")
+        @DisplayName("가격이 null이면 상품 등록을 할 수 없다.")
         @ParameterizedTest
         @NullSource
         void priceIsNull(BigDecimal price) {
@@ -61,7 +61,7 @@ class ProductServiceTest {
                 .isThrownBy(() -> productService.create(product));
         }
 
-        @DisplayName("가격이 0보다 작으면 오류가 발생한다.")
+        @DisplayName("가격이 0보다 작으면 상품 등록을 할 수 없다.")
         @ParameterizedTest
         @ValueSource(longs = {-1, -99, -100000})
         void priceUnderZero(long price) {
@@ -70,7 +70,7 @@ class ProductServiceTest {
                 .isThrownBy(() -> productService.create(product));
         }
 
-        @DisplayName("이름이 null 이면 오류가 발생한다.")
+        @DisplayName("이름이 null 이면 상품 등록을 할 수 없다.")
         @Test
         void nameNull() {
             Product product = new Product(UUID.randomUUID(), null, BigDecimal.valueOf(12000));
@@ -78,7 +78,7 @@ class ProductServiceTest {
                 .isThrownBy(() -> productService.create(product));
         }
 
-        @DisplayName("이름에 비속어가 포함되어 있다면 오류가 발생한다.")
+        @DisplayName("이름에 비속어가 포함되어 있으면  상품 등록을 할 수 없다.")
         @Test
         void purgomalTrue() {
             given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
@@ -91,7 +91,7 @@ class ProductServiceTest {
             then(productRepository).should(times(0)).save(any());
         }
 
-        @DisplayName("가격이 0보다 크고 이름에 비속어가 없으면 정상 등록")
+        @DisplayName("가격이 0보다 크고 이름에 비속어가 없으면 정상 등록 된다.")
         @Test
         void normal() {
             //given
@@ -112,7 +112,7 @@ class ProductServiceTest {
     @Nested
     @DisplayName("상품 가격 변경 검증")
     class changePrice {
-        @DisplayName("상품 가격이 null이면 오류가 발생한다.")
+        @DisplayName("상품 가격이 null이면 가격을 변경 할 수 없다.")
         @ParameterizedTest
         @NullSource
         void changePrice_priceIsNull(BigDecimal price) {
@@ -123,7 +123,7 @@ class ProductServiceTest {
             then(menuRepository).should(times(0)).findAllByProductId(any());
         }
 
-        @DisplayName("상품 가격이 0보다 작으면 오류가 발생한다.")
+        @DisplayName("상품 가격이 0보다 작으면  가격을 변경 할 수 없다.")
         @ParameterizedTest
         @ValueSource(longs = {-1, -99, -100000})
         void updatePrice_priceUnderZero(long price) {
@@ -134,7 +134,7 @@ class ProductServiceTest {
             then(menuRepository).should(times(0)).findAllByProductId(any());
         }
 
-        @DisplayName("등록되지 않은 상품의 가격을 수정할때, 오류가 발생한다.")
+        @DisplayName("등록되지 않은 상품의 가격을 수정할때, 가격을 변경 할 수 없다.")
         @Test
         void notFoundProduct() {
             //given
@@ -149,7 +149,7 @@ class ProductServiceTest {
             then(menuRepository).should(times(0)).findAllByProductId(any());
         }
 
-        @DisplayName(" 해당 상품으로 등록된 메뉴가 없는경우 상품가격만 변경된다.")
+        @DisplayName("해당 상품으로 등록된 메뉴가 없는경우 상품가격만 변경된다.")
         @Test
         void isNotExistsMenu() {
             //given

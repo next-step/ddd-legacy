@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -57,7 +57,7 @@ class OrderServiceTest {
     @Nested
     @DisplayName("주문 생성")
     class create {
-        @DisplayName("주문종류가 null 이면 오류가 발생한다.")
+        @DisplayName("주문종류가 null 이면 주문을 생성하지 못한다.")
         @Test
         void nullOfOrderType() {
             //given
@@ -69,7 +69,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.create(order));
         }
 
-        @DisplayName("주문메뉴가 없으면 오류가 발생한다..")
+        @DisplayName("주문메뉴가 없으면 주문을 생성하지 못한다.")
         @Test
         void nullOfOrderLines() {
             //given
@@ -82,7 +82,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.create(order));
         }
 
-        @DisplayName("주문메뉴에 있는 메뉴가, 메뉴에 등록되어 있지 않으면 오류가 발생한다.")
+        @DisplayName("주문메뉴에 있는 메뉴가, 메뉴에 등록되어 있지 않으면 주문을 생성하지 못한다.")
         @Test
         void notExistsMenu() {
             //given
@@ -101,7 +101,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.create(order));
         }
 
-        @DisplayName("매장식사가 아닌경우에, 주문메뉴 양이 0보다 작으면 오류가 발생한다.")
+        @DisplayName("매장식사가 아닌경우에, 주문메뉴 양이 0보다 작으면 주문을 생성하지 못한다.")
         @ParameterizedTest
         @ValueSource(strings = {"DELIVERY", "TAKEOUT"})
         void negativeOfOrderLineQuantity(OrderType orderType) {
@@ -119,7 +119,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.create(order));
         }
 
-        @DisplayName("주문메뉴 전체 등록 검증에서는 통과 했으나, 개별 등록 이 되어 있는지 검증에서 실패하면 오류가 발생한다.")
+        @DisplayName("주문메뉴 전체 등록 검증에서는 통과 했으나, 개별 등록 이 되어 있는지 검증에서 실패하면 주문을 생성하지 못한다.")
         @Test
         void singleOrderLineMenuNotExists() {
             //given
@@ -139,7 +139,7 @@ class OrderServiceTest {
             then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
         }
 
-        @DisplayName("주문메뉴에 있는 메뉴의 표시(display)가 false 인경우, 오류가 발생한다.")
+        @DisplayName("주문메뉴에 있는 메뉴의 표시(display)가 false 인경우, 주문을 생성하지 못한다.")
         @Test
         void falseOfDisplayed() {
             //given
@@ -159,7 +159,7 @@ class OrderServiceTest {
             then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
         }
 
-        @DisplayName("메뉴가격과 주문메뉴 가격이 다른경우 오류가 발생한다.")
+        @DisplayName("메뉴가격과 주문메뉴 가격이 다른경우 주문을 생성하지 못한다.")
         @Test
         void differentPrice() {
             //given
@@ -179,9 +179,9 @@ class OrderServiceTest {
             then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
         }
 
-        @DisplayName("배달 일때, 배달주소가 null 이면 오류가 발생한다.")
+        @DisplayName("배달 일때, 배달주소가 null 이면 주문을 생성하지 못한다.")
         @ParameterizedTest
-        @NullSource
+        @NullAndEmptySource
         void deliveryAddressIsNull(String address) {
             //given
             Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
@@ -201,7 +201,7 @@ class OrderServiceTest {
             then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
         }
 
-        @DisplayName("배달 일때, 배달주소가 공백 이면 오류가 발생한다.")
+        @DisplayName("배달 일때, 배달주소가 공백 이면 주문을 생성하지 못한다.")
         @Test
         void deliveryAddressIsNull() {
             //given
@@ -222,7 +222,7 @@ class OrderServiceTest {
             then(menuRepository).should(times(1)).findById(돈가스_세트_메뉴id);
         }
 
-        @DisplayName("배달 일떄, 배달주소가 정상적으로 등록되었다.")
+        @DisplayName("배달 일떄, 배달주소가 정상적으로 등록된다.")
         @Test
         void normalRegisterDeliveryAddr() {
             //given
@@ -243,7 +243,7 @@ class OrderServiceTest {
             assertThat(returnOrder.getDeliveryAddress()).isEqualTo("addr");
         }
 
-        @DisplayName("매장식사 일때, 매장 테이블이 등록이 안되어 있으면 오류가 발생한다.")
+        @DisplayName("매장식사 일때, 매장 테이블이 등록이 안되어 있으면 주문을 생성하지 못한다.")
         @Test
         void notExistsOrderTable() {
             //given
@@ -265,7 +265,7 @@ class OrderServiceTest {
             then(orderTableRepository).should(times(1)).findById(any());
         }
 
-        @DisplayName("매장식사 일떄, 손님이 자리에 앉지 않았으면 오류가 발생한다.")
+        @DisplayName("매장식사 일떄, 손님이 자리에 앉지 않았으면 주문을 생성하지 못한다.")
         @Test
         void notSit() {
             //given
@@ -288,7 +288,7 @@ class OrderServiceTest {
             then(orderTableRepository).should(times(1)).findById(any());
         }
 
-        @DisplayName("매장식사 일떄, 손님이 자리에 앉지 앉으면 주문을 세팅한다.")
+        @DisplayName("매장식사 일떄, 손님이 자리에 앉으면 주문을 생성한다.")
         @Test
         void normalEatIn() {
             //given
@@ -315,7 +315,7 @@ class OrderServiceTest {
 
         }
 
-        @DisplayName("주문이 정상 처리된다.")
+        @DisplayName("주문이 정상 생성 되었다.")
         @Test
         void normalCreate() {
             //given
@@ -345,7 +345,7 @@ class OrderServiceTest {
     @Nested
     @DisplayName("주문을 수락한다.")
     class accept {
-        @DisplayName("주문번호로 등록된 주문을 찾을 수 없어서 오류가 발생한다.")
+        @DisplayName("주문번호로 등록된 주문을 찾을 수 없으면, 수락 하지 못한다.")
         @Test
         void notExistsOrder() {
             //given
@@ -358,7 +358,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.accept(orderId));
         }
 
-        @DisplayName("주문 상태가 WAITING 이 아니면 오류가 발생한다.")
+        @DisplayName("주문 상태가 WAITING 이 아니면 수락 하지 못한다.")
         @ParameterizedTest
         @ValueSource(strings = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
         void notCorrectOrderStatus(OrderStatus orderStatus) {
@@ -416,7 +416,7 @@ class OrderServiceTest {
     @Nested
     @DisplayName("주문을 서빙한다.")
     class serve {
-        @DisplayName("주문번호로 등록된 주문을 찾을 수 없어서 오류가 발생한다.")
+        @DisplayName("주문번호로 등록된 주문을 찾을 수 없으면 서빙 하지 못한다.")
         @Test
         void notExistsOrder() {
             //given
@@ -429,7 +429,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.serve(orderId));
         }
 
-        @DisplayName("주문 상태가 ACCEPT가 아니면 오류가 발생한다.")
+        @DisplayName("주문 상태가 ACCEPT가 아니면 서빙 하지 못한다.")
         @ParameterizedTest
         @ValueSource(strings = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
         void orderStatusNotAccept(OrderStatus orderStatus) {
@@ -463,9 +463,9 @@ class OrderServiceTest {
     }
 
     @Nested
-    @DisplayName("주문을 시작한다.")
+    @DisplayName("배달을 시작 한다.")
     class startDelivery {
-        @DisplayName("주문번호로 등록된 주문을 찾을 수 없어서 오류가 발생한다.")
+        @DisplayName("주문번호로 등록된 주문을 찾을 없으면, 배달 시작을 하지 못한다.")
         @Test
         void notExistsOrder() {
             //given
@@ -478,7 +478,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.startDelivery(orderId));
         }
 
-        @DisplayName("주문 종류가 배달이 아니면 오류가 발생한다.")
+        @DisplayName("주문 종류가 배달이 아니면 배달 시작을 하지 못한다.")
         @ParameterizedTest
         @ValueSource(strings = {"TAKEOUT", "EAT_IN"})
         void orderStatusNotAccept(OrderType orderType) {
@@ -494,7 +494,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.startDelivery(orderId));
         }
 
-        @DisplayName("주문 상태가 SERVED가 아니면 오류가 발생한다.")
+        @DisplayName("주문 상태가 SERVED가 아니면 배달 시작을 하지 못한다.")
         @ParameterizedTest
         @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
         void orderStatusNotAccept(OrderStatus orderStatus) {
@@ -511,7 +511,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.startDelivery(orderId));
         }
 
-        @DisplayName("주문 상태가 DELIVERING로 정상 변경된다.")
+        @DisplayName("배달 시작이 정상 처리 되었다.")
         @Test
         void normalServe() {
             //given
@@ -533,7 +533,7 @@ class OrderServiceTest {
     @DisplayName("배달을 종료한다.")
     class completeDelivery {
 
-        @DisplayName("주문번호로 등록된 주문을 찾을 수 없어서 오류가 발생한다.")
+        @DisplayName("주문번호로 등록된 주문을 찾을 수 없으면 배달 종료를 하지 못한다.")
         @Test
         void notExistsOrder() {
             //given
@@ -546,7 +546,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.completeDelivery(orderId));
         }
 
-        @DisplayName("주문 상태가 DELIVERING가 아니면 오류가 발생한다.")
+        @DisplayName("주문 상태가 DELIVERING가 아니면 배달 종료를 하지 못한다.")
         @ParameterizedTest
         @ValueSource(strings = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
         void orderStatusNotAccept(OrderStatus orderStatus) {
@@ -562,7 +562,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.completeDelivery(orderId));
         }
 
-        @DisplayName("배달이 정상적으로 완료 되었다.")
+        @DisplayName("배달이 정상적으로 종료 되었다.")
         @Test
         void normalCompleteDelivery() {
             //given
@@ -582,7 +582,7 @@ class OrderServiceTest {
     @Nested
     @DisplayName("주문을 완료 한다.")
     class complete {
-        @DisplayName("주문번호로 등록된 주문을 찾을 수 없어서 오류가 발생한다.")
+        @DisplayName("주문번호로 등록된 주문을 찾을 수 없으면 주문을 완료하지 못한다.")
         @Test
         void notExistsOrder() {
             //given
@@ -595,7 +595,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.complete(orderId));
         }
 
-        @DisplayName("주문구분이 배달인데, 주문 상태가 DELIVERED가 아니면 오류가 발생한다.")
+        @DisplayName("주문구분이 배달인데, 주문 상태가 DELIVERED가 아니면 주문을 완료하지 못한다.")
         @ParameterizedTest
         @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "SERVED", "COMPLETED"})
         void orderStatusNotDELIVERED(OrderStatus orderStatus) {
@@ -612,7 +612,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.complete(orderId));
         }
 
-        @DisplayName("주문구분이 포장인데, 주문 상태가 SERVED가 아니면 오류가 발생한다.")
+        @DisplayName("주문구분이 포장인데, 주문 상태가 SERVED가 아니면 주문을 완료 하지 못한다.")
         @ParameterizedTest
         @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
         void orderStatusNotSERVED1(OrderStatus orderStatus) {
@@ -629,7 +629,7 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.complete(orderId));
         }
 
-        @DisplayName("주문구분이 매장식사인데, 주문 상태가 SERVED가 아니면 오류가 발생한다.")
+        @DisplayName("주문구분이 매장식사인데, 주문 상태가 SERVED가 아니면 주문을 완료하지 못한다.")
         @ParameterizedTest
         @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
         void orderStatusNotSERVED2(OrderStatus orderStatus) {
@@ -687,7 +687,7 @@ class OrderServiceTest {
             assertThat(returnOrder.getOrderTable()).isNull();
         }
 
-        @DisplayName("주문이 정산 완료 처리된다.")
+        @DisplayName("주문이 정상 완료 처리된다.")
         @Test
         void normalComplete() {
             //given

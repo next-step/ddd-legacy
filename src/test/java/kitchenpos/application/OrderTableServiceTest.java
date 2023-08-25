@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -40,9 +40,9 @@ class OrderTableServiceTest {
     @Nested
     @DisplayName("매장 테이블을 등록한다.")
     class create {
-        @DisplayName("가격이 null이면 오류가 발생한다.")
+        @DisplayName("가격이 null이면 매장 테이블 등록이 불가능 하다.")
         @ParameterizedTest
-        @NullSource
+        @NullAndEmptySource
         void priceIsNull(String name) {
             //given
             OrderTable 가_테이블 = new OrderTable(가_테이블id, name);
@@ -53,7 +53,7 @@ class OrderTableServiceTest {
                 .isThrownBy(() -> orderTableService.create(가_테이블));
         }
 
-        @DisplayName("가격이 0보다 작으면 오류가 발생한다.")
+        @DisplayName("가격이 0보다 작으면 매장 테이블 등록이 불가능 하다.")
         @Test
         void priceIsUnderZero() {
             //given
@@ -84,7 +84,7 @@ class OrderTableServiceTest {
     @DisplayName("매장 테이블에 손님이 앉는다.")
     class sit {
 
-        @DisplayName("등록되지 않은 매장 테이블을 요청하면 오류가 발생한다.")
+        @DisplayName("등록되지 않은 매장 테이블을 요청하면  매장 테이블에 앉을 수 없다.")
         @Test
         void notExitsOrderTable() {
             //given
@@ -114,7 +114,7 @@ class OrderTableServiceTest {
     @Nested
     @DisplayName("매장 테이블을 치운다(clear).")
     class clear {
-        @DisplayName("등록되지 않은 매장 테이블을 치우면 오류가 발생한다.")
+        @DisplayName("등록되지 않은 매장 테이블을 치우면 치울 수 없다.")
         @Test
         void notExitsOrderTableByClear() {
             //given
@@ -126,7 +126,7 @@ class OrderTableServiceTest {
                 .isThrownBy(() -> orderTableService.clear(가_테이블id));
         }
 
-        @DisplayName("완료되지 않은 주문을 치우면 오류가 발생한다.")
+        @DisplayName("완료되지 않은 주문을 치우면 치울 수 없다.")
         @Test
         void notCompletedOrder() {
             //given
@@ -141,7 +141,7 @@ class OrderTableServiceTest {
                 .isThrownBy(() -> orderTableService.clear(가_테이블id));
         }
 
-        @DisplayName("정상적으로 매장테이블이 치워(clear)진다..")
+        @DisplayName("정상적으로 매장테이블이 치워(clear)진다.")
         @Test
         void normalClear() {
             //given
@@ -163,7 +163,7 @@ class OrderTableServiceTest {
     @Nested
     @DisplayName("매장테이블이 앉은 손님 수를 변경한다.")
     class changeNumberOfGuests {
-        @DisplayName("변경 요청한 숫자가 0보다 작다.")
+        @DisplayName("변경 요청한 숫자가 0보다 작으면 손님 수를 변경 할 수 없다.")
         @Test
         void guestNumberUnderZero() {
             //given
@@ -176,7 +176,7 @@ class OrderTableServiceTest {
                 .isThrownBy(() -> orderTableService.changeNumberOfGuests(가_테이블id, 변경_요청_테이블));
         }
 
-        @DisplayName("등록되지 않은 매장 테이블을 요청하면 오류가 발생한다.")
+        @DisplayName("등록되지 않은 매장 테이블을 요청하면  손님 수를 변경 할 수 없다.")
         @Test
         void notExitsOrderTable() {
             //given
@@ -189,7 +189,7 @@ class OrderTableServiceTest {
                 .isThrownBy(() -> orderTableService.changeNumberOfGuests(가_테이블id, 변경_요청_테이블));
         }
 
-        @DisplayName("착석하지 않은 매장테이블의 손님수를 변경하면 오류가 발생한다.")
+        @DisplayName("착석하지 않은 매장테이블의 손님수를 변경하면  손님 수를 변경 할 수 없다.")
         @Test
         void isOccupiedTable() {
             //given
@@ -205,7 +205,7 @@ class OrderTableServiceTest {
                 .isThrownBy(() -> orderTableService.changeNumberOfGuests(가_테이블id, 변경_요청_테이블));
         }
 
-        @DisplayName("정상 변경 처리된다.")
+        @DisplayName("정상적으로 손님수가 변경 된다.")
         @Test
         void normalChanged() {
             //given
