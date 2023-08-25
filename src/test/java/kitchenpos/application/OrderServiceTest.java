@@ -1,6 +1,8 @@
 package kitchenpos.application;
 
+import static kitchenpos.domain.OrderType.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.params.provider.EnumSource.Mode.*;
 import static org.mockito.BDDMockito.*;
 
 import java.math.BigDecimal;
@@ -15,8 +17,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -74,7 +76,7 @@ class OrderServiceTest {
         void nullOfOrderLines() {
             //given
             Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
 
             //when
             //then
@@ -91,7 +93,7 @@ class OrderServiceTest {
             OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(12000));
             OrderLineItem 김밥_주문 = new OrderLineItem(김밥_세트, 1, 김밥_세트_메뉴id, BigDecimal.valueOf(10000));
             Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문, 김밥_주문));
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
 
@@ -103,7 +105,7 @@ class OrderServiceTest {
 
         @DisplayName("매장식사가 아닌경우에, 주문메뉴 양이 0보다 작으면 주문을 생성하지 못한다.")
         @ParameterizedTest
-        @ValueSource(strings = {"DELIVERY", "TAKEOUT"})
+        @EnumSource(mode = EXCLUDE, names = "EAT_IN")
         void negativeOfOrderLineQuantity(OrderType orderType) {
             //given
             Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
@@ -126,7 +128,7 @@ class OrderServiceTest {
             Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
             OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(12000));
             Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
             given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.empty());
@@ -146,7 +148,7 @@ class OrderServiceTest {
             Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), false);
             OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(12000));
             Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
             given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
@@ -166,7 +168,7 @@ class OrderServiceTest {
             Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
             OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(12001));
             Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
             given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
@@ -250,7 +252,7 @@ class OrderServiceTest {
             Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
             OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(120000));
             Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
             given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
@@ -272,7 +274,7 @@ class OrderServiceTest {
             Menu 돈가스_세트 = new Menu(돈가스_세트_메뉴id, "돈가스세트", BigDecimal.valueOf(120000), new MenuGroup(), true);
             OrderLineItem 돈가스_주문 = new OrderLineItem(돈가스_세트, 1, 돈가스_세트_메뉴id, BigDecimal.valueOf(120000));
             Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
             given(menuRepository.findById(돈가스_세트_메뉴id)).willReturn(Optional.of(돈가스_세트));
@@ -298,7 +300,7 @@ class OrderServiceTest {
             OrderTable orderTable = new OrderTable(orderTableId, "가_테이블");
             orderTable.setOccupied(true);
             Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
             order.setOrderLineItems(List.of(돈가스_주문));
             order.setOrderTable(orderTable);
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(돈가스_세트));
@@ -360,7 +362,7 @@ class OrderServiceTest {
 
         @DisplayName("주문 상태가 WAITING 이 아니면 수락 하지 못한다.")
         @ParameterizedTest
-        @ValueSource(strings = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+        @EnumSource(mode = EXCLUDE, names = "WAITING")
         void notCorrectOrderStatus(OrderStatus orderStatus) {
             //given
             UUID orderId = UUID.randomUUID();
@@ -429,9 +431,9 @@ class OrderServiceTest {
                 .isThrownBy(() -> orderService.serve(orderId));
         }
 
-        @DisplayName("주문 상태가 ACCEPT가 아니면 서빙 하지 못한다.")
+        @DisplayName("주문 상태가 ACCEPTED 가 아니면 서빙 하지 못한다.")
         @ParameterizedTest
-        @ValueSource(strings = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+        @EnumSource(mode = EXCLUDE, names = "ACCEPTED")
         void orderStatusNotAccept(OrderStatus orderStatus) {
             //given
             UUID orderId = UUID.randomUUID();
@@ -480,7 +482,7 @@ class OrderServiceTest {
 
         @DisplayName("주문 종류가 배달이 아니면 배달 시작을 하지 못한다.")
         @ParameterizedTest
-        @ValueSource(strings = {"TAKEOUT", "EAT_IN"})
+        @EnumSource(mode = EXCLUDE, names = "DELIVERY")
         void orderStatusNotAccept(OrderType orderType) {
             //given
             UUID orderId = UUID.randomUUID();
@@ -496,7 +498,7 @@ class OrderServiceTest {
 
         @DisplayName("주문 상태가 SERVED가 아니면 배달 시작을 하지 못한다.")
         @ParameterizedTest
-        @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+        @EnumSource(mode = EXCLUDE, names = "SERVED")
         void orderStatusNotAccept(OrderStatus orderStatus) {
             //given
             UUID orderId = UUID.randomUUID();
@@ -548,7 +550,7 @@ class OrderServiceTest {
 
         @DisplayName("주문 상태가 DELIVERING가 아니면 배달 종료를 하지 못한다.")
         @ParameterizedTest
-        @ValueSource(strings = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
+        @EnumSource(mode = EXCLUDE, names = "DELIVERING")
         void orderStatusNotAccept(OrderStatus orderStatus) {
             //given
             UUID orderId = UUID.randomUUID();
@@ -597,7 +599,7 @@ class OrderServiceTest {
 
         @DisplayName("주문구분이 배달인데, 주문 상태가 DELIVERED가 아니면 주문을 완료하지 못한다.")
         @ParameterizedTest
-        @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "SERVED", "COMPLETED"})
+        @EnumSource(mode = EXCLUDE, names = "DELIVERED")
         void orderStatusNotDELIVERED(OrderStatus orderStatus) {
             //given
             UUID orderId = UUID.randomUUID();
@@ -614,7 +616,7 @@ class OrderServiceTest {
 
         @DisplayName("주문구분이 포장인데, 주문 상태가 SERVED가 아니면 주문을 완료 하지 못한다.")
         @ParameterizedTest
-        @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+        @EnumSource(mode = EXCLUDE, names = "SERVED")
         void orderStatusNotSERVED1(OrderStatus orderStatus) {
             //given
             UUID orderId = UUID.randomUUID();
@@ -631,13 +633,13 @@ class OrderServiceTest {
 
         @DisplayName("주문구분이 매장식사인데, 주문 상태가 SERVED가 아니면 주문을 완료하지 못한다.")
         @ParameterizedTest
-        @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+        @EnumSource(mode = EXCLUDE, names = "SERVED")
         void orderStatusNotSERVED2(OrderStatus orderStatus) {
             //given
             UUID orderId = UUID.randomUUID();
             Order order = new Order();
             order.setStatus(orderStatus);
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             //when
@@ -655,7 +657,7 @@ class OrderServiceTest {
             orderTable.setNumberOfGuests(3);
             UUID orderId = UUID.randomUUID();
             Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
             order.setStatus(OrderStatus.SERVED);
             order.setOrderTable(orderTable);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
@@ -675,7 +677,7 @@ class OrderServiceTest {
             //given
             UUID orderId = UUID.randomUUID();
             Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            order.setType(EAT_IN);
             order.setStatus(OrderStatus.SERVED);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
             given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
