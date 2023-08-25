@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -22,8 +21,6 @@ class MenuGroupServiceTest {
 
     @Mock
     private MenuGroupRepository menuGroupRepository;
-
-    @Autowired
     private MenuGroupService menuGroupService;
     private MenuGroup 한식 = new MenuGroup(UUID.randomUUID(), "한식");
     private MenuGroup 양식 = new MenuGroup(UUID.randomUUID(), "양식");

@@ -19,7 +19,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
@@ -43,7 +42,6 @@ class OrderServiceTest {
     private OrderTableRepository orderTableRepository;
     @Mock
     private KitchenridersClient kitchenridersClient;
-    @Autowired
     private OrderService orderService;
     private UUID 돈가스_세트_메뉴id;
     private UUID 김밥_세트_메뉴id;

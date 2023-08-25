@@ -17,7 +17,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
@@ -29,7 +28,6 @@ class OrderTableServiceTest {
     private OrderTableRepository orderTableRepository;
     @Mock
     private OrderRepository orderRepository;
-    @Autowired
     private OrderTableService orderTableService;
     private UUID 가_테이블id;
 

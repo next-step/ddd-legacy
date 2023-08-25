@@ -20,7 +20,6 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
@@ -38,7 +37,6 @@ class ProductServiceTest {
     private MenuRepository menuRepository;
     @Mock
     private PurgomalumClient purgomalumClient;
-    @Autowired
     private ProductService productService;
 
     private UUID 돈가스id;
