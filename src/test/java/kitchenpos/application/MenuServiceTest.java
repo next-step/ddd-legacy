@@ -373,5 +373,16 @@ class MenuServiceTest {
         assertThrows(NoSuchElementException.class, () -> sut.changePrice(notPersistMenu.getId(), updateMenu));
     }
 
+    @DisplayName("메뉴를 전시 상태로 변경할 수 있다")
+    @Test
+    void changeDisplayed() {
+        // given
+        Menu persistMenu = menuIntegrationStep.create();
 
+        // when
+        Menu result = sut.display(persistMenu.getId());
+
+        // then
+        assertThat(result.isDisplayed()).isTrue();
+    }
 }
