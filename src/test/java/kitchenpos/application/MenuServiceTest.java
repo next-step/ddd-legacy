@@ -418,5 +418,16 @@ class MenuServiceTest {
         assertThrows(IllegalStateException.class, () -> sut.display(menu.getId()));
     }
 
+    @DisplayName("메뉴를 숨긴 상태로 변경할 수 있다")
+    @Test
+    void hide() {
+        // given
+        Menu persistMenu = menuIntegrationStep.create();
 
+        // when
+        Menu result = sut.hide(persistMenu.getId());
+
+        // then
+        assertThat(result.isDisplayed()).isFalse();
+    }
 }
