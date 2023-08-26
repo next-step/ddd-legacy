@@ -128,4 +128,25 @@ class OrderTableServiceTest {
             assertThrows(NoSuchElementException.class, () -> sut.sit(notPersistOrderTable.getId()));
         }
     }
+
+    @DisplayName("주문 테이블을 테이블 비사용 상태로 변경")
+    @Nested
+    class Describe_clear {
+
+        @DisplayName("고객이 앉았던 주문 테이블 정보를 비어있는 테이블로 변경할 수 있다.")
+        @Test
+        void clear() {
+            // given
+            OrderTable orderTable = orderTableIntegrationStep.create();
+            sut.sit(orderTable.getId());
+
+            // when
+            OrderTable result = sut.clear(orderTable.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getId()).isEqualTo(orderTable.getId());
+            assertThat(result.isOccupied()).isFalse();
+        }
+    }
 }
