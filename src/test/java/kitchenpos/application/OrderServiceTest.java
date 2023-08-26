@@ -651,5 +651,17 @@ class OrderServiceTest {
                 assertThrows(IllegalStateException.class, () -> sut.complete(order.getId()));
             });
         }
+
+        @DisplayName("주문 완료로 변경할 주문이 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void completeOrderNotFoundExceptionThrown() {
+            // given
+            Order notPersistOrder = OrderTestFixture.create()
+                    .changeId(UUID.randomUUID())
+                    .getOrder();
+
+            // when & then
+            assertThrows(NoSuchElementException.class, () -> sut.complete(notPersistOrder.getId()));
+        }
     }
 }
