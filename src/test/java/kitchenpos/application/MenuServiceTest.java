@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static java.math.BigDecimal.valueOf;
+import static kitchenpos.testHelper.fake.PurgomalumClientFake.Purgomalum.NORMAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -284,5 +285,28 @@ class MenuServiceTest extends SpringBootTestHelper {
         //then
         assertThat(menus).extracting("id")
             .containsExactly(savedMenu1.getId(), savedMenu2.getId());
+    }
+
+    @DisplayName("상품 가격을 수정한 상품이 포함된 메뉴의 가격이, 메뉴에 포함된 상품들의 총가격(단가 * 수량)보다 크다면 해당 메뉴를 노출시키지 않는다")
+    @Test
+    void test13 (){
+        //given Product 0 번 1개를 가지는 메뉴를 생성한다.
+        Product product = products.get(0);
+        Menu createRequest = MenuFixture.createRequestBuilder()
+            .menuGroupId(menuGroup.getId())
+            .menuProduct(product, 1L)
+            .name("menu1")
+            .build();
+        menuService.create(createRequest);
+        //Product 0번의 가격을 10배 줄인다.
+        Product changePriceRequest = new Product("name", product.getPrice().divide(BigDecimal.TEN));
+
+        //when
+        productService.changePrice(product.getId(), changePriceRequest);
+        Menu menu = menuService.findAll().get(0);
+
+        //then 10개 할인된 Product 0번의 가격보다 Menu의 가격이 크기때문에 Display는 false이다.
+        assertThat(menu.isDisplayed()).isFalse();
+
     }
 }
