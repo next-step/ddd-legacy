@@ -1,8 +1,11 @@
 package kitchenpos.integration_test_step;
 
 import kitchenpos.domain.*;
+import kitchenpos.test_fixture.OrderLineItemTestFixture;
 import kitchenpos.test_fixture.OrderTestFixture;
 import org.springframework.stereotype.Component;
+
+import java.util.Collections;
 
 @Component
 public class OrderIntegrationStep {
@@ -16,16 +19,24 @@ public class OrderIntegrationStep {
 
     public Order create() {
         Menu menu = menuIntegrationStep.create();
-        Order order = OrderTestFixture.create()
+        OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
                 .changeMenu(menu)
+                .changePrice(menu.getPrice())
+                .getOrderLineItem();
+        Order order = OrderTestFixture.create()
+                .changeOrderLineItems(Collections.singletonList(orderLineItem))
                 .getOrder();
         return orderRepository.save(order);
     }
 
     public Order createStatusWaiting(OrderTable orderTable) {
         Menu menu = menuIntegrationStep.create();
-        Order order = OrderTestFixture.create()
+        OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
                 .changeMenu(menu)
+                .changePrice(menu.getPrice())
+                .getOrderLineItem();
+        Order order = OrderTestFixture.create()
+                .changeOrderLineItems(Collections.singletonList(orderLineItem))
                 .changeOrderTable(orderTable)
                 .changeStatus(OrderStatus.WAITING)
                 .getOrder();
@@ -34,8 +45,12 @@ public class OrderIntegrationStep {
 
     public Order createStatusCompleted(OrderTable orderTable) {
         Menu menu = menuIntegrationStep.create();
-        Order order = OrderTestFixture.create()
+        OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
                 .changeMenu(menu)
+                .changePrice(menu.getPrice())
+                .getOrderLineItem();
+        Order order = OrderTestFixture.create()
+                .changeOrderLineItems(Collections.singletonList(orderLineItem))
                 .changeOrderTable(orderTable)
                 .changeStatus(OrderStatus.COMPLETED)
                 .getOrder();

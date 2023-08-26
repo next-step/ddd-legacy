@@ -4,6 +4,7 @@ import kitchenpos.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 public class OrderTestFixture {
@@ -27,6 +28,20 @@ public class OrderTestFixture {
         return new OrderTestFixture(order);
     }
 
+    public OrderTestFixture changeId(Object o) {
+        Order newOrder = new Order();
+        newOrder.setId((UUID) o);
+        newOrder.setStatus(order.getStatus());
+        newOrder.setOrderTable(order.getOrderTable());
+        newOrder.setOrderTableId(order.getOrderTableId());
+        newOrder.setDeliveryAddress(order.getDeliveryAddress());
+        newOrder.setType(order.getType());
+        newOrder.setOrderLineItems(order.getOrderLineItems());
+        newOrder.setOrderDateTime(order.getOrderDateTime());
+        this.order = newOrder;
+        return this;
+    }
+
     public OrderTestFixture changeOrderTable(OrderTable orderTable) {
         Order newOrder = new Order();
         newOrder.setId(order.getId());
@@ -41,7 +56,7 @@ public class OrderTestFixture {
         return this;
     }
 
-    public OrderTestFixture changeMenu(Menu menu) {
+    public OrderTestFixture changeOrderLineItems(List<OrderLineItem> orderLineItems) {
         Order newOrder = new Order();
         newOrder.setId(order.getId());
         newOrder.setStatus(order.getStatus());
@@ -49,7 +64,7 @@ public class OrderTestFixture {
         newOrder.setOrderTableId(order.getOrderTableId());
         newOrder.setDeliveryAddress(order.getDeliveryAddress());
         newOrder.setType(order.getType());
-        newOrder.setOrderLineItems(Collections.singletonList(OrderLineItemTestFixture.create().changeMenu(menu).getOrderLineItem()));
+        newOrder.setOrderLineItems(orderLineItems);
         newOrder.setOrderDateTime(order.getOrderDateTime());
         this.order = newOrder;
         return this;
@@ -63,6 +78,20 @@ public class OrderTestFixture {
         newOrder.setOrderTableId(order.getOrderTableId());
         newOrder.setDeliveryAddress(order.getDeliveryAddress());
         newOrder.setType(order.getType());
+        newOrder.setOrderLineItems(order.getOrderLineItems());
+        newOrder.setOrderDateTime(order.getOrderDateTime());
+        this.order = newOrder;
+        return this;
+    }
+
+    public OrderTestFixture changeType(OrderType orderType) {
+        Order newOrder = new Order();
+        newOrder.setId(order.getId());
+        newOrder.setStatus(order.getStatus());
+        newOrder.setOrderTable(order.getOrderTable());
+        newOrder.setOrderTableId(order.getOrderTableId());
+        newOrder.setDeliveryAddress(order.getDeliveryAddress());
+        newOrder.setType(orderType);
         newOrder.setOrderLineItems(order.getOrderLineItems());
         newOrder.setOrderDateTime(order.getOrderDateTime());
         this.order = newOrder;
