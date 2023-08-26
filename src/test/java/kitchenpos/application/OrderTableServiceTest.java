@@ -227,5 +227,19 @@ class OrderTableServiceTest {
             // when & then
             assertThrows(IllegalArgumentException.class, () -> sut.changeNumberOfGuests(orderTable.getId(), request));
         }
+
+        @DisplayName("주문 테이블의 `테이블에 앉은 고객 수`를 변경할 때 주문 테이블이 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void changeNumberOfGuestsNotExistsOrderTable() {
+            // given
+            OrderTable notPersistOrderTable = OrderTableTestFixture.create()
+                    .getOrderTable();
+            OrderTable request = OrderTableTestFixture.create()
+                    .changeNumberOfGuests(5)
+                    .getOrderTable();
+
+            // when & then
+            assertThrows(NoSuchElementException.class, () -> sut.changeNumberOfGuests(notPersistOrderTable.getId(), request));
+        }
     }
 }
