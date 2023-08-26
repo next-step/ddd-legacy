@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.ApplicationServiceTest;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.Product;
@@ -20,8 +21,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
-class MenuGroupServiceTest {
+class MenuGroupServiceTest extends ApplicationServiceTest {
 
     @Mock
     private MenuGroupRepository menuGroupRepository;
@@ -39,7 +39,7 @@ class MenuGroupServiceTest {
     @DisplayName("[예외] 상품의 이름은 null 이거나 empty 일 수 없다.")
     @NullAndEmptySource
     @ParameterizedTest
-    void create_fail_due_to_null_or_empty_name(String name) {
+    void create_fail_because_null_or_empty_name(String name) {
         MenuGroup menuGroup = MenuGroupFixture.create(name);
 
         assertThatThrownBy(() -> menuGroupService.create(menuGroup))

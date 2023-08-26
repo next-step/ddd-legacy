@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.ApplicationServiceTest;
 import kitchenpos.domain.*;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuProductFixture;
@@ -28,8 +29,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-class ProductServiceTest {
+class ProductServiceTest extends ApplicationServiceTest {
 
     @Mock
     private ProductRepository productRepository;
@@ -71,7 +71,7 @@ class ProductServiceTest {
 
         @DisplayName("[예외] 상품의 이름은 비속어일 수 없다.")
         @Test
-        void create_fail_due_to_profanity_name() {
+        void create_fail_because_profanity_name() {
             Product product = ProductFixture.create(BigDecimal.valueOf(10000L));
             when(purgomalumClient.containsProfanity(product.getName())).thenReturn(true);
 
@@ -82,7 +82,7 @@ class ProductServiceTest {
         @DisplayName("[예외] 상품의 이름은 null 일 수 없다")
         @NullSource
         @ParameterizedTest
-        void create_fail_due_to_null_name(String name) {
+        void create_fail_because_null_name(String name) {
             Product product = ProductFixture.create(name, BigDecimal.valueOf(10000L));
 
             assertThatThrownBy(() -> productService.create(product))
@@ -116,7 +116,7 @@ class ProductServiceTest {
                     {"상품의 가격이 0원으로 내려간 경우", product, menu, BigDecimal.valueOf(0), false},
             };
         }
-        public static Object[][] changePrice_fail_due_to_illegal_price() {
+        public static Object[][] changePrice_fail_because_illegal_price() {
             return new Object[][]{
                     {"상품의 가격을 -1으로 변경 요청한 경우", ProductFixture.create(BigDecimal.valueOf(-1))},
                     {"상품의 가격을 null로 변경 요청한 경우", ProductFixture.create(null)},
@@ -145,9 +145,9 @@ class ProductServiceTest {
         }
 
         @DisplayName("[예외] 변경되는 상품의 가격은 null이거나 0미만 일 수 없습니다.")
-        @MethodSource("kitchenpos.application.ProductServiceTest$changePrice_source#changePrice_fail_due_to_illegal_price")
+        @MethodSource("kitchenpos.application.ProductServiceTest$changePrice_source#changePrice_fail_because_illegal_price")
         @ParameterizedTest(name = "{0}")
-        void changePrice_fail_due_to_illegal_price(String testName, Product product) {
+        void changePrice_fail_because_illegal_price(String testName, Product product) {
             assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), product))
                     .isInstanceOf(IllegalArgumentException.class);
         }

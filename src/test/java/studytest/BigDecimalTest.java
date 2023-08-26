@@ -10,9 +10,9 @@ public class BigDecimalTest {
 
     @Test
     void compareTo() {
-        System.out.println(BigDecimal.valueOf(1L).compareTo(BigDecimal.ZERO));
-        System.out.println(BigDecimal.valueOf(ZERO).compareTo(BigDecimal.ZERO));
-        System.out.println(BigDecimal.valueOf(-1L).compareTo(BigDecimal.ZERO));
+        System.out.println(BigDecimal.valueOf(1L).compareTo(BigDecimal.ZERO)); // 1
+        System.out.println(BigDecimal.valueOf(ZERO).compareTo(BigDecimal.ZERO)); // 0
+        System.out.println(BigDecimal.valueOf(-1L).compareTo(BigDecimal.ZERO)); // -1
     }
 
 }
