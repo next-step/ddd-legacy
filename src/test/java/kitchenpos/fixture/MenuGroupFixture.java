@@ -10,8 +10,11 @@ public class MenuGroupFixture {
     }
 
     public static MenuGroup create() {
+        return create(DEFAULT_NAME);
+    }
+    public static MenuGroup create(String name) {
         MenuGroup result = new MenuGroup();
-        result.setName(DEFAULT_NAME);
+        result.setName(name);
         return result;
     }
 }
