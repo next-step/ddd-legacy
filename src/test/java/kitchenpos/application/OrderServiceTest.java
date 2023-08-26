@@ -626,5 +626,16 @@ class OrderServiceTest {
             assertThat(result).isNotNull();
             assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
         }
+
+        @DisplayName("주문 완료로 변경할 주문이 배달 주문일 때 주문 상태가 배달 완료가 아니라면 변경이 불가능하다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "WAITING", "SERVED", "DELIVERING", "COMPLETED"})
+        void completeDeliveryOrderStatusNotDeliveredExceptionThrown(OrderStatus orderStatus) {
+            // given
+            Order order = orderIntegrationStep.createDeliveryByStatus(orderStatus);
+
+            // when & then
+            assertThrows(IllegalStateException.class, () -> sut.complete(order.getId()));
+        }
     }
 }
