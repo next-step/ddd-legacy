@@ -215,6 +215,17 @@ class OrderTableServiceTest {
             assertThat(result.getNumberOfGuests()).isEqualTo(5);
         }
 
+        @DisplayName("주문 테이블의 `테이블에 앉은 고객 수`를 변경할 때 고객 수가 음수이면 예외가 발생한다.")
+        @Test
+        void changeNumberOfGuestsNegative() {
+            // given
+            OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+            OrderTable request = OrderTableTestFixture.create()
+                    .changeNumberOfGuests(-1)
+                    .getOrderTable();
 
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> sut.changeNumberOfGuests(orderTable.getId(), request));
+        }
     }
 }
