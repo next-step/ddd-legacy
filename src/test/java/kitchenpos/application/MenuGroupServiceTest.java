@@ -24,7 +24,7 @@ class MenuGroupServiceTest {
     @Autowired
     private MenuGroupService menuGroupService;
 
-    @DisplayName("메뉴그룹 생성요청 후 메뉴그룹시 메뉴그룹이 존재해야한다.")
+    @DisplayName("메뉴그룹 생성 후 메뉴그룹조회시 추가한 메뉴그룹이 조회되야 한다.")
     @Test
     void 메뉴그룹생성() {
         // when
@@ -36,7 +36,7 @@ class MenuGroupServiceTest {
         assertThat(findMenuGroup.getName()).isEqualTo(메뉴그룹_1.getName());
     }
 
-    @DisplayName("메뉴그룹 생성요청시 이름이 존재하지 않으면 에러를 던진다.")
+    @DisplayName("메뉴그룹 생성 시 이름이 존재하지 않으면 에러를 던진다.")
     @Test
     void 메뉴그룹생성_실패_이름미존재() {
         // when then
