@@ -489,7 +489,7 @@ class OrderServiceTest {
 
     @DisplayName("주문 상태를 배달 중으로 변경")
     @Nested
-    class Describe_startDelivery {
+    class Describe_start_delivery {
         @BeforeEach
         void setUp() {
             databaseCleanStep.clean();
@@ -541,6 +541,29 @@ class OrderServiceTest {
 
             // when & then
             assertThrows(IllegalStateException.class, () -> sut.startDelivery(order.getId()));
+        }
+    }
+
+    @DisplayName("주문 상태를 배달 완료로 변경")
+    @Nested
+    class Describe_complete_delivery {
+        @BeforeEach
+        void setUp() {
+            databaseCleanStep.clean();
+        }
+
+        @DisplayName("주문 상태를 배달 완료로 변경할 수 있다.")
+        @Test
+        void completeDelivery() {
+            // given
+            Order order = orderIntegrationStep.createDeliveryByStatus(OrderStatus.DELIVERING);
+
+            // when
+            Order result = sut.completeDelivery(order.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED);
         }
     }
 }
