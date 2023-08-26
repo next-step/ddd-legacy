@@ -48,6 +48,17 @@ public class OrderLineItemTestFixture {
         return this;
     }
 
+    public OrderLineItemTestFixture changeQuantity(long quantity) {
+        OrderLineItem newOrderLineItem = new OrderLineItem();
+        newOrderLineItem.setSeq(orderLineItem.getSeq());
+        newOrderLineItem.setMenu(orderLineItem.getMenu());
+        newOrderLineItem.setMenuId(orderLineItem.getMenuId());
+        newOrderLineItem.setQuantity(quantity);
+        newOrderLineItem.setPrice(orderLineItem.getPrice());
+        this.orderLineItem = newOrderLineItem;
+        return this;
+    }
+
     public OrderLineItem getOrderLineItem() {
         return orderLineItem;
     }

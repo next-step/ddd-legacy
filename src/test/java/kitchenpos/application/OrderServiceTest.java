@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.integration_test_step.MenuIntegrationStep;
+import kitchenpos.integration_test_step.OrderTableIntegrationStep;
 import kitchenpos.test_fixture.MenuTestFixture;
 import kitchenpos.test_fixture.OrderLineItemTestFixture;
 import kitchenpos.test_fixture.OrderTestFixture;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("OrderService 클래스")
@@ -30,6 +33,9 @@ class OrderServiceTest {
 
     @Autowired
     private MenuIntegrationStep menuIntegrationStep;
+
+    @Autowired
+    private OrderTableIntegrationStep orderTableIntegrationStep;
 
     @Autowired
     private DatabaseCleanStep databaseCleanStep;
@@ -140,6 +146,53 @@ class OrderServiceTest {
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> sut.create(order));
+        }
+
+        @DisplayName("새로운 주문 생성 시 주문 유형이 매장 식사가 아니면, 각 주문 메뉴의 수량은 음수가 될 수 없다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT"})
+        void createOrderLineItemsQuantityExceptionThrown(OrderType orderType) {
+            // given
+            Menu menu = menuIntegrationStep.create();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice())
+                    .changeQuantity(-1L)
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(orderType)
+                    .getOrder();
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> sut.create(order));
+        }
+
+        @DisplayName("새로운 주문 생성 시 주문 유형이 매장 식사이면, 각 주문 메뉴의 수량은 음수를 허용한다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderType.class, names = {"EAT_IN"})
+        void createOrderLineItemsQuantity(OrderType orderType) {
+            // given
+            Menu menu = menuIntegrationStep.create();
+            OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice())
+                    .changeQuantity(-1L)
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(orderType)
+                    .changeOrderTable(orderTable)
+                    .getOrder();
+
+            // when
+            Order result = assertDoesNotThrow(() -> sut.create(order));
+
+            // then
+            assertThat(result).isNotNull();
         }
     }
 }
