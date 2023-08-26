@@ -1,17 +1,17 @@
 package calculator.domain;
 
-public class Digit {
+public class PositiveNumber {
     private static final String MINUS_NUMBER_EXCEPTION_MESSAGE = "음수는 입력할 수 없습니다.";
 
     private int value;
 
-    private Digit(int value) {
+    private PositiveNumber(int value) {
         validationMinusNumber(value);
         this.value = value;
     }
 
-    public static Digit from(int number) {
-        return new Digit(number);
+    public static PositiveNumber from(int number) {
+        return new PositiveNumber(number);
     }
 
     private void validationMinusNumber(int number) {
@@ -20,9 +20,9 @@ public class Digit {
         }
     }
 
-    public Digit add(Digit other) {
+    public PositiveNumber add(PositiveNumber other) {
         int newValue = this.value + other.value;
-        return new Digit(newValue);
+        return new PositiveNumber(newValue);
     }
 
     public int getValue() {
