@@ -187,6 +187,7 @@ class OrderServiceTest {
                     .changeOrderLineItems(Collections.singletonList(orderLineItem))
                     .changeType(orderType)
                     .changeOrderTable(orderTable)
+                    .changeOrderTableId(orderTable)
                     .getOrder();
 
             // when
@@ -253,6 +254,26 @@ class OrderServiceTest {
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> sut.create(order));
+        }
+
+        @DisplayName("배달 주문은 주문 테이블 정보가 비어있어도 주문이 가능하다.")
+        @Test
+        void createDeliveryOrderTableNull() {
+            // given
+            Menu menu = menuIntegrationStep.create();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice())
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(OrderType.DELIVERY)
+                    .changeOrderTable(null)
+                    .getOrder();
+
+            // when & then
+            assertDoesNotThrow(() -> sut.create(order));
         }
     }
 }

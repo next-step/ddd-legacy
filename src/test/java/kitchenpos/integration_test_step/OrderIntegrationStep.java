@@ -38,6 +38,7 @@ public class OrderIntegrationStep {
         Order order = OrderTestFixture.create()
                 .changeOrderLineItems(Collections.singletonList(orderLineItem))
                 .changeOrderTable(orderTable)
+                .changeOrderTableId(orderTable)
                 .changeStatus(OrderStatus.WAITING)
                 .getOrder();
         return orderRepository.save(order);
@@ -52,6 +53,7 @@ public class OrderIntegrationStep {
         Order order = OrderTestFixture.create()
                 .changeOrderLineItems(Collections.singletonList(orderLineItem))
                 .changeOrderTable(orderTable)
+                .changeOrderTableId(orderTable)
                 .changeStatus(OrderStatus.COMPLETED)
                 .getOrder();
         return orderRepository.save(order);

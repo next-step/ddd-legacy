@@ -47,6 +47,20 @@ public class OrderTestFixture {
         newOrder.setId(order.getId());
         newOrder.setStatus(order.getStatus());
         newOrder.setOrderTable(orderTable);
+        newOrder.setOrderTableId(order.getOrderTableId());
+        newOrder.setDeliveryAddress(order.getDeliveryAddress());
+        newOrder.setType(order.getType());
+        newOrder.setOrderLineItems(order.getOrderLineItems());
+        newOrder.setOrderDateTime(order.getOrderDateTime());
+        this.order = newOrder;
+        return this;
+    }
+
+    public OrderTestFixture changeOrderTableId(OrderTable orderTable) {
+        Order newOrder = new Order();
+        newOrder.setId(order.getId());
+        newOrder.setStatus(order.getStatus());
+        newOrder.setOrderTable(order.getOrderTable());
         newOrder.setOrderTableId(orderTable.getId());
         newOrder.setDeliveryAddress(order.getDeliveryAddress());
         newOrder.setType(order.getType());
