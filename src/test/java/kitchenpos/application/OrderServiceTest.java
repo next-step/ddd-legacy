@@ -297,5 +297,27 @@ class OrderServiceTest {
             // when & then
             assertThrows(NoSuchElementException.class, () -> sut.create(order));
         }
+
+        @DisplayName("매장 식사 주문에 등록하려는 주문 테이블이 비어있는 상태이면 예외가 발생한다.")
+        @Test
+        void createEatInOrderTableEmpty() {
+            // given
+            OrderTable orderTable = orderTableIntegrationStep.createEmptyTable();
+            Menu menu = menuIntegrationStep.create();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice())
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(OrderType.EAT_IN)
+                    .changeOrderTable(orderTable)
+                    .changeOrderTableId(orderTable)
+                    .getOrder();
+
+            // when & then
+            assertThrows(IllegalStateException.class, () -> sut.create(order));
+        }
     }
 }
