@@ -1,10 +1,11 @@
 package kitchenpos.domain;
 
+import java.util.UUID;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import java.util.UUID;
 
 @Table(name = "order_table")
 @Entity
@@ -23,6 +24,13 @@ public class OrderTable {
     private boolean occupied;
 
     public OrderTable() {
+    }
+
+    public OrderTable(UUID id, String name) {
+        this.id = id;
+        this.name = name;
+        this.numberOfGuests = 0;
+        this.occupied = false;
     }
 
     public UUID getId() {

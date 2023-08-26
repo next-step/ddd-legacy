@@ -1,9 +1,21 @@
 package kitchenpos.domain;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Table(name = "menu")
 @Entity
@@ -36,12 +48,41 @@ public class Menu {
         columnDefinition = "binary(16)",
         foreignKey = @ForeignKey(name = "fk_menu_product_to_menu")
     )
-    private List<MenuProduct> menuProducts;
-
+    private List<MenuProduct> menuProducts = new ArrayList<>();
     @Transient
     private UUID menuGroupId;
 
     public Menu() {
+    }
+
+    public Menu(UUID id, String name, BigDecimal price, MenuGroup menuGroup, boolean displayed) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.menuGroup = menuGroup;
+        this.displayed = displayed;
+    }
+
+    public void addMenuProduct(MenuProduct menuProduct) {
+        if (Objects.isNull(menuProduct)) {
+            throw new IllegalArgumentException();
+        }
+        menuProducts.add(menuProduct);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Menu))
+            return false;
+        Menu menu = (Menu)o;
+        return Objects.equals(id, menu.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 
     public UUID getId() {

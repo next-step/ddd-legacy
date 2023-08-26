@@ -1,7 +1,17 @@
 package kitchenpos.domain;
 
-import javax.persistence.*;
 import java.util.UUID;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Table(name = "menu_product")
 @Entity
@@ -26,6 +36,12 @@ public class MenuProduct {
     private UUID productId;
 
     public MenuProduct() {
+    }
+
+    public MenuProduct(Product product, long quantity) {
+        this.product = product;
+        this.quantity = quantity;
+        this.productId = product.getId();
     }
 
     public Long getSeq() {
