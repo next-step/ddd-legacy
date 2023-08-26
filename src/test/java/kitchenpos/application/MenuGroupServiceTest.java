@@ -38,7 +38,7 @@ class MenuGroupServiceTest {
     }
 
     @Test
-    @DisplayName("메뉴 그룹의 이름은 비울 수 없다.")
+    @DisplayName("메뉴 그룹의 이름은 빈값일 수 없다")
     void nameTest() {
         // given
         MenuGroup request = new MenuGroup();
@@ -49,10 +49,10 @@ class MenuGroupServiceTest {
     }
 
     @Test
-    @DisplayName("메뉴 그룹의 이름은 비울 수 없다.")
+    @DisplayName("모든 메뉴 그룹 정보를 가져온다")
     void findAllTest() {
         // when
-        List<MenuGroup> actual = menuGroupService.findAll();
+        menuGroupService.findAll();
 
         // then
         then(menuGroupRepository).should(times(1)).findAll();

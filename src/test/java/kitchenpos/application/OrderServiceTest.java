@@ -78,7 +78,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void 새로운_먹고가기_주문을_등록한다() {
+    void 새로운_매장_주문을_등록한다() {
         // given
         Order order = TEST_ORDER_EAT_IN();
         Menu menu = TEST_MENU();
@@ -104,7 +104,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문_타입은_배달_먹고가기_포장_중_하나이어야_한다() {
+    void 주문_타입은_배달_매장_포장_중_하나이어야_한다() {
         // given
         Order order = TEST_ORDER_EAT_IN();
 
@@ -144,7 +144,7 @@ class OrderServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {"take_out", "delivery"})
-    void 주문_타입이_먹고가는_것이_아니라면_주문_내역의_수량이_0이상이어야_한다(String typeValue) {
+    void 주문_타입이_매장_타입이_아니라면_주문_내역의_수량이_0이상이어야_한다(String typeValue) {
         // given
         Order order = TEST_ORDER_DELIVERY();
         Menu menu = TEST_MENU();
@@ -213,7 +213,7 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문_타입이_먹고가는_것이라면_사용_가능한_테이블이_지정되어야_한다() {
+    void 주문_타입이_매장이라면_사용_가능한_테이블이_지정되어야_한다() {
         // given
         Order order = TEST_ORDER_EAT_IN();
         Menu menu = TEST_MENU();
