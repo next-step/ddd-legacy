@@ -1,6 +1,7 @@
 package kitchenpos.fixture;
 
 import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
@@ -18,6 +19,7 @@ public class MenuFixture {
         MenuProduct menuProduct = MenuProductFixture.create(product, 1);
         return create(name, price, List.of(menuProduct));
     }
+
     public static Menu createWithProducts(String name, BigDecimal price, List<Product> products) {
         List<MenuProduct> menuProduct = products.stream()
                 .map(product -> MenuProductFixture.create(product, 1))
@@ -30,17 +32,20 @@ public class MenuFixture {
     }
 
     public static Menu create(String name, BigDecimal price, List<MenuProduct> menuProducts) {
-        return create(UUID.randomUUID(), name, price, menuProducts);
+        return create(UUID.randomUUID(), name, price, menuProducts, true);
     }
 
-    public static Menu create(UUID id, String name, BigDecimal price, List<MenuProduct> menuProducts) {
+    public static Menu create(UUID id, String name, BigDecimal price, List<MenuProduct> menuProducts, boolean displayed) {
+        MenuGroup menuGroup = MenuGroupFixture.create();
+
         Menu result = new Menu();
         result.setId(id);
         result.setName(name);
         result.setPrice(price);
         result.setMenuProducts(menuProducts);
-        result.setMenuGroup(MenuGroupFixture.create());
-        result.setDisplayed(true);
+        result.setMenuGroup(menuGroup);
+        result.setMenuGroupId(menuGroup.getId());
+        result.setDisplayed(displayed);
         return result;
     }
 
