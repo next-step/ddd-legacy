@@ -382,7 +382,7 @@ class OrderServiceTest {
         @Test
         void accept() {
             // given
-            Order order = orderIntegrationStep.createStatusAccept();
+            Order order = orderIntegrationStep.createStatusWaiting();
 
             // when
             Order result = sut.accept(order.getId());
@@ -402,6 +402,17 @@ class OrderServiceTest {
 
             // when & then
             assertThrows(NoSuchElementException.class, () -> sut.accept(notPersistOrder.getId()));
+        }
+
+        @DisplayName("주문 상태를 수락으로 변경할 때 주문 상태가 대기 상태가 아니면 예외가 발생한다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+        void acceptOrderStatusNotWaitingExceptionThrown(OrderStatus orderStatus) {
+            // given
+            Order order = orderIntegrationStep.createStatus(orderStatus);
+
+            // when & then
+            assertThrows(IllegalStateException.class, () -> sut.accept(order.getId()));
         }
     }
 }

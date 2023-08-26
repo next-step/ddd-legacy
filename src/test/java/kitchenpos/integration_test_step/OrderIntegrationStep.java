@@ -19,42 +19,30 @@ public class OrderIntegrationStep {
         this.orderTableIntegrationStep = orderTableIntegrationStep;
     }
 
-    public Order create() {
+    public Order createStatus(OrderStatus orderStatus) {
         OrderTable orderTable = orderTableIntegrationStep.createSitTable();
-        Menu menu = menuIntegrationStep.create();
-        OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
-                .changeMenu(menu)
-                .changePrice(menu.getPrice())
-                .getOrderLineItem();
-        Order order = OrderTestFixture.create()
-                .changeOrderTable(orderTable)
-                .changeOrderTableId(orderTable)
-                .changeOrderLineItems(Collections.singletonList(orderLineItem))
-                .getOrder();
-        return orderRepository.save(order);
+        return this.create(orderTable, orderStatus);
     }
 
-    public Order createStatusAccept() {
+    public Order createStatusWaiting() {
         OrderTable orderTable = orderTableIntegrationStep.createSitTable();
-        return createStatusAccept(orderTable);
+        return this.createStatusWaiting(orderTable);
     }
 
-    public Order createStatusAccept(OrderTable orderTable) {
-        Menu menu = menuIntegrationStep.create();
-        OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
-                .changeMenu(menu)
-                .changePrice(menu.getPrice())
-                .getOrderLineItem();
-        Order order = OrderTestFixture.create()
-                .changeOrderLineItems(Collections.singletonList(orderLineItem))
-                .changeOrderTable(orderTable)
-                .changeOrderTableId(orderTable)
-                .changeStatus(OrderStatus.WAITING)
-                .getOrder();
-        return orderRepository.save(order);
+    public Order createStatusWaiting(OrderTable orderTable) {
+        return this.create(orderTable, OrderStatus.WAITING);
+    }
+
+    public Order createStatusCompleted() {
+        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+        return this.createStatusCompleted(orderTable);
     }
 
     public Order createStatusCompleted(OrderTable orderTable) {
+        return this.create(orderTable, OrderStatus.COMPLETED);
+    }
+
+    public Order create(OrderTable orderTable, OrderStatus orderStatus) {
         Menu menu = menuIntegrationStep.create();
         OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
                 .changeMenu(menu)
@@ -64,7 +52,7 @@ public class OrderIntegrationStep {
                 .changeOrderLineItems(Collections.singletonList(orderLineItem))
                 .changeOrderTable(orderTable)
                 .changeOrderTableId(orderTable)
-                .changeStatus(OrderStatus.COMPLETED)
+                .changeStatus(orderStatus)
                 .getOrder();
         return orderRepository.save(order);
     }
