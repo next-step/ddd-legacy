@@ -319,5 +319,29 @@ class OrderServiceTest {
             // when & then
             assertThrows(IllegalStateException.class, () -> sut.create(order));
         }
+
+        @DisplayName("매장 식사 주문의 배달 주소 값은 필요하지 않다.")
+        @Test
+        void createEatInDeliveryAddressNull() {
+            // given
+            OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+            Menu menu = menuIntegrationStep.create();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice())
+                    .getOrderLineItem();
+
+            // when & then
+            assertDoesNotThrow(() -> sut.create(OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(OrderType.EAT_IN)
+                    .changeOrderTable(orderTable)
+                    .changeOrderTableId(orderTable)
+                    .changeDeliveryAddress(null)
+                    .getOrder()));
+        }
+
+
     }
 }
