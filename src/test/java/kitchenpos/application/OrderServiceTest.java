@@ -17,6 +17,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -212,6 +213,25 @@ class OrderServiceTest {
 
             // when & then
             assertThrows(IllegalStateException.class, () -> sut.create(order));
+        }
+
+        @DisplayName("주문 메뉴는 실제 메뉴와 가격 동일하지 않으면 예외가 발생한다.")
+        @Test
+        void createOrderLineItemsPriceExceptionThrown() {
+            // given
+            Menu menu = menuIntegrationStep.create();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice().add(BigDecimal.ONE))
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(OrderType.DELIVERY)
+                    .getOrder();
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> sut.create(order));
         }
     }
 }
