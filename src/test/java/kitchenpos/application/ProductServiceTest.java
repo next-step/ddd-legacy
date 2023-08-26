@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kitchenpos.fixture.TestFixture.TEST_MENU;
 import static kitchenpos.fixture.TestFixture.TEST_PRODUCT;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,7 +39,7 @@ class ProductServiceTest {
     private PurgomalumClient purgomalumClient;
 
     @Test
-    @DisplayName("상품을 신규로 등록한다.")
+    @DisplayName("새로운 상품을 등록한다.")
     void createTest() {
         // given
         Product createRequest = TEST_PRODUCT();
@@ -53,7 +54,7 @@ class ProductServiceTest {
         verify(productRepository, times(1)).save(any());
     }
 
-    @DisplayName("상품의 이름이 널값이면 안된다.")
+    @DisplayName("이름은 비어있을 수 없다.")
     @Test
     void createNameEmptyTest() {
         // given
@@ -71,7 +72,7 @@ class ProductServiceTest {
         assertThatNoException().isThrownBy(() -> productService.create(nameTest3));
     }
 
-    @DisplayName("상품의 이름은 부적절한 영어 이름이면 안된다.")
+    @DisplayName("이름은 외설적이거나 욕설이 포함된 영어 이름은 사용 할 수 없다")
     @ParameterizedTest
     @CsvSource(value = {"fuck", "shit"})
     void createNameTest(String name) {
@@ -94,15 +95,35 @@ class ProductServiceTest {
         changeProduct.setPrice(new BigDecimal(900));
         UUID productId = product.getId();
         given(productRepository.findById(productId)).willReturn(Optional.of(product));
-        given(menuRepository.findAllByProductId(productId)).willReturn(List.of());
+        given(menuRepository.findAllByProductId(productId)).willReturn(List.of(TEST_MENU()));
 
         // when
-        Product result = productService.changePrice(any(UUID.class), changeProduct);
+        Product result = productService.changePrice(productId, changeProduct);
 
         // then
         verify(productRepository, times(1)).findById(productId);
         verify(menuRepository, times(1)).findAllByProductId(productId);
         assertThat(result.getPrice()).isEqualTo(changeProduct.getPrice());
     }
-    //TODO: 연관된 메뉴가격 관련 테스트 필요!
+
+    // TODO: 아직 작동안할 듯?
+    @Test
+    @DisplayName("가격 변경 후, 메뉴의 가격이 (메뉴에 포함된 상품들의 가격 x 개수) 총 합보다 높다면 메뉴를 비활성화 한다.")
+    void changePriceAndHideTest() {
+        // given
+        Product product = TEST_PRODUCT();
+        Product changeProduct = TEST_PRODUCT();
+        changeProduct.setPrice(new BigDecimal(100));
+        UUID productId = product.getId();
+        given(productRepository.findById(productId)).willReturn(Optional.of(product));
+        given(menuRepository.findAllByProductId(productId)).willReturn(List.of(TEST_MENU()));
+
+        // when
+        Product result = productService.changePrice(productId, changeProduct);
+
+        // then
+        verify(productRepository, times(1)).findById(productId);
+        verify(menuRepository, times(1)).findAllByProductId(productId);
+        assertThat(result.getPrice()).isEqualTo(changeProduct.getPrice());
+    }
 }
