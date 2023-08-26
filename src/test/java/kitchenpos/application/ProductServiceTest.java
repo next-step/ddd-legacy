@@ -185,7 +185,6 @@ class ProductServiceTest {
         UUID id = UUID.randomUUID();
         Product changePriceRequest = ProductTestFixture.create()
                 .changeId(id)
-                .changePrice(BigDecimal.valueOf(2000))
                 .getProduct();
 
         // when then
@@ -205,7 +204,7 @@ class ProductServiceTest {
 
         Product changePriceRequest = ProductTestFixture.create()
                 .changeId(product.getId())
-                .changePrice(BigDecimal.valueOf(1999))
+                .changePrice(menu.getPrice().subtract(BigDecimal.ONE))
                 .getProduct();
 
         // when
