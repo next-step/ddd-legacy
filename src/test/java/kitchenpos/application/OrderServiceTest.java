@@ -194,5 +194,24 @@ class OrderServiceTest {
             // then
             assertThat(result).isNotNull();
         }
+
+        @DisplayName("새로운 주문 생성 시 주문 메뉴가 숨김 상태라면 예외가 발생한다.")
+        @Test
+        void createOrderLineItemsMenuHiddenExceptionThrown() {
+            // given
+            Menu menu = menuIntegrationStep.createHideMenu();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice())
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(OrderType.DELIVERY)
+                    .getOrder();
+
+            // when & then
+            assertThrows(IllegalStateException.class, () -> sut.create(order));
+        }
     }
 }

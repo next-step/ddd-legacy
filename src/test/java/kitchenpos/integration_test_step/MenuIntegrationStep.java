@@ -30,18 +30,43 @@ public class MenuIntegrationStep {
         return this.createPersistMenu(product);
     }
 
-    public Menu createPersistMenu(Product product) {
+    public Menu createHideMenu() {
         MenuGroup menuGroup = MenuGroupTestFixture.create()
                 .changeId(UUID.randomUUID())
                 .getMenuGroup();
         menuGroupRepository.save(menuGroup);
+        Product product = ProductTestFixture.create()
+                .getProduct();
+        productRepository.save(product);
+        Menu menu = MenuTestFixture.create()
+                .changeId(UUID.randomUUID())
+                .changePrice(product.getPrice().multiply(BigDecimal.valueOf(2)))
+                .changeMenuGroup(menuGroup)
+                .changeMenuProducts(Collections.singletonList(MenuProductTestFixture.create()
+                        .changeProduct(product)
+                        .getMenuProduct()))
+                .changeDisplayed(false)
+                .getMenu();
+        return menuRepository.save(menu);
+    }
+
+    public Menu createPersistMenu(Product persistProduct) {
+        MenuGroup menuGroup = MenuGroupTestFixture.create()
+                .changeId(UUID.randomUUID())
+                .getMenuGroup();
+        menuGroupRepository.save(menuGroup);
+        return this.create(persistProduct, menuGroup);
+    }
+
+    public Menu create(Product persistProduct, MenuGroup persistMenuGroup) {
+        menuGroupRepository.save(persistMenuGroup);
         MenuProduct menuProduct = MenuProductTestFixture.create()
-                .changeProduct(product)
+                .changeProduct(persistProduct)
                 .getMenuProduct();
         Menu menu = MenuTestFixture.create()
                 .changeId(UUID.randomUUID())
                 .changePrice(menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
-                .changeMenuGroup(menuGroup)
+                .changeMenuGroup(persistMenuGroup)
                 .changeMenuProducts(Collections.singletonList(menuProduct))
                 .changeDisplayed(true)
                 .getMenu();
