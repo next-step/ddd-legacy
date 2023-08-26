@@ -25,6 +25,16 @@ public class OrderTable {
     public OrderTable() {
     }
 
+    public OrderTable(String name) {
+        this(name, 0, false);
+    }
+
+    public OrderTable(String name, int numberOfGuests, boolean occupied) {
+        this.name = name;
+        this.numberOfGuests = numberOfGuests;
+        this.occupied = occupied;
+    }
+
     public UUID getId() {
         return id;
     }
