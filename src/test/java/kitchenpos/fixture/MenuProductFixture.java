@@ -16,6 +16,7 @@ public class MenuProductFixture {
         MenuProduct result = new MenuProduct();
         result.setProduct(product);
         result.setQuantity(quantity);
+        result.setProductId(product.getId());
         return result;
     }
 

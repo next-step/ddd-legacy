@@ -3,6 +3,7 @@ package kitchenpos.fixture;
 import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class ProductFixture {
 
@@ -17,6 +18,14 @@ public class ProductFixture {
 
     public static Product create(String name, BigDecimal price) {
         Product result = new Product();
+        result.setName(name);
+        result.setPrice(price);
+        return result;
+    }
+
+    public static Product create(UUID id, String name, BigDecimal price) {
+        Product result = new Product();
+        result.setId(id);
         result.setName(name);
         result.setPrice(price);
         return result;
