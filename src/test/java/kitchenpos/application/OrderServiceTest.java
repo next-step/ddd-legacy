@@ -485,63 +485,62 @@ class OrderServiceTest {
             // when & then
             assertThrows(IllegalStateException.class, () -> sut.serve(order.getId()));
         }
+    }
 
-        @DisplayName("주문 상태를 배달 중으로 변경")
-        @Nested
-        class Describe_startDelivery {
-            @BeforeEach
-            void setUp() {
-                databaseCleanStep.clean();
-            }
+    @DisplayName("주문 상태를 배달 중으로 변경")
+    @Nested
+    class Describe_startDelivery {
+        @BeforeEach
+        void setUp() {
+            databaseCleanStep.clean();
+        }
 
-            @DisplayName("주문 상태를 배달 중으로 변경할 수 있다.")
-            @Test
-            void startDelivery() {
-                // given
-                Order order = orderIntegrationStep.createServedDeliveryOrder();
+        @DisplayName("주문 상태를 배달 중으로 변경할 수 있다.")
+        @Test
+        void startDelivery() {
+            // given
+            Order order = orderIntegrationStep.createServedDeliveryOrder();
 
-                // when
-                Order result = sut.startDelivery(order.getId());
+            // when
+            Order result = sut.startDelivery(order.getId());
 
-                // then
-                assertThat(result).isNotNull();
-                assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING);
-            }
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        }
 
-            @DisplayName("주문 상태를 배달 중으로 변경할 때 주문이 존재하지 않으면 예외가 발생한다.")
-            @Test
-            void startDeliveryOrderNotFoundExceptionThrown() {
-                // given
-                Order notPersistOrder = OrderTestFixture.create()
-                        .changeId(UUID.randomUUID())
-                        .getOrder();
+        @DisplayName("주문 상태를 배달 중으로 변경할 때 주문이 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void startDeliveryOrderNotFoundExceptionThrown() {
+            // given
+            Order notPersistOrder = OrderTestFixture.create()
+                    .changeId(UUID.randomUUID())
+                    .getOrder();
 
-                // when & then
-                assertThrows(NoSuchElementException.class, () -> sut.startDelivery(notPersistOrder.getId()));
-            }
+            // when & then
+            assertThrows(NoSuchElementException.class, () -> sut.startDelivery(notPersistOrder.getId()));
+        }
 
-            @DisplayName("주문 상태를 배달 중으로 변경할 때 주문 유형이 배달이 아니면 예외가 발생한다.")
-            @ParameterizedTest
-            @EnumSource(value = OrderType.class, names = {"TAKEOUT", "EAT_IN"})
-            void startDeliveryOrderTypeNotDeliveryExceptionThrown(OrderType orderType) {
-                // given
-                Order order = orderIntegrationStep.createServedOrderByType(orderType);
+        @DisplayName("주문 상태를 배달 중으로 변경할 때 주문 유형이 배달이 아니면 예외가 발생한다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderType.class, names = {"TAKEOUT", "EAT_IN"})
+        void startDeliveryOrderTypeNotDeliveryExceptionThrown(OrderType orderType) {
+            // given
+            Order order = orderIntegrationStep.createServedOrderByType(orderType);
 
-                // when & then
-                assertThrows(IllegalStateException.class, () -> sut.startDelivery(order.getId()));
-            }
+            // when & then
+            assertThrows(IllegalStateException.class, () -> sut.startDelivery(order.getId()));
+        }
 
-            @DisplayName("주문 상태를 배달 중으로 변경할 때 주문 상태가 제공 상태가 아니면 예외가 발생한다.")
-            @ParameterizedTest
-            @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "WAITING", "DELIVERING", "DELIVERED", "COMPLETED"})
-            void startDeliveryOrderStatusNotServedExceptionThrown(OrderStatus orderStatus) {
-                // given
-                Order order = orderIntegrationStep.createDeliveryByStatus(orderStatus);
+        @DisplayName("주문 상태를 배달 중으로 변경할 때 주문 상태가 제공 상태가 아니면 예외가 발생한다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "WAITING", "DELIVERING", "DELIVERED", "COMPLETED"})
+        void startDeliveryOrderStatusNotServedExceptionThrown(OrderStatus orderStatus) {
+            // given
+            Order order = orderIntegrationStep.createDeliveryByStatus(orderStatus);
 
-                // when & then
-                assertThrows(IllegalStateException.class, () -> sut.startDelivery(order.getId()));
-            }
-
+            // when & then
+            assertThrows(IllegalStateException.class, () -> sut.startDelivery(order.getId()));
         }
     }
 }
