@@ -14,8 +14,18 @@ public class OrderTableIntegrationStep {
         this.orderTableRepository = orderTableRepository;
     }
 
-    public OrderTable create() {
+    public OrderTable createEmptyTable() {
         OrderTable orderTable = OrderTableTestFixture.create()
+                .changeOccupied(false)
+                .changeNumberOfGuests(0)
+                .getOrderTable();
+        return orderTableRepository.save(orderTable);
+    }
+
+    public OrderTable createSitTable() {
+        OrderTable orderTable = OrderTableTestFixture.create()
+                .changeOccupied(true)
+                .changeNumberOfGuests(1)
                 .getOrderTable();
         return orderTableRepository.save(orderTable);
     }

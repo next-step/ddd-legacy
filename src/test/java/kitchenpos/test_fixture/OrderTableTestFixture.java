@@ -1,5 +1,6 @@
 package kitchenpos.test_fixture;
 
+import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderTable;
 
 import java.util.UUID;
@@ -36,6 +37,26 @@ public class OrderTableTestFixture {
         newOrderTable.setName(name);
         newOrderTable.setNumberOfGuests(orderTable.getNumberOfGuests());
         newOrderTable.setOccupied(orderTable.isOccupied());
+        this.orderTable = newOrderTable;
+        return this;
+    }
+
+    public OrderTableTestFixture changeNumberOfGuests(int numberOfGuests) {
+        OrderTable newOrderTable = new OrderTable();
+        newOrderTable.setId(orderTable.getId());
+        newOrderTable.setName(orderTable.getName());
+        newOrderTable.setNumberOfGuests(numberOfGuests);
+        newOrderTable.setOccupied(orderTable.isOccupied());
+        this.orderTable = newOrderTable;
+        return this;
+    }
+
+    public OrderTableTestFixture changeOccupied(boolean occupied) {
+        OrderTable newOrderTable = new OrderTable();
+        newOrderTable.setId(orderTable.getId());
+        newOrderTable.setName(orderTable.getName());
+        newOrderTable.setNumberOfGuests(orderTable.getNumberOfGuests());
+        newOrderTable.setOccupied(occupied);
         this.orderTable = newOrderTable;
         return this;
     }

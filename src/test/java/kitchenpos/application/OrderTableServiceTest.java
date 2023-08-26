@@ -111,7 +111,7 @@ class OrderTableServiceTest {
         @Test
         void sit() {
             // given
-            OrderTable orderTable = orderTableIntegrationStep.create();
+            OrderTable orderTable = orderTableIntegrationStep.createEmptyTable();
 
             // when
             OrderTable result = sut.sit(orderTable.getId());
@@ -142,7 +142,7 @@ class OrderTableServiceTest {
         @Test
         void clear() {
             // given
-            OrderTable orderTable = orderTableIntegrationStep.create();
+            OrderTable orderTable = orderTableIntegrationStep.createEmptyTable();
             sut.sit(orderTable.getId());
 
             // when
@@ -169,7 +169,7 @@ class OrderTableServiceTest {
         @Test
         void clearOrderTableNotCompletedOrder() {
             // given
-            OrderTable orderTable = orderTableIntegrationStep.create();
+            OrderTable orderTable = orderTableIntegrationStep.createEmptyTable();
             sut.sit(orderTable.getId());
             orderIntegrationStep.createStatusWaiting(orderTable);
 
@@ -181,7 +181,7 @@ class OrderTableServiceTest {
         @Test
         void clearOrderTableCompletedOrder() {
             // given
-            OrderTable orderTable = orderTableIntegrationStep.create();
+            OrderTable orderTable = orderTableIntegrationStep.createEmptyTable();
             sut.sit(orderTable.getId());
             orderIntegrationStep.createStatusCompleted(orderTable);
 
@@ -192,5 +192,29 @@ class OrderTableServiceTest {
             assertThat(result.isOccupied()).isFalse();
             assertThat(result.getNumberOfGuests()).isEqualTo(0);
         }
+    }
+
+    @DisplayName("주문 테이블의 `테이블에 앉은 고객 수`를 변경")
+    @Nested
+    class Describe_change_number_of_guests {
+        @DisplayName("주문 테이블의 `테이블에 앉은 고객 수`를 변경할 수 있다.")
+        @Test
+        void changeNumberOfGuests() {
+            // given
+            OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+            OrderTable request = OrderTableTestFixture.create()
+                    .changeNumberOfGuests(5)
+                    .getOrderTable();
+
+            // when
+            OrderTable result = sut.changeNumberOfGuests(orderTable.getId(), request);
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getId()).isEqualTo(orderTable.getId());
+            assertThat(result.getNumberOfGuests()).isEqualTo(5);
+        }
+
+
     }
 }
