@@ -342,6 +342,25 @@ class OrderServiceTest {
                     .getOrder()));
         }
 
+        @DisplayName("포장 주문은 배달 주소, 주문 테이블 정보가 필요하지 않다.")
+        @Test
+        void createTakeOut() {
+            // given
+            Menu menu = menuIntegrationStep.create();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changeQuantity(1L)
+                    .changePrice(menu.getPrice())
+                    .getOrderLineItem();
 
+            // when & then
+            assertDoesNotThrow(() -> sut.create(OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(OrderType.TAKEOUT)
+                    .changeOrderTable(null)
+                    .changeDeliveryAddress(null)
+                    .getOrder()));
+        }
     }
 }
