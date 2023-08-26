@@ -637,5 +637,19 @@ class OrderServiceTest {
             // when & then
             assertThrows(IllegalStateException.class, () -> sut.complete(order.getId()));
         }
+
+        @DisplayName("주문 완료로 변경할 주문이 매장 식사 주문, 포장 주문일 때 주문 상태가 제공 상태가 아니라면 변경이 불가능하다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "WAITING", "DELIVERING", "DELIVERED", "COMPLETED"})
+        void completeEatInOrderStatusNotServedExceptionThrown(OrderStatus orderStatus) {
+            List<OrderType> orderTypes = List.of(OrderType.TAKEOUT, OrderType.EAT_IN);
+            orderTypes.forEach(orderType -> {
+                // given
+                Order order = orderIntegrationStep.createByTypeAndStatus(orderType, orderStatus);
+
+                // when & then
+                assertThrows(IllegalStateException.class, () -> sut.complete(order.getId()));
+            });
+        }
     }
 }
