@@ -209,7 +209,7 @@ class MenuServiceTest extends ApplicationServiceTest {
             );
             Menu menu = MenuFixture.createWithProducts("후라이드 치킨 세트", BigDecimal.valueOf(19_000L), products);
             Menu changingPriceMenu = MenuFixture.create(
-                menu.getId(), "후라이드 치킨 세트", changedPrice, menu.getMenuProducts()
+                menu.getId(), "후라이드 치킨 세트", changedPrice, menu.getMenuProducts(), true
             );
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -234,7 +234,7 @@ class MenuServiceTest extends ApplicationServiceTest {
             );
             Menu menu = MenuFixture.createWithProducts("후라이드 치킨 세트", BigDecimal.valueOf(20_000L), products);
             Menu changingPriceMenu = MenuFixture.create(
-                menu.getId(), "후라이드 치킨 세트", BigDecimal.valueOf(2_001L), menu.getMenuProducts()
+                menu.getId(), "후라이드 치킨 세트", BigDecimal.valueOf(2_001L), menu.getMenuProducts(), true
             );
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
