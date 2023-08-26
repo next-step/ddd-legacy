@@ -77,6 +77,19 @@ class OrderTableServiceTest {
             assertThat(result.getNumberOfGuests()).isEqualTo(0);
         }
 
+        @DisplayName("새롭게 등록하는 주문 테이블의 `테이블 사용 여부`는 `사용하지 않는 상태`로 생성된다.")
+        @Test
+        void createOccupied() {
+            // given
+            OrderTable orderTable = OrderTableTestFixture.create()
+                    .changeId(null)
+                    .getOrderTable();
 
+            // when
+            OrderTable result = sut.create(orderTable);
+
+            // then
+            assertThat(result.isOccupied()).isFalse();
+        }
     }
 }
