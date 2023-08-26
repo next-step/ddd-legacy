@@ -101,4 +101,18 @@ public class OrderTestFixture {
     public Order getOrder() {
         return order;
     }
+
+    public OrderTestFixture changeDeliveryAddress(String deliveryAddress) {
+        Order newOrder = new Order();
+        newOrder.setId(order.getId());
+        newOrder.setStatus(order.getStatus());
+        newOrder.setOrderTable(order.getOrderTable());
+        newOrder.setOrderTableId(order.getOrderTableId());
+        newOrder.setDeliveryAddress(deliveryAddress);
+        newOrder.setType(order.getType());
+        newOrder.setOrderLineItems(order.getOrderLineItems());
+        newOrder.setOrderDateTime(order.getOrderDateTime());
+        this.order = newOrder;
+        return this;
+    }
 }

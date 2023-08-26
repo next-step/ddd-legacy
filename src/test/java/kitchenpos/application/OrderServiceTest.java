@@ -233,5 +233,26 @@ class OrderServiceTest {
             // when & then
             assertThrows(IllegalArgumentException.class, () -> sut.create(order));
         }
+
+        @DisplayName("새로운 배달 주문은 배달주소가 비어있으면 예외가 발생한다.")
+        @ParameterizedTest
+        @NullAndEmptySource
+        void createDeliveryAddressNullExceptionThrown(String deliveryAddress) {
+            // given
+            Menu menu = menuIntegrationStep.create();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice())
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(OrderType.DELIVERY)
+                    .changeDeliveryAddress(deliveryAddress)
+                    .getOrder();
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> sut.create(order));
+        }
     }
 }
