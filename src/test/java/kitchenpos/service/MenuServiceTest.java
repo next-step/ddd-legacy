@@ -19,6 +19,7 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -78,6 +79,20 @@ public class MenuServiceTest {
         Menu menu = new Menu();
         menu.setPrice(new BigDecimal(0));
         menu.setMenuProducts(List.of(new MenuProduct()));
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 메뉴_생성_실패__메뉴상품의_갯수가_음수() {
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(new MenuGroup()));
+        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(new Product()));
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setQuantity(-1);
+        Menu menu = new Menu();
+        menu.setPrice(new BigDecimal(0));
+        menu.setMenuProducts(List.of(menuProduct));
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
