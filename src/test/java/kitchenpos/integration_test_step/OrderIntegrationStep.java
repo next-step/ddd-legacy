@@ -11,25 +11,35 @@ import java.util.Collections;
 public class OrderIntegrationStep {
     private final OrderRepository orderRepository;
     private final MenuIntegrationStep menuIntegrationStep;
+    private final OrderTableIntegrationStep orderTableIntegrationStep;
 
-    public OrderIntegrationStep(OrderRepository orderRepository, MenuIntegrationStep menuIntegrationStep) {
+    public OrderIntegrationStep(OrderRepository orderRepository, MenuIntegrationStep menuIntegrationStep, OrderTableIntegrationStep orderTableIntegrationStep) {
         this.orderRepository = orderRepository;
         this.menuIntegrationStep = menuIntegrationStep;
+        this.orderTableIntegrationStep = orderTableIntegrationStep;
     }
 
     public Order create() {
+        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
         Menu menu = menuIntegrationStep.create();
         OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
                 .changeMenu(menu)
                 .changePrice(menu.getPrice())
                 .getOrderLineItem();
         Order order = OrderTestFixture.create()
+                .changeOrderTable(orderTable)
+                .changeOrderTableId(orderTable)
                 .changeOrderLineItems(Collections.singletonList(orderLineItem))
                 .getOrder();
         return orderRepository.save(order);
     }
 
-    public Order createStatusWaiting(OrderTable orderTable) {
+    public Order createStatusAccept() {
+        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+        return createStatusAccept(orderTable);
+    }
+
+    public Order createStatusAccept(OrderTable orderTable) {
         Menu menu = menuIntegrationStep.create();
         OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
                 .changeMenu(menu)

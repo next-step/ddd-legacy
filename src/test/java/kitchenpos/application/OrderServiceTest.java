@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.integration_test_step.MenuIntegrationStep;
+import kitchenpos.integration_test_step.OrderIntegrationStep;
 import kitchenpos.integration_test_step.OrderTableIntegrationStep;
 import kitchenpos.test_fixture.MenuTestFixture;
 import kitchenpos.test_fixture.OrderLineItemTestFixture;
@@ -32,6 +33,9 @@ class OrderServiceTest {
 
     @Autowired
     private OrderService sut;
+
+    @Autowired
+    private OrderIntegrationStep orderIntegrationStep;
 
     @Autowired
     private MenuIntegrationStep menuIntegrationStep;
@@ -362,5 +366,31 @@ class OrderServiceTest {
                     .changeDeliveryAddress(null)
                     .getOrder()));
         }
+    }
+
+    @DisplayName("주문 상태 수락으로 변경")
+    @Nested
+    class Describe_accept {
+
+        @BeforeEach
+        void setUp() {
+            databaseCleanStep.clean();
+        }
+
+        @DisplayName("주문 상태를 수락으로 변경할 수 있다.")
+        @Test
+        void accept() {
+            // given
+            Order order = orderIntegrationStep.createStatusAccept();
+
+            // when
+            Order result = sut.accept(order.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        }
+
+
     }
 }

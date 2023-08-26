@@ -17,7 +17,7 @@ public class OrderTestFixture {
     public static OrderTestFixture create() {
         Order order = new Order();
         order.setId(UUID.randomUUID());
-        order.setStatus(OrderStatus.WAITING);
+        order.setStatus(OrderStatus.ACCEPTED);
         OrderTable orderTable = OrderTableTestFixture.create().getOrderTable();
         order.setOrderTable(orderTable);
         order.setOrderTableId(orderTable.getId());

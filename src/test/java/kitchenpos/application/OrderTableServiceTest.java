@@ -182,7 +182,7 @@ class OrderTableServiceTest {
             // given
             OrderTable orderTable = orderTableIntegrationStep.createEmptyTable();
             sut.sit(orderTable.getId());
-            orderIntegrationStep.createStatusWaiting(orderTable);
+            orderIntegrationStep.createStatusAccept(orderTable);
 
             // when & then
             assertThrows(IllegalStateException.class, () -> sut.clear(orderTable.getId()));
