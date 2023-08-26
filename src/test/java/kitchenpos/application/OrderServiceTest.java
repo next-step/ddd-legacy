@@ -519,6 +519,17 @@ class OrderServiceTest {
                 // when & then
                 assertThrows(NoSuchElementException.class, () -> sut.startDelivery(notPersistOrder.getId()));
             }
+
+            @DisplayName("주문 상태를 배달 중으로 변경할 때 주문 유형이 배달이 아니면 예외가 발생한다.")
+            @ParameterizedTest
+            @EnumSource(value = OrderType.class, names = {"TAKEOUT", "EAT_IN"})
+            void startDeliveryOrderTypeNotDeliveryExceptionThrown(OrderType orderType) {
+                // given
+                Order order = orderIntegrationStep.createServedOrderByType(orderType);
+
+                // when & then
+                assertThrows(IllegalStateException.class, () -> sut.startDelivery(order.getId()));
+            }
         }
     }
 }
