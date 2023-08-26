@@ -241,5 +241,18 @@ class OrderTableServiceTest {
             // when & then
             assertThrows(NoSuchElementException.class, () -> sut.changeNumberOfGuests(notPersistOrderTable.getId(), request));
         }
+
+        @DisplayName("주문 테이블의 `테이블에 앉은 고객 수`를 변경할 때 주문 테이블이 `비어있는 상태`이면 예외가 발생한다.")
+        @Test
+        void changeNumberOfGuestsNotOccupied() {
+            // given
+            OrderTable orderTable = orderTableIntegrationStep.createEmptyTable();
+            OrderTable request = OrderTableTestFixture.create()
+                    .changeNumberOfGuests(5)
+                    .getOrderTable();
+
+            // when & then
+            assertThrows(IllegalStateException.class, () -> sut.changeNumberOfGuests(orderTable.getId(), request));
+        }
     }
 }
