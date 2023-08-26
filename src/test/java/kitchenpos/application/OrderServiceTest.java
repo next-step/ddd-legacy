@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.integration_test_step.MenuIntegrationStep;
+import kitchenpos.test_fixture.MenuTestFixture;
 import kitchenpos.test_fixture.OrderLineItemTestFixture;
 import kitchenpos.test_fixture.OrderTestFixture;
 import org.junit.jupiter.api.BeforeEach;
@@ -115,6 +116,25 @@ class OrderServiceTest {
             Order order = OrderTestFixture.create()
                     .changeId(null)
                     .changeOrderLineItems(orderLineItems)
+                    .changeType(OrderType.DELIVERY)
+                    .getOrder();
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> sut.create(order));
+        }
+
+        @DisplayName("새로운 주문 생성 시 주문 메뉴가 존재하지 않는 메뉴면 예외가 발생한다.")
+        @Test
+        void createOrderLineItemsMenuNotFoundExceptionThrown() {
+            // given
+            Menu notPersistMenu = MenuTestFixture.create().getMenu();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(notPersistMenu)
+                    .changePrice(notPersistMenu.getPrice())
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
                     .changeType(OrderType.DELIVERY)
                     .getOrder();
 
