@@ -5,7 +5,6 @@ import kitchenpos.test_fixture.MenuGroupTestFixture;
 import kitchenpos.test_fixture.MenuProductTestFixture;
 import kitchenpos.test_fixture.MenuTestFixture;
 import kitchenpos.test_fixture.ProductTestFixture;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;

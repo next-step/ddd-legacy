@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.OrderTable;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
+import kitchenpos.integration_test_step.OrderTableIntegrationStep;
 import kitchenpos.test_fixture.OrderTableTestFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("OrderTableService 클래스")
@@ -21,6 +21,9 @@ class OrderTableServiceTest {
 
     @Autowired
     private OrderTableService sut;
+
+    @Autowired
+    private OrderTableIntegrationStep orderTableIntegrationStep;
 
     @Autowired
     private DatabaseCleanStep databaseCleanStep;
@@ -90,6 +93,26 @@ class OrderTableServiceTest {
 
             // then
             assertThat(result.isOccupied()).isFalse();
+        }
+    }
+
+    @DisplayName("주문 테이블을 테이블 사용 상태로 변경")
+    @Nested
+    class Describe_sit {
+
+        @DisplayName("주문 테이블에 고객이 앉았음을 등록할 수 있다.")
+        @Test
+        void sit() {
+            // given
+            OrderTable orderTable = orderTableIntegrationStep.create();
+
+            // when
+            OrderTable result = sut.sit(orderTable.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getId()).isEqualTo(orderTable.getId());
+            assertThat(result.isOccupied()).isTrue();
         }
     }
 }
