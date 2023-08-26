@@ -12,10 +12,11 @@ public class StringCalculator {
         }
 
         String[] strValue = split.split(text);
-        PositiveNumber number = Arrays.stream(strValue).map(PositiveNumber::toNumberValue)
-                .reduce(PositiveNumber::addValue).orElseThrow(RuntimeException::new);
-
-        return number.getValue();
+        return Arrays.stream(strValue)
+                .map(PositiveNumber::toNumberValue)
+                .reduce(PositiveNumber::addValue)
+                .orElseThrow(RuntimeException::new)
+                .getValue();
     }
 
     private boolean isBlank(final String text) {
