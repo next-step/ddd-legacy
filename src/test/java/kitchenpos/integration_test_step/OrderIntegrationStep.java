@@ -57,6 +57,11 @@ public class OrderIntegrationStep {
         return this.create(orderTable, OrderStatus.WAITING, OrderType.DELIVERY);
     }
 
+    public Order createDeliveryByStatus(OrderStatus orderStatus) {
+        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+        return this.create(orderTable, orderStatus, OrderType.DELIVERY);
+    }
+
     public Order create(OrderTable orderTable, OrderStatus orderStatus, OrderType orderType) {
         Menu menu = menuIntegrationStep.create();
         OrderLineItem orderLineItem = OrderLineItemTestFixture.create()

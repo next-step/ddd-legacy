@@ -530,6 +530,18 @@ class OrderServiceTest {
                 // when & then
                 assertThrows(IllegalStateException.class, () -> sut.startDelivery(order.getId()));
             }
+
+            @DisplayName("주문 상태를 배달 중으로 변경할 때 주문 상태가 제공 상태가 아니면 예외가 발생한다.")
+            @ParameterizedTest
+            @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "WAITING", "DELIVERING", "DELIVERED", "COMPLETED"})
+            void startDeliveryOrderStatusNotServedExceptionThrown(OrderStatus orderStatus) {
+                // given
+                Order order = orderIntegrationStep.createDeliveryByStatus(orderStatus);
+
+                // when & then
+                assertThrows(IllegalStateException.class, () -> sut.startDelivery(order.getId()));
+            }
+
         }
     }
 }
