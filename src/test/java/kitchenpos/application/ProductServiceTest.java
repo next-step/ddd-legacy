@@ -1,8 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,8 +16,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.fixture.TestFixture.TEST_MENU;
-import static kitchenpos.fixture.TestFixture.TEST_PRODUCT;
+import static kitchenpos.fixture.TestFixture.*;
+import static kitchenpos.fixture.TestFixture.TEST_MENU_PRODUCT;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -92,38 +90,57 @@ class ProductServiceTest {
         // given
         Product product = TEST_PRODUCT();
         Product changeProduct = TEST_PRODUCT();
-        changeProduct.setPrice(new BigDecimal(900));
+        changeProduct.setPrice(new BigDecimal(1500));
         UUID productId = product.getId();
         given(productRepository.findById(productId)).willReturn(Optional.of(product));
-        given(menuRepository.findAllByProductId(productId)).willReturn(List.of(TEST_MENU()));
 
         // when
+        Menu menu = TEST_MENU();
+        MenuProduct menuProduct = TEST_MENU_PRODUCT();
+        menuProduct.setProduct(changeProduct);
+        menuProduct.setProductId(changeProduct.getId());
+        menuProduct.setQuantity(2);
+        menu.setMenuProducts(List.of(menuProduct));
+        given(menuRepository.findAllByProductId(productId)).willReturn(List.of(menu));
+
         Product result = productService.changePrice(productId, changeProduct);
 
         // then
         verify(productRepository, times(1)).findById(productId);
         verify(menuRepository, times(1)).findAllByProductId(productId);
+        List<Menu> allByProductId = menuRepository.findAllByProductId(productId);
+
         assertThat(result.getPrice()).isEqualTo(changeProduct.getPrice());
+        assertThat(allByProductId).extracting("displayed").containsExactly(true);
     }
 
-    // TODO: 아직 작동안할 듯?
     @Test
     @DisplayName("가격 변경 후, 메뉴의 가격이 (메뉴에 포함된 상품들의 가격 x 개수) 총 합보다 높다면 메뉴를 비활성화 한다.")
     void changePriceAndHideTest() {
         // given
         Product product = TEST_PRODUCT();
         Product changeProduct = TEST_PRODUCT();
-        changeProduct.setPrice(new BigDecimal(100));
+        changeProduct.setPrice(new BigDecimal(10));
         UUID productId = product.getId();
         given(productRepository.findById(productId)).willReturn(Optional.of(product));
-        given(menuRepository.findAllByProductId(productId)).willReturn(List.of(TEST_MENU()));
 
         // when
+        Menu menu = TEST_MENU();
+        MenuProduct menuProduct = TEST_MENU_PRODUCT();
+        menuProduct.setProduct(changeProduct);
+        menuProduct.setProductId(changeProduct.getId());
+        menuProduct.setQuantity(2);
+        menu.setMenuProducts(List.of(menuProduct));
+        given(menuRepository.findAllByProductId(productId)).willReturn(List.of(menu));
+
         Product result = productService.changePrice(productId, changeProduct);
 
         // then
         verify(productRepository, times(1)).findById(productId);
         verify(menuRepository, times(1)).findAllByProductId(productId);
+        List<Menu> allByProductId = menuRepository.findAllByProductId(productId);
+
         assertThat(result.getPrice()).isEqualTo(changeProduct.getPrice());
+        assertThat(allByProductId).extracting("displayed").containsExactly(false);
     }
 }
