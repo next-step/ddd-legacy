@@ -589,4 +589,42 @@ class OrderServiceTest {
             assertThrows(IllegalStateException.class, () -> sut.completeDelivery(order.getId()));
         }
     }
+
+    @DisplayName("주문 상태를 완료로 변경")
+    @Nested
+    class Describe_complete {
+        @BeforeEach
+        void setUp() {
+            databaseCleanStep.clean();
+        }
+
+        @DisplayName("매장 식사 주문, 포장 주문의 상태를 완료로 변경할 수 있다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderType.class, names = {"TAKEOUT", "EAT_IN"})
+        void complete(OrderType orderType) {
+            // given
+            Order order = orderIntegrationStep.createByTypeAndStatus(orderType, OrderStatus.SERVED);
+
+            // when
+            Order result = sut.complete(order.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        }
+
+        @DisplayName("배달 주문의 상태를 완료로 변경할 수 있다.")
+        @Test
+        void complete() {
+            // given
+            Order order = orderIntegrationStep.createDeliveredDeliveryOrder();
+
+            // when
+            Order result = sut.complete(order.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        }
+    }
 }
