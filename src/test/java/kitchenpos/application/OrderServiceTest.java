@@ -389,7 +389,7 @@ class OrderServiceTest {
         @Test
         void accept() {
             // given
-            Order order = orderIntegrationStep.createStatusWaiting();
+            Order order = orderIntegrationStep.createWaitingEatInOrder();
 
             // when
             Order result = sut.accept(order.getId());
@@ -416,7 +416,7 @@ class OrderServiceTest {
         @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
         void acceptOrderStatusNotWaitingExceptionThrown(OrderStatus orderStatus) {
             // given
-            Order order = orderIntegrationStep.createStatus(orderStatus);
+            Order order = orderIntegrationStep.createEatInByStatus(orderStatus);
 
             // when & then
             assertThrows(IllegalStateException.class, () -> sut.accept(order.getId()));
@@ -453,7 +453,7 @@ class OrderServiceTest {
         @Test
         void served() {
             // given
-            Order order = orderIntegrationStep.createStatusAccept();
+            Order order = orderIntegrationStep.createAcceptEatInOrder();
 
             // when
             Order result = sut.serve(order.getId());
@@ -480,7 +480,7 @@ class OrderServiceTest {
         @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
         void servedOrderStatusNotAcceptedExceptionThrown(OrderStatus orderStatus) {
             // given
-            Order order = orderIntegrationStep.createStatus(orderStatus);
+            Order order = orderIntegrationStep.createEatInByStatus(orderStatus);
 
             // when & then
             assertThrows(IllegalStateException.class, () -> sut.serve(order.getId()));

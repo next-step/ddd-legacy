@@ -19,6 +19,11 @@ public class OrderIntegrationStep {
         this.orderTableIntegrationStep = orderTableIntegrationStep;
     }
 
+    public Order createEatInByStatus(OrderStatus orderStatus) {
+        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+        return this.create(orderTable, orderStatus, OrderType.EAT_IN);
+    }
+
     public Order createByTypeAndStatus(OrderType orderType, OrderStatus orderStatus) {
         OrderTable orderTable = orderTableIntegrationStep.createSitTable();
         return this.create(orderTable, orderStatus, orderType);
@@ -26,50 +31,37 @@ public class OrderIntegrationStep {
 
     public Order createServedOrderByType(OrderType orderType) {
         OrderTable orderTable = orderTableIntegrationStep.createSitTable();
-        return this.create(orderTable, OrderStatus.WAITING, orderType);
+        return this.create(orderTable, OrderStatus.SERVED, orderType);
     }
 
-    public Order createStatus(OrderStatus orderStatus) {
+    public Order createWaitingEatInOrder() {
         OrderTable orderTable = orderTableIntegrationStep.createSitTable();
-        return this.create(orderTable, orderStatus, OrderType.EAT_IN);
+        return this.createWaitingEatInOrder(orderTable);
     }
 
-    public Order createStatusWaiting() {
-        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
-        return this.createStatusWaiting(orderTable);
-    }
-
-    public Order createStatusWaiting(OrderTable orderTable) {
+    public Order createWaitingEatInOrder(OrderTable orderTable) {
         return this.create(orderTable, OrderStatus.WAITING, OrderType.EAT_IN);
     }
 
-    public Order createStatusAccept() {
+    public Order createAcceptEatInOrder() {
         OrderTable orderTable = orderTableIntegrationStep.createSitTable();
         return this.create(orderTable, OrderStatus.ACCEPTED, OrderType.EAT_IN);
     }
 
-    public Order createStatusCompleted() {
-        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
-        return this.create(orderTable, OrderStatus.COMPLETED, OrderType.EAT_IN);
-    }
-
-    public Order createStatusCompleted(OrderTable orderTable) {
+    public Order createCompletedEatInOrder(OrderTable orderTable) {
         return this.create(orderTable, OrderStatus.COMPLETED, OrderType.EAT_IN);
     }
 
     public Order createWaitingDeliveryOrder() {
-        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
-        return this.create(orderTable, OrderStatus.WAITING, OrderType.DELIVERY);
+        return this.createDeliveryByStatus(OrderStatus.WAITING);
     }
 
     public Order createServedDeliveryOrder() {
-        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
-        return this.create(orderTable, OrderStatus.SERVED, OrderType.DELIVERY);
+        return this.createDeliveryByStatus(OrderStatus.SERVED);
     }
 
     public Order createDeliveredDeliveryOrder() {
-        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
-        return this.create(orderTable, OrderStatus.DELIVERED, OrderType.DELIVERY);
+        return this.createDeliveryByStatus(OrderStatus.DELIVERED);
     }
 
     public Order createDeliveryByStatus(OrderStatus orderStatus) {

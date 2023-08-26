@@ -10,11 +10,11 @@
 
 ## step3 요구사항
 - 통합 테스트 코드 작성
-  - [ ] 상품(Product Business Object) 에 대한 테스트 작성
-  - [ ] 메뉴(Menu Business Object) 에 대한 테스트 작성
-  - [ ] 메뉴 그룹(Menu Group Business Object) 에 대한 테스트 작성
-  - [ ] 주문 테이블(Order Table Business Object) 에 대한 테스트 작성
-  - [ ] 주문(Order Business Object) 에 대한 테스트 작성
+  - [x] 상품(Product Business Object) 에 대한 테스트 작성
+  - [x] 메뉴(Menu Business Object) 에 대한 테스트 작성
+  - [x] 메뉴 그룹(Menu Group Business Object) 에 대한 테스트 작성
+  - [x] 주문 테이블(Order Table Business Object) 에 대한 테스트 작성
+  - [x] 주문(Order Business Object) 에 대한 테스트 작성
 - Controller 테스트 코드 작성
   - [ ] ProductRestController 테스트 작성
   - [ ] MenuRestController 테스트 작성
