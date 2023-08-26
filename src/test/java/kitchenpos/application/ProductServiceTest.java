@@ -68,6 +68,7 @@ class ProductServiceTest {
     @Nested
     @DisplayName("상품을 등록할 수 있다.")
     class create {
+
         @Test
         @DisplayName("등록")
         void create_1() {
@@ -84,6 +85,7 @@ class ProductServiceTest {
         @Nested
         @DisplayName("가격은 비어있거나 0보다 작으면 예외가 발생한다.")
         class create_2 {
+
             @Test
             @DisplayName("비어있는 경우")
             void create_2_1() {
@@ -110,6 +112,7 @@ class ProductServiceTest {
         @Nested
         @DisplayName("이름은 없거나 비속어 이면 예외가 발생한다.")
         class create_3 {
+
             @Test
             @DisplayName("비어있는 경우")
             void create_3_1() {
@@ -152,6 +155,7 @@ class ProductServiceTest {
     @Nested
     @DisplayName("상품의 가격을 변경할 수 있다.")
     class changePrice {
+
         @Test
         @DisplayName("변경")
         void changePrice_1() {
@@ -168,6 +172,7 @@ class ProductServiceTest {
         @Nested
         @DisplayName("가격은 비어있거나 0보다 작으면 예외가 발생한다.")
         class changePrice_2 {
+
             @Test
             @DisplayName("비어있는 경우")
             void changePrice_2_1() {
@@ -203,6 +208,7 @@ class ProductServiceTest {
         @Nested
         @DisplayName("가격이 바뀐 후 메뉴의 가격이 메뉴에 속한 상품들의 수량 * 가격 보다 크면 노출하지 않는다.")
         class changePrice_4 {
+
             @Test
             @DisplayName("노출하지 않는 경우")
             void changePrice_4_1() {

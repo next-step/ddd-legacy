@@ -55,6 +55,7 @@ class MenuGroupServiceTest {
     @Nested
     @DisplayName("메뉴그룹을 등록할 수 있다.")
     class create {
+
         @Test
         @DisplayName("등록")
         void create_1() {
