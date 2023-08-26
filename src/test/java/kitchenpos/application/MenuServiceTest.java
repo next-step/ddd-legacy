@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,7 +18,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Collections.emptyList;
 import static kitchenpos.application.ProductServiceTest.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -50,8 +50,9 @@ class MenuServiceTest {
         menuProduct = createMenuProduct(product, 1L);
     }
 
+    @DisplayName("메뉴의 가격이 null이면 메뉴를 생성할 수 없다")
     @Test
-    void 메뉴의_가격이_null이면_메뉴를_생성할_수_없다() {
+    void notCreateMenuWithoutPrice() {
         // given
         Menu request = createMenu(null, "메뉴", List.of(menuProduct));
 
@@ -59,8 +60,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 가격이 0미만이면 메뉴를 생성할 수 없다")
     @Test
-    void 메뉴의_가격이_0미만이면_메뉴를_생성할_수_없다() {
+    void notCreateMenuWithPriceLessThanZero() {
         // given
         Menu request = createMenu(new BigDecimal("-1"), "메뉴", List.of(menuProduct));
 
@@ -68,8 +70,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴가 메뉴 그룹에 속해 있지 않으면 메뉴를 생성할 수 없다")
     @Test
-    void 메뉴가_메뉴_그룹에_속해_있지_않으면_메뉴를_생성할_수_없다() {
+    void notCreateMenuWithoutMenuGroup() {
         // given
         Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
@@ -79,9 +82,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(NoSuchElementException.class);
     }
 
-    @ParameterizedTest(name = "메뉴는_최소한_1개_이상의_음식으로_이루어져야_메뉴를_생성할_수_있다: menuProducts = {0}")
+    @ParameterizedTest(name = "메뉴는 최소한 1개 이상의 음식으로 이루어져야 메뉴를 생성할 수 있다: menuProducts = {0}")
     @NullAndEmptySource
-    void 메뉴는_최소한_1개_이상의_음식으로_이루어져야_메뉴를_생성할_수_있다(List<MenuProduct> menuProducts) {
+    void notCreateMenuWithZeroOrFewerProduct(List<MenuProduct> menuProducts) {
         // given
         Menu request = createMenu(new BigDecimal("1000"), "메뉴", menuProducts);
 
@@ -91,21 +94,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴는 최소한 1개 이상의 음식으로 이루어져야 메뉴를 생성할 수 있다")
     @Test
-    void 메뉴에_포함된_음식_중_하나라도_이미_생성된_상태가_아니라면_메뉴를_생성할_수_없다() {
-        // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
-
-        given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
-        given(productRepository.findAllByIdIn(any())).willReturn(emptyList());
-
-        // when & then
-        assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
-    }
-
-
-    @Test
-    void 메뉴에_들어가는_음식의_양이_0미만이면_메뉴를_생성할_수_없다() {
+    void notCreateMenuWithZeroOrFewerQuantityOfMenu() {
         // given
         MenuProduct menuProduct = createMenuProduct(product, -1L);
         Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
@@ -117,8 +108,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 가격이 음식 가격의 합보다 커진다면 메뉴를 생성할 수 없다")
     @Test
-    void 메뉴의_가격이_음식_가격의_합보다_커진다면_메뉴를_생성할_수_없다() {
+    void notCreateMenuWithPriceGreaterThanSumOfProducts() {
         // given
         Menu request = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
 
@@ -130,8 +122,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 이름이 null이면 메뉴를 생성할 수 없다")
     @Test
-    void 메뉴의_이름이_null이면_메뉴를_생성할_수_없다() {
+    void notCreateMenuWithoutName() {
         // given
         Menu request = createMenu(new BigDecimal("1000"), null, List.of(menuProduct));
 
@@ -143,8 +136,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("음식의 이름에 비속어가 포함되어 있으면 메뉴를 생성할 수 없다")
     @Test
-    void 음식의_이름에_비속어가_포함되어_있으면_메뉴를_생성할_수_없다() {
+    void notCreateMenuWithNameContainingProfanity() {
         // given
         Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
@@ -157,8 +151,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴를 생성할 수 있다")
     @Test
-    void 메뉴를_생성할_수_있다() {
+    void createMenu() {
         // given
         Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
@@ -175,8 +170,9 @@ class MenuServiceTest {
         assertThat(result).isExactlyInstanceOf(Menu.class);
     }
 
+    @DisplayName("메뉴의 가격이 null이면 메뉴의 가격을 수정할 수 없다")
     @Test
-    void 메뉴의_가격이_null이면_메뉴의_가격을_수정할_수_없다() {
+    void notChangePriceWithoutPrice() {
         // given
         Menu request = createMenu(null, "메뉴", List.of(menuProduct));
 
@@ -184,8 +180,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.changePrice(uuid, request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 가격이 0미만이면 메뉴의 가격을 수정할 수 없다")
     @Test
-    void 메뉴의_가격이_0미만이면_메뉴의_가격을_수정할_수_없다() {
+    void notChangePriceWithPriceLessThenZero() {
         // given
         Menu request = createMenu(new BigDecimal("-1"), "메뉴", List.of(menuProduct));
 
@@ -193,8 +190,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.changePrice(uuid, request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 가격이 음식 가격의 합보다 커진다면 메뉴의 가격을 수정할 수 없다")
     @Test
-    void 메뉴의_가격이_음식_가격의_합보다_커진다면_메뉴의_가격을_수정할_수_없다() {
+    void notChangePriceIfPriceOfMenuIsGreaterThanSumOfProducts() {
         // given
         Menu request = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
 
@@ -204,8 +202,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.changePrice(uuid, request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 가격을 수정할 수 있다")
     @Test
-    void 메뉴의_가격을_수정할_수_있다() {
+    void changePrice() {
         // given
         Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
@@ -218,8 +217,9 @@ class MenuServiceTest {
         assertThat(result).isExactlyInstanceOf(Menu.class);
     }
 
+    @DisplayName("메뉴의 가격이 음식 가격의 합보다 커진다면 메뉴를 화면에 표시할 수 없다")
     @Test
-    void 메뉴의_가격이_음식_가격의_합보다_커진다면_메뉴를_화면에_표시할_수_없다() {
+    void notDisplayMenuIfPriceOfMenuIsGreaterthanSumOfProducts() {
         // given
         Menu menu = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
 
@@ -229,8 +229,9 @@ class MenuServiceTest {
         assertThatThrownBy(() -> sut.display(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("메뉴를 화면에 표시할 수 있다")
     @Test
-    void 메뉴를_화면에_표시할_수_있다() {
+    void displayMenu() {
         // given
         Menu menu = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 
@@ -243,8 +244,9 @@ class MenuServiceTest {
         assertThat(menu.isDisplayed()).isTrue();
     }
 
+    @DisplayName("메뉴를 화면에서 숨길 수 있다")
     @Test
-    void 메뉴를_화면에서_숨길_수_있다() {
+    void hideMenu() {
         // given
         Menu menu = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
 

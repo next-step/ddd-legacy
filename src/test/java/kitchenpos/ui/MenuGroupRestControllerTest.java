@@ -3,6 +3,7 @@ package kitchenpos.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,8 +35,9 @@ class MenuGroupRestControllerTest {
 
     private static final String BASE_URL = "/api/menu-groups";
 
+    @DisplayName("메뉴 그룹을 생성한다")
     @Test
-    void 메뉴_그룹을_생성한다() throws Exception {
+    void create() throws Exception {
         // given
         MenuGroup menuGroup = createMenuGroup("메뉴 그룹");
         given(menuGroupService.create(any())).willReturn(menuGroup);
@@ -51,8 +53,9 @@ class MenuGroupRestControllerTest {
                 .andExpect(jsonPath("$.name").value(menuGroup.getName()));
     }
 
+    @DisplayName("모든 메뉴 그룹을 조회한다")
     @Test
-    void 모든_메뉴_그룹을_조회한다() throws Exception {
+    void findAll() throws Exception {
         // given
         MenuGroup menuGroup1 = createMenuGroup("메뉴 그룹1");
         MenuGroup menuGroup2 = createMenuGroup("메뉴 그룹1");

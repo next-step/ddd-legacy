@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.application.OrderTableService;
 import kitchenpos.application.OrderTableServiceTest;
 import kitchenpos.domain.OrderTable;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -11,15 +12,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.List;
 
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,8 +34,9 @@ class OrderTableRestControllerTest {
 
     private static final String BASE_URL = "/api/order-tables";
 
+    @DisplayName("주문 테이블을 생성한다")
     @Test
-    void 주문_테이블을_생성한다() throws Exception {
+    void create() throws Exception {
         // given
         OrderTable orderTable = createOrderTable("테이블", 1, null);
 
@@ -56,8 +55,9 @@ class OrderTableRestControllerTest {
                 .andExpect(jsonPath("$.occupied").value(orderTable.isOccupied()));
     }
 
+    @DisplayName("주문 테이블에 착석 처리를 한다")
     @Test
-    void 주문_테이블에_착석_처리를_한다() throws Exception {
+    void sit() throws Exception {
         // given
         OrderTable orderTable = createOrderTable("테이블", 1, true);
 
@@ -73,8 +73,9 @@ class OrderTableRestControllerTest {
                 .andExpect(jsonPath("$.occupied").value(true));
     }
 
+    @DisplayName("주문 테이블에 비움 처리를 한다")
     @Test
-    void 주문_테이블에_비움_처리를_한다() throws Exception {
+    void createOrderTable() throws Exception {
         // given
         OrderTable orderTable = createOrderTable("테이블", 1, false);
 
@@ -90,8 +91,9 @@ class OrderTableRestControllerTest {
                 .andExpect(jsonPath("$.occupied").value(false));
     }
 
+    @DisplayName("주문 테이블에 착석한 손님의 숫자를 바꾼다")
     @Test
-    void 주문_테이블에_착석한_손님의_숫자를_바꾼다() throws Exception {
+    void changeNumberOfGuests() throws Exception {
         // given
         OrderTable orderTable = createOrderTable("테이블", 3, false);
 
@@ -108,8 +110,9 @@ class OrderTableRestControllerTest {
                 .andExpect(jsonPath("$.numberOfGuests").value(orderTable.getNumberOfGuests()));
     }
 
+    @DisplayName("모든 주문 테이블을 조회할 수 있다")
     @Test
-    void 모든_주문_테이블을_조회할_수_있다() throws Exception {
+    void findAll() throws Exception {
         // given
         OrderTable orderTable1 = createOrderTable("테이블1", 1, true);
         OrderTable orderTable2 = createOrderTable("테이블2", 2, false);

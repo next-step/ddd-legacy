@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,7 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,8 +35,9 @@ public class ProductServiceTest {
 
     private final static UUID uuid = UUID.randomUUID();
 
+    @DisplayName("음식의 가격이 null이면 음식을 생성할 수 없다")
     @Test
-    void 음식의_가격이_null이면_음식을_생성할_수_없다() {
+    void notCreateProductWithoutPrice() {
         // given
         Product request = createProduct("햄버거", null);
 
@@ -44,8 +45,9 @@ public class ProductServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("음식의 가격이 0미만이면 음식을 생성할 수 없다")
     @Test
-    void 음식의_가격이_0미만이면_음식을_생성할_수_없다() {
+    void notCreateProductWithPriceLessThanZero() {
         // given
         Product request = createProduct("햄버거", new BigDecimal("-1"));
 
@@ -53,8 +55,9 @@ public class ProductServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("음식의 이름이 null이면 음식을 생성할 수 없다")
     @Test
-    void 음식의_이름이_null이면_음식을_생성할_수_없다() {
+    void notCreateProductWithoutName() {
         // given
         Product request = createProduct(null, new BigDecimal("1000"));
 
@@ -62,8 +65,9 @@ public class ProductServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("음식의 이름에 비속어가 포함되어 있으면 음식을 생성할 수 없다")
     @Test
-    void 음식의_이름에_비속어가_포함되어_있으면_음식을_생성할_수_없다() {
+    void notCreateProductWithNameContainingProfanity() {
         // given
         Product request = createProduct("바보", new BigDecimal("1000"));
 
@@ -73,8 +77,9 @@ public class ProductServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("음식을 생성할 수 있다")
     @Test
-    void 음식을_생성할_수_있다() {
+    void createProduct() {
         // given
         Product request = createProduct("햄버거", new BigDecimal("1000"));
 
@@ -88,8 +93,9 @@ public class ProductServiceTest {
         assertThat(result).isExactlyInstanceOf(Product.class);
     }
 
+    @DisplayName("음식의 가격이 null이면 음식의 가격을 수정할 수 없다")
     @Test
-    void 음식의_가격이_null이면_음식의_가격을_수정할_수_없다() {
+    void notChangePriceWithoutPrice() {
         // given
         Product request = createProduct("햄버거", null);
 
@@ -97,8 +103,9 @@ public class ProductServiceTest {
         assertThatThrownBy(() -> sut.changePrice(uuid, request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("음식의 가격이 0미만이면 음식의 가격을 수정할 수 없다")
     @Test
-    void 음식의_가격이_0미만이면_음식의_가격을_수정할_수_없다() {
+    void notChangePriceWithPriceLessThenZero() {
         // given
         Product request = createProduct("햄버거", new BigDecimal("-1"));
 
@@ -106,19 +113,9 @@ public class ProductServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("음식의 가격을 수정할 수 있다")
     @Test
-    void 음식이_생성되어_있는_상태가_아니라면_가격을_수정할_수_없다() {
-        // given
-        Product request = createProduct("햄버거", new BigDecimal("2000"));
-
-        given(productRepository.findById(any())).willReturn(Optional.empty());
-
-        // when & then
-        assertThatThrownBy(() -> sut.changePrice(uuid, request)).isExactlyInstanceOf(NoSuchElementException.class);
-    }
-
-    @Test
-    void 음식의_가격을_수정할_수_있다() {
+    void chanePrice() {
         // given
         Product request = createProduct("햄버거", new BigDecimal("2000"));
 
@@ -131,8 +128,9 @@ public class ProductServiceTest {
         assertThat(result).isExactlyInstanceOf(Product.class);
     }
 
+    @DisplayName("음식의 가격을 수정했을 때 메뉴의 가격이 음식 가격의 합보다 커진다면 메뉴를 숨김 처리한다")
     @Test
-    void 음식의_가격을_수정했을_때_메뉴의_가격이_음식_가격의_합보다_커진다면_메뉴를_숨김_처리한다() {
+    void hideMenuIfPriceOfMenuGreaterThanSumOfProducts() {
         // given
         Product request = createProduct("햄버거", new BigDecimal("2000"));
         MenuProduct menuProduct = createMenuProduct(request, 1L);

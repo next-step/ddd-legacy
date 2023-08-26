@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,8 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public
-class MenuGroupServiceTest {
+public class MenuGroupServiceTest {
 
     @Mock
     private MenuGroupRepository menuGroupRepository;
@@ -29,9 +29,9 @@ class MenuGroupServiceTest {
 
     private static final UUID uuid = UUID.randomUUID();
 
-    @ParameterizedTest(name = "메뉴의_그룹의_이름이_없으면_메뉴_그룹을_생성할_수_없다: name = {0}")
+    @ParameterizedTest(name = "메뉴의 그룹의 이름이 없으면 메뉴 그룹을 생성할 수 없다: name = {0}")
     @NullAndEmptySource
-    void 메뉴의_그룹의_이름이_없으면_메뉴_그룹을_생성할_수_없다(String name) {
+    void notCreateMenuGroupWithoutName(String name) {
         // given
         MenuGroup menuGroup = createMenuGroup(name);
 
@@ -40,8 +40,9 @@ class MenuGroupServiceTest {
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴 그룹을 생성할 수 있다")
     @Test
-    void 메뉴_그룹을_생성할_수_있다() {
+    void createMenuGroup() {
         // given
         MenuGroup request = createMenuGroup("메뉴 그룹");
 

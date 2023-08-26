@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,9 +33,9 @@ class OrderTableServiceTest {
 
     private final static UUID uuid = UUID.randomUUID();
 
-    @ParameterizedTest(name = "주문_테이블의_이름이_없으면_주문_테이블을_생성할_수_없다: name = {0}")
+    @ParameterizedTest(name = "주문 테이블의 이름이 없으면 주문 테이블을 생성할 수 없다: name = {0}")
     @NullAndEmptySource
-    void 주문_테이블의_이름이_없으면_주문_테이블을_생성할_수_없다(String name) {
+    void notCreateOrderTableWithoutName(String name) {
         // given
         OrderTable request = createOrderTable(name, 3);
 
@@ -42,8 +43,9 @@ class OrderTableServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("주문 테이블을 생성할 수 있다")
     @Test
-    void 주문_테이블을_생성할_수_있다() {
+    void createOrderTable() {
         // given
         OrderTable request = createOrderTable("테이블1", 3);
 
@@ -56,8 +58,9 @@ class OrderTableServiceTest {
         assertThat(result).isExactlyInstanceOf(OrderTable.class);
     }
 
+    @DisplayName("주문 테이블에 착석 처리를 할 수 있다")
     @Test
-    void 주문_테이블에_착석_처리를_할_수_있다() {
+    void sit() {
         // given
         OrderTable orderTable = createOrderTable("테이블1", 3);
 
@@ -70,8 +73,9 @@ class OrderTableServiceTest {
         assertThat(orderTable.isOccupied()).isTrue();
     }
 
+    @DisplayName("착석 처리가 되어 있지 않은 주문 테이블에 비움 처리를 할 수 있다")
     @Test
-    void 착석_처리가_되어_있지_않은_주문_테이블에_비움_처리를_할_수_있다() {
+    void notClearIfNoOneIsSitting() {
         // given
         OrderTable orderTable = new OrderTable();
 
@@ -82,8 +86,9 @@ class OrderTableServiceTest {
         assertThatThrownBy(() -> sut.clear(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("주문 테이블에 비움 처리를 할 수 있다")
     @Test
-    void 주문_테이블에_비움_처리를_할_수_있다() {
+    void clear() {
         // given
         OrderTable orderTable = createOrderTable("테이블1", 3);
 
@@ -97,8 +102,9 @@ class OrderTableServiceTest {
         assertThat(orderTable.isOccupied()).isFalse();
     }
 
+    @DisplayName("손님의 수가 0미만이면 착석한 손님의 숫자를 바꿀 수 없다")
     @Test
-    void 손님의_수가_0미만이면_착석한_손님의_숫자를_바꿀_수_없다() {
+    void notChangeNumberOfGuestsIfNumberOfGuestsIsLessThanZero() {
         // given
         OrderTable request = createOrderTable("테이블1", -1);
 
@@ -107,8 +113,9 @@ class OrderTableServiceTest {
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("착석 상태가 아닌 주문 테이블의 손님의 숫자를 바꿀 수 없다")
     @Test
-    void 착석_상태가_아닌_주문_테이블의_손님의_숫자를_바꿀_수_없다() {
+    void notChangeNumberOfGuestsIfNoOneIsSitting() {
         // given
         OrderTable request = createOrderTable("테이블1", 3);
 
@@ -122,8 +129,9 @@ class OrderTableServiceTest {
                 .isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("주문 테이블의 손님의 숫자를 바꿀 수 있다")
     @Test
-    void 주문_테이블의_손님의_숫자를_바꿀_수_있다() {
+    void changeNumberOfGuests() {
         // given
         OrderTable request = createOrderTable("테이블1", 3);
         OrderTable orderTable = createOrderTable("테이블1", 3);

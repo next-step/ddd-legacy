@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.*;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -53,8 +54,9 @@ class OrderRestControllerTest {
         orderLineItem = createOrderLineItem(1L, menu.getPrice(), menu);
     }
 
+    @DisplayName("주문을 생성한다")
     @Test
-    void 주문을_생성한다() throws Exception {
+    void create() throws Exception {
         // given
         Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), null);
         Order order = createOrder(OrderType.EAT_IN, List.of(orderLineItem), null);
@@ -78,8 +80,9 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$.orderTable").exists());
     }
 
+    @DisplayName("주문을 수락한다")
     @Test
-    void 주문을_수락한다() throws Exception {
+    void accept() throws Exception {
         // given
         Order request = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.WAITING);
         Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
@@ -98,8 +101,9 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$.status").value(order.getStatus().name()));
     }
 
+    @DisplayName("주문을 제공한다")
     @Test
-    void 주문을_제공한다() throws Exception {
+    void serve() throws Exception {
         // given
         Order request = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
         Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.SERVED);
@@ -118,8 +122,9 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$.status").value(order.getStatus().name()));
     }
 
+    @DisplayName("배달을 시작한다")
     @Test
-    void 배달을_시작한다() throws Exception {
+    void startDelivery() throws Exception {
         // given
         Order request = createOngoingOrder(OrderType.DELIVERY, OrderStatus.ACCEPTED);
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
@@ -138,8 +143,9 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$.status").value(order.getStatus().name()));
     }
 
+    @DisplayName("배달을 완료한다")
     @Test
-    void 배달을_완료한다() throws Exception {
+    void completeDelivery() throws Exception {
         // given
         Order request = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
@@ -158,8 +164,9 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$.status").value(order.getStatus().name()));
     }
 
+    @DisplayName("주문을 완료한다")
     @Test
-    void 주문을_완료한다() throws Exception {
+    void complete() throws Exception {
         // given
         Order request = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.COMPLETED);
@@ -178,8 +185,9 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$.status").value(order.getStatus().name()));
     }
 
+    @DisplayName("모든 주문을 조회한다")
     @Test
-    void 모든_주문을_조회한다() throws Exception {
+    void findAll() throws Exception {
         // given
         Order order1 = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
         Order order2 = createOngoingOrder(OrderType.EAT_IN, OrderStatus.COMPLETED);

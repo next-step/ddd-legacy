@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -58,8 +59,9 @@ public class OrderServiceTest {
         orderLineItem = createOrderLineItem(1L, menu.getPrice(), menu);
     }
 
+    @DisplayName("주문 타입이 null이면 주문을 생성할 수 없다")
     @Test
-    void 주문_타입이_null이면_주문을_생성할_수_없다() {
+    void notCreateOrderWithoutOrderType() {
         // given
         Order request = new Order();
         request.setType(null);
@@ -68,9 +70,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    @ParameterizedTest(name = "주문은_최소한_1개_이상의_상품으로_이루어져야_주문을_생성할_수_있다: orderLineItems = {0}")
+    @ParameterizedTest(name = "주문은 최소한 1개 이상의 상품으로 이루어져야 주문을 생성할 수 있다: orderLineItems = {0}")
     @NullAndEmptySource
-    void 주문은_최소한_1개_이상의_상품으로_이루어져야_주문을_생성할_수_있다(List<OrderLineItem> orderLineItems) {
+    void notCreateOrderWithZeroOrFewerProduct(List<OrderLineItem> orderLineItems) {
         // given
         Order request = createOrder(OrderType.EAT_IN, orderLineItems, "주소지");
 
@@ -78,8 +80,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("포장 및 배달 주문의 경우 주문할 메뉴의 양이 0 이상이어야 한다")
     @Test
-    void 포장_및_배달_주문의_경우_주문할_메뉴의_양이_0_이상이어야_한다() {
+    void notCreateTakeoutOrDeliveryOrderWithQuantityOfMenuLessThanZero() {
         // given
         Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), "주소지");
 
@@ -89,9 +92,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    @ParameterizedTest(name = "포장_및_배달_주문의_경우_주문할_메뉴의_양이_0이상이_아니라면_주문을_생성할_수_없다: orderType = {0}")
+    @ParameterizedTest(name = "포장 및 배달 주문의 경우 주문할 메뉴의 양이 0이상이 아니라면 주문을 생성할 수 없다: orderType = {0}")
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT"})
-    void 포장_및_배달_주문의_경우_주문할_메뉴의_양이_0이상이_아니라면_주문을_생성할_수_없다(OrderType orderType) {
+    void notCreateTakeoutOrDeliveryOrderWithQuantityOfMenuLessThanZero(OrderType orderType) {
         // given
         OrderLineItem orderLineItem = createOrderLineItem(-1L, menu.getPrice(), menu);
         Order request = createOrder(orderType, List.of(orderLineItem), "주소지");
@@ -102,8 +105,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("화면에 표시되지 않고 있는 메뉴를 주문한 경우엔 주문을 생성할 수 없다")
     @Test
-    void 화면에_표시되지_않고_있는_메뉴를_주문한_경우엔_주문을_생성할_수_없다() {
+    void noteCreateOrderIfMenuIsHidden() {
         // given
         menu.setDisplayed(false);
 
@@ -116,8 +120,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("메뉴의 현재 가격과 주문시점의 메뉴 가격이 다르면 주문을 생성할 수 없다")
     @Test
-    void 메뉴의_현재_가격과_주문시점의_메뉴_가격이_다르면_주문을_생성할_수_없다() {
+    void notCreateOrderIfMenuPriceIsDifferentFromOrderPoint() {
         // given
         OrderLineItem orderLineItem = createOrderLineItem(1L, new BigDecimal("3000"), menu);
         Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), "주소지");
@@ -129,9 +134,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    @ParameterizedTest(name = "배달_주문의_경우_주소지가_없다면_주문을_생성할_수_없다: deliveryAddress = {0}")
+    @ParameterizedTest(name = "배달 주문의 경우 주소지가 없다면 주문을 생성할 수 없다: deliveryAddress = {0}")
     @NullAndEmptySource
-    void 배달_주문의_경우_주소지가_없다면_주문을_생성할_수_없다(String deliveryAddress) {
+    void notCreateDeliveryOrderIfNoAddress(String deliveryAddress) {
         // given
         Order request = createOrder(OrderType.DELIVERY, List.of(orderLineItem), deliveryAddress);
 
@@ -142,8 +147,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("매장에서 식사하는 경우 테이블에 착석해 있지 않다면 주문을 생성할 수 없다")
     @Test
-    void 매장에서_식사하는_경우_테이블에_착석해_있지_않다면_주문을_생성할_수_없다() {
+    void notCreateEatInOrderIfNotSitting() {
         // given
         Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), "주소");
 
@@ -157,8 +163,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("주문을 생성할 수 있다")
     @Test
-    void 주문을_생성할_수_있다() {
+    void createOrder() {
         // given
         Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), "주소");
 
@@ -174,8 +181,9 @@ public class OrderServiceTest {
         assertThat(result).isExactlyInstanceOf(Order.class);
     }
 
+    @DisplayName("주문이 대기중이 아닌 경우에는 수락 처리할 수 없다")
     @Test
-    void 주문이_대기중이_아닌_경우에는_수락_처리할_수_없다() {
+    void notAcceptOrderIfOrderStatusIsNotWaiting() {
         // given
         Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
 
@@ -185,8 +193,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.accept(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("주문을 수락 처리할 수 있다")
     @Test
-    void 주문을_수락_처리할_수_있다() {
+    void acceptOrder() {
         // given
         Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.WAITING);
 
@@ -199,8 +208,9 @@ public class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
+    @DisplayName("배달 주문의 수락처리는 kitchenridersClient 배달 요청 API를 요청한 후에 이뤄진다")
     @Test
-    void 배달_주문의_수락처리는_kitchenridersClient_배달_요청_API를_요청한_후에_이뤄진다() {
+    void acceptDeliveryOrderAfterRequestingKitchenidersClientAPI() {
         // given
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.WAITING);
         order.setOrderLineItems(List.of(orderLineItem));
@@ -215,8 +225,9 @@ public class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
+    @DisplayName("수락 상태가 아닌 주문을 제공 처리할 수 없다")
     @Test
-    void 수락_상태가_아닌_주문을_제공_처리할_수_없다() {
+    void notServeOrderIfOrderStatusIsNotAccepted() {
         // given
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.WAITING);
 
@@ -226,8 +237,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.serve(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("주문을 제공 처리할 수 있다")
     @Test
-    void 주문을_제공_처리할_수_있다() {
+    void serveOrder() {
         // given
         Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
 
@@ -240,8 +252,9 @@ public class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
+    @DisplayName("배달 주문이 아닌 경우 배달을 시작 처리할 수 없다")
     @Test
-    void 배달_주문이_아닌_경우_배달을_시작_처리할_수_없다() {
+    void notStartDeliveryIfOrderTypeIsNotDelivery() {
         // given
         Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
 
@@ -251,8 +264,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.startDelivery(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("주문이 제공인 상태가 아닌 경우 배달을 시작 처리할 수 없다")
     @Test
-    void 주문이_제공인_상태가_아닌_경우_배달을_시작_처리할_수_없다() {
+    void notStartDeliveryIfOrderStatusIsNotServed() {
         // given
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.ACCEPTED);
 
@@ -262,8 +276,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.startDelivery(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("배달을 시작 처리할 수 있다")
     @Test
-    void 배달을_시작_처리할_수_있다() {
+    void startDelivery() {
         // given
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.SERVED);
 
@@ -276,8 +291,9 @@ public class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     }
 
+    @DisplayName("배달을 시작한 상태가 아닌 경우 배달을 완료 처리할 수 없다")
     @Test
-    void 배달을_시작한_상태가_아닌_경우_배달을_완료_처리할_수_없다() {
+    void notCompleteDeliveryIfOrderStatusIsNotDelivering() {
         // given
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.SERVED);
 
@@ -287,8 +303,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.completeDelivery(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("배달을 완료 처리할 수 있다")
     @Test
-    void 배달을_완료_처리할_수_있다() {
+    void completeDelivery() {
         // given
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
 
@@ -301,8 +318,9 @@ public class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
+    @DisplayName("배달 주문이면서 배달 완료 상태가 아닌 경우 주문을 완료 처리할 수 없다")
     @Test
-    void 배달_주문이면서_배달_완료_상태가_아닌_경우_주문을_완료_처리할_수_없다() {
+    void notCompleteDeliveryOrderIfOrderStatusIsNotDelivered() {
         // given
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
 
@@ -312,9 +330,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.complete(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
-    @ParameterizedTest(name = "포장_주문_또는_매장에서_식사하는_경우_제공_상태가_아닌_경우_주문을_완료_처리할_수_없다: orderType = {0}")
+    @ParameterizedTest(name = "포장 주문 또는 매장에서 식사하는 경우 제공 상태가 아닌 경우 주문을 완료 처리할 수 없다: orderType = {0}")
     @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
-    void 포장_주문_또는_매장에서_식사하는_경우_제공_상태가_아닌_경우_주문을_완료_처리할_수_없다(OrderType orderType) {
+    void notCompleteTakeoutOrEatInOrderIfOrderStatusIsNotServiced(OrderType orderType) {
         // given
         Order order = createOngoingOrder(orderType, OrderStatus.ACCEPTED);
 
@@ -324,8 +342,9 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.complete(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @DisplayName("배달 주문을 완료 처리할 수 있다")
     @Test
-    void 배달_주문을_완료_처리할_수_있다() {
+    void completeDeliveryOrder() {
         // given
         Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
 
@@ -338,8 +357,9 @@ public class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
+    @DisplayName("포장 주문을 완료 처리할 수 있다")
     @Test
-    void 포장_주문을_완료_처리할_수_있다() {
+    void completeTakeOutOrder() {
         // given
         Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.SERVED);
 
@@ -352,8 +372,9 @@ public class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
+    @DisplayName("매장에서 식사하는 주문을 완료 처리할 수 있다")
     @Test
-    void 매장에서_식사하는_주문을_완료_처리할_수_있다() {
+    void completeEatInOrder() {
         // given
         Order order = createOngoingOrder(OrderType.EAT_IN, OrderStatus.SERVED);
         order.setOrderTable(orderTable);

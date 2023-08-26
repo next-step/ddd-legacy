@@ -3,6 +3,7 @@ package kitchenpos.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.Product;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -35,8 +36,9 @@ class ProductRestControllerTest {
 
     private static final String BASE_URL = "/api/products";
 
+    @DisplayName("음식을 생성한다")
     @Test
-    void 음식을_생성한다() throws Exception {
+    void create() throws Exception {
         // given
         Product product = createProduct("강정치킨", new BigDecimal("17000"));
         given(productService.create(any())).willReturn(product);
@@ -53,8 +55,9 @@ class ProductRestControllerTest {
                 .andExpect(jsonPath("$.price").value(product.getPrice()));
     }
 
+    @DisplayName("모든 음식을 조회한다")
     @Test
-    void 모든_음식을_조회한다() throws Exception {
+    void findAll() throws Exception {
         // given
         Product product1 = createProduct("강정치킨", new BigDecimal("17000"));
         Product product2 = createProduct("코카콜라", new BigDecimal("2000"));
