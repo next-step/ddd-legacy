@@ -5,6 +5,7 @@ import kitchenpos.fixture.OrderFixtures;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -19,7 +20,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Collections.emptyList;
 import static kitchenpos.fixture.MenuFixtures.createMenu;
 import static kitchenpos.fixture.MenuFixtures.createMenuProduct;
 import static kitchenpos.fixture.OrderFixtures.*;
@@ -80,18 +80,6 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("포장 및 배달 주문의 경우 주문할 메뉴의 양이 0 이상이어야 한다")
-    @Test
-    void notCreateTakeoutOrDeliveryOrderWithQuantityOfMenuLessThanZero() {
-        // given
-        Order request = eatInOrder();
-
-        given(menuRepository.findAllByIdIn(any())).willReturn(emptyList());
-
-        // when & then
-        assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
-    }
-
     @ParameterizedTest(name = "포장 및 배달 주문의 경우 주문할 메뉴의 양이 0이상이 아니라면 주문을 생성할 수 없다: orderType = {0}")
     @EnumSource(value = OrderType.class, names = {"DELIVERY", "TAKEOUT"})
     void notCreateTakeoutOrDeliveryOrderWithQuantityOfMenuLessThanZero(OrderType orderType) {
@@ -105,13 +93,13 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("화면에 표시되지 않고 있는 메뉴를 주문한 경우엔 주문을 생성할 수 없다")
-    @Test
-    void notCreateOrderIfMenuIsHidden() {
+    @ParameterizedTest(name = "화면에 표시되지 않고 있는 메뉴를 주문한 경우엔 주문을 생성할 수 없다: orderType = {0}")
+    @EnumSource(value = OrderType.class)
+    void notCreateOrderIfMenuIsHidden(OrderType orderType) {
         // given
         menu.setDisplayed(false);
 
-        Order request = eatInOrder();
+        Order request = createOrder(orderType);
 
         given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -120,12 +108,12 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("메뉴의 현재 가격과 주문시점의 메뉴 가격이 다르면 주문을 생성할 수 없다")
-    @Test
-    void notCreateOrderIfMenuPriceIsDifferentFromOrderPoint() {
+    @ParameterizedTest(name = "메뉴의 현재 가격과 주문시점의 메뉴 가격이 다르면 주문을 생성할 수 없다: orderType = {0}")
+    @EnumSource(value = OrderType.class)
+    void notCreateOrderIfMenuPriceIsDifferentFromOrderPoint(OrderType orderType) {
         // given
         OrderLineItem orderLineItem = createOrderLineItem(1L, new BigDecimal("3000"), menu);
-        Order request = eatInOrder(List.of(orderLineItem));
+        Order request = createOrder(orderType, List.of(orderLineItem));
 
         given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -163,29 +151,69 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
+    @Nested
     @DisplayName("주문을 생성할 수 있다")
-    @Test
-    void create() {
-        // given
-        Order request = eatInOrder();
+    class CreateOrder {
 
-        given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
-        given(orderRepository.save(any())).willReturn(new Order());
+        @DisplayName("매장에서 식사")
+        @Test
+        void eatIn() {
+            // given
+            Order request = eatInOrder();
 
-        // when
-        Order result = sut.create(request);
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+            given(orderRepository.save(any())).willReturn(new Order());
 
-        // then
-        assertThat(result).isExactlyInstanceOf(Order.class);
+            // when
+            Order result = sut.create(request);
+
+            // then
+            assertThat(result).isExactlyInstanceOf(Order.class);
+        }
+
+        @DisplayName("포장 주문")
+        @Test
+        void takeout() {
+            // given
+            Order request = takeoutOrder();
+
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            given(orderRepository.save(any())).willReturn(new Order());
+
+            // when
+            Order result = sut.create(request);
+
+            // then
+            assertThat(result).isExactlyInstanceOf(Order.class);
+        }
+
+        @Test
+        @DisplayName("배달 주문")
+        void delivery() {
+            // given
+            Order request = deliveryOrder();
+
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            given(orderRepository.save(any())).willReturn(new Order());
+
+            // when
+            Order result = sut.create(request);
+
+            // then
+            assertThat(result).isExactlyInstanceOf(Order.class);
+        }
+
     }
 
-    @DisplayName("주문이 대기중이 아닌 경우에는 수락 처리할 수 없다")
-    @Test
-    void notAcceptOrderIfOrderStatusIsNotWaiting() {
+    @ParameterizedTest(name = "주문이 대기중이 아닌 경우에는 수락 처리할 수 없다: orderType = {0}")
+    @EnumSource(value = OrderType.class)
+    void notAcceptOrderIfOrderStatusIsNotWaiting(OrderType orderType) {
         // given
-        Order order = takeoutOrder(OrderStatus.ACCEPTED);
+        Order order = createOrder(orderType, OrderStatus.ACCEPTED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -193,11 +221,11 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.accept(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("주문을 수락 처리할 수 있다")
-    @Test
-    void acceptOrder() {
+    @ParameterizedTest(name = "주문을 수락 처리할 수 있다: orderType = {0}")
+    @EnumSource(value = OrderType.class)
+    void acceptOrder(OrderType orderType) {
         // given
-        Order order = takeoutOrder(OrderStatus.WAITING);
+        Order order = createOrder(orderType, OrderStatus.WAITING);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -213,7 +241,6 @@ public class OrderServiceTest {
     void acceptDeliveryOrderAfterRequestingKitchenidersClientAPI() {
         // given
         Order order = deliveryOrder(OrderStatus.WAITING);
-        order.setOrderLineItems(List.of(orderLineItem));
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -225,11 +252,11 @@ public class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
-    @DisplayName("수락 상태가 아닌 주문을 제공 처리할 수 없다")
-    @Test
-    void notServeOrderIfOrderStatusIsNotAccepted() {
+    @ParameterizedTest(name = "수락 상태가 아닌 주문을 제공 처리할 수 없다: orderType = {0}")
+    @EnumSource(value = OrderType.class)
+    void notServeOrderIfOrderStatusIsNotAccepted(OrderType orderType) {
         // given
-        Order order = deliveryOrder(OrderStatus.WAITING);
+        Order order = createOrder(orderType, OrderStatus.WAITING);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -237,8 +264,8 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.serve(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("주문을 제공 처리할 수 있다")
-    @Test
+    @ParameterizedTest(name = "주문을 제공 처리할 수 있다: orderType = {0}")
+    @EnumSource(value = OrderType.class)
     void serveOrder() {
         // given
         Order order = takeoutOrder(OrderStatus.ACCEPTED);
@@ -252,11 +279,11 @@ public class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
-    @DisplayName("배달 주문이 아닌 경우 배달을 시작 처리할 수 없다")
-    @Test
-    void notStartDeliveryIfOrderTypeIsNotDelivery() {
+    @ParameterizedTest(name = "배달 주문이 아닌 경우 배달을 시작 처리할 수 없다: orderType = {0}")
+    @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
+    void notStartDeliveryIfOrderTypeIsNotDelivery(OrderType orderType) {
         // given
-        Order order = takeoutOrder(OrderStatus.ACCEPTED);
+        Order order = createOrder(orderType, OrderStatus.ACCEPTED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -342,52 +369,56 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> sut.complete(uuid)).isExactlyInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("배달 주문을 완료 처리할 수 있다")
-    @Test
-    void completeDeliveryOrder() {
-        // given
-        Order order = deliveryOrder(OrderStatus.DELIVERED);
+    @Nested
+    @DisplayName("주문을 완료할 수 있다")
+    class CompleteOrder {
+        @DisplayName("매장에서 식사")
+        @Test
+        void completeEatInOrder() {
+            // given
+            Order order = eatInOrder(OrderStatus.SERVED);
+            order.setOrderTable(orderTable);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
 
-        // when
-        sut.complete(uuid);
+            // when
+            sut.complete(uuid);
 
-        // then
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-    }
+            // then
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            assertThat(orderTable.getNumberOfGuests()).isZero();
+            assertThat(orderTable.isOccupied()).isFalse();
+        }
 
-    @DisplayName("포장 주문을 완료 처리할 수 있다")
-    @Test
-    void completeTakeOutOrder() {
-        // given
-        Order order = takeoutOrder(OrderStatus.SERVED);
+        @DisplayName("포장 주문")
+        @Test
+        void completeTakeOutOrder() {
+            // given
+            Order order = takeoutOrder(OrderStatus.SERVED);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
-        // when
-        sut.complete(uuid);
+            // when
+            sut.complete(uuid);
 
-        // then
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-    }
+            // then
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        }
 
-    @DisplayName("매장에서 식사하는 주문을 완료 처리할 수 있다")
-    @Test
-    void completeEatInOrder() {
-        // given
-        Order order = eatInOrder(OrderStatus.SERVED);
-        order.setOrderTable(orderTable);
+        @DisplayName("배달 주문")
+        @Test
+        void completeDeliveryOrder() {
+            // given
+            Order order = deliveryOrder(OrderStatus.DELIVERED);
 
-        given(orderRepository.findById(any())).willReturn(Optional.of(order));
-        given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
-        // when
-        sut.complete(uuid);
+            // when
+            sut.complete(uuid);
 
-        // then
-        assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-        assertThat(orderTable.getNumberOfGuests()).isZero();
-        assertThat(orderTable.isOccupied()).isFalse();
+            // then
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        }
     }
 }
