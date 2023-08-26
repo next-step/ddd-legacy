@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("OrderService 클래스")
 @SpringBootTest
@@ -81,6 +82,25 @@ class OrderServiceTest {
             // then
             assertThat(result).isNotNull();
             assertThat(result.getStatus()).isEqualTo(OrderStatus.WAITING);
+        }
+
+        @DisplayName("새로운 주문 생성 시 주문 유형이 비어있으면 예외가 발생한다.")
+        @Test
+        void createOrderTypeNullExceptionThrown() {
+            // given
+            Menu menu = menuIntegrationStep.create();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice())
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(null)
+                    .getOrder();
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> sut.create(order));
         }
     }
 }
