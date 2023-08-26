@@ -21,7 +21,7 @@ public class OrderIntegrationStep {
 
     public Order createStatus(OrderStatus orderStatus) {
         OrderTable orderTable = orderTableIntegrationStep.createSitTable();
-        return this.create(orderTable, orderStatus);
+        return this.create(orderTable, orderStatus, OrderType.EAT_IN);
     }
 
     public Order createStatusWaiting() {
@@ -30,7 +30,7 @@ public class OrderIntegrationStep {
     }
 
     public Order createStatusWaiting(OrderTable orderTable) {
-        return this.create(orderTable, OrderStatus.WAITING);
+        return this.create(orderTable, OrderStatus.WAITING, OrderType.EAT_IN);
     }
 
     public Order createStatusCompleted() {
@@ -39,10 +39,15 @@ public class OrderIntegrationStep {
     }
 
     public Order createStatusCompleted(OrderTable orderTable) {
-        return this.create(orderTable, OrderStatus.COMPLETED);
+        return this.create(orderTable, OrderStatus.COMPLETED, OrderType.EAT_IN);
     }
 
-    public Order create(OrderTable orderTable, OrderStatus orderStatus) {
+    public Order createWaitingDeliveryOrder() {
+        OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+        return this.create(orderTable, OrderStatus.WAITING, OrderType.DELIVERY);
+    }
+
+    public Order create(OrderTable orderTable, OrderStatus orderStatus, OrderType orderType) {
         Menu menu = menuIntegrationStep.create();
         OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
                 .changeMenu(menu)
@@ -52,6 +57,7 @@ public class OrderIntegrationStep {
                 .changeOrderLineItems(Collections.singletonList(orderLineItem))
                 .changeOrderTable(orderTable)
                 .changeOrderTableId(orderTable)
+                .changeType(orderType)
                 .changeStatus(orderStatus)
                 .getOrder();
         return orderRepository.save(order);

@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.infra.KitchenridersClient;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.integration_test_step.MenuIntegrationStep;
 import kitchenpos.integration_test_step.OrderIntegrationStep;
@@ -17,6 +18,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -27,6 +29,9 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("OrderService 클래스")
 @SpringBootTest
@@ -43,6 +48,9 @@ class OrderServiceTest {
 
     @Autowired
     private OrderTableIntegrationStep orderTableIntegrationStep;
+
+    @MockBean
+    private KitchenridersClient kitchenridersClient;
 
     @Autowired
     private DatabaseCleanStep databaseCleanStep;
@@ -414,5 +422,24 @@ class OrderServiceTest {
             // when & then
             assertThrows(IllegalStateException.class, () -> sut.accept(order.getId()));
         }
+
+        @DisplayName("배달 주문이라면 주문 상태를 수락으로 변경할 때 (주문고유 번호, 주문의 가격, 배달주소) 정보들을 배달기사 배정 회사에 배달을 요청해야한다.")
+        @Test
+        void acceptDeliveryOrder() {
+            // given
+            Order order = orderIntegrationStep.createWaitingDeliveryOrder();
+            BigDecimal orderPrice = order.getOrderLineItems().stream()
+                    .map(orderLineItem -> orderLineItem.getMenu().getPrice().multiply(BigDecimal.valueOf(orderLineItem.getQuantity())))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            doNothing().when(kitchenridersClient).requestDelivery(order.getId(), orderPrice, order.getDeliveryAddress());
+            // when
+            Order result = sut.accept(order.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+            verify(kitchenridersClient).requestDelivery(order.getId(), orderPrice, order.getDeliveryAddress());
+        }
+
     }
 }
