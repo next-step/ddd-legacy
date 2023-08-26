@@ -15,14 +15,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kitchenpos.fixture.OrderTableFixtures.createOrderTable;
+import static kitchenpos.fixture.OrderTableFixtures.unoccupiedOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public
-class OrderTableServiceTest {
+public class OrderTableServiceTest {
     @Mock
     private OrderTableRepository orderTableRepository;
     @Mock
@@ -45,9 +46,9 @@ class OrderTableServiceTest {
 
     @DisplayName("주문 테이블을 생성할 수 있다")
     @Test
-    void createOrderTable() {
+    void create() {
         // given
-        OrderTable request = createOrderTable("테이블1", 3);
+        OrderTable request = createOrderTable();
 
         given(orderTableRepository.save(any())).willReturn(request);
 
@@ -62,7 +63,7 @@ class OrderTableServiceTest {
     @Test
     void sit() {
         // given
-        OrderTable orderTable = createOrderTable("테이블1", 3);
+        OrderTable orderTable = createOrderTable();
 
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
@@ -90,7 +91,7 @@ class OrderTableServiceTest {
     @Test
     void clear() {
         // given
-        OrderTable orderTable = createOrderTable("테이블1", 3);
+        OrderTable orderTable = createOrderTable();
 
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
@@ -117,10 +118,8 @@ class OrderTableServiceTest {
     @Test
     void notChangeNumberOfGuestsIfNoOneIsSitting() {
         // given
-        OrderTable request = createOrderTable("테이블1", 3);
-
-        OrderTable orderTable = createOrderTable("테이블1", 3);
-        orderTable.setOccupied(false);
+        OrderTable request = createOrderTable();
+        OrderTable orderTable = unoccupiedOrderTable();
 
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
@@ -133,8 +132,8 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests() {
         // given
-        OrderTable request = createOrderTable("테이블1", 3);
-        OrderTable orderTable = createOrderTable("테이블1", 3);
+        OrderTable request = createOrderTable();
+        OrderTable orderTable = createOrderTable();
 
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
@@ -143,14 +142,5 @@ class OrderTableServiceTest {
 
         // then
         assertThat(orderTable.getNumberOfGuests()).isEqualTo(3);
-    }
-
-    public static OrderTable createOrderTable(String name, int numberOfGuests) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(uuid);
-        orderTable.setName(name);
-        orderTable.setNumberOfGuests(numberOfGuests);
-        orderTable.setOccupied(true);
-        return orderTable;
     }
 }

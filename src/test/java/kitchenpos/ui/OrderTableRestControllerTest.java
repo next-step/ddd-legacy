@@ -2,8 +2,8 @@ package kitchenpos.ui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.application.OrderTableService;
-import kitchenpos.application.OrderTableServiceTest;
 import kitchenpos.domain.OrderTable;
+import kitchenpos.fixture.OrderTableFixtures;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,7 +140,7 @@ class OrderTableRestControllerTest {
             int numberOfGuests,
             Boolean occupied
     ) {
-        OrderTable orderTable = OrderTableServiceTest.createOrderTable(name, numberOfGuests);
+        OrderTable orderTable = OrderTableFixtures.createOrderTable(name, numberOfGuests);
         if (occupied != null) {
             orderTable.setOccupied(occupied);
         }

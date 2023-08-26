@@ -3,6 +3,7 @@ package kitchenpos.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.*;
+import kitchenpos.fixture.OrderFixtures;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,11 +17,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static kitchenpos.application.MenuServiceTest.createMenu;
-import static kitchenpos.application.MenuServiceTest.createMenuProduct;
-import static kitchenpos.application.OrderServiceTest.*;
-import static kitchenpos.application.OrderTableServiceTest.createOrderTable;
-import static kitchenpos.application.ProductServiceTest.createProduct;
+import static kitchenpos.fixture.MenuFixtures.createMenu;
+import static kitchenpos.fixture.MenuFixtures.createMenuProduct;
+import static kitchenpos.fixture.OrderFixtures.*;
+import static kitchenpos.fixture.OrderTableFixtures.createOrderTable;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -40,17 +40,14 @@ class OrderRestControllerTest {
 
     private static final String BASE_URL = "/api/orders";
 
-    private Menu menu;
     private OrderLineItem orderLineItem;
     private OrderTable orderTable;
 
     @BeforeEach
     void setUp() {
-        Product product = createProduct("햄버거", new BigDecimal("1000"));
-        MenuProduct menuProduct = createMenuProduct(product, 1L);
-
-        menu = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
-        orderTable = createOrderTable("테이블1", 3);
+        MenuProduct menuProduct = createMenuProduct();
+        Menu menu = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
+        orderTable = createOrderTable();
         orderLineItem = createOrderLineItem(1L, menu.getPrice(), menu);
     }
 
@@ -84,8 +81,8 @@ class OrderRestControllerTest {
     @Test
     void accept() throws Exception {
         // given
-        Order request = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.WAITING);
-        Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
+        Order request = OrderFixtures.createOrder(OrderType.TAKEOUT, OrderStatus.WAITING);
+        Order order = OrderFixtures.createOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
 
         given(orderService.accept(any())).willReturn(order);
 
@@ -105,8 +102,8 @@ class OrderRestControllerTest {
     @Test
     void serve() throws Exception {
         // given
-        Order request = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
-        Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.SERVED);
+        Order request = OrderFixtures.createOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
+        Order order = OrderFixtures.createOrder(OrderType.TAKEOUT, OrderStatus.SERVED);
 
         given(orderService.serve(any())).willReturn(order);
 
@@ -126,8 +123,8 @@ class OrderRestControllerTest {
     @Test
     void startDelivery() throws Exception {
         // given
-        Order request = createOngoingOrder(OrderType.DELIVERY, OrderStatus.ACCEPTED);
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
+        Order request = OrderFixtures.createOrder(OrderType.DELIVERY, OrderStatus.ACCEPTED);
+        Order order = OrderFixtures.createOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
 
         given(orderService.startDelivery(any())).willReturn(order);
 
@@ -147,8 +144,8 @@ class OrderRestControllerTest {
     @Test
     void completeDelivery() throws Exception {
         // given
-        Order request = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
+        Order request = OrderFixtures.createOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
+        Order order = OrderFixtures.createOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
 
         given(orderService.completeDelivery(any())).willReturn(order);
 
@@ -168,8 +165,8 @@ class OrderRestControllerTest {
     @Test
     void complete() throws Exception {
         // given
-        Order request = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.COMPLETED);
+        Order request = OrderFixtures.createOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
+        Order order = OrderFixtures.createOrder(OrderType.DELIVERY, OrderStatus.COMPLETED);
 
         given(orderService.complete(any())).willReturn(order);
 
@@ -189,8 +186,8 @@ class OrderRestControllerTest {
     @Test
     void findAll() throws Exception {
         // given
-        Order order1 = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
-        Order order2 = createOngoingOrder(OrderType.EAT_IN, OrderStatus.COMPLETED);
+        Order order1 = OrderFixtures.createOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
+        Order order2 = OrderFixtures.createOrder(OrderType.EAT_IN, OrderStatus.COMPLETED);
 
         given(orderService.findAll()).willReturn(List.of(order1, order2));
 

@@ -14,8 +14,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.application.MenuServiceTest.createMenu;
-import static kitchenpos.application.MenuServiceTest.createMenuProduct;
+import static kitchenpos.fixture.MenuFixtures.createMenu;
+import static kitchenpos.fixture.MenuFixtures.createMenuProduct;
+import static kitchenpos.fixture.ProductFixtures.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,7 +50,7 @@ public class ProductServiceTest {
     @Test
     void notCreateProductWithPriceLessThanZero() {
         // given
-        Product request = createProduct("햄버거", new BigDecimal("-1"));
+        Product request = createProduct(new BigDecimal("-1"));
 
         // when & then
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -79,9 +80,9 @@ public class ProductServiceTest {
 
     @DisplayName("음식을 생성할 수 있다")
     @Test
-    void createProduct() {
+    void create() {
         // given
-        Product request = createProduct("햄버거", new BigDecimal("1000"));
+        Product request = createProduct();
 
         given(purgomalumClient.containsProfanity(any())).willReturn(false);
         given(productRepository.save(any())).willReturn(new Product());
@@ -107,7 +108,7 @@ public class ProductServiceTest {
     @Test
     void notChangePriceWithPriceLessThenZero() {
         // given
-        Product request = createProduct("햄버거", new BigDecimal("-1"));
+        Product request = createProduct(new BigDecimal("-1"));
 
         // when & then
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -117,7 +118,7 @@ public class ProductServiceTest {
     @Test
     void chanePrice() {
         // given
-        Product request = createProduct("햄버거", new BigDecimal("2000"));
+        Product request = createProduct(new BigDecimal("2000"));
 
         given(productRepository.findById(any())).willReturn(Optional.of(new Product()));
 
@@ -132,7 +133,7 @@ public class ProductServiceTest {
     @Test
     void hideMenuIfPriceOfMenuGreaterThanSumOfProducts() {
         // given
-        Product request = createProduct("햄버거", new BigDecimal("2000"));
+        Product request = createProduct(new BigDecimal("2000"));
         MenuProduct menuProduct = createMenuProduct(request, 1L);
         Menu menu = createMenu(new BigDecimal("3000"), "메뉴", List.of(menuProduct));
 
@@ -144,12 +145,5 @@ public class ProductServiceTest {
 
         // then
         assertThat(menu.isDisplayed()).isFalse();
-    }
-
-    public static Product createProduct(String name, BigDecimal price) {
-        Product product = new Product();
-        product.setName(name);
-        product.setPrice(price);
-        return product;
     }
 }

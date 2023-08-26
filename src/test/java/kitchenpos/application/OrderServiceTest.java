@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.OrderFixtures;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,10 +20,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Collections.emptyList;
-import static kitchenpos.application.MenuServiceTest.createMenu;
-import static kitchenpos.application.MenuServiceTest.createMenuProduct;
-import static kitchenpos.application.OrderTableServiceTest.createOrderTable;
-import static kitchenpos.application.ProductServiceTest.createProduct;
+import static kitchenpos.fixture.MenuFixtures.createMenu;
+import static kitchenpos.fixture.MenuFixtures.createMenuProduct;
+import static kitchenpos.fixture.OrderFixtures.*;
+import static kitchenpos.fixture.OrderTableFixtures.createOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.any;
@@ -51,11 +52,10 @@ public class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        Product product = createProduct("햄버거", new BigDecimal("1000"));
-        MenuProduct menuProduct = createMenuProduct(product, 1L);
+        MenuProduct menuProduct = createMenuProduct();
 
         menu = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct));
-        orderTable = createOrderTable("테이블1", 3);
+        orderTable = createOrderTable();
         orderLineItem = createOrderLineItem(1L, menu.getPrice(), menu);
     }
 
@@ -74,7 +74,7 @@ public class OrderServiceTest {
     @NullAndEmptySource
     void notCreateOrderWithZeroOrFewerProduct(List<OrderLineItem> orderLineItems) {
         // given
-        Order request = createOrder(OrderType.EAT_IN, orderLineItems, "주소지");
+        Order request = eatInOrder(orderLineItems);
 
         // when & then
         assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -84,7 +84,7 @@ public class OrderServiceTest {
     @Test
     void notCreateTakeoutOrDeliveryOrderWithQuantityOfMenuLessThanZero() {
         // given
-        Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), "주소지");
+        Order request = eatInOrder();
 
         given(menuRepository.findAllByIdIn(any())).willReturn(emptyList());
 
@@ -107,11 +107,11 @@ public class OrderServiceTest {
 
     @DisplayName("화면에 표시되지 않고 있는 메뉴를 주문한 경우엔 주문을 생성할 수 없다")
     @Test
-    void noteCreateOrderIfMenuIsHidden() {
+    void notCreateOrderIfMenuIsHidden() {
         // given
         menu.setDisplayed(false);
 
-        Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), "주소지");
+        Order request = eatInOrder();
 
         given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -125,7 +125,7 @@ public class OrderServiceTest {
     void notCreateOrderIfMenuPriceIsDifferentFromOrderPoint() {
         // given
         OrderLineItem orderLineItem = createOrderLineItem(1L, new BigDecimal("3000"), menu);
-        Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), "주소지");
+        Order request = eatInOrder(List.of(orderLineItem));
 
         given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -151,7 +151,7 @@ public class OrderServiceTest {
     @Test
     void notCreateEatInOrderIfNotSitting() {
         // given
-        Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), "주소");
+        Order request = eatInOrder();
 
         orderTable.setOccupied(false);
 
@@ -165,9 +165,9 @@ public class OrderServiceTest {
 
     @DisplayName("주문을 생성할 수 있다")
     @Test
-    void createOrder() {
+    void create() {
         // given
-        Order request = createOrder(OrderType.EAT_IN, List.of(orderLineItem), "주소");
+        Order request = eatInOrder();
 
         given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -185,7 +185,7 @@ public class OrderServiceTest {
     @Test
     void notAcceptOrderIfOrderStatusIsNotWaiting() {
         // given
-        Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
+        Order order = takeoutOrder(OrderStatus.ACCEPTED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -197,7 +197,7 @@ public class OrderServiceTest {
     @Test
     void acceptOrder() {
         // given
-        Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.WAITING);
+        Order order = takeoutOrder(OrderStatus.WAITING);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -212,7 +212,7 @@ public class OrderServiceTest {
     @Test
     void acceptDeliveryOrderAfterRequestingKitchenidersClientAPI() {
         // given
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+        Order order = deliveryOrder(OrderStatus.WAITING);
         order.setOrderLineItems(List.of(orderLineItem));
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
@@ -229,7 +229,7 @@ public class OrderServiceTest {
     @Test
     void notServeOrderIfOrderStatusIsNotAccepted() {
         // given
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+        Order order = deliveryOrder(OrderStatus.WAITING);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -241,7 +241,7 @@ public class OrderServiceTest {
     @Test
     void serveOrder() {
         // given
-        Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
+        Order order = takeoutOrder(OrderStatus.ACCEPTED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -256,7 +256,7 @@ public class OrderServiceTest {
     @Test
     void notStartDeliveryIfOrderTypeIsNotDelivery() {
         // given
-        Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
+        Order order = takeoutOrder(OrderStatus.ACCEPTED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -268,7 +268,7 @@ public class OrderServiceTest {
     @Test
     void notStartDeliveryIfOrderStatusIsNotServed() {
         // given
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.ACCEPTED);
+        Order order = deliveryOrder(OrderStatus.ACCEPTED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -280,7 +280,7 @@ public class OrderServiceTest {
     @Test
     void startDelivery() {
         // given
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.SERVED);
+        Order order = deliveryOrder(OrderStatus.SERVED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -295,7 +295,7 @@ public class OrderServiceTest {
     @Test
     void notCompleteDeliveryIfOrderStatusIsNotDelivering() {
         // given
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.SERVED);
+        Order order = deliveryOrder(OrderStatus.SERVED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -307,7 +307,7 @@ public class OrderServiceTest {
     @Test
     void completeDelivery() {
         // given
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
+        Order order = deliveryOrder(OrderStatus.DELIVERING);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -322,7 +322,7 @@ public class OrderServiceTest {
     @Test
     void notCompleteDeliveryOrderIfOrderStatusIsNotDelivered() {
         // given
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
+        Order order = deliveryOrder(OrderStatus.DELIVERING);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -334,7 +334,7 @@ public class OrderServiceTest {
     @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
     void notCompleteTakeoutOrEatInOrderIfOrderStatusIsNotServiced(OrderType orderType) {
         // given
-        Order order = createOngoingOrder(orderType, OrderStatus.ACCEPTED);
+        Order order = OrderFixtures.createOrder(orderType, OrderStatus.ACCEPTED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -346,7 +346,7 @@ public class OrderServiceTest {
     @Test
     void completeDeliveryOrder() {
         // given
-        Order order = createOngoingOrder(OrderType.DELIVERY, OrderStatus.DELIVERED);
+        Order order = deliveryOrder(OrderStatus.DELIVERED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -361,7 +361,7 @@ public class OrderServiceTest {
     @Test
     void completeTakeOutOrder() {
         // given
-        Order order = createOngoingOrder(OrderType.TAKEOUT, OrderStatus.SERVED);
+        Order order = takeoutOrder(OrderStatus.SERVED);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
@@ -376,7 +376,7 @@ public class OrderServiceTest {
     @Test
     void completeEatInOrder() {
         // given
-        Order order = createOngoingOrder(OrderType.EAT_IN, OrderStatus.SERVED);
+        Order order = eatInOrder(OrderStatus.SERVED);
         order.setOrderTable(orderTable);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
@@ -389,31 +389,5 @@ public class OrderServiceTest {
         assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
         assertThat(orderTable.getNumberOfGuests()).isZero();
         assertThat(orderTable.isOccupied()).isFalse();
-    }
-
-    public static Order createOngoingOrder(OrderType orderType, OrderStatus orderStatus) {
-        Order order = new Order();
-        order.setId(uuid);
-        order.setType(orderType);
-        order.setStatus(orderStatus);
-        return order;
-    }
-
-    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress) {
-        Order order = new Order();
-        order.setId(uuid);
-        order.setType(orderType);
-        order.setOrderLineItems(orderLineItems);
-        order.setDeliveryAddress(deliveryAddress);
-        order.setOrderTableId(uuid);
-        return order;
-    }
-
-    public static OrderLineItem createOrderLineItem(long quantity, BigDecimal price, Menu menu) {
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenu(menu);
-        orderLineItem.setQuantity(quantity);
-        orderLineItem.setPrice(price);
-        return orderLineItem;
     }
 }

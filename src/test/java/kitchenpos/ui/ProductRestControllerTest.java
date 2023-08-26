@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static kitchenpos.application.ProductServiceTest.createProduct;
+import static kitchenpos.fixture.ProductFixtures.createProduct;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

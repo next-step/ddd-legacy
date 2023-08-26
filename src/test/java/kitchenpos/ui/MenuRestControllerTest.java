@@ -2,11 +2,9 @@ package kitchenpos.ui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.application.MenuService;
-import kitchenpos.application.MenuServiceTest;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.Product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,11 +17,10 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
-import static kitchenpos.application.MenuGroupServiceTest.createMenuGroup;
-import static kitchenpos.application.MenuServiceTest.createMenuProduct;
-import static kitchenpos.application.ProductServiceTest.createProduct;
+import static kitchenpos.fixture.MenuFixtures.createMenu;
+import static kitchenpos.fixture.MenuFixtures.createMenuProduct;
+import static kitchenpos.fixture.MenuGroupFixtures.createMenuGroup;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -43,22 +40,20 @@ class MenuRestControllerTest {
 
     private static final String BASE_URL = "/api/menus";
 
-    private Product product;
     private MenuProduct menuProduct;
     private MenuGroup menuGroup;
 
     @BeforeEach
     void setUp() {
-        product = createProduct("햄버거", new BigDecimal("1000"));
-        menuProduct = createMenuProduct(product, 1L);
-        menuGroup = createMenuGroup("메뉴 그룹");
+        menuProduct = createMenuProduct();
+        menuGroup = createMenuGroup();
     }
 
     @DisplayName("메뉴를 생성한다")
     @Test
-    void createMenu() throws Exception {
+    void create() throws Exception {
         // given
-        Menu menu = createMenu(new BigDecimal("1000"), "메뉴", menuGroup, true, List.of(menuProduct));
+        Menu menu = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct), menuGroup, true);
 
         given(menuService.create(any())).willReturn(menu);
 
@@ -83,7 +78,7 @@ class MenuRestControllerTest {
     @Test
     void changePrice() throws Exception {
         // given
-        Menu menu = createMenu(new BigDecimal("2000"), "메뉴", menuGroup, true, List.of(menuProduct));
+        Menu menu = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct), menuGroup, true);
 
         given(menuService.changePrice(any(), any())).willReturn(menu);
 
@@ -102,7 +97,7 @@ class MenuRestControllerTest {
     @Test
     void display() throws Exception {
         // given
-        Menu menu = createMenu(new BigDecimal("2000"), "메뉴", menuGroup, true, List.of(menuProduct));
+        Menu menu = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct), menuGroup, true);
 
         given(menuService.display(any())).willReturn(menu);
 
@@ -121,7 +116,7 @@ class MenuRestControllerTest {
     @Test
     void hide() throws Exception {
         // given
-        Menu menu = createMenu(new BigDecimal("2000"), "메뉴", menuGroup, false, List.of(menuProduct));
+        Menu menu = createMenu(new BigDecimal("2000"), "메뉴", List.of(menuProduct), false);
 
         given(menuService.hide(any())).willReturn(menu);
 
@@ -140,8 +135,8 @@ class MenuRestControllerTest {
     @Test
     void findAll() throws Exception {
         // given
-        Menu menu1 = createMenu(new BigDecimal("2000"), "메뉴1", menuGroup, false, List.of(menuProduct));
-        Menu menu2 = createMenu(new BigDecimal("3000"), "메뉴2", menuGroup, false, List.of(menuProduct));
+        Menu menu1 = createMenu(new BigDecimal("2000"), "메뉴1", List.of(menuProduct), false);
+        Menu menu2 = createMenu(new BigDecimal("3000"), "메뉴2", List.of(menuProduct), false);
 
         given(menuService.findAll()).willReturn(List.of(menu1, menu2));
 
@@ -155,20 +150,5 @@ class MenuRestControllerTest {
                 .andExpect(jsonPath("$.size()").value(2))
                 .andExpect(jsonPath("$[0].name").value(menu1.getName()))
                 .andExpect(jsonPath("$[1].name").value(menu2.getName()));
-    }
-
-    private Menu createMenu(
-            BigDecimal price,
-            String name,
-            MenuGroup menuGroup,
-            boolean displayed,
-            List<MenuProduct> menuProducts
-    ) {
-        Menu menu = MenuServiceTest.createMenu(price, name, menuProducts);
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(displayed);
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuGroup(menuGroup);
-        return menu;
     }
 }

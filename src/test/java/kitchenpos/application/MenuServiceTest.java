@@ -18,7 +18,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.application.ProductServiceTest.createProduct;
+import static kitchenpos.fixture.MenuFixtures.createMenu;
+import static kitchenpos.fixture.MenuFixtures.createMenuProduct;
+import static kitchenpos.fixture.ProductFixtures.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.any;
@@ -46,8 +48,8 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
-        product = createProduct("햄버거", new BigDecimal("1000"));
-        menuProduct = createMenuProduct(product, 1L);
+        product = createProduct();
+        menuProduct = createMenuProduct();
     }
 
     @DisplayName("메뉴의 가격이 null이면 메뉴를 생성할 수 없다")
@@ -74,7 +76,7 @@ class MenuServiceTest {
     @Test
     void notCreateMenuWithoutMenuGroup() {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
+        Menu request = createMenu();
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
 
@@ -140,7 +142,7 @@ class MenuServiceTest {
     @Test
     void notCreateMenuWithNameContainingProfanity() {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
+        Menu request = createMenu();
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
@@ -153,9 +155,9 @@ class MenuServiceTest {
 
     @DisplayName("메뉴를 생성할 수 있다")
     @Test
-    void createMenu() {
+    void create() {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
+        Menu request = createMenu();
 
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(new MenuGroup()));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
@@ -206,7 +208,7 @@ class MenuServiceTest {
     @Test
     void changePrice() {
         // given
-        Menu request = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
+        Menu request = createMenu();
 
         given(menuRepository.findById(any())).willReturn(Optional.of(request));
 
@@ -233,7 +235,7 @@ class MenuServiceTest {
     @Test
     void displayMenu() {
         // given
-        Menu menu = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
+        Menu menu = createMenu();
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -248,7 +250,7 @@ class MenuServiceTest {
     @Test
     void hideMenu() {
         // given
-        Menu menu = createMenu(new BigDecimal("1000"), "메뉴", List.of(menuProduct));
+        Menu menu = createMenu();
 
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
@@ -257,22 +259,5 @@ class MenuServiceTest {
 
         // then
         assertThat(menu.isDisplayed()).isFalse();
-    }
-
-    public static Menu createMenu(BigDecimal price, String name, List<MenuProduct> menuProducts) {
-        Menu menu = new Menu();
-        menu.setPrice(price);
-        menu.setName(name);
-        menu.setMenuGroupId(uuid);
-        menu.setMenuProducts(menuProducts);
-        menu.setDisplayed(true);
-        return menu;
-    }
-
-    public static MenuProduct createMenuProduct(Product product, long quantity) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
     }
 }

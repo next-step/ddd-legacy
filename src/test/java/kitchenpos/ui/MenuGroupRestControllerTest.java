@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
-import static kitchenpos.application.MenuGroupServiceTest.createMenuGroup;
+import static kitchenpos.fixture.MenuGroupFixtures.createMenuGroup;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -39,7 +39,7 @@ class MenuGroupRestControllerTest {
     @Test
     void create() throws Exception {
         // given
-        MenuGroup menuGroup = createMenuGroup("메뉴 그룹");
+        MenuGroup menuGroup = createMenuGroup();
         given(menuGroupService.create(any())).willReturn(menuGroup);
 
         // when
