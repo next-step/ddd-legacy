@@ -62,6 +62,21 @@ class OrderTableServiceTest {
             assertThrows(IllegalArgumentException.class, () -> sut.create(orderTable));
         }
 
+        @DisplayName("새롭게 등록하는 주문 테이블의 `테이블에 앉은 고객 수`는 0명으로 생성된다.")
+        @Test
+        void createNumberOfGuests() {
+            // given
+            OrderTable orderTable = OrderTableTestFixture.create()
+                    .changeId(null)
+                    .getOrderTable();
+
+            // when
+            OrderTable result = sut.create(orderTable);
+
+            // then
+            assertThat(result.getNumberOfGuests()).isEqualTo(0);
+        }
+
 
     }
 }
