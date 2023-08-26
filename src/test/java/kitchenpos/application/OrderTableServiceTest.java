@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.NoSuchElementException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -113,6 +115,17 @@ class OrderTableServiceTest {
             assertThat(result).isNotNull();
             assertThat(result.getId()).isEqualTo(orderTable.getId());
             assertThat(result.isOccupied()).isTrue();
+        }
+
+        @DisplayName("주문 테이블에 고객이 앉았음을 등록할 떄 주문 테이블이 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void sitNotExistsOrderTable() {
+            // given
+            OrderTable notPersistOrderTable = OrderTableTestFixture.create()
+                    .getOrderTable();
+
+            // when & then
+            assertThrows(NoSuchElementException.class, () -> sut.sit(notPersistOrderTable.getId()));
         }
     }
 }
