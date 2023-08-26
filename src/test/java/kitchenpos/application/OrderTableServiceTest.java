@@ -5,6 +5,7 @@ import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.integration_test_step.OrderIntegrationStep;
 import kitchenpos.integration_test_step.OrderTableIntegrationStep;
 import kitchenpos.test_fixture.OrderTableTestFixture;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,11 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블을 생성")
     @Nested
     class Describe_create {
+
+        @BeforeEach
+        void setUp() {
+            databaseCleanStep.clean();
+        }
 
         @DisplayName("새로운 주문 테이블을 생성할 수 있다.")
         @Test
@@ -106,6 +112,11 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블을 테이블 사용 상태로 변경")
     @Nested
     class Describe_sit {
+
+        @BeforeEach
+        void setUp() {
+            databaseCleanStep.clean();
+        }
 
         @DisplayName("주문 테이블에 고객이 앉았음을 등록할 수 있다.")
         @Test
@@ -197,6 +208,11 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블의 `테이블에 앉은 고객 수`를 변경")
     @Nested
     class Describe_change_number_of_guests {
+        @BeforeEach
+        void setUp() {
+            databaseCleanStep.clean();
+        }
+
         @DisplayName("주문 테이블의 `테이블에 앉은 고객 수`를 변경할 수 있다.")
         @Test
         void changeNumberOfGuests() {
