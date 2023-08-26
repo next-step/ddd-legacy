@@ -470,5 +470,16 @@ class OrderServiceTest {
             // when & then
             assertThrows(NoSuchElementException.class, () -> sut.serve(notPersistOrder.getId()));
         }
+
+        @DisplayName("주문 상태를 제공으로 변경할 때 주문 상태가 수락 상태가 아니면 예외가 발생한다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+        void servedOrderStatusNotAcceptedExceptionThrown(OrderStatus orderStatus) {
+            // given
+            Order order = orderIntegrationStep.createStatus(orderStatus);
+
+            // when & then
+            assertThrows(IllegalStateException.class, () -> sut.serve(order.getId()));
+        }
     }
 }
