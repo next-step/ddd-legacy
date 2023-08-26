@@ -87,31 +87,9 @@ class ProductAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("상품 목록을 조회한다")
     @Test
-    void getAllProducts() throws Exception {
-        // given
-        final Product product = generateNewProduct();
-
+    void getAllProducts() {
         // expected
         given().contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(objectMapper.writeValueAsBytes(product))
-                .when()
-                .get(getPath())
-                .then()
-                .log()
-                .all()
-                .statusCode(HttpStatus.OK.value())
-        ;
-    }
-
-    @DisplayName("상품 가격을 변경한다")
-    @Test
-    void changePrice() throws Exception {
-        // given
-        final Product product = generateNewProduct();
-
-        // expected
-        given().contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(objectMapper.writeValueAsBytes(product))
                 .when()
                 .get(getPath())
                 .then()
