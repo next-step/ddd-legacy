@@ -6,10 +6,14 @@ import kitchenpos.test_fixture.OrderTableTestFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("OrderTableService 클래스")
 @SpringBootTest
@@ -43,5 +47,21 @@ class OrderTableServiceTest {
             assertThat(result.getNumberOfGuests()).isEqualTo(0);
             assertThat(result.isOccupied()).isFalse();
         }
+
+        @DisplayName("새로운 주문 테이블의 이름이 빈 값이면 예외가 발생한다.")
+        @ParameterizedTest
+        @NullAndEmptySource
+        void createNullOrEmptyNameExceptionThrown(String name) {
+            // given
+            OrderTable orderTable = OrderTableTestFixture.create()
+                    .changeId(null)
+                    .changeName(name)
+                    .getOrderTable();
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> sut.create(orderTable));
+        }
+
+
     }
 }

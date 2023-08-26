@@ -30,6 +30,16 @@ public class OrderTableTestFixture {
         return this;
     }
 
+    public OrderTableTestFixture changeName(String name) {
+        OrderTable newOrderTable = new OrderTable();
+        newOrderTable.setId(orderTable.getId());
+        newOrderTable.setName(name);
+        newOrderTable.setNumberOfGuests(orderTable.getNumberOfGuests());
+        newOrderTable.setOccupied(orderTable.isOccupied());
+        this.orderTable = newOrderTable;
+        return this;
+    }
+
     public OrderTable getOrderTable() {
         return orderTable;
     }
