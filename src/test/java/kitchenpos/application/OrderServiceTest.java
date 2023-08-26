@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -391,6 +392,16 @@ class OrderServiceTest {
             assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
         }
 
+        @DisplayName("주문 상태를 수락으로 변경할 때 주문이 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void acceptOrderNotFoundExceptionThrown() {
+            // given
+            Order notPersistOrder = OrderTestFixture.create()
+                    .changeId(UUID.randomUUID())
+                    .getOrder();
 
+            // when & then
+            assertThrows(NoSuchElementException.class, () -> sut.accept(notPersistOrder.getId()));
+        }
     }
 }
