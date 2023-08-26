@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.OrderTable;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
+import kitchenpos.integration_test_step.OrderIntegrationStep;
 import kitchenpos.integration_test_step.OrderTableIntegrationStep;
 import kitchenpos.test_fixture.OrderTableTestFixture;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("OrderTableService 클래스")
@@ -26,6 +28,9 @@ class OrderTableServiceTest {
 
     @Autowired
     private OrderTableIntegrationStep orderTableIntegrationStep;
+
+    @Autowired
+    private OrderIntegrationStep orderIntegrationStep;
 
     @Autowired
     private DatabaseCleanStep databaseCleanStep;
@@ -158,6 +163,34 @@ class OrderTableServiceTest {
 
             // when & then
             assertThrows(NoSuchElementException.class, () -> sut.clear(notPersistOrderTable.getId()));
+        }
+
+        @DisplayName("주문 테이블을 비어있는 테이블로 변경할 때 만약 주문 테이블에 주문이 존재하고 주문 상태가 `주문 완료`가 아니면 예외가 발생한다.")
+        @Test
+        void clearOrderTableNotCompletedOrder() {
+            // given
+            OrderTable orderTable = orderTableIntegrationStep.create();
+            sut.sit(orderTable.getId());
+            orderIntegrationStep.createStatusWaiting(orderTable);
+
+            // when & then
+            assertThrows(IllegalStateException.class, () -> sut.clear(orderTable.getId()));
+        }
+
+        @DisplayName("주문 테이블을 비어있는 테이블로 변경할 때 만약 주문 테이블에 주문이 존재하고 주문 상태가 `주문 완료`이면 주문 테이블의 `테이블에 앉은 고객 수`는 0명으로 변경된다.")
+        @Test
+        void clearOrderTableCompletedOrder() {
+            // given
+            OrderTable orderTable = orderTableIntegrationStep.create();
+            sut.sit(orderTable.getId());
+            orderIntegrationStep.createStatusCompleted(orderTable);
+
+            // when
+            OrderTable result = assertDoesNotThrow(() -> sut.clear(orderTable.getId()));
+
+            // then
+            assertThat(result.isOccupied()).isFalse();
+            assertThat(result.getNumberOfGuests()).isEqualTo(0);
         }
     }
 }
