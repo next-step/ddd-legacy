@@ -1,5 +1,6 @@
 package calculator;
 
+import calculator.application.StringCalculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class StringCalculatorTest {
+class StringCalculatorTest {
     private StringCalculator calculator;
 
     @BeforeEach
