@@ -1,9 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderLineItem;
-import kitchenpos.domain.OrderType;
+import kitchenpos.domain.*;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.integration_test_step.MenuIntegrationStep;
 import kitchenpos.test_fixture.OrderLineItemTestFixture;
@@ -61,6 +58,29 @@ class OrderServiceTest {
 
             // then
             assertThat(result).isNotNull();
+        }
+
+        @DisplayName("새로운 주문 생성 시 주문 상태는 대기(WAITING) 상태이다.")
+        @Test
+        void createOrderStatusWaiting() {
+            // given
+            Menu menu = menuIntegrationStep.create();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice())
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(OrderType.DELIVERY)
+                    .getOrder();
+
+            // when
+            Order result = sut.create(order);
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getStatus()).isEqualTo(OrderStatus.WAITING);
         }
     }
 }
