@@ -6,6 +6,7 @@ import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MenuFixture {
@@ -29,7 +30,12 @@ public class MenuFixture {
     }
 
     public static Menu create(String name, BigDecimal price, List<MenuProduct> menuProducts) {
+        return create(UUID.randomUUID(), name, price, menuProducts);
+    }
+
+    public static Menu create(UUID id, String name, BigDecimal price, List<MenuProduct> menuProducts) {
         Menu result = new Menu();
+        result.setId(id);
         result.setName(name);
         result.setPrice(price);
         result.setMenuProducts(menuProducts);
