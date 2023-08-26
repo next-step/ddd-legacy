@@ -440,6 +440,23 @@ class OrderServiceTest {
             assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
             verify(kitchenridersClient).requestDelivery(order.getId(), orderPrice, order.getDeliveryAddress());
         }
+    }
 
+    @DisplayName("주문 상태 제공으로 변경")
+    @Nested
+    class Describe_served {
+        @DisplayName("주문 상태를 제공으로 변경할 수 있다.")
+        @Test
+        void served() {
+            // given
+            Order order = orderIntegrationStep.createStatusAccept();
+
+            // when
+            Order result = sut.serve(order.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED);
+        }
     }
 }
