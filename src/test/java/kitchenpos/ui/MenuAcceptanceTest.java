@@ -18,8 +18,8 @@ import java.math.BigDecimal;
 import static io.restassured.RestAssured.given;
 import static kitchenpos.fixture.MenuFixture.generateMenu;
 import static kitchenpos.fixture.MenuGroupFixture.generateMenuGroup;
-import static kitchenpos.fixture.ProductFixture.generateProductWithPrice;
 import static kitchenpos.fixture.ProductFixture.generateProduct;
+import static kitchenpos.fixture.ProductFixture.generateProductWithPrice;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 

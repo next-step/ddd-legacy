@@ -1,6 +1,5 @@
 package kitchenpos.ui;
 
-import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
@@ -20,8 +19,8 @@ import java.math.BigDecimal;
 import static io.restassured.RestAssured.given;
 import static kitchenpos.fixture.MenuFixture.generateMenu;
 import static kitchenpos.fixture.MenuGroupFixture.generateMenuGroup;
-import static kitchenpos.fixture.ProductFixture.generateProduct;
 import static kitchenpos.fixture.ProductFixture.generateNewProductWithName;
+import static kitchenpos.fixture.ProductFixture.generateProduct;
 import static kitchenpos.fixture.ProductFixture.generateProductWithPrice;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.hamcrest.Matchers.equalTo;
@@ -53,7 +52,7 @@ class ProductAcceptanceTest extends AcceptanceTest {
                 .assertThat()
                 .body("name", equalTo(product.getName()))
                 .body("price", equalTo(product.getPrice().intValue()))
-                ;
+        ;
     }
 
     @DisplayName("상품 이름을 반드시 지정해야 한다")

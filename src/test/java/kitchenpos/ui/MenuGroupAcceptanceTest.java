@@ -1,8 +1,6 @@
 package kitchenpos.ui;
 
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.Product;
-import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.util.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
