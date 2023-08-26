@@ -21,6 +21,7 @@ import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.infra.PurgomalumClient;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
@@ -30,6 +31,9 @@ public class MenuServiceTest {
 
     @Mock
     private ProductRepository productRepository;
+
+    @Mock
+    private PurgomalumClient purgomalumClient;
 
     @InjectMocks
     private MenuService menuService;
@@ -111,6 +115,44 @@ public class MenuServiceTest {
         Menu menu = new Menu();
         menu.setPrice(new BigDecimal(1001));
         menu.setMenuProducts(List.of(menuProduct));
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 메뉴_생성_실패__이름이_null() {
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(new MenuGroup()));
+        Product product = new Product();
+        product.setPrice(new BigDecimal(500));
+        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(product));
+        when(productRepository.findById(any())).thenReturn(Optional.of(product));
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setQuantity(2);
+        menuProduct.setProduct(product);
+        Menu menu = new Menu();
+        menu.setPrice(new BigDecimal(1000));
+        menu.setMenuProducts(List.of(menuProduct));
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 메뉴_생성_실패__이름에_욕설_포함() {
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(new MenuGroup()));
+        Product product = new Product();
+        product.setPrice(new BigDecimal(500));
+        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(product));
+        when(productRepository.findById(any())).thenReturn(Optional.of(product));
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setQuantity(2);
+        menuProduct.setProduct(product);
+        Menu menu = new Menu();
+        menu.setPrice(new BigDecimal(1000));
+        menu.setMenuProducts(List.of(menuProduct));
+        menu.setName("abuse name");
+        when(purgomalumClient.containsProfanity("abuse name")).thenReturn(true);
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
