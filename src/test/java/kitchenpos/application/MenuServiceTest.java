@@ -1,10 +1,10 @@
 package kitchenpos.application;
 
 import static java.math.BigDecimal.valueOf;
-import static kitchenpos.testHelper.fixture.ProductFixture.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -52,9 +52,9 @@ class MenuServiceTest extends SpringBootTestHelper {
     private void initProduct() {
         purgomalumClient.setReturn(Purgomalum.NORMAL);
         List<Product> requests = List.of(
-            of("P1", 1000L),
-            of("P2", 2000L),
-            of("P3", 3000L)
+            new Product("P1", BigDecimal.valueOf(1000L)),
+            new Product("P2", BigDecimal.valueOf(2000L)),
+            new Product("P3", BigDecimal.valueOf(3000L))
         );
         for (Product request : requests) {
             productService.create(request);

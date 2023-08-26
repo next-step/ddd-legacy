@@ -4,8 +4,6 @@ import static java.util.List.of;
 import static java.util.stream.Collectors.toList;
 import static kitchenpos.testHelper.fake.PurgomalumClientFake.Purgomalum.NORMAL;
 import static kitchenpos.testHelper.fake.PurgomalumClientFake.Purgomalum.SLANG;
-import static kitchenpos.testHelper.fixture.ProductFixture.forPrice;
-import static kitchenpos.testHelper.fixture.ProductFixture.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -105,8 +103,8 @@ class ProductServiceTest extends SpringBootTestHelper {
     void test5(long price) {
         //given
         purgomalumClient.setReturn(NORMAL);
-        Product savedProduct = productService.create(forPrice(5L));
-        Product request = forPrice(price);
+        Product savedProduct = productService.create(new Product("name", BigDecimal.valueOf(5L)));
+        Product request = new Product("name", BigDecimal.valueOf(price));
 
         //when
         Product changedProduct = productService.changePrice(savedProduct.getId(), request);
@@ -143,8 +141,8 @@ class ProductServiceTest extends SpringBootTestHelper {
 
     static Stream<List<Product>> test6MethodSource() {
         return Stream.of(
-            of(of("P1", 1l), of("P2", 2l)),
-            of(of("P3", 3l)),
+            of(new Product("P1", BigDecimal.valueOf(1L)), new Product("P2", BigDecimal.valueOf(2L))),
+            of(new Product("P3", BigDecimal.valueOf(3L))),
             List.of()
         );
     }
