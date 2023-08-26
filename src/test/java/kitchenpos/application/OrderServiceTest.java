@@ -663,5 +663,21 @@ class OrderServiceTest {
             // when & then
             assertThrows(NoSuchElementException.class, () -> sut.complete(notPersistOrder.getId()));
         }
+
+        @DisplayName("매장 식사 주문인 경우 주문 완료 변경 후 주문 테이블은 빈 테이블로 변경해야 한다.")
+        @Test
+        void completeEatInOrderTableEmpty() {
+            // given
+            Order order = orderIntegrationStep.createByTypeAndStatus(OrderType.EAT_IN, OrderStatus.SERVED);
+
+            // when
+            Order result = sut.complete(order.getId());
+
+            // then
+            assertThat(result).isNotNull();
+            OrderTable orderTable = result.getOrderTable();
+            assertThat(orderTable.isOccupied()).isFalse();
+            assertThat(orderTable.getNumberOfGuests()).isZero();
+        }
     }
 }
