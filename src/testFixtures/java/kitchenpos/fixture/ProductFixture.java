@@ -12,7 +12,7 @@ public class ProductFixture {
     private static final String DEFAULT_PRODUCT_NAME = "menu";
     private static final BigDecimal DEFAULT_PRODUCT_PRICE = BigDecimal.ZERO;
 
-    public static Product generateNewProduct() {
+    public static Product generateProduct() {
         return createProduct(UUID.randomUUID(), DEFAULT_PRODUCT_NAME, DEFAULT_PRODUCT_PRICE);
     }
 

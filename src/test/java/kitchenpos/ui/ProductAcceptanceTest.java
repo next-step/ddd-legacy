@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import java.math.BigDecimal;
 
 import static io.restassured.RestAssured.given;
-import static kitchenpos.fixture.ProductFixture.generateNewProduct;
+import static kitchenpos.fixture.ProductFixture.generateProduct;
 import static kitchenpos.fixture.ProductFixture.generateNewProductWithName;
 import static kitchenpos.fixture.ProductFixture.generateNewProductWithPrice;
 import static org.hamcrest.Matchers.equalTo;
@@ -20,13 +20,13 @@ class ProductAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("상품을 등록한다")
     @Test
-    void createProduct() throws Exception {
+    void createProduct() {
         // given
-        final Product product = generateNewProduct();
+        final Product product = generateProduct();
 
         // expected
         given().contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(objectMapper.writeValueAsBytes(product))
+                .body(writeValueAsBytes(product))
                 .when()
                 .post(getPath())
                 .then()
@@ -39,13 +39,13 @@ class ProductAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("상품 이름을 반드시 지정해야 한다")
     @Test
-    void nullProductName() throws Exception {
+    void nullProductName() {
         // given
         final Product product = generateNewProductWithName(null);
 
         // expected
         given().contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(objectMapper.writeValueAsBytes(product))
+                .body(writeValueAsBytes(product))
                 .when()
                 .post(getPath())
                 .then()
@@ -55,13 +55,13 @@ class ProductAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("상품 이름에 욕설이 들어가면 안된다")
     @Test
-    void profaneName() throws Exception {
+    void profaneName() {
         // given
         final Product product = generateNewProductWithName("shit");
 
         // expected
         given().contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(objectMapper.writeValueAsBytes(product))
+                .body(writeValueAsBytes(product))
                 .when()
                 .post(getPath())
                 .then()
@@ -71,13 +71,13 @@ class ProductAcceptanceTest extends AcceptanceTest {
 
     @DisplayName("상품 가격은 0원 이상이어야 한다")
     @Test
-    void negativePrice() throws Exception {
+    void negativePrice() {
         // given
         final Product product = generateNewProductWithPrice(BigDecimal.valueOf(-1));
 
         // expected
         given().contentType(MediaType.APPLICATION_JSON_VALUE)
-                .body(objectMapper.writeValueAsBytes(product))
+                .body(writeValueAsBytes(product))
                 .when()
                 .post(getPath())
                 .then()
