@@ -148,5 +148,16 @@ class OrderTableServiceTest {
             assertThat(result.getId()).isEqualTo(orderTable.getId());
             assertThat(result.isOccupied()).isFalse();
         }
+
+        @DisplayName("주문 테이블을 비어있는 테이블로 변경할 때 주문 테이블이 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void clearNotExistsOrderTable() {
+            // given
+            OrderTable notPersistOrderTable = OrderTableTestFixture.create()
+                    .getOrderTable();
+
+            // when & then
+            assertThrows(NoSuchElementException.class, () -> sut.clear(notPersistOrderTable.getId()));
+        }
     }
 }
