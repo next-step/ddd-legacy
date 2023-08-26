@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -274,6 +275,27 @@ class OrderServiceTest {
 
             // when & then
             assertDoesNotThrow(() -> sut.create(order));
+        }
+
+        @DisplayName("매장 식사 주문에 등록하려는 주문 테이블이 존재하지 않는 주문 테이블이면 예외가 발생한다.")
+        @Test
+        void createEatInOrderTableNull() {
+            // given
+            OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+            Menu menu = menuIntegrationStep.create();
+            OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
+                    .changeMenu(menu)
+                    .changePrice(menu.getPrice())
+                    .getOrderLineItem();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(Collections.singletonList(orderLineItem))
+                    .changeType(OrderType.EAT_IN)
+                    .changeOrderTable(null)
+                    .getOrder();
+
+            // when & then
+            assertThrows(NoSuchElementException.class, () -> sut.create(order));
         }
     }
 }
