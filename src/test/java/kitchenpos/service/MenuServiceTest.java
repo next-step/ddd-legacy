@@ -97,4 +97,22 @@ public class MenuServiceTest {
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void 메뉴_생성_실패__구성메뉴상품의_가격_총합이_메뉴_가격_보다_이상일_수_없다() {
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(new MenuGroup()));
+        Product product = new Product();
+        product.setPrice(new BigDecimal(500));
+        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(product));
+        when(productRepository.findById(any())).thenReturn(Optional.of(product));
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setQuantity(2);
+        menuProduct.setProduct(product);
+        Menu menu = new Menu();
+        menu.setPrice(new BigDecimal(1001));
+        menu.setMenuProducts(List.of(menuProduct));
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
