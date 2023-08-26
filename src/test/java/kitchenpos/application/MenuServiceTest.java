@@ -1,7 +1,6 @@
 package kitchenpos.application;
 
 import static java.math.BigDecimal.valueOf;
-import static kitchenpos.testHelper.fake.PurgomalumClientFake.Purgomalum.NORMAL;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -13,8 +12,6 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.Product;
 import kitchenpos.testHelper.SpringBootTestHelper;
-import kitchenpos.testHelper.fake.PurgomalumClientFake;
-import kitchenpos.testHelper.fake.PurgomalumClientFake.Purgomalum;
 import kitchenpos.testHelper.fixture.MenuFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,36 +29,17 @@ class MenuServiceTest extends SpringBootTestHelper {
     MenuService menuService;
     @Autowired
     ProductService productService;
-    @Autowired
-    MenuGroupService menuGroupService;
-    @Autowired
-    PurgomalumClientFake purgomalumClient;
-    List<Product> products;
+
     MenuGroup menuGroup;
+    List<Product> products;
 
     @BeforeEach
     public void init() {
         super.init();
-        initProduct();
-        initMenuGroup();
-    }
-
-    private void initMenuGroup() {
-        this.menuGroup = menuGroupService.create(new MenuGroup("메뉴그룹"));
-    }
-
-    private void initProduct() {
-        purgomalumClient.setReturn(Purgomalum.NORMAL);
-        List<Product> requests = List.of(
-            new Product("P1", BigDecimal.valueOf(1000L)),
-            new Product("P2", BigDecimal.valueOf(2000L)),
-            new Product("P3", BigDecimal.valueOf(3000L))
-        );
-        for (Product request : requests) {
-            productService.create(request);
-        }
-
-        this.products = productService.findAll();
+        super.initProduct();
+        products = super.getProducts();
+        super.initMenuGroup();
+        menuGroup = super.getMenuGroup();
     }
 
     @DisplayName("메뉴의 가격은 0원 이상이여야 한다")
@@ -289,7 +267,7 @@ class MenuServiceTest extends SpringBootTestHelper {
 
     @DisplayName("상품 가격을 수정한 상품이 포함된 메뉴의 가격이, 메뉴에 포함된 상품들의 총가격(단가 * 수량)보다 크다면 해당 메뉴를 노출시키지 않는다")
     @Test
-    void test13 (){
+    void test13() {
         //given Product 0 번 1개를 가지는 메뉴를 생성한다.
         Product product = products.get(0);
         Menu createRequest = MenuFixture.createRequestBuilder()
