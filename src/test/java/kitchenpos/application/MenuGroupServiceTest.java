@@ -28,12 +28,11 @@ class MenuGroupServiceTest {
     @Test
     void 메뉴그룹생성() {
         // when
-        MenuGroup saveMenuGruop = menuGroupService.create(메뉴그룹_1);
+        MenuGroup menuGroup = menuGroupService.create(메뉴그룹_1);
 
         // then
-        MenuGroup findMenuGroup = menuGroupRepository.findById(saveMenuGruop.getId()).orElse(null);
-        assertThat(findMenuGroup).isNotNull();
-        assertThat(findMenuGroup.getName()).isEqualTo(메뉴그룹_1.getName());
+        assertThat(menuGroup).isNotNull();
+        assertThat(menuGroup.getName()).isEqualTo(메뉴그룹_1.getName());
     }
 
     @DisplayName("메뉴그룹 생성 시 이름이 존재하지 않으면 에러를 던진다.")

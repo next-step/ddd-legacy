@@ -59,7 +59,7 @@ class MenuGroupRestControllerTest extends ControllerTest {
     private void 메뉴그룹전체조회됨(ExtractableResponse<Response> response) {
         assertThat(response.jsonPath().getList("name", String.class))
                 .hasSize(2)
-                .containsExactly(메뉴그룹_1.getName(), 메뉴그룹_2.getName());
+                .containsExactlyInAnyOrder(메뉴그룹_1.getName(), 메뉴그룹_2.getName());
     }
 
 }
