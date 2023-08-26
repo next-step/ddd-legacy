@@ -9,10 +9,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -97,6 +100,22 @@ class OrderServiceTest {
                     .changeId(null)
                     .changeOrderLineItems(Collections.singletonList(orderLineItem))
                     .changeType(null)
+                    .getOrder();
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> sut.create(order));
+        }
+
+        @DisplayName("새로운 주문 생성 시 주문 메뉴가 비어있으면 예외가 발생한다.")
+        @ParameterizedTest
+        @NullAndEmptySource
+        void createOrderLineItemsNullExceptionThrown(List<OrderLineItem> orderLineItems) {
+            // given
+            Menu menu = menuIntegrationStep.create();
+            Order order = OrderTestFixture.create()
+                    .changeId(null)
+                    .changeOrderLineItems(orderLineItems)
+                    .changeType(OrderType.DELIVERY)
                     .getOrder();
 
             // when & then
