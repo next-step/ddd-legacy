@@ -565,5 +565,17 @@ class OrderServiceTest {
             assertThat(result).isNotNull();
             assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED);
         }
+
+        @DisplayName("주문 상태를 배달 완료로 변경할 때 주문이 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void completeDeliveryOrderNotFoundExceptionThrown() {
+            // given
+            Order notPersistOrder = OrderTestFixture.create()
+                    .changeId(UUID.randomUUID())
+                    .getOrder();
+
+            // when & then
+            assertThrows(NoSuchElementException.class, () -> sut.completeDelivery(notPersistOrder.getId()));
+        }
     }
 }
