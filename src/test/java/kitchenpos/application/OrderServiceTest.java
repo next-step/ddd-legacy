@@ -29,7 +29,6 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 
@@ -445,6 +444,11 @@ class OrderServiceTest {
     @DisplayName("주문 상태 제공으로 변경")
     @Nested
     class Describe_served {
+        @BeforeEach
+        void setUp() {
+            databaseCleanStep.clean();
+        }
+
         @DisplayName("주문 상태를 제공으로 변경할 수 있다.")
         @Test
         void served() {
@@ -480,6 +484,29 @@ class OrderServiceTest {
 
             // when & then
             assertThrows(IllegalStateException.class, () -> sut.serve(order.getId()));
+        }
+
+        @DisplayName("주문 상태를 배달 중으로 변경")
+        @Nested
+        class Describe_startDelivery {
+            @BeforeEach
+            void setUp() {
+                databaseCleanStep.clean();
+            }
+
+            @DisplayName("주문 상태를 배달 중으로 변경할 수 있다.")
+            @Test
+            void startDelivery() {
+                // given
+                Order order = orderIntegrationStep.createServedDeliveryOrder();
+
+                // when
+                Order result = sut.startDelivery(order.getId());
+
+                // then
+                assertThat(result).isNotNull();
+                assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+            }
         }
     }
 }
