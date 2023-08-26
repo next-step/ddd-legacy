@@ -474,4 +474,24 @@ class MenuServiceTest {
             assertThrows(NoSuchElementException.class, () -> sut.hide(notPersistMenu.getId()));
         }
     }
+
+    @DisplayName("메뉴 목록 조회")
+    @Nested
+    class Describe_find_all {
+        @DisplayName("메뉴 목록을 조회할 수 있다.")
+        @Test
+        void findAll() {
+            // given
+            Menu persistMenu = menuIntegrationStep.create();
+            Menu persistMenu2 = menuIntegrationStep.create();
+
+            // when
+            List<Menu> result = sut.findAll();
+
+            // then
+            assertThat(result).hasSize(2);
+            assertThat(result.get(0).getId()).isEqualTo(persistMenu.getId());
+            assertThat(result.get(1).getId()).isEqualTo(persistMenu2.getId());
+        }
+    }
 }
