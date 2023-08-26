@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 import static io.restassured.RestAssured.given;
 import static kitchenpos.fixture.MenuFixture.generateMenu;
 import static kitchenpos.fixture.MenuGroupFixture.generateMenuGroup;
-import static kitchenpos.fixture.ProductFixture.generateNewProductWithPrice;
+import static kitchenpos.fixture.ProductFixture.generateProductWithPrice;
 import static kitchenpos.fixture.ProductFixture.generateProduct;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
@@ -148,7 +148,7 @@ class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void changeMenuPrice() {
         // given
-        final Product product = productSetup.setupProduct(generateNewProductWithPrice(BigDecimal.valueOf(10_000)));
+        final Product product = productSetup.setupProduct(generateProductWithPrice(BigDecimal.valueOf(10_000)));
         final MenuGroup menuGroup = menuGroupSetup.setupMenuGroup(generateMenuGroup());
         final int quantity = 1;
         final Menu menu = menuSetup.setupMenu(generateMenu(product, quantity, menuGroup));
@@ -179,7 +179,7 @@ class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void changeMenuPriceValidation() {
         // given
-        final Product product = productSetup.setupProduct(generateNewProductWithPrice(BigDecimal.valueOf(10_000)));
+        final Product product = productSetup.setupProduct(generateProductWithPrice(BigDecimal.valueOf(10_000)));
         final MenuGroup menuGroup = menuGroupSetup.setupMenuGroup(generateMenuGroup());
         final int quantity = 1;
         final Menu menu = menuSetup.setupMenu(generateMenu(product, quantity, menuGroup));
@@ -208,7 +208,7 @@ class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void changeDisplayed() {
         // given
-        final Product product = productSetup.setupProduct(generateNewProductWithPrice(BigDecimal.valueOf(10_000)));
+        final Product product = productSetup.setupProduct(generateProductWithPrice(BigDecimal.valueOf(10_000)));
         final MenuGroup menuGroup = menuGroupSetup.setupMenuGroup(generateMenuGroup());
         final int quantity = 1;
         final Menu menu = menuSetup.setupMenu(generateMenu(product, quantity, menuGroup, BigDecimal.valueOf(9_000), false));
@@ -236,7 +236,7 @@ class MenuAcceptanceTest extends AcceptanceTest {
     @Test
     void validChangeDisplayed() {
         // given
-        final Product product = productSetup.setupProduct(generateNewProductWithPrice(BigDecimal.valueOf(10_000)));
+        final Product product = productSetup.setupProduct(generateProductWithPrice(BigDecimal.valueOf(10_000)));
         final MenuGroup menuGroup = menuGroupSetup.setupMenuGroup(generateMenuGroup());
         final int quantity = 1;
         final Menu menu = menuSetup.setupMenu(generateMenu(product, quantity, menuGroup, BigDecimal.valueOf(11_000), false));

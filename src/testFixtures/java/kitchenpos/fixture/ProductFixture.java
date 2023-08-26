@@ -20,7 +20,7 @@ public class ProductFixture {
         return createProduct(UUID.randomUUID(), name, DEFAULT_PRODUCT_PRICE);
     }
 
-    public static Product generateNewProductWithPrice(final BigDecimal price) {
+    public static Product generateProductWithPrice(final BigDecimal price) {
         return createProduct(UUID.randomUUID(), DEFAULT_PRODUCT_NAME, price);
     }
 
