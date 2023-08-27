@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -25,11 +26,16 @@ class MenuServiceTest {
     private final ProductRepository productRepository = mock(ProductRepository.class);
     private final PurgomalumClient purgomalumClient = mock(PurgomalumClient.class);
     private final MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+    private Menu menu;
+
+    @BeforeEach
+    void setUp() {
+        menu = new Menu();
+    }
 
     @DisplayName("메뉴 생성시 가격이 null 이면 예외를 발생시킨다.")
     @Test
     void menu_create_price_null() {
-        Menu menu = new Menu();
         menu.setPrice(null);
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -39,7 +45,6 @@ class MenuServiceTest {
     @DisplayName("메뉴 생성시 가격이 음수면 예외를 발생시킨다.")
     @Test
     void menu_create_price_negative() {
-        Menu menu = new Menu();
         menu.setPrice(BigDecimal.valueOf(-1));
 
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -50,7 +55,6 @@ class MenuServiceTest {
     @Test
     void menu_create_not_found_menuGroup() {
         BDDMockito.given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
-        Menu menu = new Menu();
         menu.setPrice(BigDecimal.valueOf(16000));
 
         assertThatExceptionOfType(NoSuchElementException.class)
@@ -62,7 +66,6 @@ class MenuServiceTest {
     @NullAndEmptySource
     void menu_create_null_menuProducts(List<MenuProduct> productList) {
         BDDMockito.given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuFixture.MenuGroupFixture.한마리메뉴()));
-        Menu menu = new Menu();
         menu.setPrice(BigDecimal.valueOf(16000));
         menu.setMenuProducts(productList);
 
