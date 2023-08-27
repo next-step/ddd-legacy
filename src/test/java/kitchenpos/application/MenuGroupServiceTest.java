@@ -2,14 +2,20 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.helper.MenuGroupHelper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toUnmodifiableList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -74,6 +80,30 @@ class MenuGroupServiceTest extends ApplicationTest {
                 assertThatThrownBy(() -> menuGroupService.create(menuGroup))
                         .isInstanceOf(DataIntegrityViolationException.class);
             }
+        }
+    }
+
+    @DisplayName("모든 메뉴 그룹을 가져온다.")
+    @Nested
+    class FindAllMenuGroups {
+
+        private List<MenuGroup> beforeCreatedMenuGroups;
+
+        @BeforeEach
+        void beforeEach() {
+            beforeCreatedMenuGroups = IntStream.range(0, 50)
+                    .mapToObj(n -> menuGroupService.create(MenuGroupHelper.create()))
+                    .collect(toUnmodifiableList());
+        }
+
+        @DisplayName("모든 메뉴 그룹을 가져온다 (성공)")
+        @Test
+        void success1() {
+            // When
+            List<MenuGroup> allMenuGroups = menuGroupService.findAll();
+
+            // Then
+            assertThat(allMenuGroups.size()).isEqualTo(beforeCreatedMenuGroups.size());
         }
     }
 
