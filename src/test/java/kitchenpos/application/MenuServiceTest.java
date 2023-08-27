@@ -7,6 +7,7 @@ import kitchenpos.domain.Product;
 import kitchenpos.helper.MenuGroupHelper;
 import kitchenpos.helper.MenuHelper;
 import kitchenpos.helper.ProductHelper;
+import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,6 +16,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ import static kitchenpos.helper.NameHelper.NAME_OF_255_CHARACTERS;
 import static kitchenpos.helper.NameHelper.NAME_OF_256_CHARACTERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 @Transactional
 class MenuServiceTest extends ApplicationTest {
@@ -41,6 +44,9 @@ class MenuServiceTest extends ApplicationTest {
 
     @Autowired
     private MenuService menuService;
+
+    @SpyBean
+    private PurgomalumClient purgomalumClient;
 
     @BeforeAll
     static void beforeAll(@Autowired ProductService productService,
@@ -344,6 +350,24 @@ class MenuServiceTest extends ApplicationTest {
                 // Then
                 assertThatThrownBy(() -> menuService.create(menu))
                         .isInstanceOf(DataIntegrityViolationException.class);
+            }
+        }
+
+        @DisplayName("메뉴명에는 비속어가 포함되어 있으면 안 된다.")
+        @Nested
+        class Policy7 {
+            @DisplayName("메뉴명이 비속어인 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(strings = {"나쁜놈", "fuck"})
+            void fail1(final String name) {
+                // Given
+                when(purgomalumClient.containsProfanity(name)).thenReturn(true);
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts, name);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> menuService.create(menu))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
         }
     }
