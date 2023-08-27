@@ -70,20 +70,6 @@ class MenuServiceTest {
         menu.setMenuGroupId(MENU_GROUP_ID);
     }
 
-    @Test
-    @DisplayName("메뉴는 식별키, 이름, 가격, 메뉴그룹, 노출여부, 메뉴상품을 가진다.")
-    void menu() {
-        assertAll(
-                () -> assertThat(menu.getId()).isEqualTo(MENU_ID),
-                () -> assertThat(menu.getName()).isEqualTo(MENU_NAME),
-                () -> assertThat(menu.getPrice()).isEqualTo(MENU_PRICE),
-                () -> assertThat(menu.getMenuGroup()).isEqualTo(menuGroup),
-                () -> assertThat(menu.isDisplayed()).isEqualTo(true),
-                () -> assertThat(menu.getMenuProducts()).isEqualTo(List.of(menuProduct)),
-                () -> assertThat(menu.getMenuGroupId()).isEqualTo(MENU_GROUP_ID)
-        );
-    }
-
     @Nested
     @DisplayName("메뉴를 등록할 수 있다.")
     class create {

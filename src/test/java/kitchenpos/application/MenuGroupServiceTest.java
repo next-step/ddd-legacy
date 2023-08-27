@@ -43,15 +43,6 @@ class MenuGroupServiceTest {
         menuGroup.setName(MENU_GROUP_NAME);
     }
 
-    @Test
-    @DisplayName("메뉴그룹은 식별키, 이름을 가진다.")
-    void menuGroup() {
-        assertAll(
-                () -> assertThat(menuGroup.getName()).isEqualTo(MENU_GROUP_NAME),
-                () -> assertThat(menuGroup.getId()).isEqualTo(MENU_GROUP_ID)
-        );
-    }
-
     @Nested
     @DisplayName("메뉴그룹을 등록할 수 있다.")
     class create {

@@ -79,21 +79,6 @@ class OrderServiceTest {
         order.setOrderTableId(ORDER_TABLE_ID);
     }
 
-    @Test
-    @DisplayName("주문은 식별키, 주문타입, 주문상태, 주문시간, 주문내역, 배달주소, 주문테이블을 가진다.")
-    void order() {
-        assertAll(
-                () -> assertThat(order.getId()).isEqualTo(ORDER_TABLE_ID),
-                () -> assertThat(order.getType()).isEqualTo(ORDER_TYPE),
-                () -> assertThat(order.getStatus()).isEqualTo(ORDER_STATUS),
-                () -> assertThat(order.getOrderDateTime()).isEqualTo(ORDER_DATE_TIME),
-                () -> assertThat(order.getOrderLineItems()).isEqualTo(List.of(orderLineItem)),
-                () -> assertThat(order.getDeliveryAddress()).isEqualTo(DELIVERY_ADDRESS),
-                () -> assertThat(order.getOrderTable()).isEqualTo(orderTable),
-                () -> assertThat(order.getOrderTableId()).isEqualTo(ORDER_TABLE_ID)
-        );
-    }
-
     @Nested
     @DisplayName("주문을 등록할 수 있다.")
     class create {

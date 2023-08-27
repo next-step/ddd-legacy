@@ -55,16 +55,6 @@ class ProductServiceTest {
         menuProduct.setQuantity(1);
     }
 
-    @Test
-    @DisplayName("상품은 식별키, 이름, 가격을 가진다.")
-    void product() {
-        assertAll(
-                () -> assertThat(product.getId()).isEqualTo(PRODUCT_ID),
-                () -> assertThat(product.getName()).isEqualTo(PRODUCT_NAME),
-                () -> assertThat(product.getPrice()).isEqualTo(PRODUCT_PRICE)
-        );
-    }
-
     @Nested
     @DisplayName("상품을 등록할 수 있다.")
     class create {

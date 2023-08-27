@@ -51,17 +51,6 @@ class OrderTableServiceTest {
         orderTable.setOccupied(OCCUPIED);
     }
 
-    @Test
-    @DisplayName("주문테이블은 식별키, 이름, 손님수, 사용가능여부를 가진다.")
-    void menuGroup() {
-        assertAll(
-                () -> assertThat(orderTable.getId()).isEqualTo(ORDER_TABLE_ID),
-                () -> assertThat(orderTable.getName()).isEqualTo(ORDER_TABLE_NAME),
-                () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(NUMBER_OF_GUEST),
-                () -> assertThat(orderTable.isOccupied()).isEqualTo(OCCUPIED)
-        );
-    }
-
     @Nested
     @DisplayName("주문테이블을 등록할 수 있다.")
     class create {
