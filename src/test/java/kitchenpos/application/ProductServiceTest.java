@@ -6,6 +6,7 @@ import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -14,7 +15,10 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.toUnmodifiableList;
 import static kitchenpos.helper.ProductHelper.DEFAULT_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -198,6 +202,30 @@ class ProductServiceTest extends ApplicationTest {
                 assertThatThrownBy(() -> productService.changePrice(beforeCreatedProduct.getId(), beforeCreatedProduct))
                         .isInstanceOf(IllegalArgumentException.class);
             }
+        }
+    }
+
+    @DisplayName("모든 상품을 가져온다.")
+    @Nested
+    class FindAllProducts {
+
+        private List<Product> beforeCreatedProducts;
+
+        @BeforeEach
+        void beforeEach() {
+            beforeCreatedProducts = IntStream.range(0, 50)
+                    .mapToObj(n -> productService.create(ProductHelper.create()))
+                    .collect(toUnmodifiableList());
+        }
+
+        @DisplayName("모든 상품을 가져온다 (성공)")
+        @Test
+        void success1() {
+            // When
+            List<Product> allProducts = productService.findAll();
+
+            // Then
+            assertThat(allProducts.size()).isEqualTo(beforeCreatedProducts.size());
         }
     }
 
