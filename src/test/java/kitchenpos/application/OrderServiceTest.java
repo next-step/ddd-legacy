@@ -3,11 +3,17 @@ package kitchenpos.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
@@ -17,8 +23,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 
 public class OrderServiceTest extends SpringBootTestHelper {
 
@@ -26,6 +34,8 @@ public class OrderServiceTest extends SpringBootTestHelper {
     OrderService orderService;
     @Autowired
     MenuService menuService;
+    @SpyBean
+    OrderRepository orderRepository;
     @Autowired
     OrderTableService orderTableService;
     List<Menu> menus;
@@ -466,5 +476,98 @@ public class OrderServiceTest extends SpringBootTestHelper {
 
         //then
         assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("'접수 완료'된 주문만 서빙할수 있다")
+    @ParameterizedTest
+    @MethodSource("test23MethodSource")
+    void test23(String orderStatus) {
+        //given
+        Order order = new Order();
+        order.setStatus(OrderStatus.valueOf(orderStatus));
+        order.setId(UUID.randomUUID());
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+
+        //when && then
+        assertThatThrownBy(
+            () -> orderService.serve(order.getId())
+        ).isInstanceOf(IllegalStateException.class);
+    }
+
+    static Stream<String> test23MethodSource() {
+        return Arrays.stream(OrderStatus.values())
+            .filter(orderStatus -> orderStatus != OrderStatus.ACCEPTED)
+            .map(OrderStatus::name);
+    }
+
+    @DisplayName("'배달 주문'만 배달할수 있다")
+    @ParameterizedTest
+    @MethodSource("test24MethodSource")
+    void test24(String orderType) {
+        //given
+        Order order = new Order();
+        order.setType(OrderType.valueOf(orderType));
+        order.setId(UUID.randomUUID());
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+
+        //when && then
+        assertThatThrownBy(
+            () -> orderService.startDelivery(order.getId())
+        ).isInstanceOf(IllegalStateException.class);
+
+    }
+
+    static Stream<String> test24MethodSource() {
+        return Arrays.stream(OrderType.values())
+            .filter(orderType -> orderType != OrderType.DELIVERY)
+            .map(OrderType::name);
+    }
+
+    @DisplayName("'서빙 중'인 배달주문만 배달할수 있다")
+    @ParameterizedTest
+    @MethodSource("test25MethodSource")
+    void test25(String orderStatus) {
+        //given
+        Order order = new Order();
+        order.setType(OrderType.DELIVERY);
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.valueOf(orderStatus));
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+
+        //when && then
+        assertThatThrownBy(
+            () -> orderService.startDelivery(order.getId())
+        ).isInstanceOf(IllegalStateException.class);
+
+    }
+
+    static Stream<String> test25MethodSource() {
+        return Arrays.stream(OrderStatus.values())
+            .filter(orderStatus -> orderStatus != OrderStatus.SERVED)
+            .map(OrderStatus::name);
+    }
+
+    @DisplayName("'배달 중'인 배달주문만 배달완료 처리 할수 있다")
+    @ParameterizedTest
+    @MethodSource("test26MethodSource")
+    void test26(String orderStatus) {
+        //given
+        Order order = new Order();
+        order.setType(OrderType.DELIVERY);
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.valueOf(orderStatus));
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
+
+        //when && then
+        assertThatThrownBy(
+            () -> orderService.completeDelivery(order.getId())
+        ).isInstanceOf(IllegalStateException.class);
+
+    }
+
+    static Stream<String> test26MethodSource() {
+        return Arrays.stream(OrderStatus.values())
+            .filter(orderStatus -> orderStatus != OrderStatus.DELIVERING)
+            .map(OrderStatus::name);
     }
 }
