@@ -555,4 +555,29 @@ class MenuServiceTest extends ApplicationTest {
         }
     }
 
+    @DisplayName("모든 메뉴를 가져온다.")
+    @Nested
+    class FindAllMenus {
+
+        private List<Menu> beforeCreatedMenus;
+
+        @BeforeEach
+        void beforeEach() {
+            // When
+            beforeCreatedMenus = IntStream.range(0, 11)
+                    .mapToObj(n -> menuService.create(MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts)))
+                    .collect(toUnmodifiableList());
+        }
+
+        @DisplayName("모든 메뉴를 가져온다(성공)")
+        @Test
+        void success1() {
+            // When
+            List<Menu> allMenus = menuService.findAll();
+
+            // Then
+            assertThat(allMenus.size()).isEqualTo(beforeCreatedMenus.size());
+        }
+    }
+
 }

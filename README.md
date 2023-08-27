@@ -39,7 +39,7 @@ docker compose -p kitchenpos up -d
   - [X] 등록한 메뉴의 상품들을 노출한다.
     - [X] 메뉴의 가격은 메뉴에 등록된 상품들의 가격과 수량을 곱한 값의 합보다 클 수 없다.
   - [X] 노출한 메뉴를 숨긴다.
-  - [ ] 모든 메뉴를 가져온다.
+  - [X] 모든 메뉴를 가져온다.
 - 주문 (Orders)
   - 주문 유형에는 배달(Delivery), 포장(Takeout), 매장 식사(Eat in)가 있다.
   - 주문 상태에는 대기(Waiting), 승낙(Accepted), 제공(Served), 배달중(Delivering), 배달 완료(Delivered), 완료(Completed)가 있다
