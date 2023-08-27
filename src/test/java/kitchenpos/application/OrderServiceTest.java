@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,7 +23,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
     @InjectMocks
@@ -37,7 +37,8 @@ class OrderServiceTest {
     private KitchenridersClient kitchenridersClient;
 
     @Test
-    void 새로운_배달_주문을_등록한다() {
+    @DisplayName("새로운_배달_주문을_등록한다")
+    void newOrderTest() {
         // given
         Order order = TEST_ORDER_DELIVERY();
         Menu menu = TEST_MENU();
@@ -58,7 +59,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 새로운_테이크아웃_주문을_등록한다() {
+    @DisplayName("새로운_테이크아웃_주문을_등록한다")
+    void newTakeOutOrderTest() {
         // given
         Order order = TEST_ORDER_TAKEOUT();
         Menu menu = TEST_MENU();
@@ -78,7 +80,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 새로운_매장_주문을_등록한다() {
+    @DisplayName("새로운_매장_주문을_등록한다")
+    void newEatInTest() {
         // given
         Order order = TEST_ORDER_EAT_IN();
         Menu menu = TEST_MENU();
@@ -104,7 +107,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문_타입은_배달_매장_포장_중_하나이어야_한다() {
+    @DisplayName("주문_타입은_배달_매장_포장_중_하나이어야_한다")
+    void menuTypeTest() {
         // given
         Order order = TEST_ORDER_EAT_IN();
 
@@ -117,7 +121,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문의_주문_내역은_비어있을_수_없다() {
+    @DisplayName("주문의_주문_내역은_비어있을_수_없다")
+    void menuListNotEmpty() {
         // given
         Order order = TEST_ORDER_EAT_IN();
 
@@ -130,7 +135,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문_내역에_포함된_메뉴들은_존재하는_메뉴들이어야_한다() {
+    @DisplayName("주문_내역에_포함된_메뉴들은_존재하는_메뉴들이어야_한다")
+    void menuShouldExist() {
         // given
         Order order = TEST_ORDER_EAT_IN();
 
@@ -144,7 +150,8 @@ class OrderServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {"take_out", "delivery"})
-    void 주문_타입이_매장_타입이_아니라면_주문_내역의_수량이_0이상이어야_한다(String typeValue) {
+    @DisplayName("주문_타입이_매장_타입이_아니라면_주문_내역의_수량이_0이상이어야_한다")
+    void menuQuantityTest(String typeValue) {
         // given
         Order order = TEST_ORDER_DELIVERY();
         Menu menu = TEST_MENU();
@@ -163,7 +170,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문_내역들의_메뉴들은_활성화_된_메뉴들이어야_한다() {
+    @DisplayName("주문_내역들의_메뉴들은_활성화_된_메뉴들이어야_한다")
+    void menuShouldDisplay() {
         // given
         Order order = TEST_ORDER_EAT_IN();
         Menu menu = TEST_MENU();
@@ -180,7 +188,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문_내역의_가격과_메뉴의_가격이_일치하여야_한다() {
+    @DisplayName("주문_내역의_가격과_메뉴의_가격이_일치하여야_한다")
+    void menuAndMenuLinePriceTest() {
         // given
         Order order = TEST_ORDER_EAT_IN();
         Menu menu = TEST_MENU();
@@ -197,7 +206,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문_타입이_배달이라면_주소가_적혀있어야_한다() {
+    @DisplayName("주문_타입이_배달이라면_주소가_적혀있어야_한다")
+    void addressTest() {
         // given
         Order order = TEST_ORDER_DELIVERY();
         Menu menu = TEST_MENU();
@@ -213,7 +223,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문_타입이_매장이라면_사용_가능한_테이블이_지정되어야_한다() {
+    @DisplayName("주문_타입이_매장이라면_사용_가능한_테이블이_지정되어야_한다")
+    void orderTableShouldSet() {
         // given
         Order order = TEST_ORDER_EAT_IN();
         Menu menu = TEST_MENU();
@@ -233,7 +244,8 @@ class OrderServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {"take_out", "eat_in"})
-    void 테이크아웃과_매장_주문을_수락한다(String typeName) {
+    @DisplayName("테이크아웃과_매장_주문을_수락한다")
+    void takeOutAndEatInTest(String typeName) {
         // given
         Order order = getOrderByTypeName(typeName);
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
@@ -247,7 +259,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 수락하려는_주문의_상태가_대기중이어야_한다() {
+    @DisplayName("수락하려는_주문의_상태가_대기중이어야_한다")
+    void acceptStatusTest() {
         // given
         Order order = TEST_ORDER_EAT_IN();
 
@@ -261,7 +274,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 배달_주문이라면_배달을_요청한다() {
+    @DisplayName("배달_주문이라면_배달을_요청한다")
+    void deliveryAcceptTest() {
         // given
         Order order = TEST_ORDER_DELIVERY();
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
@@ -276,7 +290,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문을_조리_완료하고_제공_상태로_변경한다() {
+    @DisplayName("주문을_조리_완료하고_제공_상태로_변경한다")
+    void changeStatusTest() {
         // given
         Order order = TEST_ORDER_DELIVERY();
         order.setStatus(OrderStatus.ACCEPTED);
@@ -291,7 +306,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문의_상태가_수락된_상태이어야_한다() {
+    @DisplayName("주문의_상태가_수락된_상태이어야_한다")
+    void orderStatusShouldAccept() {
         // given
         Order order = TEST_ORDER_EAT_IN();
 
@@ -305,7 +321,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문의_배달을_시작한다() {
+    @DisplayName("주문의_배달을_시작한다")
+    void startDelivery() {
         // given
         Order order = TEST_ORDER_DELIVERY();
         order.setStatus(OrderStatus.SERVED);
@@ -321,7 +338,8 @@ class OrderServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {"take_out", "eat_in"})
-    void 주문_타입이_배달이어야_한다(String typeName) {
+    @DisplayName("주문_타입이_배달이어야_한다")
+    void typeShouldDeliveryTest(String typeName) {
         // given
         Order order = getOrderByTypeName(typeName);
 
@@ -334,7 +352,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문_상태가_제공_상태이어야_한다() {
+    @DisplayName("주문_상태가_제공_상태이어야_한다")
+    void statusShouldServed() {
         // given
         Order order = TEST_ORDER_DELIVERY();
 
@@ -348,7 +367,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문의_배달을_완료한다() {
+    @DisplayName("주문의_배달을_완료한다")
+    void completeDelivery() {
         // given
         Order order = TEST_ORDER_DELIVERY();
         order.setStatus(OrderStatus.DELIVERING);
@@ -363,7 +383,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문의_상태가_배달중이어야_한다() {
+    @DisplayName("주문의_상태가_배달중이어야_한다")
+    void statusShouldDelivering() {
         // given
         Order order = TEST_ORDER_DELIVERY();
 
@@ -377,7 +398,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 배달_주문을_완료한다() {
+    @DisplayName("배달_주문을_완료한다")
+    void completeDeliveryTest() {
         // given
         Order order = TEST_ORDER_DELIVERY();
         order.setStatus(OrderStatus.DELIVERED);
@@ -392,7 +414,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 주문이_배달이라면_주문_상태가_배달_완료이어야한다() {
+    @DisplayName("주문이_배달이라면_주문_상태가_배달_완료이어야한다")
+    void checkDeliveryStatus() {
         // given
         Order order = TEST_ORDER_DELIVERY();
 
@@ -406,7 +429,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 매장_주문을_완료하면서_테이블도_정리한다() {
+    @DisplayName("매장_주문을_완료하면서_테이블도_정리한다")
+    void clearTableTest() {
         // given
         Order order = TEST_ORDER_EAT_IN();
         order.setStatus(OrderStatus.SERVED);
@@ -423,7 +447,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 포장_주문을_완료한다() {
+    @DisplayName("포장_주문을_완료한다")
+    void completeTakeOutOrder() {
         // given
         Order order = TEST_ORDER_TAKEOUT();
         order.setStatus(OrderStatus.SERVED);
@@ -439,7 +464,8 @@ class OrderServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {"take_out", "eat_in"})
-    void 주문이_매장이거나_포장이라면_주문_상태가_제공된_상태이여야한다(String typeName) {
+    @DisplayName("주문이_매장이거나_포장이라면_주문_상태가_제공된_상태이여야한다")
+    void checkTakeOutAndEatInStatus(String typeName) {
         // given
         Order order = getOrderByTypeName(typeName);
 
@@ -453,7 +479,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void 모든_주문_정보를_가져온다() {
+    @DisplayName("모든_주문_정보를_가져온다")
+    void findAll() {
         // given
         Order delivery = TEST_ORDER_DELIVERY();
         Order takeout = TEST_ORDER_TAKEOUT();

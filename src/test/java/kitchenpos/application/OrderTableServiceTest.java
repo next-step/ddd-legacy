@@ -4,8 +4,11 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -22,7 +25,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
     @InjectMocks
@@ -33,7 +35,8 @@ class OrderTableServiceTest {
     private OrderTableRepository orderTableRepository;
 
     @Test
-    void 새로운_주문_테이블을_등록한다() {
+    @DisplayName("새로운_주문_테이블을_등록한다")
+    void createOrderTable() {
         // given
         OrderTable orderTableRequest = TEST_ORDER_TABLE();
         given(orderTableRepository.save(any(OrderTable.class))).willReturn(orderTableRequest);
@@ -51,21 +54,18 @@ class OrderTableServiceTest {
     void 이름은_비어있을_수_없다() {
         // given
         OrderTable nameNull = TEST_ORDER_TABLE();
-        OrderTable nameEmpty1 = TEST_ORDER_TABLE();
 
         // when
-        nameNull.setName(null);
-        nameEmpty1.setName("");
+        nameNull.setName(input);
 
         // then
         assertThatThrownBy(() -> orderTableService.create(nameNull))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> orderTableService.create(nameEmpty1))
-                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
-    void 테이블에_손님을_채운다() {
+    @DisplayName("테이블에_손님을_채운다")
+    void sitTest() {
         // given
         OrderTable orderTable = TEST_ORDER_TABLE();
         UUID orderTableId = orderTable.getId();
@@ -80,7 +80,8 @@ class OrderTableServiceTest {
     }
 
     @Test
-    void 테이블에_있던_손님이_나가고_다시_손님을_받을_수_있는_상태로_변경한다() {
+    @DisplayName("테이블에_있던_손님이_나가고_다시_손님을_받을_수_있는_상태로_변경한다")
+    void clearTableTest() {
         // given
         OrderTable orderTable = TEST_ORDER_TABLE();
         UUID orderTableId = orderTable.getId();
@@ -100,7 +101,8 @@ class OrderTableServiceTest {
     }
 
     @Test
-    void 주문이_완료되지_않았다면_테이블을_정리할_수_없다() {
+    @DisplayName("주문이_완료되지_않았다면_테이블을_정리할_수_없다")
+    void clearStatusShouldCompleted() {
         // given
         OrderTable orderTable = TEST_ORDER_TABLE();
         UUID orderTableId = orderTable.getId();
@@ -116,7 +118,8 @@ class OrderTableServiceTest {
     }
 
     @Test
-    void 테이블에_인원_수를_변경한다() {
+    @DisplayName("테이블에_인원_수를_변경한다")
+    void changeNumberOfGuest() {
         // given
         OrderTable orderTable = TEST_ORDER_TABLE();
         UUID orderTableId = orderTable.getId();
@@ -134,7 +137,8 @@ class OrderTableServiceTest {
     }
 
     @Test
-    void 변경할_인원_수는_0명_이상이어야_한다() {
+    @DisplayName("변경할_인원_수는_0명_이상이어야_한다")
+    void guestNumberShouldGreaterThanZero() {
         // given
         OrderTable orderTable = TEST_ORDER_TABLE();
         UUID orderTableId = orderTable.getId();
@@ -148,7 +152,8 @@ class OrderTableServiceTest {
     }
 
     @Test
-    void 사용가능한_테이블만_인원_수를_변경_할_수_있다() {
+    @DisplayName("사용가능한_테이블만_인원_수를_변경_할_수_있다")
+    void changeGuestNumberShouldOccupiedTrue() {
         // given
         OrderTable orderTable = TEST_ORDER_TABLE();
         UUID orderTableId = orderTable.getId();
@@ -164,7 +169,8 @@ class OrderTableServiceTest {
     }
 
     @Test
-    void 모든_주문_테이블_정보를_가져온다() {
+    @DisplayName("모든_주문_테이블_정보를_가져온다")
+    void findAllTest() {
         // given
         OrderTable orderTable = TEST_ORDER_TABLE();
         given(orderTableRepository.findAll()).willReturn(List.of(orderTable, orderTable));

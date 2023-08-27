@@ -24,7 +24,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@SuppressWarnings("NonAsciiCharacters")
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
     @InjectMocks
@@ -62,7 +61,8 @@ public class MenuServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {"-50030", "-1", "null"})
-    void 메뉴의_가격은_0원_이상이여야_한다(String price) {
+    @DisplayName("메뉴의_가격은_0원_이상이여야_한다")
+    void priceTest(String price) {
         // given
         Menu menuRequest = TEST_MENU();
 
@@ -76,7 +76,8 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 메뉴_생성시_상품을_등록해야한다() {
+    @DisplayName("메뉴_생성시_상품을_등록해야한다")
+    void productRequiredTest() {
         // given
         Menu menuRequest = TEST_MENU();
         given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
@@ -90,7 +91,8 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 메뉴_생성시_상품들은_등록된_상품이어야_한다() {
+    @DisplayName("메뉴_생성시_상품들은_등록된_상품이어야_한다")
+    void productShouldExist() {
         // given
         Menu menuRequest = TEST_MENU();
         given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
@@ -105,7 +107,8 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 메뉴의_상품들은_수량은_0개_이상이어야_한다() {
+    @DisplayName("메뉴의_상품들은_수량은_0개_이상이어야_한다")
+    void quantityTest() {
         // given
         Menu menuRequest = TEST_MENU();
         given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
@@ -141,7 +144,8 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 메뉴의_이름은_빈값이면_안된다() {
+    @DisplayName("메뉴의_이름은_빈값이면_안된다")
+    void menuNameNotNull() {
         // given
         Menu menuRequest = TEST_MENU();
         given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
@@ -150,6 +154,7 @@ public class MenuServiceTest {
 
         // when
         menuRequest.setName(null);
+
         // then
         assertThatThrownBy(() -> menuService.create(menuRequest))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -157,7 +162,8 @@ public class MenuServiceTest {
 
     @ParameterizedTest
     @CsvSource(value = {"fuck", "shit"})
-    void 메뉴의_이름은_부적절한_영어_이름이면_안된다(String name) {
+    @DisplayName("메뉴의_이름은_부적절한_영어_이름이면_안된다")
+    void profanityTest(String name) {
         // given
         Menu menuRequest = TEST_MENU();
         given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
@@ -173,7 +179,8 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 기존_메뉴의_가격을_수정한다() {
+    @DisplayName("기존_메뉴의_가격을_수정한다")
+    void menuPriceChangeTest() {
         // given
         Menu menuRequest = TEST_MENU();
         given(menuRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU()));
@@ -189,7 +196,8 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 변경할_가격은_0원_이상이어야_한다() {
+    @DisplayName("변경할_가격은_0원_이상이어야_한다")
+    void changePriceTest() {
         // given
         Menu menuRequest = TEST_MENU();
 
@@ -219,7 +227,8 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 기존_메뉴가_사용자에게_보이도록_활성화한다() {
+    @DisplayName("기존_메뉴가_사용자에게_보이도록_활성화한다")
+    void menuDisplayTest() {
         // given
         Menu menuRequest = TEST_MENU();
         given(menuRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU()));
@@ -249,7 +258,8 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 기존_메뉴가_사용자에게_보이지_않도록_비활성화한다() {
+    @DisplayName("기존_메뉴가_사용자에게_보이지_않도록_비활성화한다")
+    void hideTest() {
         // given
         Menu menuRequest = TEST_MENU();
         given(menuRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU()));
@@ -264,7 +274,8 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 모든_메뉴_정보를_가져온다() {
+    @DisplayName("모든_메뉴_정보를_가져온다")
+    void findAllTest() {
         // given
         given(menuRepository.findAll()).willReturn(List.of(new Menu(), new Menu(), new Menu()));
 
