@@ -1,16 +1,17 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
 
 import java.math.BigDecimal;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 
 class MenuServiceTest {
@@ -24,20 +25,33 @@ class MenuServiceTest {
 
     @DisplayName("메뉴 생성시 가격이 null 이면 예외를 발생시킨다.")
     @Test
-    void create_price_null() {
+    void menu_create_price_null() {
         Menu menu = new Menu();
         menu.setPrice(null);
+
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(menu));
     }
 
     @DisplayName("메뉴 생성시 가격이 음수면 예외를 발생시킨다.")
     @Test
-    void create_price_negative() {
+    void menu_create_price_negative() {
         Menu menu = new Menu();
         menu.setPrice(BigDecimal.valueOf(-1));
+
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(menu));
+    }
+
+    @DisplayName("메뉴는 메뉴그룹이 없으면 예외를 발생시킨다.")
+    @Test
+    void menu_create_not_found_menuGroup() {
+        BDDMockito.given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
+        Menu menu = new Menu();
+        menu.setPrice(BigDecimal.valueOf(16000));
+
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy( () ->  menuService.create(menu));
     }
 
 
