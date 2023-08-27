@@ -21,6 +21,10 @@ public final class MenuHelper {
         return create(price, menuGroupId, menuProducts, DEFAULT_NAME, DEFAULT_DISPLAYED);
     }
 
+    public static Menu create(BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProducts, String name) {
+        return create(price, menuGroupId, menuProducts, name, DEFAULT_DISPLAYED);
+    }
+
     public static Menu create(BigDecimal price, UUID menuGroupId, List<MenuProduct> menuProducts, String name, boolean displayed) {
         Menu menu = new Menu();
         menu.setPrice(price);

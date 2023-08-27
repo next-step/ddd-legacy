@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
+import static kitchenpos.helper.NameHelper.NAME_OF_255_CHARACTERS;
+import static kitchenpos.helper.NameHelper.NAME_OF_256_CHARACTERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -33,7 +35,7 @@ class MenuGroupServiceTest extends ApplicationTest {
         class Policy1 {
             @DisplayName("메뉴 그룹명이 0자 초가 255자 이하인 경우 (성공)")
             @ParameterizedTest
-            @ValueSource(strings = {" ", "한", "a", "1", "메뉴 그룹명", "menu group name", "메뉴 그룹 A", "Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one."})
+            @ValueSource(strings = {" ", "한", "a", "1", "메뉴 그룹명", "menu group name", "메뉴 그룹 A", NAME_OF_255_CHARACTERS})
             void success1(final String name) {
                 // Given
                 MenuGroup menuGroup = MenuGroupHelper.create(name);
@@ -71,7 +73,7 @@ class MenuGroupServiceTest extends ApplicationTest {
 
             @DisplayName("메뉴 그룹명이 255자를 초과한 경우 (실패)")
             @ParameterizedTest
-            @ValueSource(strings = {"Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia, looked up one ."})
+            @ValueSource(strings = {NAME_OF_256_CHARACTERS})
             void fail3(final String name) {
                 // When
                 MenuGroup menuGroup = MenuGroupHelper.create(name);

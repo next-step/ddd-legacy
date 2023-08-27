@@ -15,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,8 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
 import static kitchenpos.helper.MenuHelper.DEFAULT_PRICE;
+import static kitchenpos.helper.NameHelper.NAME_OF_255_CHARACTERS;
+import static kitchenpos.helper.NameHelper.NAME_OF_256_CHARACTERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -64,6 +67,12 @@ class MenuServiceTest extends ApplicationTest {
     private List<UUID> collectMenuProductIds(List<MenuProduct> menuProducts) {
         return menuProducts.stream()
                 .map(m -> m.getProduct().getId())
+                .collect(toUnmodifiableList());
+    }
+
+    private List<String> collectMenuNames(List<MenuProduct> menuProducts) {
+        return menuProducts.stream()
+                .map(m -> m.getProduct().getName())
                 .collect(toUnmodifiableList());
     }
 
@@ -287,6 +296,54 @@ class MenuServiceTest extends ApplicationTest {
                 // Then
                 assertThatThrownBy(() -> menuService.create(menu))
                         .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+
+        @DisplayName("메뉴명은 비어있을 수 없고, 255자를 초과할 수 없다.")
+        @Nested
+        class Policy6 {
+            @DisplayName("메뉴명이 0자 이상 255자 이하인 경우 (성공)")
+            @ParameterizedTest
+            @ValueSource(strings = {"", "한", "a", "1", "메뉴명", "menu name", "메뉴 A", NAME_OF_255_CHARACTERS})
+            void success1(final String name) {
+                // Given
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts, name);
+
+                // When
+                Menu createdMenu = menuService.create(menu);
+
+                // Then
+                assertThat(createdMenu.getPrice()).isEqualTo(DEFAULT_PRICE);
+                assertThat(createdMenu.getMenuGroup().getId()).isEqualTo(createdMenuGroup.getId());
+                assertThat(createdMenu.getMenuProducts().size()).isEqualTo(createdMenuProducts.size());
+                assertThat(collectMenuProductIds(createdMenu.getMenuProducts()))
+                        .containsAll(collectMenuProductIds(createdMenuProducts));
+                assertThat(collectMenuNames(createdMenu.getMenuProducts()))
+                        .containsAll(collectMenuNames(createdMenuProducts));
+            }
+
+            @DisplayName("메뉴명이 null 인 경우 (실패)")
+            @ParameterizedTest
+            @NullSource
+            void fail1(final String name) {
+                // When
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts, name);
+
+                // Then
+                assertThatThrownBy(() -> menuService.create(menu))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("메뉴명이 255자를 초과한 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(strings = {NAME_OF_256_CHARACTERS})
+            void fail2(final String name) {
+                // When
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts, name);
+
+                // Then
+                assertThatThrownBy(() -> menuService.create(menu))
+                        .isInstanceOf(DataIntegrityViolationException.class);
             }
         }
     }
