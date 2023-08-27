@@ -476,4 +476,34 @@ class MenuServiceTest extends ApplicationTest {
         }
     }
 
+    @DisplayName("등록한 메뉴의 상품들을 노출한다.")
+    @Nested
+    class DisplayMenu {
+
+        private Menu beforeCreatedMenu;
+
+        @BeforeEach
+        void beforeEach() {
+            beforeCreatedMenu = menuService.create(MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts));
+        }
+
+        @DisplayName("메뉴의 가격은 메뉴에 등록된 상품들의 가격과 수량을 곱한 값의 합보다 클 수 없다.")
+        @Nested
+        class Policy1 {
+            @DisplayName("메뉴의 가격이 (메뉴에 등록된 상품들의 가격과 수량을 곱한 값의 합)보다 작거나 같은 경우 (성공)")
+            @Test
+            void success1() {
+                // When
+                Menu displayedMenu = menuService.display(beforeCreatedMenu.getId());
+
+                // Then
+                assertThat(displayedMenu.isDisplayed()).isEqualTo(true);
+                assertThat(displayedMenu.getMenuGroup().getId()).isEqualTo(createdMenuGroup.getId());
+                assertThat(displayedMenu.getMenuProducts().size()).isEqualTo(createdMenuProducts.size());
+                assertThat(collectMenuProductIds(displayedMenu.getMenuProducts()))
+                        .containsAll(collectMenuProductIds(createdMenuProducts));
+            }
+        }
+    }
+
 }
