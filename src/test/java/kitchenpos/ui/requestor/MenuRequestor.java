@@ -31,6 +31,15 @@ public class MenuRequestor {
                 .extract().jsonPath().getObject("id", UUID.class);
     }
 
+    public static Menu 메뉴생성요청_메뉴반환(Menu menu) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(menu)
+                .when().post(DEFAULT_URL)
+                .then().log().all()
+                .extract().jsonPath().getObject("$", Menu.class);
+    }
+
     public static ExtractableResponse<Response> 메뉴가격변경요청(UUID menuId, Menu menu) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

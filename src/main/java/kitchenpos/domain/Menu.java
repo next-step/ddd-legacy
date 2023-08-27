@@ -46,6 +46,11 @@ public class Menu {
 
     public Menu(String name, BigDecimal price, MenuGroup menuGroup, boolean displayed,
                 List<MenuProduct> menuProducts, UUID menuGroupId) {
+        this(UUID.randomUUID(), name, price, menuGroup, displayed, menuProducts, menuGroupId);
+    }
+
+    public Menu(UUID id, String name, BigDecimal price, MenuGroup menuGroup, boolean displayed, List<MenuProduct> menuProducts, UUID menuGroupId) {
+        this.id = id;
         this.name = name;
         this.price = price;
         this.menuGroup = menuGroup;

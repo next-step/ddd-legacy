@@ -14,4 +14,8 @@ public class MenuMaker {
         return new Menu(name, new BigDecimal(price), menuGroup, true, List.of(menuProducts), menuGroup.getId());
     }
 
+    public static Menu makeHideMenu(String name, Long price, MenuGroup menuGroup, MenuProduct... menuProducts) {
+        return new Menu(name, new BigDecimal(price), menuGroup, false, List.of(menuProducts), menuGroup.getId());
+    }
+
 }

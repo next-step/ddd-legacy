@@ -49,6 +49,15 @@ public class Order {
     public Order() {
     }
 
+    public Order(OrderType type, List<OrderLineItem> orderLineItems, String deliveryAddress,
+                 OrderTable orderTable, UUID orderTableId) {
+        this.type = type;
+        this.orderLineItems = orderLineItems;
+        this.deliveryAddress = deliveryAddress;
+        this.orderTable = orderTable;
+        this.orderTableId = orderTableId;
+    }
+
     public UUID getId() {
         return id;
     }

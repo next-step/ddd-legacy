@@ -30,6 +30,11 @@ public class OrderTable {
     }
 
     public OrderTable(String name, int numberOfGuests, boolean occupied) {
+        this(UUID.randomUUID(), name, numberOfGuests, occupied);
+    }
+
+    public OrderTable(UUID id, String name, int numberOfGuests, boolean occupied) {
+        this.id = id;
         this.name = name;
         this.numberOfGuests = numberOfGuests;
         this.occupied = occupied;
