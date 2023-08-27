@@ -242,6 +242,53 @@ class MenuServiceTest extends ApplicationTest {
                         .isInstanceOf(IllegalArgumentException.class);
             }
         }
+
+        @DisplayName("메뉴의 가격은 메뉴에 등록된 상품들의 가격과 수량을 곱한 값의 합보다 클 수 없다.")
+        @Nested
+        class Policy5 {
+            @DisplayName("메뉴의 가격이 (메뉴에 등록된 상품들의 가격과 수량을 곱한 값의 합)보다 작거나 같은 경우 (성공)")
+            @ParameterizedTest
+            @ValueSource(ints = {0, 1, 10, 100})
+            void success1(final int price) {
+                // Given
+                BigDecimal totalPrice = createdMenuProducts.parallelStream()
+                        .map(menuProduct -> menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal menuPrice = totalPrice.subtract(BigDecimal.valueOf(price));
+
+                Menu menu = MenuHelper.create(menuPrice, createdMenuGroup.getId(), createdMenuProducts);
+
+                // When
+                Menu createdMenu = menuService.create(menu);
+
+                // Then
+                assertThat(createdMenu.getPrice()).isEqualTo(menuPrice);
+                assertThat(createdMenu.getMenuGroup().getId()).isEqualTo(createdMenuGroup.getId());
+                assertThat(createdMenu.getMenuProducts().size()).isEqualTo(createdMenuProducts.size());
+                assertThat(collectMenuProductIds(createdMenu.getMenuProducts()))
+                        .containsAll(collectMenuProductIds(createdMenuProducts));
+            }
+
+            @DisplayName("메뉴의 가격이 (메뉴에 등록된 상품들의 가격과 수량을 곱한 값의 합)보다 큰 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(ints = {1, 10, 100})
+            void fail1(final int price) {
+                // Given
+                BigDecimal totalPrice = createdMenuProducts.parallelStream()
+                        .map(menuProduct -> menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal menuPrice = totalPrice.add(BigDecimal.valueOf(price));
+
+                Menu menu = MenuHelper.create(menuPrice, createdMenuGroup.getId(), createdMenuProducts);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> menuService.create(menu))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
     }
 
 }
