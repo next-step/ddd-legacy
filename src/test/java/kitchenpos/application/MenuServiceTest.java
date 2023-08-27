@@ -8,10 +8,7 @@ import kitchenpos.helper.MenuGroupHelper;
 import kitchenpos.helper.MenuHelper;
 import kitchenpos.helper.ProductHelper;
 import kitchenpos.infra.PurgomalumClient;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -56,7 +53,7 @@ class MenuServiceTest extends ApplicationTest {
                 .mapToObj(n -> productService.create(ProductHelper.create(BigDecimal.valueOf(n * 1000L))))
                 .collect(toUnmodifiableList());
         createdMenuProducts = IntStream.range(0, createdProducts.size())
-                .mapToObj(i -> createMenuProduct(i, i))
+                .mapToObj(i -> createMenuProduct(i, i + 1))
                 .collect(toUnmodifiableList());
         createdMenuGroup = menuGroupService.create(MenuGroupHelper.create());
     }
@@ -367,6 +364,64 @@ class MenuServiceTest extends ApplicationTest {
                 // When
                 // Then
                 assertThatThrownBy(() -> menuService.create(menu))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+    }
+
+    @DisplayName("기존 메뉴의 가격을 변경한다.")
+    @Nested
+    class ChangeMenuPrice {
+
+        private Menu beforeCreatedMenu;
+
+        @BeforeEach
+        void beforeEach() {
+            beforeCreatedMenu = menuService.create(MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts));
+        }
+
+        @DisplayName("메뉴 가격은 0원 이상이어야 한다.")
+        @Nested
+        class Policy1 {
+            @DisplayName("메뉴에 대한 가격은 0원 이상인 경우 (성공)")
+            @ParameterizedTest
+            @ValueSource(ints = {0, 1, 1000})
+            void success1(final int priceInt) {
+                // Given
+                BigDecimal price = new BigDecimal(priceInt);
+                Menu menu = MenuHelper.create(price, createdMenuGroup.getId(), createdMenuProducts);
+
+                // When
+                Menu createdMenu = menuService.changePrice(beforeCreatedMenu.getId(), menu);
+
+                // Then
+                assertThat(createdMenu.getPrice()).isEqualTo(price);
+            }
+
+            @DisplayName("메뉴에 대한 가격은 null 인 경우 (실패)")
+            @ParameterizedTest
+            @NullSource
+            void fail1(BigDecimal price) {
+                // When
+                Menu menu = MenuHelper.create(price, createdMenuGroup.getId(), createdMenuProducts);
+
+                // Then
+                assertThatThrownBy(() -> menuService.changePrice(beforeCreatedMenu.getId(), menu))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("메뉴에 대한 가격은 0원 미만인 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(ints = {-1, -100, Integer.MIN_VALUE})
+            void fail2(final int priceInt) {
+                // Given
+                BigDecimal price = new BigDecimal(priceInt);
+
+                // When
+                Menu menu = MenuHelper.create(price, createdMenuGroup.getId(), createdMenuProducts);
+
+                // Then
+                assertThatThrownBy(() -> menuService.changePrice(beforeCreatedMenu.getId(), menu))
                         .isInstanceOf(IllegalArgumentException.class);
             }
         }
