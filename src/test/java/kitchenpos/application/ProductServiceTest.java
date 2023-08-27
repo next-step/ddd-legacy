@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.Product;
 import kitchenpos.helper.ProductHelper;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -140,6 +141,64 @@ class ProductServiceTest extends ApplicationTest {
             }
         }
 
+    }
+
+    @DisplayName("기존 상품의 가격을 변경한다.")
+    @Nested
+    class ChangeProductPrice {
+
+        private Product beforeCreatedProduct;
+
+        @BeforeEach
+        void beforeEach() {
+            beforeCreatedProduct = productService.create(ProductHelper.create());
+        }
+
+        @DisplayName("상품에 대한 가격은 0원 이상이어야 한다.")
+        @Nested
+        class Policy1 {
+            @DisplayName("상품에 대한 가격은 0원 이상인 경우 (성공)")
+            @ParameterizedTest
+            @ValueSource(ints = {0, 1, Integer.MAX_VALUE})
+            void success1(final int priceInt) {
+                // Given
+                BigDecimal price = new BigDecimal(priceInt);
+                beforeCreatedProduct.setPrice(price);
+
+                // When
+                Product createdProduct = productService.changePrice(beforeCreatedProduct.getId(), beforeCreatedProduct);
+
+                // Then
+                assertThat(createdProduct.getPrice()).isEqualTo(price);
+            }
+
+            @DisplayName("상품에 대한 가격은 null 인 경우 (실패)")
+            @ParameterizedTest
+            @NullSource
+            void fail1(BigDecimal price) {
+                // Given
+                beforeCreatedProduct.setPrice(price);
+
+                // When
+                assertThatThrownBy(() -> productService.changePrice(beforeCreatedProduct.getId(), beforeCreatedProduct))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("상품에 대한 가격은 0원 미만인 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(ints = {-1, -100, Integer.MIN_VALUE})
+            void fail2(final int priceInt) {
+                // Given
+                BigDecimal price = new BigDecimal(priceInt);
+
+                // When
+                beforeCreatedProduct.setPrice(price);
+
+                // Then
+                assertThatThrownBy(() -> productService.changePrice(beforeCreatedProduct.getId(), beforeCreatedProduct))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
     }
 
 }

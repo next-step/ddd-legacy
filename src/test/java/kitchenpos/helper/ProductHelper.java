@@ -14,6 +14,10 @@ public final class ProductHelper {
     private ProductHelper() {
     }
 
+    public static Product create() {
+        return create(DEFAULT_NAME, DEFAULT_PRICE);
+    }
+
     public static Product create(BigDecimal price) {
         return create(DEFAULT_NAME, price);
     }
