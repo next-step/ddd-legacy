@@ -50,8 +50,10 @@ class OrderTableServiceTest {
         assertThat(orderTable.isOccupied()).isFalse();
     }
 
-    @Test
-    void 이름은_비어있을_수_없다() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @DisplayName("이름은_비어있을_수_없다")
+    void nameNotEmpty(String input) {
         // given
         OrderTable nameNull = TEST_ORDER_TABLE();
 
