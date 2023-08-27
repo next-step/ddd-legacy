@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -98,7 +99,7 @@ public class MenuServiceTest {
         given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
 
         // when
-        List<Product> emptyList = List.of();
+        List<Product> emptyList = Collections.emptyList();
         given(productRepository.findAllByIdIn(anyList())).willReturn(emptyList);
 
         // then
