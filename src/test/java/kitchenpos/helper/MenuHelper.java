@@ -11,6 +11,7 @@ import java.util.UUID;
 public final class MenuHelper {
 
     public static final String DEFAULT_NAME = "테스트 기본 메뉴명";
+    public static final BigDecimal DEFAULT_PRICE = new BigDecimal(1000);
     public static final boolean DEFAULT_DISPLAYED = true;
 
     private MenuHelper() {

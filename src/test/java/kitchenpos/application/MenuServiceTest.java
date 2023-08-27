@@ -10,17 +10,22 @@ import kitchenpos.helper.ProductHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
+import static kitchenpos.helper.MenuHelper.DEFAULT_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -100,6 +105,50 @@ class MenuServiceTest extends ApplicationTest {
                 // Then
                 assertThatThrownBy(() -> menuService.create(menu))
                         .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+
+        @DisplayName("등록할 메뉴 그룹이 있어야 한다.")
+        @Nested
+        class Policy2 {
+            @DisplayName("등록할 메뉴 그룹이 있는 경우 (성공)")
+            @Test
+            void success1() {
+                // Given
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts);
+
+                // When
+                Menu createdMenu = menuService.create(menu);
+
+                // Then
+                assertThat(createdMenu.getPrice()).isEqualTo(DEFAULT_PRICE);
+                assertThat(createdMenu.getMenuGroup().getId()).isEqualTo(createdMenuGroup.getId());
+            }
+
+            @DisplayName("등록할 메뉴 그룹 ID가 null 인 경우 (실패)")
+            @ParameterizedTest
+            @NullSource
+            void fail1(UUID menuGroupId) {
+                // When
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, menuGroupId, createdMenuProducts);
+
+                // Then
+                assertThatThrownBy(() -> menuService.create(menu))
+                        .isInstanceOf(InvalidDataAccessApiUsageException.class);
+            }
+
+            @DisplayName("등록할 메뉴 그룹이 없는 경우 (실패)")
+            @Test
+            void fail2() {
+                // Given
+                final UUID menuGroupId = UUID.randomUUID();
+
+                // When
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, menuGroupId, createdMenuProducts);
+
+                // Then
+                assertThatThrownBy(() -> menuService.create(menu))
+                        .isInstanceOf(NoSuchElementException.class);
             }
         }
     }
