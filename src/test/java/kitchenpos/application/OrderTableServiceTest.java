@@ -1,7 +1,9 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
-import org.junit.jupiter.api.BeforeEach;
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,11 +17,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
+import static kitchenpos.fixture.OrderTableFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -36,21 +38,6 @@ class OrderTableServiceTest {
     @Mock
     private OrderRepository orderRepository;
 
-    private static final UUID ORDER_TABLE_ID = UUID.randomUUID();
-    private static final String ORDER_TABLE_NAME = "name";
-    private static final int NUMBER_OF_GUEST = 0;
-    private static final boolean OCCUPIED = false;
-    private OrderTable orderTable;
-
-    @BeforeEach
-    void setUp() {
-        orderTable = new OrderTable();
-        orderTable.setId(ORDER_TABLE_ID);
-        orderTable.setName(ORDER_TABLE_NAME);
-        orderTable.setNumberOfGuests(NUMBER_OF_GUEST);
-        orderTable.setOccupied(OCCUPIED);
-    }
-
     @Nested
     @DisplayName("주문테이블을 등록할 수 있다.")
     class create {
@@ -59,6 +46,7 @@ class OrderTableServiceTest {
         @DisplayName("등록")
         void create_1() {
             // Given
+            OrderTable orderTable = createOrderTable();
             when(orderTableRepository.save(any())).thenReturn(orderTable);
 
             // When
@@ -73,7 +61,7 @@ class OrderTableServiceTest {
         @DisplayName("이름은 비어있거나 공백이면 예외가 발생한다.")
         void create_2(String name) {
             // When
-            orderTable.setName(name);
+            OrderTable orderTable = createOrderTableWithName(name);
 
             // Then
             assertThatThrownBy(() -> orderTableService.create(orderTable))
@@ -89,10 +77,10 @@ class OrderTableServiceTest {
         @DisplayName("존재하지 않는 주문테이블일 경우 예외가 발생한다.")
         void sit_1() {
             // Given
-            when(orderTableRepository.findById(ORDER_TABLE_ID)).thenReturn(Optional.empty());
+            when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
 
             // Then
-            assertThatThrownBy(() -> orderTableService.sit(ORDER_TABLE_ID))
+            assertThatThrownBy(() -> orderTableService.sit(any()))
                     .isInstanceOf(NoSuchElementException.class);
         }
 
@@ -100,10 +88,11 @@ class OrderTableServiceTest {
         @DisplayName("착석 등록")
         void sit_2() {
             // Given
-            when(orderTableRepository.findById(ORDER_TABLE_ID)).thenReturn(Optional.of(orderTable));
+            OrderTable orderTable = createOrderTable();
+            when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
 
             // When
-            OrderTable result = orderTableService.sit(ORDER_TABLE_ID);
+            OrderTable result = orderTableService.sit(any());
 
             // Then
             assertThat(result.isOccupied()).isTrue();
@@ -118,10 +107,10 @@ class OrderTableServiceTest {
         @DisplayName("존재하지 않는 주문테이블일 경우 예외가 발생한다.")
         void clear_1() {
             // Given
-            when(orderTableRepository.findById(ORDER_TABLE_ID)).thenReturn(Optional.empty());
+            when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
 
             // Then
-            assertThatThrownBy(() -> orderTableService.clear(ORDER_TABLE_ID))
+            assertThatThrownBy(() -> orderTableService.clear(any()))
                     .isInstanceOf(NoSuchElementException.class);
         }
 
@@ -129,13 +118,14 @@ class OrderTableServiceTest {
         @DisplayName("주문이 완료상태가 아니면 예외가 발생한다.")
         void clear_2() {
             // Given
-            when(orderTableRepository.findById(ORDER_TABLE_ID)).thenReturn(Optional.of(orderTable));
+            OrderTable orderTable = createOrderTable();
+            when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
 
             // When
             when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(true);
 
             // Then
-            assertThatThrownBy(() -> orderTableService.clear(ORDER_TABLE_ID))
+            assertThatThrownBy(() -> orderTableService.clear(any()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
@@ -143,11 +133,12 @@ class OrderTableServiceTest {
         @DisplayName("정리")
         void clear_3() {
             // Given
-            when(orderTableRepository.findById(ORDER_TABLE_ID)).thenReturn(Optional.of(orderTable));
+            OrderTable orderTable = createOrderTable();
+            when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
             when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).thenReturn(false);
 
             // When
-            OrderTable result = orderTableService.clear(ORDER_TABLE_ID);
+            OrderTable result = orderTableService.clear(any());
 
             // Then
             assertAll(
@@ -161,7 +152,7 @@ class OrderTableServiceTest {
     @DisplayName("주문테이블의 전체목록을 조회할 수 있다.")
     void findAll() {
         // Given
-        List<OrderTable> orderTables = List.of(orderTable, orderTable);
+        List<OrderTable> orderTables = createOrderTables();
         when(orderTableRepository.findAll()).thenReturn(orderTables);
 
         // When
@@ -179,10 +170,10 @@ class OrderTableServiceTest {
         @DisplayName("손님수는 0보다 작으면 예외가 발생한다.")
         void changeNumberOfGuests_1() {
             // When
-            orderTable.setNumberOfGuests(-1);
+            OrderTable orderTable = createOrderTableWithNumberOfGuest(-1);
 
             // Then
-            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(ORDER_TABLE_ID, orderTable))
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -190,10 +181,11 @@ class OrderTableServiceTest {
         @DisplayName("존재하지 않는 주문테이블일 경우 예외가 발생한다.")
         void changeNumberOfGuests_2() {
             // Given
-            when(orderTableRepository.findById(ORDER_TABLE_ID)).thenReturn(Optional.empty());
+            OrderTable orderTable = createOrderTable();
+            when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
 
             // Then
-            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(ORDER_TABLE_ID, orderTable))
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(any(), orderTable))
                     .isInstanceOf(NoSuchElementException.class);
         }
 
@@ -201,13 +193,11 @@ class OrderTableServiceTest {
         @DisplayName("사용중이 아니라면 예외가 발생한다.")
         void changeNumberOfGuests_3() {
             // Given
-            when(orderTableRepository.findById(ORDER_TABLE_ID)).thenReturn(Optional.of(orderTable));
-
-            // When
-            orderTable.setOccupied(false);
+            OrderTable orderTable = createOrderTableWithOccupied(false);
+            when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
 
             // Then
-            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(ORDER_TABLE_ID, orderTable))
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(any(), orderTable))
                     .isInstanceOf(IllegalStateException.class);
         }
 
@@ -215,12 +205,13 @@ class OrderTableServiceTest {
         @DisplayName("손님수 변경")
         void changeNumberOfGuests_4() {
             // Given
-            when(orderTableRepository.findById(ORDER_TABLE_ID)).thenReturn(Optional.of(orderTable));
+            OrderTable orderTable = createOrderTable();
+            when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
 
             // When
             orderTable.setNumberOfGuests(10);
             orderTable.setOccupied(true);
-            OrderTable result = orderTableService.changeNumberOfGuests(ORDER_TABLE_ID, orderTable);
+            OrderTable result = orderTableService.changeNumberOfGuests(any(), orderTable);
 
             // Then
             assertThat(result.getNumberOfGuests()).isEqualTo(10);

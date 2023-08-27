@@ -1,8 +1,10 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,14 +14,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.createMenuWithPrice;
+import static kitchenpos.fixture.ProductFixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Product")
@@ -37,24 +42,6 @@ class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
-    private static final UUID PRODUCT_ID = UUID.randomUUID();
-    private static final String PRODUCT_NAME = "name";
-    private static final BigDecimal PRODUCT_PRICE = BigDecimal.TEN;
-    private Product product;
-    private MenuProduct menuProduct;
-
-    @BeforeEach
-    void setUp() {
-        product = new Product();
-        product.setId(PRODUCT_ID);
-        product.setName(PRODUCT_NAME);
-        product.setPrice(PRODUCT_PRICE);
-
-        menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(1);
-    }
-
     @Nested
     @DisplayName("상품을 등록할 수 있다.")
     class create {
@@ -63,6 +50,7 @@ class ProductServiceTest {
         @DisplayName("등록")
         void create_1() {
             // Given
+            Product product = createProduct();
             when(productRepository.save(any())).thenReturn(product);
 
             // When
@@ -80,7 +68,7 @@ class ProductServiceTest {
             @DisplayName("비어있는 경우")
             void create_2_1() {
                 // When
-                product.setPrice(null);
+                Product product = createProductWithPrice(null);
 
                 // Then
                 assertThatThrownBy(() -> productService.create(product))
@@ -91,7 +79,7 @@ class ProductServiceTest {
             @DisplayName("0보다 작은경우")
             void create_2_2() {
                 // When
-                product.setPrice(BigDecimal.valueOf(-1));
+                Product product = createProductWithPrice(BigDecimal.valueOf(-1));
 
                 // Then
                 assertThatThrownBy(() -> productService.create(product))
@@ -107,7 +95,7 @@ class ProductServiceTest {
             @DisplayName("비어있는 경우")
             void create_3_1() {
                 // When
-                product.setName(null);
+                Product product = createProductWithName(null);
 
                 // Then
                 assertThatThrownBy(() -> productService.create(product))
@@ -119,7 +107,7 @@ class ProductServiceTest {
             void create_3_2() {
                 // When
                 when(purgomalumClient.containsProfanity("비속어")).thenReturn(true);
-                product.setName("비속어");
+                Product product = createProductWithName("비속어");
 
                 // Then
                 assertThatThrownBy(() -> productService.create(product))
@@ -132,7 +120,7 @@ class ProductServiceTest {
     @DisplayName("상품의 전체목록을 조회할 수 있다.")
     void findAll() {
         // Given
-        List<Product> products = List.of(product, product);
+        List<Product> products = createProducts();
         when(productRepository.findAll()).thenReturn(products);
 
         // When
@@ -150,10 +138,11 @@ class ProductServiceTest {
         @DisplayName("변경")
         void changePrice_1() {
             // Given
-            when(productRepository.findById(eq(PRODUCT_ID))).thenReturn(Optional.of(product));
+            Product product = createProduct();
+            when(productRepository.findById(any())).thenReturn(Optional.of(product));
 
             // When
-            Product changedProduct = productService.changePrice(PRODUCT_ID, product);
+            Product changedProduct = productService.changePrice(any(), product);
 
             // Then
             assertThat(changedProduct.getPrice()).isEqualTo(BigDecimal.valueOf(10));
@@ -167,10 +156,10 @@ class ProductServiceTest {
             @DisplayName("비어있는 경우")
             void changePrice_2_1() {
                 // When
-                product.setPrice(null);
+                Product product = createProductWithPrice(null);
 
                 // Then
-                assertThatThrownBy(() -> productService.changePrice(PRODUCT_ID, product))
+                assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), product))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
@@ -178,10 +167,10 @@ class ProductServiceTest {
             @DisplayName("0보다 작은경우")
             void changePrice_2_2() {
                 // When
-                product.setPrice(BigDecimal.valueOf(-1));
+                Product product = createProductWithPrice(BigDecimal.valueOf(-1));
 
                 // Then
-                assertThatThrownBy(() -> productService.changePrice(PRODUCT_ID, product))
+                assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), product))
                         .isInstanceOf(IllegalArgumentException.class);
             }
         }
@@ -189,9 +178,14 @@ class ProductServiceTest {
         @Test
         @DisplayName("미리 존재하는 상품이 아니면 예외가 발생한다.")
         void changePrice_3() {
-            when(productRepository.findById(eq(PRODUCT_ID))).thenReturn(Optional.empty());
+            // Given
+            Product product = createProduct();
 
-            assertThatThrownBy(() -> productService.changePrice(PRODUCT_ID, product))
+            // When
+            when(productRepository.findById(any())).thenReturn(Optional.empty());
+
+            // Then
+            assertThatThrownBy(() -> productService.changePrice(any(), product))
                     .isInstanceOf(NoSuchElementException.class);
         }
 
@@ -203,16 +197,14 @@ class ProductServiceTest {
             @DisplayName("노출하지 않는 경우")
             void changePrice_4_1() {
                 // Given
-                Menu menu = new Menu();
-                menu.setPrice(BigDecimal.valueOf(11));
-                menu.setDisplayed(true);
-                menu.setMenuProducts(List.of((menuProduct)));
+                Menu menu = createMenuWithPrice(BigDecimal.valueOf(11));
+                Product product = createProduct();
 
-                when(productRepository.findById(eq(PRODUCT_ID))).thenReturn(Optional.of(product));
-                when(menuRepository.findAllByProductId(eq(PRODUCT_ID))).thenReturn(List.of(menu));
+                when(productRepository.findById(any())).thenReturn(Optional.of(product));
+                when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
 
                 // When
-                productService.changePrice(PRODUCT_ID, product);
+                productService.changePrice(any(), product);
 
                 // Then
                 assertThat(menu.isDisplayed()).isFalse();
@@ -222,16 +214,14 @@ class ProductServiceTest {
             @DisplayName("노출 하는 경우")
             void changePrice_4_2() {
                 // Given
-                Menu menu = new Menu();
-                menu.setPrice(BigDecimal.valueOf(9));
-                menu.setDisplayed(true);
-                menu.setMenuProducts(List.of(menuProduct));
+                Menu menu = createMenuWithPrice(BigDecimal.valueOf(9));
+                Product product = createProduct();
 
-                when(productRepository.findById(eq(PRODUCT_ID))).thenReturn(Optional.of(product));
-                when(menuRepository.findAllByProductId(eq(PRODUCT_ID))).thenReturn(List.of(menu));
+                when(productRepository.findById(any())).thenReturn(Optional.of(product));
+                when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
 
                 // When
-                productService.changePrice(PRODUCT_ID, product);
+                productService.changePrice(any(), product);
 
                 // Then
                 assertThat(menu.isDisplayed()).isTrue();
