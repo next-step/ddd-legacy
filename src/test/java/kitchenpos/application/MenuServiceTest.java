@@ -47,21 +47,30 @@ class MenuServiceTest extends ApplicationTest {
                 .mapToObj(n -> productService.create(ProductHelper.create(BigDecimal.valueOf(n * 1000L))))
                 .collect(toUnmodifiableList());
         createdMenuProducts = IntStream.range(0, createdProducts.size())
-                .mapToObj(i -> {
-                    MenuProduct menuProduct = new MenuProduct();
-                    menuProduct.setSeq((long) i);
-                    menuProduct.setProductId(createdProducts.get(i).getId());
-                    menuProduct.setProduct(createdProducts.get(i));
-                    menuProduct.setQuantity(i);
-                    return menuProduct;
-                })
+                .mapToObj(i -> createMenuProduct(i, i))
                 .collect(toUnmodifiableList());
         createdMenuGroup = menuGroupService.create(MenuGroupHelper.create());
+    }
+
+    private static MenuProduct createMenuProduct(int index, long quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq((long) index);
+        menuProduct.setProductId(createdProducts.get(index).getId());
+        menuProduct.setProduct(createdProducts.get(index));
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
+
+    private List<UUID> collectMenuProductIds(List<MenuProduct> menuProducts) {
+        return menuProducts.stream()
+                .map(m -> m.getProduct().getId())
+                .collect(toUnmodifiableList());
     }
 
     @DisplayName("새로운 메뉴를 등록한다.")
     @Nested
     class CreateMenu {
+
         @DisplayName("메뉴 가격은 0원 이상이어야 한다.")
         @Nested
         class Policy1 {
@@ -172,12 +181,6 @@ class MenuServiceTest extends ApplicationTest {
                         .containsAll(collectMenuProductIds(createdMenuProducts));
             }
 
-            private List<UUID> collectMenuProductIds(List<MenuProduct> menuProducts) {
-                return menuProducts.stream()
-                        .map(m -> m.getProduct().getId())
-                        .collect(toUnmodifiableList());
-            }
-
             @DisplayName("메뉴에 등록할 상품이 null 인 경우 (실패)")
             @ParameterizedTest
             @NullSource
@@ -195,6 +198,44 @@ class MenuServiceTest extends ApplicationTest {
             void fail2() {
                 // When
                 Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), List.of());
+
+                // Then
+                assertThatThrownBy(() -> menuService.create(menu))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+
+        @DisplayName("메뉴에 등록할 상품의 수량은 0개 이상이어야 한다.")
+        @Nested
+        class Policy4 {
+            @DisplayName("메뉴에 등록할 상품의 수량이 1개 이상 있는 경우 (성공)")
+            @Test
+            void success1() {
+                // Given
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts);
+
+                // When
+                Menu createdMenu = menuService.create(menu);
+
+                // Then
+                assertThat(createdMenu.getPrice()).isEqualTo(DEFAULT_PRICE);
+                assertThat(createdMenu.getMenuGroup().getId()).isEqualTo(createdMenuGroup.getId());
+                assertThat(createdMenu.getMenuProducts().size()).isEqualTo(createdMenuProducts.size());
+                assertThat(collectMenuProductIds(createdMenu.getMenuProducts()))
+                        .containsAll(collectMenuProductIds(createdMenuProducts));
+            }
+
+            @DisplayName("메뉴에 등록할 상품의 수량이 1개 미만인 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(longs = {0, -1, -10})
+            void fail1(final long productQuantity) {
+                // Given
+                List<MenuProduct> modifiedMenuProducts = IntStream.range(0, createdProducts.size())
+                        .mapToObj(i -> createMenuProduct(i, productQuantity))
+                        .collect(toUnmodifiableList());
+
+                // When
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), modifiedMenuProducts);
 
                 // Then
                 assertThatThrownBy(() -> menuService.create(menu))
