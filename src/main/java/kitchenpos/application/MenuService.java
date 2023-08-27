@@ -102,6 +102,7 @@ public class MenuService {
 
         final Menu menu = menuRepository.findById(menuId)
             .orElseThrow(NoSuchElementException::new);
+
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             final BigDecimal sum = menuProduct.getProduct()
                 .getPrice()
