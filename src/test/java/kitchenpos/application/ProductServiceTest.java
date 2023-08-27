@@ -127,7 +127,7 @@ class ProductServiceTest {
         List<Product> findAllProducts = productService.findAll();
 
         // Then
-        assertThat(findAllProducts.size()).isEqualTo(2);
+        assertThat(findAllProducts).hasSize(products.size());
     }
 
     @Nested
@@ -145,7 +145,7 @@ class ProductServiceTest {
             Product changedProduct = productService.changePrice(any(), product);
 
             // Then
-            assertThat(changedProduct.getPrice()).isEqualTo(BigDecimal.valueOf(10));
+            assertThat(changedProduct.getPrice()).isEqualTo(BigDecimal.TEN);
         }
 
         @Nested

@@ -72,7 +72,7 @@ class MenuGroupServiceTest {
         List<MenuGroup> findAllMenuGroups = menuGroupService.findAll();
 
         // Then
-        assertThat(findAllMenuGroups.size()).isEqualTo(2);
+        assertThat(findAllMenuGroups).hasSize(menuGroups.size());
     }
 
 }

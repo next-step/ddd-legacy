@@ -159,7 +159,7 @@ class OrderTableServiceTest {
         List<OrderTable> findAllOrderTables = orderTableService.findAll();
 
         // Then
-        assertThat(findAllOrderTables.size()).isEqualTo(2);
+        assertThat(findAllOrderTables).hasSize(orderTables.size());
     }
 
     @Nested

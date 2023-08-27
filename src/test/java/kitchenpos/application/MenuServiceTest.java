@@ -349,7 +349,7 @@ class MenuServiceTest {
         List<Menu> findAllMenus = menuService.findAll();
 
         // Then
-        assertThat(findAllMenus.size()).isEqualTo(2);
+        assertThat(findAllMenus).hasSize(menus.size());
     }
 
     @Nested

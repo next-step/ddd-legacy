@@ -514,7 +514,7 @@ class OrderServiceTest {
         List<Order> findAllOrders = orderService.findAll();
 
         // Then
-        assertThat(findAllOrders.size()).isEqualTo(2);
+        assertThat(findAllOrders).hasSize(orders.size());
     }
 
 }
