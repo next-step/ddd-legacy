@@ -19,6 +19,8 @@ public class MenuFixture {
         private String name;
         private List<MenuProduct> menuProducts = new ArrayList<>();
         private UUID menuGroupId;
+        private boolean isDisplay;
+
         MenuCreateRequestBuilder() {
         }
 
@@ -47,12 +49,19 @@ public class MenuFixture {
             return this;
         }
 
+        public MenuCreateRequestBuilder isDisplay(final boolean isDisplay) {
+            this.isDisplay = isDisplay;
+
+            return this;
+        }
+
         public Menu build() {
             Menu menu = new Menu();
             menu.setMenuGroupId(this.menuGroupId);
             menu.setMenuProducts(this.menuProducts);
             menu.setName(this.name);
             menu.setPrice(this.price);
+            menu.setDisplayed(this.isDisplay);
 
             return menu;
         }
