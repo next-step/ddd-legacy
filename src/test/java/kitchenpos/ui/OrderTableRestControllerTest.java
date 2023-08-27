@@ -2,6 +2,8 @@ package kitchenpos.ui;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import kitchenpos.domain.*;
+import kitchenpos.objectmother.*;
 import kitchenpos.ui.utils.ControllerTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,7 +12,11 @@ import org.springframework.http.HttpStatus;
 import java.util.UUID;
 
 import static kitchenpos.objectmother.OrderTableMaker.*;
+import static kitchenpos.ui.requestor.MenuGroupRequestor.메뉴그룹생성요청_메뉴그룹반환;
+import static kitchenpos.ui.requestor.MenuRequestor.메뉴생성요청_메뉴반환;
+import static kitchenpos.ui.requestor.OrderRequestor.주문생성요청;
 import static kitchenpos.ui.requestor.OrderTableRequestor.*;
+import static kitchenpos.ui.requestor.ProductRequestor.상품생성요청_상품반환;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OrderTableRestControllerTest extends ControllerTest {
@@ -61,13 +67,34 @@ class OrderTableRestControllerTest extends ControllerTest {
     @DisplayName("테이블을 치울경우 고객 수는 0으로 변경되며 착석여부는 비착석으로 변경된다.")
     @Test
     void 테이블청소() {
+        // given
+        UUID 테이블식별번호 = 테이블생성요청_테이블식별번호반환(테이블_1);
+        테이블착석요청(테이블식별번호);
 
+        // when
+        ExtractableResponse<Response> response = 테이블청소요청(테이블식별번호);
+
+        // then
+        테이블청소됨(response);
     }
 
     @DisplayName("테이블에 착석 한 고객의 주문이 처리되지 않은 경우 테이블을 초기화 할 수 없다.")
     @Test
     void 테이블청소실패_테이블주문미처리() {
+        // given
+        MenuGroup 메뉴그룹 = 메뉴그룹생성요청_메뉴그룹반환(MenuGroupMaker.make("메뉴그룹"));
+        Product 상품_1 = 상품생성요청_상품반환(ProductMaker.make("상품1", 1500L));
+        MenuProduct 메뉴상품_1 = MenuProductMaker.make(상품_1, 2);
+        OrderTable 착석테이블 = 테이블생성_착석_고객수_요청테이블반환(OrderTableMaker.make("착석테이블", 4));
+        Menu 메뉴_1 = 메뉴생성요청_메뉴반환(MenuMaker.make("메뉴1", 2000L, 메뉴그룹, 메뉴상품_1));
 
+        주문생성요청(OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 2000L)));
+
+        // when
+        ExtractableResponse<Response> response = 테이블청소요청(착석테이블.getId());
+
+        // then
+        테이블청소실패됨(response);
     }
 
     @DisplayName("착석한 테이블에 고객수를 얘기하면 변경된다.")
@@ -135,6 +162,15 @@ class OrderTableRestControllerTest extends ControllerTest {
 
     private void 테이블착석됨(ExtractableResponse<Response> response) {
         assertThat(response.jsonPath().getObject("occupied", Boolean.class)).isTrue();
+    }
+
+    private void 테이블청소됨(ExtractableResponse<Response> response) {
+        assertThat(response.jsonPath().getObject("numberOfGuests", Integer.class)).isZero();
+        assertThat(response.jsonPath().getObject("occupied", Boolean.class)).isFalse();
+    }
+
+    private void 테이블청소실패됨(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     private void 고객수변경됨(ExtractableResponse<Response> response) {

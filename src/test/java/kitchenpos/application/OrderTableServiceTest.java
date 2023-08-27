@@ -93,7 +93,13 @@ class OrderTableServiceTest {
     @DisplayName("테이블에 착석 한 고객의 주문이 처리되지 않은 경우 테이블을 초기화 할 수 없다.")
     @Test
     void 테이블청소실패_테이블주문미처리() {
+        // given
+        OrderTable orderTable = orderTableService.create(테이블_1);
+        when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(true);
 
+        // when then
+        assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("착석한 테이블에 고객수를 얘기하면 변경된다.")

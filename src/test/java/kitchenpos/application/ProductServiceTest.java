@@ -1,9 +1,11 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.objectmother.MenuGroupMaker;
+import kitchenpos.objectmother.MenuMaker;
+import kitchenpos.objectmother.MenuProductMaker;
+import kitchenpos.objectmother.ProductMaker;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +25,9 @@ import static org.mockito.Mockito.when;
 @Transactional
 @SpringBootTest
 class ProductServiceTest {
+
+    @Autowired
+    private MenuGroupRepository menuGroupRepository;
 
     @Autowired
     private MenuRepository menuRepository;
@@ -84,7 +89,19 @@ class ProductServiceTest {
             "초과할 경우 해당 메뉴를 비활성화 해야 한다.")
     @Test
     void 상품가격변경_메뉴가격_메뉴상품총가격_초과() {
+        // given
+        MenuGroup 메뉴그룹 = menuGroupRepository.save(MenuGroupMaker.make("메뉴그룹"));
+        Product 상품_1 = productRepository.save(ProductMaker.make("상품1", 3000L));
+        MenuProduct 메뉴상품_1 = MenuProductMaker.make(상품_1, 2);
+        Menu 메뉴 = menuRepository.save(MenuMaker.make("메뉴", 6000L, 메뉴그룹, 메뉴상품_1));
 
+        // when
+        productService.changePrice(상품_1.getId(), 상품_2);
+
+        // then
+        Menu menu = menuRepository.findById(메뉴.getId()).orElse(null);
+        assertThat(menu).isNotNull();
+        assertThat(menu.isDisplayed()).isFalse();
     }
 
     @DisplayName("상품 전체조회시 지금까지 등록된 상품이 전부 조회되야 한다.")

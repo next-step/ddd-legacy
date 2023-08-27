@@ -22,14 +22,10 @@ import static kitchenpos.domain.OrderType.*;
 import static kitchenpos.ui.requestor.MenuGroupRequestor.메뉴그룹생성요청_메뉴그룹반환;
 import static kitchenpos.ui.requestor.MenuRequestor.메뉴생성요청_메뉴반환;
 import static kitchenpos.ui.requestor.OrderRequestor.*;
-import static kitchenpos.ui.requestor.OrderTableRequestor.*;
+import static kitchenpos.ui.requestor.OrderTableRequestor.테이블생성_착석_고객수_요청테이블반환;
+import static kitchenpos.ui.requestor.OrderTableRequestor.테이블생성요청_테이블반환;
 import static kitchenpos.ui.requestor.ProductRequestor.상품생성요청_상품반환;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 class OrderRestControllerTest extends ControllerTest {
 
@@ -41,7 +37,6 @@ class OrderRestControllerTest extends ControllerTest {
     private OrderTable 착석테이블;
     private OrderTable 미착석테이블;
     private Menu 메뉴_1;
-    private Menu 메뉴_2;
     private Menu 비노출메뉴;
 
     @BeforeEach
@@ -55,7 +50,6 @@ class OrderRestControllerTest extends ControllerTest {
         착석테이블 = 테이블생성_착석_고객수_요청테이블반환(OrderTableMaker.make("착석테이블", 4));
         미착석테이블 = 테이블생성요청_테이블반환(OrderTableMaker.make("미착석테이블"));
         메뉴_1 = 메뉴생성요청_메뉴반환(MenuMaker.make("메뉴1", 15000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
-        메뉴_2 = 메뉴생성요청_메뉴반환(MenuMaker.make("메뉴2", 12000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
         비노출메뉴 = 메뉴생성요청_메뉴반환(MenuMaker.makeHideMenu("비노출메뉴", 12000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
     }
 
