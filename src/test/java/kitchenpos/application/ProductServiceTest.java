@@ -61,7 +61,7 @@ class ProductServiceTest {
         }
 
         @Nested
-        @DisplayName("가격은 비어있거나 0보다 작으면 예외가 발생한다.")
+        @DisplayName("가격은 비어있거나 0보다 작을 수 없다.")
         class create_2 {
 
             @Test
@@ -88,7 +88,7 @@ class ProductServiceTest {
         }
 
         @Nested
-        @DisplayName("이름은 없거나 비속어 이면 예외가 발생한다.")
+        @DisplayName("이름은 없거나 비속어 이면 안된다.")
         class create_3 {
 
             @Test
@@ -149,7 +149,7 @@ class ProductServiceTest {
         }
 
         @Nested
-        @DisplayName("가격은 비어있거나 0보다 작으면 예외가 발생한다.")
+        @DisplayName("가격은 비어있거나 0보다 작을 수 없다.")
         class changePrice_2 {
 
             @Test
@@ -176,7 +176,7 @@ class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("미리 존재하는 상품이 아니면 예외가 발생한다.")
+        @DisplayName("미리 존재하는 상품이어야 한다.")
         void changePrice_3() {
             // Given
             Product product = createProduct();

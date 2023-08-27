@@ -58,7 +58,7 @@ class OrderTableServiceTest {
 
         @ParameterizedTest
         @NullAndEmptySource
-        @DisplayName("이름은 비어있거나 공백이면 예외가 발생한다.")
+        @DisplayName("이름은 없거나 비어있을 수 없다.")
         void create_2(String name) {
             // When
             OrderTable orderTable = createOrderTableWithName(name);
@@ -74,7 +74,7 @@ class OrderTableServiceTest {
     class sit {
 
         @Test
-        @DisplayName("존재하지 않는 주문테이블일 경우 예외가 발생한다.")
+        @DisplayName("존재하는 주문테이블 이어야 한다.")
         void sit_1() {
             // Given
             when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
@@ -104,7 +104,7 @@ class OrderTableServiceTest {
     class clear {
 
         @Test
-        @DisplayName("존재하지 않는 주문테이블일 경우 예외가 발생한다.")
+        @DisplayName("존재하는 주문테이블 이어야 한다.")
         void clear_1() {
             // Given
             when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
@@ -115,7 +115,7 @@ class OrderTableServiceTest {
         }
 
         @Test
-        @DisplayName("주문이 완료상태가 아니면 예외가 발생한다.")
+        @DisplayName("주문테이블의 주문은 완료 상태이어야 한다.")
         void clear_2() {
             // Given
             OrderTable orderTable = createOrderTable();
@@ -167,7 +167,7 @@ class OrderTableServiceTest {
     class changeNumberOfGuests {
 
         @Test
-        @DisplayName("손님수는 0보다 작으면 예외가 발생한다.")
+        @DisplayName("손님수는 0보다 커야 한다.")
         void changeNumberOfGuests_1() {
             // When
             OrderTable orderTable = createOrderTableWithNumberOfGuest(-1);
@@ -178,7 +178,7 @@ class OrderTableServiceTest {
         }
 
         @Test
-        @DisplayName("존재하지 않는 주문테이블일 경우 예외가 발생한다.")
+        @DisplayName("존재하는 주문테이블 이어야 한다.")
         void changeNumberOfGuests_2() {
             // Given
             OrderTable orderTable = createOrderTable();
@@ -190,7 +190,7 @@ class OrderTableServiceTest {
         }
 
         @Test
-        @DisplayName("사용중이 아니라면 예외가 발생한다.")
+        @DisplayName("사용중 이어야 한다.")
         void changeNumberOfGuests_3() {
             // Given
             OrderTable orderTable = createOrderTableWithOccupied(false);

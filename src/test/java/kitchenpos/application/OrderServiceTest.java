@@ -55,7 +55,7 @@ class OrderServiceTest {
     class create {
 
         @Test
-        @DisplayName("주문타입이 null 일 경우 예외가 발생한다.")
+        @DisplayName("주문타입은 비어있을 수 없다.")
         void create_1() {
             // When
             Order order = createOrderWithType(null);
@@ -67,7 +67,7 @@ class OrderServiceTest {
 
         @ParameterizedTest
         @NullAndEmptySource
-        @DisplayName("주문내역은 존재하지 않으면 예외가 발생한다.")
+        @DisplayName("주문내역은 존재해야 한다.")
         void create_2(List<OrderLineItem> orderLine) {
             // When
             Order order = createOrderWithOrderLineItems(orderLine);
@@ -78,7 +78,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("메뉴 개수와 주문 항목 개수가 일치하지 않을 경우 예외가 발생한다.")
+        @DisplayName("주문목록은 1개 이상이어야 한다.")
         void create_3() {
             // When
             Menu menu = createMenu();
@@ -96,7 +96,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문타입이 매장 내 식사가 아닐경우 주문수량이 0이하이면 예외가 발생한다")
+        @DisplayName("주문타입이 매장 내 식사가 아니라면 주문수량이 0 이상이어야 한다.")
         void create_4() {
             // Given
             Menu menu = createMenu();
@@ -112,7 +112,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("등록된 메뉴가 아니라면 예외가 발생한다.")
+        @DisplayName("등록된 메뉴만 주문할 수 있다.")
         void create_5() {
             // Given
             Menu menu = createMenu();
@@ -128,7 +128,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("노출되지 않은 메뉴일 경우 예외가 발생한다.")
+        @DisplayName("노출되지 않은 메뉴는 주문할 수 없다.")
         void create_6() {
             // Given
             Order order = createOrder();
@@ -143,7 +143,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문목록의 가격과 메뉴가격은 일치하지 않으면 예외가 발생한다.")
+        @DisplayName("주문목록의 가격과 메뉴가격은 일치해야 한다.")
         void create_7() {
             // Given
             Menu menu = createMenu();
@@ -160,7 +160,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문타입이 배달일 경우 배달주소가 존재하지 않으면 예외가 발생한다.")
+        @DisplayName("주문타입이 배달일 경우 배달주소는 존재해야 한다.")
         void create_8() {
             // Given
             Menu menu = createMenu();
@@ -180,7 +180,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문타입이 매장 내 식사일 경우 주문 테이블을 사용할 수 없으면 예외가 발생한다.")
+        @DisplayName("주문타입이 매장 내 식사일 경우 주문 테이블이 사용가능해야 한다.")
         void create_9() {
             // Given
             Menu menu = createMenu();
@@ -225,7 +225,7 @@ class OrderServiceTest {
     class accept {
 
         @Test
-        @DisplayName("존재하지 않는 주문일 경우 예외가 발생한다.")
+        @DisplayName("존재하는 주문이어야 한다.")
         void accept_1() {
             // Given
             when(orderRepository.findById(any())).thenReturn(Optional.empty());
@@ -236,7 +236,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문상태가 대기중이 아닐 경우 예외가 발생한다.")
+        @DisplayName("주문상태가 대기중 이어야 한다.")
         void accept_2() {
             // Given
             Order order = createOrderWithStatus(COMPLETED);
@@ -281,7 +281,7 @@ class OrderServiceTest {
     class serve {
 
         @Test
-        @DisplayName("존재하지 않는 주문일 경우 예외가 발생한다.")
+        @DisplayName("존재하는 주문이어야 한다.")
         void serve_1() {
             // Given
             when(orderRepository.findById(any())).thenReturn(Optional.empty());
@@ -292,7 +292,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문상태가 접수가 아닐경우 예외가 발생한다.")
+        @DisplayName("주문상태가 접수 이어야 한다.")
         void serve_2() {
             // Given
             Order order = createOrder();
@@ -334,7 +334,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문타입이 배달이 아닐경우 예외가 발생한다.")
+        @DisplayName("주문타입이 배달이어야 한다.")
         void startDelivery_2() {
             // Given
             Order order = createOrderWithType(TAKEOUT);
@@ -346,7 +346,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문상태가 서빙이 아닐경우 예외가 발생한다.")
+        @DisplayName("주문상태가 서빙이어야 한다.")
         void startDelivery_3() {
             // Given
             Order order = createOrderWithStatus(COMPLETED);
@@ -388,7 +388,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문상태가 배달중이 아닐경우 예외가 발생한다.")
+        @DisplayName("주문상태가 배달중 이어야 한다.")
         void completeDelivery_2() {
             // Given
             Order order = createOrderWithStatus(COMPLETED);
@@ -430,7 +430,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문타입이 배달일 경우 주문상태가 배달완료가 아니면 예외가 발생한다.")
+        @DisplayName("주문타입이 배달이라면 주문상태는 배달완료 이어야 한다.")
         void complete_2() {
             // Given
             Order order = createOrderWithTypeAndStatus(DELIVERY, COMPLETED);
@@ -442,7 +442,7 @@ class OrderServiceTest {
         }
 
         @Nested
-        @DisplayName("주문타입이 포장 또는 매장 내 식사일 경우 주문상태가 서빙이 아니면 예외가 발생한다.")
+        @DisplayName("주문타입이 포장 또는 매장 내 식사이면 주문상태는 서빙이어야 한다.")
         class complete_3 {
 
             @Test
@@ -485,7 +485,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("매장 주문이 완료되고 다른 주문이 없으면 테이블을 초기화한다.")
+        @DisplayName("주문타입이 매장 내 식사이면 주문테이블의 손님 수를 0으로 만든 후 사용가능 처리한다.")
         void complete_5() {
             // Given
             Order order = createOrderWithTypeAndStatus(EAT_IN, SERVED);

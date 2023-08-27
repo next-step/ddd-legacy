@@ -50,7 +50,7 @@ class MenuGroupServiceTest {
 
         @ParameterizedTest
         @NullAndEmptySource
-        @DisplayName("이름은 비어있거나 공백이면 예외가 발생한다.")
+        @DisplayName("이름은 비어있거나 공백일 수 없다.")
         void create_2(String name) {
             // When
             MenuGroup menuGroup = createMenuGroupWithName(name);

@@ -50,7 +50,7 @@ class MenuServiceTest {
     class create {
 
         @Nested
-        @DisplayName("가격은 비어있거나 0보다 작으면 예외가 발생한다.")
+        @DisplayName("가격은 비어있거나 0보다 적을 수 없다.")
         class create_1 {
 
             @Test
@@ -77,7 +77,7 @@ class MenuServiceTest {
         }
 
         @Test
-        @DisplayName("메뉴그룹은 미리 등록되어 있지 않으면 예외가 발생한다.")
+        @DisplayName("메뉴는 미리 등록된 메뉴그룹에 속한다.")
         void create_2() {
             // Given
             Menu menu = createMenu();
@@ -89,7 +89,7 @@ class MenuServiceTest {
         }
 
         @Nested
-        @DisplayName("미리 존재하는 메뉴상품이 아니면 예외가 발생한다.")
+        @DisplayName("메뉴상품은 미리 등록되어 있어야 한다.")
         class create_3 {
 
             @Test
@@ -124,7 +124,7 @@ class MenuServiceTest {
         }
 
         @Test
-        @DisplayName("메뉴상품 수량은 실제 상품의 수량과 일치하지 않으면 예외가 발생한다.")
+        @DisplayName("메뉴는 1개 이상의 상품를 가진다.")
         void create_4() {
             // Given
             Menu menu = createMenu();
@@ -142,7 +142,7 @@ class MenuServiceTest {
         }
 
         @Test
-        @DisplayName("메뉴상품의 수량이 0보다 작으면 예외가 발생한다.")
+        @DisplayName("메뉴상품의 수량은 0 이하일 수 없다.")
         void create_5() {
             // Given
             MenuGroup menuGroup = createMenuGroup();
@@ -162,7 +162,7 @@ class MenuServiceTest {
         }
 
         @Test
-        @DisplayName("메뉴 상품 ID로 상품을 찾을 수 없을 경우 예외가 발생한다.")
+        @DisplayName("상품 미리 등록되어 있어야 한다.")
         void create_6() {
             // Given
             Menu menu = createMenu();
@@ -182,7 +182,7 @@ class MenuServiceTest {
         }
 
         @Test
-        @DisplayName("가격은 상품들의 수량 * 가격 보다 크면 예외가 발생한다.")
+        @DisplayName("가격은 상품들의 수량 * 가격 보다 클 수 없다.")
         void create_7() {
             // Given
             Menu menu = createMenu();
@@ -203,7 +203,7 @@ class MenuServiceTest {
         }
 
         @Nested
-        @DisplayName("메뉴의 이름이 없거나 비속어 이면 예외가 발생한다.")
+        @DisplayName("메뉴의 이름이 없거나 비속어 이면 안된다.")
         class create_8 {
 
             @Test
@@ -273,7 +273,7 @@ class MenuServiceTest {
     class changePrice {
 
         @Nested
-        @DisplayName("가격은 비어있거나 0보다 작으면 예외가 발생한다.")
+        @DisplayName("변경할 가격은 비어있거나 0보다 적을 수 없다.")
         class changePrice_1 {
 
             @Test
@@ -300,7 +300,7 @@ class MenuServiceTest {
         }
 
         @Test
-        @DisplayName("미리 존재하지 않는 메뉴일 경우 예외가 발생한다.")
+        @DisplayName("존재하는 메뉴이어야 한다.")
         void changePrice_2() {
             // Given
             Menu menu = createMenu();
@@ -312,7 +312,7 @@ class MenuServiceTest {
         }
 
         @Test
-        @DisplayName("변경할 가격이 상품들의 수량 * 가격 보다 크면 예외가 발생한다.")
+        @DisplayName("변경할 가격은 상품들의 수량 * 가격 보다 클 수 없다.")
         void changePrice_3() {
             // Given
             Menu menu = createMenuWithPrice(BigDecimal.valueOf(100));
@@ -357,7 +357,7 @@ class MenuServiceTest {
     class display {
 
         @Test
-        @DisplayName("미리 존재하지 않는 메뉴일 경우 예외가 발생한다.")
+        @DisplayName("존재하는 메뉴이어야 한다.")
         void display_1() {
             // Given
             Menu menu = createMenu();
@@ -369,7 +369,7 @@ class MenuServiceTest {
         }
 
         @Test
-        @DisplayName("메뉴의 가격이 상품들의 수량 * 가격보다 클 경우 예외가 발생한다.")
+        @DisplayName("메뉴의 가격이 상품들의 수량 * 가격 이하일 경우에만 노출한다.")
         void display_2() {
             // Given
             Menu menu = createMenuWithPrice(BigDecimal.valueOf(100));
@@ -400,7 +400,7 @@ class MenuServiceTest {
     class hide {
 
         @Test
-        @DisplayName("미리 존재하지 않는 메뉴일 경우 예외가 발생한다.")
+        @DisplayName("존재하는 메뉴이어야 한다.")
         void hide_1() {
             // Given
             Menu menu = createMenu();
