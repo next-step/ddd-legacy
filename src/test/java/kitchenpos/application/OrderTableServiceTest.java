@@ -142,8 +142,8 @@ class OrderTableServiceTest {
 
             // Then
             assertAll(
-                    () -> assertThat(result.getNumberOfGuests()).isEqualTo(0),
-                    () -> assertThat(result.isOccupied()).isEqualTo(false)
+                    () -> assertThat(result.getNumberOfGuests()).isZero(),
+                    () -> assertThat(result.isOccupied()).isFalse()
             );
         }
     }

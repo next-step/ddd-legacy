@@ -497,7 +497,7 @@ class OrderServiceTest {
             // Then
             assertAll(
                     () -> assertThat(result.getStatus()).isEqualTo(COMPLETED),
-                    () -> assertThat(result.getOrderTable().getNumberOfGuests()).isEqualTo(0),
+                    () -> assertThat(result.getOrderTable().getNumberOfGuests()).isZero(),
                     () -> assertThat(result.getOrderTable().isOccupied()).isFalse()
             );
         }
