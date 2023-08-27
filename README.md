@@ -22,6 +22,65 @@ ____
         - 양념 치킨 ==> 상품
         - 사이다 ==> 상품
 ____
+- 키친포스는 다음 Use Case와 같이 주문 상태를 관리한다.
+```uml
+left to right direction
+
+:관리자 : as Admin
+:손님 : as Guest
+(키친포스) as Pos
+
+package 주문 {
+    usecase "매장_내_식사_주문" as os1
+    usecase "포장_주문" as os2
+    usecase "배달_주문" as os3
+}
+
+package 매장_내_식사_주문 {
+    usecase "대기중" as  es1
+    usecase "조리완료" as es2
+    usecase "서빙완료" as es3
+    usecase "완료" as es4
+}
+
+package 포장_주문 {
+    usecase "대기중" as ts1
+    usecase "조리완료" as ts2
+    usecase "서빙완료" as ts3
+    usecase "완료" as ts4
+}
+
+package 배달_주문 {
+    usecase "대기중" as ds1
+    usecase "조리완료" as ds2
+    usecase "배달중" as ds3
+    usecase "배달완료" as ds4
+    usecase "완료" as ds5
+}
+Guest --> Admin : 주문
+Admin --> (Pos) : 주문 관리
+
+Pos --> os1 : 매장내 식사
+Pos --> os2 : 배달
+Pos --> os3 : 포장
+
+os1 --> (es1) : spte1. 주문생성
+os1 --> (es2) : spte2. 조리완료
+os1 --> (es3) : spte3. 서빙완료
+os1 --> (es4) : spte4. 완료
+
+os2 --> (ts1) : spte1. 주문생성
+os2 --> (ts2) : spte2. 조리완료
+os2 --> (ts3) : spte3. 서빙완료
+os2 --> (ts4) : spte4. 완료
+
+os3 --> (ds1) : spte1. 주문생성
+os3 --> (ds2) : spte2. 조리완료
+os3 --> (ds3) : spte3. 배달중
+os3 --> (ds4) : spte4. 배달완료
+os3 --> (ds5) : spte5. 완료
+```
+
 
 ### 메뉴
 - [ ] 메뉴를 등록할 수 있다.
