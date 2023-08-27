@@ -19,6 +19,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -392,10 +393,10 @@ class MenuServiceTest extends ApplicationTest {
                 Menu menu = MenuHelper.create(price, createdMenuGroup.getId(), createdMenuProducts);
 
                 // When
-                Menu createdMenu = menuService.changePrice(beforeCreatedMenu.getId(), menu);
+                Menu changedMenu = menuService.changePrice(beforeCreatedMenu.getId(), menu);
 
                 // Then
-                assertThat(createdMenu.getPrice()).isEqualTo(price);
+                assertThat(changedMenu.getPrice()).isEqualTo(price);
             }
 
             @DisplayName("메뉴에 대한 가격은 null 인 경우 (실패)")
@@ -420,6 +421,54 @@ class MenuServiceTest extends ApplicationTest {
                 // When
                 Menu menu = MenuHelper.create(price, createdMenuGroup.getId(), createdMenuProducts);
 
+                // Then
+                assertThatThrownBy(() -> menuService.changePrice(beforeCreatedMenu.getId(), menu))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+
+        @DisplayName("메뉴의 가격은 메뉴에 등록된 상품들의 가격과 수량을 곱한 값의 합보다 클 수 없다.")
+        @Nested
+        class Policy2 {
+            @DisplayName("메뉴의 가격이 (메뉴에 등록된 상품들의 가격과 수량을 곱한 값의 합)보다 작거나 같은 경우 (성공)")
+            @ParameterizedTest
+            @ValueSource(ints = {0, 1, 10, 100})
+            void success1(final int price) {
+                // Given
+                BigDecimal minimumMenuProductPrice = createdMenuProducts.parallelStream()
+                        .map(menuProduct -> menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
+                        .min(Comparator.naturalOrder())
+                        .orElse(BigDecimal.ZERO);
+
+                BigDecimal menuPrice = minimumMenuProductPrice.subtract(BigDecimal.valueOf(price));
+
+                Menu menu = MenuHelper.create(menuPrice, createdMenuGroup.getId(), createdMenuProducts);
+
+                // When
+                Menu changedMenu = menuService.changePrice(beforeCreatedMenu.getId(), menu);
+
+                // Then
+                assertThat(changedMenu.getPrice()).isEqualTo(menuPrice);
+                assertThat(changedMenu.getMenuGroup().getId()).isEqualTo(createdMenuGroup.getId());
+                assertThat(changedMenu.getMenuProducts().size()).isEqualTo(createdMenuProducts.size());
+                assertThat(collectMenuProductIds(changedMenu.getMenuProducts()))
+                        .containsAll(collectMenuProductIds(createdMenuProducts));
+            }
+
+            @DisplayName("메뉴의 가격이 (메뉴에 등록된 상품들의 가격과 수량을 곱한 값의 합)보다 큰 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(ints = {1, 10, 100})
+            void fail1(final int price) {
+                // Given
+                BigDecimal totalPrice = createdMenuProducts.parallelStream()
+                        .map(menuProduct -> menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal menuPrice = totalPrice.add(BigDecimal.valueOf(price));
+
+                Menu menu = MenuHelper.create(menuPrice, createdMenuGroup.getId(), createdMenuProducts);
+
+                // When
                 // Then
                 assertThatThrownBy(() -> menuService.changePrice(beforeCreatedMenu.getId(), menu))
                         .isInstanceOf(IllegalArgumentException.class);
