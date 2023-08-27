@@ -506,4 +506,53 @@ class MenuServiceTest extends ApplicationTest {
         }
     }
 
+    @DisplayName("노출한 메뉴를 숨긴다.")
+    @Nested
+    class HideMenu {
+
+        private Menu beforeDisplayedMenu;
+
+        @BeforeEach
+        void beforeEach() {
+            Menu createdMenu = menuService.create(MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts));
+            beforeDisplayedMenu = menuService.display(createdMenu.getId());
+        }
+
+        @DisplayName("노출한 메뉴를 숨긴다 (성공)")
+        @Test
+        void success1() {
+            // When
+            Menu hidenMenu = menuService.hide(beforeDisplayedMenu.getId());
+
+            // Then
+            assertThat(hidenMenu.isDisplayed()).isEqualTo(false);
+            assertThat(hidenMenu.getMenuGroup().getId()).isEqualTo(createdMenuGroup.getId());
+            assertThat(hidenMenu.getMenuProducts().size()).isEqualTo(createdMenuProducts.size());
+            assertThat(collectMenuProductIds(hidenMenu.getMenuProducts()))
+                    .containsAll(collectMenuProductIds(createdMenuProducts));
+        }
+
+        @DisplayName("menuId null 로 인한 노출한 메뉴를 숨긴다 (실패)")
+        @ParameterizedTest
+        @NullSource
+        void fail1(UUID menuId) {
+            // When
+            // Then
+            assertThatThrownBy(() -> menuService.hide(menuId))
+                    .isInstanceOf(InvalidDataAccessApiUsageException.class);
+        }
+
+        @DisplayName("존재하지 않는 메뉴를 숨긴다 (실패)")
+        @Test
+        void fail2() {
+            // Given
+            final UUID menuId = UUID.randomUUID();
+
+            // When
+            // Then
+            assertThatThrownBy(() -> menuService.hide(menuId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+    }
+
 }
