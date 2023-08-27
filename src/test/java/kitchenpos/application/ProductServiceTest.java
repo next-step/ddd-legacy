@@ -2,12 +2,14 @@ package kitchenpos.application;
 
 import kitchenpos.domain.Product;
 import kitchenpos.helper.ProductHelper;
+import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.math.BigDecimal;
@@ -15,11 +17,15 @@ import java.math.BigDecimal;
 import static kitchenpos.helper.ProductHelper.DEFAULT_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 class ProductServiceTest extends ApplicationTest {
 
     @Autowired
     private ProductService productService;
+
+    @SpyBean
+    private PurgomalumClient purgomalumClient;
 
 
     @DisplayName("새로운 상품을 등록한다.")
@@ -112,6 +118,25 @@ class ProductServiceTest extends ApplicationTest {
                 // Then
                 assertThatThrownBy(() -> productService.create(product))
                         .isInstanceOf(DataIntegrityViolationException.class);
+            }
+        }
+
+        @DisplayName("상품명에 비속어가 포함되어 있으면 안 된다.")
+        @Nested
+        class Policy3 {
+            @DisplayName("상품명이 비속어인 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(strings = {"나쁜놈", "fuck"})
+            void fail1(final String name) {
+                // Given
+                when(purgomalumClient.containsProfanity(name)).thenReturn(true);
+
+                // When
+                Product product = ProductHelper.create(name);
+
+                // Then
+                assertThatThrownBy(() -> productService.create(product))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
         }
 
