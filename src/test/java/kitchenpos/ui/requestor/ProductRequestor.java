@@ -30,6 +30,15 @@ public class ProductRequestor {
                 .extract().jsonPath().getObject("id", UUID.class);
     }
 
+    public static Product 상품생성요청_상품반환(Product product) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(product)
+                .when().post(DEFAULT_URL)
+                .then().log().all()
+                .extract().jsonPath().getObject("$", Product.class);
+    }
+
     public static ExtractableResponse<Response> 상품가격변경요청(UUID productId, Product product) {
         return RestAssured.given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)

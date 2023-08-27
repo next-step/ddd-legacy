@@ -34,7 +34,7 @@ class OrderTableServiceTest {
     @Autowired
     private OrderTableService orderTableService;
 
-    @DisplayName("테이블생성 후 테이블조회시 추가된 테이블이 조회되야 한다.")
+    @DisplayName("테이블생성시 요청한 데이터로 테이블이 생성되야 한다.")
     @Test
     void 테이블생성() {
         // when

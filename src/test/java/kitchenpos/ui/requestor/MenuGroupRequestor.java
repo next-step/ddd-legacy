@@ -19,6 +19,15 @@ public class MenuGroupRequestor {
                 .extract();
     }
 
+    public static MenuGroup 메뉴그룹생성요청_메뉴그룹반환(MenuGroup menuGroup) {
+        return RestAssured.given().log().all()
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(menuGroup)
+                .when().post(DEFAULT_URL)
+                .then().log().all()
+                .extract().jsonPath().getObject("$", MenuGroup.class);
+    }
+
     public static ExtractableResponse<Response> 메뉴그룹전체조회요청() {
         return RestAssured.given().log().all()
                 .when().get(DEFAULT_URL)
