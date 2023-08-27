@@ -151,6 +151,56 @@ class MenuServiceTest extends ApplicationTest {
                         .isInstanceOf(NoSuchElementException.class);
             }
         }
+
+        @DisplayName("메뉴에 등록할 상품이 1개 이상 있어야 한다.")
+        @Nested
+        class Policy3 {
+            @DisplayName("메뉴에 등록할 상품이 1개 이상 있는 경우 (성공)")
+            @Test
+            void success1() {
+                // Given
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts);
+
+                // When
+                Menu createdMenu = menuService.create(menu);
+
+                // Then
+                assertThat(createdMenu.getPrice()).isEqualTo(DEFAULT_PRICE);
+                assertThat(createdMenu.getMenuGroup().getId()).isEqualTo(createdMenuGroup.getId());
+                assertThat(createdMenu.getMenuProducts().size()).isEqualTo(createdMenuProducts.size());
+                assertThat(collectMenuProductIds(createdMenu.getMenuProducts()))
+                        .containsAll(collectMenuProductIds(createdMenuProducts));
+            }
+
+            private List<UUID> collectMenuProductIds(List<MenuProduct> menuProducts) {
+                return menuProducts.stream()
+                        .map(m -> m.getProduct().getId())
+                        .collect(toUnmodifiableList());
+            }
+
+            @DisplayName("메뉴에 등록할 상품이 null 인 경우 (실패)")
+            @ParameterizedTest
+            @NullSource
+            void fail1(List<MenuProduct> menuProducts) {
+                // When
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), menuProducts);
+
+                // Then
+                assertThatThrownBy(() -> menuService.create(menu))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("메뉴에 등록할 상품이 없는 경우 (실패)")
+            @Test
+            void fail2() {
+                // When
+                Menu menu = MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), List.of());
+
+                // Then
+                assertThatThrownBy(() -> menuService.create(menu))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
     }
 
 }
