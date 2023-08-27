@@ -10,7 +10,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuGroupFixture.generateMenuGroup;
 import static kitchenpos.fixture.MenuProductFixture.generateMenuProduct;
+import static kitchenpos.fixture.ProductFixture.generateProduct;
 
 public class MenuFixture {
 
@@ -18,6 +20,14 @@ public class MenuFixture {
 
     private static final String DEFAULT_NAME = "menu";
     private static final BigDecimal DEFAULT_PRICE = BigDecimal.ZERO;
+
+    public static Menu generateMenu() {
+        final Product product = generateProduct();
+        final int quantity = 1;
+        final MenuGroup menuGroup = generateMenuGroup();
+
+        return generateMenu(product, quantity, menuGroup);
+    }
 
     public static Menu generateMenu(final Product product, final int quantity, final MenuGroup menuGroup) {
         return createMenu(

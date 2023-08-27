@@ -11,13 +11,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.generateMenu;
 import static kitchenpos.fixture.OrderLineItemFixture.generateOrderLineItem;
+import static kitchenpos.fixture.OrderTableFixture.generateOrderTable;
 
 public class OrderFixture {
 
     private OrderFixture() {}
 
     private static final String DEFAULT_ADDRESS = "address";
+    private static final int DEFAULT_QUANTITY = 1;
 
     public static Order initializeDeliveryOrder(final Menu menu, final long quantity) {
         return generateDeliveryOrder(OrderStatus.WAITING, menu, quantity, DEFAULT_ADDRESS);
@@ -76,6 +79,67 @@ public class OrderFixture {
                 null,
                 orderTable
         );
+    }
+
+    public static Order automaticallyInitializeOrderByType(final OrderType orderType) {
+        final Menu menu = generateMenu();
+
+        switch (orderType) {
+            case DELIVERY:
+                return initializeDeliveryOrder(menu, DEFAULT_QUANTITY);
+            case TAKEOUT:
+                return initializeTakeOutOrder(menu, DEFAULT_QUANTITY);
+            case EAT_IN:
+                final OrderTable orderTable = generateOrderTable();
+                return initializeEatInOrder(menu, DEFAULT_QUANTITY, orderTable);
+            default:
+                throw new IllegalStateException("Undefined behavior for " + orderType.name());
+        }
+    }
+
+    public static Order automaticallyInitializeOrder(final OrderType orderType, final OrderStatus orderStatus) {
+        final Menu menu = generateMenu();
+
+        switch (orderType) {
+            case DELIVERY:
+                switch (orderStatus) {
+                    case WAITING:
+                        return initializeDeliveryOrder(menu, DEFAULT_QUANTITY);
+                    case ACCEPTED:
+                    case SERVED:
+                    case DELIVERING:
+                    case DELIVERED:
+                    case COMPLETED:
+                        return generateDeliveryOrder(orderStatus, menu, DEFAULT_QUANTITY, null);
+                    default:
+                        throw new IllegalStateException("Undefined behavior for " + orderStatus.name());
+                }
+            case TAKEOUT:
+                switch (orderStatus) {
+                    case WAITING:
+                        return initializeTakeOutOrder(menu, DEFAULT_QUANTITY);
+                    case ACCEPTED:
+                    case SERVED:
+                    case COMPLETED:
+                        return generateTakeoutOrder(orderStatus, menu, DEFAULT_QUANTITY);
+                    default:
+                        throw new IllegalStateException("Undefined behavior for " + orderStatus.name());
+                }
+            case EAT_IN:
+                final OrderTable orderTable = generateOrderTable();
+                switch (orderStatus) {
+                    case WAITING:
+                        return initializeEatInOrder(menu, DEFAULT_QUANTITY, orderTable);
+                    case ACCEPTED:
+                    case SERVED:
+                    case COMPLETED:
+                        return generateEatInOrder(orderStatus, menu, DEFAULT_QUANTITY, orderTable);
+                    default:
+                        throw new IllegalStateException("Undefined behavior for " + orderStatus.name());
+                }
+            default:
+                throw new IllegalStateException("Undefined behavior for " + orderType.name());
+        }
     }
 
     private static Order createOrder(
