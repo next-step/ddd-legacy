@@ -4,9 +4,12 @@ import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.BDDMockito;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -51,8 +54,20 @@ class MenuServiceTest {
         menu.setPrice(BigDecimal.valueOf(16000));
 
         assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy( () ->  menuService.create(menu));
+                .isThrownBy(() -> menuService.create(menu));
     }
 
+    @DisplayName("메뉴의 메뉴상품목록이 null 이거나 비어있으면 예외를 발생시킨다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void menu_create_null_menuProducts(List<MenuProduct> productList) {
+        BDDMockito.given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuFixture.MenuGroupFixture.한마리메뉴()));
+        Menu menu = new Menu();
+        menu.setPrice(BigDecimal.valueOf(16000));
+        menu.setMenuProducts(productList);
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.create(menu));
+    }
 
 }
