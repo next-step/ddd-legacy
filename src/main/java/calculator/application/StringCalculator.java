@@ -1,8 +1,11 @@
 package calculator.application;
 
-import calculator.domain.Digit;
+import calculator.domain.PositiveNumber;
+import calculator.domain.PositiveNumbers;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class StringCalculator {
 
@@ -13,14 +16,18 @@ public class StringCalculator {
             return RETURN_VALUE_WHEN_EMPTY_OR_NULL;
         }
 
-        return Arrays.stream(stringToInt(inputText))
-            .mapToObj(Digit::from)
-            .reduce(Digit.from(0), Digit::add)
-            .getValue();
+        return PositiveNumbers.from(createPositiveNumbers(inputText))
+            .sum();
     }
 
     private boolean validateInputText(String inputText) {
         return inputText == null || inputText.trim().isEmpty();
+    }
+
+    private List<PositiveNumber> createPositiveNumbers(String inputText) {
+        return Arrays.stream(stringToInt(inputText))
+            .mapToObj(PositiveNumber::from)
+            .collect(Collectors.toList());
     }
 
     private int[] stringToInt(String inputText) {
