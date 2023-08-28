@@ -1,6 +1,6 @@
 package kitchenpos.acceptance;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.util.List;
@@ -46,12 +46,16 @@ public class MenuGroupApi {
         List<Object> menuGroups = objectMapper.readValue(response.getContentAsString(), List.class);
         assertThat(menuGroups).hasSize(expectedSize);
     }
-    
-    public static String extractMenuGroupId(MockHttpServletResponse createdResponse) {
+
+    private static String extractMenuGroupId(MockHttpServletResponse createdResponse) {
         Matcher matcher = MENU_GROUP_ID_EXTRACT_PATTERN.matcher(createdResponse.getHeader("Location"));
         matcher.find();
         String menuGroupId = matcher.group(CAPTURING_MENU_GROUP_ID_INDEX);
         return menuGroupId;
+    }
+
+    public static String 메뉴그룹_생성(MockMvc mockMvc, Map<String, Object> request) throws Exception {
+        return extractMenuGroupId(메뉴그룹_생성_요청(mockMvc, request));
     }
 
 }

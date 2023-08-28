@@ -27,9 +27,8 @@ public class MenuAcceptanceTest {
 
     @Test
     void 메뉴_생성__성공() throws Exception {
-        MockHttpServletResponse menuGroupCreatedResponse = 메뉴그룹_생성_요청(mockMvc, 추천_메뉴.getValue());
         MockHttpServletResponse productCreatedResponse = 상품_생성_요청(mockMvc, 강정치킨.getValue());
-        String menuGroupId = extractMenuGroupId(menuGroupCreatedResponse);
+        String menuGroupId = 메뉴그룹_생성(mockMvc, 추천_메뉴.getValue());
         String productId = extractProductId(productCreatedResponse);
 
         Map<String, Object> request = Map.of(
@@ -49,9 +48,8 @@ public class MenuAcceptanceTest {
 
     @Test
     void 메뉴_가격_변경__성공() throws Exception {
-        MockHttpServletResponse menuGroupCreatedResponse = 메뉴그룹_생성_요청(mockMvc, 추천_메뉴.getValue());
         MockHttpServletResponse productCreatedResponse = 상품_생성_요청(mockMvc, 강정치킨.getValue());
-        String menuGroupId = extractMenuGroupId(menuGroupCreatedResponse);
+        String menuGroupId = 메뉴그룹_생성(mockMvc, 추천_메뉴.getValue());
         String productId = extractProductId(productCreatedResponse);
 
         Map<String, Object> createRequest = Map.of(
@@ -75,9 +73,8 @@ public class MenuAcceptanceTest {
 
     @Test
     void 메뉴_보이기_설정__성공() throws Exception {
-        MockHttpServletResponse menuGroupCreatedResponse = 메뉴그룹_생성_요청(mockMvc, 추천_메뉴.getValue());
         MockHttpServletResponse productCreatedResponse = 상품_생성_요청(mockMvc, 강정치킨.getValue());
-        String menuGroupId = extractMenuGroupId(menuGroupCreatedResponse);
+        String menuGroupId = 메뉴그룹_생성(mockMvc, 추천_메뉴.getValue());
         String productId = extractProductId(productCreatedResponse);
 
         Map<String, Object> createRequest = Map.of(
@@ -100,9 +97,8 @@ public class MenuAcceptanceTest {
 
     @Test
     void 메뉴_숨기기_설정__성공() throws Exception {
-        MockHttpServletResponse menuGroupCreatedResponse = 메뉴그룹_생성_요청(mockMvc, 추천_메뉴.getValue());
         MockHttpServletResponse productCreatedResponse = 상품_생성_요청(mockMvc, 강정치킨.getValue());
-        String menuGroupId = extractMenuGroupId(menuGroupCreatedResponse);
+        String menuGroupId = 메뉴그룹_생성(mockMvc, 추천_메뉴.getValue());
         String productId = extractProductId(productCreatedResponse);
 
         Map<String, Object> createRequest = Map.of(
@@ -125,9 +121,8 @@ public class MenuAcceptanceTest {
 
     @Test
     void 메뉴_전체조회() throws Exception {
-        MockHttpServletResponse menuGroupCreatedResponse = 메뉴그룹_생성_요청(mockMvc, 추천_메뉴.getValue());
         MockHttpServletResponse productCreatedResponse = 상품_생성_요청(mockMvc, 강정치킨.getValue());
-        String menuGroupId = extractMenuGroupId(menuGroupCreatedResponse);
+        String menuGroupId = 메뉴그룹_생성(mockMvc, 추천_메뉴.getValue());
         String productId = extractProductId(productCreatedResponse);
 
         Map<String, Object> createRequest = Map.of(
