@@ -7,12 +7,16 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import kitchenpos.application.MenuService;
 import kitchenpos.domain.Menu;
@@ -23,25 +27,38 @@ import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
+@Transactional
 public class MenuServiceTest {
 
-    @Mock
+    @Autowired
     private MenuGroupRepository menuGroupRepository;
 
-    @Mock
+    @Autowired
     private ProductRepository productRepository;
 
-    @Mock
+    @MockBean
     private PurgomalumClient purgomalumClient;
 
-    @InjectMocks
+    @Autowired
     private MenuService menuService;
+
+    private MenuGroup 추천메뉴;
+
+    @BeforeEach
+    void init() {
+        추천메뉴 = new MenuGroup();
+        추천메뉴.setId(UUID.randomUUID());
+        추천메뉴.setName("추천 메뉴");
+        menuGroupRepository.save(추천메뉴);
+    }
 
     @Test
     void 메뉴_생성_실패__가격이_null() {
-        Menu menu = new Menu();
-        menu.setPrice(null);
+        Menu menu = MenuFixture.builder()
+                .price(null)
+                .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
