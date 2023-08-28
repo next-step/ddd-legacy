@@ -147,4 +147,15 @@ class ProductServiceTest {
         Menu menuOfProduct = menuRepository.findById(오늘의치킨.getId()).get();
         assertThat(menuOfProduct.isDisplayed()).isFalse();
     }
+
+    @Test
+    void 상품_가격_변경_성공() {
+        UUID productId = 강정치킨.getId();
+        Product request = new Product();
+        request.setPrice(new BigDecimal(1001));
+
+        assertDoesNotThrow(() -> productService.changePrice(productId, request));
+        Menu menuOfProduct = menuRepository.findById(오늘의치킨.getId()).get();
+        assertThat(menuOfProduct.isDisplayed()).isTrue();
+    }
 }
