@@ -157,4 +157,21 @@ public class MenuServiceTest {
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void 메뉴_가격_변경_실패__가격이_null() {
+        Menu menu = new Menu();
+
+        assertThatThrownBy(() -> menuService.changePrice(null, menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 메뉴_가격_변경_실패__가격이_음수() {
+        Menu menu = new Menu();
+        menu.setPrice(new BigDecimal(-1));
+
+        assertThatThrownBy(() -> menuService.changePrice(null, menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
