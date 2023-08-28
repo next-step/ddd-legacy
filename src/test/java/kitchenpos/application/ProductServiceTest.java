@@ -6,11 +6,10 @@ import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.support.BaseServiceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,5 +62,17 @@ class ProductServiceTest extends BaseServiceTest {
         when(purgomalumClient.containsProfanity(any())).thenReturn(true);
 
         assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
+    }
+
+    @DisplayName("상품은 가격 수정이 가능하다")
+    @Test
+    void test4() {
+        final Product product = productRepository.save(createProduct(UUID.randomUUID(), "상품", BigDecimal.TEN));
+        final Product newPriceProduct = createProduct("상품", BigDecimal.ONE);
+
+        final Product changedPriceProduct = productService.changePrice(product.getId(), newPriceProduct);
+
+        assertThat(changedPriceProduct.getId()).isEqualTo(product.getId());
+        assertThat(changedPriceProduct.getPrice()).isEqualTo(newPriceProduct.getPrice());
     }
 }
