@@ -5,6 +5,7 @@ import kitchenpos.helper.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -78,6 +79,20 @@ class OrderServiceTest extends ApplicationTest {
         OrderLineItem orderLineItem2 = new OrderLineItem();
         orderLineItem2.setMenuId(displayedMenu2.getId());
         orderLineItem2.setQuantity(2);
+        orderLineItem2.setPrice(displayedMenu2.getPrice());
+
+        return List.of(orderLineItem1, orderLineItem2);
+    }
+
+    private List<OrderLineItem> createOrderLineItemsWhichQuantityIsNegative() {
+        OrderLineItem orderLineItem1 = new OrderLineItem();
+        orderLineItem1.setMenuId(displayedMenu1.getId());
+        orderLineItem1.setQuantity(-1);
+        orderLineItem1.setPrice(displayedMenu1.getPrice());
+
+        OrderLineItem orderLineItem2 = new OrderLineItem();
+        orderLineItem2.setMenuId(displayedMenu2.getId());
+        orderLineItem2.setQuantity(-2);
         orderLineItem2.setPrice(displayedMenu2.getPrice());
 
         return List.of(orderLineItem1, orderLineItem2);
@@ -181,6 +196,50 @@ class OrderServiceTest extends ApplicationTest {
             void fail2(final OrderType orderType) {
                 // Given
                 Order order = getOrder(orderType, List.of());
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+
+        @DisplayName("주문 유형이 매장 식사가 아닌 경우, 주문할 메뉴의 수량은 0개 이상이어야 한다.")
+        @Nested
+        class Policy3 {
+            @DisplayName("주문 유형이 매장 식사일 때, 메뉴의 수량이 음수인 경우(성공)")
+            @Test
+            void success1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItemsWhichQuantityIsNegative();
+                Order order = getOrder(OrderType.EAT_IN, orderLineItems);
+
+                // When
+                Order createdOrder = orderService.create(order);
+
+                // Then
+                assertThat(getOrderedMenuId(createdOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+            }
+
+            @DisplayName("주문 유형이 배달일 때, 메뉴의 수량이 음수인 경우(실패)")
+            @Test
+            void fail1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItemsWhichQuantityIsNegative();
+                Order order = getOrder(OrderType.DELIVERY, orderLineItems);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("주문 유형이 포장일 때, 메뉴의 수량이 음수인 경우(실패)")
+            @Test
+            void fail2() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItemsWhichQuantityIsNegative();
+                Order order = getOrder(OrderType.TAKEOUT, orderLineItems);
 
                 // When
                 // Then
