@@ -1,6 +1,9 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.helper.OrderTableHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,12 +26,19 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 import static kitchenpos.helper.NameHelper.NAME_OF_255_CHARACTERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 @Transactional
 class OrderTableServiceTest extends ApplicationTest {
 
     @Autowired
     private OrderTableService orderTableService;
+
+    @Autowired
+    private OrderTableRepository orderTableRepository;
+
+    @SpyBean
+    private OrderRepository orderRepository;
 
 
     @DisplayName("새로운 테이블을 등록한다.")
@@ -107,6 +118,68 @@ class OrderTableServiceTest extends ApplicationTest {
             // Then
             assertThatThrownBy(() -> orderTableService.sit(notExistedOrderTableId))
                     .isInstanceOf(NoSuchElementException.class);
+        }
+    }
+
+    @DisplayName("등록된 테이블에 고객을 퇴장시킨다.")
+    @Nested
+    class ClearOrderTable {
+
+        private OrderTable beforeSatOrderTable;
+
+        @BeforeEach
+        void beforeEach() {
+            OrderTable orderTable = orderTableService.create(OrderTableHelper.create());
+            orderTableService.sit(orderTable.getId());
+            beforeSatOrderTable = orderTableService.changeNumberOfGuests(orderTable.getId(), OrderTableHelper.create(5));
+        }
+
+        @DisplayName("해당 테이블의 주문 상태가 완료가 아니면, 고객을 퇴장시킬 수 없다.")
+        @Nested
+        class Policy1 {
+            @DisplayName("해당 테이블의 주문 상태가 완료인 경우 (성공)")
+            @Test
+            void success1() {
+                // Given
+                OrderTable orderTable = orderTableRepository.findById(beforeSatOrderTable.getId())
+                        .orElseThrow(NoSuchElementException::new);
+                when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
+                        .thenReturn(false);
+
+                // When
+                OrderTable cleardOrderTable = orderTableService.clear(orderTable.getId());
+
+                // Then
+                assertThat(cleardOrderTable.getNumberOfGuests()).isZero();
+                assertThat(cleardOrderTable.isOccupied()).isFalse();
+            }
+
+            @DisplayName("주문 테이블이 없는 경우 (실패)")
+            @Test
+            void fail1() {
+                // Given
+                final UUID orderTableId = UUID.randomUUID();
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderTableService.clear(orderTableId))
+                        .isInstanceOf(NoSuchElementException.class);
+            }
+
+            @DisplayName("해당 테이블의 주문 상태가 완료가 아닌 경우 (성공)")
+            @Test
+            void fail2() {
+                // Given
+                OrderTable orderTable = orderTableRepository.findById(beforeSatOrderTable.getId())
+                        .orElseThrow(NoSuchElementException::new);
+                when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
+                        .thenReturn(true);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
+                        .isInstanceOf(IllegalStateException.class);
+            }
         }
     }
 
