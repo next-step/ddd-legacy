@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.helper.*;
+import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -10,7 +11,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -23,6 +26,7 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 import static kitchenpos.helper.MenuHelper.DEFAULT_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 
 @Transactional
 class OrderServiceTest extends ApplicationTest {
@@ -39,6 +43,9 @@ class OrderServiceTest extends ApplicationTest {
 
     @Autowired
     private OrderService orderService;
+
+    @SpyBean
+    private KitchenridersClient kitchenridersClient;
 
 
     @BeforeAll
@@ -487,6 +494,44 @@ class OrderServiceTest extends ApplicationTest {
                 // Then
                 assertThatThrownBy(() -> orderService.accept(acceptedOrder.getId()))
                         .isInstanceOf(IllegalStateException.class);
+            }
+        }
+
+        @DisplayName("주문 유형이 배달이면, 배달 업체에 배달 요청을 한다.")
+        @Nested
+        class Policy2 {
+            @DisplayName("배달 업체에 배달 요청을 성공한 경우 (성공)")
+            @Test
+            void success1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, "배달 주소");
+                Order createdOrder = orderService.create(order);
+
+                // When
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+
+                // Then
+                assertThat(getOrderedMenuId(acceptedOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+                assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+            }
+
+            @DisplayName("배달 업체에 배달 요청을 실패한 경우 (실패)")
+            @Test
+            void fail1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, "배달 주소");
+                Order createdOrder = orderService.create(order);
+
+                doThrow(RuntimeException.class)
+                        .when(kitchenridersClient)
+                        .requestDelivery(Mockito.any(), Mockito.any(), Mockito.any());
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.accept(createdOrder.getId()))
+                        .isInstanceOf(RuntimeException.class);
             }
         }
     }
