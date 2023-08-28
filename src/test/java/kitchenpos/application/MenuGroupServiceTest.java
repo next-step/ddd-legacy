@@ -24,7 +24,7 @@ class MenuGroupServiceTest {
     @Autowired
     private MenuGroupService menuGroupService;
 
-    @DisplayName("메뉴그룹 생성 후 메뉴그룹조회시 추가한 메뉴그룹이 조회되야 한다.")
+    @DisplayName("메뉴그룹 생성시 요청한 데이터로 메뉴그룹이 생성되야 한다.")
     @Test
     void 메뉴그룹생성() {
         // when

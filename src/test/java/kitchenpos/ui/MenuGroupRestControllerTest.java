@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MenuGroupRestControllerTest extends ControllerTest {
 
 
-    @DisplayName("메뉴그룹 생성요청 후 메뉴그룹시 메뉴그룹이 존재해야한다.")
+    @DisplayName("메뉴그룹 생성시 요청한 데이터로 메뉴그룹이 생성되야 한다.")
     @Test
     void 메뉴그룹생성() {
         // when
