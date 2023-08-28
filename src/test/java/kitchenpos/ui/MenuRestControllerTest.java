@@ -52,7 +52,7 @@ class MenuRestControllerTest extends ControllerTest {
     @Test
     void 메뉴생성() {
         // given
-        Menu 메뉴 = MenuMaker.make("메뉴", 15000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2);
+        Menu 메뉴 = MenuMaker.make("메뉴", 15_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2);
 
         // when
         ExtractableResponse<Response> response = 메뉴생성요청(메뉴);
@@ -65,7 +65,7 @@ class MenuRestControllerTest extends ControllerTest {
     @Test
     void 메뉴생성실패_가격_음수() {
         // given
-        Menu 메뉴 = MenuMaker.make("메뉴", -15000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2);
+        Menu 메뉴 = MenuMaker.make("메뉴", -15_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2);
 
         // when
         ExtractableResponse<Response> response = 메뉴생성요청(메뉴);
@@ -78,7 +78,7 @@ class MenuRestControllerTest extends ControllerTest {
     @Test
     void 메뉴생성실패_메뉴상품수량_음수() {
         // given
-        Menu 메뉴 = MenuMaker.make("메뉴", 15000L, 메뉴그룹, 메뉴상품_1, 수량음수상품);
+        Menu 메뉴 = MenuMaker.make("메뉴", 15_000L, 메뉴그룹, 메뉴상품_1, 수량음수상품);
 
         // when
         ExtractableResponse<Response> response = 메뉴생성요청(메뉴);
@@ -91,7 +91,7 @@ class MenuRestControllerTest extends ControllerTest {
     @Test
     void 메뉴생성실패_메뉴이름_욕설포함() {
         // given
-        Menu 메뉴 = MenuMaker.make("Fuck메뉴", 15000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2);
+        Menu 메뉴 = MenuMaker.make("Fuck메뉴", 15_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2);
 
         // when
         ExtractableResponse<Response> response = 메뉴생성요청(메뉴);
@@ -104,7 +104,7 @@ class MenuRestControllerTest extends ControllerTest {
     @Test
     void 가격변경() {
         // given
-        UUID 메뉴식별번호 = 메뉴생성요청_메뉴식별번호반환(MenuMaker.make("메뉴", 15000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
+        UUID 메뉴식별번호 = 메뉴생성요청_메뉴식별번호반환(MenuMaker.make("메뉴", 15_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
 
         // when
         ExtractableResponse<Response> response = 메뉴가격변경요청(메뉴식별번호, MenuMaker.make("메뉴", 3000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
@@ -117,7 +117,7 @@ class MenuRestControllerTest extends ControllerTest {
     @Test
     void 가격변경실패_메뉴가격_메뉴상품총가격_초과() {
         // given
-        UUID 메뉴식별번호 = 메뉴생성요청_메뉴식별번호반환(MenuMaker.make("메뉴", 15000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
+        UUID 메뉴식별번호 = 메뉴생성요청_메뉴식별번호반환(MenuMaker.make("메뉴", 15_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
 
         // when
         ExtractableResponse<Response> response = 메뉴가격변경요청(메뉴식별번호, MenuMaker.make("메뉴", 5000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
@@ -143,7 +143,7 @@ class MenuRestControllerTest extends ControllerTest {
     @Test
     void 메뉴노출실패_메뉴가격_메뉴상품총가격_초과() {
         // given
-        UUID 메뉴식별번호 = 메뉴생성요청_메뉴식별번호반환(MenuMaker.make("메뉴", 15000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
+        UUID 메뉴식별번호 = 메뉴생성요청_메뉴식별번호반환(MenuMaker.make("메뉴", 15_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
 
         // when
         ExtractableResponse<Response> response = 메뉴노출요청(메뉴식별번호);
@@ -156,7 +156,7 @@ class MenuRestControllerTest extends ControllerTest {
     @Test
     void 메뉴비노출() {
         // given
-        UUID 메뉴식별번호 = 메뉴생성요청_메뉴식별번호반환(MenuMaker.make("메뉴", 15000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
+        UUID 메뉴식별번호 = 메뉴생성요청_메뉴식별번호반환(MenuMaker.make("메뉴", 15_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
 
         // when
         ExtractableResponse<Response> response = 메뉴비노출요청(메뉴식별번호);
@@ -169,8 +169,8 @@ class MenuRestControllerTest extends ControllerTest {
     @Test
     void 메뉴전체조회() {
         // given
-        메뉴생성요청(MenuMaker.make("메뉴", 15000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
-        메뉴생성요청(MenuMaker.make("메뉴2", 12000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
+        메뉴생성요청(MenuMaker.make("메뉴", 15_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
+        메뉴생성요청(MenuMaker.make("메뉴2", 12_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
 
         // when
         ExtractableResponse<Response> response = 메뉴전체조회요청();
@@ -239,8 +239,8 @@ class MenuRestControllerTest extends ControllerTest {
                         getRecursiveComparisonConfiguration()
                 )
                 .containsExactlyInAnyOrder(
-                        Tuple.tuple("메뉴", new BigDecimal(15000L), true),
-                        Tuple.tuple("메뉴2", new BigDecimal(12000L), true)
+                        Tuple.tuple("메뉴", new BigDecimal(15_000L), true),
+                        Tuple.tuple("메뉴2", new BigDecimal(12_000L), true)
                 );
 
         assertThat(menus)

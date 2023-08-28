@@ -49,15 +49,15 @@ class OrderRestControllerTest extends ControllerTest {
         메뉴상품_2 = MenuProductMaker.make(상품_2, 5);
         착석테이블 = 테이블생성_착석_고객수_요청테이블반환(OrderTableMaker.make("착석테이블", 4));
         미착석테이블 = 테이블생성요청_테이블반환(OrderTableMaker.make("미착석테이블"));
-        메뉴_1 = 메뉴생성요청_메뉴반환(MenuMaker.make("메뉴1", 15000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
-        비노출메뉴 = 메뉴생성요청_메뉴반환(MenuMaker.makeHideMenu("비노출메뉴", 12000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
+        메뉴_1 = 메뉴생성요청_메뉴반환(MenuMaker.make("메뉴1", 15_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
+        비노출메뉴 = 메뉴생성요청_메뉴반환(MenuMaker.makeHideMenu("비노출메뉴", 12_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
     }
 
     @DisplayName("매장주문생성시 요청한 데이터로 주문이 생성되야 한다.")
     @Test
     void 매장주문생성() {
         // given
-        Order 매장주문 = OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15000L));
+        Order 매장주문 = OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
 
         // when
         ExtractableResponse<Response> response = 주문생성요청(매장주문);
@@ -70,7 +70,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 매장주문생성실패_미착석() {
         // given
-        Order 매장주문 = OrderMaker.makeEatin(미착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15000L));
+        Order 매장주문 = OrderMaker.makeEatin(미착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
 
         // when
         ExtractableResponse<Response> response = 주문생성요청(매장주문);
@@ -83,7 +83,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 주문생성실패_비노출메뉴() {
         // given
-        Order 매장주문 = OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(비노출메뉴, 1, 15000L));
+        Order 매장주문 = OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(비노출메뉴, 1, 15_000L));
 
         // when
         ExtractableResponse<Response> response = 주문생성요청(매장주문);
@@ -96,7 +96,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 주문생성실패_주문가격_메뉴가격_불일치() {
         // given
-        Order 매장주문 = OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 10000L));
+        Order 매장주문 = OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 10_000L));
 
         // when
         ExtractableResponse<Response> response = 주문생성요청(매장주문);
@@ -109,7 +109,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 주문생성실패_수량음수() {
         // given
-        Order 배달주문 = OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, -1, 15000L));
+        Order 배달주문 = OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, -1, 15_000L));
 
         // when
         ExtractableResponse<Response> response = 주문생성요청(배달주문);
@@ -122,7 +122,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 배달주문생성() {
         // given
-        Order 배달주문 = OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15000L));
+        Order 배달주문 = OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
 
         // when
         ExtractableResponse<Response> response = 주문생성요청(배달주문);
@@ -135,7 +135,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 포장주문생성() {
         // given
-        Order 포장주문 = OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15000L));
+        Order 포장주문 = OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
 
         // when
         ExtractableResponse<Response> response = 주문생성요청(포장주문);
@@ -148,7 +148,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 주문수락() {
         // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
+        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
 
         // when
         ExtractableResponse<Response> response = 주문수락요청(주문식별번호);
@@ -161,7 +161,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 주문수락실패_대기상태아닐경우() {
         // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
+        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
         주문수락요청(주문식별번호);
 
         // when
@@ -175,7 +175,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 배달주문수락() {
         // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
+        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
 
         // when
         ExtractableResponse<Response> response = 주문수락요청(주문식별번호);
@@ -188,7 +188,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 주문제공() {
         // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
+        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
         주문수락요청(주문식별번호);
 
         // when
@@ -202,7 +202,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 배달주문_배달시작() {
         // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
+        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
         주문수락요청(주문식별번호);
         주문제공요청(주문식별번호);
 
@@ -217,7 +217,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 배달주문_배달완료() {
         // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
+        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
         주문수락요청(주문식별번호);
         주문제공요청(주문식별번호);
         주문배달시작요청(주문식별번호);
@@ -233,7 +233,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 매장주문완료() {
         // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
+        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
         주문수락요청(주문식별번호);
         주문제공요청(주문식별번호);
 
@@ -248,7 +248,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 배달주문완료() {
         // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
+        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
         주문수락요청(주문식별번호);
         주문제공요청(주문식별번호);
         주문배달시작요청(주문식별번호);
@@ -265,7 +265,7 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 포장주문완료() {
         // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
+        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
         주문수락요청(주문식별번호);
         주문제공요청(주문식별번호);
 
@@ -280,9 +280,9 @@ class OrderRestControllerTest extends ControllerTest {
     @Test
     void 주문전체조회() {
         // given
-        UUID 매장주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
-        UUID 배달주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
-        UUID 포장주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15000L)));
+        UUID 매장주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
+        UUID 배달주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
+        UUID 포장주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
 
         주문수락요청(포장주문식별번호);
         주문제공요청(포장주문식별번호);
