@@ -14,8 +14,8 @@ public class OrderTableFixture {
 
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(ORDER_TABLE_NAME);
-        orderTable.setNumberOfGuests(3);
-        orderTable.setOccupied(true);
+        orderTable.setNumberOfGuests(0);
+        orderTable.setOccupied(false);
 
         return orderTable;
     }
