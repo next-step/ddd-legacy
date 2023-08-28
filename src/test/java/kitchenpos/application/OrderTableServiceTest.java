@@ -98,4 +98,16 @@ class OrderTableServiceTest extends BaseServiceTest {
 
         assertThatIllegalStateException().isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), changeOrderTable));
     }
+
+    @DisplayName("테이블은 전체 조회가 가능하다")
+    @Test
+    void test8() {
+        final OrderTable orderTable1 = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
+        final OrderTable orderTable2 = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
+        final OrderTable orderTable3 = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
+
+        final List<OrderTable> foundOrderTables = orderTableService.findAll();
+
+        assertThat(foundOrderTables).containsExactly(orderTable1, orderTable2, orderTable3);
+    }
 }
