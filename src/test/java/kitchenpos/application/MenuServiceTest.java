@@ -157,6 +157,45 @@ class MenuServiceTest extends BaseServiceTest {
         assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
     }
 
+    @DisplayName("메뉴는 가격 수정이 가능하다.")
+    @Test
+    void test11() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID(), "치킨", BigDecimal.TEN));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), "치킨", BigDecimal.ONE, menuGroup, List.of(menuProduct)));
+        final Menu changeMenu = createMenu(BigDecimal.TEN);
+
+        final Menu changedMenu = menuService.changePrice(menu.getId(), changeMenu);
+
+        assertThat(changedMenu.getId()).isEqualTo(menu.getId());
+        assertThat(changedMenu.getPrice()).isEqualTo(changeMenu.getPrice());
+    }
+
+    @DisplayName("수정 될 메뉴의 가격 0원 이상이어야 한다.")
+    @Test
+    void test12() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID(), "치킨", BigDecimal.TEN));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), "치킨", BigDecimal.ONE, menuGroup, List.of(menuProduct)));
+        final Menu changeMenu = createMenu(new BigDecimal("-0.0001"));
+
+        assertThatIllegalArgumentException().isThrownBy(() -> menuService.changePrice(menu.getId(), changeMenu));
+    }
+
+    @DisplayName("메뉴의 가격 수정시 메뉴의 가격은 모든 메뉴 구성의 합보다 크면 안된다")
+    @Test
+    void test13() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID(), "치킨", BigDecimal.TEN));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), "치킨", BigDecimal.ONE, menuGroup, List.of(menuProduct)));
+        final Menu changeMenu = createMenu(new BigDecimal(100000000));
+
+        assertThatIllegalArgumentException().isThrownBy(() -> menuService.changePrice(menu.getId(), changeMenu));
+    }
+
     private static class MenuProductFields {
         final Long seq;
         final Product product;
