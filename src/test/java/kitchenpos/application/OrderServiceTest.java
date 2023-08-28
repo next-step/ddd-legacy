@@ -750,6 +750,53 @@ class OrderServiceTest extends ApplicationTest {
                         .isInstanceOf(IllegalStateException.class);
             }
         }
+
+        @DisplayName("주문 유형이 포장 또는 매장 식사이면, 주문 상태가 제공이여야 한다.")
+        @Nested
+        class Policy2 {
+            @DisplayName("주문 상태가 제공 상태인 경우 (성공)")
+            @ParameterizedTest
+            @EnumSource
+            void success1(final OrderType orderType) {
+                // Given
+                if (orderType == OrderType.DELIVERY) {
+                    return;
+                }
+
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrder(orderType, orderLineItems);
+                Order createdOrder = orderService.create(order);
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+                Order servedOrder = orderService.serve(acceptedOrder.getId());
+
+                // When
+                Order completedOrder = orderService.complete(servedOrder.getId());
+
+                // Then
+                assertThat(getOrderedMenuId(completedOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+                assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            }
+
+            @DisplayName("주문 상태가 제공 상태가 아닌 경우 (실패)")
+            @ParameterizedTest
+            @EnumSource
+            void fail1(final OrderType orderType) {
+                // Given
+                if (orderType == OrderType.DELIVERY) {
+                    return;
+                }
+
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrder(orderType, orderLineItems);
+                Order createdOrder = orderService.create(order);
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.complete(acceptedOrder.getId()))
+                        .isInstanceOf(IllegalStateException.class);
+            }
+        }
     }
 
 }
