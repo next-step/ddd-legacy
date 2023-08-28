@@ -13,9 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
+import static java.util.stream.Collectors.toUnmodifiableList;
 import static kitchenpos.helper.NameHelper.NAME_OF_255_CHARACTERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -185,6 +188,30 @@ class OrderTableServiceTest extends ApplicationTest {
                 assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(beforeNotSatOrderTable.getId(), orderTable))
                         .isInstanceOf(IllegalStateException.class);
             }
+        }
+    }
+
+    @DisplayName("모든 테이블을 가져온다.")
+    @Nested
+    class FindAllOrderTables {
+
+        private List<OrderTable> beforeCreatedOrderTables;
+
+        @BeforeEach
+        void beforeEach() {
+            beforeCreatedOrderTables = IntStream.range(0, 11)
+                    .mapToObj(n -> orderTableService.create(OrderTableHelper.create()))
+                    .collect(toUnmodifiableList());
+        }
+
+        @DisplayName("모든 테이블을 가져온다 (성공)")
+        @Test
+        void success1() {
+            // When
+            List<OrderTable> allOrderTables = orderTableService.findAll();
+
+            // Then
+            assertThat(allOrderTables.size()).isEqualTo(beforeCreatedOrderTables.size());
         }
     }
 

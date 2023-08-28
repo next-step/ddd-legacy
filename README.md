@@ -49,7 +49,7 @@ docker compose -p kitchenpos up -d
   - [X] 입장된 테이블의 고객 수를 변경한다.
     - [X] 테이블의 고객 수는 0명 이상이어야 한다.
     - [X] 테이블에 고객이 입장해 있는 상태여야 한다.
-  - [ ] 모든 테이블을 가져온다.
+  - [X] 모든 테이블을 가져온다.
 - 주문 (Orders)
   - 주문 유형에는 배달(Delivery), 포장(Takeout), 매장 식사(Eat in)가 있다.
   - 주문 상태에는 대기(Waiting), 승낙(Accepted), 제공(Served), 배달중(Delivering), 배달 완료(Delivered), 완료(Completed)가 있다
