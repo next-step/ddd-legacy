@@ -54,7 +54,7 @@ docker compose -p kitchenpos up -d
   - 주문 유형에는 배달(Delivery), 포장(Takeout), 매장 식사(Eat in)가 있다.
   - 주문 상태에는 대기(Waiting), 승낙(Accepted), 제공(Served), 배달중(Delivering), 배달 완료(Delivered), 완료(Completed)가 있다
   - [ ] 새로운 주문을 등록한다.
-    - [ ] 주문 유형은 비어있을 수 없다.
+    - [X] 주문 유형은 비어있을 수 없다.
     - [ ] 주문할 메뉴는 1개 이상 있어야 한다.
     - [ ] 주문 유형이 매장 식사가 아닌 경우, 주문할 메뉴의 수량은 0개 이상이어야 한다.
     - [ ] 주문할 메뉴가 노출된 상태이여야 한다.

@@ -59,7 +59,7 @@ class MenuServiceTest extends ApplicationTest {
         createdMenuGroup = menuGroupService.create(MenuGroupHelper.create());
     }
 
-    public static MenuProduct createMenuProduct(int index, long quantity) {
+    private static MenuProduct createMenuProduct(int index, long quantity) {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setSeq((long) index);
         menuProduct.setProductId(createdProducts.get(index).getId());

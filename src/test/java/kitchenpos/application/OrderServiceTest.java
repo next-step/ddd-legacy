@@ -1,0 +1,147 @@
+package kitchenpos.application;
+
+import kitchenpos.domain.*;
+import kitchenpos.helper.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toUnmodifiableList;
+import static kitchenpos.helper.MenuHelper.DEFAULT_PRICE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+@Transactional
+class OrderServiceTest extends ApplicationTest {
+
+    private static List<Product> createdProducts;
+    private static List<MenuProduct> createdMenuProducts;
+    private static MenuGroup createdMenuGroup;
+    private static Menu displayedMenu1;
+    private static Menu displayedMenu2;
+    private static OrderTable occupiedOrderTable;
+    private static OrderTable notOccupiedOrderTable;
+
+    @Autowired
+    private OrderService orderService;
+
+
+    @BeforeAll
+    static void beforeAll(@Autowired ProductService productService,
+                          @Autowired MenuGroupService menuGroupService,
+                          @Autowired MenuService menuService,
+                          @Autowired OrderTableService orderTableService) {
+
+        createdProducts = IntStream.range(1, 5)
+                .mapToObj(n -> productService.create(ProductHelper.create(BigDecimal.valueOf(n * 1000L))))
+                .collect(toUnmodifiableList());
+        createdMenuProducts = IntStream.range(0, createdProducts.size())
+                .mapToObj(i -> createMenuProduct(i, i + 1))
+                .collect(toUnmodifiableList());
+        createdMenuGroup = menuGroupService.create(MenuGroupHelper.create());
+
+        Menu createdMenu1 = menuService.create(MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts));
+        displayedMenu1 = menuService.display(createdMenu1.getId());
+        Menu createdMenu2 = menuService.create(MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts));
+        displayedMenu2 = menuService.display(createdMenu2.getId());
+
+        OrderTable createdOrderTable = orderTableService.create(OrderTableHelper.create());
+        occupiedOrderTable = orderTableService.sit(createdOrderTable.getId());
+        notOccupiedOrderTable = orderTableService.create(OrderTableHelper.create());
+    }
+
+    private static MenuProduct createMenuProduct(int index, long quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq((long) index);
+        menuProduct.setProductId(createdProducts.get(index).getId());
+        menuProduct.setProduct(createdProducts.get(index));
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
+
+    private List<OrderLineItem> createOrderLineItems() {
+        OrderLineItem orderLineItem1 = new OrderLineItem();
+        orderLineItem1.setMenuId(displayedMenu1.getId());
+        orderLineItem1.setQuantity(1);
+        orderLineItem1.setPrice(displayedMenu1.getPrice());
+
+        OrderLineItem orderLineItem2 = new OrderLineItem();
+        orderLineItem2.setMenuId(displayedMenu2.getId());
+        orderLineItem2.setQuantity(2);
+        orderLineItem2.setPrice(displayedMenu2.getPrice());
+
+        return List.of(orderLineItem1, orderLineItem2);
+    }
+
+    private List<UUID> getOrderedMenuId(List<OrderLineItem> orderLineItems) {
+        return orderLineItems
+                .parallelStream()
+                .map(orderLineItem -> orderLineItem.getMenu().getId())
+                .collect(toUnmodifiableList());
+    }
+
+    private Order getOrder(OrderType orderType, List<OrderLineItem> orderLineItems) {
+        if (orderType == OrderType.DELIVERY) {
+            return OrderHelper.createOrderTypeIsDelivery(orderType, orderLineItems, "배달 주소");
+        }
+
+        if (orderType == OrderType.EAT_IN) {
+            return OrderHelper.createOrderTypeIsEatIn(orderType, orderLineItems, occupiedOrderTable.getId());
+        }
+
+        if (orderType == OrderType.TAKEOUT) {
+            return OrderHelper.createOrderTypeIsTakeOut(orderType, orderLineItems);
+        }
+
+        return OrderHelper.create(orderType, orderLineItems, null, null);
+    }
+
+    @DisplayName("새로운 주문을 등록한다.")
+    @Nested
+    class CreateOrder {
+
+        @DisplayName("주문 유형은 비어있을 수 없다.")
+        @Nested
+        class Policy1 {
+            @DisplayName("주문 유형이 있는 경우 (성공)")
+            @ParameterizedTest
+            @EnumSource
+            void success1(final OrderType orderType) {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrder(orderType, orderLineItems);
+
+                // When
+                Order createdOrder = orderService.create(order);
+
+                // Then
+                assertThat(getOrderedMenuId(createdOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+            }
+
+            @DisplayName("주문 유형이 null 인 경우 (실패)")
+            @ParameterizedTest
+            @NullSource
+            void fail1(OrderType orderType) {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrder(orderType, orderLineItems);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+    }
+
+}
