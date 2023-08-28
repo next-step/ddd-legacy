@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import static kitchenpos.fixture.ProductFixture.createProduct;
@@ -74,5 +75,16 @@ class ProductServiceTest extends BaseServiceTest {
 
         assertThat(changedPriceProduct.getId()).isEqualTo(product.getId());
         assertThat(changedPriceProduct.getPrice()).isEqualTo(newPriceProduct.getPrice());
+    }
+
+    @DisplayName("상품은 전체 조회가 가능하다")
+    @Test
+    void test5() {
+        final Product chicken = productRepository.save(createProduct(UUID.randomUUID(), "치킨", BigDecimal.ONE));
+        final Product pizza = productRepository.save(createProduct(UUID.randomUUID(), "피자", BigDecimal.ZERO));
+
+        final List<Product> products = productRepository.findAll();
+
+        assertThat(products).containsExactly(chicken, pizza);
     }
 }
