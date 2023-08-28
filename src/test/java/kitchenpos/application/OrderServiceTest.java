@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
@@ -141,6 +142,10 @@ class OrderServiceTest extends ApplicationTest {
 
     private Order getOrderThatTypeIsDelivery(List<OrderLineItem> orderLineItems, String deliveryAddress) {
         return OrderHelper.createOrderTypeIsDelivery(OrderType.DELIVERY, orderLineItems, deliveryAddress);
+    }
+
+    private Order getOrderThatTypeIsEatIn(List<OrderLineItem> orderLineItems, UUID orderTableId) {
+        return OrderHelper.createOrderTypeIsEatIn(OrderType.EAT_IN, orderLineItems, orderTableId);
     }
 
     private Order getOrder(OrderType orderType, List<OrderLineItem> orderLineItems) {
@@ -396,6 +401,50 @@ class OrderServiceTest extends ApplicationTest {
                 // Then
                 assertThatThrownBy(() -> orderService.create(order))
                         .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+
+        @DisplayName("주문 유형이 매장 식사인 경우, 주문 테이블에 입장해 있어야 한다.")
+        @Nested
+        class Policy7 {
+            @DisplayName("주문 유형이 매장 식사일 때, 주문 테이블에 입장해 있는 경우 (성공)")
+            @Test
+            void success1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsEatIn(orderLineItems, occupiedOrderTable.getId());
+
+                // When
+                Order createdOrder = orderService.create(order);
+
+                // Then
+                assertThat(getOrderedMenuId(createdOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+            }
+
+            @DisplayName("주문 유형이 매장 식사일 때, 주문 테이블이 존재하지 않는 경우 (실패)")
+            @Test
+            void fail1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsEatIn(orderLineItems, UUID.randomUUID());
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(NoSuchElementException.class);
+            }
+
+            @DisplayName("주문 유형이 매장 식사일 때, 주문 테이블에 입장해 있지 않은 경우 (실패)")
+            @Test
+            void fail2() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsEatIn(orderLineItems, notOccupiedOrderTable.getId());
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalStateException.class);
             }
         }
     }
