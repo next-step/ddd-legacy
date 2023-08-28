@@ -3,7 +3,6 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.support.BaseServiceTest;
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -194,6 +193,31 @@ class MenuServiceTest extends BaseServiceTest {
         final Menu changeMenu = createMenu(new BigDecimal(100000000));
 
         assertThatIllegalArgumentException().isThrownBy(() -> menuService.changePrice(menu.getId(), changeMenu));
+    }
+
+    @DisplayName("메뉴는 키오스크에 표출할 수 있다.")
+    @Test
+    void test14() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID(), "치킨", BigDecimal.TEN));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
+
+        final Menu changedMenu = menuService.display(menu.getId());
+
+        assertThat(changedMenu.getId()).isEqualTo(menu.getId());
+        assertThat(changedMenu.isDisplayed()).isTrue();
+    }
+
+    @DisplayName("메뉴의 가격 수정시 메뉴의 가격은 모든 메뉴 구성의 합보다 크면 안된다")
+    @Test
+    void test15() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID(), "치킨", BigDecimal.TEN));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), "치킨", new BigDecimal(100000000), menuGroup, List.of(menuProduct)));
+
+        assertThatIllegalStateException().isThrownBy(() -> menuService.display(menu.getId()));
     }
 
     private static class MenuProductFields {

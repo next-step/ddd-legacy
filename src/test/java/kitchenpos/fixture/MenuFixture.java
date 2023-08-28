@@ -40,11 +40,18 @@ public class MenuFixture {
         );
     }
 
+    public static Menu createMenu(final UUID id, final MenuGroup menuGroup, final boolean displayed, final List<MenuProduct> menuProducts) {
+        return createMenu(
+                id, "치킨", BigDecimal.TEN,
+                menuGroup, displayed, menuProducts
+        );
+    }
+
     public static Menu createMenu(
             final UUID id, final String name, final BigDecimal price,
             final MenuGroup menuGroup, final List<MenuProduct> menuProducts
     ) {
-        return createMenu(id, "치킨", price, menuGroup, true, menuProducts, menuGroup.getId());
+        return createMenu(id, name, price, menuGroup, true, menuProducts, menuGroup.getId());
     }
 
     public static Menu createMenu(
