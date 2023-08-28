@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import kitchenpos.application.MenuService;
+import kitchenpos.application.ProductService;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -46,6 +47,9 @@ public class MenuServiceTest {
     @Autowired
     private MenuService menuService;
 
+    @Autowired
+    private ProductService productService;
+
     private MenuGroup 추천메뉴;
     private Product 강정치킨;
     private Product 양념치킨;
@@ -73,7 +77,9 @@ public class MenuServiceTest {
                                 .product(강정치킨)
                                 .quantity(1)
                                 .build()
-                ).build();
+                )
+                .displayed(true)
+                .build();
         menuRepository.save(오늘의치킨);
     }
 
@@ -267,5 +273,24 @@ public class MenuServiceTest {
 
         assertThatThrownBy(() -> menuService.changePrice(menuId, request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 메뉴_보임_설정_실패__메뉴가_존재하지_않음() {
+        UUID menuId = UUID.randomUUID();
+
+        assertThatThrownBy(() -> menuService.display(menuId))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void 메뉴_보임_설정_실패__메뉴_가격은_속한_메뉴상품_가격의_총합보다_클_수_없음() {
+        UUID menuId = 오늘의치킨.getId();
+        Product request = new Product();
+        request.setPrice(new BigDecimal(999));
+        productService.changePrice(강정치킨.getId(), request);
+
+        assertThatThrownBy(() -> menuService.display(menuId))
+                .isInstanceOf(IllegalStateException.class);
     }
 }
