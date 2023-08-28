@@ -73,4 +73,34 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(menu));
     }
 
+    @DisplayName("메뉴상품의 수와 상품의 수가 다르면 예외를 발생시킨다.")
+    @Test
+    void menu_create_menuProducts_not_match_size() {
+        BDDMockito.given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuFixture.MenuGroupFixture.한마리메뉴()));
+        menu.setPrice(BigDecimal.valueOf(16000));
+        menu.setMenuProducts(
+                List.of(
+                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(ProductFixture.후라이드()),
+                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(ProductFixture.후라이드()))
+        );
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.create(menu));
+    }
+
+    @DisplayName("메뉴상품의 수량이 음수면 예외를 발생시킨다.")
+    @Test
+    void menu_create_menuProducts_negative_quantity() {
+        BDDMockito.given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuFixture.MenuGroupFixture.한마리메뉴()));
+        menu.setPrice(BigDecimal.valueOf(16000));
+        menu.setMenuProducts(
+                List.of(
+                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(ProductFixture.후라이드()),
+                        MenuFixture.MenuProductFixture.메뉴상품_양념_재고음수(ProductFixture.양념치킨()))
+        );
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.create(menu));
+    }
+
 }

@@ -27,6 +27,13 @@ public class MenuFixture {
             menuGroup.setName("한마리메뉴");
             return menuGroup;
         }
+
+        public static MenuGroup 두마리메뉴() {
+            MenuGroup menuGroup = new MenuGroup();
+            menuGroup.setId(UUID.randomUUID());
+            menuGroup.setName("두마리메뉴");
+            return menuGroup;
+        }
     }
 
     public static class MenuProductFixture {
@@ -36,6 +43,24 @@ public class MenuFixture {
             menuProduct.setProduct(product);
             menuProduct.setProductId(product.getId());
             menuProduct.setQuantity(1);
+            return menuProduct;
+        }
+
+        public static MenuProduct 메뉴상품_양념(Product product) {
+            MenuProduct menuProduct = new MenuProduct();
+            menuProduct.setSeq(2L);
+            menuProduct.setProduct(product);
+            menuProduct.setProductId(product.getId());
+            menuProduct.setQuantity(1);
+            return menuProduct;
+        }
+
+        public static MenuProduct 메뉴상품_양념_재고음수(Product product) {
+            MenuProduct menuProduct = new MenuProduct();
+            menuProduct.setSeq(2L);
+            menuProduct.setProduct(product);
+            menuProduct.setProductId(product.getId());
+            menuProduct.setQuantity(-1);
             return menuProduct;
         }
     }
