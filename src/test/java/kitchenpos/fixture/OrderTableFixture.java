@@ -26,6 +26,12 @@ public class OrderTableFixture {
     }
 
     public static OrderTable createOrderTable(
+            final UUID id, final int numberOfGuests, final boolean occupied
+    ) {
+        return createOrderTable(id, "테이블1", numberOfGuests, occupied);
+    }
+
+    public static OrderTable createOrderTable(
             final UUID id, final String name, final int numberOfGuests, final boolean occupied
     ) {
         final OrderTable orderTable = new OrderTable();

@@ -8,10 +8,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
+import java.util.UUID;
+
 import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.junit.jupiter.api.Assertions.*;
 
 class OrderTableServiceTest extends BaseServiceTest {
     private final OrderTableService orderTableService;
@@ -45,5 +46,15 @@ class OrderTableServiceTest extends BaseServiceTest {
         final OrderTable orderTable = createOrderTable(name, 5, true);
 
         assertThatIllegalArgumentException().isThrownBy(() -> orderTableService.create(orderTable));
+    }
+
+    @DisplayName("테이블은 착석이 가능하다.")
+    @Test
+    void test3() {
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
+
+        orderTableService.sit(orderTable.getId());
+
+        assertThat(orderTable.isOccupied()).isTrue();
     }
 }
