@@ -20,9 +20,8 @@ class StringCalculator {
         if (matcher.find()) {
             String customDelimiter = matcher.group(1);
             return matcher.group(2).split(customDelimiter);
-        } else {
-            return expressions.split(DEFAULT_DELIMITER);
         }
+        return expressions.split(DEFAULT_DELIMITER);
     }
 
     public int getResult() {
