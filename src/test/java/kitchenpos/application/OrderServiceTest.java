@@ -44,6 +44,9 @@ class OrderServiceTest extends ApplicationTest {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private OrderTableRepository orderTableRepository;
+
     @SpyBean
     private KitchenridersClient kitchenridersClient;
 
@@ -795,6 +798,32 @@ class OrderServiceTest extends ApplicationTest {
                 // Then
                 assertThatThrownBy(() -> orderService.complete(acceptedOrder.getId()))
                         .isInstanceOf(IllegalStateException.class);
+            }
+        }
+
+        @DisplayName("주문 유형이 매장 식사이면, 주문 테이블을 퇴장처리한다.")
+        @Nested
+        class Policy3 {
+            @DisplayName("주문 테이블 퇴장에 성공한 경우 (성공)")
+            @Test
+            void success1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsEatIn(orderLineItems, occupiedOrderTable.getId());
+                Order createdOrder = orderService.create(order);
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+                Order servedOrder = orderService.serve(acceptedOrder.getId());
+
+                // When
+                Order completedOrder = orderService.complete(servedOrder.getId());
+                OrderTable orderTable = orderTableRepository.findById(occupiedOrderTable.getId())
+                        .orElseThrow(NoSuchElementException::new);
+
+                // Then
+                assertThat(getOrderedMenuId(completedOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+                assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+                assertThat(orderTable.getNumberOfGuests()).isZero();
+                assertThat(orderTable.isOccupied()).isFalse();
             }
         }
     }
