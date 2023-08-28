@@ -663,4 +663,47 @@ class OrderServiceTest extends ApplicationTest {
         }
     }
 
+    @DisplayName("주문에 대한 배달을 완료한다.")
+    @Nested
+    class MakeOrderDelivered {
+
+        @DisplayName("주문 상태가 배달중이여야 한다.")
+        @Nested
+        class Policy1 {
+            @DisplayName("주문 상태가 배달중 상태인 경우 (성공)")
+            @Test
+            void success1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, "배달 주소");
+                Order createdOrder = orderService.create(order);
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+                Order servedOrder = orderService.serve(acceptedOrder.getId());
+                Order deliveringOrder = orderService.startDelivery(servedOrder.getId());
+
+                // When
+                Order deliveredOrder = orderService.completeDelivery(deliveringOrder.getId());
+
+                // Then
+                assertThat(getOrderedMenuId(deliveredOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+                assertThat(deliveredOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+            }
+
+            @DisplayName("주문 상태가 배달중 상태가 아닌 경우 (실패)")
+            @Test
+            void fail1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, "배달 주소");
+                Order createdOrder = orderService.create(order);
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.completeDelivery(acceptedOrder.getId()))
+                        .isInstanceOf(IllegalStateException.class);
+            }
+        }
+    }
+
 }
