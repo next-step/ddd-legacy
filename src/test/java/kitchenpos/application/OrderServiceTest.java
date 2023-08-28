@@ -449,4 +449,46 @@ class OrderServiceTest extends ApplicationTest {
         }
     }
 
+    @DisplayName("들어온 주문을 승낙한다.")
+    @Nested
+    class AcceptOrder {
+
+        @DisplayName("주문 상태가 대기 상태이여야 한다.")
+        @Nested
+        class Policy1 {
+            @DisplayName("주문 상태가 대기 상태인 경우 (성공)")
+            @ParameterizedTest
+            @EnumSource
+            void success1(final OrderType orderType) {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrder(orderType, orderLineItems);
+                Order createdOrder = orderService.create(order);
+
+                // When
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+
+                // Then
+                assertThat(getOrderedMenuId(acceptedOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+                assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+            }
+
+            @DisplayName("주문 상태가 대기 상태가 아닌 경우 (실패)")
+            @ParameterizedTest
+            @EnumSource
+            void fail1(final OrderType orderType) {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrder(orderType, orderLineItems);
+                Order createdOrder = orderService.create(order);
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.accept(acceptedOrder.getId()))
+                        .isInstanceOf(IllegalStateException.class);
+            }
+        }
+    }
+
 }
