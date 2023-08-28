@@ -23,13 +23,13 @@ public class MenuFixture {
         return menu;
     }
 
-    public static Menu create(BigDecimal price, List<MenuProduct> products){
+    public static Menu create(BigDecimal price, List<MenuProduct> menuProducts){
         return create(
             DEFAULT_MENU_NAME
             , price
             , true
             , MenuGroupFixture.createDefault()
-            , products
+            , menuProducts
         );
     }
 
