@@ -234,14 +234,25 @@ class MenuServiceTest extends BaseServiceTest {
         assertThat(changedMenu.isDisplayed()).isFalse();
     }
 
+    @DisplayName("메뉴는 전체 조회가 가능하다.")
+    @Test
+    void test17() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID(), "치킨", BigDecimal.TEN));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu1 = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
+        final Menu menu2 = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, false, List.of(menuProduct)));
+
+        final List<Menu> menus = menuService.findAll();
+
+        assertThat(menus).contains(menu1, menu2);
+    }
 
     private static class MenuProductFields {
-        final Long seq;
         final Product product;
         final long quantity;
 
         public MenuProductFields(MenuProduct menuProduct) {
-            this.seq = menuProduct.getSeq();
             this.product = menuProduct.getProduct();
             this.quantity = menuProduct.getQuantity();
         }
@@ -251,12 +262,12 @@ class MenuServiceTest extends BaseServiceTest {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             final MenuProductFields that = (MenuProductFields) o;
-            return quantity == that.quantity && Objects.equals(seq, that.seq) && Objects.equals(product, that.product);
+            return quantity == that.quantity && Objects.equals(product, that.product);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(seq, product, quantity);
+            return Objects.hash(product, quantity);
         }
     }
 }
