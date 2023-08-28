@@ -11,7 +11,7 @@ import static kitchenpos.fixture.OrderTableFixture.TEST_ORDER_TABLE;
 
 public class OrderFixture {
 
-    public static Order TEST_ORDER_EAT_IN() {
+    public static Order TEST_ORDER_EAT_IN(OrderStatus orderStatus) {
         Order order = new Order();
         OrderTable orderTable = TEST_ORDER_TABLE();
         order.setOrderTable(orderTable);
@@ -20,28 +20,28 @@ public class OrderFixture {
         order.setOrderDateTime(LocalDateTime.now());
         order.setId(UUID.randomUUID());
         order.setOrderLineItems(List.of(TEST_ORDER_LINE_ITEM()));
-        order.setStatus(OrderStatus.WAITING);
+        order.setStatus(orderStatus);
         return order;
     }
 
-    public static Order TEST_ORDER_DELIVERY() {
+    public static Order TEST_ORDER_DELIVERY(OrderStatus orderStatus) {
         Order order = new Order();
         order.setType(OrderType.DELIVERY);
         order.setDeliveryAddress("여기로 배달와줘");
         order.setOrderDateTime(LocalDateTime.now());
         order.setId(UUID.randomUUID());
         order.setOrderLineItems(List.of(TEST_ORDER_LINE_ITEM()));
-        order.setStatus(OrderStatus.WAITING);
+        order.setStatus(orderStatus);
         return order;
     }
 
-    public static Order TEST_ORDER_TAKEOUT() {
+    public static Order TEST_ORDER_TAKEOUT(OrderStatus orderStatus) {
         Order order = new Order();
         order.setType(OrderType.TAKEOUT);
         order.setOrderDateTime(LocalDateTime.now());
         order.setId(UUID.randomUUID());
         order.setOrderLineItems(List.of(TEST_ORDER_LINE_ITEM()));
-        order.setStatus(OrderStatus.WAITING);
+        order.setStatus(orderStatus);
         return order;
     }
 

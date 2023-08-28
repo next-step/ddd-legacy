@@ -5,6 +5,7 @@ import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,35 +35,40 @@ class OrderTableServiceTest {
     @Mock
     private OrderTableRepository orderTableRepository;
 
-    @Test
-    @DisplayName("새로운_주문_테이블을_등록한다")
-    void createOrderTable() {
-        // given
-        OrderTable orderTableRequest = TEST_ORDER_TABLE();
-        given(orderTableRepository.save(any(OrderTable.class))).willReturn(orderTableRequest);
+    @Nested
+    @DisplayName("새로운 주문 테이블을 등록한다")
+    class createTestClass {
 
-        // when
-        OrderTable orderTable = orderTableService.create(orderTableRequest);
+        @Test
+        @DisplayName("새로운_주문_테이블을_정상적으로_등록한다")
+        void createOrderTable() {
+            // given
+            OrderTable orderTableRequest = TEST_ORDER_TABLE();
+            given(orderTableRepository.save(any(OrderTable.class))).willReturn(orderTableRequest);
 
-        // then
-        verify(orderTableRepository, times(1)).save(any(OrderTable.class));
-        assertThat(orderTable.getNumberOfGuests()).isZero();
-        assertThat(orderTable.isOccupied()).isFalse();
-    }
+            // when
+            OrderTable orderTable = orderTableService.create(orderTableRequest);
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @DisplayName("이름은_비어있을_수_없다")
-    void nameNotEmpty(String input) {
-        // given
-        OrderTable nameNull = TEST_ORDER_TABLE();
+            // then
+            verify(orderTableRepository, times(1)).save(any(OrderTable.class));
+            assertThat(orderTable.getNumberOfGuests()).isZero();
+            assertThat(orderTable.isOccupied()).isFalse();
+        }
 
-        // when
-        nameNull.setName(input);
+        @ParameterizedTest
+        @NullAndEmptySource
+        @DisplayName("이름은_비어있을_수_없다")
+        void nameNotEmpty(String input) {
+            // given
+            OrderTable nameNull = TEST_ORDER_TABLE();
 
-        // then
-        assertThatThrownBy(() -> orderTableService.create(nameNull))
-                .isInstanceOf(IllegalArgumentException.class);
+            // when
+            nameNull.setName(input);
+
+            // then
+            assertThatThrownBy(() -> orderTableService.create(nameNull))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Test
@@ -74,96 +80,105 @@ class OrderTableServiceTest {
         given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
 
         // when
-        OrderTable sitTable = orderTableService.sit(orderTableId);
+        OrderTable actual = orderTableService.sit(orderTableId);
 
         // then
-        assertThat(sitTable.isOccupied()).isTrue();
+        assertThat(actual.isOccupied()).isTrue();
     }
 
-    @Test
-    @DisplayName("테이블에_있던_손님이_나가고_다시_손님을_받을_수_있는_상태로_변경한다")
-    void clearTableTest() {
-        // given
-        OrderTable orderTable = TEST_ORDER_TABLE();
-        UUID orderTableId = orderTable.getId();
-        given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
-        given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
-                .willReturn(false);
+    @Nested
+    @DisplayName("테이블을 정리한다")
+    class clearTestClass {
 
-        // when
-        OrderTable clearedTable = orderTableService.clear(orderTableId);
+        @Test
+        @DisplayName("테이블에_있던_손님이_나가고_다시_손님을_받을_수_있는_상태로_변경한다")
+        void clearTableTest() {
+            // given
+            OrderTable orderTable = TEST_ORDER_TABLE();
+            UUID orderTableId = orderTable.getId();
+            given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
+            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
+                    .willReturn(false);
 
-        // then
-        verify(orderRepository, times(1))
-                .existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED);
-        assertThat(clearedTable.isOccupied()).isFalse();
-        assertThat(clearedTable.getNumberOfGuests()).isZero();
+            // when
+            OrderTable actual = orderTableService.clear(orderTableId);
+
+            // then
+            verify(orderRepository, times(1))
+                    .existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED);
+            assertThat(actual.isOccupied()).isFalse();
+            assertThat(actual.getNumberOfGuests()).isZero();
+        }
+
+        @Test
+        @DisplayName("주문이_완료되지_않았다면_테이블을_정리할_수_없다")
+        void clearStatusShouldCompleted() {
+            // given
+            OrderTable orderTable = TEST_ORDER_TABLE();
+            UUID orderTableId = orderTable.getId();
+            given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
+            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
+                    .willReturn(true);
+
+            // when && then
+            assertThatThrownBy(() -> orderTableService.clear(orderTableId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
-    @Test
-    @DisplayName("주문이_완료되지_않았다면_테이블을_정리할_수_없다")
-    void clearStatusShouldCompleted() {
-        // given
-        OrderTable orderTable = TEST_ORDER_TABLE();
-        UUID orderTableId = orderTable.getId();
-        given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
+    @Nested
+    @DisplayName("테이블의 인원 수를 변경한다.")
+    class changeNumberOfGuestTestClass {
 
-        // when
-        given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
-                .willReturn(true);
-        // then
-        assertThatThrownBy(() -> orderTableService.clear(orderTableId))
-                .isInstanceOf(IllegalStateException.class);
-    }
+        @Test
+        @DisplayName("테이블에_인원_수를_정상적으로_변경한다")
+        void changeNumberOfGuest() {
+            // given
+            OrderTable orderTable = TEST_ORDER_TABLE();
+            UUID orderTableId = orderTable.getId();
+            given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
 
-    @Test
-    @DisplayName("테이블에_인원_수를_변경한다")
-    void changeNumberOfGuest() {
-        // given
-        OrderTable orderTable = TEST_ORDER_TABLE();
-        UUID orderTableId = orderTable.getId();
-        given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
+            // when
+            orderTable.setOccupied(true);
+            orderTable.setNumberOfGuests(15);
+            OrderTable actual = orderTableService.changeNumberOfGuests(orderTableId, orderTable);
 
-        // when
-        orderTable.setOccupied(true);
-        orderTable.setNumberOfGuests(15);
-        OrderTable clearedTable = orderTableService.changeNumberOfGuests(orderTableId, orderTable);
+            // then
+            assertThat(actual.isOccupied()).isTrue();
+            assertThat(actual.getNumberOfGuests()).isEqualTo(15);
+        }
 
-        // then
-        assertThat(clearedTable.isOccupied()).isTrue();
-        assertThat(clearedTable.getNumberOfGuests()).isEqualTo(15);
-    }
+        @Test
+        @DisplayName("변경할_인원_수는_0명_이상이어야_한다")
+        void guestNumberShouldGreaterThanZero() {
+            // given
+            OrderTable orderTable = TEST_ORDER_TABLE();
+            UUID orderTableId = orderTable.getId();
 
-    @Test
-    @DisplayName("변경할_인원_수는_0명_이상이어야_한다")
-    void guestNumberShouldGreaterThanZero() {
-        // given
-        OrderTable orderTable = TEST_ORDER_TABLE();
-        UUID orderTableId = orderTable.getId();
+            // when
+            orderTable.setNumberOfGuests(-1);
 
-        // when
-        orderTable.setNumberOfGuests(-1);
+            // then
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, orderTable))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
 
-        // then
-        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, orderTable))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
+        @Test
+        @DisplayName("사용가능한_테이블만_인원_수를_변경_할_수_있다")
+        void changeGuestNumberShouldOccupiedTrue() {
+            // given
+            OrderTable orderTable = TEST_ORDER_TABLE();
+            UUID orderTableId = orderTable.getId();
+            given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
 
-    @Test
-    @DisplayName("사용가능한_테이블만_인원_수를_변경_할_수_있다")
-    void changeGuestNumberShouldOccupiedTrue() {
-        // given
-        OrderTable orderTable = TEST_ORDER_TABLE();
-        UUID orderTableId = orderTable.getId();
-        given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
+            // when
+            orderTable.setNumberOfGuests(13);
 
-        // when
-        orderTable.setNumberOfGuests(13);
-        orderTable.setOccupied(false);
+            // then
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, orderTable))
+                    .isInstanceOf(IllegalStateException.class);
+        }
 
-        // then
-        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, orderTable))
-                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test

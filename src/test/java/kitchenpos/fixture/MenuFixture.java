@@ -35,4 +35,23 @@ public class MenuFixture {
         menuProduct.setProduct(product);
         return menuProduct;
     }
+
+    public static Menu TEST_MENU_BY_PRODUCT(Product product) {
+        Menu menu = new Menu();
+        menu.setName("테스트 메뉴");
+        menu.setPrice(new BigDecimal(10_00));
+        MenuGroup menuGroup = TEST_MENU_GROUP();
+        menu.setMenuGroup(menuGroup);
+        menu.setDisplayed(true);
+        MenuProduct menuProduct = TEST_MENU_PRODUCT();
+        menuProduct.setProduct(product);
+        menuProduct.setProductId(product.getId());
+        menu.setMenuProducts(List.of(menuProduct));
+        menu.setMenuGroupId(menuGroup.getId());
+        menu.setId(UUID.randomUUID());
+        return menu;
+    }
+
+    public static BigDecimal MINIMUM_PRICE = new BigDecimal(1);
+    public static BigDecimal MAX_PRICE = new BigDecimal(999_999_999);
 }
