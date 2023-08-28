@@ -10,6 +10,14 @@ public class MenuProductFixture {
         return createMenuProduct(1L, createProduct(), 10);
     }
 
+    public static MenuProduct createMenuProduct(final Product product) {
+        return createMenuProduct(1L, product, 10);
+    }
+
+    public static MenuProduct createMenuProduct(final Product product, final long quantity) {
+        return createMenuProduct(1L, product, quantity);
+    }
+
     public static MenuProduct createMenuProduct(final Long seq, final Product product, final long quantity) {
         final MenuProduct menuProduct = new MenuProduct();
 

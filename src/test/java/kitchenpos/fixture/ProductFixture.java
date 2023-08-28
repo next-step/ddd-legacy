@@ -10,6 +10,10 @@ public class ProductFixture {
         return createProduct("치킨", new BigDecimal(100));
     }
 
+    public static Product createProduct(final UUID id) {
+        return createProduct(id, "치킨", new BigDecimal(100));
+    }
+
     public static Product createProduct(final String name, final BigDecimal price) {
         return createProduct(null, name, price);
     }
