@@ -1,6 +1,6 @@
 package kitchenpos.acceptance;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class ProductApi {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     }
 
-    public static String extractProductId(MockHttpServletResponse createdResponse) {
+    private static String extractProductId(MockHttpServletResponse createdResponse) {
         Matcher matcher = PRODUCT_ID_EXTRACT_PATTERN.matcher(createdResponse.getHeader("Location"));
         matcher.find();
         String productId = matcher.group(CAPTURING_PRODUCT_ID_INDEX);
@@ -62,6 +62,10 @@ public class ProductApi {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         List<Object> menuGroups = objectMapper.readValue(response.getContentAsString(), List.class);
         assertThat(menuGroups).hasSize(expectedSize);
+    }
+
+    public static String 상품_생성(MockMvc mockMvc, Map<String, Object> request) throws Exception {
+        return extractProductId(상품_생성_요청(mockMvc, request));
     }
 
 }

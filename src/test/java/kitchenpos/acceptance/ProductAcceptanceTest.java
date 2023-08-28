@@ -33,10 +33,7 @@ public class ProductAcceptanceTest {
 
     @Test
     void 상품_가격_변경__성공() throws Exception {
-        Map<String, Object> createRequest = 강정치킨.getValue();
-        MockHttpServletResponse createdResponse = 상품_생성_요청(mockMvc, createRequest);
-
-        String productId = extractProductId(createdResponse);
+        String productId = 상품_생성(mockMvc, 강정치킨.getValue());
         Map<String, Object> request = Map.of("price", 17000);
 
         MockHttpServletResponse response = 상품_가격_변경_요청(mockMvc, productId, request);
