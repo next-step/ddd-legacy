@@ -144,4 +144,25 @@ class MenuServiceTest {
                 .isThrownBy(() -> menuService.create(menu));
     }
 
+    @DisplayName("메뉴 이름에 비속어가 포함되어 있으면 예외를 발생시킨다.")
+    @Test
+    void menu_create_menu_name() {
+        Product 후라이드 = ProductFixture.후라이드();
+        Product 양념치킨 = ProductFixture.양념치킨();
+        BDDMockito.given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuFixture.MenuGroupFixture.두마리메뉴()));
+        BDDMockito.given(productRepository.findAllByIdIn(any())).willReturn(List.of(후라이드, 양념치킨));
+        BDDMockito.given(productRepository.findById(후라이드.getId())).willReturn(Optional.of(후라이드));
+        BDDMockito.given(productRepository.findById(양념치킨.getId())).willReturn(Optional.of(양념치킨));
+        BDDMockito.given(purgomalumClient.containsProfanity(any())).willReturn(true);
+        menu.setPrice(후라이드.getPrice().add(양념치킨.getPrice()).add(BigDecimal.valueOf(33000)));
+        menu.setMenuProducts(
+                List.of(
+                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(후라이드),
+                        MenuFixture.MenuProductFixture.메뉴상품_양념(양념치킨))
+        );
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.create(menu));
+    }
+
 }
