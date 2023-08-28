@@ -293,4 +293,12 @@ public class MenuServiceTest {
         assertThatThrownBy(() -> menuService.display(menuId))
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @Test
+    void 메뉴_숨김_설정_실패__메뉴가_존재하지_않음() {
+        UUID menuId = UUID.randomUUID();
+
+        assertThatThrownBy(() -> menuService.hide(menuId))
+                .isInstanceOf(NoSuchElementException.class);
+    }
 }
