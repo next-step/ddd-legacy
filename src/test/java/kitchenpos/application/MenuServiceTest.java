@@ -201,7 +201,7 @@ class MenuServiceTest extends BaseServiceTest {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID(), "치킨", BigDecimal.TEN));
         final MenuProduct menuProduct = createMenuProduct(product);
-        final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
+        final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, false, List.of(menuProduct)));
 
         final Menu changedMenu = menuService.display(menu.getId());
 
@@ -219,6 +219,21 @@ class MenuServiceTest extends BaseServiceTest {
 
         assertThatIllegalStateException().isThrownBy(() -> menuService.display(menu.getId()));
     }
+
+    @DisplayName("메뉴는 키오스크에 미표출할 수 있다.")
+    @Test
+    void test16() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID(), "치킨", BigDecimal.TEN));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
+
+        final Menu changedMenu = menuService.hide(menu.getId());
+
+        assertThat(changedMenu.getId()).isEqualTo(menu.getId());
+        assertThat(changedMenu.isDisplayed()).isFalse();
+    }
+
 
     private static class MenuProductFields {
         final Long seq;
