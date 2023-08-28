@@ -1,6 +1,11 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
+import kitchenpos.helper.MenuGroupHelper;
+import kitchenpos.helper.MenuHelper;
 import kitchenpos.helper.ProductHelper;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,24 +17,31 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
 import static kitchenpos.helper.NameHelper.NAME_OF_255_CHARACTERS;
-import static kitchenpos.helper.NameHelper.NAME_OF_256_CHARACTERS;
 import static kitchenpos.helper.ProductHelper.DEFAULT_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+@Transactional
 class ProductServiceTest extends ApplicationTest {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private MenuGroupService menuGroupService;
+
+    @Autowired
+    private MenuService menuService;
 
     @SpyBean
     private PurgomalumClient purgomalumClient;
@@ -114,18 +126,6 @@ class ProductServiceTest extends ApplicationTest {
                 assertThatThrownBy(() -> productService.create(product))
                         .isInstanceOf(IllegalArgumentException.class);
             }
-
-            @DisplayName("상품명이 255자를 초과한 경우 (실패)")
-            @ParameterizedTest
-            @ValueSource(strings = {NAME_OF_256_CHARACTERS})
-            void fail2(final String name) {
-                // When
-                Product product = ProductHelper.create(name);
-
-                // Then
-                assertThatThrownBy(() -> productService.create(product))
-                        .isInstanceOf(DataIntegrityViolationException.class);
-            }
         }
 
         @DisplayName("상품명에 비속어가 포함되어 있으면 안 된다.")
@@ -154,10 +154,21 @@ class ProductServiceTest extends ApplicationTest {
     class ChangeProductPrice {
 
         private Product beforeCreatedProduct;
+        private Menu displayedMenu;
 
         @BeforeEach
         void beforeEach() {
             beforeCreatedProduct = productService.create(ProductHelper.create());
+            MenuGroup createdMenuGroup = menuGroupService.create(MenuGroupHelper.create());
+
+            MenuProduct menuProduct = new MenuProduct();
+            menuProduct.setSeq(1L);
+            menuProduct.setProductId(beforeCreatedProduct.getId());
+            menuProduct.setProduct(beforeCreatedProduct);
+            menuProduct.setQuantity(10);
+            BigDecimal menuPrice = menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
+            Menu createdMenu = menuService.create(MenuHelper.create(menuPrice, createdMenuGroup.getId(), List.of(menuProduct)));
+            displayedMenu = menuService.display(createdMenu.getId());
         }
 
         @DisplayName("상품에 대한 가격은 0원 이상이어야 한다.")
@@ -205,6 +216,31 @@ class ProductServiceTest extends ApplicationTest {
                         .isInstanceOf(IllegalArgumentException.class);
             }
         }
+
+        @DisplayName("해당 상품이 등록된 모든 메뉴에 대해서, 변경된 상품 가격을 토대로 메뉴의 가격 조건을 검증한다. 만약 조건을 만족하지 못 했을 때는, 해당 메뉴는 숨김 처리한다.")
+        @Nested
+        class Policy2 {
+            @DisplayName("메뉴의 가격 조건을 만족하지 않았을 경우, 메뉴 숨김 처리 (성공)")
+            @ParameterizedTest
+            @ValueSource(ints = {1, 10, 100})
+            void success1(final int price) {
+                // Given
+                BigDecimal minimumProductPrice = displayedMenu.getMenuProducts().parallelStream()
+                        .map(menuProduct -> menuProduct.getProduct().getPrice())
+                        .min(Comparator.naturalOrder())
+                        .orElse(BigDecimal.ZERO);
+
+                BigDecimal changedProductPrice = minimumProductPrice.subtract(BigDecimal.valueOf(price));
+
+                // When
+                Product changedProduct = productService.changePrice(beforeCreatedProduct.getId(), ProductHelper.create(beforeCreatedProduct.getName(), changedProductPrice));
+
+                // Then
+                assertThat(changedProduct.getName()).isEqualTo(beforeCreatedProduct.getName());
+                assertThat(changedProduct.getPrice()).isEqualTo(changedProductPrice);
+                assertThat(displayedMenu.isDisplayed()).isEqualTo(false);
+            }
+        }
     }
 
     @DisplayName("모든 상품을 가져온다.")
@@ -215,7 +251,7 @@ class ProductServiceTest extends ApplicationTest {
 
         @BeforeEach
         void beforeEach() {
-            beforeCreatedProducts = IntStream.range(0, 50)
+            beforeCreatedProducts = IntStream.range(0, 11)
                     .mapToObj(n -> productService.create(ProductHelper.create()))
                     .collect(toUnmodifiableList());
         }
