@@ -60,6 +60,6 @@ class NumberParsePolicyTest {
         //when && then
         assertThatThrownBy(() -> numberParsePolicy.parse(input))
             .isInstanceOf(RuntimeException.class)
-            .hasMessage("음수는 변환할수 없습니다.");
+            .hasMessage("음수는 사용할수 없습니다..");
     }
 }
