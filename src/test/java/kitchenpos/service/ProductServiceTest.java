@@ -136,4 +136,15 @@ class ProductServiceTest {
         assertThatThrownBy(() -> productService.changePrice(productId, request))
                 .isInstanceOf(NoSuchElementException.class);
     }
+
+    @Test
+    void 상품_가격_변경_성공__가격변경으로_인해_기존_메뉴의_가격이_메뉴상품의_가격총합보다_커져서_메뉴가_숨겨짐() {
+        UUID productId = 강정치킨.getId();
+        Product request = new Product();
+        request.setPrice(new BigDecimal(999));
+
+        assertDoesNotThrow(() -> productService.changePrice(productId, request));
+        Menu menuOfProduct = menuRepository.findById(오늘의치킨.getId()).get();
+        assertThat(menuOfProduct.isDisplayed()).isFalse();
+    }
 }
