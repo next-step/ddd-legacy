@@ -7,12 +7,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.List;
 import java.util.UUID;
 
 import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.*;
 
 class OrderTableServiceTest extends BaseServiceTest {
     private final OrderTableService orderTableService;
@@ -56,5 +57,45 @@ class OrderTableServiceTest extends BaseServiceTest {
         orderTableService.sit(orderTable.getId());
 
         assertThat(orderTable.isOccupied()).isTrue();
+    }
+
+    @DisplayName("테이블은 청소가 가능하다.")
+    @Test
+    void test4() {
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
+
+        orderTableService.clear(orderTable.getId());
+
+        assertThat(orderTable.getNumberOfGuests()).isZero();
+        assertThat(orderTable.isOccupied()).isFalse();
+    }
+
+    @DisplayName("테이블은 인원수를 수정할 수 있다.")
+    @Test
+    void test5() {
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
+        final OrderTable changeOrderTable = createOrderTable(1, true);
+
+        orderTableService.changeNumberOfGuests(orderTable.getId(), changeOrderTable);
+
+        assertThat(orderTable.getNumberOfGuests()).isEqualTo(changeOrderTable.getNumberOfGuests());
+    }
+
+    @DisplayName("테이블 인원수 수정시 변경 될 인원수는 0명 이상이어야 한다")
+    @Test
+    void test6() {
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
+        final OrderTable changeOrderTable = createOrderTable(-1, true);
+
+        assertThatIllegalArgumentException().isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), changeOrderTable));
+    }
+
+    @DisplayName("테이블 인원수 수정시 테이블은 착석중이어야 한다.")
+    @Test
+    void test7() {
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
+        final OrderTable changeOrderTable = createOrderTable(1, true);
+
+        assertThatIllegalStateException().isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), changeOrderTable));
     }
 }
