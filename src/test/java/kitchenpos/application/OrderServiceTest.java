@@ -30,6 +30,8 @@ class OrderServiceTest extends ApplicationTest {
     private static MenuGroup createdMenuGroup;
     private static Menu displayedMenu1;
     private static Menu displayedMenu2;
+    private static Menu hiddenMenu1;
+    private static Menu hiddenMenu2;
     private static OrderTable occupiedOrderTable;
     private static OrderTable notOccupiedOrderTable;
 
@@ -56,6 +58,9 @@ class OrderServiceTest extends ApplicationTest {
         Menu createdMenu2 = menuService.create(MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts));
         displayedMenu2 = menuService.display(createdMenu2.getId());
 
+        hiddenMenu1 = menuService.create(MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts));
+        hiddenMenu2 = menuService.create(MenuHelper.create(DEFAULT_PRICE, createdMenuGroup.getId(), createdMenuProducts));
+
         OrderTable createdOrderTable = orderTableService.create(OrderTableHelper.create());
         occupiedOrderTable = orderTableService.sit(createdOrderTable.getId());
         notOccupiedOrderTable = orderTableService.create(OrderTableHelper.create());
@@ -80,6 +85,20 @@ class OrderServiceTest extends ApplicationTest {
         orderLineItem2.setMenuId(displayedMenu2.getId());
         orderLineItem2.setQuantity(2);
         orderLineItem2.setPrice(displayedMenu2.getPrice());
+
+        return List.of(orderLineItem1, orderLineItem2);
+    }
+
+    private List<OrderLineItem> createOrderLineItemsThatMenusAreHidden() {
+        OrderLineItem orderLineItem1 = new OrderLineItem();
+        orderLineItem1.setMenuId(hiddenMenu1.getId());
+        orderLineItem1.setQuantity(1);
+        orderLineItem1.setPrice(hiddenMenu1.getPrice());
+
+        OrderLineItem orderLineItem2 = new OrderLineItem();
+        orderLineItem2.setMenuId(hiddenMenu2.getId());
+        orderLineItem2.setQuantity(2);
+        orderLineItem2.setPrice(hiddenMenu2.getPrice());
 
         return List.of(orderLineItem1, orderLineItem2);
     }
@@ -245,6 +264,39 @@ class OrderServiceTest extends ApplicationTest {
                 // Then
                 assertThatThrownBy(() -> orderService.create(order))
                         .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+
+        @DisplayName("주문할 메뉴가 노출된 상태이여야 한다.")
+        @Nested
+        class Policy4 {
+            @DisplayName("주문할 메뉴가 노출된 상태인 경우 (성공)")
+            @ParameterizedTest
+            @EnumSource
+            void success1(final OrderType orderType) {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrder(orderType, orderLineItems);
+
+                // When
+                Order createdOrder = orderService.create(order);
+
+                // Then
+                assertThat(getOrderedMenuId(createdOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+            }
+
+            @DisplayName("주문할 메뉴가 숨김 상태인 경우 (실패)")
+            @ParameterizedTest
+            @EnumSource
+            void fail1(final OrderType orderType) {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItemsThatMenusAreHidden();
+                Order order = getOrder(orderType, orderLineItems);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalStateException.class);
             }
         }
     }
