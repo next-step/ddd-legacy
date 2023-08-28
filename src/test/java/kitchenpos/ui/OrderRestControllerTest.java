@@ -9,6 +9,7 @@ import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguratio
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
@@ -53,32 +54,6 @@ class OrderRestControllerTest extends ControllerTest {
         비노출메뉴 = 메뉴생성요청_메뉴반환(MenuMaker.makeHideMenu("비노출메뉴", 12_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
     }
 
-    @DisplayName("매장주문생성시 요청한 데이터로 주문이 생성되야 한다.")
-    @Test
-    void 매장주문생성() {
-        // given
-        Order 매장주문 = OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
-
-        // when
-        ExtractableResponse<Response> response = 주문생성요청(매장주문);
-
-        // then
-        매장주문생성됨(response);
-    }
-
-    @DisplayName("매장주문생성시 테이블에 착석한 손님이 아닐경우 에러를 던진다.")
-    @Test
-    void 매장주문생성실패_미착석() {
-        // given
-        Order 매장주문 = OrderMaker.makeEatin(미착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
-
-        // when
-        ExtractableResponse<Response> response = 주문생성요청(매장주문);
-
-        // then
-        주문생성실패됨(response);
-    }
-
     @DisplayName("주문생성시 비노출메뉴를 주문할경우 에러를 던진다.")
     @Test
     void 주문생성실패_비노출메뉴() {
@@ -118,32 +93,6 @@ class OrderRestControllerTest extends ControllerTest {
         주문생성실패됨(response);
     }
 
-    @DisplayName("배달주문생성시 요청한 데이터로 주문이 생성되야 한다.")
-    @Test
-    void 배달주문생성() {
-        // given
-        Order 배달주문 = OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
-
-        // when
-        ExtractableResponse<Response> response = 주문생성요청(배달주문);
-
-        // then
-        배달주문생성됨(response);
-    }
-
-    @DisplayName("포장주문생성시 요청한 데이터로 주문이 생성되야 한다.")
-    @Test
-    void 포장주문생성() {
-        // given
-        Order 포장주문 = OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
-
-        // when
-        ExtractableResponse<Response> response = 주문생성요청(포장주문);
-
-        // then
-        포장주문생성됨(response);
-    }
-
     @DisplayName("주문대기중인 주문을 수락할경우 해당주문이 수락된다.")
     @Test
     void 주문수락() {
@@ -171,19 +120,6 @@ class OrderRestControllerTest extends ControllerTest {
         주문수락실패됨(response);
     }
 
-    @DisplayName("주문대기중인 배달주문을 수락할경우 주문이 수락되며 배달요청을 수행한다.")
-    @Test
-    void 배달주문수락() {
-        // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
-
-        // when
-        ExtractableResponse<Response> response = 주문수락요청(주문식별번호);
-
-        // then
-        주문수락됨(response);
-    }
-
     @DisplayName("주문상태가 수락일경우 제공이 가능하다.")
     @Test
     void 주문제공() {
@@ -196,84 +132,6 @@ class OrderRestControllerTest extends ControllerTest {
 
         // then
         주문제공됨(response);
-    }
-
-    @DisplayName("배달주문인경우 주문이 제공된경우 배달을 시작할 수 있다.")
-    @Test
-    void 배달주문_배달시작() {
-        // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
-        주문수락요청(주문식별번호);
-        주문제공요청(주문식별번호);
-
-        // when
-        ExtractableResponse<Response> response = 주문배달시작요청(주문식별번호);
-
-        // then
-        주문배달시작됨(response);
-    }
-
-    @DisplayName("배달주문인경우 주문이 제공된경우 배달을 시작할 수 있다.")
-    @Test
-    void 배달주문_배달완료() {
-        // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
-        주문수락요청(주문식별번호);
-        주문제공요청(주문식별번호);
-        주문배달시작요청(주문식별번호);
-
-        // when
-        ExtractableResponse<Response> response = 주문배달완료요청(주문식별번호);
-
-        // then
-        주문배달완료됨(response);
-    }
-
-    @DisplayName("매장주문인 경우 주문상태가 제공인 경우 완료할 수 있으며 테이블을 치운다.")
-    @Test
-    void 매장주문완료() {
-        // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
-        주문수락요청(주문식별번호);
-        주문제공요청(주문식별번호);
-
-        // when
-        ExtractableResponse<Response> response = 주문완료요청(주문식별번호);
-
-        // then
-        매장주문완료됨(response);
-    }
-
-    @DisplayName("배달주문인 경우 배달이 완료된 경우 완료할 수 있다.")
-    @Test
-    void 배달주문완료() {
-        // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
-        주문수락요청(주문식별번호);
-        주문제공요청(주문식별번호);
-        주문배달시작요청(주문식별번호);
-        주문배달완료요청(주문식별번호);
-
-        // when
-        ExtractableResponse<Response> response = 주문완료요청(주문식별번호);
-
-        // then
-        배달주문완료됨(response);
-    }
-
-    @DisplayName("포장주문인 경우 제공되었으면 완료할 수 있다.")
-    @Test
-    void 포장주문완료() {
-        // given
-        UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
-        주문수락요청(주문식별번호);
-        주문제공요청(주문식별번호);
-
-        // when
-        ExtractableResponse<Response> response = 주문완료요청(주문식별번호);
-
-        // then
-        포장주문완료됨(response);
     }
 
     @DisplayName("주문을 전체조회 할 수 있다.")
@@ -292,6 +150,166 @@ class OrderRestControllerTest extends ControllerTest {
 
         // then
         주문전체조회됨(response);
+    }
+
+    @DisplayName("매장주문관련 테스트")
+    @Nested
+    class Eatin {
+
+        @DisplayName("매장주문생성시 요청한 데이터로 주문이 생성되야 한다.")
+        @Test
+        void 매장주문생성() {
+            // given
+            Order 매장주문 = OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
+
+            // when
+            ExtractableResponse<Response> response = 주문생성요청(매장주문);
+
+            // then
+            매장주문생성됨(response);
+        }
+
+        @DisplayName("매장주문생성시 테이블에 착석한 손님이 아닐경우 에러를 던진다.")
+        @Test
+        void 매장주문생성실패_미착석() {
+            // given
+            Order 매장주문 = OrderMaker.makeEatin(미착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
+
+            // when
+            ExtractableResponse<Response> response = 주문생성요청(매장주문);
+
+            // then
+            주문생성실패됨(response);
+        }
+
+        @DisplayName("매장주문인 경우 주문상태가 제공인 경우 완료할 수 있으며 테이블을 치운다.")
+        @Test
+        void 매장주문완료() {
+            // given
+            UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
+            주문수락요청(주문식별번호);
+            주문제공요청(주문식별번호);
+
+            // when
+            ExtractableResponse<Response> response = 주문완료요청(주문식별번호);
+
+            // then
+            매장주문완료됨(response);
+        }
+
+    }
+
+    @DisplayName("포장주문관련 테스트")
+    @Nested
+    class Takeout {
+
+        @DisplayName("포장주문생성시 요청한 데이터로 주문이 생성되야 한다.")
+        @Test
+        void 포장주문생성() {
+            // given
+            Order 포장주문 = OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
+
+            // when
+            ExtractableResponse<Response> response = 주문생성요청(포장주문);
+
+            // then
+            포장주문생성됨(response);
+        }
+
+        @DisplayName("포장주문인 경우 제공되었으면 완료할 수 있다.")
+        @Test
+        void 포장주문완료() {
+            // given
+            UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
+            주문수락요청(주문식별번호);
+            주문제공요청(주문식별번호);
+
+            // when
+            ExtractableResponse<Response> response = 주문완료요청(주문식별번호);
+
+            // then
+            포장주문완료됨(response);
+        }
+
+    }
+
+    @DisplayName("배달주문관련 테스트")
+    @Nested
+    class Delivery {
+
+        @DisplayName("배달주문생성시 요청한 데이터로 주문이 생성되야 한다.")
+        @Test
+        void 배달주문생성() {
+            // given
+            Order 배달주문 = OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
+
+            // when
+            ExtractableResponse<Response> response = 주문생성요청(배달주문);
+
+            // then
+            배달주문생성됨(response);
+        }
+
+        @DisplayName("주문대기중인 배달주문을 수락할경우 주문이 수락되며 배달요청을 수행한다.")
+        @Test
+        void 배달주문수락() {
+            // given
+            UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
+
+            // when
+            ExtractableResponse<Response> response = 주문수락요청(주문식별번호);
+
+            // then
+            주문수락됨(response);
+        }
+
+        @DisplayName("배달주문인경우 주문이 제공된경우 배달을 시작할 수 있다.")
+        @Test
+        void 배달주문_배달시작() {
+            // given
+            UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
+            주문수락요청(주문식별번호);
+            주문제공요청(주문식별번호);
+
+            // when
+            ExtractableResponse<Response> response = 주문배달시작요청(주문식별번호);
+
+            // then
+            주문배달시작됨(response);
+        }
+
+        @DisplayName("배달주문인경우 주문이 제공된경우 배달을 시작할 수 있다.")
+        @Test
+        void 배달주문_배달완료() {
+            // given
+            UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
+            주문수락요청(주문식별번호);
+            주문제공요청(주문식별번호);
+            주문배달시작요청(주문식별번호);
+
+            // when
+            ExtractableResponse<Response> response = 주문배달완료요청(주문식별번호);
+
+            // then
+            주문배달완료됨(response);
+        }
+
+        @DisplayName("배달주문인 경우 배달이 완료된 경우 완료할 수 있다.")
+        @Test
+        void 배달주문완료() {
+            // given
+            UUID 주문식별번호 = 주문생성요청_주문식별번호반환(OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
+            주문수락요청(주문식별번호);
+            주문제공요청(주문식별번호);
+            주문배달시작요청(주문식별번호);
+            주문배달완료요청(주문식별번호);
+
+            // when
+            ExtractableResponse<Response> response = 주문완료요청(주문식별번호);
+
+            // then
+            배달주문완료됨(response);
+        }
     }
 
     private void 매장주문생성됨(ExtractableResponse<Response> response) {

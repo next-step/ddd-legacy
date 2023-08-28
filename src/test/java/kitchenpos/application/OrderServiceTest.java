@@ -6,6 +6,7 @@ import kitchenpos.objectmother.*;
 import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -68,45 +69,6 @@ class OrderServiceTest {
         비노출메뉴 = menuRepository.save(MenuMaker.makeHideMenu("비노출메뉴", 12_000L, 메뉴그룹, 메뉴상품_1, 메뉴상품_2));
     }
 
-    @DisplayName("매장주문생성시 요청한 데이터로 주문이 생성되야 한다.")
-    @Test
-    void 매장주문생성() {
-        // given
-        Order order = OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
-
-        // when
-        Order saveOrder = orderService.create(order);
-
-        // then
-        assertThat(saveOrder.getType()).isEqualTo(EAT_IN);
-        assertThat(saveOrder.getStatus()).isEqualTo(WAITING);
-        assertThat(saveOrder.getOrderDateTime()).isNotNull();
-        assertThat(saveOrder.getOrderLineItems())
-                .hasSize(1)
-                .extracting(OrderLineItem::getMenu)
-                .flatExtracting(Menu::getMenuProducts)
-                .extracting(MenuProduct::getProduct)
-                .extracting(Product::getName, Product::getPrice)
-                .containsExactlyInAnyOrder(
-                        Tuple.tuple(상품_1.getName(), 상품_1.getPrice()),
-                        Tuple.tuple(상품_2.getName(), 상품_2.getPrice())
-                );
-        assertThat(saveOrder.getOrderTable())
-                .extracting(OrderTable::getName, OrderTable::getNumberOfGuests, OrderTable::isOccupied)
-                .containsExactly(착석테이블.getName(), 4, true);
-    }
-
-    @DisplayName("매장주문생성시 테이블에 착석한 손님이 아닐경우 에러를 던진다.")
-    @Test
-    void 매장주문생성실패_미착석() {
-        // given
-        Order order = OrderMaker.makeEatin(미착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
-
-        // when then
-        assertThatThrownBy(() -> orderService.create(order))
-                .isInstanceOf(IllegalStateException.class);
-    }
-
     @DisplayName("주문생성시 비노출메뉴를 주문할경우 에러를 던진다.")
     @Test
     void 주문생성실패_비노출메뉴() {
@@ -140,57 +102,6 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("배달주문생성시 요청한 데이터로 주문이 생성되야 한다.")
-    @Test
-    void 배달주문생성() {
-        // given
-        Order order = OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
-
-        // when
-        Order saveOrder = orderService.create(order);
-
-        // then
-        assertThat(saveOrder.getType()).isEqualTo(DELIVERY);
-        assertThat(saveOrder.getStatus()).isEqualTo(WAITING);
-        assertThat(saveOrder.getOrderDateTime()).isNotNull();
-        assertThat(saveOrder.getDeliveryAddress()).isEqualTo("넥스트타워");
-        assertThat(saveOrder.getOrderLineItems())
-                .hasSize(1)
-                .extracting(OrderLineItem::getMenu)
-                .flatExtracting(Menu::getMenuProducts)
-                .extracting(MenuProduct::getProduct)
-                .extracting(Product::getName, Product::getPrice)
-                .containsExactlyInAnyOrder(
-                        Tuple.tuple(상품_1.getName(), 상품_1.getPrice()),
-                        Tuple.tuple(상품_2.getName(), 상품_2.getPrice())
-                );
-    }
-
-    @DisplayName("포장주문생성시 요청한 데이터로 주문이 생성되야 한다.")
-    @Test
-    void 포장주문생성() {
-        // given
-        Order order = OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
-
-        // when
-        Order saveOrder = orderService.create(order);
-
-        // then
-        assertThat(saveOrder.getType()).isEqualTo(TAKEOUT);
-        assertThat(saveOrder.getStatus()).isEqualTo(WAITING);
-        assertThat(saveOrder.getOrderDateTime()).isNotNull();
-        assertThat(saveOrder.getOrderLineItems())
-                .hasSize(1)
-                .extracting(OrderLineItem::getMenu)
-                .flatExtracting(Menu::getMenuProducts)
-                .extracting(MenuProduct::getProduct)
-                .extracting(Product::getName, Product::getPrice)
-                .containsExactlyInAnyOrder(
-                        Tuple.tuple(상품_1.getName(), 상품_1.getPrice()),
-                        Tuple.tuple(상품_2.getName(), 상품_2.getPrice())
-                );
-    }
-
     @DisplayName("주문대기중인 주문을 수락할경우 해당주문이 수락된다.")
     @Test
     void 주문수락() {
@@ -216,21 +127,6 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("주문대기중인 배달주문을 수락할경우 주문이 수락되며 배달요청을 수행한다.")
-    @Test
-    void 배달주문수락() {
-        // given
-        Order order = orderService.create(
-                OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L))
-        );
-
-        // when
-        orderService.accept(order.getId());
-
-        // then
-        verify(kitchenridersClient, times(1)).requestDelivery(any(), any(), any());
-    }
-
     @DisplayName("주문상태가 수락일경우 제공이 가능하다.")
     @Test
     void 주문제공() {
@@ -243,93 +139,6 @@ class OrderServiceTest {
 
         // then
         assertThat(serveOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
-    }
-
-    @DisplayName("배달주문인경우 주문이 제공된경우 배달을 시작할 수 있다.")
-    @Test
-    void 배달주문_배달시작() {
-        // given
-        Order order = orderService.create(
-                OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L))
-        );
-        orderService.accept(order.getId());
-        orderService.serve(order.getId());
-
-        // when
-        Order deliveryOrder = orderService.startDelivery(order.getId());
-
-        // then
-        assertThat(deliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
-    }
-
-    @DisplayName("배달주문인경우 주문이 제공된경우 배달을 시작할 수 있다.")
-    @Test
-    void 배달주문_배달완료() {
-        // given
-        Order order = orderService.create(
-                OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L))
-        );
-        orderService.accept(order.getId());
-        orderService.serve(order.getId());
-        orderService.startDelivery(order.getId());
-
-        // when
-        Order completeDeliveryOrder = orderService.completeDelivery(order.getId());
-
-        // then
-        assertThat(completeDeliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
-    }
-
-    @DisplayName("매장주문인 경우 주문상태가 제공인 경우 완료할 수 있으며 테이블을 치운다.")
-    @Test
-    void 매장주문완료() {
-        // given
-        Order order = orderService.create(OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
-        orderService.accept(order.getId());
-        orderService.serve(order.getId());
-
-        // when
-        Order completeOrder = orderService.complete(order.getId());
-
-        // then
-        assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-        assertThat(completeOrder.getOrderTable())
-                .extracting(OrderTable::getNumberOfGuests, OrderTable::isOccupied)
-                .containsExactly(0, false);
-    }
-
-    @DisplayName("배달주문인 경우 배달이 완료된 경우 완료할 수 있다.")
-    @Test
-    void 배달주문완료() {
-        // given
-        Order order = orderService.create(
-                OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L))
-        );
-        orderService.accept(order.getId());
-        orderService.serve(order.getId());
-        orderService.startDelivery(order.getId());
-        orderService.completeDelivery(order.getId());
-
-        // when
-        Order completeOrder = orderService.complete(order.getId());
-
-        // then
-        assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-    }
-
-    @DisplayName("포장주문인 경우 제공되었으면 완료할 수 있다.")
-    @Test
-    void 포장주문완료() {
-        // given
-        Order order = orderService.create(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
-        orderService.accept(order.getId());
-        orderService.serve(order.getId());
-
-        // when
-        Order completeOrder = orderService.complete(order.getId());
-
-        // then
-        assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @DisplayName("주문을 전체조회 할 수 있다.")
@@ -361,5 +170,214 @@ class OrderServiceTest {
                         Tuple.tuple(DELIVERY, WAITING),
                         Tuple.tuple(TAKEOUT, SERVED)
                 );
+    }
+
+    @DisplayName("매장주문관련 테스트")
+    @Nested
+    class Eatin {
+
+        @DisplayName("매장주문생성시 요청한 데이터로 주문이 생성되야 한다.")
+        @Test
+        void 매장주문생성() {
+            // given
+            Order order = OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
+
+            // when
+            Order saveOrder = orderService.create(order);
+
+            // then
+            assertThat(saveOrder.getType()).isEqualTo(EAT_IN);
+            assertThat(saveOrder.getStatus()).isEqualTo(WAITING);
+            assertThat(saveOrder.getOrderDateTime()).isNotNull();
+            assertThat(saveOrder.getOrderLineItems())
+                    .hasSize(1)
+                    .extracting(OrderLineItem::getMenu)
+                    .flatExtracting(Menu::getMenuProducts)
+                    .extracting(MenuProduct::getProduct)
+                    .extracting(Product::getName, Product::getPrice)
+                    .containsExactlyInAnyOrder(
+                            Tuple.tuple(상품_1.getName(), 상품_1.getPrice()),
+                            Tuple.tuple(상품_2.getName(), 상품_2.getPrice())
+                    );
+            assertThat(saveOrder.getOrderTable())
+                    .extracting(OrderTable::getName, OrderTable::getNumberOfGuests, OrderTable::isOccupied)
+                    .containsExactly(착석테이블.getName(), 4, true);
+        }
+
+        @DisplayName("매장주문생성시 테이블에 착석한 손님이 아닐경우 에러를 던진다.")
+        @Test
+        void 매장주문생성실패_미착석() {
+            // given
+            Order order = OrderMaker.makeEatin(미착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
+
+            // when then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("매장주문인 경우 주문상태가 제공인 경우 완료할 수 있으며 테이블을 치운다.")
+        @Test
+        void 매장주문완료() {
+            // given
+            Order order = orderService.create(OrderMaker.makeEatin(착석테이블, OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
+            orderService.accept(order.getId());
+            orderService.serve(order.getId());
+
+            // when
+            Order completeOrder = orderService.complete(order.getId());
+
+            // then
+            assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            assertThat(completeOrder.getOrderTable())
+                    .extracting(OrderTable::getNumberOfGuests, OrderTable::isOccupied)
+                    .containsExactly(0, false);
+        }
+
+    }
+
+    @DisplayName("포장주문관련 테스트")
+    @Nested
+    class Takeout {
+
+        @DisplayName("포장주문생성시 요청한 데이터로 주문이 생성되야 한다.")
+        @Test
+        void 포장주문생성() {
+            // given
+            Order order = OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
+
+            // when
+            Order saveOrder = orderService.create(order);
+
+            // then
+            assertThat(saveOrder.getType()).isEqualTo(TAKEOUT);
+            assertThat(saveOrder.getStatus()).isEqualTo(WAITING);
+            assertThat(saveOrder.getOrderDateTime()).isNotNull();
+            assertThat(saveOrder.getOrderLineItems())
+                    .hasSize(1)
+                    .extracting(OrderLineItem::getMenu)
+                    .flatExtracting(Menu::getMenuProducts)
+                    .extracting(MenuProduct::getProduct)
+                    .extracting(Product::getName, Product::getPrice)
+                    .containsExactlyInAnyOrder(
+                            Tuple.tuple(상품_1.getName(), 상품_1.getPrice()),
+                            Tuple.tuple(상품_2.getName(), 상품_2.getPrice())
+                    );
+        }
+
+        @DisplayName("포장주문인 경우 제공되었으면 완료할 수 있다.")
+        @Test
+        void 포장주문완료() {
+            // given
+            Order order = orderService.create(OrderMaker.makeTakeout(OrderLineItemMaker.make(메뉴_1, 1, 15_000L)));
+            orderService.accept(order.getId());
+            orderService.serve(order.getId());
+
+            // when
+            Order completeOrder = orderService.complete(order.getId());
+
+            // then
+            assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        }
+
+    }
+
+    @DisplayName("배달주문관련 테스트")
+    @Nested
+    class Delivery {
+
+        @DisplayName("배달주문생성시 요청한 데이터로 주문이 생성되야 한다.")
+        @Test
+        void 배달주문생성() {
+            // given
+            Order order = OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L));
+
+            // when
+            Order saveOrder = orderService.create(order);
+
+            // then
+            assertThat(saveOrder.getType()).isEqualTo(DELIVERY);
+            assertThat(saveOrder.getStatus()).isEqualTo(WAITING);
+            assertThat(saveOrder.getOrderDateTime()).isNotNull();
+            assertThat(saveOrder.getDeliveryAddress()).isEqualTo("넥스트타워");
+            assertThat(saveOrder.getOrderLineItems())
+                    .hasSize(1)
+                    .extracting(OrderLineItem::getMenu)
+                    .flatExtracting(Menu::getMenuProducts)
+                    .extracting(MenuProduct::getProduct)
+                    .extracting(Product::getName, Product::getPrice)
+                    .containsExactlyInAnyOrder(
+                            Tuple.tuple(상품_1.getName(), 상품_1.getPrice()),
+                            Tuple.tuple(상품_2.getName(), 상품_2.getPrice())
+                    );
+        }
+
+        @DisplayName("주문대기중인 배달주문을 수락할경우 주문이 수락되며 배달요청을 수행한다.")
+        @Test
+        void 배달주문수락() {
+            // given
+            Order order = orderService.create(
+                    OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L))
+            );
+
+            // when
+            orderService.accept(order.getId());
+
+            // then
+            verify(kitchenridersClient, times(1)).requestDelivery(any(), any(), any());
+        }
+
+        @DisplayName("배달주문인경우 주문이 제공된경우 배달을 시작할 수 있다.")
+        @Test
+        void 배달주문_배달시작() {
+            // given
+            Order order = orderService.create(
+                    OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L))
+            );
+            orderService.accept(order.getId());
+            orderService.serve(order.getId());
+
+            // when
+            Order deliveryOrder = orderService.startDelivery(order.getId());
+
+            // then
+            assertThat(deliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        }
+
+        @DisplayName("배달주문인경우 주문이 제공된경우 배달을 시작할 수 있다.")
+        @Test
+        void 배달주문_배달완료() {
+            // given
+            Order order = orderService.create(
+                    OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L))
+            );
+            orderService.accept(order.getId());
+            orderService.serve(order.getId());
+            orderService.startDelivery(order.getId());
+
+            // when
+            Order completeDeliveryOrder = orderService.completeDelivery(order.getId());
+
+            // then
+            assertThat(completeDeliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+        }
+
+        @DisplayName("배달주문인 경우 배달이 완료된 경우 완료할 수 있다.")
+        @Test
+        void 배달주문완료() {
+            // given
+            Order order = orderService.create(
+                    OrderMaker.makeDelivery("넥스트타워", OrderLineItemMaker.make(메뉴_1, 1, 15_000L))
+            );
+            orderService.accept(order.getId());
+            orderService.serve(order.getId());
+            orderService.startDelivery(order.getId());
+            orderService.completeDelivery(order.getId());
+
+            // when
+            Order completeOrder = orderService.complete(order.getId());
+
+            // then
+            assertThat(completeOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        }
     }
 }
