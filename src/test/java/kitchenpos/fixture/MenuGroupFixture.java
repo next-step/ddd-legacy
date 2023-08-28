@@ -9,6 +9,10 @@ public class MenuGroupFixture {
         return createMenuGroup("치킨");
     }
 
+    public static MenuGroup createMenuGroup(final UUID id) {
+        return createMenuGroup(id, "치킨");
+    }
+
     public static MenuGroup createMenuGroup(final String name) {
         return createMenuGroup(null, name);
     }
