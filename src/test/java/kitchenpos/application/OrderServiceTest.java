@@ -706,4 +706,50 @@ class OrderServiceTest extends ApplicationTest {
         }
     }
 
+    @DisplayName("주문을 완료한다.")
+    @Nested
+    class CompleteOrder {
+
+        @DisplayName("주문 유형이 배달이면, 주문 상태가 배달 완료이여야 한다.")
+        @Nested
+        class Policy1 {
+            @DisplayName("주문 상태가 배달 완료 상태인 경우 (성공)")
+            @Test
+            void success1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, "배달 주소");
+                Order createdOrder = orderService.create(order);
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+                Order servedOrder = orderService.serve(acceptedOrder.getId());
+                Order deliveringOrder = orderService.startDelivery(servedOrder.getId());
+                Order deliveredOrder = orderService.completeDelivery(deliveringOrder.getId());
+
+                // When
+                Order completedOrder = orderService.complete(deliveredOrder.getId());
+
+                // Then
+                assertThat(getOrderedMenuId(completedOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+                assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            }
+
+            @DisplayName("주문 상태가 배달 완료 상태가 아닌 경우 (실패)")
+            @Test
+            void fail1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, "배달 주소");
+                Order createdOrder = orderService.create(order);
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+                Order servedOrder = orderService.serve(acceptedOrder.getId());
+                Order deliveringOrder = orderService.startDelivery(servedOrder.getId());
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.complete(deliveringOrder.getId()))
+                        .isInstanceOf(IllegalStateException.class);
+            }
+        }
+    }
+
 }
