@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -136,6 +137,10 @@ class OrderServiceTest extends ApplicationTest {
                 .parallelStream()
                 .map(orderLineItem -> orderLineItem.getMenu().getId())
                 .collect(toUnmodifiableList());
+    }
+
+    private Order getOrderThatTypeIsDelivery(List<OrderLineItem> orderLineItems, String deliveryAddress) {
+        return OrderHelper.createOrderTypeIsDelivery(OrderType.DELIVERY, orderLineItems, deliveryAddress);
     }
 
     private Order getOrder(OrderType orderType, List<OrderLineItem> orderLineItems) {
@@ -339,6 +344,53 @@ class OrderServiceTest extends ApplicationTest {
                 // Given
                 List<OrderLineItem> orderLineItems = createOrderLineItemsWhichPriceIsNotSame();
                 Order order = getOrder(orderType, orderLineItems);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+
+        @DisplayName("주문 유형이 배달인 경우, 배달 주소가 있어야 한다.")
+        @Nested
+        class Policy6 {
+            @DisplayName("주문 유형이 배달일 때, 배달 주소가 있는 경우(성공)")
+            @ParameterizedTest
+            @ValueSource(strings = {" ", "1", "a", "ㄱ", "서울시 용산구", "USA"})
+            void success1(final String deliveryAddress) {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, deliveryAddress);
+
+                // When
+                Order createdOrder = orderService.create(order);
+
+                // Then
+                assertThat(getOrderedMenuId(createdOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+            }
+
+            @DisplayName("주문 유형이 배달일 때, 배달 주소가 null 인 경우 (실패)")
+            @ParameterizedTest
+            @NullSource
+            void fail1(final String deliveryAddress) {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, deliveryAddress);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("주문 유형이 배달일 때, 배달 주소가 비어있는 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(strings = {""})
+            void fail2(final String deliveryAddress) {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, deliveryAddress);
 
                 // When
                 // Then
