@@ -17,7 +17,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.fixture.TestFixture.*;
+import static kitchenpos.fixture.MenuFixture.TEST_MENU;
+import static kitchenpos.fixture.MenuFixture.TEST_MENU_PRODUCT;
+import static kitchenpos.fixture.MenuGroupFixture.TEST_MENU_GROUP;
+import static kitchenpos.fixture.ProductFixture.TEST_PRODUCT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;

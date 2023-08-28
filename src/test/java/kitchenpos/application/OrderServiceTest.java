@@ -15,7 +15,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import static kitchenpos.fixture.TestFixture.*;
+import static kitchenpos.fixture.MenuFixture.TEST_MENU;
+import static kitchenpos.fixture.OrderFixture.*;
+import static kitchenpos.fixture.OrderTableFixture.TEST_ORDER_TABLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
