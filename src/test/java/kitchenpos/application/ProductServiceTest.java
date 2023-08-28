@@ -52,7 +52,6 @@ class ProductServiceTest {
     @DisplayName("상품등록 이름체크")
     @ParameterizedTest
     @NullSource
-    @Test
     public void 상품등록_이름_필수값체크(String name) throws Exception {
         product = ProductFixture.create(name);
 

@@ -23,6 +23,8 @@ class OrderTableServiceTest {
 
     @Mock
     OrderTableRepository orderTableRepository;
+    @Mock
+    OrderRepository orderRepository;
     @InjectMocks
     OrderTableService orderTableService;
 
@@ -53,6 +55,7 @@ class OrderTableServiceTest {
     public void 주문테이블_청소() throws Exception {
         orderTable = OrderTableFixture.create("1번테이블", 4, true);
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+        when(orderRepository.existsByOrderTableAndStatusNot(any(),any())).thenReturn(false);
 
         orderTable = orderTableService.clear(orderTable.getId());
 
