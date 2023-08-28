@@ -629,16 +629,11 @@ class OrderServiceTest extends ApplicationTest {
         @Nested
         class Policy2 {
             @DisplayName("주문 상태가 제공 상태인 경우 (성공)")
-            @ParameterizedTest
-            @EnumSource
-            void success1(final OrderType orderType) {
+            @Test
+            void success1() {
                 // Given
-                if (orderType != OrderType.DELIVERY) {
-                    return;
-                }
-
                 List<OrderLineItem> orderLineItems = createOrderLineItems();
-                Order order = getOrder(orderType, orderLineItems);
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, "배달 주소");
                 Order createdOrder = orderService.create(order);
                 Order acceptedOrder = orderService.accept(createdOrder.getId());
                 Order servedOrder = orderService.serve(acceptedOrder.getId());
@@ -652,16 +647,11 @@ class OrderServiceTest extends ApplicationTest {
             }
 
             @DisplayName("주문 상태가 제공 상태가 아닌 경우 (실패)")
-            @ParameterizedTest
-            @EnumSource
-            void fail1(final OrderType orderType) {
+            @Test
+            void fail1() {
                 // Given
-                if (orderType != OrderType.DELIVERY) {
-                    return;
-                }
-
                 List<OrderLineItem> orderLineItems = createOrderLineItems();
-                Order order = getOrder(orderType, orderLineItems);
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, "배달 주소");
                 Order createdOrder = orderService.create(order);
                 Order acceptedOrder = orderService.accept(createdOrder.getId());
 
