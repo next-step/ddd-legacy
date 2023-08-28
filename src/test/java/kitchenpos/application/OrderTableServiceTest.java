@@ -107,4 +107,50 @@ class OrderTableServiceTest extends ApplicationTest {
         }
     }
 
+    @DisplayName("입장된 테이블의 고객 수를 변경한다.")
+    @Nested
+    class ChangeOrderTableNumberOfGuests {
+
+        private OrderTable beforeSatOrderTable;
+
+        @BeforeEach
+        void beforeEach() {
+            OrderTable orderTable = orderTableService.create(OrderTableHelper.create());
+            beforeSatOrderTable = orderTableService.sit(orderTable.getId());
+        }
+
+        @DisplayName("테이블의 고객 수는 0명 이상이어야 한다.")
+        @Nested
+        class Policy1 {
+            @DisplayName("변경할 테이블의 고객 수가 0명 이상인 경우 (성공)")
+            @ParameterizedTest
+            @ValueSource(ints = {0, 1, Integer.MAX_VALUE})
+            void success1(final int numberOfGuests) {
+                // Given
+                OrderTable orderTable = OrderTableHelper.create(numberOfGuests);
+
+                // When
+                OrderTable changedOrderTable = orderTableService.changeNumberOfGuests(beforeSatOrderTable.getId(), orderTable);
+
+                // Then
+                assertThat(changedOrderTable.getId()).isEqualTo(beforeSatOrderTable.getId());
+                assertThat(changedOrderTable.getName()).isEqualTo(beforeSatOrderTable.getName());
+                assertThat(changedOrderTable.getNumberOfGuests()).isEqualTo(numberOfGuests);
+            }
+
+            @DisplayName("변경할 테이블의 고객 수가 0명 미만인 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(ints = {-1, -100, Integer.MIN_VALUE})
+            void fail1(final int numberOfGuests) {
+                // Given
+                OrderTable orderTable = OrderTableHelper.create(numberOfGuests);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(beforeSatOrderTable.getId(), orderTable))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+    }
+
 }

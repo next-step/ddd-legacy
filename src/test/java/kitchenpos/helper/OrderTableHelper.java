@@ -16,6 +16,12 @@ public final class OrderTableHelper {
         return create(DEFAULT_NAME);
     }
 
+    public static OrderTable create(int numberOfGuests) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setNumberOfGuests(numberOfGuests);
+        return orderTable;
+    }
+
     public static OrderTable create(String name) {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
