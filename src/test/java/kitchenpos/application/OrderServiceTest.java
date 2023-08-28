@@ -142,6 +142,52 @@ class OrderServiceTest extends ApplicationTest {
                         .isInstanceOf(IllegalArgumentException.class);
             }
         }
+
+        @DisplayName("주문할 메뉴는 1개 이상 있어야 한다.")
+        @Nested
+        class Policy2 {
+            @DisplayName("주문할 메뉴가 1개 이상 있는 경우 (성공)")
+            @ParameterizedTest
+            @EnumSource
+            void success1(final OrderType orderType) {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrder(orderType, orderLineItems);
+
+                // When
+                Order createdOrder = orderService.create(order);
+
+                // Then
+                assertThat(getOrderedMenuId(createdOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+                assertThat(createdOrder.getOrderLineItems().size()).isGreaterThan(0);
+            }
+
+            @DisplayName("주문할 메뉴가 null 인 경우 (실패)")
+            @ParameterizedTest
+            @EnumSource
+            void fail1(final OrderType orderType) {
+                // Given
+                Order order = getOrder(orderType, null);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("주문할 메뉴가 없는 경우 (실패)")
+            @ParameterizedTest
+            @EnumSource
+            void fail2(final OrderType orderType) {
+                // Given
+                Order order = getOrder(orderType, List.of());
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
     }
 
 }
