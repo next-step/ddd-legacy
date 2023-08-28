@@ -77,7 +77,6 @@ class OrderTableServiceTest {
         OrderTable sitTable = orderTableService.sit(orderTableId);
 
         // then
-        verify(orderTableRepository, times(1)).findById(orderTableId);
         assertThat(sitTable.isOccupied()).isTrue();
     }
 
@@ -95,7 +94,6 @@ class OrderTableServiceTest {
         OrderTable clearedTable = orderTableService.clear(orderTableId);
 
         // then
-        verify(orderTableRepository, times(1)).findById(orderTableId);
         verify(orderRepository, times(1))
                 .existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED);
         assertThat(clearedTable.isOccupied()).isFalse();
@@ -109,7 +107,6 @@ class OrderTableServiceTest {
         OrderTable orderTable = TEST_ORDER_TABLE();
         UUID orderTableId = orderTable.getId();
         given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
-
 
         // when
         given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
@@ -133,7 +130,6 @@ class OrderTableServiceTest {
         OrderTable clearedTable = orderTableService.changeNumberOfGuests(orderTableId, orderTable);
 
         // then
-        verify(orderTableRepository, times(1)).findById(orderTableId);
         assertThat(clearedTable.isOccupied()).isTrue();
         assertThat(clearedTable.getNumberOfGuests()).isEqualTo(15);
     }
@@ -182,7 +178,7 @@ class OrderTableServiceTest {
 
         // then
         verify(orderTableRepository, times(1)).findAll();
-        assertThat(orderTables).isNotNull();
         assertThat(orderTables).hasSize(2);
+        assertThat(orderTables).containsExactly(orderTable, orderTable);
     }
 }

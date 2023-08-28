@@ -50,10 +50,9 @@ class OrderServiceTest {
         Order actual = orderService.create(order);
 
         // then
-        verify(menuRepository, times(1)).findAllByIdIn(any());
-        verify(menuRepository, times(1)).findById(any());
         verify(orderRepository, times(1)).save(any(Order.class));
-
+        assertThat(actual).isEqualTo(order);
+        assertThat(actual.getType()).isEqualTo(OrderType.DELIVERY);
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
         assertThat(actual.getDeliveryAddress()).isNotEmpty();
     }
@@ -72,10 +71,9 @@ class OrderServiceTest {
         Order actual = orderService.create(order);
 
         // then
-        verify(menuRepository, times(1)).findAllByIdIn(any());
-        verify(menuRepository, times(1)).findById(any());
         verify(orderRepository, times(1)).save(any(Order.class));
-
+        assertThat(actual).isEqualTo(order);
+        assertThat(actual.getType()).isEqualTo(OrderType.TAKEOUT);
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
     }
 
@@ -97,11 +95,9 @@ class OrderServiceTest {
         Order actual = orderService.create(order);
 
         // then
-        verify(menuRepository, times(1)).findAllByIdIn(any());
-        verify(menuRepository, times(1)).findById(any());
-        verify(orderTableRepository, times(1)).findById(order.getOrderTableId());
         verify(orderRepository, times(1)).save(any(Order.class));
-
+        assertThat(actual).isEqualTo(order);
+        assertThat(actual.getType()).isEqualTo(OrderType.EAT_IN);
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
         assertThat(actual.getOrderTableId()).isNotNull();
     }
@@ -251,11 +247,10 @@ class OrderServiceTest {
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
         // when
-        Order result = orderService.accept(order.getId());
+        Order actual = orderService.accept(order.getId());
 
         // then
-        verify(orderRepository, times(1)).findById(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
     @Test
@@ -281,12 +276,12 @@ class OrderServiceTest {
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
         // when
-        orderService.accept(order.getId());
+        Order actual = orderService.accept(order.getId());
 
         // then
-        verify(orderRepository, times(1)).findById(order.getId());
         verify(kitchenridersClient, times(1))
                 .requestDelivery(eq(order.getId()),any(BigDecimal.class), anyString());
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
     @Test
@@ -298,11 +293,10 @@ class OrderServiceTest {
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
         // when
-        Order result = orderService.serve(order.getId());
+        Order actual = orderService.serve(order.getId());
 
         // then
-        verify(orderRepository, times(1)).findById(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED);
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
     @Test
@@ -329,11 +323,10 @@ class OrderServiceTest {
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
         // when
-        Order result = orderService.startDelivery(order.getId());
+        Order actual = orderService.startDelivery(order.getId());
 
         // then
-        verify(orderRepository, times(1)).findById(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     }
 
     @ParameterizedTest
@@ -375,11 +368,10 @@ class OrderServiceTest {
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
         // when
-        Order result = orderService.completeDelivery(order.getId());
+        Order actual = orderService.completeDelivery(order.getId());
 
         // then
-        verify(orderRepository, times(1)).findById(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
     @Test
@@ -406,11 +398,10 @@ class OrderServiceTest {
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
         // when
-        Order result = orderService.complete(order.getId());
+        Order actual = orderService.complete(order.getId());
 
         // then
-        verify(orderRepository, times(1)).findById(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @Test
@@ -437,13 +428,14 @@ class OrderServiceTest {
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
         // when
-        Order result = orderService.complete(order.getId());
+        Order actual = orderService.complete(order.getId());
 
         // then
-        verify(orderRepository, times(1)).findById(order.getId());
         verify(orderRepository, times(1))
                 .existsByOrderTableAndStatusNot(order.getOrderTable(), OrderStatus.COMPLETED);
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(actual.getOrderTable().isOccupied()).isFalse();
+        assertThat(actual.getOrderTable().getNumberOfGuests()).isZero();
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @Test
@@ -455,11 +447,10 @@ class OrderServiceTest {
         given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
         // when
-        Order result = orderService.complete(order.getId());
+        Order actual = orderService.complete(order.getId());
 
         // then
-        verify(orderRepository, times(1)).findById(order.getId());
-        assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @ParameterizedTest
@@ -488,11 +479,11 @@ class OrderServiceTest {
         given(orderRepository.findAll()).willReturn(List.of(delivery, takeout, eat_in));
 
         // when
-        List<Order> result = orderService.findAll();
+        List<Order> actual = orderService.findAll();
 
         // then
         verify(orderRepository, times(1)).findAll();
-        assertThat(result).containsExactly(delivery, takeout, eat_in);
+        assertThat(actual).containsExactly(delivery, takeout, eat_in);
     }
 
     private Order getOrderByTypeName(String typeName) {

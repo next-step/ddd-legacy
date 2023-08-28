@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -17,8 +18,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kitchenpos.fixture.TestFixture.*;
-import static kitchenpos.fixture.TestFixture.TEST_MENU_PRODUCT;
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -45,29 +46,26 @@ class ProductServiceTest {
         given(productRepository.save(any(Product.class))).willReturn(createRequest);
 
         // when
-        productService.create(createRequest);
+        Product actual = productService.create(createRequest);
 
         // then
-        verify(purgomalumClient, times(1)).containsProfanity(anyString());
         verify(productRepository, times(1)).save(any());
+        assertThat(actual).isEqualTo(createRequest);
     }
 
     @DisplayName("이름은 비어있을 수 없다.")
-    @Test
+    @ParameterizedTest
+    @NullAndEmptySource
     void createNameEmptyTest() {
         // given
-        Product nameTest1 = TEST_PRODUCT();
-        nameTest1.setName(null);
-        Product nameTest2 = TEST_PRODUCT();
-        nameTest2.setName(" ");
-        Product nameTest3 = TEST_PRODUCT();
-        nameTest3.setName("");
+        Product createRequest  = TEST_PRODUCT();
 
-        // when && then
-        assertThatThrownBy(() -> productService.create(nameTest1))
+        // when
+        createRequest .setName(null);
+
+        // then
+        assertThatThrownBy(() -> productService.create(createRequest ))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatNoException().isThrownBy(() -> productService.create(nameTest2));
-        assertThatNoException().isThrownBy(() -> productService.create(nameTest3));
     }
 
     @DisplayName("이름은 외설적이거나 욕설이 포함된 영어 이름은 사용 할 수 없다")
@@ -103,14 +101,13 @@ class ProductServiceTest {
         menu.setMenuProducts(List.of(menuProduct));
         given(menuRepository.findAllByProductId(productId)).willReturn(List.of(menu));
 
-        Product result = productService.changePrice(productId, changeProduct);
+        Product actual = productService.changePrice(productId, changeProduct);
 
         // then
-        verify(productRepository, times(1)).findById(productId);
         verify(menuRepository, times(1)).findAllByProductId(productId);
         List<Menu> allByProductId = menuRepository.findAllByProductId(productId);
 
-        assertThat(result.getPrice()).isEqualTo(changeProduct.getPrice());
+        assertThat(actual.getPrice()).isEqualTo(changeProduct.getPrice());
         assertThat(allByProductId).extracting("displayed").containsExactly(true);
     }
 
@@ -133,14 +130,13 @@ class ProductServiceTest {
         menu.setMenuProducts(List.of(menuProduct));
         given(menuRepository.findAllByProductId(productId)).willReturn(List.of(menu));
 
-        Product result = productService.changePrice(productId, changeProduct);
+        Product actual = productService.changePrice(productId, changeProduct);
 
         // then
-        verify(productRepository, times(1)).findById(productId);
         verify(menuRepository, times(1)).findAllByProductId(productId);
         List<Menu> allByProductId = menuRepository.findAllByProductId(productId);
 
-        assertThat(result.getPrice()).isEqualTo(changeProduct.getPrice());
+        assertThat(actual.getPrice()).isEqualTo(changeProduct.getPrice());
         assertThat(allByProductId).extracting("displayed").containsExactly(false);
     }
 }

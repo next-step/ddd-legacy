@@ -15,6 +15,7 @@ import java.util.List;
 import static kitchenpos.fixture.TestFixture.TEST_MENU_GROUP;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.times;
 
@@ -30,11 +31,13 @@ class MenuGroupServiceTest {
     void createTest() {
         // given
         MenuGroup request = TEST_MENU_GROUP();
+        given(menuGroupRepository.save(any(MenuGroup.class))).willReturn(request);
         // when
-        menuGroupService.create(request);
+        MenuGroup actual = menuGroupService.create(request);
 
         // then
         then(menuGroupRepository).should(times(1)).save(any(MenuGroup.class));
+        assertThat(actual).isEqualTo(request);
     }
 
     @Test
@@ -51,10 +54,16 @@ class MenuGroupServiceTest {
     @Test
     @DisplayName("모든 메뉴 그룹 정보를 가져온다")
     void findAllTest() {
+        // given
+        MenuGroup menuGroup = TEST_MENU_GROUP();
+        given(menuGroupRepository.findAll()).willReturn(List.of(menuGroup));
+
         // when
-        menuGroupService.findAll();
+        List<MenuGroup> actual = menuGroupService.findAll();
 
         // then
         then(menuGroupRepository).should(times(1)).findAll();
+        assertThat(actual).hasSize(1);
+        assertThat(actual).containsExactly(menuGroup);
     }
 }

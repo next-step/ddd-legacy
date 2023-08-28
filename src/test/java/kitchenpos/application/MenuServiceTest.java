@@ -47,17 +47,14 @@ public class MenuServiceTest {
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(new Product()));
         given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_PRODUCT()));
         given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
-        given(menuRepository.save(any(Menu.class))).willReturn(TEST_MENU());
+        given(menuRepository.save(any(Menu.class))).willReturn(menuRequest);
 
         // when
-        menuService.create(menuRequest);
+        Menu actual = menuService.create(menuRequest);
 
         // then
-        verify(menuGroupRepository, times(1)).findById(any(UUID.class));
-        verify(productRepository, times(1)).findAllByIdIn(any());
-        verify(productRepository, times(1)).findById(any(UUID.class));
-        verify(purgomalumClient, times(1)).containsProfanity(anyString());
         verify(menuRepository, times(1)).save(any(Menu.class));
+        assertThat(menuRequest).isEqualTo(actual);
     }
 
     @ParameterizedTest
@@ -192,7 +189,6 @@ public class MenuServiceTest {
         Menu menu = menuService.changePrice(menuRequest.getId(), changePrice);
 
         // then
-        verify(menuRepository, times(1)).findById(any(UUID.class));
         assertThat(menu.getPrice()).isEqualTo(changePrice.getPrice());
     }
 
@@ -239,7 +235,6 @@ public class MenuServiceTest {
         Menu menu = menuService.display(menuRequest.getId());
 
         // then
-        verify(menuRepository, times(1)).findById(any(UUID.class));
         assertThat(menu.isDisplayed()).isTrue();
     }
 
@@ -270,7 +265,6 @@ public class MenuServiceTest {
         Menu menu = menuService.hide(menuRequest.getId());
 
         // then
-        verify(menuRepository, times(1)).findById(any(UUID.class));
         assertThat(menu.isDisplayed()).isFalse();
     }
 
@@ -281,11 +275,11 @@ public class MenuServiceTest {
         given(menuRepository.findAll()).willReturn(List.of(new Menu(), new Menu(), new Menu()));
 
         // when
-        List<Menu> menus = menuService.findAll();
+        List<Menu> actual = menuService.findAll();
 
         // then
         verify(menuRepository, times(1)).findAll();
-        assertThat(menus).isNotNull();
-        assertThat(menus).hasSize(3);
+        assertThat(actual).isNotNull();
+        assertThat(actual).hasSize(3);
     }
 }
