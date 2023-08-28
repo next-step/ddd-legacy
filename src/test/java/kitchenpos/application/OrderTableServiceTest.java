@@ -112,11 +112,13 @@ class OrderTableServiceTest extends ApplicationTest {
     class ChangeOrderTableNumberOfGuests {
 
         private OrderTable beforeSatOrderTable;
+        private OrderTable beforeNotSatOrderTable;
 
         @BeforeEach
         void beforeEach() {
             OrderTable orderTable = orderTableService.create(OrderTableHelper.create());
             beforeSatOrderTable = orderTableService.sit(orderTable.getId());
+            beforeNotSatOrderTable = orderTableService.create(OrderTableHelper.create());
         }
 
         @DisplayName("테이블의 고객 수는 0명 이상이어야 한다.")
@@ -149,6 +151,39 @@ class OrderTableServiceTest extends ApplicationTest {
                 // Then
                 assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(beforeSatOrderTable.getId(), orderTable))
                         .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
+
+        @DisplayName("테이블에 고객이 입장해 있는 상태여야 한다.")
+        @Nested
+        class Policy2 {
+            @DisplayName("변경할 테이블에 고객이 입장해 있는 경우 (성공)")
+            @ParameterizedTest
+            @ValueSource(ints = {0, 1, Integer.MAX_VALUE})
+            void success1(final int numberOfGuests) {
+                // Given
+                OrderTable orderTable = OrderTableHelper.create(numberOfGuests);
+
+                // When
+                OrderTable changedOrderTable = orderTableService.changeNumberOfGuests(beforeSatOrderTable.getId(), orderTable);
+
+                // Then
+                assertThat(changedOrderTable.getId()).isEqualTo(beforeSatOrderTable.getId());
+                assertThat(changedOrderTable.getName()).isEqualTo(beforeSatOrderTable.getName());
+                assertThat(changedOrderTable.getNumberOfGuests()).isEqualTo(numberOfGuests);
+            }
+
+            @DisplayName("변경할 테이블에 고객이 입장해 있지 않은 경우 (실패)")
+            @ParameterizedTest
+            @ValueSource(ints = {0, 1, Integer.MAX_VALUE})
+            void fail1(final int numberOfGuests) {
+                // Given
+                OrderTable orderTable = OrderTableHelper.create(numberOfGuests);
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(beforeNotSatOrderTable.getId(), orderTable))
+                        .isInstanceOf(IllegalStateException.class);
             }
         }
     }
