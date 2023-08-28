@@ -258,4 +258,14 @@ public class MenuServiceTest {
         assertThatThrownBy(() -> menuService.changePrice(menuId, request))
                 .isInstanceOf(NoSuchElementException.class);
     }
+
+    @Test
+    void 메뉴_가격_변경_실패__메뉴_가격은_속한_메뉴상품_가격의_총합보다_클_수_없음() {
+        UUID menuId = 오늘의치킨.getId();
+        Menu request = new Menu();
+        request.setPrice(new BigDecimal(20000));
+
+        assertThatThrownBy(() -> menuService.changePrice(menuId, request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
