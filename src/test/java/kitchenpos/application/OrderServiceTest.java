@@ -578,4 +578,52 @@ class OrderServiceTest extends ApplicationTest {
         }
     }
 
+    @DisplayName("주문에 대한 배달을 시작한다.")
+    @Nested
+    class MakeOrderDelivering {
+
+        @DisplayName("주문 유형이 배달이여야 한다.")
+        @Nested
+        class Policy1 {
+            @DisplayName("주문 유형이 배달인 경우 (성공)")
+            @Test
+            void success1() {
+                // Given
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrderThatTypeIsDelivery(orderLineItems, "배달 주소");
+                Order createdOrder = orderService.create(order);
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+                Order servedOrder = orderService.serve(acceptedOrder.getId());
+
+                // When
+                Order deliveringOrder = orderService.startDelivery(servedOrder.getId());
+
+                // Then
+                assertThat(getOrderedMenuId(deliveringOrder.getOrderLineItems())).containsAll(orderLineItems.parallelStream().map(OrderLineItem::getMenuId).collect(toUnmodifiableList()));
+                assertThat(deliveringOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+            }
+
+            @DisplayName("주문 유형이 배달인 아닌 경우 (실패)")
+            @ParameterizedTest
+            @EnumSource
+            void fail1(final OrderType orderType) {
+                // Given
+                if (orderType == OrderType.DELIVERY) {
+                    return;
+                }
+
+                List<OrderLineItem> orderLineItems = createOrderLineItems();
+                Order order = getOrder(orderType, orderLineItems);
+                Order createdOrder = orderService.create(order);
+                Order acceptedOrder = orderService.accept(createdOrder.getId());
+                Order servedOrder = orderService.serve(acceptedOrder.getId());
+
+                // When
+                // Then
+                assertThatThrownBy(() -> orderService.startDelivery(servedOrder.getId()))
+                        .isInstanceOf(IllegalStateException.class);
+            }
+        }
+    }
+
 }
