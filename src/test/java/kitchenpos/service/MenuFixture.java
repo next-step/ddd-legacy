@@ -1,10 +1,12 @@
 package kitchenpos.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuProduct;
 
 public class MenuFixture {
     private final Menu menu;
@@ -30,6 +32,17 @@ public class MenuFixture {
 
     public MenuFixture menuGroup(MenuGroup menuGroup) {
         menu.setMenuGroup(menuGroup);
+        menu.setMenuGroupId(menuGroup.getId());
+        return this;
+    }
+
+    public MenuFixture menuProduct(MenuProduct menuProduct) {
+        menu.setMenuProducts(List.of(menuProduct));
+        return this;
+    }
+
+    public MenuFixture menuProducts(List<MenuProduct> menuProducts) {
+        menu.setMenuProducts(menuProducts);
         return this;
     }
 
