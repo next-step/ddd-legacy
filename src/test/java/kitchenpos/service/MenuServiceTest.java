@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -230,19 +231,31 @@ public class MenuServiceTest {
 
     @Test
     void 메뉴_가격_변경_실패__가격이_null() {
-        Menu menu = new Menu();
-        menu.setPrice(null);
+        UUID menuId = 오늘의치킨.getId();
+        Menu request = new Menu();
+        request.setPrice(null);
 
-        assertThatThrownBy(() -> menuService.changePrice(오늘의치킨.getId(), menu))
+        assertThatThrownBy(() -> menuService.changePrice(menuId, request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     void 메뉴_가격_변경_실패__가격이_음수() {
-        Menu menu = new Menu();
-        menu.setPrice(new BigDecimal(-1));
+        UUID menuId = 오늘의치킨.getId();
+        Menu request = new Menu();
+        request.setPrice(new BigDecimal(-1));
 
-        assertThatThrownBy(() -> menuService.changePrice(오늘의치킨.getId(), menu))
+        assertThatThrownBy(() -> menuService.changePrice(menuId, request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 메뉴_가격_변경_실패__메뉴가_존재하지_않음() {
+        UUID menuId = UUID.randomUUID();
+        Menu request = new Menu();
+        request.setPrice(new BigDecimal(20000));
+
+        assertThatThrownBy(() -> menuService.changePrice(menuId, request))
+                .isInstanceOf(NoSuchElementException.class);
     }
 }
