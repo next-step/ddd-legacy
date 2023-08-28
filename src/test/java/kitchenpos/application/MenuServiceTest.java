@@ -107,16 +107,40 @@ class MenuServiceTest {
     @DisplayName("메뉴상품의 상품이 존재하지 않으면 예외를 발생시킨다.")
     @Test
     void menu_create_menuProducts_not_found_product() {
+        Product 후라이드 = ProductFixture.후라이드();
+        Product 양념치킨 = ProductFixture.양념치킨();
         BDDMockito.given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuFixture.MenuGroupFixture.두마리메뉴()));
-        BDDMockito.given(productRepository.findAllByIdIn(any())).willReturn(List.of(ProductFixture.후라이드(), ProductFixture.양념치킨()));
+        BDDMockito.given(productRepository.findAllByIdIn(any())).willReturn(List.of(후라이드, 양념치킨));
+        BDDMockito.given(productRepository.findById(후라이드.getId())).willReturn(Optional.of(후라이드));
+        BDDMockito.given(productRepository.findById(양념치킨.getId())).willReturn(Optional.empty());
         menu.setPrice(BigDecimal.valueOf(16000));
         menu.setMenuProducts(
                 List.of(
-                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(ProductFixture.후라이드()),
-                        MenuFixture.MenuProductFixture.메뉴상품_양념(ProductFixture.양념치킨()))
+                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(후라이드),
+                        MenuFixture.MenuProductFixture.메뉴상품_양념(양념치킨))
         );
 
         assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> menuService.create(menu));
+    }
+
+    @DisplayName("메뉴가격이 메뉴상품들의 가격의 합보다 크면 예외를 발생시킨다.")
+    @Test
+    void menu_create_menu_price_more_menuProducts_price_sum() {
+        Product 후라이드 = ProductFixture.후라이드();
+        Product 양념치킨 = ProductFixture.양념치킨();
+        BDDMockito.given(menuGroupRepository.findById(any())).willReturn(Optional.of(MenuFixture.MenuGroupFixture.두마리메뉴()));
+        BDDMockito.given(productRepository.findAllByIdIn(any())).willReturn(List.of(후라이드, 양념치킨));
+        BDDMockito.given(productRepository.findById(후라이드.getId())).willReturn(Optional.of(후라이드));
+        BDDMockito.given(productRepository.findById(양념치킨.getId())).willReturn(Optional.of(양념치킨));
+        menu.setPrice(후라이드.getPrice().add(양념치킨.getPrice()).add(BigDecimal.valueOf(10000)));
+        menu.setMenuProducts(
+                List.of(
+                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(후라이드),
+                        MenuFixture.MenuProductFixture.메뉴상품_양념(양념치킨))
+        );
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(menu));
     }
 
