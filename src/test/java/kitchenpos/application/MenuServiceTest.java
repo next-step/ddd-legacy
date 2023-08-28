@@ -287,4 +287,27 @@ class MenuServiceTest extends SpringBootTestHelper {
         assertThat(menu.isDisplayed()).isFalse();
 
     }
+
+    @DisplayName("총 6000원 원가의 메뉴를 5000원으로 가격을 변경할수 있다. <에러 발생! 버그 픽스 필요>")
+    @Test
+    void test14() {
+        //given 0번 상품을 2개로 묶은 메뉴를 생성한다.
+        Menu createRequest = MenuFixture.createRequestBuilder()
+            .menuGroupId(menuGroup.getId())
+            .menuProduct(products.get(0), 2L) //1000 * 2
+            .menuProduct(products.get(1), 2L) //2000 * 2
+            .name("menuMame")
+            .build();
+        Menu savedMenu = menuService.create(createRequest);
+
+        Menu updateRequest = MenuFixture.updateRequestBuilder()
+            .price(5000)
+            .build();
+
+        //when
+        Menu result = menuService.changePrice(savedMenu.getId(), updateRequest);
+
+        //then
+        assertThat(result.getPrice()).isEqualTo(updateRequest.getPrice());
+    }
 }
