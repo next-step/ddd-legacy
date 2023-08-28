@@ -1,12 +1,10 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Order;
 import kitchenpos.domain.*;
 import kitchenpos.helper.*;
 import kitchenpos.infra.KitchenridersClient;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
@@ -825,6 +823,30 @@ class OrderServiceTest extends ApplicationTest {
                 assertThat(orderTable.getNumberOfGuests()).isZero();
                 assertThat(orderTable.isOccupied()).isFalse();
             }
+        }
+    }
+
+    @DisplayName("모든 주문을 가져온다.")
+    @Nested
+    class FindAllOrders {
+
+        private List<Order> beforeCreatedOrders;
+
+        @BeforeEach
+        void beforeEach() {
+            beforeCreatedOrders = IntStream.range(0, 11)
+                    .mapToObj(n -> orderService.create(getOrder(OrderType.DELIVERY, createOrderLineItems())))
+                    .collect(toUnmodifiableList());
+        }
+
+        @DisplayName("모든 주문을 가져온다 (성공)")
+        @Test
+        void success1() {
+            // When
+            List<Order> allOrders = orderService.findAll();
+
+            // Then
+            assertThat(allOrders.size()).isEqualTo(beforeCreatedOrders.size());
         }
     }
 
