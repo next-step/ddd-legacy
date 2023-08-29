@@ -436,6 +436,70 @@ class OrderServiceTest extends BaseServiceTest {
         assertThatIllegalStateException().isThrownBy(() -> orderService.complete(order.getId()));
     }
 
+    @DisplayName("테이크 아웃 주문 종료시 상태는 제공됨 이어야 한다.")
+    @Test
+    void test25() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
+        final Order order = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.TAKEOUT, OrderStatus.SERVED, "청주시", orderLineItems, null));
+
+        final Order completedOrder = orderService.complete(order.getId());
+
+        assertThat(completedOrder.getId()).isEqualTo(order.getId());
+        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("테이크 아웃 주문 종료시 상태는 제공됨 아니면 실패한다")
+    @EnumSource(value = OrderStatus.class, names = {"SERVED"}, mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void test26(final OrderStatus orderStatus) {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
+        final Order order = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.TAKEOUT, orderStatus, "청주시", orderLineItems, null));
+
+        assertThatIllegalStateException().isThrownBy(() -> orderService.complete(order.getId()));
+    }
+
+    @DisplayName("매장 내 식사 주문 종료시 상태는 제공됨 이어야 한다.")
+    @Test
+    void test27() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
+        final Order order = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.EAT_IN, OrderStatus.SERVED, "청주시", orderLineItems, orderTable));
+
+        final Order completedOrder = orderService.complete(order.getId());
+
+        assertThat(completedOrder.getId()).isEqualTo(order.getId());
+        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(completedOrder.getOrderTable().getNumberOfGuests()).isZero();
+        assertThat(completedOrder.getOrderTable().isOccupied()).isFalse();
+    }
+
+    @DisplayName("매장 내 식사 주문 종료시 상태는 제공됨 아니면 실패한다")
+    @EnumSource(value = OrderStatus.class, names = {"SERVED"}, mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void test28(final OrderStatus orderStatus) {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
+        final Order order = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.EAT_IN, orderStatus, null, orderLineItems, orderTable));
+
+        assertThatIllegalStateException().isThrownBy(() -> orderService.complete(order.getId()));
+    }
+
     private static class OrderLineItemFields {
         final Menu menu;
         final long quantity;
