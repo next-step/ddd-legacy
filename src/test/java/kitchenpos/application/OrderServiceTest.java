@@ -10,10 +10,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static kitchenpos.fixture.MenuFixture.createMenu;
@@ -22,9 +19,9 @@ import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.OrderFixture.createDeliveryOrder;
 import static kitchenpos.fixture.OrderFixture.createOrder;
 import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
+import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static kitchenpos.fixture.ProductFixture.createProduct;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.*;
 
 class OrderServiceTest extends BaseServiceTest {
     private final OrderService orderService;
@@ -114,6 +111,20 @@ class OrderServiceTest extends BaseServiceTest {
         final Order order = createOrder(OrderType.DELIVERY, deliveryAddress, orderLineItems, null);
 
         assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("주문 수령 방법이 매장내 식사의 경우 테이블은 필수이다")
+    @Test
+    void test6() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
+        final OrderTable orderTable = createOrderTable(UUID.randomUUID(), 5, false);
+        final Order order = createOrder(OrderType.EAT_IN, "청주시", orderLineItems, orderTable);
+
+        assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> orderService.create(order));
     }
 
     private static class OrderLineItemFields {
