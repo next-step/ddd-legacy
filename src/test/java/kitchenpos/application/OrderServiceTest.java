@@ -25,6 +25,8 @@ import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
 import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 class OrderServiceTest extends BaseServiceTest {
     private final OrderService orderService;
@@ -241,7 +243,7 @@ class OrderServiceTest extends BaseServiceTest {
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
         final MenuProduct menuProduct = createMenuProduct(product);
         final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
-        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, -1, BigDecimal.TEN));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), OrderStatus.WAITING, orderLineItems));
 
         final Order acceptedOrder = orderService.accept(order.getId());
@@ -258,12 +260,29 @@ class OrderServiceTest extends BaseServiceTest {
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
         final MenuProduct menuProduct = createMenuProduct(product);
         final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
-        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, -1, BigDecimal.TEN));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), orderStatus, orderLineItems));
 
         assertThatIllegalStateException().isThrownBy(() -> orderService.accept(order.getId()));
     }
 
+    @DisplayName("주문 승인시 주문 수령 방법이 배달일 경우 라이더 배정은 필수이다")
+    @Test
+    void test15() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 3, BigDecimal.TEN));
+        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), OrderStatus.WAITING, orderLineItems));
+
+        doNothing().when(kitchenridersClient).requestDelivery(order.getId(), BigDecimal.valueOf(30),order.getDeliveryAddress());
+
+        final Order acceptedOrder = orderService.accept(order.getId());
+
+        assertThat(acceptedOrder.getId()).isEqualTo(order.getId());
+        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
 
     private static class OrderLineItemFields {
         final Menu menu;
