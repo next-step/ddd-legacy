@@ -314,6 +314,22 @@ class OrderServiceTest extends BaseServiceTest {
         assertThatIllegalStateException().isThrownBy(() -> orderService.serve(order.getId()));
     }
 
+    @DisplayName("주문 배달 시작이 가능하다.")
+    @Test
+    void test17() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
+        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), OrderStatus.SERVED, orderLineItems));
+
+        final Order startedDeliveryOrder = orderService.startDelivery(order.getId());
+
+        assertThat(startedDeliveryOrder.getId()).isEqualTo(order.getId());
+        assertThat(startedDeliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+    }
+
     private static class OrderLineItemFields {
         final Menu menu;
         final long quantity;
