@@ -14,9 +14,9 @@ public class OrderLineItem {
 
     @ManyToOne(optional = false)
     @JoinColumn(
-        name = "menu_id",
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_order_line_item_to_menu")
+            name = "menu_id",
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_order_line_item_to_menu")
     )
     private Menu menu;
 
@@ -30,6 +30,13 @@ public class OrderLineItem {
     private BigDecimal price;
 
     public OrderLineItem() {
+    }
+
+    public OrderLineItem(Menu menu, long quantity, BigDecimal price, UUID menuId) {
+        this.menu = menu;
+        this.quantity = quantity;
+        this.price = price;
+        this.menuId = menuId;
     }
 
     public Long getSeq() {
