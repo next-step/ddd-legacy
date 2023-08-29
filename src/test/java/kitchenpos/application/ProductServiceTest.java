@@ -35,7 +35,7 @@ class ProductServiceTest extends BaseServiceTest {
     @Test
     void test1() {
         final Product product = createProduct();
-        given(purgomalumClient.containsProfanity(any())).willReturn(false);
+        given(purgomalumClient.containsProfanity(product.getName())).willReturn(false);
 
         final Product createdProduct = productService.create(product);
 
@@ -51,7 +51,7 @@ class ProductServiceTest extends BaseServiceTest {
     @Test
     void test2() {
         final Product product = createProduct(null, BigDecimal.TEN);
-        given(purgomalumClient.containsProfanity(any())).willReturn(false);
+        given(purgomalumClient.containsProfanity(product.getName())).willReturn(false);
 
         assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
     }
@@ -60,7 +60,8 @@ class ProductServiceTest extends BaseServiceTest {
     @Test
     void test3() {
         final Product product = createProduct("비속어", BigDecimal.TEN);
-        when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+
+        when(purgomalumClient.containsProfanity(product.getName())).thenReturn(true);
 
         assertThatIllegalArgumentException().isThrownBy(() -> productService.create(product));
     }

@@ -18,6 +18,7 @@ import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 
 class MenuServiceTest extends BaseServiceTest {
     private final MenuService menuService;
@@ -42,7 +43,7 @@ class MenuServiceTest extends BaseServiceTest {
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
         final MenuProduct menuProduct = createMenuProduct(product);
         final Menu menu = createMenu(menuGroup, List.of(menuProduct));
-        given(purgomalumClient.containsProfanity(any())).willReturn(false);
+        given(purgomalumClient.containsProfanity(menu.getName())).willReturn(false);
 
         final Menu createdMenu = menuService.create(menu);
 
@@ -66,7 +67,7 @@ class MenuServiceTest extends BaseServiceTest {
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
         final MenuProduct menuProduct = createMenuProduct(product);
         final Menu menu = createMenu(null, BigDecimal.ONE, menuGroup, List.of(menuProduct));
-        given(purgomalumClient.containsProfanity(any())).willReturn(false);
+        given(purgomalumClient.containsProfanity(menu.getName())).willReturn(false);
 
         assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
     }
@@ -78,7 +79,8 @@ class MenuServiceTest extends BaseServiceTest {
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
         final MenuProduct menuProduct = createMenuProduct(product);
         final Menu menu = createMenu("비속어", BigDecimal.ONE, menuGroup, List.of(menuProduct));
-        given(purgomalumClient.containsProfanity(any())).willReturn(true);
+
+        when(purgomalumClient.containsProfanity(menu.getName())).thenReturn(true);
 
         assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
     }

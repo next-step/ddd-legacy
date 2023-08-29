@@ -264,6 +264,7 @@ class OrderServiceTest extends BaseServiceTest {
         assertThatIllegalStateException().isThrownBy(() -> orderService.accept(order.getId()));
     }
 
+
     private static class OrderLineItemFields {
         final Menu menu;
         final long quantity;
