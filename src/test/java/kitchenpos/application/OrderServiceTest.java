@@ -10,7 +10,6 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -105,7 +104,7 @@ class OrderServiceTest extends BaseServiceTest {
 
     @DisplayName("주문 수령 방법이 배달일 경우 배달지 주소가 있으면 주문이 가능하다")
     @Test
-    void test5(){
+    void test5() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
         final MenuProduct menuProduct = createMenuProduct(product);
@@ -142,7 +141,7 @@ class OrderServiceTest extends BaseServiceTest {
     @DisplayName("주문 수령 방법이 매장내 식사의 경우 테이블 착석중이면 주문이 가능하다.")
     @ParameterizedTest
     @ValueSource(longs = {-1, 0, 1})
-    void test7(final long quantity){
+    void test7(final long quantity) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
         final MenuProduct menuProduct = createMenuProduct(product);
@@ -249,6 +248,20 @@ class OrderServiceTest extends BaseServiceTest {
 
         assertThat(acceptedOrder.getId()).isEqualTo(order.getId());
         assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @DisplayName("승인 될 주문은 주문 요청이 된 상태여야 한다")
+    @EnumSource(value = OrderStatus.class, names = {"WAITING"}, mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void test14(final OrderStatus orderStatus) {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, -1, BigDecimal.TEN));
+        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), orderStatus, orderLineItems));
+
+        assertThatIllegalStateException().isThrownBy(() -> orderService.accept(order.getId()));
     }
 
     private static class OrderLineItemFields {
