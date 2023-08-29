@@ -29,4 +29,22 @@ public class OrderTableAcceptanceTest {
 
         주문테이블_생성_성공함(response);
     }
+
+    @Test
+    void 주문테이블_착석__성공() throws Exception {
+        String orderTableId = 주문테이블_생성(mockMvc, Map.of("name", "1번 테이블"));
+
+        MockHttpServletResponse response = 주문테이블_착석_요청(mockMvc, orderTableId);
+
+        주문테이블_착석_성공함(response);
+    }
+
+    @Test
+    void 주문테이블_정리__성공() throws Exception {
+        String orderTableId = 주문테이블_생성(mockMvc, Map.of("name", "1번 테이블"));
+
+        MockHttpServletResponse response = 주문테이블_정리_요청(mockMvc, orderTableId);
+
+        주문테이블_정리_성공함(response);
+    }
 }
