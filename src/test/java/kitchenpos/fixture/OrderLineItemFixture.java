@@ -17,6 +17,10 @@ public class OrderLineItemFixture {
         return createOrderLineItem(null, menu, 1, BigDecimal.TEN);
     }
 
+    public static OrderLineItem createOrderLineItem(final Menu menu, final long quantity) {
+        return createOrderLineItem(null, menu, quantity, BigDecimal.TEN);
+    }
+
     public static OrderLineItem createOrderLineItem(
             final Long seq, final Menu menu, final long quantity, final BigDecimal price
     ) {

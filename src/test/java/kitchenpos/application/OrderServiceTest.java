@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
@@ -135,14 +136,15 @@ class OrderServiceTest extends BaseServiceTest {
         assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
     }
 
-    @DisplayName("주문 수령 방법이 매장내 식사의 경우 테이블 착석중이면 주문이 가능하다")
-    @Test
-    void test7(){
+    @DisplayName("주문 수령 방법이 매장내 식사의 경우 테이블 착석중이면 주문이 가능하다.")
+    @ParameterizedTest
+    @ValueSource(longs = {-1, 0, 1})
+    void test7(final long quantity){
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
         final MenuProduct menuProduct = createMenuProduct(product);
         final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct))));
-        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, quantity));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
         final Order order = createOrder(OrderType.EAT_IN, null, orderLineItems, orderTable);
 
