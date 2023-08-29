@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -79,6 +80,22 @@ class OrderServiceTest extends BaseServiceTest {
         final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct))));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
         final Order order = createOrder(null, null, orderLineItems, null);
+
+        assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("주문의 주문 목록은 비어있으면 안된다")
+    @Test
+    void test3() {
+        final Order order = createOrder(OrderType.DELIVERY, "delivery", null, null);
+
+        assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("주문의 주문 목록은 필수이다")
+    @Test
+    void test4() {
+        final Order order = createOrder(OrderType.DELIVERY, "delivery", Collections.emptyList(), null);
 
         assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
     }
