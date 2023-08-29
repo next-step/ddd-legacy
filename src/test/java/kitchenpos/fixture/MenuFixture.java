@@ -12,6 +12,14 @@ import java.util.UUID;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 
 public class MenuFixture {
+
+    public static Menu createMenu() {
+        return createMenu(
+                null, "치킨", BigDecimal.ONE,
+                createMenuGroup(), true, Collections.emptyList()
+        );
+    }
+
     public static Menu createMenu(final String name, final BigDecimal price, final MenuGroup menuGroup, final List<MenuProduct> menuProducts) {
         return createMenu(
                 null, name, price,
