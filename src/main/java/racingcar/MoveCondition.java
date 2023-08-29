@@ -14,6 +14,6 @@ class NumberMoveCondition implements MoveCondition {
 
     @Override
     public boolean movable() {
-        return condition > 4;
+        return condition >= 4;
     }
 }
