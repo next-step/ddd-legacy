@@ -500,6 +500,23 @@ class OrderServiceTest extends BaseServiceTest {
         assertThatIllegalStateException().isThrownBy(() -> orderService.complete(order.getId()));
     }
 
+    @DisplayName("주문은 전체 조회가 가능하다")
+    @Test
+    void test29() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
+        final Order order1 = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.DELIVERY, OrderStatus.DELIVERED, null, orderLineItems, null));
+        final Order order2 = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.EAT_IN, OrderStatus.SERVED, null, orderLineItems, orderTable));
+
+        final List<Order> orders = orderService.findAll();
+
+        assertThat(orders).containsExactly(order1, order2);
+    }
+
     private static class OrderLineItemFields {
         final Menu menu;
         final long quantity;
