@@ -14,6 +14,7 @@ public class OrderFixture {
                 null, null
         );
     }
+
     public static Order createDeliveryOrder(final UUID id, final OrderStatus status, final List<OrderLineItem> orderLineItems) {
         return createOrder(
                 id, OrderType.DELIVERY, status,

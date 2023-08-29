@@ -7,7 +7,6 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class MenuProductTest {
     @DisplayName("메뉴 구성 생성")

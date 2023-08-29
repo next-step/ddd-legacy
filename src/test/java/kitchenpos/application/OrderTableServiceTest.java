@@ -102,7 +102,7 @@ class OrderTableServiceTest extends BaseServiceTest {
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
         final Order order = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.EAT_IN, orderStatus, null, orderLineItems, orderTable));
 
-        assertThatIllegalStateException().isThrownBy(() ->  orderTableService.clear(orderTable.getId()));
+        assertThatIllegalStateException().isThrownBy(() -> orderTableService.clear(orderTable.getId()));
     }
 
     @DisplayName("테이블은 인원수를 수정할 수 있다.")

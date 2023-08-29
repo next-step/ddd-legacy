@@ -26,7 +26,6 @@ import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
 
 class OrderServiceTest extends BaseServiceTest {
     private final OrderService orderService;
@@ -276,7 +275,7 @@ class OrderServiceTest extends BaseServiceTest {
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 3, BigDecimal.TEN));
         final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), OrderStatus.WAITING, orderLineItems));
 
-        doNothing().when(kitchenridersClient).requestDelivery(order.getId(), BigDecimal.valueOf(30),order.getDeliveryAddress());
+        doNothing().when(kitchenridersClient).requestDelivery(order.getId(), BigDecimal.valueOf(30), order.getDeliveryAddress());
 
         final Order acceptedOrder = orderService.accept(order.getId());
 
