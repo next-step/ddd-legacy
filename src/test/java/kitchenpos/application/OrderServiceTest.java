@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
+import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
@@ -23,6 +24,7 @@ import static java.util.stream.Collectors.toUnmodifiableList;
 import static kitchenpos.helper.MenuHelper.DEFAULT_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 
 class OrderServiceTest extends BaseServiceTest {
@@ -72,6 +74,13 @@ class OrderServiceTest extends BaseServiceTest {
         OrderTable createdOrderTable = orderTableService.create(OrderTableHelper.create());
         occupiedOrderTable = orderTableService.sit(createdOrderTable.getId());
         notOccupiedOrderTable = orderTableService.create(OrderTableHelper.create());
+    }
+
+    @BeforeEach
+    void beforeEach() {
+        doAnswer((Answer<Void>) invocation -> null)
+                .when(kitchenridersClient)
+                .requestDelivery(Mockito.any(), Mockito.any(), Mockito.any());
     }
 
     private static MenuProduct createMenuProduct(int index, long quantity) {
