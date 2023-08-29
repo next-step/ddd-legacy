@@ -12,18 +12,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.OngoingStubbing;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +42,7 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
-        menuGroup = DummyMenuGroup.defaultMenuGroup();
+        menuGroup = DummyMenuGroup.createMenuGroup();
         menuProducts = List.of(DummyMenuProduct.defaultMenuProduct());
 
     }
@@ -81,20 +78,11 @@ class MenuServiceTest {
         Menu menu = DummyMenu.createMenu(menuGroup, menuProducts);
         menu.setPrice(new BigDecimal(20000));
 
-        setMockDefault();
         when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
 
-        Menu changePrice = menuService.changePrice(menu.getId(), menu);
+        assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
+                .isInstanceOf(IllegalArgumentException.class);
 
-        // then
-        assertAll(
-                () -> assertThat(changePrice.getId()).isNotNull(),
-                () -> assertThat(changePrice.getName()).isEqualTo(menu.getName()),
-                () -> assertThat(changePrice.getPrice()).isEqualTo(menu.getPrice()),
-                () -> assertThat(changePrice.getMenuGroup()).isEqualTo(menu.getMenuGroup()),
-                () -> assertThat(changePrice.isDisplayed()).isEqualTo(menu.isDisplayed()),
-                () -> assertThat(changePrice.getMenuProducts()).isEqualTo(menu.getMenuProducts())
-        );
     }
 
     @DisplayName("메뉴 가격을 작은 값으로 변경한다.")

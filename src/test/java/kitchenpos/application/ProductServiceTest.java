@@ -22,7 +22,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 
 
 public class ProductServiceTest {
@@ -49,7 +48,7 @@ public class ProductServiceTest {
     @DisplayName("상품의 가격은 0원 미만이면 예외가 발생한다.")
     @Test
     void changePrice_over_0() {
-        final Product request = DummyProduct.createProductRequest(-1L );
+        final Product request = DummyProduct.createProductRequest(-1L);
         assertThatThrownBy(() -> productService.create(request))
                 .isInstanceOf(ProductPriceException.class);
 

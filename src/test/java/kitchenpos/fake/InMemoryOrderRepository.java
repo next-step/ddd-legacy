@@ -6,10 +6,10 @@ import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class InMemoryOrderRepository implements OrderRepository {
     HashMap<UUID, Order> entities = new HashMap<>();
+
     @Override
     public Optional<Order> findById(UUID uuid) {
         return Optional.ofNullable(entities.get(uuid));

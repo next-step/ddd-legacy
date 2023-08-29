@@ -2,8 +2,6 @@ package kitchenpos.fake;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;

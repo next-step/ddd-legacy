@@ -27,12 +27,13 @@ public class DummyMenu {
     }
 
     public static Menu createMenu(String name, BigDecimal price, boolean displayed) {
-        return createMenu(name, price, displayed, DummyMenuGroup.defaultMenuGroup());
+        return createMenu(name, price, displayed, DummyMenuGroup.createMenuGroup());
     }
 
     public static Menu createMenu(String name, BigDecimal price) {
         return createMenu(name, price, true);
     }
+
     public static Menu createMenu(String name) {
         return createMenu(name, new BigDecimal(10000));
     }
@@ -50,7 +51,7 @@ public class DummyMenu {
                 "기본 메뉴",
                 new BigDecimal(10000),
                 false,
-                DummyMenuGroup.defaultMenuGroup(),
+                DummyMenuGroup.createMenuGroup(),
                 List.of(DummyMenuProduct.defaultMenuProduct())
         );
     }

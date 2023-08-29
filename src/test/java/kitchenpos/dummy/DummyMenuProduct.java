@@ -12,6 +12,7 @@ public class DummyMenuProduct {
         menuProduct.setProductId(DummyProduct.defaultProduct().getId());
         return menuProduct;
     }
+
     public static MenuProduct defaultMenuProduct() {
         return createMenuProduct();
     }
