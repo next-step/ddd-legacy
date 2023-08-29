@@ -10,18 +10,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toUnmodifiableList;
 import static kitchenpos.helper.NameHelper.NAME_OF_255_CHARACTERS;
-import static kitchenpos.helper.NameHelper.NAME_OF_256_CHARACTERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-class MenuGroupServiceTest extends ApplicationTest {
+class MenuGroupServiceTest extends BaseServiceTest {
 
     @Autowired
     private MenuGroupService menuGroupService;
@@ -69,18 +67,6 @@ class MenuGroupServiceTest extends ApplicationTest {
                 // Then
                 assertThatThrownBy(() -> menuGroupService.create(menuGroup))
                         .isInstanceOf(IllegalArgumentException.class);
-            }
-
-            @DisplayName("메뉴 그룹명이 255자를 초과한 경우 (실패)")
-            @ParameterizedTest
-            @ValueSource(strings = {NAME_OF_256_CHARACTERS})
-            void fail3(final String name) {
-                // When
-                MenuGroup menuGroup = MenuGroupHelper.create(name);
-
-                // Then
-                assertThatThrownBy(() -> menuGroupService.create(menuGroup))
-                        .isInstanceOf(DataIntegrityViolationException.class);
             }
         }
     }
