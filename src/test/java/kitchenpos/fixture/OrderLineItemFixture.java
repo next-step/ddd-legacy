@@ -10,7 +10,11 @@ import static kitchenpos.fixture.MenuFixture.createMenu;
 
 public class OrderLineItemFixture {
     public static OrderLineItem createOrderLineItem() {
-        return createOrderLineItem(1L, createMenu(), 1, BigDecimal.TEN);
+        return createOrderLineItem(null, createMenu(), 1, BigDecimal.TEN);
+    }
+
+    public static OrderLineItem createOrderLineItem(final Menu menu) {
+        return createOrderLineItem(null, menu, 1, BigDecimal.TEN);
     }
 
     public static OrderLineItem createOrderLineItem(
