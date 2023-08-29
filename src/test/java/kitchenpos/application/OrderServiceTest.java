@@ -300,6 +300,20 @@ class OrderServiceTest extends BaseServiceTest {
         assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
+    @DisplayName("제공 될 주문은 주문 승인이 된 상태여야 한다")
+    @EnumSource(value = OrderStatus.class, names = {"ACCEPTED"}, mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void test16(final OrderStatus orderStatus) {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
+        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), orderStatus, orderLineItems));
+
+        assertThatIllegalStateException().isThrownBy(() -> orderService.serve(order.getId()));
+    }
+
     private static class OrderLineItemFields {
         final Menu menu;
         final long quantity;
