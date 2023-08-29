@@ -6,9 +6,11 @@ import kitchenpos.support.BaseServiceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -187,6 +189,21 @@ class OrderServiceTest extends BaseServiceTest {
         final Order order = createOrder(OrderType.EAT_IN, null, orderLineItems, orderTable);
 
         assertThatIllegalStateException().isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("매장 식사의 경우가 아닐 경우 주문 목록의 메뉴 수랑은 필수 이다.")
+    @ParameterizedTest
+    @EnumSource(value = OrderType.class, names = {"EAT_IN"}, mode = EnumSource.Mode.EXCLUDE)
+    void test10(final OrderType orderType) {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, -1));
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
+        final Order order = createOrder(orderType, "주소", orderLineItems, orderTable);
+
+        assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
     }
 
     private static class OrderLineItemFields {
