@@ -13,10 +13,10 @@ public final class OrderHelper {
     private OrderHelper() {
     }
 
-    public static Order createOrderTypeIsDelivery(OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress) {
+public static Order createOrderTypeIsDelivery(List<OrderLineItem> orderLineItems, String deliveryAddress) {
         Order order = new Order();
         order.setId(UUID.randomUUID());
-        order.setType(orderType);
+        order.setType(OrderType.DELIVERY);
         order.setOrderLineItems(orderLineItems);
         order.setDeliveryAddress(deliveryAddress);
         return order;
