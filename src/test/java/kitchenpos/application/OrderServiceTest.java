@@ -284,6 +284,22 @@ class OrderServiceTest extends BaseServiceTest {
         assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
+    @DisplayName("주문 제공이 가능하다")
+    @Test
+    void test16() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 3, BigDecimal.TEN));
+        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), OrderStatus.ACCEPTED, orderLineItems));
+
+        final Order servedOrder = orderService.serve(order.getId());
+
+        assertThat(servedOrder.getId()).isEqualTo(order.getId());
+        assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
+
     private static class OrderLineItemFields {
         final Menu menu;
         final long quantity;
