@@ -3,6 +3,7 @@ package kitchenpos.application;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import kitchenpos.domain.MenuGroup;
@@ -21,6 +22,11 @@ public class MenuGroupFakeRepository implements MenuGroupRepository {
         menuGroups.put(entity.getId(), entity);
 
         return entity;
+    }
+
+    @Override
+    public Optional<MenuGroup> findById(final UUID id) {
+        return Optional.ofNullable(menuGroups.get(id));
     }
 
     @Override

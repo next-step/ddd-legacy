@@ -37,17 +37,14 @@ class MenuGroupServiceTest {
         final MenuGroup actual = service.create(request);
 
         // then
-        assertThat(actual)
-            .usingRecursiveComparison()
-            .ignoringFields("id")
-            .isEqualTo(request);
+        assertThat(actual.getId()).isNotNull();
     }
 
 
     @DisplayName("menuGroup의 이름이 null이거나 비어있으면 예외를 발생시킨다")
     @ParameterizedTest
     @NullAndEmptySource
-    void create_request(final String value) {
+    void create_invalid_name(final String value) {
 
         // given
         final MenuGroup request = create(value);

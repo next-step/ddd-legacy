@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupJpaRepository;
+import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
@@ -22,13 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final MenuGroupJpaRepository menuGroupRepository;
+    private final MenuGroupRepository menuGroupRepository;
     private final ProductRepository productRepository;
     private final PurgomalumClient purgomalumClient;
 
     public MenuService(
         final MenuRepository menuRepository,
-        final MenuGroupJpaRepository menuGroupRepository,
+        final MenuGroupRepository menuGroupRepository,
         final ProductRepository productRepository,
         final PurgomalumClient purgomalumClient
     ) {
