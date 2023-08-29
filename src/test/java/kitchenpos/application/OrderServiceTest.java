@@ -431,6 +431,7 @@ class OrderServiceTest {
                     .map(orderLineItem -> orderLineItem.getMenu().getPrice().multiply(BigDecimal.valueOf(orderLineItem.getQuantity())))
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
             doNothing().when(kitchenridersClient).requestDelivery(order.getId(), orderPrice, order.getDeliveryAddress());
+
             // when
             Order result = sut.accept(order.getId());
 
