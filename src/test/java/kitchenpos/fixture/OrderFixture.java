@@ -23,9 +23,13 @@ public class OrderFixture {
     }
 
     public static Order createOrder(final OrderType type, final String deliveryAddress, final List<OrderLineItem> orderLineItems, final OrderTable orderTable) {
+        return createOrder(null, type, OrderStatus.COMPLETED, deliveryAddress, orderLineItems, orderTable);
+    }
+
+    public static Order createOrder(final UUID id, final OrderType type, final OrderStatus orderStatus, final String deliveryAddress, final List<OrderLineItem> orderLineItems, final OrderTable orderTable) {
         final UUID orderTableId = orderTable == null ? null : orderTable.getId();
         return createOrder(
-                null, type, OrderStatus.COMPLETED,
+                id, type, orderStatus,
                 LocalDateTime.now(), orderLineItems, deliveryAddress,
                 orderTable, orderTableId
         );

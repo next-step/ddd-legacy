@@ -330,6 +330,36 @@ class OrderServiceTest extends BaseServiceTest {
         assertThat(startedDeliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     }
 
+    @DisplayName("주문 배달 시작은 주문 수령 방법이 배달이어야 한다.")
+    @EnumSource(value = OrderType.class, names = {"DELIVERY"}, mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void test18(final OrderType orderType) {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
+        final Order order = orderRepository.save(createOrder(UUID.randomUUID(), orderType, OrderStatus.SERVED, "청주시", orderLineItems, orderTable));
+
+        assertThatIllegalStateException().isThrownBy(() -> orderService.startDelivery(order.getId()));
+    }
+
+    @DisplayName("주문 배달 시작은 주문 수령 방법이 배달이어야 한다.")
+    @EnumSource(value = OrderStatus.class, names = {"SERVED"}, mode = EnumSource.Mode.EXCLUDE)
+    @ParameterizedTest
+    void test19(final OrderStatus orderStatus) {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
+        final Order order = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.DELIVERY, orderStatus, "청주시", orderLineItems, orderTable));
+
+        assertThatIllegalStateException().isThrownBy(() -> orderService.startDelivery(order.getId()));
+    }
+
     private static class OrderLineItemFields {
         final Menu menu;
         final long quantity;
