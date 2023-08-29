@@ -17,9 +17,11 @@ import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.OrderFixture.createDeliveryOrder;
+import static kitchenpos.fixture.OrderFixture.createOrder;
 import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 class OrderServiceTest extends BaseServiceTest {
     private final OrderService orderService;
@@ -66,6 +68,19 @@ class OrderServiceTest extends BaseServiceTest {
         assertThat(createdOrder.getOrderTable()).isEqualTo(order.getOrderTable());
         assertThat(createdOrder.getOrderTableId()).isEqualTo(order.getOrderTableId());
         assertThat(foundOrder.getId()).isEqualTo(createdOrder.getId());
+    }
+
+    @DisplayName("주문의 수령 방법은 필수이다.")
+    @Test
+    void test2() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
+        final Order order = createOrder(null, null, orderLineItems, null);
+
+        assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
     }
 
     private static class OrderLineItemFields {
