@@ -19,6 +19,7 @@ public class OrderTableApi {
     private static final String API_ORDER_TABLE_URL = "/api/order-tables";
     private static final String API_ORDER_TABLE_SIT_URL = "/api/order-tables/{orderTableId}/sit";
     private static final String API_ORDER_TABLE_CLEAR_URL = "/api/order-tables/{orderTableId}/clear";
+    private static final String API_ORDER_TABLE_CHANGE_NUMBER_OF_GUESTS_URL = "/api/order-tables/{orderTableId}/number-of-guests";
 
     private static final String ORDER_TABLE_ID_EXTRACT_PATTERN_FROM_LOCATION = "/api/order-tables/([a-fA-F0-9-]+)";
     private static final Pattern ORDER_TABLE_ID_EXTRACT_PATTERN = Pattern.compile(ORDER_TABLE_ID_EXTRACT_PATTERN_FROM_LOCATION);
@@ -53,6 +54,17 @@ public class OrderTableApi {
     }
 
     public static void 주문테이블_정리_성공함(MockHttpServletResponse response) {
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    public static MockHttpServletResponse 주문테이블_손님수_변경_요청(MockMvc mockMvc, String orderTableId, Map<String, Object> request) throws Exception {
+        return mockMvc.perform(put(API_ORDER_TABLE_CHANGE_NUMBER_OF_GUESTS_URL.replace("{orderTableId}", orderTableId))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andReturn().getResponse();
+    }
+
+    public static void 주문테이블_손님수_변경_성공함(MockHttpServletResponse response) {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     }
 
