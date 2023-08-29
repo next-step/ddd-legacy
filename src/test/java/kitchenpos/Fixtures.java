@@ -97,6 +97,29 @@ public class Fixtures {
         return orderTable;
     }
 
+    public static OrderTable 주문테이블_생성(String name) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName(name);
+        return orderTable;
+    }
+
+    public static OrderTable 주문테이블_생성(String name, int numberOfGuests, boolean empty) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName(name);
+        orderTable.setNumberOfGuests(numberOfGuests);
+        orderTable.setOccupied(empty);
+        return orderTable;
+    }
+
+    public static OrderTable 망가진_테이블() {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setName("보수중 - 앉으면 망가져요");
+        orderTable.setNumberOfGuests(1);
+        return orderTable;
+    }
+
     public static Menu 메뉴_생성_두마리_매콤_치킨_시험중() {
         final Product product = 상품_생성("매콤 후라이드", 0L);
         final MenuGroup menuGroup = 메뉴그룹_생성("매콤 치킨 세트");
