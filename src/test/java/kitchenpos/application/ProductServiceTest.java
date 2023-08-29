@@ -46,8 +46,7 @@ class ProductServiceTest {
     @BeforeEach
     void setUp() {
         product1 = new Product();
-        UUID productId = UUID.randomUUID();
-        product1.setId(productId);
+        product1.setId(UUID.randomUUID());
         product1.setName("상품1");
         product1.setPrice(BigDecimal.valueOf(100));
 
