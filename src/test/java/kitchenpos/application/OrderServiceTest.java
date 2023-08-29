@@ -99,10 +99,32 @@ class OrderServiceTest extends BaseServiceTest {
         assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
     }
 
+    @DisplayName("주문 수령 방법이 배달일 경우 배달지 주소가 있으면 주문이 가능하다")
+    @Test
+    void test5(){
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
+        final Order order = createOrder(OrderType.DELIVERY, "청주시", orderLineItems, null);
+
+        final Order createdOrder = orderService.create(order);
+
+        assertThat(createdOrder.getId()).isNotNull();
+        assertThat(createdOrder.getType()).isEqualTo(order.getType());
+        assertThat(createdOrder.getStatus()).isEqualTo(OrderStatus.WAITING);
+        assertThat(createdOrder.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(createdOrder.getOrderLineItems())
+                .map(OrderLineItemFields::new)
+                .containsExactlyElementsOf(order.getOrderLineItems().stream().map(OrderLineItemFields::new).collect(Collectors.toList()));
+        assertThat(createdOrder.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress());
+    }
+
     @DisplayName("주문 수령 방법이 배달일 경우 배달지 주소는 필수이다.")
     @NullAndEmptySource
     @ParameterizedTest
-    void test5(final String deliveryAddress) {
+    void test6(final String deliveryAddress) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
         final MenuProduct menuProduct = createMenuProduct(product);
@@ -113,18 +135,56 @@ class OrderServiceTest extends BaseServiceTest {
         assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
     }
 
-    @DisplayName("주문 수령 방법이 매장내 식사의 경우 테이블은 필수이다")
+    @DisplayName("주문 수령 방법이 매장내 식사의 경우 테이블 착석중이면 주문이 가능하다")
     @Test
-    void test6() {
+    void test7(){
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
         final MenuProduct menuProduct = createMenuProduct(product);
         final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct))));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
-        final OrderTable orderTable = createOrderTable(UUID.randomUUID(), 5, false);
-        final Order order = createOrder(OrderType.EAT_IN, "청주시", orderLineItems, orderTable);
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
+        final Order order = createOrder(OrderType.EAT_IN, null, orderLineItems, orderTable);
+
+        final Order createdOrder = orderService.create(order);
+
+        assertThat(createdOrder.getId()).isNotNull();
+        assertThat(createdOrder.getType()).isEqualTo(order.getType());
+        assertThat(createdOrder.getStatus()).isEqualTo(OrderStatus.WAITING);
+        assertThat(createdOrder.getOrderDateTime()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(createdOrder.getOrderLineItems())
+                .map(OrderLineItemFields::new)
+                .containsExactlyElementsOf(order.getOrderLineItems().stream().map(OrderLineItemFields::new).collect(Collectors.toList()));
+        assertThat(createdOrder.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress());
+        assertThat(createdOrder.getOrderTable()).isEqualTo(order.getOrderTable());
+    }
+
+    @DisplayName("주문 수령 방법이 매장내 식사의 경우 테이블은 필수이다")
+    @Test
+    void test8() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
+        final OrderTable orderTable = createOrderTable(UUID.randomUUID(), 5, true);
+        final Order order = createOrder(OrderType.EAT_IN, null, orderLineItems, orderTable);
 
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("주문 수령 방법이 매장내 식사의 경우 테이블이 미착석이면 주문을 실패한다.")
+    @Test
+    void test9() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
+        final Order order = createOrder(OrderType.EAT_IN, null, orderLineItems, orderTable);
+
+        assertThatIllegalStateException().isThrownBy(() -> orderService.create(order));
     }
 
     private static class OrderLineItemFields {
