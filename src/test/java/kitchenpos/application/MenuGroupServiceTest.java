@@ -11,7 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static kitchenpos.Fixtures.createMenuGroup;
+import static kitchenpos.Fixtures.메뉴그룹_생성;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,7 +37,7 @@ class MenuGroupServiceTest {
     @DisplayName("메뉴그룹을 등록한다")
     void saveMenuGroup() {
         // given
-        final MenuGroup 요청_객체 = createMenuGroup(한식);
+        final MenuGroup 요청_객체 = 메뉴그룹_생성(한식);
 
         given(menuGroupRepository.save(any()))
                 .willReturn(요청_객체);
@@ -52,7 +52,7 @@ class MenuGroupServiceTest {
     @DisplayName("메뉴그룹 이름은 비어있거나 공백일 수 없다")
     void requireMenuGroupName() {
         // given
-        final MenuGroup request = createMenuGroup(공백);
+        final MenuGroup request = 메뉴그룹_생성(공백);
 
         // when & then
         assertThatThrownBy(() -> menuGroupService.create(request))
@@ -63,8 +63,8 @@ class MenuGroupServiceTest {
     @DisplayName("메뉴 그룹 목록을 조회한다")
     void findAllByMenuGroup() {
         // given
-        final MenuGroup 요청_객체_1 = createMenuGroup(한식);
-        final MenuGroup 요청_객체_2 = createMenuGroup(일식);
+        final MenuGroup 요청_객체_1 = 메뉴그룹_생성(한식);
+        final MenuGroup 요청_객체_2 = 메뉴그룹_생성(일식);
 
         given(menuGroupRepository.findAll())
                 .willReturn(List.of(요청_객체_1, 요청_객체_2));
