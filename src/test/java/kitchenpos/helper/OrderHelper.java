@@ -22,19 +22,19 @@ public static Order createOrderTypeIsDelivery(List<OrderLineItem> orderLineItems
         return order;
     }
 
-    public static Order createOrderTypeIsEatIn(OrderType orderType, List<OrderLineItem> orderLineItems, UUID orderTableId) {
+    public static Order createOrderTypeIsEatIn(List<OrderLineItem> orderLineItems, UUID orderTableId) {
         Order order = new Order();
         order.setId(UUID.randomUUID());
-        order.setType(orderType);
+        order.setType(OrderType.EAT_IN);
         order.setOrderLineItems(orderLineItems);
         order.setOrderTableId(orderTableId);
         return order;
     }
 
-    public static Order createOrderTypeIsTakeOut(OrderType orderType, List<OrderLineItem> orderLineItems) {
+    public static Order createOrderTypeIsTakeOut(List<OrderLineItem> orderLineItems) {
         Order order = new Order();
         order.setId(UUID.randomUUID());
-        order.setType(orderType);
+        order.setType(OrderType.TAKEOUT);
         order.setOrderLineItems(orderLineItems);
         return order;
     }

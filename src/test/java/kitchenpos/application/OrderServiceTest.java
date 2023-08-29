@@ -147,24 +147,24 @@ class OrderServiceTest extends BaseServiceTest {
     }
 
     private Order getOrderThatTypeIsDelivery(List<OrderLineItem> orderLineItems, String deliveryAddress) {
-        return OrderHelper.createOrderTypeIsDelivery(OrderType.DELIVERY, orderLineItems, deliveryAddress);
+        return OrderHelper.createOrderTypeIsDelivery(orderLineItems, deliveryAddress);
     }
 
     private Order getOrderThatTypeIsEatIn(List<OrderLineItem> orderLineItems, UUID orderTableId) {
-        return OrderHelper.createOrderTypeIsEatIn(OrderType.EAT_IN, orderLineItems, orderTableId);
+        return OrderHelper.createOrderTypeIsEatIn(orderLineItems, orderTableId);
     }
 
     private Order getOrder(OrderType orderType, List<OrderLineItem> orderLineItems) {
         if (orderType == OrderType.DELIVERY) {
-            return OrderHelper.createOrderTypeIsDelivery(orderType, orderLineItems, "배달 주소");
+            return OrderHelper.createOrderTypeIsDelivery(orderLineItems, "배달 주소");
         }
 
         if (orderType == OrderType.EAT_IN) {
-            return OrderHelper.createOrderTypeIsEatIn(orderType, orderLineItems, occupiedOrderTable.getId());
+            return OrderHelper.createOrderTypeIsEatIn(orderLineItems, occupiedOrderTable.getId());
         }
 
         if (orderType == OrderType.TAKEOUT) {
-            return OrderHelper.createOrderTypeIsTakeOut(orderType, orderLineItems);
+            return OrderHelper.createOrderTypeIsTakeOut(orderLineItems);
         }
 
         return OrderHelper.create(orderType, orderLineItems, null, null);
