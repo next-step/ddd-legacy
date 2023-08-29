@@ -604,13 +604,9 @@ class OrderServiceTest extends BaseServiceTest {
 
             @DisplayName("주문 유형이 배달인 아닌 경우 (실패)")
             @ParameterizedTest
-            @EnumSource
+            @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
             void fail1(final OrderType orderType) {
                 // Given
-                if (orderType == OrderType.DELIVERY) {
-                    return;
-                }
-
                 List<OrderLineItem> orderLineItems = createOrderLineItems();
                 Order order = getOrder(orderType, orderLineItems);
                 Order createdOrder = orderService.create(order);
@@ -755,13 +751,9 @@ class OrderServiceTest extends BaseServiceTest {
         class Policy2 {
             @DisplayName("주문 상태가 제공 상태인 경우 (성공)")
             @ParameterizedTest
-            @EnumSource
+            @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
             void success1(final OrderType orderType) {
                 // Given
-                if (orderType == OrderType.DELIVERY) {
-                    return;
-                }
-
                 List<OrderLineItem> orderLineItems = createOrderLineItems();
                 Order order = getOrder(orderType, orderLineItems);
                 Order createdOrder = orderService.create(order);
@@ -778,13 +770,9 @@ class OrderServiceTest extends BaseServiceTest {
 
             @DisplayName("주문 상태가 제공 상태가 아닌 경우 (실패)")
             @ParameterizedTest
-            @EnumSource
+            @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
             void fail1(final OrderType orderType) {
                 // Given
-                if (orderType == OrderType.DELIVERY) {
-                    return;
-                }
-
                 List<OrderLineItem> orderLineItems = createOrderLineItems();
                 Order order = getOrder(orderType, orderLineItems);
                 Order createdOrder = orderService.create(order);
