@@ -45,7 +45,27 @@ public class MenuFixtures {
 
     public static MenuProduct 메뉴_상품_등록(Product product, long quantity) {
         MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProductId(UUID.randomUUID());
         menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
+
+
+
+    public static Menu 메뉴_등록_요청(String name, int price, boolean displayed, List<MenuProduct> menuProducts) {
+        Menu menu = new Menu();
+        menu.setName(name);
+        menu.setPrice(new BigDecimal(price));
+        menu.setDisplayed(displayed);
+        menu.setMenuGroupId(UUID.randomUUID());
+        menu.setMenuProducts(menuProducts);
+        return menu;
+    }
+
+    public static MenuProduct 메뉴_상품_등록_요청(long quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProductId(UUID.randomUUID());
         menuProduct.setQuantity(quantity);
         return menuProduct;
     }

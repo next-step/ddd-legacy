@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class ProductFixtures {
     private static final String name = "등심돈까스";
-    private static final int price = 100000;
+    private static final int price = 15000;
 
 
     public static Product 상품_등록() {

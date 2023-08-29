@@ -84,7 +84,7 @@ public class ProductServiceTest extends ApplicationTest {
         );
     }
 
-    @DisplayName("상품 등록 시 상품 이름(비속어)을 체크 한다.")
+    @DisplayName("상품 등록시 상품 이름(비속어)을 체크 한다.")
     @ParameterizedTest
     @ValueSource(strings = {"fuck"})
     void createCheckName(String name) {
