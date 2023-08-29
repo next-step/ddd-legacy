@@ -5,6 +5,8 @@ import kitchenpos.infra.KitchenridersClient;
 import kitchenpos.support.BaseServiceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
@@ -96,6 +98,20 @@ class OrderServiceTest extends BaseServiceTest {
     @Test
     void test4() {
         final Order order = createOrder(OrderType.DELIVERY, "delivery", Collections.emptyList(), null);
+
+        assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("주문 수령 방법이 배달일 경우 배달지 주소는 필수이다.")
+    @NullAndEmptySource
+    @ParameterizedTest
+    void test5(final String deliveryAddress) {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
+        final Order order = createOrder(OrderType.DELIVERY, deliveryAddress, orderLineItems, null);
 
         assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
     }
