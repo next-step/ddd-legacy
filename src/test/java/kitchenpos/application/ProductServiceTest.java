@@ -28,6 +28,7 @@ import static kitchenpos.helper.NameHelper.NAME_OF_255_CHARACTERS;
 import static kitchenpos.helper.ProductHelper.DEFAULT_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class ProductServiceTest extends BaseServiceTest {
@@ -43,6 +44,13 @@ class ProductServiceTest extends BaseServiceTest {
 
     @SpyBean
     private PurgomalumClient purgomalumClient;
+
+
+    @BeforeEach
+    void beforeEach() {
+        when(purgomalumClient.containsProfanity(any()))
+                .thenReturn(false);
+    }
 
 
     @DisplayName("새로운 상품을 등록한다.")

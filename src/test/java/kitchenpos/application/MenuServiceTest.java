@@ -30,6 +30,7 @@ import static kitchenpos.helper.NameHelper.NAME_OF_255_CHARACTERS;
 import static kitchenpos.helper.NameHelper.NAME_OF_256_CHARACTERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 class MenuServiceTest extends BaseServiceTest {
@@ -55,6 +56,12 @@ class MenuServiceTest extends BaseServiceTest {
                 .mapToObj(i -> createMenuProduct(i, i + 1))
                 .collect(toUnmodifiableList());
         createdMenuGroup = menuGroupService.create(MenuGroupHelper.create());
+    }
+
+    @BeforeEach
+    void beforeEach() {
+        when(purgomalumClient.containsProfanity(any()))
+                .thenReturn(false);
     }
 
     private static MenuProduct createMenuProduct(int index, long quantity) {
