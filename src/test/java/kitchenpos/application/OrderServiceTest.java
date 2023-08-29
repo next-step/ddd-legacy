@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -218,6 +219,20 @@ class OrderServiceTest extends BaseServiceTest {
         final Order order = createOrder(OrderType.EAT_IN, null, orderLineItems, orderTable);
 
         assertThatIllegalStateException().isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("주문 요청시의 주문 목록 가격과 현재 메뉴 가격은 같아야 한다")
+    @Test
+    void test12() {
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
+        final Product product = productRepository.save(createProduct(UUID.randomUUID()));
+        final MenuProduct menuProduct = createMenuProduct(product);
+        final Menu menu = menuRepository.save(menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct))));
+        final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, -1, BigDecimal.TEN));
+        final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
+        final Order order = createOrder(OrderType.EAT_IN, null, orderLineItems, orderTable);
+
+        assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
     }
 
     private static class OrderLineItemFields {

@@ -22,6 +22,12 @@ public class OrderLineItemFixture {
     }
 
     public static OrderLineItem createOrderLineItem(
+            final Menu menu, final long quantity, final BigDecimal price
+    ) {
+        return createOrderLineItem(null, menu, quantity, menu.getId(), price);
+    }
+
+    public static OrderLineItem createOrderLineItem(
             final Long seq, final Menu menu, final long quantity, final BigDecimal price
     ) {
         return createOrderLineItem(seq, menu, quantity, menu.getId(), price);

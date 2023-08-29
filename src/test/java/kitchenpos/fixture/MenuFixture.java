@@ -55,6 +55,13 @@ public class MenuFixture {
         );
     }
 
+    public static Menu createMenu(final UUID id, final BigDecimal price, final MenuGroup menuGroup, final boolean displayed, final List<MenuProduct> menuProducts) {
+        return createMenu(
+                id, "치킨", price,
+                menuGroup, displayed, menuProducts
+        );
+    }
+
     public static Menu createMenu(
             final UUID id, final String name, final BigDecimal price,
             final MenuGroup menuGroup, final List<MenuProduct> menuProducts
