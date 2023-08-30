@@ -68,7 +68,9 @@ public class Fixtures {
     public static Order createOrder(OrderStatus orderStatus, OrderType orderType, List<OrderLineItem> orderLineItems, String deliveryAddress) {
         Order order = new Order();
         order.setId(UUID.randomUUID());
-        order.setOrderTable(createOrderTable("테이블", false));
+        OrderTable orderTable = createOrderTable("테이블", false);
+        order.setOrderTable(orderTable);
+        order.setOrderTableId(orderTable.getId());
         order.setStatus(orderStatus);
         order.setType(orderType);
         order.setOrderDateTime(LocalDateTime.now());

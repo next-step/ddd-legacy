@@ -163,6 +163,193 @@ class OrderServiceTest {
         assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    @DisplayName("주문이 수락되는 경우, 주문상태를 접수로 변경한다.")
+    void accept01() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        Order acceptedOrder = orderService.accept(savedOrder.getId());
+
+        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @Test
+    @DisplayName("주문 수락의 경우 주문상태가 대기만 가능하다.")
+    void accept02() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.ACCEPTED, OrderType.TAKEOUT, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.accept(savedOrder.getId())).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("주문이 제공되면 주문상태를 주문제공으로 변경한다.")
+    void serve01() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.ACCEPTED, OrderType.DELIVERY, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        Order acceptedOrder = orderService.serve(savedOrder.getId());
+
+        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
+
+    @Test
+    @DisplayName("주문이 제공되는 경우 주문상태가 접수만 가능하다.")
+    void serve02() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.WAITING, OrderType.DELIVERY, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.serve(savedOrder.getId())).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("배달이 시작되는 경우 주문상태를 배달중으로 변경한다.")
+    void startDelivery01() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.SERVED, OrderType.DELIVERY, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        Order acceptedOrder = orderService.startDelivery(savedOrder.getId());
+
+        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+    }
+
+    @Test
+    @DisplayName("배달이 시작되는 경우 주문상태가 주문제공만 가능하다.")
+    void startDelivery02() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.ACCEPTED, OrderType.DELIVERY, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.startDelivery(savedOrder.getId())).isInstanceOf(
+                IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("배달이 시작되는 경우 주문상태가 주문제공만 가능하다.")
+    void startDelivery03() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.SERVED, OrderType.EAT_IN, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.startDelivery(savedOrder.getId())).isInstanceOf(
+                IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("배달이 종료되는 경우 주문상태를 배달완료로 변경한다.")
+    void completeDelivery01() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.DELIVERING, OrderType.DELIVERY, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        Order completeDelivery = orderService.completeDelivery(savedOrder.getId());
+
+        assertThat(completeDelivery.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+    }
+
+    @Test
+    @DisplayName("배달이 종료되는 경우 주문상태가 배달주문만 가능하다.")
+    void completeDelivery02() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.ACCEPTED, OrderType.DELIVERY, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.completeDelivery(savedOrder.getId())).isInstanceOf(
+                IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("주문을 종료하는 경우 주문상태를 완료 로 변경한다.")
+    void complete01() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.SERVED, OrderType.TAKEOUT, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        Order complete = orderService.complete(savedOrder.getId());
+
+        assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("주문 종료에서 주문타입이 배달주문인경우, 주문상태가 배달완료면 안된다.")
+    void complete02() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.SERVED, OrderType.DELIVERY, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.complete(savedOrder.getId())).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("주문 종료에서 주문타입이 포장주문 또는, 매장주문인 경우, 주문상태는 주문제공이면 안된다.")
+    void complete03() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.complete(savedOrder.getId())).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("주문타입이 매장주문 경우, 해당 테이블의 종료된 상태면 손님의 수와, 테이블 여부를 초기화 한다.")
+    void complete04() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.SERVED, OrderType.EAT_IN, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        Order complete = orderService.complete(savedOrder.getId());
+
+        assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        OrderTable orderTable = complete.getOrderTable();
+        assertThat(orderTable.getNumberOfGuests()).isZero();
+        assertThat(orderTable.isOccupied()).isFalse();
+    }
+
     private OrderTable getSavedOrderTable(boolean occupied) {
         OrderTable orderTable = createOrderTable("테이블", occupied);
         return orderTableRepository.save(orderTable);
