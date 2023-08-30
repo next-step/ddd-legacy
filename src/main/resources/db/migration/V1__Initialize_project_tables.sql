@@ -6,14 +6,14 @@ create table menu
     price         decimal(19, 2) not null,
     menu_group_id binary(16)     not null,
     primary key (id)
-) engine = InnoDB;
+);
 
 create table menu_group
 (
     id   binary(16)   not null,
     name varchar(255) not null,
     primary key (id)
-) engine = InnoDB;
+);
 
 create table menu_product
 (
@@ -22,7 +22,7 @@ create table menu_product
     product_id binary(16) not null,
     menu_id    binary(16) not null,
     primary key (seq)
-) engine = InnoDB;
+);
 
 create table order_line_item
 (
@@ -31,7 +31,7 @@ create table order_line_item
     menu_id  binary(16) not null,
     order_id binary(16) not null,
     primary key (seq)
-) engine = InnoDB;
+);
 
 create table order_table
 (
@@ -40,7 +40,7 @@ create table order_table
     name             varchar(255) not null,
     number_of_guests integer      not null,
     primary key (id)
-) engine = InnoDB;
+);
 
 create table orders
 (
@@ -51,7 +51,7 @@ create table orders
     type             varchar(255) not null,
     order_table_id   binary(16),
     primary key (id)
-) engine = InnoDB;
+);
 
 create table product
 (
@@ -59,7 +59,7 @@ create table product
     name  varchar(255)   not null,
     price decimal(19, 2) not null,
     primary key (id)
-) engine = InnoDB;
+);
 
 alter table menu
     add constraint fk_menu_to_menu_group
