@@ -14,8 +14,8 @@ import java.math.BigDecimal;
 import static kitchenpos.acceptance.acceptance_step.MenuStep.상품_가격보다_메뉴_가격이_높아져서_메뉴가_숨김_상태로_변경됐다;
 import static kitchenpos.acceptance.acceptance_step.MenuStep.메뉴가_등록된_상태다;
 import static kitchenpos.acceptance.acceptance_step.ProductStep.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
+@DisplayName("상품 인수 테스트")
 class ProductAcceptanceTest extends AcceptanceTestBase {
 
     @Autowired

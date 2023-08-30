@@ -18,7 +18,7 @@
 - Controller 테스트 코드 작성
   - [x] ProductRestController 테스트 작성
   - [ ] MenuRestController 테스트 작성
-  - [ ] MenuGroupRestController 테스트 작성
+  - [x] MenuGroupRestController 테스트 작성
   - [ ] OrderTableRestController 테스트 작성
   - [ ] OrderRestController 테스트 작성
 
