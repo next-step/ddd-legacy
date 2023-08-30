@@ -15,7 +15,7 @@ public class OrderFixture {
         );
     }
 
-    public static Order createDeliveryOrder(final UUID id, final OrderStatus status, final List<OrderLineItem> orderLineItems) {
+    public static Order createDeliveryOrderWithDefaultId(final UUID id, final OrderStatus status, final List<OrderLineItem> orderLineItems) {
         return createOrder(
                 id, OrderType.DELIVERY, status,
                 LocalDateTime.now(), orderLineItems, "청주시",

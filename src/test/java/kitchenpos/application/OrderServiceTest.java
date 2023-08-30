@@ -1,6 +1,8 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.MenuProductFixture;
+import kitchenpos.fixture.OrderFixture;
 import kitchenpos.infra.KitchenridersClient;
 import kitchenpos.support.BaseServiceTest;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 
 import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
-import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
+import static kitchenpos.fixture.MenuProductFixture.createMenuProductWithDefaultId;
 import static kitchenpos.fixture.OrderFixture.createDeliveryOrder;
 import static kitchenpos.fixture.OrderFixture.createOrder;
 import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
@@ -52,7 +54,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test1() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
         final Order order = createDeliveryOrder(orderLineItems);
@@ -79,7 +81,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test2() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
         final Order order = createOrder(null, null, orderLineItems, null);
@@ -108,7 +110,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test5() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
         final Order order = createOrder(OrderType.DELIVERY, "청주시", orderLineItems, null);
@@ -131,7 +133,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test6(final String deliveryAddress) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
         final Order order = createOrder(OrderType.DELIVERY, deliveryAddress, orderLineItems, null);
@@ -145,7 +147,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test7(final long quantity) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, quantity));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
@@ -169,7 +171,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test8() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
         final OrderTable orderTable = createOrderTable(UUID.randomUUID(), 5, true);
@@ -183,7 +185,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test9() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
@@ -198,7 +200,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test10(final OrderType orderType) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, -1));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
@@ -212,7 +214,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test11() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), menuGroup, false, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, -1));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
@@ -226,7 +228,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test12() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, -1, BigDecimal.TEN));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
@@ -240,10 +242,10 @@ class OrderServiceTest extends BaseServiceTest {
     void test13() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
-        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), OrderStatus.WAITING, orderLineItems));
+        final Order order = orderRepository.save(OrderFixture.createDeliveryOrderWithDefaultId(UUID.randomUUID(), OrderStatus.WAITING, orderLineItems));
 
         final Order acceptedOrder = orderService.accept(order.getId());
 
@@ -257,10 +259,10 @@ class OrderServiceTest extends BaseServiceTest {
     void test14(final OrderStatus orderStatus) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
-        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), orderStatus, orderLineItems));
+        final Order order = orderRepository.save(OrderFixture.createDeliveryOrderWithDefaultId(UUID.randomUUID(), orderStatus, orderLineItems));
 
         assertThatIllegalStateException().isThrownBy(() -> orderService.accept(order.getId()));
     }
@@ -270,10 +272,10 @@ class OrderServiceTest extends BaseServiceTest {
     void test15() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 3, BigDecimal.TEN));
-        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), OrderStatus.WAITING, orderLineItems));
+        final Order order = orderRepository.save(OrderFixture.createDeliveryOrderWithDefaultId(UUID.randomUUID(), OrderStatus.WAITING, orderLineItems));
 
         doNothing().when(kitchenridersClient).requestDelivery(order.getId(), BigDecimal.valueOf(30), order.getDeliveryAddress());
 
@@ -288,10 +290,10 @@ class OrderServiceTest extends BaseServiceTest {
     void test16() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 3, BigDecimal.TEN));
-        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), OrderStatus.ACCEPTED, orderLineItems));
+        final Order order = orderRepository.save(OrderFixture.createDeliveryOrderWithDefaultId(UUID.randomUUID(), OrderStatus.ACCEPTED, orderLineItems));
 
         final Order servedOrder = orderService.serve(order.getId());
 
@@ -305,10 +307,10 @@ class OrderServiceTest extends BaseServiceTest {
     void test16(final OrderStatus orderStatus) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
-        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), orderStatus, orderLineItems));
+        final Order order = orderRepository.save(OrderFixture.createDeliveryOrderWithDefaultId(UUID.randomUUID(), orderStatus, orderLineItems));
 
         assertThatIllegalStateException().isThrownBy(() -> orderService.serve(order.getId()));
     }
@@ -318,10 +320,10 @@ class OrderServiceTest extends BaseServiceTest {
     void test17() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
-        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), OrderStatus.SERVED, orderLineItems));
+        final Order order = orderRepository.save(OrderFixture.createDeliveryOrderWithDefaultId(UUID.randomUUID(), OrderStatus.SERVED, orderLineItems));
 
         final Order startedDeliveryOrder = orderService.startDelivery(order.getId());
 
@@ -335,7 +337,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test18(final OrderType orderType) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
@@ -350,7 +352,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test19(final OrderStatus orderStatus) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
@@ -364,10 +366,10 @@ class OrderServiceTest extends BaseServiceTest {
     void test20() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
-        final Order order = orderRepository.save(createDeliveryOrder(UUID.randomUUID(), OrderStatus.DELIVERING, orderLineItems));
+        final Order order = orderRepository.save(OrderFixture.createDeliveryOrderWithDefaultId(UUID.randomUUID(), OrderStatus.DELIVERING, orderLineItems));
 
         final Order completedDeliveryOrder = orderService.completeDelivery(order.getId());
 
@@ -381,7 +383,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test21(final OrderType orderType) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
@@ -396,7 +398,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test22(final OrderStatus orderStatus) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, false));
@@ -410,7 +412,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test23() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final Order order = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.DELIVERY, OrderStatus.DELIVERED, "청주시", orderLineItems, null));
@@ -427,7 +429,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test24(final OrderStatus orderStatus) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final Order order = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.DELIVERY, orderStatus, "청주시", orderLineItems, null));
@@ -440,7 +442,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test25() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final Order order = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.TAKEOUT, OrderStatus.SERVED, "청주시", orderLineItems, null));
@@ -457,7 +459,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test26(final OrderStatus orderStatus) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final Order order = orderRepository.save(createOrder(UUID.randomUUID(), OrderType.TAKEOUT, orderStatus, "청주시", orderLineItems, null));
@@ -470,7 +472,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test27() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
@@ -490,7 +492,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test28(final OrderStatus orderStatus) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
@@ -504,7 +506,7 @@ class OrderServiceTest extends BaseServiceTest {
     void test29() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));

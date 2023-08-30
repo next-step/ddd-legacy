@@ -6,15 +6,15 @@ import kitchenpos.domain.Product;
 import static kitchenpos.fixture.ProductFixture.createProduct;
 
 public class MenuProductFixture {
-    public static MenuProduct createMenuProduct() {
+    public static MenuProduct createMenuProductWithDefaultId() {
         return createMenuProduct(1L, createProduct(), 10);
     }
 
-    public static MenuProduct createMenuProduct(final Product product) {
+    public static MenuProduct createMenuProductWithDefaultId(final Product product) {
         return createMenuProduct(1L, product, 10);
     }
 
-    public static MenuProduct createMenuProduct(final Product product, final long quantity) {
+    public static MenuProduct createMenuProductWithDefaultId(final Product product, final long quantity) {
         return createMenuProduct(1L, product, quantity);
     }
 

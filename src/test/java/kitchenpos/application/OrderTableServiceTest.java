@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.support.BaseServiceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
-import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
+import static kitchenpos.fixture.MenuProductFixture.createMenuProductWithDefaultId;
 import static kitchenpos.fixture.OrderFixture.createOrder;
 import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
 import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
@@ -78,7 +79,7 @@ class OrderTableServiceTest extends BaseServiceTest {
     void test4() {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));
@@ -96,7 +97,7 @@ class OrderTableServiceTest extends BaseServiceTest {
     void test5(final OrderStatus orderStatus) {
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
         final Product product = productRepository.save(createProduct(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu menu = menuRepository.save(createMenu(UUID.randomUUID(), BigDecimal.ONE, menuGroup, true, List.of(menuProduct)));
         final List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(menu, 1, BigDecimal.TEN));
         final OrderTable orderTable = orderTableRepository.save(createOrderTable(UUID.randomUUID(), 5, true));

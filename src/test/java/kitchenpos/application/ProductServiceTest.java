@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.support.BaseServiceTest;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +14,7 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
-import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
+import static kitchenpos.fixture.MenuProductFixture.createMenuProductWithDefaultId;
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -88,7 +89,7 @@ class ProductServiceTest extends BaseServiceTest {
     void test5() {
         final Product product = productRepository.save(createProduct(UUID.randomUUID(), "치킨", BigDecimal.TEN));
         final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroup(UUID.randomUUID()));
-        final MenuProduct menuProduct = createMenuProduct(product);
+        final MenuProduct menuProduct = MenuProductFixture.createMenuProductWithDefaultId(product);
         final Menu cheapMenu = menuRepository.save(createMenu(UUID.randomUUID(), "치킨", new BigDecimal(0), menuGroup, true, List.of(menuProduct)));
         final Menu expensiveMenu = menuRepository.save(createMenu(UUID.randomUUID(), "치킨", new BigDecimal(100000000), menuGroup, true, List.of(menuProduct)));
         final Product newPriceProduct = createProduct("상품", BigDecimal.ONE);
