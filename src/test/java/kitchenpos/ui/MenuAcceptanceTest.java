@@ -7,6 +7,7 @@ import kitchenpos.setup.MenuGroupSetup;
 import kitchenpos.setup.MenuSetup;
 import kitchenpos.setup.ProductSetup;
 import kitchenpos.util.AcceptanceTest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,7 +205,7 @@ class MenuAcceptanceTest extends AcceptanceTest {
         ;
     }
 
-    @DisplayName("메뉴 노출 여부를 수정한다")
+    @DisplayName("메뉴를 노출한다")
     @Test
     void changeDisplayed() {
         // given
@@ -255,6 +256,34 @@ class MenuAcceptanceTest extends AcceptanceTest {
                 .log()
                 .all()
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+        ;
+    }
+
+    @DisplayName("메뉴를 숨긴다")
+    @Test
+    void hideMenu() {
+        // given
+        final Product product = productSetup.setupProduct(generateProductWithPrice(BigDecimal.valueOf(10_000)));
+        final MenuGroup menuGroup = menuGroupSetup.setupMenuGroup(generateMenuGroup());
+        final int quantity = 1;
+        final Menu menu = menuSetup.setupMenu(generateMenu(product, quantity, menuGroup, BigDecimal.valueOf(9_000), true));
+
+        // expected
+        final String path = getPath() +
+                "/" +
+                menu.getId().toString() +
+                "/hide";
+
+        given().contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(writeValueAsBytes(menu))
+                .when()
+                .put(path)
+                .then()
+                .log()
+                .all()
+                .statusCode(HttpStatus.OK.value())
+                .assertThat()
+                .body("displayed", equalTo(false));
         ;
     }
 
