@@ -20,7 +20,8 @@ public class OrderTableServiceTest {
         OrderTable request = new OrderTable();
         request.setName(null);
 
-        assertThatThrownBy(() -> orderTableService.create(request));
+        assertThatThrownBy(() -> orderTableService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -28,6 +29,7 @@ public class OrderTableServiceTest {
         OrderTable request = new OrderTable();
         request.setName("");
 
-        assertThatThrownBy(() -> orderTableService.create(request));
+        assertThatThrownBy(() -> orderTableService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
