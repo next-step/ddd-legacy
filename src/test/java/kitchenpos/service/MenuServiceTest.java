@@ -57,9 +57,7 @@ public class MenuServiceTest {
 
     @BeforeEach
     void init() {
-        추천메뉴 = MenuGroupFixture.builder()
-                .name("추천 메뉴")
-                .build();
+        추천메뉴 = MenuGroupFixture.builder().build();
         menuGroupRepository.save(추천메뉴);
 
         강정치킨 = ProductFixture.Data.강정치킨();
@@ -68,18 +66,11 @@ public class MenuServiceTest {
         양념치킨 = ProductFixture.Data.양념치킨();
         productRepository.save(양념치킨);
 
-        오늘의치킨 = MenuFixture.builder()
-                .name("오늘의 치킨")
-                .price(new BigDecimal(1000))
-                .menuGroup(추천메뉴)
-                .menuProduct(
-                        MenuProductFixture.create()
-                                .product(강정치킨)
-                                .quantity(1)
-                                .build()
+        오늘의치킨 = MenuFixture.builder(추천메뉴)
+                .menuProducts(List.of(
+                        MenuProductFixture.builder(강정치킨).build())
                 )
-                .displayed(true)
-                .build();
+                .name("오늘의 치킨").build();
         menuRepository.save(오늘의치킨);
     }
 
@@ -97,7 +88,6 @@ public class MenuServiceTest {
     void 메뉴_생성_실패__가격이_음수() {
         Menu menu = MenuFixture.builder()
                 .price(new BigDecimal(-1))
-                .menuGroup(추천메뉴)
                 .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
@@ -107,7 +97,6 @@ public class MenuServiceTest {
     @Test
     void 메뉴_생성_실패__메뉴그룹이_존재하지_않음() {
         Menu menu = MenuFixture.builder()
-                .price(new BigDecimal(1000))
                 .menuGroup(MenuGroupFixture.builder()
                         .name("존재하지 않는 메뉴그룹")
                         .build())
@@ -119,9 +108,8 @@ public class MenuServiceTest {
 
     @Test
     void 메뉴_생성_실패__메뉴상품이_null() {
-        Menu menu = MenuFixture.builder()
-                .price(new BigDecimal(1000))
-                .menuGroup(추천메뉴)
+        Menu menu = MenuFixture.builder(추천메뉴)
+                .menuProducts(null)
                 .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
@@ -130,9 +118,7 @@ public class MenuServiceTest {
 
     @Test
     void 메뉴_생성_실패__메뉴상품이_0개() {
-        Menu menu = MenuFixture.builder()
-                .price(new BigDecimal(1000))
-                .menuGroup(추천메뉴)
+        Menu menu = MenuFixture.builder(추천메뉴)
                 .menuProducts(List.of())
                 .build();
 
@@ -142,14 +128,9 @@ public class MenuServiceTest {
 
     @Test
     void 메뉴_생성_실패__메뉴_생성_요청의_메뉴상품이_존재하지_않음() {
-        Menu menu = MenuFixture.builder()
-                .price(new BigDecimal(1000))
-                .menuGroup(추천메뉴)
+        Menu menu = MenuFixture.builder(추천메뉴)
                 .menuProducts(
-                        List.of(
-                                MenuProductFixture.create()
-                                        .build()
-                        )
+                        List.of(MenuProductFixture.builder().build())
                 ).build();
 
         assertThatThrownBy(() -> menuService.create(menu))
@@ -158,13 +139,10 @@ public class MenuServiceTest {
 
     @Test
     void 메뉴_생성_실패__메뉴상품의_갯수가_음수() {
-        Menu menu = MenuFixture.builder()
-                .price(new BigDecimal(1000))
-                .menuGroup(추천메뉴)
+        Menu menu = MenuFixture.builder(추천메뉴)
                 .menuProducts(
                         List.of(
-                                MenuProductFixture.create()
-                                        .product(강정치킨)
+                                MenuProductFixture.builder(강정치킨)
                                         .quantity(-1)
                                         .build()
                         )
@@ -176,17 +154,13 @@ public class MenuServiceTest {
 
     @Test
     void 메뉴_생성_실패__구성메뉴상품의_가격_총합이_메뉴_가격_보다_초과일_수_없다() {
-        Menu menu = MenuFixture.builder()
+        Menu menu = MenuFixture.builder(추천메뉴)
                 .price(new BigDecimal(52001))
-                .menuGroup(추천메뉴)
                 .menuProducts(
                         List.of(
-                                MenuProductFixture.create()
-                                        .product(강정치킨)
-                                        .quantity(1)
+                                MenuProductFixture.builder(강정치킨)
                                         .build(),
-                                MenuProductFixture.create()
-                                        .product(양념치킨)
+                                MenuProductFixture.builder(양념치킨)
                                         .quantity(2)
                                         .build()
                         )
@@ -198,17 +172,10 @@ public class MenuServiceTest {
 
     @Test
     void 메뉴_생성_실패__이름이_null() {
-        Menu menu = MenuFixture.builder()
+        Menu menu = MenuFixture.builder(추천메뉴)
                 .name(null)
-                .price(new BigDecimal(10000))
-                .menuGroup(추천메뉴)
                 .menuProducts(
-                        List.of(
-                                MenuProductFixture.create()
-                                        .product(강정치킨)
-                                        .quantity(1)
-                                        .build()
-                        )
+                        List.of(MenuProductFixture.builder(강정치킨).build())
                 ).build();
 
         assertThatThrownBy(() -> menuService.create(menu))
@@ -218,17 +185,10 @@ public class MenuServiceTest {
     @Test
     void 메뉴_생성_실패__이름에_욕설_포함() {
         when(purgomalumClient.containsProfanity("abuse name")).thenReturn(true);
-        Menu menu = MenuFixture.builder()
+        Menu menu = MenuFixture.builder(추천메뉴)
                 .name("abuse name")
-                .price(new BigDecimal(10000))
-                .menuGroup(추천메뉴)
                 .menuProducts(
-                        List.of(
-                                MenuProductFixture.create()
-                                        .product(강정치킨)
-                                        .quantity(1)
-                                        .build()
-                        )
+                        List.of(MenuProductFixture.builder(강정치킨).build())
                 ).build();
 
         assertThatThrownBy(() -> menuService.create(menu))

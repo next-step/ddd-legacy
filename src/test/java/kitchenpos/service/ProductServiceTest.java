@@ -45,9 +45,7 @@ class ProductServiceTest {
         강정치킨 = ProductFixture.Data.강정치킨();
         productRepository.save(강정치킨);
 
-        MenuGroup 추천메뉴 = MenuGroupFixture.builder()
-                .name("추천 메뉴")
-                .build();
+        MenuGroup 추천메뉴 = MenuGroupFixture.builder().build();
         menuGroupRepository.save(추천메뉴);
 
         오늘의치킨 = MenuFixture.builder()
@@ -55,10 +53,7 @@ class ProductServiceTest {
                 .price(new BigDecimal(1000))
                 .menuGroup(추천메뉴)
                 .menuProduct(
-                        MenuProductFixture.create()
-                                .product(강정치킨)
-                                .quantity(1)
-                                .build()
+                        MenuProductFixture.builder(강정치킨).build()
                 )
                 .displayed(true)
                 .build();

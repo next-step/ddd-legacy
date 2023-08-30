@@ -14,10 +14,19 @@ public class MenuFixture {
     public MenuFixture() {
         menu = new Menu();
         menu.setId(UUID.randomUUID());
+        menu.setName("내일의 치킨");
+        menu.setPrice(new BigDecimal(15000));
     }
 
     public static MenuFixture builder() {
-        return new MenuFixture();
+        return builder(null);
+    }
+
+    public static MenuFixture builder(MenuGroup menuGroup) {
+        return new MenuFixture()
+                .menuGroup(menuGroup)
+                .price(new BigDecimal(1000))
+                .displayed(true);
     }
 
     public MenuFixture name(String name) {
@@ -32,7 +41,9 @@ public class MenuFixture {
 
     public MenuFixture menuGroup(MenuGroup menuGroup) {
         menu.setMenuGroup(menuGroup);
-        menu.setMenuGroupId(menuGroup.getId());
+        if (menuGroup != null) {
+            menu.setMenuGroupId(menuGroup.getId());
+        }
         return this;
     }
 

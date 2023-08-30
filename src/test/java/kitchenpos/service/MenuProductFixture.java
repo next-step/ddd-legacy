@@ -14,13 +14,21 @@ public class MenuProductFixture {
         menuProduct.setSeq(seq.incrementAndGet());
     }
 
-    public static MenuProductFixture create() {
-        return new MenuProductFixture();
+    public static MenuProductFixture builder() {
+        return builder(null);
+    }
+
+    public static MenuProductFixture builder(Product product) {
+        return new MenuProductFixture()
+                .product(product)
+                .quantity(1L);
     }
 
     public MenuProductFixture product(Product product) {
         menuProduct.setProduct(product);
-        menuProduct.setProductId(product.getId());
+        if (product != null) {
+            menuProduct.setProductId(product.getId());
+        }
         return this;
     }
 
