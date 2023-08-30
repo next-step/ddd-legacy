@@ -147,7 +147,7 @@ public class MenuServiceTest {
         @DisplayName("메뉴의_이름은_빈값이면_안된다")
         void menuNameNotNull() {
             // given
-            Menu menu = getMenuAndSaveMenuProduct();
+            Menu menu = getTestMenuAndInitProduct();
             given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
 
             // when
@@ -164,7 +164,7 @@ public class MenuServiceTest {
         @DisplayName("메뉴의_이름은_부적절한_영어_이름이면_안된다")
         void profanityTest(String name) {
             // given
-            Menu menu = getMenuAndSaveMenuProduct();
+            Menu menu = getTestMenuAndInitProduct();
             given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
             given(purgomalumClient.containsProfanity(anyString())).willReturn(true);
 
@@ -186,7 +186,7 @@ public class MenuServiceTest {
         @DisplayName("기존_메뉴의_가격을_정상적으로_수정한다")
         void menuPriceChangeTest() {
             // given
-            Menu menu = getMenuAndSaveMenuProduct();
+            Menu menu = getTestMenuAndInitProduct();
             menuRepository.save(menu);
 
             // when
@@ -201,7 +201,7 @@ public class MenuServiceTest {
         @DisplayName("변경할_가격은_0원_이상이어야_한다")
         void changePriceTest() {
             // given
-            Menu menu = getMenuAndSaveMenuProduct();
+            Menu menu = getTestMenuAndInitProduct();
 
             // when
             menu.setPrice(new BigDecimal(-1));
@@ -216,7 +216,7 @@ public class MenuServiceTest {
         @DisplayName("변경할 메뉴의 가격은 포함된 상품들의 각 금액(상품 가격 X 수량)의 합보다 높을 수 없다")
         void priceChangeTest() {
             // given
-            Menu menu = getMenuAndSaveMenuProduct();
+            Menu menu = getTestMenuAndInitProduct();
             menuRepository.save(menu);
 
             // when
@@ -280,7 +280,7 @@ public class MenuServiceTest {
         assertThat(menu.isDisplayed()).isFalse();
     }
 
-    private Menu getMenuAndSaveMenuProduct() {
+    private Menu getTestMenuAndInitProduct() {
         Menu menuRequest = CREATE_TEST_MENU();
         productRepository.save(menuRequest.getMenuProducts().get(0).getProduct());
         return menuRequest;

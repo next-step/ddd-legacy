@@ -150,7 +150,7 @@ class OrderServiceTest {
                     TEST_ORDER_TAKEOUT(OrderStatus.WAITING) : TEST_ORDER_DELIVERY(OrderStatus.WAITING);
 
             order.setType(typeValue.equals("take_out") ? OrderType.TAKEOUT : OrderType.DELIVERY);
-            getSavedMenu();
+            initTestMenu();
 
             // when
             order.getOrderLineItems().forEach(item -> item.setQuantity(-1));
@@ -181,7 +181,7 @@ class OrderServiceTest {
         void menuAndMenuLinePriceTest() {
             // given
             Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING);
-            Menu menu = getSavedMenu();
+            Menu menu = initTestMenu();
 
             // when
             menu.setPrice(MAX_PRICE);
@@ -196,7 +196,7 @@ class OrderServiceTest {
         void addressTest() {
             // given
             Order order = TEST_ORDER_DELIVERY(OrderStatus.WAITING);
-            getSavedMenu();
+            initTestMenu();
 
             // when
             order.setDeliveryAddress(null);
@@ -234,7 +234,7 @@ class OrderServiceTest {
         @DisplayName("테이크아웃과_매장_주문을_수락한다")
         void takeOutAndEatInTest(String typeName) {
             // given
-            Order order = getSaveOrderByType(getOrderByTypeName(typeName, OrderStatus.WAITING));
+            Order order = initOrderByType(getOrderByTypeName(typeName, OrderStatus.WAITING));
 
             // when
             Order actual = orderService.accept(order.getId());
@@ -247,7 +247,7 @@ class OrderServiceTest {
         @DisplayName("수락하려는_주문의_상태가_대기중이어야_한다")
         void acceptStatusTest() {
             // given
-            Order order = getSaveOrderByType(TEST_ORDER_EAT_IN(OrderStatus.COMPLETED));
+            Order order = initOrderByType(TEST_ORDER_EAT_IN(OrderStatus.COMPLETED));
 
             // when && then
             assertThatThrownBy(() -> orderService.accept(order.getId()))
@@ -258,7 +258,7 @@ class OrderServiceTest {
         @DisplayName("배달_주문이라면_배달을_요청한다")
         void deliveryAcceptTest() {
             // given
-            Order order = getSaveOrderByType(TEST_ORDER_DELIVERY(OrderStatus.WAITING));
+            Order order = initOrderByType(TEST_ORDER_DELIVERY(OrderStatus.WAITING));
 
             // when
             Order actual = orderService.accept(order.getId());
@@ -458,13 +458,13 @@ class OrderServiceTest {
         return order;
     }
 
-    private Menu getSavedMenu() {
+    private Menu initTestMenu() {
         Menu menu = CREATE_TEST_MENU();
         menuRepository.save(menu);
         return menu;
     }
 
-    private Order getSaveOrderByType(Order typeName) {
+    private Order initOrderByType(Order typeName) {
         orderRepository.save(typeName);
         return typeName;
     }
