@@ -71,8 +71,8 @@ class OrderTableServiceTest {
     void changeNumberOfGuests01() {
         OrderTable orderTable = createOrderTable("테이블이름", true);
         OrderTable savedOrderTable = orderTableRepository.save(orderTable);
-
         orderTable.setNumberOfGuests(10);
+
         OrderTable changedOrderTable = orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable);
 
         assertThat(changedOrderTable.getNumberOfGuests()).isEqualTo(10);
@@ -83,8 +83,8 @@ class OrderTableServiceTest {
     void changeNumberOfGuests02() {
         OrderTable orderTable = createOrderTable("테이블이름", true);
         OrderTable savedOrderTable = orderTableRepository.save(orderTable);
-
         orderTable.setNumberOfGuests(-1);
+
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable))
                 .isInstanceOf(IllegalArgumentException.class);
     }
@@ -95,9 +95,7 @@ class OrderTableServiceTest {
         OrderTable orderTable = createOrderTable("테이블이름", false);
         OrderTable savedOrderTable = orderTableRepository.save(orderTable);
 
-        orderTable.setNumberOfGuests(10);
-        OrderTable changedOrderTable = orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable);
-
-        assertThat(changedOrderTable.getNumberOfGuests()).isEqualTo(10);
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable))
+                .isInstanceOf(IllegalStateException.class);
     }
 }
