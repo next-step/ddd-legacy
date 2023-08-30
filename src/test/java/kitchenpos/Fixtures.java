@@ -40,12 +40,12 @@ public class Fixtures {
         return menu;
     }
 
-    public static MenuProduct createMenuProduct(Long seq, Product product) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setSeq(seq);
-        menuProduct.setProduct(product);
-        menuProduct.setProductId(product.getId());
-        menuProduct.setQuantity(1L);
-        return menuProduct;
-    }
+     public static MenuProduct createMenuProduct(Long seq, Product product, long quantity) {
+         MenuProduct menuProduct = new MenuProduct();
+         menuProduct.setSeq(seq);
+         menuProduct.setProduct(product);
+         menuProduct.setProductId(product.getId());
+         menuProduct.setQuantity(quantity);
+         return menuProduct;
+     }
 }

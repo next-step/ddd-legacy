@@ -103,8 +103,9 @@ class ProductServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Menu menu = createMenu(savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0)),
-                createMenuProduct(2L, savedProducts.get(1))), new BigDecimal("15000"));
+        Menu menu = createMenu(savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
+                                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
+                               new BigDecimal("15000"));
         Menu savedMenu = menuRepository.save(menu);
 
         Product product = savedProducts.get(0);
@@ -129,10 +130,11 @@ class ProductServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Menu menu1 = createMenu(savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0))),
-                new BigDecimal("10000"));
-        Menu menu2 = createMenu(savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0)),
-                createMenuProduct(2L, savedProducts.get(1))), new BigDecimal("20000"));
+        Menu menu1 = createMenu(savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0), 1L)),
+                                new BigDecimal("10000"));
+        Menu menu2 = createMenu(savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
+                                                        createMenuProduct(2L, savedProducts.get(1), 1L)),
+                                new BigDecimal("20000"));
 
         // when
         List<Menu> savedMenus = menuRepository.saveAll(List.of(menu1, menu2));

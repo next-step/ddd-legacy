@@ -99,4 +99,17 @@ public class Menu {
     public void setMenuGroupId(final UUID menuGroupId) {
         this.menuGroupId = menuGroupId;
     }
+
+    @Override
+    public String toString() {
+        return "Menu{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", menuGroup=" + menuGroup +
+                ", displayed=" + displayed +
+                ", menuProducts=" + menuProducts +
+                ", menuGroupId=" + menuGroupId +
+                '}';
+    }
 }
