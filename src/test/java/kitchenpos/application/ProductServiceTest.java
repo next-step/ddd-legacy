@@ -1,44 +1,40 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.math.BigDecimal;
 
 import static kitchenpos.fixture.MenuFixture.*;
-import static kitchenpos.fixture.ProductFixture.TEST_PRODUCT;
+import static kitchenpos.fixture.ProductFixture.CREATE_TEST_PRODUCT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
-    @InjectMocks
-    private ProductService productService;
-    @Mock
-    private ProductRepository productRepository;
-    @Mock
-    private MenuRepository menuRepository;
+
+    private final ProductRepository productRepository = new InMemoryProductRepository();
+    private final MenuRepository menuRepository = new InMemoryMenuRepository();
     @Mock
     private PurgomalumClient purgomalumClient;
+
+    private ProductService productService;
+
+    @BeforeEach
+    void setup() {
+        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+    }
 
     @Nested
     @DisplayName("새로운 상품을 등록한다.")
@@ -48,28 +44,25 @@ class ProductServiceTest {
         @DisplayName("새로운 상품을 정상적으로 등록한다.")
         void createTest() {
             // given
-            Product createRequest = TEST_PRODUCT();
+            Product createRequest = CREATE_TEST_PRODUCT();
             given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
-            given(productRepository.save(any(Product.class))).willReturn(createRequest);
 
             // when
             Product actual = productService.create(createRequest);
 
             // then
-            verify(productRepository, times(1)).save(any());
-            assertThat(actual).isEqualTo(createRequest);
+            assertThat(actual.getId()).isNotNull();
+            assertThat(actual.getPrice()).isEqualTo(createRequest.getPrice());
+            assertThat(actual.getName()).isEqualTo(createRequest.getName());
         }
 
         @Test
         @DisplayName("이름은 비어있을 수 없다.")
         void createNameEmptyTest() {
             // given
-            Product createRequest  = TEST_PRODUCT();
+            Product createRequest  = CREATE_TEST_PRODUCT(new BigDecimal(500), null);
 
-            // when
-            createRequest.setName(null);
-
-            // then
+            // when && then
             assertThatThrownBy(() -> productService.create(createRequest ))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -79,8 +72,7 @@ class ProductServiceTest {
         @CsvSource(value = {"fuck", "shit"})
         void createNameTest(String name) {
             // given
-            Product createRequest = TEST_PRODUCT();
-            createRequest.setName(name);
+            Product createRequest = CREATE_TEST_PRODUCT(name);
             given(purgomalumClient.containsProfanity(name)).willReturn(true);
 
             // when && then
@@ -97,18 +89,17 @@ class ProductServiceTest {
         @DisplayName("상품의 가격을 변경하면서 메뉴가 비활성화 되지 않는다.")
         void changePriceTest() {
             // given
-            Product productRequest = TEST_PRODUCT();
-            UUID productId = productRequest.getId();
-            Menu menu = TEST_MENU_BY_PRODUCT(productRequest);
-            given(productRepository.findById(productId)).willReturn(Optional.of(productRequest));
-            given(menuRepository.findAllByProductId(productId)).willReturn(List.of(menu));
+            Product productRequest = CREATE_TEST_PRODUCT();
+            Product product = productService.create(productRequest);
+            Menu menu = CREATE_TEST_MENU(product);
+            menuRepository.save(menu);
 
             // when
-            productRequest.setPrice(MAX_PRICE);
-            Product actual = productService.changePrice(productId, productRequest);
+            product.setPrice(MAX_PRICE);
+            Product actual = productService.changePrice(product.getId(), product);
 
             // then
-            assertThat(actual.getPrice()).isEqualTo(productRequest.getPrice());
+            assertThat(actual.getPrice()).isEqualTo(product.getPrice());
             assertThat(menu.isDisplayed()).isTrue();
         }
 
@@ -116,18 +107,17 @@ class ProductServiceTest {
         @DisplayName("가격 변경 후, 메뉴의 가격이 (메뉴에 포함된 상품들의 가격 x 개수) 총 합보다 높다면 메뉴를 비활성화 한다.")
         void changePriceAndHideTest() {
             // given
-            Product productRequest = TEST_PRODUCT();
-            UUID productId = productRequest.getId();
-            Menu menu = TEST_MENU_BY_PRODUCT(productRequest);
-            given(productRepository.findById(productId)).willReturn(Optional.of(productRequest));
-            given(menuRepository.findAllByProductId(productId)).willReturn(List.of(menu));
+            Product productRequest = CREATE_TEST_PRODUCT();
+            Product product = productService.create(productRequest);
+            Menu menu = CREATE_TEST_MENU(product);
+            menuRepository.save(menu);
 
             // when
-            productRequest.setPrice(MINIMUM_PRICE);
-            Product actual = productService.changePrice(productId, productRequest);
+            product.setPrice(MINIMUM_PRICE);
+            Product actual = productService.changePrice(product.getId(), product);
 
             // then
-            assertThat(actual.getPrice()).isEqualTo(productRequest.getPrice());
+            assertThat(actual.getPrice()).isEqualTo(product.getPrice());
             assertThat(menu.isDisplayed()).isFalse();
         }
     }

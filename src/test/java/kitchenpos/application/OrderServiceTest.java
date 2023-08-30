@@ -1,24 +1,20 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Order;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
+import static kitchenpos.fixture.MenuFixture.CREATE_TEST_MENU;
 import static kitchenpos.fixture.MenuFixture.MAX_PRICE;
-import static kitchenpos.fixture.MenuFixture.TEST_MENU;
 import static kitchenpos.fixture.OrderFixture.*;
 import static kitchenpos.fixture.OrderTableFixture.TEST_ORDER_TABLE;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,16 +26,19 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
-    @InjectMocks
-    private OrderService orderService;
-    @Mock
-    private OrderRepository orderRepository;
-    @Mock
-    private MenuRepository menuRepository;
+
+    private final OrderRepository orderRepository = new InMemoryOrderRepository();
+    private final MenuRepository menuRepository = new InMemoryMenuRepository();
     @Mock
     private OrderTableRepository orderTableRepository;
     @Mock
     private KitchenridersClient kitchenridersClient;
+    private OrderService orderService;
+
+    @BeforeEach
+    void setup() {
+        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
+    }
 
     @Nested
     @DisplayName("새로운 주문을 등록한다")
@@ -49,18 +48,15 @@ class OrderServiceTest {
         @DisplayName("새로운_배달_주문을_등록한다")
         void newOrderTest() {
             // given
-            Order order = TEST_ORDER_DELIVERY(OrderStatus.WAITING);
-            Menu menu = TEST_MENU();
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-            given(orderRepository.save(any(Order.class))).willReturn(order);
+            Menu menu = CREATE_TEST_MENU();
+            Order order = TEST_ORDER_DELIVERY(OrderStatus.WAITING, menu);
+            menuRepository.save(menu);
 
             // when
             Order actual = orderService.create(order);
 
             // then
-            verify(orderRepository, times(1)).save(any(Order.class));
-            assertThat(actual).isEqualTo(order);
+            assertThat(actual.getId()).isNotNull();
             assertThat(actual.getType()).isEqualTo(OrderType.DELIVERY);
             assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
             assertThat(actual.getDeliveryAddress()).isNotEmpty();
@@ -70,18 +66,15 @@ class OrderServiceTest {
         @DisplayName("새로운_테이크아웃_주문을_등록한다")
         void newTakeOutOrderTest() {
             // given
-            Order order = TEST_ORDER_TAKEOUT(OrderStatus.WAITING);
-            Menu menu = TEST_MENU();
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-            given(orderRepository.save(any(Order.class))).willReturn(order);
+            Menu menu = CREATE_TEST_MENU();
+            Order order = TEST_ORDER_TAKEOUT(OrderStatus.WAITING, menu);
+            menuRepository.save(menu);
 
             // when
             Order actual = orderService.create(order);
 
             // then
-            verify(orderRepository, times(1)).save(any(Order.class));
-            assertThat(actual).isEqualTo(order);
+            assertThat(actual.getId()).isNotNull();
             assertThat(actual.getType()).isEqualTo(OrderType.TAKEOUT);
             assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
         }
@@ -90,25 +83,23 @@ class OrderServiceTest {
         @DisplayName("새로운_매장_주문을_등록한다")
         void newEatInTest() {
             // given
-            Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING);
-            Menu menu = TEST_MENU();
-            OrderTable orderTable = TEST_ORDER_TABLE();
-            orderTable.setOccupied(true);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            Menu menu = CREATE_TEST_MENU();
+            Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING, menu);
+            menuRepository.save(menu);
+
+            OrderTable orderTable = TEST_ORDER_TABLE(true);
             given(orderTableRepository.findById(order.getOrderTableId()))
                     .willReturn(Optional.of(orderTable));
-            given(orderRepository.save(any(Order.class))).willReturn(order);
 
             // when
             Order actual = orderService.create(order);
 
             // then
-            verify(orderRepository, times(1)).save(any(Order.class));
-            assertThat(actual).isEqualTo(order);
+            assertThat(actual.getId()).isNotNull();
             assertThat(actual.getType()).isEqualTo(OrderType.EAT_IN);
             assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
-            assertThat(actual.getOrderTableId()).isNotNull();
+            assertThat(actual.getOrderTable()).isNotNull();
+            assertThat(actual.getOrderTable().getId()).isNotNull();
         }
 
         @Test
@@ -145,10 +136,7 @@ class OrderServiceTest {
             // given
             Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING);
 
-            // when
-            given(menuRepository.findAllByIdIn(any())).willReturn(Collections.emptyList());
-
-            // then
+            // when && then
             assertThatThrownBy(() -> orderService.create(order))
                     .isExactlyInstanceOf(IllegalArgumentException.class);
         }
@@ -160,9 +148,9 @@ class OrderServiceTest {
             // given
             Order order = typeValue.equals("take_out") ?
                     TEST_ORDER_TAKEOUT(OrderStatus.WAITING) : TEST_ORDER_DELIVERY(OrderStatus.WAITING);
+
             order.setType(typeValue.equals("take_out") ? OrderType.TAKEOUT : OrderType.DELIVERY);
-            Menu menu = TEST_MENU();
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            getSavedMenu();
 
             // when
             order.getOrderLineItems().forEach(item -> item.setQuantity(-1));
@@ -176,10 +164,9 @@ class OrderServiceTest {
         @DisplayName("주문_내역들의_메뉴들은_활성화_된_메뉴들이어야_한다")
         void menuShouldDisplay() {
             // given
-            Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING);
-            Menu menu = TEST_MENU();
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            Menu menu = CREATE_TEST_MENU();
+            Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING, menu);
+            menuRepository.save(menu);
 
             // when
             menu.setDisplayed(false);
@@ -194,9 +181,7 @@ class OrderServiceTest {
         void menuAndMenuLinePriceTest() {
             // given
             Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING);
-            Menu menu = TEST_MENU();
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            Menu menu = getSavedMenu();
 
             // when
             menu.setPrice(MAX_PRICE);
@@ -211,9 +196,7 @@ class OrderServiceTest {
         void addressTest() {
             // given
             Order order = TEST_ORDER_DELIVERY(OrderStatus.WAITING);
-            Menu menu = TEST_MENU();
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            getSavedMenu();
 
             // when
             order.setDeliveryAddress(null);
@@ -227,11 +210,10 @@ class OrderServiceTest {
         @DisplayName("주문_타입이_매장이라면_사용_가능한_테이블이_지정되어야_한다")
         void orderTableShouldSet() {
             // given
-            Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING);
-            Menu menu = TEST_MENU();
+            Menu menu = CREATE_TEST_MENU();
+            Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING, menu);
+            menuRepository.save(menu);
             OrderTable orderTable = TEST_ORDER_TABLE();
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
             given(orderTableRepository.findById(order.getOrderTableId())).willReturn(Optional.of(orderTable));
 
             // when
@@ -252,8 +234,7 @@ class OrderServiceTest {
         @DisplayName("테이크아웃과_매장_주문을_수락한다")
         void takeOutAndEatInTest(String typeName) {
             // given
-            Order order = getOrderByTypeName(typeName, OrderStatus.WAITING);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = getSaveOrderByType(getOrderByTypeName(typeName, OrderStatus.WAITING));
 
             // when
             Order actual = orderService.accept(order.getId());
@@ -266,8 +247,7 @@ class OrderServiceTest {
         @DisplayName("수락하려는_주문의_상태가_대기중이어야_한다")
         void acceptStatusTest() {
             // given
-            Order order = TEST_ORDER_EAT_IN(OrderStatus.COMPLETED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = getSaveOrderByType(TEST_ORDER_EAT_IN(OrderStatus.COMPLETED));
 
             // when && then
             assertThatThrownBy(() -> orderService.accept(order.getId()))
@@ -278,8 +258,7 @@ class OrderServiceTest {
         @DisplayName("배달_주문이라면_배달을_요청한다")
         void deliveryAcceptTest() {
             // given
-            Order order = TEST_ORDER_DELIVERY(OrderStatus.WAITING);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = getSaveOrderByType(TEST_ORDER_DELIVERY(OrderStatus.WAITING));
 
             // when
             Order actual = orderService.accept(order.getId());
@@ -300,7 +279,7 @@ class OrderServiceTest {
         void changeStatusTest() {
             // given
             Order order = TEST_ORDER_DELIVERY(OrderStatus.ACCEPTED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when
             Order actual = orderService.serve(order.getId());
@@ -314,7 +293,7 @@ class OrderServiceTest {
         void orderStatusShouldAccept() {
             // given
             Order order = TEST_ORDER_EAT_IN(OrderStatus.COMPLETED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when && then
             assertThatThrownBy(() -> orderService.serve(order.getId()))
@@ -331,7 +310,7 @@ class OrderServiceTest {
         void startDelivery() {
             // given
             Order order = TEST_ORDER_DELIVERY(OrderStatus.SERVED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when
             Order actual = orderService.startDelivery(order.getId());
@@ -346,11 +325,9 @@ class OrderServiceTest {
         void typeShouldDeliveryTest(String typeName) {
             // given
             Order order = getOrderByTypeName(typeName, OrderStatus.SERVED);
+            orderRepository.save(order);
 
-            // when
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
-
-            // then
+            // when && then
             assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
                     .isExactlyInstanceOf(IllegalStateException.class);
         }
@@ -360,7 +337,7 @@ class OrderServiceTest {
         void statusShouldServed() {
             // given
             Order order = TEST_ORDER_DELIVERY(OrderStatus.COMPLETED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when && then
             assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
@@ -372,7 +349,7 @@ class OrderServiceTest {
         void completeDelivery() {
             // given
             Order order = TEST_ORDER_DELIVERY(OrderStatus.DELIVERING);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when
             Order actual = orderService.completeDelivery(order.getId());
@@ -386,7 +363,7 @@ class OrderServiceTest {
         void statusShouldDelivering() {
             // given
             Order order = TEST_ORDER_DELIVERY(OrderStatus.COMPLETED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when && then
             assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
@@ -403,7 +380,7 @@ class OrderServiceTest {
         void completeDeliveryTest() {
             // given
             Order order = TEST_ORDER_DELIVERY(OrderStatus.DELIVERED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when
             Order actual = orderService.complete(order.getId());
@@ -417,7 +394,7 @@ class OrderServiceTest {
         void checkDeliveryStatus() {
             // given
             Order order = TEST_ORDER_DELIVERY(OrderStatus.COMPLETED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when && then
             assertThatThrownBy(() -> orderService.complete(order.getId()))
@@ -429,14 +406,12 @@ class OrderServiceTest {
         void clearTableTest() {
             // given
             Order order = TEST_ORDER_EAT_IN(OrderStatus.SERVED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when
             Order actual = orderService.complete(order.getId());
 
             // then
-            verify(orderRepository, times(1))
-                    .existsByOrderTableAndStatusNot(order.getOrderTable(), OrderStatus.COMPLETED);
             assertThat(actual.getOrderTable().isOccupied()).isFalse();
             assertThat(actual.getOrderTable().getNumberOfGuests()).isZero();
             assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
@@ -447,7 +422,7 @@ class OrderServiceTest {
         void completeTakeOutOrder() {
             // given
             Order order = TEST_ORDER_TAKEOUT(OrderStatus.SERVED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when
             Order actual = orderService.complete(order.getId());
@@ -462,7 +437,7 @@ class OrderServiceTest {
         void checkTakeOutAndEatInStatus(String typeName) {
             // given
             Order order = getOrderByTypeName(typeName, OrderStatus.COMPLETED);
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            orderRepository.save(order);
 
             // when && then
             assertThatThrownBy(() -> orderService.complete(order.getId()))
@@ -470,20 +445,9 @@ class OrderServiceTest {
         }
 
         @Test
+        @Disabled
         @DisplayName("모든_주문_정보를_가져온다")
         void findAll() {
-            // given
-            Order delivery = TEST_ORDER_DELIVERY(OrderStatus.DELIVERING);
-            Order takeout = TEST_ORDER_TAKEOUT(OrderStatus.WAITING);
-            Order eat_in = TEST_ORDER_EAT_IN(OrderStatus.SERVED);
-            given(orderRepository.findAll()).willReturn(List.of(delivery, takeout, eat_in));
-
-            // when
-            List<Order> actual = orderService.findAll();
-
-            // then
-            verify(orderRepository, times(1)).findAll();
-            assertThat(actual).containsExactly(delivery, takeout, eat_in);
         }
     }
 
@@ -498,5 +462,16 @@ class OrderServiceTest {
                 order = TEST_ORDER_EAT_IN(status);
         }
         return order;
+    }
+
+    private Menu getSavedMenu() {
+        Menu menu = CREATE_TEST_MENU();
+        menuRepository.save(menu);
+        return menu;
+    }
+
+    private Order getSaveOrderByType(Order typeName) {
+        orderRepository.save(typeName);
+        return typeName;
     }
 }

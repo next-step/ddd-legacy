@@ -1,9 +1,7 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kitchenpos.fixture.OrderFixture.TEST_ORDER_EAT_IN;
 import static kitchenpos.fixture.OrderTableFixture.TEST_ORDER_TABLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -28,12 +27,15 @@ import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
-    @InjectMocks
-    private OrderTableService orderTableService;
-    @Mock
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository = new InMemoryOrderRepository();
     @Mock
     private OrderTableRepository orderTableRepository;
+    private OrderTableService orderTableService;
+
+    @BeforeEach
+    void setup() {
+        orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+    }
 
     @Nested
     @DisplayName("새로운 주문 테이블을 등록한다")
@@ -97,15 +99,11 @@ class OrderTableServiceTest {
             OrderTable orderTable = TEST_ORDER_TABLE();
             UUID orderTableId = orderTable.getId();
             given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
-            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
-                    .willReturn(false);
 
             // when
             OrderTable actual = orderTableService.clear(orderTableId);
 
             // then
-            verify(orderRepository, times(1))
-                    .existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED);
             assertThat(actual.isOccupied()).isFalse();
             assertThat(actual.getNumberOfGuests()).isZero();
         }
@@ -117,10 +115,12 @@ class OrderTableServiceTest {
             OrderTable orderTable = TEST_ORDER_TABLE();
             UUID orderTableId = orderTable.getId();
             given(orderTableRepository.findById(orderTableId)).willReturn(Optional.of(orderTable));
-            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
-                    .willReturn(true);
 
-            // when && then
+            // when
+            Order order = TEST_ORDER_EAT_IN(orderTable, OrderStatus.WAITING);
+            orderRepository.save(order);
+
+            // then
             assertThatThrownBy(() -> orderTableService.clear(orderTableId))
                     .isInstanceOf(IllegalStateException.class);
         }
