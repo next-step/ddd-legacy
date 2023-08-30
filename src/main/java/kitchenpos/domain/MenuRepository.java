@@ -5,11 +5,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public interface MenuRepository extends JpaRepository<Menu, UUID> {
+public interface MenuRepository {
+    Menu save(Menu entity);
+    Optional<Menu> findById(UUID uuid);
     List<Menu> findAllByIdIn(List<UUID> ids);
+    List<Menu> findAll();
+    List<Menu> findAllByProductId(UUID productId);
+}
 
+@SuppressWarnings("unused")
+interface JpaMenuRepository extends MenuRepository, JpaRepository<Menu, UUID> {
     @Query("select m from Menu m, MenuProduct mp where mp.product.id = :productId")
     List<Menu> findAllByProductId(@Param("productId") UUID productId);
+
 }
