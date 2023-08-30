@@ -1,9 +1,6 @@
 package kitchenpos;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.Product;
+import kitchenpos.domain.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,12 +37,22 @@ public class Fixtures {
         return menu;
     }
 
-     public static MenuProduct createMenuProduct(Long seq, Product product, long quantity) {
-         MenuProduct menuProduct = new MenuProduct();
-         menuProduct.setSeq(seq);
-         menuProduct.setProduct(product);
-         menuProduct.setProductId(product.getId());
-         menuProduct.setQuantity(quantity);
-         return menuProduct;
-     }
+    public static OrderTable createOrderTable(String name, boolean occupied) {
+        OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName(name);
+        orderTable.setOccupied(occupied);
+        orderTable.setNumberOfGuests(0);
+
+        return orderTable;
+    }
+
+    public static MenuProduct createMenuProduct(Long seq, Product product, long quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq(seq);
+        menuProduct.setProduct(product);
+        menuProduct.setProductId(product.getId());
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
 }
