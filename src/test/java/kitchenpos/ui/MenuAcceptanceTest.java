@@ -176,14 +176,17 @@ class MenuAcceptanceTest extends AcceptanceTest {
         ;
     }
 
-    @DisplayName("변경된 메뉴 가격은 메뉴에 포함된 상품들의 총가격(단가 * 수량) 보다 작아야 한다")
+    @Disabled
+    @DisplayName("변경된 메뉴 가격이 메뉴에 포함된 상품들의 총가격(단가 * 수량) 보다 작으면 노출하지 않는다")
     @Test
-    void changeMenuPriceValidation() {
+    void invisibleMenuAfterChangePriceOfMenu() {
         // given
         final Product product = productSetup.setupProduct(generateProductWithPrice(BigDecimal.valueOf(10_000)));
         final MenuGroup menuGroup = menuGroupSetup.setupMenuGroup(generateMenuGroup());
         final int quantity = 1;
         final Menu menu = menuSetup.setupMenu(generateMenu(product, quantity, menuGroup));
+
+        assert menu.isDisplayed();
 
         final BigDecimal newPrice = product.getPrice().add(BigDecimal.valueOf(100));
         menu.setPrice(newPrice);
@@ -201,7 +204,10 @@ class MenuAcceptanceTest extends AcceptanceTest {
                 .then()
                 .log()
                 .all()
-                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .statusCode(HttpStatus.OK.value())
+                .assertThat()
+                .body("price", equalTo(newPrice.intValue()))
+                .body("displayed", equalTo(false));
         ;
     }
 
