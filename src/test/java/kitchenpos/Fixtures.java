@@ -12,7 +12,9 @@ import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class Fixtures {
@@ -41,19 +43,34 @@ public class Fixtures {
         return menu;
     }
 
-    public static MenuProduct 메뉴_상품_생성(Product product, Long seq, int quantity) {
+    public static MenuProduct 메뉴_상품_생성(Product product, int quantity) {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setProduct(product);
         menuProduct.setProductId(product.getId());
-        menuProduct.setSeq(seq);
+        menuProduct.setSeq(new Random().nextLong());
         menuProduct.setQuantity(quantity);
         return menuProduct;
     }
+
+    public static MenuProduct 메뉴_상품_생성(final Product product, final long quantity) {
+        final MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq(new Random().nextLong());
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
+
 
     public static Product 상품_생성(String name, Long price) {
         Product product = new Product();
         product.setId(UUID.randomUUID());
         product.setName(name);
+        product.setPrice(BigDecimal.valueOf(price));
+        return product;
+    }
+
+    public static Product 상품_생성(final long price) {
+        Product product = new Product();
         product.setPrice(BigDecimal.valueOf(price));
         return product;
     }
@@ -123,20 +140,46 @@ public class Fixtures {
     public static Menu 메뉴_생성_두마리_매콤_치킨_시험중() {
         final Product product = 상품_생성("매콤 후라이드", 0L);
         final MenuGroup menuGroup = 메뉴그룹_생성("매콤 치킨 세트");
-        return createMenu_두마리_치킨(BigDecimal.valueOf(0), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1L, 2)), "불나는 치킨 세트", false);
+        return createMenu_두마리_치킨(BigDecimal.valueOf(0), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 2)), "불나는 치킨 세트", false);
     }
 
     public static Menu 메뉴_생성_두마리_치킨() {
         final Product product = 상품_생성("후라이드", 16_000L);
         final MenuGroup menuGroup = 메뉴그룹_생성("치킨 세트");
-        return createMenu_두마리_치킨(BigDecimal.valueOf(32_000L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1L, 2)), "아름다운 치킨 세트", true);
+        return createMenu_두마리_치킨(BigDecimal.valueOf(32_000L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 2)), "아름다운 치킨 세트", true);
+    }
+
+    public static Menu 메뉴_생성_두마리_치킨(long price) {
+        final Product product = 상품_생성("후라이드", price);
+        final MenuGroup menuGroup = 메뉴그룹_생성("치킨 세트");
+        return createMenu_두마리_치킨(BigDecimal.valueOf(32_000L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 2)), "아름다운 치킨 세트", true);
     }
 
     public static Menu 메뉴_생성_두마리_반_치킨() {
         final Product product = 상품_생성("후라이드", 16_000L);
         final MenuGroup menuGroup = 메뉴그룹_생성("치킨 세트");
-        return createMenu_두마리_치킨(BigDecimal.valueOf(31_500L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1L, 2)), "아름다운 치킨 세트", true);
+        return createMenu_두마리_치킨(BigDecimal.valueOf(31_500L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 2)), "아름다운 치킨 세트", true);
     }
+
+    public static MenuProduct 상품_메뉴(final Product product, final long quantity) {
+        final MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq(new Random().nextLong());
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
+
+    public static Menu 메뉴_생성(final long price, final boolean displayed, final MenuProduct... menuProducts) {
+        final Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName("후라이드+후라이드");
+        menu.setPrice(BigDecimal.valueOf(price));
+        menu.setMenuGroup(메뉴그룹_생성("치킨 세트"));
+        menu.setDisplayed(displayed);
+        menu.setMenuProducts(Arrays.asList(menuProducts));
+        return menu;
+    }
+
 
     public static Order 주문_요청() {
         return 주문_생성(OrderType.EAT_IN, LocalDateTime.now(),

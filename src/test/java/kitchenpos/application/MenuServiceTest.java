@@ -8,7 +8,7 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.DefaultPurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,7 +48,7 @@ class MenuServiceTest {
     private ProductRepository productRepository;
 
     @Mock
-    private PurgomalumClient purgomalumClient;
+    private DefaultPurgomalumClient defaultPurgomalumClient;
 
     @InjectMocks
     private MenuService menuService;
@@ -83,7 +83,7 @@ class MenuServiceTest {
     @DisplayName("메뉴는 메뉴 그룹에 속해야 한다.")
     void requireMenuGroup() {
         // given
-        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_000L), null, menuGroup, List.of(메뉴_상품_생성(product, 1L, 1)), "저녁 안주", true);
+        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_000L), null, menuGroup, List.of(메뉴_상품_생성(product, 1)), "저녁 안주", true);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(요청_객체))
@@ -106,7 +106,7 @@ class MenuServiceTest {
     @DisplayName("메뉴의 가격은 0원 이상이어야 한다")
     void requireMenuPrice() {
         // given
-        Menu 요청_객체 = createMenu_두마리_치킨(new BigDecimal("-1"), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1L, 1)), "저녁 안주", true);
+        Menu 요청_객체 = createMenu_두마리_치킨(new BigDecimal("-1"), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1)), "저녁 안주", true);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(요청_객체))
@@ -133,7 +133,7 @@ class MenuServiceTest {
         given(menuGroupRepository.findById(any())).willReturn(java.util.Optional.of(menuGroup));
         given(productRepository.findById(any())).willReturn(java.util.Optional.of(product));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
-        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_000L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 0L, 0)), "저녁 안주", true);
+        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_000L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 0)), "저녁 안주", true);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(요청_객체))
@@ -147,7 +147,7 @@ class MenuServiceTest {
         given(menuGroupRepository.findById(any())).willReturn(java.util.Optional.of(menuGroup));
         given(productRepository.findById(any())).willReturn(java.util.Optional.of(product));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
-        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_001L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1L, 1)), "저녁 안주", true);
+        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_001L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1)), "저녁 안주", true);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(요청_객체))
@@ -162,8 +162,8 @@ class MenuServiceTest {
         given(menuGroupRepository.findById(any())).willReturn(java.util.Optional.of(menuGroup));
         given(productRepository.findById(any())).willReturn(java.util.Optional.of(product));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
-        given(purgomalumClient.containsProfanity(any())).willReturn(true);
-        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_000L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1L, 1)), name, true);
+        given(defaultPurgomalumClient.containsProfanity(any())).willReturn(true);
+        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_000L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1)), name, true);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(요청_객체))
@@ -174,7 +174,7 @@ class MenuServiceTest {
     @DisplayName("가격 값은 존재해야 하며 양수여야 한다.")
     void updateMenuPriceMustBePrice() {
         // given
-        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(-1L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1L, 1)), "저녁 안주", true);
+        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(-1L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1)), "저녁 안주", true);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(요청_객체))
@@ -195,7 +195,7 @@ class MenuServiceTest {
     @DisplayName("메뉴 가격이 상품 가격 * 수량의 총합보다 작거나 같지 않으면 가격을 변경 할 수 없다.")
     void updateMenuPriceIsNotLessThanSumOfMenuProductsPrice() {
         // given
-        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_001L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1L, 1)), "저녁 안주", true);
+        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_001L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1)), "저녁 안주", true);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(요청_객체));
 
@@ -212,7 +212,7 @@ class MenuServiceTest {
         Menu 요청_객체 = Fixtures.메뉴_생성_두마리_치킨();
         given(menuRepository.findById(any())).willReturn(Optional.of(요청_객체));
 
-        Menu 가격_올린_치킨_셋트 = createMenu_두마리_치킨(BigDecimal.valueOf(15_000L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1L, 1)), "저녁 안주", true);
+        Menu 가격_올린_치킨_셋트 = createMenu_두마리_치킨(BigDecimal.valueOf(15_000L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1)), "저녁 안주", true);
 
         // when & then
         final Menu menu = menuService.changePrice(요청_객체.getId(), 가격_올린_치킨_셋트);
@@ -238,7 +238,7 @@ class MenuServiceTest {
     @DisplayName("메뉴의 가격이 메뉴에 포함된 제품들의 총 가격보다 큰 경우 노출 할 수 없다.")
     void updateMenuDisplayIsNotLessThanSumOfMenuProductsPrice() {
         // given
-        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_001L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1L, 1)), "저녁 안주", true);
+        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_001L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1)), "저녁 안주", true);
 
         given(menuRepository.findById(any())).willReturn(Optional.of(요청_객체));
 
