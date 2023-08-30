@@ -81,4 +81,56 @@ class MenuRestControllerTest extends BaseRestControllerTest{
                 .andExpect(jsonPath("menuGroupId").exists())
         ;
     }
+
+
+    @Test
+    @DisplayName("[PUT] /{menuId}/display 메뉴를 활성화한다.")
+    void displayTest() throws Exception {
+        //given
+        Menu menu = TEST_MENU();
+        given(menuService.display(any())).willReturn(menu);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                put(BASE_URL +"/" + menu.getId() + "/display")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print());
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("price").exists())
+                .andExpect(jsonPath("menuGroup").exists())
+                .andExpect(jsonPath("displayed").exists())
+                .andExpect(jsonPath("menuProducts").exists())
+                .andExpect(jsonPath("menuGroupId").exists())
+        ;
+    }
+
+
+    @Test
+    @DisplayName("[PUT] /{menuId}/hide 메뉴를 비활성화한다.")
+    void hideTest() throws Exception {
+        //given
+        Menu menu = TEST_MENU();
+        given(menuService.hide(any())).willReturn(menu);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(
+                put(BASE_URL +"/" + menu.getId() + "/hide")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andDo(print());
+
+        //then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("price").exists())
+                .andExpect(jsonPath("menuGroup").exists())
+                .andExpect(jsonPath("displayed").exists())
+                .andExpect(jsonPath("menuProducts").exists())
+                .andExpect(jsonPath("menuGroupId").exists())
+        ;
+    }
 }
