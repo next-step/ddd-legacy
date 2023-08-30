@@ -53,4 +53,27 @@ public class OrderTableServiceTest {
         assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @Test
+    void 주문테이블_손님수_변경_실패__손님수가_음수() {
+        OrderTable createRequest = new OrderTable();
+        createRequest.setName("1번 테이블");
+        OrderTable orderTable = orderTableService.create(createRequest);
+        OrderTable request = new OrderTable();
+        request.setNumberOfGuests(-1);
+
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 주문테이블_손님수_변경_실패__주문테이블이_착석상태가_아님() {
+        OrderTable createRequest = new OrderTable();
+        createRequest.setName("1번 테이블");
+        OrderTable orderTable = orderTableService.create(createRequest);
+        OrderTable request = new OrderTable();
+
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
+                .isInstanceOf(IllegalStateException.class);
+    }
 }
