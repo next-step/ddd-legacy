@@ -11,34 +11,33 @@ import java.util.List;
 import java.util.UUID;
 
 import static kitchenpos.fixture.MenuGroupFixture.TEST_MENU_GROUP;
-import static kitchenpos.fixture.ProductFixture.CREATE_TEST_PRODUCT;
 
 public class MenuFixture {
 
-    public static Menu CREATE_TEST_MENU() {
-        return CREATE_TEST_MENU(new BigDecimal(10_000), TEST_MENU_GROUP(), true, TEST_MENU_PRODUCT());
+    public static Menu TEST_MENU() {
+        return TEST_MENU(new BigDecimal(10_000), TEST_MENU_GROUP(), true, TEST_MENU_PRODUCT());
     }
 
-    public static Menu CREATE_TEST_MENU(Product product) {
-        return CREATE_TEST_MENU(new BigDecimal(10_000), TEST_MENU_GROUP(), true, TEST_MENU_PRODUCT(product));
+    public static Menu TEST_MENU(Product product) {
+        return TEST_MENU(new BigDecimal(10_000), TEST_MENU_GROUP(), true, TEST_MENU_PRODUCT(product));
     }
 
-    public static Menu CREATE_TEST_MENU(MenuProduct menuProduct) {
-        return CREATE_TEST_MENU(new BigDecimal(10_000), TEST_MENU_GROUP(), true, menuProduct);
+    public static Menu TEST_MENU(MenuProduct menuProduct) {
+        return TEST_MENU(new BigDecimal(10_000), TEST_MENU_GROUP(), true, menuProduct);
     }
 
-    public static Menu CREATE_TEST_MENU(boolean displayed) {
-        return CREATE_TEST_MENU(new BigDecimal(10_000), TEST_MENU_GROUP(), displayed, TEST_MENU_PRODUCT());
+    public static Menu TEST_MENU(boolean displayed) {
+        return TEST_MENU(new BigDecimal(10_000), TEST_MENU_GROUP(), displayed, TEST_MENU_PRODUCT());
     }
-    public static Menu CREATE_TEST_MENU(BigDecimal price) {
-        return CREATE_TEST_MENU(price, TEST_MENU_GROUP(), true, TEST_MENU_PRODUCT());
-    }
-
-    public static Menu CREATE_TEST_MENU(BigDecimal price, Product product) {
-        return CREATE_TEST_MENU(price, TEST_MENU_GROUP(), true, TEST_MENU_PRODUCT(product));
+    public static Menu TEST_MENU(BigDecimal price) {
+        return TEST_MENU(price, TEST_MENU_GROUP(), true, TEST_MENU_PRODUCT());
     }
 
-    public static Menu CREATE_TEST_MENU(BigDecimal price, MenuGroup menuGroup, boolean displayed, MenuProduct menuProduct) {
+    public static Menu TEST_MENU(BigDecimal price, Product product) {
+        return TEST_MENU(price, TEST_MENU_GROUP(), true, TEST_MENU_PRODUCT(product));
+    }
+
+    public static Menu TEST_MENU(BigDecimal price, MenuGroup menuGroup, boolean displayed, MenuProduct menuProduct) {
         Menu menu = new Menu();
         menu.setName("테스트 메뉴");
         menu.setPrice(price);
@@ -52,11 +51,11 @@ public class MenuFixture {
     }
 
     public static MenuProduct TEST_MENU_PRODUCT() {
-        return TEST_MENU_PRODUCT(3, CREATE_TEST_PRODUCT());
+        return TEST_MENU_PRODUCT(3, ProductFixture.TEST_PRODUCT());
     }
 
     public static MenuProduct TEST_MENU_PRODUCT(int quantity) {
-        return TEST_MENU_PRODUCT(quantity, CREATE_TEST_PRODUCT());
+        return TEST_MENU_PRODUCT(quantity, ProductFixture.TEST_PRODUCT());
     }
 
     public static MenuProduct TEST_MENU_PRODUCT(Product product) {

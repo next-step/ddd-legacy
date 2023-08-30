@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +19,6 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.*;
 import static kitchenpos.fixture.MenuGroupFixture.TEST_MENU_GROUP;
-import static kitchenpos.fixture.ProductFixture.CREATE_TEST_PRODUCT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,8 +51,8 @@ public class MenuServiceTest {
         void createTest() {
             // given
             MenuGroup menuGroup = TEST_MENU_GROUP();
-            Product product = CREATE_TEST_PRODUCT();
-            Menu menuRequest = CREATE_TEST_MENU(new BigDecimal(150), product);
+            Product product = ProductFixture.TEST_PRODUCT();
+            Menu menuRequest = TEST_MENU(new BigDecimal(150), product);
             productRepository.save(product);
             given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(menuGroup));
             given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
@@ -74,7 +74,7 @@ public class MenuServiceTest {
         void priceTest(String price) {
             // given && when
             BigDecimal value = price.equals("null") ? null : new BigDecimal(price);
-            Menu menuRequest = CREATE_TEST_MENU(value);
+            Menu menuRequest = TEST_MENU(value);
 
             // then
             assertThatThrownBy(() -> menuService.create(menuRequest))
@@ -89,7 +89,7 @@ public class MenuServiceTest {
             given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
 
             // when
-            Menu menuRequest = CREATE_TEST_MENU((MenuProduct) null);
+            Menu menuRequest = TEST_MENU((MenuProduct) null);
 
             //then
             assertThatThrownBy(() -> menuService.create(menuRequest))
@@ -101,7 +101,7 @@ public class MenuServiceTest {
         @DisplayName("메뉴_생성시_상품들은_등록된_상품이어야_한다")
         void productShouldExist() {
             // given
-            Menu menuRequest = CREATE_TEST_MENU();
+            Menu menuRequest = TEST_MENU();
             given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
 
             // when && then
@@ -118,7 +118,7 @@ public class MenuServiceTest {
 
             // when
             MenuProduct menuProduct = TEST_MENU_PRODUCT(-1);
-            Menu menuRequest = CREATE_TEST_MENU(menuProduct);
+            Menu menuRequest = TEST_MENU(menuProduct);
             Product product = menuRequest.getMenuProducts().get(0).getProduct();
             productRepository.save(product);
 
@@ -132,9 +132,9 @@ public class MenuServiceTest {
         @DisplayName("메뉴의 가격은 포함된 상품들의 각 금액(상품 가격 X 수량)의 합보다 높을 수 없다.")
         void priceSumTest() {
             // given
-            Product product = CREATE_TEST_PRODUCT();
+            Product product = ProductFixture.TEST_PRODUCT();
             productRepository.save(product);
-            Menu menuRequest = CREATE_TEST_MENU(product);
+            Menu menuRequest = TEST_MENU(product);
             given(menuGroupRepository.findById(any(UUID.class))).willReturn(Optional.of(TEST_MENU_GROUP()));
 
             // when
@@ -240,7 +240,7 @@ public class MenuServiceTest {
         @DisplayName("기존_메뉴가_사용자에게_보이도록_정상적으로_활성화한다")
         void menuDisplayTest() {
             // given
-            Menu request = CREATE_TEST_MENU();
+            Menu request = TEST_MENU();
             menuRepository.save(request);
 
             // when
@@ -255,7 +255,7 @@ public class MenuServiceTest {
         @DisplayName("활성화 시킬 메뉴의 가격은 포함된 상품들의 각 금액(상품 가격 X 수량)의 합보다 높을 수 없다")
         void displayChangeTest() {
             // given
-            Menu request = CREATE_TEST_MENU();
+            Menu request = TEST_MENU();
             menuRepository.save(request);
 
             // when
@@ -272,7 +272,7 @@ public class MenuServiceTest {
     @DisplayName("기존_메뉴가_사용자에게_보이지_않도록_비활성화한다")
     void hideTest() {
         // given
-        Menu menuRequest = CREATE_TEST_MENU();
+        Menu menuRequest = TEST_MENU();
         menuRequest.setDisplayed(true);
         menuRepository.save(menuRequest);
 
@@ -284,7 +284,7 @@ public class MenuServiceTest {
     }
 
     private Menu getTestMenuAndInitProduct() {
-        Menu menuRequest = CREATE_TEST_MENU();
+        Menu menuRequest = TEST_MENU();
         productRepository.save(menuRequest.getMenuProducts().get(0).getProduct());
         return menuRequest;
     }

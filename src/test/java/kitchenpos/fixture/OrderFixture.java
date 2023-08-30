@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.fixture.MenuFixture.CREATE_TEST_MENU;
 import static kitchenpos.fixture.OrderTableFixture.TEST_ORDER_TABLE;
 
 public class OrderFixture {
@@ -36,7 +35,7 @@ public class OrderFixture {
     }
 
     public static Order TEST_ORDER_DELIVERY(OrderStatus orderStatus) {
-        return TEST_ORDER_DELIVERY(orderStatus, CREATE_TEST_MENU());
+        return TEST_ORDER_DELIVERY(orderStatus, MenuFixture.TEST_MENU());
     }
 
     public static Order TEST_ORDER_DELIVERY(OrderStatus orderStatus, Menu menu) {
@@ -51,7 +50,7 @@ public class OrderFixture {
     }
 
     public static Order TEST_ORDER_TAKEOUT(OrderStatus orderStatus) {
-        return TEST_ORDER_TAKEOUT(orderStatus, CREATE_TEST_MENU());
+        return TEST_ORDER_TAKEOUT(orderStatus, MenuFixture.TEST_MENU());
     }
 
     public static Order TEST_ORDER_TAKEOUT(OrderStatus orderStatus, Menu menu) {
@@ -65,7 +64,7 @@ public class OrderFixture {
     }
 
     public static OrderLineItem TEST_ORDER_LINE_ITEM() {
-        return TEST_ORDER_LINE_ITEM(CREATE_TEST_MENU());
+        return TEST_ORDER_LINE_ITEM(MenuFixture.TEST_MENU());
     }
 
     public static OrderLineItem TEST_ORDER_LINE_ITEM(Menu menu) {

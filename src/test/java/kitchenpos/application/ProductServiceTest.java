@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 
 import static kitchenpos.fixture.MenuFixture.*;
-import static kitchenpos.fixture.ProductFixture.CREATE_TEST_PRODUCT;
+import static kitchenpos.fixture.ProductFixture.TEST_PRODUCT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -44,7 +45,7 @@ class ProductServiceTest {
         @DisplayName("새로운 상품을 정상적으로 등록한다.")
         void createTest() {
             // given
-            Product createRequest = CREATE_TEST_PRODUCT();
+            Product createRequest = ProductFixture.TEST_PRODUCT();
             given(purgomalumClient.containsProfanity(anyString())).willReturn(false);
 
             // when
@@ -60,7 +61,7 @@ class ProductServiceTest {
         @DisplayName("이름은 비어있을 수 없다.")
         void createNameEmptyTest() {
             // given
-            Product createRequest  = CREATE_TEST_PRODUCT(new BigDecimal(500), null);
+            Product createRequest  = TEST_PRODUCT(new BigDecimal(500), null);
 
             // when && then
             assertThatThrownBy(() -> productService.create(createRequest ))
@@ -72,7 +73,7 @@ class ProductServiceTest {
         @CsvSource(value = {"fuck", "shit"})
         void createNameTest(String name) {
             // given
-            Product createRequest = CREATE_TEST_PRODUCT(name);
+            Product createRequest = ProductFixture.TEST_PRODUCT(name);
             given(purgomalumClient.containsProfanity(name)).willReturn(true);
 
             // when && then
@@ -89,9 +90,9 @@ class ProductServiceTest {
         @DisplayName("상품의 가격을 변경하면서 메뉴가 비활성화 되지 않는다.")
         void changePriceTest() {
             // given
-            Product productRequest = CREATE_TEST_PRODUCT();
+            Product productRequest = ProductFixture.TEST_PRODUCT();
             Product product = productService.create(productRequest);
-            Menu menu = CREATE_TEST_MENU(product);
+            Menu menu = TEST_MENU(product);
             menuRepository.save(menu);
 
             // when
@@ -107,9 +108,9 @@ class ProductServiceTest {
         @DisplayName("가격 변경 후, 메뉴의 가격이 (메뉴에 포함된 상품들의 가격 x 개수) 총 합보다 높다면 메뉴를 비활성화 한다.")
         void changePriceAndHideTest() {
             // given
-            Product productRequest = CREATE_TEST_PRODUCT();
+            Product productRequest = ProductFixture.TEST_PRODUCT();
             Product product = productService.create(productRequest);
-            Menu menu = CREATE_TEST_MENU(product);
+            Menu menu = TEST_MENU(product);
             menuRepository.save(menu);
 
             // when

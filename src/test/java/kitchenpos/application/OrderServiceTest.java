@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.MenuFixture;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import static kitchenpos.fixture.MenuFixture.CREATE_TEST_MENU;
 import static kitchenpos.fixture.MenuFixture.MAX_PRICE;
 import static kitchenpos.fixture.OrderFixture.*;
 import static kitchenpos.fixture.OrderTableFixture.TEST_ORDER_TABLE;
@@ -50,7 +50,7 @@ class OrderServiceTest {
         @DisplayName("새로운_배달_주문을_등록한다")
         void newOrderTest() {
             // given
-            Menu menu = CREATE_TEST_MENU();
+            Menu menu = MenuFixture.TEST_MENU();
             Order order = TEST_ORDER_DELIVERY(OrderStatus.WAITING, menu);
             menuRepository.save(menu);
 
@@ -68,7 +68,7 @@ class OrderServiceTest {
         @DisplayName("새로운_테이크아웃_주문을_등록한다")
         void newTakeOutOrderTest() {
             // given
-            Menu menu = CREATE_TEST_MENU();
+            Menu menu = MenuFixture.TEST_MENU();
             Order order = TEST_ORDER_TAKEOUT(OrderStatus.WAITING, menu);
             menuRepository.save(menu);
 
@@ -85,7 +85,7 @@ class OrderServiceTest {
         @DisplayName("새로운_매장_주문을_등록한다")
         void newEatInTest() {
             // given
-            Menu menu = CREATE_TEST_MENU();
+            Menu menu = MenuFixture.TEST_MENU();
             Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING, menu);
             menuRepository.save(menu);
 
@@ -166,7 +166,7 @@ class OrderServiceTest {
         @DisplayName("주문_내역들의_메뉴들은_활성화_된_메뉴들이어야_한다")
         void menuShouldDisplay() {
             // given
-            Menu menu = CREATE_TEST_MENU();
+            Menu menu = MenuFixture.TEST_MENU();
             Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING, menu);
             menuRepository.save(menu);
 
@@ -212,7 +212,7 @@ class OrderServiceTest {
         @DisplayName("주문_타입이_매장이라면_사용_가능한_테이블이_지정되어야_한다")
         void orderTableShouldSet() {
             // given
-            Menu menu = CREATE_TEST_MENU();
+            Menu menu = MenuFixture.TEST_MENU();
             Order order = TEST_ORDER_EAT_IN(OrderStatus.WAITING, menu);
             menuRepository.save(menu);
             OrderTable orderTable = TEST_ORDER_TABLE();
@@ -461,7 +461,7 @@ class OrderServiceTest {
     }
 
     private Menu initTestMenu() {
-        Menu menu = CREATE_TEST_MENU();
+        Menu menu = MenuFixture.TEST_MENU();
         menuRepository.save(menu);
         return menu;
     }
