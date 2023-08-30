@@ -4,8 +4,11 @@ import kitchenpos.domain.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TestFixture {
     private TestFixture() {
@@ -47,12 +50,53 @@ public class TestFixture {
     }
 
     public static Menu createMenu(
+            String name,
+            Long price,
+            boolean displayed,
+            MenuGroup menuGroup,
+            List<Product> products
+    ) {
+
+        List<MenuProduct> menuProducts = IntStream.range(0, products.size())
+                .mapToObj(i -> createMenuProduct(products.get(i), i, 1))
+                .collect(Collectors.toList());
+
+        return createMenu(UUID.randomUUID(), name, price, displayed, menuGroup.getId(), menuGroup, menuProducts);
+    }
+
+    public static MenuProduct createMenuProduct(
+            Product product,
+            long seq,
+            int quantity
+    ) {
+        var menuProduct = new MenuProduct();
+        menuProduct.setProductId(product.getId());
+        menuProduct.setSeq(seq);
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
+
+
+    public static Menu createMenu(
             UUID id,
             String name,
             Long price,
             boolean displayed,
             UUID menuGroupId,
             MenuGroup menuGroup
+    ) {
+        return createMenu(id, name, price, displayed, menuGroupId, menuGroup, Collections.emptyList());
+    }
+
+    public static Menu createMenu(
+            UUID id,
+            String name,
+            Long price,
+            boolean displayed,
+            UUID menuGroupId,
+            MenuGroup menuGroup,
+            List<MenuProduct> menuProducts
     ) {
         var menu = new Menu();
         menu.setId(id);
@@ -61,6 +105,7 @@ public class TestFixture {
         menu.setDisplayed(displayed);
         menu.setMenuGroupId(menuGroupId);
         menu.setMenuGroup(menuGroup);
+        menu.setMenuProducts(menuProducts);
         return menu;
     }
 
