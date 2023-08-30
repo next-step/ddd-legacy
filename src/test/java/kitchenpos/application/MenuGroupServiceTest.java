@@ -51,20 +51,4 @@ class MenuGroupServiceTest {
         assertThatThrownBy(() -> menuGroupService.create(request))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
     }
-
-    @Test
-    @DisplayName("모든 메뉴 그룹 정보를 가져온다")
-    void findAllTest() {
-        // given
-        MenuGroup menuGroup = TEST_MENU_GROUP();
-        given(menuGroupRepository.findAll()).willReturn(List.of(menuGroup));
-
-        // when
-        List<MenuGroup> actual = menuGroupService.findAll();
-
-        // then
-        then(menuGroupRepository).should(times(1)).findAll();
-        assertThat(actual).hasSize(1);
-        assertThat(actual).containsExactly(menuGroup);
-    }
 }

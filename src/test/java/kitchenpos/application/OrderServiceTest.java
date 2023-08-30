@@ -443,12 +443,6 @@ class OrderServiceTest {
             assertThatThrownBy(() -> orderService.complete(order.getId()))
                     .isExactlyInstanceOf(IllegalStateException.class);
         }
-
-        @Test
-        @Disabled
-        @DisplayName("모든_주문_정보를_가져온다")
-        void findAll() {
-        }
     }
 
     private Order getOrderByTypeName(String typeName, OrderStatus status) {

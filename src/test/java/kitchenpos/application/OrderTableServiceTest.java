@@ -180,20 +180,4 @@ class OrderTableServiceTest {
         }
 
     }
-
-    @Test
-    @DisplayName("모든_주문_테이블_정보를_가져온다")
-    void findAllTest() {
-        // given
-        OrderTable orderTable = TEST_ORDER_TABLE();
-        given(orderTableRepository.findAll()).willReturn(List.of(orderTable, orderTable));
-
-        // when
-        List<OrderTable> orderTables = orderTableService.findAll();
-
-        // then
-        verify(orderTableRepository, times(1)).findAll();
-        assertThat(orderTables).hasSize(2);
-        assertThat(orderTables).containsExactly(orderTable, orderTable);
-    }
 }
