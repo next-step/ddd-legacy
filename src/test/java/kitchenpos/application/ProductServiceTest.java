@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -63,7 +63,7 @@ class ProductServiceTest {
     @Test
     public void 상품등록_이름_욕설체크() throws Exception {
         product = ProductFixture.create("욕설");
-        when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+        given(purgomalumClient.containsProfanity(any())).willReturn(true);
 
         assertThatThrownBy(() -> productService.create(product)).isInstanceOf(
             IllegalArgumentException.class);
@@ -73,8 +73,8 @@ class ProductServiceTest {
     @Test
     public void 상품등록_성공() throws Exception {
         product = ProductFixture.create("정상 상품");
-        when(purgomalumClient.containsProfanity(any())).thenReturn(false);
-        when(productRepository.save(any())).thenReturn(product);
+        given(purgomalumClient.containsProfanity(any())).willReturn(false);
+        given(productRepository.save(any())).willReturn(product);
 
         Product savedProduct = productService.create(product);
 
@@ -98,8 +98,8 @@ class ProductServiceTest {
         Menu menu = MenuFixture.create(
             BigDecimal.valueOf(30000)
             , MenuProductFixture.createDefaultsWithProduct(product_10000, product_20000));
-        when(productRepository.findById(product_10000.getId())).thenReturn(Optional.of(product_10000));
-        when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
+        given(productRepository.findById(product_10000.getId())).willReturn(Optional.of(product_10000));
+        given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
         assertThat(menu.isDisplayed()).isTrue();
 
         product_10000.setPrice(BigDecimal.valueOf(1500));
@@ -112,7 +112,7 @@ class ProductServiceTest {
     @Test
     public void 상품가격변경_성공() throws Exception {
         product = ProductFixture.create("상품", BigDecimal.valueOf(10000));
-        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+        given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
         product.setPrice(BigDecimal.valueOf(20000));
 
         Product changeProduct = productService.changePrice(product.getId(), product);

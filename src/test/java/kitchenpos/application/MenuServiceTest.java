@@ -5,7 +5,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -104,7 +103,7 @@ class MenuServiceTest {
             , menuProducts);
 
         setMock();
-        when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+        given(purgomalumClient.containsProfanity(any())).willReturn(true);
 
         assertThatThrownBy(() -> menuService.create(menu))
             .isInstanceOf(IllegalArgumentException.class);
@@ -122,8 +121,8 @@ class MenuServiceTest {
             , menuProducts);
 
         setMock();
-        when(purgomalumClient.containsProfanity(any())).thenReturn(false);
-        when(menuRepository.save(any())).thenReturn(menu);
+        given(purgomalumClient.containsProfanity(any())).willReturn(false);
+        given(menuRepository.save(any())).willReturn(menu);
 
         assertThat(menuService.create(menu).getName()).isEqualTo("메뉴");
     }
@@ -138,7 +137,7 @@ class MenuServiceTest {
             , menuGroup
             , menuProducts);
 
-        when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
+        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
 
         BigDecimal changePrice = BigDecimal.valueOf(25000);
         menu.setPrice(changePrice);
@@ -156,7 +155,7 @@ class MenuServiceTest {
             , true
             , menuGroup
             , menuProducts);
-        when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
+        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
 
         BigDecimal changePrice = BigDecimal.valueOf(31000);
         menu.setPrice(changePrice);
@@ -175,7 +174,7 @@ class MenuServiceTest {
             , false
             , menuGroup
             , menuProducts);
-        when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
+        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
 
         menuService.display(menu.getId());
 
@@ -191,7 +190,7 @@ class MenuServiceTest {
             , false
             , menuGroup
             , menuProducts);
-        when(menuRepository.findById(menu.getId())).thenReturn(Optional.of(menu));
+        given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
 
         assertThatThrownBy(
             () -> menuService.display(menu.getId())).isInstanceOf(IllegalStateException.class);
@@ -199,13 +198,13 @@ class MenuServiceTest {
 
 
     private void setMock() {
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-        when(productRepository.findAllByIdIn(any()))
-            .thenReturn(List.of(product_10000, product_20000));
-        when(productRepository.findById(product_10000.getId()))
-            .thenReturn(Optional.of(product_10000));
-        when(productRepository.findById(product_20000.getId()))
-            .thenReturn(Optional.of(product_20000));
+        given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
+        given(productRepository.findAllByIdIn(any()))
+            .willReturn(List.of(product_10000, product_20000));
+        given(productRepository.findById(product_10000.getId()))
+            .willReturn(Optional.of(product_10000));
+        given(productRepository.findById(product_20000.getId()))
+            .willReturn(Optional.of(product_20000));
     }
 
 }

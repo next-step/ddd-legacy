@@ -3,7 +3,7 @@ package kitchenpos.application;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 import java.util.Optional;
 import kitchenpos.domain.OrderRepository;
@@ -43,7 +43,7 @@ class OrderTableServiceTest {
     @Test
     public void 주문테이블_착석() throws Exception {
         orderTable = OrderTableFixture.create("1번테이블", 0, false);
-        when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         orderTable = orderTableService.sit(orderTable.getId());
 
@@ -54,8 +54,8 @@ class OrderTableServiceTest {
     @Test
     public void 주문테이블_청소() throws Exception {
         orderTable = OrderTableFixture.create("1번테이블", 4, true);
-        when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
-        when(orderRepository.existsByOrderTableAndStatusNot(any(),any())).thenReturn(false);
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+        given(orderRepository.existsByOrderTableAndStatusNot(any(),any())).willReturn(false);
 
         orderTable = orderTableService.clear(orderTable.getId());
 
@@ -67,7 +67,7 @@ class OrderTableServiceTest {
     @Test
     public void 주문테이블_고객수변경_성공() throws Exception {
         orderTable = OrderTableFixture.create("1번테이블", 4, true);
-        when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
         orderTable.setNumberOfGuests(5);
 
         orderTable = orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);

@@ -4,7 +4,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -113,9 +113,9 @@ class OrderServiceTest {
         Order order = OrderFixture.create(OrderType.TAKEOUT, Optional.of(orderTable),
             Optional.of(deliveryAddress),
             List.of(orderLineItem));
-        when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-        when(orderRepository.save(any())).thenReturn(order);
+        given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+        given(orderRepository.save(any())).willReturn(order);
 
         order = orderService.create(order);
 
@@ -129,7 +129,7 @@ class OrderServiceTest {
             Optional.of(deliveryAddress),
             List.of(orderLineItem));
         order.setStatus(OrderStatus.WAITING);
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         orderService.accept(order.getId());
 
@@ -143,7 +143,7 @@ class OrderServiceTest {
             Optional.of(deliveryAddress),
             List.of(orderLineItem));
         order.setStatus(OrderStatus.ACCEPTED);
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         orderService.serve(order.getId());
 
@@ -157,7 +157,7 @@ class OrderServiceTest {
         Order order = OrderFixture.create(OrderType.DELIVERY, Optional.of(orderTable),
             Optional.of(deliveryAddress),
             List.of(orderLineItem));
-        when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
+        given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
 
         assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(
             IllegalArgumentException.class);
@@ -169,8 +169,8 @@ class OrderServiceTest {
         Order order = OrderFixture.create(OrderType.DELIVERY, Optional.of(orderTable),
             Optional.empty(),
             List.of(orderLineItem));
-        when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
         assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(
             IllegalArgumentException.class);
@@ -183,7 +183,7 @@ class OrderServiceTest {
             Optional.empty(),
             List.of(orderLineItem));
         order.setStatus(OrderStatus.SERVED);
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         order = orderService.startDelivery(order.getId());
 
@@ -197,7 +197,7 @@ class OrderServiceTest {
             Optional.empty(),
             List.of(orderLineItem));
         order.setStatus(OrderStatus.DELIVERING);
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         order = orderService.completeDelivery(order.getId());
 
@@ -211,7 +211,7 @@ class OrderServiceTest {
             Optional.empty(),
             List.of(orderLineItem));
         order.setStatus(OrderStatus.DELIVERED);
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         order = orderService.complete(order.getId());
 
@@ -225,7 +225,7 @@ class OrderServiceTest {
         Order order = OrderFixture.create(OrderType.TAKEOUT, Optional.of(orderTable),
             Optional.of(deliveryAddress),
             List.of(orderLineItem));
-        when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
+        given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
 
         assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(
             IllegalArgumentException.class);
@@ -238,7 +238,7 @@ class OrderServiceTest {
             Optional.of(deliveryAddress),
             List.of(orderLineItem));
         order.setStatus(OrderStatus.SERVED);
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         order = orderService.complete(order.getId());
 
@@ -252,9 +252,9 @@ class OrderServiceTest {
         Order order = OrderFixture.create(OrderType.EAT_IN, Optional.of(orderTable),
             Optional.of(deliveryAddress),
             List.of(orderLineItem));
-        when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-        when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+        given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+        given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(
             IllegalStateException.class);
@@ -267,8 +267,8 @@ class OrderServiceTest {
             Optional.of(deliveryAddress),
             List.of(orderLineItem));
         order.setStatus(OrderStatus.SERVED);
-        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
-        when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(false);
+        given(orderRepository.findById(any())).willReturn(Optional.of(order));
+        given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
 
         order = orderService.complete(order.getId());
 
