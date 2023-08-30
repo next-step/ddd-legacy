@@ -11,6 +11,7 @@ public class MenuGroupFixture {
     public MenuGroupFixture() {
         this.menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
+        menuGroup.setName("추천 메뉴");
     }
 
     public static MenuGroupFixture builder() {
