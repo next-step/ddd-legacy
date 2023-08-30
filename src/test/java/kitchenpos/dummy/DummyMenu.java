@@ -39,20 +39,23 @@ public class DummyMenu {
     }
 
     public static Menu createMenu(MenuGroup menuGroup, List<MenuProduct> menuProducts) {
-        Menu menu = defaultMenu();
+        Menu menu = createMenu();
         menu.setMenuGroup(menuGroup);
         menu.setMenuGroupId(menuGroup.getId());
         menu.setMenuProducts(menuProducts);
         return menu;
     }
 
-    public static Menu defaultMenu() {
+    public static Menu createMenu(boolean displayed) {
         return createMenu(
                 "기본 메뉴",
                 new BigDecimal(10000),
-                false,
+                displayed,
                 DummyMenuGroup.createMenuGroup(),
                 List.of(DummyMenuProduct.defaultMenuProduct())
         );
+    }
+    public static Menu createMenu() {
+        return createMenu(false);
     }
 }
