@@ -80,8 +80,8 @@ public class MenuApi {
 
     public static void 메뉴_전체조회_성공함(MockHttpServletResponse response, int expectedSize) throws Exception {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        List<Object> menuGroups = objectMapper.readValue(response.getContentAsString(), List.class);
-        assertThat(menuGroups).hasSize(expectedSize);
+        List<Object> menus = objectMapper.readValue(response.getContentAsString(), List.class);
+        assertThat(menus).hasSize(expectedSize);
     }
 
 }
