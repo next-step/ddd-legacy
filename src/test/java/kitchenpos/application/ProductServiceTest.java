@@ -1,10 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -99,13 +95,13 @@ class ProductServiceTest {
     }
 
     @Test
-    void 상품_생성_시_금액이_0_이하이면_예외가_발생한다() {
+    void 상품_생성_시_금액이_0_이면_예외가_발생한다() {
         Product request = new Product();
         request.setName("test");
         request.setPrice(BigDecimal.valueOf(-1));
 
         assertThatThrownBy(() -> productService.create(request))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -134,13 +130,13 @@ class ProductServiceTest {
     }
 
     @Test
-    void 상품_수정_시_금액이_0_이하이면_예외가_발생한다() {
+    void 상품_수정_시_금액이_0_미만이면_예외가_발생한다() {
         Product request = new Product();
         request.setName("test");
         request.setPrice(BigDecimal.valueOf(-1));
 
         assertThatThrownBy(() -> productService.changePrice(product1.getId(), request))
-            .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
