@@ -45,9 +45,29 @@ public class TestFixture {
             Long price,
             boolean displayed
     ) {
-        var menuGroup = createMenuGroup("메뉴그룹");
-        return createMenu(UUID.randomUUID(), name, price, displayed, menuGroup.getId(), menuGroup);
+        return createMenu(UUID.randomUUID(), name, price, displayed);
     }
+
+    public static Menu createMenu(
+            UUID id,
+            String name,
+            Long price,
+            boolean displayed
+    ) {
+        var menuGroup = createMenuGroup("메뉴그룹");
+        return createMenu(id, name, price, displayed, menuGroup.getId(), menuGroup);
+    }
+
+    public static Menu createMenu(
+            UUID id,
+            String name,
+            BigDecimal price,
+            boolean displayed
+    ) {
+        var menuGroup = createMenuGroup("메뉴그룹");
+        return createMenu(id, name, price, displayed, menuGroup.getId(), menuGroup);
+    }
+
 
     public static Menu createMenu(
             String name,
@@ -92,6 +112,17 @@ public class TestFixture {
     public static Menu createMenu(
             UUID id,
             String name,
+            BigDecimal price,
+            boolean displayed,
+            UUID menuGroupId,
+            MenuGroup menuGroup
+    ) {
+        return createMenu(id, name, price, displayed, menuGroupId, menuGroup, Collections.emptyList());
+    }
+
+    public static Menu createMenu(
+            UUID id,
+            String name,
             Long price,
             boolean displayed,
             UUID menuGroupId,
@@ -102,6 +133,26 @@ public class TestFixture {
         menu.setId(id);
         menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(price));
+        menu.setDisplayed(displayed);
+        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuGroup(menuGroup);
+        menu.setMenuProducts(menuProducts);
+        return menu;
+    }
+
+    public static Menu createMenu(
+            UUID id,
+            String name,
+            BigDecimal price,
+            boolean displayed,
+            UUID menuGroupId,
+            MenuGroup menuGroup,
+            List<MenuProduct> menuProducts
+    ) {
+        var menu = new Menu();
+        menu.setId(id);
+        menu.setName(name);
+        menu.setPrice(price);
         menu.setDisplayed(displayed);
         menu.setMenuGroupId(menuGroupId);
         menu.setMenuGroup(menuGroup);
@@ -133,21 +184,60 @@ public class TestFixture {
         return copiedOrder;
     }
 
-    public static Order createOrder(OrderStatus status, OrderType type) {
-        var orderTable = createOrderTable("테이블명", 4);
+    public static Order createOrder(
+            OrderStatus status,
+            OrderType type,
+            List<OrderLineItem> orderLineItems
+    ) {
+        return createOrder(status, type, orderLineItems, createOrderTable("테이블명", 4));
+    }
 
+    public static Order createOrder(
+            OrderStatus status,
+            OrderType type,
+            List<OrderLineItem> orderLineItems,
+            OrderTable orderTable
+    ) {
         return createdOrder(
                 UUID.randomUUID(),
                 LocalDateTime.now(),
                 status,
-                List.of(
-                        createOrderLineItem(createMenu("후라이드", 16000L), 16000L, 1),
-                        createOrderLineItem(createMenu("양념치킨", 26000L), 26000L, 5)
-                ),
+                orderLineItems,
                 UUID.randomUUID(),
                 "서울시 강남구 역삼동",
                 type,
                 orderTable
+        );
+    }
+
+    public static Order createOrder(
+            OrderStatus status,
+            OrderType type,
+            List<OrderLineItem> orderLineItems,
+            OrderTable orderTable,
+            String deliveryAddress
+    ) {
+        return createdOrder(
+                UUID.randomUUID(),
+                LocalDateTime.now(),
+                status,
+                orderLineItems,
+                UUID.randomUUID(),
+                deliveryAddress,
+                type,
+                orderTable
+        );
+    }
+
+
+    public static Order createOrder(OrderStatus status, OrderType type) {
+        return createOrder(
+                status,
+                type,
+                List.of(
+                        createOrderLineItem(createMenu("후라이드", 16000L), 16000L, 1),
+                        createOrderLineItem(createMenu("양념치킨", 26000L), 26000L, 5)
+                )
         );
     }
 
@@ -170,6 +260,7 @@ public class TestFixture {
         order.setDeliveryAddress(deliveryAddress);
         order.setType(type);
         order.setOrderTable(orderTable);
+        order.setOrderTableId(orderTable.getId());
         return order;
     }
 
@@ -221,6 +312,20 @@ public class TestFixture {
         orderLineItem.setMenuId(menu.getId());
         orderLineItem.setMenu(menu);
         orderLineItem.setPrice(BigDecimal.valueOf(price));
+        orderLineItem.setQuantity(quantity);
+        return orderLineItem;
+    }
+
+    public static OrderLineItem createOrderLineItem(
+            Menu menu,
+            BigDecimal price,
+            int quantity
+    ) {
+        var orderLineItem = new OrderLineItem();
+
+        orderLineItem.setMenuId(menu.getId());
+        orderLineItem.setMenu(menu);
+        orderLineItem.setPrice(price);
         orderLineItem.setQuantity(quantity);
         return orderLineItem;
     }
