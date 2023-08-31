@@ -10,15 +10,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+
 
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
@@ -189,8 +187,44 @@ class MenuServiceTest {
         request.setMenuProducts(Arrays.asList(menuProduct));
         request.setDisplayed(true);
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-        
+
         assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 메뉴를_노출상태로_변경한다() {
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+        menuService.display(menu.getId());
+
+        assertThat(menu.isDisplayed()).isTrue();
+    }
+
+    @Test
+    void 메뉴를_숨김상태로_변경한다() {
+        given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+        menuService.hide(menu.getId());
+
+        assertThat(menu.isDisplayed()).isFalse();
+    }
+
+    @Test
+    void 없는_메뉴를_숨김상태로_변경하면_실패한다() {
+        given(menuRepository.findById(any())).willThrow(NoSuchElementException.class);
+
+        assertThatThrownBy(() -> menuService.hide(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    void 메뉴_전체를_조회한다() {
+        given(menuRepository.findAll()).willReturn(Arrays.asList(menu));
+
+        List<Menu> actual = menuService.findAll();
+
+        assertThat(actual).isNotNull();
+        assertThat(actual).hasSize(1);
     }
 }
