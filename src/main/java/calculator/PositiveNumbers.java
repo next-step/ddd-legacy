@@ -5,18 +5,18 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class PositiveNumbers {
+    private final List<PositiveNumber> values;
+
+    public PositiveNumbers(final List<PositiveNumber> values) {
+        this.values = values;
+    }
+
     public static PositiveNumbers of(final List<Integer> values) {
         final List<PositiveNumber> positiveNumbers = values.stream()
                 .map(PositiveNumber::new)
                 .collect(Collectors.toList());
 
         return new PositiveNumbers(positiveNumbers);
-    }
-
-    private final List<PositiveNumber> values;
-
-    public PositiveNumbers(final List<PositiveNumber> values) {
-        this.values = values;
     }
 
     public PositiveNumber sum() {

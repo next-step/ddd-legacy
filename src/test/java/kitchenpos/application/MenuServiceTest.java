@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
-import static kitchenpos.fixture.MenuProductFixture.createMenuProductWithDefaultId;
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -37,6 +36,29 @@ class MenuServiceTest extends BaseServiceTest {
         this.menuRepository = menuRepository;
         this.menuGroupRepository = menuGroupRepository;
         this.productRepository = productRepository;
+    }
+
+    private static class MenuProductFields {
+        final Product product;
+        final long quantity;
+
+        public MenuProductFields(MenuProduct menuProduct) {
+            this.product = menuProduct.getProduct();
+            this.quantity = menuProduct.getQuantity();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final MenuProductFields that = (MenuProductFields) o;
+            return quantity == that.quantity && Objects.equals(product, that.product);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(product, quantity);
+        }
     }
 
     @DisplayName("등록")
@@ -264,6 +286,7 @@ class MenuServiceTest extends BaseServiceTest {
             assertThatIllegalStateException().isThrownBy(() -> menuService.display(menu.getId()));
         }
     }
+
     @DisplayName("미표출")
     @Nested
     class Hide {
@@ -299,29 +322,6 @@ class MenuServiceTest extends BaseServiceTest {
             final List<Menu> menus = menuService.findAll();
 
             assertThat(menus).contains(menu1, menu2);
-        }
-    }
-
-    private static class MenuProductFields {
-        final Product product;
-        final long quantity;
-
-        public MenuProductFields(MenuProduct menuProduct) {
-            this.product = menuProduct.getProduct();
-            this.quantity = menuProduct.getQuantity();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            final MenuProductFields that = (MenuProductFields) o;
-            return quantity == that.quantity && Objects.equals(product, that.product);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(product, quantity);
         }
     }
 }

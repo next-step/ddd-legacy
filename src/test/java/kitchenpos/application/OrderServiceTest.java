@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
-import static kitchenpos.fixture.MenuProductFixture.createMenuProductWithDefaultId;
 import static kitchenpos.fixture.OrderFixture.createDeliveryOrder;
 import static kitchenpos.fixture.OrderFixture.createOrder;
 import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
@@ -49,6 +48,29 @@ class OrderServiceTest extends BaseServiceTest {
         this.productRepository = productRepository;
         this.menuRepository = menuRepository;
         this.orderTableRepository = orderTableRepository;
+    }
+
+    private static class OrderLineItemFields {
+        final Menu menu;
+        final long quantity;
+
+        public OrderLineItemFields(final OrderLineItem orderLineItem) {
+            this.menu = orderLineItem.getMenu();
+            this.quantity = orderLineItem.getQuantity();
+        }
+
+        @Override
+        public boolean equals(final Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            final OrderLineItemFields that = (OrderLineItemFields) o;
+            return quantity == that.quantity && Objects.equals(menu, that.menu);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(menu, quantity);
+        }
     }
 
     @DisplayName("주문 요청")
@@ -567,29 +589,6 @@ class OrderServiceTest extends BaseServiceTest {
             final List<Order> orders = orderService.findAll();
 
             assertThat(orders).containsExactly(order1, order2);
-        }
-    }
-
-    private static class OrderLineItemFields {
-        final Menu menu;
-        final long quantity;
-
-        public OrderLineItemFields(final OrderLineItem orderLineItem) {
-            this.menu = orderLineItem.getMenu();
-            this.quantity = orderLineItem.getQuantity();
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            final OrderLineItemFields that = (OrderLineItemFields) o;
-            return quantity == that.quantity && Objects.equals(menu, that.menu);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(menu, quantity);
         }
     }
 }
