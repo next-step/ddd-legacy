@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -35,6 +36,15 @@ class MenuGroupServiceTest {
 
         assertThat(actual.getId()).isNotNull();
     }
+
+    @Test
+    void 메뉴_그룹_생성_시_이름이_비어있으면_예외가_발생한다() {
+        MenuGroup request = new MenuGroup();
+
+        assertThatThrownBy(() -> menuGroupService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
 
     @Test
     void 메뉴_그룹_목록을_조회한다() {
