@@ -1,8 +1,10 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.dummy.DummyMenu;
 import kitchenpos.dummy.DummyProduct;
 import kitchenpos.exception.ProductNameException;
 import kitchenpos.exception.ProductPriceException;
@@ -18,6 +20,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,7 +39,7 @@ public class ProductServiceTest {
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
-    @DisplayName("상품을 등록한다.")
+    @DisplayName("[정상] 상품을 등록한다.")
     @Test
     void create() {
         final Product request = DummyProduct.createProductRequest();
@@ -45,7 +48,7 @@ public class ProductServiceTest {
     }
 
 
-    @DisplayName("상품의 가격은 0원 미만이면 예외가 발생한다.")
+    @DisplayName("[오류 - 상품 가격이 0원 미만] 상품의 가격은 0원 미만이면 예외가 발생한다.")
     @Test
     void changePrice_over_0() {
         final Product request = DummyProduct.createProductRequest(-1L);
@@ -54,7 +57,7 @@ public class ProductServiceTest {
 
     }
 
-    @DisplayName("상품의 이름에는 비속어가 포함될 수 없다.")
+    @DisplayName("[오류 - 상품이름 비속어 포함] 상품의 이름에는 비속어가 포함될 수 없다.")
     @ValueSource(strings = {"비속어", "욕설", "욕"})
     @ParameterizedTest
     void 상품의_이름에는_비속어가_포함될_수_없다(final String name) {
@@ -64,7 +67,7 @@ public class ProductServiceTest {
 
     }
 
-    @DisplayName("상품의 가격을 변경한다.")
+    @DisplayName("[정상] 상품의 가격을 변경한다.")
     @Test
     void changePrice() {
         final Product request = DummyProduct.createProductRequest(16_000L);
@@ -73,7 +76,19 @@ public class ProductServiceTest {
         assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(20_000L));
     }
 
-    @DisplayName("상품 목록을 조회한다.")
+    @DisplayName("[정상] 메뉴 가격이 상품의 총합보다 크면 비공개로 변경한다.")
+    @Test
+    void changePrice_over_sum_price() {
+        Product product = productRepository.save(DummyProduct.createProductRequest(16_000L));
+        Menu requestMenu = menuRepository.save(DummyMenu.createMenu(true, product));
+        requestMenu.setPrice(BigDecimal.valueOf(200_000L));
+        productService.changePrice(product.getId(), product);
+        Optional<Menu> actual = menuRepository.findById(requestMenu.getId());
+        assertThat(actual.get().isDisplayed()).isEqualTo(false);
+
+    }
+
+    @DisplayName("[정상] 상품 목록을 조회한다.")
     @Test
     void findAll() {
         productRepository.save(DummyProduct.createProductRequest(UUID.randomUUID(), BigDecimal.valueOf(16_000L), "후라이드 치킨"));

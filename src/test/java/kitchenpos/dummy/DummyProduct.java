@@ -29,6 +29,7 @@ public class DummyProduct {
 
     public static Product createProductRequest(BigDecimal price, String name) {
         final Product request = new Product();
+        request.setId(UUID.randomUUID());
         request.setPrice(price);
         request.setName(name);
         return request;

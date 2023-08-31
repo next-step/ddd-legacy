@@ -3,6 +3,7 @@ package kitchenpos.dummy;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -49,14 +50,24 @@ public class DummyMenu {
         return menu;
     }
 
-    public static Menu createMenu(boolean displayed) {
+    public static Menu createMenu(boolean displayed, List<MenuProduct> menuProduct) {
         return createMenu(
                 "기본 메뉴",
                 new BigDecimal(10000),
                 displayed,
                 DummyMenuGroup.createMenuGroup(),
-                List.of(DummyMenuProduct.defaultMenuProduct())
+                menuProduct
         );
+    }
+    public static Menu createMenu(List<MenuProduct> menuProducts) {
+        return createMenu(false, menuProducts);
+    }
+    public static Menu createMenu(boolean displayed) {
+        return createMenu(displayed, List.of(DummyMenuProduct.defaultMenuProduct()));
+    }
+
+    public static Menu createMenu(boolean displayed, Product product) {
+        return createMenu(displayed, List.of(DummyMenuProduct.createMenuProduct(product, 10L)));
     }
     public static Menu createMenu() {
         return createMenu(false);

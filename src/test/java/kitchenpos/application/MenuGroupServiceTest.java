@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import static kitchenpos.dummy.DummyMenuGroup.createMenuGroup;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 class MenuGroupServiceTest {
@@ -22,7 +23,7 @@ class MenuGroupServiceTest {
         menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
-    @DisplayName("메뉴 그룹을 등록한다.")
+    @DisplayName("[정상] 메뉴 그룹을 등록한다.")
     @Test
     void create() {
         MenuGroup menuGroup = createMenuGroup();
@@ -32,6 +33,17 @@ class MenuGroupServiceTest {
                 () -> assertNotNull(actual.getId()),
                 () -> assertEquals(menuGroup.getName(), actual.getName())
         );
+    }
+
+    @DisplayName("[오류 - 이름 없음] 메뉴 그룹을 등록한다.")
+    @Test
+    void create_null_name() {
+        MenuGroup menuGroup = createMenuGroup();
+        menuGroup.setName(null);
+        assertThatThrownBy(
+                () -> menuGroupService.create(menuGroup))
+                .isInstanceOf(IllegalArgumentException.class);
+
     }
 
     @Test

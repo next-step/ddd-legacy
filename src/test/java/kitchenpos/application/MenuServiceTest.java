@@ -119,7 +119,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴 가격을 변경한다.")
+    @DisplayName("[정상] 메뉴 가격을 변경한다.")
     @Test
     void changePrice_oer_price() {
         Menu actual = menuService.create(getMenuData());
@@ -129,7 +129,7 @@ class MenuServiceTest {
 
     }
 
-    @DisplayName("메뉴 가격을 작은 값으로 변경한다.")
+    @DisplayName("[정상] 메뉴 가격을 작은 값으로 변경한다.")
     @Test
     void changePrice_under_price() {
         Menu menuRequest = menuService.create(getMenuData());
@@ -145,7 +145,7 @@ class MenuServiceTest {
         );
     }
 
-    @DisplayName("메뉴를 공개할 수 있다.")
+    @DisplayName("[정상] 메뉴를 공개할 수 있다.")
     @Test
     void display() {
         Menu menuRequest = menuService.create(getMenuData());
@@ -160,7 +160,7 @@ class MenuServiceTest {
         );
     }
 
-    @DisplayName("메뉴를 비공개한다.")
+    @DisplayName("[정상] 메뉴를 비공개한다.")
     @Test
     void hide() {
         Menu menuRequest = menuService.create(getMenuData());
@@ -175,7 +175,7 @@ class MenuServiceTest {
         );
     }
 
-    @DisplayName("전체 메뉴를 조회한다.")
+    @DisplayName("[정상] 전체 메뉴를 조회한다.")
     @Test
     void findAll() {
         menuService.create(getMenuData());
