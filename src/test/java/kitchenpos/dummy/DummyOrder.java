@@ -24,6 +24,17 @@ public class DummyOrder {
         return request;
     }
 
+    public static Order createOrder(OrderType orderType, List<OrderLineItem> orderLineItems) {
+        Order request = new Order();
+        request.setId(UUID.randomUUID());
+        request.setType(orderType);
+        request.setOrderLineItems(orderLineItems);
+        if (orderType.equals(OrderType.DELIVERY)) {
+            request.setDeliveryAddress("서울시 강남구");
+        }
+        return request;
+    }
+
     public static List<OrderLineItem> createOrderLineItem(Menu menu1, Menu menu2) {
         OrderLineItem orderLineItem1 = new OrderLineItem();
         orderLineItem1.setSeq(1L);

@@ -17,6 +17,7 @@ public class DummyOrderTable {
     public static OrderTable createOrderTable(String name) {
         return createOrderTable(name, false);
     }
+
     public static OrderTable createOrderTable(String name, boolean occupied) {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());

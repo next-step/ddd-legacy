@@ -59,9 +59,11 @@ public class DummyMenu {
                 menuProduct
         );
     }
+
     public static Menu createMenu(List<MenuProduct> menuProducts) {
         return createMenu(false, menuProducts);
     }
+
     public static Menu createMenu(boolean displayed) {
         return createMenu(displayed, List.of(DummyMenuProduct.defaultMenuProduct()));
     }
@@ -69,6 +71,7 @@ public class DummyMenu {
     public static Menu createMenu(boolean displayed, Product product) {
         return createMenu(displayed, List.of(DummyMenuProduct.createMenuProduct(product, 10L)));
     }
+
     public static Menu createMenu() {
         return createMenu(false);
     }

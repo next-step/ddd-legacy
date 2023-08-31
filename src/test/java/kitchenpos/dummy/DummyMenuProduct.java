@@ -19,9 +19,11 @@ public class DummyMenuProduct {
     public static List<MenuProduct> defaultMenuProducts(Product product, Long quantity) {
         return List.of(createMenuProduct(product, quantity));
     }
+
     public static List<MenuProduct> defaultMenuProducts() {
         return List.of(createMenuProduct(DummyProduct.createProductRequest(), 1L));
     }
+
     public static MenuProduct defaultMenuProduct() {
         return createMenuProduct(DummyProduct.createProductRequest(), 1L);
     }

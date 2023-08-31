@@ -105,7 +105,7 @@ class OrderTableServiceTest {
         orderTable.setNumberOfGuests(-1);
         assertThat(orderTable.isOccupied()).isTrue();
         assertThatThrownBy(
-                () ->orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable))
+                () -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -116,7 +116,7 @@ class OrderTableServiceTest {
         assertThat(orderTable.getNumberOfGuests()).isZero();
         assertThat(orderTable.isOccupied()).isFalse();
         assertThatThrownBy(
-                () ->orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable))
+                () -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable))
                 .isInstanceOf(IllegalStateException.class);
     }
 
