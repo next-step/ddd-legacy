@@ -99,27 +99,27 @@ docker compose -p kitchenpos up -d
 
 ## 용어 사전
 
-| 한글명   | 영문명           | 설명                          |
-|-------|---------------|-----------------------------|
-| 메뉴그룹  | menuGroup     | 메뉴그룹                        |
-| 메뉴상품  | menuProduct   | 메뉴를 구성하는 상품                 |
-| 상품    | product       | 메뉴에 등록된 상품                  |
-| 메뉴    | menu          | 메뉴                          |
-| 주문테이블 | orderTable    | 주문 테이블                      |
-| 주문    | order         | 주문                          |
-| 주문메뉴  | orderLineItem | 주문된 메뉴                      |
-|       |               |                             |
-| 주문 타입 | orderType     | eatIn, 배달주문, takeOut 을 가진다. |
-| 매장주문  | eatIn         | 매장에서 먹는 주문                  |
-| 배달주문  | delivery      | 배달 주문                       |
-| 포장주문  | takeOut       | 포장 주문                       |
-|       |               |                             |
-| 주문 상태 | orderStatus   | 주문 상태                       |
-| 대기    | waiting       | 주문이 대기중인 상태 접수 전            |
-| 접수    | accepted      | 주문이 접수된 상태                  |
-| 주문제공  | served        | 주문이 제공된 상태                  |
-| 배달중   | delivering    | 주문이 배달중인 상태                 |
-| 배달완료  | delivered     | 주문이 배달완료인 상태                |
-| 완료    | completed     | 주문이 모두 완료된 상태               |
+| 한글명   | 영문명           | 설명                     |
+|-------|---------------|------------------------|
+| 메뉴그룹  | menuGroup     | 메뉴그룹                   |
+| 메뉴상품  | menuProduct   | 메뉴를 구성하는 상품            |
+| 상품    | product       | 메뉴에 등록된 상품             |
+| 메뉴    | menu          | 메뉴                     |
+| 주문테이블 | orderTable    | 주문 테이블                 |
+| 주문    | order         | 주문                     |
+| 주문메뉴  | orderLineItem | 주문된 메뉴                 |
+|       |               |                        |
+| 주문 타입 | orderType     | 매장주문, 배달주문, 포장주문을 가진다. |
+| 매장주문  | eatIn         | 매장에서 먹는 주문             |
+| 배달주문  | delivery      | 배달 주문                  |
+| 포장주문  | takeOut       | 포장 주문                  |
+|       |               |                        |
+| 주문 상태 | orderStatus   | 주문 상태                  |
+| 대기    | waiting       | 주문이 대기중인 상태 접수 전       |
+| 접수    | accepted      | 주문이 접수된 상태             |
+| 주문제공  | served        | 주문이 제공된 상태             |
+| 배달중   | delivering    | 주문이 배달중인 상태            |
+| 배달완료  | delivered     | 주문이 배달완료인 상태           |
+| 완료    | completed     | 주문이 모두 완료된 상태          |
 
 ## 모델링
