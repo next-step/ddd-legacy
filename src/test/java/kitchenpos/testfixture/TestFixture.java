@@ -194,6 +194,14 @@ public class TestFixture {
         return createOrderTable(UUID.randomUUID(), name, numberOfGuests, true);
     }
 
+    public static OrderTable createOrderTable(
+            String name,
+            int numberOfGuests,
+            boolean occupied
+    ) {
+        return createOrderTable(UUID.randomUUID(), name, numberOfGuests, occupied);
+    }
+
     public static OrderTable copy(OrderTable orderTable) {
         var copiedOrderTable = new OrderTable();
         copiedOrderTable.setId(orderTable.getId());
