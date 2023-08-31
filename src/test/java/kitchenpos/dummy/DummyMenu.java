@@ -43,6 +43,9 @@ public class DummyMenu {
         menu.setMenuGroup(menuGroup);
         menu.setMenuGroupId(menuGroup.getId());
         menu.setMenuProducts(menuProducts);
+        menu.setPrice(menuProducts.stream()
+                .map(menuProduct -> menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add));
         return menu;
     }
 

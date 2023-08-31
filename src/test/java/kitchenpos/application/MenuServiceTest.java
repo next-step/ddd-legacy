@@ -34,7 +34,7 @@ class MenuServiceTest {
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
 
-    @DisplayName("메뉴를 등록한다.")
+    @DisplayName("[정상] 메뉴를 등록한다.")
     @Test
     void create() {
         Menu menu = getMenuData();
@@ -44,8 +44,79 @@ class MenuServiceTest {
                 () -> assertThat(actual.getName()).isEqualTo(menu.getName()),
                 () -> assertThat(actual.getPrice()).isEqualTo(menu.getPrice()),
                 () -> assertThat(actual.getMenuGroup()).isEqualTo(menu.getMenuGroup()),
-                () -> assertThat(actual.isDisplayed()).isEqualTo(menu.isDisplayed())
+                () -> assertThat(actual.isDisplayed()).isEqualTo(menu.isDisplayed()),
+                () -> assertThat(actual.isDisplayed()).isEqualTo(false)
         );
+    }
+
+    @DisplayName("[정상] 메뉴를 등록시 기본값으로 비공개로 한다.")
+    @Test
+    void create_displayed_false() {
+        Menu menu = getMenuData();
+        Menu actual = menuService.create(menu);
+        assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getName()).isEqualTo(menu.getName()),
+                () -> assertThat(actual.getPrice()).isEqualTo(menu.getPrice()),
+                () -> assertThat(actual.getMenuGroup()).isEqualTo(menu.getMenuGroup()),
+                () -> assertThat(actual.isDisplayed()).isEqualTo(menu.isDisplayed()),
+                () -> assertThat(actual.isDisplayed()).isEqualTo(false)
+        );
+    }
+
+    @DisplayName("[오류 - 상품 없음] 메뉴를 등록한다.")
+    @Test
+    void create_not_product() {
+        Menu menu = getMenuData();
+        menu.setMenuProducts(null);
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("[오류 - 이름 없음] 메뉴를 등록한다.")
+    @Test
+    void create_not_name() {
+        Menu menu = getMenuData();
+        menu.setName(null);
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("[오류 - 비속어 포함] 메뉴를 등록한다.")
+    @Test
+    void create_not_profanity() {
+        Menu menu = getMenuData();
+        menu.setName("욕설");
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("[오류 - 가격 없음] 메뉴를 등록한다.")
+    @Test
+    void create_not_price() {
+        Menu menu = getMenuData();
+        menu.setPrice(null);
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("[오류 - 가격이 0보다 낮음] 메뉴를 등록한다.")
+    @Test
+    void create_under_0_price() {
+        Menu menu = getMenuData();
+        menu.setPrice(BigDecimal.valueOf(-1));
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("[오류 - 가격이 금액 * 수량의 총합 보다 작다] 메뉴를 등록한다.")
+    @Test
+    void create_under_total_price() {
+        Menu menu = getMenuData();
+        BigDecimal requestPirce = menu.getPrice().add(BigDecimal.valueOf(1));
+        menu.setPrice(requestPirce);
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴 가격을 변경한다.")
@@ -74,7 +145,7 @@ class MenuServiceTest {
         );
     }
 
-    @DisplayName("메뉴를 노출한다.")
+    @DisplayName("메뉴를 공개할 수 있다.")
     @Test
     void display() {
         Menu menuRequest = menuService.create(getMenuData());
@@ -89,7 +160,7 @@ class MenuServiceTest {
         );
     }
 
-    @DisplayName("메뉴를 숨긴다.")
+    @DisplayName("메뉴를 비공개한다.")
     @Test
     void hide() {
         Menu menuRequest = menuService.create(getMenuData());
