@@ -18,7 +18,7 @@ class ProductTest {
 
         Product product = new Product();
         product.setId(id);
-        product.setName("상품");
+        product.setName("치킨");
         product.setPrice(price);
 
         assertThat(product.getId()).isEqualTo(id);

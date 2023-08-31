@@ -14,7 +14,7 @@ class MenuProductTest {
     @Test
     @DisplayName("메뉴상품은 상품과, 수량을 가지고 있다.")
     void create() {
-        Product product = Fixtures.createProduct("상품", new BigDecimal("10000"));
+        Product product = Fixtures.createProduct("치킨", new BigDecimal("10000"));
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setSeq(1L);
         menuProduct.setProductId(UUID.randomUUID());

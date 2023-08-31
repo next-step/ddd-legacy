@@ -16,9 +16,9 @@ class MenuGroupTest {
 
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(id);
-        menuGroup.setName("메뉴그룹");
+        menuGroup.setName("치킨 메뉴그룹");
 
         assertThat(menuGroup.getId()).isEqualTo(id);
-        assertThat(menuGroup.getName()).isEqualTo("메뉴그룹");
+        assertThat(menuGroup.getName()).isEqualTo("치킨 메뉴그룹");
     }
 }

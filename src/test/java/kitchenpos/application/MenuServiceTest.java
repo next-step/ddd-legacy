@@ -55,11 +55,11 @@ class MenuServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Product product1 = createProduct("상품1", new BigDecimal("10000"));
-        Product product2 = createProduct("상품2", new BigDecimal("20000"));
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("20000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
                                        createMenuProduct(2L, savedProducts.get(1), 1L))
         );
@@ -78,11 +78,11 @@ class MenuServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Product product1 = createProduct("상품1", new BigDecimal("10000"));
-        Product product2 = createProduct("상품2", new BigDecimal("20000"));
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), savedMenuGroup,
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("-1"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
                                        createMenuProduct(2L, savedProducts.get(1), 1L))
         );
@@ -97,9 +97,9 @@ class MenuServiceTest {
         // given
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
 
-        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), menuGroup,
-                               List.of(createMenuProduct(1L, createProduct("상품1", new BigDecimal("10000")), 1L),
-                                       createMenuProduct(2L, createProduct("상품2", new BigDecimal("20000")), 1L))
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("-1"), menuGroup,
+                               List.of(createMenuProduct(1L, createProduct("반마리 치킨", new BigDecimal("10000")), 1L),
+                                       createMenuProduct(2L, createProduct("후라이드 치킨", new BigDecimal("20000")), 1L))
         );
 
         // when, then
@@ -112,7 +112,7 @@ class MenuServiceTest {
         // given
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
 
-        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), menuGroup,
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("-1"), menuGroup,
                                Collections.emptyList()
         );
 
@@ -127,10 +127,10 @@ class MenuServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Product product1 = createProduct("상품1", new BigDecimal("10000"));
-        Product product2 = createProduct("상품2", new BigDecimal("20000"));
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
 
-        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), savedMenuGroup,
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("-1"), savedMenuGroup,
                                List.of(createMenuProduct(1L, product1, 1L),
                                        createMenuProduct(2L, product2, 1L))
         );
@@ -146,13 +146,13 @@ class MenuServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Product product1 = createProduct("상품1", new BigDecimal("10000"));
-        Product product2 = createProduct("상품2", new BigDecimal("20000"));
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
         MenuProduct menuProduct1 = createMenuProduct(1L, savedProducts.get(0), 1L);
         menuProduct1.setQuantity(0);
-        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), savedMenuGroup,
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("-1"), savedMenuGroup,
                                List.of(menuProduct1,
                                        createMenuProduct(2L, savedProducts.get(1), 1L))
         );
@@ -168,13 +168,13 @@ class MenuServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Product product1 = createProduct("상품1", new BigDecimal("10000"));
-        Product product2 = createProduct("상품2", new BigDecimal("20000"));
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
         MenuProduct menuProduct1 = createMenuProduct(1L, savedProducts.get(0), 1L);
         menuProduct1.setQuantity(0);
-        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), savedMenuGroup,
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("-1"), savedMenuGroup,
                                List.of(menuProduct1,
                                        createMenuProduct(2L, savedProducts.get(1), 1L))
         );
@@ -190,11 +190,11 @@ class MenuServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Product product1 = createProduct("상품1", new BigDecimal("10000"));
-        Product product2 = createProduct("상품2", new BigDecimal("20000"));
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu("메뉴이름", new BigDecimal("31000"), savedMenuGroup,
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("31000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
                                        createMenuProduct(2L, savedProducts.get(1), 1L))
         );
@@ -210,8 +210,8 @@ class MenuServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Product product1 = createProduct("상품1", new BigDecimal("10000"));
-        Product product2 = createProduct("상품2", new BigDecimal("20000"));
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
         Menu menu = createMenu(null, new BigDecimal("20000"), savedMenuGroup,
@@ -230,11 +230,11 @@ class MenuServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Product product1 = createProduct("상품1", new BigDecimal("10000"));
-        Product product2 = createProduct("상품2", new BigDecimal("20000"));
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("20000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
                                        createMenuProduct(2L, savedProducts.get(1), 1L))
         );
@@ -331,11 +331,11 @@ class MenuServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Product product1 = createProduct("상품1", new BigDecimal("10000"));
-        Product product2 = createProduct("상품2", new BigDecimal("20000"));
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("20000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
                                        createMenuProduct(2L, savedProducts.get(1), 1L))
         );
@@ -349,11 +349,11 @@ class MenuServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Product product1 = createProduct("상품1", new BigDecimal("10000"));
-        Product product2 = createProduct("상품2", new BigDecimal("20000"));
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("20000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
                                        createMenuProduct(2L, savedProducts.get(1), 1L))
         );

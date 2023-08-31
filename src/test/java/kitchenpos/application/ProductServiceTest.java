@@ -104,14 +104,14 @@ class ProductServiceTest {
     @DisplayName("상품이 포함된 메뉴들의 가격이 메뉴의 가격보다 이하인 경우 해당 메뉴를 전시 하지 않는다.")
     void changePrice02() {
         // given
-        Product product1 = createProduct("치킨1", new BigDecimal("10000"));
-        Product product2 = createProduct("치킨2", new BigDecimal("10000"));
+        Product product1 = createProduct("후라이트 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("간장 치킨", new BigDecimal("10000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        MenuGroup menuGroup = createMenuGroup("메뉴그룹");
+        MenuGroup menuGroup = createMenuGroup("치킨 메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Menu menu = createMenu("메뉴이름", new BigDecimal("15000"),
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("15000"),
                                savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
                                                        createMenuProduct(2L, savedProducts.get(1), 1L))
         );
@@ -136,12 +136,12 @@ class ProductServiceTest {
         Product product2 = createProduct("치킨2", new BigDecimal("10000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        MenuGroup menuGroup = createMenuGroup("메뉴그룹");
+        MenuGroup menuGroup = createMenuGroup("치킨 메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Menu menu1 = createMenu("메뉴이름", new BigDecimal("10000"), savedMenuGroup,
+        Menu menu1 = createMenu("1.5인분 치킨메뉴", new BigDecimal("10000"), savedMenuGroup,
                                 List.of(createMenuProduct(1L, savedProducts.get(0), 1L)));
-        Menu menu2 = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
+        Menu menu2 = createMenu("1.5인분 치킨메뉴", new BigDecimal("20000"), savedMenuGroup,
                                 List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
                                         createMenuProduct(2L, savedProducts.get(1), 1L)));
 

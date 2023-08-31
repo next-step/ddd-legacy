@@ -26,7 +26,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("주문테이블을 생성한다.")
     void create01() {
-        OrderTable orderTable = createOrderTable("테이블이름", false);
+        OrderTable orderTable = createOrderTable("1번 테이블", false);
 
         OrderTable savedOrderTable = orderTableService.create(orderTable);
 
@@ -45,7 +45,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("테이블에 손님이 앉으면, 테이블을 점유한다.")
     void sit01() {
-        OrderTable orderTable = createOrderTable("테이블이름", false);
+        OrderTable orderTable = createOrderTable("1번 테이블", false);
         OrderTable savedOrderTable = orderTableRepository.save(orderTable);
         assertThat(orderTable.isOccupied()).isFalse();
 
@@ -57,7 +57,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("테이블을 치운다.")
     void clear01() {
-        OrderTable orderTable = createOrderTable("테이블이름", true);
+        OrderTable orderTable = createOrderTable("1번 테이블", true);
         OrderTable savedOrderTable = orderTableRepository.save(orderTable);
 
         OrderTable sitOrderTable = orderTableService.clear(savedOrderTable.getId());
@@ -69,7 +69,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("테이블 손님의 수를 변경한다.")
     void changeNumberOfGuests01() {
-        OrderTable orderTable = createOrderTable("테이블이름", true);
+        OrderTable orderTable = createOrderTable("1번 테이블", true);
         OrderTable savedOrderTable = orderTableRepository.save(orderTable);
         orderTable.setNumberOfGuests(10);
 
@@ -81,7 +81,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("손님의 수는 0보다 작을 수 없다.")
     void changeNumberOfGuests02() {
-        OrderTable orderTable = createOrderTable("테이블이름", true);
+        OrderTable orderTable = createOrderTable("1번 테이블", true);
         OrderTable savedOrderTable = orderTableRepository.save(orderTable);
         orderTable.setNumberOfGuests(-1);
 
@@ -92,7 +92,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("테이블이 점유되어있지 않으면 변경할 수 없다.")
     void changeNumberOfGuests03() {
-        OrderTable orderTable = createOrderTable("테이블이름", false);
+        OrderTable orderTable = createOrderTable("1번 테이블", false);
         OrderTable savedOrderTable = orderTableRepository.save(orderTable);
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable))
