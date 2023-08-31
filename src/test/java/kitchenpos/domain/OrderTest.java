@@ -10,6 +10,7 @@ import java.util.UUID;
 import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
 import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class OrderTest {
     @DisplayName("주문 생성")
@@ -34,14 +35,16 @@ class OrderTest {
         order.setOrderTable(orderTable);
         order.setOrderTableId(orderTableId);
 
-        assertThat(order.getId()).isEqualTo(id);
-        assertThat(order.getType()).isEqualTo(type);
-        assertThat(order.getStatus()).isEqualTo(status);
-        assertThat(order.getOrderDateTime()).isEqualTo(orderDateTime);
-        assertThat(order.getOrderLineItems()).isEqualTo(orderLineItems);
-        assertThat(order.getDeliveryAddress()).isEqualTo(deliveryAddress);
-        assertThat(order.getOrderTable()).isEqualTo(orderTable);
-        assertThat(order.getOrderTableId()).isEqualTo(orderTableId);
+        assertAll(
+                () -> assertThat(order.getId()).isEqualTo(id),
+                () -> assertThat(order.getType()).isEqualTo(type),
+                () -> assertThat(order.getStatus()).isEqualTo(status),
+                () -> assertThat(order.getOrderDateTime()).isEqualTo(orderDateTime),
+                () -> assertThat(order.getOrderLineItems()).isEqualTo(orderLineItems),
+                () -> assertThat(order.getDeliveryAddress()).isEqualTo(deliveryAddress),
+                () -> assertThat(order.getOrderTable()).isEqualTo(orderTable),
+                () -> assertThat(order.getOrderTableId()).isEqualTo(orderTableId)
+        );
     }
 
 }

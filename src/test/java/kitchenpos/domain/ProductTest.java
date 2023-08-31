@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ProductTest {
     @DisplayName("상품 생성")
@@ -21,8 +22,10 @@ class ProductTest {
         product.setName(name);
         product.setPrice(price);
 
-        assertThat(product.getId()).isEqualTo(id);
-        assertThat(product.getName()).isEqualTo(name);
-        assertThat(product.getPrice()).isEqualTo(price);
+        assertAll(
+                () -> assertThat(product.getId()).isEqualTo(id),
+                () -> assertThat(product.getName()).isEqualTo(name),
+                () -> assertThat(product.getPrice()).isEqualTo(price)
+        );
     }
 }

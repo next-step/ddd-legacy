@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 
 class MenuGroupTest {
@@ -19,7 +20,9 @@ class MenuGroupTest {
         menuGroup.setId(id);
         menuGroup.setName(name);
 
-        assertThat(menuGroup.getId()).isEqualTo(id);
-        assertThat(menuGroup.getName()).isEqualTo(name);
+        assertAll(
+                () -> assertThat(menuGroup.getId()).isEqualTo(id),
+                () -> assertThat(menuGroup.getName()).isEqualTo(name)
+        );
     }
 }

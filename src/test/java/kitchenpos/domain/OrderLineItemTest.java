@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.createMenu;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class OrderLineItemTest {
     @DisplayName("주문 목록 생성")
@@ -26,10 +27,12 @@ class OrderLineItemTest {
         orderLineItem.setMenuId(menuId);
         orderLineItem.setPrice(price);
 
-        assertThat(orderLineItem.getSeq()).isEqualTo(seq);
-        assertThat(orderLineItem.getMenu()).isEqualTo(menu);
-        assertThat(orderLineItem.getQuantity()).isEqualTo(quantity);
-        assertThat(orderLineItem.getMenuId()).isEqualTo(menuId);
-        assertThat(orderLineItem.getPrice()).isEqualTo(price);
+        assertAll(
+                () -> assertThat(orderLineItem.getSeq()).isEqualTo(seq),
+                () -> assertThat(orderLineItem.getMenu()).isEqualTo(menu),
+                () -> assertThat(orderLineItem.getQuantity()).isEqualTo(quantity),
+                () -> assertThat(orderLineItem.getMenuId()).isEqualTo(menuId),
+                () -> assertThat(orderLineItem.getPrice()).isEqualTo(price)
+        );
     }
 }

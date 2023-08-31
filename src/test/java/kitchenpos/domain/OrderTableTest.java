@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class OrderTableTest {
     @DisplayName("테이블은 이름과 인원수, 착석 여부로 구성되어 있다")
@@ -22,10 +23,12 @@ class OrderTableTest {
         orderTable.setNumberOfGuests(numberOfGuests);
         orderTable.setOccupied(occupied);
 
-        assertThat(orderTable.getId()).isEqualTo(id);
-        assertThat(orderTable.getName()).isEqualTo(name);
-        assertThat(orderTable.getNumberOfGuests()).isEqualTo(numberOfGuests);
-        assertThat(orderTable.isOccupied()).isEqualTo(occupied);
+        assertAll(
+                () -> assertThat(orderTable.getId()).isEqualTo(id),
+                () -> assertThat(orderTable.getName()).isEqualTo(name),
+                () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(numberOfGuests),
+                () -> assertThat(orderTable.isOccupied()).isEqualTo(occupied)
+        );
     }
 
 }

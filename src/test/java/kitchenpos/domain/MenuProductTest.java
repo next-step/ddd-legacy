@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MenuProductTest {
     @DisplayName("메뉴 구성 생성")
@@ -23,9 +24,11 @@ class MenuProductTest {
         menuProduct.setQuantity(quantity);
         menuProduct.setProductId(productId);
 
-        assertThat(menuProduct.getSeq()).isEqualTo(seq);
-        assertThat(menuProduct.getProduct()).isEqualTo(product);
-        assertThat(menuProduct.getQuantity()).isEqualTo(quantity);
-        assertThat(menuProduct.getProductId()).isEqualTo(productId);
+        assertAll(
+                () -> assertThat(menuProduct.getSeq()).isEqualTo(seq),
+                () -> assertThat(menuProduct.getProduct()).isEqualTo(product),
+                () -> assertThat(menuProduct.getQuantity()).isEqualTo(quantity),
+                () -> assertThat(menuProduct.getProductId()).isEqualTo(productId)
+        );
     }
 }

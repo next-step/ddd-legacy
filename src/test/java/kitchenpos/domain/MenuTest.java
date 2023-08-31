@@ -12,6 +12,7 @@ import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProductWithDefaultId;
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class MenuTest {
     @DisplayName("메뉴 생성")
@@ -35,12 +36,14 @@ class MenuTest {
         menu.setMenuProducts(menuProducts);
         menu.setMenuGroupId(menuGroupId);
 
-        assertThat(menu.getId()).isEqualTo(id);
-        assertThat(menu.getName()).isEqualTo(name);
-        assertThat(menu.getPrice()).isEqualTo(price);
-        assertThat(menu.getMenuGroup()).isEqualTo(menuGroup);
-        assertThat(menu.isDisplayed()).isEqualTo(displayed);
-        assertThat(menu.getMenuProducts()).isEqualTo(menuProducts);
-        assertThat(menu.getMenuGroupId()).isEqualTo(menuGroupId);
+        assertAll(
+                () -> assertThat(menu.getId()).isEqualTo(id),
+                () -> assertThat(menu.getName()).isEqualTo(name),
+                () -> assertThat(menu.getPrice()).isEqualTo(price),
+                () -> assertThat(menu.getMenuGroup()).isEqualTo(menuGroup),
+                () -> assertThat(menu.isDisplayed()).isEqualTo(displayed),
+                () -> assertThat(menu.getMenuProducts()).isEqualTo(menuProducts),
+                () -> assertThat(menu.getMenuGroupId()).isEqualTo(menuGroupId)
+        );
     }
 }
