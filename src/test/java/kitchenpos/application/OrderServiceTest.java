@@ -363,10 +363,10 @@ class OrderServiceTest {
         Product product2 = createProduct("상품2", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("20000"));
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
         menu.setDisplayed(displayed);
 
         return menuRepository.save(menu);
@@ -380,10 +380,10 @@ class OrderServiceTest {
         Product product2 = createProduct("상품2", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        return createMenu(savedMenuGroup,
+        return createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
                           List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                  createMenuProduct(2L, savedProducts.get(1), 1L)),
-                          new BigDecimal("20000"));
+                                  createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
     }
 
 }

@@ -33,14 +33,14 @@ public class Fixtures {
         return menuGroup;
     }
 
-    public static Menu createMenu(MenuGroup menuGroup, List<MenuProduct> menuProducts, BigDecimal price) {
+    public static Menu createMenu(String name, BigDecimal price, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
+        menu.setName(name);
+        menu.setPrice(price);
         menu.setDisplayed(true);
         menu.setMenuGroup(menuGroup);
         menu.setMenuGroupId(menuGroup.getId());
-        menu.setName("메뉴이름");
-        menu.setPrice(price);
         menu.setMenuProducts(menuProducts);
 
         return menu;

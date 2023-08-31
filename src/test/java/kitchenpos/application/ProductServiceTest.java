@@ -1,6 +1,11 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static kitchenpos.Fixtures.*;
+import static kitchenpos.Fixtures.createMenu;
+import static kitchenpos.Fixtures.createMenuGroup;
+import static kitchenpos.Fixtures.createMenuProduct;
+import static kitchenpos.Fixtures.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -103,9 +111,10 @@ class ProductServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Menu menu = createMenu(savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("15000"));
+        Menu menu = createMenu("메뉴이름", new BigDecimal("15000"),
+                               savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
+                                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
         Menu savedMenu = menuRepository.save(menu);
 
         Product product = savedProducts.get(0);
@@ -130,11 +139,11 @@ class ProductServiceTest {
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
         MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
 
-        Menu menu1 = createMenu(savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0), 1L)),
-                                new BigDecimal("10000"));
-        Menu menu2 = createMenu(savedMenuGroup, List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                                        createMenuProduct(2L, savedProducts.get(1), 1L)),
-                                new BigDecimal("20000"));
+        Menu menu1 = createMenu("메뉴이름", new BigDecimal("10000"), savedMenuGroup,
+                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L)));
+        Menu menu2 = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
+                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
+                                        createMenuProduct(2L, savedProducts.get(1), 1L)));
 
         // when
         List<Menu> savedMenus = menuRepository.saveAll(List.of(menu1, menu2));

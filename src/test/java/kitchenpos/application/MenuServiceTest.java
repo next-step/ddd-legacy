@@ -1,6 +1,12 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -15,7 +21,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static kitchenpos.Fixtures.*;
+import static kitchenpos.Fixtures.createMenu;
+import static kitchenpos.Fixtures.createMenuGroup;
+import static kitchenpos.Fixtures.createMenuProduct;
+import static kitchenpos.Fixtures.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,10 +59,10 @@ class MenuServiceTest {
         Product product2 = createProduct("상품2", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("20000"));
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
 
         // when
         Menu savedMenu = menuService.create(menu);
@@ -73,10 +82,10 @@ class MenuServiceTest {
         Product product2 = createProduct("상품2", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("-1"));
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
 
         // when, then
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
@@ -88,10 +97,10 @@ class MenuServiceTest {
         // given
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
 
-        Menu menu = createMenu(menuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), menuGroup,
                                List.of(createMenuProduct(1L, createProduct("상품1", new BigDecimal("10000")), 1L),
-                                       createMenuProduct(2L, createProduct("상품2", new BigDecimal("20000")), 1L)),
-                               new BigDecimal("-1"));
+                                       createMenuProduct(2L, createProduct("상품2", new BigDecimal("20000")), 1L))
+        );
 
         // when, then
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
@@ -103,9 +112,9 @@ class MenuServiceTest {
         // given
         MenuGroup menuGroup = createMenuGroup("메뉴그룹");
 
-        Menu menu = createMenu(menuGroup,
-                               Collections.emptyList(),
-                               new BigDecimal("-1"));
+        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), menuGroup,
+                               Collections.emptyList()
+        );
 
         // when, then
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
@@ -121,10 +130,10 @@ class MenuServiceTest {
         Product product1 = createProduct("상품1", new BigDecimal("10000"));
         Product product2 = createProduct("상품2", new BigDecimal("20000"));
 
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), savedMenuGroup,
                                List.of(createMenuProduct(1L, product1, 1L),
-                                       createMenuProduct(2L, product2, 1L)),
-                               new BigDecimal("-1"));
+                                       createMenuProduct(2L, product2, 1L))
+        );
 
         // when, then
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
@@ -143,10 +152,10 @@ class MenuServiceTest {
 
         MenuProduct menuProduct1 = createMenuProduct(1L, savedProducts.get(0), 1L);
         menuProduct1.setQuantity(0);
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), savedMenuGroup,
                                List.of(menuProduct1,
-                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("-1"));
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
 
         // when, then
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
@@ -165,10 +174,10 @@ class MenuServiceTest {
 
         MenuProduct menuProduct1 = createMenuProduct(1L, savedProducts.get(0), 1L);
         menuProduct1.setQuantity(0);
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("-1"), savedMenuGroup,
                                List.of(menuProduct1,
-                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("-1"));
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
 
         // when, then
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
@@ -185,10 +194,10 @@ class MenuServiceTest {
         Product product2 = createProduct("상품2", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("31000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("31000"));
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
 
         // when, then
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
@@ -205,11 +214,10 @@ class MenuServiceTest {
         Product product2 = createProduct("상품2", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu(null, new BigDecimal("20000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("20000"));
-        menu.setName(null);
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
 
         // when, then
         assertThatThrownBy(() -> menuService.create(menu)).isInstanceOf(IllegalArgumentException.class);
@@ -226,10 +234,10 @@ class MenuServiceTest {
         Product product2 = createProduct("상품2", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("20000"));
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
 
         given(purgomalumClient.containsProfanity(any())).willReturn(true);
 
@@ -327,10 +335,10 @@ class MenuServiceTest {
         Product product2 = createProduct("상품2", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("20000"));
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
 
         // when
         return menuRepository.save(menu);
@@ -345,10 +353,10 @@ class MenuServiceTest {
         Product product2 = createProduct("상품2", new BigDecimal("20000"));
         List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
 
-        Menu menu = createMenu(savedMenuGroup,
+        Menu menu = createMenu("메뉴이름", new BigDecimal("20000"), savedMenuGroup,
                                List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
-                                       createMenuProduct(2L, savedProducts.get(1), 1L)),
-                               new BigDecimal("20000"));
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
 
         menu.setDisplayed(false);
 
