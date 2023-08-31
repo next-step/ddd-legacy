@@ -25,7 +25,7 @@ class OrderTableServiceTest {
         orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 
-    @DisplayName("주문 테이블을 등록한다.")
+    @DisplayName("[정상] 주문 테이블을 등록한다.")
     @Test
     void create() {
         OrderTable orderTable = createOrderTable();
@@ -33,12 +33,21 @@ class OrderTableServiceTest {
         assertAll(
                 () -> assertNotNull(actual),
                 () -> assertNotNull(actual.getId()),
+                () -> assertThat(actual.getNumberOfGuests()).isZero(),
+                () -> assertThat(actual.isOccupied()).isFalse(),
                 () -> assertEquals(orderTable.getName(), actual.getName()));
-
     }
 
+    @DisplayName("[오류 - 테이블 이름 없음] 주문 테이블을 등록한다.")
+    @Test
+    void create_null_name() {
+        OrderTable orderTable = createOrderTable();
+        orderTable.setName(null);
+        assertThatThrownBy(() -> orderTableService.create(orderTable))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 
-    @DisplayName("주문 테이블에 손님이 앉는다.")
+    @DisplayName("[정상] 주문 테이블에 손님이 앉는다.")
     @Test
     void sit() {
         OrderTable orderTable = orderTableService.create(createOrderTable());
@@ -50,7 +59,7 @@ class OrderTableServiceTest {
                 () -> assertEquals(orderTable.isOccupied(), true));
     }
 
-    @DisplayName("주문 테이블의 손님이 모두 나간다.")
+    @DisplayName("[정상] 주문 테이블의 손님이 모두 나간다.")
     @Test
     void clear() {
         OrderTable orderTable = orderTableService.create(createOrderTable());
@@ -63,7 +72,7 @@ class OrderTableServiceTest {
                 () -> assertEquals(orderTable.isOccupied(), false));
     }
 
-    @DisplayName("손님이 앉지 않은 테이블은 손님 수를 변경할 수 없다.")
+    @DisplayName("[정상] 손님이 앉지 않은 테이블은 손님 수를 변경할 수 없다.")
     @Test
     void changeNumberOfGuests_false() {
         OrderTable orderTable = orderTableService.create(createOrderTable());
@@ -73,7 +82,7 @@ class OrderTableServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("손님이 앉은 테이블은 손님 수를 변경할 수 있다.")
+    @DisplayName("[정상] 손님이 앉은 테이블은 손님 수를 변경할 수 있다.")
     @Test
     void changeNumberOfGuests_true() {
         OrderTable orderTable = orderTableService.create(createOrderTable());
@@ -88,6 +97,28 @@ class OrderTableServiceTest {
                 () -> assertEquals(orderTable.getNumberOfGuests(), 10));
     }
 
+    @DisplayName("[오류 - 손님 수 0 미만] 손님이 앉은 테이블은 손님 수를 변경할 수 있다.")
+    @Test
+    void changeNumberOfGuests_under_0_guest_test() {
+        OrderTable orderTable = orderTableService.create(createOrderTable());
+        orderTableService.sit(orderTable.getId());
+        orderTable.setNumberOfGuests(-1);
+        assertThat(orderTable.isOccupied()).isTrue();
+        assertThatThrownBy(
+                () ->orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("[오류 - 점유 상태가 아닌 경우] 손님이 앉은 테이블은 손님 수를 변경할 수 있다.")
+    @Test
+    void changeNumberOfGuests_not_occupied_test() {
+        OrderTable orderTable = orderTableService.create(createOrderTable());
+        assertThat(orderTable.getNumberOfGuests()).isZero();
+        assertThat(orderTable.isOccupied()).isFalse();
+        assertThatThrownBy(
+                () ->orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable))
+                .isInstanceOf(IllegalStateException.class);
+    }
 
     @Test
     void findAll() {
