@@ -1,6 +1,6 @@
 package kitchenpos.acceptance;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.util.List;
@@ -84,4 +84,7 @@ public class MenuApi {
         assertThat(menus).hasSize(expectedSize);
     }
 
+    public static String 메뉴_생성(MockMvc mockMvc, Map<String, Object> request) throws Exception {
+        return extractMenuId(메뉴_생성_요청(mockMvc, request));
+    }
 }
