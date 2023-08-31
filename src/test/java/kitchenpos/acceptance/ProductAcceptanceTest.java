@@ -2,6 +2,7 @@ package kitchenpos.acceptance;
 
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.test_fixture.ProductTestFixture;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 
+import static kitchenpos.acceptance.acceptance_step.MenuGroupStep.메뉴_그룹_등록된_상태다;
 import static kitchenpos.acceptance.acceptance_step.MenuStep.상품_가격보다_메뉴_가격이_높아져서_메뉴가_숨김_상태로_변경됐다;
 import static kitchenpos.acceptance.acceptance_step.MenuStep.메뉴가_등록된_상태다;
 import static kitchenpos.acceptance.acceptance_step.ProductStep.*;
@@ -159,7 +161,8 @@ class ProductAcceptanceTest extends AcceptanceTestBase {
     void changeProductPriceWithMenuPriceHigherThanChangedPrice() {
         // given
         Product 등록된_상품 = 상품이_등록된_상태다();
-        메뉴가_등록된_상태다(등록된_상품);
+        MenuGroup 등록된_메뉴_그룹 = 메뉴_그룹_등록된_상태다();
+        메뉴가_등록된_상태다(등록된_상품, 등록된_메뉴_그룹);
         Product 가격_변경_정보 = ProductTestFixture.create()
                 .changePrice(등록된_상품.getPrice().subtract(BigDecimal.valueOf(1)))
                 .getProduct();

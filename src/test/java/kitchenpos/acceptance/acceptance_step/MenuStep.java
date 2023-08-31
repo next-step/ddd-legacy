@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static io.restassured.RestAssured.*;
-import static kitchenpos.acceptance.acceptance_step.MenuGroupStep.메뉴_그룹_등록된_상태다;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MenuStep {
@@ -30,8 +29,7 @@ public class MenuStep {
                 .extract();
     }
 
-    public static Menu 메뉴가_등록된_상태다(Product product) {
-        MenuGroup 등록된_메뉴_그룹 = 메뉴_그룹_등록된_상태다();
+    public static Menu 메뉴가_등록된_상태다(Product product, MenuGroup menuGroup) {
         MenuProduct 등록할_메뉴_상품 = MenuProductTestFixture.create()
                 .changeProduct(product)
                 .changeQuantity(1)
@@ -41,7 +39,7 @@ public class MenuStep {
                 .changeName("메뉴1")
                 .changePrice(BigDecimal.valueOf(10000))
                 .changeMenuProducts(Collections.singletonList(등록할_메뉴_상품))
-                .changeMenuGroup(등록된_메뉴_그룹)
+                .changeMenuGroup(menuGroup)
                 .getMenu();
         return 메뉴를_등록한다(등록할_메뉴).body().as(Menu.class);
     }
