@@ -11,8 +11,7 @@ import org.springframework.test.context.jdbc.Sql;
 public class ControllerTest {
     @LocalServerPort
     int port;
-
-
+    
     @BeforeEach
     public void setUp() {
         RestAssured.port = port;
