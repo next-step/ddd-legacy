@@ -314,6 +314,7 @@ class MenuServiceTest {
 
     public Menu createMenu(Integer price, String name, MenuGroup menuGroup, List<MenuProduct> products, boolean display) {
         return new MenuBuilder()
+                .id(UUID.randomUUID())
                 .price(createPrice(price))
                 .name(name)
                 .menuGroup(menuGroup)

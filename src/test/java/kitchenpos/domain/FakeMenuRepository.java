@@ -9,7 +9,10 @@ public class FakeMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAllByIdIn(List<UUID> ids) {
-        return null;
+        return map.values()
+                .stream()
+                .filter(menu -> ids.contains(menu.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override
