@@ -1,6 +1,6 @@
 package kitchenpos.service;
 
-import static kitchenpos.domain.OrderStatus.ACCEPTED;
+import static kitchenpos.domain.OrderStatus.*;
 import static kitchenpos.domain.OrderType.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -183,6 +183,16 @@ public class OrderServiceTest {
         orderRepository.save(order);
 
         assertThatThrownBy(() -> orderService.accept(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void 주문_서빙_실패__수락됨_상태가_아님() {
+        Order order = orderService.create(OrderFixture.builder(오늘의치킨).build());
+        order.setStatus(SERVED);
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.serve(order.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 }
