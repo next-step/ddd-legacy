@@ -1,5 +1,6 @@
 package kitchenpos.service;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import kitchenpos.domain.Menu;
@@ -41,6 +42,11 @@ public class OrderLineItemFixture {
 
     public OrderLineItemFixture quantity(long quantity) {
         orderLineItem.setQuantity(quantity);
+        return this;
+    }
+
+    public OrderLineItemFixture price(long price) {
+        orderLineItem.setPrice(new BigDecimal(price));
         return this;
     }
 }

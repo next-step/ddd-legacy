@@ -125,5 +125,16 @@ public class OrderServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @Test
+    void 주문_생성_실패__주문항목의_가격과_메뉴의_가격이_다름() {
+        Order request = OrderFixture.builder()
+                .orderLineItem(List.of(OrderLineItemFixture.builder(오늘의치킨)
+                        .price(28000).build()))
+                .build();
+
+        assertThatThrownBy(() -> orderService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
 
 }
