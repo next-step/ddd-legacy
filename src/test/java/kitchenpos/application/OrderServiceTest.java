@@ -39,7 +39,7 @@ public class OrderServiceTest {
 
     @BeforeEach
     void setup() {
-        this.orderService = new OrderService(orderRepository, menuRepository,orderTableRepository, kitchenridersClient);
+        this.orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
         this.menuTestFixture = new MenuTestFixture();
         this.orderTestFixture = new OrderTestFixture();
         this.orderTableTestFixture = new OrderTableTestFixture();
@@ -144,7 +144,7 @@ public class OrderServiceTest {
     @DisplayName("주문 승인 시 주문 상태가 대기가 아니면 예외를 반환한다.")
     @Test
     void acceptOrderStatus() {
-        Order order = orderTestFixture.createOrder(OrderStatus.ACCEPTED,OrderType.DELIVERY);
+        Order order = orderTestFixture.createOrder(OrderStatus.ACCEPTED, OrderType.DELIVERY);
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         assertThatThrownBy(() -> orderService.accept(order.getId()))
@@ -157,7 +157,7 @@ public class OrderServiceTest {
     @DisplayName("주문 제공시 주문상태가 수락이 아니면 예외를 반환한다.")
     @Test
     void serveStatus() {
-        Order order = orderTestFixture.createOrder(OrderStatus.SERVED,OrderType.DELIVERY);
+        Order order = orderTestFixture.createOrder(OrderStatus.SERVED, OrderType.DELIVERY);
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         assertThatThrownBy(() -> orderService.serve(order.getId()))
@@ -199,7 +199,7 @@ public class OrderServiceTest {
     @DisplayName("배달중 주문 상태가 배달중이 아니면 예외를 반환한다.")
     @Test
     void completeDeliveryStatus() {
-        Order order = orderTestFixture.createOrder(OrderStatus.SERVED,OrderType.EAT_IN);
+        Order order = orderTestFixture.createOrder(OrderStatus.SERVED, OrderType.EAT_IN);
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
         assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
@@ -208,6 +208,7 @@ public class OrderServiceTest {
 
 
     }
+
     @Nested
     @DisplayName("주문 완료 시")
     class Order_complete {
@@ -239,11 +240,11 @@ public class OrderServiceTest {
     @DisplayName("매장 식사 시 완료 처리 되지 않은 주문이 없는 경우 손님수를 0으로 설정하고, 테이블 상태를 비어있음으로 변경한다.")
     @Test
     void tableClean() {
-        OrderTable orderTable = orderTableTestFixture.createOrderTable(true,3);
-        Order order = orderTestFixture.createOrder(OrderStatus.SERVED,OrderType.EAT_IN,orderTable);
+        OrderTable orderTable = orderTableTestFixture.createOrderTable(true, 3);
+        Order order = orderTestFixture.createOrder(OrderStatus.SERVED, OrderType.EAT_IN, orderTable);
 
         given(orderRepository.findById(any())).willReturn(Optional.of(order));
-        given(orderRepository.existsByOrderTableAndStatusNot(any(),any())).willReturn(false);
+        given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
 
         Order orderResult = orderService.complete(order.getId());
         assertThat(orderResult.getOrderTable().getNumberOfGuests()).isEqualTo(0);

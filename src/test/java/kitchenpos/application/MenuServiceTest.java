@@ -110,6 +110,7 @@ public class MenuServiceTest {
                     .hasMessageContaining("상품명오류");
         }
     }
+
     @Nested
     @DisplayName("가격 변경 시")
     class Price_change {
