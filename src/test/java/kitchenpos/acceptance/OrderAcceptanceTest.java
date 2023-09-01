@@ -106,5 +106,10 @@ public class OrderAcceptanceTest {
         // 주문 배달 시작 요청 테스트
         MockHttpServletResponse orderDeliveryStartedResponse = 주문_배달_시작_요청(mockMvc, orderId);
         주문_배달_시작됨(orderDeliveryStartedResponse);
+
+
+        // 주문 배달 완료 요청 테스트
+        MockHttpServletResponse orderDeliveryCompletedResponse = 주문_배달_완료_요청(mockMvc, orderId);
+        주문_배달_완료됨(orderDeliveryCompletedResponse);
     }
 }
