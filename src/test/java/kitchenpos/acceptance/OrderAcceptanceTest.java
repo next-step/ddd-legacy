@@ -43,7 +43,8 @@ public class OrderAcceptanceTest {
     }
 
     @Test
-    void 먹고가기_주문_생성__성공() throws Exception {
+    void 먹고가기_주문_통합테스트__성공() throws Exception {
+        // 주문 생성 요청 테스트
         주문테이블_착석_요청(mockMvc, orderTableId);
         Map<String, Object> request = Map.of(
                 "type", "EAT_IN",
@@ -55,8 +56,15 @@ public class OrderAcceptanceTest {
                         )
                 ));
 
-        MockHttpServletResponse response = 주문_생성_요청(mockMvc, request);
+        MockHttpServletResponse orderCreatedResponse = 주문_생성_요청(mockMvc, request);
 
-        주문_생성_성공함(response);
+        주문_생성_성공함(orderCreatedResponse);
+
+        // 주문 수락 요청 테스트
+        String orderId = extractOrderId(orderCreatedResponse);
+
+        MockHttpServletResponse orderAcceptedResponse = 주문_수락_요청(mockMvc, orderId);
+
+        주문_수락됨(orderAcceptedResponse);
     }
 }
