@@ -5,6 +5,7 @@ import java.util.List;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
 
 public class OrderFixture {
@@ -40,6 +41,14 @@ public class OrderFixture {
 
     public OrderFixture deliveryAddress(String deliveryAddress) {
         order.setDeliveryAddress(deliveryAddress);
+        return this;
+    }
+
+    public OrderFixture orderTable(OrderTable orderTable) {
+        if (orderTable != null) {
+            order.setOrderTableId(orderTable.getId());
+        }
+        order.setOrderTable(orderTable);
         return this;
     }
 }

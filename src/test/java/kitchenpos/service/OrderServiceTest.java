@@ -1,6 +1,6 @@
 package kitchenpos.service;
 
-import static kitchenpos.domain.OrderType.DELIVERY;
+import static kitchenpos.domain.OrderType.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
@@ -20,6 +20,8 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 
@@ -38,10 +40,14 @@ public class OrderServiceTest {
     @Autowired
     private MenuRepository menuRepository;
 
+    @Autowired
+    private OrderTableRepository orderTableRepository;
+
     private MenuGroup 추천메뉴;
     private Product 강정치킨;
     private Product 양념치킨;
     private Menu 오늘의치킨;
+    private OrderTable _1번테이블;
 
     @BeforeEach
     void init() {
@@ -60,6 +66,9 @@ public class OrderServiceTest {
                 )
                 .name("오늘의 치킨").build();
         menuRepository.save(오늘의치킨);
+
+        _1번테이블 = OrderTableFixture.builder().build();
+        orderTableRepository.save(_1번테이블);
     }
 
     @Test
@@ -146,6 +155,20 @@ public class OrderServiceTest {
 
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void 주문_생성_실패__먹고가기인데_주문테이블_착석상태_아님() {
+        _1번테이블.setOccupied(false);
+        orderTableRepository.save(_1번테이블);
+
+        Order request = OrderFixture.builder(오늘의치킨)
+                .type(EAT_IN)
+                .orderTable(_1번테이블)
+                .build();
+
+        assertThatThrownBy(() -> orderService.create(request))
+                .isInstanceOf(IllegalStateException.class);
     }
 
 
