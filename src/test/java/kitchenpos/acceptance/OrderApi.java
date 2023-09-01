@@ -3,6 +3,7 @@ package kitchenpos.acceptance;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -101,6 +102,17 @@ public class OrderApi {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         Map<String, Object> responseBody = extractResponseBody(response);
         assertThat(responseBody.get("status")).isEqualTo("COMPLETED");
+    }
+
+    public static MockHttpServletResponse 주문_전체조회_요청(MockMvc mockMvc) throws Exception {
+        return mockMvc.perform(get(API_ORDERS_URL))
+                .andReturn().getResponse();
+    }
+
+    public static void 주문_전체조회_성공함(MockHttpServletResponse response, int expectedSize) throws Exception {
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        List<Object> orders = objectMapper.readValue(response.getContentAsString(), List.class);
+        assertThat(orders).hasSize(expectedSize);
     }
 
     private static Map<String, Object> extractResponseBody(MockHttpServletResponse response) throws Exception {
