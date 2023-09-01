@@ -124,7 +124,7 @@ public class MenuService {
     @Transactional
     public Menu hide(final UUID menuId) {
         final Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_MENU));
         menu.setDisplayed(false);
         return menu;
     }

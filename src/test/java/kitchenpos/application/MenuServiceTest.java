@@ -372,6 +372,32 @@ class MenuServiceTest {
                 .hasMessage(MENU_PRICE_MORE_PRODUCTS_SUM);
     }
 
+    @DisplayName("메뉴 비노출 성공")
+    @Test
+    void menu_hide_success() {
+        Menu savedMenu = saveMenu(new MenuBuilder()
+                .price(BigDecimal.valueOf(33000))
+                .name("치킨메뉴")
+                .menuGroup(두마리메뉴())
+                .menuGroupId(두마리메뉴().getId())
+                .menuProducts(List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())))
+                .displayed(false)
+                .build());
+
+        Menu result = menuService.hide(savedMenu.getId());
+
+        assertThat(result.isDisplayed()).isFalse();
+    }
+
+    @DisplayName("메뉴 비노출로 변경시 메뉴가 존재하지 않으면 예외를 발생시킨다.")
+    @Test
+    void menu_hide_not_found_menu() {
+        assertThatThrownBy(() -> menuService.hide(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage(NOT_FOUND_MENU);
+    }
+
+
     private MenuGroup saveMenuGroup(MenuGroup menuGroup) {
         return menuGroupRepository.save(menuGroup);
     }
