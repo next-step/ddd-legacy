@@ -7,7 +7,10 @@ public class FakeOrderRepository implements OrderRepository {
 
     @Override
     public boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status) {
-        return false;
+        return map.values()
+                .stream()
+                .noneMatch(order -> (OrderStatus.COMPLETED.equals(order.getStatus()) &&
+                        orderTable.getId().equals(order.getOrderTableId())));
     }
 
     @Override

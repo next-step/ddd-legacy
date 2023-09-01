@@ -43,10 +43,6 @@ class OrderServiceTest {
                 .hasMessage(ORDER_TYPE_NULL);
     }
 
-    private OrderBuilder createOrderBuilder() {
-        return new OrderBuilder();
-    }
-
     @DisplayName("주문생성시 주문아이템이 존재하지 않으면 예외를 발생시킨다.")
     @ParameterizedTest
     @NullAndEmptySource
@@ -430,6 +426,9 @@ class OrderServiceTest {
         assertThat(result.isOccupied()).isEqualTo(false);
     }
 
+    public OrderBuilder createOrderBuilder() {
+        return new OrderBuilder();
+    }
 
     public static OrderLineItem createOrderLineItem(Menu menu, BigDecimal price, Integer quantity) {
         OrderLineItem orderLineItem = new OrderLineItem();
