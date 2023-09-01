@@ -19,6 +19,7 @@ public class OrderApi {
     private static final String API_ORDERS_URL = "/api/orders";
     private static final String API_ORDERS_ACCEPT_URL = "/api/orders/{orderId}/accept";
     private static final String API_ORDERS_SERVE_URL = "/api/orders/{orderId}/serve";
+    private static final String API_ORDERS_START_DELIVERY_URL = "/api/orders/{orderId}/start-delivery";
     private static final String API_ORDERS_COMPLETE_URL = "/api/orders/{orderId}/complete";
     private static final String ORDER_ID_EXTRACT_PATTERN_FROM_LOCATION = "/api/orders/([a-fA-F0-9-]+)";
     private static final Pattern ORDER_ID_EXTRACT_PATTERN = Pattern.compile(ORDER_ID_EXTRACT_PATTERN_FROM_LOCATION);
@@ -66,6 +67,17 @@ public class OrderApi {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         Map<String, Object> responseBody = extractResponseBody(response);
         assertThat(responseBody.get("status")).isEqualTo("SERVED");
+    }
+
+    public static MockHttpServletResponse 주문_배달_시작_요청(MockMvc mockMvc, String orderId) throws Exception {
+        return mockMvc.perform(put(API_ORDERS_START_DELIVERY_URL.replace("{orderId}", orderId)))
+                .andReturn().getResponse();
+    }
+
+    public static void 주문_배달_시작됨(MockHttpServletResponse response) throws Exception {
+        assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        Map<String, Object> responseBody = extractResponseBody(response);
+        assertThat(responseBody.get("status")).isEqualTo("DELIVERING");
     }
 
     public static MockHttpServletResponse 주문_완료_요청(MockMvc mockMvc, String orderId) throws Exception {
