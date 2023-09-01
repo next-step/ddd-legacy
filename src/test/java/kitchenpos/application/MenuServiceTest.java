@@ -1,185 +1,229 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.infra.MockPurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.BDDMockito;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static kitchenpos.domain.MenuFixture.MenuGroupFixture.두마리메뉴;
+import static kitchenpos.domain.MenuFixture.MenuGroupFixture.한마리메뉴;
+import static kitchenpos.domain.MenuFixture.MenuProductFixture.*;
+import static kitchenpos.domain.ProductFixture.양념치킨;
+import static kitchenpos.domain.ProductFixture.후라이드;
+import static kitchenpos.exception.MenuExceptionMessage.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class MenuServiceTest {
 
-
-    private final MenuRepository menuRepository = mock(MenuRepository.class);
-    private final MenuGroupRepository menuGroupRepository = mock(MenuGroupRepository.class);
-    private final ProductRepository productRepository = mock(ProductRepository.class);
-    private final PurgomalumClient purgomalumClient = mock(PurgomalumClient.class);
+    private final MenuRepository menuRepository = new FakeMenuRepository();
+    private final MenuGroupRepository menuGroupRepository = new FakeMenuGroupRepository();
+    private final ProductRepository productRepository = new FakeProductRepository();
+    private final PurgomalumClient purgomalumClient = new MockPurgomalumClient();
     private final MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
-    private Menu menu;
 
     @BeforeEach
     void setUp() {
-        menu = new Menu();
+
+    }
+
+    @DisplayName("메뉴 생성 성공")
+    @Test
+    void menu_create_success() {
+        MenuGroup 두마리메뉴 = saveMenuGroup(두마리메뉴());
+        Product 후라이드 = ProductFixture.후라이드();
+        Product 양념치킨 = 양념치킨();
+        saveProducts(List.of(후라이드, 양념치킨));
+
+        Menu menu = new MenuBuilder()
+                .price(BigDecimal.valueOf(33000))
+                .name("치킨메뉴")
+                .menuGroup(두마리메뉴)
+                .menuGroupId(두마리메뉴.getId())
+                .menuProducts(List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)))
+                .displayed(true)
+                .build();
+
+        Menu result = menuService.create(menu);
+
+        Menu savedMenu = menuRepository.findById(result.getId())
+                .get();
+
+        assertThat(savedMenu.getId()).isEqualTo(result.getId());
+        assertThat(savedMenu.getName()).isEqualTo(result.getName());
+        assertThat(savedMenu.getPrice()).isEqualTo(result.getPrice());
+        assertThat(savedMenu.isDisplayed()).isEqualTo(result.isDisplayed());
     }
 
     @DisplayName("메뉴 생성시 가격이 null 이면 예외를 발생시킨다.")
     @Test
     void menu_create_price_null() {
-        menu.setPrice(null);
+        Menu menu = new MenuBuilder()
+                .price(null)
+                .build();
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(menu));
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(PRICE_MORE_ZERO);
     }
 
     @DisplayName("메뉴 생성시 가격이 음수면 예외를 발생시킨다.")
     @Test
     void menu_create_price_negative() {
-        menu.setPrice(BigDecimal.valueOf(-1));
+        Menu menu = new MenuBuilder()
+                .price(BigDecimal.valueOf(-1))
+                .build();
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(menu));
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(PRICE_MORE_ZERO);
     }
 
     @DisplayName("메뉴는 메뉴그룹이 없으면 예외를 발생시킨다.")
     @Test
     void menu_create_not_found_menuGroup() {
-        메뉴그룹반환(Optional.empty());
-        menu.setPrice(BigDecimal.valueOf(16000));
+        Menu menu = new MenuBuilder()
+                .price(BigDecimal.valueOf(16000))
+                .build();
 
-        assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> menuService.create(menu));
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage(NOT_FOUND_MENU_GROUP);
     }
 
     @DisplayName("메뉴의 메뉴상품목록이 null 이거나 비어있으면 예외를 발생시킨다.")
     @ParameterizedTest
     @NullAndEmptySource
     void menu_create_null_menuProducts(List<MenuProduct> productList) {
-        메뉴그룹반환(Optional.of(MenuFixture.MenuGroupFixture.한마리메뉴()));
-        menu.setPrice(BigDecimal.valueOf(16000));
-        menu.setMenuProducts(productList);
+        MenuGroup 한마리메뉴 = saveMenuGroup(한마리메뉴());
+        Menu menu = new MenuBuilder()
+                .price(BigDecimal.valueOf(16000))
+                .menuGroup(한마리메뉴)
+                .menuGroupId(한마리메뉴.getId())
+                .menuProducts(productList)
+                .build();
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(menu));
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(EMPTY_MENU_PRODUCT);
     }
 
     @DisplayName("메뉴상품의 수와 상품의 수가 다르면 예외를 발생시킨다.")
     @Test
     void menu_create_menuProducts_not_match_size() {
-        메뉴그룹반환(Optional.of(MenuFixture.MenuGroupFixture.두마리메뉴()));
-        menu.setPrice(BigDecimal.valueOf(16000));
-        menu.setMenuProducts(
-                List.of(
-                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(ProductFixture.후라이드()),
-                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(ProductFixture.후라이드()))
-        );
+        MenuGroup 두마리메뉴 = saveMenuGroup(두마리메뉴());
+        Product 후라이드 = 후라이드();
+        Product 양념치킨 = 양념치킨();
+        saveProducts(List.of(후라이드));
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(menu));
-    }
-    @DisplayName("메뉴상품의 상품이 존재하지 않으면 예외를 발생시킨다.")
-    @Test
-    void menu_create_menuProducts_not_found_product() {
-        Product 후라이드 = ProductFixture.후라이드();
-        Product 양념치킨 = ProductFixture.양념치킨();
-        메뉴그룹반환(Optional.of(MenuFixture.MenuGroupFixture.두마리메뉴()));
-        상품목록반환(List.of(후라이드, 양념치킨));
+        Menu menu = new MenuBuilder()
+                .price(BigDecimal.valueOf(16000))
+                .menuGroup(두마리메뉴)
+                .menuGroupId(두마리메뉴.getId())
+                .menuProducts(List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)))
+                .build();
 
-        상품반환(후라이드, Optional.of(후라이드));
-        상품반환(양념치킨, Optional.empty());
-        menu.setPrice(BigDecimal.valueOf(16000));
-        menu.setMenuProducts(
-                List.of(
-                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(후라이드),
-                        MenuFixture.MenuProductFixture.메뉴상품_양념(양념치킨))
-        );
-
-        assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> menuService.create(menu));
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(NOT_EQUAL_MENU_PRODUCT_SIZE);
     }
 
     @DisplayName("메뉴상품의 수량이 음수면 예외를 발생시킨다.")
     @Test
     void menu_create_menuProducts_negative_quantity() {
-        Product 후라이드 = ProductFixture.후라이드();
+        MenuGroup 한마리메뉴 = saveMenuGroup(한마리메뉴());
         Product 양념치킨 = ProductFixture.양념치킨();
-        메뉴그룹반환(Optional.of(MenuFixture.MenuGroupFixture.두마리메뉴()));
-        상품목록반환(List.of(후라이드, 양념치킨));
-        상품반환(후라이드, Optional.of(후라이드));
-        상품반환(양념치킨, Optional.of(양념치킨));
-        menu.setPrice(BigDecimal.valueOf(16000));
-        menu.setMenuProducts(
-                List.of(
-                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(후라이드),
-                        MenuFixture.MenuProductFixture.메뉴상품_양념_재고음수(양념치킨))
-        );
+        saveProducts(List.of(양념치킨));
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(menu));
+        Menu menu = new MenuBuilder()
+                .price(BigDecimal.valueOf(16000))
+                .menuGroup(한마리메뉴)
+                .menuGroupId(한마리메뉴.getId())
+                .menuProducts(List.of(메뉴상품_양념_재고음수(양념치킨)))
+                .build();
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(ILLEGAL_QUANTITY);
+    }
+
+    @DisplayName("메뉴상품의 상품이 존재하지 않으면 예외를 발생시킨다.")
+    @Test
+    void menu_create_menuProducts_not_found_product() {
+        MenuGroup 두마리메뉴 = saveMenuGroup(두마리메뉴());
+        Product 후라이드 = ProductFixture.후라이드();
+        Product 양념치킨 = 양념치킨();
+        saveProducts(List.of(후라이드));
+
+        Menu menu = new MenuBuilder()
+                .price(BigDecimal.valueOf(16000))
+                .menuGroup(두마리메뉴)
+                .menuGroupId(두마리메뉴.getId())
+                .menuProducts(List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)))
+                .build();
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(NOT_EQUAL_MENU_PRODUCT_SIZE);
     }
 
 
     @DisplayName("메뉴가격이 메뉴상품들의 가격의 합보다 크면 예외를 발생시킨다.")
     @Test
     void menu_create_menu_price_more_menuProducts_price_sum() {
+        MenuGroup 두마리메뉴 = saveMenuGroup(두마리메뉴());
         Product 후라이드 = ProductFixture.후라이드();
-        Product 양념치킨 = ProductFixture.양념치킨();
-        메뉴그룹반환(Optional.of(MenuFixture.MenuGroupFixture.두마리메뉴()));
-        상품목록반환(List.of(후라이드, 양념치킨));
-        상품반환(후라이드, Optional.of(후라이드));
-        상품반환(양념치킨, Optional.of(양념치킨));
-        menu.setPrice(후라이드.getPrice().add(양념치킨.getPrice()).add(BigDecimal.valueOf(10000)));
-        menu.setMenuProducts(
-                List.of(
-                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(후라이드),
-                        MenuFixture.MenuProductFixture.메뉴상품_양념(양념치킨))
-        );
+        Product 양념치킨 = 양념치킨();
+        saveProducts(List.of(후라이드, 양념치킨));
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(menu));
+        Menu menu = new MenuBuilder()
+                .price(BigDecimal.valueOf(34000))
+                .menuGroup(두마리메뉴)
+                .menuGroupId(두마리메뉴.getId())
+                .menuProducts(List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)))
+                .build();
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(MENU_PRICE_MORE_PRODUCT);
     }
 
     @DisplayName("메뉴 이름에 비속어가 포함되어 있으면 예외를 발생시킨다.")
     @Test
     void menu_create_menu_name() {
+        MenuGroup 두마리메뉴 = saveMenuGroup(두마리메뉴());
         Product 후라이드 = ProductFixture.후라이드();
-        Product 양념치킨 = ProductFixture.양념치킨();
-        메뉴그룹반환(Optional.of(MenuFixture.MenuGroupFixture.두마리메뉴()));
-        상품목록반환(List.of(후라이드, 양념치킨));
-        상품반환(후라이드, Optional.of(후라이드));
-        상품반환(양념치킨, Optional.of(양념치킨));
-        BDDMockito.given(purgomalumClient.containsProfanity(any())).willReturn(true);
-        menu.setPrice(후라이드.getPrice().add(양념치킨.getPrice()).add(BigDecimal.valueOf(33000)));
-        menu.setMenuProducts(
-                List.of(
-                        MenuFixture.MenuProductFixture.메뉴상품_후라이드(후라이드),
-                        MenuFixture.MenuProductFixture.메뉴상품_양념(양념치킨))
-        );
+        Product 양념치킨 = 양념치킨();
+        saveProducts(List.of(후라이드, 양념치킨));
 
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(menu));
+        Menu menu = new MenuBuilder()
+                .price(BigDecimal.valueOf(33000))
+                .name("비속어치킨메뉴")
+                .menuGroup(두마리메뉴)
+                .menuGroupId(두마리메뉴.getId())
+                .menuProducts(List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)))
+                .build();
+
+        assertThatThrownBy(() -> menuService.create(menu))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(MENU_NAME_CONTAINS_PURGOMALUM);
     }
 
-    private void 메뉴그룹반환(Optional<MenuGroup> menuGroup) {
-        BDDMockito.given(menuGroupRepository.findById(any())).willReturn(menuGroup);
+    private MenuGroup saveMenuGroup(MenuGroup menuGroup) {
+        return menuGroupRepository.save(menuGroup);
     }
 
-    private void 상품반환(Product product, Optional<Product> optionalProduct) {
-        BDDMockito.given(productRepository.findById(product.getId())).willReturn(optionalProduct);
-    }
-
-    private void 상품목록반환(List<Product> products) {
-        BDDMockito.given(productRepository.findAllByIdIn(any())).willReturn(products);
+    private List<Product> saveProducts(List<Product> products) {
+        products.forEach(productRepository::save);
+        return products;
     }
 
 }

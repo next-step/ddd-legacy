@@ -7,11 +7,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
+public interface PurgomalumClient {
+    boolean containsProfanity(final String text);
+}
+
 @Component
-public class PurgomalumClient {
+class PurgomalumRestClient implements PurgomalumClient {
     private final RestTemplate restTemplate;
 
-    public PurgomalumClient(final RestTemplateBuilder restTemplateBuilder) {
+    public PurgomalumRestClient(final RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
     }
 

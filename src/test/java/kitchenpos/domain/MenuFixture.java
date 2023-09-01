@@ -4,19 +4,16 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-
-import static kitchenpos.domain.ProductFixture.후라이드;
-
 public class MenuFixture {
 
-    public static Menu 후라이드_한마리메뉴() {
+    public static Menu 후라이드_한마리메뉴(MenuGroup menuGroup, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setName("후라이드치킨");
         menu.setPrice(BigDecimal.valueOf(16000));
-        menu.setMenuGroup(MenuGroupFixture.한마리메뉴());
+        menu.setMenuGroup(menuGroup);
         menu.setDisplayed(true);
-        menu.setMenuProducts(List.of(MenuProductFixture.메뉴상품_후라이드(후라이드())));
+        menu.setMenuProducts(menuProducts);
         return menu;
     }
 
