@@ -14,10 +14,12 @@ import java.util.UUID;
 
 @Service
 public class OrderTableService {
+
     private final OrderTableRepository orderTableRepository;
     private final OrderRepository orderRepository;
 
-    public OrderTableService(final OrderTableRepository orderTableRepository, final OrderRepository orderRepository) {
+    public OrderTableService(final OrderTableRepository orderTableRepository,
+        final OrderRepository orderRepository) {
         this.orderTableRepository = orderTableRepository;
         this.orderRepository = orderRepository;
     }
