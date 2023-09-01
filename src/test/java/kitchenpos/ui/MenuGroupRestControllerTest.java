@@ -48,6 +48,7 @@ class MenuGroupRestControllerTest extends ControllerTest {
     public static ExtractableResponse<Response> 메뉴_그룹_생성_요청(String name) {
         Map<String, Object> request = new HashMap<>();
         request.put("name", name);
+        request.put("displayed", true);
         return RestAssured
                 .given().log().all()
                 .body(request)

@@ -134,6 +134,7 @@ class MenuRestControllerTest extends ControllerTest {
         request.put("price", price);
         request.put("menuGroupId", menuGroupId);
         request.put("menuProducts", toMenuProducts(products));
+        request.put("displayed", true);
         return RestAssured
                 .given().log().all()
                 .body(request)
