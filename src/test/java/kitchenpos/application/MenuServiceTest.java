@@ -85,9 +85,8 @@ public class MenuServiceTest {
         assertThat(result.getPrice()).isEqualTo(menu.getPrice());
     }
 
-    @ParameterizedTest
-    @NullSource
-    void 메뉴의_가격이_비어있을경우_IllegalArgumentException_발생(BigDecimal price) {
+    @Test
+    void 메뉴의_가격이_비어있을경우_IllegalArgumentException_발생() {
         //given
         Menu nullPriceMenu = ofPrice(null);
 
