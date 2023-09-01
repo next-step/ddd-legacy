@@ -164,6 +164,16 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("메뉴의 가격과, 주문된 가격이 다를 수 없다.")
+    void create06() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice().add(new BigDecimal("10000")));
+        Order order = createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, List.of(orderLineItem), null);
+
+        assertThatThrownBy(() -> orderService.create(order)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     @DisplayName("주문이 수락되는 경우, 주문상태를 접수로 변경한다.")
     void accept01() {
         Menu menu = getSavedMenu(true);
@@ -335,6 +345,24 @@ class OrderServiceTest {
     @Test
     @DisplayName("주문타입이 매장주문 경우, 해당 테이블의 종료된 상태면 손님의 수와, 테이블 여부를 초기화 한다.")
     void complete04() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.SERVED, OrderType.EAT_IN, List.of(orderLineItem), null);
+        order.setOrderTable(getSavedOrderTable(true));
+        order.setOrderTableId(getSavedOrderTable(true).getId());
+        Order savedOrder = orderRepository.save(order);
+
+        Order complete = orderService.complete(savedOrder.getId());
+
+        assertThat(complete.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        OrderTable orderTable = complete.getOrderTable();
+        assertThat(orderTable.getNumberOfGuests()).isZero();
+        assertThat(orderTable.isOccupied()).isFalse();
+    }
+
+    @Test
+    @DisplayName("주문타입이 매장주문 경우, 해당 테이블의 종료된 상태면 손님의 수와, 테이블 여부를 초기화 한다.")
+    void complete05() {
         Menu menu = getSavedMenu(true);
         OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
         Order order = createOrder(OrderStatus.SERVED, OrderType.EAT_IN, List.of(orderLineItem), null);
