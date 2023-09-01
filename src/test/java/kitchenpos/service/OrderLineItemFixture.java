@@ -39,4 +39,8 @@ public class OrderLineItemFixture {
         return this;
     }
 
+    public OrderLineItemFixture quantity(long quantity) {
+        orderLineItem.setQuantity(quantity);
+        return this;
+    }
 }
