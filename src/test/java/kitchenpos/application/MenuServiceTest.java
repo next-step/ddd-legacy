@@ -114,8 +114,8 @@ class MenuServiceTest {
     }
 
     @Test
-    @DisplayName("하나의 메뉴에 여러 제품을 구성할 수 있다.")
-    void requireMenuHaveMultiProducts() {
+    @DisplayName("메뉴에 등록된 상품은 존재하는 상품 이여야 한다.")
+    void requireMenuProductExist() {
         // given
         given(menuGroupRepository.findById(any())).willReturn(java.util.Optional.of(menuGroup));
         given(productRepository.findAllByIdIn(any())).willReturn(Collections.emptyList());
@@ -141,13 +141,14 @@ class MenuServiceTest {
     }
 
     @Test
-    @DisplayName("메뉴의 가격은 메뉴에 포함된 제품들의 가격 합계이다.")
+    @DisplayName("메뉴의 가격은 포함된 제품들의 합보다 같거나 작아야한다.")
     void requireMenuPriceIsSumOfMenuProductsPrice() {
         // given
         given(menuGroupRepository.findById(any())).willReturn(java.util.Optional.of(menuGroup));
         given(productRepository.findById(any())).willReturn(java.util.Optional.of(product));
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
-        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_001L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_생성(product, 1)), "저녁 안주", true);
+        MenuProduct 메뉴_상품_16000원 = 메뉴_상품_생성(product, 1);
+        Menu 요청_객체 = createMenu_두마리_치킨(BigDecimal.valueOf(16_001L), menuGroup.getId(), menuGroup, List.of(메뉴_상품_16000원), "저녁 안주", true);
 
         // when & then
         assertThatThrownBy(() -> menuService.create(요청_객체))
@@ -251,11 +252,11 @@ class MenuServiceTest {
     @DisplayName("메뉴 를 숨길수 있다.")
     void updateMenuHide() {
         // given
-        Menu 요청_객체 = Fixtures.메뉴_생성_두마리_치킨();
-        given(menuRepository.findById(any())).willReturn(Optional.of(요청_객체));
+        Menu 메뉴가_없는_요청 = Fixtures.메뉴_생성_두마리_치킨();
+        given(menuRepository.findById(any())).willReturn(Optional.of(메뉴가_없는_요청));
 
         // when
-        final Menu menu = menuService.hide(요청_객체.getId());
+        final Menu menu = menuService.hide(메뉴가_없는_요청.getId());
 
         // then
         assertThat(menu.isDisplayed()).isFalse();

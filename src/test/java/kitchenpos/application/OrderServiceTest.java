@@ -366,11 +366,11 @@ class OrderServiceTest {
     }
 
     @Nested
-    @DisplayName("주문 상태를 완료 상태로 변경")
-    class changeOrderStatusCompleted {
+    @DisplayName("배달 주문")
+    class DeliveryOrder {
 
         @Test
-        @DisplayName("주문 상태를 배달 완료 상태로 변경 할 수 있다. - 배달")
+        @DisplayName("주문 상태를 배달 완료 상태로 변경 할 수 있다.")
         void orderStatusChangeToDelivered() {
             // given
             Order 주문_요청 = 주문_요청_배달();
@@ -383,7 +383,7 @@ class OrderServiceTest {
         }
 
         @Test
-        @DisplayName("주문 상태가 배달 중인 경우 배달 완료 상태로 변경 할 수 있다. - 배달")
+        @DisplayName("주문 상태가 배달 중인 경우 배달 완료 상태로 변경 할 수 있다.")
         void orderStatusChangeToDeliveredWhenStatusIsDelivering() {
             // given
             Order 주문_요청 = 주문_요청_배달();
@@ -395,6 +395,12 @@ class OrderServiceTest {
             assertThatThrownBy(() -> orderService.complete(주문_요청.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
+
+    }
+
+    @Nested
+    @DisplayName("포장 주문")
+    class TakeoutOrder {
 
         @Test
         @DisplayName("주문 유형이 포장 (TAKEOUT) 상태 인 경우, 주문 상태가 서빙 완료 (SERVED) 상태 이여야 한다. - 포장")
@@ -420,6 +426,12 @@ class OrderServiceTest {
             assertThatThrownBy(() -> orderService.complete(주문_요청.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
+
+    }
+
+    @Nested
+    @DisplayName("매장 식사")
+    class EatinOrder {
 
         @Test
         @DisplayName("매장 식사 (EATIN) 일 경우 주문 상태를 완료로 변경시 테이블을 정리한다 - 매장")
@@ -448,7 +460,6 @@ class OrderServiceTest {
             assertThatThrownBy(() -> orderService.complete(주문_요청.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
-
     }
 
     @Test
