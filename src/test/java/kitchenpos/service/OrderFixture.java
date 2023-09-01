@@ -60,4 +60,9 @@ public class OrderFixture {
         order.setStatus(orderStatus);
         return this;
     }
+
+    public OrderFixture eatIn(OrderTable orderTable) {
+        order.setType(OrderType.EAT_IN);
+        return orderTable(orderTable);
+    }
 }

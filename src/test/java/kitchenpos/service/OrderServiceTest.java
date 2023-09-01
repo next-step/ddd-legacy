@@ -13,11 +13,15 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.Menu;
@@ -33,6 +37,8 @@ import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.KitchenridersClient;
 
 @SpringBootTest
+@Transactional
+@ExtendWith({MockitoExtension.class})
 public class OrderServiceTest {
 
     @Autowired
@@ -50,7 +56,7 @@ public class OrderServiceTest {
     @Autowired
     private OrderTableRepository orderTableRepository;
 
-    @Autowired
+    @SpyBean
     private OrderRepository orderRepository;
 
     @MockBean
@@ -262,5 +268,18 @@ public class OrderServiceTest {
 
         assertThatThrownBy(() -> orderService.complete(order.getId()))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void 주문_완료_성공__주문테이블에_주문완료_안된_테이블_있음() {
+        _1번테이블.setOccupied(true);
+        orderTableRepository.save(_1번테이블);
+        UUID orderId = orderService.create(OrderFixture.builder(오늘의치킨).eatIn(_1번테이블).build()).getId();
+        orderService.accept(orderId);
+        orderService.serve(orderId);
+        orderService.create(OrderFixture.builder(오늘의치킨).eatIn(_1번테이블).build());
+
+        assertDoesNotThrow(() -> orderService.complete(orderId));
+        verify(orderRepository, times(1)).existsByOrderTableAndStatusNot(any(), any());
     }
 }
