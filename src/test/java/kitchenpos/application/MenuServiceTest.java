@@ -3,13 +3,13 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.infra.MockPurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -31,11 +31,6 @@ class MenuServiceTest {
     private final PurgomalumClient purgomalumClient = new MockPurgomalumClient();
     private final MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
 
-    @BeforeEach
-    void setUp() {
-
-    }
-
     @DisplayName("메뉴 생성 성공")
     @Test
     void menu_create_success() {
@@ -43,15 +38,7 @@ class MenuServiceTest {
         Product 후라이드 = ProductFixture.후라이드();
         Product 양념치킨 = 양념치킨();
         saveProducts(List.of(후라이드, 양념치킨));
-
-        Menu menu = new MenuBuilder()
-                .price(BigDecimal.valueOf(33000))
-                .name("치킨메뉴")
-                .menuGroup(두마리메뉴)
-                .menuGroupId(두마리메뉴.getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)))
-                .displayed(true)
-                .build();
+        Menu menu = createMenu(33000, "치킨메뉴", 두마리메뉴, List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)), true);
 
         Menu result = menuService.create(menu);
 
@@ -67,9 +54,7 @@ class MenuServiceTest {
     @DisplayName("메뉴 생성시 가격이 null 이면 예외를 발생시킨다.")
     @Test
     void menu_create_price_null() {
-        Menu menu = new MenuBuilder()
-                .price(null)
-                .build();
+        Menu menu = createMenu(null, "치킨메뉴", null, Collections.emptyList(), true);
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -79,9 +64,7 @@ class MenuServiceTest {
     @DisplayName("메뉴 생성시 가격이 음수면 예외를 발생시킨다.")
     @Test
     void menu_create_price_negative() {
-        Menu menu = new MenuBuilder()
-                .price(BigDecimal.valueOf(-1))
-                .build();
+        Menu menu = createMenu(-1, "치킨메뉴", null, Collections.emptyList(), true);
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -91,9 +74,7 @@ class MenuServiceTest {
     @DisplayName("메뉴는 메뉴그룹이 없으면 예외를 발생시킨다.")
     @Test
     void menu_create_not_found_menuGroup() {
-        Menu menu = new MenuBuilder()
-                .price(BigDecimal.valueOf(16000))
-                .build();
+        Menu menu = createMenu(16000, "치킨메뉴", null, Collections.emptyList(), true);
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(NoSuchElementException.class)
@@ -105,12 +86,7 @@ class MenuServiceTest {
     @NullAndEmptySource
     void menu_create_null_menuProducts(List<MenuProduct> productList) {
         MenuGroup 한마리메뉴 = saveMenuGroup(한마리메뉴());
-        Menu menu = new MenuBuilder()
-                .price(BigDecimal.valueOf(16000))
-                .menuGroup(한마리메뉴)
-                .menuGroupId(한마리메뉴.getId())
-                .menuProducts(productList)
-                .build();
+        Menu menu = createMenu(16000, "치킨메뉴", 한마리메뉴, Collections.emptyList(), true);
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -124,13 +100,7 @@ class MenuServiceTest {
         Product 후라이드 = 후라이드();
         Product 양념치킨 = 양념치킨();
         saveProducts(List.of(후라이드));
-
-        Menu menu = new MenuBuilder()
-                .price(BigDecimal.valueOf(16000))
-                .menuGroup(두마리메뉴)
-                .menuGroupId(두마리메뉴.getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)))
-                .build();
+        Menu menu = createMenu(16000, "치킨메뉴", 두마리메뉴, List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)), true);
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -143,13 +113,7 @@ class MenuServiceTest {
         MenuGroup 한마리메뉴 = saveMenuGroup(한마리메뉴());
         Product 양념치킨 = ProductFixture.양념치킨();
         saveProducts(List.of(양념치킨));
-
-        Menu menu = new MenuBuilder()
-                .price(BigDecimal.valueOf(16000))
-                .menuGroup(한마리메뉴)
-                .menuGroupId(한마리메뉴.getId())
-                .menuProducts(List.of(메뉴상품_양념_재고음수(양념치킨)))
-                .build();
+        Menu menu = createMenu(16000, "치킨메뉴", 한마리메뉴, List.of(메뉴상품_양념_재고음수(양념치킨)), true);
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -163,13 +127,7 @@ class MenuServiceTest {
         Product 후라이드 = ProductFixture.후라이드();
         Product 양념치킨 = 양념치킨();
         saveProducts(List.of(후라이드));
-
-        Menu menu = new MenuBuilder()
-                .price(BigDecimal.valueOf(16000))
-                .menuGroup(두마리메뉴)
-                .menuGroupId(두마리메뉴.getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)))
-                .build();
+        Menu menu = createMenu(16000, "치킨메뉴", 두마리메뉴, List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)), true);
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -184,13 +142,7 @@ class MenuServiceTest {
         Product 후라이드 = ProductFixture.후라이드();
         Product 양념치킨 = 양념치킨();
         saveProducts(List.of(후라이드, 양념치킨));
-
-        Menu menu = new MenuBuilder()
-                .price(BigDecimal.valueOf(34000))
-                .menuGroup(두마리메뉴)
-                .menuGroupId(두마리메뉴.getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)))
-                .build();
+        Menu menu = createMenu(34000, "치킨메뉴", 두마리메뉴, List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)), true);
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -204,14 +156,7 @@ class MenuServiceTest {
         Product 후라이드 = ProductFixture.후라이드();
         Product 양념치킨 = 양념치킨();
         saveProducts(List.of(후라이드, 양념치킨));
-
-        Menu menu = new MenuBuilder()
-                .price(BigDecimal.valueOf(33000))
-                .name("비속어치킨메뉴")
-                .menuGroup(두마리메뉴)
-                .menuGroupId(두마리메뉴.getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)))
-                .build();
+        Menu menu = createMenu(33000, "비속어치킨메뉴", 두마리메뉴, List.of(메뉴상품_후라이드(후라이드), 메뉴상품_양념(양념치킨)), true);
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -224,15 +169,7 @@ class MenuServiceTest {
     @DisplayName("메뉴 가격 변경 성공")
     @Test
     void menu_price_change_success() {
-        Menu menu = saveMenu(new MenuBuilder()
-                .price(BigDecimal.valueOf(33000))
-                .name("치킨메뉴")
-                .menuGroup(두마리메뉴())
-                .menuGroupId(두마리메뉴().getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())))
-                .displayed(true)
-                .build());
-
+        Menu menu = saveMenu(createMenu(33000, "치킨메뉴", 두마리메뉴(), List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())), true));
         Menu request = new MenuBuilder()
                 .price(BigDecimal.valueOf(10000))
                 .build();
@@ -245,15 +182,7 @@ class MenuServiceTest {
     @DisplayName("메뉴 가격 변경시 가격이 null 이면 예외를 발생시킨다.")
     @Test
     void menu_price_change_price_null() {
-        Menu menu = saveMenu(new MenuBuilder()
-                .price(BigDecimal.valueOf(33000))
-                .name("치킨메뉴")
-                .menuGroup(두마리메뉴())
-                .menuGroupId(두마리메뉴().getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())))
-                .displayed(true)
-                .build());
-
+        Menu menu = createMenu(33000, "치킨메뉴", 두마리메뉴(), List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())), true);
         Menu request = new MenuBuilder()
                 .price(null)
                 .build();
@@ -266,15 +195,7 @@ class MenuServiceTest {
     @DisplayName("메뉴 가격 변경시 가격이 음수면 예외를 발생시킨다.")
     @Test
     void menu_price_change_price_negative() {
-        Menu menu = saveMenu(new MenuBuilder()
-                .price(BigDecimal.valueOf(33000))
-                .name("치킨메뉴")
-                .menuGroup(두마리메뉴())
-                .menuGroupId(두마리메뉴().getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())))
-                .displayed(true)
-                .build());
-
+        Menu menu = createMenu(33000, "치킨메뉴", 두마리메뉴(), List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())), true);
         Menu request = new MenuBuilder()
                 .price(BigDecimal.valueOf(-1))
                 .build();
@@ -287,15 +208,6 @@ class MenuServiceTest {
     @DisplayName("메뉴 가격 변경시 메뉴가 없으면 예외를 발생시킨다.")
     @Test
     void menu_price_change_not_found_menu() {
-        saveMenu(new MenuBuilder()
-                .price(BigDecimal.valueOf(33000))
-                .name("치킨메뉴")
-                .menuGroup(두마리메뉴())
-                .menuGroupId(두마리메뉴().getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())))
-                .displayed(true)
-                .build());
-
         Menu request = new MenuBuilder()
                 .price(BigDecimal.valueOf(1000))
                 .build();
@@ -308,14 +220,9 @@ class MenuServiceTest {
     @DisplayName("메뉴 가격 변경시 변경하려는 금액이 메뉴상품들 합보다 크면 예외를 발생시킨다.")
     @Test
     void menu_price_change_price_more_menuProducts_price_sum() {
-        Menu menu = saveMenu(new MenuBuilder()
-                .price(BigDecimal.valueOf(33000))
-                .name("치킨메뉴")
-                .menuGroup(두마리메뉴())
-                .menuGroupId(두마리메뉴().getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())))
-                .displayed(true)
-                .build());
+        Menu menu = saveMenu(
+                createMenu(33000, "치킨메뉴", 두마리메뉴(), List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())), true)
+        );
 
         Menu request = new MenuBuilder()
                 .id(UUID.randomUUID())
@@ -333,6 +240,10 @@ class MenuServiceTest {
     @DisplayName("메뉴 노출로 변경 성공.")
     @Test
     void menu_display_success() {
+        saveMenu(
+                createMenu(33000, "치킨메뉴", 두마리메뉴(), List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())), false)
+        );
+
         Menu savedMenu = saveMenu(new MenuBuilder()
                 .price(BigDecimal.valueOf(10000))
                 .name("치킨메뉴")
@@ -358,14 +269,9 @@ class MenuServiceTest {
     @DisplayName("메뉴 노출로 변경시 메뉴 금액이 메뉴상품들 가격 합보다 크면 예외를 발생시킨다.")
     @Test
     void menu_display_price_more_menuProducts_price_sum() {
-        Menu savedMenu = saveMenu(new MenuBuilder()
-                .price(BigDecimal.valueOf(35000))
-                .name("치킨메뉴")
-                .menuGroup(두마리메뉴())
-                .menuGroupId(두마리메뉴().getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())))
-                .displayed(false)
-                .build());
+        Menu savedMenu = saveMenu(
+                createMenu(35000, "치킨메뉴", 두마리메뉴(), List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())), false)
+        );
 
         assertThatThrownBy(() -> menuService.display(savedMenu.getId()))
                 .isInstanceOf(IllegalStateException.class)
@@ -375,14 +281,9 @@ class MenuServiceTest {
     @DisplayName("메뉴 비노출 성공")
     @Test
     void menu_hide_success() {
-        Menu savedMenu = saveMenu(new MenuBuilder()
-                .price(BigDecimal.valueOf(33000))
-                .name("치킨메뉴")
-                .menuGroup(두마리메뉴())
-                .menuGroupId(두마리메뉴().getId())
-                .menuProducts(List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())))
-                .displayed(false)
-                .build());
+        Menu savedMenu = saveMenu(
+                createMenu(33000, "치킨메뉴", 두마리메뉴(), List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())), true)
+        );
 
         Menu result = menuService.hide(savedMenu.getId());
 
@@ -409,6 +310,32 @@ class MenuServiceTest {
 
     private Menu saveMenu(Menu menu) {
         return menuRepository.save(menu);
+    }
+
+    public Menu createMenu(Integer price, String name, MenuGroup menuGroup, List<MenuProduct> products, boolean display) {
+        return new MenuBuilder()
+                .price(createPrice(price))
+                .name(name)
+                .menuGroup(menuGroup)
+                .menuGroupId(createMenuGroupId(menuGroup))
+                .menuProducts(products)
+                .displayed(display)
+                .build();
+    }
+
+    private UUID createMenuGroupId(MenuGroup menuGroup) {
+        if (menuGroup == null) {
+            return null;
+        } else {
+            return menuGroup.getId();
+        }
+    }
+
+    private BigDecimal createPrice(Integer price) {
+        if (price == null) {
+            return null;
+        }
+        return BigDecimal.valueOf(price);
     }
 
 }
