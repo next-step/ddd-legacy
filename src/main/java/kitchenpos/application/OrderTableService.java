@@ -26,7 +26,7 @@ public class OrderTableService {
     public OrderTable create(final OrderTable request) {
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("테이블명 오류");
         }
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
@@ -49,7 +49,7 @@ public class OrderTableService {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("테이블 상태 오류");
         }
         orderTable.setNumberOfGuests(0);
         orderTable.setOccupied(false);
@@ -60,12 +60,12 @@ public class OrderTableService {
     public OrderTable changeNumberOfGuests(final UUID orderTableId, final OrderTable request) {
         final int numberOfGuests = request.getNumberOfGuests();
         if (numberOfGuests < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("손님수 오류");
         }
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (!orderTable.isOccupied()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException("손님수 변경 오류");
         }
         orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;

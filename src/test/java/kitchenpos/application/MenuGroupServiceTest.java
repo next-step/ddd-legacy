@@ -9,12 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.UUID;
-
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuGroupServiceTest {
@@ -22,19 +17,19 @@ public class MenuGroupServiceTest {
     @Mock
     MenuGroupRepository menuGroupRepository;
     MenuGroupService menuGroupService;
+
     @BeforeEach
-    void setup(){
+    void setup() {
         this.menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
 
-    @DisplayName("그룹명이 입력되어야한다.")
+    @DisplayName("그룹명이 입력되지 않으면 예외를 반환한다")
     @Test
-    void name(){
+    void name() {
         MenuGroup menuGroup = new MenuGroup();
-        assertThatThrownBy(()->menuGroupService.create(menuGroup))
+        assertThatThrownBy(() -> menuGroupService.create(menuGroup))
                 .isInstanceOf(IllegalArgumentException.class);
-
     }
 
 
