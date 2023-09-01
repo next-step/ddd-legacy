@@ -1,14 +1,16 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import static kitchenpos.Fixtures.createOrderTable;
+import java.math.BigDecimal;
+import java.util.List;
+
+import static kitchenpos.Fixtures.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -21,6 +23,18 @@ class OrderTableServiceTest {
 
     @Autowired
     private OrderTableRepository orderTableRepository;
+
+    @Autowired
+    private MenuGroupRepository menuGroupRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
 
     @Test
@@ -67,6 +81,21 @@ class OrderTableServiceTest {
     }
 
     @Test
+    @DisplayName("주문의 상태가 종료되지 않으면 테이블을 치울 수 없다.")
+    void clear02() {
+        Menu menu = getSavedMenu(true);
+        OrderLineItem orderLineItem = createOrderLineItem(menu, menu.getPrice());
+        Order order = createOrder(OrderStatus.SERVED, OrderType.EAT_IN, List.of(orderLineItem), null);
+        OrderTable savedOrderTable = getSavedOrderTable(true);
+        order.setOrderTable(savedOrderTable);
+        order.setOrderTableId(savedOrderTable.getId());
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderTableService.clear(savedOrderTable.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
     @DisplayName("테이블 손님의 수를 변경한다.")
     void changeNumberOfGuests01() {
         OrderTable orderTable = createOrderTable("1번 테이블", true);
@@ -97,5 +126,27 @@ class OrderTableServiceTest {
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(savedOrderTable.getId(), orderTable))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    private OrderTable getSavedOrderTable(boolean occupied) {
+        OrderTable orderTable = createOrderTable("1번테이블", occupied);
+        return orderTableRepository.save(orderTable);
+    }
+
+    public Menu getSavedMenu(boolean displayed) {
+        MenuGroup menuGroup = createMenuGroup("메뉴그룹");
+        MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);
+
+        Product product1 = createProduct("반마리 치킨", new BigDecimal("10000"));
+        Product product2 = createProduct("후라이드 치킨", new BigDecimal("20000"));
+        List<Product> savedProducts = productRepository.saveAll(List.of(product1, product2));
+
+        Menu menu = createMenu("1.5인분 치킨메뉴", new BigDecimal("20000"), savedMenuGroup,
+                               List.of(createMenuProduct(1L, savedProducts.get(0), 1L),
+                                       createMenuProduct(2L, savedProducts.get(1), 1L))
+        );
+        menu.setDisplayed(displayed);
+
+        return menuRepository.save(menu);
     }
 }
