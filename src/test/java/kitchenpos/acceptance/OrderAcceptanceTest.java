@@ -74,4 +74,22 @@ public class OrderAcceptanceTest {
         MockHttpServletResponse orderCompletedResponse = 주문_완료_요청(mockMvc, orderId);
         주문_완료됨(orderCompletedResponse);
     }
+
+    @Test
+    void 배달_주문_통합테스트__성공() throws Exception {
+        // 주문 생성 요청 테스트
+        Map<String, Object> request = Map.of(
+                "type", "DELIVERY",
+                "deliveryAddress", "서울시 영등포구",
+                "orderLineItems", List.of(
+                        Map.of("menuId", menuId,
+                                "price", 19000,
+                                "quantity", 1
+                        )
+                ));
+
+        MockHttpServletResponse orderCreatedResponse = 주문_생성_요청(mockMvc, request);
+        주문_생성_성공함(orderCreatedResponse);
+
+    }
 }
