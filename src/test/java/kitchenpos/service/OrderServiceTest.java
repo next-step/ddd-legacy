@@ -225,4 +225,14 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @Test
+    void 주문_완료_실패__배달인데_배달됨_상태가_아님() {
+        Order order = orderService.create(OrderFixture.builder(오늘의치킨).build());
+        order.setStatus(WAITING);
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.complete(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
 }
