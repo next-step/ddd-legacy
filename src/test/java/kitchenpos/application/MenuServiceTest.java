@@ -327,6 +327,51 @@ class MenuServiceTest {
                 .hasMessage(MENU_PRICE_MORE_PRODUCTS_SUM);
     }
 
+    /*
+        메뉴 가격과 메뉴상품들 가격 합을 비교하는 로직이 for문 바깥에 있어야 한다.
+     */
+    @DisplayName("메뉴 노출로 변경 성공.")
+    @Test
+    void menu_display_success() {
+        Menu savedMenu = saveMenu(new MenuBuilder()
+                .price(BigDecimal.valueOf(10000))
+                .name("치킨메뉴")
+                .menuGroup(두마리메뉴())
+                .menuGroupId(두마리메뉴().getId())
+                .menuProducts(List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())))
+                .displayed(false)
+                .build());
+
+        Menu result = menuService.display(savedMenu.getId());
+
+        assertThat(result.isDisplayed()).isTrue();
+    }
+
+    @DisplayName("메뉴 노출로 변경시 메뉴가 존재하지 않으면 예외를 발생시킨다.")
+    @Test
+    void menu_display_not_found_menu() {
+        assertThatThrownBy(() -> menuService.display(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class)
+                .hasMessage(NOT_FOUND_MENU);
+    }
+
+    @DisplayName("메뉴 노출로 변경시 메뉴 금액이 메뉴상품들 가격 합보다 크면 예외를 발생시킨다.")
+    @Test
+    void menu_display_price_more_menuProducts_price_sum() {
+        Menu savedMenu = saveMenu(new MenuBuilder()
+                .price(BigDecimal.valueOf(35000))
+                .name("치킨메뉴")
+                .menuGroup(두마리메뉴())
+                .menuGroupId(두마리메뉴().getId())
+                .menuProducts(List.of(메뉴상품_후라이드(후라이드()), 메뉴상품_양념(양념치킨())))
+                .displayed(false)
+                .build());
+
+        assertThatThrownBy(() -> menuService.display(savedMenu.getId()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage(MENU_PRICE_MORE_PRODUCTS_SUM);
+    }
+
     private MenuGroup saveMenuGroup(MenuGroup menuGroup) {
         return menuGroupRepository.save(menuGroup);
     }
