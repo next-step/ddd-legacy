@@ -2,6 +2,7 @@ package kitchenpos.domain;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class MenuBuilder {
@@ -50,7 +51,7 @@ public class MenuBuilder {
 
     public Menu build() {
         Menu menu = new Menu();
-        menu.setId(id);
+        menu.setId(Objects.requireNonNullElseGet(id, UUID::randomUUID));
         menu.setName(name);
         menu.setPrice(price);
         menu.setMenuGroup(menuGroup);

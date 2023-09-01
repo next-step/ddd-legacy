@@ -69,7 +69,7 @@ public class MenuService {
             menuProducts.add(menuProduct);
         }
         if (price.compareTo(sum) > 0) {
-            throw new IllegalArgumentException(MENU_PRICE_MORE_PRODUCT);
+            throw new IllegalArgumentException(MENU_PRICE_MORE_PRODUCTS_SUM);
         }
         final String name = request.getName();
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
@@ -89,16 +89,16 @@ public class MenuService {
     public Menu changePrice(final UUID menuId, final Menu request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(PRICE_MORE_ZERO);
         }
         final Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow( () -> new NoSuchElementException(NOT_FOUND_MENU));
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             final BigDecimal sum = menuProduct.getProduct()
                 .getPrice()
                 .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
             if (price.compareTo(sum) > 0) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException(MENU_PRICE_MORE_PRODUCTS_SUM);
             }
         }
         menu.setPrice(price);
