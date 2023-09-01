@@ -1,5 +1,6 @@
 package kitchenpos.service;
 
+import static kitchenpos.domain.OrderType.EAT_IN;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 
@@ -109,4 +111,19 @@ public class OrderServiceTest {
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    void 주문_생성_실패__메뉴가_숨김임() {
+        오늘의치킨.setDisplayed(false);
+        menuRepository.save(오늘의치킨);
+
+        Order request = OrderFixture.builder()
+                .orderLineItem(List.of(OrderLineItemFixture.builder(오늘의치킨).build()))
+                .build();
+
+        assertThatThrownBy(() -> orderService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+
 }
