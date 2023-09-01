@@ -66,5 +66,10 @@ public class OrderAcceptanceTest {
         MockHttpServletResponse orderAcceptedResponse = 주문_수락_요청(mockMvc, orderId);
 
         주문_수락됨(orderAcceptedResponse);
+
+        // 주문 서빙 요청 테스트
+        MockHttpServletResponse orderServedResponse = 주문_서빙_요청(mockMvc, orderId);
+
+        주문_서빙됨(orderServedResponse);
     }
 }
