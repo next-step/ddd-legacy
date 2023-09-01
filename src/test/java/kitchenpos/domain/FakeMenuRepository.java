@@ -1,6 +1,8 @@
 package kitchenpos.domain;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FakeMenuRepository implements MenuRepository {
     private Map<UUID, Menu> map = new HashMap<>();
@@ -12,7 +14,10 @@ public class FakeMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAllByProductId(UUID productId) {
-        return null;
+        return map.values()
+                .stream()
+                .filter(menu -> menu.getMenuProducts().stream().anyMatch(menuProduct -> productId.equals(menuProduct.getProductId())))
+                .collect(Collectors.toList());
     }
 
     @Override

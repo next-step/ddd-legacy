@@ -308,7 +308,7 @@ class MenuServiceTest {
         return products;
     }
 
-    private Menu saveMenu(Menu menu) {
+    public Menu saveMenu(Menu menu) {
         return menuRepository.save(menu);
     }
 

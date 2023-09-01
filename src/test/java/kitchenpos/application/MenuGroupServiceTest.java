@@ -9,8 +9,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static kitchenpos.exception.MenuGroupExceptionMessage.NULL_EMPTY_NAME;
-import static org.assertj.core.api.AssertionsForClassTypes.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class MenuGroupServiceTest {
 
@@ -35,7 +35,7 @@ class MenuGroupServiceTest {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName(name);
 
-        assertThatThrownBy( () -> service.create(menuGroup))
+        assertThatThrownBy(() -> service.create(menuGroup))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage(NULL_EMPTY_NAME);
     }
