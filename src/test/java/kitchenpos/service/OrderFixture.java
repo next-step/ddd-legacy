@@ -2,6 +2,7 @@ package kitchenpos.service;
 
 import java.util.List;
 
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderType;
@@ -18,6 +19,11 @@ public class OrderFixture {
         return new OrderFixture();
     }
 
+    public static OrderFixture builder(Menu menu) {
+        return builder()
+                .orderLineItem(List.of(OrderLineItemFixture.builder(menu).build()));
+    }
+
     public Order build() {
         return order;
     }
@@ -29,6 +35,11 @@ public class OrderFixture {
 
     public OrderFixture orderLineItem(List<OrderLineItem> orderLineItems) {
         order.setOrderLineItems(orderLineItems);
+        return this;
+    }
+
+    public OrderFixture deliveryAddress(String deliveryAddress) {
+        order.setDeliveryAddress(deliveryAddress);
         return this;
     }
 }

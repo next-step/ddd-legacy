@@ -15,12 +15,13 @@ public class OrderLineItemFixture {
     }
 
     public static OrderLineItemFixture builder() {
-        return builder(null);
+        return new OrderLineItemFixture();
     }
 
     public static OrderLineItemFixture builder(Menu menu) {
-        return new OrderLineItemFixture()
-                .menu(menu);
+        return builder()
+                .menu(menu)
+                .price(menu.getPrice());
     }
 
     public OrderLineItem build() {
@@ -45,8 +46,8 @@ public class OrderLineItemFixture {
         return this;
     }
 
-    public OrderLineItemFixture price(long price) {
-        orderLineItem.setPrice(new BigDecimal(price));
+    public OrderLineItemFixture price(BigDecimal price) {
+        orderLineItem.setPrice(price);
         return this;
     }
 }

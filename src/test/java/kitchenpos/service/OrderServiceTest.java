@@ -1,13 +1,16 @@
 package kitchenpos.service;
 
-import static kitchenpos.domain.OrderType.EAT_IN;
+import static kitchenpos.domain.OrderType.DELIVERY;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -17,7 +20,6 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 
@@ -117,9 +119,7 @@ public class OrderServiceTest {
         오늘의치킨.setDisplayed(false);
         menuRepository.save(오늘의치킨);
 
-        Order request = OrderFixture.builder()
-                .orderLineItem(List.of(OrderLineItemFixture.builder(오늘의치킨).build()))
-                .build();
+        Order request = OrderFixture.builder(오늘의치킨).build();
 
         assertThatThrownBy(() -> orderService.create(request))
                 .isInstanceOf(IllegalStateException.class);
@@ -129,7 +129,19 @@ public class OrderServiceTest {
     void 주문_생성_실패__주문항목의_가격과_메뉴의_가격이_다름() {
         Order request = OrderFixture.builder()
                 .orderLineItem(List.of(OrderLineItemFixture.builder(오늘의치킨)
-                        .price(28000).build()))
+                        .price(new BigDecimal(28000)).build()))
+                .build();
+
+        assertThatThrownBy(() -> orderService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @NullAndEmptySource
+    @ParameterizedTest
+    void 주문_생성_실패__배달인데_주소가_null이거나_비어있음(String nullAndEmpty) {
+        Order request = OrderFixture.builder(오늘의치킨)
+                .type(DELIVERY)
+                .deliveryAddress(nullAndEmpty)
                 .build();
 
         assertThatThrownBy(() -> orderService.create(request))
