@@ -122,7 +122,7 @@ public class OrderServiceTest {
                 .build();
 
         assertThatThrownBy(() -> orderService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
