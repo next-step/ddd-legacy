@@ -14,6 +14,7 @@ import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -73,30 +74,81 @@ public class OrderServiceTest {
         notDisplayedMenu = createMenu("메뉴1", new BigDecimal("1500"), menuGroup, false, List.of(menuProduct));
     }
 
-    @Test
-    void 주문_등록_성공() {
-        //given
-        LocalDateTime orderDateTime = LocalDateTime.now();
-        OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
-        Order order = createOrder("서울", orderTable, orderDateTime, OrderStatus.WAITING, OrderType.EAT_IN, List.of(orderLineItem));
+    @Nested
+    class DeliveryTypeOrderTest {
+        @Test
+        void 매장식사_주문_등록_성공() {
+            //given
+            LocalDateTime orderDateTime = LocalDateTime.now();
+            OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
+            Order order = createOrder("서울", orderTable, orderDateTime, OrderStatus.WAITING, OrderType.EAT_IN, List.of(orderLineItem));
 
-        given(menuRepository.findAllByIdIn(any()))
-                .willReturn(List.of(menu));
-        given(menuRepository.findById(any()))
-                .willReturn(Optional.of(menu));
-        given(orderTableRepository.findById(any()))
-                .willReturn(Optional.of(orderTable));
-        given(orderRepository.save(any()))
-                .willReturn(order);
+            given(menuRepository.findAllByIdIn(any()))
+                    .willReturn(List.of(menu));
+            given(menuRepository.findById(any()))
+                    .willReturn(Optional.of(menu));
+            given(orderTableRepository.findById(any()))
+                    .willReturn(Optional.of(orderTable));
+            given(orderRepository.save(any()))
+                    .willReturn(order);
 
-        //when
-        Order result = orderService.create(order);
+            //when
+            Order result = orderService.create(order);
 
-        //then
-        verify(orderRepository).save(any());
-        assertThat(result).isNotNull();
-        assertThat(result.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress());
+            //then
+            verify(orderRepository).save(any());
+            assertThat(result).isNotNull();
+            assertThat(result.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress());
+        }
+
+        @Test
+        void 포장_주문_등록_성공() {
+            //given
+            LocalDateTime orderDateTime = LocalDateTime.now();
+            OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
+            Order order = createOrder("서울", orderTable, orderDateTime, OrderStatus.WAITING, OrderType.TAKEOUT, List.of(orderLineItem));
+
+            given(menuRepository.findAllByIdIn(any()))
+                    .willReturn(List.of(menu));
+            given(menuRepository.findById(any()))
+                    .willReturn(Optional.of(menu));
+            given(orderRepository.save(any()))
+                    .willReturn(order);
+
+            //when
+            Order result = orderService.create(order);
+
+            //then
+            verify(orderRepository).save(any());
+            assertThat(result).isNotNull();
+            assertThat(result.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress());
+        }
+
+        @Test
+        void 배달_주문_등록_성공() {
+            //given
+            LocalDateTime orderDateTime = LocalDateTime.now();
+            OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
+            Order order = createOrder("서울", orderTable, orderDateTime, OrderStatus.WAITING, OrderType.DELIVERY, List.of(orderLineItem));
+
+            given(menuRepository.findAllByIdIn(any()))
+                    .willReturn(List.of(menu));
+            given(menuRepository.findById(any()))
+                    .willReturn(Optional.of(menu));
+            given(orderRepository.save(any()))
+                    .willReturn(order);
+
+            //when
+            Order result = orderService.create(order);
+
+            //then
+            verify(orderRepository).save(any());
+            assertThat(result).isNotNull();
+            assertThat(result.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress());
+        }
     }
+
+
 
 
     @Test

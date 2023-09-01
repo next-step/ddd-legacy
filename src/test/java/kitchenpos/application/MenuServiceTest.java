@@ -59,7 +59,7 @@ public class MenuServiceTest {
     }
 
     @Test
-    void 메뉴_정상등록() {
+    void 메뉴_등록_성공() {
         //given
         MenuProduct menuProduct = createMenuProduct(product, 1);
         Menu menu = createMenu("메뉴1", new BigDecimal("2000"), menuGroup, false, List.of(menuProduct));
