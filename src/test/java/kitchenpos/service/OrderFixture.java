@@ -1,10 +1,12 @@
 package kitchenpos.service;
 
 import java.util.List;
+import java.util.UUID;
 
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
 
@@ -13,6 +15,7 @@ public class OrderFixture {
 
     public OrderFixture() {
         order = new Order();
+        order.setId(UUID.randomUUID());
         order.setType(OrderType.DELIVERY);
     }
 
@@ -22,7 +25,8 @@ public class OrderFixture {
 
     public static OrderFixture builder(Menu menu) {
         return builder()
-                .orderLineItem(List.of(OrderLineItemFixture.builder(menu).build()));
+                .orderLineItem(List.of(OrderLineItemFixture.builder(menu).build()))
+                .deliveryAddress("서울시 영등포구");
     }
 
     public Order build() {
@@ -49,6 +53,11 @@ public class OrderFixture {
             order.setOrderTableId(orderTable.getId());
         }
         order.setOrderTable(orderTable);
+        return this;
+    }
+
+    public OrderFixture status(OrderStatus orderStatus) {
+        order.setStatus(orderStatus);
         return this;
     }
 }
