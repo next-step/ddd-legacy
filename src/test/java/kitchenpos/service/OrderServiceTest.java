@@ -3,6 +3,9 @@ package kitchenpos.service;
 import static kitchenpos.domain.OrderStatus.*;
 import static kitchenpos.domain.OrderType.*;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.Menu;
@@ -26,6 +30,7 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.infra.KitchenridersClient;
 
 @SpringBootTest
 public class OrderServiceTest {
@@ -47,6 +52,9 @@ public class OrderServiceTest {
 
     @Autowired
     private OrderRepository orderRepository;
+
+    @MockBean
+    private KitchenridersClient kitchenridersClient;
 
     private MenuGroup 추천메뉴;
     private Product 강정치킨;
@@ -184,6 +192,16 @@ public class OrderServiceTest {
 
         assertThatThrownBy(() -> orderService.accept(order.getId()))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void 주문_수락_성공__키친_라이더스_호출() {
+        Order order = orderService.create(OrderFixture.builder(오늘의치킨).build());
+        order.setStatus(WAITING);
+        orderRepository.save(order);
+
+        assertDoesNotThrow(() -> orderService.accept(order.getId()));
+        verify(kitchenridersClient, times(1)).requestDelivery(any(), any(), any());
     }
 
     @Test
