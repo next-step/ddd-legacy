@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuGroupServiceTest {
@@ -29,7 +29,7 @@ public class MenuGroupServiceTest {
     private MenuGroupService menuGroupService;
 
     @Test
-    void 메뉴그룹은_등록할_수_있다() {
+    void 메뉴그룹_등록_성공() {
         //given
         MenuGroup menuGroup = createMenuGroup("메뉴그룹1");
         given(menuGroupRepository.save(any()))
@@ -39,13 +39,15 @@ public class MenuGroupServiceTest {
         MenuGroup result = menuGroupService.create(menuGroup);
 
         //then
+        verify(menuGroupRepository).save(any());
+        assertThat(result).isNotNull();
         assertThat(result.getName()).isEqualTo(menuGroup.getName());
         assertThat(result.getId()).isEqualTo(menuGroup.getId());
     }
     
     @ParameterizedTest
     @NullAndEmptySource
-    void 메뉴그룹의_이름은_비어있을_수_없다(String name) {
+    void 메뉴그룹의_이름이_비어있다면_IllegalArgumentException_발생(String name) {
         //given
         MenuGroup menuGroup = createMenuGroup(name);
 
@@ -55,7 +57,7 @@ public class MenuGroupServiceTest {
     }
 
     @Test
-    void 모든_메뉴그룹을_조회할_수_있다() {
+    void 모든_메뉴그룹을_조회_성공() {
         //given
         MenuGroup menuGroup1 = createMenuGroup("메뉴그룹1");
         MenuGroup menuGroup2 = createMenuGroup("메뉴그룹2");

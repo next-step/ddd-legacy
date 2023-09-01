@@ -8,12 +8,10 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -32,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
@@ -60,7 +59,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void 상품은_등록할_수_있다() {
+    void 상품_등록_성공() {
         //given
         Product product = createProduct("상품1", new BigDecimal("1000"));
 
@@ -73,13 +72,15 @@ public class ProductServiceTest {
         Product result = productService.create(product);
 
         //then
+        verify(productRepository).save(any());
+        assertThat(result).isNotNull();
         assertThat(result.getName()).isEqualTo(product.getName());
         assertThat(result.getPrice()).isEqualTo(product.getPrice());
     }
 
     @ParameterizedTest
     @NullSource
-    void 상품의_이름은_비어있을_수_없다(String productName) {
+    void 상품의_이름이_비어있다면_IllegalArgumentException_발생(String productName) {
         //given
         Product product = createProduct(productName, new BigDecimal("1000"));
 
@@ -89,7 +90,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void 상품의_이름은_욕설을_포함할_수_없다() {
+    void 상품의_이름에_욕설을_포함한다면_IllegalArgumentException_발생() {
         //given
         Product product = createProduct("상품", new BigDecimal("1000"));
 
@@ -102,7 +103,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void 상품의_가격은_0원미만일_수_없다() {
+    void 상품의_가격이_0원미만이라면_IllegalArgumentException_발생() {
         //given
         Product product = createProduct("상품", new BigDecimal("-1"));
 
@@ -112,7 +113,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void 상품의_가격을_변경할_수_있다() {
+    void 상품_가격을_변경_성공() {
         //given
         Product request = createProduct("상품1", new BigDecimal("2000"));
         Product product = createProduct("상품1", new BigDecimal("1000"));
@@ -149,7 +150,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    void 모든_상품을_조회할_수_있다() {
+    void 모든_상품을_조회_성공() {
         //given
         Product product1 = createProduct("상품1", new BigDecimal("200"));
         Product product2 = createProduct("상품2", new BigDecimal("200"));

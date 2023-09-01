@@ -61,8 +61,6 @@ public class ProductService {
                         .getPrice()
                         .multiply(BigDecimal.valueOf(menuProduct.getQuantity()));
             }
-            System.out.println("menu = " + menu.getPrice());
-            System.out.println("sum = " + sum);
             if (menu.getPrice().compareTo(sum) > 0) {
                 menu.setDisplayed(false);
             }

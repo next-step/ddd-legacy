@@ -12,4 +12,11 @@ public class MenuGroupFixtures {
         menuGroup.setName(name);
         return menuGroup;
     }
+
+    public static MenuGroup createMenuGroup() {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(UUID.randomUUID());
+        menuGroup.setName("메뉴그룹");
+        return menuGroup;
+    }
 }

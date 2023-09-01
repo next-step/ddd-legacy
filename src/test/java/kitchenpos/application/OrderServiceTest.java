@@ -13,7 +13,6 @@ import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 import kitchenpos.infra.KitchenridersClient;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +38,6 @@ import static kitchenpos.fixture.OrderTableFixtures.createOrderTable;
 import static kitchenpos.fixture.ProductFixtures.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.api.Assertions.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -76,7 +74,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 주문을_등록할_수_있다() {
+    void 주문_등록_성공() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -95,12 +93,14 @@ public class OrderServiceTest {
         Order result = orderService.create(order);
 
         //then
+        verify(orderRepository).save(any());
+        assertThat(result).isNotNull();
         assertThat(result.getDeliveryAddress()).isEqualTo(order.getDeliveryAddress());
     }
 
 
     @Test
-    void 주문타입은_필수로_등록되어야_한다() {
+    void 주문타입은_필수로_등록되어야_한다_없다면_IllegalArgumentException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -113,7 +113,7 @@ public class OrderServiceTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    void 주문상품_목록은_필수로_등록되어야_한다(List<OrderLineItem> orderLineItems) {
+    void 주문상품_목록은_필수로_등록되어야_한다_없다면_IllegalArgumentException_발생(List<OrderLineItem> orderLineItems) {
         LocalDateTime orderDateTime = LocalDateTime.now();
         Order order = createOrder("서울", orderTable, orderDateTime, OrderStatus.WAITING, OrderType.EAT_IN, orderLineItems);
 
@@ -123,7 +123,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 존재하지_않는_메뉴는_주문할_수_없다() {
+    void 존재하지_않는_메뉴로_주문한다면_NoSuchElementException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 0L, new BigDecimal("1500"), 1L);
@@ -140,7 +140,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 매장식사가_아니라면_0개_이상의_주문내역이_포함되어야_한다() {
+    void 매장식사가_아닐_때_0개_이상의_주문내역이_포함되지_않으면_IllegalArgumentException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, -1L, new BigDecimal("1500"), 1L);
@@ -155,7 +155,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 판매중이지_않은_메뉴가_주문에_존재해서는_안된다() {
+    void 판매중이지_않은_메뉴가_주문에_존재하면_IllegalStateException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(notDisplayedMenu, 1L, new BigDecimal("1500"), 1L);
@@ -173,7 +173,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 매장_식사인_경우_주문_테이블은_필수로_존재해야_한다() {
+    void 매장_식사인_경우_주문_테이블이_없다면_NoSuchElementException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -192,7 +192,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 주문_승인을_할_수_있다() {
+    void 주문_승인_성공() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -209,7 +209,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 주문승인은_전_주문_상태가_대기_상태여야한다() {
+    void 전_주문_상태가_주문_대기가_아니면_주문승인할_수_없고_IllegalStateException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -242,7 +242,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 서빙_완료를_할_수_있다() {
+    void 서빙_완료_성공() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -259,7 +259,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 서빙_완료는_전_주문_상태가_승인이어야_한다() {
+    void 전_주문_상태가_승인상태가_아니라면_서빙_완료_할_수_없고_IllegalStateException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -274,7 +274,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 배달중_상태로_변경할_수_있다() {
+    void 배달중_상태_변경_성공() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -291,7 +291,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 배달중_상태는_주문_타입이_배달이어야_한다() {
+    void 주문_타입_배달이어야_배달중_상태로_변경가능하다_다른_배달타입일경우_IllegalStateException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -306,7 +306,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 배달중_상태의_전_주문_상태는_서빙완료여야_한다() {
+    void 서빙완료_상태일_때만_배달중_상태로_변경_가능하다_다른_상태라면_IllegalStateException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -321,7 +321,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 배달_완료_상태로_변경할_수_있다() {
+    void 배달_완료_상태로_변경_성공() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -338,7 +338,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 배달_완료_상태는_전_주문_상태가_배달중이어야_한다() {
+    void 전_주문_상태가_배달중이어야_배달완료로_변경가능_다른_상태라면_IllegalStateException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -353,7 +353,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 완료_상태로_변경할_수_있다() {
+    void 완료_상태로_변경_성공() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -370,7 +370,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 주문_타입이_배달인_경우_완료상태_전_주문_상태가_배달완료여야_한다() {
+    void 주문_타입이_배달인_경우_전_주문_상태가_배달완료여야_완료상태로_변경가능_아니라면_IllegalStateException_발생() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -386,7 +386,7 @@ public class OrderServiceTest {
 
     @ParameterizedTest
     @EnumSource(value = OrderType.class, names = {"EAT_IN", "TAKEOUT"})
-    void 주문_타입이_포장_또는_매장식사인_경우_완료상태_전_주문_상태가_서빙완료여야_한다(OrderType orderType) {
+    void 주문_타입이_포장_또는_매장식사인_경우_전_주문_상태가_서빙완료여야_완료상태변경가능_아니라면_IllegalStateException_발생(OrderType orderType) {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -401,7 +401,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 주문_타입이_매장식사인_경우_테이블_점유_상태를_해제하고_주문_테이블의_손님수도_0으로_변경한다() {
+    void 주문_타입이_매장식사인_경우_완료상태로_변경하면_테이블_점유_상태를_해제하고_주문_테이블의_손님수도_0으로_변경한다() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
@@ -419,7 +419,7 @@ public class OrderServiceTest {
     }
 
     @Test
-    void 모든_주문을_조회할_수_있다() {
+    void 모든_주문_조회_성공() {
         //given
         LocalDateTime orderDateTime = LocalDateTime.now();
         OrderLineItem orderLineItem = createOrderLineItem(menu, 1L, new BigDecimal("1500"), 1L);
