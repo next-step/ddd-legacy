@@ -5,10 +5,7 @@ import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.testfixture.MenuFixture;
 import kitchenpos.testfixture.MenuGroupFixture;
 import kitchenpos.testfixture.ProductFixture;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestFactory;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -202,6 +199,26 @@ class MenuServiceTest {
                     assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
                 })
         );
+    }
+
+    @Test
+    @Disabled("잘못 구현된 코드, 오류가 발생하여야한다.")
+    @DisplayName("메뉴상품 * 재고의 합은 메뉴의 가격을 초과할 수 없다.")
+    void create2() {
+        var products = List.of(
+                ProductFixture.createProduct("상품1", 1000L),
+                ProductFixture.createProduct("상품2", 1000L)
+        );
+        var menuGroup = MenuGroupFixture.createMenuGroup("메뉴그룹");
+        var menu = MenuFixture.createMenu("메뉴", 1000L, true, menuGroup, products);
+        doAnswer(args -> Optional.of(menu)).when(menuRepository).findById(eq(menu.getId()));
+
+        var request = MenuFixture.copy(menu);
+        request.setPrice(BigDecimal.valueOf(1500L));
+
+        var throwable = catchThrowable(() -> menuService.create(request));
+
+        assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
     }
 
     @TestFactory
