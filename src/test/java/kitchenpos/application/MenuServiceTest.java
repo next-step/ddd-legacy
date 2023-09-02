@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.ProductTestFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,28 +45,10 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
-        menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("메뉴그룹1");
-
-        product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName("상품1");
-        product.setPrice(BigDecimal.valueOf(100));
-
-        menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(1L);
-        menuProduct.setSeq(1L);
-
-        menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName("메뉴1");
-        menu.setPrice(BigDecimal.valueOf(100));
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setMenuProducts(Arrays.asList(menuProduct));
-        menu.setDisplayed(true);
-
+        menuGroup = ProductTestFixture.createMenuGroup("메뉴그룹1");
+        product = ProductTestFixture.createProduct("상품1", BigDecimal.valueOf(100));
+        menuProduct = ProductTestFixture.createMenuProduct(product, 1L, 1L);
+        menu = ProductTestFixture.createMenu("메뉴1", BigDecimal.valueOf(100), menuGroup.getId(), true, menuProduct);
     }
 
     @Test

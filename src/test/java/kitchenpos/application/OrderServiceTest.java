@@ -1,6 +1,8 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.OrderTestFixture;
+import kitchenpos.fixture.ProductTestFixture;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,39 +51,12 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setDisplayed(true);
-        menu.setPrice(BigDecimal.valueOf(10_000L));
-
-        orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setQuantity(1L);
-        orderLineItem.setPrice(BigDecimal.valueOf(10_000L));
-
-        orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(true);
-
-        deliveryOrder = new Order();
-        deliveryOrder.setId(UUID.randomUUID());
-        deliveryOrder.setType(OrderType.DELIVERY);
-        deliveryOrder.setOrderLineItems(Arrays.asList(orderLineItem));
-        deliveryOrder.setDeliveryAddress("서울시 강남구 역삼동");
-        deliveryOrder.setStatus(OrderStatus.WAITING);
-
-        eatInOrder = new Order();
-        eatInOrder.setId(UUID.randomUUID());
-        eatInOrder.setType(OrderType.EAT_IN);
-        eatInOrder.setOrderLineItems(Arrays.asList(orderLineItem));
-        eatInOrder.setStatus(OrderStatus.WAITING);
-        eatInOrder.setOrderTable(orderTable);
-
-        takeOutOrder = new Order();
-        takeOutOrder.setId(UUID.randomUUID());
-        takeOutOrder.setType(OrderType.TAKEOUT);
-        takeOutOrder.setOrderLineItems(Arrays.asList(orderLineItem));
-        takeOutOrder.setStatus(OrderStatus.WAITING);
+        menu = ProductTestFixture.createMenu("메뉴1", BigDecimal.valueOf(10_000L), UUID.randomUUID(), true);
+        orderLineItem = OrderTestFixture.createOrderLineItem(menu.getId(), 1L, BigDecimal.valueOf(10_000L));
+        orderTable = OrderTestFixture.createOrderTable(true);
+        deliveryOrder = OrderTestFixture.createOrder(OrderType.DELIVERY, null, OrderStatus.WAITING, "서울시 강남구 역삼동", orderLineItem);
+        eatInOrder = OrderTestFixture.createOrder(OrderType.EAT_IN, orderTable, OrderStatus.WAITING, null, orderLineItem);
+        takeOutOrder = OrderTestFixture.createOrder(OrderType.TAKEOUT, null, OrderStatus.WAITING, null, orderLineItem);
     }
 
     @Test

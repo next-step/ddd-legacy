@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.fixture.ProductTestFixture;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -48,9 +49,7 @@ class MenuGroupServiceTest {
 
     @Test
     void 메뉴_그룹_목록을_조회한다() {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("메뉴 그룹");
+        MenuGroup menuGroup = ProductTestFixture.createMenuGroup("메뉴 그룹");
         given(menuGroupRepository.findAll()).willReturn(Arrays.asList(menuGroup));
 
         assertThat(menuGroupService.findAll()).hasSize(1);

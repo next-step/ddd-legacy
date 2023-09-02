@@ -1,8 +1,8 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.fixture.ProductTestFixture;
 import kitchenpos.infra.PurgomalumClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,50 +34,9 @@ class ProductServiceTest {
     @Mock
     PurgomalumClient purgomalumClient;
 
-    Product product1;
-    Product product2;
-    Product product3;
-    Menu menu;
-
-    @BeforeEach
-    void setUp() {
-        product1 = new Product();
-        product1.setId(UUID.randomUUID());
-        product1.setName("상품1");
-        product1.setPrice(BigDecimal.valueOf(100));
-
-        product2 = new Product();
-        product2.setId(UUID.randomUUID());
-        product2.setName("test");
-        product2.setPrice(BigDecimal.valueOf(200));
-
-        product3 = new Product();
-        product3.setId(UUID.randomUUID());
-        product3.setName("test");
-        product3.setPrice(BigDecimal.valueOf(200));
-
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setQuantity(1);
-        menuProduct.setSeq(1L);
-        menuProduct.setProduct(product1);
-
-        menu = new Menu();
-        menu.setMenuProducts(Arrays.asList(menuProduct));
-        menu.setDisplayed(true);
-        menu.setId(UUID.randomUUID());
-        menu.setMenuGroupId(UUID.randomUUID());
-        menu.setName("메뉴명");
-        menu.setPrice(BigDecimal.valueOf(400));
-    }
-
     @Test
     void 상품을_생성한다() {
-        Product product = new Product();
-        UUID productId = UUID.randomUUID();
-        product.setId(productId);
-        product.setName("test");
-        product.setPrice(BigDecimal.valueOf(200));
-
+        Product product = ProductTestFixture.createProduct("test", BigDecimal.valueOf(200));
         given(productRepository.save(any())).willReturn(product);
 
         Product actual = productService.create(product);
@@ -131,6 +90,8 @@ class ProductServiceTest {
 
     @Test
     void 상품_수정_시_금액이_0_미만이면_예외가_발생한다() {
+        Product product1 = ProductTestFixture.createProduct("상품1", BigDecimal.valueOf(100));
+
         Product request = new Product();
         request.setName("test");
         request.setPrice(BigDecimal.valueOf(-1));
@@ -141,6 +102,9 @@ class ProductServiceTest {
 
     @Test
     void 해당_상품을_포함하는_메뉴의_가격이_메뉴에_포함_된_상품_가격_x_상품_수량의_합보다_크면_메뉴_노출이_비활성화_된다() {
+        Product product1 = ProductTestFixture.createProduct("상품1", BigDecimal.valueOf(100));
+        MenuProduct menuProduct = ProductTestFixture.createMenuProduct(product1, 1L, 1L);
+        Menu menu = ProductTestFixture.createMenu("메뉴명", BigDecimal.valueOf(400), UUID.randomUUID(), true, menuProduct);
         Product request = new Product();
         request.setName("test");
         request.setPrice(BigDecimal.valueOf(300));
@@ -155,6 +119,10 @@ class ProductServiceTest {
 
     @Test
     void 상품의_전체_목록을_조회한다() {
+        Product product1 = ProductTestFixture.createProduct("상품1", BigDecimal.valueOf(100));
+        Product product2 = ProductTestFixture.createProduct("test", BigDecimal.valueOf(200));
+        Product product3 = ProductTestFixture.createProduct("test", BigDecimal.valueOf(200));
+
         given(productRepository.findAll()).willReturn(Arrays.asList(product1, product2, product3));
 
         assertThat(productService.findAll()).hasSize(3);
