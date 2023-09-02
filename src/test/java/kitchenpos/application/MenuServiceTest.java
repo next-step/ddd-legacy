@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.ApplicationServiceTest;
 import kitchenpos.domain.*;
 import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
@@ -208,8 +209,9 @@ class MenuServiceTest extends ApplicationServiceTest {
                 ProductFixture.create(UUID.randomUUID(), "코카콜라 1.5L", BigDecimal.valueOf(2_000L))
             );
             Menu menu = MenuFixture.createWithProducts("후라이드 치킨 세트", BigDecimal.valueOf(19_000L), products);
+            MenuGroup menuGroup = MenuGroupFixture.create();
             Menu changingPriceMenu = MenuFixture.create(
-                menu.getId(), "후라이드 치킨 세트", changedPrice, menu.getMenuProducts(), true
+                menu.getId(), "후라이드 치킨 세트", changedPrice, menu.getMenuProducts(), menuGroup, true
             );
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -233,8 +235,9 @@ class MenuServiceTest extends ApplicationServiceTest {
                 ProductFixture.create(UUID.randomUUID(), "코카콜라 1.5L", BigDecimal.valueOf(2_000L))
             );
             Menu menu = MenuFixture.createWithProducts("후라이드 치킨 세트", BigDecimal.valueOf(20_000L), products);
+            MenuGroup menuGroup = MenuGroupFixture.create();
             Menu changingPriceMenu = MenuFixture.create(
-                menu.getId(), "후라이드 치킨 세트", BigDecimal.valueOf(2_001L), menu.getMenuProducts(), true
+                menu.getId(), "후라이드 치킨 세트", BigDecimal.valueOf(2_001L), menu.getMenuProducts(), menuGroup, true
             );
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));

@@ -32,11 +32,11 @@ public class MenuFixture {
     }
 
     public static Menu create(String name, BigDecimal price, List<MenuProduct> menuProducts) {
-        return create(UUID.randomUUID(), name, price, menuProducts, true);
+        MenuGroup menuGroup = MenuGroupFixture.create();
+        return create(UUID.randomUUID(), name, price, menuProducts, menuGroup, true);
     }
 
-    public static Menu create(UUID id, String name, BigDecimal price, List<MenuProduct> menuProducts, boolean displayed) {
-        MenuGroup menuGroup = MenuGroupFixture.create();
+    public static Menu create(UUID id, String name, BigDecimal price, List<MenuProduct> menuProducts, MenuGroup menuGroup, boolean displayed) {
 
         Menu result = new Menu();
         result.setId(id);

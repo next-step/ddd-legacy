@@ -1,8 +1,9 @@
 package kitchenpos.application;
 
-import kitchenpos.ApplicationServiceTest;
+import kitchenpos.IntegrationTest;
 import kitchenpos.domain.*;
 import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
@@ -13,34 +14,39 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
+import java.util.Arrays;
 import java.util.UUID;
 
 import static java.math.BigDecimal.ZERO;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 
-class ProductServiceTest extends ApplicationServiceTest {
+class ProductServiceIntegrationTest extends IntegrationTest {
 
-    @Mock
-    private ProductRepository productRepository;
+    private final ProductService productService;
+    private final ProductRepository productRepository;
+    private final MenuRepository menuRepository;
+    private final MenuGroupRepository menuGroupRepository;
 
-    @Mock
-    private MenuRepository menuRepository;
+    @MockBean
+    private final PurgomalumClient purgomalumClient;
 
-    @Mock
-    private PurgomalumClient purgomalumClient;
 
-    @InjectMocks
-    private ProductService productService;
+    ProductServiceIntegrationTest(ProductService productService,
+                                  ProductRepository productRepository,
+                                  MenuRepository menuRepository,
+                                  MenuGroupRepository menuGroupRepository,
+                                  PurgomalumClient purgomalumClient) {
+        this.productService = productService;
+        this.productRepository = productRepository;
+        this.menuRepository = menuRepository;
+        this.menuGroupRepository = menuGroupRepository;
+        this.purgomalumClient = purgomalumClient;
+    }
 
 
     public static class create_source {
@@ -54,14 +60,13 @@ class ProductServiceTest extends ApplicationServiceTest {
         }
     }
 
-
     @DisplayName("상품을 등록합니다.")
     @Nested
     class create {
 
         @DisplayName("[정상] 상품이 정상적으로 등록됩니다.")
         @ParameterizedTest
-        @MethodSource("kitchenpos.application.ProductServiceTest$create_source#source_of_create_success")
+        @MethodSource("kitchenpos.application.ProductServiceIntegrationTest$create_source#source_of_create_success")
         void create_success(String name, BigDecimal price) {
             Product product = ProductFixture.create(name, price);
 
@@ -104,15 +109,11 @@ class ProductServiceTest extends ApplicationServiceTest {
     public static class changePrice_source {
 
         public static Object[][] changePrice_success() {
-            Product product = ProductFixture.create(BigDecimal.valueOf(10000));
-            MenuProduct menuProduct = MenuProductFixture.create(product, 3);
-            Menu menu = MenuFixture.create("후라이드 치킨", BigDecimal.valueOf(30000), menuProduct);
-
             return new Object[][]{
-                    {"상품의 가격이 20,000원으로 오른 경우", product, menu, BigDecimal.valueOf(20000), true},
-                    {"상품의 가격이 10,000원으로 동일한 경우", product, menu, BigDecimal.valueOf(10000), true},
-                    {"상품의 가격이 8,000원으로 내려간 경우", product, menu, BigDecimal.valueOf(8000), false},
-                    {"상품의 가격이 0원으로 내려간 경우", product, menu, BigDecimal.valueOf(0), false},
+                    {"상품의 가격이 20,000원으로 오른 경우", BigDecimal.valueOf(20000), true},
+                    {"상품의 가격이 10,000원으로 동일한 경우", BigDecimal.valueOf(10000), true},
+                    {"상품의 가격이 8,000원으로 내려간 경우", BigDecimal.valueOf(8000), false},
+                    {"상품의 가격이 0원으로 내려간 경우", BigDecimal.valueOf(0), false},
             };
         }
         public static Object[][] changePrice_fail_because_illegal_price() {
@@ -129,22 +130,26 @@ class ProductServiceTest extends ApplicationServiceTest {
     class changePrice {
 
         @DisplayName("[정상] 상품의 가격을 변경합니다.")
-        @MethodSource("kitchenpos.application.ProductServiceTest$changePrice_source#changePrice_success")
+        @MethodSource("kitchenpos.application.ProductServiceIntegrationTest$changePrice_source#changePrice_success")
         @ParameterizedTest(name = "{0}")
-        void changePrice_success(String testName, Product product, Menu menu, BigDecimal changingPrice, boolean isDisplayed) {
-            when(productRepository.findById(any())).thenReturn(Optional.of(product));
-            when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
-
+        void changePrice_success(String testName, BigDecimal changingPrice, boolean isDisplayed) {
+            Product product = productRepository.save(ProductFixture.create(UUID.randomUUID(), "후라이드 치킨", BigDecimal.valueOf(10000)));
+            MenuProduct menuProduct = MenuProductFixture.create(product, 3);
+            MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.create());
+            Menu menu = menuRepository.save(MenuFixture.create(
+                    UUID.randomUUID(), "후라이드 치킨", BigDecimal.valueOf(30000),
+                    Arrays.asList(menuProduct), menuGroup, true
+            ));
             Product changingProduct = ProductFixture.create(changingPrice);
 
-            productService.changePrice(UUID.randomUUID(), changingProduct);
+            Product actualResult = productService.changePrice(product.getId(), changingProduct);
 
-            assertEquals(changingProduct.getPrice(), product.getPrice());
+            assertEquals(changingProduct.getPrice(), actualResult.getPrice());
             assertEquals(menu.isDisplayed(), isDisplayed);
         }
 
         @DisplayName("[예외] 변경되는 상품의 가격은 null이거나 0미만 일 수 없습니다.")
-        @MethodSource("kitchenpos.application.ProductServiceTest$changePrice_source#changePrice_fail_because_illegal_price")
+        @MethodSource("kitchenpos.application.ProductServiceIntegrationTest$changePrice_source#changePrice_fail_because_illegal_price")
         @ParameterizedTest(name = "{0}")
         void changePrice_fail_because_illegal_price(String testName, Product product) {
             assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), product))

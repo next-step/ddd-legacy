@@ -11,6 +11,8 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 class MenuGroupServiceTest extends ApplicationServiceTest {
@@ -32,7 +34,7 @@ class MenuGroupServiceTest extends ApplicationServiceTest {
     @NullAndEmptySource
     @ParameterizedTest
     void create_fail_because_null_or_empty_name(String name) {
-        MenuGroup menuGroup = MenuGroupFixture.create(name);
+        MenuGroup menuGroup = MenuGroupFixture.create(UUID.randomUUID(), name);
 
         assertThatThrownBy(() -> menuGroupService.create(menuGroup))
                 .isInstanceOf(IllegalArgumentException.class);
