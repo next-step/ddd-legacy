@@ -47,25 +47,25 @@ public class ProductServiceTest {
         assertThat(actual).isNotNull();
     }
 
+    @DisplayName("[오류] 상품 이름에 비속어가 포함될 수 없다.")
+    @ValueSource(strings = {"비속어", "욕설", "욕"})
+    @ParameterizedTest
+    void create_not_profanity_test(final String name) {
+        final Product request = DummyProduct.createProductRequest(name);
+        assertThatThrownBy(() -> productService.create(request))
+                .isInstanceOf(ProductNameException.class);
 
-    @DisplayName("[오류 - 상품 가격이 0원 미만] 상품의 가격은 0원 미만이면 예외가 발생한다.")
+    }
+
+    @DisplayName("[오류] 상품 가격을 0원 보다 작게 등록할 수 없다.")
     @Test
-    void changePrice_over_0() {
+    void changePrice_over_0_test() {
         final Product request = DummyProduct.createProductRequest(-1L);
         assertThatThrownBy(() -> productService.create(request))
                 .isInstanceOf(ProductPriceException.class);
 
     }
 
-    @DisplayName("[오류 - 상품이름 비속어 포함] 상품의 이름에는 비속어가 포함될 수 없다.")
-    @ValueSource(strings = {"비속어", "욕설", "욕"})
-    @ParameterizedTest
-    void 상품의_이름에는_비속어가_포함될_수_없다(final String name) {
-        final Product request = DummyProduct.createProductRequest(name);
-        assertThatThrownBy(() -> productService.create(request))
-                .isInstanceOf(ProductNameException.class);
-
-    }
 
     @DisplayName("[정상] 상품의 가격을 변경한다.")
     @Test

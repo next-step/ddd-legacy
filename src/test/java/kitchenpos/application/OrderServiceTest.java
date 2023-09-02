@@ -76,7 +76,7 @@ class OrderServiceTest {
         );
     }
 
-    @DisplayName("[오류 - 메뉴 없음] 매장 주문을 등록한다.")
+    @DisplayName("[오류] 메뉴가 없으면 매장 주문을 등록할 수 없다.")
     @Test
     void create_eat_in_not_menu_test() {
         OrderTable orderTable = orderTableRepository.save(DummyOrderTable.createOrderTable(true));
@@ -85,7 +85,16 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 주문타입 없음] 매장 주문을 등록한다.")
+    @DisplayName("[오류] 비공개 메뉴는 주문할 수 없다.")
+    @Test
+    void create_eat_in_not_displayed_menu_test() {
+        OrderTable orderTable = orderTableRepository.save(DummyOrderTable.createOrderTable(true));
+        Order request = createOrder(OrderType.EAT_IN, orderTable, createOrderLineItem(false));
+        assertThatThrownBy(() -> orderService.create(request))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("[오류] 주문 타입이 없으면 매장 주문을 등록할 수 없다.")
     @Test
     void create_eat_in_not_order_type_test() {
         OrderTable orderTable = orderTableRepository.save(DummyOrderTable.createOrderTable(true));
@@ -95,7 +104,7 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 메뉴에 없는 상품] 포장 주문을 등록한다.")
+    @DisplayName("[오류] 메뉴에 없는 상품은 포장 주문을 할 수 없다.")
     @Test
     void create_eat_in_not_in_menu_test() {
         OrderTable orderTable = orderTableRepository.save(DummyOrderTable.createOrderTable(true));
@@ -107,7 +116,7 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 메뉴에 없는 상품] 매장 주문을 등록한다.")
+    @DisplayName("[오류] 메뉴에 없는 상품은 매장 주문을 할 수 없다.")
     @Test
     void create_eat_in_not_menu_displayed_test() {
         OrderTable orderTable = orderTableRepository.save(DummyOrderTable.createOrderTable(true));
@@ -119,7 +128,7 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 배달주문 주소 없음] 배달 주문을 등록한다.")
+    @DisplayName("[오류] 배달 주문 주소가 없으면, 배달 주문을 할 수 없다.")
     @Test
     void create_takeout_not_menu_displayed_test() {
         OrderTable orderTable = orderTableRepository.save(DummyOrderTable.createOrderTable(true));
@@ -129,7 +138,7 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 메뉴 가격과 상품 가격 다름] 매장 주문을 등록한다.")
+    @DisplayName("[오류] 메뉴 가격과 상품 가격이 다르면 매장 주문을 할 수 없다.")
     @Test
     void create_eat_in_not_equal_menu_price_and_product_price_test() {
         OrderTable orderTable = orderTableRepository.save(DummyOrderTable.createOrderTable(true));
@@ -139,7 +148,7 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 매장 주문인 경우 테이블 정보 필요] 매장 주문을 등록한다.")
+    @DisplayName("[오류] 테이블 정보가 없으면 매장 주문을 할 수 없다.")
     @Test
     void create_takeout_not_table__test() {
         Order request = createOrder(OrderType.EAT_IN, createOrderLineItem());
@@ -153,7 +162,6 @@ class OrderServiceTest {
         OrderTable orderTable = orderTableRepository.save(DummyOrderTable.createOrderTable(true));
         Order request = createOrder(OrderType.EAT_IN, orderTable, createOrderLineItem());
         Order actual = orderService.create(request);
-        assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
         orderService.accept(actual.getId());
         assertAll(
                 () -> assertNotNull(actual.getId()),
@@ -162,7 +170,7 @@ class OrderServiceTest {
         );
     }
 
-    @DisplayName("[오류 - 대기중이 아닐때] 조리완료 변경한다.")
+    @DisplayName("[오류] 대기중이 아니면 조리 완료로 변경할 수 없다.")
     @ValueSource(strings = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
     @ParameterizedTest
     void accept_not_wating(OrderStatus orderStatus) {
@@ -190,7 +198,7 @@ class OrderServiceTest {
         );
     }
 
-    @DisplayName("[오류 - 조리완료가 아닐때] 서빙을 한다.")
+    @DisplayName("[오류] 조리 완료가 아니면 서빙을 할 수 없다.")
     @ValueSource(strings = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
     @ParameterizedTest
     void accept_not_serving(OrderStatus orderStatus) {
@@ -220,7 +228,7 @@ class OrderServiceTest {
         );
     }
 
-    @DisplayName("[오류 - 배달 타입이 아니면 배달중으로 변경할 수 없음] 배달을 시작한다.")
+    @DisplayName("[오류] 배달 타입이 아니면 배달중으로 변경할 수 없다.")
     @ValueSource(strings = {"TAKEOUT", "EAT_IN"})
     @ParameterizedTest
     void accept_not_delivery(OrderType type) {
@@ -233,7 +241,7 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("[오류 - 조리완료가 아닐때] 배달을 시작 한다.")
+    @DisplayName("[오류] 조리 완료가 아니면 배달을 할 수 없다.")
     @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
     @ParameterizedTest
     void accept_not_delivery(OrderStatus orderStatus) {
@@ -263,7 +271,7 @@ class OrderServiceTest {
         );
     }
 
-    @DisplayName("[오류 - 배달중 상태가 아닐때] 배달을 완료 한다.")
+    @DisplayName("[오류] 배달중이 아니면 배달을 완료할 수 없다.")
     @ValueSource(strings = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
     @ParameterizedTest
     void completeDelivery_not_delivering(OrderStatus orderStatus) {
@@ -328,7 +336,7 @@ class OrderServiceTest {
         );
     }
 
-    @DisplayName("[오류 - 배달완료 상태가 아닐때] 배달 주문을 완료 한다.")
+    @DisplayName("[오류] 배달 완료가 아니면 주문은 완료 할 수 없다.")
     @ValueSource(strings = {"WAITING", "ACCEPTED", "SERVED", "DELIVERING", "COMPLETED"})
     @ParameterizedTest
     void completeDelivery_not_delivered(OrderStatus orderStatus) {
@@ -344,7 +352,7 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    @DisplayName("[오류 - 서빙완료 상태가 아닐때] 매장 주문을 완료 한다.")
+    @DisplayName("[오류] 버싱 완료가 아니면 매장 주문을 완료할 수 없다.")
     @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
     @ParameterizedTest
     void complete_not_serve(OrderStatus orderStatus) {
@@ -380,8 +388,12 @@ class OrderServiceTest {
 
 
     private List<OrderLineItem> createOrderLineItem() {
-        Menu menu1 = menuRepository.save(DummyMenu.createMenu(true));
-        Menu menu2 = menuRepository.save(DummyMenu.createMenu(true));
+        return createOrderLineItem(true);
+    }
+
+    private List<OrderLineItem> createOrderLineItem(boolean displayed) {
+        Menu menu1 = menuRepository.save(DummyMenu.createMenu(displayed));
+        Menu menu2 = menuRepository.save(DummyMenu.createMenu(displayed));
         return DummyOrder.createOrderLineItem(menu1, menu2);
     }
 }

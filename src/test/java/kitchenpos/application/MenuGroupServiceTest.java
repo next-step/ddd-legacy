@@ -35,7 +35,7 @@ class MenuGroupServiceTest {
         );
     }
 
-    @DisplayName("[오류 - 이름 없음] 메뉴 그룹을 등록한다.")
+    @DisplayName("[오류] 이름 없음 경우 메뉴 그룹을 등록할 수 없다.")
     @Test
     void create_null_name() {
         MenuGroup menuGroup = createMenuGroup();
@@ -46,12 +46,13 @@ class MenuGroupServiceTest {
 
     }
 
+    @DisplayName("[정상] 메뉴 그룹을 조회한다.")
     @Test
     void findAll() {
         menuGroupService.create(createMenuGroup("메뉴그룹1"));
         menuGroupService.create(createMenuGroup("메뉴그룹2"));
         menuGroupService.create(createMenuGroup("메뉴그룹3"));
-        assertThat(menuGroupRepository.findAll().size()).isSameAs(3);
+        assertThat(menuGroupService.findAll().size()).isSameAs(3);
     }
 
 }

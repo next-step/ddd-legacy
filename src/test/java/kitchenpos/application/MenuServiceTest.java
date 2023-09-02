@@ -64,7 +64,7 @@ class MenuServiceTest {
         );
     }
 
-    @DisplayName("[오류 - 상품 없음] 메뉴를 등록한다.")
+    @DisplayName("[오류] 상품 정보 없이 메뉴를 등록할 수 없다.")
     @Test
     void create_not_product() {
         Menu menu = getMenuData();
@@ -73,7 +73,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 이름 없음] 메뉴를 등록한다.")
+    @DisplayName("[오류] 이름 정보 없이 메뉴를 등록할 수 없다.")
     @Test
     void create_not_name() {
         Menu menu = getMenuData();
@@ -82,7 +82,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 비속어 포함] 메뉴를 등록한다.")
+    @DisplayName("[오류] 비속어를 포함하여 메뉴를 등록할 수 없다.")
     @Test
     void create_not_profanity() {
         Menu menu = getMenuData();
@@ -91,7 +91,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 가격 없음] 메뉴를 등록한다.")
+    @DisplayName("[오류] 가격 정보 없이 메뉴를 등록할 수 없다.")
     @Test
     void create_not_price() {
         Menu menu = getMenuData();
@@ -100,7 +100,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 가격이 0보다 낮음] 메뉴를 등록한다.")
+    @DisplayName("[오류] 0원 보다 낮은 가격으로 메뉴를 등록할 수 없다.")
     @Test
     void create_under_0_price() {
         Menu menu = getMenuData();
@@ -109,7 +109,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("[오류 - 가격이 금액 * 수량의 총합 보다 작다] 메뉴를 등록한다.")
+    @DisplayName("[오류] 가격이 금액 * 수량의 총합 보다 작다으면 메뉴를 등록할 수 없다.")
     @Test
     void create_under_total_price() {
         Menu menu = getMenuData();
@@ -121,13 +121,31 @@ class MenuServiceTest {
 
     @DisplayName("[정상] 메뉴 가격을 변경한다.")
     @Test
-    void changePrice_oer_price() {
+    void changePrice_over_price() {
         Menu actual = menuService.create(getMenuData());
         actual.setPrice(new BigDecimal(20000));
         assertThatThrownBy(() -> menuService.changePrice(actual.getId(), actual))
                 .isInstanceOf(IllegalArgumentException.class);
-
     }
+
+    @DisplayName("[오류] 메뉴 가격이 0보다 작으면, 메뉴 가격을 변경할 수 없다.")
+    @Test
+    void changePrice_under_0() {
+        Menu actual = menuService.create(getMenuData());
+        actual.setPrice(new BigDecimal(-1L));
+        assertThatThrownBy(() -> menuService.changePrice(actual.getId(), actual))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("[오류] 메뉴 가격이 없으면, 메뉴 가격을 변경할 수 없다.")
+    @Test
+    void changePrice_is_null() {
+        Menu actual = menuService.create(getMenuData());
+        actual.setPrice(null);
+        assertThatThrownBy(() -> menuService.changePrice(actual.getId(), actual))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
 
     @DisplayName("[정상] 메뉴 가격을 작은 값으로 변경한다.")
     @Test
