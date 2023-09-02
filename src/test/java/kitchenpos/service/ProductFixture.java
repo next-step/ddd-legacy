@@ -14,7 +14,8 @@ public class ProductFixture {
     }
 
     public static ProductFixture builder() {
-        return new ProductFixture();
+        return new ProductFixture()
+                .price(0L);
     }
 
     public ProductFixture name(String name) {

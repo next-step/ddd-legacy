@@ -83,7 +83,6 @@ class ProductServiceTest {
     @Test
     void 상품_생성_실패__이름이_null() {
         Product product = ProductFixture.builder()
-                .price(0L)
                 .name(null)
                 .build();
 
@@ -94,7 +93,6 @@ class ProductServiceTest {
     @Test
     void 상품_생성_실패__이름에_욕설_포함() {
         Product product = ProductFixture.builder()
-                .price(0L)
                 .name("fuck")
                 .build();
 
