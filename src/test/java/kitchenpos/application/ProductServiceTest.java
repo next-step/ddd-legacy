@@ -77,7 +77,7 @@ class ProductServiceTest extends ApplicationServiceTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @DisplayName("[예외] 상품의 이름은 null 일 수 없다")
+        @DisplayName("[예외] 상품의 이름은 비어 있을 수 없다")
         @NullSource
         @ParameterizedTest
         void create_fail_because_null_name(String name) {
