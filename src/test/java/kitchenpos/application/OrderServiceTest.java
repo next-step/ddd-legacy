@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -234,6 +235,25 @@ class OrderServiceTest {
     }
 
     @Test
+    void 전달_완료_상태_배달_주문만_배달중상태로_변경한다() {
+        deliveryOrder.setStatus(OrderStatus.WAITING);
+        given(orderRepository.findById(any())).willReturn(Optional.of(deliveryOrder));
+
+        assertThatThrownBy(() -> orderService.startDelivery(deliveryOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    void 주문_타입이_배달인_경우만_배달이_가능하다() {
+        eatInOrder.setStatus(OrderStatus.SERVED);
+        given(orderRepository.findById(any())).willReturn(Optional.of(eatInOrder));
+
+        assertThatThrownBy(() -> orderService.startDelivery(eatInOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+
+    @Test
     void 배달중인_주문만_배달완료상태로_변경한다() {
         deliveryOrder.setStatus(OrderStatus.DELIVERING);
         given(orderRepository.findById(any())).willReturn(Optional.of(deliveryOrder));
@@ -241,6 +261,15 @@ class OrderServiceTest {
         Order actual = orderService.completeDelivery(deliveryOrder.getId());
 
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+    }
+
+    @Test
+    void 배달중이_아니면_배달완료_처리에_실패한다() {
+        deliveryOrder.setStatus(OrderStatus.ACCEPTED);
+        given(orderRepository.findById(any())).willReturn(Optional.of(deliveryOrder));
+
+        assertThatThrownBy(() -> orderService.completeDelivery(deliveryOrder.getId()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -286,6 +315,14 @@ class OrderServiceTest {
                 () -> assertThat(actual.getOrderTable().isOccupied()).isFalse(),
                 () -> assertThat(actual.getOrderTable().getNumberOfGuests()).isZero()
         );
+    }
+
+    @Test
+    void 주문_목록을_조회한다() {
+        given(orderRepository.findAll()).willReturn(Arrays.asList(deliveryOrder, takeOutOrder, eatInOrder));
+
+        List<Order> actual = orderService.findAll();
+        assertThat(actual).hasSize(3);
     }
 }
 
