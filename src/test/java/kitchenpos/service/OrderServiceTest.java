@@ -123,8 +123,10 @@ public class OrderServiceTest {
     @Test
     void 주문_생성_실패__주문항목의_메뉴_내용이_실제_메뉴_내용과_다름() {
         Order request = OrderFixture.builder()
-                .orderLineItem(List.of(OrderLineItemFixture.builder(오늘의치킨)
-                        .menuId(UUID.randomUUID()).build()))
+                .orderLineItem(List.of(
+                        OrderLineItemFixture.builder(오늘의치킨)
+                                .menuId(UUID.randomUUID()).build())
+                )
                 .build();
 
         assertThatThrownBy(() -> orderService.create(request))
@@ -134,8 +136,10 @@ public class OrderServiceTest {
     @Test
     void 주문_생성_실패__주문항목의_메뉴개수가_음수() {
         Order request = OrderFixture.builder()
-                .orderLineItem(List.of(OrderLineItemFixture.builder(오늘의치킨)
-                        .quantity(-1).build()))
+                .orderLineItem(List.of(
+                        OrderLineItemFixture.builder(오늘의치킨)
+                                .quantity(-1).build())
+                )
                 .build();
 
         assertThatThrownBy(() -> orderService.create(request))
@@ -156,8 +160,10 @@ public class OrderServiceTest {
     @Test
     void 주문_생성_실패__주문항목의_가격과_메뉴의_가격이_다름() {
         Order request = OrderFixture.builder()
-                .orderLineItem(List.of(OrderLineItemFixture.builder(오늘의치킨)
-                        .price(new BigDecimal(28000)).build()))
+                .orderLineItem(List.of(
+                        OrderLineItemFixture.builder(오늘의치킨)
+                                .price(new BigDecimal(28000)).build())
+                )
                 .build();
 
         assertThatThrownBy(() -> orderService.create(request))
