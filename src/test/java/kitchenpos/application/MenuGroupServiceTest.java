@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.testfixture.FakeMenuGroupRepository;
 import kitchenpos.testfixture.MenuGroupFixture;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,8 +13,10 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.catchThrowable;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
@@ -53,7 +56,7 @@ class MenuGroupServiceTest {
 
         var throwable = catchThrowable(() -> menuGroupService.create(request));
 
-        assertThat(throwable).isInstanceOf(IllegalArgumentException.class);
+        assertThrows(IllegalArgumentException.class, () -> menuGroupService.create(request));
     }
 
     @Test
