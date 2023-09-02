@@ -26,4 +26,26 @@ class OperandTest {
         assertThat(new Operand(1).plus(new Operand(1)))
                 .isEqualTo(new Operand(2));
     }
+
+    @Test
+    void Operand_동등성_비교() {
+        Operand actual = new Operand(1);
+
+
+        assertThat(actual.equals(actual)).isTrue();
+
+        assertThat(actual.equals(null)).isFalse();
+        assertThat(actual.equals("wrong class")).isFalse();
+
+        assertThat(actual.equals(new Operand(1))).isTrue();
+        assertThat(actual.equals(new Operand(2))).isFalse();
+    }
+
+    @Test
+    void Operand_hashCode() {
+        Operand actual = new Operand(1);
+
+        assertThat(actual.hashCode()).isEqualTo(new Operand(1).hashCode());
+        assertThat(actual.hashCode()).isNotEqualTo(new Operand(2).hashCode());
+    }
 }
