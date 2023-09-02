@@ -27,6 +27,10 @@ public class ProductFixture {
         return this;
     }
 
+    public ProductFixture price(long price) {
+        return price(new BigDecimal(price));
+    }
+
     public Product build() {
         return product;
     }
@@ -35,14 +39,14 @@ public class ProductFixture {
         public static Product 강정치킨() {
             return builder()
                     .name("강정치킨")
-                    .price(new BigDecimal(18000))
+                    .price(18000L)
                     .build();
         }
 
         public static Product 양념치킨() {
             return builder()
                     .name("양념치킨")
-                    .price(new BigDecimal(17000))
+                    .price(17000L)
                     .build();
         }
     }

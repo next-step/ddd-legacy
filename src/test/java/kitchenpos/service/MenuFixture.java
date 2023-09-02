@@ -26,7 +26,7 @@ public class MenuFixture {
     public static MenuFixture builder(MenuGroup menuGroup) {
         return builder()
                 .menuGroup(menuGroup)
-                .price(new BigDecimal(1000))
+                .price(1000L)
                 .displayed(true);
     }
 
@@ -43,6 +43,10 @@ public class MenuFixture {
     public MenuFixture price(BigDecimal price) {
         menu.setPrice(price);
         return this;
+    }
+
+    public MenuFixture price(long price) {
+        return price(new BigDecimal(price));
     }
 
     public MenuFixture menuGroup(MenuGroup menuGroup) {

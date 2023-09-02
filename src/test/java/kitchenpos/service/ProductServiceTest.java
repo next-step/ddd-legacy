@@ -50,7 +50,7 @@ class ProductServiceTest {
 
         오늘의치킨 = MenuFixture.builder()
                 .name("오늘의 치킨")
-                .price(new BigDecimal(1000))
+                .price(1000L)
                 .menuGroup(추천메뉴)
                 .menuProduct(
                         MenuProductFixture.builder(강정치킨).build()
@@ -73,7 +73,7 @@ class ProductServiceTest {
     @Test
     void 상품_생성_실패__가격이_음수() {
         Product product = ProductFixture.builder()
-                .price(new BigDecimal(-1))
+                .price(-1L)
                 .build();
 
         assertThatThrownBy(() -> productService.create(product))
@@ -83,7 +83,7 @@ class ProductServiceTest {
     @Test
     void 상품_생성_실패__이름이_null() {
         Product product = ProductFixture.builder()
-                .price(new BigDecimal(0))
+                .price(0L)
                 .name(null)
                 .build();
 
@@ -94,7 +94,7 @@ class ProductServiceTest {
     @Test
     void 상품_생성_실패__이름에_욕설_포함() {
         Product product = ProductFixture.builder()
-                .price(new BigDecimal(0))
+                .price(0L)
                 .name("fuck")
                 .build();
 

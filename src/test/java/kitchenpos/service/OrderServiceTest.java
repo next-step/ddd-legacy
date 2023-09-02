@@ -162,7 +162,7 @@ public class OrderServiceTest {
         Order request = OrderFixture.builder()
                 .orderLineItem(List.of(
                         OrderLineItemFixture.builder(오늘의치킨)
-                                .price(new BigDecimal(28000)).build())
+                                .price(28000L).build())
                 )
                 .build();
 

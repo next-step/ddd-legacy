@@ -50,4 +50,8 @@ public class OrderLineItemFixture {
         orderLineItem.setPrice(price);
         return this;
     }
+
+    public OrderLineItemFixture price(long price) {
+        return price(new BigDecimal(price));
+    }
 }

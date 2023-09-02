@@ -87,7 +87,7 @@ public class MenuServiceTest {
     @Test
     void 메뉴_생성_실패__가격이_음수() {
         Menu menu = MenuFixture.builder()
-                .price(new BigDecimal(-1))
+                .price(-1L)
                 .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
@@ -155,7 +155,7 @@ public class MenuServiceTest {
     @Test
     void 메뉴_생성_실패__구성메뉴상품의_가격_총합이_메뉴_가격_보다_초과일_수_없다() {
         Menu menu = MenuFixture.builder(추천메뉴)
-                .price(new BigDecimal(52001))
+                .price(52001L)
                 .menuProducts(
                         List.of(
                                 MenuProductFixture.builder(강정치킨)
