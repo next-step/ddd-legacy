@@ -3,7 +3,7 @@ package kitchenpos.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.application.MenuGroupService;
-import kitchenpos.testfixture.TestFixture;
+import kitchenpos.testfixture.MenuGroupFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +38,8 @@ class MenuGroupRestControllerTest {
     @Test
     @DisplayName("메뉴 그룹 생성 API")
     void create() throws Exception {
-        var request = TestFixture.createMenuGroup("테스트");
-        var response = TestFixture.createMenuGroup(request.getId(), request.getName());
+        var request = MenuGroupFixture.createMenuGroup("테스트");
+        var response = MenuGroupFixture.createMenuGroup(request.getId(), request.getName());
         given(menuGroupService.create(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -59,9 +59,9 @@ class MenuGroupRestControllerTest {
     @DisplayName("메뉴 그룹 목록 조회 API")
     void findAll() throws Exception {
         var response = List.of(
-                TestFixture.createMenuGroup("테스트1"),
-                TestFixture.createMenuGroup("테스트2"),
-                TestFixture.createMenuGroup("테스트3")
+                MenuGroupFixture.createMenuGroup("테스트1"),
+                MenuGroupFixture.createMenuGroup("테스트2"),
+                MenuGroupFixture.createMenuGroup("테스트3")
         );
         given(menuGroupService.findAll()).willReturn(response);
 

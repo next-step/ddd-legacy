@@ -3,7 +3,7 @@ package kitchenpos.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.application.MenuService;
-import kitchenpos.testfixture.TestFixture;
+import kitchenpos.testfixture.MenuFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +38,8 @@ class MenuRestControllerTest {
     @Test
     @DisplayName("메뉴를 생성 API")
     void create() throws Exception {
-        var request = TestFixture.createMenu("후라이드치킨", 16000L, true);
-        var response = TestFixture.copy(request);
+        var request = MenuFixture.createMenu("후라이드치킨", 16000L, true);
+        var response = MenuFixture.copy(request);
         given(menuService.create(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -59,8 +59,8 @@ class MenuRestControllerTest {
     @Test
     @DisplayName("메뉴 목록 조회 API")
     void changePrice() throws Exception {
-        var request = TestFixture.createMenu("후라이드치킨", 16000L);
-        var response = TestFixture.copy(request);
+        var request = MenuFixture.createMenu("후라이드치킨", 16000L);
+        var response = MenuFixture.copy(request);
         given(menuService.changePrice(any(), any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -81,7 +81,7 @@ class MenuRestControllerTest {
     @DisplayName("메뉴 전시 API")
     void display() throws Exception {
         var menuId = UUID.randomUUID();
-        var response = TestFixture.createMenu("후라이드치킨", true);
+        var response = MenuFixture.createMenu("후라이드치킨", true);
         given(menuService.display(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -100,7 +100,7 @@ class MenuRestControllerTest {
     @DisplayName("메뉴 숨김 API")
     void hide() throws Exception {
         var menuId = UUID.randomUUID();
-        var response = TestFixture.createMenu("후라이드치킨", false);
+        var response = MenuFixture.createMenu("후라이드치킨", false);
         given(menuService.display(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -119,9 +119,9 @@ class MenuRestControllerTest {
     @DisplayName("메뉴 목록 조회 API")
     void findAll() throws Exception {
         var response = List.of(
-                TestFixture.createMenu("후라이드치킨1", 11000L, true),
-                TestFixture.createMenu("후라이드치킨2", 12000L, false),
-                TestFixture.createMenu("후라이드치킨3", 13000L, true)
+                MenuFixture.createMenu("후라이드치킨1", 11000L, true),
+                MenuFixture.createMenu("후라이드치킨2", 12000L, false),
+                MenuFixture.createMenu("후라이드치킨3", 13000L, true)
         );
         given(menuService.findAll()).willReturn(response);
 

@@ -3,7 +3,7 @@ package kitchenpos.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.application.OrderTableService;
-import kitchenpos.testfixture.TestFixture;
+import kitchenpos.testfixture.OrderTableFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +39,8 @@ class OrderTableRestControllerTest {
     @Test
     @DisplayName("주문 테이블 생성 API")
     void create() throws Exception {
-        var request = TestFixture.createOrderTable("테이블", 5);
-        var response = TestFixture.copy(request);
+        var request = OrderTableFixture.createOrderTable("테이블", 5);
+        var response = OrderTableFixture.copy(request);
         given(orderTableService.create(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -62,7 +62,7 @@ class OrderTableRestControllerTest {
     @DisplayName("주문 테이블 점유 API")
     void sit() throws Exception {
         var orderTableId = UUID.randomUUID();
-        var response = TestFixture.createOrderTable(orderTableId, "테이블", 5, true);
+        var response = OrderTableFixture.createOrderTable(orderTableId, "테이블", 5, true);
         given(orderTableService.sit(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -83,7 +83,7 @@ class OrderTableRestControllerTest {
     @DisplayName("주문 테이블 비우기 API")
     void clear() throws Exception {
         var orderTableId = UUID.randomUUID();
-        var response = TestFixture.createOrderTable(orderTableId, "테이블2", 3, false);
+        var response = OrderTableFixture.createOrderTable(orderTableId, "테이블2", 3, false);
         given(orderTableService.clear(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -104,8 +104,8 @@ class OrderTableRestControllerTest {
     @DisplayName("주문 테이블 인원 변경 API")
     void changeNumberOfGuests() throws Exception {
         var orderTableId = UUID.randomUUID();
-        var request = TestFixture.createOrderTable(orderTableId, "테이블2", 5, false);
-        var response = TestFixture.copy(request);
+        var request = OrderTableFixture.createOrderTable(orderTableId, "테이블2", 5, false);
+        var response = OrderTableFixture.copy(request);
         given(orderTableService.changeNumberOfGuests(any(), any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -127,8 +127,8 @@ class OrderTableRestControllerTest {
     @DisplayName("주문 테이블 목록 조회 API")
     void findAll() throws Exception {
         var response = List.of(
-                TestFixture.createOrderTable("테이블1", 5),
-                TestFixture.createOrderTable("테이블2", 3)
+                OrderTableFixture.createOrderTable("테이블1", 5),
+                OrderTableFixture.createOrderTable("테이블2", 3)
         );
 
         given(orderTableService.findAll()).willReturn(response);

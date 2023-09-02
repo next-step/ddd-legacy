@@ -3,7 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.testfixture.TestFixture;
+import kitchenpos.testfixture.OrderTableFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ class OrderTableServiceTest {
 
         return List.of(
                 dynamicTest("주문 테이블을 생성할 수 있다. 생성된 주문 테이블의 손님 수는 항상 0이다.", () -> {
-                    var request = TestFixture.createOrderTable("주문테이블", 1);
+                    var request = OrderTableFixture.createOrderTable("주문테이블", 1);
 
                     var result = orderTableService.create(request);
 
@@ -55,7 +55,7 @@ class OrderTableServiceTest {
                 }),
 
                 dynamicTest("주문 테이블의 이름은 null 일 수 없다.", () -> {
-                    var request = TestFixture.createOrderTable(null, 1);
+                    var request = OrderTableFixture.createOrderTable(null, 1);
 
                     var throwable = catchThrowable(() -> orderTableService.create(request));
 
@@ -63,7 +63,7 @@ class OrderTableServiceTest {
                 }),
 
                 dynamicTest("주문 테이블의 이름은 빈 값 일 수 없다.", () -> {
-                    var request = TestFixture.createOrderTable("", 1);
+                    var request = OrderTableFixture.createOrderTable("", 1);
 
                     var throwable = catchThrowable(() -> orderTableService.create(request));
 
@@ -74,8 +74,8 @@ class OrderTableServiceTest {
 
     @TestFactory
     List<DynamicTest> sit() {
-        var satTable = TestFixture.createOrderTable("빈_주문_테이블", 0, true);
-        var emptyTable = TestFixture.createOrderTable("앉은_주문_테이블", 3, false);
+        var satTable = OrderTableFixture.createOrderTable("빈_주문_테이블", 0, true);
+        var emptyTable = OrderTableFixture.createOrderTable("앉은_주문_테이블", 3, false);
 
         return List.of(
                 dynamicTest("빈 테이블을 점유할 수 있다.", () -> {
@@ -101,8 +101,8 @@ class OrderTableServiceTest {
 
     @TestFactory
     List<DynamicTest> clear() {
-        var orderCompletedTable = TestFixture.createOrderTable("주문_완료_테이블", 0, true);
-        var orderPendingTable = TestFixture.createOrderTable("주문_대기_테이블", 3, false);
+        var orderCompletedTable = OrderTableFixture.createOrderTable("주문_완료_테이블", 0, true);
+        var orderPendingTable = OrderTableFixture.createOrderTable("주문_대기_테이블", 3, false);
 
         return List.of(
                 dynamicTest("주문이 완료된 상태여야라면 주문테이블을 초기화 할 수 있다", () -> {
@@ -130,14 +130,14 @@ class OrderTableServiceTest {
 
     @TestFactory
     List<DynamicTest> changeNumberOfGuests() {
-        var satTable = TestFixture.createOrderTable("빈_주문_테이블", 0, true);
-        var emptyTable = TestFixture.createOrderTable("앉은_주문_테이블", 3, false);
+        var satTable = OrderTableFixture.createOrderTable("빈_주문_테이블", 0, true);
+        var emptyTable = OrderTableFixture.createOrderTable("앉은_주문_테이블", 3, false);
 
         return List.of(
                 dynamicTest("주문 테이블에 앉은 손님 수를 변경할 수 있다.", () -> {
                     var orderTableId = satTable.getId();
                     doAnswer(args -> Optional.of(satTable)).when(orderTableRepository).findById(eq(orderTableId));
-                    var request = TestFixture.createOrderTable(satTable.getId(), satTable.getName(), 10, satTable.isOccupied());
+                    var request = OrderTableFixture.createOrderTable(satTable.getId(), satTable.getName(), 10, satTable.isOccupied());
 
                     var result = orderTableService.changeNumberOfGuests(orderTableId, request);
 
@@ -147,7 +147,7 @@ class OrderTableServiceTest {
                 dynamicTest("주문 테이블에 앉은 손님 수 이외의 다른 값은 변경할 수 없다.", () -> {
                     var orderTableId = satTable.getId();
                     doAnswer(args -> Optional.of(satTable)).when(orderTableRepository).findById(eq(orderTableId));
-                    var request = TestFixture.createOrderTable(UUID.randomUUID(), "메에에륭", satTable.getNumberOfGuests(), !satTable.isOccupied());
+                    var request = OrderTableFixture.createOrderTable(UUID.randomUUID(), "메에에륭", satTable.getNumberOfGuests(), !satTable.isOccupied());
 
                     var result = orderTableService.changeNumberOfGuests(orderTableId, request);
 
@@ -159,7 +159,7 @@ class OrderTableServiceTest {
                 dynamicTest("주문 테이블의 변경하는 손님 수는 0일 수 있다.", () -> {
                     var orderTableId = satTable.getId();
                     doAnswer(args -> Optional.of(satTable)).when(orderTableRepository).findById(eq(orderTableId));
-                    var request = TestFixture.createOrderTable(satTable.getId(), satTable.getName(), 0, satTable.isOccupied());
+                    var request = OrderTableFixture.createOrderTable(satTable.getId(), satTable.getName(), 0, satTable.isOccupied());
 
                     var result = orderTableService.changeNumberOfGuests(orderTableId, request);
 
@@ -170,7 +170,7 @@ class OrderTableServiceTest {
 
                 dynamicTest("주문 테이블의 변경하는 손님 수는 반드시 0 이상이어야 한다.", () -> {
                     var orderTableId = satTable.getId();
-                    var request = TestFixture.createOrderTable(satTable.getId(), satTable.getName(), -1, satTable.isOccupied());
+                    var request = OrderTableFixture.createOrderTable(satTable.getId(), satTable.getName(), -1, satTable.isOccupied());
 
                     var throwable = catchThrowable(() -> orderTableService.changeNumberOfGuests(orderTableId, request));
 
@@ -179,7 +179,7 @@ class OrderTableServiceTest {
 
                 dynamicTest("점유하지 있는 테이블은 손님수를 변경할 수 없다.", () -> {
                     var orderTableId = emptyTable.getId();
-                    var request = TestFixture.createOrderTable(emptyTable.getId(), emptyTable.getName(), 5, emptyTable.isOccupied());
+                    var request = OrderTableFixture.createOrderTable(emptyTable.getId(), emptyTable.getName(), 5, emptyTable.isOccupied());
 
                     var throwable = catchThrowable(() -> orderTableService.changeNumberOfGuests(orderTableId, request));
 
@@ -191,7 +191,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName("모든 주문 테이블을 리스트로 조회할 수 있다.")
     void findAll() {
-        doAnswer(args -> List.of(TestFixture.createOrderTable("주문테이블1", 1, true)))
+        doAnswer(args -> List.of(OrderTableFixture.createOrderTable("주문테이블1", 1, true)))
                 .when(orderTableRepository).findAll();
 
         var result = orderTableService.findAll();

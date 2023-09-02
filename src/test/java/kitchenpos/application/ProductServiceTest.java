@@ -3,7 +3,9 @@ package kitchenpos.application;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import kitchenpos.testfixture.TestFixture;
+import kitchenpos.testfixture.MenuFixture;
+import kitchenpos.testfixture.MenuGroupFixture;
+import kitchenpos.testfixture.ProductFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -45,7 +47,7 @@ class ProductServiceTest {
 
         return List.of(
                 dynamicTest("상품을 생성할 수 있다.", () -> {
-                    var request = TestFixture.createProduct("상품", 1000L);
+                    var request = ProductFixture.createProduct("상품", 1000L);
 
                     var result = productService.create(request);
 
@@ -55,7 +57,7 @@ class ProductServiceTest {
                 }),
 
                 dynamicTest("상품의 가격은 반드시 0 이상이어야 한다.", () -> {
-                    var request = TestFixture.createProduct("상품", -100L);
+                    var request = ProductFixture.createProduct("상품", -100L);
 
                     var throwable = catchThrowable(() -> productService.create(request));
 
@@ -63,7 +65,7 @@ class ProductServiceTest {
                 }),
 
                 dynamicTest("상품의 가격은 0일 수 있다.", () -> {
-                    var request = TestFixture.createProduct("상품", 0L);
+                    var request = ProductFixture.createProduct("상품", 0L);
 
                     var result = productService.create(request);
 
@@ -71,7 +73,7 @@ class ProductServiceTest {
                 }),
 
                 dynamicTest("상품 이름에는 욕설이 들어갈 수 없다.", () -> {
-                    var request = TestFixture.createProduct("미친상품", 0L);
+                    var request = ProductFixture.createProduct("미친상품", 0L);
 
                     var throwable = catchThrowable(() -> productService.create(request));
 
@@ -82,24 +84,24 @@ class ProductServiceTest {
 
     @TestFactory
     List<DynamicTest> changePrice() {
-        var menuGroup = TestFixture.createMenuGroup("메뉴그룹");
+        var menuGroup = MenuGroupFixture.createMenuGroup("메뉴그룹");
         var products = List.of(
-                TestFixture.createProduct("후라이드치킨", 100),
-                TestFixture.createProduct("양념치킨", 120),
-                TestFixture.createProduct("파닭", 150),
-                TestFixture.createProduct("치킨무", 500)
+                ProductFixture.createProduct("후라이드치킨", 100),
+                ProductFixture.createProduct("양념치킨", 120),
+                ProductFixture.createProduct("파닭", 150),
+                ProductFixture.createProduct("치킨무", 500)
         );
         var menus = List.of(
-                TestFixture.createMenu("메뉴1", 1000L, true, menuGroup, products),
-                TestFixture.createMenu("메뉴2", 1000L, true, menuGroup, products)
+                MenuFixture.createMenu("메뉴1", 1000L, true, menuGroup, products),
+                MenuFixture.createMenu("메뉴2", 1000L, true, menuGroup, products)
         );
 
-        doAnswer(args -> Optional.of(TestFixture.createProduct(args.getArgument(0), "상품", 1000L)))
+        doAnswer(args -> Optional.of(ProductFixture.createProduct(args.getArgument(0), "상품", 1000L)))
                 .when(productRepository).findById(any());
 
         return List.of(
                 dynamicTest("상품의 가격을 변경할 수 있다", () -> {
-                    var request = TestFixture.createProduct("상품", 5000L);
+                    var request = ProductFixture.createProduct("상품", 5000L);
 
                     var result = productService.changePrice(request.getId(), request);
 
@@ -108,7 +110,7 @@ class ProductServiceTest {
                 }),
 
                 dynamicTest("가격 변경된 상품이 포함된 메뉴들에서 (상품 가격*재고)가 메뉴가격을 초과한다면, 해당 메뉴 전시를 비활성화 한다.", () -> {
-                    var request = TestFixture.createProduct("상품", 999999);
+                    var request = ProductFixture.createProduct("상품", 999999);
                     doAnswer(args -> menus).when(menuRepository).findAllByProductId(any());
 
                     var result = productService.changePrice(request.getId(), request);
@@ -123,7 +125,7 @@ class ProductServiceTest {
     @Test
     @DisplayName("모든 상품을 리스트로 조회 할 수 있다.")
     void findAll() {
-        doAnswer(args -> List.of(TestFixture.createProduct("메뉴", 1000L)))
+        doAnswer(args -> List.of(ProductFixture.createProduct("메뉴", 1000L)))
                 .when(productRepository).findAll();
 
         var result = productService.findAll();

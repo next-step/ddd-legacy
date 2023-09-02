@@ -2,7 +2,9 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
-import kitchenpos.testfixture.TestFixture;
+import kitchenpos.testfixture.MenuFixture;
+import kitchenpos.testfixture.MenuGroupFixture;
+import kitchenpos.testfixture.ProductFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
@@ -43,18 +45,18 @@ class MenuServiceTest {
 
     @TestFactory()
     List<DynamicTest> createMenu() throws Exception {
-        var menuGroup = TestFixture.createMenuGroup("메뉴그룹");
+        var menuGroup = MenuGroupFixture.createMenuGroup("메뉴그룹");
         var products = List.of(
-                TestFixture.createProduct("후라이드치킨", 10000),
-                TestFixture.createProduct("양념치킨", 12000),
-                TestFixture.createProduct("파닭", 15000),
-                TestFixture.createProduct("치킨무", 500)
+                ProductFixture.createProduct("후라이드치킨", 10000),
+                ProductFixture.createProduct("양념치킨", 12000),
+                ProductFixture.createProduct("파닭", 15000),
+                ProductFixture.createProduct("치킨무", 500)
         );
         mockCreateMenu(menuGroup, products);
 
         return List.of(
                 dynamicTest("메뉴는 가격, 이름, 메뉴그룹, 전시여부를 필수로 가진다.", () -> {
-                    var request = TestFixture.createMenu("메뉴", 1000L, true, menuGroup, products);
+                    var request = MenuFixture.createMenu("메뉴", 1000L, true, menuGroup, products);
 
                     var result = menuService.create(request);
 
@@ -67,7 +69,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴의 가격은 반드시 0원 이상이여야한다.", () -> {
-                    var request = TestFixture.createMenu("메뉴", -100L, true, menuGroup, products);
+                    var request = MenuFixture.createMenu("메뉴", -100L, true, menuGroup, products);
 
                     var throwable = catchThrowable(() -> menuService.create(request));
 
@@ -75,7 +77,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴의 가격은 0원 일 수 있다", () -> {
-                    var request = TestFixture.createMenu("메뉴", 0L, true, menuGroup, products);
+                    var request = MenuFixture.createMenu("메뉴", 0L, true, menuGroup, products);
 
                     var result = menuService.create(request);
 
@@ -83,7 +85,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴의 이름은 빈 값일 수 있다.", () -> {
-                    var request = TestFixture.createMenu("", 1000L, true, menuGroup, products);
+                    var request = MenuFixture.createMenu("", 1000L, true, menuGroup, products);
 
                     var throwable = catchThrowable(() -> menuService.create(request));
 
@@ -91,7 +93,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴의 이름은 욕설을 포함할 수 없다.", () -> {
-                    var request = TestFixture.createMenu("미친메뉴", 1000L, true, menuGroup, products);
+                    var request = MenuFixture.createMenu("미친메뉴", 1000L, true, menuGroup, products);
 
                     var throwable = catchThrowable(() -> menuService.create(request));
 
@@ -99,7 +101,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴는 반드시 메뉴 그룹에 속해있어야한다.", () -> {
-                    var request = TestFixture.createMenu("", 1000L, true, menuGroup, products);
+                    var request = MenuFixture.createMenu("", 1000L, true, menuGroup, products);
                     request.setMenuGroup(null);
                     request.setMenuGroupId(null);
 
@@ -109,7 +111,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("등록할 때 메뉴 상품의 재고는 0을 초과해야한다. 즉 0일 수 없다.", () -> {
-                    var request = TestFixture.createMenu("", 1000L, true, menuGroup, products);
+                    var request = MenuFixture.createMenu("", 1000L, true, menuGroup, products);
                     request.getMenuProducts().forEach(
                             menuProduct -> menuProduct.setQuantity(0)
                     );
@@ -120,7 +122,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴안에 포함된 모든 (상품의 가격 * 재고)의 합은 메뉴의 가격을 초과하지 않아야 한다.", () -> {
-                    var request = TestFixture.createMenu("메뉴", 999999L, true, menuGroup, products);
+                    var request = MenuFixture.createMenu("메뉴", 999999L, true, menuGroup, products);
 
                     var throwable = catchThrowable(() -> menuService.create(request));
 
@@ -128,7 +130,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴상품은 상품정보와 재고 정보를 포함해야 한다.", () -> {
-                    var request = TestFixture.createMenu("메뉴", 1000L, true, menuGroup, products);
+                    var request = MenuFixture.createMenu("메뉴", 1000L, true, menuGroup, products);
 
                     var result = menuService.create(request);
 
@@ -147,14 +149,14 @@ class MenuServiceTest {
 
     @TestFactory
     List<DynamicTest> changePrice() throws Exception {
-        var products = List.of(TestFixture.createProduct("상품", 1000L));
-        var menuGroup = TestFixture.createMenuGroup("메뉴그룹");
-        var menu = TestFixture.createMenu("메뉴", 1000L, true, menuGroup, products);
+        var products = List.of(ProductFixture.createProduct("상품", 1000L));
+        var menuGroup = MenuGroupFixture.createMenuGroup("메뉴그룹");
+        var menu = MenuFixture.createMenu("메뉴", 1000L, true, menuGroup, products);
         doAnswer(args -> Optional.of(menu)).when(menuRepository).findById(eq(menu.getId()));
 
         return List.of(
                 dynamicTest("메뉴의 가격은 언제든지 변경할 수 있다.", () -> {
-                    var request = TestFixture.copy(menu);
+                    var request = MenuFixture.copy(menu);
                     request.setPrice(BigDecimal.valueOf(100L));
 
                     var result = menuService.changePrice(menu.getId(), request);
@@ -163,7 +165,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("가격 이외의 다른 값은 변경할 수 없다.", () -> {
-                    var request = TestFixture.copy(menu);
+                    var request = MenuFixture.copy(menu);
                     request.setName("새로운이름");
                     request.setDisplayed(!menu.isDisplayed());
 
@@ -174,7 +176,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴의 가격은 반드시 0원 이상이여야한다.", () -> {
-                    var request = TestFixture.copy(menu);
+                    var request = MenuFixture.copy(menu);
                     request.setPrice(BigDecimal.valueOf(-1000));
 
                     var throwable = catchThrowable(() -> menuService.changePrice(menu.getId(), request));
@@ -183,7 +185,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴의 가격은 0원 일 수 있다", () -> {
-                    var request = TestFixture.copy(menu);
+                    var request = MenuFixture.copy(menu);
                     request.setPrice(BigDecimal.valueOf(0));
 
                     var throwable = catchThrowable(() -> menuService.changePrice(menu.getId(), request));
@@ -192,7 +194,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴안에 포함된 모든 (상품의 가격 * 재고)의 합은 메뉴의 가격을 초과하지 않아야 한다.", () -> {
-                    var request = TestFixture.copy(menu);
+                    var request = MenuFixture.copy(menu);
                     request.setPrice(BigDecimal.valueOf(9999999L));
 
                     var throwable = catchThrowable(() -> menuService.changePrice(menu.getId(), request));
@@ -204,9 +206,9 @@ class MenuServiceTest {
 
     @TestFactory
     List<DynamicTest> display() throws Exception {
-        var products = List.of(TestFixture.createProduct("상품", 1000L));
-        var menuGroup = TestFixture.createMenuGroup("메뉴그룹");
-        var menu = TestFixture.createMenu("메뉴", 1000L, false, menuGroup, products);
+        var products = List.of(ProductFixture.createProduct("상품", 1000L));
+        var menuGroup = MenuGroupFixture.createMenuGroup("메뉴그룹");
+        var menu = MenuFixture.createMenu("메뉴", 1000L, false, menuGroup, products);
 
         return List.of(
                 dynamicTest("메뉴의 전시여부는 언제든지 수정할 수 있다.", () -> {
@@ -218,7 +220,7 @@ class MenuServiceTest {
                 }),
 
                 dynamicTest("메뉴를 전시하려면 (상품의 가격 * 재고)의 합이 메뉴의 가격을 초과하지 않아야 한다.", () -> {
-                    doAnswer(args -> Optional.of(TestFixture.createMenu("메뉴", 999999L, true, menuGroup, products)))
+                    doAnswer(args -> Optional.of(MenuFixture.createMenu("메뉴", 999999L, true, menuGroup, products)))
                             .when(menuRepository).findById(eq(menu.getId()));
 
                     var throwable = catchThrowable(() -> menuService.display(menu.getId()));
@@ -231,9 +233,9 @@ class MenuServiceTest {
     @Test
     @DisplayName("메뉴를 숨길 수 있다.")
     void hide() throws Exception {
-        var products = List.of(TestFixture.createProduct("상품", 1000L));
-        var menuGroup = TestFixture.createMenuGroup("메뉴그룹");
-        var menu = TestFixture.createMenu("메뉴", 1000L, true, menuGroup, products);
+        var products = List.of(ProductFixture.createProduct("상품", 1000L));
+        var menuGroup = MenuGroupFixture.createMenuGroup("메뉴그룹");
+        var menu = MenuFixture.createMenu("메뉴", 1000L, true, menuGroup, products);
         doAnswer(args -> Optional.of(menu)).when(menuRepository).findById(eq(menu.getId()));
 
         var result = menuService.hide(menu.getId());
@@ -244,7 +246,7 @@ class MenuServiceTest {
     @Test
     @DisplayName("모든 메뉴를 리스트로 조회할 수 있다.")
     void findAll() throws Exception {
-        doAnswer(args -> List.of(TestFixture.createMenu("메뉴", 1000L)))
+        doAnswer(args -> List.of(MenuFixture.createMenu("메뉴", 1000L)))
                 .when(menuRepository).findAll();
 
         var result = menuService.findAll();

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderType;
-import kitchenpos.testfixture.TestFixture;
+import kitchenpos.testfixture.OrderFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +41,8 @@ class OrderRestControllerTest {
     @Test
     @DisplayName("주문 생성 API")
     void create() throws Exception {
-        var request = TestFixture.createOrder(OrderStatus.WAITING, OrderType.EAT_IN);
-        var response = TestFixture.copy(request);
+        var request = OrderFixture.createOrder(OrderStatus.WAITING, OrderType.EAT_IN);
+        var response = OrderFixture.copy(request);
         given(orderService.create(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -63,7 +63,7 @@ class OrderRestControllerTest {
     @Test
     @DisplayName("주문 접수 API")
     void accept() throws Exception {
-        var response = TestFixture.createOrder(OrderStatus.ACCEPTED, OrderType.EAT_IN);
+        var response = OrderFixture.createOrder(OrderStatus.ACCEPTED, OrderType.EAT_IN);
         given(orderService.accept(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -82,7 +82,7 @@ class OrderRestControllerTest {
     @Test
     @DisplayName("주문 서빙 완료 API")
     void serve() throws Exception {
-        var response = TestFixture.createOrder(OrderStatus.SERVED, OrderType.EAT_IN);
+        var response = OrderFixture.createOrder(OrderStatus.SERVED, OrderType.EAT_IN);
         given(orderService.serve(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -101,7 +101,7 @@ class OrderRestControllerTest {
     @Test
     @DisplayName("주문 배달 시작 API")
     void startDelivery() throws Exception {
-        var response = TestFixture.createOrder(OrderStatus.DELIVERING, OrderType.DELIVERY);
+        var response = OrderFixture.createOrder(OrderStatus.DELIVERING, OrderType.DELIVERY);
         given(orderService.startDelivery(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -120,7 +120,7 @@ class OrderRestControllerTest {
     @Test
     @DisplayName("주문 배달 완료 API")
     void completeDelivery() throws Exception {
-        var response = TestFixture.createOrder(OrderStatus.COMPLETED, OrderType.DELIVERY);
+        var response = OrderFixture.createOrder(OrderStatus.COMPLETED, OrderType.DELIVERY);
         given(orderService.completeDelivery(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -139,7 +139,7 @@ class OrderRestControllerTest {
     @Test
     @DisplayName("주문 완료 API")
     void complete() throws Exception {
-        var response = TestFixture.createOrder(OrderStatus.COMPLETED, OrderType.EAT_IN);
+        var response = OrderFixture.createOrder(OrderStatus.COMPLETED, OrderType.EAT_IN);
         given(orderService.complete(any())).willReturn(response);
 
         var result = mockMvc.perform(
@@ -159,10 +159,10 @@ class OrderRestControllerTest {
     @DisplayName("주문 목록 조회 API")
     void findAll() throws Exception {
         var response = List.of(
-                TestFixture.createOrder(OrderStatus.WAITING, OrderType.EAT_IN),
-                TestFixture.createOrder(OrderStatus.ACCEPTED, OrderType.EAT_IN),
-                TestFixture.createOrder(OrderStatus.SERVED, OrderType.EAT_IN),
-                TestFixture.createOrder(OrderStatus.COMPLETED, OrderType.EAT_IN)
+                OrderFixture.createOrder(OrderStatus.WAITING, OrderType.EAT_IN),
+                OrderFixture.createOrder(OrderStatus.ACCEPTED, OrderType.EAT_IN),
+                OrderFixture.createOrder(OrderStatus.SERVED, OrderType.EAT_IN),
+                OrderFixture.createOrder(OrderStatus.COMPLETED, OrderType.EAT_IN)
         );
         given(orderService.findAll()).willReturn(response);
 

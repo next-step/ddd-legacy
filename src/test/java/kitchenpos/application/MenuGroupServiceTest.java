@@ -4,7 +4,7 @@ import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import kitchenpos.testfixture.TestFixture;
+import kitchenpos.testfixture.MenuGroupFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +40,7 @@ class MenuGroupServiceTest {
     @Test
     @DisplayName("메뉴를 등록하기 위해 메뉴그룹을 생성할 수 있다.")
     void create1() {
-        var request = TestFixture.createMenuGroup("메뉴그룹");
+        var request = MenuGroupFixture.createMenuGroup("메뉴그룹");
         given(menuGroupRepository.save(any())).willReturn(request);
 
         var result = menuGroupService.create(request);
@@ -55,7 +55,7 @@ class MenuGroupServiceTest {
     @ParameterizedTest(name = "메뉴 그룹의 이름은 공백이거나 빈 값일 수 없다. (input={0})")
     @NullAndEmptySource
     void create2(String input) {
-        var request = TestFixture.createMenuGroup(input);
+        var request = MenuGroupFixture.createMenuGroup(input);
 
         var throwable = catchThrowable(() -> menuGroupService.create(request));
 
@@ -65,7 +65,7 @@ class MenuGroupServiceTest {
     @Test
     @DisplayName("전체 메뉴 그룹을 리스트로 조회할 수 있다.")
     void findAll() {
-        var request = TestFixture.createMenuGroup("메뉴그룹");
+        var request = MenuGroupFixture.createMenuGroup("메뉴그룹");
         given(menuGroupRepository.findAll()).willReturn(List.of(request));
 
         var result = menuGroupService.findAll();
