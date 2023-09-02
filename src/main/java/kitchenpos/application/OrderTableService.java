@@ -12,6 +12,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 
+import static kitchenpos.exception.OrderTableExceptionMessage.*;
+
 @Service
 public class OrderTableService {
     private final OrderTableRepository orderTableRepository;
@@ -26,7 +28,7 @@ public class OrderTableService {
     public OrderTable create(final OrderTable request) {
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(ORDER_TABLE_NAME_EMPTY);
         }
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
@@ -39,7 +41,7 @@ public class OrderTableService {
     @Transactional
     public OrderTable sit(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_ORDER_TABLE));
         orderTable.setOccupied(true);
         return orderTable;
     }
@@ -47,9 +49,9 @@ public class OrderTableService {
     @Transactional
     public OrderTable clear(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_ORDER_TABLE));
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(NOT_EXIST_COMPLETE_ORDER_TABLE);
         }
         orderTable.setNumberOfGuests(0);
         orderTable.setOccupied(false);
@@ -60,12 +62,12 @@ public class OrderTableService {
     public OrderTable changeNumberOfGuests(final UUID orderTableId, final OrderTable request) {
         final int numberOfGuests = request.getNumberOfGuests();
         if (numberOfGuests < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(NUMBER_GUESTS_NEGATIVE);
         }
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (!orderTable.isOccupied()) {
-            throw new IllegalStateException();
+            throw new IllegalStateException(NOT_OCCUPIED);
         }
         orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;

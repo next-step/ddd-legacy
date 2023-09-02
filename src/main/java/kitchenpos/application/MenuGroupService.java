@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static kitchenpos.exception.MenuGroupExceptionMessage.NULL_EMPTY_NAME;
+
 @Service
 public class MenuGroupService {
     private final MenuGroupRepository menuGroupRepository;
@@ -21,7 +23,7 @@ public class MenuGroupService {
     public MenuGroup create(final MenuGroup request) {
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(NULL_EMPTY_NAME);
         }
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());

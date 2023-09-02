@@ -11,6 +11,8 @@ import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 
+import static kitchenpos.exception.ProductExceptionMessage.*;
+
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
@@ -31,11 +33,11 @@ public class ProductService {
     public Product create(final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(PRODUCT_PRICE_MORE_ZERO);
         }
         final String name = request.getName();
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(PRODUCT_NAME_CONTAINS_PURGOMALUM);
         }
         final Product product = new Product();
         product.setId(UUID.randomUUID());
@@ -48,10 +50,10 @@ public class ProductService {
     public Product changePrice(final UUID productId, final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(PRODUCT_PRICE_MORE_ZERO);
         }
         final Product product = productRepository.findById(productId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchElementException(NOT_FOUND_PRODUCT));
         product.setPrice(price);
         final List<Menu> menus = menuRepository.findAllByProductId(productId);
         for (final Menu menu : menus) {
