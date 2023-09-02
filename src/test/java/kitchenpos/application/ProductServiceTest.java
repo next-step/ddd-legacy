@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import kitchenpos.application.fakerepository.MenuFakeRepository;
+import kitchenpos.application.fakerepository.ProductFakeRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
@@ -19,11 +21,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ProductServiceTest extends AbstractApplicationServiceTest {
+class ProductServiceTest extends TestSetup {
 
     private static final String TEST_NAME = "dummyName";
     private static final BigDecimal TEST_PRICE = BigDecimal.valueOf(1_000L);
@@ -58,18 +63,13 @@ class ProductServiceTest extends AbstractApplicationServiceTest {
     }
 
     @DisplayName("product의 가격이 없거나 음수이면 예외를 발생시킨다.")
-    @Test
-    void create_invalid_price() {
-
-        // given
-        final Product nullPrice = createProductRequest(TEST_NAME, null);
-        final Product negativePrice = createProductRequest(TEST_NAME, BigDecimal.valueOf(-1L));
-
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = "-1")
+    void create_invalid_price(final BigDecimal value) {
         // when & then
-        assertThatThrownBy(() -> service.create(nullPrice))
-            .isInstanceOf(IllegalArgumentException.class);
-
-        assertThatThrownBy(() -> service.create(negativePrice))
+        assertThatThrownBy(
+            () -> service.create(createProductRequest(TEST_NAME, value)))
             .isInstanceOf(IllegalArgumentException.class);
     }
 

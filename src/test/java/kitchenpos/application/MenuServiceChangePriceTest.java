@@ -6,6 +6,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.google.common.collect.ImmutableList;
 import java.math.BigDecimal;
 import java.util.UUID;
+import kitchenpos.application.fakerepository.MenuFakeRepository;
+import kitchenpos.application.fakerepository.MenuGroupFakeRepository;
+import kitchenpos.application.fakerepository.ProductFakeRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -21,7 +24,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class MenuServiceChangePriceTest extends AbstractApplicationServiceTest {
+class MenuServiceChangePriceTest extends TestSetup {
 
     private static final BigDecimal TEST_PRICE = BigDecimal.valueOf(1_000L);
     private static final String TEST_MENU_NAME = "dummyMenuName";

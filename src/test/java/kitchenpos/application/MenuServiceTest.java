@@ -4,6 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.util.List;
+import kitchenpos.application.fakerepository.MenuFakeRepository;
+import kitchenpos.application.fakerepository.MenuGroupFakeRepository;
+import kitchenpos.application.fakerepository.ProductFakeRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
@@ -17,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class MenuServiceTest extends AbstractApplicationServiceTest {
+class MenuServiceTest extends TestSetup {
 
     @Mock
     private PurgomalumClient mockClient;

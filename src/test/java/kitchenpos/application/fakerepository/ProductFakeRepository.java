@@ -1,4 +1,4 @@
-package kitchenpos.application;
+package kitchenpos.application.fakerepository;
 
 import java.util.HashMap;
 import java.util.List;

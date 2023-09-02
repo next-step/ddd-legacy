@@ -8,6 +8,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import kitchenpos.application.fakerepository.MenuFakeRepository;
+import kitchenpos.application.fakerepository.MenuGroupFakeRepository;
+import kitchenpos.application.fakerepository.ProductFakeRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -23,7 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class MenuServiceDisplayTest extends AbstractApplicationServiceTest {
+class MenuServiceDisplayTest extends TestSetup {
 
     private static final BigDecimal TEST_PRICE = BigDecimal.valueOf(1_000L);
     private static final String TEST_MENU_NAME = "dummyMenuName";
