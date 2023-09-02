@@ -185,9 +185,10 @@ class OrderServiceTest extends ApplicationServiceTest {
             List<MenuProduct> givenMenuProducts = givenProducts.stream()
                     .map(e -> MenuProductFixture.create(e, 1))
                     .collect(Collectors.toList());
+            MenuGroup menuGroup = MenuGroupFixture.create();
             Menu givenMenu = MenuFixture.create(
                     UUID.randomUUID(), "후라이드 치킨 세트", BigDecimal.valueOf(19_000L),
-                    givenMenuProducts, false
+                    givenMenuProducts, menuGroup, false
             );
             OrderLineItem givenOrderLineItem = OrderLineItemFixture.create(givenMenu, 1L);
             Order givenOrder = OrderFixture.create(null, OrderType.TAKEOUT, null, List.of(givenOrderLineItem));
@@ -208,9 +209,10 @@ class OrderServiceTest extends ApplicationServiceTest {
             List<MenuProduct> givenMenuProducts = givenProducts.stream()
                     .map(e -> MenuProductFixture.create(e, 1))
                     .collect(Collectors.toList());
+            MenuGroup menuGroup = MenuGroupFixture.create();
             Menu givenMenu = MenuFixture.create(
                     UUID.randomUUID(), "후라이드 치킨 세트", BigDecimal.valueOf(19_000L),
-                    givenMenuProducts, true
+                    givenMenuProducts, menuGroup, true
             );
             OrderLineItem givenOrderLineItem = OrderLineItemFixture.create(givenMenu, 1L);
             givenMenu.setPrice(BigDecimal.valueOf(20_000L));
