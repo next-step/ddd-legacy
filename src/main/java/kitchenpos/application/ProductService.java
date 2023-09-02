@@ -31,11 +31,11 @@ public class ProductService {
     public Product create(final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("제품 가격 오류");
         }
         final String name = request.getName();
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("제품명 오류");
         }
         final Product product = new Product();
         product.setId(UUID.randomUUID());
@@ -48,7 +48,7 @@ public class ProductService {
     public Product changePrice(final UUID productId, final Product request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("가격 변경 오류");
         }
         final Product product = productRepository.findById(productId)
             .orElseThrow(NoSuchElementException::new);
