@@ -172,11 +172,9 @@ public class MenuServiceTest {
 
     @Test
     void 메뉴_생성_실패__이름이_null() {
-        Menu menu = MenuFixture.builder(추천메뉴)
+        Menu menu = MenuFixture.builder(추천메뉴, 강정치킨)
                 .name(null)
-                .menuProducts(
-                        List.of(MenuProductFixture.builder(강정치킨).build())
-                ).build();
+                .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -185,11 +183,9 @@ public class MenuServiceTest {
     @Test
     void 메뉴_생성_실패__이름에_욕설_포함() {
         when(purgomalumClient.containsProfanity("abuse name")).thenReturn(true);
-        Menu menu = MenuFixture.builder(추천메뉴)
+        Menu menu = MenuFixture.builder(추천메뉴, 강정치킨)
                 .name("abuse name")
-                .menuProducts(
-                        List.of(MenuProductFixture.builder(강정치킨).build())
-                ).build();
+                .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
                 .isInstanceOf(IllegalArgumentException.class);

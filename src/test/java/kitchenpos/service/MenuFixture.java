@@ -7,6 +7,7 @@ import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Product;
 
 public class MenuFixture {
     private final Menu menu;
@@ -19,14 +20,19 @@ public class MenuFixture {
     }
 
     public static MenuFixture builder() {
-        return builder(null);
+        return new MenuFixture();
     }
 
     public static MenuFixture builder(MenuGroup menuGroup) {
-        return new MenuFixture()
+        return builder()
                 .menuGroup(menuGroup)
                 .price(new BigDecimal(1000))
                 .displayed(true);
+    }
+
+    public static MenuFixture builder(MenuGroup menuGroup, Product product) {
+        return builder(menuGroup)
+                .menuProducts(List.of(MenuProductFixture.builder(product).build()));
     }
 
     public MenuFixture name(String name) {
