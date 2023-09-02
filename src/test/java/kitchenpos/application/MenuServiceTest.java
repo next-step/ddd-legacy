@@ -14,6 +14,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -223,8 +224,9 @@ class MenuServiceTest {
         given(menuRepository.findAll()).willReturn(Arrays.asList(menu));
 
         List<Menu> actual = menuService.findAll();
-
-        assertThat(actual).isNotNull();
-        assertThat(actual).hasSize(1);
+        assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(actual).hasSize(1)
+        );
     }
 }

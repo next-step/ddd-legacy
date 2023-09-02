@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -93,10 +94,11 @@ class OrderServiceTest {
         given(orderRepository.save(any())).willReturn(deliveryOrder);
 
         Order actual = orderService.create(request);
-
-        assertThat(actual.getId()).isNotNull();
-        assertThat(actual.getType()).isEqualTo(request.getType());
-        assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
+        assertAll(
+                () -> assertThat(actual.getId()).isNotNull(),
+                () -> assertThat(actual.getType()).isEqualTo(request.getType()),
+                () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING)
+        );
     }
 
     @Test
@@ -279,9 +281,11 @@ class OrderServiceTest {
 
         Order actual = orderService.complete(eatInOrder.getId());
 
-        assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-        assertThat(actual.getOrderTable().isOccupied()).isFalse();
-        assertThat(actual.getOrderTable().getNumberOfGuests()).isZero();
+        assertAll(
+                () -> assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                () -> assertThat(actual.getOrderTable().isOccupied()).isFalse(),
+                () -> assertThat(actual.getOrderTable().getNumberOfGuests()).isZero()
+        );
     }
 }
 
