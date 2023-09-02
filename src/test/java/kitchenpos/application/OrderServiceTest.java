@@ -281,7 +281,7 @@ class OrderServiceTest {
 
         assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
         assertThat(actual.getOrderTable().isOccupied()).isFalse();
-        assertThat(actual.getOrderTable().getNumberOfGuests()).isEqualTo(0);
+        assertThat(actual.getOrderTable().getNumberOfGuests()).isZero();
     }
 }
 

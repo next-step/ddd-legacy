@@ -82,7 +82,7 @@ class OrderTableServiceTest {
         OrderTable actual = orderTableService.clear(request.getId());
 
         assertThat(actual.isOccupied()).isFalse();
-        assertThat(actual.getNumberOfGuests()).isEqualTo(0);
+        assertThat(actual.getNumberOfGuests()).isZero();
     }
 
     @Test
