@@ -47,7 +47,11 @@ public class OrderTestFixture {
         newOrder.setId(order.getId());
         newOrder.setStatus(order.getStatus());
         newOrder.setOrderTable(orderTable);
-        newOrder.setOrderTableId(order.getOrderTableId());
+        if (orderTable != null) {
+            newOrder.setOrderTableId(orderTable.getId());
+        } else {
+            newOrder.setOrderTableId(null);
+        }
         newOrder.setDeliveryAddress(order.getDeliveryAddress());
         newOrder.setType(order.getType());
         newOrder.setOrderLineItems(order.getOrderLineItems());

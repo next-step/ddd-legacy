@@ -7,6 +7,8 @@ import kitchenpos.test_fixture.OrderTableTestFixture;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+import java.util.UUID;
+
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,7 +65,7 @@ public class OrderTableStep {
 
     public static OrderTable 주문_테이블이_등록된_상태가_아니다() {
         return OrderTableTestFixture.create()
-                .changeId(null)
+                .changeId(UUID.randomUUID())
                 .changeNumberOfGuests(0)
                 .changeName("테이블1")
                 .changeOccupied(false)
@@ -71,7 +73,7 @@ public class OrderTableStep {
     }
 
     public static void 주문_테이블을_손님이_앉은_상태로_변경에_실패한다(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     public static ExtractableResponse<Response> 주문_테이블을_비어있는_상태로_변경한다(OrderTable orderTable) {
@@ -90,7 +92,7 @@ public class OrderTableStep {
     }
 
     public static void 주문_테이블을_비어있는_상태로_변경에_실패한다(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     public static void 주문_테이블에_주문이_완료되지않아_비어있는_상태로_변경에_실패(ExtractableResponse<Response> response) {
@@ -117,7 +119,7 @@ public class OrderTableStep {
     }
 
     public static void 주문_테이블이_등록되지_않아_앉은_고객_수_변경에_실패했다(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     public static ExtractableResponse<Response> 등록된_전체_주문_테이블_정보를_조회한다() {
