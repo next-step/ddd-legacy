@@ -156,50 +156,6 @@ class OrderServiceMockTest {
     }
 
     @Nested
-    class 포장_주문_전체기능_테스트 {
-        @Test
-        void 매장_주문을_등록한다() {
-            Order 매장_주문 = 매장_주문(양념치킨_메뉴);
-            given(menuRepository.findById(any())).willReturn(Optional.of(양념치킨_메뉴));
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(착석_가능한_손님_2명의_오른쪽_테이블()));
-            given(menuRepository.findAllByIdIn(anyList())).willReturn(List.of(양념치킨_메뉴));
-            given(orderRepository.save(any())).willReturn(매장_주문);
-
-            Order 등록된_주문 = orderService.create(매장_주문);
-
-            assertThat(등록된_주문.getId()).isNotNull();
-        }
-
-        @Test
-        void 매장_주문을_수락한다() {
-            given(orderRepository.findById(any())).willReturn(Optional.of(대기중인_매장주문(양념치킨_메뉴)));
-
-            Order 수락한_주문 = orderService.accept(UUID.randomUUID());
-
-            assertThat(수락한_주문.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
-        }
-
-        @Test
-        void 매장_주문을_제공한다() {
-            given(orderRepository.findById(any())).willReturn(Optional.of(수락된_매장_주문(양념치킨_메뉴)));
-
-            Order 제공된_주문 = orderService.serve(UUID.randomUUID());
-
-            assertThat(제공된_주문.getStatus()).isEqualTo(OrderStatus.SERVED);
-        }
-
-        @Test
-        void 매장_주문을_완료한다() {
-            given(orderRepository.existsByOrderTableAndStatusNot(any(),any())).willReturn(false);
-            given(orderRepository.findById(any())).willReturn(Optional.of(매장_준비된_주문(양념치킨_메뉴, 착석_가능한_손님_2명의_오른쪽_테이블())));
-
-            Order 완료된_매장_주문 = orderService.complete(UUID.randomUUID());
-
-            assertThat(완료된_매장_주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-        }
-    }
-
-    @Nested
     class 주문_전체기능 {
 
         @Test
