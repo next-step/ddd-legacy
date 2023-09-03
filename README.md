@@ -17,7 +17,7 @@
   - [x] 주문(Order Business Object) 에 대한 테스트 작성
 - Controller 테스트 코드 작성
   - [x] ProductRestController 테스트 작성
-  - [ ] MenuRestController 테스트 작성
+  - [x] MenuRestController 테스트 작성
   - [x] MenuGroupRestController 테스트 작성
   - [x] OrderTableRestController 테스트 작성
   - [ ] OrderRestController 테스트 작성
