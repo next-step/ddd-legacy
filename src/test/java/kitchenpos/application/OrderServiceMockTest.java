@@ -52,6 +52,7 @@ class OrderServiceMockTest {
 
     @Nested
     class 배달_주문_전체기능_정상_테스트 {
+
         @Test
         void 배달_주문을_등록한다() {
             Order 배달_주문 = 배달_주문(양념치킨_메뉴);
@@ -113,6 +114,7 @@ class OrderServiceMockTest {
 
     @Nested
     class 매장_주문_전체기능_정상_테스트 {
+
         @Test
         void 매장_주문을_등록한다() {
             Order 매장_주문 = 매장_주문(양념치킨_메뉴);
@@ -227,6 +229,7 @@ class OrderServiceMockTest {
 
         @Nested
         class 배달_주문_예외_테스트 {
+
             @Test
             void 배달_주문이_아니면_배달을_시작할_수_없다() {
                 UUID 주문_아이디 = UUID.randomUUID();
