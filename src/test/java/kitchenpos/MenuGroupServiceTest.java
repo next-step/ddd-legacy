@@ -30,8 +30,8 @@ class MenuGroupServiceTest {
     @DisplayName("유효한 메뉴 그룹 생성 및 반환")
     void createValidMenuGroupReturnsCreatedMenuGroup() {
         // Arrange
-        MenuGroup savedMenuGroup = createMenuGroup("한마리 메뉴");
-        when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(savedMenuGroup);
+        MenuGroup 한마리_메뉴그룹 = createMenuGroup("한마리 메뉴");
+        when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(한마리_메뉴그룹);
 
         MenuGroup request = createMenuGroup("한마리 메뉴");
 

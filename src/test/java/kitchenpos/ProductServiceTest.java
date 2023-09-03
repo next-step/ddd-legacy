@@ -68,20 +68,20 @@ class ProductServiceTest {
     void changePriceValidProductReturnsUpdatedProduct() {
         // Arrange
         UUID productId = UUID.randomUUID();
-        Product existingProduct = createProduct(productId, "반반치킨", BigDecimal.valueOf(16000));
-        MenuProduct menuProduct = createMenuProduct(UUID.randomUUID(), 1, existingProduct);
-        Menu menu = createMenu("반반치킨", BigDecimal.valueOf(16000), UUID.randomUUID(), true, List.of(menuProduct));
+        Product 반반치킨_상품 = createProduct(productId, "반반치킨", BigDecimal.valueOf(16000));
+        MenuProduct 반반치킨_메뉴상품 = createMenuProduct(UUID.randomUUID(), 1, 반반치킨_상품);
+        Menu 반반치킨_메뉴 = createMenu("반반치킨", BigDecimal.valueOf(16000), UUID.randomUUID(), true, List.of(반반치킨_메뉴상품));
 
-        when(productRepository.findById(productId)).thenReturn(Optional.of(existingProduct));
-        when(menuRepository.findAllByProductId(productId)).thenReturn(List.of(menu));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(반반치킨_상품));
+        when(menuRepository.findAllByProductId(productId)).thenReturn(List.of(반반치킨_메뉴));
 
         Product request = createProduct("반반치킨", BigDecimal.valueOf(17000));
 
         // Act
-        Product updatedProduct = productService.changePrice(productId, request);
+        Product 가격수정된_반반치킨_상품 = productService.changePrice(productId, request);
 
         // Assert
-        assertThat(updatedProduct.getPrice()).isEqualTo(BigDecimal.valueOf(17000));
+        assertThat(가격수정된_반반치킨_상품.getPrice()).isEqualTo(BigDecimal.valueOf(17000));
     }
 
     @Test
@@ -100,11 +100,11 @@ class ProductServiceTest {
     @DisplayName("전체 상품 조회")
     void findAllProductsReturnsAllProducts() {
         // Arrange
-        List<Product> products = new ArrayList<>();
-        products.add(createProduct("간장치킨", BigDecimal.valueOf(16000)));
-        products.add(createProduct("순살치킨", BigDecimal.valueOf(15000)));
+        List<Product> 전체상품목록 = new ArrayList<>();
+        전체상품목록.add(createProduct("간장치킨", BigDecimal.valueOf(16000)));
+        전체상품목록.add(createProduct("순살치킨", BigDecimal.valueOf(15000)));
 
-        when(productRepository.findAll()).thenReturn(products);
+        when(productRepository.findAll()).thenReturn(전체상품목록);
 
         // Act
         List<Product> allProducts = productService.findAll();

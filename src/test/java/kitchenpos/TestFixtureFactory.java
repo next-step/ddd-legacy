@@ -100,6 +100,16 @@ public class TestFixtureFactory {
         return order;
     }
 
+    public static Order createOrder(OrderType orderType, OrderStatus orderStatus, List<OrderLineItem> orderLineItems, OrderTable orderTable) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setStatus(orderStatus);
+        order.setOrderLineItems(orderLineItems);
+        order.setOrderTable(orderTable);
+        return order;
+    }
+
     public static OrderLineItem createOrderLineItem(UUID menuId, int quantity, BigDecimal price) {
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItem.setMenuId(menuId);
@@ -123,4 +133,5 @@ public class TestFixtureFactory {
         orderTable.setOccupied(isOccupied);
         return orderTable;
     }
+
 }

@@ -35,7 +35,7 @@ class OrderTableServiceTest {
     private OrderRepository orderRepository;
 
     @Test
-    @DisplayName("주문 테이블 생성 - 정상적으로 주문 테이블 생성 후 반환")
+    @DisplayName("주문 테이블 등록 - 정상적으로 주문 테이블 등록 후 반환")
     void createValidOrderTableReturnsCreatedOrderTable() {
         // Arrange
         OrderTable request = createOrderTable("1번 테이블");
@@ -43,15 +43,15 @@ class OrderTableServiceTest {
         when(orderTableRepository.save(any(OrderTable.class))).thenReturn(new OrderTable());
 
         // Act
-        OrderTable createdOrderTable = orderTableService.create(request);
+        OrderTable 등록된_주문테이블 = orderTableService.create(request);
 
         // Assert
-        assertThat(createdOrderTable).isNotNull();
+        assertThat(등록된_주문테이블).isNotNull();
         verify(orderTableRepository, times(1)).save(any(OrderTable.class));
     }
 
     @Test
-    @DisplayName("주문 테이블 생성 - 이름이 비어있을 때 예외 발생")
+    @DisplayName("주문 테이블 등록 - 이름이 비어있을 때 예외 발생")
     void createEmptyTableNameThrowsIllegalArgumentException() {
         // Arrange
         OrderTable request = createOrderTable("");
@@ -67,15 +67,15 @@ class OrderTableServiceTest {
     void sitValidOrderTableReturnsOccupiedOrderTable() {
         // Arrange
         UUID orderTableId = UUID.randomUUID();
-        OrderTable orderTable = createOrderTable("1번 테이블");
+        OrderTable 주문_1번_테이블 = createOrderTable("1번 테이블");
 
-        when(orderTableRepository.findById(orderTableId)).thenReturn(Optional.of(orderTable));
+        when(orderTableRepository.findById(orderTableId)).thenReturn(Optional.of(주문_1번_테이블));
 
         // Act
-        OrderTable occupiedOrderTable = orderTableService.sit(orderTableId);
+        OrderTable 점유된_주문테이블 = orderTableService.sit(orderTableId);
 
         // Assert
-        assertThat(occupiedOrderTable.isOccupied()).isTrue();
+        assertThat(점유된_주문테이블.isOccupied()).isTrue();
     }
 
     @Test
@@ -83,18 +83,18 @@ class OrderTableServiceTest {
     void clearValidOrderTableReturnsClearedOrderTable() {
         // Arrange
         UUID orderTableId = UUID.randomUUID();
-        OrderTable orderTable = createOrderTable("1번 테이블", 3, true);
+        OrderTable 주문_1번_테이블 = createOrderTable("1번 테이블", 3, true);
 
-        when(orderTableRepository.findById(orderTableId)).thenReturn(Optional.of(orderTable));
+        when(orderTableRepository.findById(orderTableId)).thenReturn(Optional.of(주문_1번_테이블));
         when(orderRepository.existsByOrderTableAndStatusNot(any(OrderTable.class), any(OrderStatus.class)))
                 .thenReturn(false);
 
         // Act
-        OrderTable clearedOrderTable = orderTableService.clear(orderTableId);
+        OrderTable 클리어된_주문테이블= orderTableService.clear(orderTableId);
 
         // Assert
-        assertThat(clearedOrderTable.isOccupied()).isFalse();
-        assertThat(clearedOrderTable.getNumberOfGuests()).isEqualTo(0);
+        assertThat(클리어된_주문테이블.isOccupied()).isFalse();
+        assertThat(클리어된_주문테이블.getNumberOfGuests()).isEqualTo(0);
     }
 
     @Test
@@ -102,17 +102,17 @@ class OrderTableServiceTest {
     void changeNumberOfGuestsValidOrderTableReturnsUpdatedOrderTable() {
         // Arrange
         UUID orderTableId = UUID.randomUUID();
-        OrderTable orderTable = createOrderTable("1번 테이블", 3, true);
+        OrderTable 주문_1번_테이블 = createOrderTable("1번 테이블", 3, true);
 
-        when(orderTableRepository.findById(orderTableId)).thenReturn(Optional.of(orderTable));
+        when(orderTableRepository.findById(orderTableId)).thenReturn(Optional.of(주문_1번_테이블));
 
         OrderTable request =  createOrderTable("1번 테이블", 5, true);
 
         // Act
-        OrderTable updatedOrderTable = orderTableService.changeNumberOfGuests(orderTableId, request);
+        OrderTable 손님수_수정된_주문테이블 = orderTableService.changeNumberOfGuests(orderTableId, request);
 
         // Assert
-        assertThat(updatedOrderTable.getNumberOfGuests()).isEqualTo(5);
+        assertThat(손님수_수정된_주문테이블.getNumberOfGuests()).isEqualTo(5);
     }
 
     @Test
@@ -131,11 +131,11 @@ class OrderTableServiceTest {
     @DisplayName("전체 주문 테이블 조회")
     void findAllOrderTablesReturnsAllOrderTables() {
         // Arrange
-        List<OrderTable> mockOrderTables = new ArrayList<>();
-        mockOrderTables.add(createOrderTable("1번 테이블"));
-        mockOrderTables.add(createOrderTable("2번 테이블"));
+        List<OrderTable> 전체테이블목록 = new ArrayList<>();
+        전체테이블목록.add(createOrderTable("1번 테이블"));
+        전체테이블목록.add(createOrderTable("2번 테이블"));
 
-        when(orderTableRepository.findAll()).thenReturn(mockOrderTables);
+        when(orderTableRepository.findAll()).thenReturn(전체테이블목록);
 
         // Act
         List<OrderTable> allOrderTables = orderTableService.findAll();
