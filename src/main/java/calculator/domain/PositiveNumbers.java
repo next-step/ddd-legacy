@@ -14,7 +14,7 @@ public class PositiveNumbers {
     public int sum() {
         return operands.stream()
                 .reduce(PositiveNumber::sum)
-                .get()
+                .orElseGet(() -> new PositiveNumber(0))
                 .getNumber();
     }
 }
