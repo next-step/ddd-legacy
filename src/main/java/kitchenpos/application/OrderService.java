@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.infra.RidersClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,13 +16,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final OrderTableRepository orderTableRepository;
-    private final KitchenridersClient kitchenridersClient;
+    private final RidersClient kitchenridersClient;
 
     public OrderService(
             final OrderRepository orderRepository,
             final MenuRepository menuRepository,
             final OrderTableRepository orderTableRepository,
-            final KitchenridersClient kitchenridersClient
+            final RidersClient kitchenridersClient
     ) {
         this.orderRepository = orderRepository;
         this.menuRepository = menuRepository;
@@ -39,6 +40,7 @@ public class OrderService {
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
             throw new IllegalArgumentException();
         }
+
         final List<Menu> menus = menuRepository.findAllByIdIn(
                 orderLineItemRequests.stream()
                         .map(OrderLineItem::getMenuId)
@@ -63,7 +65,7 @@ public class OrderService {
             if (menu.getPrice().compareTo(orderLineItemRequest.getPrice()) != 0) {
                 throw new IllegalArgumentException();
             }
-            final OrderLineItem orderLineItem = new OrderLineItem();
+            OrderLineItem orderLineItem = new OrderLineItem();
             orderLineItem.setMenu(menu);
             orderLineItem.setQuantity(quantity);
             orderLineItems.add(orderLineItem);

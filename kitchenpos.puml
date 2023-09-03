@@ -1,5 +1,5 @@
 @startuml
-'https://plantuml.com/use-case-diagram
+'https://plantuml.com/use-case-diagram'
 left to right direction
 
 :관리자 : as Admin
