@@ -374,7 +374,7 @@ class MenuAcceptanceTest extends AcceptanceTestBase {
             Menu 등록된_메뉴 = 메뉴가_등록된_상태다(등록된_상품, 등록된_메뉴_그룹);
 
             // when
-            ExtractableResponse<Response> response = 메뉴를_전시_상태를_변경한다(등록된_메뉴);
+            ExtractableResponse<Response> response = 메뉴를_전시_상태로_변경한다(등록된_메뉴);
 
             // then
             메뉴_전시_상태_변경에_성공했다(response);
@@ -388,7 +388,7 @@ class MenuAcceptanceTest extends AcceptanceTestBase {
             Menu 등록되지_않은_메뉴 = 메뉴가_등록되지_않은_상태다(등록된_상품, 등록된_메뉴_그룹);
 
             // when
-            ExtractableResponse<Response> response = 메뉴를_전시_상태를_변경한다(등록되지_않은_메뉴);
+            ExtractableResponse<Response> response = 메뉴를_전시_상태로_변경한다(등록되지_않은_메뉴);
 
             // then
             존재하지_않는_메뉴라서_전시_상태_변경에_실패했다(response);
@@ -408,7 +408,7 @@ class MenuAcceptanceTest extends AcceptanceTestBase {
             상품의_가격을_변경한다(등록된_상품.getId(), 상품_가격을_메뉴_가격보다_작게_변경);
 
             // when
-            ExtractableResponse<Response> response = 메뉴를_전시_상태를_변경한다(등록된_메뉴);
+            ExtractableResponse<Response> response = 메뉴를_전시_상태로_변경한다(등록된_메뉴);
 
             // then
             메뉴_가격이_메뉴에_포함된_상품_가격의_총합보다_비싸서_전시_상태_변경에_실패했다(response);
@@ -423,12 +423,12 @@ class MenuAcceptanceTest extends AcceptanceTestBase {
             MenuGroup 등록된_메뉴_그룹 = 메뉴_그룹_등록된_상태다();
             Product 등록된_상품 = 상품이_등록된_상태다();
             Menu 등록된_메뉴 = 메뉴가_등록된_상태다(등록된_상품, 등록된_메뉴_그룹);
-            ExtractableResponse<Response> 메뉴를_전시_상태를_변경_응답 = 메뉴를_전시_상태를_변경한다(등록된_메뉴);
+            ExtractableResponse<Response> 메뉴를_전시_상태를_변경_응답 = 메뉴를_전시_상태로_변경한다(등록된_메뉴);
             메뉴_전시_상태_변경에_성공했다(메뉴를_전시_상태를_변경_응답);
 
 
             // when
-            ExtractableResponse<Response> response = 메뉴를_숨김_상태를_변경한다(등록된_메뉴);
+            ExtractableResponse<Response> response = 메뉴를_숨김_상태로_변경한다(등록된_메뉴);
 
             // then
             메뉴_숨김_상태_변경에_성공했다(response);
@@ -442,7 +442,7 @@ class MenuAcceptanceTest extends AcceptanceTestBase {
             Menu 등록되지_않은_메뉴 = 메뉴가_등록되지_않은_상태다(등록된_상품, 등록된_메뉴_그룹);
 
             // when
-            ExtractableResponse<Response> response = 메뉴를_숨김_상태를_변경한다(등록되지_않은_메뉴);
+            ExtractableResponse<Response> response = 메뉴를_숨김_상태로_변경한다(등록되지_않은_메뉴);
 
             // then
             존재하지_않는_메뉴라서_숨김_상태_변경에_실패했다(response);

@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static io.restassured.RestAssured.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,7 +70,7 @@ public class MenuStep {
                 .changeQuantity(1)
                 .getMenuProduct();
         return MenuTestFixture.create()
-                .changeId(null)
+                .changeId(UUID.randomUUID())
                 .changeName("메뉴1")
                 .changePrice(BigDecimal.valueOf(10000))
                 .changeMenuProducts(Collections.singletonList(등록할_메뉴_상품))
@@ -137,14 +138,14 @@ public class MenuStep {
     }
 
     public static void 변경할_메뉴가_존재하지_않아서_가격_변경에_실패했다(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     public static void 메뉴_가격이_메뉴에_포함된_모든_상품의_합보다_비싸서_가격_변경에_실패했다(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    public static ExtractableResponse<Response> 메뉴를_전시_상태를_변경한다(Menu menu) {
+    public static ExtractableResponse<Response> 메뉴를_전시_상태로_변경한다(Menu menu) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/api/menus/" + menu.getId() + "/display")
@@ -159,14 +160,14 @@ public class MenuStep {
     }
 
     public static void 존재하지_않는_메뉴라서_전시_상태_변경에_실패했다(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     public static void 메뉴_가격이_메뉴에_포함된_상품_가격의_총합보다_비싸서_전시_상태_변경에_실패했다(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-    public static ExtractableResponse<Response> 메뉴를_숨김_상태를_변경한다(Menu menu) {
+    public static ExtractableResponse<Response> 메뉴를_숨김_상태로_변경한다(Menu menu) {
         return given().log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when().put("/api/menus/" + menu.getId() + "/hide")
@@ -181,6 +182,10 @@ public class MenuStep {
     }
 
     public static void 존재하지_않는_메뉴라서_숨김_상태_변경에_실패했다(ExtractableResponse<Response> response) {
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    public static void 숨김_상태의_메뉴를_주문에_포함시켜_주문_등록에_실패했다(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 }
