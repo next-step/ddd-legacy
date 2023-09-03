@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.7.3'
     id 'io.spring.dependency-management' version '1.0.13.RELEASE'
     id 'org.flywaydb.flyway' version '8.2.0'
+    id 'org.asciidoctor.jvm.convert' version "3.3.2"
     id 'java'
 }
 
@@ -12,6 +13,10 @@ description = 'Kitchenpos project with domain-driven design'
 
 repositories {
     mavenCentral()
+}
+
+configurations {
+    asciidoctorExtensions
 }
 
 dependencies {
@@ -25,14 +30,49 @@ dependencies {
     runtimeOnly 'mysql:mysql-connector-java'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'com.h2database:h2'
+
+    asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+}
+
+ext {
+    snippetsDir = file("$buildDir/generated-snippets")
 }
 
 test {
     useJUnitPlatform()
+    outputs.dir snippetsDir
 }
 
 flyway {
     url = 'jdbc:mysql://localhost:33306/kitchenpos'
     user = 'user'
     password = 'password'
+}
+
+asciidoctor.doFirst {
+    delete file("src/main/resources/static/docs")
+}
+
+asciidoctor {
+    configurations 'asciidoctorExtensions'
+    inputs.dir snippetsDir
+    dependsOn test
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
+}
+
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+    from file("$buildDir/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+build {
+    dependsOn copyDocument
 }
