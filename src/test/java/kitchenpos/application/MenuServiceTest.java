@@ -193,6 +193,8 @@ class MenuServiceTest {
         List<Menu> actual = sut.findAll();
 
         // then
-        assertThat(actual);
+        assertThat(actual.size()).isEqualTo(expected.size());
+        assertThat(actual.get(0).getId()).isEqualTo(expected.get(0).getId());
+        assertThat(actual.get(1).getId()).isEqualTo(expected.get(1).getId());
     }
 }
