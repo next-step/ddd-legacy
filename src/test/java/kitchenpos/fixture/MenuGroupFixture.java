@@ -23,4 +23,8 @@ public class MenuGroupFixture {
     ) {
         return create(UUID.randomUUID(), name);
     }
+
+    public static MenuGroup create() {
+        return create("testMenuGroup");
+    }
 }
