@@ -245,4 +245,3 @@ class ProductServiceTest {
         assertTrue(product.getPrice().compareTo(price) == 0);
     }
 }
-
