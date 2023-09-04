@@ -14,7 +14,6 @@ import java.util.List;
 import static kitchenpos.acceptance.acceptance_step.MenuGroupStep.메뉴_그룹_등록된_상태다;
 import static kitchenpos.acceptance.acceptance_step.MenuStep.*;
 import static kitchenpos.acceptance.acceptance_step.OrderStep.*;
-import static kitchenpos.acceptance.acceptance_step.OrderTableStep.*;
 import static kitchenpos.acceptance.acceptance_step.ProductStep.상품이_등록된_상태다;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -295,7 +294,7 @@ public class DeliveryOrderAcceptanceTest extends AcceptanceTestBase {
             ExtractableResponse<Response> response = 배달주문을_배달시작_상태로_변경한다(등록된_배달주문);
 
             // then
-            배달완료_상태가_아닌_주문이라서_주문완료_상태로_변경에_실패했다(response);
+            배달완료_상태가_아닌_배달주문이라서_주문완료_상태로_변경에_실패했다(response);
         }
     }
 }

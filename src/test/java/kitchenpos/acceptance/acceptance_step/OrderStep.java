@@ -36,6 +36,22 @@ public class OrderStep {
                 .getOrder();
     }
 
+    public static Order 등록할_매장주문_정보_생성한다(Menu 등록된_메뉴, OrderTable 등록된_주문_테이블) {
+        OrderLineItem 등록할_주문_메뉴 = OrderLineItemTestFixture.create()
+                .changeMenu(등록된_메뉴)
+                .changePrice(등록된_메뉴.getPrice())
+                .changeQuantity(1)
+                .getOrderLineItem();
+        return OrderTestFixture.create()
+                .changeId(null)
+                .changeType(OrderType.EAT_IN)
+                .changeOrderTable(등록된_주문_테이블)
+                .changeDeliveryAddress(null)
+                .changeStatus(null)
+                .changeOrderLineItems(Collections.singletonList(등록할_주문_메뉴))
+                .getOrder();
+    }
+
     public static Order 주문_유형이_없는_주문_정보를_생성한다(Menu 등록된_메뉴) {
         OrderLineItem 등록할_주문_메뉴 = OrderLineItemTestFixture.create()
                 .changeMenu(등록된_메뉴)
@@ -164,20 +180,13 @@ public class OrderStep {
     }
 
     public static Order 배달주문이_등록된_상태다(Menu 메뉴) {
-        OrderLineItem 등록할_주문_메뉴 = OrderLineItemTestFixture.create()
-                .changeMenu(메뉴)
-                .changePrice(메뉴.getPrice())
-                .changeQuantity(1)
-                .getOrderLineItem();
-        Order 배달주문 = OrderTestFixture.create()
-                .changeId(null)
-                .changeType(OrderType.DELIVERY)
-                .changeOrderTable(null)
-                .changeDeliveryAddress("서울시 강남구")
-                .changeStatus(null)
-                .changeOrderLineItems(Collections.singletonList(등록할_주문_메뉴))
-                .getOrder();
+        Order 배달주문 = 등록할_배달주문_정보_생성한다(메뉴);
         return 주문을_등록한다(배달주문).body().as(Order.class);
+    }
+
+    public static Order 매장주문이_등록된_상태다(Menu 메뉴, OrderTable 주문_테이블) {
+        Order 등록할_매장주문_정보 = 등록할_매장주문_정보_생성한다(메뉴, 주문_테이블);
+        return 주문을_등록한다(등록할_매장주문_정보).body().as(Order.class);
     }
 
     public static ExtractableResponse<Response> 주문을_수락_상태로_변경한다(Order order) {
@@ -270,7 +279,21 @@ public class OrderStep {
         assertThat(주문완료된_주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
-    public static void 배달완료_상태가_아닌_주문이라서_주문완료_상태로_변경에_실패했다(ExtractableResponse<Response> response) {
+    public static void 배달완료_상태가_아닌_배달주문이라서_주문완료_상태로_변경에_실패했다(ExtractableResponse<Response> response) {
         assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    public static void 제공_상태가_아닌_매장주문이라서_주문완료_상태로_변경에_실패했다(ExtractableResponse<Response> response) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+    public static void 제공_상태인_매장주문을_주문완료_상태로_변경하고_주문테이블을_사용하지_않음_상태로_변경하는데_성공했다(
+            ExtractableResponse<Response> response
+    ) {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        Order 주문완료된_주문 = response.body().as(Order.class);
+        assertThat(주문완료된_주문.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(주문완료된_주문.getOrderTable().isOccupied()).isFalse();
+        assertThat(주문완료된_주문.getOrderTable().getNumberOfGuests()).isZero();
     }
 }
