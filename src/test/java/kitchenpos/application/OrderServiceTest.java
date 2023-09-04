@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.ApplicationServiceTest;
+import kitchenpos.UnitTest;
 import kitchenpos.domain.*;
 import kitchenpos.fixture.*;
 import kitchenpos.infra.KitchenridersClient;
@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
-class OrderServiceTest extends ApplicationServiceTest {
+class OrderServiceTest extends UnitTest {
 
     @Mock
     private OrderRepository orderRepository;

@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.ApplicationServiceTest;
+import kitchenpos.UnitTest;
 import kitchenpos.domain.*;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class MenuServiceTest extends ApplicationServiceTest {
+class MenuServiceTest extends UnitTest {
 
     @Mock
     private MenuRepository menuRepository;

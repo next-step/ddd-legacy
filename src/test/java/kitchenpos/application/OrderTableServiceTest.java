@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.ApplicationServiceTest;
+import kitchenpos.UnitTest;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-class OrderTableServiceTest extends ApplicationServiceTest {
+class OrderTableServiceTest extends UnitTest {
 
     @Mock
     private OrderTableRepository orderTableRepository;

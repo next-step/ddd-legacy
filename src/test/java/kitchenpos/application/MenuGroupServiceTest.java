@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.ApplicationServiceTest;
+import kitchenpos.UnitTest;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.fixture.MenuGroupFixture;
@@ -15,7 +15,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-class MenuGroupServiceTest extends ApplicationServiceTest {
+class MenuGroupServiceTest extends UnitTest {
 
     @Mock
     private MenuGroupRepository menuGroupRepository;
