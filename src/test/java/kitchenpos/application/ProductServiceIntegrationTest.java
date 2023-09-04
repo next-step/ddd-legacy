@@ -18,9 +18,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static java.math.BigDecimal.ZERO;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.BDDMockito.given;
@@ -156,6 +158,16 @@ class ProductServiceIntegrationTest extends IntegrationTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
+    }
+
+    @Test
+    void findAll() {
+        Product chicken = productRepository.save(ProductFixture.create( "후라이드 치킨", BigDecimal.valueOf(18000)));
+        Product coke = productRepository.save(ProductFixture.create("코카콜라", BigDecimal.valueOf(2000)));
+
+        List<Product> actualResult = productService.findAll();
+
+        assertThat(actualResult).containsExactly(chicken, coke);
     }
 
 }

@@ -169,9 +169,10 @@ class MenuServiceTest extends ApplicationServiceTest {
                 product -> when(productRepository.findById(product.getId()))
                     .thenReturn(Optional.of(product))
             );
-            when(purgomalumClient.containsProfanity(any())).thenReturn(false);
+            when(purgomalumClient.containsProfanity(any())).thenReturn(true);
 
-            menuService.create(menu);
+            assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -208,11 +209,9 @@ class MenuServiceTest extends ApplicationServiceTest {
                 ProductFixture.create(UUID.randomUUID(), "후라이드 치킨", BigDecimal.valueOf(18_000L)),
                 ProductFixture.create(UUID.randomUUID(), "코카콜라 1.5L", BigDecimal.valueOf(2_000L))
             );
-            Menu menu = MenuFixture.createWithProducts("후라이드 치킨 세트", BigDecimal.valueOf(19_000L), products);
-            MenuGroup menuGroup = MenuGroupFixture.create();
-            Menu changingPriceMenu = MenuFixture.create(
-                menu.getId(), "후라이드 치킨 세트", changedPrice, menu.getMenuProducts(), menuGroup, true
-            );
+            Menu menu = MenuFixture.createWithProducts("후라이드 치킨 세트", BigDecimal.valueOf(1_000L), products);
+
+            Menu changingPriceMenu = MenuFixture.create(menu.getId(), changedPrice, menu.getMenuGroup());
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
@@ -234,7 +233,7 @@ class MenuServiceTest extends ApplicationServiceTest {
                 ProductFixture.create(UUID.randomUUID(), "후라이드 치킨", BigDecimal.valueOf(18_000L)),
                 ProductFixture.create(UUID.randomUUID(), "코카콜라 1.5L", BigDecimal.valueOf(2_000L))
             );
-            Menu menu = MenuFixture.createWithProducts("후라이드 치킨 세트", BigDecimal.valueOf(20_000L), products);
+            Menu menu = MenuFixture.createWithProducts("후라이드 치킨 세트", BigDecimal.valueOf(1_000L), products);
             MenuGroup menuGroup = MenuGroupFixture.create();
             Menu changingPriceMenu = MenuFixture.create(
                 menu.getId(), "후라이드 치킨 세트", BigDecimal.valueOf(2_001L), menu.getMenuProducts(), menuGroup, true

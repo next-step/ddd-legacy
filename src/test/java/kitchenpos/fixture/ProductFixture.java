@@ -17,10 +17,7 @@ public class ProductFixture {
     }
 
     public static Product create(String name, BigDecimal price) {
-        Product result = new Product();
-        result.setName(name);
-        result.setPrice(price);
-        return result;
+        return create(UUID.randomUUID(), name, price);
     }
 
     public static Product create(UUID id, String name, BigDecimal price) {

@@ -6,18 +6,20 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class MenuFixture {
 
+    private static final String DEFAULT_NAME = "기본 메뉴 이름";
+
     private MenuFixture() {
     }
 
-    public static Menu createWithProducts(String name, BigDecimal price, Product product) {
-        MenuProduct menuProduct = MenuProductFixture.create(product, 1);
-        return create(name, price, List.of(menuProduct));
+    public static Menu create(UUID id, BigDecimal price, MenuGroup menuGroup) {
+        return create(id, DEFAULT_NAME, price, new ArrayList<>(), menuGroup, true);
     }
 
     public static Menu createWithProducts(String name, BigDecimal price, List<Product> products) {
