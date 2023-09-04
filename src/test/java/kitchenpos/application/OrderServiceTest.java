@@ -7,6 +7,8 @@ import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -214,8 +216,7 @@ class OrderServiceTest extends UnitTest {
                     UUID.randomUUID(), "후라이드 치킨 세트", BigDecimal.valueOf(19_000L),
                     givenMenuProducts, menuGroup, true
             );
-            givenMenu.setPrice(BigDecimal.valueOf(20_000L));
-            OrderLineItem givenOrderLineItem = OrderLineItemFixture.create(givenMenu, 1L);
+            OrderLineItem givenOrderLineItem = OrderLineItemFixture.create(givenMenu, BigDecimal.valueOf(20_000L), 1L);
 
             Order givenOrder = OrderFixture.create(null, OrderType.TAKEOUT, null, List.of(givenOrderLineItem));
 
@@ -227,8 +228,9 @@ class OrderServiceTest extends UnitTest {
 
 
         @DisplayName("[예외] 배달 주문 유형인 주문은 배달 주소가 있어야 합니다.")
-        @Test
-        void create_fail_because_delivery_order_type_but_delivery_address_is_null() {
+        @NullAndEmptySource
+        @ParameterizedTest
+        void create_fail_because_delivery_order_type_but_delivery_address_is_null(String deliveryAddress) {
             List<Product> givenProducts = Arrays.asList(
                     ProductFixture.create(UUID.randomUUID(), "후라이드 치킨", BigDecimal.valueOf(18_000L)),
                     ProductFixture.create(UUID.randomUUID(), "코카콜라 1.5L", BigDecimal.valueOf(2_000L))
@@ -236,7 +238,7 @@ class OrderServiceTest extends UnitTest {
             Menu givenMenu = MenuFixture.createWithProducts("후라이드 치킨 세트", BigDecimal.valueOf(19_000L), givenProducts);
             OrderLineItem givenOrderLineItem = OrderLineItemFixture.create(givenMenu, 1L);
             Order givenOrder = OrderFixture.create(null, OrderType.DELIVERY, null, List.of(givenOrderLineItem));
-            givenOrder.setDeliveryAddress(null);
+            givenOrder.setDeliveryAddress(deliveryAddress);
 
             when(menuRepository.findAllByIdIn(anyList())).thenReturn(List.of(givenMenu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(givenMenu));
