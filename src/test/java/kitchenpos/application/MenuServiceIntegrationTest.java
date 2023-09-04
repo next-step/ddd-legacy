@@ -18,9 +18,9 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
@@ -167,7 +167,8 @@ class MenuServiceIntegrationTest extends IntegrationTest {
 
             given(purgomalumClient.containsProfanity(any())).willReturn(true);
 
-            menuService.create(creatingMenu);
+            assertThatThrownBy(() -> menuService.create(creatingMenu))
+              .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -312,6 +313,31 @@ class MenuServiceIntegrationTest extends IntegrationTest {
             Menu actualResult = menuService.hide(menu.getId());
             assertFalse(actualResult.isDisplayed());
         }
+    }
+
+
+    @Test
+    @DisplayName("메뉴를 조회합니다.")
+    void findAll() {
+        List<Product> products = productRepository.saveAll(Arrays.asList(
+          ProductFixture.create(UUID.randomUUID(), "후라이드 치킨", BigDecimal.valueOf(18_000L)),
+          ProductFixture.create(UUID.randomUUID(), "코카콜라 1.5L", BigDecimal.valueOf(2_000L))
+        ));
+        MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.create());
+        List<MenuProduct> menuProducts = MenuProductFixture.create(products , 1);
+        given(purgomalumClient.containsProfanity(any())).willReturn(false);
+        Menu firstMenu = menuRepository.save(MenuFixture.create(
+          UUID.randomUUID(), "후라이드 치킨 세트", BigDecimal.valueOf(2_001L),
+          menuProducts, menuGroup, true
+        ));
+        Menu secondMenu = menuRepository.save(MenuFixture.create(
+          UUID.randomUUID(), "후라이드 치킨 세트2", BigDecimal.valueOf(2_001L),
+          menuProducts, menuGroup, true
+        ));
+
+        List<Menu> actualResult = menuService.findAll();
+
+        assertThat(actualResult).containsExactly(firstMenu, secondMenu);
     }
 
 }
