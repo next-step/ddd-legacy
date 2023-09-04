@@ -8,6 +8,7 @@ import kitchenpos.integration_test_step.OrderIntegrationStep;
 import kitchenpos.integration_test_step.OrderTableIntegrationStep;
 import kitchenpos.test_fixture.MenuTestFixture;
 import kitchenpos.test_fixture.OrderLineItemTestFixture;
+import kitchenpos.test_fixture.OrderTableTestFixture;
 import kitchenpos.test_fixture.OrderTestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -293,7 +294,10 @@ class OrderServiceTest {
         @Test
         void createEatInOrderTableNull() {
             // given
-            OrderTable orderTable = orderTableIntegrationStep.createSitTable();
+            OrderTable orderTable = OrderTableTestFixture.create()
+                    .changeId(UUID.randomUUID())
+                    .changeOccupied(true)
+                    .getOrderTable();
             Menu menu = menuIntegrationStep.create();
             OrderLineItem orderLineItem = OrderLineItemTestFixture.create()
                     .changeMenu(menu)
@@ -303,7 +307,8 @@ class OrderServiceTest {
                     .changeId(null)
                     .changeOrderLineItems(Collections.singletonList(orderLineItem))
                     .changeType(OrderType.EAT_IN)
-                    .changeOrderTable(null)
+                    .changeOrderTable(orderTable)
+                    .changeOrderTableId(orderTable)
                     .getOrder();
 
             // when & then

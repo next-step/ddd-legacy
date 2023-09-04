@@ -18,9 +18,13 @@ public class AcceptanceTestBase {
     @Autowired
     private DatabaseCleanStep databaseCleanStep;
 
+    @Autowired
+    public KitchenridersClientDummy kitchenridersClientDummy;
+
     @BeforeEach
     void setUp() {
         RestAssured.port = this.port;
         this.databaseCleanStep.clean();
+        this.kitchenridersClientDummy.clearCallCount();
     }
 }
