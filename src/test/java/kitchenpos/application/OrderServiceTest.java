@@ -55,7 +55,7 @@ class OrderServiceTest {
     @Autowired
     private DatabaseCleanStep databaseCleanStep;
 
-    @DisplayName("새로운 주문 생성")
+    @DisplayName("새로운 주문 등록 테스트")
     @Nested
     class Describe_create {
 
@@ -64,7 +64,7 @@ class OrderServiceTest {
             databaseCleanStep.clean();
         }
 
-        @DisplayName("새로운 주문을 생성할 수 있다.")
+        @DisplayName("새로운 주문을 등록할 수 있다.")
         @Test
         void create() {
             // given
