@@ -15,13 +15,11 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -45,7 +43,7 @@ class OrderTableServiceTest {
     @Nested
     class OrderTableCreateTestGroup {
 
-        @DisplayName("테이블 이름이 없으면 예외 발생")
+        @DisplayName("테이블 이름이 없으면 등록할 수 없다.")
         @ParameterizedTest(name = "테이블 이름: {0}")
         @NullAndEmptySource
         void createTest1(String name) {
@@ -69,11 +67,13 @@ class OrderTableServiceTest {
             OrderTable actual = orderTableService.create(request);
 
             // then
-            assertThat(actual).isNotNull();
-            assertThat(actual.getId()).isNotNull();
-            assertThat(actual.getName()).isEqualTo(request.getName());
-            assertThat(actual.getNumberOfGuests()).isEqualTo(request.getNumberOfGuests());
-            assertThat(actual.isOccupied()).isEqualTo(request.isOccupied());
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(actual).getId()).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(actual).getName()).isEqualTo(request.getName()),
+                    () -> assertThat(Objects.requireNonNull(actual).getNumberOfGuests()).isEqualTo(request.getNumberOfGuests()),
+                    () -> assertThat(Objects.requireNonNull(actual).isOccupied()).isEqualTo(request.isOccupied())
+            );
         }
     }
 
@@ -81,19 +81,17 @@ class OrderTableServiceTest {
     @Nested
     class OrderTableSitTestGroup {
 
-        @DisplayName("등록된 테이블이 아니면 예외 발생")
+        @DisplayName("등록된 테이블이 아니면 테이블에 앉을 수 없다.")
         @Test
         void sitTest1() {
 
             // given
-            final UUID orderTableId = UUID.randomUUID();
-
             given(orderTableRepository.findById(any()))
                     .willReturn(Optional.empty());
 
             // when + then
             assertThatExceptionOfType(NoSuchElementException.class)
-                    .isThrownBy(() -> orderTableService.sit(orderTableId));
+                    .isThrownBy(() -> orderTableService.sit(UUID.randomUUID()));
         }
 
         @DisplayName("테이블에 손님이 앉음")
@@ -101,18 +99,19 @@ class OrderTableServiceTest {
         void sitTest2() {
 
             // given
-            final UUID orderTableId = UUID.randomUUID();
             final OrderTable orderTable = OrderTableFixture.createOrderTableWithIsOccupied(false);
 
             given(orderTableRepository.findById(any()))
                     .willReturn(Optional.of(orderTable));
 
             // when
-            OrderTable actual = orderTableService.sit(orderTableId);
+            OrderTable actual = orderTableService.sit(UUID.randomUUID());
 
             // then
-            assertThat(actual).isNotNull();
-            assertThat(actual.isOccupied()).isTrue();
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(actual).isOccupied()).isTrue()
+            );
         }
     }
 
@@ -120,27 +119,24 @@ class OrderTableServiceTest {
     @Nested
     class OrderTableClearTestGroup {
 
-        @DisplayName("등록된 테이블이 아닌 경우 예외 발생")
+        @DisplayName("등록된 테이블이 아닌 경우 빈 테이블로 변경 할 수 없다.")
         @Test
         void clearTest1() {
 
             // given
-            final UUID orderTableId = UUID.randomUUID();
-
             given(orderTableRepository.findById(any()))
                     .willReturn(Optional.empty());
 
             // when + then
             assertThatExceptionOfType(NoSuchElementException.class)
-                    .isThrownBy(() -> orderTableService.clear(orderTableId));
+                    .isThrownBy(() -> orderTableService.clear(UUID.randomUUID()));
         }
 
-        @DisplayName("완료(COMPLETED)되지 않은 주문이 있다면 예외 발생")
+        @DisplayName("완료(COMPLETED)되지 않은 주문이 있다면 빈 테이블로 변경 할 수 없다.")
         @Test
         void clearTest2() {
 
             // given
-            final UUID orderTableId = UUID.randomUUID();
             final OrderTable orderTable = OrderTableFixture.createOrderTable();
 
             given(orderTableRepository.findById(any()))
@@ -150,7 +146,7 @@ class OrderTableServiceTest {
 
             // when + then
             assertThatExceptionOfType(IllegalStateException.class)
-                    .isThrownBy(() -> orderTableService.clear(orderTableId));
+                    .isThrownBy(() -> orderTableService.clear(UUID.randomUUID()));
         }
 
         @DisplayName("빈 테이블로 변경")
@@ -158,7 +154,6 @@ class OrderTableServiceTest {
         void clearTest3() {
 
             // given
-            final UUID orderTableId = UUID.randomUUID();
             final OrderTable orderTable = OrderTableFixture.createOrderTableWithIsOccupied(false);
 
             given(orderTableRepository.findById(any()))
@@ -167,12 +162,14 @@ class OrderTableServiceTest {
                     .willReturn(false);
 
             // when
-            OrderTable actual = orderTableService.clear(orderTableId);
+            OrderTable actual = orderTableService.clear(UUID.randomUUID());
 
             // then
-            assertThat(actual).isNotNull();
-            assertThat(actual.isOccupied()).isFalse();
-            assertThat(actual.getNumberOfGuests()).isZero();
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(actual.isOccupied()).isFalse(),
+                    () -> assertThat(actual.getNumberOfGuests()).isZero()
+            );
         }
     }
 
@@ -180,25 +177,23 @@ class OrderTableServiceTest {
     @Nested
     class ChangeNumberOfGuestsTestGroup {
 
-        @DisplayName("손님 수가 음수 값이면 예외 발생")
+        @DisplayName("손님 수가 음수 값이면 변경 할 수 없다.")
         @Test
         void changeNumberOfGuestsTest1() {
 
             // given
-            final UUID orderTableId = UUID.randomUUID();
             final OrderTable request = OrderTableFixture.createOrderTableWithNumberOfGuests(-1);
 
             // when + then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                    .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request));
+                    .isThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), request));
         }
 
-        @DisplayName("등록된 테이블이 아니면 예외 발생")
+        @DisplayName("등록된 테이블이 아니면 변경 할 수 없다.")
         @Test
         void changeNumberOfGuestsTest2() {
 
             // given
-            final UUID orderTableId = UUID.randomUUID();
             final OrderTable request = OrderTableFixture.createOrderTable();
 
             given(orderTableRepository.findById(any()))
@@ -206,15 +201,14 @@ class OrderTableServiceTest {
 
             // when + then
             assertThatExceptionOfType(NoSuchElementException.class)
-                    .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request));
+                    .isThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), request));
         }
 
-        @DisplayName("빈 테이블이면 예외 발생")
+        @DisplayName("빈 테이블이면 변경 할 수 없다.")
         @Test
         void changeNumberOfGuestsTest3() {
 
             // given
-            final UUID orderTableId = UUID.randomUUID();
             final OrderTable orderTable = OrderTableFixture.createOrderTableWithIsOccupied(false);
             final OrderTable request = OrderTableFixture.createOrderTable();
 
@@ -223,7 +217,7 @@ class OrderTableServiceTest {
 
             // when + then
             assertThatExceptionOfType(IllegalStateException.class)
-                    .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request));
+                    .isThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), request));
         }
 
         @DisplayName("손님 수 변경")
@@ -231,7 +225,6 @@ class OrderTableServiceTest {
         void changeNumberOfGuestsTest4() {
 
             // given
-            final UUID orderTableId = UUID.randomUUID();
             final OrderTable orderTable = OrderTableFixture.createOrderTableWithIsOccupiedAndNumberOfGuests(true, 1);
             final OrderTable request = OrderTableFixture.createOrderTableWithNumberOfGuests(2);
 
@@ -239,11 +232,13 @@ class OrderTableServiceTest {
                     .willReturn(Optional.of(orderTable));
 
             // when
-            OrderTable actual = orderTableService.changeNumberOfGuests(orderTableId, request);
+            OrderTable actual = orderTableService.changeNumberOfGuests(UUID.randomUUID(), request);
 
             // then
-            assertThat(actual).isNotNull();
-            assertThat(actual.getNumberOfGuests()).isEqualTo(request.getNumberOfGuests());
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(actual.getNumberOfGuests()).isEqualTo(request.getNumberOfGuests())
+            );
         }
     }
 

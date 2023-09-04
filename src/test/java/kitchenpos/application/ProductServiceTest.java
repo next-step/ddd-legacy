@@ -17,13 +17,11 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -50,7 +48,7 @@ class ProductServiceTest {
     @Nested
     class ProductCreateTestGroup {
 
-        @DisplayName("상품 가격이 없으면 예외 발생")
+        @DisplayName("상품 가격이 없으면 등록할 수 없다.")
         @Test
         void createTest1() {
             // given
@@ -61,7 +59,7 @@ class ProductServiceTest {
                     .isThrownBy(() -> productService.create(request));
         }
 
-        @DisplayName("상품 가격이 음수 값이면 예외 발생")
+        @DisplayName("상품 가격이 음수 값이면 등록할 수 없다.")
         @Test
         void createTest2() {
             // given
@@ -72,7 +70,7 @@ class ProductServiceTest {
                     .isThrownBy(() -> productService.create(request));
         }
 
-        @DisplayName("상품 이름이 없으면 예외 발생")
+        @DisplayName("상품 이름이 없으면 등록할 수 없다.")
         @Test
         void createTest3() {
             // given
@@ -83,7 +81,7 @@ class ProductServiceTest {
                     .isThrownBy(() -> productService.create(request));
         }
 
-        @DisplayName("상품 이름이 비속어라면 예외 발생")
+        @DisplayName("상품 이름이 비속어라면 등록할 수 없다.")
         @Test
         void createTest4() {
             // given
@@ -102,7 +100,6 @@ class ProductServiceTest {
         void createTest5() {
             // given
             final Product request = ProductFixture.createProduct();
-            Product product = ProductFixture.createProductWithRequest(request);
 
             given(purgomalumClient.containsProfanity(any()))
                     .willReturn(false);
@@ -111,10 +108,12 @@ class ProductServiceTest {
             Product actual = productService.create(request);
 
             // then
-            assertThat(actual).isNotNull();
-            assertThat(actual.getId()).isNotNull();
-            assertThat(actual.getName()).isEqualTo(request.getName());
-            assertThat(actual.getPrice()).isEqualTo(request.getPrice());
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(actual).getId()).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(actual).getName()).isEqualTo(request.getName()),
+                    () -> assertThat(Objects.requireNonNull(actual).getPrice()).isEqualTo(request.getPrice())
+            );
         }
     }
 
@@ -122,35 +121,32 @@ class ProductServiceTest {
     @Nested
     class ChangePriceTestGroup {
 
-        @DisplayName("상품 가격이 없으면 예외 발생")
+        @DisplayName("상품 가격이 없으면 변경할 수 없다.")
         @Test
         void changePriceTest1() {
             // given
-            final UUID productId = UUID.randomUUID();
             final Product request = ProductFixture.createProductWithPrice(null);
 
             // when + then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                    .isThrownBy(() -> productService.changePrice(productId, request));
+                    .isThrownBy(() -> productService.changePrice(UUID.randomUUID(), request));
         }
 
-        @DisplayName("상품 가격이 음수 값이면 예외 발생")
+        @DisplayName("상품 가격이 음수 값이면 변경할 수 없다.")
         @Test
         void changePriceTest2() {
             // given
-            final UUID productId = UUID.randomUUID();
             final Product request = ProductFixture.createProductWithPrice(-1);
 
             // when + then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                    .isThrownBy(() -> productService.changePrice(productId, request));
+                    .isThrownBy(() -> productService.changePrice(UUID.randomUUID(), request));
         }
 
-        @DisplayName("등록된 상품이 아니면 예외 발생")
+        @DisplayName("등록된 상품이 아니면 변경할 수 없다.")
         @Test
         void changePriceTest3() {
             // given
-            final UUID productId = UUID.randomUUID();
             final Product request = ProductFixture.createProduct();
 
             given(productRepository.findById(any()))
@@ -158,14 +154,13 @@ class ProductServiceTest {
 
             // when + then
             assertThatExceptionOfType(NoSuchElementException.class)
-                    .isThrownBy(() -> productService.changePrice(productId, request));
+                    .isThrownBy(() -> productService.changePrice(UUID.randomUUID(), request));
         }
 
         @DisplayName("상품의 가격과 수량을 곱한 가격이 메뉴 가격보다 크면 전시 된 메뉴를 숨기고 상품 가격을 변경")
         @Test
         void changePriceTest4() {
             // given
-            final UUID productId = UUID.randomUUID();
             final MenuGroup menuGroup = MenuGroupFixture.createMenuGroup();
             final Product product = ProductFixture.createProductWithPrice(500);
             final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
@@ -184,18 +179,19 @@ class ProductServiceTest {
                     .willReturn(menus);
 
             // when
-            Product actual = productService.changePrice(productId, request);
+            Product actual = productService.changePrice(UUID.randomUUID(), request);
 
             // then
-            assertThat(menu.isDisplayed()).isFalse();
-            assertThat(actual.getPrice()).isEqualTo(request.getPrice());
+            assertAll(
+                    () -> assertThat(menu.isDisplayed()).isFalse(),
+                    () -> assertThat(actual.getPrice()).isEqualTo(request.getPrice())
+            );
         }
 
         @DisplayName("상품 가격을 변경")
         @Test
         void changePriceTest5() {
             // given
-            final UUID productId = UUID.randomUUID();
             final Product request = ProductFixture.createProductWithPrice(1000);
             final Product product = ProductFixture.createProductWithPrice(2000);
 
@@ -205,7 +201,7 @@ class ProductServiceTest {
                     .willReturn(List.of(MenuFixture.createMenu()));
 
             // when
-            Product actual = productService.changePrice(productId, request);
+            Product actual = productService.changePrice(UUID.randomUUID(), request);
 
             // then
             assertThat(actual.getPrice()).isEqualTo(new BigDecimal(1000));
@@ -226,7 +222,9 @@ class ProductServiceTest {
         List<Product> actual = productService.findAll();
 
         // then
-        assertThat(actual).isNotNull();
-        assertThat(actual.size()).isOne();
+        assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(Objects.requireNonNull(actual).size()).isOne()
+        );
     }
 }

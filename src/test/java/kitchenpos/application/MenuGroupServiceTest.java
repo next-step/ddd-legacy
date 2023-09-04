@@ -14,9 +14,11 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,7 +38,7 @@ class MenuGroupServiceTest {
     @Nested
     class CreateTestGroup {
 
-        @DisplayName("메뉴 그룹의 이름이 없으면 예외 발생")
+        @DisplayName("메뉴 그룹의 이름이 없으면 등록할 수 없다.")
         @ParameterizedTest(name = "메뉴 그룹명: {0}")
         @NullAndEmptySource
         void createTest1(String name) {
@@ -60,9 +62,11 @@ class MenuGroupServiceTest {
             MenuGroup actual = menuGroupService.create(request);
 
             // then
-            assertThat(actual).isNotNull();
-            assertThat(actual.getId()).isNotNull();
-            assertThat(actual.getName()).isEqualTo(request.getName());
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(actual.getId()).isNotNull(),
+                    () -> assertThat(actual.getName()).isEqualTo(request.getName())
+            );
         }
     }
 
@@ -80,7 +84,9 @@ class MenuGroupServiceTest {
         List<MenuGroup> actual = menuGroupService.findAll();
 
         // then
-        assertThat(actual).isNotNull();
-        assertThat(actual.size()).isOne();
+        assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(Objects.requireNonNull(actual).size()).isOne()
+        );
     }
 }

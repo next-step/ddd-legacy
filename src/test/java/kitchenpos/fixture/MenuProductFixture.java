@@ -13,9 +13,6 @@ public class MenuProductFixture {
     }
 
     public static MenuProduct createMenuProduct() {
-        MenuProduct menuGroup = new MenuProduct();
-        menuGroup.setProduct(ProductFixture.createProduct());
-        menuGroup.setQuantity(1);
-        return menuGroup;
+        return createMenuProduct(ProductFixture.createProduct(), 1);
     }
 }

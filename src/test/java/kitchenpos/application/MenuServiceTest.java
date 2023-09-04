@@ -3,7 +3,6 @@ package kitchenpos.application;
 import kitchenpos.domain.*;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
-import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.spy.SpyMenuRepository;
@@ -20,6 +19,7 @@ import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -52,7 +52,7 @@ class MenuServiceTest {
     @Nested
     class CreateTestGroup {
 
-        @DisplayName("메뉴의 가격이 없으면 예외 발생")
+        @DisplayName("메뉴의 가격이 없으면 등록할 수 없다.")
         @Test
         void createTest1() {
 
@@ -64,7 +64,7 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request));
         }
 
-        @DisplayName("메뉴의 가격이 음수 값이면 예외 발생")
+        @DisplayName("메뉴의 가격이 음수 값이면 등록할 수 없다.")
         @Test
         void createTest2() {
 
@@ -76,7 +76,7 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request));
         }
 
-        @DisplayName("등록된 메뉴 그룹이 아니면 예외 발생")
+        @DisplayName("등록된 메뉴 그룹이 아니면 등록할 수 없다.")
         @Test
         void createTest3() {
 
@@ -91,7 +91,7 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request));
         }
 
-        @DisplayName("상품 항목이 없으면 예외 발생")
+        @DisplayName("상품 항목이 없으면 등록할 수 없다.")
         @Test
         void createTest4() {
 
@@ -107,7 +107,7 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request));
         }
 
-        @DisplayName("등록된 상품의 항목과 맞지 않으면 예외 발생")
+        @DisplayName("등록된 상품의 항목과 맞지 않으면 등록할 수 없다.")
         @Test
         void createTest5() {
 
@@ -123,7 +123,7 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request));
         }
 
-        @DisplayName("등록된 상품 항목과 맞지 않으면 예외 발생")
+        @DisplayName("등록된 상품 항목과 맞지 않으면 등록할 수 없다.")
         @Test
         void createTest6() {
 
@@ -144,15 +144,14 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request));
         }
 
-        @DisplayName("메뉴의 상품 수량이 음수 값이면 예외 발생")
+        @DisplayName("메뉴의 상품 수량이 음수 값이면 등록할 수 없다.")
         @Test
         void createTest7() {
 
             // given
             final MenuGroup menuGroup = MenuGroupFixture.createMenuGroup();
             final Product product = ProductFixture.createProduct();
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, -1);
-            final Menu request = MenuFixture.createMenuWithMenuProducts(List.of(menuProduct));
+            final Menu request = MenuFixture.createMenuWithProductAndMenuQuantity(product, -1);
 
             given(menuGroupRepository.findById(any()))
                     .willReturn(Optional.of(menuGroup));
@@ -164,7 +163,7 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request));
         }
 
-        @DisplayName("등록된 상품이 아니면 예외 발생")
+        @DisplayName("등록된 상품이 아니면 등록할 수 없다.")
         @Test
         void createTest8() {
 
@@ -185,15 +184,14 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request));
         }
 
-        @DisplayName("메뉴 가격이 상품의 가격과 수량을 곱한 가격과 같거나 높지 않으면 예외 발생")
+        @DisplayName("메뉴 가격이 상품의 가격과 수량을 곱한 가격과 같거나 높지 않으면 등록할 수 없다.")
         @Test
         void createTest9() {
 
             // given
             final MenuGroup menuGroup = MenuGroupFixture.createMenuGroup();
             final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu request = MenuFixture.createMenuWithMenuProductsAndPrice(List.of(menuProduct), 700);
+            final Menu request = MenuFixture.createMenuWithProductAndMenuQuantityAndPrice(product, 1, 700);
 
             given(menuGroupRepository.findById(any()))
                     .willReturn(Optional.of(menuGroup));
@@ -207,15 +205,14 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request));
         }
 
-        @DisplayName("메뉴 이름이 없으면 예외 발생")
+        @DisplayName("메뉴 이름이 없으면 등록할 수 없다.")
         @Test
         void createTest10() {
 
             // given
             final MenuGroup menuGroup = MenuGroupFixture.createMenuGroup();
             final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu request = MenuFixture.createMenuWithMenuProductsAndPriceAndName(null, List.of(menuProduct), 500);
+            final Menu request = MenuFixture.createMenuWithProductAndNameAndPriceAndMenuQuantity(product, null, 500, 1);
 
             given(menuGroupRepository.findById(any()))
                     .willReturn(Optional.of(menuGroup));
@@ -229,15 +226,14 @@ class MenuServiceTest {
                     .isThrownBy(() -> menuService.create(request));
         }
 
-        @DisplayName("메뉴 이름이 비속어라면 예외 발생")
+        @DisplayName("메뉴 이름이 비속어라면 등록할 수 없다.")
         @Test
         void createTest11() {
 
             // given
             final MenuGroup menuGroup = MenuGroupFixture.createMenuGroup();
             final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu request = MenuFixture.createMenuWithMenuProductsAndPrice(List.of(menuProduct), 500);
+            final Menu request = MenuFixture.createMenuWithProductAndMenuQuantityAndPrice(product, 1, 500);
 
             given(menuGroupRepository.findById(any()))
                     .willReturn(Optional.of(menuGroup));
@@ -260,8 +256,7 @@ class MenuServiceTest {
             // given
             final MenuGroup menuGroup = MenuGroupFixture.createMenuGroup();
             final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu request = MenuFixture.createMenuWithMenuProductsAndPrice(List.of(menuProduct), 500);
+            final Menu request = MenuFixture.createMenuWithProductAndMenuQuantityAndPrice(product, 1, 500);
 
             given(menuGroupRepository.findById(any()))
                     .willReturn(Optional.of(menuGroup));
@@ -276,11 +271,13 @@ class MenuServiceTest {
             Menu actual = menuService.create(request);
 
             // then
-            assertThat(actual).isNotNull();
-            assertThat(actual.getId()).isNotNull();
-            assertThat(actual.getName()).isEqualTo(request.getName());
-            assertThat(actual.getPrice()).isEqualTo(request.getPrice());
-            assertThat(actual.isDisplayed()).isEqualTo(request.isDisplayed());
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(actual).getId()).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(actual).getName()).isEqualTo(request.getName()),
+                    () -> assertThat(Objects.requireNonNull(actual).getPrice()).isEqualTo(request.getPrice()),
+                    () -> assertThat(Objects.requireNonNull(actual).isDisplayed()).isEqualTo(request.isDisplayed())
+            );
         }
     }
 
@@ -288,71 +285,59 @@ class MenuServiceTest {
     @Nested
     class ChangePriceTestGroup {
 
-        @DisplayName("메뉴 가격이 없다면 예외 발생")
+        @DisplayName("메뉴 가격이 없다면 메뉴 가격을 변경할 수 없다.")
         @Test
         void changePriceTest1() {
 
             // given
-            final UUID menuId = UUID.randomUUID();
-            final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu request = MenuFixture.createMenuWithMenuProductsAndPrice(List.of(menuProduct), null);
+            final Menu request = MenuFixture.createMenuWithProductPriceAndMenuQuantityAndPrice(500, 1, null);
 
             // when + then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                    .isThrownBy(() -> menuService.changePrice(menuId, request));
+                    .isThrownBy(() -> menuService.changePrice(UUID.randomUUID(), request));
         }
 
-        @DisplayName("메뉴 가격이 음수 값이면 예외 발생")
+        @DisplayName("메뉴 가격이 음수 값이면 메뉴 가격을 변경할 수 없다.")
         @Test
         void changePriceTest2() {
 
             // given
-            final UUID menuId = UUID.randomUUID();
-            final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu request = MenuFixture.createMenuWithMenuProductsAndPrice(List.of(menuProduct), -1);
+            final Menu request = MenuFixture.createMenuWithProductPriceAndMenuQuantityAndPrice(500, 1, -1);
 
             // when + then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                    .isThrownBy(() -> menuService.changePrice(menuId, request));
+                    .isThrownBy(() -> menuService.changePrice(UUID.randomUUID(), request));
         }
 
-        @DisplayName("등록된 메뉴가 아니면 예외 발생")
+        @DisplayName("등록된 메뉴가 아니면 메뉴 가격을 변경할 수 없다.")
         @Test
         void changePriceTest3() {
 
             // given
-            final UUID menuId = UUID.randomUUID();
-            final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu request = MenuFixture.createMenuWithMenuProductsAndPrice(List.of(menuProduct), 700);
+            final Menu request = MenuFixture.createMenuWithProductPriceAndMenuQuantityAndPrice(500, 1, 700);
 
             given(menuRepository.findById(any()))
                     .willReturn(Optional.empty());
 
             // when + then
             assertThatExceptionOfType(NoSuchElementException.class)
-                    .isThrownBy(() -> menuService.changePrice(menuId, request));
+                    .isThrownBy(() -> menuService.changePrice(UUID.randomUUID(), request));
         }
 
-        @DisplayName("메뉴 가격이 상품의 가격과 수량을 곱한 가격과 같거나 높지 않으면 예외 발생")
+        @DisplayName("메뉴 가격이 상품의 가격과 수량을 곱한 가격과 같거나 높지 않으면 메뉴 가격을 변경할 수 없다.")
         @Test
         void changePriceTest4() {
 
             // given
-            final UUID menuId = UUID.randomUUID();
-            final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu menu = MenuFixture.createMenuWithMenuProductsAndPrice(List.of(menuProduct), 500);
-            final Menu request = MenuFixture.createMenuWithMenuProductsAndPrice(List.of(menuProduct), 700);
+            final Menu menu = MenuFixture.createMenuWithProductPriceAndMenuQuantityAndPrice(500, 1, 500);
+            final Menu request = MenuFixture.createMenuWithProductPriceAndMenuQuantityAndPrice(500, 1, 700);
 
             given(menuRepository.findById(any()))
                     .willReturn(Optional.of(menu));
 
             // when + then
             assertThatExceptionOfType(IllegalArgumentException.class)
-                    .isThrownBy(() -> menuService.changePrice(menuId, request));
+                    .isThrownBy(() -> menuService.changePrice(UUID.randomUUID(), request));
         }
 
         @DisplayName("메뉴 가격 완료")
@@ -360,20 +345,19 @@ class MenuServiceTest {
         void changePriceTest5() {
 
             // given
-            final UUID menuId = UUID.randomUUID();
-            final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu request = MenuFixture.createMenuWithMenuProductsAndPrice(List.of(menuProduct), 400);
+            final Menu request = MenuFixture.createMenuWithProductPriceAndMenuQuantityAndPrice(500, 1, 400);
 
             given(menuRepository.findById(any()))
                     .willReturn(Optional.of(request));
 
             // when
-            Menu actual = menuService.changePrice(menuId, request);
+            Menu actual = menuService.changePrice(UUID.randomUUID(), request);
 
             // then
-            assertThat(actual).isNotNull();
-            assertThat(actual.getPrice()).isEqualTo(request.getPrice());
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(actual).getPrice()).isEqualTo(request.getPrice())
+            );
         }
     }
 
@@ -381,38 +365,32 @@ class MenuServiceTest {
     @Nested
     class DisplayTestGroup {
 
-        @DisplayName("등록된 메뉴가 아니면 예외 발생")
+        @DisplayName("등록된 메뉴가 아니면 메뉴를 전시할 수 없다.")
         @Test
         void displayTest1() {
 
             // given
-            final UUID menuId = UUID.randomUUID();
-            final Menu menu = MenuFixture.createMenu();
-
             given(menuRepository.findById(any()))
                     .willReturn(Optional.empty());
 
             // when + then
             assertThatExceptionOfType(NoSuchElementException.class)
-                    .isThrownBy(() -> menuService.display(menuId));
+                    .isThrownBy(() -> menuService.display(UUID.randomUUID()));
         }
 
-        @DisplayName("메뉴 가격이 상품의 가격과 수량을 곱한 가격과 같거나 높지 않으면 예외 발생")
+        @DisplayName("메뉴 가격이 상품의 가격과 수량을 곱한 가격과 같거나 높지 않으면 메뉴를 전시할 수 없다.")
         @Test
         void displayTest2() {
 
             // given
-            final UUID menuId = UUID.randomUUID();
-            final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu menu = MenuFixture.createMenuWithMenuProductsAndPrice(List.of(menuProduct), 700);
+            final Menu menu = MenuFixture.createMenuWithProductPriceAndMenuQuantityAndPrice(500, 1, 700);
 
             given(menuRepository.findById(any()))
                     .willReturn(Optional.of(menu));
 
             // when + then
             assertThatExceptionOfType(IllegalStateException.class)
-                    .isThrownBy(() -> menuService.display(menuId));
+                    .isThrownBy(() -> menuService.display(UUID.randomUUID()));
         }
 
         @DisplayName("메뉴 전시 완료")
@@ -420,20 +398,19 @@ class MenuServiceTest {
         void displayTest3() {
 
             // given
-            final UUID menuId = UUID.randomUUID();
-            final Product product = ProductFixture.createProductWithPrice(500);
-            final MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1);
-            final Menu menu = MenuFixture.createMenuWithMenuProductsAndPriceAndDisplayed(List.of(menuProduct), 500, false);
+            final Menu menu = MenuFixture.createMenuWithProductPriceAndMenuQuantityAndPrice(500, 1, 500);
 
             given(menuRepository.findById(any()))
                     .willReturn(Optional.of(menu));
 
             // when
-            Menu actual = menuService.display(menuId);
+            Menu actual = menuService.display(UUID.randomUUID());
 
             // then
-            assertThat(actual).isNotNull();
-            assertThat(actual.isDisplayed()).isTrue();
+            assertAll(
+                    () -> assertThat(actual).isNotNull(),
+                    () -> assertThat(Objects.requireNonNull(actual).isDisplayed()).isTrue()
+            );
         }
     }
 
@@ -442,18 +419,19 @@ class MenuServiceTest {
     void hideTest() {
 
         // given
-        final UUID menuId = UUID.randomUUID();
         final Menu menu = MenuFixture.createMenuWithDisplayed(true);
 
         given(menuRepository.findById(any()))
                 .willReturn(Optional.of(menu));
 
         // when
-        Menu actual = menuService.hide(menuId);
+        Menu actual = menuService.hide(UUID.randomUUID());
 
         // then
-        assertThat(actual).isNotNull();
-        assertThat(actual.isDisplayed()).isFalse();
+        assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(Objects.requireNonNull(actual).isDisplayed()).isFalse()
+        );
 
     }
 
@@ -471,7 +449,9 @@ class MenuServiceTest {
         List<Menu> actual = menuService.findAll();
 
         // then
-        assertThat(actual).isNotNull();
-        assertThat(actual.size()).isOne();
+        assertAll(
+                () -> assertThat(actual).isNotNull(),
+                () -> assertThat(Objects.requireNonNull(actual).size()).isOne()
+        );
     }
 }

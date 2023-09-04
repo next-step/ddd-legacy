@@ -21,10 +21,6 @@ public class ProductFixture {
         return createProduct("후라이드", 500);
     }
 
-    public static Product createProductWithRequest(Product request) {
-        return createProduct(request.getName(), request.getPrice().intValue());
-    }
-
     public static Product createProductWithName(String name) {
         return createProduct(name, 500);
     }

@@ -3,6 +3,7 @@ package kitchenpos.fixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -64,34 +65,44 @@ public class MenuFixture {
         );
     }
 
-    public static Menu createMenuWithMenuProductsAndPrice(List<MenuProduct> menuProducts, Integer price) {
+    public static Menu createMenuWithProductAndMenuQuantity(Product product, long menuQuantity) {
         return createMenu(
                 MenuGroupFixture.createMenuGroup(),
                 "후라이드 한마리",
-                price,
-                menuProducts,
+                1000,
+                List.of(MenuProductFixture.createMenuProduct(product, menuQuantity)),
                 true
         );
     }
 
-    public static Menu createMenuWithMenuProductsAndPriceAndDisplayed(
-            List<MenuProduct> menuProducts, Integer price, boolean displayed) {
+    public static Menu createMenuWithProductPriceAndMenuQuantityAndPrice(Integer productPrice, long menuQuantity, Integer menuPrice) {
+        return createMenu(
+                MenuGroupFixture.createMenuGroup(),
+                "후라이드 한마리",
+                menuPrice,
+                List.of(MenuProductFixture.createMenuProduct(
+                        ProductFixture.createProductWithPrice(productPrice), menuQuantity)),
+                true
+        );
+    }
+
+    public static Menu createMenuWithProductAndMenuQuantityAndPrice(Product product, long menuQuantity, Integer price) {
         return createMenu(
                 MenuGroupFixture.createMenuGroup(),
                 "후라이드 한마리",
                 price,
-                menuProducts,
-                displayed
+                List.of(MenuProductFixture.createMenuProduct(product, menuQuantity)),
+                true
         );
     }
 
-    public static Menu createMenuWithMenuProductsAndPriceAndName(String name, List<MenuProduct> menuProducts, Integer price) {
-
+    public static Menu createMenuWithProductAndNameAndPriceAndMenuQuantity(
+            Product product, String name, Integer productPrice, long menuQuantity) {
         return createMenu(
                 MenuGroupFixture.createMenuGroup(),
                 name,
-                price,
-                menuProducts,
+                productPrice,
+                List.of(MenuProductFixture.createMenuProduct(product, menuQuantity)),
                 true
         );
     }
