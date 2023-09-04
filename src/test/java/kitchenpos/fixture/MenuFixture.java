@@ -65,6 +65,17 @@ public class MenuFixture {
         );
     }
 
+    public static Menu create(boolean displayed) {
+        return create(
+            UUID.randomUUID(), "testMenu",
+            BigDecimal.valueOf(10_000),
+            MenuGroupFixture.create("testMenuGroup"),
+            displayed,
+            List.of(MenuProductFixture.create())
+        );
+    }
+
+
     public static Menu create() {
         return create(10_000);
     }
