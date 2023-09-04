@@ -5,6 +5,8 @@ import kitchenpos.domain.*;
 import java.util.List;
 import java.util.UUID;
 
+import static java.time.LocalDateTime.now;
+
 public class OrderFixture {
 
     private OrderFixture() {
@@ -18,6 +20,7 @@ public class OrderFixture {
         result.setId(id);
         result.setType(orderType);
         result.setStatus(orderStatus);
+        result.setOrderDateTime(now());
         result.setOrderLineItems(orderLineItems);
         result.setOrderTable(orderTable);
         result.setOrderTableId(orderTable == null ? null : orderTable.getId());

@@ -214,8 +214,8 @@ class OrderServiceTest extends ApplicationServiceTest {
                     UUID.randomUUID(), "후라이드 치킨 세트", BigDecimal.valueOf(19_000L),
                     givenMenuProducts, menuGroup, true
             );
-            OrderLineItem givenOrderLineItem = OrderLineItemFixture.create(givenMenu, 1L);
             givenMenu.setPrice(BigDecimal.valueOf(20_000L));
+            OrderLineItem givenOrderLineItem = OrderLineItemFixture.create(givenMenu, 1L);
 
             Order givenOrder = OrderFixture.create(null, OrderType.TAKEOUT, null, List.of(givenOrderLineItem));
 
