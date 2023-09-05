@@ -1,7 +1,8 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.integration_test_step.DatabaseCleanStep;
+import kitchenpos.infra.FakeProfanityClient;
+import kitchenpos.infra.ProfanityClient;
 import kitchenpos.integration_test_step.MenuGroupIntegrationStep;
 import kitchenpos.integration_test_step.MenuIntegrationStep;
 import kitchenpos.integration_test_step.ProductIntegrationStep;
@@ -16,8 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -28,26 +27,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("MenuService 클래스")
-@SpringBootTest
 class MenuServiceTest {
 
-    @Autowired
     private MenuService sut;
-
-    @Autowired
     private MenuIntegrationStep menuIntegrationStep;
-
-    @Autowired
     private ProductIntegrationStep productIntegrationStep;
-
-    @Autowired
     private MenuGroupIntegrationStep menuGroupIntegrationStep;
 
-    @Autowired
     private MenuRepository menuRepository;
-
-    @Autowired
-    private DatabaseCleanStep databaseCleanStep;
+    private ProductRepository productRepository;
+    private MenuGroupRepository menuGroupRepository;
+    private ProfanityClient profanityClient;
 
     @DisplayName("새로운 메뉴 등록")
     @Nested
@@ -55,7 +45,14 @@ class MenuServiceTest {
 
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            profanityClient = new FakeProfanityClient();
+            sut = new MenuService(menuRepository, menuGroupRepository, productRepository, profanityClient);
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            productIntegrationStep = new ProductIntegrationStep(productRepository);
+            menuGroupIntegrationStep = new MenuGroupIntegrationStep(menuGroupRepository);
         }
 
         @DisplayName("메뉴를 등록할 수 있다.")
@@ -250,7 +247,7 @@ class MenuServiceTest {
             Menu menu = MenuTestFixture.create()
                     .changeMenuGroup(menuGroup)
                     .changeMenuProducts(Collections.singletonList(menuProduct))
-                    .changeName("bastard") // `새끼` 라는 나쁜말 ^^
+                    .changeName("욕설이포함된메뉴이름") // `새끼` 라는 나쁜말 ^^
                     .changePrice(menuProduct.getProduct().getPrice().multiply(BigDecimal.valueOf(menuProduct.getQuantity())))
                     .getMenu();
 
@@ -288,7 +285,14 @@ class MenuServiceTest {
     class Describe_change_price {
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            profanityClient = new FakeProfanityClient();
+            sut = new MenuService(menuRepository, menuGroupRepository, productRepository, profanityClient);
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            productIntegrationStep = new ProductIntegrationStep(productRepository);
+            menuGroupIntegrationStep = new MenuGroupIntegrationStep(menuGroupRepository);
         }
 
         @DisplayName("메뉴의 가격을 변경할 수 있다.")
@@ -393,7 +397,14 @@ class MenuServiceTest {
     class Describe_display {
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            profanityClient = new FakeProfanityClient();
+            sut = new MenuService(menuRepository, menuGroupRepository, productRepository, profanityClient);
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            productIntegrationStep = new ProductIntegrationStep(productRepository);
+            menuGroupIntegrationStep = new MenuGroupIntegrationStep(menuGroupRepository);
         }
 
         @DisplayName("메뉴를 전시 상태로 변경할 수 있다")
@@ -448,7 +459,14 @@ class MenuServiceTest {
     class Describe_hide {
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            profanityClient = new FakeProfanityClient();
+            sut = new MenuService(menuRepository, menuGroupRepository, productRepository, profanityClient);
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            productIntegrationStep = new ProductIntegrationStep(productRepository);
+            menuGroupIntegrationStep = new MenuGroupIntegrationStep(menuGroupRepository);
         }
 
         @DisplayName("메뉴를 숨긴 상태로 변경할 수 있다")
@@ -478,6 +496,18 @@ class MenuServiceTest {
     @DisplayName("메뉴 목록 조회")
     @Nested
     class Describe_find_all {
+        @BeforeEach
+        void setUp() {
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            profanityClient = new FakeProfanityClient();
+            sut = new MenuService(menuRepository, menuGroupRepository, productRepository, profanityClient);
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            productIntegrationStep = new ProductIntegrationStep(productRepository);
+            menuGroupIntegrationStep = new MenuGroupIntegrationStep(menuGroupRepository);
+        }
+
         @DisplayName("메뉴 목록을 조회할 수 있다.")
         @Test
         void findAll() {
@@ -489,9 +519,9 @@ class MenuServiceTest {
             List<Menu> result = sut.findAll();
 
             // then
-            assertThat(result).hasSize(2);
-            assertThat(result.get(0).getId()).isEqualTo(persistMenu.getId());
-            assertThat(result.get(1).getId()).isEqualTo(persistMenu2.getId());
+            assertThat(result).hasSize(2)
+                    .extracting("id")
+                    .containsAll(List.of(persistMenu.getId(), persistMenu2.getId()));
         }
     }
 }

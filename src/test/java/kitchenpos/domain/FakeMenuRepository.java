@@ -1,13 +1,16 @@
 package kitchenpos.domain;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class FakeMenuRepository implements MenuRepository {
     private final Map<UUID, Menu> menus = new HashMap<>();
+    private AtomicLong menuProductSeq = new AtomicLong(1L);
 
     @Override
     public Menu save(Menu menu) {
+        menu.getMenuProducts().forEach(menuProduct -> menuProduct.setSeq(menuProductSeq.getAndIncrement()));
         menus.put(menu.getId(), menu);
         return menu;
     }
