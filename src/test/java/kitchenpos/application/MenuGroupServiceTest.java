@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.FakeMenuGroupRepository;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
@@ -19,20 +20,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("MenuGroupService 클래스")
-@SpringBootTest
 class MenuGroupServiceTest {
-    @Autowired
     private MenuGroupService sut;
-
-    @Autowired
     private MenuGroupRepository menuGroupRepository;
-
-    @Autowired
-    private DatabaseCleanStep databaseCleanStep;
 
     @BeforeEach
     void setUp() {
-        databaseCleanStep.clean();
+        menuGroupRepository = new FakeMenuGroupRepository();
+        sut = new MenuGroupService(menuGroupRepository);
     }
 
     @DisplayName("새로운 메뉴 그룹을 등록할 수 있다.")
