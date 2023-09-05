@@ -26,15 +26,12 @@ import static org.assertj.core.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
     @Mock
-    PurgomalumClient purgomalumClient;
+    private PurgomalumClient purgomalumClient;
 
-    MenuGroupService menuGroupService;
-    ProductService productService;
-    MenuService menuService;
-
-    MenuGroup 한마리_그룹;
-    Product 양념치킨;
-    Menu 양념치킨_메뉴;
+    private MenuGroupService menuGroupService;
+    private ProductService productService;
+    private MenuService menuService;
+    private Menu 양념치킨_메뉴;
 
     @BeforeEach
     void setUp() {
@@ -44,8 +41,8 @@ class MenuServiceTest {
         this.menuGroupService = new MenuGroupService(fakeMenuGroupRepository);
         this.productService = new ProductService(fakeProductRepository, fakeMenuRepository, purgomalumClient);
         this.menuService = new MenuService(fakeMenuRepository, fakeMenuGroupRepository, fakeProductRepository, purgomalumClient);
-        this.한마리_그룹 = menuGroupService.create(한마리());
-        this.양념치킨 = productService.create(양념치킨());
+        MenuGroup 한마리_그룹 = menuGroupService.create(한마리());
+        Product 양념치킨 = productService.create(양념치킨());
         this.양념치킨_메뉴 = 양념치킨_메뉴(한마리_그룹, 양념치킨);
     }
 
@@ -197,6 +194,4 @@ class MenuServiceTest {
         }
 
     }
-
-
 }

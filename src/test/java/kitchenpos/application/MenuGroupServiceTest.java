@@ -11,13 +11,12 @@ import static kitchenpos.fixture.MenuGroupFixture.*;
 import static org.assertj.core.api.Assertions.*;
 
 class MenuGroupServiceTest {
-    FakeMenuGroupRepository menuGroupRepository;
 
-    MenuGroupService menuGroupService;
+    private MenuGroupService menuGroupService;
 
     @BeforeEach
     void setUp() {
-        menuGroupRepository = new FakeMenuGroupRepository();
+        FakeMenuGroupRepository menuGroupRepository = new FakeMenuGroupRepository();
         menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 
@@ -45,6 +44,4 @@ class MenuGroupServiceTest {
         assertThatThrownBy(() -> menuGroupService.create(비어있음))
                 .isInstanceOf(IllegalArgumentException.class);
     }
-
-
 }

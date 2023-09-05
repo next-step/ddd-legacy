@@ -21,22 +21,20 @@ import static org.assertj.core.api.Assertions.*;
 class OrderTableServiceTest {
 
     @Mock
-    OrderRepository orderRepository;
+    private OrderRepository orderRepository;
 
-    OrderTableRepository orderTableRepository;
+    private OrderTableService orderTableService;
 
-    OrderTableService orderTableService;
-
-    OrderTable 왼쪽_테이블;
-    OrderTable 착석_가능한_손님_2명의_오른쪽_테이블;
-    OrderTable 이름없는_테이블;
+    private OrderTable 왼쪽_테이블;
+    private OrderTable 착석_가능한_손님_2명의_오른쪽_테이블;
+    private OrderTable 이름없는_테이블;
 
     @BeforeEach
     void setUp() {
         this.왼쪽_테이블 = 왼쪽_테이블();
         this.착석_가능한_손님_2명의_오른쪽_테이블 = 착석_가능한_손님_2명의_오른쪽_테이블();
         this.이름없는_테이블 = 이름없는_테이블();
-        this.orderTableRepository = new FakeOrderTableRepository();
+        OrderTableRepository orderTableRepository = new FakeOrderTableRepository();
         this.orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 
@@ -136,7 +134,4 @@ class OrderTableServiceTest {
     private OrderTable 손님수를_변경한다(UUID id, OrderTable 변경할_테이블_정보) {
         return orderTableService.changeNumberOfGuests(id, 변경할_테이블_정보);
     }
-
-
-
 }

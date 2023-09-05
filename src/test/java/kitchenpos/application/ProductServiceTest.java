@@ -25,12 +25,12 @@ import static org.mockito.BDDMockito.given;
 class ProductServiceTest {
 
     @Mock
-    MenuRepository menuRepository;
+    private MenuRepository menuRepository;
 
     @Mock
-    PurgomalumClient purgomalumClient;
+    private PurgomalumClient purgomalumClient;
 
-    ProductService productService;
+    private ProductService productService;
 
     @BeforeEach
     void setUp() {
@@ -73,13 +73,6 @@ class ProductServiceTest {
 
         assertThatThrownBy(() -> productService.create(비속어_상품))
                 .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    private Product 상품_생성(final String name, final BigDecimal price) {
-        Product product = new Product();
-        product.setName(name);
-        product.setPrice(price);
-        return product;
     }
 
     private void 상품가격_변경하기(final BigDecimal price, final Product product) {
