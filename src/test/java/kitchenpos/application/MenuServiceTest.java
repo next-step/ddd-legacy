@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class MenuServiceTest extends TestSetup {
+class MenuServiceTest extends MenuTestSetup {
 
     @Mock
     private PurgomalumClient mockClient;

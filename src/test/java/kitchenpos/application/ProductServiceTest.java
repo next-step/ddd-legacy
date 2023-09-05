@@ -28,7 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ProductServiceTest extends TestSetup {
+class ProductServiceTest extends MenuTestSetup {
 
     private static final String TEST_NAME = "dummyName";
     private static final BigDecimal TEST_PRICE = BigDecimal.valueOf(1_000L);
