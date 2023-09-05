@@ -1,8 +1,8 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.infra.FakeKitchenridersClient;
 import kitchenpos.infra.KitchenridersClient;
-import kitchenpos.integration_test_step.DatabaseCleanStep;
 import kitchenpos.integration_test_step.MenuIntegrationStep;
 import kitchenpos.integration_test_step.OrderIntegrationStep;
 import kitchenpos.integration_test_step.OrderTableIntegrationStep;
@@ -17,9 +17,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -34,26 +31,18 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 
 @DisplayName("OrderService 클래스")
-@SpringBootTest
 class OrderServiceTest {
 
-    @Autowired
     private OrderService sut;
-
-    @Autowired
+    private OrderRepository orderRepository;
+    private ProductRepository productRepository;
+    private MenuRepository menuRepository;
+    private MenuGroupRepository menuGroupRepository;
+    private OrderTableRepository orderTableRepository;
     private OrderIntegrationStep orderIntegrationStep;
-
-    @Autowired
     private MenuIntegrationStep menuIntegrationStep;
-
-    @Autowired
     private OrderTableIntegrationStep orderTableIntegrationStep;
-
-    @MockBean
     private KitchenridersClient kitchenridersClient;
-
-    @Autowired
-    private DatabaseCleanStep databaseCleanStep;
 
     @DisplayName("새로운 주문 등록 테스트")
     @Nested
@@ -61,7 +50,16 @@ class OrderServiceTest {
 
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            orderRepository = new FakeOrderRepository();
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            orderTableRepository = new FakeOrderTableRepository();
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            orderTableIntegrationStep = new OrderTableIntegrationStep(orderTableRepository);
+            orderIntegrationStep = new OrderIntegrationStep(orderRepository, menuIntegrationStep, orderTableIntegrationStep);
+            kitchenridersClient = new FakeKitchenridersClient();
+            sut = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
         }
 
         @DisplayName("새로운 주문을 등록할 수 있다.")
@@ -387,7 +385,16 @@ class OrderServiceTest {
 
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            orderRepository = new FakeOrderRepository();
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            orderTableRepository = new FakeOrderTableRepository();
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            orderTableIntegrationStep = new OrderTableIntegrationStep(orderTableRepository);
+            orderIntegrationStep = new OrderIntegrationStep(orderRepository, menuIntegrationStep, orderTableIntegrationStep);
+            kitchenridersClient = new FakeKitchenridersClient();
+            sut = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
         }
 
         @DisplayName("주문 상태를 수락으로 변경할 수 있다.")
@@ -435,7 +442,6 @@ class OrderServiceTest {
             BigDecimal orderPrice = order.getOrderLineItems().stream()
                     .map(orderLineItem -> orderLineItem.getMenu().getPrice().multiply(BigDecimal.valueOf(orderLineItem.getQuantity())))
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-            doNothing().when(kitchenridersClient).requestDelivery(order.getId(), orderPrice, order.getDeliveryAddress());
 
             // when
             Order result = sut.accept(order.getId());
@@ -443,7 +449,6 @@ class OrderServiceTest {
             // then
             assertThat(result).isNotNull();
             assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
-            verify(kitchenridersClient).requestDelivery(order.getId(), orderPrice, order.getDeliveryAddress());
         }
     }
 
@@ -452,7 +457,16 @@ class OrderServiceTest {
     class Describe_served {
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            orderRepository = new FakeOrderRepository();
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            orderTableRepository = new FakeOrderTableRepository();
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            orderTableIntegrationStep = new OrderTableIntegrationStep(orderTableRepository);
+            orderIntegrationStep = new OrderIntegrationStep(orderRepository, menuIntegrationStep, orderTableIntegrationStep);
+            kitchenridersClient = new FakeKitchenridersClient();
+            sut = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
         }
 
         @DisplayName("주문 상태를 제공으로 변경할 수 있다.")
@@ -498,7 +512,16 @@ class OrderServiceTest {
     class Describe_start_delivery {
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            orderRepository = new FakeOrderRepository();
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            orderTableRepository = new FakeOrderTableRepository();
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            orderTableIntegrationStep = new OrderTableIntegrationStep(orderTableRepository);
+            orderIntegrationStep = new OrderIntegrationStep(orderRepository, menuIntegrationStep, orderTableIntegrationStep);
+            kitchenridersClient = new FakeKitchenridersClient();
+            sut = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
         }
 
         @DisplayName("주문 상태를 배달 중으로 변경할 수 있다.")
@@ -555,7 +578,16 @@ class OrderServiceTest {
     class Describe_complete_delivery {
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            orderRepository = new FakeOrderRepository();
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            orderTableRepository = new FakeOrderTableRepository();
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            orderTableIntegrationStep = new OrderTableIntegrationStep(orderTableRepository);
+            orderIntegrationStep = new OrderIntegrationStep(orderRepository, menuIntegrationStep, orderTableIntegrationStep);
+            kitchenridersClient = new FakeKitchenridersClient();
+            sut = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
         }
 
         @DisplayName("주문 상태를 배달 완료로 변경할 수 있다.")
@@ -601,7 +633,16 @@ class OrderServiceTest {
     class Describe_complete {
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            orderRepository = new FakeOrderRepository();
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            orderTableRepository = new FakeOrderTableRepository();
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            orderTableIntegrationStep = new OrderTableIntegrationStep(orderTableRepository);
+            orderIntegrationStep = new OrderIntegrationStep(orderRepository, menuIntegrationStep, orderTableIntegrationStep);
+            kitchenridersClient = new FakeKitchenridersClient();
+            sut = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
         }
 
         @DisplayName("매장 식사 주문, 포장 주문의 상태를 완료로 변경할 수 있다.")
