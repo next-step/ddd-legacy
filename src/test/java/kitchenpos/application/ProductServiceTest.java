@@ -1,14 +1,13 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
-import kitchenpos.integration_test_step.DatabaseCleanStep;
+import kitchenpos.infra.FakeProfanityClient;
+import kitchenpos.infra.ProfanityClient;
 import kitchenpos.integration_test_step.MenuIntegrationStep;
 import kitchenpos.test_fixture.ProductTestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,27 +20,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("ProductService 클래스")
-@SpringBootTest
 class ProductServiceTest {
 
-    @Autowired
     private ProductService sut;
-
-    @Autowired
     private ProductRepository productRepository;
-
-    @Autowired
     private MenuRepository menuRepository;
-
-    @Autowired
+    private MenuGroupRepository menuGroupRepository;
+    private ProfanityClient profanityClient;
     private MenuIntegrationStep menuIntegrationStep;
-
-    @Autowired
-    private DatabaseCleanStep databaseCleanStep;
 
     @BeforeEach
     void setUp() {
-        databaseCleanStep.clean();
+        productRepository = new FakeProductRepository();
+        menuRepository = new FakeMenuRepository();
+        profanityClient = new FakeProfanityClient();
+        menuGroupRepository = new FakeMenuGroupRepository();
+        sut = new ProductService(productRepository, menuRepository, profanityClient);
+        menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
     }
 
 
@@ -111,7 +106,7 @@ class ProductServiceTest {
         // given
         Product product = ProductTestFixture.create()
                 .changeId(null)
-                .changeName("bastard") // `새끼` 라는 나쁜말 ^^
+                .changeName("욕설이포함된이름") // `새끼` 라는 나쁜말 ^^
                 .getProduct();
 
         // when then
@@ -199,16 +194,16 @@ class ProductServiceTest {
         Product product = ProductTestFixture.create()
                 .changeId(UUID.randomUUID())
                 .getProduct();
-        productRepository.save(product);
-        Menu menu = menuIntegrationStep.createPersistMenu(product);
+        Product savedProduct = productRepository.save(product);
+        Menu menu = menuIntegrationStep.createPersistMenu(savedProduct);
 
         Product changePriceRequest = ProductTestFixture.create()
-                .changeId(product.getId())
+                .changeId(savedProduct.getId())
                 .changePrice(menu.getPrice().subtract(BigDecimal.ONE))
                 .getProduct();
 
         // when
-        sut.changePrice(product.getId(), changePriceRequest);
+        sut.changePrice(savedProduct.getId(), changePriceRequest);
 
         // then
         Menu menuWithProduct = menuRepository.findById(menu.getId()).get();
