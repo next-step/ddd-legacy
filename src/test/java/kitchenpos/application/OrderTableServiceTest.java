@@ -34,7 +34,6 @@ class OrderTableServiceTest {
 
     private OrderTableService sut;
 
-    private
     @BeforeEach
     void setUp() {
         sut = new OrderTableService(orderTableRepository, orderRepository);
