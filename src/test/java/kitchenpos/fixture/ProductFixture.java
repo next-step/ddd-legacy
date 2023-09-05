@@ -30,4 +30,12 @@ public class ProductFixture {
         product.setPrice(BigDecimal.valueOf(0));
         return product;
     }
+
+    public static Product 상품_생성(final String name, final BigDecimal price) {
+        final Product product = new Product();
+        product.setId(UUID.randomUUID());
+        product.setName(name);
+        product.setPrice(price);
+        return product;
+    }
 }
