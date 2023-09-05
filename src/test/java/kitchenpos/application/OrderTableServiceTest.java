@@ -1,7 +1,8 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.*;
 import kitchenpos.integration_test_step.DatabaseCleanStep;
+import kitchenpos.integration_test_step.MenuIntegrationStep;
 import kitchenpos.integration_test_step.OrderIntegrationStep;
 import kitchenpos.integration_test_step.OrderTableIntegrationStep;
 import kitchenpos.test_fixture.OrderTableTestFixture;
@@ -21,20 +22,17 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DisplayName("OrderTableService 클래스")
-@SpringBootTest
 class OrderTableServiceTest {
 
-    @Autowired
     private OrderTableService sut;
-
-    @Autowired
+    private OrderTableRepository orderTableRepository;
+    private OrderRepository orderRepository;
     private OrderTableIntegrationStep orderTableIntegrationStep;
-
-    @Autowired
     private OrderIntegrationStep orderIntegrationStep;
-
-    @Autowired
-    private DatabaseCleanStep databaseCleanStep;
+    private ProductRepository productRepository;
+    private MenuRepository menuRepository;
+    private MenuGroupRepository menuGroupRepository;
+    private MenuIntegrationStep menuIntegrationStep;
 
     @DisplayName("새로운 주문 테이블 등록 테스트")
     @Nested
@@ -42,7 +40,15 @@ class OrderTableServiceTest {
 
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            orderTableRepository = new FakeOrderTableRepository();
+            orderRepository = new FakeOrderRepository();
+            orderTableIntegrationStep = new OrderTableIntegrationStep(orderTableRepository);
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            orderIntegrationStep = new OrderIntegrationStep(orderRepository, menuIntegrationStep, orderTableIntegrationStep);
+            sut = new OrderTableService(orderTableRepository, orderRepository);
         }
 
         @DisplayName("새로운 주문 테이블을 등록할 수 있다.")
@@ -115,7 +121,15 @@ class OrderTableServiceTest {
 
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            orderTableRepository = new FakeOrderTableRepository();
+            orderRepository = new FakeOrderRepository();
+            orderTableIntegrationStep = new OrderTableIntegrationStep(orderTableRepository);
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            orderIntegrationStep = new OrderIntegrationStep(orderRepository, menuIntegrationStep, orderTableIntegrationStep);
+            sut = new OrderTableService(orderTableRepository, orderRepository);
         }
 
         @DisplayName("주문 테이블에 고객이 앉았음을 등록할 수 있다.")
@@ -148,6 +162,19 @@ class OrderTableServiceTest {
     @DisplayName("주문 테이블을 테이블 비사용 상태로 변경")
     @Nested
     class Describe_clear {
+
+        @BeforeEach
+        void setUp() {
+            orderTableRepository = new FakeOrderTableRepository();
+            orderRepository = new FakeOrderRepository();
+            orderTableIntegrationStep = new OrderTableIntegrationStep(orderTableRepository);
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            orderIntegrationStep = new OrderIntegrationStep(orderRepository, menuIntegrationStep, orderTableIntegrationStep);
+            sut = new OrderTableService(orderTableRepository, orderRepository);
+        }
 
         @DisplayName("고객이 앉았던 주문 테이블 정보를 비어있는 테이블로 변경할 수 있다.")
         @Test
@@ -210,7 +237,15 @@ class OrderTableServiceTest {
     class Describe_change_number_of_guests {
         @BeforeEach
         void setUp() {
-            databaseCleanStep.clean();
+            orderTableRepository = new FakeOrderTableRepository();
+            orderRepository = new FakeOrderRepository();
+            orderTableIntegrationStep = new OrderTableIntegrationStep(orderTableRepository);
+            productRepository = new FakeProductRepository();
+            menuRepository = new FakeMenuRepository();
+            menuGroupRepository = new FakeMenuGroupRepository();
+            menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+            orderIntegrationStep = new OrderIntegrationStep(orderRepository, menuIntegrationStep, orderTableIntegrationStep);
+            sut = new OrderTableService(orderTableRepository, orderRepository);
         }
 
         @DisplayName("주문 테이블의 `테이블에 앉은 고객 수`를 변경할 수 있다.")

@@ -33,10 +33,10 @@ class ProductServiceTest {
     void setUp() {
         productRepository = new FakeProductRepository();
         menuRepository = new FakeMenuRepository();
-        profanityClient = new FakeProfanityClient();
         menuGroupRepository = new FakeMenuGroupRepository();
-        sut = new ProductService(productRepository, menuRepository, profanityClient);
         menuIntegrationStep = new MenuIntegrationStep(menuRepository, menuGroupRepository, productRepository);
+        profanityClient = new FakeProfanityClient();
+        sut = new ProductService(productRepository, menuRepository, profanityClient);
     }
 
 
