@@ -15,7 +15,6 @@ public class OrderFakeRepository implements OrderRepository {
 
     private final Map<UUID, Order> orders = new HashMap<>();
 
-
     @Override
     public Order save(final Order entity) {
         if (entity.getId() == null) {

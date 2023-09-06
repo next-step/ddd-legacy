@@ -1,14 +1,11 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_ORDER_TABLE_NAME;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_ORDER_TABLE_NUMBER_OF_GUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import kitchenpos.application.fakerepository.OrderFakeRepository;
-import kitchenpos.application.fakerepository.OrderTableFakeRepository;
-import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
@@ -20,24 +17,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 @Nested
 @DisplayName("OrderTableService 클래스")
-class OrderTableServiceCreateTest extends OrderTestSetup {
-
-    private static final String TEST_NAME = "tableName";
-    private static final int TEST_NUMBER_OF_GUEST = 2;
-
-    private OrderTableRepository orderTableRepository;
-    private OrderRepository orderRepository;
-
-    private OrderTableService sut;
-
-    @BeforeEach
-    void setUp() {
-
-        orderTableRepository = new OrderTableFakeRepository();
-        orderRepository = new OrderFakeRepository();
-
-        sut = new OrderTableService(orderTableRepository, orderRepository);
-    }
+class OrderTableServiceCreateTest extends OrderTableServiceTestSetup {
 
     @Nested
     @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
@@ -59,14 +39,15 @@ class OrderTableServiceCreateTest extends OrderTestSetup {
 
             // when
             final OrderTable actual = sut.create(
-                createOrderTableRequest(TEST_NAME, TEST_NUMBER_OF_GUEST, true));
+                createOrderTableRequest(TEST_ORDER_TABLE_NAME,
+                    TEST_ORDER_TABLE_NUMBER_OF_GUEST, true));
 
             // then
             assertThat(actual.getId()).isNotNull();
         }
 
         private OrderTable create(final String name) {
-            return createOrderTableRequest(name, TEST_NUMBER_OF_GUEST, true);
+            return createOrderTableRequest(name, TEST_ORDER_TABLE_NUMBER_OF_GUEST, true);
         }
     }
 }

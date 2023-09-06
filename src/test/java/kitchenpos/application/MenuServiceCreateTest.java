@@ -1,5 +1,9 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_MENU_GROUP_NAME;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_MENU_NAME;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_PRODUCT_NAME;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_PRODUCT_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
@@ -31,12 +35,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class MenuServiceForCreateTest extends MenuTestSetup {
-
-    private static final BigDecimal TEST_PRICE = BigDecimal.valueOf(1_000L);
-    private static final String TEST_MENU_NAME = "dummyMenuName";
-    private static final String TEST_MENU_GROUP_NAME = "dummyMenuGroup";
-    private static final String TEST_PRODUCT_NAME = "dummyProductName";
+class MenuServiceCreateTest extends MenuServiceTestRequestUtils {
 
     @Mock
     protected PurgomalumClient mockClient;
@@ -63,7 +62,8 @@ class MenuServiceForCreateTest extends MenuTestSetup {
         // given
         final MenuGroup menuGroup = menuGroupRepository.save(
             createMenuGroupRequest(TEST_MENU_GROUP_NAME));
-        final Product product = productRepository.save(createProductRequest("product", TEST_PRICE));
+        final Product product = productRepository.save(
+            createProductRequest("product", TEST_PRODUCT_PRICE));
         final Menu request = create(product, 1, menuGroup);
 
         // when
@@ -100,7 +100,7 @@ class MenuServiceForCreateTest extends MenuTestSetup {
         final MenuGroup menuGroup = menuGroupRepository.save(
             createMenuGroupRequest(TEST_MENU_GROUP_NAME));
         final Product product = productRepository.save(
-            createProductRequest(TEST_PRODUCT_NAME, TEST_PRICE));
+            createProductRequest(TEST_PRODUCT_NAME, TEST_PRODUCT_PRICE));
         final Menu request = create(product, 1, menuGroup);
 
         // when
@@ -114,7 +114,7 @@ class MenuServiceForCreateTest extends MenuTestSetup {
     @Test
     void create_invalid_menuGroup() {
         // given
-        final Menu request = createMenuRequest(TEST_MENU_NAME, TEST_PRICE,
+        final Menu request = createMenuRequest(TEST_MENU_NAME, TEST_PRODUCT_PRICE,
             List.of(), createMenuGroupRequest(TEST_MENU_GROUP_NAME), false);
 
         // then & then
@@ -129,7 +129,8 @@ class MenuServiceForCreateTest extends MenuTestSetup {
         // given
         final MenuGroup menuGroup = menuGroupRepository.save(
             createMenuGroupRequest(TEST_MENU_GROUP_NAME));
-        final Menu menu = createMenuRequest(TEST_MENU_NAME, TEST_PRICE, value, menuGroup, false);
+        final Menu menu = createMenuRequest(TEST_MENU_NAME, TEST_PRODUCT_PRICE, value, menuGroup,
+            false);
 
         // when & then
         assertThatThrownBy(() -> service.create(menu))
@@ -143,7 +144,7 @@ class MenuServiceForCreateTest extends MenuTestSetup {
         final MenuGroup menuGroup = menuGroupRepository.save(
             createMenuGroupRequest(TEST_MENU_GROUP_NAME));
         final Product product = productRepository.save(
-            createProductRequest(TEST_PRODUCT_NAME, TEST_PRICE));
+            createProductRequest(TEST_PRODUCT_NAME, TEST_PRODUCT_PRICE));
         final Menu request = create(product, -1, menuGroup);
 
         // when & then
@@ -155,14 +156,14 @@ class MenuServiceForCreateTest extends MenuTestSetup {
     @Test
     void create_invalid_menuProduct_2() {
         // given
-        final Product product = createProductRequest("product", TEST_PRICE);
+        final Product product = createProductRequest(TEST_PRODUCT_NAME, TEST_PRODUCT_PRICE);
         final MenuGroup menuGroup = menuGroupRepository.save(
             createMenuGroupRequest(TEST_MENU_GROUP_NAME));
         final Menu request = create(product, menuGroup);
 
         // when & then
         assertThatThrownBy(() -> service.create(request))
-            .isInstanceOf(NoSuchElementException.class);
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("메뉴 이름이 없으면 예외를 발생시킨다.")
@@ -171,7 +172,7 @@ class MenuServiceForCreateTest extends MenuTestSetup {
     void create_invalid_name_null(final String value) {
         // given
         final Product product = productRepository.save(
-            createProductRequest(TEST_PRODUCT_NAME, TEST_PRICE));
+            createProductRequest(TEST_PRODUCT_NAME, TEST_PRODUCT_PRICE));
         final MenuGroup menuGroup = menuGroupRepository.save(
             createMenuGroupRequest(TEST_MENU_GROUP_NAME));
         final Menu request = create(value, product, menuGroup);
@@ -187,7 +188,7 @@ class MenuServiceForCreateTest extends MenuTestSetup {
     void create_invalid_name_profanity(final String value) {
         // given
         final Product product = productRepository.save(
-            createProductRequest(TEST_PRODUCT_NAME, TEST_PRICE));
+            createProductRequest(TEST_PRODUCT_NAME, TEST_PRODUCT_PRICE));
         final MenuGroup menuGroup = menuGroupRepository.save(
             createMenuGroupRequest(TEST_MENU_GROUP_NAME));
         doReturn(true)
@@ -203,7 +204,7 @@ class MenuServiceForCreateTest extends MenuTestSetup {
 
 
     private Menu create(final String name, final Product product, final MenuGroup menuGroup) {
-        return createMenuRequest(name, TEST_PRICE,
+        return createMenuRequest(name, TEST_PRODUCT_PRICE,
             ImmutableList.of(createMenuProductRequest(product, 1)), menuGroup, false);
     }
 
@@ -212,7 +213,7 @@ class MenuServiceForCreateTest extends MenuTestSetup {
     }
 
     private Menu create(final Product product, final long quantity, final MenuGroup menuGroup) {
-        return createMenuRequest(TEST_MENU_NAME, TEST_PRICE,
+        return createMenuRequest(TEST_MENU_NAME, TEST_PRODUCT_PRICE,
             ImmutableList.of(createMenuProductRequest(product, quantity)), menuGroup, false);
     }
 }

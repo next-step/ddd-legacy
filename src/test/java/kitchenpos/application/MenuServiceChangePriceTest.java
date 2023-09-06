@@ -1,5 +1,9 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_MENU_GROUP_NAME;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_MENU_NAME;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_MENU_PRICE;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_PRODUCT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -24,12 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class MenuServiceChangePriceTest extends MenuTestSetup {
-
-    private static final BigDecimal TEST_PRICE = BigDecimal.valueOf(1_000L);
-    private static final String TEST_MENU_NAME = "dummyMenuName";
-    private static final String TEST_PRODUCT_NAME = "dummyProductName";
-    private static final String TEST_MENU_GROUP_NAME = "dummyMenuGroup";
+class MenuServiceChangePriceTest extends MenuServiceTestRequestUtils {
 
     @Mock
     private PurgomalumClient mockClient;
@@ -55,7 +54,7 @@ class MenuServiceChangePriceTest extends MenuTestSetup {
     void changePrice_success() {
         // given
         final Product product = productRepository.save(
-            createProductRequest(TEST_PRODUCT_NAME, TEST_PRICE));
+            createProductRequest(TEST_PRODUCT_NAME, TEST_MENU_PRICE));
         final MenuGroup menuGroup = menuGroupRepository.save(
             createMenuGroupRequest(TEST_MENU_GROUP_NAME));
         final Menu menu = menuRepository.save(create(product, menuGroup));
@@ -94,7 +93,8 @@ class MenuServiceChangePriceTest extends MenuTestSetup {
     @Test
     void changePrice_invalid_price_2() {
         // given
-        final Product product = productRepository.save(createProductRequest("product", TEST_PRICE));
+        final Product product = productRepository.save(createProductRequest("product",
+            TEST_MENU_PRICE));
         final MenuGroup menuGroup = menuGroupRepository.save(
             createMenuGroupRequest(TEST_MENU_GROUP_NAME));
         final Menu menu = menuRepository.save(create(product, menuGroup));
@@ -106,7 +106,7 @@ class MenuServiceChangePriceTest extends MenuTestSetup {
     }
 
     private Menu create(final Product product, final MenuGroup menuGroup) {
-        return createMenuRequest(TEST_MENU_NAME, TEST_PRICE,
+        return createMenuRequest(TEST_MENU_NAME, TEST_MENU_PRICE,
             ImmutableList.of(createMenuProductRequest(product, 1)), menuGroup, false);
     }
 }

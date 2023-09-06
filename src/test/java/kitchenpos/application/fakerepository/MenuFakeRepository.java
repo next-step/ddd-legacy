@@ -40,6 +40,7 @@ public class MenuFakeRepository implements MenuRepository {
     @Override
     public List<Menu> findAllByIdIn(final List<UUID> ids) {
         return ids.stream()
+            .filter(id -> menus.get(id) != null)
             .map(menus::get)
             .collect(Collectors.toUnmodifiableList());
     }

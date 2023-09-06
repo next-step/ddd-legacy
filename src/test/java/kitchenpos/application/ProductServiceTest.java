@@ -1,5 +1,7 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_PRODUCT_NAME;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_PRODUCT_PRICE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.doReturn;
@@ -28,10 +30,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ProductServiceTest extends MenuTestSetup {
-
-    private static final String TEST_NAME = "dummyName";
-    private static final BigDecimal TEST_PRICE = BigDecimal.valueOf(1_000L);
+class ProductServiceTest extends MenuServiceTestRequestUtils {
 
     @Mock
     private PurgomalumClient mockClient;
@@ -53,7 +52,7 @@ class ProductServiceTest extends MenuTestSetup {
     void create_success() {
 
         // given
-        final Product request = createProductRequest(TEST_NAME, TEST_PRICE);
+        final Product request = createProductRequest(TEST_PRODUCT_NAME, TEST_PRODUCT_PRICE);
 
         // when
         final Product actual = service.create(request);
@@ -69,7 +68,7 @@ class ProductServiceTest extends MenuTestSetup {
     void create_invalid_price(final BigDecimal value) {
         // when & then
         assertThatThrownBy(
-            () -> service.create(createProductRequest(TEST_NAME, value)))
+            () -> service.create(createProductRequest(TEST_PRODUCT_NAME, value)))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -79,7 +78,7 @@ class ProductServiceTest extends MenuTestSetup {
     void create_invalid_name_1() {
 
         // given
-        final Product nullName = createProductRequest(null, TEST_PRICE);
+        final Product nullName = createProductRequest(null, TEST_PRODUCT_PRICE);
 
         // when & then
         assertThatThrownBy(() -> service.create(nullName))
@@ -91,7 +90,7 @@ class ProductServiceTest extends MenuTestSetup {
     void create_invalid_name_2() {
 
         // given
-        final Product profanityName = createProductRequest("비속어", TEST_PRICE);
+        final Product profanityName = createProductRequest("비속어", TEST_PRODUCT_PRICE);
         doReturn(true)
             .when(mockClient)
             .containsProfanity(profanityName.getName());
@@ -125,8 +124,9 @@ class ProductServiceTest extends MenuTestSetup {
     @Test
     void changePrice_invalid_price() {
         // given
-        final Product nullPrice = createProductRequest(TEST_NAME, null);
-        final Product negativePrice = createProductRequest(TEST_NAME, BigDecimal.valueOf(-1L));
+        final Product nullPrice = createProductRequest(TEST_PRODUCT_NAME, null);
+        final Product negativePrice = createProductRequest(TEST_PRODUCT_NAME,
+            BigDecimal.valueOf(-1L));
 
         // when & then
         assertThatThrownBy(() -> service.changePrice(UUID.randomUUID(), nullPrice));
@@ -138,7 +138,7 @@ class ProductServiceTest extends MenuTestSetup {
     @Test
     void changePrice_invalid_productId() {
         // given
-        final Product request = createProductRequest(TEST_NAME, TEST_PRICE);
+        final Product request = createProductRequest(TEST_PRODUCT_NAME, TEST_PRODUCT_PRICE);
 
         // when & then
         assertThatThrownBy(() -> service.changePrice(UUID.randomUUID(), request))
@@ -150,12 +150,12 @@ class ProductServiceTest extends MenuTestSetup {
     void changePrice_success_with_menu_display() {
         // given
         final Product product = productRepository.save(
-            createProductRequest(TEST_NAME, BigDecimal.valueOf(3_000L)));
+            createProductRequest(TEST_PRODUCT_NAME, BigDecimal.valueOf(3_000L)));
         menuRepository.save(createMenuHasOneMenuProduct(BigDecimal.valueOf(1_000L), product));
 
         // when
         service.changePrice(product.getId(),
-            createProductRequest(TEST_NAME, BigDecimal.valueOf(500L)));
+            createProductRequest(TEST_PRODUCT_NAME, BigDecimal.valueOf(500L)));
 
         // then
         final Menu actual = menuRepository.findAllByProductId(product.getId()).get(0);

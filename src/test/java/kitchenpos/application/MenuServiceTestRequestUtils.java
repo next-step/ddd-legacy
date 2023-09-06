@@ -9,7 +9,7 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 
-public abstract class MenuTestSetup {
+public abstract class MenuServiceTestRequestUtils {
 
     protected Product createProductRequest(final String name, final BigDecimal price) {
         final Product product = new Product();

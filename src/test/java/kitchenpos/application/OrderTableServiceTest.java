@@ -1,49 +1,26 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_DELIVERY_ADDRESS;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_ORDER_DATE_TIME;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_ORDER_TABLE_NAME;
+import static kitchenpos.application.constant.KitchenposTestConst.TEST_ORDER_TABLE_NUMBER_OF_GUEST;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.google.common.collect.ImmutableList;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import kitchenpos.application.fakerepository.OrderFakeRepository;
-import kitchenpos.application.fakerepository.OrderTableFakeRepository;
 import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-class OrderTableServiceTest extends OrderTestSetup {
-
-    private static final String TEST_NAME = "tableName";
-    private static final int TEST_NUMBER_OF_GUEST = 2;
-    private static final String TEST_DELIVERY_ADDRESS = "경기도 성남시 분당구";
-    private static final LocalDateTime TEST_ORDER_DATE_TIME
-        = LocalDateTime.of(2023, 9, 5, 10, 0, 0);
-
-    private OrderTableRepository orderTableRepository;
-    private OrderRepository orderRepository;
-
-    private OrderTableService sut;
-
-    @BeforeEach
-    void setUp() {
-
-        orderTableRepository = new OrderTableFakeRepository();
-        orderRepository = new OrderFakeRepository();
-
-        sut = new OrderTableService(orderTableRepository, orderRepository);
-    }
-
+class OrderTableServiceTest extends OrderTableServiceTestSetup {
 
     @DisplayName("orderTable이 없으면 예외를 발생시킨다")
     @Test
@@ -69,7 +46,8 @@ class OrderTableServiceTest extends OrderTestSetup {
     }
 
     private OrderTable create(final boolean occupied) {
-        return createOrderTableRequest(TEST_NAME, TEST_NUMBER_OF_GUEST, occupied);
+        return createOrderTableRequest(TEST_ORDER_TABLE_NAME,
+            TEST_ORDER_TABLE_NUMBER_OF_GUEST, occupied);
     }
 
     @DisplayName("orderTable이 없으면 예외를 발생시킨다")
@@ -87,7 +65,8 @@ class OrderTableServiceTest extends OrderTestSetup {
 
         // given
         final OrderTable orderTable = orderTableRepository.save(
-            createOrderTableRequest(TEST_NAME, TEST_NUMBER_OF_GUEST, true));
+            createOrderTableRequest(TEST_ORDER_TABLE_NAME,
+                TEST_ORDER_TABLE_NUMBER_OF_GUEST, true));
         orderRepository.save(create(orderTable, OrderStatus.SERVED));
 
         // when & then
@@ -107,7 +86,7 @@ class OrderTableServiceTest extends OrderTestSetup {
 
         // given
         final OrderTable orderTable = orderTableRepository.save(
-            createOrderTableRequest(TEST_NAME, TEST_NUMBER_OF_GUEST, true));
+            createOrderTableRequest(TEST_ORDER_TABLE_NAME, TEST_ORDER_TABLE_NUMBER_OF_GUEST, true));
         orderRepository.save(create(orderTable, OrderStatus.COMPLETED));
 
         // when
@@ -123,7 +102,7 @@ class OrderTableServiceTest extends OrderTestSetup {
     @CsvSource("dummyName1,dummyName2,dummyName3")
     void findAll_orderTable을_모두_반환한다(final String dummy1, final String dummy2,
         final String dummy3) {
-        
+
         // given
         final OrderTable orderTable1 = orderTableRepository.save(create(dummy1));
         final OrderTable orderTable2 = orderTableRepository.save(create(dummy2));
@@ -139,6 +118,6 @@ class OrderTableServiceTest extends OrderTestSetup {
     }
 
     private OrderTable create(final String name) {
-        return createOrderTableRequest(name, TEST_NUMBER_OF_GUEST, true);
+        return createOrderTableRequest(name, TEST_ORDER_TABLE_NUMBER_OF_GUEST, true);
     }
 }

@@ -21,6 +21,7 @@ public class ProductFakeRepository implements ProductRepository {
     @Override
     public List<Product> findAllByIdIn(final List<UUID> ids) {
         return ids.stream()
+            .filter(id -> products.get(id) != null)
             .map(products::get)
             .collect(Collectors.toList());
     }
