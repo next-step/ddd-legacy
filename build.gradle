@@ -24,6 +24,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql'
     runtimeOnly 'mysql:mysql-connector-java'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.rest-assured:rest-assured'
     testRuntimeOnly 'com.h2database:h2'
 }
 
