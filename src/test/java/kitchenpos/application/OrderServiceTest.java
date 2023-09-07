@@ -2,7 +2,6 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import java.util.Collections;
@@ -22,6 +21,7 @@ import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.infra.KitchenridersClient;
 import kitchenpos.repository.MenuFakeRepository;
+import kitchenpos.repository.OrderFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -37,7 +37,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
-    @Mock
     private OrderRepository orderRepository;
 
     private MenuRepository menuRepository;
@@ -52,6 +51,7 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
+        orderRepository = new OrderFakeRepository();
         menuRepository = new MenuFakeRepository();
 
         sut = new OrderService(
@@ -71,8 +71,6 @@ class OrderServiceTest {
             // given
             Menu menu = menuRepository.save(MenuFixture.create());
             Order order = OrderFixture.createDelivery(menu);
-
-            given(orderRepository.save(any(Order.class))).willReturn(order);
 
             // when
             Order actual = sut.create(order);
@@ -174,10 +172,8 @@ class OrderServiceTest {
         @Test
         void testAccept() {
             // given
-            Order order = OrderFixture.createDelivery();
-            Menu menu = MenuFixture.create();
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Menu menu = menuRepository.save(MenuFixture.create());
+            Order order = orderRepository.save(OrderFixture.createDelivery(menu));
 
             // when
             Order actual = sut.accept(order.getId());
@@ -191,9 +187,7 @@ class OrderServiceTest {
         @MethodSource
         void testAcceptWhenOrderStatusIsNotAccepted(OrderStatus orderStatus) {
             // given
-            Order order = OrderFixture.createDelivery(orderStatus);
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createDelivery(orderStatus));
 
             // when // then
             assertThatThrownBy(() -> sut.accept(order.getId()))
@@ -219,9 +213,7 @@ class OrderServiceTest {
         @Test
         void testServe() {
             // given
-            Order order = OrderFixture.createDelivery(OrderStatus.ACCEPTED);
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createDelivery(OrderStatus.ACCEPTED));
 
             // when
             Order actual = sut.serve(order.getId());
@@ -235,9 +227,7 @@ class OrderServiceTest {
         @MethodSource
         void testServeWhenOrderStatusIsNotAccepted(OrderStatus orderStatus) {
             // given
-            Order order = OrderFixture.createDelivery(orderStatus);
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createDelivery(orderStatus));
 
             // when // then
             assertThatThrownBy(() -> sut.serve(order.getId()))
@@ -258,9 +248,7 @@ class OrderServiceTest {
         @Test
         void testServeWhenNotExistOrder() {
             // given
-            Order order = OrderFixture.createDelivery(OrderStatus.ACCEPTED);
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createDelivery(OrderStatus.ACCEPTED));
 
             // when
             Order actual = sut.serve(order.getId());
@@ -278,9 +266,7 @@ class OrderServiceTest {
         @Test
         void testStartDelivery() {
             // given
-            Order order = OrderFixture.createDelivery(OrderStatus.SERVED);
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createDelivery(OrderStatus.SERVED));
 
             // when
             Order actual = sut.startDelivery(order.getId());
@@ -293,9 +279,7 @@ class OrderServiceTest {
         @Test
         void testStartDeliveryWhenNotDeliveryOrder() {
             // given
-            Order order = OrderFixture.createEatIn(OrderTableFixture.create());
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createEatIn(OrderTableFixture.create()));
 
             // when // then
             assertThatThrownBy(() -> sut.startDelivery(order.getId()))
@@ -307,9 +291,7 @@ class OrderServiceTest {
         @MethodSource
         void testStartDeliveryWhenOrderStatusIsNotDelivery(OrderStatus orderStatus) {
             // given
-            Order order = OrderFixture.createDelivery(orderStatus);
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createDelivery(orderStatus));
 
             // when // then
             assertThatThrownBy(() -> sut.startDelivery(order.getId()))
@@ -335,9 +317,7 @@ class OrderServiceTest {
         @Test
         void testCompleteDelivery() {
             // given
-            Order order = OrderFixture.createDelivery(OrderStatus.DELIVERING);
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createDelivery(OrderStatus.DELIVERING));
 
             // when
             Order actual = sut.completeDelivery(order.getId());
@@ -350,9 +330,7 @@ class OrderServiceTest {
         @Test
         void testCompleteDeliveryWhenNotDeliveryOrder() {
             // given
-            Order order = OrderFixture.createEatIn(OrderTableFixture.create());
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createEatIn(OrderTableFixture.create()));
 
             // when // then
             assertThatThrownBy(() -> sut.startDelivery(order.getId()))
@@ -364,9 +342,7 @@ class OrderServiceTest {
         @MethodSource
         void testCompleteDeliveryWhenOrderStatusIsNotDelivery(OrderStatus orderStatus) {
             // given
-            Order order = OrderFixture.createDelivery(orderStatus);
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createDelivery(orderStatus));
 
             // when // then
             assertThatThrownBy(() -> sut.startDelivery(order.getId()))
@@ -391,9 +367,7 @@ class OrderServiceTest {
         @Test
         void testDeliveryOrderComplete() {
             // given
-            Order order = OrderFixture.createDelivery(OrderStatus.DELIVERED);
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createDelivery(OrderStatus.DELIVERED));
 
             // when
             Order actual = sut.complete(order.getId());
@@ -406,9 +380,7 @@ class OrderServiceTest {
         @Test
         void testEatInOrderComplete() {
             // given
-            Order order = OrderFixture.createEatIn(OrderStatus.SERVED);
-
-            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            Order order = orderRepository.save(OrderFixture.createEatIn(OrderStatus.SERVED));
 
             // when
             Order actual = sut.complete(order.getId());
@@ -425,10 +397,8 @@ class OrderServiceTest {
         @Test
         void testFindAll() {
             // given
-            Order deliveryOrder = OrderFixture.createDelivery();
-            Order eatInOrder = OrderFixture.createEatIn(OrderTableFixture.create());
-
-            given(orderRepository.findAll()).willReturn(List.of(deliveryOrder, eatInOrder));
+            Order deliveryOrder = orderRepository.save(OrderFixture.createDelivery());
+            Order eatInOrder = orderRepository.save(OrderFixture.createEatIn(OrderTableFixture.create()));
 
             // when
             List<Order> actual = sut.findAll();

@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
+import kitchenpos.repository.OrderFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,13 +31,13 @@ class OrderTableServiceTest {
     @Mock
     private OrderTableRepository orderTableRepository;
 
-    @Mock
     private OrderRepository orderRepository;
 
     private OrderTableService sut;
 
     @BeforeEach
     void setUp() {
+        orderRepository = new OrderFakeRepository();
         sut = new OrderTableService(orderTableRepository, orderRepository);
     }
 
@@ -113,7 +114,6 @@ class OrderTableServiceTest {
             OrderTable orderTable = OrderTableFixture.createEmpty();
 
             given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
-            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).willReturn(false);
 
             // when
             OrderTable actual = sut.clear(orderTable.getId());
@@ -123,14 +123,14 @@ class OrderTableServiceTest {
             assertThat(actual.getNumberOfGuests()).isZero();
         }
 
-        @DisplayName("완료된 주문이 없는 경우, 주문 테이블을 초기화할 수 없다")
+        @DisplayName("완료된 주문이 있는 경우, 주문 테이블을 초기화할 수 없다")
         @Test
         void testClearWhenCompletedOrderNotExist() {
             // given
-            OrderTable orderTable = OrderTableFixture.createEmpty();
+            OrderTable orderTable = OrderTableFixture.createOccupied(3);
+            orderRepository.save(OrderFixture.createEatIn(orderTable));
 
             given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
-            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).willReturn(true);
 
             // when // then
             assertThatThrownBy(() -> sut.clear(orderTable.getId()))
