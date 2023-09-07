@@ -9,20 +9,28 @@ public class ProductFixture {
     private ProductFixture() {
     }
 
-    public static Product create(UUID id, String name, int price) {
+    public static Product create(UUID id, String name, BigDecimal price) {
         Product product = new Product();
         product.setId(id);
         product.setName(name);
-        product.setPrice(BigDecimal.valueOf(price));
+        product.setPrice(price);
 
         return product;
+    }
+
+    public static Product create(BigDecimal price) {
+        return create(UUID.randomUUID(), "testProduct", price);
+    }
+
+    public static Product create(UUID id, String name, Integer price) {
+        return create(id, name, BigDecimal.valueOf(price));
     }
 
     public static Product create(String name) {
         return create(UUID.randomUUID(), name, 15_000);
     }
 
-    public static Product create(int price) {
+    public static Product create(Integer price) {
         return create(UUID.randomUUID(), "testProductName", price);
     }
 

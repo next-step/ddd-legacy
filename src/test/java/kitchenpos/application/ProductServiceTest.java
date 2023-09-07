@@ -4,10 +4,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.repository.MenuFakeRepository;
@@ -18,6 +23,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -76,7 +82,19 @@ class ProductServiceTest {
         @Test
         void testCreateWhenProductNameIsNull() {
             // given
-            var request = ProductFixture.create(null);
+            var request = ProductFixture.create((String) null);
+
+            // when // then
+            assertThatThrownBy(() -> sut.create(request))
+                .isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("상품의 가격이 0미만이면 상품을 신규 등록할 수 없다.")
+        @ParameterizedTest
+        @ValueSource(ints = {-10_000, -1_000})
+        void testCreateWhenProductPriceIsNegative(int productPrice) {
+            // given
+            var request = ProductFixture.create(productPrice);
 
             // when // then
             assertThatThrownBy(() -> sut.create(request))
@@ -85,8 +103,8 @@ class ProductServiceTest {
 
         @DisplayName("상품의 가격은 null일 수 없다 상품을 신규 등록할 수 없다.")
         @ParameterizedTest
-        @ValueSource(ints = {-10_000, -1_000})
-        void testCreateWhenProductPriceIsNegative(int productPrice) {
+        @NullSource
+        void testCreateWhenProductPriceIsNull(BigDecimal productPrice) {
             // given
             var request = ProductFixture.create(productPrice);
 
@@ -124,6 +142,37 @@ class ProductServiceTest {
             // when // then
             assertThatThrownBy(() -> sut.changePrice(request.getId(), request))
                 .isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("존재하지 않는 상품의 가격은 수정할 수 없다")
+        @Test
+        void testChangePriceWhenProductIdIsNotExist() {
+            // given
+            var request = ProductFixture.create();
+
+            // when // then
+            assertThatThrownBy(() -> sut.changePrice(request.getId(), request))
+                .isExactlyInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("상품의 가격을 수정할 때, 상품이 포함된 메뉴 가격이 상품 가격의 합보다 비싸면 메뉴는 숨김처리된다")
+        @Test
+        void testChangePriceWhenMenuWithChangedProductIsHide() {
+            // given
+            var product = productRepository.save(ProductFixture.create(10_000));
+            Menu menu = menuRepository.save(MenuFixture.create(12_000, List.of(MenuProductFixture.create(product, 1))));
+
+            var request = ProductFixture.create(5_000);
+            // when
+            Product actual = sut.changePrice(product.getId(), request);
+
+            // then
+            Menu findMenu = menuRepository.findById(menu.getId()).get();
+
+            assertThat(actual.getId()).isEqualTo(product.getId());
+            assertThat(actual.getPrice()).isEqualTo(product.getPrice());
+            assertThat(actual.getName()).isEqualTo(product.getName());
+            assertThat(findMenu.isDisplayed()).isFalse();
         }
     }
 
