@@ -2,39 +2,27 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 
-import java.util.ArrayList;
 import java.util.List;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.fixture.MenuGroupFixture;
+import kitchenpos.repository.MenuGroupFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
 
-    /*
-    다양한 케이스에 대해서 테스트 코드를 만들어보면 어떨까요?
-    ( 실패하는 경우, 성공하는 경우, 구간별로 실패하는 경우 )
-
-     */
     private MenuGroupService sut;
 
-    @Mock
-    private MenuGroupRepository menuGroupRepository;
+    private MenuGroupFakeRepository menuGroupRepository;
 
     @BeforeEach
     void setUp() {
+        menuGroupRepository = new MenuGroupFakeRepository();
         sut = new MenuGroupService(menuGroupRepository);
     }
 
@@ -47,8 +35,6 @@ class MenuGroupServiceTest {
             // given
             String menuName = "test menu name";
             var expected = MenuGroupFixture.create(menuName);
-
-            given(menuGroupRepository.save(Mockito.any(MenuGroup.class))).willReturn(expected);
 
             // when
             MenuGroup actual = sut.create(expected);
@@ -79,20 +65,19 @@ class MenuGroupServiceTest {
         @Test
         void testFindAll() {
             // given
-            var menuGroups = List.of(
-                MenuGroupFixture.create("menuGroup1"),
-                MenuGroupFixture.create("menuGroup2")
-            );
+            MenuGroup menuGroup1 = MenuGroupFixture.create("menuGroup1");
+            menuGroupRepository.save(menuGroup1);
 
-            given(menuGroupRepository.findAll()).willReturn(menuGroups);
+            MenuGroup menuGroup2 = MenuGroupFixture.create("menuGroup2");
+            menuGroupRepository.save(menuGroup2);
 
             // when
             List<MenuGroup> actual = sut.findAll();
 
             // then
-            assertThat(actual.size()).isEqualTo(menuGroups.size());
-            assertThat(actual.get(0)).usingRecursiveComparison().isEqualTo(menuGroups.get(0));
-            assertThat(actual.get(1)).usingRecursiveComparison().isEqualTo(menuGroups.get(1));
+            assertThat(actual.size()).isEqualTo(2);
+            assertThat(actual.get(0)).usingRecursiveComparison().isEqualTo(menuGroup1);
+            assertThat(actual.get(1)).usingRecursiveComparison().isEqualTo(menuGroup2);
         }
     }
 }
