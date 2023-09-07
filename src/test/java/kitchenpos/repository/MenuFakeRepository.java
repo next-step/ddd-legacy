@@ -23,7 +23,7 @@ public class MenuFakeRepository implements MenuRepository {
     @Override
     public List<Menu> findAllByProductId(UUID productId) {
         return menus.stream()
-            .filter(it -> it.getMenuProducts().stream().anyMatch(menuProduct -> menuProduct.getProductId().equals(it)))
+            .filter(menu -> menu.getMenuProducts().stream().anyMatch(menuProduct -> menuProduct.getProductId().equals(productId)))
             .collect(Collectors.toList());
     }
 
