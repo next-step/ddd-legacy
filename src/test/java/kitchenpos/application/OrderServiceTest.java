@@ -149,7 +149,7 @@ class OrderServiceTest {
         void testCreateEatInOrderWhenNotExistOrderTable() {
             // given
             Menu menu = menuRepository.save(MenuFixture.create());
-            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.create());
+            OrderTable orderTable = OrderTableFixture.create();
             Order order = OrderFixture.createEatIn(orderTable, menu);
 
             // when // then
