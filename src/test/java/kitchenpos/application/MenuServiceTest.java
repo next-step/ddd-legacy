@@ -24,6 +24,7 @@ import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.repository.MenuGroupFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -42,13 +43,14 @@ class MenuServiceTest {
     https://jessyt.tistory.com/152
     https://velog.io/@vov3616/TDD-Fake-vs-Mock
      */
+
+    // TODO(경록) : 페이크 객체로 변경하는 중!!  (MenuGroupRepository만 현재 완료!)  --> 생성한 페이크 객체로 교체하는 작업 진행!
     private MenuService sut;
 
     @Mock
     private MenuRepository menuRepository;
 
-    @Mock
-    private MenuGroupRepository menuGroupRepository;
+    private MenuGroupFakeRepository menuGroupRepository;
 
     @Mock
     private ProductRepository productRepository;
@@ -58,6 +60,7 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
+        menuGroupRepository = new MenuGroupFakeRepository();
         sut = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
 

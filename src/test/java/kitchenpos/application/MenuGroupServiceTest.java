@@ -5,6 +5,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import java.util.List;
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.repository.MenuGroupFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +19,7 @@ class MenuGroupServiceTest {
 
     private MenuGroupService sut;
 
-    private MenuGroupFakeRepository menuGroupRepository;
+    private MenuGroupRepository menuGroupRepository;
 
     @BeforeEach
     void setUp() {
