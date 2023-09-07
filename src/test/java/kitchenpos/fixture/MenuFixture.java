@@ -27,8 +27,19 @@ public class MenuFixture {
         menu.setMenuGroup(menuGroup);
         menu.setDisplayed(displayed);
         menu.setMenuProducts(menuProducts);
+        menu.setMenuGroupId(menuGroup.getId());
 
         return menu;
+    }
+
+    public static Menu create(int price, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+        return create(
+            UUID.randomUUID(), "testMenu",
+            BigDecimal.valueOf(price),
+            menuGroup,
+            true,
+            menuProducts
+        );
     }
 
     public static Menu create(int price, List<MenuProduct> menuProducts) {
@@ -39,6 +50,10 @@ public class MenuFixture {
             true,
             menuProducts
         );
+    }
+
+    public static Menu create(MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+        return create(10_000, menuGroup, menuProducts);
     }
 
     public static Menu create(List<MenuProduct> menuProducts) {

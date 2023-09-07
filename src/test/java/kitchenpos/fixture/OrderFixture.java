@@ -16,17 +16,29 @@ public class OrderFixture {
     }
 
     public static Order createDelivery() {
-        return createDelivery("서울 서초구 반포대로 310-6 103동 1401호");
+        return createDelivery("서울 서초구 반포대로 310-6 103동 1401호", MenuFixture.create());
     }
 
-    public static Order createDelivery(String deliveryAddress) {
+    public static Order createDelivery(Menu menu) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setOrderDateTime(LocalDateTime.of(2023, 9, 4, 2, 0));
+        order.setDeliveryAddress("서울 서초구 반포대로 310-6 103동 1401호");
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.WAITING);
+        order.setOrderLineItems(List.of(OrderLineItemFixture.create(menu)));
+
+        return order;
+    }
+
+    public static Order createDelivery(String deliveryAddress, Menu menu) {
         Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setOrderDateTime(LocalDateTime.of(2023, 9, 4, 2, 0));
         order.setDeliveryAddress(deliveryAddress);
         order.setType(OrderType.DELIVERY);
         order.setStatus(OrderStatus.WAITING);
-        order.setOrderLineItems(List.of(OrderLineItemFixture.create()));
+        order.setOrderLineItems(List.of(OrderLineItemFixture.create(menu)));
 
         return order;
     }
@@ -44,12 +56,16 @@ public class OrderFixture {
     }
 
     public static Order createEatIn(OrderTable orderTable) {
+        return createEatIn(orderTable, MenuFixture.create());
+    }
+
+    public static Order createEatIn(OrderTable orderTable, Menu menu) {
         Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setOrderDateTime(LocalDateTime.of(2023, 9, 4, 2, 0));
         order.setType(OrderType.EAT_IN);
         order.setStatus(OrderStatus.WAITING);
-        order.setOrderLineItems(List.of(OrderLineItemFixture.create()));
+        order.setOrderLineItems(List.of(OrderLineItemFixture.create(menu)));
         order.setOrderTable(orderTable);
         order.setOrderTableId(orderTable.getId());
 
@@ -79,18 +95,6 @@ public class OrderFixture {
         order.setType(OrderType.DELIVERY);
         order.setStatus(OrderStatus.WAITING);
         order.setOrderLineItems(orderLineItems);
-
-        return order;
-    }
-
-    public static Order createDelivery(Menu menu) {
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setOrderDateTime(LocalDateTime.of(2023, 9, 4, 2, 0));
-        order.setDeliveryAddress("서울 서초구 반포대로 310-6 103동 1401호");
-        order.setType(OrderType.DELIVERY);
-        order.setStatus(OrderStatus.WAITING);
-        order.setOrderLineItems(List.of(OrderLineItemFixture.create(menu)));
 
         return order;
     }

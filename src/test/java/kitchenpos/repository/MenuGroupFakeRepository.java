@@ -15,7 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 
 public class MenuGroupFakeRepository implements MenuGroupRepository {
+
     private final List<MenuGroup> menuGroups = new ArrayList<>();
+
     @Override
     public List<MenuGroup> findAll() {
         return Collections.unmodifiableList(menuGroups);
@@ -79,7 +81,9 @@ public class MenuGroupFakeRepository implements MenuGroupRepository {
 
     @Override
     public Optional<MenuGroup> findById(UUID uuid) {
-        return Optional.empty();
+        return menuGroups.stream()
+            .filter(it -> uuid.equals(it.getId()))
+            .findFirst();
     }
 
     @Override

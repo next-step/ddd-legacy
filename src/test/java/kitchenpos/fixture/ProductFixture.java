@@ -25,6 +25,7 @@ public class ProductFixture {
     public static Product create(int price) {
         return create(UUID.randomUUID(), "testProductName", price);
     }
+
     public static Product create() {
         return create("testProductName");
     }

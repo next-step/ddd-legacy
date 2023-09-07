@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,6 +23,7 @@ import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.repository.MenuFakeRepository;
 import kitchenpos.repository.MenuGroupFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -37,20 +37,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
-    /*
-    Mock를 사용해보셨다면 Fake 객체를 활용해보는건 어떨까요~!?
 
-    https://jessyt.tistory.com/152
-    https://velog.io/@vov3616/TDD-Fake-vs-Mock
-     */
-
-    // TODO(경록) : 페이크 객체로 변경하는 중!!  (MenuGroupRepository만 현재 완료!)  --> 생성한 페이크 객체로 교체하는 작업 진행!
     private MenuService sut;
 
-    @Mock
     private MenuRepository menuRepository;
 
-    private MenuGroupFakeRepository menuGroupRepository;
+    private MenuGroupRepository menuGroupRepository;
 
     @Mock
     private ProductRepository productRepository;
@@ -60,6 +52,7 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
+        menuRepository = new MenuFakeRepository();
         menuGroupRepository = new MenuGroupFakeRepository();
         sut = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
@@ -71,18 +64,28 @@ class MenuServiceTest {
         @Test
         void testCreate() {
             // given
-            Menu request = MenuFixture.create();
+            MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.create());
 
-            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(MenuGroupFixture.create()));
-            given(productRepository.findAllByIdIn(any(List.class))).willReturn(List.of(ProductFixture.create()));
-            given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(ProductFixture.create()));
-            given(menuRepository.save(any(Menu.class))).willReturn(request);
+            Product product = ProductFixture.create();
+            MenuProduct menuProduct = MenuProductFixture.create(product, 1);
+
+            Menu request = MenuFixture.create(menuGroup, List.of(menuProduct));
+
+            given(productRepository.findAllByIdIn(any(List.class))).willReturn(List.of(product));
+            given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(product));
 
             // when
             Menu actual = sut.create(request);
 
             // then
-            assertThat(actual).isEqualTo(request);
+            Menu expected = menuRepository.findById(actual.getId()).get();
+
+            assertThat(actual.getId()).isEqualTo(expected.getId());
+            assertThat(actual.getName()).isEqualTo(expected.getName());
+            assertThat(actual.getPrice()).isEqualTo(expected.getPrice());
+            assertThat(actual.getMenuGroupId()).isEqualTo(expected.getMenuGroupId());
+            assertThat(actual.getMenuGroup().getName()).isEqualTo(expected.getMenuGroup().getName());
+            assertThat(actual.getMenuProducts().size()).isEqualTo(expected.getMenuProducts().size());
         }
 
         @DisplayName("메뉴는 0원 미만의 가격으로 등록할 수 없다")
@@ -100,8 +103,10 @@ class MenuServiceTest {
         @Test
         void testCreateWhenMenuProductsIsEmpty() {
             // given
-            Menu request = MenuFixture.create(Collections.emptyList());
-            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(MenuGroupFixture.create()));
+            MenuGroup menuGroup = MenuGroupFixture.create();
+            menuGroupRepository.save(menuGroup);
+
+            Menu request = MenuFixture.create(menuGroup, Collections.emptyList());
 
             // when // then
             assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);
@@ -113,9 +118,11 @@ class MenuServiceTest {
             // given
             Product product = ProductFixture.create(10_000);
             MenuProduct menuProduct = MenuProductFixture.create(product, 2);
-            Menu request = MenuFixture.create(22_000, List.of(menuProduct));
+            MenuGroup menuGroup = MenuGroupFixture.create();
+            Menu request = MenuFixture.create(22_000, menuGroup, List.of(menuProduct));
 
-            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(MenuGroupFixture.create()));
+            menuGroupRepository.save(menuGroup);
+
             given(productRepository.findAllByIdIn(any(List.class))).willReturn(List.of(product));
             given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(product));
 
@@ -134,7 +141,7 @@ class MenuServiceTest {
             Menu menu = MenuFixture.create();
             int expectedPrice = 5_000;
 
-            given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+            menuRepository.save(menu);
 
             // when
             Menu actual = sut.changePrice(menu.getId(), MenuFixture.create(expectedPrice));
@@ -149,8 +156,6 @@ class MenuServiceTest {
             // given
             Menu menu = MenuFixture.create();
             int expectedPrice = 5_000;
-
-            given(menuRepository.findById(menu.getId())).willReturn(Optional.empty());
 
             // when // then
             assertThatThrownBy(() -> sut.changePrice(menu.getId(), MenuFixture.create(expectedPrice)))
@@ -179,7 +184,7 @@ class MenuServiceTest {
             // given
             Menu menu = MenuFixture.create();
 
-            given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+            menuRepository.save(menu);
 
             // when
             Menu actual = sut.display(menu.getId());
@@ -194,7 +199,7 @@ class MenuServiceTest {
             // given
             Menu menu = MenuFixture.create();
 
-            given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+            menuRepository.save(menu);
 
             // when
             Menu actual = sut.hide(menu.getId());
@@ -211,17 +216,18 @@ class MenuServiceTest {
         @Test
         void testFindAll() {
             // given
-            List<Menu> expected = List.of(MenuFixture.create("testMenu1"), MenuFixture.create("testMenu2"));
-
-            given(menuRepository.findAll()).willReturn(expected);
+            Menu menu1 = MenuFixture.create("testMenu1");
+            Menu menu2 = MenuFixture.create("testMenu2");
+            menuRepository.save(menu1);
+            menuRepository.save(menu2);
 
             // when
             List<Menu> actual = sut.findAll();
 
             // then
-            assertThat(actual.size()).isEqualTo(expected.size());
-            assertThat(actual.get(0).getId()).isEqualTo(expected.get(0).getId());
-            assertThat(actual.get(1).getId()).isEqualTo(expected.get(1).getId());
+            assertThat(actual.size()).isEqualTo(2);
+            assertThat(actual.get(0).getId()).isEqualTo(menu1.getId());
+            assertThat(actual.get(1).getId()).isEqualTo(menu2.getId());
         }
     }
 }

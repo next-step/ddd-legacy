@@ -12,6 +12,7 @@ import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.repository.MenuFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +28,6 @@ class ProductServiceTest {
 
     private ProductService sut;
 
-    @Mock
     private MenuRepository menuRepository;
 
     @Mock
@@ -38,6 +38,7 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
+        menuRepository = new MenuFakeRepository();
         sut = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
@@ -104,7 +105,6 @@ class ProductServiceTest {
         void testChangePrice() {
             // given
             var request = ProductFixture.create(10_000);
-
             given(productRepository.findById(request.getId())).willReturn(Optional.of(request));
 
             // when
