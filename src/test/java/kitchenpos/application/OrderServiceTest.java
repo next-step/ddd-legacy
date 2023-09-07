@@ -27,8 +27,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.ArgumentsProvider;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -175,6 +180,7 @@ class OrderServiceTest {
         }
     }
 
+    @TestInstance(Lifecycle.PER_CLASS)
     @Nested
     class 주문_수락 {
 
@@ -219,6 +225,7 @@ class OrderServiceTest {
         }
     }
 
+    @TestInstance(Lifecycle.PER_CLASS)
     @Nested
     class 주문_서빙 {
 
@@ -277,6 +284,7 @@ class OrderServiceTest {
         }
     }
 
+    @TestInstance(Lifecycle.PER_CLASS)
     @Nested
     class 주문_배달_시작 {
 
@@ -333,6 +341,7 @@ class OrderServiceTest {
         }
     }
 
+    @TestInstance(Lifecycle.PER_CLASS)
     @Nested
     class 주문_배송완료 {
 
