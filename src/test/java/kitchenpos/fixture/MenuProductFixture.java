@@ -1,6 +1,5 @@
 package kitchenpos.fixture;
 
-import java.util.UUID;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 

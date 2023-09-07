@@ -3,7 +3,6 @@ package kitchenpos.domain.repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import kitchenpos.db.MenuJpaRepository;
 import kitchenpos.db.OrderJpaRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderRepository;

@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MenuGroupJpaRepository extends JpaRepository<MenuGroup, UUID> {
 
-    List<Menu> findAllByIdIn(List<UUID>  ids);
+    List<Menu> findAllByIdIn(List<UUID> ids);
 
     List<Menu> findAllByProductId(UUID productId);
 }
