@@ -2,15 +2,11 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -25,6 +21,7 @@ import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.repository.MenuFakeRepository;
 import kitchenpos.repository.MenuGroupFakeRepository;
+import kitchenpos.repository.ProductFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,7 +41,6 @@ class MenuServiceTest {
 
     private MenuGroupRepository menuGroupRepository;
 
-    @Mock
     private ProductRepository productRepository;
 
     @Mock
@@ -54,6 +50,7 @@ class MenuServiceTest {
     void setUp() {
         menuRepository = new MenuFakeRepository();
         menuGroupRepository = new MenuGroupFakeRepository();
+        productRepository = new ProductFakeRepository();
         sut = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
 
@@ -66,13 +63,10 @@ class MenuServiceTest {
             // given
             MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.create());
 
-            Product product = ProductFixture.create();
+            Product product = productRepository.save(ProductFixture.create());
             MenuProduct menuProduct = MenuProductFixture.create(product, 1);
 
             Menu request = MenuFixture.create(menuGroup, List.of(menuProduct));
-
-            given(productRepository.findAllByIdIn(any(List.class))).willReturn(List.of(product));
-            given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(product));
 
             // when
             Menu actual = sut.create(request);
@@ -118,13 +112,8 @@ class MenuServiceTest {
             // given
             Product product = ProductFixture.create(10_000);
             MenuProduct menuProduct = MenuProductFixture.create(product, 2);
-            MenuGroup menuGroup = MenuGroupFixture.create();
+            MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.create());
             Menu request = MenuFixture.create(22_000, menuGroup, List.of(menuProduct));
-
-            menuGroupRepository.save(menuGroup);
-
-            given(productRepository.findAllByIdIn(any(List.class))).willReturn(List.of(product));
-            given(productRepository.findById(any(UUID.class))).willReturn(Optional.of(product));
 
             // when // then
             assertThatThrownBy(() -> sut.create(request)).isExactlyInstanceOf(IllegalArgumentException.class);

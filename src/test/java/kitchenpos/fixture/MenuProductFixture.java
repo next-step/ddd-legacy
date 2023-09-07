@@ -16,9 +16,9 @@ public class MenuProductFixture {
     public static MenuProduct create(Product product, int quantity) {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setSeq(1L);
-        menuProduct.setProductId(UUID.randomUUID());
         menuProduct.setQuantity(quantity);
         menuProduct.setProduct(product);
+        menuProduct.setProductId(product.getId());
 
         return menuProduct;
     }

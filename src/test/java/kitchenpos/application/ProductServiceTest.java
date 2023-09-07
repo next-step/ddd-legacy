@@ -2,17 +2,16 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import java.util.List;
-import java.util.Optional;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.repository.MenuFakeRepository;
+import kitchenpos.repository.ProductFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -30,7 +29,6 @@ class ProductServiceTest {
 
     private MenuRepository menuRepository;
 
-    @Mock
     private ProductRepository productRepository;
 
     @Mock
@@ -38,6 +36,7 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
+        productRepository = new ProductFakeRepository();
         menuRepository = new MenuFakeRepository();
         sut = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
@@ -51,13 +50,13 @@ class ProductServiceTest {
             // given
             var request = ProductFixture.create();
             given(purgomalumClient.containsProfanity(request.getName())).willReturn(false);
-            given(productRepository.save(any(Product.class))).willReturn(request);
 
             // when
             Product actual = sut.create(request);
 
             // then
-            assertThat(actual).isEqualTo(request);
+            Product expected = productRepository.findById(actual.getId()).get();
+            assertThat(actual).isEqualTo(expected);
         }
 
         @DisplayName("상품명에 욕설이 포함되면 상품을 신규 등록할 수 없다.")
@@ -104,8 +103,7 @@ class ProductServiceTest {
         @Test
         void testChangePrice() {
             // given
-            var request = ProductFixture.create(10_000);
-            given(productRepository.findById(request.getId())).willReturn(Optional.of(request));
+            var request = productRepository.save(ProductFixture.create(10_000));
 
             // when
             Product actual = sut.changePrice(request.getId(), request);
@@ -134,15 +132,11 @@ class ProductServiceTest {
 
         @DisplayName("모든 상품을 조회한다")
         @Test
-        void testChangePriceWhenPriceIsNull() {
+        void testFindAll() {
             // given
-            var products = List.of(
-                ProductFixture.create("product1"),
-                ProductFixture.create("product2"),
-                ProductFixture.create("product3")
-            );
-
-            given(productRepository.findAll()).willReturn(products);
+            productRepository.save(ProductFixture.create("product1"));
+            productRepository.save(ProductFixture.create("product2"));
+            productRepository.save(ProductFixture.create("product3"));
 
             // when
             List<Product> actual = sut.findAll();
