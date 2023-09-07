@@ -2,12 +2,10 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.BDDMockito.given;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Stream;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
@@ -22,6 +20,7 @@ import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.infra.KitchenridersClient;
 import kitchenpos.repository.MenuFakeRepository;
 import kitchenpos.repository.OrderFakeRepository;
+import kitchenpos.repository.OrderTableFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -41,7 +40,6 @@ class OrderServiceTest {
 
     private MenuRepository menuRepository;
 
-    @Mock
     private OrderTableRepository orderTableRepository;
 
     @Mock
@@ -51,6 +49,7 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
+        orderTableRepository = new OrderTableFakeRepository();
         orderRepository = new OrderFakeRepository();
         menuRepository = new MenuFakeRepository();
 
@@ -79,8 +78,6 @@ class OrderServiceTest {
             assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
         }
 
-        // 튜플은 2개의 원소가 짝을 이뤄서 하나의 값을 가지는?  그거 아님?
-
         @Nested
         class 주문_유형별 {
 
@@ -100,11 +97,9 @@ class OrderServiceTest {
             @Test
             void testCreateEatInOrderWhenNotOccupiedOrderTable() {
                 // given
-                OrderTable orderTable = OrderTableFixture.createEmpty();
+                OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createEmpty());
                 Menu menu = menuRepository.save(MenuFixture.create());
                 Order order = OrderFixture.createEatIn(orderTable, menu);
-
-                given(orderTableRepository.findById(order.getOrderTableId())).willReturn(Optional.of(orderTable));
 
                 // when // then
                 assertThatThrownBy(() -> sut.create(order))
@@ -154,9 +149,8 @@ class OrderServiceTest {
         void testCreateEatInOrderWhenNotExistOrderTable() {
             // given
             Menu menu = menuRepository.save(MenuFixture.create());
-            Order order = OrderFixture.createEatIn(OrderTableFixture.create(), menu);
-
-            given(orderTableRepository.findById(order.getOrderTableId())).willReturn(Optional.empty());
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.create());
+            Order order = OrderFixture.createEatIn(orderTable, menu);
 
             // when // then
             assertThatThrownBy(() -> sut.create(order))

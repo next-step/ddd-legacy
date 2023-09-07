@@ -2,33 +2,26 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.repository.OrderFakeRepository;
+import kitchenpos.repository.OrderTableFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
 
-    @Mock
     private OrderTableRepository orderTableRepository;
 
     private OrderRepository orderRepository;
@@ -37,6 +30,7 @@ class OrderTableServiceTest {
 
     @BeforeEach
     void setUp() {
+        orderTableRepository = new OrderTableFakeRepository();
         orderRepository = new OrderFakeRepository();
         sut = new OrderTableService(orderTableRepository, orderRepository);
     }
@@ -50,13 +44,12 @@ class OrderTableServiceTest {
             // given
             OrderTable orderTable = OrderTableFixture.createEmpty();
 
-            given(orderTableRepository.save(any(OrderTable.class))).willReturn(orderTable);
-
             // when
             OrderTable actual = sut.create(orderTable);
 
             // then
-            assertThat(actual).isEqualTo(orderTable);
+            OrderTable expected = orderTableRepository.findById(actual.getId()).get();
+            assertThat(actual).isEqualTo(expected);
         }
 
         @DisplayName("빈 문자열이나 null인 이름으로는 주문 테이블을 등록할 수 없다")
@@ -79,9 +72,7 @@ class OrderTableServiceTest {
         @Test
         void testSit() {
             // given
-            OrderTable orderTable = OrderTableFixture.createEmpty();
-
-            given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createEmpty());
 
             // when
             OrderTable actual = sut.sit(orderTable.getId());
@@ -96,8 +87,6 @@ class OrderTableServiceTest {
             // given
             OrderTable orderTable = OrderTableFixture.createEmpty();
 
-            given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.empty());
-
             // when // then
             assertThatThrownBy(() -> sut.sit(orderTable.getId()))
                 .isExactlyInstanceOf(NoSuchElementException.class);
@@ -111,9 +100,7 @@ class OrderTableServiceTest {
         @Test
         void testClear() {
             // given
-            OrderTable orderTable = OrderTableFixture.createEmpty();
-
-            given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createEmpty());
 
             // when
             OrderTable actual = sut.clear(orderTable.getId());
@@ -127,10 +114,8 @@ class OrderTableServiceTest {
         @Test
         void testClearWhenCompletedOrderNotExist() {
             // given
-            OrderTable orderTable = OrderTableFixture.createOccupied(3);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOccupied(3));
             orderRepository.save(OrderFixture.createEatIn(orderTable));
-
-            given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
 
             // when // then
             assertThatThrownBy(() -> sut.clear(orderTable.getId()))
@@ -145,10 +130,8 @@ class OrderTableServiceTest {
         @Test
         void testChangeNumberOfGuests() {
             // given
-            OrderTable orderTable = OrderTableFixture.createOccupied(0);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createOccupied(0));
             int expectedNumberOfGuests = 3;
-
-            given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.of(orderTable));
 
             // when
             OrderTable actual = sut.changeNumberOfGuests(orderTable.getId(), OrderTableFixture.createOccupied(expectedNumberOfGuests));
@@ -183,9 +166,7 @@ class OrderTableServiceTest {
         @Test
         void testChangeNumberOfGuestsWhenOrderTableIsNotExist() {
             // given
-            OrderTable orderTable = OrderTableFixture.createEmpty();
-
-            given(orderTableRepository.findById(orderTable.getId())).willReturn(Optional.empty());
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.createEmpty());
 
             // when // then
             assertThatThrownBy(() -> sut.changeNumberOfGuests(orderTable.getId(), OrderTableFixture.createOccupied(1)));
@@ -199,17 +180,18 @@ class OrderTableServiceTest {
         @Test
         void testFindAll() {
             // given
-            var orderTables = List.of(OrderTableFixture.createEmpty(), OrderTableFixture.create());
-
-            given(orderTableRepository.findAll()).willReturn(orderTables);
+            OrderTable orderTable1 = OrderTableFixture.createEmpty();
+            OrderTable orderTable2 = OrderTableFixture.create();
+            orderTableRepository.save(orderTable1);
+            orderTableRepository.save(orderTable2);
 
             // when
             List<OrderTable> actual = sut.findAll();
 
             // then
             assertThat(actual).hasSize(2);
-            assertThat(actual.get(0)).isEqualTo(orderTables.get(0));
-            assertThat(actual.get(1)).isEqualTo(orderTables.get(1));
+            assertThat(actual.get(0)).isEqualTo(orderTable1);
+            assertThat(actual.get(1)).isEqualTo(orderTable2);
         }
     }
 }
