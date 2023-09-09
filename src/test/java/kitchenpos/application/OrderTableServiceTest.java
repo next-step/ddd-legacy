@@ -69,7 +69,6 @@ class OrderTableServiceTest extends IntegrationTest {
         );
 
         주문품목_후라이드치킨세트 = List.of(OrderLineItemFixture.create(메뉴_후라이드치킨세트, 1L));
-
     }
 
     @DisplayName("[정상] 주문 테이블을 등록합니다.")
