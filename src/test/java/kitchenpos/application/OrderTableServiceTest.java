@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.IntegrationTest;
 import kitchenpos.domain.*;
 import kitchenpos.fixture.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -42,17 +43,43 @@ class OrderTableServiceTest extends IntegrationTest {
         this.menuRepository = menuRepository;
     }
 
+    private OrderTable 테이블_0명_점유중;
+    private OrderTable 테이블_0명_빈테이블;
+    private List<Product> 상품_치킨_콜라;
+    private List<MenuProduct> 메뉴구성상품_치킨_콜라;
+    private MenuGroup 메뉴그룹_기본;
+    private Menu 메뉴_후라이드치킨세트;
+
+    private List<OrderLineItem> 주문품목_후라이드치킨세트;
+
+    @BeforeEach
+    void setUp() {
+        테이블_0명_점유중 = OrderTableFixture.create(UUID.randomUUID(), "테이블", 0, true);
+        테이블_0명_빈테이블 = OrderTableFixture.create(UUID.randomUUID(), "테이블", 0, false);
+        상품_치킨_콜라 = Arrays.asList(
+                ProductFixture.create(UUID.randomUUID(), "후라이드 치킨", BigDecimal.valueOf(18_000L)),
+                ProductFixture.create(UUID.randomUUID(), "코카콜라 1.5L", BigDecimal.valueOf(2_000L))
+        );
+
+        메뉴구성상품_치킨_콜라 = MenuProductFixture.create(상품_치킨_콜라 , 1);
+        메뉴그룹_기본 = MenuGroupFixture.create();
+        메뉴_후라이드치킨세트 = MenuFixture.create(
+                UUID.randomUUID(), "후라이드 치킨 세트", BigDecimal.valueOf(1_000L),
+                메뉴구성상품_치킨_콜라, 메뉴그룹_기본, true
+        );
+
+        주문품목_후라이드치킨세트 = List.of(OrderLineItemFixture.create(메뉴_후라이드치킨세트, 1L));
+
+    }
 
     @DisplayName("[정상] 주문 테이블을 등록합니다.")
     @Test
     void create_success() {
-        OrderTable givenOrderTable = OrderTableFixture.create();
+        OrderTable actualResult = orderTableService.create(테이블_0명_빈테이블);
 
-        OrderTable actualResult = orderTableService.create(givenOrderTable);
-
-        assertEquals(givenOrderTable.getName(), actualResult.getName());
-        assertEquals(givenOrderTable.getNumberOfGuests(), 0);
-        assertFalse(givenOrderTable.isOccupied());
+        assertEquals(테이블_0명_빈테이블.getName(), actualResult.getName());
+        assertEquals(테이블_0명_빈테이블.getNumberOfGuests(), 0);
+        assertFalse(테이블_0명_빈테이블.isOccupied());
     }
 
     static Object[][] create_fail_because_illegal_name() {
@@ -73,7 +100,7 @@ class OrderTableServiceTest extends IntegrationTest {
     @DisplayName("[정상] 주문 테이블을 착석 처리 합니다.")
     @Test
     void sit() {
-        OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.create());
+        OrderTable givenOrderTable = orderTableRepository.save(테이블_0명_빈테이블);
 
         OrderTable actualResult = orderTableService.sit(givenOrderTable.getId());
 
@@ -83,20 +110,13 @@ class OrderTableServiceTest extends IntegrationTest {
     @DisplayName("[정상] 주문 테이블을 정리 처리 합니다.")
     @Test
     void clear() {
-        OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.create());
-        List<Product> products = productRepository.saveAll(Arrays.asList(
-                ProductFixture.create(UUID.randomUUID(), "후라이드 치킨", BigDecimal.valueOf(18_000L)),
-                ProductFixture.create(UUID.randomUUID(), "코카콜라 1.5L", BigDecimal.valueOf(2_000L))
-        ));
-        MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.create());
-        List<MenuProduct> menuProducts = MenuProductFixture.create(products , 1);
-        Menu createdMenu = menuRepository.save(MenuFixture.create(
-                UUID.randomUUID(), "후라이드 치킨 세트", BigDecimal.valueOf(1_000L),
-                menuProducts, menuGroup, true
-        ));
-        OrderLineItem orderLineItem = OrderLineItemFixture.create(createdMenu, 1L);
-        orderRepository.save(OrderFixture.create(
-                UUID.randomUUID(), OrderType.EAT_IN, OrderStatus.COMPLETED, givenOrderTable, Arrays.asList(orderLineItem)
+        productRepository.saveAll(상품_치킨_콜라);
+        menuGroupRepository.save(메뉴그룹_기본);
+        menuRepository.save(메뉴_후라이드치킨세트);
+
+        OrderTable givenOrderTable = orderTableRepository.save(테이블_0명_빈테이블);
+        Order completedOrder = orderRepository.save(OrderFixture.create(
+                UUID.randomUUID(), OrderType.EAT_IN, OrderStatus.COMPLETED, givenOrderTable, 주문품목_후라이드치킨세트
         ));
 
         OrderTable actualResult = orderTableService.clear(givenOrderTable.getId());
@@ -107,22 +127,14 @@ class OrderTableServiceTest extends IntegrationTest {
     @DisplayName("[예외] 주문이 완료 상태가 아니므로 주문 테이블 정리를 할 수 없습니다.")
     @Test
     void clear_fail_because_order_status_is_not_completed() {
-        OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.create());
-        List<Product> products = productRepository.saveAll(Arrays.asList(
-                ProductFixture.create(UUID.randomUUID(), "후라이드 치킨", BigDecimal.valueOf(18_000L)),
-                ProductFixture.create(UUID.randomUUID(), "코카콜라 1.5L", BigDecimal.valueOf(2_000L))
-        ));
-        MenuGroup menuGroup = menuGroupRepository.save(MenuGroupFixture.create());
-        List<MenuProduct> menuProducts = MenuProductFixture.create(products , 1);
-        Menu createdMenu = menuRepository.save(MenuFixture.create(
-                UUID.randomUUID(), "후라이드 치킨 세트", BigDecimal.valueOf(1_000L),
-                menuProducts, menuGroup, true
-        ));
-        OrderLineItem orderLineItem = OrderLineItemFixture.create(createdMenu, 1L);
-        orderRepository.save(OrderFixture.create(
-                UUID.randomUUID(), OrderType.EAT_IN, OrderStatus.WAITING, givenOrderTable, Arrays.asList(orderLineItem)
-        ));
+        productRepository.saveAll(상품_치킨_콜라);
+        menuGroupRepository.save(메뉴그룹_기본);
+        menuRepository.save(메뉴_후라이드치킨세트);
 
+        OrderTable givenOrderTable = orderTableRepository.save(테이블_0명_빈테이블);
+        Order waitingOrder = orderRepository.save(OrderFixture.create(
+                UUID.randomUUID(), OrderType.EAT_IN, OrderStatus.WAITING, givenOrderTable, 주문품목_후라이드치킨세트
+        ));
 
         assertThatThrownBy(() -> orderTableService.clear(givenOrderTable.getId()))
                 .isInstanceOf(IllegalStateException.class);
@@ -131,12 +143,8 @@ class OrderTableServiceTest extends IntegrationTest {
     @DisplayName("[정상] 주문 테이블에 고객 수를 변경합니다.")
     @Test
     void changeNumberOfGuests_success() {
-        OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.create(
-                UUID.randomUUID(), "테이블", 0, true)
-        );
-        OrderTable changingNumberOfGuest = OrderTableFixture.create(
-                givenOrderTable.getId(), givenOrderTable.getName(), 3, givenOrderTable.isOccupied()
-        );
+        OrderTable givenOrderTable = orderTableRepository.save(테이블_0명_점유중);
+        OrderTable changingNumberOfGuest = OrderTableFixture.createChangeNumberOfGuestRequest(3);
 
         OrderTable actualResult = orderTableService.changeNumberOfGuests(givenOrderTable.getId(), changingNumberOfGuest);
 
@@ -147,13 +155,9 @@ class OrderTableServiceTest extends IntegrationTest {
     @DisplayName("[예외] 주문 테이블에 고객 수를 0명 미만으로 변경합니다.")
     @Test
     void changeNumberOfGuests_fail_because_change_zero_guest() {
-        OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.create(
-                UUID.randomUUID(), "테이블", 0, true)
-        );
+        OrderTable givenOrderTable = orderTableRepository.save(테이블_0명_점유중);
 
-        OrderTable changingNumberOfGuest = OrderTableFixture.create(
-                givenOrderTable.getId(), givenOrderTable.getName(), -1, givenOrderTable.isOccupied()
-        );
+        OrderTable changingNumberOfGuest = OrderTableFixture.createChangeNumberOfGuestRequest(-1);
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(givenOrderTable.getId(), changingNumberOfGuest))
                 .isInstanceOf(IllegalArgumentException.class);
     }
@@ -161,13 +165,9 @@ class OrderTableServiceTest extends IntegrationTest {
     @DisplayName("[예외] 점유되지 않은 주문 테이블에 대해 고객 수 변경을 시도합니다.")
     @Test
     void changeNumberOfGuests_fail_because_order_table_is_not_occupied() {
-        OrderTable givenOrderTable = orderTableRepository.save(OrderTableFixture.create(
-                UUID.randomUUID(), "테이블", 0, false)
-        );
+        OrderTable givenOrderTable = orderTableRepository.save(테이블_0명_빈테이블);
 
-        OrderTable changingNumberOfGuest = OrderTableFixture.create(
-                givenOrderTable.getId(), givenOrderTable.getName(), 3, givenOrderTable.isOccupied()
-        );
+        OrderTable changingNumberOfGuest = OrderTableFixture.createChangeNumberOfGuestRequest(3);
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(givenOrderTable.getId(), changingNumberOfGuest))
                 .isInstanceOf(IllegalStateException.class);
     }
@@ -175,8 +175,8 @@ class OrderTableServiceTest extends IntegrationTest {
     @DisplayName("주문 테이블을 조회합니다.")
     @Test
     void findAll() {
-        OrderTable firstOrderTable = orderTableRepository.save(OrderTableFixture.create());
-        OrderTable secondOrderTable = orderTableRepository.save(OrderTableFixture.create());
+        OrderTable firstOrderTable = orderTableRepository.save(테이블_0명_점유중);
+        OrderTable secondOrderTable = orderTableRepository.save(테이블_0명_빈테이블);
 
         List<OrderTable> actualResult = orderTableService.findAll();
 

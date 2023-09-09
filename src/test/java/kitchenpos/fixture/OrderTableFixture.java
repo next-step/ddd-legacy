@@ -14,6 +14,11 @@ public class OrderTableFixture {
     public static OrderTable create() {
         return create(UUID.randomUUID(), DEFAULT_NAME, 0, false);
     }
+    public static OrderTable createChangeNumberOfGuestRequest(int numberOfGuest) {
+        OrderTable result = new OrderTable();
+        result.setNumberOfGuests(numberOfGuest);
+        return result;
+    }
 
     public static OrderTable create(UUID id, String name) {
         return create(id, name, 0, false);
