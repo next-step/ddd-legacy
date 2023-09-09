@@ -9,8 +9,4 @@ import org.springframework.transaction.annotation.Transactional;
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class IntegrationTest {
-
-    @Autowired
-    private DatabaseCleanup databaseCleanup;
-
 }
