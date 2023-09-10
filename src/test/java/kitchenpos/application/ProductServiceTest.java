@@ -18,7 +18,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,7 +53,6 @@ class ProductServiceTest extends IntegrationTest {
     @BeforeEach
     void setUp() {
         상품_만원 = ProductFixture.create(BigDecimal.valueOf(10_000L));
-
     }
 
     public static class create_source {
@@ -74,7 +72,7 @@ class ProductServiceTest extends IntegrationTest {
 
         @DisplayName("[정상] 상품이 정상적으로 등록됩니다.")
         @ParameterizedTest
-        @MethodSource("kitchenpos.application.ProductServiceIntegrationTest$create_source#source_of_create_success")
+        @MethodSource("kitchenpos.application.ProductServiceTest$create_source#source_of_create_success")
         void create_success(String name, BigDecimal price) {
             Product product = ProductFixture.create(name, price);
 
@@ -141,7 +139,7 @@ class ProductServiceTest extends IntegrationTest {
     class changePrice {
 
         @DisplayName("[정상] 상품의 가격을 변경합니다.")
-        @MethodSource("kitchenpos.application.ProductServiceIntegrationTest$changePrice_source#changePrice_success")
+        @MethodSource("kitchenpos.application.ProductServiceTest$changePrice_source#changePrice_success")
         @ParameterizedTest(name = "{0}")
         void changePrice_success(String testName, BigDecimal changingPrice, boolean isDisplayed) {
             Product product = productRepository.save(상품_만원);
@@ -160,7 +158,7 @@ class ProductServiceTest extends IntegrationTest {
         }
 
         @DisplayName("[예외] 변경되는 상품의 가격은 null이거나 0미만 일 수 없습니다.")
-        @MethodSource("kitchenpos.application.ProductServiceIntegrationTest$changePrice_source#changePrice_fail_because_illegal_price")
+        @MethodSource("kitchenpos.application.ProductServiceTest$changePrice_source#changePrice_fail_because_illegal_price")
         @ParameterizedTest(name = "{0}")
         void changePrice_fail_because_illegal_price(String testName, Product product) {
             assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), product))

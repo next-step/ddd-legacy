@@ -4,7 +4,6 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.OrderLineItem;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 public class OrderLineItemFixture {
 
