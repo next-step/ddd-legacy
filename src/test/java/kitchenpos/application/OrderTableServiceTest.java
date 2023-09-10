@@ -17,6 +17,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
 class OrderTableServiceTest extends IntegrationTest {
 
@@ -113,7 +114,7 @@ class OrderTableServiceTest extends IntegrationTest {
         menuRepository.save(메뉴_후라이드치킨세트);
 
         OrderTable givenOrderTable = orderTableRepository.save(테이블_0명_빈테이블);
-        Order completedOrder = orderRepository.save(OrderFixture.create(
+        orderRepository.save(OrderFixture.create(
                 UUID.randomUUID(), OrderType.EAT_IN, OrderStatus.COMPLETED, givenOrderTable, 주문품목_후라이드치킨세트
         ));
 
@@ -130,7 +131,7 @@ class OrderTableServiceTest extends IntegrationTest {
         menuRepository.save(메뉴_후라이드치킨세트);
 
         OrderTable givenOrderTable = orderTableRepository.save(테이블_0명_빈테이블);
-        Order waitingOrder = orderRepository.save(OrderFixture.create(
+        orderRepository.save(OrderFixture.create(
                 UUID.randomUUID(), OrderType.EAT_IN, OrderStatus.WAITING, givenOrderTable, 주문품목_후라이드치킨세트
         ));
 

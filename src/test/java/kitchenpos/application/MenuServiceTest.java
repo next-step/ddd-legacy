@@ -2,10 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.IntegrationTest;
 import kitchenpos.domain.*;
-import kitchenpos.fixture.MenuFixture;
-import kitchenpos.fixture.MenuGroupFixture;
-import kitchenpos.fixture.MenuProductFixture;
-import kitchenpos.fixture.ProductFixture;
+import kitchenpos.fixture.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,15 +13,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -53,7 +46,6 @@ class MenuServiceTest extends IntegrationTest {
     private Product 상품_치킨;
     private List<MenuProduct> 메뉴구성상품_치킨_콜라;
     private MenuGroup 메뉴그룹_기본;
-    private Menu 메뉴_후라이드치킨세트;
 
     @BeforeEach
     void setUp() {
@@ -65,10 +57,6 @@ class MenuServiceTest extends IntegrationTest {
 
         메뉴구성상품_치킨_콜라 = MenuProductFixture.create(상품_치킨_콜라, 1);
         메뉴그룹_기본 = MenuGroupFixture.create();
-        메뉴_후라이드치킨세트 = MenuFixture.create(
-                UUID.randomUUID(), "후라이드 치킨 세트", BigDecimal.valueOf(1_000L),
-                메뉴구성상품_치킨_콜라, 메뉴그룹_기본, true
-        );
     }
 
     static class create_source {
