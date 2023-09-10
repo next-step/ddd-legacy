@@ -22,13 +22,6 @@ public class MenuFixture {
         return create(id, DEFAULT_NAME, price, new ArrayList<>(), menuGroup, true);
     }
 
-    public static Menu createWithProducts(String name, BigDecimal price, List<Product> products) {
-        List<MenuProduct> menuProduct = products.stream()
-                .map(product -> MenuProductFixture.create(product, 1))
-                .collect(Collectors.toList());
-        return create(name, price, menuProduct);
-    }
-
     public static Menu create(String name, BigDecimal price, MenuProduct menuProducts) {
         return create(name, price, List.of(menuProducts));
     }
