@@ -35,7 +35,7 @@ public class MenuService {
             throw new InvalidPriceException(price);
         }
         final MenuGroup menuGroup = menuGroupRepository.findById(request.getMenuGroupId())
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchMenuGroupException(request.getMenuGroupId()));
         final List<MenuProduct> menuProductRequests = request.getMenuProducts();
         if (Objects.isNull(menuProductRequests) || menuProductRequests.isEmpty()) {
             throw new IllegalArgumentException();

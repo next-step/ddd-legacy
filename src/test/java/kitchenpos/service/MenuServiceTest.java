@@ -24,6 +24,7 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.NoSuchMenuGroupException;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
@@ -106,7 +107,8 @@ public class MenuServiceTest {
                 .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
-                .isInstanceOf(NoSuchElementException.class);
+                .isExactlyInstanceOf(NoSuchMenuGroupException.class)
+                .hasMessage(String.format("해당 메뉴그룹이 존재하지 않습니다. MenuGroup id 값: [%s]", menu.getMenuGroupId()));
     }
 
     @Test
