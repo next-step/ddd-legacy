@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import kitchenpos.application.OrderTableService;
+import kitchenpos.domain.InvalidNameException;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 
@@ -32,7 +33,8 @@ public class OrderTableServiceTest {
                 .build();
 
         assertThatThrownBy(() -> orderTableService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(InvalidNameException.class)
+                .hasMessage("이름은 null이거나 비어있을 수 없습니다. 현재 값: [null]");
     }
 
     @Test
@@ -42,7 +44,8 @@ public class OrderTableServiceTest {
                 .build();
 
         assertThatThrownBy(() -> orderTableService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(InvalidNameException.class)
+                .hasMessage("이름은 null이거나 비어있을 수 없습니다. 현재 값: []");
     }
 
     @Test

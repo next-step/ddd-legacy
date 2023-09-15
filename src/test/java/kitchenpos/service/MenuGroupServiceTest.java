@@ -7,6 +7,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import kitchenpos.application.MenuGroupService;
+import kitchenpos.domain.InvalidNameException;
 import kitchenpos.domain.MenuGroup;
 
 public class MenuGroupServiceTest {
@@ -20,6 +21,7 @@ public class MenuGroupServiceTest {
                 .build();
 
         assertThatThrownBy(() -> menuGroupService.create(menuGroup))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(InvalidNameException.class)
+                .hasMessage(String.format("이름은 null이거나 비어있을 수 없습니다. 현재 값: [%s]", nullAndEmpty));
     }
 }

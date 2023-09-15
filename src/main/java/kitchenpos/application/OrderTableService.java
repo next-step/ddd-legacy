@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.InvalidNameException;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
@@ -26,7 +27,7 @@ public class OrderTableService {
     public OrderTable create(final OrderTable request) {
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new InvalidNameException(name);
         }
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
