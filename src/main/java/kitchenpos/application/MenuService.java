@@ -32,7 +32,7 @@ public class MenuService {
     public Menu create(final Menu request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new InvalidPriceException(price);
         }
         final MenuGroup menuGroup = menuGroupRepository.findById(request.getMenuGroupId())
             .orElseThrow(NoSuchElementException::new);
@@ -87,7 +87,7 @@ public class MenuService {
     public Menu changePrice(final UUID menuId, final Menu request) {
         final BigDecimal price = request.getPrice();
         if (Objects.isNull(price) || price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException();
+            throw new InvalidPriceException(price);
         }
         final Menu menu = menuRepository.findById(menuId)
             .orElseThrow(NoSuchElementException::new);

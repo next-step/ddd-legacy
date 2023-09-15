@@ -14,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import kitchenpos.application.ProductService;
+import kitchenpos.domain.InvalidPriceException;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -67,7 +68,8 @@ class ProductServiceTest {
                 .build();
 
         assertThatThrownBy(() -> productService.create(product))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(InvalidPriceException.class)
+                .hasMessage("이름은 null이거나 음수일 수 없습니다. 현재 값: [null]");
     }
 
     @Test
@@ -77,7 +79,8 @@ class ProductServiceTest {
                 .build();
 
         assertThatThrownBy(() -> productService.create(product))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(InvalidPriceException.class)
+                .hasMessage("이름은 null이거나 음수일 수 없습니다. 현재 값: [-1]");
     }
 
     @Test
@@ -107,7 +110,8 @@ class ProductServiceTest {
         product.setPrice(null);
 
         assertThatThrownBy(() -> productService.changePrice(productId, product))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(InvalidPriceException.class)
+                .hasMessage("이름은 null이거나 음수일 수 없습니다. 현재 값: [null]");
     }
 
     @Test
@@ -117,7 +121,8 @@ class ProductServiceTest {
         request.setPrice(new BigDecimal(-1));
 
         assertThatThrownBy(() -> productService.changePrice(productId, request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(InvalidPriceException.class)
+                .hasMessage("이름은 null이거나 음수일 수 없습니다. 현재 값: [-1]");
     }
 
     @Test
