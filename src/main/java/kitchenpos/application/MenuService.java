@@ -56,7 +56,7 @@ public class MenuService {
         for (final MenuProduct menuProductRequest : menuProductRequests) {
             final long quantity = menuProductRequest.getQuantity();
             if (quantity < 0) {
-                throw new IllegalArgumentException();
+                throw new InvalidQuantityException(quantity);
             }
             final Product product = productRepository.findById(menuProductRequest.getProductId())
                 .orElseThrow(() -> new NoSuchProductException(menuProductRequest.getProductId()));

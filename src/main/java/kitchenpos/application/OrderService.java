@@ -52,7 +52,7 @@ public class OrderService {
             final long quantity = orderLineItemRequest.getQuantity();
             if (type != OrderType.EAT_IN) {
                 if (quantity < 0) {
-                    throw new IllegalArgumentException();
+                    throw new InvalidQuantityException(quantity);
                 }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())

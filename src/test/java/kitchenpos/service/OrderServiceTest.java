@@ -24,6 +24,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import kitchenpos.application.OrderService;
+import kitchenpos.domain.InvalidQuantityException;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -143,7 +144,8 @@ public class OrderServiceTest {
                 .build();
 
         assertThatThrownBy(() -> orderService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(InvalidQuantityException.class)
+                .hasMessage("수량은 음수일 수 없습니다. 현재 값: [-1]");
     }
 
     @Test

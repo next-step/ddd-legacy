@@ -21,6 +21,7 @@ import kitchenpos.application.MenuService;
 import kitchenpos.application.NullOrEmptyMenuProductRequestsException;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.InvalidPriceException;
+import kitchenpos.domain.InvalidQuantityException;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -161,7 +162,8 @@ public class MenuServiceTest {
                 ).build();
 
         assertThatThrownBy(() -> menuService.create(menu))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(InvalidQuantityException.class)
+                .hasMessage("수량은 음수일 수 없습니다. 현재 값: [-1]");
     }
 
     @Test
