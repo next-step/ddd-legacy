@@ -38,7 +38,7 @@ public class MenuService {
             .orElseThrow(() -> new NoSuchMenuGroupException(request.getMenuGroupId()));
         final List<MenuProduct> menuProductRequests = request.getMenuProducts();
         if (Objects.isNull(menuProductRequests) || menuProductRequests.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new NullOrEmptyMenuProductRequestsException(menuProductRequests);
         }
         final List<Product> products = productRepository.findAllByIdIn(
             menuProductRequests.stream()

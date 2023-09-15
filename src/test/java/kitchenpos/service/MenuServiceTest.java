@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import kitchenpos.application.MenuService;
+import kitchenpos.application.NullOrEmptyMenuProductRequestsException;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.InvalidPriceException;
 import kitchenpos.domain.Menu;
@@ -118,7 +119,8 @@ public class MenuServiceTest {
                 .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NullOrEmptyMenuProductRequestsException.class)
+                .hasMessage("메뉴상품요청은 null이거나 비어있을 수 없습니다. 현재 값: [null]");
     }
 
     @Test
@@ -128,7 +130,8 @@ public class MenuServiceTest {
                 .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NullOrEmptyMenuProductRequestsException.class)
+                .hasMessage("메뉴상품요청은 null이거나 비어있을 수 없습니다. 현재 값: [0]");
     }
 
     @Test
