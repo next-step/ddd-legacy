@@ -26,6 +26,7 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.NoSuchMenuGroupException;
+import kitchenpos.domain.NoSuchProductException;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
@@ -142,7 +143,10 @@ public class MenuServiceTest {
                 ).build();
 
         assertThatThrownBy(() -> menuService.create(menu))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(NoSuchProductException.class)
+                .hasMessage(String.format(
+                        "해당 Product가 존재하지 않습니다. Product id 값: [%s]", menu.getMenuProducts().get(0).getProductId())
+                );
     }
 
     @Test

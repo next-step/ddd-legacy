@@ -15,7 +15,7 @@ public class MenuProductFixture {
     }
 
     public static MenuProductFixture builder() {
-        return builder(null);
+        return builder(ProductFixture.builder().build());
     }
 
     public static MenuProductFixture builder(Product product) {
