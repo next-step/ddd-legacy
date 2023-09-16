@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.InvalidNameException;
+import kitchenpos.domain.NotOccupiedOrderTableException;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 
@@ -76,6 +77,7 @@ public class OrderTableServiceTest {
         OrderTable request = new OrderTable();
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
-                .isInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(NotOccupiedOrderTableException.class)
+                .hasMessage(String.format("착석상태가 아닌 주문테이블입니다. OrderTable id 값: [%s]", orderTable.getId()));
     }
 }

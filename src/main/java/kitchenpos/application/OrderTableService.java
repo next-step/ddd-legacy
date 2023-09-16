@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.InvalidNameException;
+import kitchenpos.domain.NotOccupiedOrderTableException;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
@@ -66,7 +67,7 @@ public class OrderTableService {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (!orderTable.isOccupied()) {
-            throw new IllegalStateException();
+            throw new NotOccupiedOrderTableException(orderTableId);
         }
         orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;

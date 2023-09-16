@@ -29,6 +29,7 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.NotOccupiedOrderTableException;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
@@ -195,7 +196,8 @@ public class OrderServiceTest {
                 .build();
 
         assertThatThrownBy(() -> orderService.create(request))
-                .isInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(NotOccupiedOrderTableException.class)
+                .hasMessage(String.format("착석상태가 아닌 주문테이블입니다. OrderTable id 값: [%s]", _1번테이블.getId()));
     }
 
     @Test

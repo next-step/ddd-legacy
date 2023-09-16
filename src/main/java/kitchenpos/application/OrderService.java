@@ -85,7 +85,7 @@ public class OrderService {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
             if (!orderTable.isOccupied()) {
-                throw new IllegalStateException();
+                throw new NotOccupiedOrderTableException(orderTable.getId());
             }
             order.setOrderTable(orderTable);
         }
