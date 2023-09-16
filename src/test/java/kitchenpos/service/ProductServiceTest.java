@@ -21,6 +21,7 @@ import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.ProfanityNameException;
 
 @SpringBootTest
 @Transactional
@@ -90,7 +91,8 @@ class ProductServiceTest {
                 .build();
 
         assertThatThrownBy(() -> productService.create(product))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(ProfanityNameException.class)
+                .hasMessage("이름은 null이거나 욕설일 수 없습니다. 현재 값: [null]");
     }
 
     @Test
@@ -100,7 +102,8 @@ class ProductServiceTest {
                 .build();
 
         assertThatThrownBy(() -> productService.create(product))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(ProfanityNameException.class)
+                .hasMessage("이름은 null이거나 욕설일 수 없습니다. 현재 값: [fuck]");
     }
 
     @Test

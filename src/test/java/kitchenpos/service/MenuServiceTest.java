@@ -32,6 +32,7 @@ import kitchenpos.domain.NoSuchMenuGroupException;
 import kitchenpos.domain.NoSuchProductException;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.ProfanityNameException;
 import kitchenpos.infra.PurgomalumClient;
 
 @SpringBootTest
@@ -194,7 +195,8 @@ public class MenuServiceTest {
                 .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(ProfanityNameException.class)
+                .hasMessage("이름은 null이거나 욕설일 수 없습니다. 현재 값: [null]");
     }
 
     @Test
@@ -205,7 +207,8 @@ public class MenuServiceTest {
                 .build();
 
         assertThatThrownBy(() -> menuService.create(menu))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(ProfanityNameException.class)
+                .hasMessage("이름은 null이거나 욕설일 수 없습니다. 현재 값: [abuse name]");
     }
 
     @Test

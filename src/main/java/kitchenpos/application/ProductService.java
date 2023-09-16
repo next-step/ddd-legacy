@@ -35,7 +35,7 @@ public class ProductService {
         }
         final String name = request.getName();
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+            throw new ProfanityNameException(name);
         }
         final Product product = new Product();
         product.setId(UUID.randomUUID());

@@ -74,7 +74,7 @@ public class MenuService {
         }
         final String name = request.getName();
         if (Objects.isNull(name) || purgomalumClient.containsProfanity(name)) {
-            throw new IllegalArgumentException();
+            throw new ProfanityNameException(name);
         }
         final Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
