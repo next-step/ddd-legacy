@@ -25,6 +25,7 @@ import kitchenpos.domain.InvalidQuantityException;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuPriceException;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.NoSuchMenuException;
 import kitchenpos.domain.NoSuchMenuGroupException;
@@ -182,7 +183,8 @@ public class MenuServiceTest {
                 ).build();
 
         assertThatThrownBy(() -> menuService.create(menu))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(MenuPriceException.class)
+                .hasMessage(String.format("메뉴가격은 속한 메뉴상품 가격의 총합보다 클 수 없습니다. 메뉴가격: 52001, 메뉴상품가격총합: 52000"));
     }
 
     @Test
@@ -246,7 +248,8 @@ public class MenuServiceTest {
         request.setPrice(new BigDecimal(20000));
 
         assertThatThrownBy(() -> menuService.changePrice(menuId, request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(MenuPriceException.class)
+                .hasMessage(String.format("메뉴가격은 속한 메뉴상품 가격의 총합보다 클 수 없습니다. 메뉴가격: 20000, 메뉴상품가격총합: 18000"));
     }
 
     @Test
@@ -266,7 +269,8 @@ public class MenuServiceTest {
         productService.changePrice(강정치킨.getId(), request);
 
         assertThatThrownBy(() -> menuService.display(menuId))
-                .isInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(MenuPriceException.class)
+                .hasMessage(String.format("메뉴가격은 속한 메뉴상품 가격의 총합보다 클 수 없습니다. 메뉴가격: 1000, 메뉴상품가격총합: 999"));
     }
 
     @Test
