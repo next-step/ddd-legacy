@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.InvalidNameException;
+import kitchenpos.domain.InvalidNumberOfGuestsException;
 import kitchenpos.domain.NotOccupiedOrderTableException;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
@@ -65,7 +66,8 @@ public class OrderTableServiceTest {
         request.setNumberOfGuests(-1);
 
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isExactlyInstanceOf(InvalidNumberOfGuestsException.class)
+                .hasMessage("방문한 손님 수는 음수일 수 없습니다. 현재 값: [-1]");
     }
 
     @Test

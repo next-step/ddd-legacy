@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.InvalidNameException;
+import kitchenpos.domain.InvalidNumberOfGuestsException;
 import kitchenpos.domain.NotOccupiedOrderTableException;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
@@ -62,7 +63,7 @@ public class OrderTableService {
     public OrderTable changeNumberOfGuests(final UUID orderTableId, final OrderTable request) {
         final int numberOfGuests = request.getNumberOfGuests();
         if (numberOfGuests < 0) {
-            throw new IllegalArgumentException();
+            throw new InvalidNumberOfGuestsException(numberOfGuests);
         }
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
