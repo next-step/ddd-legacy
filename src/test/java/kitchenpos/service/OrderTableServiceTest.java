@@ -14,6 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.InvalidNameException;
 import kitchenpos.domain.InvalidNumberOfGuestsException;
+import kitchenpos.domain.NotCompletedAnyOrderException;
 import kitchenpos.domain.NotOccupiedOrderTableException;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
@@ -56,7 +57,8 @@ public class OrderTableServiceTest {
         when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(true);
 
         assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(NotCompletedAnyOrderException.class)
+                .hasMessage(String.format("주문테이블에 완료되지 않은 주문이 존재합니다. 현재 값: [%s]", orderTable.getId()));
     }
 
     @Test

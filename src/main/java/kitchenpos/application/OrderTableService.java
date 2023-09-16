@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.InvalidNameException;
 import kitchenpos.domain.InvalidNumberOfGuestsException;
+import kitchenpos.domain.NotCompletedAnyOrderException;
 import kitchenpos.domain.NotOccupiedOrderTableException;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
@@ -52,7 +53,7 @@ public class OrderTableService {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
-            throw new IllegalStateException();
+            throw new NotCompletedAnyOrderException(orderTableId);
         }
         orderTable.setNumberOfGuests(0);
         orderTable.setOccupied(false);
