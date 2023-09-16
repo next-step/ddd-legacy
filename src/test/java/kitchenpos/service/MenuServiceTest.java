@@ -26,6 +26,7 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.NoSuchMenuException;
 import kitchenpos.domain.NoSuchMenuGroupException;
 import kitchenpos.domain.NoSuchProductException;
 import kitchenpos.domain.Product;
@@ -234,7 +235,8 @@ public class MenuServiceTest {
         request.setPrice(new BigDecimal(20000));
 
         assertThatThrownBy(() -> menuService.changePrice(menuId, request))
-                .isInstanceOf(NoSuchElementException.class);
+                .isExactlyInstanceOf(NoSuchMenuException.class)
+                .hasMessage(String.format("해당 메뉴가 존재하지 않습니다. Menu id 값: [%s]", menuId));
     }
 
     @Test
@@ -252,7 +254,8 @@ public class MenuServiceTest {
         UUID menuId = UUID.randomUUID();
 
         assertThatThrownBy(() -> menuService.display(menuId))
-                .isInstanceOf(NoSuchElementException.class);
+                .isExactlyInstanceOf(NoSuchMenuException.class)
+                .hasMessage(String.format("해당 메뉴가 존재하지 않습니다. Menu id 값: [%s]", menuId));
     }
 
     @Test
@@ -271,6 +274,7 @@ public class MenuServiceTest {
         UUID menuId = UUID.randomUUID();
 
         assertThatThrownBy(() -> menuService.hide(menuId))
-                .isInstanceOf(NoSuchElementException.class);
+                .isExactlyInstanceOf(NoSuchMenuException.class)
+                .hasMessage(String.format("해당 메뉴가 존재하지 않습니다. Menu id 값: [%s]", menuId));
     }
 }

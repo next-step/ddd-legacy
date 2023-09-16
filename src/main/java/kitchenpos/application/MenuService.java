@@ -93,7 +93,7 @@ public class MenuService {
             throw new InvalidPriceException(price);
         }
         final Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchMenuException(menuId));
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             final BigDecimal sum = menuProduct.getProduct()
                 .getPrice()
@@ -109,7 +109,7 @@ public class MenuService {
     @Transactional
     public Menu display(final UUID menuId) {
         final Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchMenuException(menuId));
         for (final MenuProduct menuProduct : menu.getMenuProducts()) {
             final BigDecimal sum = menuProduct.getProduct()
                 .getPrice()
@@ -125,7 +125,7 @@ public class MenuService {
     @Transactional
     public Menu hide(final UUID menuId) {
         final Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchMenuException(menuId));
         menu.setDisplayed(false);
         return menu;
     }
