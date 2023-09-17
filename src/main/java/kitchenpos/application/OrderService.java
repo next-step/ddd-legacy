@@ -56,7 +56,7 @@ public class OrderService {
                 }
             }
             final Menu menu = menuRepository.findById(orderLineItemRequest.getMenuId())
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new NoSuchMenuException(orderLineItemRequest.getMenuId()));
             if (!menu.isDisplayed()) {
                 throw new IllegalStateException();
             }
