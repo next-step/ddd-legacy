@@ -7,12 +7,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -61,17 +60,13 @@ public class OrderServiceTest extends ServiceTest {
 
     @DisplayName("주문을 한다.")
     @ParameterizedTest
-    @MethodSource("orderTypes")
+    @EnumSource(value = OrderType.class)
     void create(OrderType orderType) {
         Order order = OrderFixture.create(orderType, List.of(orderLineItem), orderTable);
 
         Order creteOrder = orderService.create(order);
 
         assertThat(order.getType()).isEqualTo(creteOrder.getType());
-    }
-
-    private static Stream<OrderType> orderTypes() {
-        return Stream.of(OrderType.EAT_IN, OrderType.DELIVERY, OrderType.TAKEOUT);
     }
 
     @DisplayName("주문타입을 넣어주지 않을 경우 에러를 반환한다.")
@@ -147,7 +142,7 @@ public class OrderServiceTest extends ServiceTest {
 
     @DisplayName("주문을 받는다.")
     @ParameterizedTest
-    @MethodSource("orderTypes")
+    @EnumSource(value = OrderType.class)
     void accept(OrderType orderType) {
         Order order = orderRepository.save(OrderFixture.create(orderType, List.of(orderLineItem), orderTable));
         Order createOrder = orderService.accept(order.getId());
