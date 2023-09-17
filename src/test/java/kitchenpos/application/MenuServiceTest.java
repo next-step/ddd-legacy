@@ -5,11 +5,15 @@ import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.MenuProductFixture;
 import kitchenpos.fixture.ProductFixure;
+import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.util.ServiceTest;
 import org.junit.jupiter.api.*;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class MenuServiceTest extends ServiceTest {
@@ -17,6 +21,9 @@ class MenuServiceTest extends ServiceTest {
     private final MenuService menuService;
     private final MenuGroupRepository menuGroupRepository;
     private final ProductRepository productRepository;
+
+    @MockBean
+    private  PurgomalumClient purgomalumClient;
 
     private Product product;
     private MenuGroup menuGroup;
@@ -84,6 +91,8 @@ class MenuServiceTest extends ServiceTest {
         @DisplayName("메뉴생성시, 메뉴 이름이 비속어이면 에러를 반환한다.")
         @Test
         void createnamePurgomalException() {
+            when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+
             MenuProduct menuProduct = MenuProductFixture.create(product, 1);
             Menu menu = MenuFixture.create("bitch", menuGroup, menuProduct, 1000);
 
