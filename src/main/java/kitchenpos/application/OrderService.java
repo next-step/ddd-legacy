@@ -95,7 +95,7 @@ public class OrderService {
     @Transactional
     public Order accept(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderException(orderId));
         if (order.getStatus() != OrderStatus.WAITING) {
             throw new InvalidOrderStatusException(order.getStatus(), OrderStatus.ACCEPTED);
         }
@@ -115,7 +115,7 @@ public class OrderService {
     @Transactional
     public Order serve(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderException(orderId));
         if (order.getStatus() != OrderStatus.ACCEPTED) {
             throw new InvalidOrderStatusException(order.getStatus(), OrderStatus.SERVED);
         }
@@ -126,7 +126,7 @@ public class OrderService {
     @Transactional
     public Order startDelivery(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderException(orderId));
         if (order.getType() != OrderType.DELIVERY) {
             throw new IllegalStateException();
         }
@@ -140,7 +140,7 @@ public class OrderService {
     @Transactional
     public Order completeDelivery(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderException(orderId));
         if (order.getStatus() != OrderStatus.DELIVERING) {
             throw new InvalidOrderStatusException(order.getStatus(), OrderStatus.DELIVERED);
         }
@@ -151,7 +151,7 @@ public class OrderService {
     @Transactional
     public Order complete(final UUID orderId) {
         final Order order = orderRepository.findById(orderId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderException(orderId));
         final OrderType type = order.getType();
         final OrderStatus status = order.getStatus();
         if (type == OrderType.DELIVERY) {
