@@ -97,7 +97,7 @@ public class OrderService {
         final Order order = orderRepository.findById(orderId)
             .orElseThrow(NoSuchElementException::new);
         if (order.getStatus() != OrderStatus.WAITING) {
-            throw new IllegalStateException();
+            throw new InvalidOrderStatusException(order.getStatus(), OrderStatus.ACCEPTED);
         }
         if (order.getType() == OrderType.DELIVERY) {
             BigDecimal sum = BigDecimal.ZERO;
@@ -117,7 +117,7 @@ public class OrderService {
         final Order order = orderRepository.findById(orderId)
             .orElseThrow(NoSuchElementException::new);
         if (order.getStatus() != OrderStatus.ACCEPTED) {
-            throw new IllegalStateException();
+            throw new InvalidOrderStatusException(order.getStatus(), OrderStatus.SERVED);
         }
         order.setStatus(OrderStatus.SERVED);
         return order;
@@ -131,7 +131,7 @@ public class OrderService {
             throw new IllegalStateException();
         }
         if (order.getStatus() != OrderStatus.SERVED) {
-            throw new IllegalStateException();
+            throw new InvalidOrderStatusException(order.getStatus(), OrderStatus.DELIVERING);
         }
         order.setStatus(OrderStatus.DELIVERING);
         return order;
@@ -142,7 +142,7 @@ public class OrderService {
         final Order order = orderRepository.findById(orderId)
             .orElseThrow(NoSuchElementException::new);
         if (order.getStatus() != OrderStatus.DELIVERING) {
-            throw new IllegalStateException();
+            throw new InvalidOrderStatusException(order.getStatus(), OrderStatus.DELIVERED);
         }
         order.setStatus(OrderStatus.DELIVERED);
         return order;
@@ -156,12 +156,12 @@ public class OrderService {
         final OrderStatus status = order.getStatus();
         if (type == OrderType.DELIVERY) {
             if (status != OrderStatus.DELIVERED) {
-                throw new IllegalStateException();
+                throw new InvalidOrderStatusException(status, OrderStatus.COMPLETED);
             }
         }
         if (type == OrderType.TAKEOUT || type == OrderType.EAT_IN) {
             if (status != OrderStatus.SERVED) {
-                throw new IllegalStateException();
+                throw new InvalidOrderStatusException(status, OrderStatus.COMPLETED);
             }
         }
         order.setStatus(OrderStatus.COMPLETED);

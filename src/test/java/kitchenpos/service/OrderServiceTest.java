@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +23,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.transaction.annotation.Transactional;
 
 import kitchenpos.application.OrderService;
+import kitchenpos.domain.InvalidOrderStatusException;
 import kitchenpos.domain.InvalidQuantityException;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
@@ -207,7 +207,8 @@ public class OrderServiceTest {
         orderRepository.save(order);
 
         assertThatThrownBy(() -> orderService.accept(order.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(InvalidOrderStatusException.class)
+                .hasMessage("현재 주문 상태에서는 요청한 주문 상태로 바뀔 수 없습니다. 현재 주문 상태: [ACCEPTED], 요청한 주문 상태: [ACCEPTED]");
     }
 
     @Test
@@ -227,7 +228,8 @@ public class OrderServiceTest {
         orderRepository.save(order);
 
         assertThatThrownBy(() -> orderService.serve(order.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(InvalidOrderStatusException.class)
+                .hasMessage("현재 주문 상태에서는 요청한 주문 상태로 바뀔 수 없습니다. 현재 주문 상태: [SERVED], 요청한 주문 상태: [SERVED]");
     }
 
     @Test
@@ -247,7 +249,8 @@ public class OrderServiceTest {
         orderRepository.save(order);
 
         assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(InvalidOrderStatusException.class)
+                .hasMessage("현재 주문 상태에서는 요청한 주문 상태로 바뀔 수 없습니다. 현재 주문 상태: [WAITING], 요청한 주문 상태: [DELIVERING]");
     }
 
     @Test
@@ -257,7 +260,8 @@ public class OrderServiceTest {
         orderRepository.save(order);
 
         assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(InvalidOrderStatusException.class)
+                .hasMessage("현재 주문 상태에서는 요청한 주문 상태로 바뀔 수 없습니다. 현재 주문 상태: [WAITING], 요청한 주문 상태: [DELIVERED]");
     }
 
     @Test
@@ -267,7 +271,8 @@ public class OrderServiceTest {
         orderRepository.save(order);
 
         assertThatThrownBy(() -> orderService.complete(order.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(InvalidOrderStatusException.class)
+                .hasMessage("현재 주문 상태에서는 요청한 주문 상태로 바뀔 수 없습니다. 현재 주문 상태: [WAITING], 요청한 주문 상태: [COMPLETED]");
     }
 
     @Test
@@ -277,7 +282,8 @@ public class OrderServiceTest {
         orderRepository.save(order);
 
         assertThatThrownBy(() -> orderService.complete(order.getId()))
-                .isInstanceOf(IllegalStateException.class);
+                .isExactlyInstanceOf(InvalidOrderStatusException.class)
+                .hasMessage("현재 주문 상태에서는 요청한 주문 상태로 바뀔 수 없습니다. 현재 주문 상태: [WAITING], 요청한 주문 상태: [COMPLETED]");
     }
 
     @Test
