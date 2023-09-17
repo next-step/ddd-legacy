@@ -17,7 +17,6 @@ class MenuServiceTest extends ServiceTest {
 
     private final MenuService menuService;
     private final MenuGroupRepository menuGroupRepository;
-    private final MenuRepository menuRepository;
     private final ProductRepository productRepository;
 
     private Product product;
@@ -25,11 +24,9 @@ class MenuServiceTest extends ServiceTest {
 
     public MenuServiceTest(final MenuService menuService,
                            final MenuGroupRepository menuGroupRepository,
-                           final MenuRepository menuRepository,
                            final ProductRepository productRepository) {
         this.menuService = menuService;
         this.menuGroupRepository = menuGroupRepository;
-        this.menuRepository = menuRepository;
         this.productRepository = productRepository;
     }
 
