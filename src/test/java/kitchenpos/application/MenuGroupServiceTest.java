@@ -28,7 +28,7 @@ class MenuGroupServiceTest extends ServiceTest {
         assertThat(menuGroup.getName()).isEqualTo(createMenuGroup.getName());
     }
 
-    @DisplayName("메뉴그룹 이름이 공백이거나 null이면 에러를 발생한다.")
+    @DisplayName("메뉴 그룹은 비어 있으면 에러를 발생한다.")
     @ParameterizedTest
     @NullAndEmptySource
     void menuGroupNameException(String name) {
