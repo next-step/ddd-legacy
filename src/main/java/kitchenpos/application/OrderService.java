@@ -83,7 +83,7 @@ public class OrderService {
         }
         if (type == OrderType.EAT_IN) {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
-                .orElseThrow(NoSuchElementException::new);
+                .orElseThrow(() -> new NoSuchOrderTableException(request.getOrderTableId()));
             if (!orderTable.isOccupied()) {
                 throw new NotOccupiedOrderTableException(orderTable.getId());
             }

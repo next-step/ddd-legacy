@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.domain.InvalidNameException;
 import kitchenpos.domain.InvalidNumberOfGuestsException;
+import kitchenpos.domain.NoSuchOrderTableException;
 import kitchenpos.domain.NotCompletedAnyOrderException;
 import kitchenpos.domain.NotOccupiedOrderTableException;
 import kitchenpos.domain.OrderRepository;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -43,7 +43,7 @@ public class OrderTableService {
     @Transactional
     public OrderTable sit(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderTableException(orderTableId));
         orderTable.setOccupied(true);
         return orderTable;
     }
@@ -51,7 +51,7 @@ public class OrderTableService {
     @Transactional
     public OrderTable clear(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderTableException(orderTableId));
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
             throw new NotCompletedAnyOrderException(orderTableId);
         }
@@ -67,7 +67,7 @@ public class OrderTableService {
             throw new InvalidNumberOfGuestsException(numberOfGuests);
         }
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderTableException(orderTableId));
         if (!orderTable.isOccupied()) {
             throw new NotOccupiedOrderTableException(orderTableId);
         }
