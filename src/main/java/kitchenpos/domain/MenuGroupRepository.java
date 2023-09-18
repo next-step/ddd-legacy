@@ -13,7 +13,3 @@ public interface MenuGroupRepository {
     List<MenuGroup> findAll();
 
 }
-
-interface JpaMenuGroupRepository extends MenuGroupRepository, JpaRepository<MenuGroup, UUID>{
-
-}

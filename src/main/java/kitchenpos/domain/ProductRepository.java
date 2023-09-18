@@ -15,7 +15,3 @@ public interface ProductRepository {
 
     List<Product> findAll();
 }
-
-interface JpaProductRepository extends ProductRepository, JpaRepository<Product, UUID> {
-    List<Product> findAllByIdIn(List<UUID> ids);
-}
