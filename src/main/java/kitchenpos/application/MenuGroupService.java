@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.InvalidNameException;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class MenuGroupService {
     public MenuGroup create(final MenuGroup request) {
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new InvalidNameException(name);
         }
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
@@ -32,5 +33,9 @@ public class MenuGroupService {
     @Transactional(readOnly = true)
     public List<MenuGroup> findAll() {
         return menuGroupRepository.findAll();
+    }
+
+    public static void main(String[] args) {
+        System.out.println("현재값 : [" + "" + "]");
     }
 }

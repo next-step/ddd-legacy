@@ -1,5 +1,10 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.InvalidNameException;
+import kitchenpos.domain.InvalidNumberOfGuestsException;
+import kitchenpos.domain.NoSuchOrderTableException;
+import kitchenpos.domain.NotCompletedAnyOrderException;
+import kitchenpos.domain.NotOccupiedOrderTableException;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
@@ -8,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,7 +30,7 @@ public class OrderTableService {
     public OrderTable create(final OrderTable request) {
         final String name = request.getName();
         if (Objects.isNull(name) || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new InvalidNameException(name);
         }
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
@@ -39,7 +43,7 @@ public class OrderTableService {
     @Transactional
     public OrderTable sit(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderTableException(orderTableId));
         orderTable.setOccupied(true);
         return orderTable;
     }
@@ -47,9 +51,9 @@ public class OrderTableService {
     @Transactional
     public OrderTable clear(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderTableException(orderTableId));
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
-            throw new IllegalStateException();
+            throw new NotCompletedAnyOrderException(orderTableId);
         }
         orderTable.setNumberOfGuests(0);
         orderTable.setOccupied(false);
@@ -60,12 +64,12 @@ public class OrderTableService {
     public OrderTable changeNumberOfGuests(final UUID orderTableId, final OrderTable request) {
         final int numberOfGuests = request.getNumberOfGuests();
         if (numberOfGuests < 0) {
-            throw new IllegalArgumentException();
+            throw new InvalidNumberOfGuestsException(numberOfGuests);
         }
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
-            .orElseThrow(NoSuchElementException::new);
+            .orElseThrow(() -> new NoSuchOrderTableException(orderTableId));
         if (!orderTable.isOccupied()) {
-            throw new IllegalStateException();
+            throw new NotOccupiedOrderTableException(orderTableId);
         }
         orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;
