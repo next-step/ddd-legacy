@@ -2,27 +2,26 @@ package kitchenpos.fake;
 
 import kitchenpos.domain.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FakeMenuRepository implements MenuRepository {
 
-    private List<Menu> menus = new ArrayList();
+    private Map<UUID, Menu> menus = new HashMap<>();
 
     @Override
     public List<Menu> findAllByIdIn(List<UUID> ids) {
-        return this.menus.stream()
-                .filter(it -> ids.contains(it.getId()))
+        return menus.keySet().stream()
+                .filter(ids::contains)
+                .map(id -> menus.get(id))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Menu> findAllByProductId(UUID productId) {
-        return this.menus.stream()
-                .filter(it -> hasProduct(it.getMenuProducts(), productId))
+        return menus.values()
+                .stream()
+                .filter(menu -> hasProduct(menu.getMenuProducts(), productId))
                 .collect(Collectors.toList());
     }
 
@@ -32,19 +31,19 @@ public class FakeMenuRepository implements MenuRepository {
 
     @Override
     public Menu save(Menu menu) {
-        this.menus.add(menu);
-        return menus.get(this.menus.size()-1);
+        menus.put(menu.getId(), menu);
+        return menu;
     }
 
     @Override
     public Optional<Menu> findById(UUID id) {
-        return this.menus.stream()
-                .filter(it -> id.equals(it.getId()))
-                .findFirst();
+        return Optional.ofNullable(menus.get(id));
     }
 
     @Override
     public List<Menu> findAll() {
-        return this.menus;
+        return menus.values()
+                .stream()
+                .collect(Collectors.toList());
     }
 }

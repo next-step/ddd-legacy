@@ -3,31 +3,29 @@ package kitchenpos.fake;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FakeOrderTableRepository implements OrderTableRepository {
 
-    private List<OrderTable> orderTables = new ArrayList<>();
+    private Map<UUID, OrderTable> orderTables = new HashMap<>();
 
     @Override
     public Optional<OrderTable> findById(UUID id) {
-        return orderTables.stream()
-                .filter(it -> id.equals(it.getId()))
-                .findFirst();
+        return Optional.ofNullable(orderTables.get(id));
     }
 
     @Override
     public OrderTable save(OrderTable orderTable) {
-        orderTables.add(orderTable);
-        return orderTables.get(orderTables.size() - 1);
+        orderTables.put(orderTable.getId(), orderTable);
+        return orderTable;
     }
 
     @Override
     public List<OrderTable> findAll() {
-        return this.orderTables;
+        return orderTables.values()
+                .stream()
+                .collect(Collectors.toList());
     }
 
 }

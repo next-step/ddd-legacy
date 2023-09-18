@@ -5,37 +5,36 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class FakeOrderRepository implements OrderRepository {
 
-    private List<Order> orders = new ArrayList<>();
+    private Map<UUID, Order> orders = new HashMap<>();
 
     @Override
     public boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status) {
-        return orders.stream()
+        return orders.values()
+                .stream()
                 .noneMatch(order -> order.getStatus().equals(status)
                 && order.getOrderTable().getId().equals(orderTable.getId()));
     }
 
     @Override
     public Order save(Order order) {
-        orders.add(order);
+        orders.put(order.getId(), order);
         return order;
     }
 
     @Override
     public Optional<Order> findById(UUID id) {
-        return orders.stream()
-                .filter(order -> order.getId().equals(id))
-                .findFirst();
+        return Optional.ofNullable(orders.get(id));
     }
 
     @Override
     public List<Order> findAll() {
-        return orders;
+        return orders.values()
+                .stream()
+                .collect(Collectors.toList());
     }
 }

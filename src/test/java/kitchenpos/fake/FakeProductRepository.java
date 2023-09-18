@@ -3,39 +3,38 @@ package kitchenpos.fake;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FakeProductRepository implements ProductRepository {
 
-    private final List<Product> products = new ArrayList<>();
+    private final Map<UUID, Product> products = new HashMap<>();
 
     @Override
     public List<Product> findAllByIdIn(List<UUID> ids) {
-        return this.products.stream()
-                .filter(it -> ids.contains(it.getId()))
+        return products.keySet()
+                .stream()
+                .filter(id -> ids.contains(id))
+                .map(id -> products.get(id))
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<Product> findById(UUID uuid) {
-        return this.products.stream()
-                .filter(it -> uuid.equals(it.getId()))
-                .findFirst();
+        return Optional.ofNullable(products.get(uuid));
     }
 
     @Override
     public Product save(Product product) {
-        this.products.add(product);
-        return this.products.get(products.size()-1);
+        products.put(product.getId(), product);
+        return product;
     }
 
     @Override
     public List<Product> findAll() {
-        return this.products;
+        return products.values()
+                .stream()
+                .collect(Collectors.toList());
     }
 
 }
