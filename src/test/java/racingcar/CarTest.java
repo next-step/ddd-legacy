@@ -6,33 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class Car {
-    private String name;
-    private int position;
-
-    public Car(String name) {
-        this(name, 0);
-    }
-
-    public Car(String name, int position) {
-        if (name.length() > 5) {
-            throw new IllegalArgumentException();
-        }
-        this.name = name;
-        this.position = position;
-    }
-
-    public void move(int condition) {
-        if (condition >= 4) {
-            position++;
-        }
-    }
-
-    public int position() {
-        return position;
-    }
-}
-
 class CarTest {
     @DisplayName("자동차 이름은 5 글자를 넘을 수 없다.")
     @Test
@@ -45,7 +18,7 @@ class CarTest {
     @Test
     void moveTest() {
         final Car car = new Car("보라돌");
-        car.move(4);
+        car.move(() -> true);
         assertThat(car.position()).isEqualTo(1);
     }
 
@@ -53,7 +26,7 @@ class CarTest {
     @Test
     void stopTest() {
         final Car car = new Car("보라돌");
-        car.move(3);
+        car.move(() -> false);
         assertThat(car.position()).isEqualTo(0);
     }
 }
