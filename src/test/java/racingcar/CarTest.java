@@ -17,7 +17,7 @@ public class CarTest {
     @DisplayName("4 이상인 경우 자동차는 움직인다.")
     void move() {
         Car car = new Car("아아아아");
-        car.move(4);
+        car.move(new GoStrategy());
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
@@ -25,7 +25,7 @@ public class CarTest {
     @DisplayName("4 미만인 경우 움직이지 않는다.")
     void stop() {
         Car car = new Car("아아아아");
-        car.move(3);
+        car.move(new StopStrategy());
         assertThat(car.getPosition()).isEqualTo(0);
     }
 }
