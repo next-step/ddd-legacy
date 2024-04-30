@@ -21,6 +21,10 @@ public class Number {
         return new Number(parseInt(value));
     }
 
+    public int value() {
+        return value;
+    }
+
     private static void validateNumber(final int value) {
         if (value < ZERO) {
             throw new IllegalArgumentException(NEGATIVE_NUMBER_EXCEPTION);
