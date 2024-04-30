@@ -28,8 +28,8 @@ public class StringCalculator {
             return Arrays.stream(matcher.trim().split(separator))
                     .mapToInt(Integer::valueOf)
                     .sum();
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException();
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("올바른 숫자 입력 값이 아닙니다.");
         }
     }
 }
