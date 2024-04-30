@@ -18,7 +18,7 @@ class CarTest {
     @Test
     void moveTest() {
         final Car car = new Car("보라돌");
-        car.move(() -> true);
+        car.move(new GoStrategy());
         assertThat(car.position()).isEqualTo(1);
     }
 
@@ -26,7 +26,7 @@ class CarTest {
     @Test
     void stopTest() {
         final Car car = new Car("보라돌");
-        car.move(() -> false);
+        car.move(new StopStrategy());
         assertThat(car.position()).isEqualTo(0);
     }
 }
