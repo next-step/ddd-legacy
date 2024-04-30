@@ -10,15 +10,15 @@ data class Car(val name: String) {
         }
     }
 
-    fun move(position: Int) {
-        if (position < 0 || position > 9) {
+    fun move(condition: Int) {
+        if (condition < 0 || condition > 9) {
             throw IllegalArgumentException("position 은 0 ~ 9 사이의 값만 가능합니다.")
         }
 
-        if (position < 4) {
+        if (condition < 4) {
             return
         }
 
-        currentPosition += position
+        currentPosition++
     }
 }
