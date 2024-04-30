@@ -1,6 +1,7 @@
 package racingcar;
 
 public class Car {
+
     private final String name;
     private int position;
 
@@ -9,10 +10,6 @@ public class Car {
             throw new IllegalArgumentException();
         }
         this.name = name;
-    }
-
-    public void move(final int condition) {
-        move(() -> condition >= 4);
     }
 
     public void move(final MovingStrategy condition) {
