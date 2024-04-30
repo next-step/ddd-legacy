@@ -59,10 +59,17 @@ class CarTest {
         Assertions.assertThat(actual).isEqualTo(expected);
     }
 
-    @DisplayName("자동차는 앞으로 움직인다.")
+    @DisplayName("자동차는 멈춘다.")
     @Test
     void carMoveMoveForwardTest() {
+        // given
+        var car = new Car("소나타V5", 5);
 
+        // when
+        var stoppedCar = car.stop();
+
+        // then
+        Assertions.assertThat(stoppedCar).isEqualTo(new Car("소나타V5", 5));
     }
 
 

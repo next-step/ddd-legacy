@@ -16,4 +16,8 @@ public record Car (
         }
         return new Car(this.name, this.position + distance);
     }
+
+    public Car stop() {
+        return this;
+    }
 }
