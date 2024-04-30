@@ -2,6 +2,7 @@ package racingcar.domain;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -46,20 +47,18 @@ public class CarTest {
     @DisplayName("[조건] 이동")
     class MovingTest {
 
-        @DisplayName("이동 조건이 4미만인 경우 움직이지 않는다")
-        @ParameterizedTest
-        @ValueSource(ints = { 0, 1, 2, 3 })
-        void lessThanFour(final int condition) {
-            var car = 벤츠;
-            assertThat(car.getPosition()).isEqualTo(0);
-        }
-
-        @DisplayName("이동 조건이 4이상인 경우 움직인다")
-        @ParameterizedTest
-        @ValueSource(ints = { 4, 5, 6, 7, 8, 9 })
-        void fourOrMore(final int condition) {
+        @DisplayName("이동 조건이 충족되는 경우 움직일 수 있다")
+        @Test
+        void move(final int condition) {
             var car = 벤츠;
             assertThat(car.getPosition()).isEqualTo(1);
+        }
+
+        @DisplayName("이동 조건이 충족되지 않은 경우 움직일 수 없다")
+        @Test
+        void stop(final int condition) {
+            var car = 벤츠;
+            assertThat(car.getPosition()).isEqualTo(0);
         }
 
     }
