@@ -27,9 +27,14 @@ public class StringCalculator {
         try {
             return Arrays.stream(matcher.trim().split(separator))
                     .mapToInt(Integer::valueOf)
+                    .peek(x -> {
+                        if (x < 0) {
+                            throw new IllegalArgumentException("음수값은 처리할 수 없습니다.");
+                        }
+                    })
                     .sum();
         } catch (NumberFormatException e) {
-            throw new RuntimeException("올바른 숫자 입력 값이 아닙니다.");
+            throw new NumberFormatException("올바른 숫자 입력 값이 아닙니다.");
         }
     }
 }
