@@ -8,6 +8,9 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
     private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
+    private static final int CUSTOM_SEPARATOR_INDEX = 1;
+    private static final int MATCHER_BODY_INDEX = 2;
+
 
     public static int getSum(String input) {
         if (StringUtils.isBlank(input)) {
@@ -19,8 +22,8 @@ public class StringCalculator {
             return splitAndGetSum(input, "[,:]");
         }
 
-        String customSeparator = matcher.group(1);
-        return splitAndGetSum(matcher.group(2), customSeparator);
+        String customSeparator = matcher.group(CUSTOM_SEPARATOR_INDEX);
+        return splitAndGetSum(matcher.group(MATCHER_BODY_INDEX), customSeparator);
     }
 
     private static int splitAndGetSum(String matcher, String separator) {
