@@ -12,14 +12,14 @@ public class CarTest {
     @Test
     void constructor() {
         Assertions.assertThatIllegalArgumentException()
-            .isThrownBy(() -> new Car("룰루랄라랄랄랄라"));
+            .isThrownBy(() -> new Car("황일용황일용"));
     }
 
     @DisplayName("숫자가 4 이상인 경우 자동차는 전진한다")
     @Test
     void move() {
         final Car car = new Car("황일용");
-        car.move(4);
+        car.move(new GoStrategy());
         assertThat(car.position()).isEqualTo(1);
     }
 
@@ -27,7 +27,7 @@ public class CarTest {
     @Test
     void stop() {
         final Car car = new Car("황일용");
-        car.move(3);
+        car.move(new StopStrategy());
         assertThat(car.position()).isEqualTo(0);
     }
 }
