@@ -40,7 +40,7 @@ class CarTest : DescribeSpec({
         }
 
         describe("move 메소드는") {
-            context("컨디션이 4 이상인 경우") {
+            context("GoStrategy가 주어지면") {
                 it("자동차는 전진한다") {
                     val movedCar = Car.init("이민준").move(GoStrategy())
 
@@ -48,7 +48,7 @@ class CarTest : DescribeSpec({
                 }
             }
 
-            context("컨디션이 4 미만 경우") {
+            context("StopStrategy가 주어지면") {
                 it("자동차는 정지한다") {
                     val movedCar = Car.init("이민준").move(StopStrategy())
 
