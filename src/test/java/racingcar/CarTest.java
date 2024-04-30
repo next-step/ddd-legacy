@@ -31,10 +31,32 @@ class CarTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("자동차는 움직임 값이 4 이상일때만 움직인다.")
+    @DisplayName("자동차는 움직임 값이 4 이상이면 움직인다.")
     @Test
     void carMoveMinTest() {
+        // given
+        var car = new Car("소나타V5", 0);
 
+        // when
+        var actual = car.move(4);
+
+        // expected
+        var expected = new Car("소나타V5", 4);
+        Assertions.assertThat(actual).isEqualTo(expected);
+    }
+
+    @DisplayName("자동차는 움직임 값이 4 미만이면 움직이지 않는다.")
+    @Test
+    void carDontMoveTest() {
+        // given
+        var car = new Car("소나타V5", 0);
+
+        // when
+        var actual = car.move(3);
+
+        // expected
+        var expected = new Car("소나타V5", 0);
+        Assertions.assertThat(actual).isEqualTo(expected);
     }
 
     @DisplayName("자동차는 앞으로 움직인다.")
