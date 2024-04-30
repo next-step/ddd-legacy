@@ -67,4 +67,12 @@ public class StringCalculatorTest {
         String input = "1";
         assertThat(StringCalculator.getSum(input)).isEqualTo(1);
     }
+
+    @Test
+    @DisplayName(value = "일반,커스텀 형태 이외의 구분자를 넣는 경우 RuntimeException Throw")
+    void failTest4() {
+        String input = "1&2&3";
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> StringCalculator.getSum(input));
+    }
 }
