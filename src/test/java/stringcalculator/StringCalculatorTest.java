@@ -3,15 +3,14 @@ package stringcalculator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatRuntimeException;
+import static org.assertj.core.api.Assertions.*;
 
 public class StringCalculatorTest {
     @Test
-    @DisplayName("빈 스트링을 넣는 경우 0을 반환한다.")
+    @DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")
     void zero() {
         String input = "";
-        assertThat(StringCalculator.getSum(input)).isEqualTo(0);
+        assertThat(StringCalculator.getSum(input)).isZero();
     }
 
     @Test
@@ -53,12 +52,19 @@ public class StringCalculatorTest {
     @DisplayName("(일반 구분자) 숫자 이외의 값을 넘기는 경우 RuntimeException Throw")
     void failTest2() {
         String input = "a,3";
-        assertThatRuntimeException().isThrownBy(() -> StringCalculator.getSum(input));
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> StringCalculator.getSum(input));
     }
     @Test
     @DisplayName("(커스텀 구분자) 숫자 이외의 값을 넘기는 경우 RuntimeException Throw")
     void failTest3() {
         String input = "//;\n1a;3";
-        assertThatRuntimeException().isThrownBy(() -> StringCalculator.getSum(input));
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> StringCalculator.getSum(input));
+    }
+
+    @Test
+    @DisplayName(value = "숫자가 하나인 경우 해당 숫자를 반환한다.")
+    void onlyNum() {
+        String input = "1";
+        assertThat(StringCalculator.getSum(input)).isEqualTo(1);
     }
 }
