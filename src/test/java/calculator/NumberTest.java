@@ -17,23 +17,23 @@ class NumberTest {
     @ValueSource(strings = {"a", "string", "-", "+"})
     @ParameterizedTest
     void invalidParsing(String value) {
-        Assertions.assertThatThrownBy(() -> new Number(value))
+        Assertions.assertThatThrownBy(() -> Number.from(value))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(PARSING_INTEGER_EXCEPTION);
     }
 
     @DisplayName("입력 받은 값이 음수이면 예외가 발생한다.")
-    @ValueSource(ints = {-1, -99, -100, Integer.MIN_VALUE})
+    @ValueSource(strings = {"-1", "-99", "-100"})
     @ParameterizedTest
-    void invalidNegativeNumber(int value) {
-        Assertions.assertThatThrownBy(() -> new Number(value))
+    void invalidNegativeNumber(String value) {
+        Assertions.assertThatThrownBy(() -> Number.from(value))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(NEGATIVE_NUMBER_EXCEPTION);
     }
 
     @DisplayName("입력 받은 값이 빈 문자열이나 null이면 0이 반환된다.")
     @NullAndEmptySource
-    @ValueSource(strings = " ")
+    @ValueSource(strings = {" ", "         "})
     @ParameterizedTest
     void returnZero(String value) {
         assertThat(Number.from(value)).isEqualTo(ZERO_NUMBER);
