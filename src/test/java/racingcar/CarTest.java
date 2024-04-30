@@ -16,14 +16,14 @@ public class CarTest {
     @Test
     void 숫자가_4이상인_경우_자동차는_전진한다() {
         final Car car = new Car("홍길동");
-        car.move(4);
+        car.move(new GoStrategy());
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
     @Test
     void 숫자가_4미만인_경우_자동차는_움직이지_않는다() {
         final Car car = new Car("홍길동");
-        car.move(3);
+        car.move(new StopStrategy());
         assertThat(car.getPosition()).isEqualTo(0);
     }
 }
