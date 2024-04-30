@@ -17,7 +17,11 @@ public class Car {
     }
 
     public void move(int condition) {
-        if (condition >= 4) {
+        move(() -> condition >= 4);
+    }
+
+    public void move(MovingStrategy condition) {
+        if (condition.movable()) {
             position++;
         }
     }
