@@ -18,7 +18,7 @@ class CarTest {
     @Test
     fun test2() {
         val car = Car(name = "홍길동")
-        car.move(GoStrategy())
+        car.move { GoStrategy().movable() }
         assertThat(car.position).isEqualTo(1)
     }
 
@@ -26,7 +26,7 @@ class CarTest {
     @Test
     fun test3() {
         val car = Car(name = "홍길동")
-        car.move(StopStrategy())
+        car.move { StopStrategy().movable() }
         assertThat(car.position).isEqualTo(0)
     }
 }
