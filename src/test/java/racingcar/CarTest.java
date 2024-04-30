@@ -22,8 +22,8 @@ class Car {
         this.position = position;
     }
 
-    public void move(int condition) {
-        if (condition >= 4) {
+    public void move(MoveStrategy moveStrategy) {
+        if (moveStrategy.movable()) {
             position++;
         }
     }
@@ -46,7 +46,7 @@ class CarTest {
     @Test
     void move() {
         Car car = new Car("abcd");
-        car.move(4);
+        car.move(new GoStrategy());
         assertThat(car.position()).isEqualTo(1);
     }
 
@@ -54,7 +54,7 @@ class CarTest {
     @Test
     void stop() {
         Car car = new Car("abcd");
-        car.move(3);
+        car.move(new StopStrategy());
         assertThat(car.position()).isEqualTo(0);
     }
 }
