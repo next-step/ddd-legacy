@@ -33,4 +33,11 @@ public class StringCalculatorTest {
         String input = "1:2,3";
         assertThat(StringCalculator.getSum(input)).isEqualTo(6);
     }
+
+    @Test
+    @DisplayName("커스텀 구분자로 숫자 합을 반환한다.")
+    void custom() {
+        String input = "//;\n1;2;3";
+        assertThat(StringCalculator.getSum(input)).isEqualTo(6);
+    }
 }
