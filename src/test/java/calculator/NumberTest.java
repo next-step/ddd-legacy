@@ -2,6 +2,7 @@ package calculator;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -37,5 +38,12 @@ class NumberTest {
     @ParameterizedTest
     void returnZero(String value) {
         assertThat(Number.from(value)).isEqualTo(ZERO_NUMBER);
+    }
+
+    @DisplayName("입력한 문자가 음수가 아닌 숫자이면 숫자를 반환한다.")
+    @Test
+    void validNumber() {
+        Number number = Number.from("1");
+        assertThat(number.value()).isEqualTo(1);
     }
 }
