@@ -2,6 +2,7 @@ package stringcalculator;
 
 import org.junit.platform.commons.util.StringUtils;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 public class StringCalculator {
@@ -9,11 +10,9 @@ public class StringCalculator {
         if (StringUtils.isBlank(input)) {
             return 0;
         }
-        String[] split = input.trim().split("[,:]");
-        int result = 0;
-        for (String s : split) {
-            result += Integer.valueOf(s);
-        }
-        return result;
+
+        return Arrays.stream(input.trim().split("[,:]"))
+                .mapToInt(Integer::valueOf)
+                .sum();
     }
 }
