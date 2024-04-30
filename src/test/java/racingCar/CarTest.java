@@ -3,6 +3,9 @@ package racingCar;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
@@ -22,8 +25,8 @@ class Car {
         this(name, 0);
     }
 
-    public void move(int condition) {
-        if (condition >= 4){
+    public void move(final MoveStrategy condition) {
+        if(condition.movable()){
             position++;
         }
     }
@@ -45,7 +48,7 @@ public class CarTest {
     @Test
     void move() {
         final var car = new Car("홍길동");
-        car.move(4);
+        car.move(new GoStrategy());
         assertThat(car.Position()).isEqualTo(1);
     }
 
@@ -53,7 +56,7 @@ public class CarTest {
     @Test
     void stop() {
         final var car = new Car("홍길동");
-        car.move(3);
+        car.move(new StopStrategy());
         assertThat(car.Position()).isEqualTo(0);
     }
 
