@@ -19,7 +19,7 @@ class CarTest {
     @DisplayName("숫자가 4 이상인 경우 자동차는 전진한다")
     public void move() {
         final Car car = new Car("홍길동");
-        car.move(4);
+        car.move(() -> true);
         assertThat(car.position()).isEqualTo(1);
     }
 
@@ -27,7 +27,7 @@ class CarTest {
     @DisplayName("숫자가 4 미만인 경우 자동차는 움직이지 않는다")
     public void stop() {
         final Car car = new Car("홍길동");
-        car.move(3);
+        car.move(() -> false);
         assertThat(car.position()).isEqualTo(0);
     }
 }
