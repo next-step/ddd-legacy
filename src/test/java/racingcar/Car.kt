@@ -8,8 +8,8 @@ class Car(
         require(name.length < 5) { "이름은 5자 미만이어야 합니다." }
     }
 
-    fun move(condition: Int) {
-        if (condition >= 4) {
+    fun move(condition: MovingStrategy) {
+        if (condition.movable()) {
             position++
         }
     }
