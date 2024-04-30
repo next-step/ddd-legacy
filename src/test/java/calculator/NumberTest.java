@@ -46,4 +46,19 @@ class NumberTest {
         Number number = Number.from("1");
         assertThat(number.value()).isEqualTo(1);
     }
+
+    @DisplayName("두 수를 더하여 덧셈의 결과인 숫자를 반환한다.")
+    @Test
+    void plus() {
+        // given
+        Number firstOperand = Number.from("2");
+        Number secondOperand = Number.from("5");
+
+        // when
+        Number result = firstOperand.plus(secondOperand);
+
+        // then
+        assertThat(result).isEqualTo(Number.from("7"));
+        assertThat(result.value()).isEqualTo(7);
+    }
 }
