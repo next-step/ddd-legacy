@@ -13,8 +13,8 @@ data class Car(
         }
     }
 
-    fun move(moveCondition: () -> Boolean) {
-        if (moveCondition()) {
+    fun move(randomNumber: Int, moveCondition: (Int) -> Boolean) {
+        if (moveCondition(randomNumber)) {
             position++
         }
     }

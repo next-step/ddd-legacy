@@ -17,7 +17,7 @@ class CarTest {
     fun carMoveTest() {
         val car = Car("car")
 
-        car.move { true }
+        car.move(4) { it >= 4 }
 
         Assertions.assertThat(car.position).isEqualTo(1)
     }
@@ -27,7 +27,7 @@ class CarTest {
     fun carStopTest() {
         val car = Car("car")
 
-        car.move { false }
+        car.move(2) { it >= 4 }
 
         Assertions.assertThat(car.position).isEqualTo(0)
     }
