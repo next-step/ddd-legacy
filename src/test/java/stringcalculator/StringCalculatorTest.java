@@ -2,14 +2,16 @@ package stringcalculator;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static org.assertj.core.api.Assertions.*;
 
 public class StringCalculatorTest {
-    @Test
     @DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")
-    void zero() {
-        String input = "";
+    @ParameterizedTest
+    @NullAndEmptySource
+    void zero(final String input) {
         assertThat(StringCalculator.getSum(input)).isZero();
     }
 
