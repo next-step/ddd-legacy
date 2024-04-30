@@ -27,7 +27,7 @@ class CarTest {
 
         // when
         assertThrows(IllegalArgumentException::class.java) {
-            car.move(position = -1)
+            car.move(condition = -1)
         }
     }
 
@@ -39,7 +39,7 @@ class CarTest {
         val car = Car(name = name)
 
         // when
-        car.move(position = 3)
+        car.move(condition = 3)
 
         // then
         assertEquals(0, car.currentPosition)
@@ -56,6 +56,6 @@ class CarTest {
         car.move(4)
 
         // then
-        assertEquals(4, car.currentPosition)
+        assertEquals(1, car.currentPosition)
     }
 }
