@@ -5,6 +5,6 @@ class StringCalculator {
         if (text.isNullOrBlank()) {
             return 0
         }
-        return 1;
+        return text.toInt();
     }
 }
