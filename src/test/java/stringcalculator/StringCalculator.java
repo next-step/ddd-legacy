@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
-    static Pattern pattern = Pattern.compile("//(.)\n(.*)");
+    private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
 
     public static int getSum(String input) {
         if (StringUtils.isBlank(input)) {
