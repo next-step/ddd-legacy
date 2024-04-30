@@ -14,7 +14,7 @@ public class Car {
         this(name, 0);
     }
 
-    public Car(String name, int position) {
+    private Car(String name, int position) {
         if (!StringUtils.hasText(name)) {
             throw new IllegalArgumentException("자동차의 이름은 비어있을 수 없습니다.");
         }
