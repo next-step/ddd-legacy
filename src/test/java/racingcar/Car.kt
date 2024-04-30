@@ -13,10 +13,6 @@ data class Car(
         }
     }
 
-    fun move(condition: Int) {
-        move { condition >= 4 }
-    }
-
     fun move(moveCondition: () -> Boolean) {
         if (moveCondition()) {
             position++
