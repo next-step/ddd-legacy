@@ -21,6 +21,10 @@ public class Number {
         return new Number(parseInt(value));
     }
 
+    public Number plus(final Number number) {
+        return new Number(this.value + number.value);
+    }
+
     public int value() {
         return value;
     }
