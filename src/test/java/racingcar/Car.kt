@@ -9,7 +9,7 @@ class Car(
     }
 
     fun move(condition: () -> Boolean) {
-        if (condition.invoke()) {
+        if (condition()) {
             position++
         }
     }
