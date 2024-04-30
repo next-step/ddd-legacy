@@ -17,12 +17,17 @@ public class Car {
     }
 
     public void move(int condition) {
-        if (condition >= 4) {
-            this.position++;
-        }
+        move(() -> condition >= 4);
     }
+
 
     public int position() {
         return this.position;
+    }
+
+    public void move(final MovingStrategy condition) {
+        if (condition.isMovable()) {
+            this.position++;
+        }
     }
 }
