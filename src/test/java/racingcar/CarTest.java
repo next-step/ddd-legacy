@@ -38,7 +38,7 @@ class CarTest {
         var car = new Car("소나타V5", 0);
 
         // when
-        var actual = car.move(4);
+        var actual = car.move(new SameNumberStrategy(4));
 
         // expected
         var expected = new Car("소나타V5", 4);
@@ -52,7 +52,7 @@ class CarTest {
         var car = new Car("소나타V5", 0);
 
         // when
-        var actual = car.move(3);
+        var actual = car.move(new SameNumberStrategy(3));
 
         // expected
         var expected = new Car("소나타V5", 0);
@@ -71,12 +71,4 @@ class CarTest {
         // then
         Assertions.assertThat(stoppedCar).isEqualTo(new Car("소나타V5", 5));
     }
-
-
-    @DisplayName("자동차는 뒤로 움직인다.")
-    @Test
-    void carMoveMoveBackwardTest() {
-
-    }
-
 }
