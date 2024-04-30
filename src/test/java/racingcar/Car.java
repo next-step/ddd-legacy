@@ -1,6 +1,6 @@
 package racingcar;
 
-class Car {
+public class Car {
 	
 	private final String name;
 	private int position;
@@ -18,7 +18,11 @@ class Car {
 	}
 	
 	public void move(int condition) {
-		if (condition >= 4) {
+		move(() -> condition >= 4);
+	}
+	
+	public void move(final MovingStrategy condition) {
+		if (condition.movable()) {
 			position++;
 		}
 	}
