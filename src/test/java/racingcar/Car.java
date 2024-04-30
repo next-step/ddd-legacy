@@ -1,7 +1,7 @@
 package racingcar;
 
-class Car {
-    private String name;
+public class Car {
+    private final String name;
     private int position;
 
     public Car(String name) {
@@ -12,15 +12,13 @@ class Car {
         this.position = 0;
     }
 
-    public void move(int randomValue) {
-        if (randomValue >= 4) {
-            this.position++;
-        }
+    public void move(int condition) {
+        move(() -> condition >= 4);
     }
 
-    public void stop(int randomValue) {
-        if (randomValue <= 4) {
-            this.position--;
+    public void move(MovingStrategy condition) {
+        if (condition.moveable()) {
+            this.position++;
         }
     }
 
