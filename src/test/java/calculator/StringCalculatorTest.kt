@@ -28,4 +28,11 @@ class StringCalculatorTest {
     fun test2(text: String) {
         assertThat(calculator.add(text)).isSameAs(text.toInt())
     }
+
+    @DisplayName("숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
+    @ParameterizedTest
+    @ValueSource(strings = ["1,2"])
+    fun test3(text: String) {
+        assertThat(calculator.add(text)).isSameAs(3)
+    }
 }

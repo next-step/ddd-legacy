@@ -5,6 +5,8 @@ class StringCalculator {
         if (text.isNullOrBlank()) {
             return 0
         }
-        return text.toInt();
+
+        return text.split(",")
+            .sumOf { it.toInt() }
     }
 }
