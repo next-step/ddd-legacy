@@ -19,7 +19,7 @@ class CarTest {
     @Test
     void move() {
         Car car = new Car("김지오");
-        car.move(4);
+        car.move(() -> true);
         assertThat(car.position()).isEqualTo(1);
     }
 
@@ -27,7 +27,7 @@ class CarTest {
     @Test
     void stop() {
         Car car = new Car("김지오");
-        car.move(3);
+        car.move(() -> false);
         assertThat(car.position()).isEqualTo(0);
     }
 }
