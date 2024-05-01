@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class CalculatorNumber {
-    private static final Map<Integer, CalculatorNumber> cache = new HashMap();
+    private static final Map<Integer, CalculatorNumber> cache = new HashMap<>();
     private final int number;
 
     public static CalculatorNumber from(final String number) {
@@ -18,8 +18,7 @@ public class CalculatorNumber {
     }
 
     private static CalculatorNumber findCache(final int validatedNumber) {
-        CalculatorNumber calculatorNumber = cache.computeIfAbsent(validatedNumber, CalculatorNumber::new);
-        return calculatorNumber;
+        return cache.computeIfAbsent(validatedNumber, CalculatorNumber::new);
     }
 
     public static int validateNumber(String number) {
