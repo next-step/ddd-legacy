@@ -18,8 +18,8 @@ public class StringCalculator {
         }
         String[] tokens = getValue(text);
         String[] numbers = Arrays.stream(tokens)
-                .filter(token -> isNumeric(token))
-                .filter(token -> isPositiveNumber(token))
+                .filter(this::isNumeric)
+                .filter(this::isPositiveNumber)
                 .toArray(String[]::new);
 
 
@@ -31,12 +31,10 @@ public class StringCalculator {
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
         if (m.find()) {
             String customDelimiter = m.group(1);
-            String[] tokens = m.group(2).split(customDelimiter);
-            return tokens;
+            return m.group(2).split(customDelimiter);
         }
 
-        String[] numbers = text.split(",|:");
-        return numbers;
+        return text.split(",|:");
     }
 
     private boolean isNumeric(String number) {
