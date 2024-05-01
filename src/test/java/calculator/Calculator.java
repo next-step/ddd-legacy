@@ -59,7 +59,7 @@ public class Calculator{
     private static int toInt(String values) {
         int value = Integer.parseInt(values);
         if (value < 0) {
-            throw new RuntimeException();
+            throw new RuntimeException("value should not be negative");
         }
         return value;
     }
