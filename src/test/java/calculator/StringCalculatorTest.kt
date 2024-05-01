@@ -35,4 +35,11 @@ class StringCalculatorTest {
     fun test3(text: String) {
         assertThat(calculator.add(text)).isSameAs(3)
     }
+
+    @DisplayName("구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
+    @ParameterizedTest
+    @ValueSource(strings = ["1,2:3"])
+    fun test4(text: String) {
+        assertThat(calculator.add(text)).isSameAs(6)
+    }
 }
