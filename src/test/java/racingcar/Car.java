@@ -22,10 +22,14 @@ public class Car{
         return position;
     }
 
-    public void moving(int num){
+    public void moving(int condition){
+        moving( () -> condition >= 4);
+    }
 
-        if(num >= 4){
-             position++;
+    // 확장을 위한 인터페이스 생섬 및 함수 생성
+    public void moving(final MovingStrategy condition) {
+        if (condition.movable()) {
+            position++;
         }
     }
 
