@@ -12,10 +12,14 @@ public class Number {
     }
 
     public Number(int number) {
+        validateNumber(number);
+        this.number = number;
+    }
+
+    private void validateNumber(int number) {
         if (isNegative(number)) {
             throw new NegativeNumberException(number + "is Negative");
         }
-        this.number = number;
     }
 
     private boolean isNegative(int number) {
