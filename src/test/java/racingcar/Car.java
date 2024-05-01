@@ -19,10 +19,14 @@ public class Car {
 	}
 
 	public Car move(final int power) {
-		if (power < 4) {
-			return this;
+		return move(() -> power >= 4);
+	}
+
+	public Car move(final MovingStrategy movingStrategy) {
+		if (movingStrategy.movable()) {
+			return new Car(name, position + 1);
 		}
-		
-		return new Car(name, position + 1);
+
+		return this;
 	}
 }

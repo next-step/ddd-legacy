@@ -38,4 +38,20 @@ public class CarTest {
 			.extracting("position")
 			.isEqualTo(0);
 	}
+
+	@DisplayName("MovingStrategy가 움직일 수 있는 경우 자동차는 움직인다.")
+	@Test
+	void moveByMovingStrategy() {
+		assertThat(new Car("name").move(() -> true))
+			.extracting("position")
+			.isEqualTo(1);
+	}
+
+	@DisplayName("MovingStrategy가 움직일 수 없는 경우 자동차는 움직인다.")
+	@Test
+	void notMoveByMovingStrategy() {
+		assertThat(new Car("name").move(() -> false))
+			.extracting("position")
+			.isEqualTo(0);
+	}
 }
