@@ -18,6 +18,14 @@ class StringCalculatorTest {
         Assertions.assertThat(calculator.add(text)).isZero();
     }
 
+    @DisplayName(value = "숫자 이외의 값을 입력할 경우 예외가 발생한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"ㅂ", "asdas"})
+    void notNumber(final String text) {
+        Assertions.assertThatExceptionOfType(RuntimeException.class)
+                  .isThrownBy(() -> calculator.add(text));
+    }
+
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
     @ParameterizedTest
     @CsvSource(value = {

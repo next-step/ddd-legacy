@@ -37,7 +37,7 @@ public class StringCalculator {
     /**
      * 분리된 숫자 문자열을 합산해 최종 결과를 반환한다.
      * <p>
-     * 음수인 수가 포함되어 있다면 IllegalArgumentException을 던진다.
+     * 음수거나 숫자가 아닌 문자가 포함되어 있다면 IllegalArgumentException을 던진다.
      */
     private int sumNumbers(String[] numberStrings) {
         return Arrays.stream(numberStrings)
