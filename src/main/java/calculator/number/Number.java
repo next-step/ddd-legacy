@@ -18,6 +18,10 @@ public class Number {
         this.value = parse(value);
     }
 
+    public boolean isNegative() {
+        return value < 0;
+    }
+
     private Integer parse(String text) {
         if (StringUtils.isBlankWhenTrim(text)) {
             return Integer.parseInt(text);
