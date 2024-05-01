@@ -8,18 +8,21 @@ class StringCalculator {
             return 0
         }
 
-        val matcher = Pattern.compile("//(.)\n(.*)").matcher(text)
+        return Pattern.compile("//(.)\n(.*)").matcher(text)
+            .let { matcher ->
+                when {
+                    matcher.find() -> {
+                        val customDelimiter = matcher.group(1)
+                        matcher.group(2)
+                            .split(regex = customDelimiter.toRegex())
+                            .sumOf { it.toInt() }
+                    }
 
-        return when {
-            matcher.find() -> {
-                val customDelimiter = matcher.group(1)
-                matcher.group(2)
-                    .split(regex = customDelimiter.toRegex())
-                    .sumOf { it.toInt() }
+                    else -> text.split(regex = "[,|:]".toRegex())
+                        .sumOf { s ->
+                            s.toInt().takeIf { it > -1 } ?: throw RuntimeException("음수를 입력할 수 없습니다.")
+                        }
+                }
             }
-
-            else -> text.split(regex = "[,|:]".toRegex())
-                .sumOf { it.toInt() }
-        }
     }
 }
