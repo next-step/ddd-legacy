@@ -17,10 +17,14 @@ public class Calculator{
         if (isBlank(input)) {
             return ZERO;
         }
-        if (hasNonNumber(input)) {
-            throw new RuntimeException();
-        }
+        validate(input);
         return sum(toInts(split(input)));
+    }
+
+    private static void validate(String input) {
+        if (hasNonNumber(input)) {
+            throw new RuntimeException('"' + input + "\" is not a valid number string");
+        }
     }
 
     private static boolean isBlank(String input) {
