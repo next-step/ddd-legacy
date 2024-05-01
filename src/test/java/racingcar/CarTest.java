@@ -23,10 +23,20 @@ public class CarTest {
 
     }
 
-    @DisplayName("자동차가 움직이는 조건은 0 ~ 9로 무작위 값을 구한 후, 무작위 값이 4이상인 경우에만")
+    @DisplayName("숫자가 4 이상인 경우 자동차가 전진한다")
     @Test
-    void moving(){
+    void move(){
+        final Car car = new Car("k5");
+        car.moving(4);
+        assertThat(car.getPosition()).isEqualTo(1);
+    }
 
+    @DisplayName("숫자가 4 미만인 경우 자동차는 정지한다")
+    @Test
+    void stop(){
+        final Car car = new Car("k5");
+        car.moving(1);
+        assertThat(car.getPosition()).isEqualTo(0);
     }
 
 }
