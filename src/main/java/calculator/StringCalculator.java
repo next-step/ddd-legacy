@@ -6,41 +6,20 @@ import org.springframework.util.StringUtils;
 
 public class StringCalculator {
 
-    private final int ZERO_VALUE = 0;
-
     public int add(String text) {
         if (!StringUtils.hasLength(text)) {
-            return ZERO_VALUE;
+            return Number.ZERO_VALUE;
         }
 
-        String[] tokens = SplitterUtils.split(text);
-        return sum(toNumbers(tokens));
+        Numbers numbers = makeNumbers(SplitterUtils.split(text));
+        return numbers.getSum();
     }
 
-    private List<Integer> toNumbers(String[] tokens) {
-        return Arrays.stream(tokens)
-                .map(this::toNumber)
+    private Numbers makeNumbers(String[] tokens) {
+        List<Number> numbers = Arrays.stream(tokens)
+                .map(Number::new)
                 .toList();
-    }
 
-    private int toNumber(String token) {
-        validateToken(token);
-        return Integer.parseInt(token);
-    }
-
-    private void validateToken(String token) {
-        if (isNegative(token)) {
-            throw new RuntimeException(token + "is Negative");
-        }
-    }
-
-    private boolean isNegative(String token) {
-        return Integer.parseInt(token) < 0;
-    }
-
-    private int sum(List<Integer> numbers) {
-        return numbers.stream()
-                .mapToInt(Integer::intValue)
-                .sum();
+        return new Numbers(numbers);
     }
 }
