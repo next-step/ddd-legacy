@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class CarTest {
 
@@ -19,5 +21,21 @@ public class CarTest {
 			.doesNotThrowAnyException();
 	}
 
+	@DisplayName("자동차는 power가 4 이상인 경우에만 움직인다.")
+	@ParameterizedTest
+	@ValueSource(ints = {4, 5, 6, 7, 8, 9})
+	void move(final int power) {
+		assertThat(new Car("백승윤").move(power))
+			.extracting("position")
+			.isEqualTo(1);
+	}
 
+	@DisplayName("자동차는 power가 3 이하인 경우에는 움직이지 않는다.")
+	@ParameterizedTest
+	@ValueSource(ints = {1, 2, 3})
+	void notMove(final int power) {
+		assertThat(new Car("백승윤").move(power))
+			.extracting("position")
+			.isEqualTo(0);
+	}
 }
