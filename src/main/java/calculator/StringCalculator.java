@@ -5,15 +5,21 @@ import java.util.List;
 
 public class StringCalculator {
 
-    public int calculate(SplitStrategy strategy, String input) {
-        List<Integer> splitInput = strategy.split(input);
+    public int calculate(SplitStrategy strategy, String stringNumbers) {
+        List<Integer> splitNumbers = strategy.split(stringNumbers);
+        int result = 0;
 
-        if (splitInput.size() == 1) {
-            return splitInput.get(0);
+        for (Integer number : splitNumbers) {
+            handleNegative(number);
+            result = result + number;
         }
 
-        return splitInput.stream()
-                .mapToInt(value -> value)
-                .sum();
+        return result;
+    }
+
+    private void handleNegative(Integer number) {
+        if (number < 0) {
+            throw new RuntimeException("전달된 수에 음수가 존재합니다.");
+        }
     }
 }
