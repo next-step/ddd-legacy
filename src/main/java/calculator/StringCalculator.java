@@ -6,18 +6,16 @@ import org.springframework.util.StringUtils;
 
 public class StringCalculator {
 
-    private static final String regex = ",|:";
-
     public int add(String text) {
         if (!StringUtils.hasLength(text)) {
             return 0;
         }
 
-        return sum(splitNumbers(text));
+        String[] tokens = SplitterUtils.split(text);
+        return sum(toIntegers(tokens));
     }
 
-    private List<Integer> splitNumbers(String text) {
-        String[] tokens = text.split(regex);
+    private List<Integer> toIntegers(String[] tokens) {
         return Arrays.stream(tokens)
                 .map(Integer::parseInt)
                 .toList();
