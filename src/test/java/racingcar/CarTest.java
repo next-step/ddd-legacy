@@ -24,7 +24,7 @@ public class CarTest {
 	@DisplayName("숫자가 4 이상이면 전진한다")
 	void fourToNineTest(Integer condition) {
 		Car car = new Car("kim");
-		car.move(condition);
+		car.move(new ConditionStrategy(condition));
 		assertThat(car.position()).isEqualTo(1);
 	}
 
@@ -33,7 +33,7 @@ public class CarTest {
 	@DisplayName("숫자가 4 미만이면 움직이지 않는다")
 	void oneToThreeTest(Integer condition) {
 		Car car = new Car("kim");
-		car.move(condition);
+		car.move(new ConditionStrategy(condition));
 		assertThat(car.position()).isEqualTo(0);
 	}
 
