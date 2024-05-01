@@ -8,29 +8,59 @@ import java.util.regex.Pattern;
 public class StringCalculator {
 
 
-    public StringCalculator(){
+    public StringCalculator() {
     }
 
-    public int add(String text){
+    public int add(String text) {
 
-        if(Objects.isNull(text) || text.isBlank()){
+        if (Objects.isNull(text) || text.isBlank()) {
             return 0;
         }
+        String[] tokens = getValue(text);
+        String[] numbers = Arrays.stream(tokens)
+                .filter(token -> isNumeric(token))
+                .filter(token -> isPositiveNumber(token))
+                .toArray(String[]::new);
 
+
+        return sum(numbers);
+
+    }
+
+    private String[] getValue(String text) {
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
         if (m.find()) {
             String customDelimiter = m.group(1);
-            String[] tokens= m.group(2).split(customDelimiter);
-            return sum(tokens);
+            String[] tokens = m.group(2).split(customDelimiter);
+            return tokens;
         }
 
         String[] numbers = text.split(",|:");
-        return sum(numbers);
+        return numbers;
     }
 
-    private int sum(String[] numbers){
+    private boolean isNumeric(String number) {
+        boolean result = number.matches("[0-9]+");
+
+        if(!result){
+            throw new RuntimeException("숫자가 아닙니다.");
+        }
+        return true;
+    }
+
+    private boolean isPositiveNumber(String number) {
+        int value = Integer.parseInt(number);
+        if(value < 0){
+            throw new RuntimeException("음수는 처리할 수 없습니다.");
+        }
+        return true;
+    }
+
+    private int sum(String[] numbers) {
         return Arrays.stream(numbers)
                 .mapToInt(Integer::parseInt)
                 .sum();
     }
+
+
 }

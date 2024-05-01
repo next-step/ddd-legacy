@@ -2,11 +2,13 @@ package calculator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class StringCalculatorTest {
     private StringCalculator calculator;
@@ -49,6 +51,13 @@ class StringCalculatorTest {
     @ValueSource(strings = {"//;\n1;2;3"})
     void customDelimiter(final String text) {
         assertThat(calculator.add(text)).isSameAs(6);
+    }
+
+    @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @Test
+    void negative() {
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> calculator.add("2,-1,3"));
     }
 
 }
