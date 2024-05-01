@@ -17,4 +17,12 @@ class PositiveNumberTest {
                 .isThrownBy(() -> new PositiveNumber(input));
     }
 
+    @ParameterizedTest
+    @DisplayName("양수만 가능하다")
+    @ValueSource(strings = {"-2", "-1", "-3"})
+    void positiveNumber(String input) {
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new PositiveNumber(input));
+    }
+
 }

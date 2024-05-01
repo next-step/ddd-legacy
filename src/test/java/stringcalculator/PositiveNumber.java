@@ -5,6 +5,10 @@ public class PositiveNumber extends Number {
     public static final PositiveNumber ZERO = new PositiveNumber(0);
     private final int value;
 
+    public PositiveNumber(String value) {
+        this(Integer.parseInt(value));
+    }
+
     public PositiveNumber(int value) {
         if (value < 0) {
             throw new IllegalArgumentException();
