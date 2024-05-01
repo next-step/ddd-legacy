@@ -15,13 +15,8 @@ data class Car(val name: String) {
             throw IllegalArgumentException("position 은 0 ~ 9 사이의 값만 가능합니다.")
         }
 
-        move(
-            object : MovingStrategy {
-                override fun movable(): Boolean {
-                    return condition >= 4
-                }
-            },
-        )
+        val strategy = MovableStrategy(condition = condition)
+        move(strategy = strategy)
     }
 
     private fun move(strategy: MovingStrategy) {
