@@ -40,4 +40,13 @@ class CarTest {
 
 		assertThat(car.position()).isEqualTo(1);
 	}
+
+	@Test
+	@DisplayName("숫자가 4 미만인 경우 자동차는 전진하지 못한다.")
+	void stop() {
+		final var car = new Car("홍길동");
+		car.move(new StopStrategy());
+
+		assertThat(car.position()).isEqualTo(0);
+	}
 }
