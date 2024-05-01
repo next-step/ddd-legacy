@@ -1,5 +1,6 @@
 package kitchenpos.stringcalculator;
 
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,18 +30,15 @@ public class StringCalculator {
     }
 
     private int sumNumbers(String[] numberStrings) {
-        int total = 0;
+        return Arrays.stream(numberStrings)
+                     .mapToInt(Integer::parseInt)
+                     .peek(this::validateNegativeNumber)
+                     .sum();
+    }
 
-        for (String numberString : numberStrings) {
-            int number = Integer.parseInt(numberString);
-
-            if (number < 0) {
-                throw new RuntimeException();
-            }
-
-            total += number;
+    private void validateNegativeNumber(int number) {
+        if (number < 0) {
+            throw new RuntimeException("음수는 포함될 수 없습니다: " + number);
         }
-
-        return total;
     }
 }
