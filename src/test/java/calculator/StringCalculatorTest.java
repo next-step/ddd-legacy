@@ -22,13 +22,13 @@ public class StringCalculatorTest {
     @ParameterizedTest
     @NullAndEmptySource
     void checkEmptyAndNull(String input) {
-        Assertions.assertThat(calculator.calculate(input)).isEqualTo(0);
+        Assertions.assertThat(calculator.calculate(strategy, input)).isEqualTo(0);
     }
 
     @DisplayName("숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.(예 : “1”)")
     @Test
     void inputOnlyOne() {
-        Assertions.assertThat(calculator.calculate("1")).isEqualTo(1);
+        Assertions.assertThat(calculator.calculate(strategy, "1")).isEqualTo(1);
     }
 
     @DisplayName("숫자 두개를 컴마(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.(예 : “1,2”)")
@@ -41,41 +41,5 @@ public class StringCalculatorTest {
     @Test
     void sum_splitByColon() {
         Assertions.assertThat(calculator.calculate(strategy, "1,2:3")).isEqualTo(6);
-    }
-}
-
-class StringCalculator {
-
-    public int calculate(String input) {
-        if (input == null || input.isEmpty()) {
-            return 0;
-        }
-        return Integer.valueOf(input);
-    }
-
-    public int calculate(SplitStrategy strategy, String input) {
-        String[] splitInput = strategy.split(input);
-
-        if (splitInput.length == 1) {
-            return Integer.valueOf(splitInput[0]);
-        }
-
-        int result = Arrays.stream(splitInput)
-                .mapToInt(Integer::valueOf)
-                .sum();
-
-        return result;
-    }
-}
-
-interface SplitStrategy {
-    String[] split(String input);
-}
-
-class StringSplitStrategy implements SplitStrategy {
-
-    @Override
-    public String[] split(String input) {
-        return input.split(",|:");
     }
 }
