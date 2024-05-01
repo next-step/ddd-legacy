@@ -45,7 +45,7 @@ class StringCalculatorTest {
 
     @DisplayName("문자열 계산기에 숫자 이외의 값 혹은 음수를 입력시 RuntimeException 발생한다.")
     @ParameterizedTest
-    @CsvSource({"1,-1,2", "1,a,2"})
+    @CsvSource({"1;-1;2", "1;a;2"})
     void invalidInputExceptionTest(String userInput) {
         // when & then
         Assertions.assertThatThrownBy(() -> new StringCalculator(userInput).calculate())
