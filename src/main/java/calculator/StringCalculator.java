@@ -8,7 +8,7 @@ public class StringCalculator {
 
     public int add(String text) {
         if (!StringUtils.hasLength(text)) {
-            return Number.ZERO_VALUE;
+            return Number.ZERO_NUMBER;
         }
 
         Numbers numbers = makeNumbers(SplitterUtils.split(text));

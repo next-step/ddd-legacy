@@ -2,7 +2,7 @@ package calculator;
 
 public class Number {
 
-    public static final int ZERO_VALUE = 0;
+    public static final int ZERO_NUMBER = 0;
     private final int number;
 
     public Number(String token) {
