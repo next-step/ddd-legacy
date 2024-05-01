@@ -2,6 +2,7 @@ package stringcalculator;
 
 public class PositiveNumber extends Number {
 
+    public static final PositiveNumber ZERO = new PositiveNumber(0);
     private final int value;
 
     public PositiveNumber(int value) {
@@ -29,5 +30,9 @@ public class PositiveNumber extends Number {
     @Override
     public double doubleValue() {
         return value;
+    }
+
+    public PositiveNumber sum(PositiveNumber other) {
+        return new PositiveNumber(value + other.value);
     }
 }
