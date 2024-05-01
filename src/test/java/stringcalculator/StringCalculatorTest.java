@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
@@ -36,14 +37,18 @@ class StringCalculatorTest {
         var userInput = "//!\n1!2!10";
 
         // when
-        int actual = new StringCalculator(userInput).calculate();
+        var actual = new StringCalculator(userInput).calculate();
 
         // then
         Assertions.assertThat(actual).isEqualTo(13);
     }
 
     @DisplayName("문자열 계산기에 숫자 이외의 값 혹은 음수를 입력시 RuntimeException 발생한다.")
-    void invalidInputExceptionTest() {
-
+    @ParameterizedTest
+    @CsvSource({"1,-1,2", "1,a,2"})
+    void invalidInputExceptionTest(String userInput) {
+        // when & then
+        Assertions.assertThatThrownBy(() -> new StringCalculator(userInput).calculate())
+                .isInstanceOf(RuntimeException.class);
     }
 }
