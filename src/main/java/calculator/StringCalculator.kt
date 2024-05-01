@@ -4,6 +4,7 @@ import java.util.regex.Pattern
 
 class StringCalculator {
     companion object {
+        private val defaultDelimiters: Regex = "[,:]".toRegex()
         private val customDelimiterPattern: Pattern = Pattern.compile("//(.)\n(.*)")
     }
 
@@ -28,6 +29,7 @@ class StringCalculator {
                 .sumOf { it.toInt() }
         }
 
-        return -1
+        return text.split(defaultDelimiters)
+            .sumOf { it.toInt() }
     }
 }
