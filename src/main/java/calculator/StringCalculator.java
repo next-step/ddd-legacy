@@ -12,13 +12,28 @@ public class StringCalculator {
         }
 
         String[] tokens = SplitterUtils.split(text);
-        return sum(toIntegers(tokens));
+        return sum(toNumbers(tokens));
     }
 
-    private List<Integer> toIntegers(String[] tokens) {
+    private List<Integer> toNumbers(String[] tokens) {
         return Arrays.stream(tokens)
-                .map(Integer::parseInt)
+                .map(this::toNumber)
                 .toList();
+    }
+
+    private int toNumber(String token) {
+        validateToken(token);
+        return Integer.parseInt(token);
+    }
+
+    private void validateToken(String token) {
+        if (isNegative(token)) {
+            throw new RuntimeException(token + "is Negative");
+        }
+    }
+
+    private boolean isNegative(String token) {
+        return Integer.parseInt(token) < 0;
     }
 
     private int sum(List<Integer> numbers) {
