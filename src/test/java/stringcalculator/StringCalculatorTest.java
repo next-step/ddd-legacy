@@ -5,6 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.*;
+
 public class StringCalculatorTest {
 
     /**
@@ -30,7 +32,7 @@ public class StringCalculatorTest {
 
         int sum = stringCalculator.sum("1,2");
 
-        Assertions.assertThat(sum).isEqualTo(3);
+        assertThat(sum).isEqualTo(3);
     }
 
     @DisplayName("쉼표(,) or 클론(:) 구분자로 ")
@@ -39,12 +41,13 @@ public class StringCalculatorTest {
 
         int sum = stringCalculator.sum("1,2:3");
 
-        Assertions.assertThat(sum).isEqualTo(6);
+        assertThat(sum).isEqualTo(6);
     }
 
     @DisplayName("'//' 와 '\n' 사이에 위치한 문자를 커스텀 구분자로")
     @Test
     void seperate3(){
-
+        int customSeperator = stringCalculator.getCustomSeperator("//;\n1;2;3");
+        assertThat(customSeperator).isEqualTo(6);
     }
 }
