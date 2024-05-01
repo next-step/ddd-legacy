@@ -5,6 +5,8 @@ import java.util.Arrays;
 public class StringCalculator {
 
     public static final String DEFAULT_DELIMITER = ",|:";
+    public static final String PREFIX_OF_CUSTOM_DELIMITER = "//";
+    public static final String SUFFIX_OF_CUSTOM_DELIMITER = "\n";
 
     public static int calculate(String input) {
         if (input == null || input.isEmpty()) {
@@ -31,18 +33,18 @@ public class StringCalculator {
     }
 
     private static String extractDelimiter(String input) {
-        if (!input.startsWith("//")) {
+        if (!input.startsWith(PREFIX_OF_CUSTOM_DELIMITER)) {
             return DEFAULT_DELIMITER;
         }
-        int endIndex = input.indexOf("\n");
-        return input.substring(2, endIndex);
+        int endIndex = input.indexOf(SUFFIX_OF_CUSTOM_DELIMITER);
+        return input.substring(PREFIX_OF_CUSTOM_DELIMITER.length(), endIndex);
     }
 
     private static String removeDelimiter(String input) {
-        if (!input.startsWith("//")) {
+        if (!input.startsWith(PREFIX_OF_CUSTOM_DELIMITER)) {
             return input;
         }
-        return input.substring(input.indexOf("\n") + 1);
+        return input.substring(input.indexOf(SUFFIX_OF_CUSTOM_DELIMITER) + 1);
     }
 
     private static int toPositive(String strNumber) {
