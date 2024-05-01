@@ -6,9 +6,11 @@ import org.springframework.util.StringUtils;
 
 public class StringCalculator {
 
+    private final int ZERO_VALUE = 0;
+
     public int add(String text) {
         if (!StringUtils.hasLength(text)) {
-            return 0;
+            return ZERO_VALUE;
         }
 
         String[] tokens = SplitterUtils.split(text);
