@@ -7,10 +7,10 @@ class StringCalculator {
         text: String?,
     ): Int = if (text.isNullOrBlank()) {
         EMPTY_RESULT
-    } else parseText(text = text,)
+    } else parseText(text = text)
 
     private fun parseText(text: String): Int {
-        return Pattern.compile(EXTRACT_CUSTOM_DELIMITER_REGEX).matcher(text).let { matcher ->
+        return pattern.matcher(text).let { matcher ->
             if (matcher.find()) {
                 return sumByString(
                     delimiter = matcher.group(DELIMITER_GROUP_INDEX),
@@ -35,7 +35,9 @@ class StringCalculator {
     private fun Int.requirePositive(): Int =
         this.takeIf { it > NEGATIVE_NUMBER } ?: throw RuntimeException(ERROR_MESSAGE_NEGATIVE_NUMBER)
 
-    companion object Constant {
+    companion object {
+        private val pattern by lazy { Pattern.compile(EXTRACT_CUSTOM_DELIMITER_REGEX) }
+
         private const val DEFAULT_DELIMITER = "[,|:]"
         private const val EXTRACT_CUSTOM_DELIMITER_REGEX = "//(.)\\n(.*)"
 
