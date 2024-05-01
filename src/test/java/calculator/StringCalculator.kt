@@ -3,30 +3,37 @@ package calculator
 import java.util.regex.Pattern
 
 class StringCalculator {
-    fun add(text: String?): Int {
-        if (text.isNullOrBlank()) {
-            return EMPTY_RESULT
-        }
+    fun add(
+        text: String?,
+    ): Int = if (text.isNullOrBlank()) {
+        EMPTY_RESULT
+    } else parseText(text = text,)
 
-        return Pattern.compile(EXTRACT_CUSTOM_DELIMITER_REGEX).matcher(text)
-            .let { matcher ->
-                when {
-                    matcher.find() -> {
-                        val customDelimiter = matcher.group(DELIMITER_GROUP_INDEX)
-                        matcher.group(DATA_GROUP_INDEX)
-                            .split(regex = customDelimiter.toRegex())
-                            .sumOf { it.toInt() }
-                    }
-
-                    else -> text.split(regex = DEFAULT_DELIMITER.toRegex())
-                        .sumOf { split ->
-                            split.toInt()
-                                .takeIf { it > NEGATIVE_ONE }
-                                ?: throw RuntimeException(ERROR_MESSAGE_NEGATIVE_NUMBER)
-                        }
-                }
+    private fun parseText(text: String): Int {
+        return Pattern.compile(EXTRACT_CUSTOM_DELIMITER_REGEX).matcher(text).let { matcher ->
+            if (matcher.find()) {
+                return sumByString(
+                    delimiter = matcher.group(DELIMITER_GROUP_INDEX),
+                    numbersText = matcher.group(DATA_GROUP_INDEX),
+                )
             }
+
+            sumByString(
+                delimiter = DEFAULT_DELIMITER,
+                numbersText = text,
+            )
+        }
     }
+
+    private fun sumByString(
+        delimiter: String,
+        numbersText: String,
+    ): Int = numbersText
+        .split(regex = delimiter.toRegex())
+        .sumOf { numberText -> numberText.toInt().requirePositive() }
+
+    private fun Int.requirePositive(): Int =
+        this.takeIf { it > NEGATIVE_NUMBER } ?: throw RuntimeException(ERROR_MESSAGE_NEGATIVE_NUMBER)
 
     companion object Constant {
         private const val DEFAULT_DELIMITER = "[,|:]"
@@ -38,6 +45,6 @@ class StringCalculator {
         private const val DATA_GROUP_INDEX = 2
 
         private const val EMPTY_RESULT = 0
-        private const val NEGATIVE_ONE = -1
+        private const val NEGATIVE_NUMBER = -1
     }
 }
