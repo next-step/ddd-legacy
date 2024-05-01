@@ -3,6 +3,7 @@ package calculator;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
@@ -14,5 +15,12 @@ public class StringCalculatorTest {
     void null_or_empty(String input) {
         int result = StringCalculator.calculate(input);
         assertThat(result).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("숫자 하나가 들어오면 해당 숫자를 반환한다")
+    void one_number() {
+        int result = StringCalculator.calculate("1");
+        assertThat(result).isEqualTo(1);
     }
 }
