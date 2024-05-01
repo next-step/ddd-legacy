@@ -2,27 +2,27 @@ package calculator;
 
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Calculator{
 
-    private int[] numbers;
 
-    public Calculator(String input) {
+    public static int calculate(String input) {
         if (hasNonNumber(input)) {
             throw new RuntimeException();
         }
-        toInts(split(input));
+        return sum(toInts(split(input)));
     }
 
-    private boolean hasNonNumber(String input) {
+    private static boolean hasNonNumber(String input) {
         return input.matches("[a-zA-Z]");
     }
 
 
-    public int sum() {
-        return Arrays.stream(numbers).sum();
+    public static int sum(List<Integer> numbers) {
+        return numbers.stream().mapToInt(it -> it).sum();
     }
 
     private static String[] split(String input) {
@@ -35,11 +35,10 @@ public class Calculator{
         return m.group(2).split(customDelimiter);
     }
 
-    private void toInts(String[] values) {
-        numbers = initArray(values);
-        for (int i = 0; i < values.length; i++) {
-            numbers[i] = toInt(values[i]);
-        }
+    private static List<Integer> toInts(String[] values) {
+        return Arrays.stream(values)
+                .map(Calculator::toInt)
+                .toList();
     }
 
     private static int toInt(String values) {
@@ -48,10 +47,5 @@ public class Calculator{
             throw new RuntimeException();
         }
         return value;
-    }
-
-
-    private static int [] initArray(String[] values) {
-        return new int[values.length];
     }
 }
