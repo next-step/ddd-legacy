@@ -36,8 +36,7 @@ public class CalculatorNumber {
     }
 
     public static int sum(Stream<CalculatorNumber> numbers) {
-        return numbers.map(CalculatorNumber::getNumber)
-                .reduce(0, Integer::sum);
+        return numbers.mapToInt(CalculatorNumber::getNumber).sum();
     }
 
     public int getNumber() {
