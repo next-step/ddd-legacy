@@ -1,12 +1,15 @@
 package calculator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.data.repository.query.Param;
 
 public class StringCalculatorTest {
 
@@ -31,5 +34,13 @@ public class StringCalculatorTest {
     public void multiple_numbers_comma_or_colon(String input, int expected) {
         int result = StringCalculator.calculate(input);
         assertThat(result).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @DisplayName("숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException을 throw 한다")
+    @ValueSource(strings = {"-1", "a"})
+    public void negative_or_not_number(String input) {
+        assertThatThrownBy(() -> StringCalculator.calculate(input))
+            .isInstanceOf(RuntimeException.class);
     }
 }
