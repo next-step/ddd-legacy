@@ -3,6 +3,7 @@ package stringcalculator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class StringCalculator {
     public static final String REGULAR_DELIMITER_REGEX = "[,;]";
@@ -18,9 +19,19 @@ public class StringCalculator {
         if (EMPTY_USER_INPUT.equals(userInput) || userInput == null) {
             return Collections.emptyList();
         }
-        return Arrays.stream(userInput.split(REGULAR_DELIMITER_REGEX))
-                .map(Integer::valueOf)
-                .toList();
+        String delimiter = REGULAR_DELIMITER_REGEX;
+        var matcher = Pattern.compile("//(.*?)\n").matcher(userInput);
+        if (matcher.find()) {
+            delimiter = matcher.group(1);
+            return Arrays.stream(userInput.split("\n")[1].split(delimiter))
+                    .map(Integer::valueOf)
+                    .toList();
+        } else {
+            delimiter = REGULAR_DELIMITER_REGEX;
+            return Arrays.stream(userInput.split(delimiter))
+                    .map(Integer::valueOf)
+                    .toList();
+        }
     }
 
     public int calculate() {
