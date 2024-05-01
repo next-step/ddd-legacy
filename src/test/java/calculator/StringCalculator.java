@@ -1,18 +1,31 @@
 package calculator;
 
+import java.util.Arrays;
+
 public class StringCalculator {
+
+    public static final String DEFAULT_DELIMITER = ",|:";
 
     public static int calculate(String input) {
         if (input == null || input.isEmpty()) {
             return 0;
         }
-        String[] strNumbers = input.split(",|:");
-        int sum = 0;
-        for (String strNumber : strNumbers) {
-            sum += toPositive(strNumber);
-        }
+        return sum(toNumbers(split(input)));
+    }
 
-        return sum;
+    private static int sum(int[] numbers) {
+        return Arrays.stream(numbers).sum();
+    }
+
+    private static int[] toNumbers(String[] strNumbers) {
+        return Arrays.stream(strNumbers)
+            .map(StringCalculator::toPositive)
+            .mapToInt(Integer::intValue)
+            .toArray();
+    }
+
+    private static String[] split(String input) {
+        return input.split(DEFAULT_DELIMITER);
     }
 
     private static int toPositive(String strNumber) {
