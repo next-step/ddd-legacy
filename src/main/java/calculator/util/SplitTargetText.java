@@ -1,10 +1,10 @@
 package calculator.util;
 
-public class TargetText {
+public class SplitTargetText {
 
     private final String targetText;
 
-    public TargetText(String targetText) {
+    public SplitTargetText(String targetText) {
         validateSplitText(targetText);
         this.targetText = targetText;
     }

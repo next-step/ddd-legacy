@@ -11,12 +11,12 @@ public class SplitterUtils {
     private static final int TEXT_GROUP = 2;
 
     public static String[] split(String text) {
-        TargetText targetText = new TargetText(text);
+        SplitTargetText targetText = new SplitTargetText(text);
         Delimiter delimiter = new Delimiter(DEFAULT_DELIMITER);
         Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
         if (matcher.find()) {
             delimiter.addDelimiter(matcher.group(DELIMITER_GROUP));
-            targetText = new TargetText(matcher.group(TEXT_GROUP));
+            targetText = new SplitTargetText(matcher.group(TEXT_GROUP));
             return delimiter.split(targetText);
         }
 

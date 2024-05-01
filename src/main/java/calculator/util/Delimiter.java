@@ -11,7 +11,7 @@ public class Delimiter {
         this.delimiter = this.delimiter + "|" + delimiter;
     }
 
-    public String[] split(TargetText text){
+    public String[] split(SplitTargetText text){
         return text.split(delimiter);
     }
 }
