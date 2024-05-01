@@ -3,6 +3,8 @@ package calculator;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -46,5 +48,13 @@ class CalculatorTest {
 
         assertThatThrownBy(() -> Calculator.calculate("1,2,-1"))
                 .isInstanceOf(RuntimeException.class);
+    }
+
+    @DisplayName("0 또는 null이 입력되면 0을 반환한다")
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldReturnZeroWhenInputIsNullOrEmpty(String inputString) {
+
+        assertThat(Calculator.calculate(inputString)).isZero();
     }
 }

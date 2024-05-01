@@ -8,12 +8,20 @@ import java.util.regex.Pattern;
 
 public class Calculator{
 
+    private final static int ZERO = 0;
 
     public static int calculate(String input) {
+        if (isBlank(input)) {
+            return ZERO;
+        }
         if (hasNonNumber(input)) {
             throw new RuntimeException();
         }
         return sum(toInts(split(input)));
+    }
+
+    private static boolean isBlank(String input) {
+        return input == null || input.trim().isEmpty();
     }
 
     private static boolean hasNonNumber(String input) {
