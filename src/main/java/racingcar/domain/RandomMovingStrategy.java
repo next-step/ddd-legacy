@@ -2,7 +2,7 @@ package racingcar.domain;
 
 import java.security.SecureRandom;
 
-public class DefaultMovingStrategy implements MovingStrategy {
+public class RandomMovingStrategy implements MovingStrategy {
 	private static final int RANDOM_BOUND_VALUE = 10;
 
 	private static final int MINIMUM_MOVABLE_NUMBER = 4;
