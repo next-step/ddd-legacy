@@ -13,20 +13,22 @@ class CarTest {
     Assertions.assertThatIllegalArgumentException()
             .isThrownBy(() -> new Car("동해물과백두산이", 0));
   }
-  
+
   @Test
-  @DisplayName("무작위_값_4이상_인_경우에만_자동차가_움직인다")
-  void 무작위_값_4이상_인_경우에만_자동차가_움직인다() {
-    final int condition = new Random().nextInt(10);
-
+  @DisplayName("값_4이상일_경우")
+  void 값_4이상일_경우() {
     final Car car = new Car("움직인다", 0);
-    car.setPosition(condition);
+    MovingStrategy movingStrategy = new GoStrategy();
+    Assertions.assertThat(
+            car.isMoving(movingStrategy, 5)).isTrue();
+  }
 
-    if (car.getPosition() > car.getCurrentPosition()) {
-      Assertions.assertThat(car.isMoving()).isTrue();
-
-    } else {
-      Assertions.assertThat(car.isMoving()).isFalse();
-    }
+  @Test
+  @DisplayName("값_4이하일_경우")
+  void 값_4이하일_경우() {
+    final Car car = new Car("넌안된다", 0);
+    MovingStrategy movingStrategy = new StopStrategy();
+    Assertions.assertThat(
+            car.isMoving(movingStrategy, 3)).isFalse();
   }
 }
