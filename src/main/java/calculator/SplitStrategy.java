@@ -1,5 +1,7 @@
 package calculator;
 
+import java.util.List;
+
 public interface SplitStrategy {
-    String[] split(String input);
+    List<Integer> split(String input);
 }
