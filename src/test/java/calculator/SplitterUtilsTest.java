@@ -37,7 +37,7 @@ class SplitterUtilsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"//;\n1;2,3"})
+    @ValueSource(strings = {"//;\n1;2;3", "//&\n1&2&3", "//;\n1;2,3"})
     void 문자열_사이에_커스텀구분자를_지정할_수_있다(final String text) {
         String[] token = SplitterUtils.split(text);
         assertThat(token).contains("1", "2", "3");
