@@ -17,13 +17,13 @@ public class Number {
     }
 
     private void validateNumber(int number) {
-        if (isNegative(number)) {
+        if (!isPositive(number)) {
             throw new NegativeNumberException(number + "is Negative");
         }
     }
 
-    private boolean isNegative(int number) {
-        return number < 0;
+    private boolean isPositive(int number) {
+        return number >= 0;
     }
 
     public int getNumber() {
