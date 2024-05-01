@@ -12,8 +12,8 @@ class StringCalculator {
             .let { matcher ->
                 when {
                     matcher.find() -> {
-                        val customDelimiter = matcher.group(1)
-                        matcher.group(2)
+                        val customDelimiter = matcher.group(DELIMITER_GROUP_INDEX)
+                        matcher.group(DATA_GROUP_INDEX)
                             .split(regex = customDelimiter.toRegex())
                             .sumOf { it.toInt() }
                     }
@@ -33,6 +33,9 @@ class StringCalculator {
         private const val EXTRACT_CUSTOM_DELIMITER_REGEX = "//(.)\\n(.*)"
 
         private const val ERROR_MESSAGE_NEGATIVE_NUMBER = "음수를 입력할 수 없습니다."
+
+        private const val DELIMITER_GROUP_INDEX = 1
+        private const val DATA_GROUP_INDEX = 2
 
         private const val EMPTY_RESULT = 0
         private const val NEGATIVE_ONE = -1
