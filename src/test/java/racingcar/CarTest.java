@@ -1,22 +1,25 @@
 package racingcar;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import racingcar.domain.Car;
+import racingcar.domain.MoveStrategy;
+import racingcar.domain.RandomStrategy;
+
+import java.util.Random;
 
 @DisplayName("자동차 도메인 테스트")
-@ExtendWith(MockitoExtension.class)
 public class CarTest {
-    @Mock
-    MoveStrategy fakeMoveStrategy;
+    MoveStrategy moveStrategy;
+    Car car;
 
-    @InjectMocks
-    Car fakeCar = new Car();
+    @BeforeEach
+    void setUp() {
+        moveStrategy = new RandomStrategy();
+        car = new Car();
+    }
 
     @Test
     @DisplayName("자동차의 이름은 5글자를 넘을 수 없다.")
@@ -32,10 +35,7 @@ public class CarTest {
     void move() {
         int randomValue = 4;
 
-        Mockito.when(fakeMoveStrategy.isMovable(randomValue))
-                .thenReturn(true);
-
-        Assertions.assertThat(fakeCar.movable(fakeMoveStrategy, randomValue))
+        Assertions.assertThat(car.movable(moveStrategy, randomValue))
                 .isEqualTo(true);
     }
 
@@ -44,43 +44,16 @@ public class CarTest {
     void stop() {
         int randomValue = 3;
 
-        Mockito.when(fakeMoveStrategy.isMovable(randomValue))
-                .thenReturn(false);
-
-        Assertions.assertThat(fakeCar.movable(fakeMoveStrategy, randomValue))
+        Assertions.assertThat(car.movable(moveStrategy, randomValue))
                 .isEqualTo(false);
     }
 
-    class Car {
-        private String name;
-        private int position;
-
-        public Car() {
-            name = "";
-            position = 0;
-        }
-
-        public Car(String name) {
-            handleNameLength(name);
-            this.name = name;
-        }
-
-        private void handleNameLength(String name) {
-            if (5 < name.length()) {
-                throw new IllegalArgumentException("자동차 이름은 5 글자를 넘을 수 없습니다.");
-            }
-        }
-
-        public boolean movable(MoveStrategy strategy, int value) {
-            if (strategy.isMovable(value)) {
-                position++;
-                return true;
-            }
-            return false;
-        }
-    }
-
-    interface MoveStrategy {
-        boolean isMovable(int value);
+    @Test
+    @DisplayName("랜덤 값에 따른 자동차 움직임 결과를 확인한다.")
+    void movableByRandomValue() {
+        int randomValue = new Random().nextInt(10);
+        System.out.println("랜덤 값 : " + randomValue);
+        boolean result = car.movable(moveStrategy, randomValue);
+        System.out.println("결과 : " + result);
     }
 }
