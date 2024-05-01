@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StringCalculator implements Calculator<Integer, String> {
+public class StringAddCalculator implements Calculator<Integer, String> {
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     private final List<String> delimiters = new ArrayList<>(List.of(",", ":"));
 
-    public StringCalculator() {
+    public StringAddCalculator() {
     }
 
     @Override

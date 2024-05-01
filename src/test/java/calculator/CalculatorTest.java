@@ -69,6 +69,6 @@ public class CalculatorTest {
     }
 
     private Calculator<Integer, String> createCalculator() {
-        return new StringCalculator();
+        return new StringAddCalculator();
     }
 }
