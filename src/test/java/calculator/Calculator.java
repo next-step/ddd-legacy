@@ -17,30 +17,15 @@ public class Calculator{
         if (isBlank(input)) {
             return ZERO;
         }
-        validate(input);
         return sum(toInts(split(input)));
-    }
-
-    private static void validate(String input) {
-        if (hasNonNumber(input)) {
-            throw new RuntimeException('"' + input + "\" is not a valid number string");
-        }
     }
 
     private static boolean isBlank(String input) {
         return input == null || input.trim().isEmpty();
     }
 
-    private static boolean hasNonNumber(String input) {
-        return input.matches(ALPHABET_PATTERN);
-    }
-
-
-    public static int sum(List<Integer> numbers) {
-        return numbers.stream().mapToInt(it -> it).sum();
-    }
-
     private static String[] split(String input) {
+        validate(input);
         Matcher m = DELIMITER_PATTERN.matcher(input);
         if(!m.find()){
             return input.split("[,:]");
@@ -49,6 +34,7 @@ public class Calculator{
         String customDelimiter = m.group(1);
         return m.group(2).split(customDelimiter);
     }
+
 
     private static List<Integer> toInts(String[] values) {
         return Arrays.stream(values)
@@ -62,5 +48,19 @@ public class Calculator{
             throw new RuntimeException("value should not be negative");
         }
         return value;
+    }
+
+    public static int sum(List<Integer> numbers) {
+        return numbers.stream().mapToInt(it -> it).sum();
+    }
+
+    private static void validate(String input) {
+        if (hasNonNumber(input)) {
+            throw new RuntimeException('"' + input + "\" is not a valid number string");
+        }
+    }
+
+    private static boolean hasNonNumber(String input) {
+        return input.matches(ALPHABET_PATTERN);
     }
 }
