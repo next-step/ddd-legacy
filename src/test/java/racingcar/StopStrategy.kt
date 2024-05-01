@@ -1,4 +1,7 @@
 package racingcar
 
-class StopStrategy {
+class StopStrategy : MovingStrategy {
+    override fun isMovable(): Boolean {
+        return false
+    }
 }

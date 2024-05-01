@@ -1,4 +1,8 @@
 package racingcar
 
-class GoStrategy {
+class GoStrategy : MovingStrategy {
+    override fun isMovable(): Boolean {
+        return true
+    }
+
 }
