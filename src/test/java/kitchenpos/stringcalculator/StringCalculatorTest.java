@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -19,23 +20,36 @@ class StringCalculatorTest {
 
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
     @ParameterizedTest
-    @ValueSource(strings = {"1"})
-    void oneNumber(final String text) {
-        Assertions.assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
+    @CsvSource(value = {
+        "1=1",
+        "42=42",
+        "0=0",
+        "100=100"
+    }, delimiter = '=')
+    void oneNumber(final String text, int expected) {
+        Assertions.assertThat(calculator.add(text)).isSameAs(expected);
     }
 
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
     @ParameterizedTest
-    @ValueSource(strings = {"1,2"})
-    void twoNumbers(final String text) {
-        Assertions.assertThat(calculator.add(text)).isSameAs(3);
+    @CsvSource(value = {
+        "1,2=3",
+        "10,20=30",
+        "3,7=10"
+    }, delimiter = '=')
+    void twoNumbers(final String text, int expected) {
+        Assertions.assertThat(calculator.add(text)).isSameAs(expected);
     }
 
     @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
     @ParameterizedTest
-    @ValueSource(strings = {"1,2:3"})
-    void colons(final String text) {
-        Assertions.assertThat(calculator.add(text)).isSameAs(6);
+    @CsvSource(value = {
+        "1,2:3=6",
+        "2:4,6=12",
+        "1:1:1=3"
+    }, delimiter = '=')
+    void colons(final String text, int expected) {
+        Assertions.assertThat(calculator.add(text)).isSameAs(expected);
     }
 
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
