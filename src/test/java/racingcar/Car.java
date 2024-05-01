@@ -10,14 +10,14 @@ public class Car {
 
     public Car(String name, int position) {
         if (name.length() > 5) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("자동차의 네이밍은 다섯글자를 초과할 수 없습니다.");
         }
         this.name = name;
         this.position = position;
     }
 
-    public void move(MovingStrategy condition) {
-        if (condition.movable()) {
+    public void move(MovingStrategy condition, int number) {
+        if (condition.movable(number)) {
             this.position++;
         }
     }

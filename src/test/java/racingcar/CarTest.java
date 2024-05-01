@@ -12,7 +12,8 @@ class CarTest {
     @Test
     void constructor() {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Car("동해물과백두산이"))
+                .isThrownBy(() -> new Car("동해물과백두"))
+                .withMessage("자동차의 네이밍은 다섯글자를 초과할 수 없습니다.")
         ;
     }
 
@@ -20,7 +21,7 @@ class CarTest {
     @Test
     void move() {
         final Car car = new Car("홍길동");
-        car.move(new GoStrategy());
+        car.move(new RandomMovingStrategy(), 4);
         assertThat(car.position()).isEqualTo(1);
     }
 
@@ -28,7 +29,7 @@ class CarTest {
     @Test
     void stop() {
         final Car car = new Car("홍길동");
-        car.move(new StopStrategy());
+        car.move(new RandomMovingStrategy(), 3);
         assertThat(car.position()).isZero();
     }
 }
