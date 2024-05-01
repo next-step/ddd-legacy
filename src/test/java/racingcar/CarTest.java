@@ -37,6 +37,22 @@ public class CarTest {
 		assertThat(car.position()).isEqualTo(0);
 	}
 
+	@Test
+	@DisplayName("움직이는 상황에서 움직인다")
+	void goTest() {
+		Car car = new Car("kim");
+		car.move(new GoStrategy());
+		assertThat(car.position()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("움직이지 않을 상황에서는 움직이지 않는다")
+	void stopTest() {
+		Car car = new Car("kim");
+		car.move(new StopStrategy());
+		assertThat(car.position()).isEqualTo(0);
+	}
+
 	static List<Integer> fourToNine() {
 		return Arrays.asList(4, 5, 6, 7, 8, 9);
 	}
