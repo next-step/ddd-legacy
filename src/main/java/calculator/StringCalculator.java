@@ -1,5 +1,6 @@
 package calculator;
 
+import calculator.util.SplitterUtils;
 import org.springframework.util.StringUtils;
 
 public class StringCalculator {
