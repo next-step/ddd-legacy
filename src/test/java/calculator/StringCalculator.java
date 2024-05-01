@@ -25,7 +25,24 @@ public class StringCalculator {
     }
 
     private static String[] split(String input) {
-        return input.split(DEFAULT_DELIMITER);
+        String delimiter = extractDelimiter(input);
+        input = removeDelimiter(input);
+        return input.split(delimiter);
+    }
+
+    private static String extractDelimiter(String input) {
+        if (!input.startsWith("//")) {
+            return DEFAULT_DELIMITER;
+        }
+        int endIndex = input.indexOf("\n");
+        return input.substring(2, endIndex);
+    }
+
+    private static String removeDelimiter(String input) {
+        if (!input.startsWith("//")) {
+            return input;
+        }
+        return input.substring(input.indexOf("\n") + 1);
     }
 
     private static int toPositive(String strNumber) {

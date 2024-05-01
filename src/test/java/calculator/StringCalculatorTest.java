@@ -43,4 +43,11 @@ public class StringCalculatorTest {
         assertThatThrownBy(() -> StringCalculator.calculate(input))
             .isInstanceOf(RuntimeException.class);
     }
+
+    @Test
+    @DisplayName("커스텀 구분자를 사용할 수 있다")
+    public void custom_delimiter() {
+        int result = StringCalculator.calculate("//;\n1;2;3");
+        assertThat(result).isEqualTo(6);
+    }
 }
