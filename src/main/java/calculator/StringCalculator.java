@@ -1,11 +1,11 @@
 package calculator;
 
-import calculator.number.*;
-import utils.*;
+import calculator.number.Positives;
+import utils.StringUtils;
 
-import java.util.regex.*;
+import java.util.regex.Pattern;
 
-import static calculator.number.Number.ZERO;
+import static calculator.number.Positive.ZERO;
 
 public class StringCalculator {
 
@@ -18,7 +18,7 @@ public class StringCalculator {
 
     public int add(String text) {
         if (StringUtils.isBlank(text)) {
-            return ZERO.getValue();
+            return ZERO.getIntValue();
         }
 
         var texts = separate(text);

@@ -1,6 +1,6 @@
 package racingcar.domain;
 
-import utils.*;
+import utils.StringUtils;
 
 public class Car {
 

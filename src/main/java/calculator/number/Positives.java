@@ -1,6 +1,8 @@
 package calculator.number;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Arrays;
 
 public class Positives {
 
@@ -22,6 +24,12 @@ public class Positives {
         return this.positives.stream()
                 .mapToInt(Positive::getIntValue)
                 .sum();
+    }
+
+    private List<Positive> convert(String[] texts) {
+        return Arrays.stream(texts)
+                .map(Positive::new)
+                .toList();
     }
 
 }

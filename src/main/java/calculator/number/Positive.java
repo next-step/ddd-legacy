@@ -1,26 +1,28 @@
 package calculator.number;
 
+import calculator.exception.CalculatorException;
+
+import static calculator.exception.ErrorMessage.IS_NOT_NEGATIVE;
+
 public class Positive {
 
-    private final Number value;
+    private final int value;
+
+    public static final Positive ZERO = new Positive(0);
 
     public Positive(String value) {
-        this(new Number(value));
+        this(Integer.parseInt(value));
     }
 
     public Positive(Integer value) {
-        this(new Number(value));
-    }
-
-    public Positive(Number value) {
-        if (value.isNegative()) {
-            throw new RuntimeException("음수는 허용되지 않습니다.");
+        if (value < 0) {
+            throw new CalculatorException(IS_NOT_NEGATIVE);
         }
         this.value = value;
     }
 
     public int getIntValue() {
-        return this.value.getValue();
+        return this.value;
     }
 
 }
