@@ -8,8 +8,9 @@ class StringCalculator {
             return 0
         }
 
-        return formula.split(FORMULA_SPLITTER.toRegex()).let { numbers ->
-            numbers.sumOf { it.toInt() }
-        }
+        return formula.split(FORMULA_SPLITTER.toRegex())
+            .map { Operand(it) }
+            .reduce { acc, operand -> acc + operand }
+            .value
     }
 }
