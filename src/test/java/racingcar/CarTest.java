@@ -25,8 +25,7 @@ public class CarTest {
 	@ParameterizedTest
 	@ValueSource(ints = {4, 5, 6, 7, 8, 9})
 	void move(final int power) {
-		assertThat(new Car("백승윤").move(power))
-			.extracting("position")
+		assertThat(new Car("백승윤").move(power).getPosition())
 			.isEqualTo(1);
 	}
 
@@ -34,8 +33,7 @@ public class CarTest {
 	@ParameterizedTest
 	@ValueSource(ints = {1, 2, 3})
 	void notMove(final int power) {
-		assertThat(new Car("백승윤").move(power))
-			.extracting("position")
+		assertThat(new Car("백승윤").move(power).getPosition())
 			.isEqualTo(0);
 	}
 
@@ -44,8 +42,7 @@ public class CarTest {
 	void moveByMovingStrategy() {
 		final MovingStrategy goStrategy = () -> true;
 
-		assertThat(new Car("name").move(goStrategy))
-			.extracting("position")
+		assertThat(new Car("name").move(goStrategy).getPosition())
 			.isEqualTo(1);
 	}
 
@@ -53,9 +50,8 @@ public class CarTest {
 	@Test
 	void notMoveByMovingStrategy() {
 		MovingStrategy stopStrategy = () -> false;
-		
-		assertThat(new Car("name").move(stopStrategy))
-			.extracting("position")
+
+		assertThat(new Car("name").move(stopStrategy).getPosition())
 			.isEqualTo(0);
 	}
 }

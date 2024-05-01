@@ -4,15 +4,15 @@ public class Car {
 
 	private static final int POWER_THRESHOLD = 4;
 	private final Name name;
-	private final int position;
+	private final Position position;
 
-	private Car(final Name name, final int position) {
+	private Car(final Name name, final Position position) {
 		this.name = name;
 		this.position = position;
 	}
 
 	public Car(final String name) {
-		this(new Name(name), 0);
+		this(new Name(name), Position.INITIAL);
 	}
 
 	public Car move(final int power) {
@@ -21,9 +21,13 @@ public class Car {
 
 	public Car move(final MovingStrategy movingStrategy) {
 		if (movingStrategy.movable()) {
-			return new Car(name, position + 1);
+			return new Car(name, position.next());
 		}
 
 		return this;
+	}
+
+	public int getPosition() {
+		return position.value();
 	}
 }
