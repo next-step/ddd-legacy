@@ -1,6 +1,6 @@
 package racingcar;
 
-public class Car{
+public class Car {
 
     private final String name;
     private int position;
@@ -11,7 +11,7 @@ public class Car{
 
     public Car(String name, int position) {
 
-        if(name.length() > 5){
+        if (name.length() > 5) {
             throw new IllegalArgumentException();
         }
         this.name = name;
@@ -20,10 +20,6 @@ public class Car{
 
     public int getPosition() {
         return position;
-    }
-
-    public void moving(int condition){
-        moving( () -> condition >= 4);
     }
 
     // 확장을 위한 인터페이스 생섬 및 함수 생성

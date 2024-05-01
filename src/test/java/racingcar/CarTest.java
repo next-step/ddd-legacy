@@ -13,29 +13,29 @@ public class CarTest {
 
     @DisplayName("자동차 이름은 5 글자를 넘을 수 없다")
     @Test
-    void constructor(){
-       // 5글자가 넘는 경우, IllegalArgumentException 발생
-       assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-               () -> {
-                  new Car("동해물과백두산이");
-               }
-       );
+    void constructor() {
+        // 5글자가 넘는 경우, IllegalArgumentException 발생
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+                () -> {
+                    new Car("동해물과백두산이");
+                }
+        );
 
     }
 
     @DisplayName("숫자가 4 이상인 경우 자동차가 전진한다")
     @Test
-    void move(){
+    void move() {
         final Car car = new Car("k5");
-        car.moving(4);
+        car.moving(new GoStrategy());
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
     @DisplayName("숫자가 4 미만인 경우 자동차는 정지한다")
     @Test
-    void stop(){
+    void stop() {
         final Car car = new Car("k5");
-        car.moving(1);
+        car.moving(new StopStrategy());
         assertThat(car.getPosition()).isEqualTo(0);
     }
 
