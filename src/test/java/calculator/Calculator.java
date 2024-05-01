@@ -9,6 +9,9 @@ import java.util.regex.Pattern;
 public class Calculator{
 
     private final static int ZERO = 0;
+    private final static String ALPHABET_PATTERN = "[a-zA-Z]";
+    private final static Pattern DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
+
 
     public static int calculate(String input) {
         if (isBlank(input)) {
@@ -25,7 +28,7 @@ public class Calculator{
     }
 
     private static boolean hasNonNumber(String input) {
-        return input.matches("[a-zA-Z]");
+        return input.matches(ALPHABET_PATTERN);
     }
 
 
@@ -34,7 +37,7 @@ public class Calculator{
     }
 
     private static String[] split(String input) {
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(input);
+        Matcher m = DELIMITER_PATTERN.matcher(input);
         if(!m.find()){
             return input.split("[,:]");
         }
