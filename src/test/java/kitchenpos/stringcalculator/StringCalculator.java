@@ -37,7 +37,7 @@ public class StringCalculator {
     /**
      * 분리된 숫자 문자열을 합산해 최종 결과를 반환한다.
      * <p>
-     * 음수인 수가 포함되어 있다면 RuntimeException을 던진다.
+     * 음수인 수가 포함되어 있다면 IllegalArgumentException을 던진다.
      */
     private int sumNumbers(String[] numberStrings) {
         return Arrays.stream(numberStrings)
@@ -48,7 +48,7 @@ public class StringCalculator {
 
     private void validateNegativeNumber(int number) {
         if (number < 0) {
-            throw new RuntimeException("음수는 포함될 수 없습니다: " + number);
+            throw new IllegalArgumentException("음수는 포함될 수 없습니다: " + number);
         }
     }
 }
