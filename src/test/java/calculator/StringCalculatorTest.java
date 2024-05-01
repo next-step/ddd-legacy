@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import java.util.Arrays;
 
 @DisplayName("문자열 덧셈 계산기 테스트")
 public class StringCalculatorTest {

@@ -1,6 +1,5 @@
 package calculator;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class StringCalculator {
