@@ -19,4 +19,8 @@ public class Positive {
         this.value = value;
     }
 
+    public int getIntValue() {
+        return this.value.getValue();
+    }
+
 }
