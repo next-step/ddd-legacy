@@ -17,12 +17,7 @@ public class CalculatorNumber {
     }
 
     private static CalculatorNumber findCache(final int validatedNumber) {
-        CalculatorNumber calculatorNumber = cache.get(validatedNumber);
-        if (calculatorNumber == null) {
-            CalculatorNumber number = new CalculatorNumber(validatedNumber);
-            cache.put(validatedNumber, number);
-            return number;
-        }
+        CalculatorNumber calculatorNumber = cache.computeIfAbsent(validatedNumber, CalculatorNumber::new);
         return calculatorNumber;
     }
 
