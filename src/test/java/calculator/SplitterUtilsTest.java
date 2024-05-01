@@ -1,16 +1,26 @@
 package calculator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import calculator.util.SplitterUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("SplitterUtils")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class SplitterUtilsTest {
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void 빈문자열_또는_null값을_입력할경우_IllegalArgumentException_예외처리를_한다(final String text) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> SplitterUtils.split(text));
+    }
 
     @ParameterizedTest
     @ValueSource(strings = {"가,나"})
