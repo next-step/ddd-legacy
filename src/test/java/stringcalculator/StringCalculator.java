@@ -9,19 +9,9 @@ public class StringCalculator {
     public StringCalculator() {
     }
 
-    //
     public int sum(String inputString) {
 
-        String[] split = inputString.split("");
-
-        int sum = Arrays.stream(split)
-                .filter(s -> !s.contains(":"))
-                .filter(
-                        s -> !s.contains(",")
-                ).mapToInt(Integer::parseInt)
-                .sum();
-
-        return sum;
-
+        String[] split = inputString.split(",|:");
+        return Arrays.stream(split).mapToInt(Integer::parseInt).sum();
     }
 }

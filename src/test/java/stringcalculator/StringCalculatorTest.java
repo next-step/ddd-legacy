@@ -1,6 +1,7 @@
 package stringcalculator;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,14 +16,35 @@ public class StringCalculatorTest {
      *
      * 문자열 계산기에 숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException 예외를 throw 한다.
      */
+
+    private StringCalculator stringCalculator;
+
+    @BeforeEach
+    void setUp() {
+        stringCalculator = new StringCalculator();
+    }
     @DisplayName("쉼표(,) or 클론(:) 구분자로 ")
     @Test
-    void seperate(){
+    void seperate1(){
 
-        StringCalculator stringCalculator = new StringCalculator();
 
         int sum = stringCalculator.sum("1,2");
 
         Assertions.assertThat(sum).isEqualTo(3);
+    }
+
+    @DisplayName("쉼표(,) or 클론(:) 구분자로 ")
+    @Test
+    void seperate2(){
+
+        int sum = stringCalculator.sum("1,2:3");
+
+        Assertions.assertThat(sum).isEqualTo(6);
+    }
+
+    @DisplayName("'//' 와 '\n' 사이에 위치한 문자를 커스텀 구분자로")
+    @Test
+    void seperate3(){
+
     }
 }
