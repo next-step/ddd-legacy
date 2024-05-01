@@ -25,10 +25,20 @@ public class StringCalculator {
         return sumNumbers(splitNumbers(input, DEFAULT_DELIMITERS));
     }
 
+    /**
+     * 입력된 문자열을 주어진 구분자 패턴을 사용해 분리한다.
+     * <p>
+     * 구분자를 기준으로 문자열을 여러 숫자 문자열로 나누고, 이를 배열로 반환한다.
+     */
     private String[] splitNumbers(String input, String delimiterPattern) {
         return input.split(delimiterPattern);
     }
 
+    /**
+     * 분리된 숫자 문자열을 합산해 최종 결과를 반환한다.
+     * <p>
+     * 음수인 수가 포함되어 있다면 RuntimeException을 던진다.
+     */
     private int sumNumbers(String[] numberStrings) {
         return Arrays.stream(numberStrings)
                      .mapToInt(Integer::parseInt)
