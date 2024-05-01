@@ -8,9 +8,9 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
     private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
+    private static final String GENERAL_SEPARATOR = "[,:]";
     private static final int CUSTOM_SEPARATOR_INDEX = 1;
     private static final int MATCHER_BODY_INDEX = 2;
-
 
     public static int getSum(String input) {
         if (StringUtils.isBlank(input)) {
@@ -19,7 +19,7 @@ public class StringCalculator {
 
         Matcher matcher = pattern.matcher(input);
         if (!matcher.matches()) {
-            return splitAndGetSum(input, "[,:]");
+            return splitAndGetSum(input, GENERAL_SEPARATOR);
         }
 
         String customSeparator = matcher.group(CUSTOM_SEPARATOR_INDEX);
@@ -27,17 +27,9 @@ public class StringCalculator {
     }
 
     private static int splitAndGetSum(String matcher, String separator) {
-        try {
-            return Arrays.stream(matcher.trim().split(separator))
-                    .mapToInt(Integer::valueOf)
-                    .peek(x -> {
-                        if (x < 0) {
-                            throw new IllegalArgumentException("음수값은 처리할 수 없습니다.");
-                        }
-                    })
-                    .sum();
-        } catch (NumberFormatException e) {
-            throw new NumberFormatException("올바른 숫자 입력 값이 아닙니다.");
-        }
+        return Arrays.stream(matcher.trim().split(separator))
+                .map(CalculatorNumber::new)
+                .mapToInt(CalculatorNumber::getNumber)
+                .sum();
     }
 }
