@@ -2,9 +2,10 @@ package stringcalculator;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class CalculatorNumber {
-    private static Map<Integer, CalculatorNumber> cache = new HashMap();
+    private static final Map<Integer, CalculatorNumber> cache = new HashMap();
     private final int number;
 
     public static CalculatorNumber from(final String number) {
@@ -32,6 +33,11 @@ public class CalculatorNumber {
         } catch (NumberFormatException e) {
             throw new NumberFormatException("올바른 숫자 입력 값이 아닙니다.");
         }
+    }
+
+    public static int sum(Stream<CalculatorNumber> numbers) {
+        return numbers.map(CalculatorNumber::getNumber)
+                .reduce(0, Integer::sum);
     }
 
     public int getNumber() {
