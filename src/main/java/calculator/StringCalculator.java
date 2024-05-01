@@ -13,7 +13,7 @@ public class StringCalculator {
             return 0;
         }
 
-        return Integer.parseInt(text);
+        return sum(splitNumbers(text));
     }
 
     private List<Integer> splitNumbers(String text) {
@@ -21,5 +21,11 @@ public class StringCalculator {
         return Arrays.stream(tokens)
                 .map(Integer::parseInt)
                 .toList();
+    }
+
+    private int sum(List<Integer> numbers) {
+        return numbers.stream()
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 }
