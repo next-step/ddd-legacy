@@ -8,12 +8,14 @@ public class Positives {
 
     public static final Positives EMPTY = new Positives(Collections.emptyList());
 
-    public Positives(List<Positive> positives) {
-        this.positives = positives;
+    public Positives(String[] texts) {
+        this.positives = Arrays.stream(texts)
+                .map(Positive::new)
+                .toList();
     }
 
-    public Positives(Positive... positive) {
-        this.positives = List.of(positive);
+    public Positives(List<Positive> positives) {
+        this.positives = positives;
     }
 
     public int sum() {

@@ -1,21 +1,17 @@
 package calculator.number;
 
-import utils.*;
-
-import java.util.*;
-
 public class Number {
 
     private final int value;
 
-    public static final int ZERO = 0;
+    public static final Number ZERO = new Number(0);
 
-    public Number(Integer value) {
-        this.value = Optional.ofNullable(value).orElse(ZERO);
+    public Number(int value) {
+        this.value = value;
     }
 
     public Number(String value) {
-        this.value = parse(value);
+        this(Integer.parseInt(value));
     }
 
     public boolean isNegative() {
@@ -24,14 +20,6 @@ public class Number {
 
     public int getValue() {
         return this.value;
-    }
-
-    private Integer parse(String text) {
-        if (StringUtils.isBlankWhenTrim(text)) {
-            return Integer.parseInt(text);
-        }
-
-        return ZERO;
     }
 
 }

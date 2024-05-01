@@ -4,8 +4,8 @@ import java.util.*;
 
 public class StringUtils {
 
-    public static boolean isBlankWhenTrim(String text) {
-        return Objects.isNull(text) || text.trim().isEmpty();
+    public static boolean isBlank(String text) {
+        return Objects.isNull(text) || text.isEmpty();
     }
 
 }

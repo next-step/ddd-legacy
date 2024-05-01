@@ -15,7 +15,7 @@ public class Car {
     }
 
     private Car(String name, int position) {
-        if (StringUtils.isBlankWhenTrim(name)) {
+        if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException("자동차의 이름은 비어있을 수 없습니다.");
         }
 
