@@ -42,4 +42,11 @@ class StringCalculatorTest {
     fun test4(text: String) {
         assertThat(calculator.add(text)).isSameAs(6)
     }
+
+    @DisplayName("//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @ParameterizedTest
+    @ValueSource(strings = ["//;\n1;2;3"])
+    fun test5(text: String) {
+        assertThat(calculator.add(text)).isSameAs(6)
+    }
 }
