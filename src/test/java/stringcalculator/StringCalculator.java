@@ -28,7 +28,7 @@ public class StringCalculator {
 
     private static int splitAndGetSum(String matcher, String separator) {
         return Arrays.stream(matcher.trim().split(separator))
-                .map(CalculatorNumber::new)
+                .map(CalculatorNumber::from)
                 .mapToInt(CalculatorNumber::getNumber)
                 .sum();
     }
