@@ -35,4 +35,8 @@ class StringCalculatorTest : ExpectSpec({
             stringCalculator.add("test")
         }
     }
+
+    expect("커스텀 구분자를 지정할 수 있다.") {
+        stringCalculator.add("//;\n1;2;3") shouldBe 6
+    }
 })
