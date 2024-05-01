@@ -6,6 +6,10 @@ class StringCalculator {
             return 0
         }
 
+        if (text.contains("-")) {
+            throw RuntimeException()
+        }
+
         if (text.length == 1) {
             return text.toInt()
         }
