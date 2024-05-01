@@ -42,7 +42,9 @@ public class CarTest {
 	@DisplayName("MovingStrategy가 움직일 수 있는 경우 자동차는 움직인다.")
 	@Test
 	void moveByMovingStrategy() {
-		assertThat(new Car("name").move(() -> true))
+		final MovingStrategy goStrategy = () -> true;
+
+		assertThat(new Car("name").move(goStrategy))
 			.extracting("position")
 			.isEqualTo(1);
 	}
@@ -50,7 +52,9 @@ public class CarTest {
 	@DisplayName("MovingStrategy가 움직일 수 없는 경우 자동차는 움직인다.")
 	@Test
 	void notMoveByMovingStrategy() {
-		assertThat(new Car("name").move(() -> false))
+		MovingStrategy stopStrategy = () -> false;
+		
+		assertThat(new Car("name").move(stopStrategy))
 			.extracting("position")
 			.isEqualTo(0);
 	}

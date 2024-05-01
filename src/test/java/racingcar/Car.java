@@ -2,24 +2,21 @@ package racingcar;
 
 public class Car {
 
-	private final String name;
+	private static final int POWER_THRESHOLD = 4;
+	private final Name name;
 	private final int position;
 
-	private Car(final String name, final int position) {
-		if (name.length() > 5) {
-			throw new IllegalArgumentException("이름은 5글자를 넘을 수 없습니다");
-		}
-
+	private Car(final Name name, final int position) {
 		this.name = name;
 		this.position = position;
 	}
 
 	public Car(final String name) {
-		this(name, 0);
+		this(new Name(name), 0);
 	}
 
 	public Car move(final int power) {
-		return move(() -> power >= 4);
+		return move(() -> power >= POWER_THRESHOLD);
 	}
 
 	public Car move(final MovingStrategy movingStrategy) {
