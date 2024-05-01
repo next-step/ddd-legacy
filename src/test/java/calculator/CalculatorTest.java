@@ -1,20 +1,31 @@
 package calculator;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatRuntimeException;
 
 public class CalculatorTest {
 
-    @ParameterizedTest(name = "쉼표 또는 콜론을 구분자를 가지는 {0} 문자열을 덧셈 계산한다")
+    @DisplayName("구분자를 갖지 않은 문자열을 덧셈 계산한다")
+    @Test
+    void one_add() {
+        Calculator<Integer, String> calculator = createCalculator();
+        assertThat(calculator.calculate("1")).isEqualTo(1);
+    }
+
+    @ParameterizedTest(name = "쉼표 또는 콜론을 구분자를 1개 가지는 {0} 문자열을 덧셈 계산한다")
+    @ValueSource(strings = {"1,2", "1:2"})
+    void two_add(String input) {
+        Calculator<Integer, String> calculator = createCalculator();
+        assertThat(calculator.calculate(input)).isEqualTo(3);
+    }
+
+    @ParameterizedTest(name = "쉼표 또는 콜론을 구분자를 2개 가지는 {0} 문자열을 덧셈 계산한다")
     @ValueSource(strings = {
             "1,2:3",
             "1,2,3",
