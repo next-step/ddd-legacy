@@ -1,5 +1,7 @@
 package calculator;
 
+import calculator.exception.NegativeNumberException;
+
 public class Number {
 
     public static final int ZERO_NUMBER = 0;
@@ -10,10 +12,14 @@ public class Number {
     }
 
     public Number(int number) {
-        if (number < 0) {
-            throw new RuntimeException(number + "is Negative");
+        if (isNegative(number)) {
+            throw new NegativeNumberException(number + "is Negative");
         }
         this.number = number;
+    }
+
+    private boolean isNegative(int number) {
+        return number < 0;
     }
 
     public int getNumber() {
