@@ -6,19 +6,20 @@ import java.util.regex.Pattern;
 public class SplitterUtils {
 
     private static final String DEFAULT_DELIMITER = ",|:";
-    private static final Pattern DEFAULT_PATTERN = Pattern.compile("//(.)\n(.*)");
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     public static String[] split(String text) {
-        Matcher matcher = DEFAULT_PATTERN.matcher(text);
+        Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
         if (matcher.find()) {
             String customDelimiter = makeCustomDelimiter(matcher.group(1));
-            return matcher.group(2).split(customDelimiter);
+            String targetText = matcher.group(2);
+            return targetText.split(customDelimiter);
         }
 
         return text.split(DEFAULT_DELIMITER);
     }
 
-    private static String makeCustomDelimiter(String delimiter){
+    private static String makeCustomDelimiter(String delimiter) {
         return DEFAULT_DELIMITER + "|" + delimiter;
     }
 }
