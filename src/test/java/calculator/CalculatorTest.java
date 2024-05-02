@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,4 +39,9 @@ class CalculatorTest {
         assertThat(calculator.add(text)).isSameAs(expected);
     }
 
+    @Test
+    @DisplayName("구분자를 컴마(,) 이외에 콜론(:)을 사용할 수 있다")
+    void commaAndColons() {
+        assertThat(calculator.add("1,2;3")).isSameAs(6);
+    }
 }
