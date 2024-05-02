@@ -53,4 +53,11 @@ class CalculatorTest {
         assertThatExceptionOfType(RuntimeException::class.java)
             .isThrownBy { calculator.add("-1") }
     }
+
+    @DisplayName(value = "문자열 계산기에 숫자 이외의 문자를 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @Test
+    fun notNumeric() {
+        assertThatExceptionOfType(RuntimeException::class.java)
+            .isThrownBy { calculator.add("abcd;efg:hijk") }
+    }
 }
