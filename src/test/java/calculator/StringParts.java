@@ -20,6 +20,10 @@ public class StringParts {
         this.parts = List.of(parts);
     }
 
+    public List<String> parts() {
+        return parts;
+    }
+
     public List<Integer> toNumbers() {
         return parts.stream()
                 .map(Integer::parseInt)
