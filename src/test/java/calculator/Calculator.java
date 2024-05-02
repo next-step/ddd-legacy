@@ -1,27 +1,32 @@
 package calculator;
 
 
-import java.util.Arrays;
-import java.util.List;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Calculator{
+
+public class Calculator {
 
     private final static int ZERO = 0;
-    private final static String ALPHABET_PATTERN = "[a-zA-Z]";
     private final static Pattern DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
-
+    private final static String ALPHABET_PATTERN = "[a-zA-Z]";
 
     public static int calculate(String input) {
         if (isBlank(input)) {
             return ZERO;
         }
-        return sum(toInts(split(input)));
+        var numbers = toNumbers(input);
+        return numbers.sum();
     }
 
     private static boolean isBlank(String input) {
         return input == null || input.trim().isEmpty();
+    }
+
+    private static Numbers toNumbers(String input) {
+        return new Numbers(split(input));
     }
 
     private static String[] split(String input) {
@@ -35,24 +40,6 @@ public class Calculator{
         return m.group(2).split(customDelimiter);
     }
 
-
-    private static List<Integer> toInts(String[] values) {
-        return Arrays.stream(values)
-                .map(Calculator::toInt)
-                .toList();
-    }
-
-    private static int toInt(String values) {
-        int value = Integer.parseInt(values);
-        if (value < 0) {
-            throw new RuntimeException("value should not be negative");
-        }
-        return value;
-    }
-
-    public static int sum(List<Integer> numbers) {
-        return numbers.stream().mapToInt(it -> it).sum();
-    }
 
     private static void validate(String input) {
         if (hasNonNumber(input)) {
