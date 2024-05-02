@@ -6,9 +6,12 @@ value class Operand(val value: Int) {
         require(value >= 0) { "value must be positive" }
     }
 
-    constructor(valueString: String) : this(
-        valueString.toIntOrNull() ?: throw IllegalArgumentException("valueString must be a number")
-    )
-
     operator fun plus(other: Operand): Operand = Operand(value + other.value)
+
+    companion object {
+        fun from(valueString: String): Operand {
+            require(valueString.toIntOrNull() != null) { "value must be a number" }
+            return Operand(valueString.toInt())
+        }
+    }
 }

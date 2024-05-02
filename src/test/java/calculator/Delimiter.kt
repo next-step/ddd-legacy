@@ -2,7 +2,7 @@ package calculator
 
 @JvmInline
 value class Delimiter private constructor(private val delimiter: Regex) {
-    fun split(input: String): List<Operand> = input.split(delimiter).map(::Operand)
+    fun split(input: String): List<Operand> = input.split(delimiter).map(Operand::from)
 
     companion object {
         private val defaultDelimiter = "[,:]".toRegex()
