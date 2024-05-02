@@ -5,16 +5,12 @@ import java.util.regex.Pattern;
 public class StringSplitter {
 
     private static final String DEFAULT_DELIMITER_REGEX = "[,:]";
-    private static final String  DEFAULT_CUSTOM_DELIMITER_REGEX = "//(.)\n(.*)";
+    private static final Pattern DEFAULT_CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     private final Pattern customDelimiterPattern;
 
     public StringSplitter() {
-        this(DEFAULT_CUSTOM_DELIMITER_REGEX);
-    }
-
-    public StringSplitter(String regex) {
-        this(Pattern.compile(regex));
+        this(DEFAULT_CUSTOM_DELIMITER_PATTERN);
     }
 
     public StringSplitter(Pattern pattern) {
