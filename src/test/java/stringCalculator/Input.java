@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 
 public class Input {
     private final String[] inputStrings;
+    private final String defaultRegex = "[,\\:]";
+    private final static Pattern customPattern = Pattern.compile("//(.)\\n(.*)");
 
     public Input(String text) {
         this.validation(text);
@@ -24,10 +26,7 @@ public class Input {
     }
 
     private String[] splitTextByRegex(String text) {
-        final String defaultRegex = "[,\\:]";
-
-        Pattern pattern = Pattern.compile("//(.)\\n(.*)");
-        Matcher matcher = pattern.matcher(text);
+        Matcher matcher = customPattern.matcher(text);
 
         if (matcher.find()) {
             String regex = matcher.group(1);
