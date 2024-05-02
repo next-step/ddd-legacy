@@ -30,15 +30,12 @@ public class StringCalculator {
     }
 
     private int sumNumbers(String[] numberStrings) {
-        return Arrays.stream(numberStrings)
-                     .mapToInt(Integer::parseInt)
-                     .peek(this::validateNegativeNumber)
-                     .sum();
-    }
+        PositiveNumber[] positiveNumbers = Arrays.stream(numberStrings)
+                                                 .map(PositiveNumber::new)
+                                                 .toArray(PositiveNumber[]::new);
 
-    private void validateNegativeNumber(int number) {
-        if (number < 0) {
-            throw new IllegalArgumentException("음수는 포함될 수 없습니다: " + number);
-        }
+        return Arrays.stream(positiveNumbers)
+                     .mapToInt(PositiveNumber::getValue)
+                     .sum();
     }
 }
