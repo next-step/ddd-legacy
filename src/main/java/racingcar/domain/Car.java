@@ -1,6 +1,6 @@
 package racingcar.domain;
 
-import org.springframework.util.StringUtils;
+import utils.StringUtils;
 
 public class Car {
 
@@ -14,8 +14,8 @@ public class Car {
         this(name, 0);
     }
 
-    public Car(String name, int position) {
-        if (!StringUtils.hasText(name)) {
+    private Car(String name, int position) {
+        if (StringUtils.isBlank(name)) {
             throw new IllegalArgumentException("자동차의 이름은 비어있을 수 없습니다.");
         }
 
