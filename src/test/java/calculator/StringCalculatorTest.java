@@ -29,7 +29,7 @@ class StringCalculatorTest {
     @ParameterizedTest
     @ValueSource(strings = {"1"})
     void oneNumber(final String text) {
-        assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
+        assertThat(calculator.add(text)).isSameAs(1);
     }
 
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")

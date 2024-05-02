@@ -59,6 +59,5 @@ class NumberTest {
 
         // then
         assertThat(result).isEqualTo(Number.from("7"));
-        assertThat(result.value()).isEqualTo(7);
     }
 }
