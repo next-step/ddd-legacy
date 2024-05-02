@@ -1,8 +1,10 @@
 package calculator;
 
 public class StringAddCalculator implements Calculator<Integer, String> {
+    private final PartsGenerator partsGenerator;
 
-    public StringAddCalculator() {
+    public StringAddCalculator(PartsGenerator partsGenerator) {
+        this.partsGenerator = partsGenerator;
     }
 
     @Override
@@ -10,8 +12,8 @@ public class StringAddCalculator implements Calculator<Integer, String> {
         if (input == null || "".equals(input)) {
             return 0;
         }
-        StringParts stringParts = new StringParts(input);
-        return stringParts.toNumbers()
+        Parts parts = partsGenerator.generate(input);
+        return parts.intParts()
                 .stream()
                 .reduce(0, Integer::sum);
     }
