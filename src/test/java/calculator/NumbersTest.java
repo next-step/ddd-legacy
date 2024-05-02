@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class NumbersTest {
 
-    @DisplayName("문자열의 배열을 입력 받아 합의 결과를 반환한다.")
+    @DisplayName("입력받은 숫자들의 합을 반환한다.")
     @Test
     void sumTest() {
         // given
