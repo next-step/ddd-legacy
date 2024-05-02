@@ -1,7 +1,6 @@
 package calculator;
 
 
-import org.jetbrains.annotations.NotNull;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,9 +8,9 @@ import java.util.regex.Pattern;
 
 public class Calculator {
 
-    private final static int ZERO = 0;
-    private final static Pattern DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
-    private final static String ALPHABET_PATTERN = "[a-zA-Z]";
+    private static final int ZERO = 0;
+    private static final Pattern DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
+    private static final String ALPHABET_PATTERN = "[a-zA-Z]";
 
     public static int calculate(String input) {
         if (isBlank(input)) {
