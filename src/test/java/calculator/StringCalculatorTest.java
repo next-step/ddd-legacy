@@ -3,6 +3,7 @@ package calculator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import calculator.exception.NegativeNumberException;
 import calculator.splitter.StringSplitter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,10 +56,10 @@ class StringCalculatorTest {
         assertThat(calculator.add(text)).isSameAs(6);
     }
 
-    @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 NegativeNumberException 예외 처리를 한다.")
     @Test
     void negative() {
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(NegativeNumberException.class)
                 .isThrownBy(() -> calculator.add("-1"));
     }
 }
