@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 
 @DisplayName("문자열 덧셈 계산기 테스트")
 public class StringCalculatorTest {
-    private SplitStrategy strategy;
     private StringCalculator calculator;
+    private SplitStrategy strategy;
 
     @BeforeEach
     void setUp() {
-        strategy = new StringSplitStrategy();
         calculator = new StringCalculator();
+        strategy = new StringSplitStrategy();
     }
 
     @Test

@@ -20,6 +20,17 @@ public class StringSplitStrategy implements SplitStrategy {
         return setSplitResult(input);
     }
 
+    @Override
+    public List<Number> splitRefactoring(String input) {
+        if (isNullAndEmpty(input)) {
+            return List.of(new Number(0));
+        }
+        if (isInputOnlyOne(input)) {
+            return List.of(new Number(input));
+        }
+        return setSplitResultRefactoring(input);
+    }
+
     private boolean isNullAndEmpty(String input) {
         return input == null || input.isEmpty();
     }
@@ -40,6 +51,21 @@ public class StringSplitStrategy implements SplitStrategy {
         }
         return Arrays.stream(splitResult)
                 .map(Integer::valueOf)
+                .collect(Collectors.toList());
+    }
+
+    private List<Number> setSplitResultRefactoring(String input) {
+        String[] splitResult = null;
+        Matcher matcher = PATTERN.matcher(input);
+        if (isContainComma(input) || isContainColon(input)){
+            splitResult = input.split(",|:");
+        }
+        if (matcher.find()) {
+            String customDelimiter = matcher.group(1);
+            splitResult = matcher.group(2).split(customDelimiter);
+        }
+        return Arrays.stream(splitResult)
+                .map(splitInput -> new Number(splitInput))
                 .collect(Collectors.toList());
     }
 

@@ -5,20 +5,13 @@ import java.util.List;
 public class StringCalculator {
 
     public int calculate(SplitStrategy strategy, String stringNumbers) {
-        List<Integer> splitNumbers = strategy.split(stringNumbers);
-        int result = 0;
+        List<Number> splitNumbers = strategy.splitRefactoring(stringNumbers);
+        Number result = new Number();
 
-        for (Integer number : splitNumbers) {
-            handleNegative(number);
-            result = result + number;
+        for (Number number : splitNumbers) {
+            result = result.add(number);
         }
 
-        return result;
-    }
-
-    private void handleNegative(Integer number) {
-        if (number < 0) {
-            throw new RuntimeException("전달된 수에 음수가 존재합니다.");
-        }
+        return result.getNumber();
     }
 }
