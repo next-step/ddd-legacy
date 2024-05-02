@@ -2,7 +2,7 @@ package racingcar;
 
 public class Car {
     private String name;
-    private int movingDistance;
+    private int position;
 
     public Car(String name) {
         if (name == null || name.isEmpty()) {
@@ -12,6 +12,6 @@ public class Car {
             throw new IllegalArgumentException("자동차 이름은 5 글자를 넘을 수 없다.");
         }
         this.name = name;
-        this.movingDistance = 0;
+        this.position = 0;
     }
 }
