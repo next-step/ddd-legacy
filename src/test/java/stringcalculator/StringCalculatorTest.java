@@ -57,7 +57,7 @@ class StringCalculatorTest {
 	}
 
 	@ParameterizedTest
-	@DisplayName("음수를 전달할 경우 RuntimeException 예외가 발생해야 한다. (예 : “-1,2,3”)")
+	@DisplayName("음수나 숫자가 아닌 값을 전달할 경우 RuntimeException 예외가 발생해야 한다. (예 : “-1,2,3”)")
 	@ValueSource(strings = {"-1,2,3", "2,a,7", "3,-,14", "김,1,29", "!,72,a"})
 	void constructorWithNegativeInteger(final String input) {
 		assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> new StringCalculator(input));
