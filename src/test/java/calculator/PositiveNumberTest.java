@@ -22,6 +22,13 @@ class PositiveNumberTest {
                 .isThrownBy(() -> new PositiveNumber(token));
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {"가", "나", "?"})
+    void 숫자가아닌_단순_문자열로_PositiveNumber를_생성하면_NumberFormatException_예외처리를_한다(String token) {
+        assertThatExceptionOfType(NumberFormatException.class)
+                .isThrownBy(() -> new PositiveNumber(token));
+    }
+
     @Test
     void 문자열로_PositiveNumber를_생성할수있다() {
         PositiveNumber positiveNumber = new PositiveNumber("10");
