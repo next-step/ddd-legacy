@@ -11,8 +11,8 @@ data class Car(val name: String) {
     }
 
     fun move(condition: Int) {
-        if (condition < 0 || condition > 9) {
-            throw IllegalArgumentException("position 은 0 ~ 9 사이의 값만 가능합니다.")
+        require(condition in 0..9) {
+            "condition 은 0 ~ 9 사이의 값만 가능합니다."
         }
 
         val strategy = MovableStrategy(condition = condition)
