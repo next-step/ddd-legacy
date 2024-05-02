@@ -16,10 +16,10 @@ data class Car(val name: String) {
         }
 
         val strategy = MovableStrategy(condition = condition)
-        move(strategy = strategy)
+        changePositionBy(strategy = strategy)
     }
 
-    private fun move(strategy: MovingStrategy) {
+    private fun changePositionBy(strategy: MovingStrategy) {
         if (strategy.movable()) {
             currentPosition++
         }
