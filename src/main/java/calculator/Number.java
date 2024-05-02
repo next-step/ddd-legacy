@@ -1,5 +1,7 @@
 package calculator;
 
+import calculator.exception.IllegalNumberException;
+
 import java.util.Objects;
 
 public class Number {
@@ -31,7 +33,7 @@ public class Number {
 
     private static void validateNumber(final int value) {
         if (value < ZERO) {
-            throw new IllegalArgumentException(NEGATIVE_NUMBER_EXCEPTION);
+            throw new IllegalNumberException(NEGATIVE_NUMBER_EXCEPTION, String.valueOf(value));
         }
     }
 
@@ -39,7 +41,8 @@ public class Number {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException(PARSING_INTEGER_EXCEPTION);
+            throw new IllegalNumberException(PARSING_INTEGER_EXCEPTION, value);
+
         }
     }
 
