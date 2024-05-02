@@ -14,7 +14,7 @@ public class CalculatorNumber {
         return findCache(validatedNumber);
     }
 
-    private CalculatorNumber(int number) {
+    protected CalculatorNumber(int number) {
         this.number = number;
     }
 
