@@ -8,5 +8,11 @@ public class Car {
         this.carName = new CarName(carName);
     }
 
+    public long move(CarMovingStrategy carMovingStrategy) {
+        if (carMovingStrategy.isMovable()) {
+            position++;
+        }
+        return position;
+    }
 
 }
