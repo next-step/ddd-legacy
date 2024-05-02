@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
-
+    private static final String DEFAULT_DELIMITER = ",|:";
 
     public StringCalculator() {
     }
@@ -34,7 +34,7 @@ public class StringCalculator {
             return m.group(2).split(customDelimiter);
         }
 
-        return text.split(",|:");
+        return text.split(DEFAULT_DELIMITER);
     }
 
     private boolean isNumeric(String number) {
