@@ -10,25 +10,14 @@ public class StringSplitStrategy implements SplitStrategy {
     private static final Pattern PATTERN = Pattern.compile("//(.)\n(.*)");
 
     @Override
-    public List<Integer> split(String input) {
-        if (isNullAndEmpty(input)) {
-            return List.of(0);
-        }
-        if (isInputOnlyOne(input)) {
-            return List.of(Integer.valueOf(input));
-        }
-        return setSplitResult(input);
-    }
-
-    @Override
-    public List<Number> splitRefactoring(String input) {
+    public List<Number> split(String input) {
         if (isNullAndEmpty(input)) {
             return List.of(new Number(0));
         }
         if (isInputOnlyOne(input)) {
             return List.of(new Number(input));
         }
-        return setSplitResultRefactoring(input);
+        return setSplitResult(input);
     }
 
     private boolean isNullAndEmpty(String input) {
@@ -39,22 +28,7 @@ public class StringSplitStrategy implements SplitStrategy {
         return input.length() == 1;
     }
 
-    private List<Integer> setSplitResult(String input) {
-        String[] splitResult = null;
-        Matcher matcher = PATTERN.matcher(input);
-        if (isContainComma(input) || isContainColon(input)){
-            splitResult = input.split(",|:");
-        }
-        if (matcher.find()) {
-            String customDelimiter = matcher.group(1);
-            splitResult = matcher.group(2).split(customDelimiter);
-        }
-        return Arrays.stream(splitResult)
-                .map(Integer::valueOf)
-                .collect(Collectors.toList());
-    }
-
-    private List<Number> setSplitResultRefactoring(String input) {
+    private List<Number> setSplitResult(String input) {
         String[] splitResult = null;
         Matcher matcher = PATTERN.matcher(input);
         if (isContainComma(input) || isContainColon(input)){
