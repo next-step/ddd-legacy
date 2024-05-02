@@ -22,21 +22,33 @@ class StringCalculatorTest {
     @ParameterizedTest
     @NullAndEmptySource
     void emptyOrNull(final String text) {
-        assertThat(calculator.add(text)).isZero();
+        //when
+        int actual = calculator.add(text);
+
+        //then
+        assertThat(actual).isZero();
     }
 
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
     @ParameterizedTest
     @ValueSource(strings = {"1"})
     void oneNumber(final String text) {
-        assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
+        //when
+        int actual = calculator.add(text);
+
+        //then
+        assertThat(actual).isSameAs(Integer.parseInt(text));
     }
 
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
     @ParameterizedTest
     @ValueSource(strings = {"1,2"})
     void twoNumbers(final String text) {
-        assertThat(calculator.add(text)).isSameAs(3);
+        //when
+        int actual = calculator.add(text);
+
+        //then
+        assertThat(actual).isSameAs(3);
     }
 
     @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
@@ -50,14 +62,22 @@ class StringCalculatorTest {
     @ParameterizedTest
     @ValueSource(strings = {"//;\n1;2;3"})
     void customDelimiter(final String text) {
-        assertThat(calculator.add(text)).isSameAs(6);
+        //when
+        int actual = calculator.add(text);
+
+        //then
+        assertThat(actual).isSameAs(6);
     }
 
     @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
     @Test
     void negative() {
+        //given
+        String text = "2,-1,3";
+
+        //when & then
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> calculator.add("2,-1,3"));
+                .isThrownBy(() -> calculator.add(text));
     }
 
 }
