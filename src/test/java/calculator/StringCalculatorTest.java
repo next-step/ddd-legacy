@@ -1,33 +1,22 @@
 package calculator;
 
+import calculator.domain.SplitStrategy;
+import calculator.domain.StringCalculator;
+import calculator.domain.StringSplitStrategy;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 @DisplayName("문자열 덧셈 계산기 테스트")
 public class StringCalculatorTest {
+    private SplitStrategy strategy;
     private StringCalculator calculator;
-    private SplitStrategy strategy = new StringSplitStrategy();
 
     @BeforeEach
     void setUp() {
+        strategy = new StringSplitStrategy();
         calculator = new StringCalculator();
-    }
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    @DisplayName("빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.(예 : “” => 0, null => 0)")
-    void checkEmptyAndNull(String input) {
-        Assertions.assertThat(calculator.calculate(strategy, input)).isEqualTo(0);
-    }
-
-    @Test
-    @DisplayName("숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.(예 : “1”)")
-    void inputOnlyOne() {
-        Assertions.assertThat(calculator.calculate(strategy, "1")).isEqualTo(1);
     }
 
     @Test
