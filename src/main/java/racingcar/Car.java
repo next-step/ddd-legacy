@@ -1,4 +1,4 @@
-package racingcar.domain;
+package racingcar;
 
 import utils.StringUtils;
 

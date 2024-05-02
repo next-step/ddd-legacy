@@ -1,4 +1,4 @@
-package racingcar.domain;
+package racingcar;
 
 @FunctionalInterface
 public interface MovingStrategy {
