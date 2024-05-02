@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class CalculatorNumber {
-    private static final Map<Integer, CalculatorNumber> cache = new HashMap<>();
+    private static final Map<Integer, CalculatorNumber> CACHE = new HashMap<>();
     private final int number;
 
     public static CalculatorNumber from(final String number) {
