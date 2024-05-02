@@ -2,6 +2,7 @@ package stringcalculator;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public class CalculatorNumber {
@@ -18,7 +19,7 @@ public class CalculatorNumber {
     }
 
     private static CalculatorNumber findCache(final int validatedNumber) {
-        return cache.computeIfAbsent(validatedNumber, CalculatorNumber::new);
+        return CACHE.computeIfAbsent(validatedNumber, CalculatorNumber::new);
     }
 
     public static int validateNumber(String number) {
@@ -40,5 +41,25 @@ public class CalculatorNumber {
 
     public int getNumber() {
         return number;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CalculatorNumber that = (CalculatorNumber) o;
+        return number == that.number;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number);
+    }
+
+    @Override
+    public String toString() {
+        return "CalculatorNumber{" +
+                "number=" + number +
+                '}';
     }
 }
