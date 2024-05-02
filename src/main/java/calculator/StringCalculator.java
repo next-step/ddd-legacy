@@ -1,14 +1,15 @@
 package calculator;
 
 import calculator.splitter.Splitter;
+import calculator.splitter.StringSplitter;
 import org.springframework.util.StringUtils;
 
 public class StringCalculator {
 
     private final Splitter<String> splitter;
 
-    public StringCalculator(Splitter<String> splitter) {
-        this.splitter = splitter;
+    public StringCalculator() {
+        this.splitter = new StringSplitter();
     }
 
     public int add(String text) {
