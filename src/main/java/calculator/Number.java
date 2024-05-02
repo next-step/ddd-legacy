@@ -9,6 +9,7 @@ public class Number {
     static final Number ZERO_NUMBER = new Number(ZERO);
     static final String PARSING_INTEGER_EXCEPTION = "숫자로 변환할 수 없는 문자열 입니다.";
     static final String NEGATIVE_NUMBER_EXCEPTION = "음수는 유효하지 않은 숫자입니다.";
+
     private final int value;
 
     private Number(final int value) {
