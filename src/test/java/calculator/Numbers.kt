@@ -1,16 +1,16 @@
 package calculator
 
-class Tokens(
-    private val tokens: List<Token>
+class Numbers(
+    private val numbers: List<Number>
 ) {
     companion object {
 
-        fun create(delimiters: Array<String>, stringTokens: String): Tokens {
+        fun create(delimiters: Array<String>, stringTokens: String): Numbers {
             val splitStringTokens = stringTokens.split(*delimiters).apply { validate() }
 
-            return Tokens(
-                tokens = splitStringTokens.map {
-                    Token(it.toInt())
+            return Numbers(
+                numbers = splitStringTokens.map {
+                    Number(it.toInt())
                 }
             )
         }
@@ -21,6 +21,6 @@ class Tokens(
     }
 
     fun sum(): Int {
-        return tokens.sumOf { it.number }
+        return numbers.sumOf { it.number }
     }
 }

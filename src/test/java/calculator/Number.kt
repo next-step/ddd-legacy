@@ -1,6 +1,6 @@
 package calculator
 
-class Token(
+class Number(
     val number: Int
 ) {
     init {
