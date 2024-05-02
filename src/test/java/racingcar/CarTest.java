@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 
 public class CarTest {
@@ -24,5 +25,23 @@ public class CarTest {
         assertThatCode(() -> new Car("bumpercar"))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("자동차 이름은 5 글자를 넘을 수 없다.");
+    }
+
+    @Test
+    @DisplayName("무작위 값이 4 이상이면 움직인다.")
+    void moveCarRandomNumberOverEqualFour() {
+        Car mycar = new Car("mycar");
+        mycar.move(new GoStrategy());
+
+        assertThat(mycar.getPosition()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("무작위 값이 3 이하이면 움직이지 않는다.")
+    void noMoveCarRandomNumberUnderEqualThree() {
+        Car mycar = new Car("mycar");
+        mycar.move(new StopStrategy());
+
+        assertThat(mycar.getPosition()).isEqualTo(0);
     }
 }
