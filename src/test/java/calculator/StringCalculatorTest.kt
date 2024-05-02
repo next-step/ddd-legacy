@@ -62,7 +62,7 @@ class StringCalculatorTest : DescribeSpec({
 
                     assertThrows<IllegalArgumentException> {
                         calculator.add("-1,-2,-3")
-                    }.message shouldBe "음수는 입력할 수 없습니다."
+                    }.message shouldBe "숫자는 0보다 커야합니다."
                 }
             }
 
