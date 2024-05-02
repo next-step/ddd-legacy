@@ -18,7 +18,7 @@ public class Number {
     }
 
     public static Number from(final String value) {
-        if (value == null || value.isBlank()) {
+        if (isNullOrBlank(value) || isZeroValue(value)) {
             return ZERO_NUMBER;
         }
         return new Number(parseInt(value));
@@ -43,8 +43,15 @@ public class Number {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
             throw new IllegalNumberException(PARSING_INTEGER_EXCEPTION, value);
-
         }
+    }
+
+    private static boolean isNullOrBlank(final String value) {
+        return value == null || value.isBlank();
+    }
+
+    private static boolean isZeroValue(String value) {
+        return value.equals("0");
     }
 
     @Override
