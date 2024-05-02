@@ -18,12 +18,13 @@ class StringCalculatorTest {
         Assertions.assertThat(calculator.add(text)).isZero();
     }
 
-    @DisplayName(value = "숫자 이외의 값을 입력할 경우 예외가 발생한다.")
+    @DisplayName(value = "숫자 이외의 값을 입력할 경우 IllegalArgumentException 예외가 발생한다.")
     @ParameterizedTest
     @ValueSource(strings = {"ㅂ", "asdas"})
     void notNumber(final String text) {
-        Assertions.assertThatExceptionOfType(RuntimeException.class)
-                  .isThrownBy(() -> calculator.add(text));
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                  .isThrownBy(() -> calculator.add(text))
+                  .withMessageContaining("숫자 이외의 값을 입력할 수 없습니다: " + text);
     }
 
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
@@ -67,10 +68,11 @@ class StringCalculatorTest {
         Assertions.assertThat(calculator.add(text)).isSameAs(6);
     }
 
-    @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 IllegalArgumentException 예외 처리를 한다.")
     @Test
     void negative() {
-        Assertions.assertThatExceptionOfType(RuntimeException.class)
-                  .isThrownBy(() -> calculator.add("-1"));
+        Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
+                  .isThrownBy(() -> calculator.add("-1"))
+                  .withMessageContaining("음수는 포함될 수 없습니다: -1");
     }
 }
