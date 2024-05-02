@@ -11,6 +11,6 @@ public class StringCalculator {
         }
 
         PositiveNumbers numbers = new PositiveNumbers(SplitterUtils.split(text));
-        return numbers.getSum();
+        return numbers.sum();
     }
 }

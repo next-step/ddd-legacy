@@ -17,7 +17,7 @@ public class PositiveNumbers {
         this.numbers = numbers;
     }
 
-    public int getSum() {
+    public int sum() {
         return numbers.stream()
                 .mapToInt(PositiveNumber::getNumber)
                 .sum();
