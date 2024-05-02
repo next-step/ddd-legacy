@@ -5,8 +5,8 @@ data class Car(val name: String) {
         private set
 
     init {
-        if (name.length > 5) {
-            throw IllegalArgumentException()
+        require(name.length <= 5) {
+            "name 은 5 글자를 넘어갈수 없습니다."
         }
     }
 
