@@ -26,4 +26,10 @@ public class StringCalculator {
                 .map(PositiveNumber::new)
                 .reduce(PositiveNumber.ZERO, PositiveNumber::sum).intValue();
     }
+
+    public int add(String text, StringSplitter splitter) {
+        return Arrays.stream(splitter.split(text))
+                .map(PositiveNumber::new)
+                .reduce(PositiveNumber.ZERO, PositiveNumber::sum).intValue();
+    }
 }
