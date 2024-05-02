@@ -1,4 +1,4 @@
-package calculator;
+package calculator.splitter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -15,7 +15,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("StringSplitter")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
-class SplitterTest {
+class StringSplitterTest {
 
     private Splitter<String> splitter;
 

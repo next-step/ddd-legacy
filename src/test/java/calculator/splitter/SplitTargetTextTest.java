@@ -16,7 +16,7 @@ class SplitTargetTextTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    void null_또는_empty한_문자열로_SplitTargetText를_생성하면_IllegalArgumentException를_던진다(String text) {
+    void null_또는_empty한_문자열로_SplitTargetText를_생성하면_IllegalArgumentException예외처리를_한다(String text) {
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> new SplitTargetText(text));
     }
