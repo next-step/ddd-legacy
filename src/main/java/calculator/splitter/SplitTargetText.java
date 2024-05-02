@@ -1,5 +1,7 @@
 package calculator.splitter;
 
+import java.util.Objects;
+
 public class SplitTargetText {
 
     private final String targetText;
@@ -21,5 +23,22 @@ public class SplitTargetText {
 
     public String[] split(String delimiter) {
         return targetText.split(delimiter);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        SplitTargetText that = (SplitTargetText) o;
+        return Objects.equals(targetText, that.targetText);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(targetText);
     }
 }
