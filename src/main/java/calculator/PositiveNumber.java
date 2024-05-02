@@ -2,16 +2,16 @@ package calculator;
 
 import calculator.exception.NegativeNumberException;
 
-public class Number {
+public class PositiveNumber {
 
     public static final int ZERO_NUMBER = 0;
     private final int number;
 
-    public Number(String token) {
+    public PositiveNumber(String token) {
         this(Integer.parseInt(token));
     }
 
-    public Number(int number) {
+    public PositiveNumber(int number) {
         validateNumber(number);
         this.number = number;
     }

@@ -7,10 +7,10 @@ public class StringCalculator {
 
     public int add(String text) {
         if (!StringUtils.hasLength(text)) {
-            return Number.ZERO_NUMBER;
+            return PositiveNumber.ZERO_NUMBER;
         }
 
-        Numbers numbers = new Numbers(SplitterUtils.split(text));
+        PositiveNumbers numbers = new PositiveNumbers(SplitterUtils.split(text));
         return numbers.getSum();
     }
 }
