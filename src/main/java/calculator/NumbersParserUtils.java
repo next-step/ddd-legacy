@@ -14,6 +14,7 @@ public class NumbersParserUtils {
             List.of(new BasicSplitStrategy(), new CustomSplitStrategy());
 
     private NumbersParserUtils() {
+        throw new AssertionError("This class should not be instantiated.");
     }
 
     public static Numbers parse(String input) {
