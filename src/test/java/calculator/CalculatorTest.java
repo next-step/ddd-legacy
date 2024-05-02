@@ -4,7 +4,8 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -14,15 +15,16 @@ class CalculatorTest {
 
 
     @DisplayName("계산기는 문자열을 입력받는다")
-    @Test
-    void calculatorInputString() {
-        Assertions.assertThatCode(() -> Calculator.calculate("1,2,3"))
+    @ValueSource(strings = {"1,2,3", "1:2:3"})
+    @ParameterizedTest
+    void calculatorInputString(String input) {
+        Assertions.assertThatCode(() -> Calculator.calculate(input))
                 .doesNotThrowAnyException();
     }
 
     @DisplayName("계산기는 문자열과 구분자를 입력받는다")
     @Test
-    void calculatorInputStringAndCustomeDelimiter() {
+    void calculatorInputStringAndCustomDelimiter() {
         Assertions.assertThatCode(() -> Calculator.calculate("//&\n1&2&3"))
                 .doesNotThrowAnyException();
     }
@@ -50,11 +52,11 @@ class CalculatorTest {
                 .isInstanceOf(RuntimeException.class);
     }
 
-    @DisplayName("0 또는 null이 입력되면 0을 반환한다")
+    @DisplayName("0, 빈문자열, null이 입력되면 0을 반환한다")
     @ParameterizedTest
-    @NullAndEmptySource
+    @CsvSource(value = {"0", "null", "''"}, nullValues = "null")
     void shouldReturnZeroWhenInputIsNullOrEmpty(String inputString) {
-
+        System.out.println("inputString = " + inputString);
         assertThat(Calculator.calculate(inputString)).isZero();
     }
 }
