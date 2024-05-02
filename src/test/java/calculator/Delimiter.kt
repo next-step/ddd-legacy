@@ -1,19 +1,17 @@
 package calculator
 
 @JvmInline
-value class Delimiter private constructor(private val delimiter: Regex) {
-    fun split(input: String): List<Operand> = input.split(delimiter).map(Operand::from)
-
+value class Delimiter(val regex: Regex) {
     companion object {
         private val defaultDelimiter = "[,:]".toRegex()
-        private val customDelimiterPattern = "//(.)\n".toRegex()
+        val customDelimiterPattern = "//(.)\n".toRegex()
 
-        fun from(input: String): Pair<Delimiter, String> {
+        fun from(input: String): Delimiter {
             customDelimiterPattern.find(input)?.let {
                 val customDelimiter = it.groupValues[1].toRegex()
-                return Delimiter(customDelimiter) to input
+                return Delimiter(customDelimiter)
             }
-            return Delimiter(defaultDelimiter) to input
+            return Delimiter(defaultDelimiter)
         }
     }
 }
