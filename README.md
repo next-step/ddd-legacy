@@ -23,7 +23,6 @@ docker compose -p kitchenpos up -d
     - A Guide to JUnit 5
     - Guide to JUnit 5 Parameterized Tests
 
-
 ## 용어 사전
 
 | 한글명 | 영문명 | 설명 |
