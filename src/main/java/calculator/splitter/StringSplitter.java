@@ -1,9 +1,9 @@
-package calculator;
+package calculator.splitter;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Splitter {
+public class StringSplitter implements Splitter<String> {
 
     private static final String DEFAULT_DELIMITER = ",|:";
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
@@ -12,13 +12,13 @@ public class Splitter {
 
     private final Delimiter delimiter;
 
-    public Splitter() {
+    public StringSplitter() {
         this.delimiter = new Delimiter(DEFAULT_DELIMITER);
     }
 
-    public String[] split(String text) {
-        SplitTargetText targetText = new SplitTargetText(text);
-        Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
+    public String[] split(String target) {
+        SplitTargetText targetText = new SplitTargetText(target);
+        Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(target);
         if (matcher.find()) {
             delimiter.addDelimiter(matcher.group(DELIMITER_GROUP));
             targetText = new SplitTargetText(matcher.group(TARGET_TEXT_GROUP));

@@ -1,15 +1,15 @@
-package calculator;
+package calculator.splitter;
 
 public class SplitTargetText {
 
     private final String targetText;
 
     public SplitTargetText(String targetText) {
-        validateSplitText(targetText);
+        validateTargetText(targetText);
         this.targetText = targetText;
     }
 
-    private static void validateSplitText(String text) {
+    private static void validateTargetText(String text) {
         if (text == null) {
             throw new IllegalArgumentException("Text is Null. Can't Split");
         }

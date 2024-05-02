@@ -3,6 +3,8 @@ package calculator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import calculator.splitter.Splitter;
+import calculator.splitter.StringSplitter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -11,15 +13,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-@DisplayName("Splitter")
+@DisplayName("StringSplitter")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class SplitterTest {
 
-    private Splitter splitter;
+    private Splitter<String> splitter;
 
     @BeforeEach
     void setUp() {
-        splitter = new Splitter();
+        splitter = new StringSplitter();
     }
 
     @ParameterizedTest

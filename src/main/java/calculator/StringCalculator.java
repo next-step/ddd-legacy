@@ -1,12 +1,13 @@
 package calculator;
 
+import calculator.splitter.Splitter;
 import org.springframework.util.StringUtils;
 
 public class StringCalculator {
 
-    private final Splitter splitter;
+    private final Splitter<String> splitter;
 
-    public StringCalculator(Splitter splitter) {
+    public StringCalculator(Splitter<String> splitter) {
         this.splitter = splitter;
     }
 
