@@ -1,17 +1,18 @@
-package calculator.util;
+package calculator;
 
 public class Delimiter {
+
     private String delimiter;
 
     public Delimiter(String delimiter) {
         this.delimiter = delimiter;
     }
 
-    public void addDelimiter(String delimiter){
+    public void addDelimiter(String delimiter) {
         this.delimiter = this.delimiter + "|" + delimiter;
     }
 
-    public String[] split(SplitTargetText text){
+    public String[] split(SplitTargetText text) {
         return text.split(delimiter);
     }
 }

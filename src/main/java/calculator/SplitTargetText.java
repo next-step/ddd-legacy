@@ -1,4 +1,4 @@
-package calculator.util;
+package calculator;
 
 public class SplitTargetText {
 
