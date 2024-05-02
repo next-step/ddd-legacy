@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 
 class CalculatorTest {
@@ -49,5 +51,14 @@ class CalculatorTest {
     @DisplayName("//와 \n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     void customDelimiter() {
         assertThat(calculator.add("//!\n1!2!3")).isSameAs(6);
+    }
+
+    @ParameterizedTest
+    @DisplayName("음수를 전달할 경우 IllegalArgumentException이 발생해야 한다")
+    @ValueSource(strings = {"-1", "-1,2;3", "//!\n1!-2!3"})
+    void negativeNumber(String text) {
+        assertThatThrownBy(() -> {
+            calculator.add(text);
+        }).isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -16,10 +16,21 @@ public class Calculator {
         if (m.find()) {
             String customDelimiter = m.group(1);
             numbers = m.group(2).split(customDelimiter);
-            return Arrays.stream(numbers).mapToInt(Integer::parseInt).sum();
+            return Arrays.stream(numbers)
+                    .filter(this::isPositiveNumber)
+                    .mapToInt(Integer::parseInt).sum();
         }
 
         numbers = text.split("[,|;]");
-        return Arrays.stream(numbers).mapToInt(Integer::parseInt).sum();
+        return Arrays.stream(numbers)
+                .filter(this::isPositiveNumber)
+                .mapToInt(Integer::parseInt).sum();
+    }
+
+    private boolean isPositiveNumber(String input) {
+        int number = Integer.parseInt(input);
+
+        if (number > 0) return true;
+        throw new IllegalArgumentException("입력값은 음수 일 수 없습니다.");
     }
 }
