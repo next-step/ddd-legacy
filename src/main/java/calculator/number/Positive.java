@@ -2,6 +2,9 @@ package calculator.number;
 
 import calculator.exception.CalculatorException;
 
+import java.math.*;
+import java.util.*;
+
 import static calculator.exception.ErrorMessage.IS_NOT_NEGATIVE;
 
 public class Positive {
@@ -21,8 +24,12 @@ public class Positive {
         this.value = value;
     }
 
-    public int getIntValue() {
+    public int getValue() {
         return this.value;
+    }
+
+    public Positive add(Positive addend) {
+        return new Positive(this.value + addend.getValue());
     }
 
 }

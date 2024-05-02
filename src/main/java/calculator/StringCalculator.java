@@ -18,13 +18,13 @@ public class StringCalculator {
 
     public int add(String text) {
         if (StringUtils.isBlank(text)) {
-            return ZERO.getIntValue();
+            return ZERO.getValue();
         }
 
         var texts = separate(text);
         var positives = new Positives(texts);
 
-        return positives.sum();
+        return positives.sum().getValue();
     }
 
     private String[] separate(final String text) {
