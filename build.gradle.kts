@@ -7,6 +7,7 @@ plugins {
     kotlin("plugin.spring") version "1.9.23"
     kotlin("plugin.jpa") version "1.9.23"
     id("org.flywaydb.flyway") version "7.12.0"
+    id("org.jlleitschuh.gradle.ktlint") version "11.6.1"
 }
 
 group = "camp.nextstep.edu"
