@@ -9,10 +9,10 @@ public class StringCalculatorTokenParser {
 
     public StringCalculatorTokenParser(String text) {
 
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+        Matcher m = Pattern.compile("//(.*)\n(.*)").matcher(text);
 
         this.tokens = m.find() ?
-                m.group(2).split(m.group(1)) : text.split(",|:");
+                m.group(2).split(Pattern.quote(m.group(1))) : text.split(",|:");
     }
 
     public int[] getIntegerTokens() {
