@@ -3,6 +3,7 @@ package kitchenpos.stringcalculator;
 import java.util.Arrays;
 
 public class StringCalculator {
+
     public int add(String input) {
         if (input == null || input.isEmpty()) {
             return 0;

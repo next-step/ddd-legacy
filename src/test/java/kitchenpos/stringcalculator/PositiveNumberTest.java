@@ -23,7 +23,6 @@ class PositiveNumberTest {
                   .hasMessageContaining("음수는 포함될 수 없습니다: " + input);
     }
 
-
     @DisplayName("숫자 이외의 값 입력 시 예외가 발생한다.")
     @ParameterizedTest
     @ValueSource(strings = {"abc", "x12", "ㅁㄴㅇ"})
