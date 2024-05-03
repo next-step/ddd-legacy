@@ -1,26 +1,22 @@
 package calculator
 
-import java.lang.IllegalArgumentException
-import java.util.regex.Pattern
-
-private val CUSTOMIZED_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)")
+private val CUSTOMIZED_DELIMITER_PATTERN = "//(.)\n(.*)".toRegex()
 
 class CustomizedDelimiterCalculator(
     private val calculatorNumberRangeValidator: CalculatorNumberRangeValidator
 ) : StringCalculateStrategy {
     override fun support(text: String?): Boolean = hasCustomizedDelimiter(text)
 
-    override fun calculate(text: String?): Int {
+    override fun calculate(text: String): Int {
         val customizedDelimiter = getCustomizedDelimiter(text)
 
-        if (text == null || customizedDelimiter == null) {
+        if (customizedDelimiter == null) {
             throw IllegalArgumentException("can't find delimiter")
         }
 
-        val tokens = CUSTOMIZED_DELIMITER_PATTERN.matcher(text)
-            .takeIf { it.find() }
-            ?.group(2)
-            ?.split(customizedDelimiter)
+        val tokens = CUSTOMIZED_DELIMITER_PATTERN.matchEntire(text)
+            ?.let { it.groups[2] }
+            ?.let { it.value.split(customizedDelimiter) }
             ?: emptyList()
 
         calculatorNumberRangeValidator.validateTokens(tokens)
@@ -29,12 +25,10 @@ class CustomizedDelimiterCalculator(
     }
 
     private fun hasCustomizedDelimiter(text: String?): Boolean =
-        text?.let { CUSTOMIZED_DELIMITER_PATTERN.matcher(it) }
-            ?.let { it.find() }
-            ?: false
+        text?.let { CUSTOMIZED_DELIMITER_PATTERN.matches(it) } ?: false
 
     private fun getCustomizedDelimiter(text: String?): String? =
-        text?.let { CUSTOMIZED_DELIMITER_PATTERN.matcher(it) }
-            ?.takeIf { it.find() }
-            ?.let { it.group(1) }
+        text?.let { CUSTOMIZED_DELIMITER_PATTERN.matchEntire(it) }
+            ?.let { it.groups[1] }
+            ?.let { it.value }
 }

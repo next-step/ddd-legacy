@@ -1,7 +1,5 @@
 package calculator
 
-import java.lang.IllegalArgumentException
-
 private val FIXED_DELIMITERS = listOf(":", ",")
 
 class FixedDelimiterCalculator(
@@ -11,11 +9,7 @@ class FixedDelimiterCalculator(
         text != null && hasFixedDelimiter(text)
 
 
-    override fun calculate(text: String?): Int {
-        if (text == null) {
-            throw IllegalArgumentException("empty text")
-        }
-
+    override fun calculate(text: String): Int {
         val tokens = text.split(*FIXED_DELIMITERS.toTypedArray())
 
         calculatorNumberRangeValidator.validateTokens(tokens)
