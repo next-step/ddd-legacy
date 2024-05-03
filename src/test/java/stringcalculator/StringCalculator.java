@@ -6,10 +6,6 @@ public class StringCalculator {
 
     private final StringSplitter splitter;
 
-    public StringCalculator() {
-        this(new StringSplitter());
-    }
-
     public StringCalculator(StringSplitter splitter) {
         this.splitter = splitter;
     }
