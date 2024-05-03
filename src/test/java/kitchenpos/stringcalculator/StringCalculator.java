@@ -14,12 +14,8 @@ public class StringCalculator {
     }
 
     private int sumNumbers(String[] numberStrings) {
-        PositiveNumber[] positiveNumbers = Arrays.stream(numberStrings)
-                                                 .map(PositiveNumber::new)
-                                                 .toArray(PositiveNumber[]::new);
-
-        return Arrays.stream(positiveNumbers)
-                     .mapToInt(PositiveNumber::getValue)
+        return Arrays.stream(numberStrings)
+                     .mapToInt(numberString -> new PositiveNumber(numberString).getValue())
                      .sum();
     }
 }
