@@ -5,7 +5,9 @@ class StringCalculator {
         text: String?,
     ): Int = if (text.isNullOrBlank()) {
         EMPTY_RESULT
-    } else parseText(text = text)
+    } else {
+        parseText(text = text)
+    }
 
     private fun parseText(text: String): Int {
         val parser = TextDelimiterParser(text)
