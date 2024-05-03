@@ -32,17 +32,11 @@ public class StringCalculator {
     }
 
     private static int splitAndGetSum2(String matcher, String separator) {
-        String[] strings = matcher.trim().split(separator);
-        CalculatorNumber result = null;
-        for (String string : strings) {
-            CalculatorNumber number = CalculatorNumber.from(string);
-            if (result == null) {
-                result = number;
-            } else {
-                result = result.plus(number);
-            }
-        }
-        return (result != null) ? result.getNumber() : 0;
+        return Arrays.stream(matcher.trim().split(separator))
+                .map(CalculatorNumber::from)
+                .reduce(CalculatorNumber::plus)
+                .orElse(CalculatorNumber.from("0"))
+                .getNumber();
     }
 
 }
