@@ -1,53 +1,47 @@
 package racingcar;
 
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 public class CarTest {
 
-    @DisplayName("자동차 이름은 5글자 이하이다.")
-    @Test
-    void constructor() {
-        assertThatCode(() -> new Car("car"))
-            .doesNotThrowAnyException();
-
-    }
-
-    @DisplayName("자동차 이름은 비어 있을 수 없다.")
     @NullAndEmptySource
     @ParameterizedTest
-    void constructor_with_null_and_empty_name(final String name) {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> new Car(name));
+    @DisplayName("자동차 이름은 null이거나 빈값일 수 없다.")
+    void carNameDoesNotExist(String carName) {
+        assertThatCode(()-> new Car(carName))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("자동차 이름은 null 이거나 빈 값일 수 없다.");
     }
 
-    @DisplayName("자동차 이름은 5 글자를 넘을 수 없다.")
     @Test
-    void constructor_illegal() {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> new Car("동해물과 백두산이"));
+    @DisplayName("자동차 이름은 5글자를 넘으면 IllegalArgumentException이 발생한다.")
+    void carNameLengthDoNotOverFiveCharacters() {
+        assertThatCode(() -> new Car("bumpercar"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("자동차 이름은 5 글자를 넘을 수 없다.");
     }
 
-    @DisplayName("자동차는 움직일 수 있는 경우 이동한다.")
     @Test
-    void move() {
-        final Car car = new Car("car", 0);
-        car.move(new ForwardStrategy());
-        assertThat(car.getPosition()).isEqualTo(1);
+    @DisplayName("무작위 값이 4 이상이면 움직인다.")
+    void moveCarRandomNumberOverEqualFour() {
+        Car mycar = new Car("mycar");
+        mycar.move(new GoStrategy());
+
+        assertThat(mycar.getPosition()).isEqualTo(1);
     }
 
-
-    @DisplayName("자동차는 움직일 수 없는 경우 정지한다.")
     @Test
-    void stop() {
-        final Car car = new Car("car", 0);
-        car.move(new HoldStrategy());
-        assertThat(car.getPosition()).isEqualTo(0);
+    @DisplayName("무작위 값이 3 이하이면 움직이지 않는다.")
+    void noMoveCarRandomNumberUnderEqualThree() {
+        Car mycar = new Car("mycar");
+        mycar.move(new StopStrategy());
+
+        assertThat(mycar.getPosition()).isEqualTo(0);
     }
 }
