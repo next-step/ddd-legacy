@@ -34,16 +34,16 @@ class CarTest {
     @Test
     @DisplayName("숫자가 4 이상인 경우 자동차는 전진한다.")
     void move() {
-        final var car = new Car("TEST1");
-        car.move(new GoStrategy());
+        final var car = new Car("TEST");
+        car.move(new GoStrategy(4));
         assertThat(car.position()).isEqualTo(1);
     }
 
     @Test
     @DisplayName("숫자가 4 미만인 경우 자동차는 움직이지 않는다.")
     void stop() {
-        final var car = new Car("TEST2");
-        car.move(new StopStrategy());
+        final var car = new Car("TEST");
+        car.move(new StopStrategy(4));
         assertThat(car.position()).isEqualTo(0);
     }
 }

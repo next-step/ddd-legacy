@@ -3,7 +3,7 @@ package racingcar;
 public class Car {
 
     private final String name;
-    private int nameLengthLTECondition;
+    private final int nameLengthLTECondition;
     private int position;
 
     public Car(String name) {
@@ -11,11 +11,12 @@ public class Car {
     }
 
     public Car(final String name, int nameLengthCondition) {
-        if (name.length() > this.nameLengthLTECondition) {
-            throw new IllegalArgumentException();
+        this.nameLengthLTECondition = nameLengthCondition;
+
+        if (name.length() >= this.nameLengthLTECondition) {
+            throw new IllegalArgumentException("Name length should be under condition, given " + name.length());
         }
         this.name = name;
-        this.nameLengthLTECondition = nameLengthCondition;
     }
 
     public String name() {
@@ -23,10 +24,14 @@ public class Car {
     }
 
 
-    public void move(final MovingStrategy condition) {
-        if (condition.movable()) {
+    public void move(final MovingStrategy condition, int moveableCarLimitScore) {
+        if (condition.movable(moveableCarLimitScore)) {
             position++;
         }
+    }
+
+    public void move(final MovingStrategy condition) {
+        this.move(condition, 4);
     }
 
     public int position() {
