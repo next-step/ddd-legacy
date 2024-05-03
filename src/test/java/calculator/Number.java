@@ -1,5 +1,6 @@
 package calculator;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Number {
@@ -32,5 +33,18 @@ public class Number {
 
     public Number add(Number other) {
         return new Number(this.number + other.number);
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Number number1)) return false;
+        return number == number1.number;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(number);
     }
 }

@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 class NumberTest {
@@ -29,5 +30,11 @@ class NumberTest {
     void createNumberFailedWhenNegative() {
         Assertions.assertThatThrownBy(() -> new Number(-1))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("동등성 테스트")
+    @Test
+    void equalsTest() {
+        assertThat(new Number(0)).isEqualTo(new Number(0));
     }
 }
