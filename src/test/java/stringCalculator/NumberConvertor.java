@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 public class NumberConvertor {
     public static final int REGEX_INDEX = 1;
     public static final int NUMSTRING_INDEX = 2;
-    private final String DEFAULT_REGEX = "[,\\:]";
     private final static Pattern customPattern = Pattern.compile("//(.)\\n(.*)");
+    private final static Pattern defaultPattern = Pattern.compile("[,\\:]");
     private final String[] numbers;
 
     public NumberConvertor(String text) {
@@ -37,6 +37,6 @@ public class NumberConvertor {
             return tempString.split(regex);
         }
 
-        return text.split(DEFAULT_REGEX);
+        return defaultPattern.split(text);
     }
 }
