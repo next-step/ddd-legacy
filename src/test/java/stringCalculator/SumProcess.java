@@ -11,7 +11,6 @@ public class SumProcess {
         this.validationNumber(numbers);
 
         return Arrays.stream(numbers)
-//                .filter(a -> this.isPositiveNumber(a))
                 .mapToInt(a -> Integer.parseInt(a))
                 .sum();
     }
