@@ -12,6 +12,6 @@ public class Car {
 
 
     public boolean isMoving(MovementStrategy ms) {
-        return false;
+        return ms.move();
     }
 }
