@@ -8,13 +8,9 @@ class Numbers(
         fun create(splitStringNumbers: List<String>): Numbers {
             return Numbers(
                 numbers = splitStringNumbers.map {
-                    Number(it.toInt())
+                    Number.create(it)
                 }
             )
-        }
-
-        private fun List<String>.validate() {
-            require(this.all { it.toIntOrNull() != null }) { "숫자가 아닌 값이 포함되어 있습니다." }
         }
     }
 

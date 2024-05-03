@@ -3,7 +3,6 @@ package calculator
 import java.util.regex.Pattern
 
 object TextParser {
-
     private val DEFAULT_DELIMITERS = arrayOf(",", ":")
     private val CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)")
 

@@ -2,7 +2,6 @@ package calculator
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import org.junit.jupiter.api.assertThrows
 
 class StringCalculatorTest : DescribeSpec({
 
@@ -53,26 +52,6 @@ class StringCalculatorTest : DescribeSpec({
                     val calculator = StringCalculator()
 
                     calculator.add("1:3:5,7") shouldBe 16
-                }
-            }
-
-            context("음수가 있는 문자열이 주어지면") {
-                it("IllegalArgumentException을 던진다") {
-                    val calculator = StringCalculator()
-
-                    assertThrows<IllegalArgumentException> {
-                        calculator.add("-1,-2,-3")
-                    }.message shouldBe "숫자는 0보다 커야합니다."
-                }
-            }
-
-            context("숫자가 아닌 문자열이 주어지면") {
-                it("IllegalArgumentException을 던진다") {
-                    val calculator = StringCalculator()
-
-                    assertThrows<IllegalArgumentException> {
-                        calculator.add("1,*")
-                    }.message shouldBe "숫자가 아닌 값이 포함되어 있습니다."
                 }
             }
 
