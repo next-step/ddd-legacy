@@ -3,10 +3,12 @@ package calculator
 @JvmInline
 value class PositiveNumber(val number: Int) {
     init {
-        require(number > NEGATIVE_NUMBER) {
+        require(isPositiveNumber(number)) {
             ERROR_MESSAGE_NEGATIVE_NUMBER
         }
     }
+
+    private fun isPositiveNumber(number: Int): Boolean = number > NEGATIVE_NUMBER
 
     companion object {
         private const val NEGATIVE_NUMBER = -1
