@@ -1,7 +1,7 @@
 package racingcar;
 
-public record Position(int pos) {
+public record Position(int position) {
     public Position up() {
-        return new Position(pos + 1);
+        return new Position(position + 1);
     }
 }
