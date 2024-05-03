@@ -9,4 +9,9 @@ public class Car {
         }
         this.name = name;
     }
+
+
+    public boolean isMoving(MovementStrategy ms) {
+        return false;
+    }
 }

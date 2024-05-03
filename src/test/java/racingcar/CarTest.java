@@ -1,5 +1,6 @@
 package racingcar;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.DisplayName;
@@ -12,6 +13,14 @@ public class CarTest {
     public void checkTheNameConstraint() {
         assertThatThrownBy(
                 () -> new Car("아주멋진차량 과학5호기")
-        ).isInstanceOf(IllegalArgumentException.class);
+        ).isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("자동차 이름은 5글자를 넘을 수 없다");
+    }
+
+    @Test
+    @DisplayName("자동차의 움직임 메서드 구현")
+    public void checkThePositionConstraint() {
+        Car k5 = new Car("K5");
+        assertThat(k5.isMoving(() -> true)).isEqualTo(true);
     }
 }
