@@ -18,7 +18,7 @@ public class Numbers {
 
     private static List<Number> toList(String[] values) {
         return Arrays.stream(values)
-                .map(Number::new)
+                .map(Number::of)
                 .toList();
     }
 

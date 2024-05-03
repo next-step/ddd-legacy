@@ -8,29 +8,25 @@ public class Number {
 
     private final int number;
 
-    public Number(String number) {
+    public Number(int number) {
+        if (number < 0) {
+            throw new IllegalArgumentException("not allowed negative number");
+        }
+        this.number = number;
+    }
+
+    public static Number of(String number) {
         if (isNotNumber(number)) {
             throw new IllegalArgumentException("invalid number string: " + number);
         }
-        this.number = toInt(number);
-        if (isNegative()) {
-            throw new IllegalArgumentException("not allow negative number: " + number);
-        }
+        return new Number(Integer.parseInt(number));
     }
 
     public int value() {
         return number;
     }
 
-    private boolean isNotNumber(String number) {
+    private static boolean isNotNumber(String number) {
         return !NUMBER_PATTERN.matcher(number).find();
-    }
-
-    private int toInt(String values) {
-        return Integer.parseInt(values);
-    }
-
-    private boolean isNegative() {
-        return number < 0;
     }
 }
