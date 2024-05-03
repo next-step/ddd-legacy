@@ -8,7 +8,8 @@ import static org.junit.platform.commons.util.StringUtils.isBlank;
 
 public class StringCalculator {
 
-    private final String DEFAULT_DELIMITER_SYMBOL = "[,:]";
+    private static final String DEFAULT_DELIMITER_SYMBOL = "[,:]";
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     public int add(String text) {
 
@@ -31,17 +32,20 @@ public class StringCalculator {
     public void isNegative(String[] strings) {
         for (String value : strings) {
             if (Integer.parseInt(value) < 0) {
-                throw new RuntimeException();
+                throw new RuntimeException("음수는 입력할 수 없습니다.");
             }
         }
     }
 
     public String[] splitByDelimiter(String text) {
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+        Matcher matched = CUSTOM_DELIMITER_PATTERN.matcher(text);
 
-        if (m.find()) {
-            return m.group(2)
-                    .split(m.group(1));
+        if (matched.find()) {
+            String customDelimiter = matched.group(1);
+            String textSource = matched.group(2);
+
+            return textSource
+                    .split(customDelimiter);
 
         }
 
