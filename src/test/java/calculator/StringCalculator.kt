@@ -2,16 +2,14 @@ package calculator
 
 class StringCalculator {
 
-    private val calculatorNumberRangeValidator = CalculatorNumberRangeValidator()
-
     private val calculators = listOf(
-        SingleNumberCalculator(calculatorNumberRangeValidator),
-        FixedDelimiterCalculator(calculatorNumberRangeValidator),
-        CustomizedDelimiterCalculator(calculatorNumberRangeValidator),
+        SingleNumberCalculator(),
+        FixedDelimiterCalculator(),
+        CustomizedDelimiterCalculator(),
     )
 
     fun add(text: String?): Int {
-        if(text.isNullOrBlank()){
+        if (text.isNullOrBlank()) {
             return 0
         }
 

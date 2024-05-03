@@ -2,20 +2,15 @@ package calculator
 
 private val FIXED_DELIMITERS = listOf(":", ",")
 
-class FixedDelimiterCalculator(
-    private val calculatorNumberRangeValidator: CalculatorNumberRangeValidator
-) : StringCalculateStrategy {
+class FixedDelimiterCalculator : StringCalculateStrategy {
     override fun support(text: String?): Boolean =
         text != null && hasFixedDelimiter(text)
 
 
-    override fun calculate(text: String): Int {
-        val tokens = text.split(*FIXED_DELIMITERS.toTypedArray())
-
-        calculatorNumberRangeValidator.validateTokens(tokens)
-
-        return tokens.mapNotNull { it.toIntOrNull() }.sum()
-    }
+    override fun calculate(text: String): Int =
+        text.split(*FIXED_DELIMITERS.toTypedArray())
+            .let { it.getNumberTokens() }
+            .let { it.calculate() }
 
     private fun hasFixedDelimiter(text: String): Boolean =
         FIXED_DELIMITERS.any { text.contains(it) }

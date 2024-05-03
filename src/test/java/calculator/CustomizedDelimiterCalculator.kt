@@ -2,9 +2,7 @@ package calculator
 
 private val CUSTOMIZED_DELIMITER_PATTERN = "//(.)\n(.*)".toRegex()
 
-class CustomizedDelimiterCalculator(
-    private val calculatorNumberRangeValidator: CalculatorNumberRangeValidator
-) : StringCalculateStrategy {
+class CustomizedDelimiterCalculator : StringCalculateStrategy {
     override fun support(text: String?): Boolean = hasCustomizedDelimiter(text)
 
     override fun calculate(text: String): Int {
@@ -14,14 +12,12 @@ class CustomizedDelimiterCalculator(
             throw IllegalArgumentException("can't find delimiter")
         }
 
-        val tokens = CUSTOMIZED_DELIMITER_PATTERN.matchEntire(text)
+        return CUSTOMIZED_DELIMITER_PATTERN.matchEntire(text)
             ?.let { it.groups[2] }
             ?.let { it.value.split(customizedDelimiter) }
-            ?: emptyList()
-
-        calculatorNumberRangeValidator.validateTokens(tokens)
-
-        return tokens.mapNotNull { it.toIntOrNull() }.sum()
+            ?.let { it.getNumberTokens() }
+            ?.let { it.calculate() }
+            ?: throw RuntimeException("can't find valid tokens")
     }
 
     private fun hasCustomizedDelimiter(text: String?): Boolean =
