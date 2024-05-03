@@ -2,20 +2,19 @@ package calculator
 
 import java.util.regex.Pattern
 
-class TextParser {
-    companion object {
-        private val DEFAULT_DELIMITERS = arrayOf(",", ":")
-        private val CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)")
-    }
+object TextParser {
 
-    fun parse(text: String): Numbers {
+    private val DEFAULT_DELIMITERS = arrayOf(",", ":")
+    private val CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)")
+
+    fun parse(text: String): List<String> {
         val matcher = CUSTOM_DELIMITER_PATTERN.matcher(text)
 
         return if (matcher.find()) {
             val customDelimiter = matcher.group(1)
-            Numbers.create(arrayOf(customDelimiter), matcher.group(2))
+            matcher.group(2).split(*arrayOf(customDelimiter))
         } else {
-            Numbers.create(DEFAULT_DELIMITERS, text)
+            text.split(*DEFAULT_DELIMITERS)
         }
     }
 }

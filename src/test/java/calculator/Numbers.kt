@@ -5,11 +5,9 @@ class Numbers(
 ) {
     companion object {
 
-        fun create(delimiters: Array<String>, stringTokens: String): Numbers {
-            val splitStringTokens = stringTokens.split(*delimiters).apply { validate() }
-
+        fun create(splitStringNumbers: List<String>): Numbers {
             return Numbers(
-                numbers = splitStringTokens.map {
+                numbers = splitStringNumbers.map {
                     Number(it.toInt())
                 }
             )
