@@ -1,6 +1,6 @@
 package stringcalculator;
 
-public class PositiveNumber extends Number {
+public class PositiveNumber {
 
     public static final PositiveNumber ZERO = new PositiveNumber(0);
     private final int value;
@@ -11,32 +11,16 @@ public class PositiveNumber extends Number {
 
     public PositiveNumber(int value) {
         if (value < 0) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("음수는 될 수 없습니다 value=%d".formatted(value));
         }
         this.value = value;
     }
 
-    @Override
-    public int intValue() {
-        return value;
-    }
-
-    @Override
-    public long longValue() {
-        return value;
-    }
-
-    @Override
-    public float floatValue() {
-        return (float) value;
-    }
-
-    @Override
-    public double doubleValue() {
-        return value;
-    }
-
-    public PositiveNumber sum(PositiveNumber other) {
+    public PositiveNumber plus(PositiveNumber other) {
         return new PositiveNumber(value + other.value);
+    }
+
+    public int value() {
+        return value;
     }
 }

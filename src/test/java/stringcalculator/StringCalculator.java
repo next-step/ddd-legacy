@@ -20,6 +20,6 @@ public class StringCalculator {
         }
         return Arrays.stream(splitter.split(text))
                 .map(PositiveNumber::new)
-                .reduce(PositiveNumber.ZERO, PositiveNumber::sum).intValue();
+                .reduce(PositiveNumber.ZERO, PositiveNumber::plus).value();
     }
 }
