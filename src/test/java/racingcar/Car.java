@@ -12,6 +12,9 @@ public class Car {
 
 
     public boolean isMoving(MovementStrategy ms) {
+        if(ms == null) {
+            return new CarMovementStrategy().move();
+        }
         return ms.move();
     }
 }

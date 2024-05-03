@@ -23,4 +23,11 @@ public class CarTest {
         Car k5 = new Car("K5");
         assertThat(k5.isMoving(() -> true)).isEqualTo(true);
     }
+
+    @Test
+    @DisplayName("Default Parameter가 반영되어 NPE 발생 안하는 것을 확인")
+    public void checkMovementStrategy() {
+        Car k8 = new Car("K8");
+        assertThat(k8.isMoving(null)).isNotNull();
+    }
 }
