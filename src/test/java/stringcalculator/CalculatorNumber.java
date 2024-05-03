@@ -14,7 +14,7 @@ public class CalculatorNumber {
         return findCache(validatedNumber);
     }
 
-    protected CalculatorNumber(int number) {
+    private CalculatorNumber(int number) {
         this.number = number;
     }
 
@@ -41,6 +41,10 @@ public class CalculatorNumber {
 
     public int getNumber() {
         return number;
+    }
+
+    public CalculatorNumber plus(CalculatorNumber number) {
+        return new CalculatorNumber(this.number + number.getNumber());
     }
 
     @Override

@@ -34,4 +34,11 @@ class CalculatorNumberTest {
         CalculatorNumber number2 = CalculatorNumber.from("1");
         assertThat(number1).isEqualTo(number2);
     }
+    @Test
+    @DisplayName(value = "동일한 숫자인 경우 동일 객체로 판단한다.")
+    void VO() {
+        CalculatorNumber number1 = CalculatorNumber.from("1");
+        CalculatorNumber number2 = CalculatorNumber.from("1");
+        assertThat(number1).isEqualTo(number2);
+    }
 }
