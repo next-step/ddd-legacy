@@ -1,6 +1,8 @@
 package stringCalculator;
 
 public class StringCalculator {
+    private final SumProcess sumProcess = new SumProcess();
+
     public StringCalculator() {
     }
 
@@ -8,8 +10,9 @@ public class StringCalculator {
         int result = 0;
 
         try {
-            SumProcess sumProcess = new SumProcess(text);
-            result = sumProcess.sum();
+            NumberConvertor numberConvertor = new NumberConvertor(text);
+
+            result = sumProcess.sum(numberConvertor.getNumbers());
         } catch (IllegalArgumentException e) {
             result = 0;
         }

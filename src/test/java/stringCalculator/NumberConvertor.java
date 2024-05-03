@@ -4,19 +4,21 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Input {
-    private final String[] inputStrings;
-    private final String defaultRegex = "[,\\:]";
+public class NumberConvertor {
+    public static final int REGEX_INDEX = 1;
+    public static final int NUMSTRING_INDEX = 2;
+    private final String DEFAULT_REGEX = "[,\\:]";
     private final static Pattern customPattern = Pattern.compile("//(.)\\n(.*)");
+    private final String[] numbers;
 
-    public Input(String text) {
+    public NumberConvertor(String text) {
         this.validation(text);
 
-        this.inputStrings = this.splitTextByRegex(text);
+        this.numbers = this.splitTextByRegex(text);
     }
 
-    public String[] getInputStrings() {
-        return inputStrings;
+    public String[] getNumbers() {
+        return numbers;
     }
 
     private void validation(String text){
@@ -29,12 +31,12 @@ public class Input {
         Matcher matcher = customPattern.matcher(text);
 
         if (matcher.find()) {
-            String regex = matcher.group(1);
-            String tempString = matcher.group(2).replaceAll("\n", "");
+            String regex = matcher.group(REGEX_INDEX);
+            String tempString = matcher.group(NUMSTRING_INDEX).replaceAll("\n", "");
 
             return tempString.split(regex);
         }
 
-        return text.split(defaultRegex);
+        return text.split(DEFAULT_REGEX);
     }
 }
