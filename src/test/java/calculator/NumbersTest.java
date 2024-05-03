@@ -14,7 +14,7 @@ class NumbersTest {
     @Test
     void createNumbersTest() {
 
-        Assertions.assertThatCode(() ->  new Numbers(new String[]{"1", "2", "3"}))
+        Assertions.assertThatCode(() -> new Numbers(new String[]{"1", "2", "3"}))
                 .doesNotThrowAnyException();
     }
 

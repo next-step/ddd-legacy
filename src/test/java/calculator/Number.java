@@ -22,11 +22,15 @@ public class Number {
         return new Number(Integer.parseInt(number));
     }
 
+    private static boolean isNotNumber(String number) {
+        return !NUMBER_PATTERN.matcher(number).find();
+    }
+
     public int value() {
         return number;
     }
 
-    private static boolean isNotNumber(String number) {
-        return !NUMBER_PATTERN.matcher(number).find();
+    public Number add(Number other) {
+        return new Number(this.number + other.number);
     }
 }

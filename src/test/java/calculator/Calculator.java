@@ -1,7 +1,6 @@
 package calculator;
 
 
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,7 +30,7 @@ public class Calculator {
     private static String[] split(String input) {
         validate(input);
         Matcher m = DELIMITER_PATTERN.matcher(input);
-        if(!m.find()){
+        if (!m.find()) {
             return input.split("[,:]");
         }
 

@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 class NumberTest {
 
@@ -24,10 +24,10 @@ class NumberTest {
         assertThrowsExactly(IllegalArgumentException.class, () -> Number.of("a"));
     }
 
-   @DisplayName("음수는 Number생성 실패한다")
-   @Test
-   void createNumberFailedWhenNegative() {
-       Assertions.assertThatThrownBy(() -> new Number(-1))
-               .isInstanceOf(IllegalArgumentException.class);
+    @DisplayName("음수는 Number생성 실패한다")
+    @Test
+    void createNumberFailedWhenNegative() {
+        Assertions.assertThatThrownBy(() -> new Number(-1))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
