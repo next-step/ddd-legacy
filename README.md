@@ -8,7 +8,7 @@ docker compose -p kitchenpos up -d
 ```
 
 ## 요구 사항
-> 치킨 포스 시스템을 구현한다.
+> 키친 포스 시스템을 구현한다.
 
 ### 모델 초안
 - `상품(Product)`
