@@ -43,8 +43,8 @@ public class CalculatorNumber {
         return number;
     }
 
-    public CalculatorNumber plus(CalculatorNumber number) {
-        return new CalculatorNumber(this.number + number.getNumber());
+    public CalculatorNumber plus(CalculatorNumber input) {
+        return new CalculatorNumber(this.number + input.number);
     }
 
     @Override
