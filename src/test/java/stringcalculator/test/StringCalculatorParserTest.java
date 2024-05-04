@@ -1,11 +1,13 @@
 package stringcalculator.test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -33,6 +35,13 @@ class StringCalculatorParserTest {
     void testCustom(String expression, List<Integer> expected) {
         List<Integer> result = stringCalculatorParser.execute(expression);
         assertThat(result).containsExactlyElementsOf(expected);
+    }
+
+    @Test
+    void testFail() {
+        String expression = "aaa";
+        assertThatExceptionOfType(RuntimeException.class)
+            .isThrownBy(() -> stringCalculatorParser.execute(expression));
     }
 
     static Stream<Arguments> testCustomSource() {

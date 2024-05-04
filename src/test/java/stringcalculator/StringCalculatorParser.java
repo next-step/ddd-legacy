@@ -44,6 +44,10 @@ public class StringCalculatorParser {
 
     private List<Integer> getNumbers(String expression, String delimiters) {
         String[] exprs = expression.split(delimiters);
-        return Arrays.stream(exprs).map(Integer::parseInt).toList();
+        try {
+            return Arrays.stream(exprs).map(Integer::parseInt).toList();
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("숫자형식이 잘못되었습니다");
+        }
     }
 }
