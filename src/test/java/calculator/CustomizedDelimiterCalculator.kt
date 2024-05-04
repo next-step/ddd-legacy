@@ -3,7 +3,7 @@ package calculator
 private val CUSTOMIZED_DELIMITER_PATTERN = "//(.)\n(.*)".toRegex()
 
 class CustomizedDelimiterCalculator : StringCalculateStrategy {
-    override fun support(text: String?): Boolean = hasCustomizedDelimiter(text)
+    override fun support(text: String): Boolean = hasCustomizedDelimiter(text)
 
     override fun calculate(text: String): Int {
         val customizedDelimiter = getCustomizedDelimiter(text)
@@ -23,8 +23,8 @@ class CustomizedDelimiterCalculator : StringCalculateStrategy {
     private fun hasCustomizedDelimiter(text: String?): Boolean =
         text?.let { CUSTOMIZED_DELIMITER_PATTERN.matches(it) } ?: false
 
-    private fun getCustomizedDelimiter(text: String?): String? =
-        text?.let { CUSTOMIZED_DELIMITER_PATTERN.matchEntire(it) }
+    private fun getCustomizedDelimiter(text: String): String? =
+        text.let { CUSTOMIZED_DELIMITER_PATTERN.matchEntire(it) }
             ?.let { it.groups[1] }
             ?.let { it.value }
 }
