@@ -1,14 +1,14 @@
 package stringcalculator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class StringCalculatorTest {
     private StringCalculator calculator;
@@ -58,5 +58,12 @@ public class StringCalculatorTest {
     void negative() {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> calculator.add("-1"));
+    }
+
+    @DisplayName(value = "두 자리 수 일 경우")
+    @ParameterizedTest
+    @ValueSource(strings = {"//;\n11;22;33"})
+    void 숫자가_여러개(final String text) {
+        assertThat(calculator.add(text)).isSameAs(66);
     }
 }
