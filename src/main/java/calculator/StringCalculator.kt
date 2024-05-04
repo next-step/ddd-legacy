@@ -6,17 +6,19 @@ class StringCalculator {
     ): Int = if (text.isNullOrBlank()) {
         EMPTY_RESULT
     } else {
-        parseText(text)
+        getSumByNumbersText(text)
     }
 
-    private fun parseText(text: String): Int {
-        val parser = TextDelimiterParser(text)
+    private fun getSumByNumbersText(text: String): Int {
+        val separateResult = separateText(text)
 
         return sumByString(
-            delimiter = parser.getDelimiter(),
-            numbersText = parser.getNumbersText(),
+            delimiter = separateResult.delimiter,
+            numbersText = separateResult.numbersText,
         )
     }
+
+    private fun separateText(text: String): SeparateResult = TextParserUtils.separateText(text)
 
     private fun sumByString(
         delimiter: Delimiter,
@@ -29,5 +31,3 @@ class StringCalculator {
         private const val EMPTY_RESULT = 0
     }
 }
-
-
