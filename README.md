@@ -112,6 +112,7 @@ docker compose -p kitchenpos up -d
     - `PUT /api/orders/${orderId}/start-delivery` : 배달을 시작합니다.
     - `PUT /api/orders/${orderId}/complete-delivery` : 배달을 완료합니다.
     - `PUT /api/orders/${orderId}/complete` : 주문을 완료합니다.
+    - `${orderId}` 는 주문의 아이디를 의미합니다.
 - `GET /api/orders` 요청을 통해 주문 목록을 조회할 수 있습니다
 
 ### OrderLineItem
@@ -129,3 +130,22 @@ docker compose -p kitchenpos up -d
     - `quantity` 1 이상의 값이어야 합니다.
     - `menu_id`는 메뉴의 아이디입니다. menu 테이블의 아이디와 연결됩니다.
     - `order_id`는 주문의 아이디입니다. order 테이블의 아이디와 연결됩니다.
+
+### OrderTable
+
+- 테이블은 매장의 좌석수를 의미합니다.
+- 주문 생성 시 타입이 **EAT_IN(매장식사)**  일 경우 해당 테이블의 Id를 참조 해야합니다.
+- 만약 모든 좌석이 사용 중일 경우 **EAT_IN(매장식사)** 타입의 주문을 생성할 수 없습니다.
+- `POST /api/order-tables` 요청을 통해 테이블을 등록할 수 있습니다.
+    - `id`, `name`, `number_of_guests`, `empty` 필드로 구성되어있습니다.
+    - `id`는 uuid로 부여/식별됩니다.
+    - `name` 필드는 필수입니다.
+    - `name` 필드는 고유한 값이어야 합니다.
+    - `number_of_guests` 필드는 테이블의 좌석수를 의미합니다.
+    - `occupied` 필드는 비트 타입으로 테이블의 사용 여부를 나타냅니다.
+- `PUT /api/order-tables/${orderTableId}/sit` 요청을 통해 테이블을 사용 중으로 변경할 수 있습니다.
+- `PUT /api/order-tables/${orderTableId}/clear` 요청을 통해 테이블을 사용 가능으로 변경할 수 있습니다.
+- `PUT /api/order-tables/${orderTableId}/number-of-guests` 요청을 통해 테이블의 좌석수를 변경할 수 있습니다.
+    - `number_of_guests` 필드는 필수입니다.
+    - `number_of_guests` 필드는 0보다 큰 값이어야 합니다.
+- `GET /api/order-tables` 요청을 통해 테이블 목록을 조회할 수 있습니다.
