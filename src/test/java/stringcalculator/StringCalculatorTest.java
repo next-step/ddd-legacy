@@ -16,8 +16,10 @@ class StringCalculatorTest {
 	@ValueSource(strings = {" ", "  "})
 	@NullAndEmptySource
 	void constructorWithNullOrBlank(final String input) {
+		// given
 		StringCalculator calculator = new StringCalculator(input);
 
+		// when / then
 		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.ZERO);
 	}
 
@@ -25,16 +27,20 @@ class StringCalculatorTest {
 	@DisplayName("숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다")
 	@ValueSource(strings = {"1", "29", "346", "4987", "56789"})
 	void constructorWithOneInteger(final String input) {
+		// given
 		StringCalculator calculator = new StringCalculator(input);
 
+		// when / then
 		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf(input));
 	}
 
 	@Test
 	@DisplayName("숫자 두개를 컴마(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다. (예 : “1,2”)")
 	void constructorWithTwoIntegers() {
+		// given
 		StringCalculator calculator = new StringCalculator("1,2");
 
+		// when / then
 		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf("3"));
 	}
 
@@ -44,6 +50,7 @@ class StringCalculatorTest {
 		// given
 		StringCalculator calculator = new StringCalculator("1,2:3");
 
+		// when / then
 		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf("6"));
 	}
 
@@ -53,6 +60,7 @@ class StringCalculatorTest {
 		// given
 		StringCalculator calculator = new StringCalculator("//;\n1;2;3");
 
+		// when / then
 		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf("6"));
 	}
 
@@ -60,7 +68,10 @@ class StringCalculatorTest {
 	@DisplayName("음수나 숫자가 아닌 값을 전달할 경우 RuntimeException 예외가 발생해야 한다. (예 : “-1,2,3”)")
 	@ValueSource(strings = {"-1,2,3", "2,a,7", "3,-,14", "김,1,29", "!,72,a"})
 	void constructorWithNegativeInteger(final String input) {
-		// given / when / then
-		assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> new StringCalculator(input).calculate());
+		// then
+		assertThatExceptionOfType(RuntimeException.class).isThrownBy(() ->
+			// given / when
+			new StringCalculator(input).calculate()
+		);
 	}
 }
