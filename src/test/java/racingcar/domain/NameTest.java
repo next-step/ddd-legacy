@@ -7,8 +7,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class NameTest {
 
@@ -18,7 +18,7 @@ class NameTest {
         @DisplayName("이름이 5자 이하인 경우에 생성된다.")
         @Test
         void normalConstructorTest() {
-            assertDoesNotThrow(() -> new Name("12345"));
+            assertThatCode(() -> new Name("12345")).doesNotThrowAnyException();
         }
 
         @DisplayName("이름이 5자 이상인 경우에 에러가 발생한다.")
