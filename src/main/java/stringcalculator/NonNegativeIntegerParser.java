@@ -6,12 +6,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class NonNegativeIntegerParser {
+	private static final Pattern INPUT_PATTERN = Pattern.compile("//(.)\n(.*)");
+
+	private static final String DELIMITER_REGEX = ",|:";
 
 	private NonNegativeIntegerParser() {
 	}
-
-	private static final String DEFAULT_INPUT_REGEX = "//(.)\n(.*)";
-	private static final String DEFAULT_OPERAND_DELIMITER_REGEX = ",|:";
 
 	public static List<NonNegativeInteger> parse(String input) {
 		if (input == null || input.isBlank()) {
@@ -24,16 +24,13 @@ public class NonNegativeIntegerParser {
 	}
 
 	private static String[] extractTokens(final String input) {
-		Matcher m = Pattern.compile(DEFAULT_INPUT_REGEX).matcher(input);
-		String[] tokens;
+		Matcher matcher = INPUT_PATTERN.matcher(input);
 
-		if (m.find()) {
-			String customDelimiter = m.group(1);
-			tokens = m.group(2).split(Pattern.quote(customDelimiter));
-		} else {
-			tokens = input.split(DEFAULT_OPERAND_DELIMITER_REGEX);
+		if (matcher.find()) {
+			String customDelimiter = matcher.group(1);
+			return matcher.group(2).split(Pattern.quote(customDelimiter));
 		}
 
-		return tokens;
+		return input.split(DELIMITER_REGEX);
 	}
 }
