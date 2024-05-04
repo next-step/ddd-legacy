@@ -34,8 +34,7 @@ public class StringCalculator {
     private static int splitAndGetSum2(String matcher, String separator) {
         return Arrays.stream(matcher.trim().split(separator))
                 .map(CalculatorNumber::from)
-                .reduce(CalculatorNumber::plus)
-                .orElse(CalculatorNumber.from("0"))
+                .reduce(CalculatorNumber.from("0"), CalculatorNumber::plus)
                 .getNumber();
     }
 
