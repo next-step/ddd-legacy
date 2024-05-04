@@ -4,16 +4,19 @@ data class NumberToken(
     val value: Int
 ) {
     init {
-        if (value < 0) {
+        require(value >= 0) {
             throw RuntimeException("negative number can't be calculated")
         }
     }
+
+    operator fun plus(token: NumberToken): NumberToken =
+        NumberToken(value + token.value)
 }
 
 data class NumberTokens(
     val tokens: List<NumberToken>
 ) {
-    fun calculate() = tokens.sumOf { it.value }
+    fun calculate(): Int = tokens.reduce { acc, numberToken -> acc + numberToken }.value
 }
 
 fun List<String>.getNumberTokens(): NumberTokens {
