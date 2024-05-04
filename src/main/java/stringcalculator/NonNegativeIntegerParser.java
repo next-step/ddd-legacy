@@ -1,5 +1,6 @@
 package stringcalculator;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,11 +16,11 @@ public class NonNegativeIntegerParser {
 
 	public static List<NonNegativeInteger> parse(String input) {
 		if (input == null || input.isBlank()) {
-			return List.of(new NonNegativeInteger("0"));
+			return List.of(NonNegativeInteger.from(BigInteger.ZERO));
 		}
 
 		return Stream.of(extractTokens(input))
-			.map(NonNegativeInteger::new)
+			.map(NonNegativeInteger::from)
 			.toList();
 	}
 

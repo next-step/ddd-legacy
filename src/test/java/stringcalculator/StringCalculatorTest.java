@@ -3,8 +3,6 @@ package stringcalculator;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.math.BigInteger;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,7 +18,7 @@ class StringCalculatorTest {
 	void constructorWithNullOrBlank(final String input) {
 		StringCalculator calculator = new StringCalculator(input);
 
-		assertThat(calculator.calculate()).isEqualTo(BigInteger.ZERO);
+		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.ZERO);
 	}
 
 	@ParameterizedTest
@@ -29,7 +27,7 @@ class StringCalculatorTest {
 	void constructorWithOneInteger(final String input) {
 		StringCalculator calculator = new StringCalculator(input);
 
-		assertThat(calculator.calculate()).isEqualTo(new BigInteger(input));
+		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.from(input));
 	}
 
 	@Test
@@ -37,29 +35,32 @@ class StringCalculatorTest {
 	void constructorWithTwoIntegers() {
 		StringCalculator calculator = new StringCalculator("1,2");
 
-		assertThat(calculator.calculate()).isEqualTo(new BigInteger("3"));
+		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.from("3"));
 	}
 
 	@Test
 	@DisplayName("구분자를 컴마(,) 이외에 콜론(:)을 사용할 수 있다. (예 : “1,2:3” => 6)")
 	void constructorWithColonDelimiter() {
+		// given
 		StringCalculator calculator = new StringCalculator("1,2:3");
 
-		assertThat(calculator.calculate()).isEqualTo(new BigInteger("6"));
+		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.from("6"));
 	}
 
 	@Test
 	@DisplayName("“//”와 “\\n” 문자 사이에 커스텀 구분자를 지정할 수 있다. (예 : “//;\\n1;2;3” => 6)")
 	void constructorWithCustomDelimiter() {
+		// given
 		StringCalculator calculator = new StringCalculator("//;\n1;2;3");
 
-		assertThat(calculator.calculate()).isEqualTo(new BigInteger("6"));
+		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.from("6"));
 	}
 
 	@ParameterizedTest
 	@DisplayName("음수나 숫자가 아닌 값을 전달할 경우 RuntimeException 예외가 발생해야 한다. (예 : “-1,2,3”)")
 	@ValueSource(strings = {"-1,2,3", "2,a,7", "3,-,14", "김,1,29", "!,72,a"})
 	void constructorWithNegativeInteger(final String input) {
+		// given / when / then
 		assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> new StringCalculator(input));
 	}
 }
