@@ -7,9 +7,12 @@ public class NumberExtractor {
 
     private static final String DEFAULT_DELIMITER = "[,:]";
 
+    private static final String CUSTOM_DELIMITER_PREFIX = "//";
+    private static final String CUSTOM_DELIMITER_SUFFIX = "\n";
+
     public String extractDelimiter(final String text) {
-        if (text.startsWith("//")) {
-            return text.split("\n")[0].substring(2);
+        if (text.startsWith(CUSTOM_DELIMITER_PREFIX)) {
+            return text.split(CUSTOM_DELIMITER_SUFFIX)[0].substring(2);
         }
 
         return DEFAULT_DELIMITER;
