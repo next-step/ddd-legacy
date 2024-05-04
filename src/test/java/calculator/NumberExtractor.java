@@ -32,17 +32,17 @@ public class NumberExtractor {
         }
     }
 
-    public List<Integer> extract(final String text) {
+    public Numbers extract(final String text) {
         if (text == null || text.isEmpty()) {
-            return List.of();
+            return new Numbers(List.of());
         }
 
         String delimiter = extractDelimiter(text);
         String numberText = extractNumberText(text);
 
-        return Stream.of(numberText.split(delimiter))
+        return new Numbers(Stream.of(numberText.split(delimiter))
             .map(Integer::parseInt)
             .peek(this::validateNumber)
-            .toList();
+            .toList());
     }
 }
