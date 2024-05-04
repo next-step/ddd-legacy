@@ -3,7 +3,6 @@ package stringcalculator;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Stream;
 
 public record Numbers(
         List<Number> numbers
