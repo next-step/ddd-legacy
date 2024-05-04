@@ -76,7 +76,7 @@ docker compose -p kitchenpos up -d
     - [x] MenuGroup
     - [x] Order
     - [x] OrderTable
-    - [ ] 매핑 테이블 정리
+    - [x] 매핑 테이블 정리
     - [ ] 생각해 볼 추가 요구사항 분석
     > - Table 의 구조를 파악한다.
     > - http 디렉터리의 .http 파일(HTTP client)을 보고 어떤 요청을 받는지 참고한다.
@@ -189,3 +189,14 @@ docker compose -p kitchenpos up -d
   - 사용 중인 해당 테이블은 손님의 수를 수정할 수 있다.
 - `findAll` : 주문 테이블 목록을 조회할 수 있다.
 
+#### 매핑테이블 정리
+- 주문메뉴 항목(`OrderLineItem`) => 메뉴이다
+  - 주문 메뉴는 **메뉴(menu)**, 수량(quantity), 가격(price)를 관리한다.
+  - 주문 하나당 중복되지 않은 메뉴 종류가 1개 이상이다.
+  - 메뉴의 가격 = 주문메뉴 항목의 가격
+  - 한 주문의 가격 = sum(주문메뉴 항목)
+- 메뉴구성 상품(`MenuProduct`) => 상품이다
+  - 메뉴 구성 상품은 상품(Product)과 상품의 수량(quantity)을 관리한다.
+  - 메뉴를 구성하는 상품은 하나의 메뉴에 여러가지 상품이 올 수 있다.
+  - 하나의 구성 상품 총 가격 = (상품의 가격 * 수량)
+  - 메뉴가격 <= sum(각 상품의 (상품의 가격 * 수량))
