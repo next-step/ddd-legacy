@@ -87,3 +87,29 @@ docker compose -p kitchenpos up -d
 - `GET /api/menus` 요청을 통해 메뉴 목록을 조회할 수 있습니다.
 
 ## Order Aggregate
+
+### Order
+
+- 고객은 주문을 생성할 수 있습니다.
+- 주문은 하나 이상의 주문항목으로 구성됩니다.
+- 고객은  **DELIVERY(배달)**, **TAKEOUT(포장)**, **EAT_IN(매장식사)** 중 하나를 선택해 주문 할 수 있습니다.
+- 고객은 **DELIVERY(배달)** 타입의 주문시 배달 주소를 제공해야한다.
+- 고객은 **EAT_IN(매장식사)** 타입의 주문시 테이블을 선택해야한다.
+- `POST /api/orders` 요청을 통해 주문을 생성할 수 있습니다.
+    - `id`, `delivery_address`, `order_date_time`, `status`, `type`, `order_table_id` 필드로 구성되어있습니다.
+    - `id`는 uuid로 부여/식별됩니다.
+    - `delivery_address` 필드는 **DELIVERY(배달)** 주문 타입일 때 필수입니다. **TAKEOUT(포장)**, **EAT_IN(매장식사)** 주문 타입일 때는 무시됩니다.
+    - `order_date_time` 필드는 주문 생성 시간입니다.
+    - `status` 필드는 주문 상태입니다.   **WAITING**, **ACCEPTED**, **SERVED**, **DELIVERING**, **DELIVERED**, **COMPLETED** 중
+      하나입니다.
+        - 최초 생성 시 `status` 필드는 **WAITING**으로 설정됩니다.
+    - `type` 필드는 주문 타입입니다. **DELIVERY(배달)**, **TAKEOUT(포장)**, **EAT_IN(매장식사)** 중 하나입니다.
+    - `order_table_id` 필드는 **EAT_IN(매장식사)** 주문 타입일 때 필수입니다. **DELIVERY(배달)**, **TAKEOUT(포장)** 주문 타입일 때는 무시됩니다.
+    - 요청 시 하나 이상의 `order_line_items`를 함께 등록해야합니다. `order_line_items` 상세한 내용은 아래에 설명합니다.
+- 하위 요청을 통해 주문의 상태를 변경할 수 있습니다.
+    - `PUT /api/orders/${orderId}/accept` : 주문을 접수합니다.
+    - `PUT /api/orders/${orderId}/serve` : 주문을 제공합니다.
+    - `PUT /api/orders/${orderId}/start-delivery` : 배달을 시작합니다.
+    - `PUT /api/orders/${orderId}/complete-delivery` : 배달을 완료합니다.
+    - `PUT /api/orders/${orderId}/complete` : 주문을 완료합니다.
+- `GET /api/orders` 요청을 통해 주문 목록을 조회할 수 있습니다
