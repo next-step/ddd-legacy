@@ -68,6 +68,7 @@ docker compose -p kitchenpos up -d
     - `displayed`는 bit 값으로, 메뉴가 화면에 표시되는지 여부를 나타냅니다.
     - `name`, `price`, `menu_group_id` 필드는 필수입니다.
     - `name` 필드는 고유한 값이어야 합니다.
+    - `name` 은 https://i.imgur.com/Jf6exQt.png 를 참조하여 비속어를 검증해야합니다. 
     - `price` 필드는 0보다 큰 값이어야 합니다.
     - `price` 는 **decimal(19,2)** 으로 최대 19 자릿수를 가질 수 있고 소수점 2자리까지 표현할 수 있습니다.
     - 등록 시 하나 이상의 `menu_product`를 함께 등록해야합니다.
