@@ -6,7 +6,7 @@ class StringCalculator {
     ): Int = if (text.isNullOrBlank()) {
         EMPTY_RESULT
     } else {
-        parseText(text = text)
+        parseText(text)
     }
 
     private fun parseText(text: String): Int {
