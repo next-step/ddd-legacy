@@ -1,6 +1,7 @@
 package calculator;
 
 class StringCalculator {
+
     private final NumberExtractor numberExtractor;
 
     public StringCalculator() {
