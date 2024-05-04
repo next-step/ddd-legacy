@@ -7,8 +7,6 @@ public class StringCalculator {
             return NumericString.ZERO;
         }
 
-        PositiveNumbers numbers = numericString.toNumbers();
-
-        return numbers.sum();
+        return numericString.sum();
     }
 }

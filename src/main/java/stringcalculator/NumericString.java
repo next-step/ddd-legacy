@@ -15,8 +15,8 @@ public class NumericString {
         this.numeric = numeric;
     }
 
-    public PositiveNumbers toNumbers() {
-        return isSingleNumber() ? parseSingleNumber() : parseMultipleNumbers();
+    public int sum() {
+        return isSingleNumber() ? parseSingleNumber().sum() : parseMultipleNumbers().sum();
     }
 
     private PositiveNumbers parseSingleNumber() {
