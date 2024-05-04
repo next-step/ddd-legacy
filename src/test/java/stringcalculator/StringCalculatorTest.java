@@ -61,6 +61,6 @@ class StringCalculatorTest {
 	@ValueSource(strings = {"-1,2,3", "2,a,7", "3,-,14", "김,1,29", "!,72,a"})
 	void constructorWithNegativeInteger(final String input) {
 		// given / when / then
-		assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> new StringCalculator(input));
+		assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> new StringCalculator(input).calculate());
 	}
 }

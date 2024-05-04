@@ -1,17 +1,15 @@
 package stringcalculator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class StringCalculator {
-	private final List<NonNegativeInteger> nonNegativeIntegers = new ArrayList<>();
+	private final String input;
 
 	public StringCalculator(final String input) {
-		this.nonNegativeIntegers.addAll(NonNegativeIntegerParser.parse(input));
+		this.input = input;
 	}
 
 	public NonNegativeInteger calculate() {
-		return nonNegativeIntegers.stream()
+		return NonNegativeIntegerParser.parse(input)
+			.stream()
 			.reduce(NonNegativeInteger.ZERO, NonNegativeInteger::add);
 	}
 }
