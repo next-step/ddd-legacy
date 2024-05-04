@@ -10,13 +10,14 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import stringcalculator.StringCalculator;
+import stringcalculator.StringCalculatorParser;
 
 class StringCalculatorTest {
     private StringCalculator calculator;
 
     @BeforeEach
     void setUp() {
-        calculator = new StringCalculator();
+        calculator = new StringCalculator(new StringCalculatorParser());
     }
 
     @DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")
@@ -49,7 +50,7 @@ class StringCalculatorTest {
 
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @ParameterizedTest
-    @ValueSource(strings = {"//;\n1;2;3"})
+    @ValueSource(strings = {"//;\n1;2;3", "//;\n//#\n1;2;3",  "//;\n//#\n1;2#3"})
     void customDelimiter(final String text) {
         assertThat(calculator.add(text)).isSameAs(6);
     }
