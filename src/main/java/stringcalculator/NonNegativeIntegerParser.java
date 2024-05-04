@@ -16,11 +16,11 @@ public class NonNegativeIntegerParser {
 
 	public static List<NonNegativeInteger> parse(String input) {
 		if (input == null || input.isBlank()) {
-			return List.of(NonNegativeInteger.from(BigInteger.ZERO));
+			return List.of(NonNegativeInteger.valueOf(BigInteger.ZERO));
 		}
 
 		return Stream.of(extractTokens(input))
-			.map(NonNegativeInteger::from)
+			.map(NonNegativeInteger::valueOf)
 			.toList();
 	}
 

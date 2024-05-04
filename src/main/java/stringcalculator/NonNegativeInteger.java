@@ -12,11 +12,11 @@ public class NonNegativeInteger {
 
 	private final BigInteger value;
 
-	public static NonNegativeInteger from(String value) {
+	public static NonNegativeInteger valueOf(String value) {
 		return new NonNegativeInteger(value);
 	}
 
-	public static NonNegativeInteger from(BigInteger value) {
+	public static NonNegativeInteger valueOf(BigInteger value) {
 		return new NonNegativeInteger(value);
 	}
 

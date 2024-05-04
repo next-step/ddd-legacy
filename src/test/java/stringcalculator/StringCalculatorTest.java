@@ -27,7 +27,7 @@ class StringCalculatorTest {
 	void constructorWithOneInteger(final String input) {
 		StringCalculator calculator = new StringCalculator(input);
 
-		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.from(input));
+		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf(input));
 	}
 
 	@Test
@@ -35,7 +35,7 @@ class StringCalculatorTest {
 	void constructorWithTwoIntegers() {
 		StringCalculator calculator = new StringCalculator("1,2");
 
-		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.from("3"));
+		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf("3"));
 	}
 
 	@Test
@@ -44,7 +44,7 @@ class StringCalculatorTest {
 		// given
 		StringCalculator calculator = new StringCalculator("1,2:3");
 
-		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.from("6"));
+		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf("6"));
 	}
 
 	@Test
@@ -53,7 +53,7 @@ class StringCalculatorTest {
 		// given
 		StringCalculator calculator = new StringCalculator("//;\n1;2;3");
 
-		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.from("6"));
+		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf("6"));
 	}
 
 	@ParameterizedTest
