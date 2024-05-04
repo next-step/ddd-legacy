@@ -5,11 +5,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-public class OperandParser {
+public class NonNegativeIntegerParser {
+
+	private NonNegativeIntegerParser() {
+	}
+
 	private static final String DEFAULT_INPUT_REGEX = "//(.)\n(.*)";
 	private static final String DEFAULT_OPERAND_DELIMITER_REGEX = ",|:";
 
-	public List<NonNegativeInteger> parse(String input) {
+	public static List<NonNegativeInteger> parse(String input) {
 		if (input == null || input.isBlank()) {
 			return List.of(new NonNegativeInteger("0"));
 		}
