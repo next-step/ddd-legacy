@@ -19,6 +19,83 @@ docker compose -p kitchenpos up -d
 
 ## 모델링
 
+### 클래스 관계도램
+```mermaid
+classDiagram
+    class MenuGroup {
+        id
+        name
+    }
+    class Menu {
+        id
+        name
+        price
+        displayed
+        menuGroup
+        menuProducts
+    }
+    class MenuProduct {
+        seq
+        product
+        quantity
+        
+    }
+    class Product {
+        id
+        name
+        price
+    }
+    class OrderTable {
+        id
+        name
+        occupied
+        numberOfGuests
+    }
+    class Order {
+        id
+        type
+        status
+        orderDateTime
+        deliveryAddress
+        orderTable
+        orderLineItems
+    }
+    class OrderLineItem {
+        seq
+        menu
+        quantity
+    }
+    
+    MenuGroup "1" <-- "1..*" Menu
+    Menu "1" <-- "1..*" MenuProduct
+    MenuProduct "1..*" --> "1" Product
+    OrderTable "0..1" <-- "1..*" Order
+    Order "1" <-- "1..*" OrderLineItem
+    Menu "1" <-- "1..*" OrderLineItem
+```
+
+#### 주문 상태 프로세스
+
+```mermaid
+stateDiagram-v2
+    direction LR
+    [*] --> WAITING : 주문 등록
+
+    WAITING --> ACCEPTED : 주문 접수
+    ACCEPTED --> SERVED : 주문 제조
+    
+    
+    state 배달주문 {
+        SERVED --> DELIVERING : 라이더 배치(주소, 주문가격) -> 배달 시작
+        DELIVERING --> DELIVERED : 배달 완료
+        DELIVERED --> COMPLETED : 주문 완료
+        
+    }
+    state 포장주문_매장주문 {
+        SERVED --> COMPLETED : 포장 주문 => 픽업 => 주문 완료 
+        SERVED --> COMPLETED : 매장 주문 => 서빙 => 주문 완료
+    }
+```
 
 -----------------------------------------------------------------------------------------------------
 ---
@@ -83,7 +160,7 @@ docker compose -p kitchenpos up -d
     > - 각 요청의 흐름 순서대로 분석해보자.
     > - 개발적인 요소들이 포함되도 좋으니 일단 작성해보자.
 1. 작성된 초안을 참고하여 요구사항을 작성한다.
-  - [ ] 필요한 도메인 모델링 작성
+  - [x] 필요한 도메인 모델링 작성
   - [ ] 유비쿼터스 언어를 아래 `용어사전`에 정의한다.
   - [ ] 사용자가 사용하는 진입 경로 순서로 요구사항을 목록화 한다.
 1. 요구사항을 리팩토링 한다.
