@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 public class Calculator {
 
     public int add(String text) {
-        if (text == null || text.isEmpty()) return 0;
+        if (InputValidator.validation(text)) return 0;
 
         String[] numbers;
 
@@ -21,7 +21,10 @@ public class Calculator {
                     .mapToInt(Integer::parseInt).sum();
         }
 
+        // 기본 구분자
         numbers = text.split("[,|;]");
+
+        // 계산 프로세스
         return Arrays.stream(numbers)
                 .filter(this::isPositiveNumber)
                 .mapToInt(Integer::parseInt).sum();
