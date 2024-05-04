@@ -1,8 +1,10 @@
 package calculator;
 
+import java.util.Objects;
+
 public class InputValidator {
 
     public static boolean validation(String text) {
-        return text == null || text.isEmpty();
+        return Objects.isNull(text) || text.isBlank();
     }
 }
