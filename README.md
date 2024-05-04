@@ -97,6 +97,18 @@ docker compose -p kitchenpos up -d
     - 매장 주문이 완료되면 해당 주문 테이블은 비웁니다.
   - 주문 목록을 조회할 수 있다. - `findAll`
 
+- 주문 테이블(`OrderTable`)
+  - 주문테이블은 이름(name), 인원(numberOfGuests), 사용 여부(occupied)를 관리한다.
+  - 주문 테이블을 등록한다. - `create`
+    - 테이블의 이름을 정하고, 해당 테이블은 비어있다.
+  - 테이블에 사람들이 앉는다. - `sit`
+  - 테이블을 비운다. - `clear`
+    - 모든 주문이 완료된 상태이면 테이블을 비운다.
+  - 테이블의 손님의 수를 변경한다. `changeNumberOfGuests`
+    - 손님의 수는 필수 값이고, 0보다 커야 한다.
+    - 사용 중인 해당 테이블은 손님의 수를 수정할 수 있다.
+  - 주문 테이블 목록을 조회할 수 있다. - `findAll`
+
 ## 용어 사전
 
 | 한글명 | 영문명 | 설명 |
@@ -161,7 +173,7 @@ docker compose -p kitchenpos up -d
     - [x] Menu
     - [x] MenuGroup
     - [x] Order
-    - [ ] OrderTable
+    - [x] OrderTable
     > - Table 의 구조를 파악한다.
     > - http 디렉터리의 .http 파일(HTTP client)을 보고 어떤 요청을 받는지 참고한다.
     > - 각 요청의 흐름 순서대로 분석해보자.
