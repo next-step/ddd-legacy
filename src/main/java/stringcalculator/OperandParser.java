@@ -9,13 +9,13 @@ public class OperandParser {
 	private static final String DEFAULT_INPUT_REGEX = "//(.)\n(.*)";
 	private static final String DEFAULT_OPERAND_DELIMITER_REGEX = ",|:";
 
-	public List<Operand> parse(String input) {
+	public List<NonNegativeInteger> parse(String input) {
 		if (input == null || input.isBlank()) {
-			return List.of(new Operand("0"));
+			return List.of(new NonNegativeInteger("0"));
 		}
 
 		return Stream.of(extractTokens(input))
-			.map(Operand::new)
+			.map(NonNegativeInteger::new)
 			.toList();
 	}
 
