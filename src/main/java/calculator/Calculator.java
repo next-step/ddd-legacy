@@ -5,6 +5,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Calculator {
+    private static final Pattern CUSTOM_DELIMITER = Pattern.compile("//(.)\n(.*)");
+    private static final String DEFAULT_DELIMITER = "[,|;]";
+
 
     public int add(String text) {
         if (InputValidator.validation(text)) return 0;
@@ -12,19 +15,20 @@ public class Calculator {
         String[] numbers;
 
         // 커스텀 구분자 지정
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+        Matcher m = CUSTOM_DELIMITER.matcher(text);
         if (m.find()) {
             String customDelimiter = m.group(1);
             numbers = m.group(2).split(customDelimiter);
-            return Arrays.stream(numbers)
-                    .filter(this::isPositiveNumber)
-                    .mapToInt(Integer::parseInt).sum();
+            return this.plus(numbers);
         }
 
         // 기본 구분자
-        numbers = text.split("[,|;]");
+        numbers = text.split(DEFAULT_DELIMITER);
 
-        // 계산 프로세스
+        return this.plus(numbers);
+    }
+
+    private int plus(String[] numbers) {
         return Arrays.stream(numbers)
                 .filter(this::isPositiveNumber)
                 .mapToInt(Integer::parseInt).sum();
