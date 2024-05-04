@@ -51,6 +51,12 @@ docker compose -p kitchenpos up -d
   - 메뉴를 목록에서 안 보이게 할 수 있다. `hide`
   - 메뉴 목록을 조회할 수 있다. - `findAll`
 
+- `메뉴 그룹(MenuGroup)`
+  - 메뉴 그룹은 이름(name)을 관리한다.
+  - 메뉴 그룹은 목록을 조회할 수 있다. - `findAll`
+  - 메뉴 그룹을 등록 할 수 있다. - `create`
+    - 이름은 필수 값이다.
+
 ## 용어 사전
 
 | 한글명 | 영문명 | 설명 |
@@ -113,7 +119,7 @@ docker compose -p kitchenpos up -d
   - [ ] `kitchenpos` 패키지의 코드를 보고 추론해본다.
     - [x] Product
     - [x] Menu
-    - [ ] MenuGroup
+    - [x] MenuGroup
     - [ ] Order
     - [ ] OrderTable
     > - Table 의 구조를 파악한다.
