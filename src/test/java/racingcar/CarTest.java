@@ -17,7 +17,7 @@ public class CarTest {
     }
 
     @Test
-    @DisplayName("값이 4이상이 경우 Car는 앞으로 움직인다.")
+    @DisplayName("차가 전진할수 있는때 차의 포지션이 1증가한다.")
     void moveForward() {
         // given
         final Car car = new Car("car");
@@ -28,7 +28,7 @@ public class CarTest {
     }
 
     @Test
-    @DisplayName("값이 4미만인 경우 Car는 정지한다.")
+    @DisplayName("차가 전진할수 없는때 차의 포지션은 변하지 않는다.")
     void stop() {
         // given
         final Car car = new Car("car");
