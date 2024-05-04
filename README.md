@@ -113,3 +113,19 @@ docker compose -p kitchenpos up -d
     - `PUT /api/orders/${orderId}/complete-delivery` : 배달을 완료합니다.
     - `PUT /api/orders/${orderId}/complete` : 주문을 완료합니다.
 - `GET /api/orders` 요청을 통해 주문 목록을 조회할 수 있습니다
+
+### OrderLineItem
+
+- 메뉴와 주문은 다대다 관계입니다.
+- 하나의 메뉴가 여러 주문에 포함될 수 있습니다.
+    - 이런 복잡성을 해소하기 위해 `order_line_item` 테이블을 사용합니다.
+    - `order` 와 `order_line_item`와 1:N 관계를 가집니다.
+    - `menu` 와 `order_line_item`와 1:N 관계를 가집니다.
+- 주문 항목은 주문 등록(`POST /api/orders`) 시 필수적으로 하나 이상 포함되어야 합니다.
+    - `seq`, `quantity`, `menu_id`, `order_id` 필드로 구성되어있습니다.
+    - `seq`는 자동 증가되는 값입니다.
+    - `seq`를 제외한 나머지 필드는 필수입니다.
+    - `quantity` 는 주문하는 메뉴의 수량을 의미합니다.
+    - `quantity` 1 이상의 값이어야 합니다.
+    - `menu_id`는 메뉴의 아이디입니다. menu 테이블의 아이디와 연결됩니다.
+    - `order_id`는 주문의 아이디입니다. order 테이블의 아이디와 연결됩니다.
