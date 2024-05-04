@@ -149,3 +149,7 @@ docker compose -p kitchenpos up -d
     - `number_of_guests` 필드는 필수입니다.
     - `number_of_guests` 필드는 0보다 큰 값이어야 합니다.
 - `GET /api/order-tables` 요청을 통해 테이블 목록을 조회할 수 있습니다.
+
+### 모델링 참고
+
+![](https://i.imgur.com/Jf6exQt.png)
