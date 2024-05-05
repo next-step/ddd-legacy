@@ -1,9 +1,10 @@
 package stringcalculator;
 
-import java.util.List;
+import static stringcalculator.CalculateType.NON_NEGATIVE_INTEGER_ADDER;
+
+import stringcalculator.parser.StringCalculatorParser;
 
 public class StringCalculator {
-    private static final String DELIMITERS = "[,:]";
     private final StringCalculatorParser stringCalculatorParser;
 
     public StringCalculator(StringCalculatorParser stringCalculatorParser) {
@@ -14,11 +15,8 @@ public class StringCalculator {
         if (text == null || text.isBlank()) {
             return 0;
         }
-        List<Integer> result = stringCalculatorParser.execute(text);
+        ParsedNumbers parsedNumbers = stringCalculatorParser.execute(text);
 
-        if (result.stream().anyMatch(it -> it < 0)) {
-            throw new RuntimeException("음수는 처리하지 않습니다");
-        }
-        return result.stream().reduce(0, Integer::sum);
+        return NON_NEGATIVE_INTEGER_ADDER.getResult(parsedNumbers);
     }
 }

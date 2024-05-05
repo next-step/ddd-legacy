@@ -1,10 +1,11 @@
-package stringcalculator;
+package stringcalculator.parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import stringcalculator.ParsedNumbers;
 
 public class StringCalculatorParser {
     private static final String DELIMITERS = "[,:]";
@@ -12,7 +13,7 @@ public class StringCalculatorParser {
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(CUSTOM_DELIMITER_REGEX);
     private static final String EXPRESSION_SEPARATOR = "\n";
 
-    public List<Integer> execute(String expression) {
+    public ParsedNumbers execute(String expression) {
         if (expression == null || expression.isBlank()) {
             throw new IllegalArgumentException("Expression should not be null or empty in StringCalculatorParser");
         }
@@ -42,10 +43,10 @@ public class StringCalculatorParser {
         return sb.toString();
     }
 
-    private List<Integer> getNumbers(String expression, String delimiters) {
+    private ParsedNumbers getNumbers(String expression, String delimiters) {
         String[] exprs = expression.split(delimiters);
         try {
-            return Arrays.stream(exprs).map(Integer::parseInt).toList();
+            return ParsedNumbers.of(Arrays.stream(exprs).map(Integer::parseInt).toList());
         } catch (NumberFormatException e) {
             throw new RuntimeException("숫자형식이 잘못되었습니다");
         }

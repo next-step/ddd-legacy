@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import stringcalculator.parser.StringCalculatorParser;
 
 class StringCalculatorParserTest {
     private StringCalculatorParser stringCalculatorParser;
@@ -24,14 +25,14 @@ class StringCalculatorParserTest {
     void testDefault(String expression, List<Integer> expected) {
         System.out.println(expression);
         System.out.println(expected);
-        List<Integer> result = stringCalculatorParser.execute(expression);
+        List<Integer> result = stringCalculatorParser.execute(expression).getIntegers();
         Assertions.assertThat(result).containsExactlyElementsOf(expected);
     }
 
     @ParameterizedTest
     @MethodSource("testCustomSource")
     void testCustom(String expression, List<Integer> expected) {
-        List<Integer> result = stringCalculatorParser.execute(expression);
+        List<Integer> result = stringCalculatorParser.execute(expression).getIntegers();
         Assertions.assertThat(result).containsExactlyElementsOf(expected);
     }
 
