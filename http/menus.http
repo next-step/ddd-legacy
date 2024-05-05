@@ -27,7 +27,7 @@ Content-Type: application/json
 PUT {{host}}/api/menus/f59b1e1c-b145-440a-aa6f-6095a0e2d63b/display
 
 ### 4. 메뉴 정보 미노출로 변경
-PUT {{host}}/api/menus/f59b1e1c-b회45-440a-aa6f-6095a0e2d63b/hide
+PUT {{host}}/api/menus/f59b1e1c-b145-440a-aa6f-6095a0e2d63b/hide
 
 ### 5. 모든 메뉴 정보 조회
 GET {{host}}/api/menus
