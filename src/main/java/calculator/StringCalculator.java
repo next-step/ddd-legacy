@@ -46,8 +46,7 @@ public class StringCalculator {
 
     private int sum(List<PositiveNumber> inputNumbers) {
         return inputNumbers.stream()
-                .map(PositiveNumber::getNumber)
-                .mapToInt(Integer::parseInt)
+                .mapToInt(PositiveNumber::getNumber)
                 .sum();
     }
 

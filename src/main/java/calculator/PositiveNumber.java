@@ -3,14 +3,14 @@ package calculator;
 
 public class PositiveNumber {
     private static final String NUMERIC_PATTERN = "[0-9]+";
-    private String inputNumber;
+    private int inputNumber;
 
     public PositiveNumber(String inputNumber){
         validationNumber(inputNumber);
-        this.inputNumber = inputNumber;
+        this.inputNumber = Integer.parseInt(inputNumber);
     }
 
-    public String getNumber(){
+    public int getNumber(){
         return this.inputNumber;
     }
 
