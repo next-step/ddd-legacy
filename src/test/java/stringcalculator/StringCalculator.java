@@ -1,11 +1,9 @@
 package stringcalculator;
 
-
-import java.util.Arrays;
 import java.util.List;
 
 public class StringCalculator {
-    private final int EMPTY_TEXT_CALCULATE_RESULT = 0;
+    private final static int EMPTY_TEXT_CALCULATE_RESULT = 0;
 
     public int add(String text) {
         if (text == null || text.isEmpty()) {
