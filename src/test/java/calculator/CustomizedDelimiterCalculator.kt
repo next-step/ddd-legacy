@@ -5,7 +5,7 @@ private val CUSTOMIZED_DELIMITER_PATTERN = "//(.)\n(.*)".toRegex()
 class CustomizedDelimiterCalculator : StringCalculateStrategy {
     override fun support(text: String): Boolean = hasCustomizedDelimiter(text)
 
-    override fun calculate(text: String): Int {
+    override fun calculate(text: String): NumberToken {
         val customizedDelimiter = getCustomizedDelimiter(text)
 
         if (customizedDelimiter == null) {

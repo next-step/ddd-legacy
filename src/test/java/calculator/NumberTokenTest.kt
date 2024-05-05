@@ -21,7 +21,7 @@ class NumberTokenTest {
         val numberToken2 = NumberToken(7)
         val result = numberToken1 + numberToken2
 
-        Assertions.assertThat(result.value).isEqualTo(8)
+        Assertions.assertThat(result).isEqualTo(NumberToken(8))
     }
 
     @DisplayName("number tokens의 계산 값은 보유한 number token value의 합")
@@ -29,6 +29,6 @@ class NumberTokenTest {
     fun numberTokensCalculateTest() {
         val numberTokens = NumberTokens(listOf(NumberToken(3), NumberToken(5), NumberToken(7)))
 
-        Assertions.assertThat(numberTokens.calculate()).isEqualTo(15)
+        Assertions.assertThat(numberTokens.calculate()).isEqualTo(NumberToken(15))
     }
 }

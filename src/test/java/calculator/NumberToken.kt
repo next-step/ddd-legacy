@@ -1,11 +1,13 @@
 package calculator
 
+import java.lang.IllegalArgumentException
+
 data class NumberToken(
     val value: Int
 ) {
     init {
         require(value >= 0) {
-            throw RuntimeException("negative number can't be calculated")
+            throw IllegalArgumentException("negative number can't be calculated")
         }
     }
 
@@ -16,14 +18,14 @@ data class NumberToken(
 data class NumberTokens(
     val tokens: List<NumberToken>
 ) {
-    fun calculate(): Int = tokens.reduce { acc, numberToken -> acc + numberToken }.value
+    fun calculate(): NumberToken = tokens.reduce { acc, numberToken -> acc + numberToken }
 }
 
 fun List<String>.getNumberTokens(): NumberTokens {
     val numberTokens = mapNotNull { it.toIntOrNull() }
         .map { NumberToken(it) }
         .ifEmpty {
-            throw RuntimeException("only string text included")
+            throw IllegalArgumentException("only string text included")
         }
 
     return NumberTokens(numberTokens)
