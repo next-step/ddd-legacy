@@ -6,6 +6,7 @@ import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -20,15 +21,15 @@ class StringCalculatorParserTest {
         stringCalculatorParser = new StringCalculatorParser();
     }
 
+    @DisplayName("구분자가 지정되지 않은 경우 테스트")
     @ParameterizedTest
     @MethodSource("testDefaultSource")
     void testDefault(String expression, List<Integer> expected) {
-        System.out.println(expression);
-        System.out.println(expected);
         List<Integer> result = stringCalculatorParser.execute(expression).getIntegers();
         Assertions.assertThat(result).containsExactlyElementsOf(expected);
     }
 
+    @DisplayName("구분자가 지정된 경우 테스트")
     @ParameterizedTest
     @MethodSource("testCustomSource")
     void testCustom(String expression, List<Integer> expected) {
@@ -36,6 +37,7 @@ class StringCalculatorParserTest {
         Assertions.assertThat(result).containsExactlyElementsOf(expected);
     }
 
+    @DisplayName("올바르지 않은 입력 파싱 실패 테스트")
     @Test
     void testFail() {
         String expression = "aaa";
