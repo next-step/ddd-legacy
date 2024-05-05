@@ -3,15 +3,16 @@ package calculator;
 import java.util.List;
 
 public class Numbers {
-    private final List<Integer> numbers;
 
-    public Numbers(List<Integer> numbers) {
+    private final List<PositiveNumber> numbers;
+
+    public Numbers(List<PositiveNumber> numbers) {
         this.numbers = numbers;
     }
 
     public int sum() {
         return numbers.stream()
-            .mapToInt(Integer::intValue)
+            .mapToInt(PositiveNumber::getNumber)
             .sum();
     }
 }

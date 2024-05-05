@@ -1,14 +1,11 @@
 package calculator;
 
 import java.util.Collections;
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class NumberExtractor {
 
-    private static final String DEFAULT_DELIMITER = "[,:]";
-    private static final String CUSTOM_DELIMITER_PREFIX = "//";
-    private static final String CUSTOM_DELIMITER_SUFFIX = "\n";
+    private static final int AFTER_CUSTOM_DELIMITER = 1;
 
     private NumberExtractor() {
     }
@@ -17,38 +14,20 @@ public class NumberExtractor {
         if (text == null || text.isEmpty()) {
             return new Numbers(Collections.emptyList());
         }
-
-        String delimiter = extractDelimiter(text);
+        Delimiter delimiter = new Delimiter(text);
         String numberText = extractNumberText(text);
 
-        return new Numbers(Stream.of(numberText.split(delimiter))
+        return delimiter.split(numberText)
             .map(Integer::parseInt)
-            .peek(NumberExtractor::validateNumber)
-            .toList());
-    }
-
-    private static String extractDelimiter(final String text) {
-        if (text.startsWith(CUSTOM_DELIMITER_PREFIX)) {
-            int prefixLength = CUSTOM_DELIMITER_PREFIX.length();
-            int suffixIndex = text.indexOf(CUSTOM_DELIMITER_SUFFIX);
-            String customDelimiter = text.substring(prefixLength, suffixIndex);
-            return DEFAULT_DELIMITER + "|" + Pattern.quote(customDelimiter);
-        }
-
-        return DEFAULT_DELIMITER;
+            .map(PositiveNumber::new)
+            .collect(Collectors.collectingAndThen(Collectors.toList(), Numbers::new));
     }
 
     private static String extractNumberText(final String text) {
-        if (text.startsWith(CUSTOM_DELIMITER_PREFIX)) {
-            return text.split(CUSTOM_DELIMITER_SUFFIX)[1];
+        if (text.startsWith(Delimiter.CUSTOM_DELIMITER_PREFIX)) {
+            return text.split(Delimiter.CUSTOM_DELIMITER_SUFFIX)[AFTER_CUSTOM_DELIMITER];
         }
 
         return text;
-    }
-
-    private static void validateNumber(final Integer number) {
-        if (number < 0) {
-            throw new RuntimeException("Negative numbers are not allowed");
-        }
     }
 }
