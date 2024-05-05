@@ -29,6 +29,5 @@ public class StringCalculatorTokenParser {
         return Arrays.stream(tokens)
                 .map(NonNegativeInteger::of)
                 .collect(Collectors.toList());
-
     }
 }
