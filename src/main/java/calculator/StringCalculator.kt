@@ -1,7 +1,7 @@
 package calculator
 
 class StringCalculator(
-    private val textDelimiterParser: TextDelimiterParser
+    private val textDelimiterParser: TextDelimiterParser,
 ) {
     fun add(
         text: String?,
@@ -27,9 +27,8 @@ class StringCalculator(
         numbersText: String,
     ): Int = numbersText
         .split(delimiter.toRegex())
-        .sumOf { numberText ->
-            numberText.toInt()
-        }
+        .map { it.toInt() }
+        .sumOf { PositiveNumber(it).number }
 
     companion object {
         private const val EMPTY_RESULT = 0
