@@ -1,5 +1,6 @@
 package calculator;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Numbers {
@@ -7,7 +8,7 @@ public class Numbers {
     private final List<PositiveNumber> numbers;
 
     public Numbers(List<PositiveNumber> numbers) {
-        this.numbers = numbers;
+        this.numbers = new ArrayList<>(numbers);
     }
 
     public int sum() {
