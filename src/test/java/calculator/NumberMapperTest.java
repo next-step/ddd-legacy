@@ -1,11 +1,11 @@
 package calculator;
 
-import java.util.stream.Stream;
-
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.assertj.core.api.Assertions;
+
+import java.util.stream.Stream;
 
 @DisplayName("NumberMapper 클래스")
 public class NumberMapperTest {
@@ -40,7 +40,7 @@ public class NumberMapperTest {
     @Test
     @DisplayName("음수 문자열을 변환하려고 할 때 RuntimeException")
     void toNumbers_NegativeNumbers_ThrowsRuntimeException() {
-        String[] tokens = new String[]{"-1","-2"};
+        String[] tokens = new String[]{"-1", "-2"};
         Assertions.assertThatThrownBy(() -> numberMapper.toNumbers(tokens).toArray())
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("Number must be positive.");

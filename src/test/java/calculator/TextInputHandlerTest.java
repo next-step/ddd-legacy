@@ -1,12 +1,12 @@
 package calculator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class TextInputHandlerTest {
 
@@ -46,7 +46,7 @@ public class TextInputHandlerTest {
     @DisplayName("토큰화 인자가 null인 경우")
     void whenTokenizeArgumentIsNull_thenThrowsNullPointerException() {
         assertThatThrownBy(() -> textInputHandler.tokenize(null))
-            .isInstanceOf(NullPointerException.class)
-            .hasMessageContaining("null");
+                .isInstanceOf(NullPointerException.class)
+                .hasMessageContaining("null");
     }
 }
