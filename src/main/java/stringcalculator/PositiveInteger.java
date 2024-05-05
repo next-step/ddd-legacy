@@ -4,7 +4,7 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 public class PositiveInteger {
-	public static final PositiveInteger ZERO = new PositiveInteger("0");
+	public static final PositiveInteger ZERO = new PositiveInteger(BigInteger.ZERO);
 
 	private static final String OPERAND_MUST_NOT_BE_NEGATIVE = "피연산자는 음수가 될 수 없습니다.";
 
@@ -13,15 +13,11 @@ public class PositiveInteger {
 	private final BigInteger value;
 
 	public static PositiveInteger valueOf(String value) {
-		return new PositiveInteger(value);
+		return new PositiveInteger(parseValue(value));
 	}
 
 	public static PositiveInteger valueOf(BigInteger value) {
 		return new PositiveInteger(value);
-	}
-
-	private PositiveInteger(String value) {
-		this(parseValue(value));
 	}
 
 	private PositiveInteger(BigInteger value) {
