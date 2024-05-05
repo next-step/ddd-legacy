@@ -1,8 +1,10 @@
 package calculator;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class Number {
+    private static final Pattern NUMBER_REGEX = Pattern.compile("^[0-9]*$");
 
     private final String number;
 
@@ -16,6 +18,7 @@ public class Number {
     }
 
     private void validation(String input) {
+        if (!NUMBER_REGEX.matcher(input).find()) throw new IllegalArgumentException("입력값은 숫자 여야 합니다");
         if (Integer.parseInt(input) < 0) throw new IllegalArgumentException("입력값은 음수 일 수 없습니다.");
     }
 
