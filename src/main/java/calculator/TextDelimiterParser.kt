@@ -46,15 +46,26 @@ class TextDelimiterParser {
         matcher.group(DATA_GROUP_INDEX)
     } else {
         text
+    }.also {
+        it.isNumberText()
     }
+
+    private fun String.isNumberText(): String =
+        if (this.matches(NUMBER_TEXT_REGEX.toRegex())) {
+            this
+        } else {
+            throw IllegalArgumentException(ERROR_MESSAGE_NOT_NUMBERS_TEXT)
+        }
 
     companion object {
         private val pattern by lazy { Pattern.compile(EXTRACT_CUSTOM_DELIMITER_REGEX) }
         private val DEFAULT_DELIMITER = Delimiter("[,|:]")
 
         private const val EXTRACT_CUSTOM_DELIMITER_REGEX = "//(.)\\n(.*)"
+        private const val NUMBER_TEXT_REGEX = "^\\d+([^0-9]+\\d+)*\$"
         private const val DELIMITER_GROUP_INDEX = 1
         private const val DATA_GROUP_INDEX = 2
+        private const val ERROR_MESSAGE_NOT_NUMBERS_TEXT = "숫자로 구성된 문자열만 있어야 합니다."
     }
 }
 

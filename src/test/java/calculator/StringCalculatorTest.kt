@@ -1,6 +1,7 @@
 package calculator
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -58,5 +59,15 @@ class StringCalculatorTest {
     fun test6() {
         assertThatExceptionOfType(RuntimeException::class.java)
             .isThrownBy { calculator.add("-1") }
+    }
+
+    @DisplayName("문자열 계산기에 숫자가 아닌 수를 전달하는 경우 IllegalArgument 예외 처리를 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = ["//.\naaa", "//;\n;;"])
+    fun test7() {
+        assertThatIllegalArgumentException()
+            .isThrownBy {
+                calculator.add("//.\naaa")
+            }
     }
 }

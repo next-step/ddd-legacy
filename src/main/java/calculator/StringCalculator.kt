@@ -28,15 +28,10 @@ class StringCalculator(
     ): Int = numbersText
         .split(delimiter.toRegex())
         .sumOf { numberText ->
-            numberText.toIntOrThrowIllegalArgumentException()
+            numberText.toInt()
         }
-
-    private fun String.toIntOrThrowIllegalArgumentException(): Int =
-        this.toIntOrNull()?.let { PositiveNumber(it).number }
-            ?: throw IllegalArgumentException(ERROR_MESSAGE_NOT_NUMBERS_TEXT)
 
     companion object {
         private const val EMPTY_RESULT = 0
-        private const val ERROR_MESSAGE_NOT_NUMBERS_TEXT = "숫자로 구성된 문자열만 있어야 합니다."
     }
 }
