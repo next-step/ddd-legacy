@@ -3,6 +3,7 @@ package calculator;
 class StringCalculator {
 
     public Integer add(String text) {
-        return NumberExtractor.extract(text).sum();
+        Numbers numbers = NumberExtractor.extract(text);
+        return numbers.sum();
     }
 }
