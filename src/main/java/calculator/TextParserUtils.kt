@@ -40,7 +40,7 @@ object TextParserUtils {
         isFind: Boolean,
         matcher: Matcher,
     ) = if (isFind) {
-        Delimiter(matcher.group(DELIMITER_GROUP_INDEX))
+        Delimiter(Pattern.quote(matcher.group(DELIMITER_GROUP_INDEX)))
     } else {
         DEFAULT_DELIMITER
     }
