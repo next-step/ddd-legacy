@@ -5,8 +5,7 @@ import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
-import racingcar.strategy.GoStrategy
-import racingcar.strategy.StopStrategy
+import racingcar.strategy.MovingStrategy
 
 class CarTest : ShouldSpec({
     context("자동차 생성") {
@@ -38,7 +37,7 @@ class CarTest : ShouldSpec({
             // given
             val car = Car("자동차")
             val carPositionBeforeMove = car.position
-            val movableStrategy = GoStrategy()
+            val movableStrategy = MovingStrategy { true }
 
             // when
             car.move(movableStrategy)
@@ -51,7 +50,7 @@ class CarTest : ShouldSpec({
             // given
             val car = Car("자동차")
             val carPositionBeforeMove = car.position
-            val unmovableStrategy = StopStrategy()
+            val unmovableStrategy = MovingStrategy { false }
 
             // when
             car.move(unmovableStrategy)

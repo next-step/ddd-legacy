@@ -1,5 +1,5 @@
 package racingcar.strategy
 
-interface MovingStrategy {
+fun interface MovingStrategy {
     fun movable(): Boolean
 }
