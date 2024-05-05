@@ -13,7 +13,7 @@ class StringCalculatorTest {
     @NullAndEmptySource
     @ParameterizedTest
     @DisplayName("입력값이 없거나 null 이면 0이 반환된다.")
-    void test1(String input) {
+    void testAdd_withNullAndEmpty(String input) {
         //Arrange
         StringCalculator calculator = new StringCalculator();
 
@@ -27,7 +27,7 @@ class StringCalculatorTest {
     @ValueSource(strings = {"1", "2", "3"})
     @ParameterizedTest
     @DisplayName("입력값이 1개인 경우 해당 값이 반환된다.")
-    void test2(String input) {
+    void testAdd_withOnlyOneValue(String input) {
         //Arrange
         StringCalculator calculator = new StringCalculator();
 
