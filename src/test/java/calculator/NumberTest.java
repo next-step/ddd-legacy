@@ -20,7 +20,7 @@ public class NumberTest {
     @Test
     void failedStringToNumberConversion() {
         assertThatCode(() -> Number.of("invalid"))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Invalid number");
     }
 
@@ -28,7 +28,7 @@ public class NumberTest {
     @Test
     void negativeNumberException() {
         assertThatCode(() -> Number.of("-1"))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Number must be positive");
     }
 }

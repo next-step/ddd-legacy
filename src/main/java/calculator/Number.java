@@ -8,7 +8,7 @@ public class Number {
 
     private Number(int number) {
         if (number < 0) {
-            throw new RuntimeException("Number must be positive.");
+            throw new IllegalArgumentException("Number must be positive.");
         }
         this.number = number;
     }
@@ -17,7 +17,7 @@ public class Number {
         try {
             return new Number(Integer.parseInt(value));
         } catch (NumberFormatException e) {
-            throw new RuntimeException("Invalid number: " + value);
+            throw new IllegalArgumentException("Invalid number: " + value);
         }
     }
 
