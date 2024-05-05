@@ -26,7 +26,7 @@ class StringCalculator(
         delimiter: Delimiter,
         numbersText: String,
     ): Int = numbersText
-        .split(regex = delimiter.toRegex())
+        .split(delimiter.toRegex())
         .sumOf { numberText ->
             numberText.toIntOrThrowIllegalArgumentException()
         }
