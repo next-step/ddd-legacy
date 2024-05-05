@@ -1,32 +1,34 @@
 package stringcalculator;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class StringCalculatorTokenParser {
-    private final String[] tokens;
+    private final int DELIMITER_GROUP_INDEX = 1;
+    private final int TEXT_GROUP_INDEX = 2;
 
-    public StringCalculatorTokenParser(String text) {
+    private final String DEFAULT_DELIMITER_PATTERN = "[,|:]";
+    private final String CUSTOM_DELIMITER_PATTERN = "//(.*)\n(.*)";
 
-        Matcher m = Pattern.compile("//(.*)\n(.*)").matcher(text);
+    private final Pattern pattern;
 
-        this.tokens = m.find() ?
-                m.group(2).split(Pattern.quote(m.group(1))) : text.split("[,|:]");
+
+    public StringCalculatorTokenParser() {
+        pattern = Pattern.compile(CUSTOM_DELIMITER_PATTERN);
     }
 
-    public int[] getIntegerTokens() {
+    public List<NonNegativeInteger> getIntegerTokens(String text) {
+        Matcher matcher = pattern.matcher(text);
+
+        String[] tokens = matcher.find() ?
+                matcher.group(TEXT_GROUP_INDEX).split(Pattern.quote(matcher.group(DELIMITER_GROUP_INDEX))) : text.split(DEFAULT_DELIMITER_PATTERN);
+
         return Arrays.stream(tokens)
-                .mapToInt(this::parseToken)
-                .toArray();
-    }
+                .map(token -> NonNegativeInteger.of(token))
+                .collect(Collectors.toList());
 
-    private int parseToken(String token) {
-        try {
-            return Integer.parseInt(token);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("Error parsing token: " + token, e);
-        }
     }
-
 }
