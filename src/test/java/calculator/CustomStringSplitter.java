@@ -15,15 +15,15 @@ final class CustomStringSplitter implements StringSplitter {
 
     @Override
     public String[] split(final String value) {
-        if (value == null) {
+        if (value == null || value.isEmpty()) {
             return new String[]{};
         }
         if (!support(value)) {
-            throw new IllegalStateException();
+            throw new IllegalArgumentException();
         }
         final Matcher matcher = SUPPORT_PATTERN.matcher(value);
         if (!matcher.find()) {
-            throw new IllegalStateException();
+            throw new IllegalArgumentException();
         }
         final String realValue = matcher.group(REAL_VALUE_REGEX);
         final String delimiter = matcher.group(DELIMITER_INDEX);

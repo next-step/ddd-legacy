@@ -6,7 +6,7 @@ final class DefaultStringSplitter implements StringSplitter {
 
     @Override
     public String[] split(final String value) {
-        return value == null ? new String[]{} : value.split(REGEX);
+        return value == null || value.isEmpty() ? new String[]{} : value.split(REGEX);
     }
 
     @Override
