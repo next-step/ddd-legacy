@@ -35,7 +35,7 @@ class DefaultStringSplitterTest {
     }
 
     @ParameterizedTest
-    @DisplayName("쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열 포맷이 아닐 경우 분할되지 않은 배열을 반환한다.")
+    @DisplayName("쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열 포맷일 경우 해당 구분자로 분할된 배열을 반환한다.")
     @MethodSource("defaultDelimiterArguments")
     void supportedFormatSplit(final String input, final String[] expected) {
         assertThat(defaultStringSplitter.split(input)).isEqualTo(expected);
