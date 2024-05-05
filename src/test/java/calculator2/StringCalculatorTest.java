@@ -89,6 +89,6 @@ class StringCalculatorTest {
         //Assert
         assertThatCode(() -> calculator.add(input))
                 .isInstanceOf(RuntimeException.class)
-                .hasMessage("Number must me positive.");
+                .hasMessage("Number must be positive.");
     }
 }
