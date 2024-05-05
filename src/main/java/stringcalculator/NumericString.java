@@ -1,8 +1,10 @@
 package stringcalculator;
 
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 public class NumericString {
 
@@ -25,11 +27,9 @@ public class NumericString {
 
     private PositiveNumbers parseMultipleNumbers() {
         StringSplitOption splitOption = StringSplitOption.find(this.numeric);
-        List<PositiveNumber> numbers = new ArrayList<>();
-        for (String number : splitOption.split(this.numeric)) {
-            numbers.add(PositiveNumber.byString(number));
-        }
-        return new PositiveNumbers(numbers);
+        return Arrays.stream(splitOption.split(this.numeric))
+                .map(PositiveNumber::byString)
+                .collect(collectingAndThen(toList(), PositiveNumbers::new));
     }
 
     public boolean isEmpty() {
