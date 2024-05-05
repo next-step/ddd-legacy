@@ -7,20 +7,20 @@ public class StringCalculator {
     }
 
     public int add(String text) {
-        int result = 0;
-
-        try {
-            NumberConvertor numberConvertor = new NumberConvertor(text);
-
-            result = sumProcess.sum(numberConvertor.getNumbers());
-        } catch (IllegalArgumentException e) {
-            result = 0;
-        }
-        catch (RuntimeException e) {
-            throw e;
+        if (this.isEmptyText(text)) {
+            return 0;
         }
 
-        return result;
+        String[] numbers = NumberConvertor.getNumbers(text);
+        return sumProcess.sum(numbers);
+    }
+
+    private boolean isEmptyText(String text) {
+        if(text == null || text.isBlank()){
+            return true;
+        }
+
+        return false;
     }
 
 }
