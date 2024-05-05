@@ -3,7 +3,6 @@ package stringcalculator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 public class CalculatorNumber {
     private static final Map<Integer, CalculatorNumber> CACHE = new HashMap<>();
@@ -28,15 +27,10 @@ public class CalculatorNumber {
             if (generatedNumber < 0) {
                 throw new IllegalArgumentException("음수값은 처리할 수 없습니다.");
             }
-
             return generatedNumber;
         } catch (NumberFormatException e) {
             throw new NumberFormatException("올바른 숫자 입력 값이 아닙니다.");
         }
-    }
-
-    public static int sum(Stream<CalculatorNumber> numbers) {
-        return numbers.mapToInt(CalculatorNumber::getNumber).sum();
     }
 
     public int getNumber() {
