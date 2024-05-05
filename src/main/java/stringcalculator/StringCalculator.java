@@ -6,15 +6,16 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
     public int add(String text) {
-        if (text == null || text.isEmpty()) {
-            return 0;
-        }
         String[] inputValues = splitAndValidate(text);
 
         return sum(inputValues);
     }
 
     private static String[] splitAndValidate(String text) {
+        if (text == null || text.isEmpty()) {
+            return new String[0];
+        }
+
         String[] values;
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
 
