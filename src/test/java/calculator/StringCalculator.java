@@ -30,7 +30,7 @@ class StringCalculator {
         }
 
         private boolean isEmpty() {
-            return Arrays.stream(this.value).anyMatch(s -> s.length() == 0);
+            return Arrays.stream(this.value).allMatch(s -> s.length() == 0);
         }
     }
 
