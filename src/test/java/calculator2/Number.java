@@ -1,6 +1,6 @@
 package calculator2;
 
-class Number {
+public class Number {
 
     private final int number;
 
