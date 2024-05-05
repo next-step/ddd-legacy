@@ -20,10 +20,10 @@ class StringCalculatorTest {
 		StringCalculator calculator = new StringCalculator(input);
 
 		// when
-		NonNegativeInteger result = calculator.calculate();
+		PositiveInteger result = calculator.calculate();
 
 		// then
-		assertThat(result).isEqualTo(NonNegativeInteger.ZERO);
+		assertThat(result).isEqualTo(PositiveInteger.ZERO);
 	}
 
 	@ParameterizedTest
@@ -34,10 +34,10 @@ class StringCalculatorTest {
 		StringCalculator calculator = new StringCalculator(input);
 
 		// when
-		NonNegativeInteger result = calculator.calculate();
+		PositiveInteger result = calculator.calculate();
 
 		// then
-		assertThat(result).isEqualTo(NonNegativeInteger.valueOf(input));
+		assertThat(result).isEqualTo(PositiveInteger.valueOf(input));
 	}
 
 	@Test
@@ -47,10 +47,10 @@ class StringCalculatorTest {
 		StringCalculator calculator = new StringCalculator("1,2");
 
 		// when
-		NonNegativeInteger result = calculator.calculate();
+		PositiveInteger result = calculator.calculate();
 
 		// then
-		assertThat(result).isEqualTo(NonNegativeInteger.valueOf("3"));
+		assertThat(result).isEqualTo(PositiveInteger.valueOf("3"));
 	}
 
 	@Test
@@ -60,10 +60,10 @@ class StringCalculatorTest {
 		StringCalculator calculator = new StringCalculator("1,2:3");
 
 		// when
-		NonNegativeInteger result = calculator.calculate();
+		PositiveInteger result = calculator.calculate();
 
 		// then
-		assertThat(result).isEqualTo(NonNegativeInteger.valueOf("6"));
+		assertThat(result).isEqualTo(PositiveInteger.valueOf("6"));
 	}
 
 	@Test
@@ -73,10 +73,10 @@ class StringCalculatorTest {
 		StringCalculator calculator = new StringCalculator("//;\n1;2;3");
 
 		// when
-		NonNegativeInteger result = calculator.calculate();
+		PositiveInteger result = calculator.calculate();
 
 		// then
-		assertThat(result).isEqualTo(NonNegativeInteger.valueOf("6"));
+		assertThat(result).isEqualTo(PositiveInteger.valueOf("6"));
 	}
 
 	@ParameterizedTest
@@ -90,7 +90,7 @@ class StringCalculatorTest {
 				StringCalculator calculator = new StringCalculator(input);
 
 				// when
-				NonNegativeInteger result = calculator.calculate();
+				PositiveInteger result = calculator.calculate();
 			}
 		);
 	}

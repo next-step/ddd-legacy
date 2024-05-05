@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-public class NonNegativeIntegerParser {
+public class PositiveIntegerParser {
 	private static final int DELIMITER_GROUP_INDEX = 1;
 	private static final int OPERAND_GROUP_INDEX = 2;
 
@@ -14,16 +14,16 @@ public class NonNegativeIntegerParser {
 
 	private static final String DELIMITER_REGEX = ",|:";
 
-	private NonNegativeIntegerParser() {
+	private PositiveIntegerParser() {
 	}
 
-	public static List<NonNegativeInteger> parse(String input) {
+	public static List<PositiveInteger> parse(String input) {
 		if (input == null || input.isBlank()) {
-			return List.of(NonNegativeInteger.valueOf(BigInteger.ZERO));
+			return List.of(PositiveInteger.valueOf(BigInteger.ZERO));
 		}
 
 		return Stream.of(extractTokens(input))
-			.map(NonNegativeInteger::valueOf)
+			.map(PositiveInteger::valueOf)
 			.toList();
 	}
 
