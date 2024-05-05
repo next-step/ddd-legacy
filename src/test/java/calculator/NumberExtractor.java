@@ -1,12 +1,12 @@
 package calculator;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class NumberExtractor {
 
     private static final String DEFAULT_DELIMITER = "[,:]";
-
     private static final String CUSTOM_DELIMITER_PREFIX = "//";
     private static final String CUSTOM_DELIMITER_SUFFIX = "\n";
 
@@ -29,15 +29,18 @@ public class NumberExtractor {
 
     private static String extractDelimiter(final String text) {
         if (text.startsWith(CUSTOM_DELIMITER_PREFIX)) {
-            return text.split(CUSTOM_DELIMITER_SUFFIX)[0].substring(2);
+            int prefixLength = CUSTOM_DELIMITER_PREFIX.length();
+            int suffixIndex = text.indexOf(CUSTOM_DELIMITER_SUFFIX);
+            String customDelimiter = text.substring(prefixLength, suffixIndex);
+            return DEFAULT_DELIMITER + "|" + Pattern.quote(customDelimiter);
         }
 
         return DEFAULT_DELIMITER;
     }
 
     private static String extractNumberText(final String text) {
-        if (text.startsWith("//")) {
-            return text.split("\n")[1];
+        if (text.startsWith(CUSTOM_DELIMITER_PREFIX)) {
+            return text.split(CUSTOM_DELIMITER_SUFFIX)[1];
         }
 
         return text;
