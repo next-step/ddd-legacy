@@ -1,6 +1,6 @@
 package stringcalculator.calculator;
 
-import stringcalculator.ParsedNumbers;
+import stringcalculator.ValidatedNumbers;
 
 public class IntegerAdder implements Calculator {
     private static final IntegerAdder instance = new IntegerAdder();
@@ -11,7 +11,7 @@ public class IntegerAdder implements Calculator {
     }
 
     @Override
-    public int execute(ParsedNumbers parsedNumbers) {
+    public int execute(ValidatedNumbers parsedNumbers) {
         return parsedNumbers.getIntegers().stream().reduce(0, Integer::sum);
     }
 }

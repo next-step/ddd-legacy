@@ -1,8 +1,9 @@
 package stringcalculator.validator;
 
 import stringcalculator.ParsedNumbers;
+import stringcalculator.ValidatedNumbers;
 
 @FunctionalInterface
 public interface Validator {
-    void execute(ParsedNumbers parsedNumbers);
+    ValidatedNumbers execute(ParsedNumbers parsedNumbers);
 }

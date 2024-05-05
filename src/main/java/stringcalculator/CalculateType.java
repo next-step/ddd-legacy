@@ -18,8 +18,8 @@ public enum CalculateType {
     }
 
     int getResult(ParsedNumbers parsedNumbers) {
-        this.validator.execute(parsedNumbers);
-        return this.calculator.execute(parsedNumbers);
+        ValidatedNumbers validatedNumbers = this.validator.execute(parsedNumbers);
+        return this.calculator.execute(validatedNumbers);
     }
 
 }
