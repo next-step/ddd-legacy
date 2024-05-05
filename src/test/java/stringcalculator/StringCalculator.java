@@ -6,22 +6,26 @@ import java.util.Arrays;
 
 public class StringCalculator {
     private final CustomStrategy CUSTOM_STRATEGY = new CustomStrategy();
-
+    private final DefaultStrategy DEFAULT_STRATEGY = new DefaultStrategy();
 
     public int getSum(final String input) {
         if (StringUtils.isBlank(input)) {
             return 0;
         }
 
-        if (!CUSTOM_STRATEGY.isCustom(input)) {
-            return splitAndGetSum(input, new DefaultStrategy());
+        CalculatorStrategy strategy = DEFAULT_STRATEGY;
+        String body = input;
+        if (CUSTOM_STRATEGY.isCustom(input)) {
+            strategy = CUSTOM_STRATEGY;
+            body = CUSTOM_STRATEGY.getBody();
         }
 
-        return splitAndGetSum(CUSTOM_STRATEGY.getBody(), CUSTOM_STRATEGY);
+        String separator = strategy.getSeparator();
+        return splitAndGetSum(body, separator);
     }
 
-    private static int splitAndGetSum(String matcher, final CalculatorStrategy calculator) {
-        return Arrays.stream(matcher.trim().split(calculator.getSeparator(matcher)))
+    private int splitAndGetSum(String matcher, String separator) {
+        return Arrays.stream(matcher.trim().split(separator))
                 .map(CalculatorNumber::from)
                 .reduce(CalculatorNumber.from("0"), CalculatorNumber::plus)
                 .getNumber();

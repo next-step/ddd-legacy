@@ -12,11 +12,11 @@ public class CustomStrategy implements CalculatorStrategy {
     @Override
     public boolean isCustom(final String input) {
         this.matcher = pattern.matcher(input);
-        return matcher.matches();
+        return this.matcher.matches();
     }
 
     @Override
-    public String getSeparator(final String input) {
+    public String getSeparator() {
         return this.matcher.group(CUSTOM_SEPARATOR_INDEX);
     }
 

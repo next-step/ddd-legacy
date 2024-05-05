@@ -9,7 +9,7 @@ public class DefaultStrategy implements CalculatorStrategy{
     }
 
     @Override
-    public String getSeparator(final String input) {
+    public String getSeparator() {
         return DEFAULT_SEPARATOR;
     }
 }
