@@ -1,7 +1,5 @@
 package stringcalculator;
 
-import jakarta.validation.constraints.Pattern;
-
 import java.util.Arrays;
 
 public class StringValidation {

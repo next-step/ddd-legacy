@@ -3,7 +3,6 @@ package stringcalculator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// 파싱 역할
 public class DelimiterParser {
 
     private final Pattern regexPattern = Pattern.compile("//(.)\n(.*)");

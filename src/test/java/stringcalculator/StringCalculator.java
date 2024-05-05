@@ -2,8 +2,6 @@ package stringcalculator;
 
 public class StringCalculator {
 
-    private String text;
-
     private final StringValidation stringValidation;
 
     public StringCalculator(){
