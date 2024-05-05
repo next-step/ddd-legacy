@@ -10,29 +10,10 @@ public class NumberExtractor {
     private static final String CUSTOM_DELIMITER_PREFIX = "//";
     private static final String CUSTOM_DELIMITER_SUFFIX = "\n";
 
-    public String extractDelimiter(final String text) {
-        if (text.startsWith(CUSTOM_DELIMITER_PREFIX)) {
-            return text.split(CUSTOM_DELIMITER_SUFFIX)[0].substring(2);
-        }
-
-        return DEFAULT_DELIMITER;
+    private NumberExtractor() {
     }
 
-    public String extractNumberText(final String text) {
-        if (text.startsWith("//")) {
-            return text.split("\n")[1];
-        }
-
-        return text;
-    }
-
-    public void validateNumber(final Integer number) {
-        if (number < 0) {
-            throw new RuntimeException("Negative numbers are not allowed");
-        }
-    }
-
-    public Numbers extract(final String text) {
+    public static Numbers extract(final String text) {
         if (text == null || text.isEmpty()) {
             return new Numbers(List.of());
         }
@@ -42,7 +23,29 @@ public class NumberExtractor {
 
         return new Numbers(Stream.of(numberText.split(delimiter))
             .map(Integer::parseInt)
-            .peek(this::validateNumber)
+            .peek(NumberExtractor::validateNumber)
             .toList());
+    }
+
+    private static String extractDelimiter(final String text) {
+        if (text.startsWith(CUSTOM_DELIMITER_PREFIX)) {
+            return text.split(CUSTOM_DELIMITER_SUFFIX)[0].substring(2);
+        }
+
+        return DEFAULT_DELIMITER;
+    }
+
+    private static String extractNumberText(final String text) {
+        if (text.startsWith("//")) {
+            return text.split("\n")[1];
+        }
+
+        return text;
+    }
+
+    private static void validateNumber(final Integer number) {
+        if (number < 0) {
+            throw new RuntimeException("Negative numbers are not allowed");
+        }
     }
 }
