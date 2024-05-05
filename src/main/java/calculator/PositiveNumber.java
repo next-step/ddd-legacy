@@ -2,6 +2,7 @@ package calculator;
 
 
 public class PositiveNumber {
+    private static final String NUMERIC_PATTERN = "[0-9]+";
     private String inputNumber;
 
     public PositiveNumber(String inputNumber){
@@ -23,8 +24,9 @@ public class PositiveNumber {
     }
 
     private boolean isNumeric(String inputNumber){
-        return inputNumber.matches("[0-9]+");
+        return inputNumber.matches("NUMERIC_PATTERN");
     }
+
     private boolean isPositive(String inputNumber){
         int number = Integer.parseInt(inputNumber);
         return (number > 0);
