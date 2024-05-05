@@ -1,17 +1,15 @@
-package stringcalculator.test;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+package stringcalculator;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import stringcalculator.StringCalculatorParser;
 
 class StringCalculatorParserTest {
     private StringCalculatorParser stringCalculatorParser;
@@ -27,21 +25,21 @@ class StringCalculatorParserTest {
         System.out.println(expression);
         System.out.println(expected);
         List<Integer> result = stringCalculatorParser.execute(expression);
-        assertThat(result).containsExactlyElementsOf(expected);
+        Assertions.assertThat(result).containsExactlyElementsOf(expected);
     }
 
     @ParameterizedTest
     @MethodSource("testCustomSource")
     void testCustom(String expression, List<Integer> expected) {
         List<Integer> result = stringCalculatorParser.execute(expression);
-        assertThat(result).containsExactlyElementsOf(expected);
+        Assertions.assertThat(result).containsExactlyElementsOf(expected);
     }
 
     @Test
     void testFail() {
         String expression = "aaa";
-        assertThatExceptionOfType(RuntimeException.class)
-            .isThrownBy(() -> stringCalculatorParser.execute(expression));
+        AssertionsForClassTypes.assertThatExceptionOfType(RuntimeException.class)
+                               .isThrownBy(() -> stringCalculatorParser.execute(expression));
     }
 
     static Stream<Arguments> testCustomSource() {
