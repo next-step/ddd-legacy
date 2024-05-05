@@ -66,7 +66,7 @@ class StringCalculatorTest {
         assertThat(actual).isEqualTo(6);
     }
 
-    @ValueSource(strings = {"abc", "1,a", "4:z", "//$\n1$a"})
+    @ValueSource(strings = {"a", "1,a", "4:a", "//$\n1$a"})
     @ParameterizedTest
     @DisplayName("문자열 계산기에 숫자 이외의 값이 전달된 경우 RuntimeException을 throw 한다.")
     void testAdd_withNonNumericValue(String input) {
@@ -74,7 +74,9 @@ class StringCalculatorTest {
         StringCalculator calculator = new StringCalculator();
 
         //Assert
-        assertThatCode(() -> calculator.add(input)).isInstanceOf(RuntimeException.class);
+        assertThatCode(() -> calculator.add(input))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Invalid number: a");
     }
 
     @ValueSource(strings = {"-1", "-1,2", "3:-5", "//;\n-1;2;3"})
@@ -85,6 +87,8 @@ class StringCalculatorTest {
         StringCalculator calculator = new StringCalculator();
 
         //Assert
-        assertThatCode(() -> calculator.add(input)).isInstanceOf(RuntimeException.class);
+        assertThatCode(() -> calculator.add(input))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Number must me positive.");
     }
 }

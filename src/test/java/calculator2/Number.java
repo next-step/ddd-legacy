@@ -6,7 +6,7 @@ public class Number {
 
     private Number(int number) {
         if (number < 0) {
-            throw new RuntimeException("숫자는 음수일 수 없습니다.");
+            throw new RuntimeException("Number must me positive.");
         }
         this.number = number;
     }
