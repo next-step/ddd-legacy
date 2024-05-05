@@ -5,50 +5,57 @@ import java.util.Arrays;
 class StringCalculator {
 
     private static final int INITIAL_RESULT = 0;
-    private final StringSplitterMatcher splitterMatcher;
+    private final StringSplitterFactory stringSplitterFactory;
 
-    StringCalculator() {
-        this.splitterMatcher = new DefaultStringSplitterMatcher();
+    public StringCalculator() {
+        this.stringSplitterFactory = new DefaultStringSplitterFactory();
     }
 
-    int add(final String separatedNumbers) {
-        final var separatedString = new SeparatedString(splitterMatcher.match(separatedNumbers));
-        if (separatedString.isEmpty()) {
+    int add(final String source) {
+        final var parsedSource = SeparatedString.parseSeparatedString(source,
+            stringSplitterFactory);
+        if (parsedSource.isEmpty()) {
             return INITIAL_RESULT;
         }
-        final int[] intArray = parseToIntArray(separatedString.getValue());
-        throwIfContainsNegative(intArray);
-        return Arrays.stream(intArray).sum();
+        final var parsedNumbers = PositiveNumbers.parsePositiveNumbers(parsedSource.value());
+        return Arrays.stream(parsedNumbers.value()).sum();
     }
 
-    private int[] parseToIntArray(final String[] inputString) {
-        try {
-            return Arrays.stream(inputString).mapToInt(Integer::valueOf).toArray();
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("숫자가 아닌 문자열이 포함되어있습니다.", e);
-        }
-    }
+    private record SeparatedString(String[] value) {
 
-    private void throwIfContainsNegative(final int[] intArray) {
-        if (Arrays.stream(intArray).anyMatch(v -> v < 0)) {
-            throw new RuntimeException("음수는 입력할 수 없습니다.");
-        }
-    }
-
-    private static final class SeparatedString {
-
-        private final String[] value;
-
-        private SeparatedString(final StringSplitter stringSplitter) {
-            this.value = stringSplitter.split();
-        }
-
-        private String[] getValue() {
-            return this.value;
+        private static SeparatedString parseSeparatedString(final String source,
+            final StringSplitterFactory stringSplitterFactory) {
+            final StringSplitter matchedSplitter = stringSplitterFactory.create(source);
+            return new SeparatedString(matchedSplitter.split(source));
         }
 
         private boolean isEmpty() {
             return Arrays.stream(this.value).anyMatch(s -> s.length() == 0);
+        }
+    }
+
+    private record PositiveNumbers(int[] value) {
+
+        PositiveNumbers {
+            throwIfContainsNegative(value);
+        }
+
+        static PositiveNumbers parsePositiveNumbers(final String[] valueAsString) {
+            return new PositiveNumbers(convertToInts(valueAsString));
+        }
+
+        private static int[] convertToInts(final String[] valueAsString) {
+            try {
+                return Arrays.stream(valueAsString).mapToInt(Integer::valueOf).toArray();
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("숫자가 아닌 문자열이 포함되어있습니다.", e);
+            }
+        }
+
+        private void throwIfContainsNegative(final int[] intArray) {
+            if (Arrays.stream(intArray).anyMatch(v -> v < 0)) {
+                throw new RuntimeException("음수는 입력할 수 없습니다.");
+            }
         }
     }
 }

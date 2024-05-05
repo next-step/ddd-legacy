@@ -1,11 +1,16 @@
 package calculator;
 
-record DefaultStringSplitter(String value) implements StringSplitter {
+final class DefaultStringSplitter implements StringSplitter {
 
     private static final String REGEX = "[,|:]";
 
     @Override
-    public String[] split() {
-        return this.value == null ? new String[]{} : this.value.split(REGEX);
+    public String[] split(final String value) {
+        return value == null ? new String[]{} : value.split(REGEX);
+    }
+
+    @Override
+    public boolean support(String value) {
+        return true;
     }
 }
