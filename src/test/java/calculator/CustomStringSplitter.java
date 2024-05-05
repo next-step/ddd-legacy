@@ -15,6 +15,9 @@ final class CustomStringSplitter implements StringSplitter {
 
     @Override
     public String[] split(final String value) {
+        if (value == null) {
+            return new String[]{};
+        }
         if (!support(value)) {
             throw new IllegalStateException();
         }
