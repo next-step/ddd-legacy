@@ -7,14 +7,31 @@ public class CustomStringNumbers {
   private final List<CustomStringNumber> stringNumbers;
 
   public CustomStringNumbers(final String text) {
-    final List<String> split = DelimiterSplit.split(text);
-    this.stringNumbers = split.isEmpty() ? new ArrayList<>() : this.create(split);
+    this.stringNumbers = this.process(text);
   }
 
   public int sum() {
-    return this.stringNumbers.isEmpty()
-        ? 0
-        : this.stringNumbers.stream().mapToInt(CustomStringNumber::getNumber).sum();
+    int sum = 0;
+
+    if (this.stringNumbers.isEmpty()) {
+      return sum;
+    }
+
+    for (CustomStringNumber stringNumber : this.stringNumbers) {
+      sum += stringNumber.getNumber();
+    }
+
+    return sum;
+  }
+
+  private List<CustomStringNumber> process(final String text) {
+    final List<String> split = DelimiterSplit.split(text);
+
+    if (split.isEmpty()) {
+      return new ArrayList<>();
+    }
+
+    return this.create(split);
   }
 
   private List<CustomStringNumber> create(final List<String> split) {

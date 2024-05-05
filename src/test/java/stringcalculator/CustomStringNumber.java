@@ -7,16 +7,30 @@ public class CustomStringNumber {
   private final Integer number;
 
   public CustomStringNumber(String stringNumber) {
-    if (this.isNumber(stringNumber)) {
-      this.number = Integer.parseInt(stringNumber);
-      CustomStringNumberValidator.negativeNumberValid(this.number);
-
-      return;
-    }
-
-    this.number = 0;
+    this.number = this.conversion(stringNumber);
   }
 
+  private Integer conversion(String stringNumber) {
+    if (this.isNumber(stringNumber)) {
+      final int number = Integer.parseInt(stringNumber);
+      CustomStringNumberValidator.negativeNumberValid(number);
+
+      return number;
+    }
+
+    return 0;
+  }
+
+  /***
+   * <h1>숫자 확인</h1>
+   * <pre>
+   *     isNumber("1")   = true
+   *     isNumber("123") = true
+   *     isNumber("-1")  = true
+   *     isNumber("A")   = false
+   *     isNumber("ABC") = false
+   * </pre>
+   */
   private boolean isNumber(final String stringNumber) {
     return STRING_NUMBER_PATTERN.matcher(stringNumber).matches();
   }
