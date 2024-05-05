@@ -5,9 +5,9 @@ import java.util.stream.Stream;
 
 public class StringCalculator {
 
-    private TextInputHandler textInputHandler = new TextInputHandler();
-    private NumberMapper numberMapper = new NumberMapper();
-    private Calculator calculator = new Calculator();
+    private final TextInputHandler textInputHandler = new TextInputHandler();
+    private final NumberMapper numberMapper = new NumberMapper();
+    private final Calculator calculator = new Calculator();
 
     public int add(String text) {
         if (textInputHandler.isBlank(text)) {
