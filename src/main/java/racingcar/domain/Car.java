@@ -1,9 +1,9 @@
 package racingcar.domain;
 
 public class Car {
-	static final int CAR_NAME_MAX_LENGTH = 5;
-	static final String CAR_NAME_SHOULD_NOT_BE_EMPTY = "자동차 이름이 존재해야 합니다.";
-	static final String CAR_NAME_SHOULD_NOT_EXCEED_MAXIMUM_LENGTH = "자동차 이름은 5글자를 넘을 수 없습니다.";
+	private static final int CAR_NAME_MAX_LENGTH = 5;
+	private static final String CAR_NAME_SHOULD_NOT_BE_EMPTY = "자동차 이름이 존재해야 합니다.";
+	private static final String CAR_NAME_SHOULD_NOT_EXCEED_MAXIMUM_LENGTH = "자동차 이름은 5글자를 넘을 수 없습니다.";
 
 	private final String name;
 	private int position;
