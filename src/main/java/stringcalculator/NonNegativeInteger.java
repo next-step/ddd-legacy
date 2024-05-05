@@ -3,7 +3,7 @@ package stringcalculator;
 public class NonNegativeInteger {
     private static final int INTEGER_ZERO = 0;
     private static final String NEGATIVE_ERROR_MESSAGE = "Negative integer found: ";
-    private static final String NON_INTERGER_ERROR_MESSAGE = "Non integer found: ";
+    private static final String NON_INTEGER_ERROR_MESSAGE = "Non integer found: ";
     private final int integer;
 
     private NonNegativeInteger(int integer) {
@@ -18,7 +18,7 @@ public class NonNegativeInteger {
             }
             return new NonNegativeInteger(integer);
         } catch (NumberFormatException e) {
-            throw new RuntimeException(NON_INTERGER_ERROR_MESSAGE + token);
+            throw new RuntimeException(NON_INTEGER_ERROR_MESSAGE + token);
         }
     }
 
