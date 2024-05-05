@@ -1,7 +1,5 @@
 package racingcar
 
-import java.lang.IllegalArgumentException
-
 data class Car(
     val name: String,
 ) {
