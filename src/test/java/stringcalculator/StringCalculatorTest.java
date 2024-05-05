@@ -19,8 +19,11 @@ class StringCalculatorTest {
 		// given
 		StringCalculator calculator = new StringCalculator(input);
 
-		// when / then
-		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.ZERO);
+		// when
+		NonNegativeInteger result = calculator.calculate();
+
+		// then
+		assertThat(result).isEqualTo(NonNegativeInteger.ZERO);
 	}
 
 	@ParameterizedTest
@@ -30,8 +33,11 @@ class StringCalculatorTest {
 		// given
 		StringCalculator calculator = new StringCalculator(input);
 
-		// when / then
-		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf(input));
+		// when
+		NonNegativeInteger result = calculator.calculate();
+
+		// then
+		assertThat(result).isEqualTo(NonNegativeInteger.valueOf(input));
 	}
 
 	@Test
@@ -40,8 +46,11 @@ class StringCalculatorTest {
 		// given
 		StringCalculator calculator = new StringCalculator("1,2");
 
-		// when / then
-		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf("3"));
+		// when
+		NonNegativeInteger result = calculator.calculate();
+
+		// then
+		assertThat(result).isEqualTo(NonNegativeInteger.valueOf("3"));
 	}
 
 	@Test
@@ -50,8 +59,11 @@ class StringCalculatorTest {
 		// given
 		StringCalculator calculator = new StringCalculator("1,2:3");
 
-		// when / then
-		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf("6"));
+		// when
+		NonNegativeInteger result = calculator.calculate();
+
+		// then
+		assertThat(result).isEqualTo(NonNegativeInteger.valueOf("6"));
 	}
 
 	@Test
@@ -60,8 +72,11 @@ class StringCalculatorTest {
 		// given
 		StringCalculator calculator = new StringCalculator("//;\n1;2;3");
 
-		// when / then
-		assertThat(calculator.calculate()).isEqualTo(NonNegativeInteger.valueOf("6"));
+		// when
+		NonNegativeInteger result = calculator.calculate();
+
+		// then
+		assertThat(result).isEqualTo(NonNegativeInteger.valueOf("6"));
 	}
 
 	@ParameterizedTest
@@ -70,8 +85,13 @@ class StringCalculatorTest {
 	void constructorWithNegativeInteger(final String input) {
 		// then
 		assertThatExceptionOfType(RuntimeException.class).isThrownBy(() ->
-			// given / when
-			new StringCalculator(input).calculate()
+			{
+				// given
+				StringCalculator calculator = new StringCalculator(input);
+
+				// when
+				NonNegativeInteger result = calculator.calculate();
+			}
 		);
 	}
 }
