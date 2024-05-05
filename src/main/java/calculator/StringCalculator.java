@@ -34,10 +34,11 @@ public class StringCalculator {
     }
 
     private String[] getValue(String text) {
-        Matcher m = CUSTOM_DELIMITER.matcher(text);
-        if (m.find()) {
-            String customDelimiter = m.group(CUSTOM_DELIMITER_GROUP);
-            return m.group(CUSTOM_DELIMITER_VALUE_GROUP).split(customDelimiter);
+        Matcher customDelimiterMatcher = CUSTOM_DELIMITER.matcher(text);
+
+        if (customDelimiterMatcher.find()) {
+            String customDelimiter = customDelimiterMatcher.group(CUSTOM_DELIMITER_GROUP);
+            return customDelimiterMatcher.group(CUSTOM_DELIMITER_VALUE_GROUP).split(customDelimiter);
         }
 
         return text.split(DEFAULT_DELIMITER);
