@@ -1,4 +1,4 @@
-###
+### 상품정보 등록
 POST {{host}}/api/products
 Content-Type: application/json
 
@@ -7,7 +7,7 @@ Content-Type: application/json
   "price": 17000
 }
 
-###
+### 상품 가격정보 변경
 PUT {{host}}/api/products/3b528244-34f7-406b-bb7e-690912f66b10/price
 Content-Type: application/json
 
@@ -15,5 +15,5 @@ Content-Type: application/json
   "price": 18000
 }
 
-###
+### 상품정보 전체 조회
 GET {{host}}/api/products

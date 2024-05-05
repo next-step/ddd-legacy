@@ -14,20 +14,20 @@ Content-Type: application/json
   ]
 }
 
-###
+### 접수 수락
 PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/accept
 
-###
+### 음식 제공
 PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/serve
 
-###
+### 배달 시작처리
 PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/start-delivery
 
-###
+### 배달 완료처리
 PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/complete-delivery
 
-###
+### 주문 접수 완료
 PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/complete
 
-###
+### 접수된 주문 전체조회
 GET {{host}}/api/orders
