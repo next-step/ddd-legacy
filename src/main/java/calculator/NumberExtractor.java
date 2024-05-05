@@ -1,6 +1,6 @@
 package calculator;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -15,7 +15,7 @@ public class NumberExtractor {
 
     public static Numbers extract(final String text) {
         if (text == null || text.isEmpty()) {
-            return new Numbers(List.of());
+            return new Numbers(Collections.emptyList());
         }
 
         String delimiter = extractDelimiter(text);
