@@ -124,3 +124,5 @@ docker compose -p kitchenpos up -d
 | EAT_IN   | 주문이 매장 내 식사로 처리되는 경우. |
 
 ## 모델링
+<img width="453" alt="image" src="https://github.com/dkswnkk/ddd-legacy/assets/74492426/f150d536-e9ea-4a01-aa33-9394339cd51f">
+
