@@ -3,7 +3,7 @@ package calculator
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
-class TextDelimiterParser{
+class TextDelimiterParser {
     fun separateText(text: String): SeparateResult {
         val matcher = getMatcher(text)
         val isFind = matcher.find()
@@ -32,7 +32,7 @@ class TextDelimiterParser{
     private fun getDelimiter(
         isFind: Boolean,
         matcher: Matcher,
-    ) = if (isFind) {
+    ): Delimiter = if (isFind) {
         Delimiter(Pattern.quote(matcher.group(DELIMITER_GROUP_INDEX)))
     } else {
         DEFAULT_DELIMITER
@@ -42,7 +42,7 @@ class TextDelimiterParser{
         isFind: Boolean,
         matcher: Matcher,
         text: String,
-    ) = if (isFind) {
+    ): String = if (isFind) {
         matcher.group(DATA_GROUP_INDEX)
     } else {
         text
