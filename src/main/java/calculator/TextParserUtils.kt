@@ -55,8 +55,3 @@ object TextParserUtils {
         text
     }
 }
-
-data class SeparateResult(
-    val delimiter: Delimiter,
-    val numbersText: String,
-)

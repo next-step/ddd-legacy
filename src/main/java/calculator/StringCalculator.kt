@@ -1,6 +1,8 @@
 package calculator
 
-class StringCalculator {
+class StringCalculator(
+    private val textDelimiterParser: TextDelimiterParser
+) {
     fun add(
         text: String?,
     ): Int = if (text.isNullOrBlank()) {
@@ -18,7 +20,7 @@ class StringCalculator {
         )
     }
 
-    private fun separateText(text: String): SeparateResult = TextParserUtils.separateText(text)
+    private fun separateText(text: String): SeparateResult = textDelimiterParser.separateText(text)
 
     private fun sumByString(
         delimiter: Delimiter,

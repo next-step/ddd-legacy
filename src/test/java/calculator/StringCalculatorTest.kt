@@ -11,10 +11,11 @@ import org.junit.jupiter.params.provider.ValueSource
 
 class StringCalculatorTest {
     private lateinit var calculator: StringCalculator
+    private val textDelimiterParser = TextDelimiterParser()
 
     @BeforeEach
     fun setUp() {
-        calculator = StringCalculator()
+        calculator = StringCalculator(textDelimiterParser)
     }
 
     @DisplayName("빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")
