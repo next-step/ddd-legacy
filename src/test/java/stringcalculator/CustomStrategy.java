@@ -3,7 +3,7 @@ package stringcalculator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CustomStategy implements CalculatorStrategy {
+public class CustomStrategy implements CalculatorStrategy {
     private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
     private static final int CUSTOM_SEPARATOR_INDEX = 1;
     private static final int MATCHER_BODY_INDEX = 2;
@@ -11,12 +11,8 @@ public class CustomStategy implements CalculatorStrategy {
 
     @Override
     public boolean isCustom(final String input) {
-        return this.from(input).matches();
-    }
-
-    public Matcher from(final String input) {
         this.matcher = pattern.matcher(input);
-        return this.matcher;
+        return matcher.matches();
     }
 
     @Override

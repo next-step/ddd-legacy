@@ -11,7 +11,7 @@ public class StringCalculator {
     private static final Pattern pattern = Pattern.compile("//(.)\n(.*)");
     private static final int CUSTOM_SEPARATOR_INDEX = 1;
     private static final int MATCHER_BODY_INDEX = 2;
-    private final CustomStategy CUSTOM_STRATEGY = new CustomStategy();
+    private final CustomStrategy CUSTOM_STRATEGY = new CustomStrategy();
 
     public static int getSum2(final String input) {
         if (StringUtils.isBlank(input)) {
