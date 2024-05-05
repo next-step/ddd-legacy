@@ -1,35 +1,38 @@
 package stringcalculator;
 
-enum ValidationNumber {
+import jakarta.validation.constraints.Pattern;
 
-    NEGATIVE_NUM_REGEX("^-\\d+$"),
-    POSITIVE_NUM_REGEX("^\\d+$");
-
-    private final String regex;
-
-    ValidationNumber(String regex) {
-        this.regex = regex;
-    }
-    public String getRegex() {
-        return regex;
-    }
-
-}
+import java.util.Arrays;
 
 public class StringValidation {
 
-    // 유효성 검증 정규식을 ENUM 으로 분리
-    private final String negativeValid = ValidationNumber.NEGATIVE_NUM_REGEX.getRegex();
+    private final DelimiterParser delimiterParser;
+
+    public StringValidation() {
+        this.delimiterParser = new DelimiterParser();
+    }
 
     public boolean isNullOrEmpty(String s) {
         return s == null || s.isEmpty();
     }
 
-    public void checkNegative(String[] numbers) {
-        for (String number : numbers) {
-            if(number.matches(negativeValid)) {
-                throw new RuntimeException();
-            }
+    public boolean checkNegative(String text) {
+        return text.matches(ValidationRegex.NEGATIVE_NUM_REGEX.getRegex());
+
+    }
+
+    public int parseNumber(String text) {
+
+        if (isNullOrEmpty(text)) {
+            return 0;
+        } else if (checkNegative(text)) {
+            throw new RuntimeException();
         }
+
+
+        String[] numbers = delimiterParser.parseDelimiter(text);
+
+        return Arrays.stream(numbers).mapToInt(Integer::parseInt).sum();
+
     }
 }

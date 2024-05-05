@@ -25,7 +25,7 @@ public class StringCalculatorTest {
         assertThat(stringCalculator.add(text)).isZero();
     }
 
-    @DisplayName(" 숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환")
+    @DisplayName("숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환")
     @ParameterizedTest
     @ValueSource(strings = {"1"})
     void oneNumber(final String text){
