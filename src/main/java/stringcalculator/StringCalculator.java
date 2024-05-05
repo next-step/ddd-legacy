@@ -10,7 +10,7 @@ public class StringCalculator {
             return 0;
         }
 
-        String[] values = new String[0];
+        String[] values;
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
 
         if (m.find()) {
@@ -20,16 +20,14 @@ public class StringCalculator {
             values = text.split("[,:]");
         }
 
-        long negativeNumberCnt = Arrays.stream(values)
-                .mapToInt(Integer::parseInt)
-                .filter(val -> val < 0)
-                .count();
-        if (negativeNumberCnt > 0) {
-            throw new RuntimeException();
-        }
+        return sum(values);
 
+
+    }
+
+    private static int sum(String[] values) {
         return Arrays.stream(values)
-                .mapToInt(Integer::parseInt)
+                .mapToInt(val -> Number.of(val).number())
                 .sum();
     }
 }
