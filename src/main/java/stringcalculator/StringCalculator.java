@@ -9,7 +9,12 @@ public class StringCalculator {
         if (text == null || text.isEmpty()) {
             return 0;
         }
+        String[] inputValues = splitAndValidate(text);
 
+        return sum(inputValues);
+    }
+
+    private static String[] splitAndValidate(String text) {
         String[] values;
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
 
@@ -19,10 +24,7 @@ public class StringCalculator {
         } else {
             values = text.split("[,:]");
         }
-
-        return sum(values);
-
-
+        return values;
     }
 
     private static int sum(String[] values) {
