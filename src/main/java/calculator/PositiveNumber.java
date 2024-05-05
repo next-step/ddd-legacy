@@ -1,10 +1,10 @@
 package calculator;
 
 
-public class InputNumber {
+public class PositiveNumber {
     private String inputNumber;
 
-    public InputNumber(String inputNumber){
+    public PositiveNumber(String inputNumber){
         validationNumber(inputNumber);
         this.inputNumber = inputNumber;
     }

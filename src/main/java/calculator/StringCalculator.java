@@ -11,7 +11,7 @@ public class StringCalculator {
     private static final String DEFAULT_DELIMITER = ",|:";
     private static final Pattern CUSTOM_DELIMITER = Pattern.compile("//(.)\n(.*)");
 
-    private List<InputNumber> inputNumbers;
+    private List<PositiveNumber> inputNumbers;
 
     public StringCalculator() {
         this.inputNumbers = new ArrayList<>();
@@ -24,7 +24,7 @@ public class StringCalculator {
 
         String[] tokens = getValue(text);
         inputNumbers = Arrays.stream(tokens)
-                .map(InputNumber::new)
+                .map(PositiveNumber::new)
                 .toList();
 
         return sum(inputNumbers);
@@ -40,9 +40,9 @@ public class StringCalculator {
         return text.split(DEFAULT_DELIMITER);
     }
 
-    private int sum(List<InputNumber> inputNumbers) {
+    private int sum(List<PositiveNumber> inputNumbers) {
         return inputNumbers.stream()
-                .map(InputNumber::getNumber)
+                .map(PositiveNumber::getNumber)
                 .mapToInt(Integer::parseInt)
                 .sum();
     }
