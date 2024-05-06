@@ -8,21 +8,20 @@ public class SumProcess {
     }
 
     public int sum(String[] numbers){
-        this.validationNumber(numbers);
+        this.validateNumber(numbers);
 
         return Arrays.stream(numbers)
-//                .filter(a -> this.isPositiveNumber(a))
                 .mapToInt(a -> Integer.parseInt(a))
                 .sum();
     }
 
-    private void validationNumber(String[] numbers) {
+    private void validateNumber(String[] numbers) {
         Arrays.stream(numbers).forEach(a -> {
-            this.isPositiveNumber(a);
+            this.validateNumberFormatAndPositiveNumber(a);
         });
     }
 
-    private void isPositiveNumber(String input) {
+    private void validateNumberFormatAndPositiveNumber(String input) {
         try {
             int num = Integer.parseInt(input);
 
@@ -30,7 +29,7 @@ public class SumProcess {
                 throw new RuntimeException("input included negative number");
             }
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("input is not number");
+            throw new IllegalArgumentException("input is invalid value. please input string type number (input : "+input+")");
         }
     }
 }
