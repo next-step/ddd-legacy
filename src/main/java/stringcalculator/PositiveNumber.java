@@ -40,4 +40,17 @@ public class PositiveNumber {
     public int value() {
         return number;
     }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof PositiveNumber that)) return false;
+
+        return number == that.number;
+    }
+
+    @Override
+    public int hashCode() {
+        return number;
+    }
 }
