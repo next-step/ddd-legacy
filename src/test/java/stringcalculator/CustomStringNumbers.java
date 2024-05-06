@@ -11,17 +11,9 @@ public class CustomStringNumbers {
   }
 
   public int sum() {
-    int sum = 0;
-
-    if (this.stringNumbers.isEmpty()) {
-      return sum;
-    }
-
-    for (CustomStringNumber stringNumber : this.stringNumbers) {
-      sum += stringNumber.getNumber();
-    }
-
-    return sum;
+    return this.stringNumbers.stream()
+            .mapToInt(CustomStringNumber::getNumber)
+            .sum();
   }
 
   private List<CustomStringNumber> process(final String text) {
