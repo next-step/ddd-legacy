@@ -1,11 +1,11 @@
-###
+### 메뉴 상품의 가격 합보다 클 수 없다.
 POST {{host}}/api/menus
 Content-Type: application/json
 
 {
   "name": "후라이드+후라이드",
   "price": 19000,
-  "menuGroupId": "dc387795-99ad-4dc3-adbd-b830aa15cc39",
+  "menuGroupId": "cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded",
   "displayed": true,
   "menuProducts": [
     {
@@ -22,7 +22,7 @@ Content-Type: application/json
 {
   "name": "후라이드+양념",
   "price": 19000,
-  "menuGroupId": "f1860abc-2ea1-411b-bd4a-baa44f0d5580",
+  "menuGroupId": "cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded",
   "displayed": true,
   "menuProducts": [
     {
