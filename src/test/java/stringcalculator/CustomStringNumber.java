@@ -1,9 +1,13 @@
 package stringcalculator;
 
+import java.util.Objects;
+
 public class CustomStringNumber {
   private final Integer number;
 
   public CustomStringNumber(String stringNumber) {
+    CustomStringNumberValidator.nullValid(stringNumber);
+    CustomStringNumberValidator.sizeValid(stringNumber);
     this.number = this.conversion(stringNumber);
   }
 
