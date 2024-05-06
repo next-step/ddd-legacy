@@ -8,22 +8,18 @@ public class Numbers {
 
     private final List<Number> value;
 
-    private Numbers(List<Number> value) {
-        this.value = value;
+    public Numbers(String[] numbers) {
+        this.value = parseNumbers(numbers);
     }
 
-    public static Numbers of(String[] numbers) {
-        return new Numbers(parseNumbers(numbers));
-    }
-
-    private static List<Number> parseNumbers(String[] numbers) {
+    private List<Number> parseNumbers(String[] numbers) {
         return Arrays.stream(numbers)
-                .map(Numbers::parseNumber)
+                .map(this::parseNumber)
                 .map(Number::new)
                 .toList();
     }
 
-    private static int parseNumber(String number) {
+    private int parseNumber(String number) {
         try {
             return Integer.parseInt(number);
         } catch (NumberFormatException e) {

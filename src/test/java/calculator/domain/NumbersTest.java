@@ -11,12 +11,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class NumbersTest {
 
     @Nested
-    class ofTest {
+    class constructorTest {
         @DisplayName("정상적으로 생성하는 테스트")
         @Test
         void normalOfTest() {
             String[] input = {"1", "2", "3"};
-            assertThatCode(() -> Numbers.of(input)).doesNotThrowAnyException();
+            assertThatCode(() -> new Numbers(input)).doesNotThrowAnyException();
         }
 
         @Nested
@@ -25,7 +25,7 @@ class NumbersTest {
             @Test
             void parseNumberExceptionTest() {
                 String[] input = {"a", "2", "3"};
-                assertThatThrownBy(() -> Numbers.of(input))
+                assertThatThrownBy(() -> new Numbers(input))
                         .isInstanceOf(RuntimeException.class)
                         .hasMessage("숫자가 아닌 값이 포함되어 있습니다.");
             }
@@ -38,7 +38,7 @@ class NumbersTest {
         @Test
         void normalSumTest() {
             String[] input = {"1", "2", "3"};
-            Numbers numbers = Numbers.of(input);
+            Numbers numbers = new Numbers(input);
             assertThat(numbers.sum()).isEqualTo(6);
         }
 
@@ -46,7 +46,7 @@ class NumbersTest {
         @Test
         void sumTestByOneNumber() {
             String[] input = {"1"};
-            Numbers numbers = Numbers.of(input);
+            Numbers numbers = new Numbers(input);
             assertThat(numbers.sum()).isEqualTo(1);
         }
     }

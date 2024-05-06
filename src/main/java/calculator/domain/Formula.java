@@ -12,18 +12,12 @@ public class Formula {
     private final String delimiter;
     private final Numbers numbers;
 
-    public static Formula of(String input) {
-        String delimiter = getDelimiter(input);
-        Numbers numbers = Numbers.of(getNumbersByDelimiter(input, delimiter));
-        return new Formula(delimiter, numbers);
+    public Formula(String input) {
+        this.delimiter = getDelimiter(input);
+        this.numbers = new Numbers(getNumbersByDelimiter(input, delimiter));
     }
 
-    private Formula(String delimiter, Numbers numbers) {
-        this.delimiter = delimiter;
-        this.numbers = numbers;
-    }
-
-    private static String[] getNumbersByDelimiter(String input, String delimiter) {
+    private String[] getNumbersByDelimiter(String input, String delimiter) {
         Matcher matched = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         if (matched.find()) {
@@ -33,7 +27,7 @@ public class Formula {
         return input.split(DEFAULT_DELIMITER);
     }
 
-    private static String getDelimiter(String input) {
+    private String getDelimiter(String input) {
         Matcher matched = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         if (matched.find()) {

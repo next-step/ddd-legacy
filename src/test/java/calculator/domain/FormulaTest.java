@@ -11,19 +11,19 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 class FormulaTest {
 
     @Nested
-    class ofTest {
+    class constructorTest {
         @DisplayName("디폴트 구분자로 수식 생성이 가능하다.")
         @ParameterizedTest
         @ValueSource(strings = {"1,2,3", "1:2:3"})
         void defaultDelimiterTest(String input) {
-            assertThatCode(() -> Formula.of(input)).doesNotThrowAnyException();
+            assertThatCode(() -> new Formula(input)).doesNotThrowAnyException();
         }
 
         @DisplayName("커스텀 구분자로 수식 생성이 가능하다.")
         @ParameterizedTest
         @ValueSource(strings = {"//;\n1;2;3", "//a\n1a2a3"})
         void customDelimiterTest(String input) {
-            assertThatCode(() -> Formula.of(input)).doesNotThrowAnyException();
+            assertThatCode(() -> new Formula(input)).doesNotThrowAnyException();
         }
     }
 
@@ -33,7 +33,7 @@ class FormulaTest {
         @ParameterizedTest
         @ValueSource(strings = {"1,2,3", "1:2:3"})
         void defaultDelimiterTest(String input) {
-            Formula formula = Formula.of(input);
+            Formula formula = new Formula(input);
             assertThat(formula.sum()).isEqualTo(6);
         }
 
@@ -41,7 +41,7 @@ class FormulaTest {
         @ParameterizedTest
         @ValueSource(strings = {"//;\n1;2;3", "//a\n1a2a3"})
         void customDelimiterTest(String input) {
-            Formula formula = Formula.of(input);
+            Formula formula = new Formula(input);
             assertThat(formula.sum()).isEqualTo(6);
         }
     }

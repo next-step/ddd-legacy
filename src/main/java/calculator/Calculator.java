@@ -5,12 +5,13 @@ import calculator.domain.Formula;
 public class Calculator {
     private static final int ZERO = 0;
 
+
     public int add(String value) {
         if (isNullAndBlank(value)) {
             return ZERO;
         }
 
-        Formula formula = Formula.of(value);
+        Formula formula = new Formula(value);
 
         return formula.sum();
     }
