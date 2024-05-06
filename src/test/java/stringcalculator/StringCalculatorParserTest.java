@@ -1,10 +1,11 @@
 package stringcalculator;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ class StringCalculatorParserTest {
     @MethodSource("testDefaultSource")
     void testDefault(String expression, List<Integer> expected) {
         List<Integer> result = stringCalculatorParser.execute(expression).getIntegers();
-        Assertions.assertThat(result).containsExactlyElementsOf(expected);
+        assertThat(result).containsExactlyElementsOf(expected);
     }
 
     @DisplayName("구분자가 지정된 경우 테스트")
@@ -34,14 +35,14 @@ class StringCalculatorParserTest {
     @MethodSource("testCustomSource")
     void testCustom(String expression, List<Integer> expected) {
         List<Integer> result = stringCalculatorParser.execute(expression).getIntegers();
-        Assertions.assertThat(result).containsExactlyElementsOf(expected);
+        assertThat(result).containsExactlyElementsOf(expected);
     }
 
     @DisplayName("올바르지 않은 입력 파싱 실패 테스트")
     @Test
     void testFail() {
         String expression = "aaa";
-        AssertionsForClassTypes.assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(RuntimeException.class)
                                .isThrownBy(() -> stringCalculatorParser.execute(expression));
     }
 
