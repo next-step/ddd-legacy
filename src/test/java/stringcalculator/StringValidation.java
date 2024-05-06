@@ -1,13 +1,14 @@
 package stringcalculator;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 public class StringValidation {
 
-    private final DelimiterParser delimiterParser;
+    private final String text;
 
-    public StringValidation() {
-        this.delimiterParser = new DelimiterParser();
+    public StringValidation(String text) {
+        this.text = text;
     }
 
     public boolean isNullOrEmpty(String s) {
@@ -19,18 +20,17 @@ public class StringValidation {
 
     }
 
-    public int parseNumber(String text) {
+    public String validateNum() {
+
+        String resultNum = text;
 
         if (isNullOrEmpty(text)) {
-            return 0;
+            resultNum = "0";
         } else if (checkNegative(text)) {
             throw new RuntimeException();
         }
 
-
-        String[] numbers = delimiterParser.parseDelimiter(text);
-
-        return Arrays.stream(numbers).mapToInt(Integer::parseInt).sum();
+        return resultNum;
 
     }
 }

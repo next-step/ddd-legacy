@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -15,7 +16,7 @@ public class StringValidationTest {
 
     @BeforeEach
     public void setUp() {
-        stringValidation = new StringValidation();
+        stringValidation = new StringValidation("");
     }
 
     @DisplayName(value = "빈 문자열일 경우 TRUE 반환")
@@ -35,13 +36,15 @@ public class StringValidationTest {
     @ParameterizedTest
     @NullAndEmptySource
     void emptyOrNull2(final String text){
-        assertThat(stringValidation.parseNumber(text)).isZero();
+        assertThat(stringValidation.validateNum()).isEqualTo("0");
     }
 
     @DisplayName(value = "parseNumber 함수 : 음수 전달 시 RuntimeException 예외 처리")
-    @Test
-    void negative2(){
-        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> stringValidation.parseNumber("-1"));
+    @ParameterizedTest
+    @ValueSource(strings = {"-1"})
+    void negative2(final String text){
+        stringValidation = new StringValidation(text);
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> stringValidation.validateNum());
     }
 
 

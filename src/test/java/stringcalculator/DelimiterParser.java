@@ -5,7 +5,10 @@ import java.util.regex.Pattern;
 
 public class DelimiterParser {
 
-    private final Pattern regexPattern = Pattern.compile("//(.)\n(.*)");
+    private final Pattern regexPattern = Pattern.compile(ValidationRegex.CUSTOM_DELIMITER_REGEX.getRegex());
+
+    public DelimiterParser() {
+    }
 
     public String[] parseDelimiter(String text) {
 
