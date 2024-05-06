@@ -13,7 +13,7 @@ class Car {
     private final String name;
     private int position;
 
-    public Car(String name, int position) {
+    private Car(String name, int position) {
         if (name.length() > 5){
             throw new IllegalArgumentException("이름은 5글자를 넘을 수 없다.");
         }
