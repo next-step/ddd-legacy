@@ -17,9 +17,9 @@ public class PositiveNumbers {
                 .toList());
     }
 
-    public int sum() {
+    public PositiveNumber sum() {
         return positives.stream()
-                .map(PositiveNumber::value)
-                .reduce(0, Integer::sum);
+                .reduce(PositiveNumber::add)
+                .orElse(PositiveNumber.ZERO);
     }
 }

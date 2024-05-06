@@ -7,8 +7,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
 public class NumericString {
-
-    public static final int ZERO = 0;
+    
     private static final String SINGLE_INTEGER_REGEX = "^-?\\d+$";
 
     private final String numeric;
@@ -17,7 +16,7 @@ public class NumericString {
         this.numeric = numeric;
     }
 
-    public int sum() {
+    public PositiveNumber sum() {
         return isSingleNumber() ? parseSingleNumber().sum() : parseMultipleNumbers().sum();
     }
 

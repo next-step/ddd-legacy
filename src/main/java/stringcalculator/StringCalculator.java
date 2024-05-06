@@ -2,9 +2,9 @@ package stringcalculator;
 
 public class StringCalculator {
 
-    public int add(NumericString numericString) {
+    public PositiveNumber add(NumericString numericString) {
         if (numericString.isEmpty()) {
-            return NumericString.ZERO;
+            return PositiveNumber.ZERO;
         }
 
         return numericString.sum();
