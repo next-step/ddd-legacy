@@ -1,4 +1,4 @@
-package kitchenpos;
+package kitchenpos.helper;
 
 import kitchenpos.domain.MenuGroup;
 
@@ -9,8 +9,8 @@ public class MenuGroupTestHelper {
         UUID id = UUID.randomUUID();
 
         MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(name);
         menuGroup.setId(id);
+        menuGroup.setName(name);
 
         return menuGroup;
     }
