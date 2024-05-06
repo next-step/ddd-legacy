@@ -1,3 +1,5 @@
+use kitchenpos;
+
 create table menu
 (
     id            binary(16)     not null,

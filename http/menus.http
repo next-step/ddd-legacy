@@ -1,4 +1,4 @@
-###
+### 메뉴 생성
 POST {{host}}/api/menus
 Content-Type: application/json
 
@@ -15,7 +15,7 @@ Content-Type: application/json
   ]
 }
 
-###
+### 메뉴 금액 변경
 PUT {{host}}/api/menus/f59b1e1c-b145-440a-aa6f-6095a0e2d63b/price
 Content-Type: application/json
 
@@ -23,11 +23,11 @@ Content-Type: application/json
   "price": 15000
 }
 
-###
+### 메뉴 정보 노출 상태로 변경
 PUT {{host}}/api/menus/f59b1e1c-b145-440a-aa6f-6095a0e2d63b/display
 
-###
+### 메뉴 정보 미노출로 변경
 PUT {{host}}/api/menus/f59b1e1c-b145-440a-aa6f-6095a0e2d63b/hide
 
-###
+### 모든 메뉴 정보 조회
 GET {{host}}/api/menus
