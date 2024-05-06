@@ -25,6 +25,7 @@ public class Formula {
         if (input == null || input.isBlank()) {
             return EMPTY_NUMBERS;
         }
+
         Matcher matched = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         if (matched.find()) {
@@ -38,6 +39,7 @@ public class Formula {
         if (input == null || input.isBlank()) {
             return EMPTY_DELIMITER;
         }
+        
         Matcher matched = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         if (matched.find()) {
