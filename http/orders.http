@@ -1,4 +1,4 @@
-###
+### 매장식사
 POST {{host}}/api/orders
 Content-Type: application/json
 
@@ -14,20 +14,72 @@ Content-Type: application/json
   ]
 }
 
-###
-PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/accept
+### 매장식사 수락
+PUT {{host}}/api/orders/83eeb314-d59a-462e-8797-224387907300/accept
 
-###
-PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/serve
+### 매장식사 손님에게 음식 제공됨
+PUT {{host}}/api/orders/83eeb314-d59a-462e-8797-224387907300/serve
 
-###
-PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/start-delivery
+### 매장식사 완료
+PUT {{host}}/api/orders/83eeb314-d59a-462e-8797-224387907300/complete
 
-###
-PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/complete-delivery
 
-###
-PUT {{host}}/api/orders/69d78f38-3bff-457c-bb72-26319c985fd8/complete
+### 포장
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{
+  "type": "TAKEOUT",
+  "orderLineItems": [
+    {
+      "menuId": "f59b1e1c-b145-440a-aa6f-6095a0e2d63b",
+      "price": 16000,
+      "quantity": 3
+    }
+  ]
+}
+
+### 포장 수락
+PUT {{host}}/api/orders/3c9fb170-82ab-4092-ac0c-7b76a4864b13/accept
+
+### 포장 음식 손님에게 제공됨
+PUT {{host}}/api/orders/3c9fb170-82ab-4092-ac0c-7b76a4864b13/serve
+
+### 포장 완료
+PUT {{host}}/api/orders/3c9fb170-82ab-4092-ac0c-7b76a4864b13/complete
+
+
+### 배달
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{
+  "type": "DELIVERY",
+  "orderLineItems": [
+    {
+      "menuId": "f59b1e1c-b145-440a-aa6f-6095a0e2d63b",
+      "price": 12000,
+      "quantity": 3
+    }
+  ],
+  "deliveryAddress": "서울시 송파구 위례성대로 33"
+}
+
+
+### 배달 수락
+PUT {{host}}/api/orders/6edea316-0d09-4872-b0aa-668372eeea18/accept
+
+### 배달기사님에게 음식 제공됨
+PUT {{host}}/api/orders/6edea316-0d09-4872-b0aa-668372eeea18/serve
+
+### 배달 시작
+PUT {{host}}/api/orders/6edea316-0d09-4872-b0aa-668372eeea18/start-delivery
+
+### 손님에게 음식 전달 됨
+PUT {{host}}/api/orders/6edea316-0d09-4872-b0aa-668372eeea18/complete-delivery
+
+### 배달 완료
+PUT {{host}}/api/orders/6edea316-0d09-4872-b0aa-668372eeea18/complete
 
 ###
 GET {{host}}/api/orders
