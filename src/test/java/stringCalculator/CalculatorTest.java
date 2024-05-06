@@ -61,4 +61,12 @@ public class CalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> calculator.add(text));
     }
+
+    @DisplayName(value = "문자열 계산기에 숫자가 아닌 값을 전달할 경우 IllegalArgumentException 예외 처리를 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"A"})
+    void noNumber(final String text) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> calculator.add(text));
+    }
 }

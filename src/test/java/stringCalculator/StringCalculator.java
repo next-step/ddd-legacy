@@ -1,5 +1,7 @@
 package stringCalculator;
 
+import java.util.List;
+
 public class StringCalculator {
     private final SumProcess sumProcess = new SumProcess();
 
@@ -11,7 +13,7 @@ public class StringCalculator {
             return 0;
         }
 
-        String[] numbers = NumberConvertor.getNumbers(text);
+        List<PositiveNumber> numbers = NumberConvertor.getNumbers(text);
         return sumProcess.sum(numbers);
     }
 
