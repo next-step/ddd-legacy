@@ -34,6 +34,14 @@ class NumbersTest {
 
     @Nested
     class sumTest {
+        @DisplayName("빈값이 들어오면 0을 리턴한다.")
+        @Test
+        void sumTestByBlank() {
+            String[] input = {};
+            Numbers numbers = new Numbers(input);
+            assertThat(numbers.sum()).isZero();
+        }
+
         @DisplayName("모든 숫자의 합을 구할 수 있다.")
         @Test
         void normalSumTest() {

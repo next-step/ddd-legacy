@@ -1,6 +1,7 @@
 package calculator.domain;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Numbers {
@@ -13,6 +14,10 @@ public class Numbers {
     }
 
     private List<Number> parseNumbers(String[] numbers) {
+        if (numbers.length == 0) {
+            return Collections.emptyList();
+        }
+
         return Arrays.stream(numbers)
                 .map(this::parseNumber)
                 .map(Number::new)
@@ -28,6 +33,9 @@ public class Numbers {
     }
 
     public int sum() {
+        if (value.isEmpty()) {
+            return 0;
+        }
         return value.stream()
                 .reduce(ZERO, Number::add)
                 .value();

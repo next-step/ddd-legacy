@@ -8,16 +8,23 @@ public class Formula {
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
     private static final int DELIMITER_INDEX = 1;
     private static final int NUMBER_INPUT_INDEX = 2;
+    private static final String EMPTY_DELIMITER = "";
+    private static final String[] EMPTY_NUMBERS = new String[0];
 
     private final String delimiter;
     private final Numbers numbers;
+    private final int result;
 
     public Formula(String input) {
         this.delimiter = getDelimiter(input);
         this.numbers = new Numbers(getNumbersByDelimiter(input, delimiter));
+        this.result = sum();
     }
 
     private String[] getNumbersByDelimiter(String input, String delimiter) {
+        if (input == null || input.isBlank()) {
+            return EMPTY_NUMBERS;
+        }
         Matcher matched = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         if (matched.find()) {
@@ -28,6 +35,9 @@ public class Formula {
     }
 
     private String getDelimiter(String input) {
+        if (input == null || input.isBlank()) {
+            return EMPTY_DELIMITER;
+        }
         Matcher matched = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         if (matched.find()) {
@@ -37,7 +47,11 @@ public class Formula {
         return DEFAULT_DELIMITER;
     }
 
-    public int sum() {
+    private int sum() {
         return numbers.sum();
+    }
+
+    public int getResult() {
+        return result;
     }
 }
