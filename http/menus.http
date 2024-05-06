@@ -5,12 +5,33 @@ Content-Type: application/json
 {
   "name": "후라이드+후라이드",
   "price": 19000,
-  "menuGroupId": "f1860abc-2ea1-411b-bd4a-baa44f0d5580",
+  "menuGroupId": "dc387795-99ad-4dc3-adbd-b830aa15cc39",
   "displayed": true,
   "menuProducts": [
     {
       "productId": "3b528244-34f7-406b-bb7e-690912f66b10",
       "quantity": 2
+    }
+  ]
+}
+
+###
+POST {{host}}/api/menus
+Content-Type: application/json
+
+{
+  "name": "후라이드+양념",
+  "price": 19000,
+  "menuGroupId": "f1860abc-2ea1-411b-bd4a-baa44f0d5580",
+  "displayed": true,
+  "menuProducts": [
+    {
+      "productId": "3b528244-34f7-406b-bb7e-690912f66b10",
+      "quantity": 1
+    },
+    {
+      "productId": "c5ee925c-3dbb-4941-b825-021446f24446",
+      "quantity": 1
     }
   ]
 }
