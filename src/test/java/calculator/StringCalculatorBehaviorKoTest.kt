@@ -3,6 +3,8 @@ package calculator
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.data.forAll
+import io.kotest.data.row
 import io.kotest.matchers.ints.shouldBeExactly
 
 class StringCalculatorBehaviorKoTest : BehaviorSpec({
@@ -15,8 +17,11 @@ class StringCalculatorBehaviorKoTest : BehaviorSpec({
 
     Given("입력 값이 빈 문자열 또는 null") {
         When("문자열 계산기 실행 시") {
-            listOf("", null).forEach { text ->
-                Then("0을 반환해야 한다.") {
+            Then("0을 반환해야 한다.") {
+                forAll(
+                    row(""),
+                    row(null),
+                ) { text ->
                     calculator.add(text) shouldBeExactly 0
                 }
             }
@@ -25,8 +30,13 @@ class StringCalculatorBehaviorKoTest : BehaviorSpec({
 
     Given("입력 값이 숫자 하나") {
         When("문자열 계산기를 실행 시") {
-            listOf("1", "11", "0", "99").forEach { text ->
-                Then("해당 숫자 $text 를 반환.") {
+            Then("해당 숫자를 반환.") {
+                forAll(
+                    row("1"),
+                    row("11"),
+                    row("0"),
+                    row("99"),
+                ) { text ->
                     calculator.add(text) shouldBeExactly text.toInt()
                 }
             }
@@ -51,9 +61,12 @@ class StringCalculatorBehaviorKoTest : BehaviorSpec({
 
     Given("//와 \\n 문자 사이에 커스텀 구분자를 지정") {
         When("문자열 계산기를 실행 시") {
-            listOf("//.\n1.2.3", "//;\n1;2;3").forEach {
+            forAll(
+                row("//.\n1.2.3"),
+                row("//;\n1;2;3"),
+            ) { text ->
                 Then("숫자의 합을 반환") {
-                    calculator.add(it) shouldBeExactly 6
+                    calculator.add(text) shouldBeExactly 6
                 }
             }
         }
@@ -71,10 +84,13 @@ class StringCalculatorBehaviorKoTest : BehaviorSpec({
 
     Given("숫자가 아닌 수를 전달하는 경우") {
         When("문자열 계산기를 실행 시") {
-            listOf("//.\naaa", "//;\n;;").forEach {
-                Then("IllegalArgument 예외 처리를 한다.") {
+            Then("IllegalArgument 예외 처리를 한다.") {
+                forAll(
+                    row("//.\naaa"),
+                    row("//;\n;;"),
+                ) { text ->
                     shouldThrowExactly<IllegalArgumentException> {
-                        calculator.add(it)
+                        calculator.add(text)
                     }
                 }
             }
