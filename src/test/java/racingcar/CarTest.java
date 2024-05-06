@@ -12,7 +12,7 @@ class CarTest {
     @DisplayName("자동차의 이름은 5글자를 넘길 수 없다")
     void 자동차의_이름은_5글자를_넘길_수_없다() {
         assertThatThrownBy(() -> {
-            Car car = new Car("메르세데스 벤츠");
+            Car car = new Car("그란투리스모");
         }).isInstanceOf(IllegalArgumentException.class);
     }
 
