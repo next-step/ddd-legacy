@@ -2,22 +2,37 @@ package stringcalculator;
 
 public class PositiveNumber {
 
-    private static final String POSITIVE_INTEGER_REGEX = "^\\d+$";
-    private static final String NEGATIVE_INTEGER_NOT_ALLOWED = "음수는 입력할 수 없습니다 %s";
+    private static final String NEGATIVE_INTEGER_NOT_ALLOWED = "음수는 입력할 수 없습니다 (입력값: %s)";
+    private static final String INVALID_INPUT_MESSAGE = "숫자를 입력해주세요 (입력값: %s)";
+
+    public static final PositiveNumber ZERO = new PositiveNumber(0);
 
     private final int number;
 
-    private PositiveNumber(final int number) {
+    public PositiveNumber(final int number) {
+        checkPositive(number);
         this.number = number;
     }
 
     public static PositiveNumber byString(String number) {
-        checkPositive(number);
+        checkPositive(parseInt(number));
         return new PositiveNumber(Integer.parseInt(number));
     }
 
-    private static void checkPositive(String number) {
-        if (!number.matches(POSITIVE_INTEGER_REGEX)) {
+    private static int parseInt(String number) {
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(String.format(INVALID_INPUT_MESSAGE, number));
+        }
+    }
+
+    public PositiveNumber add(PositiveNumber other) {
+        return new PositiveNumber(number + other.number);
+    }
+
+    private static void checkPositive(int number) {
+        if (number < 0) {
             throw new IllegalArgumentException(String.format(NEGATIVE_INTEGER_NOT_ALLOWED, number));
         }
     }
