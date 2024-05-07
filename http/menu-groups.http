@@ -1,4 +1,4 @@
-###
+### 메뉴 그륩 생성
 POST {{host}}/api/menu-groups
 Content-Type: application/json
 
@@ -6,5 +6,5 @@ Content-Type: application/json
   "name": "추천메뉴"
 }
 
-###
+### 메뉴 그룹 전체 조회
 GET {{host}}/api/menu-groups
