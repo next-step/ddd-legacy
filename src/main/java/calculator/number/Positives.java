@@ -11,22 +11,19 @@ public class Positives {
     public static final Positives EMPTY = new Positives(Collections.emptyList());
 
     public Positives(String[] texts) {
-        this.positives = Arrays.stream(texts)
-                .map(Positive::new)
-                .toList();
+        this(of(texts));
     }
 
     public Positives(List<Positive> positives) {
         this.positives = positives;
     }
 
-    public int sum() {
+    public Positive sum() {
         return this.positives.stream()
-                .mapToInt(Positive::getIntValue)
-                .sum();
+                .reduce(Positive.ZERO, Positive::add);
     }
 
-    private List<Positive> convert(String[] texts) {
+    public static List<Positive> of(String[] texts) {
         return Arrays.stream(texts)
                 .map(Positive::new)
                 .toList();
