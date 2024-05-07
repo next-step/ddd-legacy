@@ -14,7 +14,7 @@ public class NumberExtractor {
         if (text == null || text.isEmpty()) {
             return new Numbers(Collections.emptyList());
         }
-        Delimiter delimiter = new Delimiter(text);
+        Delimiter delimiter = Delimiter.of(text);
         String numberText = extractNumberText(text);
 
         return delimiter.split(numberText)
