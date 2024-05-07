@@ -1,9 +1,9 @@
 package calculator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TextExtractorFactory {
+
   private final List<TextExtractor> textExtractors;
 
   public TextExtractorFactory(TextExtractor... textExtractors) {
@@ -12,7 +12,7 @@ public class TextExtractorFactory {
 
   public TextExtractor get(String text) {
     for (TextExtractor textExtractor : textExtractors) {
-      if(textExtractor.isSupport(text)) {
+      if (textExtractor.isSupport(text)) {
         return textExtractor;
       }
     }

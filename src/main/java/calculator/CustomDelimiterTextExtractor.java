@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class CustomDelimiterTextExtractor implements TextExtractor {
+
   private final static String REGEX_PATTERN = "//(.)\n(.*)";
   private final Pattern pattern;
 
