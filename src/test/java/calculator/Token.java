@@ -1,18 +1,18 @@
 package calculator;
 
-public class PositiveInteger {
+public class Token {
 
-    private int number;
+    private final int positiveInteger;
 
-    public PositiveInteger(String strNumber) {
+    public Token(String strNumber) {
         this(parseInt(strNumber));
     }
 
-    public PositiveInteger(int number) {
-        if (number < 0) {
+    public Token(int positiveInteger) {
+        if (positiveInteger < 0) {
             throw new IllegalArgumentException("양수만 허용됩니다");
         }
-        this.number = number;
+        this.positiveInteger = positiveInteger;
     }
 
     private static int parseInt(String strNumber) {
@@ -24,6 +24,6 @@ public class PositiveInteger {
     }
 
     public int value() {
-        return number;
+        return positiveInteger;
     }
 }
