@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 
 @TestConfiguration
 public class MenuGroupTestContextConfiguration {
-    @MockBean
+//    @MockBean
     private MenuGroupRepository menuGroupRepository;
 
     @Bean

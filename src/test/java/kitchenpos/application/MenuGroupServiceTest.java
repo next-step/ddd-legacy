@@ -8,10 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 
 import java.util.Arrays;
 import java.util.List;
@@ -19,16 +17,12 @@ import java.util.List;
 import static kitchenpos.helper.MenuGroupTestHelper.메뉴카테고리_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
 
 
 @SpringBootTest
-@Import(MenuGroupTestContextConfiguration.class)
-class MenuGroupServiceTest {
+class MenuGroupServiceTest extends SetupTest{
     @Autowired
-    private MenuGroupService menuGroupService;
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
+    protected MenuGroupService menuGroupService;
 
     @BeforeEach
     void setUp() {
@@ -39,10 +33,6 @@ class MenuGroupServiceTest {
     void createMenuGroup(){
         //given
         MenuGroup requestMenuGroup = 메뉴카테고리_생성("추천메뉴");
-
-        Mockito.when(menuGroupRepository.save(any()))
-                .thenReturn(requestMenuGroup);
-
         //when
         MenuGroup createMenuGroup = menuGroupService.create(requestMenuGroup);
 
@@ -58,8 +48,10 @@ class MenuGroupServiceTest {
         MenuGroup menuGroup2 = 메뉴카테고리_생성("원플러스원메뉴");
 
         List<MenuGroup> menuGroups = Arrays.asList(menuGroup1, menuGroup2);
-        Mockito.when(menuGroupRepository.findAll())
-                .thenReturn(menuGroups);
+
+        menuGroups.forEach(a -> {
+            menuGroupService.create(a);
+        });
 
         //when
         List<MenuGroup> menuGroupList = menuGroupService.findAll();
