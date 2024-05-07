@@ -1,5 +1,6 @@
-package kitchenpos.application;
+package kitchenpos.application.menu;
 
+import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,13 +14,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+@DisplayName("Application: 메뉴 그룹 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
 
@@ -33,9 +34,7 @@ class MenuGroupServiceTest {
 
     @BeforeEach
     void setup() {
-        menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("메뉴 그룹");
+        menuGroup = MenuTestFixture.aMenuGroup();
     }
 
     @Nested
