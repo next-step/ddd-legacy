@@ -7,25 +7,33 @@ public class PositiveNumber {
         this.number = number;
     }
 
-    private static void validateNumberFormatAndPositiveNumber(String numberString) {
-        try {
-            int num = Integer.parseInt(numberString);
+    public static PositiveNumber from(String numberString){
+        validate(numberString);
 
-            if (num < 0) {
-                throw new RuntimeException("numberString included negative number");
-            }
-        } catch (NumberFormatException e) {
+        return new PositiveNumber(Integer.parseInt(numberString));
+    }
+
+    private static void validate(String numberString) {
+        int number = convertStringToNumber(numberString);
+
+        validatePositiveNumber(number);
+    }
+
+    private static void validatePositiveNumber(int number) {
+        if (number < 0) {
+            throw new RuntimeException("numberString included negative number");
+        }
+    }
+
+    private static int convertStringToNumber(String numberString){
+        try {
+            return Integer.parseInt(numberString);
+        } catch (Exception e) {
             throw new IllegalArgumentException("numberString is invalid value. please input string type number (numberString : "+numberString+")");
         }
     }
 
     public int getNumber() {
         return number;
-    }
-
-    public static PositiveNumber from(String numberString){
-        validateNumberFormatAndPositiveNumber(numberString);
-
-        return new PositiveNumber(Integer.parseInt(numberString));
     }
 }
