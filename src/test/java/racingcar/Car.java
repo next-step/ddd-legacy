@@ -20,7 +20,7 @@ class Car {
 
   private static void validateCarName(final String name) {
     if (name.length() > NAME_LENGTH_LIMIT) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException(String.format("이름의 글자수가 %d 를 넘었습니다.", NAME_LENGTH_LIMIT));
     }
   }
 
@@ -28,5 +28,9 @@ class Car {
     if (condition >= MOVING_CONDITION) {
       this.position += MOVING_POSITION_STEP;
     }
+  }
+
+  public int getPosition() {
+    return position;
   }
 }
