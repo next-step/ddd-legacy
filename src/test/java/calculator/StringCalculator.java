@@ -8,11 +8,11 @@ public class StringCalculator {
     public static final String PREFIX_OF_CUSTOM_DELIMITER = "//";
     public static final String SUFFIX_OF_CUSTOM_DELIMITER = "\n";
 
-    public static int calculate(String input) {
-        if (input == null || input.isEmpty()) {
+    public static int calculate(String expression) {
+        if (expression == null || expression.isEmpty()) {
             return 0;
         }
-        return sum(toNumbers(split(input)));
+        return sum(toNumbers(split(expression)));
     }
 
     private static int sum(int[] numbers) {
@@ -26,25 +26,25 @@ public class StringCalculator {
             .toArray();
     }
 
-    private static String[] split(String input) {
-        String delimiter = extractDelimiter(input);
-        input = removeDelimiter(input);
-        return input.split(delimiter);
+    private static String[] split(String expression) {
+        String delimiter = extractDelimiter(expression);
+        expression = removeDelimiter(expression);
+        return expression.split(delimiter);
     }
 
-    private static String extractDelimiter(String input) {
-        if (!input.startsWith(PREFIX_OF_CUSTOM_DELIMITER)) {
+    private static String extractDelimiter(String expression) {
+        if (!expression.startsWith(PREFIX_OF_CUSTOM_DELIMITER)) {
             return DEFAULT_DELIMITER;
         }
-        int endIndex = input.indexOf(SUFFIX_OF_CUSTOM_DELIMITER);
-        return input.substring(PREFIX_OF_CUSTOM_DELIMITER.length(), endIndex);
+        int endIndex = expression.indexOf(SUFFIX_OF_CUSTOM_DELIMITER);
+        return expression.substring(PREFIX_OF_CUSTOM_DELIMITER.length(), endIndex);
     }
 
-    private static String removeDelimiter(String input) {
-        if (!input.startsWith(PREFIX_OF_CUSTOM_DELIMITER)) {
-            return input;
+    private static String removeDelimiter(String expression) {
+        if (!expression.startsWith(PREFIX_OF_CUSTOM_DELIMITER)) {
+            return expression;
         }
-        return input.substring(input.indexOf(SUFFIX_OF_CUSTOM_DELIMITER) + 1);
+        return expression.substring(expression.indexOf(SUFFIX_OF_CUSTOM_DELIMITER) + 1);
     }
 
     private static int toPositive(String strNumber) {
