@@ -56,7 +56,7 @@ docker compose -p kitchenpos up -d
   - [ ] 주문 요청시 메뉴의 가격이 주문요청의 가격과 동일해야 주문이 가능하다
   - [ ] 매장식사의 주문 완료 시 해당 주문 테이블에 완료된 주문이 없을 경우에는 미점유로 상태가 변경된다
   - [ ] 주문 상태는 다음 중 하나다 WAITING, ACCEPTED, SERVED, DELIVERING, DELIVERED, COMPLETED
-
+    - [ ] <img width="1020" alt="Screenshot 2024-05-07 at 8 44 43 PM" src="https://github.com/next-step/ddd-legacy/assets/124428341/b2d9af40-211d-443b-873d-6a5791d9c31a">
 - 주문 테이블
   - [ ] 방문해서 식사하는(EAT_IN) 손님들을 지정하기 위한 매장식사 전용 테이블
   - [ ] 주문 테이블에는 손님의 수용가능 숫자와 사용 중인지 여부를 지정할 수 있다
