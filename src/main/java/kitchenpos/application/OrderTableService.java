@@ -64,7 +64,7 @@ public class OrderTableService {
         }
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
-        //점유중이지 않을 경우에만 변경 못한다?
+
         if (!orderTable.isOccupied()) {
             throw new IllegalStateException();
         }
