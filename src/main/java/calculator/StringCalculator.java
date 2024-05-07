@@ -1,6 +1,7 @@
 package calculator;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -11,15 +12,12 @@ public class StringCalculator {
       return 0;
     }
     String[] tokens;
-    Integer[] values;
     Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
     if (m.find()) {
       String customDelimiter = m.group(1);
       tokens = m.group(2).split(customDelimiter);
-      values = Arrays.stream(tokens)
-          .map(Integer::parseInt)
-          .toArray(Integer[]::new);
-      for (Integer value : values) {
+      List<Integer> numbers = NumberConverter.convert(tokens);
+      for (Integer value : numbers) {
         if(value < 0) {
           throw new RuntimeException();
         }
@@ -29,10 +27,8 @@ public class StringCalculator {
           .sum();
     }
     tokens = text.split("[,:]");
-    values = Arrays.stream(tokens)
-        .map(Integer::parseInt)
-        .toArray(Integer[]::new);
-    for (Integer value : values) {
+    List<Integer> numbers = NumberConverter.convert(tokens);
+    for (Integer value : numbers) {
       if(value < 0) {
         throw new RuntimeException();
       }
