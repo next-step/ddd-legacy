@@ -1,10 +1,10 @@
-### 메뉴 상품의 가격 합보다 클 수 없다.
+### 메뉴의 가격은 메뉴 상품의 가격 합보다 클 수 없다.
 POST {{host}}/api/menus
 Content-Type: application/json
 
 {
   "name": "후라이드+후라이드",
-  "price": 19000,
+  "price": 200000,
   "menuGroupId": "cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded",
   "displayed": true,
   "menuProducts": [
@@ -15,12 +15,54 @@ Content-Type: application/json
   ]
 }
 
-###
+### 메뉴를 등록한다
 POST {{host}}/api/menus
 Content-Type: application/json
 
 {
   "name": "후라이드+양념",
+  "price": 19000,
+  "menuGroupId": "cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded",
+  "displayed": true,
+  "menuProducts": [
+    {
+      "productId": "3b528244-34f7-406b-bb7e-690912f66b10",
+      "quantity": 1
+    },
+    {
+      "productId": "c5ee925c-3dbb-4941-b825-021446f24446",
+      "quantity": 1
+    }
+  ]
+}
+
+### 메뉴의 이름은 공백이 될 수 있다.
+POST {{host}}/api/menus
+Content-Type: application/json
+
+{
+  "name": "",
+  "price": 19000,
+  "menuGroupId": "cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded",
+  "displayed": true,
+  "menuProducts": [
+    {
+      "productId": "3b528244-34f7-406b-bb7e-690912f66b10",
+      "quantity": 1
+    },
+    {
+      "productId": "c5ee925c-3dbb-4941-b825-021446f24446",
+      "quantity": 1
+    }
+  ]
+}
+
+### 메뉴의 이름은 비속어를 포함 할 수 없다.
+POST {{host}}/api/menus
+Content-Type: application/json
+
+{
+  "name": "ass",
   "price": 19000,
   "menuGroupId": "cbc75fae-feb0-4bb1-8be2-cb8ce5d8fded",
   "displayed": true,
@@ -44,11 +86,11 @@ Content-Type: application/json
   "price": 15000
 }
 
-###
+### 메뉴를 전시 한다.
 PUT {{host}}/api/menus/f59b1e1c-b145-440a-aa6f-6095a0e2d63b/display
 
-###
+### 메뉴를 숨김 처리 한다.
 PUT {{host}}/api/menus/f59b1e1c-b145-440a-aa6f-6095a0e2d63b/hide
 
-###
+### 메뉴 목록
 GET {{host}}/api/menus
