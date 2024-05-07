@@ -37,14 +37,6 @@ public class StringCalculatorTest {
         assertThat(result).isEqualTo(expected);
     }
 
-    @ParameterizedTest
-    @DisplayName("숫자 이외의 값 또는 음수를 전달하는 경우 RuntimeException을 throw 한다")
-    @ValueSource(strings = {"-1", "a"})
-    public void negative_or_not_number(String input) {
-        assertThatThrownBy(() -> stringCalculator.calculate(input))
-            .isInstanceOf(RuntimeException.class);
-    }
-
     @Test
     @DisplayName("커스텀 구분자를 사용할 수 있다")
     public void custom_delimiter() {

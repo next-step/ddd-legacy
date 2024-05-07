@@ -1,6 +1,7 @@
 package calculator;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class StringCalculator {
 
@@ -12,18 +13,18 @@ public class StringCalculator {
         if (expression == null || expression.isEmpty()) {
             return 0;
         }
-        return sum(toNumbers(split(expression)));
+        return sum(toPositiveIntegers(split(expression)));
     }
 
-    private int sum(int[] numbers) {
-        return Arrays.stream(numbers).sum();
+    private int sum(List<Integer> numbers) {
+        return numbers.stream().reduce(0, Integer::sum);
     }
 
-    private int[] toNumbers(String[] strNumbers) {
+    private List<Integer> toPositiveIntegers(String[] strNumbers) {
         return Arrays.stream(strNumbers)
-            .map(this::toPositive)
-            .mapToInt(Integer::intValue)
-            .toArray();
+            .map(PositiveInteger::new)
+            .map(PositiveInteger::value)
+            .toList();
     }
 
     private String[] split(String expression) {
@@ -45,21 +46,5 @@ public class StringCalculator {
             return expression;
         }
         return expression.substring(expression.indexOf(SUFFIX_OF_CUSTOM_DELIMITER) + 1);
-    }
-
-    private int toPositive(String strNumber) {
-        int number = parseInt(strNumber);
-        if (number < 0) {
-            throw new RuntimeException("음수는 입력할 수 없습니다.");
-        }
-        return number;
-    }
-
-    private int parseInt(String strNumber) {
-        try {
-            return Integer.parseInt(strNumber);
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("숫자가 아닌 값은 입력할 수 없습니다.");
-        }
     }
 }
