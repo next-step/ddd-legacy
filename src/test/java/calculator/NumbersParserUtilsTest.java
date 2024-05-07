@@ -1,5 +1,6 @@
 package calculator;
 
+import calculator.exception.IllegalDelimiterArgumentException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -32,10 +33,10 @@ class NumbersParserUtilsTest {
     }
 
     @DisplayName("유효하지 않은 구분자 형식이 입력되면 예외가 발생된다.")
-    @ValueSource(strings = {"1;2;3", "1,2;3:4", "//;\n1;2;3,4,5"})
+    @ValueSource(strings = {"1,2:3;4", "1&2&3;4;5"})
     @ParameterizedTest
     void parseBasicStrategy(String input) {
         assertThatThrownBy(() -> NumbersParserUtils.parse(input))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IllegalDelimiterArgumentException.class);
     }
 }
