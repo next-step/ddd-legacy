@@ -8,7 +8,6 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.helper.MenuGroupTestHelper.메뉴카테고리_생성;
 import static kitchenpos.helper.MenuProductTestHelper.음식메뉴_생성;
@@ -60,6 +60,7 @@ class MenuServiceTest {
     @BeforeEach
     void setUp() {
         추천메뉴 = 메뉴카테고리_생성("추천메뉴");
+
         마라탕 = 음식_생성("마라탕", BigDecimal.valueOf(10000));
         미니꿔바로우 = 음식_생성("미니꿔바로우", BigDecimal.valueOf(8000));
         콜라 = 음식_생성("콜라", BigDecimal.valueOf(3000));
@@ -204,7 +205,7 @@ class MenuServiceTest {
 
     @DisplayName("특정 메뉴의 가격을 변경한다.")
     @Test
-    void changePrice(){
+    void changePriceOfMenu(){
         //given && when
         Menu request = new Menu();
         request.setPrice(BigDecimal.valueOf(17000));
@@ -212,6 +213,51 @@ class MenuServiceTest {
 
         //then
         assertThat(changeMenu.getPrice()).isSameAs(request.getPrice());
+    }
+
+    @DisplayName("특정 메뉴의 가격을 입력하지 않고 변경할 경우 IllegalArgumentException 예외가 발생한다.")
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1000})
+    void changeNoPriceOfMenu(Integer price){
+        //given && when
+        Menu request = new Menu();
+        request.setPrice((price.equals(0) ? null : BigDecimal.valueOf(price)));
+
+        //then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.changePrice(마라세트.getId(), request));
+    }
+
+    @DisplayName("등록하지 않은 메뉴에 대한 가격을 변경할 경우 NoSuchElementException 예외가 발생한다.")
+    @Test
+    void changePriceOfNoMenu(){
+        //given && when
+        Menu 없는메뉴 = new Menu();
+        없는메뉴.setId(UUID.randomUUID());
+
+        Menu request = new Menu();
+        request.setPrice(BigDecimal.valueOf(10000));
+
+        //then
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> menuService.changePrice(없는메뉴.getId(), request));
+    }
+
+    @DisplayName("특정 메뉴의 변경하려는 가격이 단일 음식들 종 금액보다 비싼 경우 IllegalArgumentException 예외가 발생한다.")
+    @Test
+    void changePriceExpensiveMoreThenSumPriceOfMenuProducts(){
+        //given && when
+        BigDecimal totalPriceOfProducts = 마라세트.getMenuProducts().stream()
+                .map(MenuProduct::getProduct)
+                .map(Product::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Menu request = new Menu();
+        request.setPrice(totalPriceOfProducts.add(BigDecimal.valueOf(1000)));
+
+        //then
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> menuService.changePrice(마라세트.getId(), request));
     }
 
     @DisplayName("특정 메뉴의 노출 상태를 판매중으로 변경한다.")
@@ -224,6 +270,43 @@ class MenuServiceTest {
         assertThat(displayMenu.isDisplayed()).isSameAs(true);
     }
 
+    @DisplayName("등록되지 않은 메뉴의 노출 상태를 판매중으로 변경할 경우 NoSuchElementException 예외가 발생한다.")
+    @Test
+    void displayOfNoMenu(){
+        //given && when
+        Menu 없는메뉴 = new Menu();
+        없는메뉴.setId(UUID.randomUUID());
+
+        //then
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> menuService.display(없는메뉴.getId()));
+    }
+
+    @DisplayName("단일 음식들 종 금액보다 비싼 메뉴의 노출 상태를 판매중으로 변경할 경우 IllegalArgumentException 예외가 발생한다.")
+    @Test
+    void displayMenuExpensiveMoreThenSumPriceOfMenuProducts(){
+        //given && when
+        Menu 단일음식총금액보다비싼메뉴 = new Menu();
+        단일음식총금액보다비싼메뉴.setId(UUID.randomUUID());
+        단일음식총금액보다비싼메뉴.setMenuGroup(추천메뉴);
+        단일음식총금액보다비싼메뉴.setMenuGroupId(추천메뉴.getId());
+        단일음식총금액보다비싼메뉴.setMenuProducts(Arrays.asList(마라탕메뉴, 미니꿔바로우메뉴));
+
+        BigDecimal totalPriceOfProducts = 단일음식총금액보다비싼메뉴.getMenuProducts().stream()
+                .map(MenuProduct::getProduct)
+                .map(Product::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        단일음식총금액보다비싼메뉴.setPrice(totalPriceOfProducts.add(BigDecimal.valueOf(1000)));
+
+        Mockito.when(menuRepository.findById(단일음식총금액보다비싼메뉴.getId()))
+                .thenReturn(Optional.of(단일음식총금액보다비싼메뉴));
+
+        //then
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> menuService.display(단일음식총금액보다비싼메뉴.getId()));
+    }
+
     @DisplayName("특정 메뉴의 노출 상태를 판매중단으로 변경한다.")
     @Test
     void hide(){
@@ -232,6 +315,18 @@ class MenuServiceTest {
 
         //then
         assertThat(hideMenu.isDisplayed()).isSameAs(false);
+    }
+
+    @DisplayName("등록되지 않은 메뉴의 노출 상태를 판매중단으로 변경할 경우 NoSuchElementException 예외가 발생한다.")
+    @Test
+    void hideOfNoMenu(){
+        //given && when
+        Menu 없는메뉴 = new Menu();
+        없는메뉴.setId(UUID.randomUUID());
+
+        //then
+        assertThatExceptionOfType(NoSuchElementException.class)
+                .isThrownBy(() -> menuService.hide(없는메뉴.getId()));
     }
 
     @DisplayName("모든 메뉴 리스트를 조회한다.")
