@@ -1,5 +1,7 @@
 package calculator;
 
+import calculator.exception.InvalidNumberFormatException;
+import calculator.exception.NegativeNumberException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,9 +9,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static calculator.Number.NEGATIVE_NUMBER_EXCEPTION;
-import static calculator.Number.PARSING_INTEGER_EXCEPTION;
 import static calculator.Number.ZERO_NUMBER;
+import static calculator.exception.InvalidNumberFormatException.PARSING_INTEGER_EXCEPTION;
+import static calculator.exception.NegativeNumberException.NEGATIVE_NUMBER_EXCEPTION;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("음이 아닌 숫자 클래스를 위한 테스트")
@@ -19,7 +21,7 @@ class NumberTest {
     @ParameterizedTest
     void invalidParsing(String value) {
         Assertions.assertThatThrownBy(() -> Number.from(value))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(InvalidNumberFormatException.class)
                 .hasMessageContaining(PARSING_INTEGER_EXCEPTION);
     }
 
@@ -28,7 +30,7 @@ class NumberTest {
     @ParameterizedTest
     void invalidNegativeNumber(String value) {
         Assertions.assertThatThrownBy(() -> Number.from(value))
-                .isInstanceOf(IllegalArgumentException.class)
+                .isInstanceOf(NegativeNumberException.class)
                 .hasMessageContaining(NEGATIVE_NUMBER_EXCEPTION);
     }
 
