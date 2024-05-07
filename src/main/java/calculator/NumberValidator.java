@@ -1,6 +1,6 @@
 package calculator;
 
-interface NumberValidator {
+public interface NumberValidator {
 
   void validate(final Number number);
 }
