@@ -2,14 +2,12 @@ package racingcar;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import racingcar.strategy.StopStrategy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 public class CarTest {
-
-  public static final int MOVING_CONDITION = 10;
-  public static final int NOT_MOVING_CONDITION = 1;
 
   @DisplayName("자동차 이름의 글자 수를 제한한다.")
   @Test
@@ -25,7 +23,7 @@ public class CarTest {
   void move() {
     Car car = Car.createCar("Simon", 0);
 
-    car.move(MOVING_CONDITION);
+    car.move(() -> true);
 
     assertThat(car.getPosition()).isEqualTo(1);
   }
@@ -35,7 +33,7 @@ public class CarTest {
   void stop() {
     Car car = Car.createCar("Simon", 0);
 
-    car.move(NOT_MOVING_CONDITION);
+    car.move(new StopStrategy());
 
     assertThat(car.getPosition()).isEqualTo(0);
   }
