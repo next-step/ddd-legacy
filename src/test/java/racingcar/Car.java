@@ -1,5 +1,7 @@
 package racingcar;
 
+import racingcar.strategy.MovingStrategy;
+
 class Car {
   public static final int NAME_LENGTH_LIMIT = 5;
   public static final int MOVING_CONDITION = 4;
@@ -26,6 +28,12 @@ class Car {
 
   public void move(final int condition) {
     if (condition >= MOVING_CONDITION) {
+      this.position += MOVING_POSITION_STEP;
+    }
+  }
+
+  public void move(final MovingStrategy movingStrategy) {
+    if (movingStrategy.movable()) {
       this.position += MOVING_POSITION_STEP;
     }
   }
