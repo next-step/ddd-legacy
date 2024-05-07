@@ -1,4 +1,4 @@
-###
+### 상품을 등록한다.
 POST {{host}}/api/products
 Content-Type: application/json
 
@@ -7,7 +7,34 @@ Content-Type: application/json
   "price": 17000
 }
 
-###
+### 상품의 이름은 비속어가 될 수 없다.
+POST {{host}}/api/products
+Content-Type: application/json
+
+{
+  "name": "ass",
+  "price": 17000
+}
+
+### 상품의 이름은 공백이 될 수 있다.
+POST {{host}}/api/products
+Content-Type: application/json
+
+{
+  "name": "",
+  "price": 17000
+}
+
+### 상품의 가격은 0원 이상이어야 한다.
+POST {{host}}/api/products
+Content-Type: application/json
+
+{
+  "name": "마늘치킨",
+  "price": 0
+}
+
+### 상품의 가격을 변경한다.
 PUT {{host}}/api/products/3b528244-34f7-406b-bb7e-690912f66b10/price
 Content-Type: application/json
 
@@ -15,5 +42,13 @@ Content-Type: application/json
   "price": 18000
 }
 
-###
+### 변경하려는 상품의 가격은 0원 이상이어야 한다
+PUT {{host}}/api/products/3b528244-34f7-406b-bb7e-690912f66b10/price
+Content-Type: application/json
+
+{
+  "price": 0
+}
+
+### 상품 목록
 GET {{host}}/api/products
