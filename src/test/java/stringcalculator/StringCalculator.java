@@ -8,8 +8,8 @@ public class StringCalculator {
 
     public StringCalculator(String text){
         StringValidation stringValidation = new StringValidation(text);
-        String parseReulst = stringValidation.validateNum();
-        this.parsedNum = new DelimiterParser().parseDelimiter(parseReulst);
+        String parseReulst = stringValidation.getText();
+        this.parsedNum = new DelimiterParser(parseReulst).getParsedNumber();
     }
 
     public int add() {

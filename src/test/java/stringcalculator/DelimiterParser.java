@@ -6,8 +6,10 @@ import java.util.regex.Pattern;
 public class DelimiterParser {
 
     private final Pattern regexPattern = Pattern.compile(ValidationRegex.CUSTOM_DELIMITER_REGEX.getRegex());
+    private String[] parsedNumbers;
 
-    public DelimiterParser() {
+    public DelimiterParser(String text) {
+        this.parsedNumbers = parseDelimiter(text);
     }
 
     public String[] parseDelimiter(String text) {
@@ -23,6 +25,10 @@ public class DelimiterParser {
 
         return parsedNumbers;
 
+    }
+
+    public String[] getParsedNumber(){
+        return parsedNumbers;
     }
 
 }
