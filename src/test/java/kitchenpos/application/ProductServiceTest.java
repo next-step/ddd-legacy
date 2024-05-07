@@ -3,11 +3,8 @@ package kitchenpos.application;
 import kitchenpos.config.ProductTestContextConfiguration;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,7 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -34,22 +30,10 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 @SpringBootTest
 @Import(ProductTestContextConfiguration.class)
-class ProductServiceTest {
+class ProductServiceTest extends SetupTest{
     @Autowired
     private ProductService productService;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private MenuRepository menuRepository;
-
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
-
     private Product 미니꿔바로우;
-
-    private List<Menu> 미니꿔바로우포함_메뉴들 = new ArrayList<>();
 
     @BeforeEach
     void setUp() {
@@ -74,8 +58,6 @@ class ProductServiceTest {
 
         Menu 마라세트 = 메뉴_생성(추천메뉴, "마라세트", totalPriceOfProducts.subtract(BigDecimal.valueOf(1000)), menuProducts);
         menuRepository.save(마라세트);
-
-        미니꿔바로우포함_메뉴들 = Arrays.asList(마라세트);
     }
 
     @DisplayName("음식을 등록한다.")
