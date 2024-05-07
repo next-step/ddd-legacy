@@ -5,13 +5,14 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 public class MenuTestHelper {
+
     public static Menu 메뉴_생성(MenuGroup menuGroup, String name, BigDecimal price, List<MenuProduct> menuProducts){
         Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
         menu.setMenuGroup(menuGroup);
         menu.setMenuGroupId(menuGroup.getId());
         menu.setName(name);
