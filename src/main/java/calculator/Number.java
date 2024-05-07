@@ -3,6 +3,7 @@ package calculator;
 import java.util.Objects;
 
 public class Number {
+
   public static Number ZERO = new Number(0);
   private final Integer value;
 
@@ -11,9 +12,9 @@ public class Number {
   }
 
   public static Number create(NumberValidator numberValidator, String value) {
-      Number number = create(value);
-      numberValidator.validate(number);
-      return number;
+    Number number = create(value);
+    numberValidator.validate(number);
+    return number;
   }
 
   public static Number create(String value) {

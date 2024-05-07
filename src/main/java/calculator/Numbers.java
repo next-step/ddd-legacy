@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Numbers {
+
   private final List<Number> numbers;
 
   private Numbers(List<Number> numbers) {
