@@ -11,21 +11,10 @@ class NumberTest : DescribeSpec({
                 it("IllegalArgumentException을 던진다") {
                     val exception =
                         shouldThrow<IllegalArgumentException> {
-                            Number.create("-1")
+                            Number.create(-1)
                         }
 
                     exception.message shouldBe "숫자는 0보다 커야합니다."
-                }
-            }
-
-            context("숫자가 아닌 문자열이 주어지면") {
-                it("IllegalArgumentException을 던진다") {
-                    val exception =
-                        shouldThrow<IllegalArgumentException> {
-                            Number.create("a")
-                        }
-
-                    exception.message shouldBe "숫자가 아닙니다."
                 }
             }
         }

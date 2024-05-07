@@ -1,5 +1,6 @@
 package calculator
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 
@@ -7,6 +8,17 @@ class StringCalculatorTest : DescribeSpec({
 
     describe("StringCalculator 클래스의") {
         describe("add 메소드는") {
+            context("숫자가 아닌 문자열이 주어지면") {
+                it("IllegalArgumentException을 던진다") {
+                    val exception =
+                        shouldThrow<IllegalArgumentException> {
+                            StringCalculator().add("1,2,a")
+                        }
+
+                    exception.message shouldBe "숫자가 아닌 값이 포함되어 있습니다."
+                }
+            }
+
             context("빈 문자열이 주어지면") {
                 it("0을 반환한다") {
                     val calculator = StringCalculator()
