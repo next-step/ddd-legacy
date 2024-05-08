@@ -38,7 +38,7 @@ public class StringCalculator {
 
     private static int sum(String[] values) {
         return Arrays.stream(values)
-                .mapToInt(val -> OnlyPositiveNumber.of(val).number())
+                .mapToInt(val -> PositiveNumber.of(val).number())
                 .sum();
     }
 }
