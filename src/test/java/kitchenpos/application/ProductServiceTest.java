@@ -13,6 +13,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.math.BigDecimal;
+
 import static kitchenpos.fixture.ProductFixture.NAME_강정치킨;
 import static kitchenpos.fixture.ProductFixture.PRICE_17000;
 import static kitchenpos.fixture.ProductFixture.productCreateRequest;
@@ -78,6 +80,32 @@ class ProductServiceTest {
         // when
         when(purgomalumClient.containsProfanity(name)).thenReturn(true);
 
+        // then
+        assertThatThrownBy(() -> productService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품을 등록할때, 가격이 공백면 예외가 발생한다.")
+    @NullSource
+    @ParameterizedTest
+    void createProduct_nullPriceException(BigDecimal price) {
+        // given
+        Product request = productCreateRequest(NAME_강정치킨, price);
+
+        // when
+        // then
+        assertThatThrownBy(() -> productService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품을 등록할때, 가격이 0원보다 작으면 예외가 발생한다.")
+    @ValueSource(longs = {-1, -1000, -9999999})
+    @ParameterizedTest
+    void createProduct_lessThenZeroPriceException(long price) {
+        // given
+        Product request = productCreateRequest(NAME_강정치킨, BigDecimal.valueOf(price));
+
+        // when
         // then
         assertThatThrownBy(() -> productService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
