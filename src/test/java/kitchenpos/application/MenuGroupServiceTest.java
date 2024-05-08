@@ -43,4 +43,17 @@ class MenuGroupServiceTest {
         assertThat(createdMenuGroup.getId()).isNotNull();
         assertThat(createdMenuGroup.getName()).isEqualTo(request.getName());
     }
+
+    @DisplayName("메뉴그룹을 등록할 때, 이름이 공백이면 예외가 발생한다.")
+    @NullAndEmptySource
+    @ParameterizedTest
+    void creatMenuGroup_nullOrEmptyNameException(String name) {
+        // given
+        MenuGroup request = createMenuGroupRequest(name);
+
+        // when
+        // then
+        assertThatThrownBy(() -> menuGroupService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
