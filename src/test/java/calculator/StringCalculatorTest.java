@@ -57,4 +57,10 @@ public class StringCalculatorTest {
 			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("Character Not Allowed: *");
 	}
+
+	@DisplayName("//와 \\n 사이에 커스텀 구분자를 지정할 수 있다.")
+	@Test
+	void customDelimiter() {
+		assertThat(stringCalculator.calculate("//;\n4;5;6,7:8")).isEqualTo(30);
+	}
 }
