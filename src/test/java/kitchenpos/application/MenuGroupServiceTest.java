@@ -1,38 +1,38 @@
 package kitchenpos.application;
 
-import kitchenpos.config.MenuGroupTestContextConfiguration;
+import jakarta.transaction.Transactional;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.helper.MenuGroupTestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static kitchenpos.helper.MenuGroupTestHelper.메뉴카테고리_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-
-@SpringBootTest
+@Transactional
 class MenuGroupServiceTest extends SetupTest{
     @Autowired
-    protected MenuGroupService menuGroupService;
+    private MenuGroupService menuGroupService;
 
     @BeforeEach
     void setUp() {
+        super.setUp();
     }
 
     @DisplayName("메뉴 카테고리를 생성한다.")
     @Test
     void createMenuGroup(){
         //given
-        MenuGroup requestMenuGroup = 메뉴카테고리_생성("추천메뉴");
+        MenuGroup requestMenuGroup = new MenuGroup();
+        requestMenuGroup.setName("추천메뉴");
+
         //when
         MenuGroup createMenuGroup = menuGroupService.create(requestMenuGroup);
 
@@ -44,14 +44,10 @@ class MenuGroupServiceTest extends SetupTest{
     @Test
     void getAllMenuGroup(){
         //given
-        MenuGroup menuGroup1 = 메뉴카테고리_생성("추천메뉴");
-        MenuGroup menuGroup2 = 메뉴카테고리_생성("원플러스원메뉴");
+        MenuGroup menuGroup1 = MenuGroupTestHelper.메뉴카테고리_생성("추천메뉴");
+        MenuGroup menuGroup2 = MenuGroupTestHelper.메뉴카테고리_생성("원플러스원메뉴");
 
         List<MenuGroup> menuGroups = Arrays.asList(menuGroup1, menuGroup2);
-
-        menuGroups.forEach(a -> {
-            menuGroupService.create(a);
-        });
 
         //when
         List<MenuGroup> menuGroupList = menuGroupService.findAll();

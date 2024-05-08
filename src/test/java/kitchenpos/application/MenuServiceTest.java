@@ -1,21 +1,21 @@
 package kitchenpos.application;
 
+import jakarta.transaction.Transactional;
 import kitchenpos.config.MenuTestContextConfiguration;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
-import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.helper.MenuGroupTestHelper;
+import kitchenpos.helper.MenuProductTestHelper;
+import kitchenpos.helper.MenuTestHelper;
+import kitchenpos.helper.ProductTestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.math.BigDecimal;
@@ -23,29 +23,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.helper.MenuGroupTestHelper.메뉴카테고리_생성;
-import static kitchenpos.helper.MenuProductTestHelper.음식메뉴_생성;
-import static kitchenpos.helper.MenuTestHelper.메뉴_생성;
-import static kitchenpos.helper.ProductTestHelper.음식_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
 
-
-@SpringBootTest
+@Transactional
 @Import(MenuTestContextConfiguration.class)
-class MenuServiceTest {
+class MenuServiceTest extends SetupTest{
     @Autowired
     private MenuService menuService;
-    @Autowired
-    private MenuRepository menuRepository;
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
-    @Autowired
-    private ProductRepository productRepository;
+
     private MenuGroup 추천메뉴;
     private MenuProduct 마라탕메뉴;
     private MenuProduct 미니꿔바로우메뉴;
@@ -59,53 +47,34 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
-        추천메뉴 = 메뉴카테고리_생성("추천메뉴");
+        super.setUp();
 
-        마라탕 = 음식_생성("마라탕", BigDecimal.valueOf(10000));
-        미니꿔바로우 = 음식_생성("미니꿔바로우", BigDecimal.valueOf(8000));
-        콜라 = 음식_생성("콜라", BigDecimal.valueOf(3000));
+        추천메뉴 = MenuGroupTestHelper.메뉴카테고리_생성("추천메뉴");
 
-        마라탕메뉴 = 음식메뉴_생성(마라탕, 1);
-        미니꿔바로우메뉴 = 음식메뉴_생성(미니꿔바로우, 1);
-        콜라메뉴 = 음식메뉴_생성(콜라, 1);
+        마라탕 = ProductTestHelper.음식_생성("마라탕", BigDecimal.valueOf(10000));
+        미니꿔바로우 = ProductTestHelper.음식_생성("미니꿔바로우", BigDecimal.valueOf(8000));
+        콜라 = ProductTestHelper.음식_생성("콜라", BigDecimal.valueOf(3000));
 
-        마라세트 = 메뉴_생성(추천메뉴, "마라세트", BigDecimal.valueOf(16000), Arrays.asList(마라탕메뉴, 미니꿔바로우메뉴));
+        마라탕메뉴 = MenuProductTestHelper.음식메뉴_생성(마라탕, 1);
+        미니꿔바로우메뉴 = MenuProductTestHelper.음식메뉴_생성(미니꿔바로우, 1);
+        콜라메뉴 = MenuProductTestHelper.음식메뉴_생성(콜라, 1);
+
+        마라세트 = MenuTestHelper.메뉴_생성(추천메뉴, "마라세트", BigDecimal.valueOf(16000), Arrays.asList(마라탕메뉴, 미니꿔바로우메뉴), true);
 
         메뉴들.add(마라세트);
-
-        Mockito.when(menuGroupRepository.findById(추천메뉴.getId()))
-                .thenReturn(Optional.of(추천메뉴));
-
-        Mockito.when(productRepository.findById(마라탕.getId()))
-                .thenReturn(Optional.of(마라탕));
-
-        Mockito.when(productRepository.findById(미니꿔바로우.getId()))
-                .thenReturn(Optional.of(미니꿔바로우));
-
-        Mockito.when(productRepository.findById(콜라.getId()))
-                .thenReturn(Optional.of(콜라));
-
-        Mockito.when(productRepository.findAllByIdIn(Arrays.asList(마라탕.getId(), 콜라.getId())))
-                .thenReturn(Arrays.asList(마라탕, 콜라));
-
-        Mockito.when(productRepository.findAllByIdIn(Arrays.asList(마라탕.getId(), 미니꿔바로우.getId())))
-                .thenReturn(Arrays.asList(마라탕, 미니꿔바로우));
-
-        Mockito.when(menuRepository.findById(마라세트.getId()))
-                .thenReturn(Optional.of(마라세트));
-
-        Mockito.when(menuRepository.findAll())
-                .thenReturn(메뉴들);
     }
 
     @DisplayName("특정 메뉴카테고리에 음식메뉴를 조합한 신규 메뉴를 추가한다.")
     @Test
     void createMenu(){
         //given
-        Menu requestMenu = 메뉴_생성(추천메뉴, "나홀로세트", BigDecimal.valueOf(11000), Arrays.asList(마라탕메뉴, 콜라메뉴));
-
-        Mockito.when(menuRepository.save(any()))
-                .thenReturn(requestMenu);
+        Menu requestMenu = new Menu();
+        requestMenu.setMenuGroup(추천메뉴);
+        requestMenu.setMenuGroupId(추천메뉴.getId());
+        requestMenu.setName("나홀로세트");
+        requestMenu.setPrice(BigDecimal.valueOf(11000));
+        requestMenu.setMenuProducts(Arrays.asList(마라탕메뉴, 콜라메뉴));
+        requestMenu.setDisplayed(true);
 
         //when
         Menu createMenu = menuService.create(requestMenu);
@@ -114,22 +83,18 @@ class MenuServiceTest {
         assertThat(createMenu.getName()).isSameAs(requestMenu.getName());
     }
 
-    @DisplayName("메뉴에 가격이 없는 경우 IllegalArgumentException 예외가 발생한다.")
-    @Test
-    void createMenuOfNoPrice(){
+    @DisplayName("메뉴에 가격이 없거나 음수인 경우 IllegalArgumentException 예외가 발생한다.")
+    @ParameterizedTest
+    @ValueSource(ints = {0, -1000})
+    void createMenuOfNoPrice(int price){
         //given
-        Menu requestMenu = 메뉴_생성(추천메뉴, "나홀로세트", null, Arrays.asList(마라탕메뉴, 콜라메뉴));
-
-        //when && then
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> menuService.create(requestMenu));
-    }
-
-    @DisplayName("메뉴에 가격이 음수인 경우 IllegalArgumentException 예외가 발생한다.")
-    @Test
-    void createMenuOfMinusPrice(){
-        //given
-        Menu requestMenu = 메뉴_생성(추천메뉴, "나홀로세트", BigDecimal.valueOf(-1000), Arrays.asList(마라탕메뉴, 콜라메뉴));
+        Menu requestMenu = new Menu();
+        requestMenu.setMenuGroup(추천메뉴);
+        requestMenu.setMenuGroupId(추천메뉴.getId());
+        requestMenu.setName("나홀로세트");
+        requestMenu.setPrice((price==0 ? null : BigDecimal.valueOf(price)));
+        requestMenu.setMenuProducts(Arrays.asList(마라탕메뉴, 콜라메뉴));
+        requestMenu.setDisplayed(true);
 
         //when && then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -140,8 +105,15 @@ class MenuServiceTest {
     @Test
     void createMenuOfNoProductMenu(){
         //given
-        MenuProduct 없는음식메뉴 = 음식메뉴_생성(new Product(), 1);
-        Menu requestMenu = 메뉴_생성(추천메뉴, "나홀로세트", BigDecimal.valueOf(10000), Arrays.asList(없는음식메뉴));
+        MenuProduct 없는음식메뉴 = MenuProductTestHelper.음식메뉴_생성(new Product(), 1);
+
+        Menu requestMenu = new Menu();
+        requestMenu.setMenuGroup(추천메뉴);
+        requestMenu.setMenuGroupId(추천메뉴.getId());
+        requestMenu.setName("나홀로세트");
+        requestMenu.setPrice(BigDecimal.valueOf(10000));
+        requestMenu.setMenuProducts(Arrays.asList(없는음식메뉴));
+        requestMenu.setDisplayed(true);
 
         //when && then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -152,29 +124,40 @@ class MenuServiceTest {
     @Test
     void createMenuOfNoQurantityProductMenu(){
         //given
-        콜라메뉴.setQuantity(-1);
+        MenuProduct 수량이_음수인_음식메뉴 = MenuProductTestHelper.음식메뉴_생성(ProductTestHelper.음식_생성("음식", BigDecimal.valueOf(1000)), -1);
 
-        Menu requestMenu = 메뉴_생성(추천메뉴, "나홀로세트", BigDecimal.valueOf(10000), Arrays.asList(마라탕메뉴, 콜라메뉴));
+        Menu requestMenu = new Menu();
+        requestMenu.setMenuGroup(추천메뉴);
+        requestMenu.setMenuGroupId(추천메뉴.getId());
+        requestMenu.setName("나홀로세트");
+        requestMenu.setPrice(BigDecimal.valueOf(10000));
+        requestMenu.setMenuProducts(Arrays.asList(마라탕메뉴, 수량이_음수인_음식메뉴));
+        requestMenu.setDisplayed(true);
 
         //when && then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(requestMenu));
     }
 
-    @DisplayName("등록되지 않은 음식으로 메뉴조합을 만들어 등록하려는 경우 NoSuchElementException 예외가 발생한다.")
+    @DisplayName("등록되지 않은 음식으로 메뉴조합을 만들어 등록하려는 경우 IllegalArgumentException 예외가 발생한다.")
     @Test
     void createMenuOfNoProduct(){
         //given
         Product 없는음식 = new Product();
-        MenuProduct 없는음식메뉴 = 음식메뉴_생성(없는음식, 1);
+        없는음식.setName("없는음식");
+        없는음식.setPrice(BigDecimal.valueOf(1000));
+        MenuProduct 없는음식메뉴 = MenuProductTestHelper.음식메뉴_생성(없는음식, 1);
 
-        Mockito.when(productRepository.findAllByIdIn(any()))
-                .thenReturn(Arrays.asList(마라탕, 없는음식));
-
-        Menu requestMenu = 메뉴_생성(추천메뉴, "나홀로세트", BigDecimal.valueOf(10000), Arrays.asList(마라탕메뉴, 없는음식메뉴));
+        Menu requestMenu = new Menu();
+        requestMenu.setMenuGroup(추천메뉴);
+        requestMenu.setMenuGroupId(추천메뉴.getId());
+        requestMenu.setName("나홀로세트");
+        requestMenu.setPrice(BigDecimal.valueOf(10000));
+        requestMenu.setMenuProducts(Arrays.asList(마라탕메뉴, 없는음식메뉴));
+        requestMenu.setDisplayed(true);
 
         //when && then
-        assertThatExceptionOfType(NoSuchElementException.class)
+        assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(requestMenu));
     }
 
@@ -183,8 +166,14 @@ class MenuServiceTest {
     void createMenuExpensiveMoreThenSumPriceOfMenuProducts(){
         //given
         BigDecimal price = 마라탕메뉴.getProduct().getPrice().add(콜라메뉴.getProduct().getPrice());
-        Menu requestMenu = 메뉴_생성(추천메뉴, "나홀로세트", price.add(BigDecimal.valueOf(1000)), Arrays.asList(마라탕메뉴, 콜라메뉴));
 
+        Menu requestMenu = new Menu();
+        requestMenu.setMenuGroup(추천메뉴);
+        requestMenu.setMenuGroupId(추천메뉴.getId());
+        requestMenu.setName("나홀로세트");
+        requestMenu.setPrice(price.add(BigDecimal.valueOf(1000)));
+        requestMenu.setMenuProducts(Arrays.asList(마라탕메뉴, 콜라메뉴));
+        requestMenu.setDisplayed(true);
         //when && then
         assertThatExceptionOfType(IllegalArgumentException.class)
                 .isThrownBy(() -> menuService.create(requestMenu));
@@ -196,7 +185,14 @@ class MenuServiceTest {
     void createMenuNameEmptyOfIncluedProfanity(String name){
         //given
         String paramName = (name.equals("") ? null : name);
-        Menu requestMenu = 메뉴_생성(추천메뉴, paramName, BigDecimal.valueOf(11000), Arrays.asList(마라탕메뉴, 콜라메뉴));
+
+        Menu requestMenu = new Menu();
+        requestMenu.setMenuGroup(추천메뉴);
+        requestMenu.setMenuGroupId(추천메뉴.getId());
+        requestMenu.setName(paramName);
+        requestMenu.setPrice(BigDecimal.valueOf(10000));
+        requestMenu.setMenuProducts(Arrays.asList(마라탕메뉴, 콜라메뉴));
+        requestMenu.setDisplayed(true);
 
         //when && then
         assertThatExceptionOfType(IllegalArgumentException.class)
@@ -286,22 +282,15 @@ class MenuServiceTest {
     @Test
     void displayMenuExpensiveMoreThenSumPriceOfMenuProducts(){
         //given && when
-        Menu 단일음식총금액보다비싼메뉴 = new Menu();
-        단일음식총금액보다비싼메뉴.setId(UUID.randomUUID());
-        단일음식총금액보다비싼메뉴.setMenuGroup(추천메뉴);
-        단일음식총금액보다비싼메뉴.setMenuGroupId(추천메뉴.getId());
-        단일음식총금액보다비싼메뉴.setMenuProducts(Arrays.asList(마라탕메뉴, 미니꿔바로우메뉴));
+        List<MenuProduct> menuProducts = Arrays.asList(마라탕메뉴, 미니꿔바로우메뉴);
 
-        BigDecimal totalPriceOfProducts = 단일음식총금액보다비싼메뉴.getMenuProducts().stream()
+        BigDecimal totalPriceOfProducts = menuProducts.stream()
                 .map(MenuProduct::getProduct)
                 .map(Product::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        단일음식총금액보다비싼메뉴.setPrice(totalPriceOfProducts.add(BigDecimal.valueOf(1000)));
 
-        Mockito.when(menuRepository.findById(단일음식총금액보다비싼메뉴.getId()))
-                .thenReturn(Optional.of(단일음식총금액보다비싼메뉴));
-
+        Menu 단일음식총금액보다비싼메뉴 = MenuTestHelper.메뉴_생성(추천메뉴, "단일음식총금액보다비싼메뉴", totalPriceOfProducts.add(BigDecimal.valueOf(1000)), Arrays.asList(마라탕메뉴, 미니꿔바로우메뉴), false);
         //then
         assertThatExceptionOfType(IllegalStateException.class)
                 .isThrownBy(() -> menuService.display(단일음식총금액보다비싼메뉴.getId()));

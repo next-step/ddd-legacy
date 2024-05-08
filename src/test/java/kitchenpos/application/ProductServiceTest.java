@@ -1,17 +1,21 @@
 package kitchenpos.application;
 
+import jakarta.transaction.Transactional;
 import kitchenpos.config.ProductTestContextConfiguration;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
+import kitchenpos.helper.MenuGroupTestHelper;
+import kitchenpos.helper.MenuProductTestHelper;
+import kitchenpos.helper.MenuTestHelper;
+import kitchenpos.helper.ProductTestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.math.BigDecimal;
@@ -20,15 +24,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static kitchenpos.helper.MenuGroupTestHelper.메뉴카테고리_생성;
-import static kitchenpos.helper.MenuProductTestHelper.음식메뉴_생성;
-import static kitchenpos.helper.MenuTestHelper.메뉴_생성;
-import static kitchenpos.helper.ProductTestHelper.음식_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-
-@SpringBootTest
+@Transactional
 @Import(ProductTestContextConfiguration.class)
 class ProductServiceTest extends SetupTest{
     @Autowired
@@ -37,17 +36,15 @@ class ProductServiceTest extends SetupTest{
 
     @BeforeEach
     void setUp() {
-        MenuGroup 추천메뉴 = 메뉴카테고리_생성("추천메뉴");
-        menuGroupRepository.save(추천메뉴);
+        super.setUp();
 
-        미니꿔바로우 = 음식_생성("미니꿔바로우", BigDecimal.valueOf(8000));
-        productRepository.save(미니꿔바로우);
+        MenuGroup 추천메뉴 = MenuGroupTestHelper.메뉴카테고리_생성("추천메뉴");
 
-        Product 마라탕 = 음식_생성("마라탕", BigDecimal.valueOf(10000));
-        productRepository.save(마라탕);
+        미니꿔바로우 = ProductTestHelper.음식_생성("미니꿔바로우", BigDecimal.valueOf(8000));
+        Product 마라탕 = ProductTestHelper.음식_생성("마라탕", BigDecimal.valueOf(10000));
 
-        MenuProduct 마라탕메뉴 = 음식메뉴_생성(마라탕, 1);
-        MenuProduct 미니꿔바로우메뉴 = 음식메뉴_생성(미니꿔바로우, 1);
+        MenuProduct 마라탕메뉴 = MenuProductTestHelper.음식메뉴_생성(마라탕, 1);
+        MenuProduct 미니꿔바로우메뉴 = MenuProductTestHelper.음식메뉴_생성(미니꿔바로우, 1);
 
         List<MenuProduct> menuProducts = Arrays.asList(마라탕메뉴, 미니꿔바로우메뉴);
 
@@ -56,8 +53,7 @@ class ProductServiceTest extends SetupTest{
                 .map(Product::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        Menu 마라세트 = 메뉴_생성(추천메뉴, "마라세트", totalPriceOfProducts.subtract(BigDecimal.valueOf(1000)), menuProducts);
-        menuRepository.save(마라세트);
+        Menu 마라세트 = MenuTestHelper.메뉴_생성(추천메뉴, "마라세트", totalPriceOfProducts.subtract(BigDecimal.valueOf(1000)), menuProducts, true);
     }
 
     @DisplayName("음식을 등록한다.")
@@ -113,7 +109,7 @@ class ProductServiceTest extends SetupTest{
         //when
         Product changeProduct = productService.changePrice(미니꿔바로우.getId(), requestProduct);
 
-        List<Menu> menus = menuRepository.findAllByProductId(changeProduct.getId());
+        List<Menu> menus = MenuTestHelper.특정음식이_속한_메뉴들_조회(changeProduct.getId());
         menus.forEach(a -> {
             assertThat(a.isDisplayed()).isSameAs(false);
         });
