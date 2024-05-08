@@ -1,21 +1,37 @@
 package springcalculator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StringCalculator {
-    public int add(String input) {
+    private List<Integer> numbers;
+
+    public StringCalculator(String input) {
+        this.numbers = new ArrayList<>();
+        parseInput(input);
+    }
+
+    public int add() {
+        int sum = 0;
+        for (int number : this.numbers) {
+            sum += number;
+        }
+        return sum;
+    }
+
+    private void parseInput(String input) {
         if (input == null || input.isEmpty()) {
-            return 0;
+            return;
         }
 
         if (!input.contains(",") && !input.contains(":")) {
-            return Integer.parseInt(input);
+            this.numbers.add(Integer.parseInt(input));
+            return;
         }
 
-        String[] numbers = input.split(",|:");
-        int sum = 0;
-        for (String number : numbers) {
-            sum += Integer.parseInt(number);
+        String[] tokens = input.split("[,:]");
+        for (String token : tokens) {
+            this.numbers.add(Integer.parseInt(token));
         }
-
-        return sum;
     }
 }
