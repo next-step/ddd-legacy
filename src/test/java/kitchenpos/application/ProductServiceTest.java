@@ -16,6 +16,7 @@ import org.mockito.Mock;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.fixture.ProductFixture.NAME_강정치킨;
 import static kitchenpos.fixture.ProductFixture.PRICE_17000;
@@ -132,5 +133,33 @@ class ProductServiceTest {
 
         // then
         assertThat(result.getPrice()).isEqualTo(request.getPrice());
+    }
+
+    @DisplayName("상품의 가격을 수정할 때, 가격이 공백이면 예외가 발생한다.")
+    @NullSource
+    @ParameterizedTest
+    void changePrice_nullPriceException(BigDecimal price) {
+        // given
+        Product request = productChangePriceRequest(price);
+        UUID ID_강정치킨 = PRODUCT_강정치킨.getId();
+
+        // when
+        // then
+        assertThatThrownBy(() -> productService.changePrice(ID_강정치킨, request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품의 가격을 수정할 때, 가격이 0원보다 작으면 예외가 발생한다.")
+    @ValueSource(longs = {-1, -1000, -9999999})
+    @ParameterizedTest
+    void changePrice_lessThenZeroPriceException(long price) {
+        // given
+        Product request = productChangePriceRequest(BigDecimal.valueOf(price));
+        UUID ID_강정치킨 = PRODUCT_강정치킨.getId();
+
+        // when
+        // then
+        assertThatThrownBy(() -> productService.changePrice(ID_강정치킨, request))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
