@@ -7,9 +7,9 @@ public class StringCalculator {
 		this.input = input;
 	}
 
-	public NonNegativeInteger calculate() {
-		return NonNegativeIntegerParser.parse(input)
+	public PositiveInteger calculate() {
+		return PositiveIntegerParser.parse(input)
 			.stream()
-			.reduce(NonNegativeInteger.ZERO, NonNegativeInteger::add);
+			.reduce(PositiveInteger.ZERO, PositiveInteger::add);
 	}
 }
