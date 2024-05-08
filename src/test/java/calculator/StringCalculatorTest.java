@@ -34,4 +34,10 @@ public class StringCalculatorTest {
 	void commaDelimiter() {
 		assertThat(stringCalculator.calculate("1,2,3")).isEqualTo(6);
 	}
+
+	@DisplayName("구분자로 쉼표와 콜론을 섞어서 사용할 수 있다.")
+	@Test
+	void colonAlsoCanBeDelimiter() {
+		assertThat(stringCalculator.calculate("1,2:5")).isEqualTo(8);
+	}
 }
