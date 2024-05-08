@@ -343,8 +343,8 @@ stateDiagram-v2
 
 - 정리한 키친포스의 요구 사항을 토대로 테스트 코드를 작성한다.
   - [ ] 모든 Business Object에 대한 테스트 코드를 작성한다.
-    - `@SpringBootTest`를 이용한 통합 테스트 코드 
-    - 또는 `@ExtendWith(MockitoExtension.class)`를 이용한 단위 테스트 코드를 작성한다.
+    - [ ] `@ExtendWith(MockitoExtension.class)`를 이용한 단위 테스트 코드를 작성한다.
+      - [ ] MockTest를 위한 기본 세팅
   - [ ] Controller : Acceptance Test 추가
     - [x] 기본 셋팅
       - [x] RestAssured 라이브러리 추가 및 구글 API 전송
