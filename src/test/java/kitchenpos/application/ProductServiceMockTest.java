@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -16,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static kitchenpos.fixture.MenuFixture.메뉴_생성;
 import static kitchenpos.fixture.ProductFixture.상품_생성;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -100,6 +102,26 @@ class ProductServiceMockTest {
         then(productRepository).should(times(1)).findById(any());
         then(menuRepository).should(times(1)).findAllByProductId(any());
         assertThat(changeProduct.getPrice()).isEqualTo(changedProduct.getPrice());
+    }
+
+    @DisplayName("상품 가격을 변경 시, 메뉴 가격이 포함된 상품 가격의 합을 초과하면 메뉴 노출 여부를 미노출로 변경한다.")
+    @Test
+    void changePrice_menu() {
+        //given
+        Product originProduct = 상품_생성("피자", BigDecimal.valueOf(50_000));
+        Menu menu = 메뉴_생성("메뉴A", BigDecimal.valueOf(50_000), true, UUID.randomUUID(), List.of(originProduct));
+        when(productRepository.findById(any())).thenReturn(Optional.of(originProduct));
+        when(menuRepository.findAllByProductId(any())).thenReturn(Collections.singletonList(menu));
+
+        //when
+        Product changeProduct = 상품_생성("피자", BigDecimal.valueOf(30_000));
+        Product changedProduct = productService.changePrice(UUID.randomUUID(), changeProduct);
+
+        //then
+        then(productRepository).should(times(1)).findById(any());
+        then(menuRepository).should(times(1)).findAllByProductId(any());
+        assertThat(changeProduct.getPrice()).isEqualTo(changedProduct.getPrice());
+        assertThat(menu.isDisplayed()).isFalse();
     }
 
     @DisplayName("존재하지 않는 상품의 가격 변경 시, 변경을 실패한다")

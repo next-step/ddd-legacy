@@ -194,6 +194,44 @@ class MenuServiceMockTest {
         then(menuRepository).should(never()).save(any());
     }
 
+    @DisplayName("메뉴 생성 시, 메뉴 상품을 선택하지 않으면 메뉴 생성을 실패한다")
+    @Test
+    void create_product_empty_exception() {
+        //given
+        Menu menu = 메뉴_생성("낚시메뉴", BigDecimal.valueOf(10_000), false, UUID.randomUUID(), Collections.emptyList());
+
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(메뉴_그룹A));
+
+        //when
+        //then
+        assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
+        then(menuGroupRepository).should(times(1)).findById(any());
+        then(productRepository).should(never()).findAllByIdIn(any());
+        then(purgomalumClient).should(never()).containsProfanity(any());
+        then(menuRepository).should(never()).save(any());
+    }
+
+    @DisplayName("메뉴 생성 시, 선택한 메뉴 상품이 존재하지 않는 상품인 경우 메뉴 생성을 실패한다")
+    @Test
+    void create_product_size_exception() {
+        //given
+        Product 상품A = 상품_생성("상품A", BigDecimal.valueOf(10_000));
+        Product 상품B = 상품_생성("상품B", BigDecimal.valueOf(20_000));
+        MenuProduct 메뉴_상품A = 메뉴_상품_생성(상품A, 1L);
+        Menu menu = 메뉴_생성("낚시메뉴", BigDecimal.valueOf(10_000), false, UUID.randomUUID(), 메뉴_상품A);
+
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(메뉴_그룹A));
+        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(상품A, 상품B));
+
+        //when
+        //then
+        assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
+        then(menuGroupRepository).should(times(1)).findById(any());
+        then(productRepository).should(times(1)).findAllByIdIn(any());
+        then(purgomalumClient).should(never()).containsProfanity(any());
+        then(menuRepository).should(never()).save(any());
+    }
+
     @DisplayName("메뉴 가격을 변경한다")
     @Test
     void changePrice() {
@@ -209,6 +247,17 @@ class MenuServiceMockTest {
         //then
         assertThat(changedMenu.getPrice()).isEqualTo(BigDecimal.ZERO);
         then(menuRepository).should(times(1)).findById(any());
+    }
+
+    @DisplayName("메뉴 가격 시, 가격은 0원 미만이면 변경을 실패한다")
+    @Test
+    void changePrice_price_exception() {
+        //given
+        Menu menu = 메뉴_생성("메뉴A", BigDecimal.valueOf(-1), false, UUID.randomUUID(), Collections.emptyList());
+
+        //when
+        //then
+        assertThatIllegalArgumentException().isThrownBy(() -> menuService.changePrice(UUID.randomUUID(), menu));
     }
 
     @DisplayName("존재하지 않는 메뉴의 가격은 변경할 수 없다")
