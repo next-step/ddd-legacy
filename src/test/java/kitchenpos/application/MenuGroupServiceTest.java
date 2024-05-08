@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 @ApplicationMockTest
 class MenuGroupServiceTest {
     private static final String 추천메뉴 = "추천메뉴";
+    private static final String 한마리메뉴 = "한마리메뉴";
     @Mock
     private MenuGroupRepository menuGroupRepository;
 
@@ -55,5 +56,20 @@ class MenuGroupServiceTest {
         // then
         assertThatThrownBy(() -> menuGroupService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴그룹 목록을 볼 수 있다")
+    @Test
+    void getMenuGroups() {
+        // given
+        List<MenuGroup> menuGroups = List.of(createMenuGroup(추천메뉴), createMenuGroup(한마리메뉴));
+
+        when(menuGroupRepository.findAll()).thenReturn(menuGroups);
+
+        // when
+        List<MenuGroup> foundMenuGroups = menuGroupService.findAll();
+
+        // then
+        assertThat(foundMenuGroups).hasSize(2);
     }
 }
