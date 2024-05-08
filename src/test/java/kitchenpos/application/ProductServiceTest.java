@@ -39,9 +39,9 @@ import static org.mockito.Mockito.when;
 @DisplayName("상품 서비스 테스트")
 @ApplicationMockTest
 class ProductServiceTest {
-    private static UUID ID_강정치킨;
-    private static Product PRODUCT_강정치킨;
-    private static Product PRODUCT_후라이드치킨;
+    private UUID ID_강정치킨;
+    private Product PRODUCT_강정치킨;
+    private Product PRODUCT_후라이드치킨;
     @Mock
     private ProductRepository productRepository;
     @Mock
