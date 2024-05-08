@@ -41,6 +41,7 @@ import static org.mockito.Mockito.when;
 class ProductServiceTest {
     private static UUID ID_강정치킨;
     private static Product PRODUCT_강정치킨;
+    private static Product PRODUCT_후라이드치킨;
     @Mock
     private ProductRepository productRepository;
     @Mock
@@ -54,6 +55,7 @@ class ProductServiceTest {
     @BeforeEach
     void setUp() {
         PRODUCT_강정치킨 = productResponse(NAME_강정치킨, PRICE_17000);
+        PRODUCT_후라이드치킨 = productResponse(NAME_후라이드치킨, PRICE_18000);
         ID_강정치킨 = PRODUCT_강정치킨.getId();
     }
 
@@ -188,10 +190,21 @@ class ProductServiceTest {
         강정치킨상품_포함된_메뉴들.forEach(menu -> assertThat(menu.isDisplayed()).isFalse());
     }
 
-    private List<Menu> settingMenus() {
-        // 메뉴 구성 상품에 넣을 상품 종류
-        Product PRODUCT_후라이드치킨 = productResponse(NAME_후라이드치킨, PRICE_18000);
+    @DisplayName("상품 목록을 볼 수 있다")
+    @Test
+    void getMenuGroups() {
+        // given
+        List<Product> list = List.of(PRODUCT_강정치킨, PRODUCT_후라이드치킨);
+        when(productRepository.findAll()).thenReturn(list);
 
+        // when
+        List<Product> result = productService.findAll();
+
+        // then
+        assertThat(result).hasSize(2);
+    }
+
+    private List<Menu> settingMenus() {
         // 메뉴구성상품 종류 (상품, 상품수량)
         MenuProduct 강정치킨_1개 = menuProductResponse(PRODUCT_강정치킨, 1);
         MenuProduct 강정치킨_2개 = menuProductResponse(PRODUCT_강정치킨, 2);
