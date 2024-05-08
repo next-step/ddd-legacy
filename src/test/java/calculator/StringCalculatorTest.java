@@ -49,4 +49,12 @@ public class StringCalculatorTest {
 			.isInstanceOf(IllegalArgumentException.class)
 			.hasMessage("Negative number not allowed: -2");
 	}
+
+	@DisplayName("숫자가 아닌 값을 전달할 경우 예외가 발생한다.")
+	@Test
+	void onlyNumberCanBeInput() {
+		assertThatCode(() -> stringCalculator.calculate("1,*,3"))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("Character Not Allowed: *");
+	}
 }

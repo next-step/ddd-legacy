@@ -9,6 +9,10 @@ public record InputNumber(int value) {
 	}
 
 	public static InputNumber from(final String inputValue) {
-		return new InputNumber(Integer.parseInt(inputValue));
+		try {
+			return new InputNumber(Integer.parseInt(inputValue));
+		} catch (final NumberFormatException e) {
+			throw new IllegalArgumentException("Character Not Allowed: " + inputValue, e);
+		}
 	}
 }
