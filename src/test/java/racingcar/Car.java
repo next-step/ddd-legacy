@@ -26,12 +26,6 @@ class Car {
     }
   }
 
-  public void move(final int condition) {
-    if (condition >= MOVING_CONDITION) {
-      this.position += MOVING_POSITION_STEP;
-    }
-  }
-
   public void move(final MovingStrategy movingStrategy) {
     if (movingStrategy.movable()) {
       this.position += MOVING_POSITION_STEP;
