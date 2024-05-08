@@ -1,6 +1,7 @@
 package calculator;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,5 +40,13 @@ public class StringCalculatorTest {
 	@Test
 	void colonAlsoCanBeDelimiter() {
 		assertThat(stringCalculator.calculate("1,2:5")).isEqualTo(8);
+	}
+
+	@DisplayName("음수를 전달할 경우 예외가 발생한다.")
+	@Test
+	void negativeNumberThrowException() {
+		assertThatCode(() -> stringCalculator.calculate("1,-2,3"))
+			.isInstanceOf(IllegalArgumentException.class)
+			.hasMessage("Negative number not allowed: -2");
 	}
 }

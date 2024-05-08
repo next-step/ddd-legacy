@@ -11,6 +11,14 @@ public class StringCalculator {
 			return 0;
 		}
 
+		Arrays.stream(input.split(DELIMITER_PATTERN))
+			.map(Integer::parseInt)
+			.filter(n -> n < 0)
+			.findFirst()
+			.ifPresent(n -> {
+				throw new IllegalArgumentException("Negative number not allowed: " + n);
+			});
+
 		return Arrays.stream(input.split(DELIMITER_PATTERN))
 			.mapToInt(Integer::parseInt)
 			.sum();
