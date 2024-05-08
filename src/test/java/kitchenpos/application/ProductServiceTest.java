@@ -5,6 +5,7 @@ import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -14,9 +15,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static kitchenpos.fixture.ProductFixture.NAME_강정치킨;
 import static kitchenpos.fixture.ProductFixture.PRICE_17000;
+import static kitchenpos.fixture.ProductFixture.PRICE_18000;
+import static kitchenpos.fixture.ProductFixture.productChangePriceRequest;
 import static kitchenpos.fixture.ProductFixture.productCreateRequest;
 import static kitchenpos.fixture.ProductFixture.productResponse;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +32,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("상품 서비스 테스트")
 @ApplicationMockTest
 class ProductServiceTest {
+    private static Product PRODUCT_강정치킨;
     @Mock
     private ProductRepository productRepository;
     @Mock
@@ -38,12 +43,16 @@ class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
+    @BeforeEach
+    void setUp() {
+        PRODUCT_강정치킨 = productResponse(NAME_강정치킨, PRICE_17000);
+    }
+
     @DisplayName("상품을 등록한다.")
     @Test
     void creatProduct() {
         // given
         Product request = productCreateRequest(NAME_강정치킨, PRICE_17000);
-        Product PRODUCT_강정치킨 = productResponse(NAME_강정치킨, PRICE_17000);
         when(productRepository.save(any())).thenReturn(PRODUCT_강정치킨);
 
         // when
@@ -109,5 +118,19 @@ class ProductServiceTest {
         // then
         assertThatThrownBy(() -> productService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품의 가격이 수정된다.")
+    @Test
+    void changeProductPriceTest() {
+        // given
+        Product request = productChangePriceRequest(PRICE_18000);
+        when(productRepository.findById(any())).thenReturn(Optional.of(PRODUCT_강정치킨));
+
+        // when
+        Product result = productService.changePrice(PRODUCT_강정치킨.getId(), request);
+
+        // then
+        assertThat(result.getPrice()).isEqualTo(request.getPrice());
     }
 }
