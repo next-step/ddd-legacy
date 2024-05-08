@@ -1,6 +1,8 @@
 package kitchenpos.application;
 
 import kitchenpos.ApplicationMockTest;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -15,10 +17,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.menuPriceAndMenuProductResponse;
+import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
 import static kitchenpos.fixture.ProductFixture.NAME_강정치킨;
+import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
 import static kitchenpos.fixture.ProductFixture.PRICE_17000;
 import static kitchenpos.fixture.ProductFixture.PRICE_18000;
 import static kitchenpos.fixture.ProductFixture.productChangePriceRequest;
@@ -33,6 +39,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("상품 서비스 테스트")
 @ApplicationMockTest
 class ProductServiceTest {
+    private static UUID ID_강정치킨;
     private static Product PRODUCT_강정치킨;
     @Mock
     private ProductRepository productRepository;
@@ -47,6 +54,7 @@ class ProductServiceTest {
     @BeforeEach
     void setUp() {
         PRODUCT_강정치킨 = productResponse(NAME_강정치킨, PRICE_17000);
+        ID_강정치킨 = PRODUCT_강정치킨.getId();
     }
 
     @DisplayName("상품을 등록한다.")
@@ -129,7 +137,7 @@ class ProductServiceTest {
         when(productRepository.findById(any())).thenReturn(Optional.of(PRODUCT_강정치킨));
 
         // when
-        Product result = productService.changePrice(PRODUCT_강정치킨.getId(), request);
+        Product result = productService.changePrice(ID_강정치킨, request);
 
         // then
         assertThat(result.getPrice()).isEqualTo(request.getPrice());
@@ -141,7 +149,6 @@ class ProductServiceTest {
     void changePrice_nullPriceException(BigDecimal price) {
         // given
         Product request = productChangePriceRequest(price);
-        UUID ID_강정치킨 = PRODUCT_강정치킨.getId();
 
         // when
         // then
@@ -155,11 +162,48 @@ class ProductServiceTest {
     void changePrice_lessThenZeroPriceException(long price) {
         // given
         Product request = productChangePriceRequest(BigDecimal.valueOf(price));
-        UUID ID_강정치킨 = PRODUCT_강정치킨.getId();
 
         // when
         // then
         assertThatThrownBy(() -> productService.changePrice(ID_강정치킨, request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("상품의 가격을 수정할 때, 상품을 포함한 각 메뉴의 가격이 상품의 (가격 * 수량)의 총 합보다 비싸면 메뉴는 노출하지 않는다.")
+    @Test
+    void changePrice_menuPriceCheck_menuNotDisplayed() {
+        // given
+        BigDecimal 변경할_상품가격 = BigDecimal.valueOf(10_000);
+        List<Menu> 강정치킨상품_포함된_메뉴들 = settingMenus();
+
+        when(productRepository.findById(any())).thenReturn(Optional.of(PRODUCT_강정치킨));
+        when(menuRepository.findAllByProductId(any())).thenReturn(강정치킨상품_포함된_메뉴들);
+
+        Product request = productChangePriceRequest(변경할_상품가격);
+
+        // when
+        productService.changePrice(ID_강정치킨, request);
+
+        // then
+        강정치킨상품_포함된_메뉴들.forEach(menu -> assertThat(menu.isDisplayed()).isFalse());
+    }
+
+    private List<Menu> settingMenus() {
+        // 메뉴 구성 상품에 넣을 상품 종류
+        Product PRODUCT_후라이드치킨 = productResponse(NAME_후라이드치킨, PRICE_18000);
+
+        // 메뉴구성상품 종류 (상품, 상품수량)
+        MenuProduct 강정치킨_1개 = menuProductResponse(PRODUCT_강정치킨, 1);
+        MenuProduct 강정치킨_2개 = menuProductResponse(PRODUCT_강정치킨, 2);
+        MenuProduct 후라이드치킨_1개 = menuProductResponse(PRODUCT_후라이드치킨, 1);
+
+        // 메뉴 가격
+        BigDecimal PRICE_MENU_두마리치킨 = BigDecimal.valueOf(30_000);
+        BigDecimal PRICE_MENU_추천메뉴 = BigDecimal.valueOf(40_000);
+
+        // 메뉴List (가격, 매뉴구성상품......)
+        Menu MENU_두마리치킨 = menuPriceAndMenuProductResponse(PRICE_MENU_두마리치킨, 강정치킨_1개, 후라이드치킨_1개);
+        Menu MENU_추천메뉴 = menuPriceAndMenuProductResponse(PRICE_MENU_추천메뉴, 강정치킨_2개, 후라이드치킨_1개);
+        return List.of(MENU_두마리치킨, MENU_추천메뉴);
     }
 }
