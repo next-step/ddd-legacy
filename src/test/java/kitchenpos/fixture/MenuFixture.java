@@ -36,6 +36,14 @@ public class MenuFixture {
         return menu;
     }
 
+    public static Menu 메뉴_생성(UUID id, boolean displayed, BigDecimal price) {
+        Menu menu = new Menu();
+        menu.setId(id);
+        menu.setDisplayed(displayed);
+        menu.setPrice(price);
+        return menu;
+    }
+
     public static MenuGroup 메뉴_그룹_생성(String name) {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName(name);
