@@ -347,7 +347,7 @@ stateDiagram-v2
     - 또는 `@ExtendWith(MockitoExtension.class)`를 이용한 단위 테스트 코드를 작성한다.
   - [ ] Controller : Acceptance Test 추가
     - [ ] 기본 셋팅
-      - [ ] RestAssured 라이브러리 추가 및 구글 API 전송
+      - [x] RestAssured 라이브러리 추가 및 구글 API 전송
       - [ ] 공통 AcceptanceTest 셋팅
       - [ ] Database Test격리
     - [ ] 기능 별 인수테스트 추가
