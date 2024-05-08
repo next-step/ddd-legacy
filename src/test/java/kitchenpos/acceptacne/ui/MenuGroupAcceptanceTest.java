@@ -3,15 +3,14 @@ package kitchenpos.acceptacne.ui;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import kitchenpos.acceptacne.AcceptanceTest;
+import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
-import java.util.Map;
-
-import static kitchenpos.acceptacne.fixture.MenuGroupParamsFixture.createMenuGroupParams;
 import static kitchenpos.acceptacne.steps.MenuGroupSteps.createMenuGroupStep;
 import static kitchenpos.acceptacne.steps.MenuGroupSteps.getMenuGroupsStep;
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -25,7 +24,7 @@ class MenuGroupAcceptanceTest {
     @Test
     void createMenuGroup() {
         // given
-        Map<String, Object> 한마리메뉴_요청 = createMenuGroupParams(이름_한마리메뉴);
+        MenuGroup 한마리메뉴_요청 = createMenuGroupRequest(이름_한마리메뉴);
 
         // when
         ExtractableResponse<Response> response = createMenuGroupStep(한마리메뉴_요청);
@@ -42,8 +41,8 @@ class MenuGroupAcceptanceTest {
     @Test
     void getMenuGroups() {
         // given
-        createMenuGroupStep(createMenuGroupParams(이름_한마리메뉴));
-        createMenuGroupStep(createMenuGroupParams(이름_추천메뉴));
+        createMenuGroupStep(createMenuGroupRequest(이름_한마리메뉴));
+        createMenuGroupStep(createMenuGroupRequest(이름_추천메뉴));
 
         // when
         ExtractableResponse<Response> response = getMenuGroupsStep();

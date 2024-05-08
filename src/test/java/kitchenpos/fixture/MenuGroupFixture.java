@@ -6,6 +6,7 @@ import kitchenpos.domain.MenuGroup;
 import java.util.UUID;
 
 public class MenuGroupFixture {
+
     public static MenuGroup createMenuGroupRequest(String name) {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName(name);

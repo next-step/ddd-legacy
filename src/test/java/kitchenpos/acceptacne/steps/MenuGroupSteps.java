@@ -3,13 +3,14 @@ package kitchenpos.acceptacne.steps;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import kitchenpos.acceptacne.RestAssuredUtils;
+import kitchenpos.domain.MenuGroup;
 
 import java.util.Map;
 
 public class MenuGroupSteps {
     private static final String URI = "/api/menu-groups";
 
-    public static ExtractableResponse<Response> createMenuGroupStep(Map<String, Object> params) {
+    public static ExtractableResponse<Response> createMenuGroupStep(MenuGroup params) {
         return RestAssuredUtils.post(params, URI);
     }
 
