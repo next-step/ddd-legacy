@@ -28,4 +28,10 @@ public class StringCalculatorTest {
 		assertThat(stringCalculator.calculate("1")).isEqualTo(1);
 		assertThat(stringCalculator.calculate("11")).isEqualTo(11);
 	}
+
+	@DisplayName("쉼표 구분자로 구분되는 숫자들의 합을 반환한다.")
+	@Test
+	void commaDelimiter() {
+		assertThat(stringCalculator.calculate("1,2,3")).isEqualTo(6);
+	}
 }
