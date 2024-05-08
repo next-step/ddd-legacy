@@ -48,6 +48,7 @@ class OrderTableServiceTest extends SetupTest{
     @BeforeEach
     void setUp() {
         super.setUp();
+
         빈주문테이블 = OrderTableTestHelper.주문테이블_생성("빈주문테이블");
         사용중인_주문테이블 = OrderTableTestHelper.주문테이블_생성("사용중인_주문테이블");
         사용중인_주문테이블 = OrderTableTestHelper.특정_주문테이블_사용여부_변경(사용중인_주문테이블.getId(), true);
@@ -55,9 +56,10 @@ class OrderTableServiceTest extends SetupTest{
 
         주문테이블들.add(빈주문테이블);
         주문테이블들.add(사용중인_주문테이블);
+        대기중_주문 = this.makeSampleOrder(사용중인_주문테이블);
+    }
 
-        MenuGroup 추천메뉴 = MenuGroupTestHelper.메뉴카테고리_생성("추천메뉴");
-
+    private Order makeSampleOrder(OrderTable 사용중인_주문테이블) {
         Product 마라탕 = ProductTestHelper.음식_생성("마라탕", BigDecimal.valueOf(10000));
         Product 미니꿔바로우 = ProductTestHelper.음식_생성("미니꿔바로우", BigDecimal.valueOf(8000));
         Product 콜라 = ProductTestHelper.음식_생성("콜라", BigDecimal.valueOf(3000));
@@ -65,6 +67,8 @@ class OrderTableServiceTest extends SetupTest{
         MenuProduct 마라탕메뉴 = MenuProductTestHelper.음식메뉴_생성(마라탕, 1);
         MenuProduct 미니꿔바로우메뉴 = MenuProductTestHelper.음식메뉴_생성(미니꿔바로우, 1);
         MenuProduct 콜라메뉴 = MenuProductTestHelper.음식메뉴_생성(콜라, 1);
+
+        MenuGroup 추천메뉴 = MenuGroupTestHelper.메뉴카테고리_생성("추천메뉴");
 
         Menu 마라세트 = MenuTestHelper.메뉴_생성(추천메뉴, "마라세트", BigDecimal.valueOf(16000), Arrays.asList(마라탕메뉴, 미니꿔바로우메뉴), true);
         Menu 나홀로세트 = MenuTestHelper.메뉴_생성(추천메뉴, "나홀로세트", BigDecimal.valueOf(11000), Arrays.asList(마라탕메뉴, 콜라메뉴), true);
@@ -79,7 +83,7 @@ class OrderTableServiceTest extends SetupTest{
 
         List<OrderLineItem> 주문할_메뉴들 = Arrays.asList(마라세트_주문, 나홀로세트_주문);
 
-        대기중_주문 = OrderTestHelper.먹고가기_주문_생성(주문할_메뉴들, 사용중인_주문테이블);
+        return OrderTestHelper.먹고가기_대기_주문_생성(주문할_메뉴들, 사용중인_주문테이블);
     }
 
     @DisplayName("주문테이블을 생성하다.")

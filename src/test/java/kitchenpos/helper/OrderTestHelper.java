@@ -19,7 +19,7 @@ public class OrderTestHelper {
         this.orderRepository = orderRepository;
     }
 
-    public static Order 먹고가기_주문_생성(List<OrderLineItem> orderLineItems, OrderTable orderTable){
+    public static Order 먹고가기_대기_주문_생성(List<OrderLineItem> orderLineItems, OrderTable orderTable){
         Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(OrderType.EAT_IN);
