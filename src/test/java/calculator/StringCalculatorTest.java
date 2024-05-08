@@ -21,4 +21,11 @@ public class StringCalculatorTest {
 		assertThat(stringCalculator.calculate("")).isEqualTo(0);
 		assertThat(stringCalculator.calculate(null)).isEqualTo(0);
 	}
+
+	@DisplayName("숫자 하나를 문자열로 입력하는 경우 해당 숫자를 반환한다.")
+	@Test
+	void oneNumberReturnNumber() {
+		assertThat(stringCalculator.calculate("1")).isEqualTo(1);
+		assertThat(stringCalculator.calculate("11")).isEqualTo(11);
+	}
 }
