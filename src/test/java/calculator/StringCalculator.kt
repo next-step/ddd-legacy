@@ -8,9 +8,9 @@ class StringCalculator {
         CustomizedDelimiterCalculator(),
     )
 
-    fun add(text: String?): Int {
+    fun add(text: String?): NumberToken {
         if (text.isNullOrBlank()) {
-            return 0
+            return NumberToken(0)
         }
 
         val calculator = calculators.find { it.support(text) }
