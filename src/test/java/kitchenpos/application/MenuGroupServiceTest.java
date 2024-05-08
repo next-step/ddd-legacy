@@ -22,7 +22,6 @@ import kitchenpos.domain.MenuGroupRepository;
 
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
-
 	@Mock
 	private MenuGroupRepository menuGroupRepository;
 
