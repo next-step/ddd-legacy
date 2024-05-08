@@ -1,6 +1,5 @@
 package calculator;
 
-import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,15 +17,10 @@ public class StringCalculator {
 		if (customDelimiterMatcher.find()) {
 			final String customDelimiter = customDelimiterMatcher.group(1);
 
-			return Arrays.stream(customDelimiterMatcher.group(2).split(DELIMITER_PATTERN + "|" + customDelimiter))
-				.map(NonNegativeNumber::from)
-				.mapToInt(NonNegativeNumber::value)
+			return Numbers.from(customDelimiterMatcher.group(2).split(DELIMITER_PATTERN + "|" + customDelimiter))
 				.sum();
 		}
 
-		return Arrays.stream(input.split(DELIMITER_PATTERN))
-			.map(NonNegativeNumber::from)
-			.mapToInt(NonNegativeNumber::value)
-			.sum();
+		return Numbers.from(input.split(DELIMITER_PATTERN)).sum();
 	}
 }
