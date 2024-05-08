@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StringCalculator {
-    private List<Integer> numbers;
+    private final List<Integer> numbers;
 
     public StringCalculator(String input) {
         this.numbers = new ArrayList<>();
@@ -24,12 +24,7 @@ public class StringCalculator {
             return;
         }
 
-        if (!input.contains(",") && !input.contains(":")) {
-            this.numbers.add(Integer.parseInt(input));
-            return;
-        }
-
-        String[] tokens = input.split("[,:]");
+        String[] tokens = new Delimiter(input).extractNumbers();
         for (String token : tokens) {
             this.numbers.add(Integer.parseInt(token));
         }
