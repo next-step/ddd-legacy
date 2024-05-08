@@ -12,14 +12,14 @@ public class Numbers {
         this.numbers = toList(values);
     }
 
-    public int sum() {
-        return numbers.stream().mapToInt(Number::value).sum();
-    }
-
     private static List<Number> toList(String[] values) {
         return Arrays.stream(values)
-                .map(Number::new)
+                .map(Number::of)
                 .toList();
+    }
+
+    public int sum() {
+        return numbers.stream().reduce(new Number(0), Number::add).value();
     }
 
 }

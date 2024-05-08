@@ -1,5 +1,6 @@
 package calculator;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class Number {
@@ -8,29 +9,42 @@ public class Number {
 
     private final int number;
 
-    public Number(String number) {
+    public Number(int number) {
+        if (number < 0) {
+            throw new IllegalArgumentException("not allowed negative number");
+        }
+        this.number = number;
+    }
+
+    public static Number of(String number) {
         if (isNotNumber(number)) {
             throw new IllegalArgumentException("invalid number string: " + number);
         }
-        this.number = toInt(number);
-        if (isNegative()) {
-            throw new IllegalArgumentException("not allow negative number: " + number);
-        }
+        return new Number(Integer.parseInt(number));
+    }
+
+    private static boolean isNotNumber(String number) {
+        return !NUMBER_PATTERN.matcher(number).find();
     }
 
     public int value() {
         return number;
     }
 
-    private boolean isNotNumber(String number) {
-        return !NUMBER_PATTERN.matcher(number).find();
+    public Number add(Number other) {
+        return new Number(this.number + other.number);
     }
 
-    private int toInt(String values) {
-        return Integer.parseInt(values);
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Number number1)) return false;
+        return number == number1.number;
     }
 
-    private boolean isNegative() {
-        return number < 0;
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(number);
     }
 }
