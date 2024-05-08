@@ -10,4 +10,13 @@ public class MenuProductFixture {
         menuProduct.setQuantity(quantity);
         return menuProduct;
     }
+
+    static public MenuProduct menuProductResponse(Long seq, Product product, long quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq(seq);
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        menuProduct.setProductId(product.getId());
+        return menuProduct;
+    }
 }
