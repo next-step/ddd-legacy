@@ -1,5 +1,6 @@
 package calculator;
 
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -19,7 +20,7 @@ class StringCalculator {
   }
 
   public int add(final String text) {
-    if (StringUtils.hasText(text)) {
+    if (ObjectUtils.isEmpty(text)) {
       return ZERO;
     }
 

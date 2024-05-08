@@ -22,3 +22,6 @@
 - 적절한 에러 메시지를 사용한다.
 - 쓰지 않는 코드 확인, 포맷 확인, 적절한 commit 메시지를 확인한다.
 - 접근 제어자를 확인한다.
+- 클래스들의 책임 구성
+  - StringCalculator - input을 받고 output을 내보내는 interface를 가진다.
+  - NumberExtractor - 주어진 String 형식의 text를 규칙에 맞게 파싱한다. (+ domain validation) 
