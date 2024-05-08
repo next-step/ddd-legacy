@@ -95,7 +95,6 @@ public class OrderService {
         if (type == OrderType.EAT_IN) {
             final OrderTable orderTable = orderTableRepository.findById(request.getOrderTableId())
                 .orElseThrow(NoSuchElementException::new);
-            // 테이블이 미사용중일 경우 주문 불가??
             if (!orderTable.isOccupied()) {
                 throw new IllegalStateException();
             }
