@@ -7,25 +7,26 @@ import java.util.regex.Pattern;
 public class StringCalculator {
 
 	private static final String DELIMITER_PATTERN = ",|:";
+	private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
 	public int calculate(final String input) {
 		if (input == null || input.isEmpty()) {
 			return 0;
 		}
 
-		final Matcher m = Pattern.compile("//(.)\n(.*)").matcher(input);
-		if (m.find()) {
-			String customDelimiter = m.group(1);
+		final Matcher customDelimiterMatcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
+		if (customDelimiterMatcher.find()) {
+			final String customDelimiter = customDelimiterMatcher.group(1);
 
-			return Arrays.stream(m.group(2).split(DELIMITER_PATTERN + "|" + customDelimiter))
-				.map(InputNumber::from)
-				.mapToInt(InputNumber::value)
+			return Arrays.stream(customDelimiterMatcher.group(2).split(DELIMITER_PATTERN + "|" + customDelimiter))
+				.map(NonNegativeNumber::from)
+				.mapToInt(NonNegativeNumber::value)
 				.sum();
 		}
 
 		return Arrays.stream(input.split(DELIMITER_PATTERN))
-			.map(InputNumber::from)
-			.mapToInt(InputNumber::value)
+			.map(NonNegativeNumber::from)
+			.mapToInt(NonNegativeNumber::value)
 			.sum();
 	}
 }

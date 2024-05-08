@@ -55,7 +55,7 @@ public class StringCalculatorTest {
 	void onlyNumberCanBeInput() {
 		assertThatCode(() -> stringCalculator.calculate("1,*,3"))
 			.isInstanceOf(IllegalArgumentException.class)
-			.hasMessage("Character Not Allowed: *");
+			.hasMessage("Character not allowed: *");
 	}
 
 	@DisplayName("//와 \\n 사이에 커스텀 구분자를 지정할 수 있다.")
