@@ -9,27 +9,29 @@ public class Tokens {
     public static final String PREFIX_OF_CUSTOM_DELIMITER = "//";
     public static final String SUFFIX_OF_CUSTOM_DELIMITER = "\n";
 
-    private final List<Token> tokens;
+    private final String expression;
 
-    public Tokens(List<Token> tokens) {
-        this.tokens = tokens;
+    public Tokens(String expression) {
+        this.expression = expression;
     }
 
-    public static Tokens from(String expression) {
-        String[] strNumbers = extractStrNumbers(expression);
+    public int sum() {
+        String[] strNumbers = extractStrNumbers();
         List<Token> tokens = Arrays.stream(strNumbers)
-            .map(Token::new)
-            .toList();
-        return new Tokens(tokens);
+                .map(Token::new)
+                .toList();
+        return tokens.stream()
+            .mapToInt(Token::value)
+            .reduce(0, Integer::sum);
     }
 
-    private static String[] extractStrNumbers(String expression) {
-        String delimiter = extractDelimiter(expression);
-        String expressionRemovedDelimiter = expressionRemovedDelimiter(expression);
+    private String[] extractStrNumbers() {
+        String delimiter = extractDelimiter();
+        String expressionRemovedDelimiter = expressionRemovedDelimiter();
         return expressionRemovedDelimiter.split(delimiter);
     }
 
-    private static String extractDelimiter(String expression) {
+    private String extractDelimiter() {
         if (!expression.startsWith(PREFIX_OF_CUSTOM_DELIMITER)) {
             return DEFAULT_DELIMITER;
         }
@@ -37,16 +39,10 @@ public class Tokens {
         return expression.substring(PREFIX_OF_CUSTOM_DELIMITER.length(), endIndex);
     }
 
-    private static String expressionRemovedDelimiter(String expression) {
+    private String expressionRemovedDelimiter() {
         if (!expression.startsWith(PREFIX_OF_CUSTOM_DELIMITER)) {
             return expression;
         }
         return expression.substring(expression.indexOf(SUFFIX_OF_CUSTOM_DELIMITER) + 1);
-    }
-
-    public int sum() {
-        return tokens.stream()
-            .mapToInt(Token::value)
-            .reduce(0, Integer::sum);
     }
 }
