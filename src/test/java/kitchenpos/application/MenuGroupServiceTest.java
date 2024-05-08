@@ -12,8 +12,10 @@ import org.mockito.Mock;
 
 import java.util.List;
 
-import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
-import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupRequest;
+import static kitchenpos.fixture.MenuGroupFixture.NAME_추천메뉴;
+import static kitchenpos.fixture.MenuGroupFixture.NAME_한마리메뉴;
+import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
+import static kitchenpos.fixture.MenuGroupFixture.menuGroupResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,8 +24,6 @@ import static org.mockito.Mockito.when;
 @DisplayName("메뉴그룹 서비스 테스트")
 @ApplicationMockTest
 class MenuGroupServiceTest {
-    private static final String 추천메뉴 = "추천메뉴";
-    private static final String 한마리메뉴 = "한마리메뉴";
     @Mock
     private MenuGroupRepository menuGroupRepository;
 
@@ -34,15 +34,15 @@ class MenuGroupServiceTest {
     @Test
     void creatMenuGroup() {
         // given
-        MenuGroup request = createMenuGroupRequest(추천메뉴);
-        when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(createMenuGroup(추천메뉴));
+        MenuGroup request = menuGroupCreateRequest(NAME_추천메뉴);
+        when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(menuGroupResponse(NAME_추천메뉴));
 
         // when
-        MenuGroup createdMenuGroup = menuGroupService.create(request);
+        MenuGroup result = menuGroupService.create(request);
 
         // then
-        assertThat(createdMenuGroup.getId()).isNotNull();
-        assertThat(createdMenuGroup.getName()).isEqualTo(request.getName());
+        assertThat(result.getId()).isNotNull();
+        assertThat(result.getName()).isEqualTo(request.getName());
     }
 
     @DisplayName("메뉴그룹을 등록할 때, 이름이 공백이면 예외가 발생한다.")
@@ -50,7 +50,7 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     void creatMenuGroup_nullOrEmptyNameException(String name) {
         // given
-        MenuGroup request = createMenuGroupRequest(name);
+        MenuGroup request = menuGroupCreateRequest(name);
 
         // when
         // then
@@ -62,14 +62,13 @@ class MenuGroupServiceTest {
     @Test
     void getMenuGroups() {
         // given
-        List<MenuGroup> menuGroups = List.of(createMenuGroup(추천메뉴), createMenuGroup(한마리메뉴));
-
+        List<MenuGroup> menuGroups = List.of(menuGroupResponse(NAME_추천메뉴), menuGroupResponse(NAME_한마리메뉴));
         when(menuGroupRepository.findAll()).thenReturn(menuGroups);
 
         // when
-        List<MenuGroup> foundMenuGroups = menuGroupService.findAll();
+        List<MenuGroup> result = menuGroupService.findAll();
 
         // then
-        assertThat(foundMenuGroups).hasSize(2);
+        assertThat(result).hasSize(2);
     }
 }

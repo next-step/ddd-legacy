@@ -5,8 +5,6 @@ import io.restassured.response.Response;
 import kitchenpos.acceptacne.RestAssuredUtils;
 import kitchenpos.domain.MenuGroup;
 
-import java.util.Map;
-
 public class MenuGroupSteps {
     private static final String URI = "/api/menu-groups";
 
