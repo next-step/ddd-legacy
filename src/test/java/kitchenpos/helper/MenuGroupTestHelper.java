@@ -2,7 +2,6 @@ package kitchenpos.helper;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 
