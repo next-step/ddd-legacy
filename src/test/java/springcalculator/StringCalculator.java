@@ -26,7 +26,15 @@ public class StringCalculator {
 
         String[] tokens = new Delimiter(input).extractNumbers();
         for (String token : tokens) {
-            this.numbers.add(Integer.parseInt(token));
+            try {
+                int number = Integer.parseInt(token);
+                if (number < 0) {
+                    throw new RuntimeException("음수값을 넣을 수 없습니다.");
+                }
+                numbers.add(number);
+            } catch (NumberFormatException e) {
+                throw new RuntimeException("숫자 이외의 값을 들어갈 수 없습니다.");
+            }
         }
     }
 }

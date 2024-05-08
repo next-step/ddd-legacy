@@ -7,6 +7,8 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StringCalculatorTest {
 
@@ -68,4 +70,27 @@ class StringCalculatorTest {
         assertThat(new StringCalculator(input).add()).isSameAs(6);
     }
 
+    @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
+    @Test
+    void negative() {
+        // given
+        String input = "1,-1,2";
+
+        // when then
+        assertThatThrownBy(() -> new StringCalculator(input).add())
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("음수값을 넣을 수 없습니다.");
+    }
+
+    @DisplayName(value = "문자열 계산기에 숫자 이외의 값 전달 시 RuntimeException 예외 처리를 한다.")
+    @Test
+    void not_numbers() {
+        // given
+        String input = "1,o,2";
+
+        // when then
+        assertThatThrownBy(() -> new StringCalculator(input).add())
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("숫자 이외의 값을 들어갈 수 없습니다.");
+    }
 }
