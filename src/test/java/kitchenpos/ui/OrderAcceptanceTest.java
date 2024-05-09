@@ -65,9 +65,9 @@ class OrderAcceptanceTest {
     @BeforeEach
     void setUp() {
         MenuGroup menuGroup = createMenuGroup();
-        MenuProduct menuProduct_강정치킨 = createMenuProduct(NAME_양념치킨, PRICE_20000, 1);
+        MenuProduct menuProduct_양념치킨 = createMenuProduct(NAME_양념치킨, PRICE_20000, 1);
         MenuProduct menuProduct_후라이드 = createMenuProduct(NAME_후라이드치킨, PRICE_18000, 1);
-        Menu menu = createMenu(PRICE_38000, menuGroup, menuProduct_강정치킨, menuProduct_후라이드);
+        Menu menu = createMenu(PRICE_38000, menuGroup, menuProduct_양념치킨, menuProduct_후라이드);
         OrderTable orderTable = createOrderTable();
         OrderLineItem ORDER_ITEM_주문메뉴항목 = orderLineItemCreate(menu, PRICE_38000, 1);
         ORDER_TABLE_ID = orderTable.getId();

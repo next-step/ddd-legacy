@@ -42,7 +42,7 @@ class MenuGroupServiceTest {
 
         // then
         assertThat(result.getId()).isNotNull();
-        assertThat(result.getName()).isEqualTo(request.getName());
+        assertThat(result.getName()).isEqualTo(NAME_추천메뉴);
     }
 
     @DisplayName("메뉴그룹을 등록할 때, 이름이 공백이면 예외가 발생한다.")
@@ -70,5 +70,6 @@ class MenuGroupServiceTest {
 
         // then
         assertThat(result).hasSize(2);
+        assertThat(result).extracting("name").contains(NAME_추천메뉴, NAME_한마리메뉴);
     }
 }

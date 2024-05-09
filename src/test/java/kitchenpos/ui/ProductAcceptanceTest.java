@@ -67,7 +67,7 @@ class ProductAcceptanceTest {
     @Test
     void getProducts() {
         //given
-        UUID PRODUCT_강정치킨_ID = createProductId(NAME_양념치킨, PRICE_20000);
+        UUID PRODUCT_양념치킨 = createProductId(NAME_양념치킨, PRICE_20000);
         ;
         UUID PRODUCT_후라이드치킨_ID = createProductId(NAME_후라이드치킨, PRICE_18000);
         ;
@@ -79,7 +79,7 @@ class ProductAcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getList("id", UUID.class)).hasSize(2)
-                        .contains(PRODUCT_강정치킨_ID, PRODUCT_후라이드치킨_ID),
+                        .contains(PRODUCT_양념치킨, PRODUCT_후라이드치킨_ID),
                 () -> assertThat(response.jsonPath().getList("name")).hasSize(2)
                         .contains(NAME_양념치킨, NAME_후라이드치킨),
                 () -> assertThat(response.jsonPath().getList("price")).hasSize(2)

@@ -34,12 +34,13 @@ import static kitchenpos.fixture.MenuFixture.PRICE_34000;
 import static kitchenpos.fixture.MenuFixture.menuChangePriceRequest;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
 import static kitchenpos.fixture.MenuFixture.menuResponse;
+import static kitchenpos.fixture.MenuGroupFixture.NAME_추천메뉴;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupResponse;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
 import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
 import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_20000;
 import static kitchenpos.fixture.ProductFixture.PRICE_18000;
+import static kitchenpos.fixture.ProductFixture.PRICE_20000;
 import static kitchenpos.fixture.ProductFixture.productResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -63,9 +64,9 @@ class MenuServiceTest {
     private MenuService menuService;
 
     private MenuGroup MENU_GROUP_추천메뉴;
-    private Product PRODUCT_강정치킨;
+    private Product PRODUCT_양념치킨;
     private Product PRODUCT_후라이드치킨;
-    private MenuProduct 강정치킨_1개;
+    private MenuProduct 양념치킨_1개;
     private MenuProduct 후라이드치킨_1개;
     private UUID ID_MENU_GOURP_추천메뉴;
     private Menu MENU_순살치킨;
@@ -73,13 +74,13 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
-        MENU_GROUP_추천메뉴 = menuGroupResponse("추천메뉴");
-        PRODUCT_강정치킨 = productResponse(NAME_양념치킨, PRICE_20000);
+        MENU_GROUP_추천메뉴 = menuGroupResponse(NAME_추천메뉴);
+        PRODUCT_양념치킨 = productResponse(NAME_양념치킨, PRICE_20000);
         PRODUCT_후라이드치킨 = productResponse(NAME_후라이드치킨, PRICE_18000);
-        강정치킨_1개 = menuProductResponse(PRODUCT_강정치킨, 1);
+        양념치킨_1개 = menuProductResponse(PRODUCT_양념치킨, 1);
         후라이드치킨_1개 = menuProductResponse(PRODUCT_후라이드치킨, 1);
         ID_MENU_GOURP_추천메뉴 = MENU_GROUP_추천메뉴.getId();
-        MENU_순살치킨 = menuResponse(NAME_순살치킨, PRICE_34000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
+        MENU_순살치킨 = menuResponse(NAME_순살치킨, PRICE_34000, ID_MENU_GOURP_추천메뉴, true, 양념치킨_1개, 후라이드치킨_1개);
         ID_MENU_순살치킨 = MENU_순살치킨.getId();
     }
 
@@ -90,7 +91,7 @@ class MenuServiceTest {
         @Test
         void creatMenu() {
             // given
-            Menu request = buildCreateRequest();
+            Menu request = buildCreateRequest(NAME_순살치킨, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
             commonStubForCreateMenu();
             stubMenuRepositorySave();
 
@@ -105,7 +106,7 @@ class MenuServiceTest {
                     () -> assertThat(result.isDisplayed()).isTrue(),
                     () -> assertThat(result.getMenuGroupId()).isEqualTo(ID_MENU_GOURP_추천메뉴),
                     () -> assertThat(result.getMenuProducts()).hasSize(2)
-                            .containsExactly(강정치킨_1개, 후라이드치킨_1개)
+                            .containsExactly(양념치킨_1개, 후라이드치킨_1개)
             );
         }
 
@@ -117,7 +118,8 @@ class MenuServiceTest {
             @ParameterizedTest
             void creatMenu_nullNameException(String name) {
                 // given
-                Menu request = buildCreateRequest(name);
+                Menu request = buildCreateRequest(name, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
+                ;
                 commonStubForCreateMenu();
 
                 // when
@@ -131,7 +133,7 @@ class MenuServiceTest {
             @ParameterizedTest
             void creatMenu_containProfanityNameException(String name) {
                 // given
-                Menu request = buildCreateRequest(name);
+                Menu request = buildCreateRequest(name, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
                 commonStubForCreateMenu();
 
                 // when
@@ -152,7 +154,7 @@ class MenuServiceTest {
             @ParameterizedTest
             void creatMenu_NullOrNegativePriceException(BigDecimal price) {
                 // given
-                Menu request = buildCreateRequest(price);
+                Menu request = buildCreateRequest(NAME_순살치킨, price, 양념치킨_1개, 후라이드치킨_1개);
 
                 // when
                 // then
@@ -165,7 +167,7 @@ class MenuServiceTest {
             @ParameterizedTest
             void creatMenu_invalidPricePolicyException(long price) {
                 // given
-                Menu request = buildCreateRequest(BigDecimal.valueOf(price));
+                Menu request = buildCreateRequest(NAME_순살치킨, BigDecimal.valueOf(price), 양념치킨_1개, 후라이드치킨_1개);
                 commonStubForCreateMenu();
 
                 // when
@@ -183,7 +185,7 @@ class MenuServiceTest {
         @Test
         void creatMenu_notExistsMenuGroupException() {
             // given
-            Menu request = buildCreateRequest();
+            Menu request = buildCreateRequest(NAME_순살치킨, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
 
             // when
             when(menuGroupRepository.findById(any())).thenReturn(Optional.empty());
@@ -200,7 +202,7 @@ class MenuServiceTest {
             @Test
             void creatMenu_emptyMenuProductException() {
                 // given
-                Menu request = buildCreateRequest();
+                Menu request = buildCreateRequest(NAME_순살치킨, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
                 stubMenuGroupRepositoryFindById();
 
                 // when
@@ -215,7 +217,7 @@ class MenuServiceTest {
             @Test
             void creatMenu_notExistsMenuProductException() {
                 // given
-                Menu request = buildCreateRequest();
+                Menu request = buildCreateRequest(NAME_순살치킨, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
                 stubMenuGroupRepositoryFindById();
 
                 // when
@@ -231,11 +233,11 @@ class MenuServiceTest {
             @ParameterizedTest
             void creatMenu_negativeQuantityMenuProductException(long quantity) {
                 // given
-                Menu request = buildCreateRequest(menuProductResponse(PRODUCT_강정치킨, quantity));
+                Menu request = buildCreateRequest(NAME_순살치킨, PRICE_34000, menuProductResponse(PRODUCT_양념치킨, quantity));
                 stubMenuGroupRepositoryFindById();
 
                 // when
-                when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_강정치킨));
+                when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_양념치킨));
 
                 // then
                 assertThatThrownBy(() -> menuService.create(request))
@@ -298,7 +300,7 @@ class MenuServiceTest {
         @ParameterizedTest
         void changeMenuPrice_invalidPricePolicyException(long price) {
             // given
-            Menu request = buildCreateRequest(BigDecimal.valueOf(price));
+            Menu request = buildCreateRequest(NAME_순살치킨, BigDecimal.valueOf(price), 양념치킨_1개, 후라이드치킨_1개);
             stubMenuRepositoryFindById();
 
             // when
@@ -397,27 +399,11 @@ class MenuServiceTest {
 
     @NotNull
     private Menu buildMenuResponse(long price) {
-        return menuResponse(NAME_순살치킨, BigDecimal.valueOf(price), ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개);
+        return menuResponse(NAME_순살치킨, BigDecimal.valueOf(price), ID_MENU_GOURP_추천메뉴, true, 양념치킨_1개);
     }
 
-    @NotNull
-    private Menu buildCreateRequest() {
-        return menuCreateRequest(NAME_순살치킨, PRICE_34000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
-    }
-
-    @NotNull
-    private Menu buildCreateRequest(String name) {
-        return menuCreateRequest(name, PRICE_34000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
-    }
-
-    @NotNull
-    private Menu buildCreateRequest(BigDecimal price) {
-        return menuCreateRequest(NAME_순살치킨, price, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
-    }
-
-    @NotNull
-    private Menu buildCreateRequest(MenuProduct... menuProducts) {
-        return menuCreateRequest(NAME_순살치킨, PRICE_34000, ID_MENU_GOURP_추천메뉴, true, menuProducts);
+    private Menu buildCreateRequest(String name, BigDecimal price, MenuProduct... menuProducts) {
+        return menuCreateRequest(name, price, ID_MENU_GOURP_추천메뉴, true, menuProducts);
     }
 
     private void stubMenuRepositorySave() {
@@ -434,8 +420,8 @@ class MenuServiceTest {
 
     private void commonStubForCreateMenu() {
         when(menuGroupRepository.findById(any())).thenReturn(Optional.ofNullable(MENU_GROUP_추천메뉴));
-        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_강정치킨, PRODUCT_후라이드치킨));
-        when(productRepository.findById(PRODUCT_강정치킨.getId())).thenAnswer(invocation -> Optional.ofNullable(PRODUCT_강정치킨));
+        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_양념치킨, PRODUCT_후라이드치킨));
+        when(productRepository.findById(PRODUCT_양념치킨.getId())).thenAnswer(invocation -> Optional.ofNullable(PRODUCT_양념치킨));
         when(productRepository.findById(PRODUCT_후라이드치킨.getId())).thenAnswer(invocation -> Optional.ofNullable(PRODUCT_후라이드치킨));
     }
 }

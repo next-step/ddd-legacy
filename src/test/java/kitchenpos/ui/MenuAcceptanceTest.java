@@ -43,18 +43,18 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @AcceptanceTest
 @DisplayName("메뉴 인수테스트")
 class MenuAcceptanceTest {
-    private Product PRODUCT_강정치킨;
+    private Product PRODUCT_양념치킨;
     private Product PRODUCT_후라이드치킨;
-    private MenuProduct 강정치킨_1개;
+    private MenuProduct 양념치킨_1개;
     private MenuProduct 후라이드치킨_1개;
     private UUID MENU_GROUP_ID;
 
     @BeforeEach
     void setUp() {
         MenuGroup menuGroup = createMenuGroupStep(menuGroupCreateRequest(NAME_추천메뉴)).as(MenuGroup.class);
-        PRODUCT_강정치킨 = createProduct(NAME_양념치킨, PRICE_20000);
+        PRODUCT_양념치킨 = createProduct(NAME_양념치킨, PRICE_20000);
         PRODUCT_후라이드치킨 = createProduct(NAME_후라이드치킨, PRICE_18000);
-        강정치킨_1개 = menuProductResponse(PRODUCT_강정치킨, 1);
+        양념치킨_1개 = menuProductResponse(PRODUCT_양념치킨, 1);
         후라이드치킨_1개 = menuProductResponse(PRODUCT_후라이드치킨, 1);
         MENU_GROUP_ID = menuGroup.getId();
     }
@@ -63,7 +63,7 @@ class MenuAcceptanceTest {
     @Test
     void createMenu() {
         // given
-        Menu request = menuCreateRequest(NAME_순살치킨, PRICE_38000, MENU_GROUP_ID, true, 강정치킨_1개, 후라이드치킨_1개);
+        Menu request = menuCreateRequest(NAME_순살치킨, PRICE_38000, MENU_GROUP_ID, true, 양념치킨_1개, 후라이드치킨_1개);
 
         // when
         ExtractableResponse<Response> response = createMenuStep(request);
@@ -77,7 +77,7 @@ class MenuAcceptanceTest {
                 () -> assertThat(response.jsonPath().getObject("menuGroup.id", UUID.class)).isEqualTo(MENU_GROUP_ID),
                 () -> assertThat(response.jsonPath().getBoolean("displayed")).isTrue(),
                 () -> assertThat(response.jsonPath().getList("menuProducts.product.id", UUID.class)).hasSize(2)
-                        .contains(PRODUCT_강정치킨.getId(), PRODUCT_후라이드치킨.getId()),
+                        .contains(PRODUCT_양념치킨.getId(), PRODUCT_후라이드치킨.getId()),
                 () -> assertThat(response.jsonPath().getList("menuProducts.quantity")).hasSize(2).contains(1)
         );
     }
@@ -86,7 +86,7 @@ class MenuAcceptanceTest {
     @Test
     void changeMenuPrice() {
         // given
-        UUID menuId = createMenuId(NAME_순살치킨, PRICE_38000, 강정치킨_1개, 후라이드치킨_1개);
+        UUID menuId = createMenuId(NAME_순살치킨, PRICE_38000, 양념치킨_1개, 후라이드치킨_1개);
         Menu request = menuChangePriceRequest(PRICE_34000);
 
         // when
@@ -107,7 +107,7 @@ class MenuAcceptanceTest {
     @Test
     void displayMenu() {
         // given
-        UUID menuId = createMenuId(NAME_순살치킨, PRICE_38000, 강정치킨_1개, 후라이드치킨_1개);
+        UUID menuId = createMenuId(NAME_순살치킨, PRICE_38000, 양념치킨_1개, 후라이드치킨_1개);
         hideMenuStep(menuId);
 
         // when
@@ -124,7 +124,7 @@ class MenuAcceptanceTest {
     @Test
     void hideMenu() {
         // given
-        UUID menuId = createMenuId(NAME_순살치킨, PRICE_38000, 강정치킨_1개, 후라이드치킨_1개);
+        UUID menuId = createMenuId(NAME_순살치킨, PRICE_38000, 양념치킨_1개, 후라이드치킨_1개);
 
         // when
         ExtractableResponse<Response> response = hideMenuStep(menuId);
@@ -140,8 +140,8 @@ class MenuAcceptanceTest {
     @Test
     void getMenus() {
         // given
-        UUID 순살치킨_MENU_ID = createMenuId(NAME_순살치킨, PRICE_38000, 강정치킨_1개, 후라이드치킨_1개);
-        UUID 반반치킨_MENU_ID = createMenuId(NAME_반반치킨, PRICE_19000, 강정치킨_1개, 후라이드치킨_1개);
+        UUID 순살치킨_MENU_ID = createMenuId(NAME_순살치킨, PRICE_38000, 양념치킨_1개, 후라이드치킨_1개);
+        UUID 반반치킨_MENU_ID = createMenuId(NAME_반반치킨, PRICE_19000, 양념치킨_1개, 후라이드치킨_1개);
 
         // when
         ExtractableResponse<Response> response = getMenusStep();

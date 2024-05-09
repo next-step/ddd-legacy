@@ -25,8 +25,8 @@ import static kitchenpos.fixture.MenuFixture.menuPriceAndMenuProductResponse;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
 import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
 import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_20000;
 import static kitchenpos.fixture.ProductFixture.PRICE_18000;
+import static kitchenpos.fixture.ProductFixture.PRICE_20000;
 import static kitchenpos.fixture.ProductFixture.productChangePriceRequest;
 import static kitchenpos.fixture.ProductFixture.productCreateRequest;
 import static kitchenpos.fixture.ProductFixture.productResponse;
@@ -39,8 +39,8 @@ import static org.mockito.Mockito.when;
 @DisplayName("상품 서비스 테스트")
 @ApplicationMockTest
 class ProductServiceTest {
-    private UUID ID_강정치킨;
-    private Product PRODUCT_강정치킨;
+    private UUID ID_양념치킨;
+    private Product PRODUCT_양념치킨;
     private Product PRODUCT_후라이드치킨;
     @Mock
     private ProductRepository productRepository;
@@ -54,9 +54,9 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
-        PRODUCT_강정치킨 = productResponse(NAME_양념치킨, PRICE_20000);
+        PRODUCT_양념치킨 = productResponse(NAME_양념치킨, PRICE_20000);
         PRODUCT_후라이드치킨 = productResponse(NAME_후라이드치킨, PRICE_18000);
-        ID_강정치킨 = PRODUCT_강정치킨.getId();
+        ID_양념치킨 = PRODUCT_양념치킨.getId();
     }
 
     @DisplayName("상품을 등록한다.")
@@ -64,7 +64,7 @@ class ProductServiceTest {
     void creatProduct() {
         // given
         Product request = productCreateRequest(NAME_양념치킨, PRICE_20000);
-        when(productRepository.save(any())).thenReturn(PRODUCT_강정치킨);
+        when(productRepository.save(any())).thenReturn(PRODUCT_양념치킨);
 
         // when
         Product result = productService.create(request);
@@ -136,10 +136,10 @@ class ProductServiceTest {
     void changeProductPriceTest() {
         // given
         Product request = productChangePriceRequest(PRICE_18000);
-        when(productRepository.findById(any())).thenReturn(Optional.of(PRODUCT_강정치킨));
+        when(productRepository.findById(any())).thenReturn(Optional.of(PRODUCT_양념치킨));
 
         // when
-        Product result = productService.changePrice(ID_강정치킨, request);
+        Product result = productService.changePrice(ID_양념치킨, request);
 
         // then
         assertThat(result.getPrice()).isEqualTo(request.getPrice());
@@ -154,7 +154,7 @@ class ProductServiceTest {
 
         // when
         // then
-        assertThatThrownBy(() -> productService.changePrice(ID_강정치킨, request))
+        assertThatThrownBy(() -> productService.changePrice(ID_양념치킨, request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -167,7 +167,7 @@ class ProductServiceTest {
 
         // when
         // then
-        assertThatThrownBy(() -> productService.changePrice(ID_강정치킨, request))
+        assertThatThrownBy(() -> productService.changePrice(ID_양념치킨, request))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -178,13 +178,13 @@ class ProductServiceTest {
         BigDecimal 변경할_상품가격 = BigDecimal.valueOf(10_000);
         List<Menu> 강정치킨상품_포함된_메뉴들 = settingMenus();
 
-        when(productRepository.findById(any())).thenReturn(Optional.of(PRODUCT_강정치킨));
+        when(productRepository.findById(any())).thenReturn(Optional.of(PRODUCT_양념치킨));
         when(menuRepository.findAllByProductId(any())).thenReturn(강정치킨상품_포함된_메뉴들);
 
         Product request = productChangePriceRequest(변경할_상품가격);
 
         // when
-        productService.changePrice(ID_강정치킨, request);
+        productService.changePrice(ID_양념치킨, request);
 
         // then
         강정치킨상품_포함된_메뉴들.forEach(menu -> assertThat(menu.isDisplayed()).isFalse());
@@ -194,7 +194,7 @@ class ProductServiceTest {
     @Test
     void getMenuGroups() {
         // given
-        List<Product> list = List.of(PRODUCT_강정치킨, PRODUCT_후라이드치킨);
+        List<Product> list = List.of(PRODUCT_양념치킨, PRODUCT_후라이드치킨);
         when(productRepository.findAll()).thenReturn(list);
 
         // when
@@ -206,17 +206,13 @@ class ProductServiceTest {
 
     private List<Menu> settingMenus() {
         // 메뉴구성상품 종류 (상품, 상품수량)
-        MenuProduct 강정치킨_1개 = menuProductResponse(PRODUCT_강정치킨, 1);
-        MenuProduct 강정치킨_2개 = menuProductResponse(PRODUCT_강정치킨, 2);
+        MenuProduct 강정치킨_1개 = menuProductResponse(PRODUCT_양념치킨, 1);
+        MenuProduct 강정치킨_2개 = menuProductResponse(PRODUCT_양념치킨, 2);
         MenuProduct 후라이드치킨_1개 = menuProductResponse(PRODUCT_후라이드치킨, 1);
 
-        // 메뉴 가격
-        BigDecimal PRICE_MENU_두마리치킨 = BigDecimal.valueOf(30_000);
-        BigDecimal PRICE_MENU_추천메뉴 = BigDecimal.valueOf(40_000);
-
         // 메뉴List (가격, 매뉴구성상품......)
-        Menu MENU_두마리치킨 = menuPriceAndMenuProductResponse(PRICE_MENU_두마리치킨, 강정치킨_1개, 후라이드치킨_1개);
-        Menu MENU_추천메뉴 = menuPriceAndMenuProductResponse(PRICE_MENU_추천메뉴, 강정치킨_2개, 후라이드치킨_1개);
+        Menu MENU_두마리치킨 = menuPriceAndMenuProductResponse(BigDecimal.valueOf(30_000), 강정치킨_1개, 후라이드치킨_1개);
+        Menu MENU_추천메뉴 = menuPriceAndMenuProductResponse(BigDecimal.valueOf(40_000), 강정치킨_2개, 후라이드치킨_1개);
         return List.of(MENU_두마리치킨, MENU_추천메뉴);
     }
 }
