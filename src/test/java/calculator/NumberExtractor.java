@@ -1,7 +1,7 @@
 package calculator;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,27 +15,35 @@ class NumberExtractor {
   private static final Pattern DELIMITER_PREFIX_REGEX = Pattern.compile("[//]");
   private static final Pattern DELIMITER_POSTFIX_REGEX = Pattern.compile("[\n].*");
 
-  // TODO 이 부분 에서 if를 없애는 방향으로 객체지향을 사용할 수 있을 것 같습니다. 좋은 아이디어가 있으시면 공유 부탁드릴께요!
-  public List<Integer> extract(String text) {
+  public List<PositiveNumber> extract(String text) {
 
     validateEmpty(text);
 
     if (startsWithCustomDelimiter(text)) {
       String delimiter = extractDelimiter(text);
 
-      String[] numbers = text
-              .replaceAll(DELIMITER_PREFIX, "")
-              .replaceAll(DELIMITER_POSTFIX, "")
-              .split(delimiter);
+      String[] numbers = extractNumbers(text, delimiter);
 
-      return Arrays.stream(numbers)
-              .filter(StringUtils::hasText)
-              .map(this::parseInt)
-              .toList();
+      return extractIntegers(numbers);
     }
 
     String[] numbers = DEFAULT_DELIMITER.split(text);
 
+    return extractIntegers(numbers);
+  }
+
+  @NotNull
+  private static String[] extractNumbers(String text, String delimiter) {
+    String[] numbers = text
+            .replaceAll(DELIMITER_PREFIX, "")
+            .replaceFirst(delimiter, "")
+            .replaceAll(DELIMITER_POSTFIX, "")
+            .split(delimiter);
+    return numbers;
+  }
+
+  @NotNull
+  private List<PositiveNumber> extractIntegers(String[] numbers) {
     return Arrays.stream(numbers)
             .map(this::parseInt)
             .toList();
@@ -54,21 +62,17 @@ class NumberExtractor {
 
   private void validateEmpty(final String text) {
     if (ObjectUtils.isEmpty(text))
-      throw new IllegalArgumentException("text is empty: Please check nullity of text");
+      throw new IllegalArgumentException("변환 대상 인풋이 빈값이거나 null 입니다.");
   }
 
-  private Integer parseInt(final String text) {
+  private PositiveNumber parseInt(final String element) {
     try {
-      Integer value = Integer.valueOf(text);
 
-      if (value.compareTo(0) < 0)
-        throw new RuntimeException("숫자가 음수 입니다.");
-
-      return value;
+      return PositiveNumber.from(element);
 
     } catch (NumberFormatException e) {
 
-      throw new RuntimeException("숫자가 아닌 값이 text에 있습니다.");
+      throw new RuntimeException(String.format("연산 대상은 숫자이어야 합니다. 입력된 글자: %s", element));
     }
   }
 }

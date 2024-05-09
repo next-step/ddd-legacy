@@ -1,7 +1,6 @@
 package calculator;
 
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -24,9 +23,10 @@ class StringCalculator {
       return ZERO;
     }
 
-    List<Integer> numbers = extractor.extract(text);
+    List<PositiveNumber> numbers = extractor.extract(text);
 
     return numbers.stream()
+            .map(PositiveNumber::getValue)
             .reduce(0, Integer::sum);
   }
 }
