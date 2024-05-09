@@ -264,6 +264,21 @@ class MenuServiceTest {
             );
         }
 
+        @DisplayName("메뉴 ID와 일치하는 메뉴가 없으면 예외 발생한다.")
+        @Test
+        void changeMenuPrice_notExistsMenuException() {
+            // given
+            Menu request = menuChangePriceRequest(BigDecimal.valueOf(30_000));
+            stubMenuRepositoryFindById();
+
+            // when
+            when(menuRepository.findById(any())).thenReturn(Optional.empty());
+
+            // then
+            assertThatThrownBy(() -> menuService.changePrice(ID_MENU_순살치킨, request))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
         @DisplayName("메뉴의 가격을 수정할 때, 가격이 공백이거나  0원보다 작으면 예외가 발생한다.")
         @NullSource
         @MethodSource("provideInvalidPrices")
