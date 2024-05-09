@@ -1,12 +1,15 @@
 package kitchenpos.menu.service;
 
 import kitchenpos.application.ProductService;
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.menu.MenuTestHelper;
 import kitchenpos.menu.fixture.ProductFixture;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +20,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @DisplayName("상품 서비스 테스트")
@@ -30,6 +35,13 @@ public class ProductServiceTest {
     private PurgomalumClient purgomalumClient;
     @InjectMocks
     private ProductService productService;
+
+    private MenuTestHelper menuTestHelper;
+
+    @BeforeEach
+    void setUp() {
+        menuTestHelper = new MenuTestHelper();
+    }
 
     @Test
     @DisplayName("새로운 상품을 추가 할 수 있다.")
@@ -65,5 +77,36 @@ public class ProductServiceTest {
         Assertions.assertThatThrownBy(
                 () -> productService.create(ProductFixture.부적절한_이름_상품)
         ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("상품의 가격을 변경할 수 있다.")
+    void changePrice() {
+        Product 상품_A = ProductFixture.상품_A;
+        Product 상품_C = ProductFixture.상품_C;
+
+        Mockito.when(productRepository.findById(Mockito.any()))
+                .thenReturn(Optional.of(상품_A));
+        Mockito.when(menuRepository.findAllByProductId(Mockito.any()))
+                .thenReturn(List.of(menuTestHelper.메뉴_A));
+
+        productService.changePrice(상품_A.getId(), 상품_C);
+        Assertions.assertThat(상품_A.getPrice()).isEqualTo(상품_C.getPrice());
+    }
+
+    @Test
+    @DisplayName("해당 상품으로 구성된 메뉴의 가격이 변경된 상품의 가격 총합보다 크다면 메뉴를 노출하지 않는다.")
+    void changePrice_exception_price() {
+        Product 상품_A = ProductFixture.상품_A;
+        Product 상품_B = ProductFixture.상품_B;
+        Menu 메뉴_A = menuTestHelper.메뉴_A;
+
+        Mockito.when(productRepository.findById(Mockito.any()))
+                .thenReturn(Optional.of(상품_A));
+        Mockito.when(menuRepository.findAllByProductId(Mockito.any()))
+                .thenReturn(List.of(메뉴_A));
+
+        productService.changePrice(상품_A.getId(), 상품_B);
+        Assertions.assertThat(메뉴_A.isDisplayed()).isEqualTo(false);
     }
 }

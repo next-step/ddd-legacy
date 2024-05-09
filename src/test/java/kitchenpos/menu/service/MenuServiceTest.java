@@ -6,7 +6,7 @@ import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import kitchenpos.menu.menuTestHelper;
+import kitchenpos.menu.MenuTestHelper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -34,11 +34,11 @@ public class MenuServiceTest {
     @InjectMocks
     private MenuService menuService;
 
-    private kitchenpos.menu.menuTestHelper menuTestHelper;
+    private MenuTestHelper menuTestHelper;
 
     @BeforeEach
     void setUp() {
-        menuTestHelper = new menuTestHelper();
+        menuTestHelper = new MenuTestHelper();
     }
 
     @Test
@@ -129,14 +129,14 @@ public class MenuServiceTest {
 
     private void mockingMenuGroupRepositoryForCreate(Menu menu) {
         Mockito.when(menuGroupRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(kitchenpos.menu.menuTestHelper.extractMenuGroupFrom(menu)));
+                .thenReturn(Optional.of(MenuTestHelper.extractMenuGroupFrom(menu)));
     }
 
     private void mockingProductRepositoryForCreate(Menu menu) {
         Mockito.when(productRepository.findAllByIdIn(Mockito.any()))
-                .thenReturn(kitchenpos.menu.menuTestHelper.extractProductsFrom(menu));
+                .thenReturn(MenuTestHelper.extractProductsFrom(menu));
         Mockito.when(productRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(kitchenpos.menu.menuTestHelper.extractProductFrom(menu)));
+                .thenReturn(Optional.of(MenuTestHelper.extractProductFrom(menu)));
     }
 
     private void mockingPurgomalumClientForCreate(boolean result) {

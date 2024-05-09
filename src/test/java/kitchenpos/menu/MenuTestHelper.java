@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class menuTestHelper {
+public class MenuTestHelper {
     public MenuProduct 메뉴_상품_A = MenuProductFixture.create(ProductFixture.상품_A,10);
     public MenuProduct 메뉴_상품_B = MenuProductFixture.create(ProductFixture.상품_B, 10);
     public MenuProduct 메뉴_상품_C = MenuProductFixture.create(ProductFixture.상품_C, 10);
