@@ -160,4 +160,19 @@ class OrderTableServiceTest {
                 () -> assertThat(result.isOccupied()).isTrue()
         );
     }
+
+    @DisplayName("고객의 수를 변경하려고 하는 해당 테이블이 없으면 예외 발생한다.")
+    @Test
+    void changeNumberOfGuestsOrderTable_notExistsOrderTableException() {
+        // given
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        UUID orderTableId = ORDER_TABLE_1번.getId();
+        when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
+        OrderTable request = changeNumberOfGuestsRequest(4);
+
+        // when
+        // then
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
+                .isInstanceOf(NoSuchElementException.class);
+    }
 }
