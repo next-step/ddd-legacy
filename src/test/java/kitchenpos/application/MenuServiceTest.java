@@ -22,6 +22,7 @@ import org.mockito.Mock;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -154,6 +155,20 @@ class MenuServiceTest {
         // then
         assertThatThrownBy(() -> menuService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴를 등록할 때, 미리 등록되어 있지 않은 메뉴그룹이면 예외 발생한다.")
+    @Test
+    void creatMenu_notExistsMenuGroupException() {
+        // given
+        Menu request = buildCreateRequest();
+
+        // when
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.empty());
+
+        // then
+        assertThatThrownBy(() -> menuService.create(request))
+                .isInstanceOf(NoSuchElementException.class);
     }
 
     @NotNull
