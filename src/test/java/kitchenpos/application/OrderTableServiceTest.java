@@ -191,4 +191,19 @@ class OrderTableServiceTest {
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
                 .isInstanceOf(IllegalStateException.class);
     }
+
+    @DisplayName("해당 주문 테이블 고객의 수를 변경할 때, 0명보다 작으면 예외 발생한다.")
+    @ValueSource(ints = {-1, -111, -99999})
+    @ParameterizedTest
+    void changeNumberOfGuestsOrderTable_negativeException(int numberOfGuests) {
+        // given
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        UUID orderTableId = ORDER_TABLE_1번.getId();
+        OrderTable request = changeNumberOfGuestsRequest(numberOfGuests);
+
+        // when
+        // then
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
 }
