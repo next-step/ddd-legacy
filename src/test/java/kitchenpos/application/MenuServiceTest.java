@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
 import static kitchenpos.fixture.MenuFixture.NAME_순살치킨;
 import static kitchenpos.fixture.MenuFixture.PRICE_32000;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
@@ -171,6 +172,52 @@ class MenuServiceTest {
                 .isInstanceOf(NoSuchElementException.class);
     }
 
+    @DisplayName("메뉴를 등록할 때, 메뉴구성상품을 하나도 담지 않으면 예외 발생한다.")
+    @Test
+    void creatMenu_emptyMenuProductException() {
+        // given
+        Menu request = buildCreateRequest();
+        stubMenuGroupRepositoryFindById();
+
+        // when
+        when(productRepository.findAllByIdIn(any())).thenReturn(emptyList());
+
+        // then
+        assertThatThrownBy(() -> menuService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴를 등록할 때, 메뉴구성상품이 미리 등록되지 않은 상품이 하나라도 있으면 예외 발생한다.")
+    @Test
+    void creatMenu_notExistsMenuProductException() {
+        // given
+        Menu request = buildCreateRequest();
+        stubMenuGroupRepositoryFindById();
+
+        // when
+        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_후라이드치킨));
+
+        // then
+        assertThatThrownBy(() -> menuService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴를 등록할 때, 메뉴구성상품의 수량이 0개 미만이면 예외 발생한다.")
+    @ValueSource(longs = {-1, -111, -999999})
+    @ParameterizedTest
+    void creatMenu_negativeQuantityMenuProductException(long quantity) {
+        // given
+        Menu request = buildCreateRequest(menuProductResponse(PRODUCT_강정치킨, quantity));
+        stubMenuGroupRepositoryFindById();
+
+        // when
+        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_강정치킨));
+
+        // then
+        assertThatThrownBy(() -> menuService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
     @NotNull
     private Menu buildCreateRequest() {
         return menuCreateRequest(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
@@ -186,9 +233,18 @@ class MenuServiceTest {
         return menuCreateRequest(NAME_순살치킨, price, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
     }
 
+    @NotNull
+    private Menu buildCreateRequest(MenuProduct... menuProducts) {
+        return menuCreateRequest(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, menuProducts);
+    }
+
     private void stubMenuRepositorySave() {
         Menu MENU_순살치킨 = menuResponse(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
         when(menuRepository.save(any())).thenReturn(MENU_순살치킨);
+    }
+
+    private void stubMenuGroupRepositoryFindById() {
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.of(new MenuGroup()));
     }
 
     private void commonStubForCreateMenu() {
