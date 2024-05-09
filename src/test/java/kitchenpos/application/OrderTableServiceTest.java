@@ -12,7 +12,6 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -124,5 +123,20 @@ class OrderTableServiceTest {
                 () -> assertThatThrownBy(() -> orderTableService.clear(orderTableId))
                         .isInstanceOf(NoSuchElementException.class)
         );
+    }
+
+    @DisplayName("해당 주문 테이블이 초기화 할 때, 주문의 상태가 '주문완료'가 아니면 예외 발생한다.")
+    @Test
+    void clearOrderTable_notCompletedOrderStatusException() {
+        // given
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
+        when(orderRepository.existsByOrderTableAndStatusNot(ORDER_TABLE_1번, OrderStatus.COMPLETED)).thenReturn(true);
+        UUID orderTableId = ORDER_TABLE_1번.getId();
+
+        // when
+        // then
+        assertThatThrownBy(() -> orderTableService.clear(orderTableId))
+                .isInstanceOf(IllegalStateException.class);
     }
 }
