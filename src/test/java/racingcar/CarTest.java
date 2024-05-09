@@ -19,7 +19,7 @@ class CarTest {
   @Test
   void canMoveWhenPositionIs4OrUpper() {
     final var car = new Car("추교준");
-    car.move(4);
+    car.move(new GoStrategy());
     assertThat(car.position()).isEqualTo(1);
   }
 
@@ -27,7 +27,7 @@ class CarTest {
   @Test
   void canNotMoveWhenPositionLessThan4() {
     final var car = new Car("추교준");
-    car.move(3);
+    car.move(new StopStrategy());
     assertThat(car.position()).isEqualTo(0);
   }
 }
