@@ -22,9 +22,9 @@ public class StringSplitter implements Splitter<String> {
         if (matcher.find()) {
             delimiter.addDelimiter(matcher.group(DELIMITER_GROUP));
             targetText = new SplitTargetText(matcher.group(TARGET_TEXT_GROUP));
-            return delimiter.split(targetText);
+            return targetText.split(delimiter);
         }
 
-        return delimiter.split(targetText);
+        return targetText.split(delimiter);
     }
 }

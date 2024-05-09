@@ -21,8 +21,8 @@ public class SplitTargetText {
         }
     }
 
-    public String[] split(String delimiter) {
-        return targetText.split(delimiter);
+    public String[] split(Delimiter delimiter) {
+        return targetText.split(delimiter.delimiter());
     }
 
     @Override

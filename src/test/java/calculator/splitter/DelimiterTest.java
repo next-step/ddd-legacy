@@ -26,20 +26,4 @@ class DelimiterTest {
         delimiter.addDelimiter(";");
         assertThat(delimiter).isEqualTo(new Delimiter(",|;"));
     }
-
-    @Test
-    void 문자열을_분리한다() {
-        SplitTargetText splitTargetText = new SplitTargetText("가,나,다");
-        assertThat(delimiter.split(splitTargetText)).contains("가", "나", "다");
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {"가,나,다", "가,나;다", "가;나;다"})
-    void 구분자를_추가한후_문자열을_분리한다(final String text) {
-        SplitTargetText splitTargetText = new SplitTargetText(text);
-
-        delimiter.addDelimiter(";");
-
-        assertThat(delimiter.split(splitTargetText)).contains("가", "나", "다");
-    }
 }
