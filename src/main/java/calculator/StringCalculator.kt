@@ -18,7 +18,7 @@ class StringCalculator {
         }
 
         if (text.length == 1) {
-            return text.toInt()
+            return text.toIntOrNull() ?: throw RuntimeException("숫자만 입력 가능합니다.")
         }
 
         val matcher = customDelimiterPattern.matcher(text)
