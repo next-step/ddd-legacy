@@ -252,7 +252,7 @@ class MenuServiceTest {
         void changeMenuPrice() {
             // given
             Menu request = menuChangePriceRequest(BigDecimal.valueOf(30_000));
-            when(menuRepository.findById(any())).thenReturn(Optional.of(MENU_순살치킨));
+            stubMenuRepositoryFindById();
 
             // when
             Menu result = menuService.changePrice(ID_MENU_순살치킨, request);
@@ -284,7 +284,7 @@ class MenuServiceTest {
         void changeMenuPrice_invalidPricePolicyException(long price) {
             // given
             Menu request = buildCreateRequest(BigDecimal.valueOf(price));
-            when(menuRepository.findById(any())).thenReturn(Optional.of(MENU_순살치킨));
+            stubMenuRepositoryFindById();
 
             // when
             // then
@@ -294,6 +294,26 @@ class MenuServiceTest {
 
         private static Stream<BigDecimal> provideInvalidPrices() {
             return Stream.of(BigDecimal.valueOf(-1), BigDecimal.valueOf(-1000), BigDecimal.valueOf(-99999990));
+        }
+    }
+
+    @Nested
+    @DisplayName("메뉴 노출 여부 테스트")
+    class changeDisplay {
+        @DisplayName("메뉴가 노출된다.")
+        @Test
+        void displayMenu() {
+            // given
+            stubMenuRepositoryFindById();
+
+            // when
+            Menu result = menuService.display(ID_MENU_순살치킨);
+
+            // then
+            assertAll(
+                    () -> assertThat(result.getId()).isEqualTo(ID_MENU_순살치킨),
+                    () -> assertThat(result.isDisplayed()).isTrue()
+            );
         }
     }
 
@@ -323,6 +343,10 @@ class MenuServiceTest {
 
     private void stubMenuGroupRepositoryFindById() {
         when(menuGroupRepository.findById(any())).thenReturn(Optional.of(new MenuGroup()));
+    }
+
+    private void stubMenuRepositoryFindById() {
+        when(menuRepository.findById(any())).thenReturn(Optional.of(MENU_순살치킨));
     }
 
     private void commonStubForCreateMenu() {
