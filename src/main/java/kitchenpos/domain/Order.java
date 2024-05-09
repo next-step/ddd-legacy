@@ -15,6 +15,7 @@ import jakarta.persistence.Transient;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Table(name = "orders")
@@ -123,5 +124,17 @@ public class Order {
 
     public void setOrderTableId(final UUID orderTableId) {
         this.orderTableId = orderTableId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order order)) return false;
+        return Objects.equals(id, order.id) && type == order.type && status == order.status && Objects.equals(orderDateTime, order.orderDateTime) && Objects.equals(orderLineItems, order.orderLineItems) && Objects.equals(deliveryAddress, order.deliveryAddress) && Objects.equals(orderTable, order.orderTable) && Objects.equals(orderTableId, order.orderTableId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, type, status, orderDateTime, orderLineItems, deliveryAddress, orderTable, orderTableId);
     }
 }
