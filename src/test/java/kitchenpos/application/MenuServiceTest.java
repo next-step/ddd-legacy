@@ -333,6 +333,26 @@ class MenuServiceTest {
                             .isInstanceOf(NoSuchElementException.class)
             );
         }
+
+        @DisplayName("메뉴의 가격이 메뉴구성상품의 (가격*수량)의 총 합보다 비싸면 예외 발생한다.")
+        @ValueSource(longs = {17_001, 30_000, 50_000})
+        @ParameterizedTest
+        void displayMenu_invalidPricePolicyException(long price) {
+            // given
+            Menu menu = buildMenuResponse(price);
+            UUID menuId = menu.getId();
+            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+
+            // when
+            // then
+            assertThatThrownBy(() -> menuService.display(menuId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+    }
+
+    @NotNull
+    private Menu buildMenuResponse(long price) {
+        return menuResponse(NAME_순살치킨, BigDecimal.valueOf(price), ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개);
     }
 
     @NotNull
