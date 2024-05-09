@@ -31,6 +31,14 @@ internal class StringCalculatorTest {
         assertThat(calculator.add(text)).isSameAs(text.toInt())
     }
 
+    @DisplayName(value = "숫자가 아닌 문자열 하나를 입력할 경우 RuntimeException 이 발생한다.")
+    @ParameterizedTest
+    @ValueSource(strings = ["a"])
+    fun oneNaNString(text: String) {
+        assertThatExceptionOfType(RuntimeException::class.java)
+            .isThrownBy { calculator.add(text) }
+    }
+
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
     @ParameterizedTest
     @ValueSource(strings = ["1,2"])
