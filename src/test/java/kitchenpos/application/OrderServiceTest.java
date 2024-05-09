@@ -172,7 +172,8 @@ class OrderServiceTest {
 
         Menu chicken = menuRepository.save(new MenuBuilder()
                 .withMenuGroup(menuGroup)
-                .with("치킨", BigDecimal.valueOf(10_000)).build());
+                .with("치킨", BigDecimal.valueOf(10_000))
+                .build());
 
         OrderLineItem orderLineItem = new OrderLineItemBuilder()
                 .withMenu(chicken)

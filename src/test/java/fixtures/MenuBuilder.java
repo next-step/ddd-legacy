@@ -17,7 +17,7 @@ public class MenuBuilder {
     private MenuGroup menuGroup = new MenuGroup();
     private boolean displayed = true;
     private List<MenuProduct> menuProducts = new ArrayList<>();
-    private UUID menuProductId = UUID.randomUUID();
+    private UUID menuGroupId;
 
     public MenuBuilder with(String name, BigDecimal price) {
         this.name = name;
@@ -27,6 +27,7 @@ public class MenuBuilder {
 
     public MenuBuilder withMenuGroup(MenuGroup menuGroup) {
         this.menuGroup = menuGroup;
+        this.menuGroupId = menuGroup.getId();
         return this;
     }
 
@@ -46,6 +47,7 @@ public class MenuBuilder {
         menu.setName(name);
         menu.setPrice(price);
         menu.setMenuGroup(menuGroup);
+        menu.setMenuGroupId(menuGroupId);
         menu.setDisplayed(displayed);
         menu.setMenuProducts(menuProducts);
         return menu;
