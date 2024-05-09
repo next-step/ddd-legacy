@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.ApplicationMockTest;
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -84,6 +86,26 @@ class OrderTableServiceTest {
                 () -> assertThat(result.getName()).isEqualTo(NAME_1번),
                 () -> assertThat(result.getNumberOfGuests()).isZero(),
                 () -> assertThat(result.isOccupied()).isTrue()
+        );
+    }
+
+    @DisplayName("해당 주문 테이블이 초기화 된다.")
+    @Test
+    void clearOrderTable() {
+        // given
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
+        when(orderRepository.existsByOrderTableAndStatusNot(ORDER_TABLE_1번, OrderStatus.COMPLETED)).thenReturn(false);
+
+        // when
+        OrderTable result = orderTableService.clear(ORDER_TABLE_1번.getId());
+
+        // then
+        assertAll(
+                () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
+                () -> assertThat(result.getName()).isEqualTo(NAME_1번),
+                () -> assertThat(result.getNumberOfGuests()).isZero(),
+                () -> assertThat(result.isOccupied()).isFalse()
         );
     }
 
