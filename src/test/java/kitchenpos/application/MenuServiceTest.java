@@ -30,6 +30,7 @@ import java.util.stream.Stream;
 import static java.util.Collections.emptyList;
 import static kitchenpos.fixture.MenuFixture.NAME_순살치킨;
 import static kitchenpos.fixture.MenuFixture.PRICE_32000;
+import static kitchenpos.fixture.MenuFixture.menuChangePriceRequest;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
 import static kitchenpos.fixture.MenuFixture.menuResponse;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupResponse;
@@ -66,6 +67,7 @@ class MenuServiceTest {
     private MenuProduct 강정치킨_1개;
     private MenuProduct 후라이드치킨_1개;
     private UUID ID_MENU_GOURP_추천메뉴;
+    private Menu MENU_순살치킨;
 
     @BeforeEach
     void setUp() {
@@ -75,6 +77,7 @@ class MenuServiceTest {
         강정치킨_1개 = menuProductResponse(1L, PRODUCT_강정치킨, 1);
         후라이드치킨_1개 = menuProductResponse(2L, PRODUCT_후라이드치킨, 1);
         ID_MENU_GOURP_추천메뉴 = MENU_GROUP_추천메뉴.getId();
+        MENU_순살치킨 = menuResponse(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
     }
 
     @DisplayName("메뉴를 등록한다.")
@@ -218,6 +221,23 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴의 가격을 수정한다.")
+    @Test
+    void changeMenuPrice() {
+        // given
+        Menu request = menuChangePriceRequest(BigDecimal.valueOf(30_000));
+        when(menuRepository.findById(any())).thenReturn(Optional.of(MENU_순살치킨));
+
+        // when
+        Menu result = menuService.changePrice(MENU_순살치킨.getId(), request);
+
+        // then
+        assertAll(
+                () -> assertThat(result.getId()).isEqualTo(MENU_순살치킨.getId()),
+                () -> assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(30_000))
+        );
+    }
+
     @NotNull
     private Menu buildCreateRequest() {
         return menuCreateRequest(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
@@ -239,7 +259,6 @@ class MenuServiceTest {
     }
 
     private void stubMenuRepositorySave() {
-        Menu MENU_순살치킨 = menuResponse(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
         when(menuRepository.save(any())).thenReturn(MENU_순살치킨);
     }
 
