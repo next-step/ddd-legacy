@@ -6,8 +6,9 @@ import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import kitchenpos.menu.MenuTestHelper;
+import kitchenpos.menu.menuTestHelper;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,10 +34,17 @@ public class MenuServiceTest {
     @InjectMocks
     private MenuService menuService;
 
+    private kitchenpos.menu.menuTestHelper menuTestHelper;
+
+    @BeforeEach
+    void setUp() {
+        menuTestHelper = new menuTestHelper();
+    }
+
     @Test
     @DisplayName("새로운 메뉴를 추가할 수 있다.")
     void create() {
-        Menu 메뉴 = MenuTestHelper.메뉴_A;
+        Menu 메뉴 = menuTestHelper.메뉴_A;
 
         mockingMenuGroupRepositoryForCreate(메뉴);
         mockingProductRepositoryForCreate(메뉴);
@@ -50,7 +58,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴는 반드시 메뉴 그룹에 포함 되어야 한다.")
     void create_exception_menuGroup() {
-        Menu 메뉴_그룹_없는_메뉴 = MenuTestHelper.메뉴_그룹_없는_메뉴;
+        Menu 메뉴_그룹_없는_메뉴 = menuTestHelper.메뉴_그룹_없는_메뉴;
 
         Assertions.assertThatThrownBy(
                 () -> menuService.create(메뉴_그룹_없는_메뉴)
@@ -60,7 +68,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴는 반드시 가격 정보를 가지고 있어야 한다.")
     void create_exception_price_null() {
-        Menu 가격_없는_메뉴 = MenuTestHelper.가격_없는_메뉴;
+        Menu 가격_없는_메뉴 = menuTestHelper.가격_없는_메뉴;
 
         Assertions.assertThatThrownBy(
                 () -> menuService.create(가격_없는_메뉴)
@@ -70,7 +78,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴는 반드시 상품 정보를 가지고 있어야 한다.")
     void create_exception_menuProduct_null() {
-        Menu 상품_없는_메뉴 = MenuTestHelper.상품_없는_메뉴;
+        Menu 상품_없는_메뉴 = menuTestHelper.상품_없는_메뉴;
 
         mockingMenuGroupRepositoryForCreate(상품_없는_메뉴);
 
@@ -82,7 +90,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴는 반드시 이름 정보를 가지고 있어야 한다.")
     void create_exception_name_null() {
-        Menu 이름_없는_메뉴 = MenuTestHelper.이름_없는_메뉴;
+        Menu 이름_없는_메뉴 = menuTestHelper.이름_없는_메뉴;
 
         mockingMenuGroupRepositoryForCreate(이름_없는_메뉴);
         mockingProductRepositoryForCreate(이름_없는_메뉴);
@@ -95,7 +103,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴 추가 시 메뉴의 이름이 부적절한지 검사한다.")
     void create_exception_containsProfanity() {
-        Menu 부적절한_이름_메뉴 = MenuTestHelper.부적절한_이름_메뉴;
+        Menu 부적절한_이름_메뉴 = menuTestHelper.부적절한_이름_메뉴;
 
         mockingMenuGroupRepositoryForCreate(부적절한_이름_메뉴);
         mockingProductRepositoryForCreate(부적절한_이름_메뉴);
@@ -109,7 +117,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴의 가격은 상품 포함된 상품의 총 가격 보다 클 수 없다.")
     void create_exception_price_difference() {
-        Menu 상품_가격보다_큰_메뉴 = MenuTestHelper.상품_가격보다_큰_메뉴;
+        Menu 상품_가격보다_큰_메뉴 = menuTestHelper.상품_가격보다_큰_메뉴;
 
         mockingMenuGroupRepositoryForCreate(상품_가격보다_큰_메뉴);
         mockingProductRepositoryForCreate(상품_가격보다_큰_메뉴);
@@ -121,14 +129,14 @@ public class MenuServiceTest {
 
     private void mockingMenuGroupRepositoryForCreate(Menu menu) {
         Mockito.when(menuGroupRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(MenuTestHelper.extractMenuGroupFrom(menu)));
+                .thenReturn(Optional.of(kitchenpos.menu.menuTestHelper.extractMenuGroupFrom(menu)));
     }
 
     private void mockingProductRepositoryForCreate(Menu menu) {
         Mockito.when(productRepository.findAllByIdIn(Mockito.any()))
-                .thenReturn(MenuTestHelper.extractProductsFrom(menu));
+                .thenReturn(kitchenpos.menu.menuTestHelper.extractProductsFrom(menu));
         Mockito.when(productRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(MenuTestHelper.extractProductFrom(menu)));
+                .thenReturn(Optional.of(kitchenpos.menu.menuTestHelper.extractProductFrom(menu)));
     }
 
     private void mockingPurgomalumClientForCreate(boolean result) {
@@ -144,10 +152,10 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴의 가격을 변경할 수 있다.")
     void changePrice() {
-        Menu 메뉴_A = MenuTestHelper.메뉴_A;
-        Menu 메뉴_B = MenuTestHelper.메뉴_B;
+        Menu 메뉴_A = menuTestHelper.메뉴_A;
+        Menu 메뉴_B = menuTestHelper.메뉴_B;
 
-        mockingMenuRepositoryForChangePrice(메뉴_A);
+        mockingMenuRepositoryFindBy(메뉴_A);
 
         menuService.changePrice(메뉴_A.getId(), 메뉴_B);
         Assertions.assertThat(메뉴_A.getPrice()).isEqualTo(메뉴_B.getPrice());
@@ -156,17 +164,39 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴의 가격은 해당 상품 총 가격 보다 클 수 없다.")
     void changePrice_exception_price() {
-        Menu 메뉴_B = MenuTestHelper.메뉴_B;
-        Menu 메뉴_A = MenuTestHelper.메뉴_A;
+        Menu 메뉴_B = menuTestHelper.메뉴_B;
+        Menu 메뉴_A = menuTestHelper.메뉴_A;
 
-        mockingMenuRepositoryForChangePrice(메뉴_B);
+        mockingMenuRepositoryFindBy(메뉴_B);
 
         Assertions.assertThatThrownBy(
                 () -> menuService.changePrice(메뉴_B.getId(), 메뉴_A)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
-    private void mockingMenuRepositoryForChangePrice(Menu menu) {
+    @Test
+    @DisplayName("메뉴를 노출할 수 있다.")
+    void display() {
+        Menu 메뉴_C = menuTestHelper.메뉴_C;
+
+        mockingMenuRepositoryFindBy(메뉴_C);
+
+        menuService.display(메뉴_C.getId());
+        Assertions.assertThat(메뉴_C.isDisplayed()).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("메뉴를 숨길 수 있다.")
+    void hide() {
+        Menu 메뉴_A = menuTestHelper.메뉴_A;
+
+        mockingMenuRepositoryFindBy(메뉴_A);
+
+        menuService.hide(메뉴_A.getId());
+        Assertions.assertThat(메뉴_A.isDisplayed()).isEqualTo(false);
+    }
+
+    private void mockingMenuRepositoryFindBy(Menu menu) {
         Mockito.when(menuRepository.findById(Mockito.any()))
                 .thenReturn(Optional.of(menu));
     }
