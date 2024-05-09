@@ -23,7 +23,7 @@ class DelimiterTest {
 
     @Test
     void 구분자를_추가한다() {
-        delimiter.addDelimiter(";");
+        delimiter = delimiter.addDelimiter(";");
         assertThat(delimiter).isEqualTo(new Delimiter(",|;"));
     }
 }
