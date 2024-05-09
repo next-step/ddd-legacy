@@ -6,7 +6,7 @@ Content-Type: application/json
   "name": "9번"
 }
 
-### 주문 테이블
+### 테이블 좌석 착석
 PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/sit
 
 ### 주문 테이블 빈 테이블로 변경
