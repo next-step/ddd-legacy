@@ -8,6 +8,7 @@ public class MenuProductFixture {
         MenuProduct menuProduct = new MenuProduct();
         menuProduct.setProduct(product);
         menuProduct.setQuantity(quantity);
+        menuProduct.setProductId(product.getId());
         return menuProduct;
     }
 
