@@ -14,14 +14,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static kitchenpos.fixture.MenuFixture.NAME_순살치킨;
 import static kitchenpos.fixture.MenuFixture.PRICE_32000;
@@ -125,6 +128,34 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
+    @DisplayName("메뉴를 등록할 때, 가격이 0원보다 작으면 예외가 발생한다.")
+    @NullSource
+    @MethodSource("provideInvalidPrices")
+    @ParameterizedTest
+    void creatMenu_NullOrNegativePriceException(BigDecimal price) {
+        // given
+        Menu request = buildCreateRequest(price);
+
+        // when
+        // then
+        assertThatThrownBy(() -> menuService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴를 등록할 때, 메뉴가격이 메뉴구성상품의 (가격*수량)의 총 합보다 비싸면 예외 발생한다.")
+    @ValueSource(longs = {35_001, 50_000, 100_000})
+    @ParameterizedTest
+    void creatMenu_invalidPricePolicyException(long price) {
+        // given
+        Menu request = buildCreateRequest(BigDecimal.valueOf(price));
+        commonStubForCreateMenu();
+
+        // when
+        // then
+        assertThatThrownBy(() -> menuService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
     @NotNull
     private Menu buildCreateRequest() {
         return menuCreateRequest(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
@@ -133,6 +164,11 @@ class MenuServiceTest {
     @NotNull
     private Menu buildCreateRequest(String name) {
         return menuCreateRequest(name, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
+    }
+
+    @NotNull
+    private Menu buildCreateRequest(BigDecimal price) {
+        return menuCreateRequest(NAME_순살치킨, price, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
     }
 
     private void stubMenuRepositorySave() {
@@ -145,5 +181,9 @@ class MenuServiceTest {
         when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_강정치킨, PRODUCT_후라이드치킨));
         when(productRepository.findById(PRODUCT_강정치킨.getId())).thenAnswer(invocation -> Optional.ofNullable(PRODUCT_강정치킨));
         when(productRepository.findById(PRODUCT_후라이드치킨.getId())).thenAnswer(invocation -> Optional.ofNullable(PRODUCT_후라이드치킨));
+    }
+
+    private static Stream<BigDecimal> provideInvalidPrices() {
+        return Stream.of(BigDecimal.valueOf(-1), BigDecimal.valueOf(-1000), BigDecimal.valueOf(-99999990));
     }
 }
