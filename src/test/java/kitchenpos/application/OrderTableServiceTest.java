@@ -11,6 +11,8 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.Optional;
+
 import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
 import static kitchenpos.fixture.OrderTableFixture.orderTableResponse;
@@ -62,5 +64,24 @@ class OrderTableServiceTest {
         // then
         assertThatThrownBy(() -> orderTableService.create(request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("고객이 주문 테이블에 앉는다.")
+    @Test
+    void sitOrderTable() {
+        // given
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 0, false);
+        when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
+
+        // when
+        OrderTable result = orderTableService.sit(ORDER_TABLE_1번.getId());
+
+        // then
+        assertAll(
+                () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
+                () -> assertThat(result.getName()).isEqualTo(NAME_1번),
+                () -> assertThat(result.getNumberOfGuests()).isZero(),
+                () -> assertThat(result.isOccupied()).isTrue()
+        );
     }
 }
