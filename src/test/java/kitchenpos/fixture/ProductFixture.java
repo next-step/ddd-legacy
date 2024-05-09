@@ -6,11 +6,11 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public class ProductFixture {
-    public static final String NAME_강정치킨 = "강정치킨";
     public static final String NAME_후라이드치킨 = "후라이드치킨";
+    public static final String NAME_양념치킨 = "양념치킨";
 
-    public static final BigDecimal PRICE_17000 = BigDecimal.valueOf(17_000);
     public static final BigDecimal PRICE_18000 = BigDecimal.valueOf(18_000);
+    public static final BigDecimal PRICE_20000 = BigDecimal.valueOf(20_000);
 
     public static Product productCreateRequest(String name, BigDecimal price) {
         Product product = new Product();

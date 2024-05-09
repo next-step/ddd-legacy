@@ -34,7 +34,7 @@ import static kitchenpos.acceptacne.steps.OrderTableSteps.createOrderTableStep;
 import static kitchenpos.acceptacne.steps.OrderTableSteps.sitOrderTableStep;
 import static kitchenpos.acceptacne.steps.ProductSteps.createProductStep;
 import static kitchenpos.fixture.MenuFixture.NAME_반반치킨;
-import static kitchenpos.fixture.MenuFixture.PRICE_35000;
+import static kitchenpos.fixture.MenuFixture.PRICE_38000;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
 import static kitchenpos.fixture.MenuGroupFixture.NAME_추천메뉴;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
@@ -46,9 +46,9 @@ import static kitchenpos.fixture.OrderFixture.orderTakeOutCreateRequest;
 import static kitchenpos.fixture.OrderLineItemFixture.orderLineItemCreate;
 import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
-import static kitchenpos.fixture.ProductFixture.NAME_강정치킨;
+import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
 import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_17000;
+import static kitchenpos.fixture.ProductFixture.PRICE_20000;
 import static kitchenpos.fixture.ProductFixture.PRICE_18000;
 import static kitchenpos.fixture.ProductFixture.productCreateRequest;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,22 +58,22 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @AcceptanceTest
 class OrderAcceptanceTest {
     private static final String 배달주소 = ORDER_배달주소;
-    private UUID orderTableId;
-    private Order 매장주문;
-    private Order 배달주문;
-    private Order 포장주문;
+    private UUID ORDER_TABLE_ID;
+    private Order ORDER_매장주문;
+    private Order ORDER_배달주문;
+    private Order ORDER_포장주문;
     @BeforeEach
     void setUp() {
         MenuGroup menuGroup = createMenuGroup();
-        MenuProduct menuProduct1 = createMenuProduct(NAME_강정치킨, PRICE_17000, 1);
-        MenuProduct menuProduct2 = createMenuProduct(NAME_후라이드치킨, PRICE_18000, 1);
-        Menu menu = createMenu(PRICE_35000, menuGroup, menuProduct1, menuProduct2);
+        MenuProduct menuProduct_강정치킨 = createMenuProduct(NAME_양념치킨, PRICE_20000, 1);
+        MenuProduct menuProduct_후라이드 = createMenuProduct(NAME_후라이드치킨, PRICE_18000, 1);
+        Menu menu = createMenu(PRICE_38000, menuGroup, menuProduct_강정치킨, menuProduct_후라이드);
         OrderTable orderTable = createOrderTable();
-        OrderLineItem orderLineItem = orderLineItemCreate(menu, PRICE_35000, 1);
-        orderTableId = orderTable.getId();
-        매장주문 = orderEatInCreateRequest(orderTableId, orderLineItem);
-        배달주문 = orderDeliveryCreateRequest(배달주소, orderLineItem);
-        포장주문 = orderTakeOutCreateRequest(orderLineItem);
+        OrderLineItem ORDER_ITEM_주문메뉴항목 = orderLineItemCreate(menu, PRICE_38000, 1);
+        ORDER_TABLE_ID = orderTable.getId();
+        ORDER_매장주문 = orderEatInCreateRequest(ORDER_TABLE_ID, ORDER_ITEM_주문메뉴항목);
+        ORDER_배달주문 = orderDeliveryCreateRequest(배달주소, ORDER_ITEM_주문메뉴항목);
+        ORDER_포장주문 = orderTakeOutCreateRequest(ORDER_ITEM_주문메뉴항목);
     }
 
     @Nested
@@ -83,10 +83,10 @@ class OrderAcceptanceTest {
         @Test
         void createEetInOrder() {
             // given
-            sitOrderTableStep(orderTableId);
+            sitOrderTableStep(ORDER_TABLE_ID);
 
             // when
-            ExtractableResponse<Response> response = createOrderStep(매장주문);
+            ExtractableResponse<Response> response = createOrderStep(ORDER_매장주문);
 
             // then
             assertAll(
@@ -96,12 +96,12 @@ class OrderAcceptanceTest {
                     () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.WAITING.name()),
                     () -> assertThat(response.jsonPath().getString("orderDateTime")).isNotNull(),
                     () -> assertThat(response.jsonPath().getString("deliveryAddress")).isNull(),
-                    () -> assertThat(response.jsonPath().getObject("orderTable.id", UUID.class)).isEqualTo(orderTableId),
+                    () -> assertThat(response.jsonPath().getObject("orderTable.id", UUID.class)).isEqualTo(ORDER_TABLE_ID),
                     () -> assertThat(response.jsonPath().getInt("orderTable.numberOfGuests")).isZero(),
                     () -> assertThat(response.jsonPath().getBoolean("orderTable.occupied")).isTrue(),
                     () -> assertThat(response.jsonPath().getList("orderLineItems.menu.id")).hasSizeGreaterThanOrEqualTo(1),
                     () -> assertThat(response.jsonPath().getList("orderLineItems.quantity")).containsExactly(1),
-                    () -> assertThat(response.jsonPath().getList("orderLineItems.menu.price")).containsExactly(PRICE_35000.floatValue()),
+                    () -> assertThat(response.jsonPath().getList("orderLineItems.menu.price")).containsExactly(PRICE_38000.floatValue()),
                     () -> assertThat(response.jsonPath().getList("orderLineItems.menu.displayed")).containsExactly(true)
             );
         }
@@ -111,7 +111,7 @@ class OrderAcceptanceTest {
         void createDeliveryOrder() {
             // given
             // when
-            ExtractableResponse<Response> response = createOrderStep(배달주문);
+            ExtractableResponse<Response> response = createOrderStep(ORDER_배달주문);
 
             // then
             assertAll(
@@ -130,7 +130,7 @@ class OrderAcceptanceTest {
         void createTakeOutOrder() {
             // given
             // when
-            ExtractableResponse<Response> response = createOrderStep(포장주문);
+            ExtractableResponse<Response> response = createOrderStep(ORDER_포장주문);
 
             // then
             assertAll(
@@ -152,8 +152,8 @@ class OrderAcceptanceTest {
         @Test
         void acceptEetInOrder() {
             // given
-            sitOrderTableStep(orderTableId);
-            UUID orderId = createOrderId(매장주문);
+            sitOrderTableStep(ORDER_TABLE_ID);
+            UUID orderId = createOrderId(ORDER_매장주문);
 
             // when
             ExtractableResponse<Response> response = acceptOrderStep(orderId);
@@ -171,7 +171,7 @@ class OrderAcceptanceTest {
         @Test
         void acceptDeliveryOrder() {
             // given
-            UUID orderId = createOrderId(배달주문);
+            UUID orderId = createOrderId(ORDER_배달주문);
 
             // when
             ExtractableResponse<Response> response = acceptOrderStep(orderId);
@@ -190,7 +190,7 @@ class OrderAcceptanceTest {
         @Test
         void acceptTakeOutOrder() {
             // given
-            UUID orderId = createOrderId(포장주문);
+            UUID orderId = createOrderId(ORDER_포장주문);
 
             // when
             ExtractableResponse<Response> response = acceptOrderStep(orderId);
@@ -212,8 +212,8 @@ class OrderAcceptanceTest {
         @Test
         void serveEetInOrder() {
             // given
-            sitOrderTableStep(orderTableId);
-            UUID orderId = createOrderId(매장주문);
+            sitOrderTableStep(ORDER_TABLE_ID);
+            UUID orderId = createOrderId(ORDER_매장주문);
             acceptOrderStep(orderId);
 
             // when
@@ -232,7 +232,7 @@ class OrderAcceptanceTest {
         @Test
         void serveDeliveryOrder() {
             // given
-            UUID orderId = createOrderId(배달주문);
+            UUID orderId = createOrderId(ORDER_배달주문);
             acceptOrderStep(orderId);
 
             // when
@@ -251,7 +251,7 @@ class OrderAcceptanceTest {
         @Test
         void serveTakeOutOrder() {
             // given
-            UUID orderId = createOrderId(포장주문);
+            UUID orderId = createOrderId(ORDER_포장주문);
             acceptOrderStep(orderId);
 
             // when
@@ -274,7 +274,7 @@ class OrderAcceptanceTest {
         @Test
         void startDelivery_DeliveryOrder() {
             // given
-            UUID orderId = createOrderId(배달주문);
+            UUID orderId = createOrderId(ORDER_배달주문);
             acceptOrderStep(orderId);
             serveOrderStep(orderId);
 
@@ -294,7 +294,7 @@ class OrderAcceptanceTest {
         @Test
         void completeDelivery_DeliveryOrder() {
             // given
-            UUID orderId = createOrderId(배달주문);
+            UUID orderId = createOrderId(ORDER_배달주문);
             acceptOrderStep(orderId);
             serveOrderStep(orderId);
             startDeliveryOrderStep(orderId);
@@ -319,8 +319,8 @@ class OrderAcceptanceTest {
         @Test
         void completeEetInOrder() {
             // given
-            sitOrderTableStep(orderTableId);
-            UUID orderId = createOrderId(매장주문);
+            sitOrderTableStep(ORDER_TABLE_ID);
+            UUID orderId = createOrderId(ORDER_매장주문);
             acceptOrderStep(orderId);
             serveOrderStep(orderId);
 
@@ -342,7 +342,7 @@ class OrderAcceptanceTest {
         @Test
         void completeDeliveryOrder() {
             // given
-            UUID orderId = createOrderId(배달주문);
+            UUID orderId = createOrderId(ORDER_배달주문);
             acceptOrderStep(orderId);
             serveOrderStep(orderId);
             startDeliveryOrderStep(orderId);
@@ -364,7 +364,7 @@ class OrderAcceptanceTest {
         @Test
         void completeTakeOutOrder() {
             // given
-            UUID orderId = createOrderId(포장주문);
+            UUID orderId = createOrderId(ORDER_포장주문);
             acceptOrderStep(orderId);
             serveOrderStep(orderId);
 

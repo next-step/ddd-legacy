@@ -23,9 +23,9 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.menuPriceAndMenuProductResponse;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
-import static kitchenpos.fixture.ProductFixture.NAME_강정치킨;
+import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
 import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_17000;
+import static kitchenpos.fixture.ProductFixture.PRICE_20000;
 import static kitchenpos.fixture.ProductFixture.PRICE_18000;
 import static kitchenpos.fixture.ProductFixture.productChangePriceRequest;
 import static kitchenpos.fixture.ProductFixture.productCreateRequest;
@@ -54,7 +54,7 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
-        PRODUCT_강정치킨 = productResponse(NAME_강정치킨, PRICE_17000);
+        PRODUCT_강정치킨 = productResponse(NAME_양념치킨, PRICE_20000);
         PRODUCT_후라이드치킨 = productResponse(NAME_후라이드치킨, PRICE_18000);
         ID_강정치킨 = PRODUCT_강정치킨.getId();
     }
@@ -63,7 +63,7 @@ class ProductServiceTest {
     @Test
     void creatProduct() {
         // given
-        Product request = productCreateRequest(NAME_강정치킨, PRICE_17000);
+        Product request = productCreateRequest(NAME_양념치킨, PRICE_20000);
         when(productRepository.save(any())).thenReturn(PRODUCT_강정치킨);
 
         // when
@@ -72,8 +72,8 @@ class ProductServiceTest {
         // then
         assertAll(
                 () -> assertThat(result.getId()).isNotNull(),
-                () -> assertThat(result.getName()).isEqualTo(NAME_강정치킨),
-                () -> assertThat(result.getPrice()).isEqualTo(PRICE_17000)
+                () -> assertThat(result.getName()).isEqualTo(NAME_양념치킨),
+                () -> assertThat(result.getPrice()).isEqualTo(PRICE_20000)
         );
     }
 
@@ -82,7 +82,7 @@ class ProductServiceTest {
     @ParameterizedTest
     void createProduct_nullNameException(String name) {
         // given
-        Product request = productCreateRequest(name, PRICE_17000);
+        Product request = productCreateRequest(name, PRICE_20000);
 
         // when
         // then
@@ -95,7 +95,7 @@ class ProductServiceTest {
     @ParameterizedTest
     void createProduct_containProfanityNameException(String name) {
         // given
-        Product request = productCreateRequest(name, PRICE_17000);
+        Product request = productCreateRequest(name, PRICE_20000);
 
         // when
         when(purgomalumClient.containsProfanity(name)).thenReturn(true);
@@ -110,7 +110,7 @@ class ProductServiceTest {
     @ParameterizedTest
     void createProduct_nullPriceException(BigDecimal price) {
         // given
-        Product request = productCreateRequest(NAME_강정치킨, price);
+        Product request = productCreateRequest(NAME_양념치킨, price);
 
         // when
         // then
@@ -123,7 +123,7 @@ class ProductServiceTest {
     @ParameterizedTest
     void createProduct_lessThenZeroPriceException(long price) {
         // given
-        Product request = productCreateRequest(NAME_강정치킨, BigDecimal.valueOf(price));
+        Product request = productCreateRequest(NAME_양념치킨, BigDecimal.valueOf(price));
 
         // when
         // then

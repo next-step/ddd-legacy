@@ -11,8 +11,8 @@ public class MenuFixture {
     public static final String NAME_순살치킨 = "순살치킨";
     public static final String NAME_반반치킨 = "반반치킨";
     public static final BigDecimal PRICE_19000 = BigDecimal.valueOf(19_000);
-    public static final BigDecimal PRICE_32000 = BigDecimal.valueOf(32_000);
-    public static final BigDecimal PRICE_35000 = BigDecimal.valueOf(35_000);
+    public static final BigDecimal PRICE_34000 = BigDecimal.valueOf(34_000);
+    public static final BigDecimal PRICE_38000 = BigDecimal.valueOf(38_000);
 
     static public Menu menuChangePriceRequest(BigDecimal price) {
         Menu menu = new Menu();

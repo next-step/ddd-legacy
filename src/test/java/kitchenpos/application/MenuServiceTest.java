@@ -30,15 +30,15 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static kitchenpos.fixture.MenuFixture.NAME_순살치킨;
-import static kitchenpos.fixture.MenuFixture.PRICE_32000;
+import static kitchenpos.fixture.MenuFixture.PRICE_34000;
 import static kitchenpos.fixture.MenuFixture.menuChangePriceRequest;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
 import static kitchenpos.fixture.MenuFixture.menuResponse;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupResponse;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
-import static kitchenpos.fixture.ProductFixture.NAME_강정치킨;
+import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
 import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_17000;
+import static kitchenpos.fixture.ProductFixture.PRICE_20000;
 import static kitchenpos.fixture.ProductFixture.PRICE_18000;
 import static kitchenpos.fixture.ProductFixture.productResponse;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -74,12 +74,12 @@ class MenuServiceTest {
     @BeforeEach
     void setUp() {
         MENU_GROUP_추천메뉴 = menuGroupResponse("추천메뉴");
-        PRODUCT_강정치킨 = productResponse(NAME_강정치킨, PRICE_17000);
+        PRODUCT_강정치킨 = productResponse(NAME_양념치킨, PRICE_20000);
         PRODUCT_후라이드치킨 = productResponse(NAME_후라이드치킨, PRICE_18000);
-        강정치킨_1개 = menuProductResponse(1L, PRODUCT_강정치킨, 1);
-        후라이드치킨_1개 = menuProductResponse(2L, PRODUCT_후라이드치킨, 1);
+        강정치킨_1개 = menuProductResponse(PRODUCT_강정치킨, 1);
+        후라이드치킨_1개 = menuProductResponse(PRODUCT_후라이드치킨, 1);
         ID_MENU_GOURP_추천메뉴 = MENU_GROUP_추천메뉴.getId();
-        MENU_순살치킨 = menuResponse(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
+        MENU_순살치킨 = menuResponse(NAME_순살치킨, PRICE_34000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
         ID_MENU_순살치킨 = MENU_순살치킨.getId();
     }
 
@@ -101,7 +101,7 @@ class MenuServiceTest {
             assertAll(
                     () -> assertThat(result.getId()).isNotNull(),
                     () -> assertThat(result.getName()).isEqualTo(NAME_순살치킨),
-                    () -> assertThat(result.getPrice()).isEqualTo(PRICE_32000),
+                    () -> assertThat(result.getPrice()).isEqualTo(PRICE_34000),
                     () -> assertThat(result.isDisplayed()).isTrue(),
                     () -> assertThat(result.getMenuGroupId()).isEqualTo(ID_MENU_GOURP_추천메뉴),
                     () -> assertThat(result.getMenuProducts()).hasSize(2)
@@ -161,7 +161,7 @@ class MenuServiceTest {
             }
 
             @DisplayName("메뉴를 등록할 때, 메뉴가격이 메뉴구성상품의 (가격*수량)의 총 합보다 비싸면 예외 발생한다.")
-            @ValueSource(longs = {35_001, 50_000, 100_000})
+            @ValueSource(longs = {38_001, 50_000, 100_000})
             @ParameterizedTest
             void creatMenu_invalidPricePolicyException(long price) {
                 // given
@@ -294,7 +294,7 @@ class MenuServiceTest {
         }
 
         @DisplayName("메뉴의 가격을 수정할 때, 메뉴가격이 메뉴구성상품의 (가격*수량)의 총 합보다 비싸면 예외 발생한다.")
-        @ValueSource(longs = {35_001, 50_000, 100_000})
+        @ValueSource(longs = {38_001, 50_000, 100_000})
         @ParameterizedTest
         void changeMenuPrice_invalidPricePolicyException(long price) {
             // given
@@ -350,7 +350,7 @@ class MenuServiceTest {
         }
 
         @DisplayName("메뉴의 가격이 메뉴구성상품의 (가격*수량)의 총 합보다 비싸면 예외 발생한다.")
-        @ValueSource(longs = {17_001, 30_000, 50_000})
+        @ValueSource(longs = {20_001, 30_000, 50_000})
         @ParameterizedTest
         void displayMenu_invalidPricePolicyException(long price) {
             // given
@@ -402,12 +402,12 @@ class MenuServiceTest {
 
     @NotNull
     private Menu buildCreateRequest() {
-        return menuCreateRequest(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
+        return menuCreateRequest(NAME_순살치킨, PRICE_34000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
     }
 
     @NotNull
     private Menu buildCreateRequest(String name) {
-        return menuCreateRequest(name, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
+        return menuCreateRequest(name, PRICE_34000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
     }
 
     @NotNull
@@ -417,7 +417,7 @@ class MenuServiceTest {
 
     @NotNull
     private Menu buildCreateRequest(MenuProduct... menuProducts) {
-        return menuCreateRequest(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, menuProducts);
+        return menuCreateRequest(NAME_순살치킨, PRICE_34000, ID_MENU_GOURP_추천메뉴, true, menuProducts);
     }
 
     private void stubMenuRepositorySave() {

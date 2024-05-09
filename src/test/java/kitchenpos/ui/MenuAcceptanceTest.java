@@ -25,14 +25,16 @@ import static kitchenpos.acceptacne.steps.ProductSteps.createProductStep;
 import static kitchenpos.fixture.MenuFixture.NAME_반반치킨;
 import static kitchenpos.fixture.MenuFixture.NAME_순살치킨;
 import static kitchenpos.fixture.MenuFixture.PRICE_19000;
-import static kitchenpos.fixture.MenuFixture.PRICE_32000;
+import static kitchenpos.fixture.MenuFixture.PRICE_34000;
+import static kitchenpos.fixture.MenuFixture.PRICE_38000;
 import static kitchenpos.fixture.MenuFixture.menuChangePriceRequest;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
+import static kitchenpos.fixture.MenuGroupFixture.NAME_추천메뉴;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
-import static kitchenpos.fixture.ProductFixture.NAME_강정치킨;
+import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
 import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_17000;
+import static kitchenpos.fixture.ProductFixture.PRICE_20000;
 import static kitchenpos.fixture.ProductFixture.PRICE_18000;
 import static kitchenpos.fixture.ProductFixture.productCreateRequest;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,28 +43,27 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @AcceptanceTest
 @DisplayName("메뉴 인수테스트")
 class MenuAcceptanceTest {
-    private MenuGroup MENU_GROUP_추천메뉴;
     private Product PRODUCT_강정치킨;
     private Product PRODUCT_후라이드치킨;
     private MenuProduct 강정치킨_1개;
     private MenuProduct 후라이드치킨_1개;
-    private UUID ID_MENU_GOURP_추천메뉴;
+    private UUID MENU_GROUP_ID;
 
     @BeforeEach
     void setUp() {
-        MENU_GROUP_추천메뉴 = createMenuGroupStep(menuGroupCreateRequest("추천메뉴")).as(MenuGroup.class);
-        PRODUCT_강정치킨 = createProductStep(productCreateRequest(NAME_강정치킨, PRICE_17000)).as(Product.class);
-        PRODUCT_후라이드치킨 = createProductStep(productCreateRequest(NAME_후라이드치킨, PRICE_18000)).as(Product.class);
-        강정치킨_1개 = menuProductResponse(1L, PRODUCT_강정치킨, 1);
-        후라이드치킨_1개 = menuProductResponse(2L, PRODUCT_후라이드치킨, 1);
-        ID_MENU_GOURP_추천메뉴 = MENU_GROUP_추천메뉴.getId();
+        MenuGroup menuGroup = createMenuGroupStep(menuGroupCreateRequest(NAME_추천메뉴)).as(MenuGroup.class);
+        PRODUCT_강정치킨 = createProduct(NAME_양념치킨, PRICE_20000);
+        PRODUCT_후라이드치킨 = createProduct(NAME_후라이드치킨, PRICE_18000);
+        강정치킨_1개 = menuProductResponse(PRODUCT_강정치킨, 1);
+        후라이드치킨_1개 = menuProductResponse(PRODUCT_후라이드치킨, 1);
+        MENU_GROUP_ID = menuGroup.getId();
     }
 
     @DisplayName("메뉴를 등록 한다.")
     @Test
     void createMenu() {
         // given
-        Menu request = menuCreateRequest(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
+        Menu request = menuCreateRequest(NAME_순살치킨, PRICE_38000, MENU_GROUP_ID, true, 강정치킨_1개, 후라이드치킨_1개);
 
         // when
         ExtractableResponse<Response> response = createMenuStep(request);
@@ -72,8 +73,8 @@ class MenuAcceptanceTest {
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
                 () -> assertThat(response.jsonPath().getString("name")).isEqualTo(NAME_순살치킨),
-                () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(PRICE_32000),
-                () -> assertThat(response.jsonPath().getObject("menuGroup.id", UUID.class)).isEqualTo(MENU_GROUP_추천메뉴.getId()),
+                () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(PRICE_38000),
+                () -> assertThat(response.jsonPath().getObject("menuGroup.id", UUID.class)).isEqualTo(MENU_GROUP_ID),
                 () -> assertThat(response.jsonPath().getBoolean("displayed")).isTrue(),
                 () -> assertThat(response.jsonPath().getList("menuProducts.product.id", UUID.class)).hasSize(2)
                         .contains(PRODUCT_강정치킨.getId(), PRODUCT_후라이드치킨.getId()),
@@ -85,8 +86,8 @@ class MenuAcceptanceTest {
     @Test
     void changeMenuPrice() {
         // given
-        UUID menuId = getUuidByCreatedMenu();
-        Menu request = menuChangePriceRequest(BigDecimal.valueOf(30_000));
+        UUID menuId = createMenuId(NAME_순살치킨, PRICE_38000, 강정치킨_1개, 후라이드치킨_1개);
+        Menu request = menuChangePriceRequest(PRICE_34000);
 
         // when
         ExtractableResponse<Response> response = changePriceMenuStep(menuId, request);
@@ -94,10 +95,10 @@ class MenuAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(BigDecimal.valueOf(30_000)),
+                () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(PRICE_34000),
                 () -> assertThat(response.jsonPath().getBoolean("displayed")).isTrue(),
-                () -> assertThat(response.jsonPath().getList("menuProducts.product.id", UUID.class)).hasSize(2)
-                        .contains(PRODUCT_강정치킨.getId(), PRODUCT_후라이드치킨.getId()),
+                () -> assertThat(response.jsonPath().getList("menuProducts.product.name")).hasSize(2)
+                        .contains(NAME_후라이드치킨, NAME_양념치킨),
                 () -> assertThat(response.jsonPath().getList("menuProducts.quantity")).hasSize(2).contains(1)
         );
     }
@@ -106,7 +107,7 @@ class MenuAcceptanceTest {
     @Test
     void displayMenu() {
         // given
-        UUID menuId = getUuidByCreatedMenu();
+        UUID menuId = createMenuId(NAME_순살치킨, PRICE_38000, 강정치킨_1개, 후라이드치킨_1개);
         hideMenuStep(menuId);
 
         // when
@@ -123,7 +124,7 @@ class MenuAcceptanceTest {
     @Test
     void hideMenu() {
         // given
-        UUID menuId = getUuidByCreatedMenu();
+        UUID menuId = createMenuId(NAME_순살치킨, PRICE_38000, 강정치킨_1개, 후라이드치킨_1개);
 
         // when
         ExtractableResponse<Response> response = hideMenuStep(menuId);
@@ -139,8 +140,8 @@ class MenuAcceptanceTest {
     @Test
     void getMenus() {
         // given
-        createMenu_순살치킨();
-        createMenu_반반치킨();
+        UUID 순살치킨_MENU_ID = createMenuId(NAME_순살치킨, PRICE_38000, 강정치킨_1개, 후라이드치킨_1개);
+        UUID 반반치킨_MENU_ID = createMenuId(NAME_반반치킨, PRICE_19000, 강정치킨_1개, 후라이드치킨_1개);
 
         // when
         ExtractableResponse<Response> response = getMenusStep();
@@ -148,23 +149,18 @@ class MenuAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getList("id")).hasSize(2)
+                () -> assertThat(response.jsonPath().getList("id", UUID.class)).hasSize(2)
+                        .containsExactly(순살치킨_MENU_ID, 반반치킨_MENU_ID)
         );
     }
 
-    private UUID getUuidByCreatedMenu() {
-        return createMenu_순살치킨().getId();
+    private UUID createMenuId(String name, BigDecimal price, MenuProduct... menuProducts) {
+        Menu request = menuCreateRequest(name, price, MENU_GROUP_ID, true, menuProducts);
+        return createMenuStep(request).as(Menu.class).getId();
     }
 
-    private Menu createMenu_순살치킨() {
-        Menu createRequest = menuCreateRequest(NAME_순살치킨, PRICE_32000, MENU_GROUP_추천메뉴.getId(), true,
-                강정치킨_1개, 후라이드치킨_1개);
-        return createMenuStep(createRequest).as(Menu.class);
-    }
 
-    private void createMenu_반반치킨() {
-        Menu createRequest = menuCreateRequest(NAME_반반치킨, PRICE_19000, MENU_GROUP_추천메뉴.getId(), true,
-                강정치킨_1개, 후라이드치킨_1개);
-        createMenuStep(createRequest).as(Menu.class);
+    private static Product createProduct(String name, BigDecimal price) {
+        return createProductStep(productCreateRequest(name, price)).as(Product.class);
     }
 }

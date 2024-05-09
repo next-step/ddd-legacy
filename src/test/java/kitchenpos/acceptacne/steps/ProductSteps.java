@@ -14,7 +14,7 @@ public class ProductSteps {
         return RestAssuredUtils.post(product, URI);
     }
 
-    public static ExtractableResponse<Response> changePriceStep(Product product, UUID id) {
+    public static ExtractableResponse<Response> changePriceStep(UUID id, Product product) {
         return RestAssuredUtils.put(product, String.format(URI + "/%s/price", id));
     }
 

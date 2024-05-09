@@ -21,17 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @AcceptanceTest
 @DisplayName("메뉴 그룹 인수 테스트")
 class MenuGroupAcceptanceTest {
-    private MenuGroup MENU_GROUP_한마리메뉴;
-    private MenuGroup MENU_GROUP_추천메뉴;
-
     @DisplayName("메뉴그룹을 등록한다.")
     @Test
     void createMenuGroup() {
         // given
-        MENU_GROUP_한마리메뉴 = menuGroupCreateRequest(NAME_한마리메뉴);
+        MenuGroup request = menuGroupCreateRequest(NAME_한마리메뉴);
 
         // when
-        ExtractableResponse<Response> response = createMenuGroupStep(MENU_GROUP_한마리메뉴);
+        ExtractableResponse<Response> response = createMenuGroupStep(request);
 
         // then
         assertAll(
@@ -45,8 +42,8 @@ class MenuGroupAcceptanceTest {
     @Test
     void getMenuGroups() {
         // given
-        MENU_GROUP_한마리메뉴 = createMenuGroupStep(menuGroupCreateRequest(NAME_한마리메뉴)).as(MenuGroup.class);
-        MENU_GROUP_추천메뉴 = createMenuGroupStep(menuGroupCreateRequest(NAME_추천메뉴)).as(MenuGroup.class);
+        UUID MENU_GROUP_한마리메뉴_ID = createMenuGroupId(NAME_한마리메뉴);
+        UUID MENU_GROUP_추천메뉴_ID = createMenuGroupId(NAME_추천메뉴);
 
         // when
         ExtractableResponse<Response> response = getMenuGroupsStep();
@@ -55,9 +52,13 @@ class MenuGroupAcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getList("id", UUID.class)).hasSize(2)
-                        .contains(MENU_GROUP_한마리메뉴.getId(), MENU_GROUP_추천메뉴.getId()),
+                        .contains(MENU_GROUP_한마리메뉴_ID, MENU_GROUP_추천메뉴_ID),
                 () -> assertThat(response.jsonPath().getList("name")).hasSize(2)
-                        .contains(MENU_GROUP_한마리메뉴.getName(), MENU_GROUP_추천메뉴.getName())
+                        .contains(NAME_한마리메뉴, NAME_한마리메뉴)
         );
+    }
+
+    private static UUID createMenuGroupId(String name) {
+        return createMenuGroupStep(menuGroupCreateRequest(name)).as(MenuGroup.class).getId();
     }
 }
