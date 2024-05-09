@@ -22,6 +22,10 @@ import static kitchenpos.acceptacne.steps.MenuSteps.displayMenuStep;
 import static kitchenpos.acceptacne.steps.MenuSteps.getMenusStep;
 import static kitchenpos.acceptacne.steps.MenuSteps.hideMenuStep;
 import static kitchenpos.acceptacne.steps.ProductSteps.createProductStep;
+import static kitchenpos.fixture.MenuFixture.NAME_반반치킨;
+import static kitchenpos.fixture.MenuFixture.NAME_순살치킨;
+import static kitchenpos.fixture.MenuFixture.PRICE_19000;
+import static kitchenpos.fixture.MenuFixture.PRICE_32000;
 import static kitchenpos.fixture.MenuFixture.menuChangePriceRequest;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
@@ -37,11 +41,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @AcceptanceTest
 @DisplayName("메뉴 인수테스트")
 class MenuAcceptanceTest {
-    private static final String NAME_순살치킨 = "순살치킨";
-    private static final String NAME_반반치킨 = "반반치킨";
-    private static final BigDecimal PRICE_32000 = BigDecimal.valueOf(32_000);
-    private static final BigDecimal PRICE_19000 = BigDecimal.valueOf(19_000);
-
     private MenuGroup MENU_GROUP_추천메뉴;
     private Product PRODUCT_강정치킨;
     private Product PRODUCT_후라이드치킨;
