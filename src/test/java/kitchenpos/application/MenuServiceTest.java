@@ -315,6 +315,24 @@ class MenuServiceTest {
                     () -> assertThat(result.isDisplayed()).isTrue()
             );
         }
+
+        @DisplayName("메뉴 ID와 일치하는 메뉴가 없으면 예외 발생한다.")
+        @Test
+        void displayMenu_notExistsMenuException() {
+            // given
+            UUID menuId = ID_MENU_순살치킨;
+
+            // when
+            when(menuRepository.findById(any())).thenReturn(Optional.empty());
+
+            // then
+            assertAll(
+                    () -> assertThatThrownBy(() -> menuService.display(menuId))
+                            .isInstanceOf(NoSuchElementException.class),
+                    () -> assertThatThrownBy(() -> menuService.hide(menuId))
+                            .isInstanceOf(NoSuchElementException.class)
+            );
+        }
     }
 
     @NotNull
