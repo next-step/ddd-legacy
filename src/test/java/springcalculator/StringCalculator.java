@@ -12,11 +12,9 @@ public class StringCalculator {
     }
 
     public int add() {
-        int sum = 0;
-        for (int number : this.numbers) {
-            sum += number;
-        }
-        return sum;
+        return numbers.stream()
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 
     private void parseInput(String input) {
