@@ -6,6 +6,8 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -13,6 +15,7 @@ import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
 import static kitchenpos.fixture.OrderTableFixture.orderTableResponse;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -46,5 +49,18 @@ class OrderTableServiceTest {
                 () -> assertThat(result.getNumberOfGuests()).isZero(),
                 () -> assertThat(result.isOccupied()).isFalse()
         );
+    }
+
+    @DisplayName("주문테이블을 등록할 때, 이름이 공백이면 예외가 발생한다.")
+    @NullAndEmptySource
+    @ParameterizedTest
+    void createOrderTable_NullOrEmptyNameException(String name) {
+        // given
+        OrderTable request = orderTableCreateRequest(name);
+
+        // when
+        // then
+        assertThatThrownBy(() -> orderTableService.create(request))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 }
