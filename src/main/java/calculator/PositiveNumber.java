@@ -1,15 +1,16 @@
 package calculator;
 
 
-public class InputNumber {
-    private String inputNumber;
+public class PositiveNumber {
+    private static final String NUMERIC_PATTERN = "[0-9]+";
+    private int inputNumber;
 
-    public InputNumber(String inputNumber){
+    public PositiveNumber(String inputNumber){
         validationNumber(inputNumber);
-        this.inputNumber = inputNumber;
+        this.inputNumber = Integer.parseInt(inputNumber);
     }
 
-    public String getNumber(){
+    public int getNumber(){
         return this.inputNumber;
     }
 
@@ -23,8 +24,9 @@ public class InputNumber {
     }
 
     private boolean isNumeric(String inputNumber){
-        return inputNumber.matches("[0-9]+");
+        return inputNumber.matches("NUMERIC_PATTERN");
     }
+
     private boolean isPositive(String inputNumber){
         int number = Integer.parseInt(inputNumber);
         return (number > 0);

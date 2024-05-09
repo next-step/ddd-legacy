@@ -11,7 +11,10 @@ public class StringCalculator {
     private static final String DEFAULT_DELIMITER = ",|:";
     private static final Pattern CUSTOM_DELIMITER = Pattern.compile("//(.)\n(.*)");
 
-    private List<InputNumber> inputNumbers;
+    private static final int CUSTOM_DELIMITER_GROUP = 1;
+    private static final int CUSTOM_DELIMITER_VALUE_GROUP = 2;
+
+    private List<PositiveNumber> inputNumbers;
 
     public StringCalculator() {
         this.inputNumbers = new ArrayList<>();
@@ -24,26 +27,26 @@ public class StringCalculator {
 
         String[] tokens = getValue(text);
         inputNumbers = Arrays.stream(tokens)
-                .map(InputNumber::new)
+                .map(PositiveNumber::new)
                 .toList();
 
         return sum(inputNumbers);
     }
 
     private String[] getValue(String text) {
-        Matcher m = CUSTOM_DELIMITER.matcher(text);
-        if (m.find()) {
-            String customDelimiter = m.group(1);
-            return m.group(2).split(customDelimiter);
+        Matcher customDelimiterMatcher = CUSTOM_DELIMITER.matcher(text);
+
+        if (customDelimiterMatcher.find()) {
+            String customDelimiter = customDelimiterMatcher.group(CUSTOM_DELIMITER_GROUP);
+            return customDelimiterMatcher.group(CUSTOM_DELIMITER_VALUE_GROUP).split(customDelimiter);
         }
 
         return text.split(DEFAULT_DELIMITER);
     }
 
-    private int sum(List<InputNumber> inputNumbers) {
+    private int sum(List<PositiveNumber> inputNumbers) {
         return inputNumbers.stream()
-                .map(InputNumber::getNumber)
-                .mapToInt(Integer::parseInt)
+                .mapToInt(PositiveNumber::getNumber)
                 .sum();
     }
 
