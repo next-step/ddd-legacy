@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
+import static kitchenpos.fixture.OrderTableFixture.changeNumberOfGuestsRequest;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
 import static kitchenpos.fixture.OrderTableFixture.orderTableResponse;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -138,5 +139,25 @@ class OrderTableServiceTest {
         // then
         assertThatThrownBy(() -> orderTableService.clear(orderTableId))
                 .isInstanceOf(IllegalStateException.class);
+    }
+
+    @DisplayName("해당 주문 테이블 고객의 수를 변경한다.")
+    @Test
+    void changeNumberOfGuestsOrderTable() {
+        // given
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
+        OrderTable request = changeNumberOfGuestsRequest(4);
+
+        // when
+        OrderTable result = orderTableService.changeNumberOfGuests(ORDER_TABLE_1번.getId(), request);
+
+        // then
+        assertAll(
+                () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
+                () -> assertThat(result.getName()).isEqualTo(NAME_1번),
+                () -> assertThat(result.getNumberOfGuests()).isEqualTo(4),
+                () -> assertThat(result.isOccupied()).isTrue()
+        );
     }
 }
