@@ -381,6 +381,20 @@ class MenuServiceTest {
         }
     }
 
+    @DisplayName("메뉴 목록을 볼 수 있다.")
+    @Test
+    void getMenus() {
+        // given
+        List<Menu> list = List.of(MENU_순살치킨);
+        when(menuRepository.findAll()).thenReturn(list);
+
+        // when
+        List<Menu> result = menuService.findAll();
+
+        // then
+        assertThat(result).hasSize(1);
+    }
+
     @NotNull
     private Menu buildMenuResponse(long price) {
         return menuResponse(NAME_순살치킨, BigDecimal.valueOf(price), ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개);
