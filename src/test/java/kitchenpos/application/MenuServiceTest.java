@@ -68,6 +68,7 @@ class MenuServiceTest {
     private MenuProduct 후라이드치킨_1개;
     private UUID ID_MENU_GOURP_추천메뉴;
     private Menu MENU_순살치킨;
+    private UUID ID_MENU_순살치킨;
 
     @BeforeEach
     void setUp() {
@@ -78,6 +79,7 @@ class MenuServiceTest {
         후라이드치킨_1개 = menuProductResponse(2L, PRODUCT_후라이드치킨, 1);
         ID_MENU_GOURP_추천메뉴 = MENU_GROUP_추천메뉴.getId();
         MENU_순살치킨 = menuResponse(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
+        ID_MENU_순살치킨 = MENU_순살치킨.getId();
     }
 
     @DisplayName("메뉴를 등록한다.")
@@ -133,7 +135,7 @@ class MenuServiceTest {
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
-    @DisplayName("메뉴를 등록할 때, 가격이 0원보다 작으면 예외가 발생한다.")
+    @DisplayName("메뉴를 등록할 때, 메뉴 가격이 공백이거나 0원보다 작으면 예외가 발생한다.")
     @NullSource
     @MethodSource("provideInvalidPrices")
     @ParameterizedTest
@@ -229,13 +231,41 @@ class MenuServiceTest {
         when(menuRepository.findById(any())).thenReturn(Optional.of(MENU_순살치킨));
 
         // when
-        Menu result = menuService.changePrice(MENU_순살치킨.getId(), request);
+        Menu result = menuService.changePrice(ID_MENU_순살치킨, request);
 
         // then
         assertAll(
-                () -> assertThat(result.getId()).isEqualTo(MENU_순살치킨.getId()),
+                () -> assertThat(result.getId()).isEqualTo(ID_MENU_순살치킨),
                 () -> assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(30_000))
         );
+    }
+
+    @DisplayName("메뉴의 가격을 수정할 때, 가격이 공백이거나  0원보다 작으면 예외가 발생한다.")
+    @NullSource
+    @MethodSource("provideInvalidPrices")
+    @ParameterizedTest
+    void changeMenuPrice_NullOrNegativePriceException(BigDecimal price) {
+        // given
+        Menu request = menuChangePriceRequest(price);
+
+        // when
+        // then
+        assertThatThrownBy(() -> menuService.changePrice(ID_MENU_순살치킨, request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("메뉴의 가격을 수정할 때, 메뉴가격이 메뉴구성상품의 (가격*수량)의 총 합보다 비싸면 예외 발생한다.")
+    @ValueSource(longs = {35_001, 50_000, 100_000})
+    @ParameterizedTest
+    void changeMenuPrice_invalidPricePolicyException(long price) {
+        // given
+        Menu request = buildCreateRequest(BigDecimal.valueOf(price));
+        when(menuRepository.findById(any())).thenReturn(Optional.of(MENU_순살치킨));
+
+        // when
+        // then
+        assertThatThrownBy(() -> menuService.changePrice(ID_MENU_순살치킨, request))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @NotNull
