@@ -13,11 +13,13 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
+import static kitchenpos.fixture.OrderTableFixture.NAME_2번;
 import static kitchenpos.fixture.OrderTableFixture.changeNumberOfGuestsRequest;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
 import static kitchenpos.fixture.OrderTableFixture.orderTableResponse;
@@ -205,5 +207,20 @@ class OrderTableServiceTest {
         // then
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @DisplayName("해당 주문테이블목록을 볼 수 있다.")
+    @Test
+    void getOrderTables() {
+        // given
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        OrderTable ORDER_TABLE_2번 = orderTableResponse(NAME_2번, 0, false);
+        when(orderTableRepository.findAll()).thenReturn(List.of(ORDER_TABLE_1번, ORDER_TABLE_2번));
+
+        // when
+        List<OrderTable> result = orderTableService.findAll();
+
+        // then
+        assertThat(result).hasSize(2);
     }
 }
