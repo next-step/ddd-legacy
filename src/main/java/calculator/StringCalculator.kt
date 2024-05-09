@@ -6,6 +6,8 @@ class StringCalculator {
     companion object {
         private val defaultDelimiters: Regex = "[,:]".toRegex()
         private val customDelimiterPattern: Pattern = Pattern.compile("//(.)\n(.*)")
+        private const val CUSTOM_DELIMITER = 1
+        private const val CALCULATE_TARGET = 2
     }
 
     fun add(text: String?): Int {
@@ -23,8 +25,8 @@ class StringCalculator {
 
         val matcher = customDelimiterPattern.matcher(text)
         if (matcher.find()) {
-            val customDelimiter = matcher.group(1)
-            return matcher.group(2)
+            val customDelimiter = matcher.group(CUSTOM_DELIMITER)
+            return matcher.group(CALCULATE_TARGET)
                 .split(customDelimiter)
                 .sumOf { it.toInt() }
         }
