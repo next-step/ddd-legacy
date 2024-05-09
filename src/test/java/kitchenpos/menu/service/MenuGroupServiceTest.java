@@ -27,7 +27,7 @@ public class MenuGroupServiceTest {
     @Test
     @DisplayName("새로운 메뉴 그룹을 추가할 수 있다.")
     void create() {
-        MenuGroup 한식 = MenuGroupFixture.메뉴_그룹_한식;
+        MenuGroup 한식 = MenuGroupFixture.메뉴_그룹_A;
 
         Mockito.when(menuGroupRepository.save(Mockito.any()))
                 .thenReturn(한식);

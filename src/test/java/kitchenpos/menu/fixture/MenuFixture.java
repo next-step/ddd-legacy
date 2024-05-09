@@ -10,6 +10,11 @@ import java.util.UUID;
 
 public class MenuFixture {
 
+    public static Menu create(String name, BigDecimal price, MenuGroup menuGroup,
+                              boolean isDisplayed, List<MenuProduct> menuProducts) {
+        return create(UUID.randomUUID(), name, price, menuGroup, isDisplayed, menuProducts);
+    }
+
     public static Menu create(UUID id, String name, BigDecimal price, MenuGroup menuGroup,
                               boolean isDisplayed, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();

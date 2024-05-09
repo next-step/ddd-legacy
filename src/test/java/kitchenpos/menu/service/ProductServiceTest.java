@@ -34,7 +34,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("새로운 상품을 추가 할 수 있다.")
     void create() {
-        Product 떡볶이 = ProductFixture.떡볶이;
+        Product 떡볶이 = ProductFixture.상품_A;
 
         Mockito.when(purgomalumClient.containsProfanity(Mockito.any()))
                         .thenReturn(false);

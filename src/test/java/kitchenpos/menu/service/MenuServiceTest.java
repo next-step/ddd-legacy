@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @DisplayName("메뉴 서비스 테스트")
@@ -32,25 +33,111 @@ public class MenuServiceTest {
     @InjectMocks
     private MenuService menuService;
 
-
     @Test
     @DisplayName("새로운 메뉴를 추가할 수 있다.")
     void create() {
-        Menu 메뉴 = MenuTestHelper.메뉴;
+        Menu 메뉴 = MenuTestHelper.메뉴_A;
 
-        Mockito.when(menuGroupRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(MenuTestHelper.extractMenuGroupFrom(메뉴)));
-        Mockito.when(productRepository.findAllByIdIn(Mockito.any()))
-                .thenReturn(MenuTestHelper.extractProductsFrom(메뉴));
-        Mockito.when(productRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(MenuTestHelper.extractProductFrom(메뉴)));
-        Mockito.when(purgomalumClient.containsProfanity(Mockito.any()))
-                .thenReturn(false);
-        Mockito.when(menuRepository.save(Mockito.any()))
-                .thenReturn(메뉴);
+        mockingMenuGroupRepositoryForCreate(메뉴);
+        mockingProductRepositoryForCreate(메뉴);
+        mockingPurgomalumClientForCreate(false);
+        mockingMenuRepositoryForCreate(메뉴);
 
         Menu result = menuService.create(메뉴);
-
         Assertions.assertThat(result.getName()).isEqualTo(메뉴.getName());
+    }
+
+    @Test
+    @DisplayName("메뉴는 반드시 메뉴 그룹에 포함 되어야 한다.")
+    void create_exception_menuGroup() {
+        Menu 메뉴_그룹_없는_메뉴 = MenuTestHelper.메뉴_그룹_없는_메뉴;
+
+        Assertions.assertThatThrownBy(
+                () -> menuService.create(메뉴_그룹_없는_메뉴)
+        ).isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴는 반드시 가격 정보를 가지고 있어야 한다.")
+    void create_exception_price_null() {
+        Menu 가격_없는_메뉴 = MenuTestHelper.가격_없는_메뉴;
+
+        Assertions.assertThatThrownBy(
+                () -> menuService.create(가격_없는_메뉴)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴는 반드시 상품 정보를 가지고 있어야 한다.")
+    void create_exception_menuProduct_null() {
+        Menu 상품_없는_메뉴 = MenuTestHelper.상품_없는_메뉴;
+
+        mockingMenuGroupRepositoryForCreate(상품_없는_메뉴);
+
+        Assertions.assertThatThrownBy(
+                () -> menuService.create(상품_없는_메뉴)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴는 반드시 이름 정보를 가지고 있어야 한다.")
+    void create_exception_name_null() {
+        Menu 이름_없는_메뉴 = MenuTestHelper.이름_없는_메뉴;
+
+        mockingMenuGroupRepositoryForCreate(이름_없는_메뉴);
+        mockingProductRepositoryForCreate(이름_없는_메뉴);
+
+        Assertions.assertThatThrownBy(
+                () -> menuService.create(이름_없는_메뉴)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴 추가 시 메뉴의 이름이 부적절한지 검사한다.")
+    void create_exception_containsProfanity() {
+        Menu 부적절한_이름_메뉴 = MenuTestHelper.부적절한_이름_메뉴;
+
+        mockingMenuGroupRepositoryForCreate(부적절한_이름_메뉴);
+        mockingProductRepositoryForCreate(부적절한_이름_메뉴);
+        mockingPurgomalumClientForCreate(true);
+
+        Assertions.assertThatThrownBy(
+                () -> menuService.create(부적절한_이름_메뉴)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴의 가격은 상품 포함된 상품의 총 가격 보다 클 수 없다.")
+    void create_exception_price_difference() {
+        Menu 상품_가격보다_큰_메뉴 = MenuTestHelper.상품_가격보다_큰_메뉴;
+
+        mockingMenuGroupRepositoryForCreate(상품_가격보다_큰_메뉴);
+        mockingProductRepositoryForCreate(상품_가격보다_큰_메뉴);
+
+        Assertions.assertThatThrownBy(
+                () -> menuService.create(상품_가격보다_큰_메뉴)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private void mockingMenuGroupRepositoryForCreate(Menu menu) {
+        Mockito.when(menuGroupRepository.findById(Mockito.any()))
+                .thenReturn(Optional.of(MenuTestHelper.extractMenuGroupFrom(menu)));
+    }
+
+    private void mockingProductRepositoryForCreate(Menu menu) {
+        Mockito.when(productRepository.findAllByIdIn(Mockito.any()))
+                .thenReturn(MenuTestHelper.extractProductsFrom(menu));
+        Mockito.when(productRepository.findById(Mockito.any()))
+                .thenReturn(Optional.of(MenuTestHelper.extractProductFrom(menu)));
+    }
+
+    private void mockingPurgomalumClientForCreate(boolean result) {
+        Mockito.when(purgomalumClient.containsProfanity(Mockito.any()))
+                .thenReturn(result);
+    }
+
+    private void mockingMenuRepositoryForCreate(Menu menu) {
+        Mockito.when(menuRepository.save(Mockito.any()))
+                .thenReturn(menu);
     }
 }
