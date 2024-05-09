@@ -15,8 +15,17 @@ import java.util.stream.Collectors;
 
 public class MenuTestHelper {
     public static MenuProduct 메뉴_상품_A = MenuProductFixture.create(ProductFixture.상품_A,10);
+    public static MenuProduct 메뉴_상품_B = MenuProductFixture.create(ProductFixture.상품_B, 10);
+    public static MenuProduct 메뉴_상품_C = MenuProductFixture.create(ProductFixture.상품_C, 10);
+
     public static Menu 메뉴_A = MenuFixture.create(
-            "메뉴", new BigDecimal(10000), MenuGroupFixture.메뉴_그룹_A, true, List.of(메뉴_상품_A)
+            "메뉴_A", new BigDecimal(10000), MenuGroupFixture.메뉴_그룹_A, true, List.of(메뉴_상품_A)
+    );
+    public static Menu 메뉴_B = MenuFixture.create(
+            "메뉴_B", new BigDecimal(5000), MenuGroupFixture.메뉴_그룹_A, true, List.of(메뉴_상품_B)
+    );
+    public static Menu 메뉴_C = MenuFixture.create(
+            "메뉴_C", new BigDecimal(100000), MenuGroupFixture.메뉴_그룹_A, true, List.of(메뉴_상품_C)
     );
     public static Menu 메뉴_그룹_없는_메뉴 = MenuFixture.create(
             "메뉴", new BigDecimal(10000), null, true, List.of(메뉴_상품_A)

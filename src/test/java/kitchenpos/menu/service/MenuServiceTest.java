@@ -140,4 +140,34 @@ public class MenuServiceTest {
         Mockito.when(menuRepository.save(Mockito.any()))
                 .thenReturn(menu);
     }
+
+    @Test
+    @DisplayName("메뉴의 가격을 변경할 수 있다.")
+    void changePrice() {
+        Menu 메뉴_A = MenuTestHelper.메뉴_A;
+        Menu 메뉴_B = MenuTestHelper.메뉴_B;
+
+        mockingMenuRepositoryForChangePrice(메뉴_A);
+
+        menuService.changePrice(메뉴_A.getId(), 메뉴_B);
+        Assertions.assertThat(메뉴_A.getPrice()).isEqualTo(메뉴_B.getPrice());
+    }
+
+    @Test
+    @DisplayName("메뉴의 가격은 해당 상품 총 가격 보다 클 수 없다.")
+    void changePrice_exception_price() {
+        Menu 메뉴_B = MenuTestHelper.메뉴_B;
+        Menu 메뉴_A = MenuTestHelper.메뉴_A;
+
+        mockingMenuRepositoryForChangePrice(메뉴_B);
+
+        Assertions.assertThatThrownBy(
+                () -> menuService.changePrice(메뉴_B.getId(), 메뉴_A)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    private void mockingMenuRepositoryForChangePrice(Menu menu) {
+        Mockito.when(menuRepository.findById(Mockito.any()))
+                .thenReturn(Optional.of(menu));
+    }
 }
