@@ -348,6 +348,22 @@ class MenuServiceTest {
             assertThatThrownBy(() -> menuService.display(menuId))
                     .isInstanceOf(IllegalStateException.class);
         }
+
+        @DisplayName("메뉴를 숨긴다.")
+        @Test
+        void hideMenu() {
+            // given
+            stubMenuRepositoryFindById();
+
+            // when
+            Menu result = menuService.hide(ID_MENU_순살치킨);
+
+            // then
+            assertAll(
+                    () -> assertThat(result.getId()).isEqualTo(ID_MENU_순살치킨),
+                    () -> assertThat(result.isDisplayed()).isFalse()
+            );
+        }
     }
 
     @NotNull
