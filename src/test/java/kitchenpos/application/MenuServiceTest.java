@@ -71,14 +71,9 @@ class MenuServiceTest {
     @Test
     void creatMenu() {
         // given
-        Menu request = menuCreateRequest(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
-        Menu MENU_순살치킨 = menuResponse(NAME_순살치킨, PRICE_32000, ID_MENU_GOURP_추천메뉴, true, 강정치킨_1개, 후라이드치킨_1개);
-
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.ofNullable(MENU_GROUP_추천메뉴));
-        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_강정치킨, PRODUCT_후라이드치킨));
-        when(productRepository.findById(any())).thenReturn(Optional.ofNullable(PRODUCT_강정치킨));
-        when(productRepository.findById(any())).thenReturn(Optional.ofNullable(PRODUCT_후라이드치킨));
-        when(menuRepository.save(any())).thenReturn(MENU_순살치킨);
+        Menu request = buildCreateRequest();
+        commonStubForCreateMenu();
+        stubMenuRepositorySave();
 
         // when
         Menu result = menuService.create(request);
