@@ -1,7 +1,10 @@
 package stringCalculator;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class NumberConvertor {
     public static final int SEPARATOR_INDEX = 1;
@@ -9,13 +12,17 @@ public class NumberConvertor {
     private final static Pattern CUSTOM_PATTERN = Pattern.compile("//(.)\\n(.*)");
     private final static Pattern DEFAULT_PATTERN = Pattern.compile("[,\\:]");
 
-    public NumberConvertor() {
+    private NumberConvertor() {
     }
 
-    public static String[] getNumbers(String text) {
+    public static List<PositiveNumber> getNumbers(String text) {
         validation(text);
 
-        return splitTextByRegex(text);
+        String[] numbers = splitTextByRegex(text);
+
+        return Arrays.stream(numbers)
+                .map(PositiveNumber::from)
+                .collect(Collectors.toList());
     }
 
     private static void validation(String text){
