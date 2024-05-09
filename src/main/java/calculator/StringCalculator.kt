@@ -14,7 +14,7 @@ class StringCalculator {
         }
 
         if (text.contains("-")) {
-            throw RuntimeException()
+            throw RuntimeException("음수는 사용할 수 없습니다.")
         }
 
         if (text.length == 1) {
