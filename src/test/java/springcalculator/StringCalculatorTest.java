@@ -30,6 +30,30 @@ class StringCalculatorTest {
         assertThat(new StringCalculator(input).add()).isEqualTo(Integer.parseInt(input));
     }
 
+    @DisplayName("구분자가 없는 문자열 중 음수값 입력 시 예외를 발생시킨다.")
+    @Test
+    void singleNumber_움수값() {
+        // given
+        String input = "-1";
+
+        // when then
+        assertThatThrownBy(() -> new StringCalculator(input).add())
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("음수값을 넣을 수 없습니다.");
+    }
+
+    @DisplayName("구분자가 없는 문자열 중 숫자가 아닐 경우 입력 시 예외를 발생시킨다.")
+    @Test
+    void singleNumber_숫자가_아닌_문자() {
+        // given
+        String input = "a";
+
+        // when then
+        assertThatThrownBy(() -> new StringCalculator(input).add())
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("숫자 이외의 값을 들어갈 수 없습니다.");
+    }
+
 
     @DisplayName("쉼표(,)로 구분 된 문자열 숫자 값의 합산을 반환한다.")
     @Test
