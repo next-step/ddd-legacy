@@ -11,7 +11,9 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
@@ -82,6 +84,23 @@ class OrderTableServiceTest {
                 () -> assertThat(result.getName()).isEqualTo(NAME_1번),
                 () -> assertThat(result.getNumberOfGuests()).isZero(),
                 () -> assertThat(result.isOccupied()).isTrue()
+        );
+    }
+
+    @DisplayName("사용여부를 수정하려고 하는 주문테이블이 미리 등록되어있지 않으면 예외가 발생한다.")
+    @Test
+    void changeOccupied_notExistsOrderTableException() {
+        // given
+        UUID orderTableId = UUID.randomUUID();
+        when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
+
+        // when
+        // then
+        assertAll(
+                () -> assertThatThrownBy(() -> orderTableService.sit(orderTableId))
+                    .isInstanceOf(NoSuchElementException.class),
+                () -> assertThatThrownBy(() -> orderTableService.clear(orderTableId))
+                        .isInstanceOf(NoSuchElementException.class)
         );
     }
 }
