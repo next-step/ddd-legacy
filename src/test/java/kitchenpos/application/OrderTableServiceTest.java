@@ -53,7 +53,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(1)
 	@DisplayName("주문 테이블이 정상적으로 저장되는 경우")
 	void testCreateSuccessfully() {
 		// given
@@ -70,7 +69,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(2)
 	@DisplayName("주문 테이블에 손님이 앉을 때 존재하지 않는 테이블 ID로 요청하면 NoSuchElementException이 발생한다")
 	void testSitWithNonExistentTable() {
 		// given
@@ -86,7 +84,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(3)
 	@DisplayName("주문 테이블에 손님이 앉을 때 존재하는 테이블 ID로 요청하면 테이블 상태가 사용 중으로 정상적으로 변경된다")
 	void testSitSuccessfully() {
 		// given
@@ -103,7 +100,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(4)
 	@DisplayName("주문 테이블을 정리할 때 존재하지 않는 테이블 ID로 요청하면 NoSuchElementException이 발생한다")
 	void testClearWithNonExistentTable() {
 		// given
@@ -119,7 +115,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(5)
 	@DisplayName("주문 테이블을 정리할 때 주문 상태가 완료되지 않은 경우 IllegalStateException이 발생한다")
 	void testClearWithIncompleteOrders() {
 		// given
@@ -138,7 +133,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(6)
 	@DisplayName("주문 테이블을 정리할 때 주문 상태가 모두 완료되었으면 테이블 상태가 사용 가능으로 정상적으로 변경된다")
 	void testClearSuccessfully() {
 		// given
@@ -157,7 +151,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(7)
 	@DisplayName("손님 수 변경 시 입력된 수가 0보다 작으면 IllegalArgumentException이 발생한다")
 	void testChangeNumberOfGuestsNegative() {
 		// given
@@ -174,7 +167,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(8)
 	@DisplayName("손님 수 변경 시 존재하지 않는 테이블 ID로 요청하면 NoSuchElementException이 발생한다")
 	void testChangeNumberOfGuestsNonExistentTable() {
 		// given
@@ -192,7 +184,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(9)
 	@DisplayName("손님 수 변경 시 테이블이 사용 중이 아니면 IllegalStateException이 발생한다")
 	void testChangeNumberOfGuestsTableNotOccupied() {
 		// given
@@ -213,7 +204,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(10)
 	@DisplayName("손님 수 변경 시 테이블이 사용 중이고 요청된 손님 수가 유효하면 손님 수가 정상적으로 변경된다")
 	void testChangeNumberOfGuestsSuccessfully() {
 		// given
@@ -237,7 +227,6 @@ class OrderTableServiceTest {
 	}
 
 	@Test
-	@Order(11)
 	@DisplayName("모든 주문 테이블을 조회할 때 정상적으로 모든 테이블이 조회된다")
 	void testFindAll() {
 		// given
