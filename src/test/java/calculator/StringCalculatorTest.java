@@ -61,6 +61,7 @@ class StringCalculatorTest {
             .isThrownBy(() -> calculator.add("-1"));
     }
 
+    // TODO domo more specific test
     @DisplayName(value = "해석할 수 없는 수식을 입력할 경우 IllegalArgumentException 예외 처리를 한다.")
     @Test
     void outOfFormat() {
