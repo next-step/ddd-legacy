@@ -7,7 +7,7 @@ import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.menu.fixture.MenuFixture;
-import kitchenpos.menu.fixture.ProductFixture;
+import kitchenpos.menu.fixture.productFixture;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,17 +36,19 @@ public class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
+    private productFixture productFixture;
     private MenuFixture menuFixture;
 
     @BeforeEach
     void setUp() {
+        productFixture = new productFixture();
         menuFixture = new MenuFixture();
     }
 
     @Test
     @DisplayName("새로운 상품을 추가 할 수 있다.")
     void create() {
-        Product 떡볶이 = ProductFixture.상품_A;
+        Product 떡볶이 = productFixture.상품_A;
 
         Mockito.when(purgomalumClient.containsProfanity(Mockito.any()))
                         .thenReturn(false);
@@ -58,55 +60,53 @@ public class ProductServiceTest {
         Assertions.assertThat(result.getName()).isEqualTo(떡볶이.getName());
     }
 
-    @ParameterizedTest
-    @MethodSource(value = "providePriceExceptionProduct")
+    @Test
     @DisplayName("상품의 가격은 반드시 존재해야 하며 0보다 커야 한다.")
-    void create_exception_상품_가격(Product product) {
-        Assertions.assertThatThrownBy(
-                () -> productService.create(product)
-        ).isInstanceOf(IllegalArgumentException.class);
-    }
+    void create_exception_상품_가격() {
+        List<Product> 상품_목록 = List.of(productFixture.가격_없는_상품, productFixture.가격_음수_상품);
 
-    static Stream<Product> providePriceExceptionProduct() {
-        return Stream.of(ProductFixture.가격_없는_상품, ProductFixture.가격_음수_상품);
+        for (Product 상품 : 상품_목록) {
+            Assertions.assertThatThrownBy(
+                    () -> productService.create(상품)
+            ).isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Test
     @DisplayName("상품의 이름은 반드시 존재해야 하며 부적절한지 검사한다.")
     void create_exception_상품_이름() {
         Assertions.assertThatThrownBy(
-                () -> productService.create(ProductFixture.부적절한_이름_상품)
+                () -> productService.create(productFixture.부적절한_이름_상품)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
     @DisplayName("상품의 가격을 변경할 수 있다.")
     void changePrice() {
-        Product 상품_A = ProductFixture.상품_A;
-        Product 상품_C = ProductFixture.상품_C;
+        Product 상품_A = productFixture.상품_A;
+        Product 상품_B = productFixture.상품_C;
 
         Mockito.when(productRepository.findById(Mockito.any()))
                 .thenReturn(Optional.of(상품_A));
         Mockito.when(menuRepository.findAllByProductId(Mockito.any()))
                 .thenReturn(List.of(menuFixture.메뉴_A));
 
-        productService.changePrice(상품_A.getId(), 상품_C);
-        Assertions.assertThat(상품_A.getPrice()).isEqualTo(상품_C.getPrice());
+        productService.changePrice(상품_A.getId(), 상품_B);
+        Assertions.assertThat(상품_A.getPrice()).isEqualTo(상품_B.getPrice());
     }
 
     @Test
     @DisplayName("해당 상품으로 구성된 메뉴의 가격이 변경된 상품의 가격 총합보다 크다면 메뉴를 노출하지 않는다.")
     void changePrice_exception_price() {
-        Product 상품_A = ProductFixture.상품_A;
-        Product 상품_B = ProductFixture.상품_B;
-        Menu 메뉴_A = menuFixture.메뉴_A;
+        Product 상품_C = productFixture.상품_C;
+        Product 상품_A = productFixture.상품_A;
 
         Mockito.when(productRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(상품_A));
+                .thenReturn(Optional.of(상품_C));
         Mockito.when(menuRepository.findAllByProductId(Mockito.any()))
-                .thenReturn(List.of(메뉴_A));
+                .thenReturn(List.of(menuFixture.메뉴_C));
 
-        productService.changePrice(상품_A.getId(), 상품_B);
-        Assertions.assertThat(메뉴_A.isDisplayed()).isEqualTo(false);
+        productService.changePrice(상품_C.getId(), 상품_A);
+        Assertions.assertThat(menuFixture.메뉴_C.isDisplayed()).isEqualTo(false);
     }
 }
