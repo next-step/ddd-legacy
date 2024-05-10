@@ -1,8 +1,21 @@
 package calculator;
 
+import java.util.List;
+import java.util.stream.Stream;
+
 public class StringCalculator {
 
+    private static final String DEFAULT_DELIMITER = ",";
+
     public int add(final String expression) {
-        return 0;
+        return getNumbers(expression).stream()
+            .mapToInt(Integer::intValue)
+            .sum();
+    }
+
+    private List<Integer> getNumbers(final String expression) {
+        return Stream.of(expression.split(DEFAULT_DELIMITER))
+            .map(Integer::parseInt)
+            .toList();
     }
 }
