@@ -80,9 +80,9 @@ class MenuServiceTest {
                       .isInstanceOf(NoSuchElementException.class);
         }
 
-        @DisplayName("메뉴에 속하는 상품이 하나라도 존재하지 않으면 예외가 발생한다.")
         @ParameterizedTest(name = "menuProducts = {0}")
         @NullAndEmptySource
+        @DisplayName("메뉴에 속하는 상품이 하나라도 존재하지 않으면 예외가 발생한다.")
         void shouldThrowExceptionIfMenuHasNoProducts(List<MenuProduct> menuProducts) {
             // given
             Menu request = MenuFixture.메뉴_생성(menuProducts);

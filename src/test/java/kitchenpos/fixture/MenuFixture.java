@@ -48,6 +48,7 @@ public class MenuFixture {
         menu.setMenuProducts(menuProducts);
         menu.setPrice(price);
         menu.setMenuGroup(기본_메뉴_그룹());
+        menu.setDisplayed(true);
 
         return menu;
     }
