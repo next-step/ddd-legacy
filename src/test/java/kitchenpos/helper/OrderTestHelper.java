@@ -19,10 +19,10 @@ public class OrderTestHelper {
         this.orderRepository = orderRepository;
     }
 
-    public static Order 먹고가기_대기_주문_생성(List<OrderLineItem> orderLineItems, OrderTable orderTable){
+    public static Order 대기_주문_생성(OrderType orderType, List<OrderLineItem> orderLineItems, OrderTable orderTable){
         Order order = new Order();
         order.setId(UUID.randomUUID());
-        order.setType(OrderType.EAT_IN);
+        order.setType(orderType);
         order.setStatus(OrderStatus.WAITING);
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(orderLineItems);
@@ -37,5 +37,4 @@ public class OrderTestHelper {
 
         return orderRepository.save(order);
     }
-
 }
