@@ -27,6 +27,7 @@ public class OrderTestHelper {
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(orderLineItems);
         order.setOrderTable(orderTable);
+        order.setDeliveryAddress(OrderType.DELIVERY.equals(orderType) ? "임시 배달 주소" : null);
 
         return orderRepository.save(order);
     }

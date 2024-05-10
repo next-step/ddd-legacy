@@ -13,6 +13,7 @@ import kitchenpos.domain.Product;
 import kitchenpos.helper.MenuGroupTestHelper;
 import kitchenpos.helper.MenuProductTestHelper;
 import kitchenpos.helper.MenuTestHelper;
+import kitchenpos.helper.OrderLineItemTestHelper;
 import kitchenpos.helper.OrderTableTestHelper;
 import kitchenpos.helper.OrderTestHelper;
 import kitchenpos.helper.ProductTestHelper;
@@ -72,17 +73,8 @@ class OrderTableServiceTest extends SetupTest{
         Menu 마라세트 = MenuTestHelper.메뉴_생성(추천메뉴, "마라세트", BigDecimal.valueOf(16000), Arrays.asList(마라탕메뉴, 미니꿔바로우메뉴), true);
         Menu 나홀로세트 = MenuTestHelper.메뉴_생성(추천메뉴, "나홀로세트", BigDecimal.valueOf(11000), Arrays.asList(마라탕메뉴, 콜라메뉴), true);
 
-        OrderLineItem 마라세트_주문 = new OrderLineItem();
-        마라세트_주문.setMenuId(마라세트.getId());
-        마라세트_주문.setMenu(마라세트);
-        마라세트_주문.setQuantity(1);
-        마라세트_주문.setPrice(마라세트.getPrice());
-
-        OrderLineItem 나홀로세트_주문 = new OrderLineItem();
-        나홀로세트_주문.setMenuId(나홀로세트.getId());
-        나홀로세트_주문.setMenu(나홀로세트);
-        나홀로세트_주문.setQuantity(2);
-        나홀로세트_주문.setPrice(나홀로세트.getPrice());
+        OrderLineItem 마라세트_주문 = OrderLineItemTestHelper.주문할_메뉴_생성(마라세트, 1);
+        OrderLineItem 나홀로세트_주문 = OrderLineItemTestHelper.주문할_메뉴_생성(나홀로세트, 1);
 
         List<OrderLineItem> 주문할_메뉴들 = Arrays.asList(마라세트_주문, 나홀로세트_주문);
 

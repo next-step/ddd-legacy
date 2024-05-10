@@ -7,6 +7,7 @@ import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.helper.MenuGroupTestHelper;
 import kitchenpos.helper.MenuTestHelper;
+import kitchenpos.helper.OrderLineItemTestHelper;
 import kitchenpos.helper.OrderTableTestHelper;
 import kitchenpos.helper.OrderTestHelper;
 import kitchenpos.helper.ProductTestHelper;
@@ -32,11 +33,12 @@ public class SetupTest {
     @Autowired
     private OrderRepository orderRepository;
 
-    private MenuGroupTestHelper menuGroupTestHelper;
-    private ProductTestHelper productTestHelper;
-    private MenuTestHelper menuTestHelper;
-    private OrderTableTestHelper orderTableTestHelper;
-    private OrderTestHelper orderTestHelper;
+    protected static MenuGroupTestHelper menuGroupTestHelper;
+    protected static ProductTestHelper productTestHelper;
+    protected static MenuTestHelper menuTestHelper;
+    protected static OrderTableTestHelper orderTableTestHelper;
+    protected static OrderTestHelper orderTestHelper;
+    protected static OrderLineItemTestHelper orderLineItemTestHelper;
 
     @BeforeEach
     void setUp() {
@@ -45,5 +47,6 @@ public class SetupTest {
         this.menuTestHelper = new MenuTestHelper(menuRepository);
         this.orderTableTestHelper = new OrderTableTestHelper(orderTableRepository);
         this.orderTestHelper = new OrderTestHelper(orderRepository);
+        this.orderLineItemTestHelper = new OrderLineItemTestHelper();
     }
 }

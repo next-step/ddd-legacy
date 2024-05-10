@@ -32,4 +32,21 @@ public class MenuTestHelper {
     public static List<Menu> 특정음식이_속한_메뉴들_조회(UUID productId){
         return menuRepository.findAllByProductId(productId);
     }
+
+    public static Menu 메뉴_판매상태_변경(UUID id, boolean displayed) {
+        Menu menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("can't find menu"));
+        menu.setDisplayed(displayed);
+
+        menuRepository.save(menu);
+
+        return menu;
+    }
+
+    public static Menu 메뉴_가격_변경(UUID id, BigDecimal price) {
+        Menu menu = menuRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("can't find menu"));
+        menu.setPrice(price);
+
+        menuRepository.save(menu);
+        return menu;
+    }
 }
