@@ -538,7 +538,7 @@ public class OrderServiceTest {
         @DisplayName("현재 주문상태는 `주문수락`이 아니면 예외가 발생한다.")
         @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"ACCEPTED"})
         @ParameterizedTest
-        void notWaitingStatusException(OrderStatus status) {
+        void invalidStatusException(OrderStatus status) {
             // given
             Order order = ORDER_포장주문;
             UUID orderId = order.getId();
@@ -554,78 +554,124 @@ public class OrderServiceTest {
     }
 
     @Nested
-    @DisplayName("배달 테스트")
-    class DeliveryOrder {
+    @DisplayName("배달 중 테스트")
+    class DeliveringOrder {
+        @DisplayName("배달주문을 시작한다.")
+        @Test
+        void startDeliveryOrder() {
+            // given
+            ORDER_배달주문.setStatus(OrderStatus.SERVED);
+            when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_배달주문));
 
-        @Nested
-        @DisplayName("매장주문")
-        class EatIn {
+            // when
+            Order result = orderService.startDelivery(ORDER_배달주문.getId());
 
-            @DisplayName("매장주문")
-            @Test
-            void eatInOrder() {
-                // given
-
-                // when
-
-                // then
-
-            }
+            // then
+            assertAll(
+                    () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
+                    () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING)
+            );
         }
 
-        @Nested
-        @DisplayName("배달주문")
-        class Delivery {
+        @DisplayName("현재 주문종류가 `배달주문`이 아니면 예외가 발생한다.")
+        @EnumSource(value = OrderType.class, mode = EnumSource.Mode.EXCLUDE, names = {"DELIVERY"})
+        @ParameterizedTest
+        void invalidTypeException(OrderType type) {
+            // given
+            Order order = ORDER_포장주문;
+            UUID orderId = order.getId();
+            order.setStatus(OrderStatus.SERVED);
+            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
-            @DisplayName("배달주문을 시작한다.")
-            @Test
-            void startDeliveryOrder() {
-                // given
-                ORDER_배달주문.setStatus(OrderStatus.SERVED);
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_배달주문));
+            // when
+            order.setType(type);
 
-                // when
-                Order result = orderService.startDelivery(ORDER_배달주문.getId());
-
-                // then
-                assertAll(
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING)
-                );
-            }
-
-            @DisplayName("배달주문을 완료한다.")
-            @Test
-            void completeDeliveryOrder() {
-                // given
-                ORDER_배달주문.setStatus(OrderStatus.DELIVERING);
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_배달주문));
-
-                // when
-                Order result = orderService.completeDelivery(ORDER_배달주문.getId());
-
-                // then
-                assertAll(
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED)
-                );
-            }
+            // then
+            assertThatThrownBy(() -> orderService.startDelivery(orderId))
+                    .isInstanceOf(IllegalStateException.class);
         }
 
-        @Nested
-        @DisplayName("포장주문")
-        class TakeOut {
+        @DisplayName("현재 주문상태는 `제조완료`가 아니면 예외가 발생한다.")
+        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"SERVED"})
+        @ParameterizedTest
+        void invalidStatusException(OrderStatus status) {
+            // given
+            Order order = ORDER_배달주문;
+            UUID orderId = order.getId();
+            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
-            @DisplayName("포장주문")
-            @Test
-            void takeOutOrder() {
-                // given
+            // when
+            order.setStatus(status);
 
-                // when
+            // then
+            assertThatThrownBy(() -> orderService.startDelivery(orderId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
 
-                // then
+        @DisplayName("주문이 미리 등록되어 있지 않으면 예외가 발생한다.")
+        @Test
+        void notExistsOrderException() {
+            // given
+            UUID orderId = ORDER_배달주문.getId();
 
-            }
+            // when
+            when(orderRepository.findById(any())).thenReturn(Optional.empty());
+
+            // then
+            assertThatThrownBy(() -> orderService.startDelivery(orderId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+    }
+
+    @Nested
+    @DisplayName("배달완료 테스트")
+    class DeliveredOrder {
+        @DisplayName("배달주문을 완료한다.")
+        @Test
+        void completeDeliveryOrder() {
+            // given
+            ORDER_배달주문.setStatus(OrderStatus.DELIVERING);
+            when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_배달주문));
+
+            // when
+            Order result = orderService.completeDelivery(ORDER_배달주문.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
+                    () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED)
+            );
+        }
+
+        @DisplayName("주문이 미리 등록되어 있지 않으면 예외가 발생한다.")
+        @Test
+        void notExistsOrderException() {
+            // given
+            UUID orderId = ORDER_배달주문.getId();
+
+            // when
+            when(orderRepository.findById(any())).thenReturn(Optional.empty());
+
+            // then
+            assertThatThrownBy(() -> orderService.completeDelivery(orderId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("현재 주문상태가 `배달중`이 아니면 예외가 발생한다.")
+        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"DELIVERING"})
+        @ParameterizedTest
+        void invalidStatusException(OrderStatus status) {
+            // given
+            Order order = ORDER_배달주문;
+            UUID orderId = order.getId();
+            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+            // when
+            order.setStatus(status);
+
+            // then
+            assertThatThrownBy(() -> orderService.completeDelivery(orderId))
+                    .isInstanceOf(IllegalStateException.class);
         }
     }
 
