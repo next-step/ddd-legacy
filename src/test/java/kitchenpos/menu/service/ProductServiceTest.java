@@ -6,7 +6,7 @@ import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import kitchenpos.menu.MenuTestHelper;
+import kitchenpos.menu.fixture.MenuFixture;
 import kitchenpos.menu.fixture.ProductFixture;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,11 +36,11 @@ public class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
-    private MenuTestHelper menuTestHelper;
+    private MenuFixture menuFixture;
 
     @BeforeEach
     void setUp() {
-        menuTestHelper = new MenuTestHelper();
+        menuFixture = new MenuFixture();
     }
 
     @Test
@@ -88,7 +88,7 @@ public class ProductServiceTest {
         Mockito.when(productRepository.findById(Mockito.any()))
                 .thenReturn(Optional.of(상품_A));
         Mockito.when(menuRepository.findAllByProductId(Mockito.any()))
-                .thenReturn(List.of(menuTestHelper.메뉴_A));
+                .thenReturn(List.of(menuFixture.메뉴_A));
 
         productService.changePrice(상품_A.getId(), 상품_C);
         Assertions.assertThat(상품_A.getPrice()).isEqualTo(상품_C.getPrice());
@@ -99,7 +99,7 @@ public class ProductServiceTest {
     void changePrice_exception_price() {
         Product 상품_A = ProductFixture.상품_A;
         Product 상품_B = ProductFixture.상품_B;
-        Menu 메뉴_A = menuTestHelper.메뉴_A;
+        Menu 메뉴_A = menuFixture.메뉴_A;
 
         Mockito.when(productRepository.findById(Mockito.any()))
                 .thenReturn(Optional.of(상품_A));
