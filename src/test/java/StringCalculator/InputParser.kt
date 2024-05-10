@@ -1,0 +1,4 @@
+package StringCalculator
+
+class InputParser {
+}
