@@ -77,7 +77,7 @@ class StringCalculatorTest {
 
     @DisplayName(value = "결과가 Integer의 범위를 벗어나는 경우 ArithmeticException 예외 처리를 한다.")
     @Test
-    void resultOverflow() {
+    void overflowResults() {
         assertThatExceptionOfType(ArithmeticException.class)
             .isThrownBy(() -> calculator.add(Integer.MAX_VALUE + ",1"));
     }

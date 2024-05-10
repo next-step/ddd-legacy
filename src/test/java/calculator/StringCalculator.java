@@ -9,8 +9,8 @@ public class StringCalculator {
 
     public int add(final String expression) {
         return getNumbers(expression).stream()
-            .mapToInt(Integer::intValue)
-            .sum();
+            .reduce(Math::addExact)
+            .orElse(0);
     }
 
     private List<Integer> getNumbers(final String expression) {
