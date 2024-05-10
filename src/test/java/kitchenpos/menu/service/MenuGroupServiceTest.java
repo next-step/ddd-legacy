@@ -5,6 +5,7 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.menu.fixture.MenuGroupFixture;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,14 +21,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class MenuGroupServiceTest {
     @Mock
     private MenuGroupRepository menuGroupRepository;
-
     @InjectMocks
     private MenuGroupService menuGroupService;
+
+    private MenuGroupFixture menuGroupFixture;
+
+    @BeforeEach
+    void setUp() {
+        menuGroupFixture = new MenuGroupFixture();
+    }
 
     @Test
     @DisplayName("새로운 메뉴 그룹을 추가할 수 있다.")
     void create() {
-        MenuGroup 한식 = MenuGroupFixture.메뉴_그룹_A;
+        MenuGroup 한식 = menuGroupFixture.메뉴_그룹_A;
 
         Mockito.when(menuGroupRepository.save(Mockito.any()))
                 .thenReturn(한식);
