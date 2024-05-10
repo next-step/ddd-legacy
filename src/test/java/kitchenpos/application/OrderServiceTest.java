@@ -520,6 +520,37 @@ public class OrderServiceTest {
                 );
             }
         }
+
+        @DisplayName("미리 등록되어있는 주문이 아니면 예외가 발생한다.")
+        @Test
+        void notExistsOrderException() {
+            // given
+            UUID orderId = ORDER_포장주문.getId();
+
+            // when
+            when(orderRepository.findById(any())).thenReturn(Optional.empty());
+
+            // then
+            assertThatThrownBy(() -> orderService.serve(orderId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("현재 주문상태는 `주문수락`이 아니면 예외가 발생한다.")
+        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"ACCEPTED"})
+        @ParameterizedTest
+        void notWaitingStatusException(OrderStatus status) {
+            // given
+            Order order = ORDER_포장주문;
+            UUID orderId = order.getId();
+            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+            // when
+            order.setStatus(status);
+
+            // then
+            assertThatThrownBy(() -> orderService.serve(orderId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     @Nested
