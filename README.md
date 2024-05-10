@@ -356,13 +356,13 @@ stateDiagram-v2
 [🚀 3단계 - 테스트를 통한 코드 보호]
 
 - 정리한 키친포스의 요구 사항을 토대로 테스트 코드를 작성한다.
-  - [ ] 모든 Business Object에 대한 테스트 코드를 작성한다.
+  - [x] 모든 Business Object에 대한 테스트 코드를 작성한다. - 목록반환은 몇 개 제외하였습니다.
     - [x] `@ExtendWith(MockitoExtension.class)`를 이용한 단위 테스트 코드를 작성한다.
       - [x] MockTest를 위한 기본 세팅
-  - [ ] Controller : Acceptance Test 추가
+  - [x] Acceptance Test 
     - [x] 기본 셋팅
       - [x] RestAssured 라이브러리 추가 및 구글 API 전송
       - [x] 공통 AcceptanceTest 셋팅
       - [x] Database Test 격리
-    - [ ] 기능 별 인수테스트 추가
-      - 위의 요구사항 보면서 체크하기.
+  - [x] 기능 별 테스트
+    - 위의 요구사항 보면서 체크하기.
