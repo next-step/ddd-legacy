@@ -9,23 +9,26 @@ public class Delimiter {
 
     public static final String CUSTOM_DELIMITER_PREFIX = "//";
     public static final String CUSTOM_DELIMITER_SUFFIX = "\n";
-
     private static final String DEFAULT_DELIMITER = "[,:]";
+
     private final String delimiter;
 
-    public Delimiter(String text) {
+    private Delimiter(String delimiter) {
+        this.delimiter = delimiter;
+    }
+
+    public static Delimiter of(String text) {
         if (text.startsWith(CUSTOM_DELIMITER_PREFIX)) {
             int prefixLength = CUSTOM_DELIMITER_PREFIX.length();
             int suffixIndex = text.indexOf(CUSTOM_DELIMITER_SUFFIX);
             String customDelimiter = text.substring(prefixLength, suffixIndex);
-            this.delimiter = combineDelimiters(customDelimiter);
-            return;
+            return new Delimiter(combineDelimiters(customDelimiter));
         }
 
-        this.delimiter = DEFAULT_DELIMITER;
+        return new Delimiter(DEFAULT_DELIMITER);
     }
 
-    private String combineDelimiters(String customDelimiter) {
+    private static String combineDelimiters(String customDelimiter) {
         return DEFAULT_DELIMITER + "|" + Pattern.quote(customDelimiter);
     }
 
