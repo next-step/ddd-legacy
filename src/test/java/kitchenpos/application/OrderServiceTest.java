@@ -280,4 +280,99 @@ class OrderServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("주문 수락")
+    class OrderAcceptance {
+        @DisplayName("주문이 존재하지 않으면 에러가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenAcceptingNonexistentOrder() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.EAT_IN);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.accept(order.getId()))
+                      .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("현재 주문 상태가 대기 상태가 아니면 예외가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenAcceptingNonWaitingOrder() {
+            // given
+            Order request = OrderFixture.주문_생성(OrderType.EAT_IN);
+            request.setStatus(OrderStatus.COMPLETED);
+            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.accept(request.getId()))
+                      .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("배달 주문일 때는 라이더를 호출해야 한다.")
+        @Test
+        void shouldCallRiderWhenAcceptingDeliveryOrder() {
+            // given
+            Menu menu = MenuFixture.기본_메뉴();
+            OrderLineItem orderLineItem = OrderFixture.주문_항목_생성(menu.getId());
+            Order order = OrderFixture.주문_생성(OrderType.DELIVERY, List.of(orderLineItem));
+            order.setStatus(OrderStatus.WAITING);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when
+            orderService.accept(order.getId());
+
+            // then
+            verify(kitchenridersClient, times(1)).requestDelivery(order.getId(), menu.getPrice(), order.getDeliveryAddress());
+        }
+
+        @DisplayName("매장 주문을 수락할 수 있다.")
+        @Test
+        void shouldAcceptEatInOrder() {
+            // given
+            Order request = OrderFixture.주문_생성(OrderType.EAT_IN);
+            request.setStatus(OrderStatus.WAITING);
+            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+
+            // when
+            Order result = orderService.accept(request.getId());
+
+            // then
+            Assertions.assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        }
+
+        @DisplayName("테이크아웃 주문을 수락할 수 있다.")
+        @Test
+        void shouldAcceptTakeoutOrder() {
+            // given
+            Order request = OrderFixture.주문_생성(OrderType.TAKEOUT);
+            request.setStatus(OrderStatus.WAITING);
+            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+
+            // when
+            Order result = orderService.accept(request.getId());
+
+            // then
+            Assertions.assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        }
+
+        @DisplayName("배달 주문을 수락할 수 있다.")
+        @Test
+        void shouldAcceptDeliveryOrder() {
+            // given
+            Menu menu = MenuFixture.기본_메뉴();
+            OrderLineItem orderLineItem = OrderFixture.주문_항목_생성(menu.getId());
+            Order order = OrderFixture.주문_생성(OrderType.DELIVERY, List.of(orderLineItem));
+            order.setStatus(OrderStatus.WAITING);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when
+            orderService.accept(order.getId());
+
+            // then
+            Assertions.assertThat(order.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        }
+    }
+
 }

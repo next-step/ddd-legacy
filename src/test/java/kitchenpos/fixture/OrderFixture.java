@@ -35,6 +35,7 @@ public class OrderFixture {
         orderLineItem.setMenuId(menuId);
         orderLineItem.setQuantity(1L);
         orderLineItem.setPrice(new BigDecimal(10_000L));
+        orderLineItem.setMenu(MenuFixture.기본_메뉴());
 
         return orderLineItem;
     }
@@ -45,6 +46,7 @@ public class OrderFixture {
         orderLineItem.setMenuId(menuId);
         orderLineItem.setQuantity(quantity);
         orderLineItem.setPrice(new BigDecimal(10_000L));
+        orderLineItem.setMenu(MenuFixture.기본_메뉴());
 
         return orderLineItem;
     }
