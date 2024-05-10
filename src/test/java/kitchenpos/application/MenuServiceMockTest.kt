@@ -219,6 +219,54 @@ class MenuServiceMockTest : BaseMockTest() {
     }
 
     @Test
+    fun `메뉴 생성 요청 - 메뉴상품의 재고량이 0보다 작을 경우 실패`() {
+        val menuGroup = MenuGroupSpec.of()
+        val product = ProductSpec.of(BigDecimal.valueOf(9000))
+        val menuProduct = MenuProductSpec.of(product, -7)
+
+        val request = Menu()
+        request.name = "치킨"
+        request.price = BigDecimal.valueOf(9000)
+        request.menuProducts = listOf(menuProduct)
+        request.isDisplayed = true
+        request.menuGroupId = menuGroup.id
+
+        `when`(menuGroupRepository.findById(menuGroup.id))
+            .thenReturn(Optional.of(menuGroup))
+
+        `when`(productRepository.findAllByIdIn(listOf(product.id)))
+            .thenReturn(listOf(product))
+
+        //when & then
+        Assertions.assertThatExceptionOfType(IllegalArgumentException::class.java)
+            .isThrownBy { menuService.create(request) }
+    }
+
+    @Test
+    fun `메뉴 생성 요청 - 메뉴상품의 상품이 존재하지 않을 경우 실패`() {
+        val menuGroup = MenuGroupSpec.of()
+        val product = ProductSpec.of(BigDecimal.valueOf(9000))
+        val menuProduct = MenuProductSpec.of(product, 2)
+
+        val request = Menu()
+        request.name = "치킨"
+        request.price = BigDecimal.valueOf(9000)
+        request.menuProducts = listOf(menuProduct)
+        request.isDisplayed = true
+        request.menuGroupId = menuGroup.id
+
+        `when`(menuGroupRepository.findById(menuGroup.id))
+            .thenReturn(Optional.of(menuGroup))
+
+        `when`(productRepository.findAllByIdIn(listOf(product.id)))
+            .thenReturn(emptyList())
+
+        //when & then
+        Assertions.assertThatExceptionOfType(IllegalArgumentException::class.java)
+            .isThrownBy { menuService.create(request) }
+    }
+
+    @Test
     fun `메뉴의 가격 변경 요청 - 정상적인 메뉴의 가격 변경 성공`() {
         val product = ProductSpec.of(BigDecimal.valueOf(9000))
         val menuProduct = MenuProductSpec.of(product, 2)
