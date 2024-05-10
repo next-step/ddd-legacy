@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
-import org.jetbrains.annotations.Nullable;
 
 public record Splitter(List<String> delimiters) {
 
@@ -23,9 +22,7 @@ public record Splitter(List<String> delimiters) {
 		return input.split(getDelimiterPattern());
 	}
 
-	@Nullable
 	private String getDelimiterPattern() {
-		System.out.println(Strings.join(delimiters, '|'));
 		return Strings.join(delimiters, '|');
 	}
 }
