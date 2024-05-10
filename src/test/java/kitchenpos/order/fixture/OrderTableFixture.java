@@ -5,6 +5,8 @@ import kitchenpos.domain.OrderTable;
 import java.util.UUID;
 
 public class OrderTableFixture {
+    public static final OrderTable 손님_있는_주문_테이블 = create("손님_있는_주문_테이블", 5, true);
+
     public OrderTable 주문_테이블_A = create("주문_테이블_A", 5);
     public OrderTable 주문_테이블_B = create("주문_테이블_B", 7);
     public OrderTable 주문_테이블_C = create("주문_테이블_C", 10);
@@ -13,6 +15,10 @@ public class OrderTableFixture {
 
     public static OrderTable create(String name, int numberOfGuest) {
         return create(UUID.randomUUID(), name, numberOfGuest, false);
+    }
+
+    public static OrderTable create(String name, int numberOfQuest, boolean occupied) {
+        return create(UUID.randomUUID(), name, numberOfQuest, occupied);
     }
 
     public static OrderTable create(UUID id, String name, int numberOfGuest, boolean occupied) {

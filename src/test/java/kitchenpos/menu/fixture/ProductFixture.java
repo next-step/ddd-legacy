@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public class ProductFixture {
+    public static final Product 상품 = create( "상품", new BigDecimal(1000));
     public static final Product 상품_A = create( "상품A", new BigDecimal(1000));
     public static final Product 상품_B = create("상품B", new BigDecimal(500));
     public static final Product 상품_C = create("상품C", new BigDecimal(10000));

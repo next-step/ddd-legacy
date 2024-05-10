@@ -14,10 +14,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MenuTestHelper {
+    public static final MenuProduct 메뉴_상품 = MenuProductFixture.create(ProductFixture.상품, 10);
     public MenuProduct 메뉴_상품_A = MenuProductFixture.create(ProductFixture.상품_A,10);
     public MenuProduct 메뉴_상품_B = MenuProductFixture.create(ProductFixture.상품_B, 10);
     public MenuProduct 메뉴_상품_C = MenuProductFixture.create(ProductFixture.상품_C, 10);
 
+    public static final Menu 메뉴 = MenuFixture.create(
+            "메뉴_A", new BigDecimal(10000), MenuGroupFixture.메뉴_그룹_A, true, List.of(메뉴_상품)
+    );
     public Menu 메뉴_A = MenuFixture.create(
             "메뉴_A", new BigDecimal(10000), MenuGroupFixture.메뉴_그룹_A, true, List.of(메뉴_상품_A)
     );
