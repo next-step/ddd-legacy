@@ -419,4 +419,62 @@ class OrderServiceTest {
         }
     }
 
+
+    @Nested
+    @DisplayName("배달 시작")
+    class DeliveryStart {
+        @DisplayName("주문이 존재하지 않으면 에러가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenStartingDeliveryForNonexistentOrder() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.DELIVERY);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
+                      .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("현재 주문 유형이 배달이 아니면 예외가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenStartingDeliveryForNonDeliveryOrderType() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.EAT_IN);
+            order.setStatus(OrderStatus.SERVED);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
+                      .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("현재 주문 상태가 제공 상태가 아니면 예외가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenStartingDeliveryForOrderNotServed() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.DELIVERY);
+            order.setStatus(OrderStatus.COMPLETED);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
+                      .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("배달을 시작할 수 있다.")
+        @Test
+        void shouldSuccessfullyStartDeliveryForServedOrder() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.DELIVERY);
+            order.setStatus(OrderStatus.SERVED);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when
+            Order result = orderService.startDelivery(order.getId());
+
+            // then
+            Assertions.assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        }
+    }
+
 }
