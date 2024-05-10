@@ -64,17 +64,17 @@ docker compose -p kitchenpos up -d
 
 ### 주문(orders)
 
-- [ ] 주문은 선택적으로 **배달 주소**를 가질 수 있다.
-- [ ] 각 주문은 **주문 시간**을 기록한다.
-- [ ] 주문은 **주문 방법**을 가진다.
+- [x] 주문은 선택적으로 **배달 주소**를 가질 수 있다.
+- [x] 각 주문은 **주문 시간**을 기록한다.
+- [x] 주문은 **주문 방법**을 가진다.
     - 주문 방법은 `DELIVERY, TAKEOUT, EAT_IN` 중 하나이다.
-- [ ] 각 주문은 현재의 **진행 상태**를 나타낸다.
+- [x] 각 주문은 현재의 **진행 상태**를 나타낸다.
     - 진행 상태는 `WAITING, ACCEPTED, SERVED, DELIVERING, DELIVERED, COMPLETED` 중 하나이다.
     - 주문 진행 상태는 주문 방법에 따라 플로우와 진행 상태가 달라진다.
     - 배달 주문(`DELIVERY`)은 `WAITING`상태에서 시작하여,`ACCEPTED`,`SERVER`,`DELIVERING`,`DELIVERED`를 거쳐`COMPLETED`로 마무리된다.
     - 테이크 아웃(`TAKEOUT`)은 `WAITING`상태에서 시작하여,`ACCEPTED`,`SERVER`단계를 거쳐 직접 고객에게 제공된 후`COMPLETED`로 마무리된다.
     - 매장 내 식사(`EAT_IN`)은 `WAITING`상태에서 시작하여,`ACCEPTED`,`SERVER`단계를 거쳐 모든 서비스가 제공된 후`COMPLETED`로 마무리된다.
-- [ ] 주문은 선택적으로 **주문 테이블의 ID**를 가질 수 있다.
+- [x] 주문은 선택적으로 **주문 테이블의 ID**를 가질 수 있다.
     - 주문이 주문 테이블의 ID를 가지는 경우는 주문 방법이 `EAT_IN` 즉 **매장 내 식사일 경우**일 때이다.
 
   #### 주문 생성
