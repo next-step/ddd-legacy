@@ -477,4 +477,49 @@ class OrderServiceTest {
         }
     }
 
+
+    @Nested
+    @DisplayName("배달 완료")
+    class DeliveryCompletion {
+        @DisplayName("주문이 존재하지 않으면 에러가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenCompletingDeliveryForNonexistentOrder() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.DELIVERY);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
+                      .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("현재 주문 상태가 배달 중이 아니면 예외가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenCompletingDeliveryForOrderNotDelivering() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.DELIVERY);
+            order.setStatus(OrderStatus.COMPLETED);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
+                      .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("배달을 완료할 수 있다.")
+        @Test
+        void shouldSuccessfullyCompleteDeliveryForDeliveringOrder() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.DELIVERY);
+            order.setStatus(OrderStatus.DELIVERING);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when
+            Order result = orderService.completeDelivery(order.getId());
+
+            // then
+            Assertions.assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+        }
+    }
+
 }
