@@ -80,7 +80,8 @@ class MenuServiceTest {
                       .isInstanceOf(NoSuchElementException.class);
         }
 
-        @ParameterizedTest(name = ("메뉴에 속하는 상품이 하나라도 존재하지 않으면 예외가 발생한다. : menuProducts = {0}"))
+        @DisplayName("메뉴에 속하는 상품이 하나라도 존재하지 않으면 예외가 발생한다.")
+        @ParameterizedTest(name = "menuProducts = {0}")
         @NullAndEmptySource
         void shouldThrowExceptionIfMenuHasNoProducts(List<MenuProduct> menuProducts) {
             // given
@@ -192,8 +193,72 @@ class MenuServiceTest {
     @Nested
     @DisplayName("가격 변경")
     class ChangePrice {
+        @Test
+        @DisplayName("변경하려는 가격이 비어있으면 예외가 발생한다.")
+        void shouldThrowExceptionWhenChangingToNullPrice() {
+            // given
+            BigDecimal price = null;
+            Menu menu = MenuFixture.메뉴_생성(price);
 
+            // when & then
+            Assertions.assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
+                      .isInstanceOf(IllegalArgumentException.class);
+        }
 
+        @Test
+        @DisplayName("변경하려는 가격이 0원 미만이면 예외가 발생한다.")
+        void shouldThrowExceptionWhenChangingToNegativePrice() {
+            // given
+            BigDecimal price = new BigDecimal(-10_000L);
+            Menu menu = MenuFixture.메뉴_생성(price);
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
+                      .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("변경하려는 메뉴가 존재하지 않으면 예외가 발생한다.")
+        void shouldThrowExceptionWhenChangingPriceOfNonexistentMenu() {
+            Menu menu = MenuFixture.기본_메뉴();
+            given(menuRepository.findById(menu.getId())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
+                      .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Test
+        @DisplayName("변경 하고자 하는 메뉴 가격이 현재 메뉴에 포함된 상품들의 총합 가격보다 크면 예외가 발생한다.")
+        void shouldThrowExceptionWhenMenuPriceExceedsProductSum() {
+            // given
+            Product 만원짜리_상품 = ProductFixture.기본_상품();
+            MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(만원짜리_상품, 1L);
+            Menu 삼만원짜리_메뉴 = MenuFixture.메뉴_생성(BigDecimal.valueOf(30_000L), List.of(menuProduct));
+
+            given(menuRepository.findById(삼만원짜리_메뉴.getId())).willReturn(Optional.of(삼만원짜리_메뉴));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> menuService.changePrice(삼만원짜리_메뉴.getId(), 삼만원짜리_메뉴))
+                      .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("메뉴의 가격을 변경할 수 있다.")
+        void shouldChangeMenuPriceSuccessfully() {
+            // given
+            Product 만원짜리_상품 = ProductFixture.기본_상품();
+            MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(만원짜리_상품, 1L);
+            Menu 만원짜리_메뉴 = MenuFixture.메뉴_생성(BigDecimal.valueOf(10_000L), List.of(menuProduct));
+
+            given(menuRepository.findById(만원짜리_메뉴.getId())).willReturn(Optional.of(만원짜리_메뉴));
+
+            // when
+            menuService.changePrice(만원짜리_메뉴.getId(), 만원짜리_메뉴);
+
+            // then
+            Assertions.assertThat(만원짜리_메뉴.getPrice()).isEqualTo(BigDecimal.valueOf(10_000L));
+        }
     }
 
     @Nested
