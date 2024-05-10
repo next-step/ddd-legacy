@@ -13,9 +13,9 @@ public class Numbers {
     this.numbers = new ArrayList<>(numbers);
   }
 
-  public static Numbers create(NumberValidator numberValidator, String[] values) {
+  public static Numbers create(String[] values) {
     List<Number> numbers = Arrays.stream(values)
-        .map(value -> Number.create(numberValidator, value))
+        .map(Number::createPositive)
         .collect(Collectors.toList());
     return new Numbers(numbers);
   }

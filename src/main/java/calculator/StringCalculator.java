@@ -2,11 +2,9 @@ package calculator;
 
 public class StringCalculator {
 
-  private final NumberValidator numberValidator;
   private final TextExtractorFactory textExtractorFactory;
 
   public StringCalculator() {
-    this.numberValidator = new PositiveNumberValidator();
     this.textExtractorFactory = new TextExtractorFactory(
         new EmptyTextExtractor(),
         new CustomDelimiterTextExtractor(),
@@ -17,7 +15,7 @@ public class StringCalculator {
   public Number add(String text) {
     TextExtractor textExtractor = textExtractorFactory.get(text);
     String[] tokens = textExtractor.extract(text);
-    Numbers numbers = Numbers.create(numberValidator, tokens);
+    Numbers numbers = Numbers.create(tokens);
     return numbers.sum();
   }
 }

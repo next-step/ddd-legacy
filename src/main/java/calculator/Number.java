@@ -5,33 +5,26 @@ import java.util.Objects;
 public class Number {
 
   public static Number ZERO = new Number(0);
-  private final Integer value;
+  private final int value;
 
-  private Number(Integer value) {
+  private Number(int value) {
     this.value = value;
   }
 
-  public static Number create(NumberValidator numberValidator, String value) {
-    Number number = create(value);
-    numberValidator.validate(number);
-    return number;
-  }
-
-  public static Number create(String value) {
+  public static Number createPositive(String value) {
     try {
       int intValue = Integer.parseInt(value);
-      return create(intValue);
+      return createPositive(intValue);
     } catch (java.lang.NumberFormatException e) {
       throw new NumberFormatException("숫자 이외의 값은 변환할 수 없습니다.", e);
     }
   }
 
-  public static Number create(Integer value) {
+  public static Number createPositive(int value) {
+    if(value < 0) {
+      throw new NumberFormatException("음수는 지원하지 않습니다.");
+    }
     return new Number(value);
-  }
-
-  public boolean isNegative() {
-    return value.compareTo(0) < 0;
   }
 
   public Number add(Number number) {
