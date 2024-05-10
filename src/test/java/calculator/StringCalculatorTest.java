@@ -70,7 +70,7 @@ class StringCalculatorTest {
 
     @DisplayName(value = "연산자가 Integer 범위를 벗어나는 경우 NumberFormatException 예외 처리를 한다.")
     @Test
-    void operandOverflow() {
+    void overflowOperand() {
         assertThatExceptionOfType(NumberFormatException.class)
             .isThrownBy(() -> calculator.add("-1"));
     }

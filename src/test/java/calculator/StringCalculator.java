@@ -8,6 +8,10 @@ public class StringCalculator {
     private static final String DEFAULT_DELIMITER = ",";
 
     public int add(final String expression) {
+        if (expression == null || expression.isEmpty()) {
+            return 0;
+        }
+
         return getNumbers(expression).stream()
             .reduce(Math::addExact)
             .orElse(0);
