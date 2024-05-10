@@ -72,7 +72,7 @@ class StringCalculatorTest {
     @Test
     void overflowOperand() {
         assertThatExceptionOfType(NumberFormatException.class)
-            .isThrownBy(() -> calculator.add("-1"));
+            .isThrownBy(() -> calculator.add("9999999999"));
     }
 
     @DisplayName(value = "결과가 Integer의 범위를 벗어나는 경우 ArithmeticException 예외 처리를 한다.")
