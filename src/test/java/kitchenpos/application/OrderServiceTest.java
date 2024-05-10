@@ -354,11 +354,9 @@ public class OrderServiceTest {
     @Nested
     @DisplayName("주문수락 테스트")
     class AcceptOrder {
-
         @Nested
         @DisplayName("매장주문")
         class EatIn {
-
             @DisplayName("매장주문 접수를 수락한다.")
             @Test
             void eatInOrder() {
@@ -419,6 +417,37 @@ public class OrderServiceTest {
                         () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
                 );
             }
+        }
+
+        @DisplayName("미리 등록되어있는 주문이 아니면 예외가 발생한다.")
+        @Test
+        void notExistsOrderException() {
+            // given
+            UUID orderId = ORDER_포장주문.getId();
+
+            // when
+            when(orderRepository.findById(any())).thenReturn(Optional.empty());
+
+            // then
+            assertThatThrownBy(() -> orderService.accept(orderId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("현재 주문상태는 `수락대기`가 아니면 예외가 발생한다.")
+        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"WAITING"})
+        @ParameterizedTest
+        void notWaitingStatusException(OrderStatus status) {
+            // given
+            Order order = ORDER_포장주문;
+            UUID orderId = order.getId();
+            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+            // when
+            order.setStatus(status);
+
+            // then
+            assertThatThrownBy(() -> orderService.accept(orderId))
+                    .isInstanceOf(IllegalStateException.class);
         }
     }
 
@@ -489,7 +518,6 @@ public class OrderServiceTest {
                         () -> assertThat(result.getType()).isEqualTo(OrderType.TAKEOUT),
                         () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED)
                 );
-
             }
         }
     }
