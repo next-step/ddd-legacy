@@ -18,14 +18,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.NAME_반반치킨;
+import static kitchenpos.fixture.MenuFixture.PRICE_34000;
 import static kitchenpos.fixture.MenuFixture.PRICE_38000;
 import static kitchenpos.fixture.MenuFixture.menuResponse;
 import static kitchenpos.fixture.MenuGroupFixture.NAME_추천메뉴;
@@ -47,6 +52,7 @@ import static kitchenpos.fixture.ProductFixture.PRICE_18000;
 import static kitchenpos.fixture.ProductFixture.PRICE_20000;
 import static kitchenpos.fixture.ProductFixture.productResponse;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -102,7 +108,7 @@ public class OrderServiceTest {
         @DisplayName("매장주문")
         class EatIn {
 
-            @DisplayName("매장주문을 등록한다.")
+            @DisplayName("매장 주문을 등록한다.")
             @Test
             void eatInOrder() {
                 // given
@@ -125,13 +131,46 @@ public class OrderServiceTest {
                         () -> assertThat(result.getOrderTable().isOccupied()).isTrue()
                 );
             }
+
+            @DisplayName("주문테이블이 미리 등록되어 있지 않으면 예외가 발생한다.")
+            @Test
+            void notExistsOrderTableException() {
+                // given
+                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
+                when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+                Order request = orderEatInCreateRequest(orderTableId, orderLineItem);
+
+                // when
+                when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
+
+                // then
+                assertThatThrownBy(() -> orderService.create(request))
+                        .isInstanceOf(NoSuchElementException.class);
+            }
+
+            @DisplayName("주문테이블 사용여부를 미리 사용중으로 하지않으면 예외가 발생한다.")
+            @Test
+            void notOccupiedOrderTableException() {
+                // given
+                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
+                when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+                Order request = orderEatInCreateRequest(orderTableId, orderLineItem);
+
+                // when
+                orderTable.setOccupied(false);
+                when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+
+                // then
+                assertThatThrownBy(() -> orderService.create(request))
+                        .isInstanceOf(IllegalStateException.class);
+            }
         }
 
         @Nested
         @DisplayName("배달주문")
         class Delivery {
 
-            @DisplayName("배달주문")
+            @DisplayName("배달 주문을 등록한다.")
             @Test
             void deliveryOrder() {
                 // given
@@ -151,6 +190,22 @@ public class OrderServiceTest {
                         () -> assertThat(result.getDeliveryAddress()).isEqualTo(ORDER_배달주소),
                         () -> assertThat(result.getOrderTable()).isNull()
                 );
+            }
+
+            @DisplayName("배달 주소 정보가 없으면 예외가 발생한다.")
+            @NullAndEmptySource
+            @ParameterizedTest
+            void nullOrEmptyAddressException(String deliveryAddress) {
+                // given
+                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
+                when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+
+                // when
+                Order request = orderDeliveryCreateRequest(deliveryAddress, orderLineItem);
+
+                // then
+                assertThatThrownBy(() -> orderService.create(request))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
         }
 
@@ -180,8 +235,121 @@ public class OrderServiceTest {
                 );
             }
         }
-    }
 
+        @DisplayName("주문종류를 지정해주지 않으면 예외 발생한다.")
+        @Test
+        void nullOrderTypeException() {
+            // given
+            Order order = new Order();
+
+            // when
+            // then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+
+        @DisplayName("주문메뉴항목이 1개 이하이면 예외 발생한다.")
+        @Test
+        void nullAndEmptyOrderLineItemException() {
+            // given
+            Order order = new Order();
+            order.setType(OrderType.TAKEOUT);
+
+            // when
+            // then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("주문메뉴항목은 같은 메뉴가 중복해서 들어오면 예외 발생한다.")
+        @Test
+        void duplicatedOrderLineItemException() {
+            // given
+            Order order = new Order();
+            order.setType(OrderType.EAT_IN);
+            order.setOrderLineItems(List.of(orderLineItem));
+
+            // when
+            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of());
+
+            // then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("매장주문 제외하고, 주문메뉴항목의 수량이 0보다 작으면 예외 발생한다.")
+        @EnumSource(value = OrderType.class, mode = EnumSource.Mode.EXCLUDE, names = {"EAT_IN"})
+        @ParameterizedTest
+        void noEatInType_orderLineItemsLessThanZeroException(OrderType type) {
+            // given
+            Order order = new Order();
+            order.setType(type);
+            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
+
+            // when
+            orderLineItem.setQuantity(-1);
+            order.setOrderLineItems(List.of(orderLineItem));
+
+            // then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("주문메뉴항목이 미리 등록된 메뉴가 아니면 예외 발생한다.")
+        @Test
+        void notExistsOrderLineItem() {
+            // given
+            Order order = new Order();
+            order.setType(OrderType.EAT_IN);
+            order.setOrderLineItems(List.of(orderLineItem));
+            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
+
+            // when
+            when(menuRepository.findById(any())).thenReturn(Optional.empty());
+
+
+            // then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("주문메뉴항목의 메뉴가 노출안함 상태이면 예외가 발생한다.")
+        @Test
+        void noDisplayedMenuException() {
+            // given
+            Order order = new Order();
+            order.setType(OrderType.DELIVERY);
+            order.setOrderLineItems(List.of(orderLineItem));
+            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
+
+            // when
+            menu.setDisplayed(false);
+            when(menuRepository.findById(any())).thenReturn(Optional.ofNullable(menu));
+
+            // then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("주문메뉴항목의 메뉴과 원래 메뉴의 가격이 다르면 예외가 발생한다.")
+        @Test
+        void differentMenuPriceException() {
+            // given
+            Order order = new Order();
+            order.setType(OrderType.DELIVERY);
+            order.setOrderLineItems(List.of(orderLineItem));
+            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
+
+            // when
+            menu.setPrice(PRICE_34000);
+            when(menuRepository.findById(any())).thenReturn(Optional.ofNullable(menu));
+
+            // then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
 
     @Nested
     @DisplayName("주문수락 테스트")
