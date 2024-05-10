@@ -11,6 +11,7 @@ public class OrderLineItemFixture {
         orderLineItem.setMenuId(menu.getId());
         orderLineItem.setPrice(price);
         orderLineItem.setQuantity(quantity);
+        orderLineItem.setMenu(menu);
         return orderLineItem;
     }
 }
