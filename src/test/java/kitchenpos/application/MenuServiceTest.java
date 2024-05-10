@@ -262,8 +262,51 @@ class MenuServiceTest {
     }
 
     @Nested
-    @DisplayName("메뉴 노출 상태 변경")
+    @DisplayName("메뉴 노출 상태로 변경")
     class ChangeDisplay {
+        @Test
+        @DisplayName("메뉴가 존재하지 않으면 예외가 발생한다.")
+        void shouldThrowExceptionWhenDisplayingNonexistentMenu() {
+            // given
+            Menu menu = MenuFixture.기본_메뉴();
+            given(menuRepository.findById(menu.getId())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> menuService.display(menu.getId()))
+                      .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Test
+        @DisplayName("메뉴의 가격이 상품의 가격의 합보다 크면 예외가 발생한다.")
+        void shouldThrowExceptionWhenDisplayingMenuWithExcessivePrice() {
+            // given
+            Product 만원짜리_상품 = ProductFixture.기본_상품();
+            MenuProduct 메뉴_상품 = MenuProductFixture.메뉴_상품_생성(만원짜리_상품, 1L);
+            Menu 삼만원짜리_메뉴 = MenuFixture.메뉴_생성(BigDecimal.valueOf(30_000L), List.of(메뉴_상품));
+
+            given(menuRepository.findById(삼만원짜리_메뉴.getId())).willReturn(Optional.of(삼만원짜리_메뉴));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> menuService.display(삼만원짜리_메뉴.getId()))
+                      .isInstanceOf(IllegalStateException.class);
+        }
+
+        @Test
+        @DisplayName("메뉴를 노출 상태로 변경할 수 있다.")
+        void shouldDisplayMenuSuccessfully() {
+            // given
+            Product 만원짜리_상품 = ProductFixture.기본_상품();
+            MenuProduct 메뉴_상품 = MenuProductFixture.메뉴_상품_생성(만원짜리_상품, 1L);
+            Menu 만원짜리_메뉴 = MenuFixture.메뉴_생성(BigDecimal.valueOf(10_000L), List.of(메뉴_상품));
+
+            given(menuRepository.findById(만원짜리_메뉴.getId())).willReturn(Optional.of(만원짜리_메뉴));
+
+            // when
+            menuService.display(만원짜리_메뉴.getId());
+
+            // then
+            Assertions.assertThat(만원짜리_메뉴.isDisplayed()).isTrue();
+        }
     }
 
 }
