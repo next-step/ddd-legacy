@@ -309,4 +309,34 @@ class MenuServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("메뉴 숨김 상태로 변경")
+    class ChangeHide {
+        @Test
+        @DisplayName("메뉴가 존재하지 않으면 예외가 발생한다.")
+        void shouldThrowExceptionWhenHidingNonexistentMenu() {
+            // given
+            Menu menu = MenuFixture.기본_메뉴();
+            given(menuRepository.findById(menu.getId())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> menuService.hide(menu.getId()))
+                      .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Test
+        @DisplayName("메뉴를 숨김 상태로 변경할 수 있다.")
+        void shouldSuccessfullyHideMenu() {
+            // given
+            Menu menu = MenuFixture.기본_메뉴();
+            given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+            // when
+            menuService.hide(menu.getId());
+
+            // then
+            Assertions.assertThat(menu.isDisplayed()).isFalse();
+        }
+    }
+
 }
