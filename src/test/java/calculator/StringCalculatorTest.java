@@ -60,4 +60,25 @@ class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
             .isThrownBy(() -> calculator.add("-1"));
     }
+
+    @DisplayName(value = "해석할 수 없는 수식을 입력할 경우 IllegalArgumentException 예외 처리를 한다.")
+    @Test
+    void outOfFormat() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> calculator.add("-1"));
+    }
+
+    @DisplayName(value = "연산자가 Integer 범위를 벗어나는 경우 NumberFormatException 예외 처리를 한다.")
+    @Test
+    void operandOverflow() {
+        assertThatExceptionOfType(NumberFormatException.class)
+            .isThrownBy(() -> calculator.add("-1"));
+    }
+
+    @DisplayName(value = "결과가 Integer의 범위를 벗어나는 경우 ArithmeticException 예외 처리를 한다.")
+    @Test
+    void resultOverflow() {
+        assertThatExceptionOfType(ArithmeticException.class)
+            .isThrownBy(() -> calculator.add(Integer.MAX_VALUE + ",1"));
+    }
 }
