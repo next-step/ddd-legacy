@@ -25,6 +25,7 @@ class MenuGroupServiceTest {
     @Nested
     @DisplayName("메뉴 그룹 생성")
     class MenuGroupCreation {
+
         @ParameterizedTest
         @NullAndEmptySource
         @DisplayName("메뉴 그룹 이름이 null이거나 비어있으면 예외가 발생한다.")

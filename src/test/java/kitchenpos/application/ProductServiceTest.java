@@ -23,7 +23,6 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
-
     @InjectMocks
     private ProductService productService;
 
@@ -39,6 +38,7 @@ class ProductServiceTest {
     @Nested
     @DisplayName("상품 생성")
     class ProductCreation {
+
         @Test
         @DisplayName("가격이 비어있으면 예외가 발생한다.")
         void throwIfPriceIsNull() {
@@ -100,6 +100,7 @@ class ProductServiceTest {
     @Nested
     @DisplayName("상품 가격 변경")
     class ProductPriceChange {
+
         @Test
         @DisplayName("가격이 비어있으면 예외가 발생한다.")
         void throwIfPriceIsNull() {
@@ -126,15 +127,15 @@ class ProductServiceTest {
         @DisplayName("메뉴의 가격이 속해있는 상품들의 총합계 가격보다 높을 경우 메뉴를 숨김 처리한다.")
         void hideMenuIfPriceExceedsSum() {
             // given
-            Product product = ProductFixture.상품_생성(new BigDecimal(10_000L));
-            MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(product, 1L);
+            Product request = ProductFixture.상품_생성(new BigDecimal(10_000L));
+            MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(request, 1L);
             Menu menu = MenuFixture.메뉴_생성(BigDecimal.valueOf(20_000L), List.of(menuProduct));
 
-            given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
-            given(menuRepository.findAllByProductId(product.getId())).willReturn(List.of(menu));
+            given(productRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(menuRepository.findAllByProductId(request.getId())).willReturn(List.of(menu));
 
             // when
-            productService.changePrice(product.getId(), product);
+            productService.changePrice(request.getId(), request);
 
             // then
             Assertions.assertThat(menu.isDisplayed()).isFalse();
@@ -144,15 +145,15 @@ class ProductServiceTest {
         @DisplayName("상품 가격을 변경할 수 있다.")
         void changeProductPrice() {
             // given
-            Product product = ProductFixture.상품_생성(new BigDecimal(10_000L));
-            MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(product, 1L);
+            Product request = ProductFixture.상품_생성(new BigDecimal(10_000L));
+            MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(request, 1L);
             Menu menu = MenuFixture.메뉴_생성(BigDecimal.valueOf(10_000L), List.of(menuProduct));
 
-            given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
-            given(menuRepository.findAllByProductId(product.getId())).willReturn(List.of(menu));
+            given(productRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(menuRepository.findAllByProductId(request.getId())).willReturn(List.of(menu));
 
             // when & then
-            productService.changePrice(product.getId(), product);
+            productService.changePrice(request.getId(), request);
         }
     }
 }

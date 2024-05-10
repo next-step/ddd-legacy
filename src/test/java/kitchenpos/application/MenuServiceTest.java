@@ -26,7 +26,6 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
-
     @InjectMocks
     private MenuService menuService;
 
@@ -45,6 +44,7 @@ class MenuServiceTest {
     @Nested
     @DisplayName("메뉴 생성")
     class MenuCreation {
+
         @Test
         @DisplayName("가격이 비어있으면 예외가 발생한다.")
         void shouldThrowExceptionIfPriceIsNull() {
@@ -193,15 +193,16 @@ class MenuServiceTest {
     @Nested
     @DisplayName("가격 변경")
     class ChangePrice {
+
         @Test
         @DisplayName("변경하려는 가격이 비어있으면 예외가 발생한다.")
         void shouldThrowExceptionWhenChangingToNullPrice() {
             // given
             BigDecimal price = null;
-            Menu menu = MenuFixture.메뉴_생성(price);
+            Menu request = MenuFixture.메뉴_생성(price);
 
             // when & then
-            Assertions.assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
+            Assertions.assertThatThrownBy(() -> menuService.changePrice(request.getId(), request))
                       .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -210,21 +211,21 @@ class MenuServiceTest {
         void shouldThrowExceptionWhenChangingToNegativePrice() {
             // given
             BigDecimal price = new BigDecimal(-10_000L);
-            Menu menu = MenuFixture.메뉴_생성(price);
+            Menu request = MenuFixture.메뉴_생성(price);
 
             // when & then
-            Assertions.assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
+            Assertions.assertThatThrownBy(() -> menuService.changePrice(request.getId(), request))
                       .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         @DisplayName("변경하려는 메뉴가 존재하지 않으면 예외가 발생한다.")
         void shouldThrowExceptionWhenChangingPriceOfNonexistentMenu() {
-            Menu menu = MenuFixture.기본_메뉴();
-            given(menuRepository.findById(menu.getId())).willReturn(Optional.empty());
+            Menu request = MenuFixture.기본_메뉴();
+            given(menuRepository.findById(request.getId())).willReturn(Optional.empty());
 
             // when & then
-            Assertions.assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
+            Assertions.assertThatThrownBy(() -> menuService.changePrice(request.getId(), request))
                       .isInstanceOf(NoSuchElementException.class);
         }
 
@@ -264,15 +265,16 @@ class MenuServiceTest {
     @Nested
     @DisplayName("메뉴 노출 상태로 변경")
     class ChangeDisplay {
+
         @Test
         @DisplayName("메뉴가 존재하지 않으면 예외가 발생한다.")
         void shouldThrowExceptionWhenDisplayingNonexistentMenu() {
             // given
-            Menu menu = MenuFixture.기본_메뉴();
-            given(menuRepository.findById(menu.getId())).willReturn(Optional.empty());
+            Menu request = MenuFixture.기본_메뉴();
+            given(menuRepository.findById(request.getId())).willReturn(Optional.empty());
 
             // when & then
-            Assertions.assertThatThrownBy(() -> menuService.display(menu.getId()))
+            Assertions.assertThatThrownBy(() -> menuService.display(request.getId()))
                       .isInstanceOf(NoSuchElementException.class);
         }
 
@@ -312,15 +314,16 @@ class MenuServiceTest {
     @Nested
     @DisplayName("메뉴 숨김 상태로 변경")
     class ChangeHide {
+
         @Test
         @DisplayName("메뉴가 존재하지 않으면 예외가 발생한다.")
         void shouldThrowExceptionWhenHidingNonexistentMenu() {
             // given
-            Menu menu = MenuFixture.기본_메뉴();
-            given(menuRepository.findById(menu.getId())).willReturn(Optional.empty());
+            Menu request = MenuFixture.기본_메뉴();
+            given(menuRepository.findById(request.getId())).willReturn(Optional.empty());
 
             // when & then
-            Assertions.assertThatThrownBy(() -> menuService.hide(menu.getId()))
+            Assertions.assertThatThrownBy(() -> menuService.hide(request.getId()))
                       .isInstanceOf(NoSuchElementException.class);
         }
 
@@ -328,14 +331,14 @@ class MenuServiceTest {
         @DisplayName("메뉴를 숨김 상태로 변경할 수 있다.")
         void shouldSuccessfullyHideMenu() {
             // given
-            Menu menu = MenuFixture.기본_메뉴();
-            given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+            Menu request = MenuFixture.기본_메뉴();
+            given(menuRepository.findById(request.getId())).willReturn(Optional.of(request));
 
             // when
-            menuService.hide(menu.getId());
+            menuService.hide(request.getId());
 
             // then
-            Assertions.assertThat(menu.isDisplayed()).isFalse();
+            Assertions.assertThat(request.isDisplayed()).isFalse();
         }
     }
 
