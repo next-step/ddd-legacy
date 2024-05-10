@@ -52,10 +52,18 @@ public class MenuFixture {
         return menu;
     }
 
-    private static MenuGroup 기본_메뉴_그룹() {
+    public static MenuGroup 기본_메뉴_그룹() {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
         menuGroup.setName("메뉴그룹");
+
+        return menuGroup;
+    }
+
+    public static MenuGroup 메뉴_그룹_생성(String name) {
+        final MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(UUID.randomUUID());
+        menuGroup.setName(name);
 
         return menuGroup;
     }
