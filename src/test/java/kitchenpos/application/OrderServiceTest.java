@@ -375,4 +375,48 @@ class OrderServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("주문 제공")
+    class OrderServing {
+        @DisplayName("주문이 존재하지 않으면 에러가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenServingNonexistentOrder() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.EAT_IN);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.serve(order.getId()))
+                      .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("현재 주문 상태가 수락 상태가 아니면 예외가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenServingUnacceptedOrder() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.EAT_IN);
+            order.setStatus(OrderStatus.COMPLETED);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.serve(order.getId()))
+                      .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("주문을 제공할 수 있다.")
+        @Test
+        void shouldSuccessfullyServeOrderWhenAccepted() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.EAT_IN);
+            order.setStatus(OrderStatus.ACCEPTED);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when
+            Order result = orderService.serve(order.getId());
+
+            // then
+            Assertions.assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED);
+        }
+    }
+
 }
