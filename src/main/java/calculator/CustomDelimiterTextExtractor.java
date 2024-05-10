@@ -6,21 +6,17 @@ import java.util.regex.Pattern;
 public class CustomDelimiterTextExtractor implements TextExtractor {
 
   private final static String REGEX_PATTERN = "//(.)\n(.*)";
-  private final Pattern pattern;
-
-  public CustomDelimiterTextExtractor() {
-    this.pattern = Pattern.compile(REGEX_PATTERN);
-  }
+  private final static Pattern PATTERN = Pattern.compile(REGEX_PATTERN);
 
   @Override
   public boolean isSupport(String text) {
-    return pattern.matcher(text)
+    return PATTERN.matcher(text)
         .find();
   }
 
   @Override
   public String[] extract(String text) {
-    Matcher matcher = pattern.matcher(text);
+    Matcher matcher = PATTERN.matcher(text);
     if (matcher.find()) {
       String customDelimiter = matcher.group(1);
       return matcher.group(2).split(customDelimiter);
