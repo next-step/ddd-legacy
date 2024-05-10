@@ -9,16 +9,16 @@ public class ProductFixture {
     private ProductFixture() {
     }
 
-    public static Product create() {
+    public static Product 기본_상품() {
         final Product product = new Product();
         product.setId(UUID.randomUUID());
         product.setName("상품명");
-        product.setPrice(BigDecimal.valueOf(16_000));
+        product.setPrice(BigDecimal.valueOf(10_000));
 
         return product;
     }
 
-    public static Product create(BigDecimal price) {
+    public static Product 상품_생성(BigDecimal price) {
         final Product product = new Product();
         product.setId(UUID.randomUUID());
         product.setName("상품명");
@@ -27,7 +27,7 @@ public class ProductFixture {
         return product;
     }
 
-    public static Product create(final String name, final BigDecimal price) {
+    public static Product 상품_생성(final String name, final BigDecimal price) {
         final Product product = new Product();
         product.setId(UUID.randomUUID());
         product.setName(name);

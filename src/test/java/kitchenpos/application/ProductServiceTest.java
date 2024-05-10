@@ -43,7 +43,7 @@ class ProductServiceTest {
         @DisplayName("가격이 비어있으면 예외가 발생한다.")
         void throwIfPriceIsNull() {
             // given
-            Product request = ProductFixture.create("치킨", null);
+            Product request = ProductFixture.상품_생성("치킨", null);
 
             // when & then
             Assertions.assertThatThrownBy(() -> productService.create(request))
@@ -54,7 +54,7 @@ class ProductServiceTest {
         @DisplayName("가격이 0원 이상이지 않으면 예외가 발생한다.")
         void throwIfPriceIsNotPositive() {
             // given
-            Product request = ProductFixture.create("치킨", new BigDecimal(-10_000L));
+            Product request = ProductFixture.상품_생성("치킨", new BigDecimal(-10_000L));
 
             // when & then
             Assertions.assertThatThrownBy(() -> productService.create(request))
@@ -65,7 +65,7 @@ class ProductServiceTest {
         @DisplayName("상품명이 비어있으면 예외가 발생한다.")
         void throwIfNameIsEmpty() {
             // given
-            Product request = ProductFixture.create(null, new BigDecimal(10_000L));
+            Product request = ProductFixture.상품_생성(null, new BigDecimal(10_000L));
 
             // when & then
             Assertions.assertThatThrownBy(() -> productService.create(request))
@@ -76,7 +76,7 @@ class ProductServiceTest {
         @DisplayName("상품명에 욕설이 포함되어있으면 예외가 발생한다.")
         void throwIfNameContainsProfanity() {
             // given
-            Product request = ProductFixture.create("ㅅㅂ", new BigDecimal(10_000L));
+            Product request = ProductFixture.상품_생성("ㅅㅂ", new BigDecimal(10_000L));
             given(purgomalumClient.containsProfanity(request.getName())).willReturn(true);
 
             // when & then
@@ -88,11 +88,11 @@ class ProductServiceTest {
         @DisplayName("상품을 생성할 수 있다.")
         void createProduct() {
             // given
-            Product request = ProductFixture.create();
+            Product request = ProductFixture.기본_상품();
             given(purgomalumClient.containsProfanity(request.getName())).willReturn(false);
             given(productRepository.save(any())).willReturn(new Product());
 
-            // when
+            // when & then
             productService.create(request);
         }
     }
@@ -104,7 +104,7 @@ class ProductServiceTest {
         @DisplayName("가격이 비어있으면 예외가 발생한다.")
         void throwIfPriceIsNull() {
             // given
-            Product request = ProductFixture.create("치킨", null);
+            Product request = ProductFixture.상품_생성("치킨", null);
 
             // when & then
             Assertions.assertThatThrownBy(() -> productService.changePrice(request.getId(), request))
@@ -115,7 +115,7 @@ class ProductServiceTest {
         @DisplayName("가격이 0원 이상이지 않으면 예외가 발생한다.")
         void throwIfPriceIsNotPositive() {
             // given
-            Product request = ProductFixture.create("치킨", new BigDecimal(-10_000L));
+            Product request = ProductFixture.상품_생성("치킨", new BigDecimal(-10_000L));
 
             // when & then
             Assertions.assertThatThrownBy(() -> productService.changePrice(request.getId(), request))
@@ -126,9 +126,9 @@ class ProductServiceTest {
         @DisplayName("메뉴의 가격이 속해있는 상품들의 총합계 가격보다 높을 경우 메뉴를 숨김 처리한다.")
         void hideMenuIfPriceExceedsSum() {
             // given
-            Product product = ProductFixture.create(new BigDecimal(10_000L));
-            MenuProduct menuProduct = MenuProductFixture.create(product, 1L);
-            Menu menu = MenuFixture.create(BigDecimal.valueOf(20_000L), List.of(menuProduct));
+            Product product = ProductFixture.상품_생성(new BigDecimal(10_000L));
+            MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(product, 1L);
+            Menu menu = MenuFixture.메뉴_생성(BigDecimal.valueOf(20_000L), List.of(menuProduct));
 
             given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
             given(menuRepository.findAllByProductId(product.getId())).willReturn(List.of(menu));
@@ -144,14 +144,14 @@ class ProductServiceTest {
         @DisplayName("상품 가격을 변경할 수 있다.")
         void changeProductPrice() {
             // given
-            Product product = ProductFixture.create(new BigDecimal(10_000L));
-            MenuProduct menuProduct = MenuProductFixture.create(product, 1L);
-            Menu menu = MenuFixture.create(BigDecimal.valueOf(10_000L), List.of(menuProduct));
+            Product product = ProductFixture.상품_생성(new BigDecimal(10_000L));
+            MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(product, 1L);
+            Menu menu = MenuFixture.메뉴_생성(BigDecimal.valueOf(10_000L), List.of(menuProduct));
 
             given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
             given(menuRepository.findAllByProductId(product.getId())).willReturn(List.of(menu));
 
-            // when
+            // when & then
             productService.changePrice(product.getId(), product);
         }
     }
