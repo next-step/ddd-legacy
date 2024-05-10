@@ -522,4 +522,92 @@ class OrderServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("주문 완료")
+    class OrderCompletion {
+        @DisplayName("주문이 존재하지 않으면 에러가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenCompletingNonexistentOrder() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.EAT_IN);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.complete(order.getId()))
+                      .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("배달일 때 배달 완료 상태가 아니면 예외가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenCompletingDeliveryOrderNotDelivered() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.DELIVERY);
+            order.setStatus(OrderStatus.SERVED);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.complete(order.getId()))
+                      .isInstanceOf(IllegalStateException.class);
+
+        }
+
+        @DisplayName("테이크아웃이거나 매장 내 식사일 때 제공 완료 상태가 아니면 예외가 발생한다.")
+        @Test
+        void shouldThrowExceptionWhenCompletingNonDeliveryOrderNotServed() {
+            // given
+            Order order = OrderFixture.주문_생성(OrderType.TAKEOUT);
+            order.setStatus(OrderStatus.ACCEPTED);
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.complete(order.getId()))
+                      .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("매장 내 식사 주문일 때 해당 테이블에 모든 주문이 완료되지 않았다면 테이블은 치우지 않는다.")
+        @Test
+        void shouldThrowExceptionWhenCompletingEatInOrderWithUncompletedTable() {
+            // given
+            OrderTable orderTable = OrderFixture.주문_테이블_생성();
+            orderTable.setOccupied(true);
+
+            Order order = OrderFixture.주문_생성(OrderType.EAT_IN);
+            order.setOrderTable(orderTable);
+            order.setStatus(OrderStatus.SERVED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).willReturn(true);
+
+            // when
+            Order result = orderService.complete(order.getId());
+
+            // then
+            Assertions.assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            Assertions.assertThat(result.getOrderTable().isOccupied()).isEqualTo(true);
+
+        }
+
+        @DisplayName("매장 내 식사 주문일 때 해당 테이블에 모든 주문이 완료되었다면 테이블은 치운다.")
+        @Test
+        void shouldSuccessfullyCompleteEatInOrderWithCompletedTable() {
+            // given
+            OrderTable orderTable = OrderFixture.주문_테이블_생성();
+            orderTable.setOccupied(true);
+
+            Order order = OrderFixture.주문_생성(OrderType.EAT_IN);
+            order.setOrderTable(orderTable);
+            order.setStatus(OrderStatus.SERVED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).willReturn(false);
+
+            // when
+            Order result = orderService.complete(order.getId());
+
+            // then
+            Assertions.assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            Assertions.assertThat(result.getOrderTable().isOccupied()).isEqualTo(false);
+        }
+    }
+
 }
