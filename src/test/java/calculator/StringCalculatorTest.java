@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class StringCalculatorTest {
+
   private StringCalculator calculator;
 
   @BeforeEach

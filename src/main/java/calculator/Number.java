@@ -21,7 +21,7 @@ public class Number {
   }
 
   public static Number createPositive(int value) {
-    if(value < 0) {
+    if (value < 0) {
       throw new NumberFormatException("음수는 지원하지 않습니다.");
     }
     return new Number(value);
