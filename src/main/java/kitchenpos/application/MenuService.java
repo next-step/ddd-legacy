@@ -75,6 +75,7 @@ public class MenuService {
             menuProduct.setQuantity(quantity);
             menuProducts.add(menuProduct);
         }
+
         if (price.compareTo(sum) > 0) {
             throw new IllegalArgumentException();
         }
