@@ -256,6 +256,23 @@ class MenuServiceTest {
     @Nested
     class DisplayTest {
 
+        @DisplayName("메뉴는 정상적으로 노출 처리된다.")
+        @Test
+        void displayedTest() {
+            // given
+            var id = UUID.randomUUID();
+            var product = ProductFixture.newOne(5000);
+            var originalMenu = MenuFixture.newOne(5000, List.of(product));
+
+            given(menuRepository.findById(any())).willReturn(Optional.of(originalMenu));
+
+            // when
+            var actual = menuService.display(id);
+
+            // then
+            assertThat(actual.isDisplayed()).isTrue();
+        }
+
         @DisplayName("[예외] 메뉴가 존재하지 않을 경우 예외 발생한다.")
         @Test
         void notFoundMenuExceptionTest() {
