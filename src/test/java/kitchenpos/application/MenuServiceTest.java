@@ -266,6 +266,21 @@ class MenuServiceTest {
             assertThatThrownBy(() -> menuService.display(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
         }
+
+        @DisplayName("[예외] 메뉴를 구성하는 상품의 총 가격 < 메뉴의 가격 이면 예외가 발생한다.")
+        @Test
+        void productTotalPriceExceptionTest() {
+            // given
+            var id = UUID.randomUUID();
+            var product = ProductFixture.newOne(5000);
+            var originalMenu = MenuFixture.newOne(5001, List.of(product));
+
+            given(menuRepository.findById(any())).willReturn(Optional.of(originalMenu));
+
+            // when & then
+            assertThatThrownBy(() -> menuService.display(id))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     @Test
