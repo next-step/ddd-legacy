@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -82,6 +83,19 @@ class ProductServiceTest {
                     Arguments.arguments(ProductFixture.newOne(-1000)),
                     Arguments.arguments(ProductFixture.newOne((BigDecimal) null))
             );
+        }
+
+        @DisplayName("[예외] 상품이 존재하지 않을 경우 예외가 발생한다.")
+        @Test
+        void notFoundProductExceptionTest() {
+            // given
+            var id = UUID.randomUUID();
+            var updatedProduct = ProductFixture.newOne(4999);
+            given(productRepository.findById(any())).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> productService.changePrice(id, updatedProduct))
+                    .isInstanceOf(NoSuchElementException.class);
         }
     }
 
