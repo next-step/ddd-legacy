@@ -3,13 +3,9 @@ package kitchenpos.application;
 import kitchenpos.application.testFixture.MenuFixture;
 import kitchenpos.application.testFixture.MenuGroupFixture;
 import kitchenpos.application.testFixture.ProductFixture;
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.api.Assertions;
-import org.hibernate.mapping.Any;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,9 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -63,10 +57,17 @@ class MenuServiceTest {
         @DisplayName("[예외] 가격은 음수이거나 null일수 없다.")
         @ParameterizedTest
         @MethodSource("priceMethodSource")
-        void invalidPriceTest(Menu menu) {
+        void invalidPriceExceptionTest(Menu menu) {
             // when & then
             Assertions.assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        static Stream<Arguments> priceMethodSource() {
+            return Stream.of(
+                    Arguments.arguments(MenuFixture.newOne(BigDecimal.valueOf(-1000))),
+                    Arguments.arguments(MenuFixture.newOne((BigDecimal) null))
+            );
         }
 
         @DisplayName("[예외] 존재하지 않는 메뉴 그룹이면 예외가 발생한다.")
@@ -82,29 +83,39 @@ class MenuServiceTest {
                     .isInstanceOf(NoSuchElementException.class);
         }
 
-
         @DisplayName("[예외] 존재하지 않는 상품일 경우 예외가 발생한다.")
         @Test
-        void notFoundProductTest() {
+        void notFoundProductExceptionTest() {
             // given
             var id = UUID.randomUUID();
             given(menuGroupRepository.findById(any()))
-                    .willReturn(Optional.of(MenuGroupFixture.newOne("신메뉴")));
+                    .willReturn(Optional.of(MenuGroupFixture.newOne()));
             given(productRepository.findAllByIdIn(any()))
                     .willReturn(Collections.EMPTY_LIST);
 
             // when & then
-            var product = ProductFixture.newOnById(id);
+            var product = ProductFixture.newOne(id);
             var menu = MenuFixture.newOne(product);
             Assertions.assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        static Stream<Arguments> priceMethodSource() {
-            return Stream.of(
-                    Arguments.arguments(MenuFixture.newOne(BigDecimal.valueOf(-1000))),
-                    Arguments.arguments(MenuFixture.newOne((BigDecimal) null))
-            );
+        @DisplayName("[예외] 메뉴를 구성하는 상품의 총 가격 < 메뉴의 가격 이면 예외가 발생한다.")
+        @Test
+        void productTotalPriceExceptionTest() {
+            // given
+            var product = ProductFixture.newOne(5000);
+            var menu = MenuFixture.newOne(5001, List.of(product));
+
+            given(menuGroupRepository.findById(any()))
+                    .willReturn(Optional.of(MenuGroupFixture.newOne()));
+            given(productRepository.findAllByIdIn(any()))
+                    .willReturn(List.of(product));
+            given(productRepository.findById(any())).willReturn(Optional.of(product));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 

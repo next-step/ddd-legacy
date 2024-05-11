@@ -11,7 +11,14 @@ public record MenuProductFixture() {
         return menuProduct;
     }
 
-    public static MenuProduct newOneByProduct(Product product) {
+    public static MenuProduct newOne(int quantity) {
+        var menuProduct = new MenuProduct();
+        menuProduct.setProduct(ProductFixture.newOne());
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
+
+    public static MenuProduct newOne(Product product) {
         var menuProduct = new MenuProduct();
         menuProduct.setProduct(product);
         menuProduct.setQuantity(1);
