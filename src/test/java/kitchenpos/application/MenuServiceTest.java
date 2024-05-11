@@ -252,9 +252,9 @@ class MenuServiceTest {
         }
     }
 
-    @DisplayName("노출여부 설정시")
+    @DisplayName("메뉴 노출 처리시,")
     @Nested
-    class DisplayTest {
+    class DisplayOnTest {
 
         @DisplayName("메뉴는 정상적으로 노출 처리된다.")
         @Test
@@ -300,8 +300,19 @@ class MenuServiceTest {
         }
     }
 
-    @Test
-    void hide() {
+    @DisplayName("메뉴 비노출 처리시,")
+    @Nested
+    class DisplayOffTest {
+        @DisplayName("[예외] 메뉴가 존재하지 않을 경우 예외 발생한다.")
+        @Test
+        void notFoundMenuExceptionTest() {
+            // given
+            given(menuRepository.findById(any())).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> menuService.hide(UUID.randomUUID()))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @Test
