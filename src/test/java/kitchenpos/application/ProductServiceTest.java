@@ -85,5 +85,28 @@ class ProductServiceTest {
                     Arguments.arguments(ProductFixture.newOne((BigDecimal) null))
             );
         }
+
+        @DisplayName("[예외] 상품의 이름은 null일 수 없다.")
+        @Test
+        void createProductWithNameNullTest() {
+            // given
+            var product = ProductFixture.newOne((String) null);
+
+            // when & then
+            assertThatThrownBy(() -> productService.create(product))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("[예외] 상품의 이름은 비속어를 포함할 수 없다.")
+        @Test
+        void createProductWithProfanityTest() {
+            // given
+            var product = ProductFixture.newOne();
+            given(purgomalumClient.containsProfanity(any())).willReturn(true);
+
+            // when & then
+            assertThatThrownBy(() -> productService.create(product))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
 }
