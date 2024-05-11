@@ -1,9 +1,7 @@
 package kitchenpos.order.service;
 
 import kitchenpos.application.OrderTableService;
-import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.*;
 import kitchenpos.order.fixture.OrderTableFixture;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,6 +63,19 @@ public class OrderTableServiceTest {
         orderTableService.sit(주문_테이블.getId());
 
         Assertions.assertThat(주문_테이블.isOccupied()).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("매장 주인은 테이블을 정리할 수 있다.")
+    void clear() {
+        OrderTable 손님_있는_주문_테이블 = orderTableFixture.손님_있는_주문_테이블;
+
+        mockingOrderTableRepository(OrderTableRepositoryMethod.FIND, 손님_있는_주문_테이블);
+        Mockito.when(orderRepository.existsByOrderTableAndStatusNot(Mockito.any(), Mockito.any()))
+                .thenReturn(false);
+        orderTableService.clear(손님_있는_주문_테이블.getId());
+
+        Assertions.assertThat(손님_있는_주문_테이블.getNumberOfGuests()).isEqualTo(0);
     }
 
     @Test
