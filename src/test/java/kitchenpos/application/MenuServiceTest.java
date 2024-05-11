@@ -251,8 +251,21 @@ class MenuServiceTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
-    @Test
-    void display() {
+
+    @DisplayName("노출여부 설정시")
+    @Nested
+    class DisplayTest {
+
+        @DisplayName("[예외] 메뉴가 존재하지 않을 경우 예외 발생한다.")
+        @Test
+        void notFoundMenuExceptionTest() {
+            // given
+            given(menuRepository.findById(any())).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> menuService.display(UUID.randomUUID()))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @Test
