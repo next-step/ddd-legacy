@@ -17,6 +17,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.createMenu;
@@ -43,7 +44,7 @@ class MenuServiceTest {
     private PurgomalumClient purgomalumClient;
 
     @Nested
-    class createNested {
+    class createTest {
         @DisplayName("메뉴를 생성할 수 있다.")
         @Test
         void createSuccessTest() {
@@ -113,7 +114,7 @@ class MenuServiceTest {
             menuGroup = menuGroupRepository.save(menuGroup);
 
             MenuProduct menuProduct = createMenuProduct(UUID.randomUUID(), 1);
-            
+
             Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
 
             assertThatThrownBy(() -> menuService.create(menu))
@@ -192,18 +193,114 @@ class MenuServiceTest {
     }
 
     @Nested
-    class changePriceNested {
+    class changePriceTest {
+        @DisplayName("메뉴의 가격을 변경할 수 있다.")
+        @Test
+        void changePriceSuccessTest() {
+            MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            product = productRepository.save(product);
+
+            MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+
+            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            menu = menuService.create(menu);
+
+            BigDecimal changedPrice = BigDecimal.valueOf(15000L);
+            menu.setPrice(BigDecimal.valueOf(15000L));
+            menu = menuService.changePrice(menu.getId(), menu);
+
+            assertThat(menu.getPrice()).isEqualTo(changedPrice);
+        }
+
+        @DisplayName("변경할 가격이 0보다 작으면 예외가 발생한다.")
+        @Test
+        void changePriceFailWhenPriceIsNegativeTest() {
+            MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            product = productRepository.save(product);
+
+            MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+
+            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            menu = menuService.create(menu);
+
+            UUID menuId = menu.getId();
+            menu.setPrice(BigDecimal.valueOf(-15000L));
+            Menu changeMenu = menu;
+
+            assertThatThrownBy(() -> menuService.changePrice(menuId, changeMenu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("변경할 가격이 존재하지 않으면 예외가 발생한다.")
+        @Test
+        void changePriceFailWhenPriceIsNullTest() {
+            MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            product = productRepository.save(product);
+
+            MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+
+            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            menu = menuService.create(menu);
+
+            UUID menuId = menu.getId();
+            menu.setPrice(null);
+            Menu changeMenu = menu;
+
+            assertThatThrownBy(() -> menuService.changePrice(menuId, changeMenu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴가 존재하지 않으면 에러가 발생한다.")
+        @Test
+        void changePriceFailWhenMenuNotFoundTest() {
+            UUID menuId = UUID.randomUUID();
+            Menu menu = createMenu(UUID.randomUUID(), "후라이드치킨", BigDecimal.valueOf(16000L), true, Collections.emptyList());
+
+            assertThatThrownBy(() -> menuService.changePrice(menuId, menu))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("메뉴의 가격이 전체 상품의 가격보다 크면 예외가 발생한다.")
+        @Test
+        void changePriceFailWhenPriceIsGreaterThanSumOfProductPriceTest() {
+            MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            product = productRepository.save(product);
+
+            MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+
+            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            menu = menuService.create(menu);
+
+            UUID menuId = menu.getId();
+            menu.setPrice(BigDecimal.valueOf(32000L));
+            Menu changeMenu = menu;
+
+            assertThatThrownBy(() -> menuService.changePrice(menuId, changeMenu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Nested
-    class displayNested {
+    class displayTest {
     }
 
     @Nested
-    class hide {
+    class hideTest {
     }
 
     @Nested
-    class findAll {
+    class findAllTest {
     }
 }
