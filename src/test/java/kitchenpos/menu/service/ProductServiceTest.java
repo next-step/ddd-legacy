@@ -51,7 +51,6 @@ public class ProductServiceTest {
                         .thenReturn(false);
         Mockito.when(productRepository.save(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
-
         Product result = productService.create(떡볶이);
 
         Assertions.assertThat(result.getId()).isNotNull();
@@ -62,7 +61,8 @@ public class ProductServiceTest {
     void create_exception_상품_가격() {
         List<Product> 상품_목록 = List.of(productFixture.가격_없는_상품, productFixture.가격_음수_상품);
 
-        for (Product 상품 : 상품_목록) {
+        for (Product 상품 : 상품_목록)
+        {
             Assertions.assertThatThrownBy(
                     () -> productService.create(상품)
             ).isInstanceOf(IllegalArgumentException.class);
@@ -87,8 +87,8 @@ public class ProductServiceTest {
                 .thenReturn(Optional.of(상품_A));
         Mockito.when(menuRepository.findAllByProductId(Mockito.any()))
                 .thenReturn(List.of(menuFixture.메뉴_A));
-
         productService.changePrice(상품_A.getId(), 상품_B);
+
         Assertions.assertThat(상품_A.getPrice()).isEqualTo(상품_B.getPrice());
     }
 
@@ -102,8 +102,8 @@ public class ProductServiceTest {
                 .thenReturn(Optional.of(상품_C));
         Mockito.when(menuRepository.findAllByProductId(Mockito.any()))
                 .thenReturn(List.of(menuFixture.메뉴_C));
-
         productService.changePrice(상품_C.getId(), 상품_A);
+
         Assertions.assertThat(menuFixture.메뉴_C.isDisplayed()).isEqualTo(false);
     }
 }

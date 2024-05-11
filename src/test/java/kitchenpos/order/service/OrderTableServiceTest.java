@@ -40,8 +40,8 @@ public class OrderTableServiceTest {
         OrderTable 주문_테이블 = orderTableFixture.주문_테이블_A;
 
         mockingOrderTableRepository(OrderTableRepositoryMethod.SAVE, 주문_테이블);
-
         OrderTable result = orderTableService.create(주문_테이블);
+
         Assertions.assertThat(result.getId()).isNotNull();
         Assertions.assertThat(result.isOccupied()).isEqualTo(false);
     }
@@ -62,8 +62,8 @@ public class OrderTableServiceTest {
         OrderTable 주문_테이블 = orderTableFixture.주문_테이블_A;
 
         mockingOrderTableRepository(OrderTableRepositoryMethod.FIND, 주문_테이블);
-
         orderTableService.sit(주문_테이블.getId());
+
         Assertions.assertThat(주문_테이블.isOccupied()).isEqualTo(true);
     }
 
@@ -74,9 +74,9 @@ public class OrderTableServiceTest {
         OrderTable 주문_테이블_B = orderTableFixture.주문_테이블_B;
 
         mockingOrderTableRepository(OrderTableRepositoryMethod.FIND, 주문_테이블_A);
-
         orderTableService.sit(주문_테이블_A.getId());
         orderTableService.changeNumberOfGuests(주문_테이블_A.getId(), 주문_테이블_B);
+
         Assertions.assertThat(주문_테이블_A.getNumberOfGuests()).isEqualTo(주문_테이블_B.getNumberOfGuests());
     }
 

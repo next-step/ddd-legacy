@@ -39,7 +39,6 @@ public class MenuGroupServiceTest {
 
         Mockito.when(menuGroupRepository.save(Mockito.any()))
                 .then(AdditionalAnswers.returnsFirstArg());
-
         MenuGroup result = menuGroupService.create(한식);
 
         Assertions.assertThat(result.getId()).isNotNull();

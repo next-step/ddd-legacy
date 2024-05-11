@@ -51,8 +51,8 @@ public class MenuServiceTest {
         mockingProductRepositoryForCreate(메뉴);
         mockingPurgomalumClientForCreate(false);
         mockingMenuRepositoryForCreate();
-
         Menu result = menuService.create(메뉴);
+
         Assertions.assertThat(result.getId()).isNotNull();
     }
 
@@ -157,8 +157,8 @@ public class MenuServiceTest {
         Menu 메뉴_B = menuFixture.메뉴_B;
 
         mockingMenuRepositoryFindBy(메뉴_A);
-
         menuService.changePrice(메뉴_A.getId(), 메뉴_B);
+
         Assertions.assertThat(메뉴_A.getPrice()).isEqualTo(메뉴_B.getPrice());
     }
 
@@ -181,8 +181,8 @@ public class MenuServiceTest {
         Menu 메뉴_C = menuFixture.메뉴_C;
 
         mockingMenuRepositoryFindBy(메뉴_C);
-
         menuService.display(메뉴_C.getId());
+
         Assertions.assertThat(메뉴_C.isDisplayed()).isEqualTo(true);
     }
 
@@ -192,8 +192,8 @@ public class MenuServiceTest {
         Menu 메뉴_A = menuFixture.메뉴_A;
 
         mockingMenuRepositoryFindBy(메뉴_A);
-
         menuService.hide(메뉴_A.getId());
+
         Assertions.assertThat(메뉴_A.isDisplayed()).isEqualTo(false);
     }
 
