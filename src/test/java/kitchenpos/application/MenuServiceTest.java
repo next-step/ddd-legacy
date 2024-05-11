@@ -24,13 +24,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("메뉴(Menu) 서비스 테스트")
@@ -71,20 +69,31 @@ class MenuServiceTest {
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
+        @DisplayName("[예외] 존재하지 않는 메뉴 그룹이면 예외가 발생한다.")
+        @Test
+        void notFoundMenuGroupExceptionTest() {
+            // given
+            given(menuGroupRepository.findById(any()))
+                    .willReturn(Optional.empty());
+
+            // then
+            var menu = MenuFixture.newOne();
+            Assertions.assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+
         @DisplayName("[예외] 존재하지 않는 상품일 경우 예외가 발생한다.")
         @Test
         void notFoundProductTest() {
             // given
             var id = UUID.randomUUID();
-            menuGroupRepository.save(MenuGroupFixture.newOne("신메뉴"));
+            given(menuGroupRepository.findById(any()))
+                    .willReturn(Optional.of(MenuGroupFixture.newOne("신메뉴")));
+            given(productRepository.findAllByIdIn(any()))
+                    .willReturn(Collections.EMPTY_LIST);
 
-            // when
-            Mockito.when(menuGroupRepository.findById(any()))
-                    .thenReturn(Optional.of(MenuGroupFixture.newOne("신메뉴")));
-            Mockito.when(productRepository.findAllByIdIn(any()))
-                    .thenReturn(Collections.EMPTY_LIST);
-
-            // then
+            // when & then
             var product = ProductFixture.newOnById(id);
             var menu = MenuFixture.newOne(product);
             Assertions.assertThatThrownBy(() -> menuService.create(menu))
