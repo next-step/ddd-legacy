@@ -1,4 +1,4 @@
-###
+### 주문 테이블 생성
 POST {{host}}/api/order-tables
 Content-Type: application/json
 
@@ -6,13 +6,13 @@ Content-Type: application/json
   "name": "9번"
 }
 
-###
+### 테이블 좌석 착석
 PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/sit
 
-###
+### 주문 테이블 빈 테이블로 변경
 PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/clear
 
-###
+### 주문 테이블에 손님 수 변경
 PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/number-of-guests
 Content-Type: application/json
 
@@ -20,5 +20,5 @@ Content-Type: application/json
   "numberOfGuests": 4
 }
 
-###
+### 주문 테이블 전체 조회
 GET {{host}}/api/order-tables
