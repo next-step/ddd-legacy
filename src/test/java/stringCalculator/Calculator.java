@@ -1,25 +1,51 @@
 package stringCalculator;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.*;
 
 public class Calculator {
 
     final String word;
-    final String[] conditions;
+    final String[] delimiters;
+    final CustomDelimiterCondition condition;
 
-    public Calculator(String word, String[] conditions){
+    public Calculator(String word, String[] delimiters, CustomDelimiterCondition condition){
        this.word = word;
-       this.conditions = conditions;
+       this.delimiters = delimiters;
+       this.condition = condition;
     }
 
     public int getNumber(){
-        String[] words = splitWord(this.word, this.conditions);
+        String customDelimiter = findCustomDelimiter(this.word, this.condition.getStart(), this.condition.getEnd());
+        List<String> delimiters = new ArrayList<String>();
+
+        delimiters.add(customDelimiter);
+        delimiters.addAll(Arrays.asList(this.delimiters));
+
+        String[] words = splitWord(this.word, delimiters);
         return Arrays.stream(words)
                 .mapToInt(this::getValidNumber)
                 .sum();
     }
 
-    protected String[] splitWord(String word, String[] conditions) {
+    protected String findCustomDelimiter(String word, String startChar, String endChar) {
+        startChar = Pattern.quote(startChar);
+        endChar = Pattern.quote(endChar);
+
+        String patternString = startChar + "(.+)" + endChar;
+        Pattern pattern = Pattern.compile(patternString);
+        Matcher matcher = pattern.matcher(word);
+
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+
+        return ",";
+    }
+
+    protected String[] splitWord(String word, List<String> conditions) {
         for (String condition : conditions) {
             word = word.replace(condition, ",");
         }
