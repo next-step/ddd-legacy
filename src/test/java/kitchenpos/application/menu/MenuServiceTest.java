@@ -22,12 +22,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
@@ -72,7 +74,7 @@ class MenuServiceTest {
 
     @Test
     @DisplayName("메뉴를 등록 할 수 있다.")
-    void create_1() {
+    void menu_create() {
         // given
         Menu response = MenuTestFixture.aMenu("레허반반순살", 24000L, menuGroup, menuProducts);
         List<UUID> productIds = List.of(product_1.getId(), product_2.getId());
@@ -106,7 +108,7 @@ class MenuServiceTest {
 
     @Nested
     @DisplayName("메뉴를 등록에 실패 할 수 있다.")
-    class fail_case {
+    class menu_create_fail_case {
 
         @ParameterizedTest(name = "{index}: {0}")
         @DisplayName("가격이 null 이거나 0 미만일 경우")
@@ -230,10 +232,70 @@ class MenuServiceTest {
     @Nested
     @DisplayName("메뉴의 가격을 수정할 수 있다.")
     class changePrice {
+        @Test
+        @DisplayName("수정할 수 있다.")
+        void case_1() {
+            //given
+            BigDecimal beforePrice = menu.getPrice(); //수정 전 가격
+            Menu aMenu = MenuTestFixture.aMenuJustPrice("레허반반순살", 23000L);
+            UUID id = menu.getId();
+
+            //when
+            when(menuRepository.findById(id)).thenReturn(Optional.of(menu));
+            Menu changedMenu = menuService.changePrice(id, aMenu);
+            BigDecimal afterPrice = changedMenu.getPrice();
+
+            //then
+            assertEquals(changedMenu.getId(), menu.getId());
+            assertEquals(changedMenu.getName(), menu.getName());
+            assertEquals(changedMenu.getPrice(), aMenu.getPrice());
+            assertNotEquals(beforePrice, afterPrice);
+        }
+
+        @Test
+        @DisplayName("수정할 가격이 입력되지 않으면 IllegalArgumentException이 발생한다.")
+        void case_2() {
+            //given
+            Menu aMenu = MenuTestFixture.aMenuJustPrice("레허반반순살", null);
+            UUID id = menu.getId();
+
+            //when && then
+            assertThrows(IllegalArgumentException.class,
+                    () -> menuService.changePrice(id, aMenu));
+        }
+
+        @Test
+        @DisplayName("수정 대상 상품이 없을 경우 NoSuchElementException가 발생한다.")
+        void case_3() {
+            //given
+            Menu aMenu = MenuTestFixture.aMenuJustPrice("레허반반순살", 25000L);
+            UUID id = menu.getId();
+
+            //when
+            when(menuRepository.findById(id)).thenReturn(Optional.empty());
+
+            //then
+            assertThrows(NoSuchElementException.class,
+                    () -> menuService.changePrice(id, aMenu));
+        }
+
+        @Test
+        @DisplayName("메뉴상품의 구성 가격보다 비쌀 경우 IllegalArgumentException이 발생한다.")
+        void case_4() {
+            //given
+            Menu aMenu = MenuTestFixture.aMenuJustPrice("레허반반순살", 25000L);
+            UUID id = menu.getId();
+
+            //when
+            when(menuRepository.findById(id)).thenReturn(Optional.of(menu));
+
+            //then
+            assertThrows(IllegalArgumentException.class,
+                    () -> menuService.changePrice(id, aMenu));
+        }
     }
 
-    @Nested
-    @DisplayName("메뉴를 공개 할 수 있다.")
+
     class display {
     }
 
