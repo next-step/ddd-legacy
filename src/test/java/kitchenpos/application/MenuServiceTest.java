@@ -387,5 +387,27 @@ class MenuServiceTest {
 
     @Nested
     class findAllTest {
+        @DisplayName("모든 메뉴를 조회할 수 있다.")
+        @Test
+        void findAllSuccessTest() {
+            MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            product = productRepository.save(product);
+
+            MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+
+            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            menu = menuService.create(menu);
+
+            List<Menu> menus = menuService.findAll();
+            List<UUID> menuIds = menus.stream()
+                    .map(Menu::getId)
+                    .toList();
+
+            assertThat(menus).hasSize(1);
+            assertThat(menuIds).contains(menu.getId());
+        }
     }
 }
