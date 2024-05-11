@@ -21,6 +21,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 @DisplayName("주문 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
@@ -53,7 +55,8 @@ public class OrderServiceTest {
     void create_exception_status_item_null() {
         List<Order> exceptionOrders = List.of(orderFixture.주문_유형_없는_주문, orderFixture.주문_항목_없는_주문);
 
-        for (Order exceptionOrder : exceptionOrders) {
+        for (Order exceptionOrder : exceptionOrders)
+        {
             Assertions.assertThatThrownBy(
                     () -> orderService.create(exceptionOrder)
             ).isInstanceOf(IllegalArgumentException.class);
@@ -127,8 +130,12 @@ public class OrderServiceTest {
         for (Order 주문 : 주문_목록) {
             mockingOrderRepository(RepositoryMethod.FIND, 주문);
             orderService.serve(주문.getId());
-            Assertions.assertThat(주문.getStatus()).isEqualTo(OrderStatus.SERVED);
         }
+
+        assertAll(
+                () -> Assertions.assertThat(매장_접수_주문.getStatus()).isEqualTo(OrderStatus.SERVED),
+                () -> Assertions.assertThat(포장_접수_주문.getStatus()).isEqualTo(OrderStatus.SERVED)
+        );
     }
 
     @Test
