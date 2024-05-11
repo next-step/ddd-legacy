@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -37,11 +38,11 @@ public class MenuGroupServiceTest {
         MenuGroup 한식 = menuGroupFixture.메뉴_그룹_A;
 
         Mockito.when(menuGroupRepository.save(Mockito.any()))
-                .thenReturn(한식);
+                .then(AdditionalAnswers.returnsFirstArg());
 
         MenuGroup result = menuGroupService.create(한식);
 
-        Assertions.assertThat(result.getName()).isEqualTo(한식.getName());
+        Assertions.assertThat(result.getId()).isNotNull();
     }
 
     @ParameterizedTest

@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -49,11 +50,11 @@ public class ProductServiceTest {
         Mockito.when(purgomalumClient.containsProfanity(Mockito.any()))
                         .thenReturn(false);
         Mockito.when(productRepository.save(Mockito.any()))
-                .thenReturn(떡볶이);
+                .then(AdditionalAnswers.returnsFirstArg());
 
         Product result = productService.create(떡볶이);
 
-        Assertions.assertThat(result.getName()).isEqualTo(떡볶이.getName());
+        Assertions.assertThat(result.getId()).isNotNull();
     }
 
     @Test

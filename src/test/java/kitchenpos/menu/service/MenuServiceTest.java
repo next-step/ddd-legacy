@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.AdditionalAnswers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -49,10 +50,10 @@ public class MenuServiceTest {
         mockingMenuGroupRepositoryForCreate(메뉴);
         mockingProductRepositoryForCreate(메뉴);
         mockingPurgomalumClientForCreate(false);
-        mockingMenuRepositoryForCreate(메뉴);
+        mockingMenuRepositoryForCreate();
 
         Menu result = menuService.create(메뉴);
-        Assertions.assertThat(result.getName()).isEqualTo(메뉴.getName());
+        Assertions.assertThat(result.getId()).isNotNull();
     }
 
     @Test
@@ -144,9 +145,9 @@ public class MenuServiceTest {
                 .thenReturn(result);
     }
 
-    private void mockingMenuRepositoryForCreate(Menu menu) {
+    private void mockingMenuRepositoryForCreate() {
         Mockito.when(menuRepository.save(Mockito.any()))
-                .thenReturn(menu);
+                .then(AdditionalAnswers.returnsFirstArg());
     }
 
     @Test

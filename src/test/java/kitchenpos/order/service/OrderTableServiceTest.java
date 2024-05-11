@@ -42,7 +42,7 @@ public class OrderTableServiceTest {
         mockingOrderTableRepository(OrderTableRepositoryMethod.SAVE, 주문_테이블);
 
         OrderTable result = orderTableService.create(주문_테이블);
-        Assertions.assertThat(result.getName()).isEqualTo(주문_테이블.getName());
+        Assertions.assertThat(result.getId()).isNotNull();
         Assertions.assertThat(result.isOccupied()).isEqualTo(false);
     }
 
