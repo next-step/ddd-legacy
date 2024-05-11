@@ -6,6 +6,7 @@ import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -56,17 +57,21 @@ class ProductServiceTest {
         void changedPriceTest() {
             // given
             var id = UUID.randomUUID();
-            var originalProduct = ProductFixture.newOne(id);
-            var menu = MenuFixture.newOne(originalProduct);
-            var updatedProduct = ProductFixture.newOne(4999);
-            given(productRepository.findById(any())).willReturn(Optional.of(originalProduct));
+            var product_닭고기 = ProductFixture.newOne(id, "닭고기 300g", 5000);
+            var product_콜라 = ProductFixture.newOne(id, "콜라", 500);
+            var menu = MenuFixture.newOne(5500, List.of(product_닭고기, product_콜라));
+            var updatedProduct = ProductFixture.newOne(5001);
+            given(productRepository.findById(any())).willReturn(Optional.of(product_닭고기));
             given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
 
             // when
             var actual = productService.changePrice(id, updatedProduct);
 
             // then
-            assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(4999));
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(5001));
+                softly.assertThat(menu.isDisplayed()).isTrue();
+            });
         }
 
         @DisplayName("[예와] 변경할 상품의 가격은 null이거나 음수일 경우 예외가 발생한다;.")
@@ -96,6 +101,29 @@ class ProductServiceTest {
             // when & then
             assertThatThrownBy(() -> productService.changePrice(id, updatedProduct))
                     .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("[예외] 상품이 속한 메뉴의 가격이 메뉴 원가를 넘을 경우, 메뉴 가격은 변경되고, 메뉴는 비노출 처리된다.")
+        @Test
+        void productPriceExceptionTest() {
+            // given
+            var product_닭고기_id = UUID.randomUUID();
+            var product_닭고기 = ProductFixture.newOne(product_닭고기_id, "닭고기 300g", 5000);
+            var product_콜라_id = UUID.randomUUID();
+            var product_콜라 = ProductFixture.newOne(product_콜라_id, "콜라", 500);
+            var menu = MenuFixture.newOne(5500, List.of(product_닭고기, product_콜라));
+            var updatedProduct = ProductFixture.newOne(4999);
+            given(productRepository.findById(any())).willReturn(Optional.of(product_닭고기));
+            given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
+
+            // when
+            var actual = productService.changePrice(product_닭고기_id, updatedProduct);
+
+            // then
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(4999));
+                softly.assertThat(menu.isDisplayed()).isFalse();
+            });
         }
     }
 

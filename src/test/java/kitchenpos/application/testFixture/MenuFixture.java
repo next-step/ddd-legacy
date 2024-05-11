@@ -66,7 +66,7 @@ public record MenuFixture() {
     public static Menu newOne(Product product) {
         var menu = new Menu();
         menu.setName("양념치킨");
-        menu.setPrice(BigDecimal.valueOf(10000));
+        menu.setPrice(BigDecimal.valueOf(5000));
         menu.setMenuGroup(MenuGroupFixture.newOne("신메뉴"));
         menu.setDisplayed(true);
         menu.setMenuProducts(List.of(MenuProductFixture.newOne(product)));
