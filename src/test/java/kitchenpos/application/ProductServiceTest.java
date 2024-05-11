@@ -6,6 +6,7 @@ import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -127,8 +128,19 @@ class ProductServiceTest {
         }
     }
 
+    @DisplayName("상품 목록 전체를 조회한다.")
     @Test
-    void findAll() {
+    void findAllTest() {
+        // given
+        var product_닭고기 = ProductFixture.newOne(UUID.randomUUID(), "닭고기 300g", 5000);
+        var product_콜라 = ProductFixture.newOne(UUID.randomUUID(), "콜라", 500);
+        given(productRepository.findAll()).willReturn(List.of(product_닭고기, product_콜라));
+
+        // when
+        var actual = productService.findAll();
+
+        // then
+        Assertions.assertThat(actual).containsAll(List.of(product_닭고기, product_콜라));
     }
 
     @Nested
