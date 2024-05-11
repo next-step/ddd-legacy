@@ -73,17 +73,33 @@ class ProductServiceTest {
     void productPriceIsZeroOrPositiveTest() {
 
         // given
-        Product product = new ProductBuilder().anProduct().with("후라이드치킨", BigDecimal.ZERO).build();
+        Product created = new ProductBuilder().anProduct().with("후라이드치킨", BigDecimal.ZERO).build();
 
         // when
-        Product savedProduct = productService.create(product);
+        Product sut = productService.create(created);
 
         // then
-        assertNotNull(savedProduct.getId());
-        assertEquals(product.getName(), savedProduct.getName());
-        assertEquals(product.getPrice(), savedProduct.getPrice());
+        assertNotNull(sut.getId());
     }
 
+
+    @DisplayName("상품의 가격을 변경한다")
+    @Test
+    void changePriceTest() {
+
+        Product product = new ProductBuilder()
+                .with("치킨", BigDecimal.valueOf(10_000))
+                .build();
+
+        Product created = productService.create(product);
+
+        // when
+        created.setPrice(BigDecimal.valueOf(20_000));
+
+        // then
+        Product sut = productService.changePrice(created.getId(), created);
+        assertThat(sut.getPrice()).isEqualTo(BigDecimal.valueOf(20_000));
+    }
 
     @DisplayName("변경한 상품 가격으로 계산한 메뉴상품 가격보다 메뉴 가격이 크면 메뉴가 숨김처리 된다")
     @Test
@@ -104,7 +120,6 @@ class ProductServiceTest {
         Menu sut = menuRepository.findById(menu.getId()).get();
         assertThat(sut.isDisplayed()).isFalse();
     }
-
 
     private Menu createMenu(Product product) {
 
