@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,6 +61,35 @@ public class OrderServiceTest {
                     () -> orderService.create(exceptionOrder)
             ).isInstanceOf(IllegalArgumentException.class);
         }
+    }
+
+    @Test
+    @DisplayName("주문 항목에 있는 메뉴들은 판매 되고 있는 메뉴들이어야 한다.")
+    void create_exception_hide() {
+        OrderLineItem 비활성화_메뉴_주문_항목 = OrderLineItemFixture.create(
+                menuFixture.비활성화_메뉴, 1, new BigDecimal(1000)
+        );
+        Order 주문 = OrderFixture.create(OrderType.EAT_IN, List.of(비활성화_메뉴_주문_항목));
+
+        mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.비활성화_메뉴);
+        mockingMenuRepository(RepositoryMethod.FIND, menuFixture.비활성화_메뉴);
+
+        Assertions.assertThatThrownBy(
+                () -> orderService.create(주문)
+        ).isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("주문 가격은 주문 항목에 있는 메뉴의 가격 총합과 같아야 한다.")
+    void create_exception_price() {
+        Order 주문 = orderFixture.매장_주문_A;
+
+        mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_B_가격_5000);
+        mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_B_가격_5000);
+
+        Assertions.assertThatThrownBy(
+                () -> orderService.create(주문)
+        ).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Nested

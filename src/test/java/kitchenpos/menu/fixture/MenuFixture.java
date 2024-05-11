@@ -50,6 +50,10 @@ public class MenuFixture {
             "fuck", new BigDecimal(10000), menuGroupFixture.메뉴_그룹_A,
             true, List.of(menuProductFixture.메뉴_상품_A_수량_10)
     );
+    public Menu 비활성화_메뉴 = create(
+            "메뉴_A", new BigDecimal(10000), menuGroupFixture.메뉴_그룹_A,
+            false, List.of(menuProductFixture.메뉴_상품)
+    );
     public Menu 메뉴_가격_11000_상품_가격_10000 = create(
             "메뉴", new BigDecimal(11000), menuGroupFixture.메뉴_그룹_A,
             true, List.of(menuProductFixture.메뉴_상품_A_수량_10)
