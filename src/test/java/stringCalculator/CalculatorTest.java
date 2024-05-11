@@ -4,6 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 //쉼표(,) 또는 콜론(:)을 구분자로 가지는 문자열을 전달하는 경우 구분자를 기준으로 분리한 각 숫자의 합을 반환
@@ -18,9 +19,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CalculatorTest {
     @Test
+    @DisplayName("with target word, should return sum value")
+    void getNumberTest() {
+        String word = "1,2:3";
+        var calc = new Calculator(word, new String[]{",", ":"});
+
+        assertEquals(6, calc.getNumber());
+    }
+    @Test
+    @DisplayName("with target word, should return list")
+    void createListTest() {
+        String word = "1,2:3";
+        var calc = new Calculator(word, new String[]{","});
+        String[] res = calc.splitWord(word, new String[]{",", ":"});
+        assertArrayEquals(new String[]{"1", "2", "3"}, res);
+    }
+
+    @Test
     @DisplayName("valid number format should return number")
     void validFormatTest() {
-        var calc = new Calculator();
+        var calc = new Calculator("1", new String[]{"1"});
+
         int targetNumber = 1;
         int res = calc.getValidNumber(String.valueOf(targetNumber));
         assertEquals(targetNumber, res);
@@ -29,7 +48,7 @@ public class CalculatorTest {
     @Test
     @DisplayName("invalid value should throw error")
     void signatureTest() {
-        var calc = new Calculator();
+        var calc = new Calculator("1", new String[]{"1"});
         assertThatThrownBy(() -> calc.getValidNumber("BMW")).isInstanceOf(RuntimeException.class);
     }
 }
