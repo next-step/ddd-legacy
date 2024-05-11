@@ -185,6 +185,24 @@ class MenuServiceTest {
     @Nested
     class ChangeMenuPriceTest {
 
+        @DisplayName("가격이 변동된다.")
+        @Test
+        void changePriceTest() {
+            // given
+            var id = UUID.randomUUID();
+            var product = ProductFixture.newOne(5000);
+            var originalMenu = MenuFixture.newOne(5000, List.of(product));
+            var updatedMenu = MenuFixture.newOne(4999, List.of(product));
+
+            given(menuRepository.findById(any())).willReturn(Optional.of(originalMenu));
+
+            // when
+            var actual = menuService.changePrice(id, updatedMenu);
+
+            // when & then
+            assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(4999));
+        }
+
         @DisplayName("[예외] 변경할 가격은 음수이거나 null일수 없다.")
         @ParameterizedTest
         @MethodSource("changePriceInvalidPrice")
