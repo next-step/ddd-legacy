@@ -78,13 +78,6 @@ class MenuServiceTest {
             assertThat(actual.getName()).isEqualTo("양념치킨");
         }
 
-        static Stream<Arguments> createMenuInvalidPrice() {
-            return Stream.of(
-                    Arguments.arguments(MenuFixture.newOne(BigDecimal.valueOf(-1000))),
-                    Arguments.arguments(MenuFixture.newOne((BigDecimal) null))
-            );
-        }
-
         @DisplayName("[예외] 가격은 음수이거나 null일수 없다.")
         @ParameterizedTest
         @MethodSource("createMenuInvalidPrice")
@@ -92,6 +85,13 @@ class MenuServiceTest {
             // when & then
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        static Stream<Arguments> createMenuInvalidPrice() {
+            return Stream.of(
+                    Arguments.arguments(MenuFixture.newOne(BigDecimal.valueOf(-1000))),
+                    Arguments.arguments(MenuFixture.newOne((BigDecimal) null))
+            );
         }
 
         @DisplayName("[예외] 존재하지 않는 메뉴 그룹이면 예외가 발생한다.")
@@ -185,6 +185,18 @@ class MenuServiceTest {
     @Nested
     class ChangeMenuPriceTest {
 
+        @DisplayName("[예외] 변경할 가격은 음수이거나 null일수 없다.")
+        @ParameterizedTest
+        @MethodSource("changePriceInvalidPrice")
+        void invalidPriceExceptionTest(Menu updatedMenu) {
+            // given
+            var id = UUID.randomUUID();
+
+            // when & then
+            assertThatThrownBy(() -> menuService.changePrice(id, updatedMenu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
         static Stream<Arguments> changePriceInvalidPrice() {
             return Stream.of(
                     Arguments.arguments(MenuFixture.newOne(BigDecimal.valueOf(-1000))),
@@ -192,18 +204,18 @@ class MenuServiceTest {
             );
         }
 
-        @DisplayName("[예외] 가격은 음수이거나 null일수 없다.")
-        @ParameterizedTest
-        @MethodSource("changePriceInvalidPrice")
-        void invalidPriceExceptionTest(Menu menu) {
+        @DisplayName("[예외] 존재하지 않는 메뉴이면 예외가 발생한다")
+        @Test
+        void notFoundMenuExceptionTest() {
             // given
             var id = UUID.randomUUID();
+            var updatedMenu = MenuFixture.newOne();
+            given(menuRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
-            assertThatThrownBy(() -> menuService.changePrice(id, menu))
-                    .isInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> menuService.changePrice(id, updatedMenu))
+                    .isInstanceOf(NoSuchElementException.class);
         }
-
     }
     @Test
     void display() {
