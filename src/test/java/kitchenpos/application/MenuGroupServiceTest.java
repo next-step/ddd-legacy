@@ -63,7 +63,7 @@ class MenuGroupServiceTest {
             assertThat(actual.getName()).isEqualTo("양념반 후라이드반");
         }
 
-        @DisplayName("메뉴명은 빈 값일 수 없다.")
+        @DisplayName("[예외]메뉴명은 빈 값일 수 없다.")
         @ParameterizedTest
         @NullSource
         @EmptySource
