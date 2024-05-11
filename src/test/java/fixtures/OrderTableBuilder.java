@@ -25,6 +25,12 @@ public class OrderTableBuilder {
         return this;
     }
 
+    public OrderTableBuilder withNumberOfGuests(int numberOfGuests) {
+        this.numberOfGuests = numberOfGuests;
+        return this;
+    }
+
+
     public OrderTable build() {
         OrderTable orderTable = new OrderTable();
         orderTable.setId(id);
