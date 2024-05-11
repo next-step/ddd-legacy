@@ -45,7 +45,7 @@ public class ProductServiceTest {
     @Test
     @DisplayName("새로운 상품을 추가 할 수 있다.")
     void create() {
-        Product 떡볶이 = productFixture.상품_A;
+        Product 떡볶이 = productFixture.상품_A_가격_1000;
 
         Mockito.when(purgomalumClient.containsProfanity(Mockito.any()))
                         .thenReturn(false);
@@ -80,13 +80,13 @@ public class ProductServiceTest {
     @Test
     @DisplayName("상품의 가격을 변경할 수 있다.")
     void changePrice() {
-        Product 상품_A = productFixture.상품_A;
-        Product 상품_B = productFixture.상품_C;
+        Product 상품_A = productFixture.상품_A_가격_1000;
+        Product 상품_B = productFixture.상품_C_가격_10000;
 
         Mockito.when(productRepository.findById(Mockito.any()))
                 .thenReturn(Optional.of(상품_A));
         Mockito.when(menuRepository.findAllByProductId(Mockito.any()))
-                .thenReturn(List.of(menuFixture.메뉴_A));
+                .thenReturn(List.of(menuFixture.메뉴_A_가격_10000));
         productService.changePrice(상품_A.getId(), 상품_B);
 
         Assertions.assertThat(상품_A.getPrice()).isEqualTo(상품_B.getPrice());
@@ -95,15 +95,15 @@ public class ProductServiceTest {
     @Test
     @DisplayName("해당 상품으로 구성된 메뉴의 가격이 변경된 상품의 가격 총합보다 크다면 메뉴를 노출하지 않는다.")
     void changePrice_exception_price() {
-        Product 상품_C = productFixture.상품_C;
-        Product 상품_A = productFixture.상품_A;
+        Product 상품_C_가격_10000 = productFixture.상품_C_가격_10000;
+        Product 상품_A_가격_1000 = productFixture.상품_A_가격_1000;
 
         Mockito.when(productRepository.findById(Mockito.any()))
-                .thenReturn(Optional.of(상품_C));
+                .thenReturn(Optional.of(상품_C_가격_10000));
         Mockito.when(menuRepository.findAllByProductId(Mockito.any()))
-                .thenReturn(List.of(menuFixture.메뉴_C));
-        productService.changePrice(상품_C.getId(), 상품_A);
+                .thenReturn(List.of(menuFixture.메뉴_C_가격_100000));
+        productService.changePrice(상품_C_가격_10000.getId(), 상품_A_가격_1000);
 
-        Assertions.assertThat(menuFixture.메뉴_C.isDisplayed()).isEqualTo(false);
+        Assertions.assertThat(menuFixture.메뉴_C_가격_100000.isDisplayed()).isEqualTo(false);
     }
 }

@@ -45,7 +45,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("새로운 메뉴를 추가할 수 있다.")
     void create() {
-        Menu 메뉴 = menuFixture.메뉴_A;
+        Menu 메뉴 = menuFixture.메뉴_A_가격_10000;
 
         mockingMenuGroupRepositoryForCreate(메뉴);
         mockingProductRepositoryForCreate(메뉴);
@@ -118,7 +118,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴의 가격은 상품 포함된 상품의 총 가격 보다 클 수 없다.")
     void create_exception_price_difference() {
-        Menu 상품_가격보다_큰_메뉴 = menuFixture.상품_가격보다_큰_메뉴;
+        Menu 상품_가격보다_큰_메뉴 = menuFixture.메뉴_가격_11000_상품_가격_10000;
 
         mockingMenuGroupRepositoryForCreate(상품_가격보다_큰_메뉴);
         mockingProductRepositoryForCreate(상품_가격보다_큰_메뉴);
@@ -153,8 +153,8 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴의 가격을 변경할 수 있다.")
     void changePrice() {
-        Menu 메뉴_A = menuFixture.메뉴_A;
-        Menu 메뉴_B = menuFixture.메뉴_B;
+        Menu 메뉴_A = menuFixture.메뉴_A_가격_10000;
+        Menu 메뉴_B = menuFixture.메뉴_B_가격_5000;
 
         mockingMenuRepositoryFindBy(메뉴_A);
         menuService.changePrice(메뉴_A.getId(), 메뉴_B);
@@ -165,8 +165,8 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴의 가격은 해당 상품 총 가격 보다 클 수 없다.")
     void changePrice_exception_price() {
-        Menu 메뉴_B = menuFixture.메뉴_B;
-        Menu 메뉴_A = menuFixture.메뉴_A;
+        Menu 메뉴_B = menuFixture.메뉴_B_가격_5000;
+        Menu 메뉴_A = menuFixture.메뉴_A_가격_10000;
 
         mockingMenuRepositoryFindBy(메뉴_B);
 
@@ -178,7 +178,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴를 노출할 수 있다.")
     void display() {
-        Menu 메뉴_C = menuFixture.메뉴_C;
+        Menu 메뉴_C = menuFixture.메뉴_C_가격_100000;
 
         mockingMenuRepositoryFindBy(메뉴_C);
         menuService.display(메뉴_C.getId());
@@ -189,7 +189,7 @@ public class MenuServiceTest {
     @Test
     @DisplayName("메뉴를 숨길 수 있다.")
     void hide() {
-        Menu 메뉴_A = menuFixture.메뉴_A;
+        Menu 메뉴_A = menuFixture.메뉴_A_가격_10000;
 
         mockingMenuRepositoryFindBy(메뉴_A);
         menuService.hide(메뉴_A.getId());

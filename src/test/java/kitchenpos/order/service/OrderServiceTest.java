@@ -71,8 +71,8 @@ public class OrderServiceTest {
             Order 매장_주문 = orderFixture.매장_주문_A;
             OrderTable 주문_테이블 = orderTableFixture.손님_있는_주문_테이블;
 
-            mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_A);
-            mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_A);
+            mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_A_가격_10000);
+            mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_A_가격_10000);
             mockingOrderTableRepository(주문_테이블);
             mockingOrderRepository(RepositoryMethod.SAVE, 매장_주문);
             Order result = orderService.create(매장_주문);
@@ -86,8 +86,8 @@ public class OrderServiceTest {
             Order 주문 = orderFixture.매장_주문_A;
             OrderTable 빈_테이블 = orderTableFixture.주문_테이블_A;
 
-            mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_A);
-            mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_A);
+            mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_A_가격_10000);
+            mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_A_가격_10000);
             mockingOrderTableRepository(빈_테이블);
 
             Assertions.assertThatThrownBy(
@@ -130,8 +130,8 @@ public class OrderServiceTest {
         void create_takeOut() {
             Order 포장_주문 = orderFixture.포장_주문_A;
 
-            mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_A);
-            mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_A);
+            mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_A_가격_10000);
+            mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_A_가격_10000);
             mockingOrderRepository(RepositoryMethod.SAVE, 포장_주문);
             Order result = orderService.create(포장_주문);
 
@@ -183,8 +183,8 @@ public class OrderServiceTest {
         void create_delivery() {
             Order 배달_주문 = orderFixture.배달_주문_A;
 
-            mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_A);
-            mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_A);
+            mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_A_가격_10000);
+            mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_A_가격_10000);
             mockingOrderRepository(RepositoryMethod.SAVE, 배달_주문);
             Order result = orderService.create(배달_주문);
 
@@ -206,8 +206,8 @@ public class OrderServiceTest {
         void create_delivery_exception_address() {
             Order 배송지_없는_배달_주문 = OrderFixture.createDelivery(List.of(orderLineItemFixture.주문_항목_A), null);
 
-            mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_A);
-            mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_A);
+            mockingMenuRepository(RepositoryMethod.FIND, menuFixture.메뉴_A_가격_10000);
+            mockingMenuRepository(RepositoryMethod.FIND_ALL, menuFixture.메뉴_A_가격_10000);
 
             Assertions.assertThatThrownBy(
                     () -> orderService.create(배송지_없는_배달_주문)

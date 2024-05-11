@@ -18,15 +18,15 @@ public class MenuFixture {
             "메뉴_A", new BigDecimal(10000), menuGroupFixture.메뉴_그룹_A,
             true, List.of(menuProductFixture.메뉴_상품)
     );
-    public Menu 메뉴_A = create(
+    public Menu 메뉴_A_가격_10000 = create(
             "메뉴_A", new BigDecimal(10000), menuGroupFixture.메뉴_그룹_A,
             true, List.of(menuProductFixture.메뉴_상품_A)
     );
-    public Menu 메뉴_B = create(
+    public Menu 메뉴_B_가격_5000 = create(
             "메뉴_B", new BigDecimal(5000), menuGroupFixture.메뉴_그룹_A,
             true, List.of(menuProductFixture.메뉴_상품_B)
     );
-    public Menu 메뉴_C = create(
+    public Menu 메뉴_C_가격_100000 = create(
             "메뉴_C", new BigDecimal(100000), menuGroupFixture.메뉴_그룹_A,
             false, List.of(menuProductFixture.메뉴_상품_C)
     );
@@ -50,7 +50,7 @@ public class MenuFixture {
             "fuck", new BigDecimal(10000), menuGroupFixture.메뉴_그룹_A,
             true, List.of(menuProductFixture.메뉴_상품_A)
     );
-    public Menu 상품_가격보다_큰_메뉴 = create(
+    public Menu 메뉴_가격_11000_상품_가격_10000 = create(
             "메뉴", new BigDecimal(11000), menuGroupFixture.메뉴_그룹_A,
             true, List.of(menuProductFixture.메뉴_상품_A)
     );
