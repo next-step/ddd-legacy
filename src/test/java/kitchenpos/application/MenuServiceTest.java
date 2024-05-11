@@ -117,6 +117,44 @@ class MenuServiceTest {
             Assertions.assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
+
+        @DisplayName("[예외] 메뉴명은 null일 수 없다")
+        @Test
+        void menuNameNullExceptionTest() {
+            // given
+            var menu = MenuFixture.newOne((String) null);
+
+            given(menuGroupRepository.findById(any()))
+                    .willReturn(Optional.of(MenuGroupFixture.newOne()));
+            var product = ProductFixture.newOne();
+            given(productRepository.findAllByIdIn(any()))
+                    .willReturn(List.of(product));
+            given(productRepository.findById(any())).willReturn(Optional.of(product));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("[예외] 메뉴명은 비속어를 포함할 수 없다")
+        @Test
+        void menuNameProfanityExceptionTest() {
+            // given
+            var menu = MenuFixture.newOne("비속어를 포함한 메뉴명");
+
+            given(menuGroupRepository.findById(any()))
+                    .willReturn(Optional.of(MenuGroupFixture.newOne()));
+            var product = ProductFixture.newOne();
+            given(productRepository.findAllByIdIn(any()))
+                    .willReturn(List.of(product));
+            given(productRepository.findById(any())).willReturn(Optional.of(product));
+
+            given(purgomalumClient.containsProfanity(any())).willReturn(true);
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Test

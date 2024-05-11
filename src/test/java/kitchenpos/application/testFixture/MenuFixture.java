@@ -19,6 +19,16 @@ public record MenuFixture() {
         return menu;
     }
 
+    public static Menu newOne(String menuName) {
+        var menu = new Menu();
+        menu.setName(menuName);
+        menu.setPrice(BigDecimal.valueOf(5000));
+        menu.setMenuGroup(MenuGroupFixture.newOne("신메뉴"));
+        menu.setDisplayed(true);
+        menu.setMenuProducts(List.of(MenuProductFixture.newOne()));
+        return menu;
+    }
+
     public static Menu newOne(BigDecimal price) {
         var menu = new Menu();
         menu.setName("양념치킨");
