@@ -78,20 +78,20 @@ class MenuServiceTest {
             assertThat(actual.getName()).isEqualTo("양념치킨");
         }
 
-        @DisplayName("[예외] 가격은 음수이거나 null일수 없다.")
-        @ParameterizedTest
-        @MethodSource("priceMethodSource")
-        void invalidPriceExceptionTest(Menu menu) {
-            // when & then
-            assertThatThrownBy(() -> menuService.create(menu))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        static Stream<Arguments> priceMethodSource() {
+        static Stream<Arguments> createMenuInvalidPrice() {
             return Stream.of(
                     Arguments.arguments(MenuFixture.newOne(BigDecimal.valueOf(-1000))),
                     Arguments.arguments(MenuFixture.newOne((BigDecimal) null))
             );
+        }
+
+        @DisplayName("[예외] 가격은 음수이거나 null일수 없다.")
+        @ParameterizedTest
+        @MethodSource("createMenuInvalidPrice")
+        void invalidPriceExceptionTest(Menu menu) {
+            // when & then
+            assertThatThrownBy(() -> menuService.create(menu))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("[예외] 존재하지 않는 메뉴 그룹이면 예외가 발생한다.")
@@ -181,10 +181,30 @@ class MenuServiceTest {
         }
     }
 
-    @Test
-    void changePrice() {
-    }
+    @DisplayName("메뉴의 가격 변경시,")
+    @Nested
+    class ChangeMenuPriceTest {
 
+        static Stream<Arguments> changePriceInvalidPrice() {
+            return Stream.of(
+                    Arguments.arguments(MenuFixture.newOne(BigDecimal.valueOf(-1000))),
+                    Arguments.arguments(MenuFixture.newOne((BigDecimal) null))
+            );
+        }
+
+        @DisplayName("[예외] 가격은 음수이거나 null일수 없다.")
+        @ParameterizedTest
+        @MethodSource("changePriceInvalidPrice")
+        void invalidPriceExceptionTest(Menu menu) {
+            // given
+            var id = UUID.randomUUID();
+
+            // when & then
+            assertThatThrownBy(() -> menuService.changePrice(id, menu))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+    }
     @Test
     void display() {
     }
