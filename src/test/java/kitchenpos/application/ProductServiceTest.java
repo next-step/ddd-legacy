@@ -2,19 +2,26 @@ package kitchenpos.application;
 
 import kitchenpos.application.testFixture.ProductFixture;
 import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -60,8 +67,23 @@ class ProductServiceTest {
             var actual = productService.create(product);
 
             // then
-            Assertions.assertThat(actual.getName()).isEqualTo("닭고기 300g");
+            assertThat(actual.getName()).isEqualTo("닭고기 300g");
         }
 
+        @DisplayName("[예외] 상품의 가격이 null이거나 음수이면 예외가 발생한다.")
+        @ParameterizedTest
+        @MethodSource("createProductInvalidPrice")
+        void createProductInvalidPriceTest(Product product) {
+            // when & then
+            assertThatThrownBy(() -> productService.create(product))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        static Stream<Arguments> createProductInvalidPrice() {
+            return Stream.of(
+                    Arguments.arguments(ProductFixture.newOne(-1000)),
+                    Arguments.arguments(ProductFixture.newOne((BigDecimal) null))
+            );
+        }
     }
 }
