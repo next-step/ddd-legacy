@@ -11,7 +11,7 @@ class PositiveNumbersTest {
     @DisplayName(value = "문자열계산기 합계 구하기")
     @Test
     void 성공_합계구하기() {
-        assertThat(PositiveNumbers.of("1", "2", "3").sum()).isEqualTo(6);
+        assertThat(PositiveNumbers.of("1", "2", "3").sum()).isEqualTo(new PositiveNumber(6));
     }
 
     @DisplayName(value = "음수가 있을경우 예외 처리")
