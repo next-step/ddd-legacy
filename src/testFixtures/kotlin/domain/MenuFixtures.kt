@@ -9,7 +9,7 @@ import java.util.UUID
 object MenuFixtures {
     fun makeMenuOne(): Menu {
         return Menu().apply {
-            this.id = UUID.randomUUID()
+            this.id = UUID.fromString("9625e053-28d8-49e6-9b43-bef6f9af4c3b")
             this.name = "후라이드 치킨"
             this.price = BigDecimal.valueOf(16000)
             this.menuGroup = makeMenuGroupOne()
