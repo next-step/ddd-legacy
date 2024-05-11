@@ -332,7 +332,17 @@ class MenuServiceTest {
         }
     }
 
+    @DisplayName("메뉴는 정상적으로 조회된다")
     @Test
     void findAll() {
+        // given
+        var menu = MenuFixture.newOne();
+        given(menuRepository.findAll()).willReturn(List.of(menu));
+
+        // when
+        var actual = menuService.findAll();
+
+        // then
+        assertThat(actual).isEqualTo(List.of(menu));
     }
 }
