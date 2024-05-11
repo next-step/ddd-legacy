@@ -67,6 +67,22 @@ class ProductServiceTest {
             // then
             assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(4999));
         }
+
+        @DisplayName("[예와] 변경할 상품의 가격은 null이거나 음수일 경우 예외가 발생한다;.")
+        @ParameterizedTest
+        @MethodSource("changeProductPriceInvalidPrice")
+        void changePriceInvalidPriceTest(Product updatedProduct) {
+            // when & then
+            assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), updatedProduct))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        static Stream<Arguments> changeProductPriceInvalidPrice() {
+            return Stream.of(
+                    Arguments.arguments(ProductFixture.newOne(-1000)),
+                    Arguments.arguments(ProductFixture.newOne((BigDecimal) null))
+            );
+        }
     }
 
     @Test
