@@ -5,7 +5,7 @@ import kitchenpos.domain.Product;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-public class productFixture {
+public class ProductFixture {
     public Product 상품 = create( "상품", new BigDecimal(1000));
     public Product 상품_A_가격_1000 = create( "상품A", new BigDecimal(1000));
     public Product 상품_B = create("상품B", new BigDecimal(500));

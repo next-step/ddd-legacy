@@ -6,7 +6,7 @@ import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.menu.fixture.MenuFixture;
-import kitchenpos.menu.fixture.productFixture;
+import kitchenpos.menu.fixture.ProductFixture;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,12 +33,12 @@ public class ProductServiceTest {
     @InjectMocks
     private ProductService productService;
 
-    private productFixture productFixture;
+    private ProductFixture productFixture;
     private MenuFixture menuFixture;
 
     @BeforeEach
     void setUp() {
-        productFixture = new productFixture();
+        productFixture = new ProductFixture();
         menuFixture = new MenuFixture();
     }
 

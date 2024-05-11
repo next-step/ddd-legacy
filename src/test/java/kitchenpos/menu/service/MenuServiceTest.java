@@ -1,12 +1,10 @@
 package kitchenpos.menu.service;
 
 import kitchenpos.application.MenuService;
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.menu.fixture.MenuFixture;
+import kitchenpos.menu.fixture.MenuProductFixture;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -112,6 +112,21 @@ public class MenuServiceTest {
 
         Assertions.assertThatThrownBy(
                 () -> menuService.create(부적절한_이름_메뉴)
+        ).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴의 상품 수량은 기존 상품의 수량과 같아야 한다.")
+    void create_exception_same_quantity() {
+        Menu 메뉴 = menuFixture.메뉴_A_가격_10000;
+        List<MenuProduct> newMenuProduct = new ArrayList<>(메뉴.getMenuProducts());
+        newMenuProduct.add(new MenuProductFixture().메뉴_상품);
+
+        mockingMenuGroupRepositoryForCreate(메뉴);
+        메뉴.setMenuProducts(newMenuProduct);
+
+        Assertions.assertThatThrownBy(
+                () -> menuService.create(메뉴)
         ).isInstanceOf(IllegalArgumentException.class);
     }
 
