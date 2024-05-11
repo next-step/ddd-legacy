@@ -12,6 +12,8 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.math.BigDecimal
 import java.util.*
 
@@ -97,13 +99,14 @@ internal class ProductServiceTest {
         }
 
         @DisplayName("상품의 요청이 정상적인 경우, 상품이 정상적으로 저장된다.")
-        @Test
-        fun test5() {
+        @ParameterizedTest
+        @ValueSource(strings = ["", " ", "테스트 상품"])
+        fun test5(name: String) {
             // given
             val request = Product().apply {
                 this.id = UUID.randomUUID()
                 this.price = BigDecimal.valueOf(1000L)
-                this.name = "테스트 상품"
+                this.name = name
             }
 
             every { purgomalumClient.containsProfanity(any()) } returns false
