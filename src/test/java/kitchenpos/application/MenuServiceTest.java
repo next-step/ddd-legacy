@@ -4,6 +4,7 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
@@ -39,6 +40,9 @@ class MenuServiceTest {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
 
     @MockBean
     private PurgomalumClient purgomalumClient;
@@ -294,10 +298,91 @@ class MenuServiceTest {
 
     @Nested
     class displayTest {
+        @DisplayName("메뉴를 노출 시킬 수 있다.")
+        @Test
+        void displaySuccessTest() {
+            MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            product = productRepository.save(product);
+
+            MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+
+            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), false, List.of(menuProduct));
+            menu = menuService.create(menu);
+
+            UUID menuId = menu.getId();
+            menu.setDisplayed(true);
+            Menu displayedMenu = menuService.display(menuId);
+
+            assertThat(displayedMenu.isDisplayed()).isTrue();
+        }
+
+        @DisplayName("존재하지 않은 메뉴에 대해서 노출을 시도하면 예외가 발생한다.")
+        @Test
+        void displayFailWhenMenuNotFoundTest() {
+            UUID menuId = UUID.randomUUID();
+
+            assertThatThrownBy(() -> menuService.display(menuId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("메뉴의 가격이 상품들의 총합보다 크면 예외가 발생한다.")
+        @Test
+        void displayFailWhenPriceIsGreaterThanSumOfProductPriceTest() {
+            MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            product = productRepository.save(product);
+
+            MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+
+            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), false, List.of(menuProduct));
+            menu = menuService.create(menu);
+
+            menu.setPrice(BigDecimal.valueOf(32000L));
+            menuRepository.save(menu);
+
+            UUID menuId = menu.getId();
+
+            assertThatThrownBy(() -> menuService.display(menuId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     @Nested
     class hideTest {
+        @DisplayName("메뉴를 비노출 시킬 수 있다.")
+        @Test
+        void hideSuccessTest() {
+            MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "메뉴 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            product = productRepository.save(product);
+
+            MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+
+            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            menu = menuService.create(menu);
+
+            UUID menuId = menu.getId();
+            menu.setDisplayed(false);
+            Menu hiddenMenu = menuService.hide(menuId);
+
+            assertThat(hiddenMenu.isDisplayed()).isFalse();
+        }
+
+        @DisplayName("존재하지 않은 메뉴에 대해서 비노출을 시도하면 예외가 발생한다.")
+        @Test
+        void displayFailWhenMenuNotFoundTest() {
+            UUID menuId = UUID.randomUUID();
+
+            assertThatThrownBy(() -> menuService.hide(menuId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @Nested
