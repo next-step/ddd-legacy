@@ -3,9 +3,11 @@ package kitchenpos.application;
 import kitchenpos.application.testFixture.MenuFixture;
 import kitchenpos.application.testFixture.MenuGroupFixture;
 import kitchenpos.application.testFixture.ProductFixture;
-import kitchenpos.domain.*;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +23,8 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -28,6 +32,7 @@ import static org.mockito.BDDMockito.given;
 @DisplayName("메뉴(Menu) 서비스 테스트")
 class MenuServiceTest {
 
+    @Mock
     private MenuRepository menuRepository;
 
     @Mock
@@ -50,8 +55,27 @@ class MenuServiceTest {
     @Nested
     class CreateTest {
 
+        @DisplayName("메뉴가 정상 생성된다.")
         @Test
-        void create() {
+        void createTest() {
+            // given
+            var id = UUID.randomUUID();
+            var menu = MenuFixture.newOne(id);
+
+            given(menuGroupRepository.findById(any()))
+                    .willReturn(Optional.of(MenuGroupFixture.newOne()));
+            var product = ProductFixture.newOne();
+            given(productRepository.findAllByIdIn(any()))
+                    .willReturn(List.of(product));
+            given(productRepository.findById(any())).willReturn(Optional.of(product));
+            given(purgomalumClient.containsProfanity(any())).willReturn(false);
+            given(menuRepository.save(any())).willReturn(menu);
+
+            // when
+            var actual = menuService.create(menu);
+
+            // then
+            assertThat(actual.getName()).isEqualTo("양념치킨");
         }
 
         @DisplayName("[예외] 가격은 음수이거나 null일수 없다.")
@@ -59,7 +83,7 @@ class MenuServiceTest {
         @MethodSource("priceMethodSource")
         void invalidPriceExceptionTest(Menu menu) {
             // when & then
-            Assertions.assertThatThrownBy(() -> menuService.create(menu))
+            assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -79,7 +103,7 @@ class MenuServiceTest {
 
             // then
             var menu = MenuFixture.newOne();
-            Assertions.assertThatThrownBy(() -> menuService.create(menu))
+            assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(NoSuchElementException.class);
         }
 
@@ -96,7 +120,7 @@ class MenuServiceTest {
             // when & then
             var product = ProductFixture.newOne(id);
             var menu = MenuFixture.newOne(product);
-            Assertions.assertThatThrownBy(() -> menuService.create(menu))
+            assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -114,7 +138,7 @@ class MenuServiceTest {
             given(productRepository.findById(any())).willReturn(Optional.of(product));
 
             // when & then
-            Assertions.assertThatThrownBy(() -> menuService.create(menu))
+            assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -132,7 +156,7 @@ class MenuServiceTest {
             given(productRepository.findById(any())).willReturn(Optional.of(product));
 
             // when & then
-            Assertions.assertThatThrownBy(() -> menuService.create(menu))
+            assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -152,7 +176,7 @@ class MenuServiceTest {
             given(purgomalumClient.containsProfanity(any())).willReturn(true);
 
             // when & then
-            Assertions.assertThatThrownBy(() -> menuService.create(menu))
+            assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }

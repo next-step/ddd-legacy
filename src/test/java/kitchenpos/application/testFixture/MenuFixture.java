@@ -1,16 +1,27 @@
 package kitchenpos.application.testFixture;
 
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public record MenuFixture() {
 
     public static Menu newOne() {
         var menu = new Menu();
+        menu.setName("양념치킨");
+        menu.setPrice(BigDecimal.valueOf(5000));
+        menu.setMenuGroup(MenuGroupFixture.newOne("신메뉴"));
+        menu.setDisplayed(true);
+        menu.setMenuProducts(List.of(MenuProductFixture.newOne()));
+        return menu;
+    }
+
+    public static Menu newOne(UUID id) {
+        var menu = new Menu();
+        menu.setId(id);
         menu.setName("양념치킨");
         menu.setPrice(BigDecimal.valueOf(5000));
         menu.setMenuGroup(MenuGroupFixture.newOne("신메뉴"));
@@ -49,16 +60,6 @@ public record MenuFixture() {
                 .map(MenuProductFixture::newOne)
                 .toList();
         menu.setMenuProducts(menuProducts);
-        return menu;
-    }
-
-    public static Menu newOne(int menuProductQuantity) {
-        var menu = new Menu();
-        menu.setName("양념치킨");
-        menu.setPrice(BigDecimal.valueOf(5000));
-        menu.setMenuGroup(MenuGroupFixture.newOne("신메뉴"));
-        menu.setDisplayed(true);
-        menu.setMenuProducts(List.of(MenuProductFixture.newOne(menuProductQuantity)));
         return menu;
     }
 
