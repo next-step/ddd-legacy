@@ -21,6 +21,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -29,8 +30,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
@@ -295,13 +298,134 @@ class MenuServiceTest {
         }
     }
 
-
+    @Nested
+    @DisplayName("메뉴를 공개 할 수 있다.")
     class display {
+        @Test
+        @DisplayName("메뉴를 공개 할 수 있다.")
+        void case_1() {
+            // given
+            UUID id = menu.getId();
+
+            // when
+            when(menuRepository.findById(id)).thenReturn(Optional.of(menu));
+            Menu displayed = menuService.display(id);
+
+            // then
+            assertEquals(displayed.getId(), menu.getId());
+            assertEquals(displayed.getName(), menu.getName());
+            assertEquals(displayed.getPrice(), menu.getPrice());
+            assertEquals(displayed.getMenuGroup(), menu.getMenuGroup());
+            assertEquals(displayed.getMenuProducts(), menu.getMenuProducts());
+            assertTrue(displayed.isDisplayed());
+        }
+
+        @Test
+        @DisplayName("동일한 상태로 변경할 경우 문제없이 변결될 수 있다")
+        void case_2() {
+            // given
+            UUID id = menu.getId();
+            ReflectionTestUtils.setField(menu, "displayed", true);
+
+            // when
+            when(menuRepository.findById(id)).thenReturn(Optional.of(menu));
+            Menu displayed = menuService.display(id);
+
+            // then
+            assertEquals(displayed.getId(), menu.getId());
+            assertEquals(displayed.getName(), menu.getName());
+            assertEquals(displayed.getPrice(), menu.getPrice());
+            assertEquals(displayed.getMenuGroup(), menu.getMenuGroup());
+            assertEquals(displayed.getMenuProducts(), menu.getMenuProducts());
+            assertTrue(displayed.isDisplayed());
+        }
+
+        @Test
+        @DisplayName("메뉴가 존재하지 않을 경우 NoSuchElementException이 발생한다.")
+        void case_3() {
+            // given
+            UUID id = menu.getId();
+
+            // when
+            when(menuRepository.findById(id)).thenReturn(Optional.empty());
+
+            // then
+            assertThrows(NoSuchElementException.class,
+                    () -> menuService.display(id));
+        }
+
+        @Test
+        @DisplayName("메뉴상품의 총합 가격이 메뉴의 가격보다 작을 경우 IllegalStateException이 발생한다.")
+        void case_4() {
+            // given
+            UUID id = menu.getId();
+            ReflectionTestUtils.setField(menu, "price", BigDecimal.valueOf(25000L));
+
+            // when
+            when(menuRepository.findById(id)).thenReturn(Optional.of(menu));
+
+            // then
+            assertThrows(IllegalStateException.class,
+                    () -> menuService.display(id));
+        }
     }
 
     @Nested
     @DisplayName("메뉴를 비공개 할 수 있다.")
     class hide {
+
+        @Test
+        @DisplayName("메뉴를 비공개 할 수 있다.")
+        void case_1() {
+            // given
+            UUID id = menu.getId();
+
+            // when
+            when(menuRepository.findById(id)).thenReturn(Optional.of(menu));
+            Menu hidden = menuService.hide(id);
+
+            // then
+            assertEquals(hidden.getId(), menu.getId());
+            assertEquals(hidden.getName(), menu.getName());
+            assertEquals(hidden.getPrice(), menu.getPrice());
+            assertEquals(hidden.getMenuGroup(), menu.getMenuGroup());
+            assertEquals(hidden.getMenuProducts(), menu.getMenuProducts());
+            assertFalse(hidden.isDisplayed());
+        }
+
+        @Test
+        @DisplayName("동일한 상태로 변경할 경우 문제없이 변결될 수 있다")
+        void case_2() {
+            // given
+            UUID id = menu.getId();
+            ReflectionTestUtils.setField(menu, "displayed", false);
+
+            // when
+            when(menuRepository.findById(id)).thenReturn(Optional.of(menu));
+            Menu hidden = menuService.hide(id);
+
+            // then
+            assertEquals(hidden.getId(), menu.getId());
+            assertEquals(hidden.getName(), menu.getName());
+            assertEquals(hidden.getPrice(), menu.getPrice());
+            assertEquals(hidden.getMenuGroup(), menu.getMenuGroup());
+            assertEquals(hidden.getMenuProducts(), menu.getMenuProducts());
+            assertFalse(hidden.isDisplayed());
+        }
+
+        @Test
+        @DisplayName("메뉴가 존재하지 않을 경우 NoSuchElementException이 발생한다.")
+        void case_3() {
+            // given
+            UUID id = menu.getId();
+
+            // when
+            when(menuRepository.findById(id)).thenReturn(Optional.empty());
+
+            // then
+            assertThrows(NoSuchElementException.class,
+                    () -> menuService.hide(id));
+        }
     }
 
     @Nested
