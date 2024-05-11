@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.application.testFixture.MenuFixture;
 import kitchenpos.application.testFixture.ProductFixture;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
@@ -17,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -43,8 +46,27 @@ class ProductServiceTest {
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
-    @Test
-    void changePrice() {
+    @Nested
+    @DisplayName("상품의 가격을 변경시,")
+    class ChangeProductPrice {
+
+        @DisplayName("가격이 정상 변동된다.")
+        @Test
+        void changedPriceTest() {
+            // given
+            var id = UUID.randomUUID();
+            var originalProduct = ProductFixture.newOne(id);
+            var menu = MenuFixture.newOne(originalProduct);
+            var updatedProduct = ProductFixture.newOne(4999);
+            given(productRepository.findById(any())).willReturn(Optional.of(originalProduct));
+            given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
+
+            // when
+            var actual = productService.changePrice(id, updatedProduct);
+
+            // then
+            assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(4999));
+        }
     }
 
     @Test
