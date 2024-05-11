@@ -290,9 +290,9 @@ class MenuServiceTest {
             // given
             var id = UUID.randomUUID();
             var product = ProductFixture.newOne(5000);
-            var originalMenu = MenuFixture.newOne(5001, List.of(product));
+            var menu = MenuFixture.newOne(5001, List.of(product));
 
-            given(menuRepository.findById(any())).willReturn(Optional.of(originalMenu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
             // when & then
             assertThatThrownBy(() -> menuService.display(id))
@@ -303,6 +303,23 @@ class MenuServiceTest {
     @DisplayName("메뉴 비노출 처리시,")
     @Nested
     class DisplayOffTest {
+
+        @DisplayName("메뉴는 정상적으로 비노출 처리된다.")
+        @Test
+        void displayedTest() {
+            // given
+            var id = UUID.randomUUID();
+            var menu = MenuFixture.newOne();
+
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+            // when
+            var actual = menuService.hide(id);
+
+            // then
+            assertThat(actual.isDisplayed()).isFalse();
+        }
+
         @DisplayName("[예외] 메뉴가 존재하지 않을 경우 예외 발생한다.")
         @Test
         void notFoundMenuExceptionTest() {
