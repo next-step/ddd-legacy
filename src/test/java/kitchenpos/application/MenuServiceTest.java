@@ -254,8 +254,6 @@ class MenuServiceTest {
 		);
 	}
 
-	// 추가된 테스트 케이스들
-
 	@ParameterizedTest
 	@NullSource
 	@ValueSource(strings = {"-1", "-100.0"})
