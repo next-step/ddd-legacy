@@ -14,7 +14,6 @@ abstract class BaseMockTest {
             .thenReturn(false)
     }
 
-
      protected fun `비속어 혹은 욕설 포함됨`(name: String) {
         Mockito.`when`(purgomalumClient.containsProfanity(name))
             .thenReturn(true)

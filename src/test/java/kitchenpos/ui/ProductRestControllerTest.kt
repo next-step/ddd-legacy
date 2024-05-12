@@ -7,18 +7,17 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
-import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import utils.상품생성
 import java.math.BigDecimal
-import java.util.*
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Sql("classpath:/db/migration/V2__Insert_default_data.sql")
 class ProductRestControllerTest {
     @Autowired
     private lateinit var mockMvc: MockMvc
@@ -46,21 +45,17 @@ class ProductRestControllerTest {
 
     @Test
     fun `상품의 가격 변경`() {
-        val productId = "3b528244-34f7-406b-bb7e-690912f66b10"
-        val price = 20000L
+        val product = Product()
+        product.name = "치킨"
+        product.price = BigDecimal.valueOf(15000)
+        val productId = mockMvc.상품생성(product)
         val request = Product()
-        request.price = BigDecimal.valueOf(price)
+        request.price = BigDecimal.valueOf(10000)
 
         mockMvc.perform(
             put("/api/products/$productId/price")
                 .content(objectMapper.writeValueAsString(request))
                 .contentType(MediaType.APPLICATION_JSON)
-        ).andDo(print()).andExpect(status().isOk).andExpectAll(jsonPath("$.price").value(price))
-    }
-
-    @Test
-    fun `모든 상품 목록 조회`() {
-        mockMvc.perform(get("/api/products").contentType(MediaType.APPLICATION_JSON))
-            .andDo(print()).andExpect(status().isOk).andExpectAll(jsonPath("$.length()").value(6))
+        ).andDo(print()).andExpect(status().isOk).andExpectAll(jsonPath("$.price").value(request.price))
     }
 }

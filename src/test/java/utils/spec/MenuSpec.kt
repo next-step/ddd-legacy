@@ -6,7 +6,11 @@ import java.math.BigDecimal
 import java.util.UUID
 
 object MenuSpec {
-    fun of(menuProducts: List<MenuProduct>, price: BigDecimal, display: Boolean = true): Menu {
+    fun of(
+        menuProducts: List<MenuProduct> = listOf(MenuProductSpec.of()),
+        price: BigDecimal = BigDecimal.valueOf(10000),
+        display: Boolean = true
+    ): Menu {
         val menu = Menu()
 
         menu.id = UUID.randomUUID()
