@@ -472,7 +472,7 @@ internal class MenuServiceTest {
     }
 
     @Nested
-    inner class `메뉴 숨김 테스트`{
+    inner class `메뉴 숨김 테스트` {
         @DisplayName("존재하지 않는 메뉴 id 라면, NoSuchElementException 예외 처리한다.")
         @Test
         fun test1() {
