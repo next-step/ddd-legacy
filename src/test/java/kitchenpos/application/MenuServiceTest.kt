@@ -15,6 +15,8 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import java.math.BigDecimal
 import java.util.*
 
@@ -469,4 +471,39 @@ class MenuServiceTest {
         }
     }
 
+    @Nested
+    inner class `메뉴 숨김 테스트`{
+        @DisplayName("존재하지 않는 메뉴 id 라면, NoSuchElementException 예외 처리한다.")
+        @Test
+        fun test1() {
+            // given
+            val menuId = UUID.randomUUID()
+
+            every { menuRepository.findById(any()) } returns Optional.empty()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                menuService.hide(menuId)
+            }
+        }
+
+        @DisplayName("정상 요청이라면, 메뉴를 숨긴다.")
+        @ParameterizedTest
+        @ValueSource(booleans = [false, true])
+        fun test2(initDisplayed: Boolean) {
+            // given
+            val menuId = UUID.randomUUID()
+            val menu = Menu().apply {
+                this.isDisplayed = initDisplayed
+            }
+
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+
+            // when
+            val result = menuService.hide(menuId)
+
+            // then
+            result.isDisplayed shouldBe false
+        }
+    }
 }
