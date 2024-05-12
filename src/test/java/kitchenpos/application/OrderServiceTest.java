@@ -65,8 +65,66 @@ class OrderServiceTest {
     void serve() {
     }
 
-    @Test
-    void startDelivery() {
+    @Nested
+    @DisplayName("배달 시작 처리시")
+    class StartDelivery {
+
+        static Stream<Arguments> notDelivery() {
+            var orderTable = OrderTableFixture.newOne("주문 테이블 1번");
+            return Stream.of(
+                    Arguments.arguments(OrderFixture.newOneTakeOut(SERVED), TAKEOUT),
+                    Arguments.arguments(OrderFixture.newOneEatIn(orderTable, SERVED), EAT_IN)
+            );
+        }
+
+        @Test
+        @DisplayName("'배송중'(DELIVERING)으로 배송 상태가 변경된다.")
+        void changedOrderStatusTest() {
+            // given
+            var order = OrderFixture.newOneDelivery(SERVED);
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+            // when
+            var actual = orderService.startDelivery(UUID.randomUUID());
+
+            // then
+            Assertions.assertThat(actual.getStatus()).isEqualTo(DELIVERING);
+        }
+
+        @Test
+        @DisplayName("[예외] '서빙완료'(SERVED)가 아니면 예외가 발생한다.")
+        void notServedTest() {
+            // given
+            var order = OrderFixture.newOneDelivery(WAITING);
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @ParameterizedTest(name = "{1}")
+        @MethodSource("notDelivery")
+        @DisplayName("[예외] '배달 주문'(DELIVERY)가 아니면 예외가 발생한다.")
+        void notDeliveryExceptionTest(Order order, OrderType orderType) {
+            // given
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] 존재하지 않는 주문일 경우 예외가 발생한다.")
+        void notFoundOrderExceptionTest() {
+            // given
+            given(orderRepository.findById(any())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @Nested
