@@ -4,6 +4,7 @@ import kitchenpos.application.testFixture.OrderFixture;
 import kitchenpos.application.testFixture.OrderTableFixture;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -68,8 +69,46 @@ class OrderServiceTest {
     void startDelivery() {
     }
 
-    @Test
-    void completeDelivery() {
+    @Nested
+    @DisplayName("'배달완료'(DELIVERED) 처리시,")
+    class CompleteDelivery {
+
+        @Test
+        @DisplayName("'배달완료'(DELIVERED)로 주문 상태가 변경된다.")
+        void changedOrderStatusTest() {
+            // given
+            var order = OrderFixture.newOneDelivery(DELIVERING);
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+            // when
+            var actual = orderService.completeDelivery(UUID.randomUUID());
+
+            // then
+            assertThat(actual.getStatus()).isEqualTo(DELIVERED);
+        }
+
+        @Test
+        @DisplayName("[예외] '배달중'(DELIVERING) 주문 상태가 아니면 예외가 발생한다.")
+        void orderStatusDeliveringExceptionTest() {
+            // given
+            var order = OrderFixture.newOneDelivery(WAITING);
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] 존재하지 않는 주문일 경우 예외가 발생한다.")
+        void notFoundOrderExceptionTest() {
+            // given
+            given(orderRepository.findById(any())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @DisplayName("주문 전체를 조회한다.")
