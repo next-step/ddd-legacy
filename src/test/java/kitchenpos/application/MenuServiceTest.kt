@@ -403,4 +403,70 @@ class MenuServiceTest {
             result.price shouldBe request.price
         }
     }
+
+    @Nested
+    inner class `메뉴 노출 테스트` {
+        @DisplayName("요청한 메뉴 id가 존재하지 않다면, NoSuchElementException 예외 처리")
+        @Test
+        fun test1() {
+            // given
+            val menuId = UUID.randomUUID()
+
+            every { menuRepository.findById(any()) } returns Optional.empty()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                menuService.display(menuId)
+            }
+        }
+
+        @DisplayName("메뉴에 속한 상품들의 가격 합보다, 메뉴의 가격이 더 높으면 IllegalStateException 예외 처리한다.")
+        @Test
+        fun test2() {
+            // given
+            val menuId = UUID.randomUUID()
+            val menu = mockk<Menu>().also {
+                every { it.menuProducts } returns listOf(mockk<MenuProduct>().also {
+                    every { it.product } returns mockk<Product>().also {
+                        every { it.price } returns BigDecimal(1000L)
+                    }
+                    every { it.quantity } returns 1
+                })
+                every { it.price } returns BigDecimal(1001L)
+            }
+
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                menuService.display(menuId)
+            }
+        }
+
+        @DisplayName("메뉴에 속한 상품들의 가격 합보다, 메뉴의 가격이 더 낮으면, 메뉴를 노출한다.")
+        @Test
+        fun test3() {
+            // given
+            val menuId = UUID.randomUUID()
+            val menu = Menu().apply {
+                this.menuProducts = listOf(MenuProduct().apply {
+                    this.product = Product().apply {
+                        this.price = BigDecimal.valueOf(1000L)
+                    }
+                    this.quantity = 1
+                })
+                this.price = BigDecimal.valueOf(999L)
+                this.isDisplayed = false
+            }
+
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+
+            // when
+            val result = menuService.display(menuId)
+
+            //then
+            result.isDisplayed shouldBe true
+        }
+    }
+
 }
