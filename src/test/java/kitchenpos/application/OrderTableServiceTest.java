@@ -9,6 +9,9 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
 import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -45,6 +48,24 @@ class OrderTableServiceTest {
 
     @Nested
     class sitTest {
+        @DisplayName("좌석에 착석 할 수 있다.")
+        @Test
+        void sitTest() {
+            OrderTable orderTable = createOrderTable("1번");
+            orderTable = orderTableService.create(orderTable);
+
+            orderTable = orderTableService.sit(orderTable.getId());
+
+            assertThat(orderTable.isOccupied()).isTrue();
+        }
+
+        @DisplayName("존재하지 않은 주문 테이블의 경우 예외가 발생한다.")
+        @Test
+        void sitFailWhenNotExistOrderTableTest() {
+            UUID notExistOrderTableId = UUID.randomUUID();
+            assertThatThrownBy(() -> orderTableService.sit(notExistOrderTableId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @Nested
