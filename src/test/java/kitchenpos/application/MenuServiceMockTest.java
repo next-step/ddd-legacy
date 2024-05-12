@@ -29,7 +29,8 @@ import static org.mockito.Mockito.times;
 class MenuServiceMockTest {
     private static MenuGroup 메뉴_그룹A;
     private static Menu 메뉴A;
-    private static Map<UUID, Product> 상품_목록;
+    private static Map<UUID, Product> 상품_DB;
+    private static List<Product> 상품_목록;
 
     @Mock
     private MenuRepository menuRepository;
@@ -48,8 +49,8 @@ class MenuServiceMockTest {
         Product 상품A = 상품_생성("상품A", BigDecimal.valueOf(10_000));
         Product 상품B = 상품_생성("상품B", BigDecimal.valueOf(20_000));
         Product 상품C = 상품_생성("상품C", BigDecimal.valueOf(30_000));
-        상품_목록 = Map.of(상품A.getId(), 상품A, 상품B.getId(), 상품B, 상품C.getId(), 상품C);
-
+        상품_DB = Map.of(상품A.getId(), 상품A, 상품B.getId(), 상품B, 상품C.getId(), 상품C);
+        상품_목록 = List.of(상품A, 상품B, 상품C);
         // 메뉴 생성
         메뉴_그룹A = 메뉴_그룹_생성("메뉴그룹A");
         메뉴A = 메뉴_생성(
@@ -68,10 +69,10 @@ class MenuServiceMockTest {
         void create() {
             //given
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(메뉴_그룹A));
-            when(productRepository.findAllByIdIn(any())).thenReturn(상품_목록.values().stream().toList());
+            when(productRepository.findAllByIdIn(any())).thenReturn(상품_목록_조회());
             for (MenuProduct menuProductRequest : 메뉴A.getMenuProducts()) {
                 UUID productId = menuProductRequest.getProductId();
-                Product product = 상품_목록.get(productId);
+                Product product = 상품_DB.get(productId);
                 when(productRepository.findById(productId)).thenReturn(Optional.of(product));
             }
             when(purgomalumClient.containsProfanity(any())).thenReturn(false);
@@ -92,7 +93,7 @@ class MenuServiceMockTest {
         @Test
         void create_price_exception() {
             //given
-            List<Product> products = 상품_목록.values().stream().toList();
+            List<Product> products = 상품_목록_조회();
             Menu menu = 메뉴_생성("담당자 실수로 태어난 메뉴", BigDecimal.valueOf(-1), false, UUID.randomUUID(), products);
 
             //when
@@ -104,13 +105,13 @@ class MenuServiceMockTest {
         @Test
         void create_name_exception() {
             //given
-            List<Product> products = 상품_목록.values().stream().toList();
+            List<Product> products = 상품_목록_조회();
             Menu menu = 메뉴_생성(null, BigDecimal.valueOf(10_000), false, UUID.randomUUID(), products);
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(메뉴_그룹A));
-            when(productRepository.findAllByIdIn(any())).thenReturn(상품_목록.values().stream().toList());
+            when(productRepository.findAllByIdIn(any())).thenReturn(상품_목록_조회());
             for (MenuProduct menuProductRequest : 메뉴A.getMenuProducts()) {
                 UUID productId = menuProductRequest.getProductId();
-                Product product = 상품_목록.get(productId);
+                Product product = 상품_DB.get(productId);
                 when(productRepository.findById(productId)).thenReturn(Optional.of(product));
             }
 
@@ -129,14 +130,14 @@ class MenuServiceMockTest {
         @Test
         void create_profanity_name_exception() {
             //given
-            List<Product> products = 상품_목록.values().stream().toList();
+            List<Product> products = 상품_목록_조회();
             Menu menu = 메뉴_생성("gubun", BigDecimal.valueOf(10_000), false, UUID.randomUUID(), products);
 
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(메뉴_그룹A));
-            when(productRepository.findAllByIdIn(any())).thenReturn(상품_목록.values().stream().toList());
+            when(productRepository.findAllByIdIn(any())).thenReturn(상품_목록_조회());
             for (MenuProduct menuProductRequest : 메뉴A.getMenuProducts()) {
                 UUID productId = menuProductRequest.getProductId();
-                Product product = 상품_목록.get(productId);
+                Product product = 상품_DB.get(productId);
                 when(productRepository.findById(productId)).thenReturn(Optional.of(product));
             }
             when(purgomalumClient.containsProfanity(any())).thenReturn(true);
@@ -156,14 +157,14 @@ class MenuServiceMockTest {
         @Test
         void create_price_sum_exception() {
             //given
-            List<Product> products = 상품_목록.values().stream().toList();
+            List<Product> products = 상품_목록_조회();
             Menu menu = 메뉴_생성("낚시메뉴", BigDecimal.valueOf(100_000), false, UUID.randomUUID(), products);
 
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(메뉴_그룹A));
-            when(productRepository.findAllByIdIn(any())).thenReturn(상품_목록.values().stream().toList());
+            when(productRepository.findAllByIdIn(any())).thenReturn(상품_목록_조회());
             for (MenuProduct menuProductRequest : 메뉴A.getMenuProducts()) {
                 UUID productId = menuProductRequest.getProductId();
-                Product product = 상품_목록.get(productId);
+                Product product = 상품_DB.get(productId);
                 when(productRepository.findById(productId)).thenReturn(Optional.of(product));
             }
 
@@ -244,7 +245,7 @@ class MenuServiceMockTest {
         @Test
         void changePrice() {
             //given
-            List<Product> products = 상품_목록.values().stream().toList();
+            List<Product> products = 상품_목록_조회();
             Menu menu = 메뉴_생성("메뉴A", BigDecimal.ZERO, false, UUID.randomUUID(), products);
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(메뉴A));
@@ -272,7 +273,7 @@ class MenuServiceMockTest {
         @Test
         void changePrice_menu_exception() {
             //given
-            List<Product> products = 상품_목록.values().stream().toList();
+            List<Product> products = 상품_목록_조회();
             Menu menu = 메뉴_생성("메뉴A", BigDecimal.ZERO, false, UUID.randomUUID(), products);
 
             when(menuRepository.findById(any())).thenReturn(Optional.empty());
@@ -287,7 +288,7 @@ class MenuServiceMockTest {
         @Test
         void changePrice_price_sum_exception() {
             //given
-            List<Product> products = 상품_목록.values().stream().toList();
+            List<Product> products = 상품_목록_조회();
             Menu menu = 메뉴_생성("메뉴A", BigDecimal.valueOf(100_000), false, UUID.randomUUID(), products);
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(메뉴A));
@@ -306,7 +307,7 @@ class MenuServiceMockTest {
         @Test
         void display() {
             //given
-            List<Product> products = 상품_목록.values().stream().toList();
+            List<Product> products = 상품_목록_조회();
             Menu menu = 메뉴_생성("메뉴A", BigDecimal.valueOf(10_000), false, UUID.randomUUID(), products);
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -335,7 +336,7 @@ class MenuServiceMockTest {
         @Test
         void display_price_sum_exception() {
             //given
-            List<Product> products = 상품_목록.values().stream().toList();
+            List<Product> products = 상품_목록_조회();
             Menu menu = 메뉴_생성("메뉴A", BigDecimal.valueOf(100_000), false, UUID.randomUUID(), products);
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -386,5 +387,9 @@ class MenuServiceMockTest {
         //then
         assertThat(menus).hasSize(0);
         then(menuRepository).should(times(1)).findAll();
+    }
+
+    private static List<Product> 상품_목록_조회() {
+        return 상품_목록;
     }
 }
