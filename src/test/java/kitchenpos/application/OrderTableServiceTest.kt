@@ -16,10 +16,10 @@ private val orderRepository = FakeOrderRepository()
 
 private val orderTableService = OrderTableService(orderTableRepository, orderRepository)
 
-private fun createOrderTable() =
+private fun createOrderTable(name: String? = "테이블") =
     OrderTable().apply {
         id = UUID.randomUUID()
-        name = "테이블"
+        this.name = name
         numberOfGuests = 0
     }
 
@@ -38,7 +38,7 @@ class OrderTableServiceTest : BehaviorSpec({
         }
 
         `when`("주문 테이블의 이름이 null이면") {
-            val newTable = createOrderTable().apply { name = null }
+            val newTable = createOrderTable(name = null)
 
             then("예외가 발생한다.") {
                 shouldThrow<IllegalArgumentException> {
@@ -48,7 +48,7 @@ class OrderTableServiceTest : BehaviorSpec({
         }
 
         `when`("주문 테이블의 이름이 빈 문자열이면") {
-            val newTable = createOrderTable().apply { name = "" }
+            val newTable = createOrderTable(name = "")
 
             then("예외가 발생한다.") {
                 shouldThrow<IllegalArgumentException> {
@@ -59,7 +59,6 @@ class OrderTableServiceTest : BehaviorSpec({
     }
 
     given("주문 테이블에 손님이 않을 떄") {
-
         `when`("주문 테이블이 존재하면") {
             val newTable = createOrderTable().let { orderTableService.create(it) }
 

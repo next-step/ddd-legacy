@@ -7,14 +7,21 @@ import io.mockk.mockk
 import kitchenpos.domain.MenuGroup
 import kitchenpos.domain.MenuGroupRepository
 import org.junit.jupiter.api.assertThrows
+import java.util.UUID
 
 private val menuGroupRepository = mockk<MenuGroupRepository>()
 private val menuGroupService = MenuGroupService(menuGroupRepository)
 
+private fun createMenuGroup(name: String? = "메뉴") =
+    MenuGroup().apply {
+        this.id = UUID.randomUUID()
+        this.name = name
+    }
+
 class MenuGroupServiceMockTest : BehaviorSpec({
     given("메뉴 그룹을 생성할 때") {
         `when`("이름이 null 이면") {
-            val newMenuGroup = MenuGroup().apply { name = null }
+            val newMenuGroup = createMenuGroup(name = null)
 
             then("예외가 발생한다.") {
                 assertThrows<IllegalArgumentException> {
@@ -24,7 +31,7 @@ class MenuGroupServiceMockTest : BehaviorSpec({
         }
 
         `when`("이름이 빈 문자열이면") {
-            val newMenuGroup = MenuGroup().apply { name = "" }
+            val newMenuGroup = createMenuGroup(name = "")
 
             then("예외가 발생한다.") {
                 assertThrows<IllegalArgumentException> {

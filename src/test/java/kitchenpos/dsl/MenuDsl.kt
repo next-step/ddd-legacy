@@ -8,14 +8,14 @@ import java.math.BigDecimal
 import java.util.UUID
 
 fun menu(
-    name: String,
-    price: Int,
+    name: String?,
+    price: Int?,
     initializer: Menu.() -> Unit
 ): Menu {
     return Menu().apply(initializer).apply {
         this.id = UUID.randomUUID()
         this.name = name
-        this.price = BigDecimal(price)
+        this.price = price?.toBigDecimal()
     }
 }
 
@@ -36,24 +36,22 @@ fun Menu.products(initializer: Products.() -> Unit) {
 
 class Products {
     val items = mutableListOf<MenuProduct>()
+}
 
-    operator fun String.invoke(initializer: ProductItem.() -> Unit) {
-        val productItem = ProductItem(this).apply(initializer)
-        val newProduct =
-            Product().apply {
-                this.id = UUID.randomUUID()
-                this.name = productItem.name
-                this.price = productItem.price
-            }
-
-        items.add(
-            MenuProduct().apply {
-                this.product = newProduct
-                this.productId = newProduct.id
-                this.seq = productItem.seq
-            }
-        )
-    }
+fun Products.item(item: ProductItem) {
+    val newSeq = this.items.size.toLong() + 1
+    this.items.add(
+        MenuProduct().apply {
+            this.product =
+                Product().apply {
+                    this.id = UUID.randomUUID()
+                    this.name = item.name
+                    this.price = item.price
+                }
+            this.quantity = item.quantity
+            this.seq = newSeq
+        }
+    )
 }
 
 infix fun String.price(price: Int): ProductItem {
@@ -67,10 +65,10 @@ infix fun ProductItem.price(price: Int): ProductItem {
 
 class ProductItem(val name: String) {
     var price: BigDecimal = BigDecimal.ZERO
-    var seq: Long = 0
+    var quantity: Long = 0
 
-    infix fun seq(seq: Long): ProductItem {
-        this.seq = seq
+    infix fun quantity(quantity: Long): ProductItem {
+        this.quantity = quantity
         return this
     }
 }
