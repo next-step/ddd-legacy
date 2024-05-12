@@ -704,4 +704,108 @@ internal class OrderServiceTest {
             result.status shouldBe OrderStatus.DELIVERED
         }
     }
+
+    @Nested
+    inner class `주문 완료 테스트` {
+        @DisplayName("존재하지 않는 주문 id 라면, NoSuchElementException 예외 처리를 한다.")
+        @Test
+        fun test1() {
+            // given
+            val orderId = UUID.randomUUID()
+
+            every { orderRepository.findById(any()) } returns Optional.empty()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                orderService.complete(orderId)
+            }
+        }
+
+        @DisplayName("주문 유형이 배달인데, 주문 상태가 배달 완료 상태가 아니라면, IllegalStateException 예외 처리")
+        @ParameterizedTest
+        @CsvSource("WAITING", "ACCEPTED", "SERVED", "DELIVERING", "COMPLETED")
+        fun test2(status: OrderStatus) {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.type = OrderType.DELIVERY
+                this.status = status
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                orderService.complete(orderId)
+            }
+        }
+
+        @DisplayName("주문 유형이 포장 또는 매장 내 식사인데, 주문 상태가 서빙 상태가 아니라면, IllegalStateException 예외 처리를 한다.")
+        @ParameterizedTest
+        @CsvSource(
+            "TAKEOUT, WAITING", "TAKEOUT, ACCEPTED", "TAKEOUT, COMPLETED",
+            "EAT_IN, WAITING", "EAT_IN, ACCEPTED", "EAT_IN, COMPLETED"
+        )
+        fun test3(type: OrderType, status: OrderStatus) {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.type = type
+                this.status = status
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                orderService.complete(orderId)
+            }
+        }
+
+        @DisplayName("주문 유형이 매장 내 식사이고, 해당 테이블을 사용하는 곳이 없다면, 주문 완료 처리가 되면서, 테이블도 치운다.")
+        @Test
+        fun test4() {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.type = OrderType.EAT_IN
+                this.status = OrderStatus.SERVED
+                this.orderTable = OrderTable().apply {
+                    this.isOccupied = true
+                    this.numberOfGuests = 4
+                }
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+            every { orderRepository.existsByOrderTableAndStatusNot(any(), any()) } returns false
+
+            // when
+            val result = orderService.complete(orderId)
+
+            // then
+            result.status shouldBe OrderStatus.COMPLETED
+            result.orderTable.isOccupied shouldBe false
+            result.orderTable.numberOfGuests shouldBe 0
+        }
+
+        @DisplayName("주문 유형이 배달 또는 포장이고, 정상 요청이면, 주문 완료 처리가 된다.")
+        @ParameterizedTest
+        @CsvSource("DELIVERY, DELIVERED", "TAKEOUT, SERVED")
+        fun test5(type: OrderType, status: OrderStatus) {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.type = type
+                this.status = status
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+
+            // when
+            val result = orderService.complete(orderId)
+
+            // then
+            result.status shouldBe OrderStatus.COMPLETED
+        }
+    }
 }
