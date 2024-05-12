@@ -11,6 +11,7 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -34,52 +36,57 @@ class ProductServiceTest {
     @Autowired
     private MenuRepository menuRepository;
 
+    @Nested
+    @DisplayName("상품이 생성될 때")
+    class ProductCreateTest {
 
-    @DisplayName("상품을 생성한다")
-    @Test
-    void createProductTest() {
+        @DisplayName("상품은 이름, 가격을 갖는다")
+        @Test
+        void createProductTest() {
 
-        // given
-        Product product = new ProductBuilder().anProduct().build();
+            // given
+            Product product = new ProductBuilder().anProduct().build();
 
-        // when
-        Product savedProduct = productService.create(product);
+            // when
+            Product savedProduct = productService.create(product);
 
-        // then
-        assertNotNull(savedProduct.getId());
-        assertEquals(product.getName(), savedProduct.getName());
-        assertEquals(product.getPrice(), savedProduct.getPrice());
-    }
+            // then
+            assertNotNull(savedProduct.getId());
+            assertEquals(product.getName(), savedProduct.getName());
+            assertEquals(product.getPrice(), savedProduct.getPrice());
+        }
 
-    @DisplayName("상품 생성 시 이름은 공백을 허용한다")
-    @EmptySource
-    @ParameterizedTest
-    void productNameWithBlankTest(String name) {
+        @DisplayName("이름은 공백을 허용한다")
+        @EmptySource
+        @ParameterizedTest
+        void productNameWithBlankTest(String name) {
 
-        // given
-        Product product = new ProductBuilder().anProduct().with(name, BigDecimal.ONE).build();
+            // given
+            Product product = new ProductBuilder().with(name, BigDecimal.ONE).build();
 
-        // when
-        Product savedProduct = productService.create(product);
+            // when
+            Product savedProduct = productService.create(product);
 
-        // then
-        assertNotNull(savedProduct.getId());
-        assertEquals(product.getName(), savedProduct.getName());
-        assertEquals(product.getPrice(), savedProduct.getPrice());
-    }
+            // then
+            assertNotNull(savedProduct.getId());
+            assertEquals(product.getName(), savedProduct.getName());
+            assertEquals(product.getPrice(), savedProduct.getPrice());
+        }
 
-    @DisplayName("상품 생성 시 가격은 0 이상이어야 한다")
-    @Test
-    void productPriceIsZeroOrPositiveTest() {
+        @DisplayName("가격이 음수면 생성이 불가능하다")
+        @Test
+        void productPriceIsZeroOrPositiveTest() {
 
-        // given
-        Product created = new ProductBuilder().anProduct().with("후라이드치킨", BigDecimal.ZERO).build();
+            // given
+            Product created = new ProductBuilder()
+                    .with("후라이드치킨", BigDecimal.valueOf(-1)).build();
 
-        // when
-        Product sut = productService.create(created);
+            // when
+            // then
+            assertThatThrownBy(() -> productService.create(created))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
 
-        // then
-        assertNotNull(sut.getId());
     }
 
 
@@ -101,7 +108,7 @@ class ProductServiceTest {
         assertThat(sut.getPrice()).isEqualTo(BigDecimal.valueOf(20_000));
     }
 
-    @DisplayName("변경한 상품 가격으로 계산한 메뉴상품 가격보다 메뉴 가격이 크면 메뉴가 숨김처리 된다")
+    @DisplayName("변경한 상품 가격보다 메뉴 가격이 크면 메뉴가 숨김처리 된다")
     @Test
     void changeProductPriceTest() {
 
