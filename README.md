@@ -8,7 +8,6 @@ docker compose -p kitchenpos up -d
 ```
 
 ## 요구 사항
-
 - 키친포스를 구현한다.
 
 
