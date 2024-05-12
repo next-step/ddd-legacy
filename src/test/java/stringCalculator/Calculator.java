@@ -9,25 +9,12 @@ public class Calculator {
 
     final String word;
     final String[] delimiters;
-    final CustomDelimiterCondition condition;
+    final CustomDelimiterCondition customCondition;
 
-    public Calculator(String word, String[] delimiters, CustomDelimiterCondition condition){
+    public Calculator(String word, String[] delimiters, CustomDelimiterCondition customCondition){
        this.word = word;
        this.delimiters = delimiters;
-       this.condition = condition;
-    }
-
-    public int getNumber(){
-        String customDelimiter = findCustomDelimiter(this.word, this.condition.getStart(), this.condition.getEnd());
-        List<String> delimiters = new ArrayList<String>();
-
-        delimiters.add(customDelimiter);
-        delimiters.addAll(Arrays.asList(this.delimiters));
-
-        String[] words = splitWord(this.word, delimiters);
-        return Arrays.stream(words)
-                .mapToInt(this::getValidNumber)
-                .sum();
+       this.customCondition = customCondition;
     }
 
     protected String findCustomDelimiter(String word, String startChar, String endChar) {
@@ -45,11 +32,44 @@ public class Calculator {
         return ",";
     }
 
+    public int getSum(){
+        String customDelimiter = findCustomDelimiter(this.word, this.customCondition.getStart(), this.customCondition.getEnd());
+
+        List<String> delimiterConditions = mergeCondition(customDelimiter);
+
+        String[] words = splitWord(this.word, delimiterConditions);
+
+        return Arrays.stream(words)
+                .mapToInt(this::getValidNumber)
+                .sum();
+    }
+
+    private List<String> mergeCondition(String customDelimiter) {
+        List<String> delimiters = new ArrayList<String>();
+        delimiters.add(customDelimiter);
+        delimiters.addAll(Arrays.asList(this.delimiters));
+        return delimiters;
+    }
+
+
     protected String[] splitWord(String word, List<String> conditions) {
+        word = detachCustomDelimiter(word);
+
         for (String condition : conditions) {
             word = word.replace(condition, ",");
         }
+
         return word.split(",");
+    }
+
+    private String detachCustomDelimiter(String word) {
+        String target  = this.customCondition.getEnd().replace("\\", "\\\\");
+        String[] results = word.split(target);
+
+        if(results.length == 2){
+            return results[1];
+        }
+        return results[0];
     }
 
     protected int getValidNumber(String targetChar) {
@@ -64,6 +84,7 @@ public class Calculator {
         if (singleChar == null || singleChar.isEmpty()) {
             return false;
         }
+
         try {
             Integer.parseInt(singleChar);
         } catch (NumberFormatException e) {

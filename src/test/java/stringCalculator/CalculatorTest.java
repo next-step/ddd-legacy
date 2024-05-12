@@ -33,7 +33,7 @@ public class CalculatorTest {
         String word = "//;\\n1;2;3";
         var calc = new Calculator(word, new String[]{",", ":"}, this.condition);
 
-        assertEquals(6, calc.getNumber());
+        assertEquals(6, calc.getSum());
     }
 
 
@@ -48,11 +48,11 @@ public class CalculatorTest {
 
     @Test
     @DisplayName("with target word, should return sum value")
-    void getNumberTest() {
+    void getSumTest() {
         String word = "1,2:3";
         var calc = new Calculator(word, new String[]{",", ":"}, this.condition);
 
-        assertEquals(6, calc.getNumber());
+        assertEquals(6, calc.getSum());
     }
 
     @Test
