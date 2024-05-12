@@ -435,5 +435,27 @@ class OrderServiceTest {
 
     @Nested
     class findAllTest {
+        @DisplayName("주문을 전체 조회 한다.")
+        @Test
+        void findAllSuccessTest() {
+            Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+            product = productRepository.save(product);
+            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            menu = menuRepository.save(menu);
+            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, OrderStatus.ACCEPTED, null, LocalDateTime.now());
+            order = orderRepository.save(order);
+
+            List<Order> orders = orderService.findAll();
+            List<UUID> orderIds = orders.stream()
+                    .map(Order::getId)
+                    .toList();
+
+            assertThat(orders).hasSize(1);
+            assertThat(orderIds).contains(order.getId());
+        }
     }
 }
