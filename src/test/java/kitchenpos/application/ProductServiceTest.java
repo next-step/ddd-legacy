@@ -1,11 +1,15 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.Product;
+import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -13,6 +17,8 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
 class ProductServiceTest {
@@ -20,8 +26,58 @@ class ProductServiceTest {
     @Autowired
     private ProductService productService;
 
+    @MockBean
+    private PurgomalumClient purgomalumClient;
+
     @Nested
     class createTest {
+        @DisplayName("메뉴를 생성할 수 있다.")
+        @Test
+        void createSuccessTest() {
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000));
+
+            final Product createdProduct = productService.create(product);
+
+            assertThat(createdProduct.getId()).isNotNull();
+        }
+
+        @DisplayName("메뉴 가격이 존재하지 않은 경우에 예외가 발생한다.")
+        @Test
+        void createFailWhenPriceIsNullTest() {
+            Product product = createProduct("후라이드 치킨", null);
+
+            assertThatThrownBy(() -> productService.create(product))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴 가격이 0 미만인 경우에 예외가 발생한다.")
+        @Test
+        void createFailWhenPriceIsLessThanZeroTest() {
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(-1));
+
+            assertThatThrownBy(() -> productService.create(product))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴의 이름이 존재하지 않은 경우에 예외가 발생한다.")
+        @ParameterizedTest
+        @NullSource
+        void createFailWhenNameIsNullTest(String name) {
+            Product product = createProduct(name, BigDecimal.valueOf(16000));
+
+            assertThatThrownBy(() -> productService.create(product))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("메뉴의 이름에 욕설이 포함된 경우에 예외가 발생한다.")
+        @Test
+        void createFailWhenNameContainsProfanityTest() {
+            given(purgomalumClient.containsProfanity("시발 후라이드 치킨")).willReturn(true);
+            Product product = createProduct("시발 후라이드 치킨", BigDecimal.valueOf(16000));
+
+            assertThatThrownBy(() -> productService.create(product))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Nested
@@ -43,7 +99,7 @@ class ProductServiceTest {
             List<UUID> productIds = products.stream()
                     .map(Product::getId)
                     .toList();
-            
+
             assertThat(products).hasSize(2);
             assertThat(productIds).contains(friedChickenProduct.getId(), seasonedChickenProduct.getId());
         }
