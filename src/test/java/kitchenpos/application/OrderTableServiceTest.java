@@ -14,6 +14,7 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -100,11 +101,20 @@ class OrderTableServiceTest {
                     .isInstanceOf(IllegalStateException.class);
         }
     }
-    void changeNumberOfGuests() {
-    }
 
+    @DisplayName("주문 테이블 전체를 조회한다.")
     @Test
     void findAll() {
+        // given
+        var orderTable1 = OrderTableFixture.newOne("1번 테이블");
+        var orderTable2 = OrderTableFixture.newOne("2번 테이블");
+        given(orderTableRepository.findAll()).willReturn(List.of(orderTable1, orderTable2));
+
+        // when
+        var actual = orderTableService.findAll();
+
+        // then
+        assertThat(actual).containsAll(List.of(orderTable1, orderTable2));
     }
 
     @Nested
