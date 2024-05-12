@@ -1,12 +1,10 @@
 package stringcalculator;
 
-import java.util.List;
-
 public class NonNegativeInteger {
     private static final int INTEGER_ZERO = 0;
     private static final String NEGATIVE_ERROR_MESSAGE = "Negative integer found: ";
     private static final String NON_INTEGER_ERROR_MESSAGE = "Non integer found: ";
-    private final int integer;
+    private int integer;
 
     private NonNegativeInteger(int integer) {
         this.integer = integer;
@@ -24,12 +22,9 @@ public class NonNegativeInteger {
         }
     }
 
-    public static NonNegativeInteger sum(List<NonNegativeInteger> nonNegativeIntegers) {
-        int total = INTEGER_ZERO;
-        for (NonNegativeInteger integer : nonNegativeIntegers) {
-            total += integer.getInteger();
-        }
-        return new NonNegativeInteger(total);
+    public NonNegativeInteger add(NonNegativeInteger nonNegativeInteger) {
+        this.integer += nonNegativeInteger.getInteger();
+        return this;
     }
 
     public int getInteger() {

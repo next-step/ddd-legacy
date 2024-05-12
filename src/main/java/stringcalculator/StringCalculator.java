@@ -13,6 +13,10 @@ public class StringCalculator {
         StringCalculatorTokenParser parser = new StringCalculatorTokenParser();
         List<NonNegativeInteger> nonNegativeIntegers = parser.getIntegerTokens(text);
 
-        return NonNegativeInteger.sum(nonNegativeIntegers).getInteger();
+        return nonNegativeIntegers.stream()
+                .reduce(NonNegativeInteger::add)
+                .orElseThrow(() -> new IllegalStateException("The list of NonNegativeIntegers cannot be empty"))
+                .getInteger();
+
     }
 }
