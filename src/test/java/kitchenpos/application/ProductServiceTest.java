@@ -82,6 +82,44 @@ class ProductServiceTest {
 
     @Nested
     class changePriceTest {
+        @DisplayName("상품의 가격을 변경할 수 있다.")
+        @Test
+        void changePriceSuccessTest() {
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000));
+            product = productService.create(product);
+
+            final Product changedProduct = productService.changePrice(product.getId(), createProduct("후라이드 치킨", BigDecimal.valueOf(17000)));
+
+            assertThat(changedProduct.getPrice()).isEqualTo(BigDecimal.valueOf(17000));
+        }
+
+        @DisplayName("상품 가격이 존재하지 않은 경우에 예외가 발생한다.")
+        @Test
+        void changePriceFailWhenPriceIsNullTest() {
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000));
+            product = productService.create(product);
+
+            UUID productId = product.getId();
+            product.setPrice(null);
+            Product changeProduct = product;
+
+            assertThatThrownBy(() -> productService.changePrice(productId, changeProduct))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("상품 가격이 0 미만인 경우에 예외가 발생한다.")
+        @Test
+        void changePriceFailWhenPriceIsLessThanZeroTest() {
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000));
+            product = productService.create(product);
+
+            UUID productId = product.getId();
+            product.setPrice(BigDecimal.valueOf(-16000));
+            Product changeProduct = product;
+
+            assertThatThrownBy(() -> productService.changePrice(productId, changeProduct))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Nested
