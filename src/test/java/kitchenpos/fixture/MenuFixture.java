@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.UUID;
 
 public class MenuFixture {
-    public static final String NAME_순살치킨 = "순살치킨";
-    public static final String NAME_반반치킨 = "반반치킨";
-    public static final BigDecimal PRICE_19000 = BigDecimal.valueOf(19_000);
-    public static final BigDecimal PRICE_34000 = BigDecimal.valueOf(34_000);
-    public static final BigDecimal PRICE_38000 = BigDecimal.valueOf(38_000);
+    public static final String 이름_순살치킨 = "순살치킨";
+    public static final String 이름_반반치킨 = "반반치킨";
+    public static final BigDecimal 가격_19000 = BigDecimal.valueOf(19_000);
+    public static final BigDecimal 가격_34000 = BigDecimal.valueOf(34_000);
+    public static final BigDecimal 가격_38000 = BigDecimal.valueOf(38_000);
 
     static public Menu menuChangePriceRequest(BigDecimal price) {
         Menu menu = new Menu();

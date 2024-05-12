@@ -23,10 +23,10 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.menuPriceAndMenuProductResponse;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
-import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
-import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_18000;
-import static kitchenpos.fixture.ProductFixture.PRICE_20000;
+import static kitchenpos.fixture.ProductFixture.이름_양념치킨;
+import static kitchenpos.fixture.ProductFixture.이름_후라이드치킨;
+import static kitchenpos.fixture.ProductFixture.가격_18000;
+import static kitchenpos.fixture.ProductFixture.가격_20000;
 import static kitchenpos.fixture.ProductFixture.productChangePriceRequest;
 import static kitchenpos.fixture.ProductFixture.productCreateRequest;
 import static kitchenpos.fixture.ProductFixture.productResponse;
@@ -54,8 +54,8 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
-        PRODUCT_양념치킨 = productResponse(NAME_양념치킨, PRICE_20000);
-        PRODUCT_후라이드치킨 = productResponse(NAME_후라이드치킨, PRICE_18000);
+        PRODUCT_양념치킨 = productResponse(이름_양념치킨, 가격_20000);
+        PRODUCT_후라이드치킨 = productResponse(이름_후라이드치킨, 가격_18000);
         ID_양념치킨 = PRODUCT_양념치킨.getId();
     }
 
@@ -63,7 +63,7 @@ class ProductServiceTest {
     @Test
     void creatProduct() {
         // given
-        Product request = productCreateRequest(NAME_양념치킨, PRICE_20000);
+        Product request = productCreateRequest(이름_양념치킨, 가격_20000);
         when(productRepository.save(any())).thenReturn(PRODUCT_양념치킨);
 
         // when
@@ -72,8 +72,8 @@ class ProductServiceTest {
         // then
         assertAll(
                 () -> assertThat(result.getId()).isNotNull(),
-                () -> assertThat(result.getName()).isEqualTo(NAME_양념치킨),
-                () -> assertThat(result.getPrice()).isEqualTo(PRICE_20000)
+                () -> assertThat(result.getName()).isEqualTo(이름_양념치킨),
+                () -> assertThat(result.getPrice()).isEqualTo(가격_20000)
         );
     }
 
@@ -82,7 +82,7 @@ class ProductServiceTest {
     @ParameterizedTest
     void createProduct_nullNameException(String name) {
         // given
-        Product request = productCreateRequest(name, PRICE_20000);
+        Product request = productCreateRequest(name, 가격_20000);
 
         // when
         // then
@@ -95,7 +95,7 @@ class ProductServiceTest {
     @ParameterizedTest
     void createProduct_containProfanityNameException(String name) {
         // given
-        Product request = productCreateRequest(name, PRICE_20000);
+        Product request = productCreateRequest(name, 가격_20000);
 
         // when
         when(purgomalumClient.containsProfanity(name)).thenReturn(true);
@@ -110,7 +110,7 @@ class ProductServiceTest {
     @ParameterizedTest
     void createProduct_nullPriceException(BigDecimal price) {
         // given
-        Product request = productCreateRequest(NAME_양념치킨, price);
+        Product request = productCreateRequest(이름_양념치킨, price);
 
         // when
         // then
@@ -123,7 +123,7 @@ class ProductServiceTest {
     @ParameterizedTest
     void createProduct_lessThenZeroPriceException(long price) {
         // given
-        Product request = productCreateRequest(NAME_양념치킨, BigDecimal.valueOf(price));
+        Product request = productCreateRequest(이름_양념치킨, BigDecimal.valueOf(price));
 
         // when
         // then
@@ -135,7 +135,7 @@ class ProductServiceTest {
     @Test
     void changeProductPriceTest() {
         // given
-        Product request = productChangePriceRequest(PRICE_18000);
+        Product request = productChangePriceRequest(가격_18000);
         when(productRepository.findById(any())).thenReturn(Optional.of(PRODUCT_양념치킨));
 
         // when

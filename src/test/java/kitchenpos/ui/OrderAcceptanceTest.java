@@ -33,8 +33,8 @@ import static kitchenpos.acceptacne.steps.OrderSteps.startDeliveryOrderStep;
 import static kitchenpos.acceptacne.steps.OrderTableSteps.createOrderTableStep;
 import static kitchenpos.acceptacne.steps.OrderTableSteps.sitOrderTableStep;
 import static kitchenpos.acceptacne.steps.ProductSteps.createProductStep;
-import static kitchenpos.fixture.MenuFixture.NAME_반반치킨;
-import static kitchenpos.fixture.MenuFixture.PRICE_38000;
+import static kitchenpos.fixture.MenuFixture.이름_반반치킨;
+import static kitchenpos.fixture.MenuFixture.가격_38000;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
 import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
@@ -46,10 +46,10 @@ import static kitchenpos.fixture.OrderFixture.orderTakeOutCreateRequest;
 import static kitchenpos.fixture.OrderLineItemFixture.orderLineItemCreate;
 import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
-import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
-import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_20000;
-import static kitchenpos.fixture.ProductFixture.PRICE_18000;
+import static kitchenpos.fixture.ProductFixture.이름_양념치킨;
+import static kitchenpos.fixture.ProductFixture.이름_후라이드치킨;
+import static kitchenpos.fixture.ProductFixture.가격_20000;
+import static kitchenpos.fixture.ProductFixture.가격_18000;
 import static kitchenpos.fixture.ProductFixture.productCreateRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -65,11 +65,11 @@ class OrderAcceptanceTest {
     @BeforeEach
     void setUp() {
         MenuGroup menuGroup = createMenuGroup();
-        MenuProduct menuProduct_양념치킨 = createMenuProduct(NAME_양념치킨, PRICE_20000, 1);
-        MenuProduct menuProduct_후라이드 = createMenuProduct(NAME_후라이드치킨, PRICE_18000, 1);
-        Menu menu = createMenu(PRICE_38000, menuGroup, menuProduct_양념치킨, menuProduct_후라이드);
+        MenuProduct menuProduct_양념치킨 = createMenuProduct(이름_양념치킨, 가격_20000, 1);
+        MenuProduct menuProduct_후라이드 = createMenuProduct(이름_후라이드치킨, 가격_18000, 1);
+        Menu menu = createMenu(가격_38000, menuGroup, menuProduct_양념치킨, menuProduct_후라이드);
         OrderTable orderTable = createOrderTable();
-        OrderLineItem ORDER_ITEM_주문메뉴항목 = orderLineItemCreate(menu, PRICE_38000, 1);
+        OrderLineItem ORDER_ITEM_주문메뉴항목 = orderLineItemCreate(menu, 가격_38000, 1);
         ORDER_TABLE_ID = orderTable.getId();
         ORDER_매장주문 = orderEatInCreateRequest(ORDER_TABLE_ID, ORDER_ITEM_주문메뉴항목);
         ORDER_배달주문 = orderDeliveryCreateRequest(배달주소, ORDER_ITEM_주문메뉴항목);
@@ -101,7 +101,7 @@ class OrderAcceptanceTest {
                     () -> assertThat(response.jsonPath().getBoolean("orderTable.occupied")).isTrue(),
                     () -> assertThat(response.jsonPath().getList("orderLineItems.menu.id")).hasSizeGreaterThanOrEqualTo(1),
                     () -> assertThat(response.jsonPath().getList("orderLineItems.quantity")).containsExactly(1),
-                    () -> assertThat(response.jsonPath().getList("orderLineItems.menu.price")).containsExactly(PRICE_38000.floatValue()),
+                    () -> assertThat(response.jsonPath().getList("orderLineItems.menu.price")).containsExactly(가격_38000.floatValue()),
                     () -> assertThat(response.jsonPath().getList("orderLineItems.menu.displayed")).containsExactly(true)
             );
         }
@@ -387,7 +387,7 @@ class OrderAcceptanceTest {
     }
 
     private static Menu createMenu(BigDecimal price, MenuGroup menuGroup, MenuProduct... menuProducts) {
-        Menu menu = menuCreateRequest(NAME_반반치킨, price, menuGroup.getId(), true, menuProducts);
+        Menu menu = menuCreateRequest(이름_반반치킨, price, menuGroup.getId(), true, menuProducts);
         return createMenuStep(menu).as(Menu.class);
     }
 

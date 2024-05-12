@@ -29,19 +29,19 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
-import static kitchenpos.fixture.MenuFixture.NAME_순살치킨;
-import static kitchenpos.fixture.MenuFixture.PRICE_34000;
 import static kitchenpos.fixture.MenuFixture.menuChangePriceRequest;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
 import static kitchenpos.fixture.MenuFixture.menuResponse;
-import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
+import static kitchenpos.fixture.MenuFixture.가격_34000;
+import static kitchenpos.fixture.MenuFixture.이름_순살치킨;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupResponse;
+import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
-import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
-import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_18000;
-import static kitchenpos.fixture.ProductFixture.PRICE_20000;
 import static kitchenpos.fixture.ProductFixture.productResponse;
+import static kitchenpos.fixture.ProductFixture.가격_18000;
+import static kitchenpos.fixture.ProductFixture.가격_20000;
+import static kitchenpos.fixture.ProductFixture.이름_양념치킨;
+import static kitchenpos.fixture.ProductFixture.이름_후라이드치킨;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -63,115 +63,266 @@ class MenuServiceTest {
     @InjectMocks
     private MenuService menuService;
 
-    private MenuGroup MENU_GROUP_추천메뉴;
-    private Product PRODUCT_양념치킨;
-    private Product PRODUCT_후라이드치킨;
+    private MenuGroup 메뉴그룹_추천메뉴;
+    private Product 상품_양념치킨;
+    private Product 상품_후라이드치킨;
     private MenuProduct 양념치킨_1개;
     private MenuProduct 후라이드치킨_1개;
-    private UUID ID_MENU_GOURP_추천메뉴;
-    private Menu MENU_순살치킨;
-    private UUID ID_MENU_순살치킨;
+    private UUID ID_추천메뉴;
+    private UUID ID_순살치킨;
+    private Menu 메뉴_순살치킨;
 
     @BeforeEach
     void setUp() {
-        MENU_GROUP_추천메뉴 = menuGroupResponse(이름_추천메뉴);
-        PRODUCT_양념치킨 = productResponse(NAME_양념치킨, PRICE_20000);
-        PRODUCT_후라이드치킨 = productResponse(NAME_후라이드치킨, PRICE_18000);
-        양념치킨_1개 = menuProductResponse(PRODUCT_양념치킨, 1);
-        후라이드치킨_1개 = menuProductResponse(PRODUCT_후라이드치킨, 1);
-        ID_MENU_GOURP_추천메뉴 = MENU_GROUP_추천메뉴.getId();
-        MENU_순살치킨 = menuResponse(NAME_순살치킨, PRICE_34000, ID_MENU_GOURP_추천메뉴, true, 양념치킨_1개, 후라이드치킨_1개);
-        ID_MENU_순살치킨 = MENU_순살치킨.getId();
+        메뉴그룹_추천메뉴 = menuGroupResponse(이름_추천메뉴);
+        상품_양념치킨 = productResponse(이름_양념치킨, 가격_20000);
+        상품_후라이드치킨 = productResponse(이름_후라이드치킨, 가격_18000);
+        양념치킨_1개 = menuProductResponse(상품_양념치킨, 1);
+        후라이드치킨_1개 = menuProductResponse(상품_후라이드치킨, 1);
+        ID_추천메뉴 = 메뉴그룹_추천메뉴.getId();
+        메뉴_순살치킨 = menuResponse(이름_순살치킨, 가격_34000, ID_추천메뉴, true, 양념치킨_1개, 후라이드치킨_1개);
+        ID_순살치킨 = 메뉴_순살치킨.getId();
     }
 
+    @DisplayName("메뉴 등록")
     @Nested
-    @DisplayName("메뉴 등록 테스트")
-    class Create {
-        @DisplayName("메뉴를 등록한다.")
-        @Test
-        void creatMenu() {
-            // given
-            Menu request = buildCreateRequest(NAME_순살치킨, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
-            commonStubForCreateMenu();
-            stubMenuRepositorySave();
-
-            // when
-            Menu result = menuService.create(request);
-
-            // then
-            assertAll(
-                    () -> assertThat(result.getId()).isNotNull(),
-                    () -> assertThat(result.getName()).isEqualTo(NAME_순살치킨),
-                    () -> assertThat(result.getPrice()).isEqualTo(PRICE_34000),
-                    () -> assertThat(result.isDisplayed()).isTrue(),
-                    () -> assertThat(result.getMenuGroupId()).isEqualTo(ID_MENU_GOURP_추천메뉴),
-                    () -> assertThat(result.getMenuProducts()).containsExactly(양념치킨_1개, 후라이드치킨_1개)
-            );
-        }
-
+    class MenuCreate {
+        @DisplayName("[성공]")
         @Nested
-        @DisplayName("이름 테스트")
-        class Name {
-            @DisplayName("메뉴를 등록할 때, 이름이 공백이면 예외가 발생한다.")
-            @NullSource
-            @ParameterizedTest
-            void creatMenu_nullNameException(String name) {
+        class Success {
+            @DisplayName("메뉴를 등록한다.")
+            @Test
+            void creatMenu() {
                 // given
-                Menu request = buildCreateRequest(name, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
-                ;
+                Menu request = buildCreateRequest(이름_순살치킨, 가격_34000, 양념치킨_1개, 후라이드치킨_1개);
                 commonStubForCreateMenu();
+                stubMenuRepositorySave();
 
                 // when
-                // then
-                assertThatThrownBy(() -> menuService.create(request))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
-
-            @DisplayName("메뉴를 등록할 때, 이름에 비속어가 포함되면 예외가 발생한다.")
-            @ValueSource(strings = {"욕설", "비속어"})
-            @ParameterizedTest
-            void creatMenu_containProfanityNameException(String name) {
-                // given
-                Menu request = buildCreateRequest(name, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
-                commonStubForCreateMenu();
-
-                // when
-                when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+                Menu result = menuService.create(request);
 
                 // then
-                assertThatThrownBy(() -> menuService.create(request))
-                        .isInstanceOf(IllegalArgumentException.class);
+                assertAll(
+                        () -> assertThat(result.getId()).isNotNull(),
+                        () -> assertThat(result.getName()).isEqualTo(이름_순살치킨),
+                        () -> assertThat(result.getPrice()).isEqualTo(가격_34000),
+                        () -> assertThat(result.isDisplayed()).isTrue(),
+                        () -> assertThat(result.getMenuGroupId()).isEqualTo(ID_추천메뉴),
+                        () -> assertThat(result.getMenuProducts()).containsExactly(양념치킨_1개, 후라이드치킨_1개)
+                );
             }
         }
 
+        @DisplayName("[실패]")
         @Nested
-        @DisplayName("가격 테스트")
-        class Price {
-            @DisplayName("메뉴를 등록할 때, 메뉴 가격이 공백이거나 0원보다 작으면 예외가 발생한다.")
+        class Fail {
+            @DisplayName("이름 테스트")
+            @Nested
+            class Name {
+                @DisplayName("이름은 필수로 입력해야 한다.")
+                @NullSource
+                @ParameterizedTest
+                void nameTest1(String name) {
+                    // given
+                    Menu request = buildCreateRequest(name, 가격_34000, 양념치킨_1개, 후라이드치킨_1개);
+                    commonStubForCreateMenu();
+
+                    // when
+                    // then
+                    assertThatThrownBy(() -> menuService.create(request))
+                            .isInstanceOf(IllegalArgumentException.class);
+                }
+
+                @DisplayName("이름은 비속어를 포함하지 않는다.")
+                @ValueSource(strings = {"욕설", "비속어"})
+                @ParameterizedTest
+                void nameTest2(String name) {
+                    // given
+                    Menu request = buildCreateRequest(name, 가격_34000, 양념치킨_1개, 후라이드치킨_1개);
+                    commonStubForCreateMenu();
+
+                    // when
+                    when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+
+                    // then
+                    assertThatThrownBy(() -> menuService.create(request))
+                            .isInstanceOf(IllegalArgumentException.class);
+                }
+            }
+
+            @DisplayName("가격 테스트")
+            @Nested
+            class Price {
+                @DisplayName("메뉴가격은 필수로 입력해야하고 `0`원 이상이다.")
+                @NullSource
+                @MethodSource("provideInvalidPrices")
+                @ParameterizedTest
+                void priceTest1(BigDecimal price) {
+                    // given
+                    Menu request = buildCreateRequest(이름_순살치킨, price, 양념치킨_1개, 후라이드치킨_1개);
+
+                    // when
+                    // then
+                    assertThatThrownBy(() -> menuService.create(request))
+                            .isInstanceOf(IllegalArgumentException.class);
+                }
+
+                @DisplayName("{메뉴가격}이 {모든 메뉴구성상품의 (가격*수량) 총 합}보다 비싸지 않아야 한다.")
+                @ValueSource(longs = {38_001, 50_000, 100_000})
+                @ParameterizedTest
+                void priceTest2(long price) {
+                    // given
+                    Menu request = buildCreateRequest(이름_순살치킨, BigDecimal.valueOf(price), 양념치킨_1개, 후라이드치킨_1개);
+                    commonStubForCreateMenu();
+
+                    // when
+                    // then
+                    assertThatThrownBy(() -> menuService.create(request))
+                            .isInstanceOf(IllegalArgumentException.class);
+                }
+
+                private static Stream<BigDecimal> provideInvalidPrices() {
+                    return Stream.of(BigDecimal.valueOf(-1), BigDecimal.valueOf(-1000), BigDecimal.valueOf(-99999990));
+                }
+            }
+
+            @DisplayName("메뉴그룹 테스트")
+            @Nested
+            class MenuGroup {
+                @DisplayName("메뉴는 이미 등록된 하나의 `메뉴 그룹`에 반드시 속한다.")
+                @Test
+                void menuGroup() {
+                    // given
+                    Menu request = buildCreateRequest(이름_순살치킨, 가격_34000, 양념치킨_1개, 후라이드치킨_1개);
+
+                    // when
+                    when(menuGroupRepository.findById(any())).thenReturn(Optional.empty());
+
+                    // then
+                    assertThatThrownBy(() -> menuService.create(request))
+                            .isInstanceOf(NoSuchElementException.class);
+                }
+            }
+
+            @DisplayName("메뉴구성상품 테스트")
+            @Nested
+            class MenuProduct {
+                @DisplayName("메뉴는 `메뉴구성 상품`을 `한 가지`이상 가진다.")
+                @Test
+                void menuProduct1() {
+                    // given
+                    Menu request = buildCreateRequest(이름_순살치킨, 가격_34000, 양념치킨_1개, 후라이드치킨_1개);
+                    stubMenuGroupRepositoryFindById();
+
+                    // when
+                    when(productRepository.findAllByIdIn(any())).thenReturn(emptyList());
+
+                    // then
+                    assertThatThrownBy(() -> menuService.create(request))
+                            .isInstanceOf(IllegalArgumentException.class);
+                }
+
+                @DisplayName("`메뉴구성 상품`은 미리 등록된 `상품`을 가진다.")
+                @Test
+                void menuProduct2() {
+                    // given
+                    Menu request = buildCreateRequest(이름_순살치킨, 가격_34000, 양념치킨_1개, 후라이드치킨_1개);
+                    stubMenuGroupRepositoryFindById();
+
+                    // when
+                    when(productRepository.findAllByIdIn(any())).thenReturn(List.of(상품_후라이드치킨));
+
+                    // then
+                    assertThatThrownBy(() -> menuService.create(request))
+                            .isInstanceOf(IllegalArgumentException.class);
+                }
+
+                @DisplayName("`메뉴구성 상품`은  수량이 0개 가진다.")
+                @ValueSource(longs = {-1, -111, -999999})
+                @ParameterizedTest
+                void menuProduct3(long quantity) {
+                    // given
+                    Menu request = buildCreateRequest(이름_순살치킨, 가격_34000, menuProductResponse(상품_양념치킨, quantity));
+                    stubMenuGroupRepositoryFindById();
+
+                    // when
+                    when(productRepository.findAllByIdIn(any())).thenReturn(List.of(상품_양념치킨));
+
+                    // then
+                    assertThatThrownBy(() -> menuService.create(request))
+                            .isInstanceOf(IllegalArgumentException.class);
+                }
+            }
+        }
+    }
+
+    @DisplayName("가격 수정 테스트")
+    @Nested
+    class ChangePrice {
+        @DisplayName("[성공]")
+        @Nested
+        class Success {
+            @DisplayName("메뉴의 가격을 수정한다.")
+            @Test
+            void changeMenuPrice() {
+                // given
+                Menu request = menuChangePriceRequest(가격_34000);
+                stubMenuRepositoryFindById();
+
+                // when
+                Menu result = menuService.changePrice(ID_순살치킨, request);
+
+                // then
+                assertAll(
+                        () -> assertThat(result.getId()).isEqualTo(ID_순살치킨),
+                        () -> assertThat(result.getPrice()).isEqualTo(가격_34000)
+                );
+            }
+        }
+
+        @DisplayName("[실패]")
+        @Nested
+        class Fail {
+            @DisplayName("해당 메뉴가 미리 등록되어 있는지 체크해야한다.")
+            @Test
+            void menuTest1() {
+                // given
+                Menu request = menuChangePriceRequest(가격_34000);
+                stubMenuRepositoryFindById();
+
+                // when
+                when(menuRepository.findById(any())).thenReturn(Optional.empty());
+
+                // then
+                assertThatThrownBy(() -> menuService.changePrice(ID_순살치킨, request))
+                        .isInstanceOf(NoSuchElementException.class);
+            }
+
+            @DisplayName("가격은 필수로 입력해야하고 `0`원 이상이다.")
             @NullSource
             @MethodSource("provideInvalidPrices")
             @ParameterizedTest
-            void creatMenu_NullOrNegativePriceException(BigDecimal price) {
+            void priceTest1(BigDecimal price) {
                 // given
-                Menu request = buildCreateRequest(NAME_순살치킨, price, 양념치킨_1개, 후라이드치킨_1개);
+                Menu request = menuChangePriceRequest(price);
 
                 // when
                 // then
-                assertThatThrownBy(() -> menuService.create(request))
+                assertThatThrownBy(() -> menuService.changePrice(ID_순살치킨, request))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
-            @DisplayName("메뉴를 등록할 때, 메뉴가격이 메뉴구성상품의 (가격*수량)의 총 합보다 비싸면 예외 발생한다.")
+            @DisplayName("{메뉴가격}이 {메뉴구성상품의 (가격*수량)의 총 합}보다 비싸지 않아야 한다.")
             @ValueSource(longs = {38_001, 50_000, 100_000})
             @ParameterizedTest
-            void creatMenu_invalidPricePolicyException(long price) {
+            void priceTest2(long price) {
                 // given
-                Menu request = buildCreateRequest(NAME_순살치킨, BigDecimal.valueOf(price), 양념치킨_1개, 후라이드치킨_1개);
-                commonStubForCreateMenu();
+                Menu request = buildCreateRequest(이름_순살치킨, BigDecimal.valueOf(price), 양념치킨_1개, 후라이드치킨_1개);
+                stubMenuRepositoryFindById();
 
                 // when
                 // then
-                assertThatThrownBy(() -> menuService.create(request))
+                assertThatThrownBy(() -> menuService.changePrice(ID_순살치킨, request))
                         .isInstanceOf(IllegalArgumentException.class);
             }
 
@@ -179,234 +330,111 @@ class MenuServiceTest {
                 return Stream.of(BigDecimal.valueOf(-1), BigDecimal.valueOf(-1000), BigDecimal.valueOf(-99999990));
             }
         }
-
-        @DisplayName("메뉴를 등록할 때, 미리 등록되어 있지 않은 메뉴그룹이면 예외 발생한다.")
-        @Test
-        void creatMenu_notExistsMenuGroupException() {
-            // given
-            Menu request = buildCreateRequest(NAME_순살치킨, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
-
-            // when
-            when(menuGroupRepository.findById(any())).thenReturn(Optional.empty());
-
-            // then
-            assertThatThrownBy(() -> menuService.create(request))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-
-        @Nested
-        @DisplayName("메뉴구성상품 테스트")
-        class MenuProduct {
-            @DisplayName("메뉴를 등록할 때, 메뉴구성상품을 하나도 담지 않으면 예외 발생한다.")
-            @Test
-            void creatMenu_emptyMenuProductException() {
-                // given
-                Menu request = buildCreateRequest(NAME_순살치킨, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
-                stubMenuGroupRepositoryFindById();
-
-                // when
-                when(productRepository.findAllByIdIn(any())).thenReturn(emptyList());
-
-                // then
-                assertThatThrownBy(() -> menuService.create(request))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
-
-            @DisplayName("메뉴를 등록할 때, 메뉴구성상품이 미리 등록되지 않은 상품이 하나라도 있으면 예외 발생한다.")
-            @Test
-            void creatMenu_notExistsMenuProductException() {
-                // given
-                Menu request = buildCreateRequest(NAME_순살치킨, PRICE_34000, 양념치킨_1개, 후라이드치킨_1개);
-                stubMenuGroupRepositoryFindById();
-
-                // when
-                when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_후라이드치킨));
-
-                // then
-                assertThatThrownBy(() -> menuService.create(request))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
-
-            @DisplayName("메뉴를 등록할 때, 메뉴구성상품의 수량이 0개 미만이면 예외 발생한다.")
-            @ValueSource(longs = {-1, -111, -999999})
-            @ParameterizedTest
-            void creatMenu_negativeQuantityMenuProductException(long quantity) {
-                // given
-                Menu request = buildCreateRequest(NAME_순살치킨, PRICE_34000, menuProductResponse(PRODUCT_양념치킨, quantity));
-                stubMenuGroupRepositoryFindById();
-
-                // when
-                when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_양념치킨));
-
-                // then
-                assertThatThrownBy(() -> menuService.create(request))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
-        }
     }
 
-    @Nested
-    @DisplayName("가격 수정 테스트")
-    class ChangePrice {
-        @DisplayName("메뉴의 가격을 수정한다.")
-        @Test
-        void changeMenuPrice() {
-            // given
-            Menu request = menuChangePriceRequest(BigDecimal.valueOf(30_000));
-            stubMenuRepositoryFindById();
-
-            // when
-            Menu result = menuService.changePrice(ID_MENU_순살치킨, request);
-
-            // then
-            assertAll(
-                    () -> assertThat(result.getId()).isEqualTo(ID_MENU_순살치킨),
-                    () -> assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(30_000))
-            );
-        }
-
-        @DisplayName("메뉴 ID와 일치하는 메뉴가 없으면 예외 발생한다.")
-        @Test
-        void changeMenuPrice_notExistsMenuException() {
-            // given
-            Menu request = menuChangePriceRequest(BigDecimal.valueOf(30_000));
-            stubMenuRepositoryFindById();
-
-            // when
-            when(menuRepository.findById(any())).thenReturn(Optional.empty());
-
-            // then
-            assertThatThrownBy(() -> menuService.changePrice(ID_MENU_순살치킨, request))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-
-        @DisplayName("메뉴의 가격을 수정할 때, 가격이 공백이거나  0원보다 작으면 예외가 발생한다.")
-        @NullSource
-        @MethodSource("provideInvalidPrices")
-        @ParameterizedTest
-        void changeMenuPrice_NullOrNegativePriceException(BigDecimal price) {
-            // given
-            Menu request = menuChangePriceRequest(price);
-
-            // when
-            // then
-            assertThatThrownBy(() -> menuService.changePrice(ID_MENU_순살치킨, request))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("메뉴의 가격을 수정할 때, 메뉴가격이 메뉴구성상품의 (가격*수량)의 총 합보다 비싸면 예외 발생한다.")
-        @ValueSource(longs = {38_001, 50_000, 100_000})
-        @ParameterizedTest
-        void changeMenuPrice_invalidPricePolicyException(long price) {
-            // given
-            Menu request = buildCreateRequest(NAME_순살치킨, BigDecimal.valueOf(price), 양념치킨_1개, 후라이드치킨_1개);
-            stubMenuRepositoryFindById();
-
-            // when
-            // then
-            assertThatThrownBy(() -> menuService.changePrice(ID_MENU_순살치킨, request))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        private static Stream<BigDecimal> provideInvalidPrices() {
-            return Stream.of(BigDecimal.valueOf(-1), BigDecimal.valueOf(-1000), BigDecimal.valueOf(-99999990));
-        }
-    }
-
-    @Nested
     @DisplayName("메뉴 노출 여부 테스트")
+    @Nested
     class changeDisplay {
-        @DisplayName("메뉴가 노출된다.")
-        @Test
-        void displayMenu() {
-            // given
-            stubMenuRepositoryFindById();
+        @DisplayName("[성공]")
+        @Nested
+        class Success {
+            @DisplayName("메뉴가 노출된다.")
+            @Test
+            void displayMenu() {
+                // given
+                stubMenuRepositoryFindById();
 
-            // when
-            Menu result = menuService.display(ID_MENU_순살치킨);
+                // when
+                Menu result = menuService.display(ID_순살치킨);
 
-            // then
-            assertAll(
-                    () -> assertThat(result.getId()).isEqualTo(ID_MENU_순살치킨),
-                    () -> assertThat(result.isDisplayed()).isTrue()
-            );
+                // then
+                assertAll(
+                        () -> assertThat(result.getId()).isEqualTo(ID_순살치킨),
+                        () -> assertThat(result.isDisplayed()).isTrue()
+                );
+            }
+
+            @DisplayName("메뉴를 보이지 않게 할 수 있다.")
+            @Test
+            void hideMenu() {
+                // given
+                stubMenuRepositoryFindById();
+
+                // when
+                Menu result = menuService.hide(ID_순살치킨);
+
+                // then
+                assertAll(
+                        () -> assertThat(result.getId()).isEqualTo(ID_순살치킨),
+                        () -> assertThat(result.isDisplayed()).isFalse()
+                );
+            }
         }
 
-        @DisplayName("메뉴 ID와 일치하는 메뉴가 없으면 예외 발생한다.")
-        @Test
-        void displayMenu_notExistsMenuException() {
-            // given
-            UUID menuId = ID_MENU_순살치킨;
+        @DisplayName("[실패]")
+        @Nested
+        class Fail {
+            @DisplayName("해당 메뉴가 미리 등록되어 있는지 체크해야한다.")
+            @Test
+            void displayMenu_notExistsMenuException() {
+                // given
+                UUID menuId = ID_순살치킨;
 
-            // when
-            when(menuRepository.findById(any())).thenReturn(Optional.empty());
+                // when
+                when(menuRepository.findById(any())).thenReturn(Optional.empty());
 
-            // then
-            assertAll(
-                    () -> assertThatThrownBy(() -> menuService.display(menuId))
-                            .isInstanceOf(NoSuchElementException.class),
-                    () -> assertThatThrownBy(() -> menuService.hide(menuId))
-                            .isInstanceOf(NoSuchElementException.class)
-            );
+                // then
+                assertAll(
+                        () -> assertThatThrownBy(() -> menuService.display(menuId))
+                                .isInstanceOf(NoSuchElementException.class),
+                        () -> assertThatThrownBy(() -> menuService.hide(menuId))
+                                .isInstanceOf(NoSuchElementException.class)
+                );
+            }
+
+            @DisplayName("{메뉴의 가격}이 {메뉴구성상품의 (가격*수량)의 총 합}보다 비싸지 않아야 한다.")
+            @ValueSource(longs = {20_001, 30_000, 50_000})
+            @ParameterizedTest
+            void displayMenu_invalidPricePolicyException(long price) {
+                // given
+                Menu menu = buildMenuResponse(price);
+                UUID menuId = menu.getId();
+                when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+
+                // when
+                // then
+                assertThatThrownBy(() -> menuService.display(menuId))
+                        .isInstanceOf(IllegalStateException.class);
+            }
         }
 
-        @DisplayName("메뉴의 가격이 메뉴구성상품의 (가격*수량)의 총 합보다 비싸면 예외 발생한다.")
-        @ValueSource(longs = {20_001, 30_000, 50_000})
-        @ParameterizedTest
-        void displayMenu_invalidPricePolicyException(long price) {
-            // given
-            Menu menu = buildMenuResponse(price);
-            UUID menuId = menu.getId();
-            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-
-            // when
-            // then
-            assertThatThrownBy(() -> menuService.display(menuId))
-                    .isInstanceOf(IllegalStateException.class);
-        }
-
-        @DisplayName("메뉴를 숨긴다.")
-        @Test
-        void hideMenu() {
-            // given
-            stubMenuRepositoryFindById();
-
-            // when
-            Menu result = menuService.hide(ID_MENU_순살치킨);
-
-            // then
-            assertAll(
-                    () -> assertThat(result.getId()).isEqualTo(ID_MENU_순살치킨),
-                    () -> assertThat(result.isDisplayed()).isFalse()
-            );
-        }
     }
 
     @DisplayName("메뉴 목록을 볼 수 있다.")
     @Test
     void getMenus() {
         // given
-        List<Menu> list = List.of(MENU_순살치킨);
+        List<Menu> list = List.of(메뉴_순살치킨);
         when(menuRepository.findAll()).thenReturn(list);
 
         // when
         List<Menu> result = menuService.findAll();
 
         // then
-        assertThat(result).containsOnly(MENU_순살치킨);
+        assertThat(result).containsOnly(메뉴_순살치킨);
     }
 
     @NotNull
     private Menu buildMenuResponse(long price) {
-        return menuResponse(NAME_순살치킨, BigDecimal.valueOf(price), ID_MENU_GOURP_추천메뉴, true, 양념치킨_1개);
+        return menuResponse(이름_순살치킨, BigDecimal.valueOf(price), ID_추천메뉴, true, 양념치킨_1개);
     }
 
     private Menu buildCreateRequest(String name, BigDecimal price, MenuProduct... menuProducts) {
-        return menuCreateRequest(name, price, ID_MENU_GOURP_추천메뉴, true, menuProducts);
+        return menuCreateRequest(name, price, ID_추천메뉴, true, menuProducts);
     }
 
     private void stubMenuRepositorySave() {
-        when(menuRepository.save(any())).thenReturn(MENU_순살치킨);
+        when(menuRepository.save(any())).thenReturn(메뉴_순살치킨);
     }
 
     private void stubMenuGroupRepositoryFindById() {
@@ -414,13 +442,13 @@ class MenuServiceTest {
     }
 
     private void stubMenuRepositoryFindById() {
-        when(menuRepository.findById(any())).thenReturn(Optional.of(MENU_순살치킨));
+        when(menuRepository.findById(any())).thenReturn(Optional.of(메뉴_순살치킨));
     }
 
     private void commonStubForCreateMenu() {
-        when(menuGroupRepository.findById(any())).thenReturn(Optional.ofNullable(MENU_GROUP_추천메뉴));
-        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(PRODUCT_양념치킨, PRODUCT_후라이드치킨));
-        when(productRepository.findById(PRODUCT_양념치킨.getId())).thenAnswer(invocation -> Optional.ofNullable(PRODUCT_양념치킨));
-        when(productRepository.findById(PRODUCT_후라이드치킨.getId())).thenAnswer(invocation -> Optional.ofNullable(PRODUCT_후라이드치킨));
+        when(menuGroupRepository.findById(any())).thenReturn(Optional.ofNullable(메뉴그룹_추천메뉴));
+        when(productRepository.findAllByIdIn(any())).thenReturn(List.of(상품_양념치킨, 상품_후라이드치킨));
+        when(productRepository.findById(상품_양념치킨.getId())).thenAnswer(invocation -> Optional.ofNullable(상품_양념치킨));
+        when(productRepository.findById(상품_후라이드치킨.getId())).thenAnswer(invocation -> Optional.ofNullable(상품_후라이드치킨));
     }
 }

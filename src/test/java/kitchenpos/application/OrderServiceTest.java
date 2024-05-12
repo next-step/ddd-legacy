@@ -29,9 +29,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.fixture.MenuFixture.NAME_반반치킨;
-import static kitchenpos.fixture.MenuFixture.PRICE_34000;
-import static kitchenpos.fixture.MenuFixture.PRICE_38000;
+import static kitchenpos.fixture.MenuFixture.이름_반반치킨;
+import static kitchenpos.fixture.MenuFixture.가격_34000;
+import static kitchenpos.fixture.MenuFixture.가격_38000;
 import static kitchenpos.fixture.MenuFixture.menuResponse;
 import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupResponse;
@@ -46,10 +46,10 @@ import static kitchenpos.fixture.OrderFixture.orderTakeOutResponse;
 import static kitchenpos.fixture.OrderLineItemFixture.orderLineItemCreate;
 import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
 import static kitchenpos.fixture.OrderTableFixture.orderTableResponse;
-import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
-import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_18000;
-import static kitchenpos.fixture.ProductFixture.PRICE_20000;
+import static kitchenpos.fixture.ProductFixture.이름_양념치킨;
+import static kitchenpos.fixture.ProductFixture.이름_후라이드치킨;
+import static kitchenpos.fixture.ProductFixture.가격_18000;
+import static kitchenpos.fixture.ProductFixture.가격_20000;
 import static kitchenpos.fixture.ProductFixture.productResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -86,15 +86,15 @@ public class OrderServiceTest {
     void setUp() {
         //메뉴
         MenuGroup menuGroup = menuGroupResponse(이름_추천메뉴);
-        Product product1 = productResponse(NAME_양념치킨, PRICE_20000);
-        Product product2 = productResponse(NAME_후라이드치킨, PRICE_18000);
+        Product product1 = productResponse(이름_양념치킨, 가격_20000);
+        Product product2 = productResponse(이름_후라이드치킨, 가격_18000);
         MenuProduct menuProduct_양념치킨 = menuProductResponse(product1, 1);
         MenuProduct menuProduct_후라이드 = menuProductResponse(product2, 1);
-        menu = menuResponse(NAME_반반치킨, PRICE_38000, menuGroup.getId(), true, menuProduct_양념치킨, menuProduct_후라이드);
+        menu = menuResponse(이름_반반치킨, 가격_38000, menuGroup.getId(), true, menuProduct_양념치킨, menuProduct_후라이드);
         //주문
         orderTable = orderTableResponse(NAME_1번, 0, true);
         orderTableId = orderTable.getId();
-        orderLineItem = orderLineItemCreate(menu, PRICE_38000, 1);
+        orderLineItem = orderLineItemCreate(menu, 가격_38000, 1);
         ORDER_매장주문 = orderEatInResponse(OrderStatus.WAITING, orderTable, orderLineItem);
         ORDER_배달주문 = orderDeliveryResponse(OrderStatus.WAITING, ORDER_배달주소, orderLineItem);
         ORDER_포장주문 = orderTakeOutResponse(OrderStatus.WAITING, orderLineItem);
@@ -342,7 +342,7 @@ public class OrderServiceTest {
             when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
 
             // when
-            menu.setPrice(PRICE_34000);
+            menu.setPrice(가격_34000);
             when(menuRepository.findById(any())).thenReturn(Optional.ofNullable(menu));
 
             // then

@@ -14,10 +14,10 @@ import java.util.UUID;
 import static kitchenpos.acceptacne.steps.ProductSteps.changePriceStep;
 import static kitchenpos.acceptacne.steps.ProductSteps.createProductStep;
 import static kitchenpos.acceptacne.steps.ProductSteps.getProductsStep;
-import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
-import static kitchenpos.fixture.ProductFixture.NAME_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.PRICE_20000;
-import static kitchenpos.fixture.ProductFixture.PRICE_18000;
+import static kitchenpos.fixture.ProductFixture.이름_양념치킨;
+import static kitchenpos.fixture.ProductFixture.이름_후라이드치킨;
+import static kitchenpos.fixture.ProductFixture.가격_20000;
+import static kitchenpos.fixture.ProductFixture.가격_18000;
 import static kitchenpos.fixture.ProductFixture.productChangePriceRequest;
 import static kitchenpos.fixture.ProductFixture.productCreateRequest;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +31,7 @@ class ProductAcceptanceTest {
     @Test
     void createProduct() {
         // given
-        Product request = productCreateRequest(NAME_양념치킨, PRICE_20000);
+        Product request = productCreateRequest(이름_양념치킨, 가격_20000);
 
         // when
         ExtractableResponse<Response> response = createProductStep(request);
@@ -40,8 +40,8 @@ class ProductAcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(response.jsonPath().getString("id")).isNotNull(),
-                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(NAME_양념치킨),
-                () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(PRICE_20000)
+                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(이름_양념치킨),
+                () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(가격_20000)
         );
     }
 
@@ -49,8 +49,8 @@ class ProductAcceptanceTest {
     @Test
     void changePrice() {
         //given
-        UUID productId = createProductId(NAME_양념치킨, PRICE_20000);
-        Product request = productChangePriceRequest(PRICE_18000);
+        UUID productId = createProductId(이름_양념치킨, 가격_20000);
+        Product request = productChangePriceRequest(가격_18000);
 
         // when
         ExtractableResponse<Response> response = changePriceStep(productId, request);
@@ -58,8 +58,8 @@ class ProductAcceptanceTest {
         //then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(NAME_양념치킨),
-                () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(PRICE_18000)
+                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(이름_양념치킨),
+                () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(가격_18000)
         );
     }
 
@@ -67,8 +67,8 @@ class ProductAcceptanceTest {
     @Test
     void getProducts() {
         //given
-        UUID PRODUCT_양념치킨 = createProductId(NAME_양념치킨, PRICE_20000);
-        UUID PRODUCT_후라이드치킨_ID = createProductId(NAME_후라이드치킨, PRICE_18000);
+        UUID PRODUCT_양념치킨 = createProductId(이름_양념치킨, 가격_20000);
+        UUID PRODUCT_후라이드치킨_ID = createProductId(이름_후라이드치킨, 가격_18000);
 
         // when
         ExtractableResponse<Response> response = getProductsStep();
@@ -79,9 +79,9 @@ class ProductAcceptanceTest {
                 () -> assertThat(response.jsonPath().getList("id", UUID.class))
                         .containsExactly(PRODUCT_양념치킨, PRODUCT_후라이드치킨_ID),
                 () -> assertThat(response.jsonPath().getList("name"))
-                        .containsExactly(NAME_양념치킨, NAME_후라이드치킨),
+                        .containsExactly(이름_양념치킨, 이름_후라이드치킨),
                 () -> assertThat(response.jsonPath().getList("price"))
-                        .containsExactly(PRICE_20000.floatValue(), PRICE_18000.floatValue())
+                        .containsExactly(가격_20000.floatValue(), 가격_18000.floatValue())
         );
     }
 
