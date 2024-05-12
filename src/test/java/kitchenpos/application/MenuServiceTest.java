@@ -110,7 +110,7 @@ class MenuServiceTest {
 		@ParameterizedTest
 		@NullSource
 		@ValueSource(strings = {"-1"})
-		@DisplayName("메뉴 생성 시 가격이 null이거나 0미만이면 IllegalArgumentException 발생")
+		@DisplayName("메뉴 생성 시 가격이 null이거나 0미만이면 메뉴를 생성할 수 없다")
 		void testCreateMenuWithInvalidPrice(BigDecimal price) {
 			// given
 			validMenu.setPrice(price);
@@ -124,7 +124,7 @@ class MenuServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 생성 시 메뉴 그룹 ID가 존재하지 않으면 NoSuchElementException 발생")
+		@DisplayName("메뉴 생성 시 메뉴 그룹 ID가 존재하지 않으면 메뉴를 생성할 수 없다")
 		void testCreateMenuWithNonexistentMenuGroup() {
 			// given
 			when(menuGroupRepository.findById(any())).thenReturn(Optional.empty());
@@ -139,7 +139,7 @@ class MenuServiceTest {
 
 		@ParameterizedTest
 		@NullAndEmptySource
-		@DisplayName("메뉴 생성 시 메뉴 상품 목록이 null이거나 비어있으면 IllegalArgumentException 발생")
+		@DisplayName("메뉴 생성 시 메뉴 상품 목록이 null이거나 비어있으면 메뉴를 생성할 수 없다")
 		void testCreateMenuWithNoMenuProducts(List<MenuProduct> menuProducts) {
 			// given
 			validMenu.setMenuProducts(menuProducts);
@@ -153,7 +153,7 @@ class MenuServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 생성 시 제공된 상품 ID의 수와 상품 목록의 수가 일치하지 않으면 IllegalArgumentException 발생")
+		@DisplayName("메뉴 생성 시 제공된 상품 ID의 수와 상품 목록의 수가 일치하지 않으면 메뉴를 생성할 수 없다")
 		void testCreateMenuWithMismatchedProducts() {
 			// given
 			when(productRepository.findAllByIdIn(List.of(validProductId))).thenReturn(
@@ -168,7 +168,7 @@ class MenuServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 생성 시 상품의 수량이 음수인 경우 IllegalArgumentException 발생")
+		@DisplayName("메뉴 생성 시 상품의 수량이 음수인 경우 메뉴를 생성할 수 없다")
 		void testCreateMenuWithNegativeQuantity() {
 			// given
 			validMenuProduct.setQuantity(-1);
@@ -182,7 +182,7 @@ class MenuServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 생성 시 상품 ID로 상품을 조회하지 못하는 경우 IllegalArgumentException 발생")
+		@DisplayName("메뉴 생성 시 상품 ID로 상품을 조회하지 못하는 경우 메뉴를 생성할 수 없다")
 		void testCreateMenuWithInvalidProductId() {
 			// given
 			when(productRepository.findById(validProductId)).thenReturn(Optional.empty());
@@ -196,7 +196,7 @@ class MenuServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 생성 시 메뉴 가격이 상품 가격 총합보다 클 때 IllegalArgumentException 발생")
+		@DisplayName("메뉴 생성 시 메뉴 가격이 상품 가격 총합보다 클 때 메뉴를 생성할 수 없다")
 		void testCreateMenuWithExcessivePrice() {
 			// given
 			BigDecimal excessivePrice = validProduct.getPrice().multiply(new BigDecimal("10"));
@@ -212,7 +212,7 @@ class MenuServiceTest {
 
 		@ParameterizedTest
 		@MethodSource("provideInvalidProductNamesForMenuCreation")
-		@DisplayName("메뉴 생성 시 이름 null 이거나 비속어가 포함되어 있으면 IllegalArgumentException 발생")
+		@DisplayName("메뉴 생성 시 이름 null 이거나 비속어가 포함되어 있으면 메뉴를 생성할 수 없다")
 		void testCreateMenuWithInvalidProductNames(BigDecimal price, String name) {
 			// given
 			validMenu.setPrice(price);
@@ -237,7 +237,7 @@ class MenuServiceTest {
 
 		@ParameterizedTest
 		@MethodSource("provideValidProductPricesAndNamesForMenuCreation")
-		@DisplayName("메뉴 생성 성공 케이스")
+		@DisplayName("메뉴를 정상적으로 생성할 수 있다")
 		void testCreateMenuWithValidProductPricesAndNames(BigDecimal price, String name) {
 			// given
 			validMenu.setPrice(price);
@@ -265,7 +265,7 @@ class MenuServiceTest {
 		@ParameterizedTest
 		@NullSource
 		@ValueSource(strings = {"-1", "-100.0"})
-		@DisplayName("메뉴 가격 변경 시 가격이 null이거나 0미만인 경우 IllegalArgumentException 발생")
+		@DisplayName("메뉴 가격 변경 시 가격이 null이거나 0미만인 경우 메뉴 가격을 변경할 수 없다")
 		void testChangePriceWithInvalidPrice(BigDecimal price) {
 			// given
 			lenient().when(menuRepository.findById(validMenuId)).thenReturn(Optional.of(validMenu));
@@ -279,7 +279,7 @@ class MenuServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 가격 변경 시 해당 메뉴 ID가 존재하지 않을 경우 NoSuchElementException 발생")
+		@DisplayName("메뉴 가격 변경 시 해당 메뉴 ID가 존재하지 않을 경우 메뉴 가격을 변경할 수 없다")
 		void testChangePriceWithNonexistentMenu() {
 			// given
 			UUID nonexistentMenuId = UUID.randomUUID();
@@ -294,8 +294,8 @@ class MenuServiceTest {
 		}
 
 		@ParameterizedTest
-		@ValueSource(strings = {"17.99", "100.00"}) // Assuming validMenu's sum of product prices is 17.99
-		@DisplayName("메뉴 가격 변경 시 변경 가격이 상품 가격 총합보다 클 때 IllegalArgumentException 발생")
+		@ValueSource(strings = {"17.99", "100.00"})
+		@DisplayName("메뉴 가격 변경 시 변경 가격이 상품 가격 총합보다 클 때 메뉴 가격을 변경할 수 없다")
 		void testChangePriceWithExcessivePrice(BigDecimal price) {
 			// given
 			when(menuRepository.findById(validMenuId)).thenReturn(Optional.of(validMenu));
@@ -310,7 +310,7 @@ class MenuServiceTest {
 
 		@ParameterizedTest
 		@ValueSource(strings = {"15.00", "17.98"})
-		@DisplayName("메뉴 가격 변경 시 변경 가격이 상품 가격 총합보다 작거나 같을 때 메뉴 가격이 성공적으로 변경됨")
+		@DisplayName("메뉴 가격 변경 시 변경 가격이 상품 가격 총합보다 작거나 같을 때 메뉴 가격을 변경할 수 있다")
 		void testChangePriceWithValidPrice(BigDecimal price) {
 			// given
 			Menu requestMenu = buildRequestMenu(price);
@@ -341,7 +341,7 @@ class MenuServiceTest {
 	@Nested
 	class display {
 		@Test
-		@DisplayName("메뉴 노출 시 메뉴가 조회되지 않을 경우 NoSuchElementException 발생")
+		@DisplayName("메뉴 노출 시 메뉴가 조회되지 않을 경우 메뉴 노출을 할 수 없다")
 		void testDisplayMenuWithNonexistentMenu() {
 			// given
 			UUID nonexistentMenuId = UUID.randomUUID();
@@ -357,7 +357,7 @@ class MenuServiceTest {
 
 		@ParameterizedTest
 		@ValueSource(strings = {"17.99", "18.00", "22.00"})
-		@DisplayName("메뉴 노출 시 메뉴 가격이 상품 가격 총합보다 크면 IllegalStateException 발생")
+		@DisplayName("메뉴 노출 시 메뉴 가격이 상품 가격 총합보다 크면 메뉴 노출을 할 수 없다")
 		void testDisplayMenuWithExcessivePrice(BigDecimal price) {
 			// given
 			validMenu.setPrice(price);
@@ -373,7 +373,7 @@ class MenuServiceTest {
 
 		@ParameterizedTest
 		@ValueSource(strings = {"12.34", "17.98"})
-		@DisplayName("메뉴 노출 시 메뉴 가격이 상품 가격 총합과 같거나 작으면 메뉴가 성공적으로 표시됨")
+		@DisplayName("메뉴 노출 시 메뉴 가격이 상품 가격 총합과 같거나 작으면 메뉴를 노출을 할 수 있다")
 		void testDisplayMenuSuccessfully(BigDecimal price) {
 			// given
 			validMenu.setPrice(price);
@@ -391,7 +391,7 @@ class MenuServiceTest {
 	@Nested
 	class hide {
 		@Test
-		@DisplayName("메뉴 숨기기 시 메뉴가 조회되지 않을 경우 NoSuchElementException 발생")
+		@DisplayName("메뉴 숨김 처리 시 메뉴가 조회되지 않을 경우 메뉴 숨김 처리를 할 수 없다")
 		void testHideMenuWithNonexistentMenu() {
 			// given
 			UUID nonexistentMenuId = UUID.randomUUID();
@@ -406,7 +406,7 @@ class MenuServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 숨기기 시 메뉴가 성공적으로 숨겨짐")
+		@DisplayName("메뉴 숨김 처리를 할 수 있다")
 		void testHideMenuSuccessfully() {
 			// given
 			when(menuRepository.findById(validMenuId)).thenReturn(Optional.of(validMenu));
@@ -423,7 +423,7 @@ class MenuServiceTest {
 	@Nested
 	class findAll {
 		@Test
-		@DisplayName("메뉴 데이터가 저장되어 있지 않은 경우 모든 메뉴 조회 시 조회가 불가능하다")
+		@DisplayName("메뉴 데이터가 저장되어 있지 않은 경우 모든 메뉴 조회가 불가능하다")
 		void findAllMenusWhenNotEmpty() {
 			// given
 			when(menuRepository.findAll()).thenReturn(Collections.emptyList());
@@ -436,7 +436,7 @@ class MenuServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 데이터가 저장되어 있는 경우 모든 메뉴 조회 시 조회가 가능하다")
+		@DisplayName("메뉴 데이터가 저장되어 있는 경우 모든 메뉴 조회가 가능하다")
 		void findAllMenusWhenEmpty() {
 			// given
 			when(menuRepository.findAll()).thenReturn(List.of(validMenu));
