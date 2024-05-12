@@ -11,6 +11,7 @@ public record MenuFixture() {
 
     public static Menu newOne() {
         var menu = new Menu();
+        menu.setId(UUID.randomUUID());
         menu.setName("양념치킨");
         menu.setPrice(BigDecimal.valueOf(5000));
         menu.setMenuGroup(MenuGroupFixture.newOne("신메뉴"));

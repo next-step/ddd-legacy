@@ -9,23 +9,28 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.NullSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+
 @DisplayName("주문테이블(OrderTable) 서비스 테스트")
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
 
-    @Autowired
+    @Mock
     private OrderTableRepository orderTableRepository;
 
-    @Autowired
+    @Mock
     private OrderRepository orderRepository;
 
     private OrderTableService orderTableService;
@@ -60,6 +65,7 @@ class OrderTableServiceTest {
         void createTest() {
             // given
             var orderTable = OrderTableFixture.newOne("1번 테이블");
+            given(orderTableRepository.save(any())).willReturn(orderTable);
 
             // when
             var actual = orderTableService.create(orderTable);
@@ -95,10 +101,10 @@ class OrderTableServiceTest {
         void sitTest() {
             // given
             var orderTable = OrderTableFixture.newOne("1번 테이블");
-            var savedOrderTable = orderTableRepository.save(orderTable);
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
             // when
-            var actual = orderTableService.sit(savedOrderTable.getId());
+            var actual = orderTableService.sit(orderTable.getId());
 
             // then
             Assertions.assertThat(actual.isOccupied()).isTrue();
@@ -110,6 +116,52 @@ class OrderTableServiceTest {
             // when & then
             Assertions.assertThatThrownBy(() -> orderTableService.sit(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
+        }
+    }
+
+    @DisplayName("주문 테이블을 초기화할 때,")
+    @Nested
+    class Clear {
+
+        @DisplayName("좌석에 앉은 손님 수는 0명이 되고, 좌석의 상태는 '미사용중'으로 변경 된다.")
+        @Test
+        void sitTest() {
+            // given
+            var id = UUID.randomUUID();
+            var orderTable = OrderTableFixture.newOne(id, "1번 테이블", 4, true);
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+            given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
+
+            // when
+            var actual = orderTableService.clear(id);
+
+            // then
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(actual.getNumberOfGuests()).isZero();
+                softly.assertThat(actual.isOccupied()).isFalse();
+            });
+        }
+
+        @DisplayName("[예외] 존재하지 않는 좌석일 경우 예외가 발생한다.")
+        @Test
+        void notFoundSitExceptionTest() {
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderTableService.clear(UUID.randomUUID()))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("[예외] 주문 상태가 '완료'가 아닐 경우 예외가 발생한다.")
+        @Test
+        void notCompletedExceptionTest() {
+            // given
+            var id = UUID.randomUUID();
+            var orderTable = OrderTableFixture.newOne("1번 테이블");
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+            given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderTableService.clear(id))
+                    .isInstanceOf(IllegalStateException.class);
         }
     }
 }
