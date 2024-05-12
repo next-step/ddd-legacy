@@ -68,7 +68,7 @@ class MenuGroupServiceTest {
 
 			// then
 			assertThat(created).isNotNull();
-			assertThat(created.getName()).isEqualTo("점심 특선");
+			assertThat(created.getName()).isEqualTo(menuGroup.getName());
 			assertThat(created.getId()).isNotNull();
 		}
 	}
@@ -99,7 +99,7 @@ class MenuGroupServiceTest {
 
 			// then
 			assertThat(foundMenuGroups).isNotEmpty();
-			assertThat(foundMenuGroups.get(0).getName()).isEqualTo("점심 특선");
+			assertThat(foundMenuGroups.get(0).getName()).isEqualTo(menuGroup.getName());
 		}
 	}
 }
