@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.OrderTable;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,33 @@ class OrderTableServiceTest {
 
     @Nested
     class clearTest {
+        @DisplayName("좌석을 비울 수 있다.")
+        @Test
+        void clearTest() {
+            OrderTable orderTable = createOrderTable("1번");
+            orderTable = orderTableService.create(orderTable);
+            orderTable = orderTableService.sit(orderTable.getId());
+
+            orderTable = orderTableService.clear(orderTable.getId());
+
+            assertThat(orderTable.isOccupied()).isFalse();
+        }
+
+        @Disabled("TODO: Order Fixtures를 생성하여 완료된 주문을 생성하고 테스트를 진행해야 합니다.")
+        @DisplayName("좌석에 완료된 주문이 없는 경우 예외가 발생한다.")
+        @Test
+        void clearFailWhenNotExistCompletedOrderTest() {
+            OrderTable orderTable = createOrderTable("1번");
+            orderTable = orderTableService.create(orderTable);
+            orderTable = orderTableService.sit(orderTable.getId());
+
+            // TODO: Order Fixtures를 생성하여 완료되지 않은 주문을 생성해야 합니다.
+            
+            UUID orderTableId = orderTable.getId();
+
+            assertThatThrownBy(() -> orderTableService.clear(orderTableId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     @Nested
