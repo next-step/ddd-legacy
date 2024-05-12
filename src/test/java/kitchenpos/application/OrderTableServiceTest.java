@@ -75,7 +75,7 @@ class OrderTableServiceTest {
 	@Nested
 	class sit {
 		@Test
-		@DisplayName("주문 테이블에 손님이 앉을 때 존재하지 않는 테이블 ID로 요청하면 NoSuchElementException이 발생한다")
+		@DisplayName("주문 테이블을 사용 중 상태로 변경 시 존재하지 않는 주문 테이블 ID로 요청하면 NoSuchElementException이 발생한다")
 		void sitWithNonExistentTable() {
 			// given
 			UUID nonExistentId = UUID.randomUUID();
@@ -90,7 +90,7 @@ class OrderTableServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 테이블에 손님이 앉을 때 존재하는 테이블 ID로 요청하면 테이블 상태가 사용 중으로 정상적으로 변경된다")
+		@DisplayName("주문 테이블을 사용 중 상태로 변경 시 존재하는 테이블 ID로 요청하면 테이블 상태가 사용 중으로 정상적으로 변경된다")
 		void sitSuccessfully() {
 			// given
 			UUID existingId = UUID.randomUUID();
@@ -109,7 +109,7 @@ class OrderTableServiceTest {
 	@Nested
 	class clear {
 		@Test
-		@DisplayName("주문 테이블을 정리할 때 존재하지 않는 테이블 ID로 요청하면 NoSuchElementException이 발생한다")
+		@DisplayName("주문 테이블을 사용 가능 상태로 변경 시 존재하지 않는 테이블 ID로 요청하면 NoSuchElementException이 발생한다")
 		void clearWithNonExistentTable() {
 			// given
 			UUID nonExistentId = UUID.randomUUID();
@@ -124,7 +124,7 @@ class OrderTableServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 테이블을 정리할 때 주문 상태가 완료되지 않은 경우 IllegalStateException이 발생한다")
+		@DisplayName("주문 테이블을 사용 가능 상태로 변경 시 완료되지 않은 주문이 존재하는 경우 IllegalStateException이 발생한다")
 		void clearWithIncompleteOrders() {
 			// given
 			UUID existingId = UUID.randomUUID();
