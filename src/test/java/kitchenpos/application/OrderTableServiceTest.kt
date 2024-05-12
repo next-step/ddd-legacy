@@ -1,6 +1,5 @@
 package kitchenpos.application
 
-import io.kotest.assertions.nondeterministic.eventually
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -8,7 +7,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.justRun
 import kitchenpos.domain.OrderRepository
 import kitchenpos.domain.OrderTable
 import kitchenpos.domain.OrderTableRepository
@@ -18,7 +16,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullAndEmptySource
-import java.util.UUID
+import java.util.*
 
 @ExtendWith(MockKExtension::class)
 internal class OrderTableServiceTest {
@@ -67,6 +65,39 @@ internal class OrderTableServiceTest {
             result.name shouldBe request.name
             result.numberOfGuests shouldBe 0
             result.isOccupied shouldBe false
+        }
+    }
+
+    @Nested
+    inner class `테이블 앉기 테스트` {
+        @DisplayName("존재하지 않는 id 라면, NoSuchElementException 예외 처리한다.")
+        @Test
+        fun test1() {
+            // given
+            val orderTableId = UUID.randomUUID()
+
+            every { orderTableRepository.findById(any()) } returns Optional.empty()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                orderTableService.sit(orderTableId)
+            }
+        }
+
+        @DisplayName("정상적인 요청이라면, 테이블 점유 상태가 된다.")
+        @Test
+        fun test2() {
+            // given
+            val orderTableId = UUID.randomUUID()
+            val orderTable = OrderTable()
+
+            every { orderTableRepository.findById(any()) } returns Optional.of(orderTable)
+
+            // when
+            val result = orderTableService.sit(orderTableId)
+
+            // then
+            result.isOccupied shouldBe true
         }
     }
 }
