@@ -10,12 +10,12 @@ public class Delimiter {
         this.delimiter = delimiter;
     }
 
-    public void addDelimiter(String delimiter) {
-        this.delimiter = this.delimiter + "|" + delimiter;
+    public Delimiter addDelimiter(String delimiter) {
+        return new Delimiter(this.delimiter + "|" + delimiter);
     }
 
-    public String[] split(SplitTargetText text) {
-        return text.split(delimiter);
+    public String delimiter() {
+        return delimiter;
     }
 
     @Override

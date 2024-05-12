@@ -26,6 +26,6 @@ class SplitTargetTextTest {
     void SplitTargetText를_구분자로_분리한다(String text) {
         SplitTargetText splitTargetText = new SplitTargetText(text);
 
-        assertThat(splitTargetText.split(",|;")).contains("가", "나", "다");
+        assertThat(splitTargetText.split(new Delimiter(",|;"))).contains("가", "나", "다");
     }
 }

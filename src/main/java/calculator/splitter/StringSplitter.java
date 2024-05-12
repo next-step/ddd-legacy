@@ -10,7 +10,7 @@ public class StringSplitter implements Splitter<String> {
     private static final int DELIMITER_GROUP = 1;
     private static final int TARGET_TEXT_GROUP = 2;
 
-    private final Delimiter delimiter;
+    private Delimiter delimiter;
 
     public StringSplitter() {
         this.delimiter = new Delimiter(DEFAULT_DELIMITER);
@@ -20,11 +20,10 @@ public class StringSplitter implements Splitter<String> {
         SplitTargetText targetText = new SplitTargetText(target);
         Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(target);
         if (matcher.find()) {
-            delimiter.addDelimiter(matcher.group(DELIMITER_GROUP));
+            delimiter = delimiter.addDelimiter(matcher.group(DELIMITER_GROUP));
             targetText = new SplitTargetText(matcher.group(TARGET_TEXT_GROUP));
-            return delimiter.split(targetText);
         }
 
-        return delimiter.split(targetText);
+        return targetText.split(delimiter);
     }
 }
