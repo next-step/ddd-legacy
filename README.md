@@ -377,8 +377,14 @@ stateDiagram-v2
     >   - 테스트마다 **랜덤한 포트**가 할당되어 애플리케이션이 실행됩니다.
     >   - 동시에 여러 개의 테스트를 실행할 때 포트 충돌이 발생하는 것을 방지할 수 있습니다.
     >   - 테스트가 시작될 때마다 포트가 동적으로 할당되므로, 실행 중인 애플리케이션의 실제 포트는 테스트코드에서 알 수 없습니다.
-  - [ ] `@Profiles`와 `@ActiveProfiles`에 대해 알아보기. 
-  - [ ] profiles를 test로 설정한 의도
+  - [x] `@Profiles`와 `@ActiveProfiles`에 대해 알아보기.
+    - `@Profiles` 와 `@ActiveProfiles`는 둘다 application-{profile}.properties 파일에 의해 환경설정을 해줄 수 있습니다.
+      - 그래서 해당 프로파일의 환경에 따라 스프링 컨테이너가 실행됩니다. 
+      - 둘의 차이점으로는 `@ActiveProfiles`는 ApplicationContext 통합 테스트를 위해 로드할 떄 활성화되는 profile 정하는 어노테이션 입니다.
+      - 반면 `@Profiles`는 현재의 profile에 따라 실행시키는데, 이 어노테이션은 클래스와 메서드에 사용 가능합니다.
+    - [x] profiles를 test로 설정한 의도
+      - 실무에서 데이터 격리를 하긴 하지만, 개발환경의 DB와도 연관성을 끊고 싶어 의식적으로 설정하였었습니다.
+      - 여기에서는 따로 DB분리를 하진 않았지만, test에 따른 설정이 필요할 것이라 생각 이 들었습니다.
   - [ ] `@TestConfiguration` 알아보기
   - [ ] `@DisplayNameGeneration`에 대해 알아보기.
   - [ ] `@Nested`
