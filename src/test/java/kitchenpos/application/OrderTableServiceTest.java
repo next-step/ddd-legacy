@@ -10,6 +10,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
@@ -145,5 +146,19 @@ class OrderTableServiceTest {
 
     @Nested
     class findAllTest {
+        @DisplayName("주문 테이블 목록을 조회한다.")
+        @Test
+        void findAllSuccessTest() {
+            OrderTable orderTable = createOrderTable("1번");
+            orderTable = orderTableService.create(orderTable);
+
+            List<OrderTable> orderTables = orderTableService.findAll();
+            List<UUID> orderTableIds = orderTables.stream()
+                    .map(OrderTable::getId)
+                    .toList();
+
+            assertThat(orderTableService.findAll()).hasSize(1);
+            assertThat(orderTableIds).contains(orderTable.getId());
+        }
     }
 }
