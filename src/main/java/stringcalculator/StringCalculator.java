@@ -13,8 +13,6 @@ public class StringCalculator {
         StringCalculatorTokenParser parser = new StringCalculatorTokenParser();
         List<NonNegativeInteger> nonNegativeIntegers = parser.getIntegerTokens(text);
 
-        return nonNegativeIntegers.stream()
-                .mapToInt(NonNegativeInteger::getInteger)
-                .sum();
+        return NonNegativeInteger.sum(nonNegativeIntegers).getInteger();
     }
 }

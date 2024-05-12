@@ -1,5 +1,7 @@
 package stringcalculator;
 
+import java.util.List;
+
 public class NonNegativeInteger {
     private static final int INTEGER_ZERO = 0;
     private static final String NEGATIVE_ERROR_MESSAGE = "Negative integer found: ";
@@ -20,6 +22,14 @@ public class NonNegativeInteger {
         } catch (NumberFormatException e) {
             throw new RuntimeException(NON_INTEGER_ERROR_MESSAGE + token);
         }
+    }
+
+    public static NonNegativeInteger sum(List<NonNegativeInteger> nonNegativeIntegers) {
+        int total = INTEGER_ZERO;
+        for (NonNegativeInteger integer : nonNegativeIntegers) {
+            total += integer.getInteger();
+        }
+        return new NonNegativeInteger(total);
     }
 
     public int getInteger() {
