@@ -77,7 +77,7 @@ class ProductServiceTest {
         void throwIfNameContainsProfanity() {
             // given
             Product request = ProductFixture.상품_생성("ㅅㅂ", new BigDecimal(10_000L));
-            given(purgomalumClient.containsProfanity(request.getName())).willReturn(true);
+            given(purgomalumClient.containsProfanity(any())).willReturn(true);
 
             // when & then
             Assertions.assertThatThrownBy(() -> productService.create(request))
@@ -89,7 +89,7 @@ class ProductServiceTest {
         void createProduct() {
             // given
             Product request = ProductFixture.기본_상품();
-            given(purgomalumClient.containsProfanity(request.getName())).willReturn(false);
+            given(purgomalumClient.containsProfanity(any())).willReturn(false);
             given(productRepository.save(any())).willReturn(new Product());
 
             // when & then
@@ -131,8 +131,8 @@ class ProductServiceTest {
             MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(request, 1L);
             Menu menu = MenuFixture.메뉴_생성(BigDecimal.valueOf(20_000L), List.of(menuProduct));
 
-            given(productRepository.findById(request.getId())).willReturn(Optional.of(request));
-            given(menuRepository.findAllByProductId(request.getId())).willReturn(List.of(menu));
+            given(productRepository.findById(any())).willReturn(Optional.of(request));
+            given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
 
             // when
             productService.changePrice(request.getId(), request);
@@ -149,8 +149,8 @@ class ProductServiceTest {
             MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(request, 1L);
             Menu menu = MenuFixture.메뉴_생성(BigDecimal.valueOf(10_000L), List.of(menuProduct));
 
-            given(productRepository.findById(request.getId())).willReturn(Optional.of(request));
-            given(menuRepository.findAllByProductId(request.getId())).willReturn(List.of(menu));
+            given(productRepository.findById(any())).willReturn(Optional.of(request));
+            given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
 
             // when & then
             productService.changePrice(request.getId(), request);

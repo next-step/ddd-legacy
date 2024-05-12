@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
@@ -69,7 +70,7 @@ class OrderTableServiceTest {
         void throwIfOrderTableNotFound() {
             // given
             OrderTable request = OrderFixture.주문_테이블_생성();
-            given(orderTableRepository.findById(request.getId())).willReturn(Optional.empty());
+            given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderTableService.sit(request.getId()))
@@ -81,7 +82,7 @@ class OrderTableServiceTest {
         void sitOrderTable() {
             // given
             OrderTable request = OrderFixture.주문_테이블_생성();
-            given(orderTableRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(request));
 
             // when & then
             orderTableService.sit(request.getId());
@@ -96,7 +97,7 @@ class OrderTableServiceTest {
         void throwIfOrderTableNotFound() {
             // given
             OrderTable request = OrderFixture.주문_테이블_생성();
-            given(orderTableRepository.findById(request.getId())).willReturn(Optional.empty());
+            given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderTableService.clear(request.getId()))
@@ -108,7 +109,7 @@ class OrderTableServiceTest {
         void throwIfOrderExists() {
             // given
             OrderTable request = OrderFixture.주문_테이블_생성();
-            given(orderTableRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(request));
             given(orderRepository.existsByOrderTableAndStatusNot(request, OrderStatus.COMPLETED)).willReturn(true);
 
             // when & then
@@ -124,7 +125,7 @@ class OrderTableServiceTest {
             request.setNumberOfGuests(10);
             request.setOccupied(true);
 
-            given(orderTableRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(request));
             given(orderRepository.existsByOrderTableAndStatusNot(request, OrderStatus.COMPLETED)).willReturn(false);
 
             // when
@@ -159,7 +160,7 @@ class OrderTableServiceTest {
             request.setNumberOfGuests(10);
             request.setOccupied(false);
 
-            given(orderTableRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(request));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(request.getId(), request))
@@ -174,7 +175,7 @@ class OrderTableServiceTest {
             request.setNumberOfGuests(10);
             request.setOccupied(true);
 
-            given(orderTableRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(request));
 
             // when
             orderTableService.changeNumberOfGuests(request.getId(), request);

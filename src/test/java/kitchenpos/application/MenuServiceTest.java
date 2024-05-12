@@ -86,7 +86,7 @@ class MenuServiceTest {
         void shouldThrowExceptionIfMenuHasNoProducts(List<MenuProduct> menuProducts) {
             // given
             Menu request = MenuFixture.메뉴_생성(menuProducts);
-            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(request.getMenuGroup()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(request.getMenuGroup()));
 
             // when & then
             Assertions.assertThatThrownBy(() -> menuService.create(request))
@@ -98,7 +98,7 @@ class MenuServiceTest {
         void shouldThrowExceptionIfAnyProductDoesNotExist() {
             // given
             Menu request = MenuFixture.기본_메뉴();
-            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(request.getMenuGroup()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(request.getMenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of());
 
             // when & then
@@ -114,7 +114,7 @@ class MenuServiceTest {
             MenuProduct 수량이_0_미만인_메뉴_상품 = MenuProductFixture.메뉴_상품_생성(product, -1L);
             Menu request = MenuFixture.메뉴_생성(List.of(수량이_0_미만인_메뉴_상품));
 
-            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(request.getMenuGroup()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(request.getMenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
 
             // when & then
@@ -130,9 +130,9 @@ class MenuServiceTest {
             MenuProduct 메뉴_상품 = MenuProductFixture.메뉴_상품_생성(만원짜리_상품, 1L);
             Menu request = MenuFixture.메뉴_생성(BigDecimal.valueOf(20_000L), List.of(메뉴_상품));
 
-            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(request.getMenuGroup()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(request.getMenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(만원짜리_상품));
-            given(productRepository.findById(만원짜리_상품.getId())).willReturn(Optional.of(만원짜리_상품));
+            given(productRepository.findById(any())).willReturn(Optional.of(만원짜리_상품));
 
             // when & then
             Assertions.assertThatThrownBy(() -> menuService.create(request))
@@ -147,7 +147,7 @@ class MenuServiceTest {
             Menu request = MenuFixture.메뉴_생성(name);
             Product product = ProductFixture.기본_상품();
 
-            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(request.getMenuGroup()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(request.getMenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
             given(productRepository.findById(any())).willReturn(Optional.of(product));
 
@@ -163,7 +163,7 @@ class MenuServiceTest {
             Menu request = MenuFixture.기본_메뉴();
             Product product = ProductFixture.기본_상품();
 
-            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(request.getMenuGroup()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(request.getMenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
             given(productRepository.findById(any())).willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(any())).willReturn(true);
@@ -180,7 +180,7 @@ class MenuServiceTest {
             Menu request = MenuFixture.기본_메뉴();
             Product product = ProductFixture.기본_상품();
 
-            given(menuGroupRepository.findById(request.getMenuGroupId())).willReturn(Optional.of(request.getMenuGroup()));
+            given(menuGroupRepository.findById(any())).willReturn(Optional.of(request.getMenuGroup()));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
             given(productRepository.findById(any())).willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(any())).willReturn(false);
@@ -222,7 +222,7 @@ class MenuServiceTest {
         @DisplayName("변경하려는 메뉴가 존재하지 않으면 예외가 발생한다.")
         void shouldThrowExceptionWhenChangingPriceOfNonexistentMenu() {
             Menu request = MenuFixture.기본_메뉴();
-            given(menuRepository.findById(request.getId())).willReturn(Optional.empty());
+            given(menuRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(() -> menuService.changePrice(request.getId(), request))
@@ -237,7 +237,7 @@ class MenuServiceTest {
             MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(만원짜리_상품, 1L);
             Menu 삼만원짜리_메뉴 = MenuFixture.메뉴_생성(BigDecimal.valueOf(30_000L), List.of(menuProduct));
 
-            given(menuRepository.findById(삼만원짜리_메뉴.getId())).willReturn(Optional.of(삼만원짜리_메뉴));
+            given(menuRepository.findById(any())).willReturn(Optional.of(삼만원짜리_메뉴));
 
             // when & then
             Assertions.assertThatThrownBy(() -> menuService.changePrice(삼만원짜리_메뉴.getId(), 삼만원짜리_메뉴))
@@ -252,7 +252,7 @@ class MenuServiceTest {
             MenuProduct menuProduct = MenuProductFixture.메뉴_상품_생성(만원짜리_상품, 1L);
             Menu 만원짜리_메뉴 = MenuFixture.메뉴_생성(BigDecimal.valueOf(10_000L), List.of(menuProduct));
 
-            given(menuRepository.findById(만원짜리_메뉴.getId())).willReturn(Optional.of(만원짜리_메뉴));
+            given(menuRepository.findById(any())).willReturn(Optional.of(만원짜리_메뉴));
 
             // when
             menuService.changePrice(만원짜리_메뉴.getId(), 만원짜리_메뉴);
@@ -271,7 +271,7 @@ class MenuServiceTest {
         void shouldThrowExceptionWhenDisplayingNonexistentMenu() {
             // given
             Menu request = MenuFixture.기본_메뉴();
-            given(menuRepository.findById(request.getId())).willReturn(Optional.empty());
+            given(menuRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(() -> menuService.display(request.getId()))
@@ -286,7 +286,7 @@ class MenuServiceTest {
             MenuProduct 메뉴_상품 = MenuProductFixture.메뉴_상품_생성(만원짜리_상품, 1L);
             Menu 삼만원짜리_메뉴 = MenuFixture.메뉴_생성(BigDecimal.valueOf(30_000L), List.of(메뉴_상품));
 
-            given(menuRepository.findById(삼만원짜리_메뉴.getId())).willReturn(Optional.of(삼만원짜리_메뉴));
+            given(menuRepository.findById(any())).willReturn(Optional.of(삼만원짜리_메뉴));
 
             // when & then
             Assertions.assertThatThrownBy(() -> menuService.display(삼만원짜리_메뉴.getId()))
@@ -301,7 +301,7 @@ class MenuServiceTest {
             MenuProduct 메뉴_상품 = MenuProductFixture.메뉴_상품_생성(만원짜리_상품, 1L);
             Menu 만원짜리_메뉴 = MenuFixture.메뉴_생성(BigDecimal.valueOf(10_000L), List.of(메뉴_상품));
 
-            given(menuRepository.findById(만원짜리_메뉴.getId())).willReturn(Optional.of(만원짜리_메뉴));
+            given(menuRepository.findById(any())).willReturn(Optional.of(만원짜리_메뉴));
 
             // when
             menuService.display(만원짜리_메뉴.getId());
@@ -320,7 +320,7 @@ class MenuServiceTest {
         void shouldThrowExceptionWhenHidingNonexistentMenu() {
             // given
             Menu request = MenuFixture.기본_메뉴();
-            given(menuRepository.findById(request.getId())).willReturn(Optional.empty());
+            given(menuRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(() -> menuService.hide(request.getId()))
@@ -332,7 +332,7 @@ class MenuServiceTest {
         void shouldSuccessfullyHideMenu() {
             // given
             Menu request = MenuFixture.기본_메뉴();
-            given(menuRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(menuRepository.findById(any())).willReturn(Optional.of(request));
 
             // when
             menuService.hide(request.getId());

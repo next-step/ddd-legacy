@@ -79,8 +79,7 @@ class OrderServiceTest {
                 OrderFixture.주문_항목_생성(기본_메뉴.getId())
             ));
 
-            given(menuRepository.findAllByIdIn(any()))
-                .willReturn(List.of(기본_메뉴));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(기본_메뉴));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.create(request))
@@ -96,8 +95,7 @@ class OrderServiceTest {
                 OrderFixture.주문_항목_생성(기본_메뉴.getId(), -1L)
             ));
 
-            given(menuRepository.findAllByIdIn(any()))
-                .willReturn(List.of(기본_메뉴));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(기본_메뉴));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.create(request))
@@ -113,8 +111,7 @@ class OrderServiceTest {
                 OrderFixture.주문_항목_생성(기본_메뉴.getId())
             ));
 
-            given(menuRepository.findAllByIdIn(any()))
-                .willReturn(List.of(기본_메뉴));
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(기본_메뉴));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.create(request))
@@ -132,7 +129,7 @@ class OrderServiceTest {
             ));
 
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(기본_메뉴));
-            given(menuRepository.findById(기본_메뉴.getId())).willReturn(Optional.of(기본_메뉴));
+            given(menuRepository.findById(any())).willReturn(Optional.of(기본_메뉴));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.create(request))
@@ -291,7 +288,7 @@ class OrderServiceTest {
         void shouldThrowExceptionWhenAcceptingNonexistentOrder() {
             // given
             Order request = OrderFixture.주문_생성(OrderType.EAT_IN);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.empty());
+            given(orderRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.accept(request.getId()))
@@ -304,7 +301,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.EAT_IN);
             request.setStatus(OrderStatus.COMPLETED);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.accept(request.getId()))
@@ -320,7 +317,7 @@ class OrderServiceTest {
             Order request = OrderFixture.주문_생성(OrderType.DELIVERY, List.of(orderLineItem));
             request.setStatus(OrderStatus.WAITING);
 
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when
             orderService.accept(request.getId());
@@ -335,7 +332,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.EAT_IN);
             request.setStatus(OrderStatus.WAITING);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when
             Order result = orderService.accept(request.getId());
@@ -350,7 +347,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.TAKEOUT);
             request.setStatus(OrderStatus.WAITING);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when
             Order result = orderService.accept(request.getId());
@@ -368,7 +365,7 @@ class OrderServiceTest {
             Order request = OrderFixture.주문_생성(OrderType.DELIVERY, List.of(orderLineItem));
             request.setStatus(OrderStatus.WAITING);
 
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when
             orderService.accept(request.getId());
@@ -387,7 +384,7 @@ class OrderServiceTest {
         void shouldThrowExceptionWhenServingNonexistentOrder() {
             // given
             Order request = OrderFixture.주문_생성(OrderType.EAT_IN);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.empty());
+            given(orderRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.serve(request.getId()))
@@ -400,7 +397,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.EAT_IN);
             request.setStatus(OrderStatus.COMPLETED);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.serve(request.getId()))
@@ -413,7 +410,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.EAT_IN);
             request.setStatus(OrderStatus.ACCEPTED);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when
             Order result = orderService.serve(request.getId());
@@ -433,7 +430,7 @@ class OrderServiceTest {
         void shouldThrowExceptionWhenStartingDeliveryForNonexistentOrder() {
             // given
             Order request = OrderFixture.주문_생성(OrderType.DELIVERY);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.empty());
+            given(orderRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.startDelivery(request.getId()))
@@ -446,7 +443,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.EAT_IN);
             request.setStatus(OrderStatus.SERVED);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.startDelivery(request.getId()))
@@ -459,7 +456,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.DELIVERY);
             request.setStatus(OrderStatus.COMPLETED);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.startDelivery(request.getId()))
@@ -472,7 +469,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.DELIVERY);
             request.setStatus(OrderStatus.SERVED);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when
             Order result = orderService.startDelivery(request.getId());
@@ -492,7 +489,7 @@ class OrderServiceTest {
         void shouldThrowExceptionWhenCompletingDeliveryForNonexistentOrder() {
             // given
             Order request = OrderFixture.주문_생성(OrderType.DELIVERY);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.empty());
+            given(orderRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.completeDelivery(request.getId()))
@@ -505,7 +502,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.DELIVERY);
             request.setStatus(OrderStatus.COMPLETED);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.completeDelivery(request.getId()))
@@ -518,7 +515,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.DELIVERY);
             request.setStatus(OrderStatus.DELIVERING);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when
             Order result = orderService.completeDelivery(request.getId());
@@ -537,7 +534,7 @@ class OrderServiceTest {
         void shouldThrowExceptionWhenCompletingNonexistentOrder() {
             // given
             Order request = OrderFixture.주문_생성(OrderType.EAT_IN);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.empty());
+            given(orderRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.complete(request.getId()))
@@ -550,7 +547,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.DELIVERY);
             request.setStatus(OrderStatus.SERVED);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.complete(request.getId()))
@@ -564,7 +561,7 @@ class OrderServiceTest {
             // given
             Order request = OrderFixture.주문_생성(OrderType.TAKEOUT);
             request.setStatus(OrderStatus.ACCEPTED);
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
 
             // when & then
             Assertions.assertThatThrownBy(() -> orderService.complete(request.getId()))
@@ -582,7 +579,7 @@ class OrderServiceTest {
             request.setOrderTable(orderTable);
             request.setStatus(OrderStatus.SERVED);
 
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
             given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).willReturn(true);
 
             // when
@@ -605,7 +602,7 @@ class OrderServiceTest {
             request.setOrderTable(orderTable);
             request.setStatus(OrderStatus.SERVED);
 
-            given(orderRepository.findById(request.getId())).willReturn(Optional.of(request));
+            given(orderRepository.findById(any())).willReturn(Optional.of(request));
             given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).willReturn(false);
 
             // when
