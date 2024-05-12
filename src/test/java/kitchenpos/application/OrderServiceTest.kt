@@ -634,7 +634,7 @@ internal class OrderServiceTest {
 
         @DisplayName("요청이 정상이라면, 배달 시작 상태로 변경한다.")
         @Test
-        fun test4(){
+        fun test4() {
             // given
             val orderId = UUID.randomUUID()
             val order = Order().apply {
