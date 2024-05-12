@@ -11,7 +11,8 @@ public class ProductTestFixture {
         Product product = new Product();
         product.setId(UUID.randomUUID());
         product.setName(name);
-        product.setPrice(BigDecimal.valueOf(price));
+        BigDecimal decimalPrice = price == null ? null : BigDecimal.valueOf(price);
+        product.setPrice(decimalPrice);
         return product;
     }
 
@@ -22,6 +23,4 @@ public class ProductTestFixture {
         product.setPrice(BigDecimal.valueOf(price));
         return product;
     }
-
-
 }
