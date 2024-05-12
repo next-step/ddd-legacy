@@ -427,10 +427,4 @@ class MenuServiceTest {
                     () -> menuService.hide(id));
         }
     }
-
-    @Nested
-    @DisplayName("메뉴를 조회 할 수 있다.")
-    class search {
-    }
-
 }
