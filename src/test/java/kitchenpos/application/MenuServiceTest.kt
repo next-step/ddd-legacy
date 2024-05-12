@@ -21,7 +21,7 @@ import java.math.BigDecimal
 import java.util.*
 
 @ExtendWith(MockKExtension::class)
-class MenuServiceTest {
+internal class MenuServiceTest {
     @MockK
     private lateinit var menuRepository: MenuRepository
 
