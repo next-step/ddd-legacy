@@ -353,8 +353,9 @@ stateDiagram-v2
 
 ---
 
-[🚀 3단계 - 테스트를 통한 코드 보호]
+## [🚀 3단계 - 테스트를 통한 코드 보호]
 
+### 요구사항
 - 정리한 키친포스의 요구 사항을 토대로 테스트 코드를 작성한다.
   - [x] 모든 Business Object에 대한 테스트 코드를 작성한다. - 목록반환은 몇 개 제외하였습니다.
     - [x] `@ExtendWith(MockitoExtension.class)`를 이용한 단위 테스트 코드를 작성한다.
@@ -366,3 +367,14 @@ stateDiagram-v2
       - [x] Database Test 격리
   - [x] 기능 별 테스트
     - 위의 요구사항 보면서 체크하기.
+
+  ####  리뷰 내용 반영
+  - [ ] `DEFINED_PORT` VS `RANDOM_PORT` 알아보고 `RANDOM_PORT` 적용해보기.
+  - [ ] `@Profiles`와 `@ActiveProfiles`에 대해 알아보기. 
+  - [ ] profiles를 test로 설정한 의도
+  - [ ] `@TestConfiguration` 알아보기
+  - [ ] `@DisplayNameGeneration`에 대해 알아보기.
+  - [ ] `@Nested`
+  - [ ] `containsExactly()`, `containsOnly()`
+  - [ ] 인수테스트의 목적
+  - [ ] 한글 변수 사용 및 가독성 체크해보기
