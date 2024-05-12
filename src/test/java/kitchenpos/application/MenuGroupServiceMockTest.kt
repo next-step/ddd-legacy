@@ -8,10 +8,10 @@ import kitchenpos.domain.MenuGroup
 import kitchenpos.domain.MenuGroupRepository
 import org.junit.jupiter.api.assertThrows
 
-class MenuGroupServiceMockTest : BehaviorSpec({
-    val menuGroupRepository = mockk<MenuGroupRepository>()
-    val menuGroupService = MenuGroupService(menuGroupRepository)
+private val menuGroupRepository = mockk<MenuGroupRepository>()
+private val menuGroupService = MenuGroupService(menuGroupRepository)
 
+class MenuGroupServiceMockTest : BehaviorSpec({
     given("메뉴 그룹을 생성할 때") {
         `when`("이름이 null 이면") {
             val newMenuGroup = MenuGroup().apply { name = null }
@@ -36,7 +36,7 @@ class MenuGroupServiceMockTest : BehaviorSpec({
 
     given("메뉴 그룹을 조회할 떄") {
         `when`("메뉴 그룹이 존재하지 않으면") {
-            every { menuGroupRepository.findAll() } returns emptyList()
+            every { menuGroupRepository.findAll() } returns mutableListOf()
 
             then("빈 목록을 반환한다.") {
                 val results = menuGroupService.findAll()
