@@ -1,5 +1,10 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +20,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.createMenu;
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
+import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -25,6 +33,12 @@ class ProductServiceTest {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private MenuRepository menuRepository;
+
+    @Autowired
+    private MenuGroupRepository menuGroupRepository;
 
     @MockBean
     private PurgomalumClient purgomalumClient;
@@ -119,6 +133,27 @@ class ProductServiceTest {
 
             assertThatThrownBy(() -> productService.changePrice(productId, changeProduct))
                     .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("상품이 존재하는 메뉴에서 가격 변경 시 메뉴의 상품이 더 높은 경우 메뉴의 displayed가 false로 변경된다.")
+        @Test
+        void changePriceFailWhenMenuPriceIsHigherThanProductPriceTest() {
+            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000));
+            product = productService.create(product);
+
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            MenuGroup menuGroup = createMenuGroup(UUID.randomUUID(), "치킨 메뉴");
+            menuGroup = menuGroupRepository.save(menuGroup);
+            Menu menu = createMenu(menuGroup, "후라이드 치킨 세트", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            menu = menuRepository.save(menu);
+            product.setPrice(BigDecimal.valueOf(15000));
+
+            assertThat(menu.isDisplayed()).isTrue();
+
+            productService.changePrice(product.getId(), product);
+            menu = menuRepository.findById(menu.getId()).get();
+
+            assertThat(menu.isDisplayed()).isFalse();
         }
     }
 
