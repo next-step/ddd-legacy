@@ -578,4 +578,77 @@ internal class OrderServiceTest {
             result.status shouldBe OrderStatus.SERVED
         }
     }
+
+    @Nested
+    inner class `배달 시작 테스트` {
+        @DisplayName("존재하지 않는 주문 id 라면, NoSuchElementException 예외 처리를 한다.")
+        @Test
+        fun test1() {
+            // given
+            val orderId = UUID.randomUUID()
+
+            every { orderRepository.findById(any()) } returns Optional.empty()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                orderService.startDelivery(orderId)
+            }
+        }
+
+        @DisplayName("주문 유형이 배달이 아니라면, IllegalStateException 예외 처리를 한다.")
+        @ParameterizedTest
+        @CsvSource("TAKEOUT", "EAT_IN")
+        fun test2(type: OrderType) {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.type = type
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                orderService.startDelivery(orderId)
+            }
+        }
+
+        @DisplayName("주문 상태가 서빙 상태가 아니라면, IllegalStateException 예외 처리를 한다.")
+        @ParameterizedTest
+        @CsvSource("WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED")
+        fun test3(status: OrderStatus) {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.type = OrderType.DELIVERY
+                this.status = status
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                orderService.startDelivery(orderId)
+            }
+        }
+
+        @DisplayName("요청이 정상이라면, 배달 시작 상태로 변경한다.")
+        @Test
+        fun test4(){
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.type = OrderType.DELIVERY
+                this.status = OrderStatus.SERVED
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+
+            // when
+            val result = orderService.startDelivery(orderId)
+
+            // then
+            result.status shouldBe OrderStatus.DELIVERING
+        }
+    }
 }
