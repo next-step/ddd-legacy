@@ -14,6 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
     @InjectMocks
@@ -44,8 +47,12 @@ class MenuGroupServiceTest {
             // given
             MenuGroup request = MenuFixture.기본_메뉴_그룹();
 
-            // when & then
+            // when
+            when(menuGroupRepository.save(any())).thenReturn(request);
             menuGroupService.create(request);
+
+            // then
+            verify(menuGroupRepository, times(1)).save(any());
         }
     }
 

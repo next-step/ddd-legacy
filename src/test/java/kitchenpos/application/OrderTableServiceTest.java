@@ -21,6 +21,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
@@ -57,8 +58,12 @@ class OrderTableServiceTest {
             // given
             OrderTable request = OrderFixture.주문_테이블_생성();
 
-            // when & then
+            // when
+            when(orderTableRepository.save(any())).thenReturn(request);
             orderTableService.create(request);
+
+            // then
+            verify(orderTableRepository, times(1)).save(any());
         }
     }
 
@@ -84,8 +89,11 @@ class OrderTableServiceTest {
             OrderTable request = OrderFixture.주문_테이블_생성();
             given(orderTableRepository.findById(any())).willReturn(Optional.of(request));
 
-            // when & then
+            // when
             orderTableService.sit(request.getId());
+
+            // then
+            Assertions.assertThat(request.isOccupied()).isTrue();
         }
     }
 

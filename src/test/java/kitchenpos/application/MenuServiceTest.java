@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
@@ -185,8 +186,12 @@ class MenuServiceTest {
             given(productRepository.findById(any())).willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(any())).willReturn(false);
 
-            // when & then
+            // when
+            when(menuRepository.save(any())).thenReturn(request);
             menuService.create(request);
+
+            // then
+            verify(menuRepository, times(1)).save(any());
         }
     }
 

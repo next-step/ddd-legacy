@@ -20,6 +20,7 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
@@ -92,8 +93,12 @@ class ProductServiceTest {
             given(purgomalumClient.containsProfanity(any())).willReturn(false);
             given(productRepository.save(any())).willReturn(new Product());
 
-            // when & then
+            // when
+            when(productRepository.save(any())).thenReturn(request);
             productService.create(request);
+
+            // then
+            verify(productRepository, times(1)).save(any());
         }
     }
 
