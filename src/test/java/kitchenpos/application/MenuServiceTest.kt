@@ -6,13 +6,12 @@ import io.mockk.mockk
 import kitchenpos.domain.FakeMenuGroupRepository
 import kitchenpos.domain.FakeMenuRepository
 import kitchenpos.domain.FakeProductRepository
-import kitchenpos.domain.Menu
-import kitchenpos.domain.MenuGroup
-import kitchenpos.domain.MenuProduct
-import kitchenpos.domain.Product
+import kitchenpos.dsl.groupName
+import kitchenpos.dsl.menu
+import kitchenpos.dsl.price
+import kitchenpos.dsl.products
 import kitchenpos.infra.PurgomalumClient
 import java.math.BigDecimal
-import java.util.UUID
 
 private val menuRepository = FakeMenuRepository()
 private val menuGroupRepository = FakeMenuGroupRepository()
@@ -22,28 +21,16 @@ private val purgomalumClient = mockk<PurgomalumClient>()
 private val menuService = MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient)
 
 private fun createMenu() =
-    Menu()
-        .apply {
-            name = "후라이드 치킨"
-            price = BigDecimal(16000)
-            menuGroupId = UUID.randomUUID()
-            menuProducts = listOf(MenuProduct())
+    menu("치킨 커플 셋트", 16000) {
+        groupName("추천 메뉴")
+        products {
+            "치킨1" price 16000 seq 1
+            "치킨1" price 16000 seq 1
         }
-        .also {
-            menuGroupRepository.save(
-                MenuGroup().apply {
-                    id = it.menuGroupId
-                    name = "치킨"
-                }
-            )
-            productRepository.save(
-                Product().apply {
-                    id = it.menuProducts[0].productId
-                    name = "후라이드 치킨"
-                    price = BigDecimal(16000)
-                }
-            )
-        }
+    }.also {
+        menuGroupRepository.save(it.menuGroup)
+        it.menuProducts.forEach { productRepository.save(it.product) }
+    }
 
 class MenuServiceTest : BehaviorSpec({
     given("메뉴를 생성할 때") {

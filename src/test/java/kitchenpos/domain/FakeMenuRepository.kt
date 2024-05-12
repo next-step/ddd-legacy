@@ -3,27 +3,16 @@ package kitchenpos.domain
 import java.util.Optional
 import java.util.UUID
 
-class FakeMenuRepository : MenuRepository {
-    private val menus = mutableListOf<Menu>()
-
-    override fun <S : Menu?> save(entity: S): S {
-        entity?.let { menus.add(it) }
-        return entity
-    }
-
-    override fun findById(id: UUID?): Optional<Menu>? {
-        return menus.find { it.id == id }?.let { Optional.of(it) } ?: Optional.empty()
-    }
-
-    override fun findAll(): MutableList<Menu> {
-        return menus
-    }
-
+class FakeMenuRepository : InMemoryRepository<Menu>(), MenuRepository {
     override fun findAllByIdIn(ids: MutableList<UUID>?): MutableList<Menu> {
-        return menus.filter { it.id in (ids ?: emptyList()) }.toMutableList()
+        return items.filter { it.id in (ids ?: emptyList()) }.toMutableList()
     }
 
     override fun findAllByProductId(productId: UUID?): MutableList<Menu> {
-        return menus.filter { menu -> menu.menuProducts.any { it.productId == productId } }.toMutableList()
+        return items.filter { menu -> menu.menuProducts.any { it.productId == productId } }.toMutableList()
+    }
+
+    override fun findById(id: UUID): Optional<Menu>? {
+        return items.find { it.id == id }?.let { Optional.of(it) } ?: Optional.empty()
     }
 }
