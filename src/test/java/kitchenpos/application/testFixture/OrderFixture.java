@@ -1,8 +1,6 @@
 package kitchenpos.application.testFixture;
 
-import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,6 +17,18 @@ public record OrderFixture() {
         order.setStatus(orderStatus);
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(List.of(OrderLineItemFixture.newOne()));
+        order.setDeliveryAddress("");
+        order.setOrderTable(orderTable);
+        return order;
+    }
+
+    public static Order newOneEatIn(OrderTable orderTable, List<OrderLineItem> orderLineItems) {
+        var order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(EAT_IN);
+        order.setStatus(OrderStatus.WAITING);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderLineItems(orderLineItems);
         order.setDeliveryAddress("");
         order.setOrderTable(orderTable);
         return order;
@@ -48,6 +58,15 @@ public record OrderFixture() {
         return order;
     }
 
+    public static Order newOneDelivery(String deliveryAddress, List<OrderLineItem> orderLineItems) {
+        var order = new Order();
+        order.setStatus(OrderStatus.WAITING);
+        order.setType(DELIVERY);
+        order.setDeliveryAddress(deliveryAddress);
+        order.setOrderLineItems(orderLineItems);
+        return order;
+    }
+
     public static Order newOneTakeOut(OrderStatus orderStatus) {
         var order = new Order();
         order.setId(UUID.randomUUID());
@@ -55,6 +74,42 @@ public record OrderFixture() {
         order.setStatus(orderStatus);
         order.setOrderDateTime(LocalDateTime.now());
         order.setOrderLineItems(List.of(OrderLineItemFixture.newOne()));
+        order.setDeliveryAddress("");
+        order.setOrderTable(null);
+        return order;
+    }
+
+    public static Order newOneTakeOut(OrderStatus orderStatus, List<OrderLineItem> orderLineItems) {
+        var order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(TAKEOUT);
+        order.setStatus(orderStatus);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderLineItems(orderLineItems);
+        order.setDeliveryAddress(null);
+        order.setOrderTable(null);
+        return order;
+    }
+
+    public static Order newOne(OrderType orderType) {
+        var order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setStatus(OrderStatus.WAITING);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderLineItems(List.of(OrderLineItemFixture.newOne()));
+        order.setDeliveryAddress("");
+        order.setOrderTable(null);
+        return order;
+    }
+
+    public static Order newOne(OrderType orderType, List<OrderLineItem> orderLineItems) {
+        var order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(orderType);
+        order.setStatus(OrderStatus.WAITING);
+        order.setOrderDateTime(LocalDateTime.now());
+        order.setOrderLineItems(orderLineItems);
         order.setDeliveryAddress("");
         order.setOrderTable(null);
         return order;

@@ -20,6 +20,17 @@ public record MenuFixture() {
         return menu;
     }
 
+    public static Menu newOne(boolean isDisplay) {
+        var menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName("양념치킨");
+        menu.setPrice(BigDecimal.valueOf(5000));
+        menu.setMenuGroup(MenuGroupFixture.newOne("신메뉴"));
+        menu.setDisplayed(isDisplay);
+        menu.setMenuProducts(List.of(MenuProductFixture.newOne()));
+        return menu;
+    }
+
     public static Menu newOne(UUID id) {
         var menu = new Menu();
         menu.setId(id);

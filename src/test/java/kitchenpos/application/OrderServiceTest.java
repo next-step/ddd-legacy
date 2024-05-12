@@ -1,6 +1,8 @@
 package kitchenpos.application;
 
+import kitchenpos.application.testFixture.MenuFixture;
 import kitchenpos.application.testFixture.OrderFixture;
+import kitchenpos.application.testFixture.OrderLineItemFixture;
 import kitchenpos.application.testFixture.OrderTableFixture;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
@@ -12,14 +14,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static kitchenpos.domain.OrderStatus.*;
@@ -54,8 +56,241 @@ class OrderServiceTest {
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
-    @Test
-    void create() {
+    @Nested
+    @DisplayName("주문을 생성시,")
+    class Create {
+
+        static Stream<Arguments> negativeQuantity() {
+            return Stream.of(
+                    Arguments.arguments(OrderFixture.newOne(DELIVERY, List.of(OrderLineItemFixture.newOne(-1))), DELIVERY),
+                    Arguments.arguments(OrderFixture.newOne(TAKEOUT, List.of(OrderLineItemFixture.newOne(-1))), TAKEOUT)
+            );
+        }
+
+        static Stream<Arguments> notFoundMenus() {
+            return Stream.of(
+                    Arguments.arguments(OrderFixture.newOne(DELIVERY, List.of(OrderLineItemFixture.newOne())), DELIVERY),
+                    Arguments.arguments(OrderFixture.newOne(EAT_IN, List.of(OrderLineItemFixture.newOne())), EAT_IN),
+                    Arguments.arguments(OrderFixture.newOne(TAKEOUT, List.of(OrderLineItemFixture.newOne())), TAKEOUT)
+            );
+        }
+
+        static Stream<Arguments> notFoundOrderLineItems() {
+            return Stream.of(
+                    Arguments.arguments(DELIVERY, null),
+                    Arguments.arguments(EAT_IN, Collections.emptyList()),
+                    Arguments.arguments(TAKEOUT, null)
+            );
+        }
+
+        @Test
+        @DisplayName("매장 내 주문은 정상 생성된다.")
+        void eatInOrderCreatedTest() {
+            // given
+            var menu = MenuFixture.newOne();
+            var orderTable = OrderTableFixture.newOne(UUID.randomUUID(), "1번테이블", 4, true);
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            var order = OrderFixture.newOneEatIn(orderTable, orderLineItems);
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+            given(orderRepository.save(any())).willReturn(order);
+
+            // when
+            var actual = orderService.create(order);
+
+            // then
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(actual.getOrderTable()).isEqualTo(orderTable);
+                softly.assertThat(actual.getType()).isEqualTo(EAT_IN);
+                softly.assertThat(actual.getStatus()).isEqualTo(WAITING);
+                softly.assertThat(actual.getOrderLineItems()).isEqualTo(orderLineItems);
+            });
+        }
+
+        @Test
+        @DisplayName("배달 주문이 생성된다.")
+        void deliveryOrderCreatedTest() {
+            // given
+            var menu = MenuFixture.newOne();
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            var deliveryAddress = "강남 테헤란로 1126-31";
+            var order = OrderFixture.newOneDelivery(deliveryAddress, orderLineItems);
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            given(orderRepository.save(any())).willReturn(order);
+
+            // when
+            var actual = orderService.create(order);
+
+            // then
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(actual.getType()).isEqualTo(DELIVERY);
+                softly.assertThat(actual.getStatus()).isEqualTo(WAITING);
+                softly.assertThat(actual.getOrderLineItems()).isEqualTo(orderLineItems);
+                softly.assertThat(actual.getDeliveryAddress()).isEqualTo(deliveryAddress);
+            });
+        }
+
+        @Test
+        @DisplayName("포장 주문이 생성된다.")
+        void takeOutOrderCreatedTest() {
+            // given
+            var menu = MenuFixture.newOne();
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            var order = OrderFixture.newOneTakeOut(WAITING, orderLineItems);
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            given(orderRepository.save(any())).willReturn(order);
+
+            // when
+            var actual = orderService.create(order);
+
+            // then
+            SoftAssertions.assertSoftly(softly -> {
+                softly.assertThat(actual.getType()).isEqualTo(TAKEOUT);
+                softly.assertThat(actual.getStatus()).isEqualTo(WAITING);
+                softly.assertThat(actual.getOrderLineItems()).isEqualTo(orderLineItems);
+            });
+        }
+
+        @Test
+        @DisplayName("[예외] 매장 내 주문일 경우 테이블의 상태는 '미사용중'이면 예외가 발생한다.")
+        void notOccupiedExceptionTest() {
+            // given
+            var menu = MenuFixture.newOne();
+            var orderTable = OrderTableFixture.newOne(UUID.randomUUID(), "1번테이블", 4, false);
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            var order = OrderFixture.newOneEatIn(orderTable, orderLineItems);
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+
+            // when & then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] 매장 내 주문일 경우, 주문 테이블이 존재하지 않으면 예외가 발생한다.")
+        void notFoundOrderTableExceptionTest() {
+            // given
+            var menu = MenuFixture.newOne();
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            var order = OrderFixture.newOneEatIn(null, orderLineItems);
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+            // when & then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @ParameterizedTest
+        @DisplayName("[예외] 배달 주문일 경우 주소가 존재하지 않으면 예외가 발생한다.")
+        @NullSource
+        @EmptySource
+        void notExistDeliveryAddressExceptionTest(String deliveryAddress) {
+            // given
+            var menu = MenuFixture.newOne();
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            var order = OrderFixture.newOneDelivery(deliveryAddress, orderLineItems);
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+            // when & then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] 주문 아이템 가격의 총합이 메뉴의 가격과 다를 경우 예외가 발생한다.")
+        void orderLineItemTotalPriceNotEqualsMenuPriceExceptionTest() {
+            // given
+            var menu = MenuFixture.newOne(BigDecimal.valueOf(5000));
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 6000));
+            var order = OrderFixture.newOne(DELIVERY, orderLineItems);
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+            // when & then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] 주문 아이템의 메뉴가 비노출되어 있을 경우 예외가 발생한다.")
+        void notFoundMenuExceptionTest() {
+            // given
+            var menu = MenuFixture.newOne(false);
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu));
+            var order = OrderFixture.newOne(DELIVERY, orderLineItems);
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+            // when & then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] 주문 아이템의 메뉴가 비노출되어 있을 경우 예외가 발생한다.")
+        void notDisplayedExceptionTest() {
+            // given
+            var menu = MenuFixture.newOne(false);
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu));
+            var order = OrderFixture.newOne(DELIVERY, orderLineItems);
+            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
+            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+
+            // when & then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @ParameterizedTest(name = "{1}")
+        @MethodSource("negativeQuantity")
+        @DisplayName("[예외]배달주문, 포장 주문일 경우 주문 수량이 음수이면 예외가 발생한다.")
+        void negativeQuantityExceptionTest(Order order, OrderType orderType) {
+            // when & then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @ParameterizedTest(name = "{1}")
+        @MethodSource("notFoundMenus")
+        @DisplayName("[예외] 주문 아이템 중 하나라도 메뉴가 존재하지 않으면 예외가 발생한다.")
+        void notFoundMenusExceptionTest(Order order, OrderType orderType) {
+            // given
+            given(menuRepository.findAllByIdIn(any())).willReturn(Collections.emptyList());
+
+            // when & then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @ParameterizedTest(name = "{0}")
+        @MethodSource("notFoundOrderLineItems")
+        @DisplayName("[예외] 주문 아이템이 존재하지 않을 경우 예외가 발생한다.")
+        void notFoundOrderLineItemsExceptionTest(OrderType orderType, List<OrderLineItem> orderLineItems) {
+            // given
+            var order = OrderFixture.newOne(orderType, orderLineItems);
+
+            // when & then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] 주문 타입이 존재하지 않을 경우 예외가 발생한다.")
+        void nullOrderTypeExceptionTest() {
+            // given
+            var order = OrderFixture.newOne((OrderType) null);
+
+            // when & then
+            assertThatThrownBy(() -> orderService.create(order))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
     }
 
     @Nested
