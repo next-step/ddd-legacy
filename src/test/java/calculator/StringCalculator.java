@@ -22,6 +22,13 @@ public class StringCalculator {
 			target = m.group(2);
 		}
 		String regex = String.join("|", delimiterList);
-		return Arrays.stream(target.split(regex)).mapToInt(Integer::parseInt).sum();
+		return Arrays.stream(target.split(regex)).mapToInt(StringCalculator::parseToInt).sum();
+	}
+
+	static int parseToInt(String text) {
+		if (Integer.parseInt(text) < 0) {
+			throw new RuntimeException();
+		}
+		return Integer.parseInt(text);
 	}
 }
