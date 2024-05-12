@@ -527,4 +527,55 @@ internal class OrderServiceTest {
             result.status shouldBe OrderStatus.ACCEPTED
         }
     }
+
+    @Nested
+    inner class `주문 서빙 테스트` {
+        @DisplayName("존재하지 않는 주문 id 라면, NoSuchElementException 예외 처리를 한다.")
+        @Test
+        fun test1() {
+            // given
+            val orderId = UUID.randomUUID()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                orderService.serve(orderId)
+            }
+        }
+
+        @DisplayName("주문 상태가 수락 상태가 아니라면, IllegalStateException 예외 처리를 한다.")
+        @ParameterizedTest
+        @CsvSource("WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED")
+        fun test2(status: OrderStatus) {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.status = status
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                orderService.serve(orderId)
+            }
+        }
+
+        @DisplayName("정상 요청이라면, 주문을 서빙 상태로 만든다.")
+        @Test
+        fun test3() {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.status = OrderStatus.ACCEPTED
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+
+            // when
+            val result = orderService.serve(orderId)
+
+            // then
+            result.status shouldBe OrderStatus.SERVED
+        }
+    }
 }
