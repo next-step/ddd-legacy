@@ -1,0 +1,438 @@
+package kitchenpos.application
+
+import io.kotest.assertions.throwables.shouldThrowExactly
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.mockk.every
+import io.mockk.impl.annotations.InjectMockKs
+import io.mockk.impl.annotations.MockK
+import io.mockk.junit5.MockKExtension
+import kitchenpos.domain.*
+import kitchenpos.infra.KitchenridersClient
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
+import java.math.BigDecimal
+import java.time.LocalDateTime
+import java.util.*
+
+@ExtendWith(MockKExtension::class)
+internal class OrderServiceTest {
+    @MockK
+    private lateinit var orderRepository: OrderRepository
+
+    @MockK
+    private lateinit var menuRepository: MenuRepository
+
+    @MockK
+    private lateinit var orderTableRepository: OrderTableRepository
+
+    @MockK
+    private lateinit var kitchenridersClient: KitchenridersClient
+
+    @InjectMockKs
+    private lateinit var orderService: OrderService
+
+    @Nested
+    inner class `주문 생성 테스트` {
+        @DisplayName("타입 정보가 없다면, IllegalArgumentException 예외 처리를 한다.")
+        @Test
+        fun test1() {
+            // given
+            val request = Order().apply {
+                this.type = null
+            }
+
+            // when & then
+            shouldThrowExactly<IllegalArgumentException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("주문 메뉴 정보가 없다면, IllegalArgumentException 예외 처리를 한다.")
+        @Test
+        fun test2() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.DELIVERY
+                this.orderLineItems = null
+            }
+
+            // when & then
+            shouldThrowExactly<IllegalArgumentException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("주문 메뉴 정보가 비어있다면, IllegalArgumentException 예외 처리를 한다.")
+        @Test
+        fun test3() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.DELIVERY
+                this.orderLineItems = emptyList()
+            }
+
+            // when & then
+            shouldThrowExactly<IllegalArgumentException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("주문 메뉴의 메뉴 개수와 실제 주문 메뉴의 개수가 다르다면, IllegalArgumentException 예외 처리를 한다.")
+        @Test
+        fun test4() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.DELIVERY
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                })
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(Menu(), Menu())
+
+            // when & then
+            shouldThrowExactly<IllegalArgumentException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("주문 유형이 배달일 때, 주문 메뉴의 요청 개수가 음수보다 작으면, IllegalStateException 예외 처리를 한다.")
+        @Test
+        fun test5() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.DELIVERY
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = -1
+                })
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(Menu())
+
+            // when & then
+            shouldThrowExactly<IllegalArgumentException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("주문 유형이 포장일 때, 주문 메뉴의 요청 개수가 음수보다 작으면, IllegalStateException 예외 처리를 한다.")
+        @Test
+        fun test6() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.TAKEOUT
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = -1
+                })
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(Menu())
+
+            // when & then
+            shouldThrowExactly<IllegalArgumentException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("주문 메뉴의 메뉴 id가 존재하지 않은 메뉴라면, NoSuchElementException 예외 처리를 한다.")
+        @Test
+        fun test7() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.EAT_IN
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = 1
+                })
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(Menu())
+            every { menuRepository.findById(any()) } returns Optional.empty()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("메뉴가 노출되지 않는 상태라면, IllegalStateException 예외 처리를 한다.")
+        @Test
+        fun test8() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.EAT_IN
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = 1
+                })
+            }
+
+            val menu = Menu().apply {
+                this.isDisplayed = false
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("메뉴의 가격이 요청한 주문 메뉴의 가격과 같지 않다면, IllegalArgumentException 예외 처리를 한다.")
+        @Test
+        fun test9() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.EAT_IN
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = 1
+                    this.price = BigDecimal.ONE
+                })
+            }
+
+            val menu = Menu().apply {
+                this.isDisplayed = true
+                this.price = BigDecimal.TWO
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+
+            // when & then
+            shouldThrowExactly<IllegalArgumentException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("주문 유형이 배달 타입일 때, 주소 정보가 없다면, IllegalArgumentException 처리를 한다.")
+        @Test
+        fun test10() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.DELIVERY
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = 1
+                    this.price = BigDecimal.ONE
+                })
+                this.deliveryAddress = null
+            }
+
+            val menu = Menu().apply {
+                this.isDisplayed = true
+                this.price = BigDecimal.ONE
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+
+            // when & then
+            shouldThrowExactly<IllegalArgumentException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("주문 유형이 배달 타입일 때, 정상 요청이라면 주문이 생성된다.")
+        @Test
+        fun test11() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.DELIVERY
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = 1
+                    this.price = BigDecimal.ONE
+                })
+                this.deliveryAddress = "주소"
+            }
+
+            val menu = Menu().apply {
+                this.isDisplayed = true
+                this.price = BigDecimal.ONE
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+            every { orderRepository.save(any()) } returns request.apply {
+                this.status = OrderStatus.WAITING
+                this.id = UUID.randomUUID()
+                this.orderDateTime = LocalDateTime.now()
+                this.orderLineItems = request.orderLineItems
+            }
+
+            // when
+            val result = orderService.create(request)
+
+            // then
+            result.type shouldBe request.type
+            result.status shouldBe OrderStatus.WAITING
+            result.id shouldNotBe null
+            result.orderDateTime shouldNotBe null
+            result.orderLineItems shouldNotBe null
+            result.orderLineItems[0].menuId shouldBe request.orderLineItems[0].menuId
+            result.orderLineItems[0].quantity shouldBe request.orderLineItems[0].quantity
+            result.orderLineItems[0].price shouldBe request.orderLineItems[0].price
+            result.deliveryAddress shouldBe request.deliveryAddress
+        }
+
+        @DisplayName("주문 유형이 매장 내 식사일 때, 테이블 id가 존재하지 않는다면, NoSuchElementException 처리를 한다.")
+        @Test
+        fun test12() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.EAT_IN
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = 1
+                    this.price = BigDecimal.ONE
+                })
+                this.deliveryAddress = null
+                this.orderTableId = null
+            }
+
+            val menu = Menu().apply {
+                this.isDisplayed = true
+                this.price = BigDecimal.ONE
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+            every { orderTableRepository.findById(any()) } returns Optional.empty()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("주문 유형이 매장 내 식사일 때, 해당 테이블이 점유 상태가 아니라면, IllegalStateException 처리를 한다.")
+        @Test
+        fun test13() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.EAT_IN
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = 1
+                    this.price = BigDecimal.ONE
+                })
+                this.deliveryAddress = null
+                this.orderTableId = null
+            }
+
+            val menu = Menu().apply {
+                this.isDisplayed = true
+                this.price = BigDecimal.ONE
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+            every { orderTableRepository.findById(any()) } returns Optional.of(OrderTable().apply {
+                this.isOccupied = false
+            })
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                orderService.create(request)
+            }
+        }
+
+        @DisplayName("주문 유형이 매장 내 식사일 때, 정상 요청이라면 주문이 생성된다.")
+        @Test
+        fun test14() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.EAT_IN
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = 1
+                    this.price = BigDecimal.ONE
+                })
+            }
+
+            val menu = Menu().apply {
+                this.isDisplayed = true
+                this.price = BigDecimal.ONE
+            }
+
+            val orderTable = OrderTable().apply {
+                this.isOccupied = true
+            }
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+            every { orderTableRepository.findById(any()) } returns Optional.of(orderTable)
+            every { orderRepository.save(any()) } returns request.apply {
+                this.status = OrderStatus.WAITING
+                this.id = UUID.randomUUID()
+                this.orderDateTime = LocalDateTime.now()
+                this.orderLineItems = request.orderLineItems
+                this.orderTable = orderTable
+            }
+
+            // when
+            val result = orderService.create(request)
+
+            // then
+            result.type shouldBe request.type
+            result.status shouldBe OrderStatus.WAITING
+            result.id shouldNotBe null
+            result.orderDateTime shouldNotBe null
+            result.orderLineItems shouldNotBe null
+            result.orderLineItems[0].menuId shouldBe request.orderLineItems[0].menuId
+            result.orderLineItems[0].quantity shouldBe request.orderLineItems[0].quantity
+            result.orderLineItems[0].price shouldBe request.orderLineItems[0].price
+            result.orderTable.isOccupied shouldBe orderTable.isOccupied
+        }
+
+        @DisplayName("주문 유형이 포장일 때, 정상 요청이라면 주문이 생성된다.")
+        @Test
+        fun test15() {
+            // given
+            val request = Order().apply {
+                this.type = OrderType.TAKEOUT
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menuId = UUID.randomUUID()
+                    this.quantity = 1
+                    this.price = BigDecimal.ONE
+                })
+            }
+
+            val menu = Menu().apply {
+                this.isDisplayed = true
+                this.price = BigDecimal.ONE
+            }
+
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
+            every { menuRepository.findById(any()) } returns Optional.of(menu)
+            every { orderRepository.save(any()) } returns request.apply {
+                this.status = OrderStatus.WAITING
+                this.id = UUID.randomUUID()
+                this.orderDateTime = LocalDateTime.now()
+                this.orderLineItems = request.orderLineItems
+            }
+
+            // when
+            val result = orderService.create(request)
+
+            // then
+            result.type shouldBe request.type
+            result.status shouldBe OrderStatus.WAITING
+            result.id shouldNotBe null
+            result.orderDateTime shouldNotBe null
+            result.orderLineItems shouldNotBe null
+            result.orderLineItems[0].menuId shouldBe request.orderLineItems[0].menuId
+            result.orderLineItems[0].quantity shouldBe request.orderLineItems[0].quantity
+            result.orderLineItems[0].price shouldBe request.orderLineItems[0].price
+        }
+    }
+}
