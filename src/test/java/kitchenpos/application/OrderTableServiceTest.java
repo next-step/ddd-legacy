@@ -221,6 +221,6 @@ class OrderTableServiceTest {
         List<OrderTable> result = orderTableService.findAll();
 
         // then
-        assertThat(result).hasSize(2);
+        assertThat(result).containsExactly(ORDER_TABLE_1번, ORDER_TABLE_2번);
     }
 }

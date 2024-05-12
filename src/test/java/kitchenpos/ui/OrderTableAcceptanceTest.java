@@ -119,9 +119,9 @@ class OrderTableAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getList("id", UUID.class)).hasSize(2)
+                () -> assertThat(response.jsonPath().getList("id", UUID.class))
                         .containsExactly(ORDER_TABLE_1번_ID, ORDER_TABLE_2번_ID),
-                () -> assertThat(response.jsonPath().getList("name")).hasSize(2)
+                () -> assertThat(response.jsonPath().getList("name"))
                         .containsExactly(NAME_1번, NAME_2번)
         );
     }

@@ -51,10 +51,10 @@ class MenuGroupAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getList("id", UUID.class)).hasSize(2)
-                        .contains(MENU_GROUP_한마리메뉴_ID, MENU_GROUP_추천메뉴_ID),
-                () -> assertThat(response.jsonPath().getList("name")).hasSize(2)
-                        .contains(NAME_한마리메뉴, NAME_한마리메뉴)
+                () -> assertThat(response.jsonPath().getList("id", UUID.class))
+                        .containsExactly(MENU_GROUP_한마리메뉴_ID, MENU_GROUP_추천메뉴_ID),
+                () -> assertThat(response.jsonPath().getList("name"))
+                        .containsExactly(NAME_한마리메뉴, NAME_추천메뉴)
         );
     }
 

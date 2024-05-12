@@ -18,6 +18,7 @@ import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -41,8 +42,10 @@ class MenuGroupServiceTest {
         MenuGroup result = menuGroupService.create(request);
 
         // then
-        assertThat(result.getId()).isNotNull();
-        assertThat(result.getName()).isEqualTo(NAME_추천메뉴);
+        assertAll(
+                () -> assertThat(result.getId()).isNotNull(),
+                () -> assertThat(result.getName()).isEqualTo(NAME_추천메뉴)
+        );
     }
 
     @DisplayName("메뉴그룹을 등록할 때, 이름이 공백이면 예외가 발생한다.")
@@ -69,7 +72,6 @@ class MenuGroupServiceTest {
         List<MenuGroup> result = menuGroupService.findAll();
 
         // then
-        assertThat(result).hasSize(2);
-        assertThat(result).extracting("name").contains(NAME_추천메뉴, NAME_한마리메뉴);
+        assertThat(result).extracting("name").containsExactly(NAME_추천메뉴, NAME_한마리메뉴);
     }
 }

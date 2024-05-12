@@ -388,9 +388,11 @@ stateDiagram-v2
   - [x] 인수테스트의 목적
     - 소프트웨어의 인수를 목적으로 하는 테스트
     - 소프트웨어를 인수하기 전에 명세한 요구사항대로 잘 작동하는지 검증
+  - [x] `containsExactly()`, `containsOnly()`
   - [ ] `@TestConfiguration` 알아보기
-  - [ ] `@DisplayNameGeneration`에 대해 알아보기.
-  - [ ] `@Nested`
-  - [ ] `containsExactly()`, `containsOnly()`
-  - [ ] 인수테스트의 목적
   - [ ] 한글 변수 사용 및 가독성 체크해보기
+  - [ ] `@DisplayNameGeneration`에 대해 알아보기.
+
+
+  #### 추가로 생각해 보고 싶은것
+    - [ ] `@MockBean` 적용해보기

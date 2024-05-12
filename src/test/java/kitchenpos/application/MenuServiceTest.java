@@ -105,8 +105,7 @@ class MenuServiceTest {
                     () -> assertThat(result.getPrice()).isEqualTo(PRICE_34000),
                     () -> assertThat(result.isDisplayed()).isTrue(),
                     () -> assertThat(result.getMenuGroupId()).isEqualTo(ID_MENU_GOURP_추천메뉴),
-                    () -> assertThat(result.getMenuProducts()).hasSize(2)
-                            .containsExactly(양념치킨_1개, 후라이드치킨_1개)
+                    () -> assertThat(result.getMenuProducts()).containsExactly(양념치킨_1개, 후라이드치킨_1개)
             );
         }
 
@@ -394,7 +393,7 @@ class MenuServiceTest {
         List<Menu> result = menuService.findAll();
 
         // then
-        assertThat(result).hasSize(1);
+        assertThat(result).containsOnly(MENU_순살치킨);
     }
 
     @NotNull

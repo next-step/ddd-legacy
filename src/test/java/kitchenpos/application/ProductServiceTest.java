@@ -201,7 +201,7 @@ class ProductServiceTest {
         List<Product> result = productService.findAll();
 
         // then
-        assertThat(result).hasSize(2);
+        assertThat(result).containsExactly(PRODUCT_양념치킨, PRODUCT_후라이드치킨);
     }
 
     private List<Menu> settingMenus() {

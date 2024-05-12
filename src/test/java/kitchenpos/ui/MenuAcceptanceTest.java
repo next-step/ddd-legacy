@@ -76,8 +76,8 @@ class MenuAcceptanceTest {
                 () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(PRICE_38000),
                 () -> assertThat(response.jsonPath().getObject("menuGroup.id", UUID.class)).isEqualTo(MENU_GROUP_ID),
                 () -> assertThat(response.jsonPath().getBoolean("displayed")).isTrue(),
-                () -> assertThat(response.jsonPath().getList("menuProducts.product.id", UUID.class)).hasSize(2)
-                        .contains(PRODUCT_양념치킨.getId(), PRODUCT_후라이드치킨.getId()),
+                () -> assertThat(response.jsonPath().getList("menuProducts.product.id", UUID.class))
+                        .containsExactly(PRODUCT_양념치킨.getId(), PRODUCT_후라이드치킨.getId()),
                 () -> assertThat(response.jsonPath().getList("menuProducts.quantity")).hasSize(2).contains(1)
         );
     }
@@ -97,8 +97,8 @@ class MenuAcceptanceTest {
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(PRICE_34000),
                 () -> assertThat(response.jsonPath().getBoolean("displayed")).isTrue(),
-                () -> assertThat(response.jsonPath().getList("menuProducts.product.name")).hasSize(2)
-                        .contains(NAME_후라이드치킨, NAME_양념치킨),
+                () -> assertThat(response.jsonPath().getList("menuProducts.product.name"))
+                        .containsExactly(NAME_양념치킨, NAME_후라이드치킨),
                 () -> assertThat(response.jsonPath().getList("menuProducts.quantity")).hasSize(2).contains(1)
         );
     }
@@ -149,7 +149,7 @@ class MenuAcceptanceTest {
         // then
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(response.jsonPath().getList("id", UUID.class)).hasSize(2)
+                () -> assertThat(response.jsonPath().getList("id", UUID.class))
                         .containsExactly(순살치킨_MENU_ID, 반반치킨_MENU_ID)
         );
     }
