@@ -3,8 +3,6 @@ package kitchenpos.application;
 import kitchenpos.application.testFixture.OrderTableFixture;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTableRepository;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +18,9 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.SoftAssertions.assertSoftly;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -40,15 +41,65 @@ class OrderTableServiceTest {
         orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 
-    @Test
-    void sit() {
-    }
+    @DisplayName("좌석에 앉은 손님 수를 변경시 ")
+    @Nested
+    class ChangeGuestNumbers {
 
-    @Test
-    void clear() {
-    }
+        @Test
+        @DisplayName("손님 수가 변경된다.")
+        void changedGuestNumberTest() {
+            // given
+            var id = UUID.randomUUID();
+            var originalOrderTable = OrderTableFixture.newOne(id, "1번 테이블", 4, true);
+            var updatedOrderTable = OrderTableFixture.newOne(id, 2);
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(originalOrderTable));
 
-    @Test
+            // when
+            var actual = orderTableService.changeNumberOfGuests(id, updatedOrderTable);
+
+            // then
+            assertThat(actual.getNumberOfGuests()).isEqualTo(2);
+        }
+
+        @Test
+        @DisplayName("[예외] 변경할 손님 수는 음수일 수 없다.")
+        void negativeGuestNumbersExceptionTest() {
+            // given
+            var id = UUID.randomUUID();
+            var updatedOrderTable = OrderTableFixture.newOne(id, -1);
+
+            // when & then
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(id, updatedOrderTable))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] 존재하지 않는 주문 테이블일 경우 예외가 발생한다.")
+        void notFoundOrderTableExceptionTest() {
+            // given
+            var id = UUID.randomUUID();
+            var updatedOrderTable = OrderTableFixture.newOne(id, 4);
+            given(orderTableRepository.findById(any())).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(id, updatedOrderTable))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] '미사용' 중인 주문 테이블일 경우 예외가 발생한다.")
+        void notOccupiedOrderTableExceptionTest() {
+            // given
+            var id = UUID.randomUUID();
+            var originalOrderTable = OrderTableFixture.newOne(id, "1번 테이블", 4, false);
+            var updatedOrderTable = OrderTableFixture.newOne(id, 4);
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(originalOrderTable));
+
+            // when & then
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(id, updatedOrderTable))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+    }
     void changeNumberOfGuests() {
     }
 
@@ -71,7 +122,7 @@ class OrderTableServiceTest {
             var actual = orderTableService.create(orderTable);
 
             // then
-            SoftAssertions.assertSoftly(softly -> {
+            assertSoftly(softly -> {
                 softly.assertThat(actual.getName()).isEqualTo("1번 테이블");
                 softly.assertThat(actual.getNumberOfGuests()).isEqualTo(0);
                 softly.assertThat(actual.isOccupied()).isFalse();
@@ -87,7 +138,7 @@ class OrderTableServiceTest {
             var orderTable = OrderTableFixture.newOne(orderTableName);
 
             // when & then
-            Assertions.assertThatThrownBy(() -> orderTableService.create(orderTable))
+            assertThatThrownBy(() -> orderTableService.create(orderTable))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -107,14 +158,14 @@ class OrderTableServiceTest {
             var actual = orderTableService.sit(orderTable.getId());
 
             // then
-            Assertions.assertThat(actual.isOccupied()).isTrue();
+            assertThat(actual.isOccupied()).isTrue();
         }
 
         @DisplayName("[예외] 존재하지 않는 좌석일 경우 예외가 발생한다.")
         @Test
         void notFoundSitExceptionTest() {
             // when & then
-            Assertions.assertThatThrownBy(() -> orderTableService.sit(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderTableService.sit(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
         }
     }
@@ -136,7 +187,7 @@ class OrderTableServiceTest {
             var actual = orderTableService.clear(id);
 
             // then
-            SoftAssertions.assertSoftly(softly -> {
+            assertSoftly(softly -> {
                 softly.assertThat(actual.getNumberOfGuests()).isZero();
                 softly.assertThat(actual.isOccupied()).isFalse();
             });
@@ -146,7 +197,7 @@ class OrderTableServiceTest {
         @Test
         void notFoundSitExceptionTest() {
             // when & then
-            Assertions.assertThatThrownBy(() -> orderTableService.clear(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderTableService.clear(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
         }
 
@@ -160,7 +211,7 @@ class OrderTableServiceTest {
             given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
 
             // when & then
-            Assertions.assertThatThrownBy(() -> orderTableService.clear(id))
+            assertThatThrownBy(() -> orderTableService.clear(id))
                     .isInstanceOf(IllegalStateException.class);
         }
     }
