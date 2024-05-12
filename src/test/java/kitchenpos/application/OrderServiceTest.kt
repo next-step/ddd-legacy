@@ -7,12 +7,16 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
+import io.mockk.justRun
+import io.mockk.verify
 import kitchenpos.domain.*
 import kitchenpos.infra.KitchenridersClient
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
@@ -433,6 +437,94 @@ internal class OrderServiceTest {
             result.orderLineItems[0].menuId shouldBe request.orderLineItems[0].menuId
             result.orderLineItems[0].quantity shouldBe request.orderLineItems[0].quantity
             result.orderLineItems[0].price shouldBe request.orderLineItems[0].price
+        }
+    }
+
+    @Nested
+    inner class `주문 수락 테스트` {
+        @DisplayName("존재하지 않는 주문 id 라면, NoSuchElementException 예외 처리를 한다.")
+        @Test
+        fun test1() {
+            // given
+            val orderId = UUID.randomUUID()
+
+            every { orderRepository.findById(any()) } returns Optional.empty()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                orderService.accept(orderId)
+            }
+        }
+
+        @DisplayName("주문 상태가 대기 상태가 아니라면, IllegalStateException 예외 처리를 한다.")
+        @ParameterizedTest
+        @CsvSource("ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED")
+        fun test2(orderStatus: OrderStatus) {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.status = orderStatus
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                orderService.accept(orderId)
+            }
+        }
+
+        @DisplayName("주문 유형이 배달일 때, 키친 라이더스에게 배달 요청을 하고, 배달을 수락 한다.")
+        @Test
+        fun test3() {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.status = OrderStatus.WAITING
+                this.type = OrderType.DELIVERY
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menu = Menu().apply {
+                        this.price = BigDecimal.ONE
+                    }
+                    this.quantity = 1
+                })
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+            justRun { kitchenridersClient.requestDelivery(any(), any(), any()) }
+
+            // when
+            val result = orderService.accept(orderId)
+
+            // then
+            result.status shouldBe OrderStatus.ACCEPTED
+            verify { kitchenridersClient.requestDelivery(any(), any(), any()) }
+        }
+
+        @DisplayName("주문 유형이 포장이나 매장 내 식사 일 때, 배달을 수락 한다.")
+        @ParameterizedTest
+        @CsvSource("TAKEOUT", "EAT_IN")
+        fun test4(type: OrderType) {
+            // given
+            val orderId = UUID.randomUUID()
+            val order = Order().apply {
+                this.status = OrderStatus.WAITING
+                this.type = type
+                this.orderLineItems = listOf(OrderLineItem().apply {
+                    this.menu = Menu().apply {
+                        this.price = BigDecimal.ONE
+                    }
+                    this.quantity = 1
+                })
+            }
+
+            every { orderRepository.findById(any()) } returns Optional.of(order)
+
+            // when
+            val result = orderService.accept(orderId)
+
+            // then
+            result.status shouldBe OrderStatus.ACCEPTED
         }
     }
 }
