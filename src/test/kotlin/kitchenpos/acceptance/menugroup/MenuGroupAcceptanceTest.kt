@@ -1,4 +1,4 @@
-package kitchenpos.acceptance.menu
+package kitchenpos.acceptance.menugroup
 
 import io.kotest.matchers.shouldBe
 import kitchenpos.acceptance.CommonAcceptanceTest

@@ -108,6 +108,11 @@ public class MenuService {
                     .multiply(BigDecimal.valueOf(menuProduct.getQuantity()))
             );
         }
+
+        System.out.println("-=-=-=-=-=-=-=-=-=-=-=-=-");
+        System.out.println(price);
+        System.out.println(sum);
+        System.out.println("-=-=-=-=-=-=-=-=-=-=-=-=-");
         if (price.compareTo(sum) > 0) {
             throw new IllegalArgumentException();
         }
