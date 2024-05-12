@@ -39,12 +39,12 @@ import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
 import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
-import static kitchenpos.fixture.OrderFixture.ORDER_배달주소;
 import static kitchenpos.fixture.OrderFixture.orderDeliveryCreateRequest;
 import static kitchenpos.fixture.OrderFixture.orderEatInCreateRequest;
 import static kitchenpos.fixture.OrderFixture.orderTakeOutCreateRequest;
+import static kitchenpos.fixture.OrderFixture.배달주소;
 import static kitchenpos.fixture.OrderLineItemFixture.orderLineItemCreate;
-import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
+import static kitchenpos.fixture.OrderTableFixture.이름_1번;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
 import static kitchenpos.fixture.ProductFixture.이름_양념치킨;
 import static kitchenpos.fixture.ProductFixture.이름_후라이드치킨;
@@ -57,7 +57,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 @DisplayName("주문 인수테스트")
 @AcceptanceTest
 class OrderAcceptanceTest {
-    private static final String 배달주소 = ORDER_배달주소;
     private UUID ORDER_TABLE_ID;
     private Order ORDER_매장주문;
     private Order ORDER_배달주문;
@@ -382,7 +381,7 @@ class OrderAcceptanceTest {
     }
 
     private static OrderTable createOrderTable() {
-        OrderTable orderTable = orderTableCreateRequest(NAME_1번);
+        OrderTable orderTable = orderTableCreateRequest(이름_1번);
         return createOrderTableStep(orderTable).as(OrderTable.class);
     }
 

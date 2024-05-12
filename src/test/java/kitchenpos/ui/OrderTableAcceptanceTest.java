@@ -15,7 +15,7 @@ import static kitchenpos.acceptacne.steps.OrderTableSteps.clearOrderTableStep;
 import static kitchenpos.acceptacne.steps.OrderTableSteps.createOrderTableStep;
 import static kitchenpos.acceptacne.steps.OrderTableSteps.getOrderTablesStep;
 import static kitchenpos.acceptacne.steps.OrderTableSteps.sitOrderTableStep;
-import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
+import static kitchenpos.fixture.OrderTableFixture.이름_1번;
 import static kitchenpos.fixture.OrderTableFixture.NAME_2번;
 import static kitchenpos.fixture.OrderTableFixture.changeNumberOfGuestsRequest;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
@@ -29,7 +29,7 @@ class OrderTableAcceptanceTest {
     @Test
     void createOrderTable() {
         // given
-        OrderTable request = orderTableCreateRequest(NAME_1번);
+        OrderTable request = orderTableCreateRequest(이름_1번);
 
         // when
         ExtractableResponse<Response> response = createOrderTableStep(request);
@@ -38,7 +38,7 @@ class OrderTableAcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(NAME_1번),
+                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(이름_1번),
                 () -> assertThat(response.jsonPath().getInt("numberOfGuests")).isZero(),
                 () -> assertThat(response.jsonPath().getBoolean("occupied")).isFalse()
         );
@@ -48,7 +48,7 @@ class OrderTableAcceptanceTest {
     @Test
     void sitOrderTable() {
         // given
-        UUID orderTableId = createOrderId(NAME_1번);
+        UUID orderTableId = createOrderId(이름_1번);
 
         // when
         ExtractableResponse<Response> response = sitOrderTableStep(orderTableId);
@@ -57,7 +57,7 @@ class OrderTableAcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isEqualTo(orderTableId),
-                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(NAME_1번),
+                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(이름_1번),
                 () -> assertThat(response.jsonPath().getInt("numberOfGuests")).isNotNegative(),
                 () -> assertThat(response.jsonPath().getBoolean("occupied")).isTrue()
         );
@@ -67,7 +67,7 @@ class OrderTableAcceptanceTest {
     @Test
     void clearOrderTable() {
         // given
-        UUID orderTableId = createOrderId(NAME_1번);
+        UUID orderTableId = createOrderId(이름_1번);
         OrderTable changeRequest = changeNumberOfGuestsRequest(3);
         sitOrderTableStep(orderTableId);
         changeNumberOfGuestsOrderTableStep(orderTableId, changeRequest);
@@ -79,7 +79,7 @@ class OrderTableAcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isEqualTo(orderTableId),
-                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(NAME_1번),
+                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(이름_1번),
                 () -> assertThat(response.jsonPath().getInt("numberOfGuests")).isZero(),
                 () -> assertThat(response.jsonPath().getBoolean("occupied")).isFalse()
         );
@@ -89,7 +89,7 @@ class OrderTableAcceptanceTest {
     @Test
     void changeNumberOfGuestsOrderTable() {
         // given
-        UUID orderTableId = createOrderId(NAME_1번);
+        UUID orderTableId = createOrderId(이름_1번);
         sitOrderTableStep(orderTableId);
         OrderTable request = changeNumberOfGuestsRequest(4);
 
@@ -100,7 +100,7 @@ class OrderTableAcceptanceTest {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isEqualTo(orderTableId),
-                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(NAME_1번),
+                () -> assertThat(response.jsonPath().getString("name")).isEqualTo(이름_1번),
                 () -> assertThat(response.jsonPath().getInt("numberOfGuests")).isEqualTo(4),
                 () -> assertThat(response.jsonPath().getBoolean("occupied")).isTrue()
         );
@@ -110,7 +110,7 @@ class OrderTableAcceptanceTest {
     @Test
     void getOrderTables() {
         // given
-        UUID ORDER_TABLE_1번_ID = createOrderId(NAME_1번);
+        UUID ORDER_TABLE_1번_ID = createOrderId(이름_1번);
         UUID ORDER_TABLE_2번_ID = createOrderId(NAME_2번);
 
         // when
@@ -122,7 +122,7 @@ class OrderTableAcceptanceTest {
                 () -> assertThat(response.jsonPath().getList("id", UUID.class))
                         .containsExactly(ORDER_TABLE_1번_ID, ORDER_TABLE_2번_ID),
                 () -> assertThat(response.jsonPath().getList("name"))
-                        .containsExactly(NAME_1번, NAME_2번)
+                        .containsExactly(이름_1번, NAME_2번)
         );
     }
 

@@ -36,7 +36,7 @@ import static kitchenpos.fixture.MenuFixture.menuResponse;
 import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupResponse;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
-import static kitchenpos.fixture.OrderFixture.ORDER_배달주소;
+import static kitchenpos.fixture.OrderFixture.배달주소;
 import static kitchenpos.fixture.OrderFixture.orderDeliveryCreateRequest;
 import static kitchenpos.fixture.OrderFixture.orderDeliveryResponse;
 import static kitchenpos.fixture.OrderFixture.orderEatInCreateRequest;
@@ -44,7 +44,7 @@ import static kitchenpos.fixture.OrderFixture.orderEatInResponse;
 import static kitchenpos.fixture.OrderFixture.orderTakeOutCreateRequest;
 import static kitchenpos.fixture.OrderFixture.orderTakeOutResponse;
 import static kitchenpos.fixture.OrderLineItemFixture.orderLineItemCreate;
-import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
+import static kitchenpos.fixture.OrderTableFixture.이름_1번;
 import static kitchenpos.fixture.OrderTableFixture.orderTableResponse;
 import static kitchenpos.fixture.ProductFixture.이름_양념치킨;
 import static kitchenpos.fixture.ProductFixture.이름_후라이드치킨;
@@ -74,641 +74,572 @@ public class OrderServiceTest {
     @InjectMocks
     private OrderService orderService;
 
-    private UUID orderTableId;
-    private OrderTable orderTable;
-    private OrderLineItem orderLineItem;
-    private Order ORDER_매장주문;
-    private Order ORDER_배달주문;
-    private Order ORDER_포장주문;
-    private Menu menu;
+    private UUID ID_1번테이블;
+    private OrderTable 주문테이블_1번;
+    private OrderLineItem 주문메뉴항목;
+    private Order 매장주문;
+    private Order 배달주문;
+    private Order 포장주문;
+    private Menu 메뉴_반반치킨;
 
     @BeforeEach
     void setUp() {
         //메뉴
         MenuGroup menuGroup = menuGroupResponse(이름_추천메뉴);
-        Product product1 = productResponse(이름_양념치킨, 가격_20000);
-        Product product2 = productResponse(이름_후라이드치킨, 가격_18000);
-        MenuProduct menuProduct_양념치킨 = menuProductResponse(product1, 1);
-        MenuProduct menuProduct_후라이드 = menuProductResponse(product2, 1);
-        menu = menuResponse(이름_반반치킨, 가격_38000, menuGroup.getId(), true, menuProduct_양념치킨, menuProduct_후라이드);
-        //주문
-        orderTable = orderTableResponse(NAME_1번, 0, true);
-        orderTableId = orderTable.getId();
-        orderLineItem = orderLineItemCreate(menu, 가격_38000, 1);
-        ORDER_매장주문 = orderEatInResponse(OrderStatus.WAITING, orderTable, orderLineItem);
-        ORDER_배달주문 = orderDeliveryResponse(OrderStatus.WAITING, ORDER_배달주소, orderLineItem);
-        ORDER_포장주문 = orderTakeOutResponse(OrderStatus.WAITING, orderLineItem);
+        Product 양념치킨 = productResponse(이름_양념치킨, 가격_20000);
+        Product 후라이드치킨 = productResponse(이름_후라이드치킨, 가격_18000);
+        MenuProduct 메뉴구성상품_양념치킨 = menuProductResponse(양념치킨, 1);
+        MenuProduct 메뉴구성상품_후라이드 = menuProductResponse(후라이드치킨, 1);
+        메뉴_반반치킨 = menuResponse(이름_반반치킨, 가격_38000, menuGroup.getId(), true, 메뉴구성상품_양념치킨, 메뉴구성상품_후라이드);
+        주문테이블_1번 = orderTableResponse(이름_1번, 0, true);
+        ID_1번테이블 = 주문테이블_1번.getId();
+        주문메뉴항목 = orderLineItemCreate(메뉴_반반치킨, 가격_38000, 1);
+        매장주문 = orderEatInResponse(OrderStatus.WAITING, 주문테이블_1번, 주문메뉴항목);
+        배달주문 = orderDeliveryResponse(OrderStatus.WAITING, 배달주소, 주문메뉴항목);
+        포장주문 = orderTakeOutResponse(OrderStatus.WAITING, 주문메뉴항목);
     }
 
 
-    @Nested
     @DisplayName("주문등록 테스트")
+    @Nested
     class CreateOrder {
-        @Nested
         @DisplayName("매장주문")
+        @Nested
         class EatIn {
+            @DisplayName("[성공]")
+            @Nested
+            class Success {
 
-            @DisplayName("매장 주문을 등록한다.")
-            @Test
-            void eatInOrder() {
-                // given
-                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-                when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-                when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
-                when(orderRepository.save(any())).thenReturn(ORDER_매장주문);
-                Order request = orderEatInCreateRequest(orderTableId, orderLineItem);
+                @DisplayName("매장 주문을 등록한다.")
+                @Test
+                void eatInOrder() {
+                    // given
+                    when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(메뉴_반반치킨));
+                    when(menuRepository.findById(any())).thenReturn(Optional.of(메뉴_반반치킨));
+                    when(orderTableRepository.findById(any())).thenReturn(Optional.of(주문테이블_1번));
+                    when(orderRepository.save(any())).thenReturn(매장주문);
+                    Order request = orderEatInCreateRequest(ID_1번테이블, 주문메뉴항목);
 
-                // when
-                Order result = orderService.create(request);
+                    // when
+                    Order result = orderService.create(request);
 
-                // then
-                assertAll(
-                        () -> assertThat(result.getId()).isNotNull(),
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.EAT_IN),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.WAITING),
-                        () -> assertThat(result.getDeliveryAddress()).isNull(),
-                        () -> assertThat(result.getOrderTable().getNumberOfGuests()).isZero(),
-                        () -> assertThat(result.getOrderTable().isOccupied()).isTrue()
-                );
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getId()).isNotNull(),
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.EAT_IN),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.WAITING),
+                            () -> assertThat(result.getDeliveryAddress()).isNull(),
+                            () -> assertThat(result.getOrderTable().getNumberOfGuests()).isZero(),
+                            () -> assertThat(result.getOrderTable().isOccupied()).isTrue()
+                    );
+                }
             }
 
-            @DisplayName("주문테이블이 미리 등록되어 있지 않으면 예외가 발생한다.")
+            @DisplayName("[실패]")
+            @Nested
+            class Fail {
+                @DisplayName("미리 `주문테이블`이 등록되어 있어야한다.")
+                @Test
+                void orderTable1() {
+                    // given
+                    when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(메뉴_반반치킨));
+                    when(menuRepository.findById(any())).thenReturn(Optional.of(메뉴_반반치킨));
+                    Order request = orderEatInCreateRequest(ID_1번테이블, 주문메뉴항목);
+
+                    // when
+                    when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
+
+                    // then
+                    assertThatThrownBy(() -> orderService.create(request))
+                            .isInstanceOf(NoSuchElementException.class);
+                }
+
+                @DisplayName("`주문 테이블`은 사용 중이어야 한다.")
+                @Test
+                void notOccupiedOrderTableException() {
+                    // given
+                    when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(메뉴_반반치킨));
+                    when(menuRepository.findById(any())).thenReturn(Optional.of(메뉴_반반치킨));
+                    Order request = orderEatInCreateRequest(ID_1번테이블, 주문메뉴항목);
+
+                    // when
+                    주문테이블_1번.setOccupied(false);
+                    when(orderTableRepository.findById(any())).thenReturn(Optional.of(주문테이블_1번));
+
+                    // then
+                    assertThatThrownBy(() -> orderService.create(request))
+                            .isInstanceOf(IllegalStateException.class);
+                }
+            }
+        }
+
+        @DisplayName("배달주문")
+        @Nested
+        class Delivery {
+            @DisplayName("[성공]")
+            @Nested
+            class Success {
+                @DisplayName("배달 주문을 등록한다.")
+                @Test
+                void deliveryOrder() {
+                    // given
+                    when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(메뉴_반반치킨));
+                    when(menuRepository.findById(any())).thenReturn(Optional.of(메뉴_반반치킨));
+                    when(orderRepository.save(any())).thenReturn(배달주문);
+                    Order request = orderDeliveryCreateRequest(배달주소, 주문메뉴항목);
+
+                    // when
+                    Order result = orderService.create(request);
+
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getId()).isNotNull(),
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.WAITING),
+                            () -> assertThat(result.getDeliveryAddress()).isEqualTo(배달주소),
+                            () -> assertThat(result.getOrderTable()).isNull()
+                    );
+                }
+            }
+
+            @DisplayName("[실패]")
+            @Nested
+            class Fail {
+                @DisplayName("배달주소는 1자 이상이어야 한다.")
+                @NullAndEmptySource
+                @ParameterizedTest
+                void address(String deliveryAddress) {
+                    // given
+                    when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(메뉴_반반치킨));
+                    when(menuRepository.findById(any())).thenReturn(Optional.of(메뉴_반반치킨));
+
+                    // when
+                    Order request = orderDeliveryCreateRequest(deliveryAddress, 주문메뉴항목);
+
+                    // then
+                    assertThatThrownBy(() -> orderService.create(request))
+                            .isInstanceOf(IllegalArgumentException.class);
+                }
+            }
+        }
+
+        @DisplayName("포장주문")
+        @Nested
+        class TakeOut {
+            @DisplayName("[성공]")
+            @Nested
+            class Success {
+                @DisplayName("포장주문")
+                @Test
+                void takeOutOrder() {
+                    // given
+                    when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(메뉴_반반치킨));
+                    when(menuRepository.findById(any())).thenReturn(Optional.of(메뉴_반반치킨));
+                    when(orderRepository.save(any())).thenReturn(포장주문);
+                    Order request = orderTakeOutCreateRequest(주문메뉴항목);
+
+                    // when
+                    Order result = orderService.create(request);
+
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getId()).isNotNull(),
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.TAKEOUT),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.WAITING),
+                            () -> assertThat(result.getDeliveryAddress()).isNull(),
+                            () -> assertThat(result.getOrderTable()).isNull()
+                    );
+                }
+            }
+        }
+
+        @DisplayName("[실패]")
+        @Nested
+        class Fail {
+            @DisplayName("주문종류는 반드시 지정해줘야 한다.")
             @Test
-            void notExistsOrderTableException() {
+            void orderType() {
                 // given
-                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-                when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-                Order request = orderEatInCreateRequest(orderTableId, orderLineItem);
+                Order order = new Order();
 
                 // when
-                when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
+                // then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+
+            @DisplayName("`주문메뉴항목`은 `1`개이상 포함한다.")
+            @Test
+            void orderLineItem1() {
+                // given
+                Order order = new Order();
+                order.setType(OrderType.TAKEOUT);
+
+                // when
+                // then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("`주문메뉴항목`은 `메뉴`를 중복해서 넣지 않는다.")
+            @Test
+            void orderLineItem2() {
+                // given
+                Order order = new Order();
+                order.setType(OrderType.EAT_IN);
+                order.setOrderLineItems(List.of(주문메뉴항목));
+
+                // when
+                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of());
 
                 // then
-                assertThatThrownBy(() -> orderService.create(request))
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("주문종류가 매장주문이 아니면 해당 `메뉴`의 수량은 `0`이상이어야 한다.")
+            @EnumSource(value = OrderType.class, mode = EnumSource.Mode.EXCLUDE, names = {"EAT_IN"})
+            @ParameterizedTest
+            void orderLineItem2(OrderType type) {
+                // given
+                Order order = new Order();
+                order.setType(type);
+                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(메뉴_반반치킨));
+
+                // when
+                주문메뉴항목.setQuantity(-1);
+                order.setOrderLineItems(List.of(주문메뉴항목));
+
+                // then
+                assertThatThrownBy(() -> orderService.create(order))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @DisplayName("`주문메뉴항목`은 이미 만들어진 `메뉴`에서 선택한다.")
+            @Test
+            void orderLineItem3() {
+                // given
+                Order order = new Order();
+                order.setType(OrderType.EAT_IN);
+                order.setOrderLineItems(List.of(주문메뉴항목));
+                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(메뉴_반반치킨));
+
+                // when
+                when(menuRepository.findById(any())).thenReturn(Optional.empty());
+
+
+                // then
+                assertThatThrownBy(() -> orderService.create(order))
                         .isInstanceOf(NoSuchElementException.class);
             }
 
-            @DisplayName("주문테이블 사용여부를 미리 사용중으로 하지않으면 예외가 발생한다.")
+            @DisplayName("`메뉴`는 노출된 상태여야 한다.")
             @Test
-            void notOccupiedOrderTableException() {
+            void orderLineItem4() {
                 // given
-                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-                when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-                Order request = orderEatInCreateRequest(orderTableId, orderLineItem);
+                Order order = new Order();
+                order.setType(OrderType.DELIVERY);
+                order.setOrderLineItems(List.of(주문메뉴항목));
+                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(메뉴_반반치킨));
 
                 // when
-                orderTable.setOccupied(false);
-                when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
+                메뉴_반반치킨.setDisplayed(false);
+                when(menuRepository.findById(any())).thenReturn(Optional.ofNullable(메뉴_반반치킨));
 
                 // then
-                assertThatThrownBy(() -> orderService.create(request))
+                assertThatThrownBy(() -> orderService.create(order))
                         .isInstanceOf(IllegalStateException.class);
             }
-        }
 
-        @Nested
-        @DisplayName("배달주문")
-        class Delivery {
-
-            @DisplayName("배달 주문을 등록한다.")
+            @DisplayName("각각의 {원래 `메뉴`의 가격}이 {현재 주문 시 요청한 메뉴의 가격}과 같아야 한다.")
             @Test
-            void deliveryOrder() {
+            void price() {
                 // given
-                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-                when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-                when(orderRepository.save(any())).thenReturn(ORDER_배달주문);
-                Order request = orderDeliveryCreateRequest(ORDER_배달주소, orderLineItem);
+                Order order = new Order();
+                order.setType(OrderType.DELIVERY);
+                order.setOrderLineItems(List.of(주문메뉴항목));
+                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(메뉴_반반치킨));
 
                 // when
-                Order result = orderService.create(request);
+                메뉴_반반치킨.setPrice(가격_34000);
+                when(menuRepository.findById(any())).thenReturn(Optional.ofNullable(메뉴_반반치킨));
 
                 // then
-                assertAll(
-                        () -> assertThat(result.getId()).isNotNull(),
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.WAITING),
-                        () -> assertThat(result.getDeliveryAddress()).isEqualTo(ORDER_배달주소),
-                        () -> assertThat(result.getOrderTable()).isNull()
-                );
-            }
-
-            @DisplayName("배달 주소 정보가 없으면 예외가 발생한다.")
-            @NullAndEmptySource
-            @ParameterizedTest
-            void nullOrEmptyAddressException(String deliveryAddress) {
-                // given
-                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-                when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-
-                // when
-                Order request = orderDeliveryCreateRequest(deliveryAddress, orderLineItem);
-
-                // then
-                assertThatThrownBy(() -> orderService.create(request))
+                assertThatThrownBy(() -> orderService.create(order))
                         .isInstanceOf(IllegalArgumentException.class);
             }
         }
+    }
 
+    @DisplayName("주문수락 테스트")
+    @Nested
+    class AcceptOrder {
+        @DisplayName("[성공]")
         @Nested
-        @DisplayName("포장주문")
-        class TakeOut {
+        class Success {
+            @DisplayName("매장주문")
+            @Nested
+            class EatIn {
+                @DisplayName("매장주문 접수를 수락한다.")
+                @Test
+                void eatInOrder() {
+                    // given
+                    UUID orderId = 매장주문.getId();
+                    when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(매장주문));
 
+                    // when
+                    Order result = orderService.accept(orderId);
+
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getId()).isEqualTo(orderId),
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.EAT_IN),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
+                    );
+                }
+            }
+
+            @DisplayName("배달주문 접수를 수락한다.")
+            @Nested
+            class Delivery {
+
+                @DisplayName("배달주문")
+                @Test
+                void deliveryOrder() {
+                    // given
+                    UUID orderId = 배달주문.getId();
+                    when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(배달주문));
+                    doNothing().when(kitchenridersClient).requestDelivery(any(), any(), any());
+                    // when
+                    Order result = orderService.accept(orderId);
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getId()).isEqualTo(orderId),
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
+                    );
+                }
+            }
+
+            @Nested
             @DisplayName("포장주문")
-            @Test
-            void takeOutOrder() {
-                // given
-                when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-                when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-                when(orderRepository.save(any())).thenReturn(ORDER_포장주문);
-                Order request = orderTakeOutCreateRequest(orderLineItem);
+            class TakeOut {
 
-                // when
-                Order result = orderService.create(request);
-
-                // then
-                assertAll(
-                        () -> assertThat(result.getId()).isNotNull(),
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.TAKEOUT),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.WAITING),
-                        () -> assertThat(result.getDeliveryAddress()).isNull(),
-                        () -> assertThat(result.getOrderTable()).isNull()
-                );
+                @DisplayName("포장주문 접수를 시작한다.")
+                @Test
+                void takeOutOrder() {
+                    // given
+                    UUID orderId = 포장주문.getId();
+                    when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(포장주문));
+                    // when
+                    Order result = orderService.accept(orderId);
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getId()).isEqualTo(orderId),
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.TAKEOUT),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
+                    );
+                }
             }
         }
 
-        @DisplayName("주문종류를 지정해주지 않으면 예외 발생한다.")
-        @Test
-        void nullOrderTypeException() {
-            // given
-            Order order = new Order();
+        @DisplayName("[실패]")
+        @Nested
+        class Fail {
+            @DisplayName("미 등록되어있는 `주문`이어야 한다.")
+            @Test
+            void notExistsOrderException() {
+                // given
+                UUID orderId = 포장주문.getId();
 
-            // when
-            // then
-            assertThatThrownBy(() -> orderService.create(order))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
+                // when
+                when(orderRepository.findById(any())).thenReturn(Optional.empty());
 
+                // then
+                assertThatThrownBy(() -> orderService.accept(orderId))
+                        .isInstanceOf(NoSuchElementException.class);
+            }
 
-        @DisplayName("주문메뉴항목이 1개 이하이면 예외 발생한다.")
-        @Test
-        void nullAndEmptyOrderLineItemException() {
-            // given
-            Order order = new Order();
-            order.setType(OrderType.TAKEOUT);
+            @DisplayName("현재 주문 상태는 **수락대기** 상태여야 한다.")
+            @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"WAITING"})
+            @ParameterizedTest
+            void notWaitingStatusException(OrderStatus status) {
+                // given
+                Order order = 포장주문;
+                UUID orderId = order.getId();
+                when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
-            // when
-            // then
-            assertThatThrownBy(() -> orderService.create(order))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
+                // when
+                order.setStatus(status);
 
-        @DisplayName("주문메뉴항목은 같은 메뉴가 중복해서 들어오면 예외 발생한다.")
-        @Test
-        void duplicatedOrderLineItemException() {
-            // given
-            Order order = new Order();
-            order.setType(OrderType.EAT_IN);
-            order.setOrderLineItems(List.of(orderLineItem));
-
-            // when
-            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of());
-
-            // then
-            assertThatThrownBy(() -> orderService.create(order))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("매장주문 제외하고, 주문메뉴항목의 수량이 0보다 작으면 예외 발생한다.")
-        @EnumSource(value = OrderType.class, mode = EnumSource.Mode.EXCLUDE, names = {"EAT_IN"})
-        @ParameterizedTest
-        void noEatInType_orderLineItemsLessThanZeroException(OrderType type) {
-            // given
-            Order order = new Order();
-            order.setType(type);
-            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-
-            // when
-            orderLineItem.setQuantity(-1);
-            order.setOrderLineItems(List.of(orderLineItem));
-
-            // then
-            assertThatThrownBy(() -> orderService.create(order))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
-
-        @DisplayName("주문메뉴항목이 미리 등록된 메뉴가 아니면 예외 발생한다.")
-        @Test
-        void notExistsOrderLineItem() {
-            // given
-            Order order = new Order();
-            order.setType(OrderType.EAT_IN);
-            order.setOrderLineItems(List.of(orderLineItem));
-            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-
-            // when
-            when(menuRepository.findById(any())).thenReturn(Optional.empty());
-
-
-            // then
-            assertThatThrownBy(() -> orderService.create(order))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-
-        @DisplayName("주문메뉴항목의 메뉴가 노출안함 상태이면 예외가 발생한다.")
-        @Test
-        void noDisplayedMenuException() {
-            // given
-            Order order = new Order();
-            order.setType(OrderType.DELIVERY);
-            order.setOrderLineItems(List.of(orderLineItem));
-            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-
-            // when
-            menu.setDisplayed(false);
-            when(menuRepository.findById(any())).thenReturn(Optional.ofNullable(menu));
-
-            // then
-            assertThatThrownBy(() -> orderService.create(order))
-                    .isInstanceOf(IllegalStateException.class);
-        }
-
-        @DisplayName("주문메뉴항목의 메뉴과 원래 메뉴의 가격이 다르면 예외가 발생한다.")
-        @Test
-        void differentMenuPriceException() {
-            // given
-            Order order = new Order();
-            order.setType(OrderType.DELIVERY);
-            order.setOrderLineItems(List.of(orderLineItem));
-            when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
-
-            // when
-            menu.setPrice(가격_34000);
-            when(menuRepository.findById(any())).thenReturn(Optional.ofNullable(menu));
-
-            // then
-            assertThatThrownBy(() -> orderService.create(order))
-                    .isInstanceOf(IllegalArgumentException.class);
+                // then
+                assertThatThrownBy(() -> orderService.accept(orderId))
+                        .isInstanceOf(IllegalStateException.class);
+            }
         }
     }
 
+    @DisplayName("제조완료 테스트")
     @Nested
-    @DisplayName("주문수락 테스트")
-    class AcceptOrder {
+    class ServedOrder {
+        @DisplayName("[성공]")
         @Nested
-        @DisplayName("매장주문")
-        class EatIn {
-            @DisplayName("매장주문 접수를 수락한다.")
-            @Test
-            void eatInOrder() {
-                // given
-                UUID orderId = ORDER_매장주문.getId();
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_매장주문));
+        class Success {
+            @DisplayName("매장주문")
+            @Nested
+            class EatIn {
 
-                // when
-                Order result = orderService.accept(orderId);
+                @DisplayName("매장주문을 제조완료한다.")
+                @Test
+                void eatInOrder() {
+                    // given
+                    매장주문.setStatus(OrderStatus.ACCEPTED);
+                    when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(매장주문));
 
-                // then
-                assertAll(
-                        () -> assertThat(result.getId()).isEqualTo(orderId),
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.EAT_IN),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
-                );
+                    // when
+                    Order result = orderService.serve(매장주문.getId());
+
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.EAT_IN),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED)
+                    );
+                }
             }
-        }
-
-        @Nested
-        @DisplayName("배달주문 접수를 수락한다.")
-        class Delivery {
 
             @DisplayName("배달주문")
-            @Test
-            void deliveryOrder() {
-                // given
-                UUID orderId = ORDER_배달주문.getId();
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_배달주문));
-                doNothing().when(kitchenridersClient).requestDelivery(any(), any(), any());
-                // when
-                Order result = orderService.accept(orderId);
-                // then
-                assertAll(
-                        () -> assertThat(result.getId()).isEqualTo(orderId),
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
-                );
+            @Nested
+            class Delivery {
+
+                @DisplayName("배달주문을 제조완료한다.")
+                @Test
+                void deliveryOrder() {
+                    // given
+                    배달주문.setStatus(OrderStatus.ACCEPTED);
+                    when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(배달주문));
+
+                    // when
+                    Order result = orderService.serve(배달주문.getId());
+
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED)
+                    );
+                }
+            }
+
+            @DisplayName("포장주문")
+            @Nested
+            class TakeOut {
+
+                @DisplayName("포장주문을 제조완료한다.")
+                @Test
+                void takeOutOrder() {
+                    // given
+                    포장주문.setStatus(OrderStatus.ACCEPTED);
+                    when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(포장주문));
+
+                    // when
+                    Order result = orderService.serve(포장주문.getId());
+
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.TAKEOUT),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED)
+                    );
+                }
             }
         }
 
+        @DisplayName("[실패]")
         @Nested
-        @DisplayName("포장주문")
-        class TakeOut {
-
-            @DisplayName("포장주문 접수를 시작한다.")
+        class Fail {
+            @DisplayName("이미 등록되어있는 `주문`이어야 한다.")
             @Test
-            void takeOutOrder() {
+            void notExistsOrderException() {
                 // given
-                UUID orderId = ORDER_포장주문.getId();
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_포장주문));
+                UUID orderId = 포장주문.getId();
+
                 // when
-                Order result = orderService.accept(orderId);
+                when(orderRepository.findById(any())).thenReturn(Optional.empty());
+
                 // then
-                assertAll(
-                        () -> assertThat(result.getId()).isEqualTo(orderId),
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.TAKEOUT),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.ACCEPTED)
-                );
+                assertThatThrownBy(() -> orderService.serve(orderId))
+                        .isInstanceOf(NoSuchElementException.class);
             }
-        }
 
-        @DisplayName("미리 등록되어있는 주문이 아니면 예외가 발생한다.")
-        @Test
-        void notExistsOrderException() {
-            // given
-            UUID orderId = ORDER_포장주문.getId();
+            @DisplayName("현재 주문 상태는 **주문수락** 상태여야 한다.")
+            @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"ACCEPTED"})
+            @ParameterizedTest
+            void invalidStatusException(OrderStatus status) {
+                // given
+                Order order = 포장주문;
+                UUID orderId = order.getId();
+                when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
-            // when
-            when(orderRepository.findById(any())).thenReturn(Optional.empty());
+                // when
+                order.setStatus(status);
 
-            // then
-            assertThatThrownBy(() -> orderService.accept(orderId))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-
-        @DisplayName("현재 주문상태는 `수락대기`가 아니면 예외가 발생한다.")
-        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"WAITING"})
-        @ParameterizedTest
-        void notWaitingStatusException(OrderStatus status) {
-            // given
-            Order order = ORDER_포장주문;
-            UUID orderId = order.getId();
-            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
-
-            // when
-            order.setStatus(status);
-
-            // then
-            assertThatThrownBy(() -> orderService.accept(orderId))
-                    .isInstanceOf(IllegalStateException.class);
+                // then
+                assertThatThrownBy(() -> orderService.serve(orderId))
+                        .isInstanceOf(IllegalStateException.class);
+            }
         }
     }
 
-    @Nested
-    @DisplayName("제조완료 테스트")
-    class ServedOrder {
-
-        @Nested
-        @DisplayName("매장주문")
-        class EatIn {
-
-            @DisplayName("매장주문을 제조완료한다.")
-            @Test
-            void eatInOrder() {
-                // given
-                ORDER_매장주문.setStatus(OrderStatus.ACCEPTED);
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_매장주문));
-
-                // when
-                Order result = orderService.serve(ORDER_매장주문.getId());
-
-                // then
-                assertAll(
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.EAT_IN),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED)
-                );
-            }
-        }
-
-        @Nested
-        @DisplayName("배달주문")
-        class Delivery {
-
-            @DisplayName("배달주문을 제조완료한다.")
-            @Test
-            void deliveryOrder() {
-                // given
-                ORDER_배달주문.setStatus(OrderStatus.ACCEPTED);
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_배달주문));
-
-                // when
-                Order result = orderService.serve(ORDER_배달주문.getId());
-
-                // then
-                assertAll(
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED)
-                );
-            }
-        }
-
-        @Nested
-        @DisplayName("포장주문")
-        class TakeOut {
-
-            @DisplayName("포장주문을 제조완료한다.")
-            @Test
-            void takeOutOrder() {
-                // given
-                ORDER_포장주문.setStatus(OrderStatus.ACCEPTED);
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_포장주문));
-
-                // when
-                Order result = orderService.serve(ORDER_포장주문.getId());
-
-                // then
-                assertAll(
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.TAKEOUT),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.SERVED)
-                );
-            }
-        }
-
-        @DisplayName("미리 등록되어있는 주문이 아니면 예외가 발생한다.")
-        @Test
-        void notExistsOrderException() {
-            // given
-            UUID orderId = ORDER_포장주문.getId();
-
-            // when
-            when(orderRepository.findById(any())).thenReturn(Optional.empty());
-
-            // then
-            assertThatThrownBy(() -> orderService.serve(orderId))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-
-        @DisplayName("현재 주문상태는 `주문수락`이 아니면 예외가 발생한다.")
-        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"ACCEPTED"})
-        @ParameterizedTest
-        void invalidStatusException(OrderStatus status) {
-            // given
-            Order order = ORDER_포장주문;
-            UUID orderId = order.getId();
-            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
-
-            // when
-            order.setStatus(status);
-
-            // then
-            assertThatThrownBy(() -> orderService.serve(orderId))
-                    .isInstanceOf(IllegalStateException.class);
-        }
-    }
-
-    @Nested
     @DisplayName("배달 중 테스트")
+    @Nested
     class DeliveringOrder {
-        @DisplayName("배달주문을 시작한다.")
-        @Test
-        void startDeliveryOrder() {
-            // given
-            ORDER_배달주문.setStatus(OrderStatus.SERVED);
-            when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_배달주문));
-
-            // when
-            Order result = orderService.startDelivery(ORDER_배달주문.getId());
-
-            // then
-            assertAll(
-                    () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
-                    () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING)
-            );
-        }
-
-        @DisplayName("현재 주문종류가 `배달주문`이 아니면 예외가 발생한다.")
-        @EnumSource(value = OrderType.class, mode = EnumSource.Mode.EXCLUDE, names = {"DELIVERY"})
-        @ParameterizedTest
-        void invalidTypeException(OrderType type) {
-            // given
-            Order order = ORDER_포장주문;
-            UUID orderId = order.getId();
-            order.setStatus(OrderStatus.SERVED);
-            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
-
-            // when
-            order.setType(type);
-
-            // then
-            assertThatThrownBy(() -> orderService.startDelivery(orderId))
-                    .isInstanceOf(IllegalStateException.class);
-        }
-
-        @DisplayName("현재 주문상태는 `제조완료`가 아니면 예외가 발생한다.")
-        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"SERVED"})
-        @ParameterizedTest
-        void invalidStatusException(OrderStatus status) {
-            // given
-            Order order = ORDER_배달주문;
-            UUID orderId = order.getId();
-            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
-
-            // when
-            order.setStatus(status);
-
-            // then
-            assertThatThrownBy(() -> orderService.startDelivery(orderId))
-                    .isInstanceOf(IllegalStateException.class);
-        }
-
-        @DisplayName("주문이 미리 등록되어 있지 않으면 예외가 발생한다.")
-        @Test
-        void notExistsOrderException() {
-            // given
-            UUID orderId = ORDER_배달주문.getId();
-
-            // when
-            when(orderRepository.findById(any())).thenReturn(Optional.empty());
-
-            // then
-            assertThatThrownBy(() -> orderService.startDelivery(orderId))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-    }
-
-    @Nested
-    @DisplayName("배달완료 테스트")
-    class DeliveredOrder {
-        @DisplayName("배달주문을 완료한다.")
-        @Test
-        void completeDeliveryOrder() {
-            // given
-            ORDER_배달주문.setStatus(OrderStatus.DELIVERING);
-            when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_배달주문));
-
-            // when
-            Order result = orderService.completeDelivery(ORDER_배달주문.getId());
-
-            // then
-            assertAll(
-                    () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
-                    () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED)
-            );
-        }
-
-        @DisplayName("주문이 미리 등록되어 있지 않으면 예외가 발생한다.")
-        @Test
-        void notExistsOrderException() {
-            // given
-            UUID orderId = ORDER_배달주문.getId();
-
-            // when
-            when(orderRepository.findById(any())).thenReturn(Optional.empty());
-
-            // then
-            assertThatThrownBy(() -> orderService.completeDelivery(orderId))
-                    .isInstanceOf(NoSuchElementException.class);
-        }
-
-        @DisplayName("현재 주문상태가 `배달중`이 아니면 예외가 발생한다.")
-        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"DELIVERING"})
-        @ParameterizedTest
-        void invalidStatusException(OrderStatus status) {
-            // given
-            Order order = ORDER_배달주문;
-            UUID orderId = order.getId();
-            when(orderRepository.findById(any())).thenReturn(Optional.of(order));
-
-            // when
-            order.setStatus(status);
-
-            // then
-            assertThatThrownBy(() -> orderService.completeDelivery(orderId))
-                    .isInstanceOf(IllegalStateException.class);
-        }
-    }
-
-    @Nested
-    @DisplayName("주문종료 테스트")
-    class CompleteOrder {
+        @DisplayName("[성공]")
         @Nested
-        @DisplayName("매장주문")
-        class EatIn {
-
-            @DisplayName("매장주문을 종료합니다.")
+        class Success {
+            @DisplayName("배달주문을 시작한다.")
             @Test
-            void eatInOrder() {
+            void startDeliveryOrder() {
                 // given
-                ORDER_매장주문.setStatus(OrderStatus.SERVED);
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_매장주문));
-                when(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED))
-                        .thenReturn(false);
+                배달주문.setStatus(OrderStatus.SERVED);
+                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(배달주문));
 
                 // when
-                Order result = orderService.complete(ORDER_매장주문.getId());
+                Order result = orderService.startDelivery(배달주문.getId());
 
                 // then
                 assertAll(
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.EAT_IN),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED),
-                        () -> assertThat(result.getOrderTable().getNumberOfGuests()).isZero(),
-                        () -> assertThat(result.getOrderTable().isOccupied()).isFalse()
+                        () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
+                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERING)
                 );
             }
+        }
 
-            @DisplayName("현재 주문상태는 `제조완료`가 아니면 예외가 발생한다.")
+        @DisplayName("[실패]")
+        @Nested
+        class Fail {
+            @DisplayName("주문종류는 **배달주문**이여야 한다.")
+            @EnumSource(value = OrderType.class, mode = EnumSource.Mode.EXCLUDE, names = {"DELIVERY"})
+            @ParameterizedTest
+            void invalidTypeException(OrderType type) {
+                // given
+                Order order = 포장주문;
+                UUID orderId = order.getId();
+                order.setStatus(OrderStatus.SERVED);
+                when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+                // when
+                order.setType(type);
+
+                // then
+                assertThatThrownBy(() -> orderService.startDelivery(orderId))
+                        .isInstanceOf(IllegalStateException.class);
+            }
+
+            @DisplayName("현재 주문 상태는 **제조완료** 상태여야 한다.")
             @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"SERVED"})
             @ParameterizedTest
             void invalidStatusException(OrderStatus status) {
                 // given
-                Order order = ORDER_매장주문;
+                Order order = 배달주문;
                 UUID orderId = order.getId();
                 when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -716,101 +647,248 @@ public class OrderServiceTest {
                 order.setStatus(status);
 
                 // then
-                assertThatThrownBy(() -> orderService.complete(orderId))
+                assertThatThrownBy(() -> orderService.startDelivery(orderId))
                         .isInstanceOf(IllegalStateException.class);
+            }
+
+            @DisplayName("이미 등록되어있는 `주문`이어야 한다.")
+            @Test
+            void notExistsOrderException() {
+                // given
+                UUID orderId = 배달주문.getId();
+
+                // when
+                when(orderRepository.findById(any())).thenReturn(Optional.empty());
+
+                // then
+                assertThatThrownBy(() -> orderService.startDelivery(orderId))
+                        .isInstanceOf(NoSuchElementException.class);
+            }
+        }
+    }
+
+    @DisplayName("배달완료 테스트")
+    @Nested
+    class DeliveredOrder {
+        @DisplayName("[성공]")
+        @Nested
+        class Success {
+            @DisplayName("배달주문을 완료한다.")
+            @Test
+            void completeDeliveryOrder() {
+                // given
+                배달주문.setStatus(OrderStatus.DELIVERING);
+                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(배달주문));
+
+                // when
+                Order result = orderService.completeDelivery(배달주문.getId());
+
+                // then
+                assertAll(
+                        () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
+                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.DELIVERED)
+                );
+            }
+        }
+
+        @DisplayName("[실패]")
+        @Nested
+        class Fail {
+            @DisplayName("이미 등록되어있는 `주문`이어야 한다.")
+            @Test
+            void notExistsOrderException() {
+                // given
+                UUID orderId = 배달주문.getId();
+
+                // when
+                when(orderRepository.findById(any())).thenReturn(Optional.empty());
+
+                // then
+                assertThatThrownBy(() -> orderService.completeDelivery(orderId))
+                        .isInstanceOf(NoSuchElementException.class);
+            }
+
+            @DisplayName("현재 주문 상태는 **배달중** 상태여야 한다.")
+            @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"DELIVERING"})
+            @ParameterizedTest
+            void invalidStatusException(OrderStatus status) {
+                // given
+                Order order = 배달주문;
+                UUID orderId = order.getId();
+                when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+                // when
+                order.setStatus(status);
+
+                // then
+                assertThatThrownBy(() -> orderService.completeDelivery(orderId))
+                        .isInstanceOf(IllegalStateException.class);
+            }
+        }
+    }
+
+    @DisplayName("주문종료 테스트")
+    @Nested
+    class CompleteOrder {
+        @DisplayName("매장주문")
+        @Nested
+        class EatIn {
+            @DisplayName("[성공]")
+            @Nested
+            class Success {
+                @DisplayName("매장주문을 종료합니다.")
+                @Test
+                void eatInOrder() {
+
+                    // given
+                    매장주문.setStatus(OrderStatus.SERVED);
+                    when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(매장주문));
+                    when(orderRepository.existsByOrderTableAndStatusNot(주문테이블_1번, OrderStatus.COMPLETED))
+                            .thenReturn(false);
+
+                    // when
+                    Order result = orderService.complete(매장주문.getId());
+
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.EAT_IN),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                            () -> assertThat(result.getOrderTable().getNumberOfGuests()).isZero(),
+                            () -> assertThat(result.getOrderTable().isOccupied()).isFalse()
+                    );
+                }
+            }
+
+            @DisplayName("[실패]")
+            @Nested
+            class Fail {
+                @DisplayName("현재 주문 상태는 **제조완료** 상태이다.")
+                @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"SERVED"})
+                @ParameterizedTest
+                void invalidStatusException(OrderStatus status) {
+                    // given
+                    Order order = 매장주문;
+                    UUID orderId = order.getId();
+                    when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+                    // when
+                    order.setStatus(status);
+
+                    // then
+                    assertThatThrownBy(() -> orderService.complete(orderId))
+                            .isInstanceOf(IllegalStateException.class);
+                }
             }
         }
 
         @Nested
         @DisplayName("배달주문")
         class Delivery {
+            @DisplayName("[성공]")
+            @Nested
+            class Success {
+                @DisplayName("배달주문을 종료합니다.")
+                @Test
+                void deliveryOrder() {
+                    // given
+                    배달주문.setStatus(OrderStatus.DELIVERED);
+                    when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(배달주문));
 
-            @DisplayName("배달주문을 종료합니다.")
-            @Test
-            void deliveryOrder() {
-                // given
-                ORDER_배달주문.setStatus(OrderStatus.DELIVERED);
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_배달주문));
+                    // when
+                    Order result = orderService.complete(배달주문.getId());
 
-                // when
-                Order result = orderService.complete(ORDER_배달주문.getId());
-
-                // then
-                assertAll(
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED)
-                );
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.DELIVERY),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED)
+                    );
+                }
             }
 
-            @DisplayName("현재 주문상태는 `배달완료`가 아니면 예외가 발생한다.")
-            @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"DELIVERED"})
-            @ParameterizedTest
-            void invalidStatusException(OrderStatus status) {
-                // given
-                Order order = ORDER_배달주문;
-                UUID orderId = order.getId();
-                when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+            @DisplayName("[실패]")
+            @Nested
+            class Fail {
+                @DisplayName("현재 주문 상태는 **배달완료** 상태이다.")
+                @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"DELIVERED"})
+                @ParameterizedTest
+                void invalidStatusException(OrderStatus status) {
+                    // given
+                    Order order = 배달주문;
+                    UUID orderId = order.getId();
+                    when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
-                // when
-                order.setStatus(status);
+                    // when
+                    order.setStatus(status);
 
-                // then
-                assertThatThrownBy(() -> orderService.complete(orderId))
-                        .isInstanceOf(IllegalStateException.class);
+                    // then
+                    assertThatThrownBy(() -> orderService.complete(orderId))
+                            .isInstanceOf(IllegalStateException.class);
+                }
             }
         }
 
         @Nested
         @DisplayName("포장주문")
         class TakeOut {
+            @DisplayName("[성공]")
+            @Nested
+            class Success {
+                @DisplayName("포장주문을 종료합니다.")
+                @Test
+                void takeOutOrder() {
+                    // given
+                    포장주문.setStatus(OrderStatus.SERVED);
+                    when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(포장주문));
 
-            @DisplayName("포장주문을 종료합니다.")
-            @Test
-            void takeOutOrder() {
-                // given
-                ORDER_포장주문.setStatus(OrderStatus.SERVED);
-                when(orderRepository.findById(any())).thenReturn(Optional.ofNullable(ORDER_포장주문));
+                    // when
+                    Order result = orderService.complete(포장주문.getId());
 
-                // when
-                Order result = orderService.complete(ORDER_포장주문.getId());
-
-                // then
-                assertAll(
-                        () -> assertThat(result.getType()).isEqualTo(OrderType.TAKEOUT),
-                        () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED)
-                );
+                    // then
+                    assertAll(
+                            () -> assertThat(result.getType()).isEqualTo(OrderType.TAKEOUT),
+                            () -> assertThat(result.getStatus()).isEqualTo(OrderStatus.COMPLETED)
+                    );
+                }
             }
 
-            @DisplayName("현재 주문상태는 `제조완료`가 아니면 예외가 발생한다.")
-            @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"SERVED"})
-            @ParameterizedTest
-            void invalidStatusException(OrderStatus status) {
-                // given
-                Order order = ORDER_포장주문;
-                UUID orderId = order.getId();
-                when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+            @DisplayName("[실패]")
+            @Nested
+            class Fail {
+                @DisplayName("현재 주문 상태는 **제조완료** 상태이다.")
+                @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"SERVED"})
+                @ParameterizedTest
+                void invalidStatusException(OrderStatus status) {
+                    // given
+                    Order order = 포장주문;
+                    UUID orderId = order.getId();
+                    when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
-                // when
-                order.setStatus(status);
+                    // when
+                    order.setStatus(status);
 
-                // then
-                assertThatThrownBy(() -> orderService.complete(orderId))
-                        .isInstanceOf(IllegalStateException.class);
+                    // then
+                    assertThatThrownBy(() -> orderService.complete(orderId))
+                            .isInstanceOf(IllegalStateException.class);
+                }
             }
         }
 
-        @DisplayName("주문이 미리 등록되어 있지 않으면 예외가 발생한다.")
-        @Test
-        void notExistsOrderException() {
-            // given
-            UUID orderId = ORDER_배달주문.getId();
+        @DisplayName("[실패]")
+        @Nested
+        class Fail {
+            @DisplayName("이미 등록되어있는 `주문`이어야 한다.")
+            @Test
+            void notExistsOrderException() {
+                // given
+                UUID orderId = 배달주문.getId();
 
-            // when
-            when(orderRepository.findById(any())).thenReturn(Optional.empty());
+                // when
+                when(orderRepository.findById(any())).thenReturn(Optional.empty());
 
-            // then
-            assertThatThrownBy(() -> orderService.complete(orderId))
-                    .isInstanceOf(NoSuchElementException.class);
+                // then
+                assertThatThrownBy(() -> orderService.complete(orderId))
+                        .isInstanceOf(NoSuchElementException.class);
+            }
         }
     }
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class OrderFixture {
-    public static final String ORDER_배달주소 = "서울시 D아파트 D동 D호";
+    public static final String 배달주소 = "서울시 D아파트 D동 D호";
 
     public static Order orderEatInCreateRequest(UUID orderTableId, OrderLineItem... orderLineItems) {
         return orderCreateRequest(OrderType.EAT_IN, null, orderTableId, orderLineItems);

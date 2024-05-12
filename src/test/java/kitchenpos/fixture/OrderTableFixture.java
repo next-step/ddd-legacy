@@ -5,7 +5,7 @@ import kitchenpos.domain.OrderTable;
 import java.util.UUID;
 
 public class OrderTableFixture {
-    public static final String NAME_1번 = "1번";
+    public static final String 이름_1번 = "1번";
     public static final String NAME_2번 = "2번";
 
     public static OrderTable orderTableCreateRequest(String name) {

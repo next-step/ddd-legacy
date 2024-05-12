@@ -18,7 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.fixture.OrderTableFixture.NAME_1번;
+import static kitchenpos.fixture.OrderTableFixture.이름_1번;
 import static kitchenpos.fixture.OrderTableFixture.NAME_2번;
 import static kitchenpos.fixture.OrderTableFixture.changeNumberOfGuestsRequest;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
@@ -44,9 +44,9 @@ class OrderTableServiceTest {
     @Test
     void createOrderTable() {
         // given
-        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 0, false);
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 0, false);
         when(orderTableRepository.save(any())).thenReturn(ORDER_TABLE_1번);
-        OrderTable request = orderTableCreateRequest(NAME_1번);
+        OrderTable request = orderTableCreateRequest(이름_1번);
 
         // when
         OrderTable result = orderTableService.create(request);
@@ -54,7 +54,7 @@ class OrderTableServiceTest {
         // then
         assertAll(
                 () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
-                () -> assertThat(result.getName()).isEqualTo(NAME_1번),
+                () -> assertThat(result.getName()).isEqualTo(이름_1번),
                 () -> assertThat(result.getNumberOfGuests()).isZero(),
                 () -> assertThat(result.isOccupied()).isFalse()
         );
@@ -77,7 +77,7 @@ class OrderTableServiceTest {
     @Test
     void sitOrderTable() {
         // given
-        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 0, false);
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 0, false);
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
 
         // when
@@ -86,7 +86,7 @@ class OrderTableServiceTest {
         // then
         assertAll(
                 () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
-                () -> assertThat(result.getName()).isEqualTo(NAME_1번),
+                () -> assertThat(result.getName()).isEqualTo(이름_1번),
                 () -> assertThat(result.getNumberOfGuests()).isZero(),
                 () -> assertThat(result.isOccupied()).isTrue()
         );
@@ -96,7 +96,7 @@ class OrderTableServiceTest {
     @Test
     void clearOrderTable() {
         // given
-        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
         when(orderRepository.existsByOrderTableAndStatusNot(ORDER_TABLE_1번, OrderStatus.COMPLETED)).thenReturn(false);
 
@@ -106,7 +106,7 @@ class OrderTableServiceTest {
         // then
         assertAll(
                 () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
-                () -> assertThat(result.getName()).isEqualTo(NAME_1번),
+                () -> assertThat(result.getName()).isEqualTo(이름_1번),
                 () -> assertThat(result.getNumberOfGuests()).isZero(),
                 () -> assertThat(result.isOccupied()).isFalse()
         );
@@ -133,7 +133,7 @@ class OrderTableServiceTest {
     @Test
     void clearOrderTable_notCompletedOrderStatusException() {
         // given
-        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
         when(orderRepository.existsByOrderTableAndStatusNot(ORDER_TABLE_1번, OrderStatus.COMPLETED)).thenReturn(true);
         UUID orderTableId = ORDER_TABLE_1번.getId();
@@ -148,7 +148,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuestsOrderTable() {
         // given
-        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
         OrderTable request = changeNumberOfGuestsRequest(4);
 
@@ -158,7 +158,7 @@ class OrderTableServiceTest {
         // then
         assertAll(
                 () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
-                () -> assertThat(result.getName()).isEqualTo(NAME_1번),
+                () -> assertThat(result.getName()).isEqualTo(이름_1번),
                 () -> assertThat(result.getNumberOfGuests()).isEqualTo(4),
                 () -> assertThat(result.isOccupied()).isTrue()
         );
@@ -168,7 +168,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuestsOrderTable_notExistsOrderTableException() {
         // given
-        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
         UUID orderTableId = ORDER_TABLE_1번.getId();
         when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
         OrderTable request = changeNumberOfGuestsRequest(4);
@@ -183,7 +183,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuestsOrderTable_occupiedException() {
         // given
-        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, false);
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, false);
         UUID orderTableId = ORDER_TABLE_1번.getId();
         when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
         OrderTable request = changeNumberOfGuestsRequest(4);
@@ -199,7 +199,7 @@ class OrderTableServiceTest {
     @ParameterizedTest
     void changeNumberOfGuestsOrderTable_negativeException(int numberOfGuests) {
         // given
-        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
         UUID orderTableId = ORDER_TABLE_1번.getId();
         OrderTable request = changeNumberOfGuestsRequest(numberOfGuests);
 
@@ -213,7 +213,7 @@ class OrderTableServiceTest {
     @Test
     void getOrderTables() {
         // given
-        OrderTable ORDER_TABLE_1번 = orderTableResponse(NAME_1번, 2, true);
+        OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
         OrderTable ORDER_TABLE_2번 = orderTableResponse(NAME_2번, 0, false);
         when(orderTableRepository.findAll()).thenReturn(List.of(ORDER_TABLE_1번, ORDER_TABLE_2번));
 
