@@ -536,6 +536,8 @@ internal class OrderServiceTest {
             // given
             val orderId = UUID.randomUUID()
 
+            every { orderRepository.findById(any()) } returns Optional.empty()
+
             // when & then
             shouldThrowExactly<NoSuchElementException> {
                 orderService.serve(orderId)
