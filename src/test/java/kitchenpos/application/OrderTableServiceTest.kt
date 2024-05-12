@@ -100,4 +100,54 @@ internal class OrderTableServiceTest {
             result.isOccupied shouldBe true
         }
     }
+
+    @Nested
+    inner class `테이블 치우기 테스트` {
+        @DisplayName("존재하지 않는 테이블 아이디이면, NoSuchElementException 예외 처리를 한다.")
+        @Test
+        fun test1() {
+            // given
+            val orderTableId = UUID.randomUUID()
+            every { orderTableRepository.findById(any()) } returns Optional.empty()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                orderTableService.clear(orderTableId)
+            }
+        }
+
+        @DisplayName("주문 상태가 완료인 주문을 제외하고, 해당 테이블이 속해있는 주문이 있다면, IllegalStateException 예외 처리를 한다.")
+        @Test
+        fun test2() {
+            // given
+            val orderTableId = UUID.randomUUID()
+            val orderTable = OrderTable()
+
+            every { orderTableRepository.findById(any()) } returns Optional.of(orderTable)
+            every { orderRepository.existsByOrderTableAndStatusNot(any(), any()) } returns true
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                orderTableService.clear(orderTableId)
+            }
+        }
+
+        @DisplayName("정상 요청이라면, 해당 테이블을 치운다.")
+        @Test
+        fun test3() {
+            // given
+            val orderTableId = UUID.randomUUID()
+            val orderTable = OrderTable()
+
+            every { orderTableRepository.findById(any()) } returns Optional.of(orderTable)
+            every { orderRepository.existsByOrderTableAndStatusNot(any(), any()) } returns false
+
+            // when
+            val result = orderTableService.clear(orderTableId)
+
+            // then
+            result.numberOfGuests shouldBe 0
+            result.isOccupied shouldBe false
+        }
+    }
 }
