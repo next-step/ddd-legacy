@@ -81,6 +81,7 @@ class OrderTableServiceTest {
             orderTable = orderTableService.clear(orderTable.getId());
 
             assertThat(orderTable.isOccupied()).isFalse();
+            assertThat(orderTable.getNumberOfGuests()).isZero();
         }
 
         @Disabled("TODO: Order Fixtures를 생성하여 완료된 주문을 생성하고 테스트를 진행해야 합니다.")
@@ -92,7 +93,7 @@ class OrderTableServiceTest {
             orderTable = orderTableService.sit(orderTable.getId());
 
             // TODO: Order Fixtures를 생성하여 완료되지 않은 주문을 생성해야 합니다.
-            
+
             UUID orderTableId = orderTable.getId();
 
             assertThatThrownBy(() -> orderTableService.clear(orderTableId))
@@ -102,6 +103,44 @@ class OrderTableServiceTest {
 
     @Nested
     class changeNumberOfGuestsTest {
+        @DisplayName("손님 수를 변경할 수 있다.")
+        @Test
+        void changeNumberOfGuestsSuccessTest() {
+            OrderTable orderTable = createOrderTable("1번");
+            orderTable = orderTableService.create(orderTable);
+            orderTableService.sit(orderTable.getId());
+            orderTable.setNumberOfGuests(4);
+            orderTable = orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
+
+            assertThat(orderTable.getNumberOfGuests()).isEqualTo(4);
+        }
+
+        @DisplayName("손님 수가 0보다 작으면 예외가 발생한다.")
+        @Test
+        void changeNumberOfGuestsFailWhenNumberOfGuestsIsLessThanZeroTest() {
+            OrderTable orderTable = createOrderTable("1번");
+            orderTable = orderTableService.create(orderTable);
+            orderTableService.sit(orderTable.getId());
+            orderTable.setNumberOfGuests(-1);
+
+            UUID orderTableId = orderTable.getId();
+            OrderTable changeOrderTable = orderTable;
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, changeOrderTable))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @DisplayName("착석하지 않은 경우 예외가 발생한다.")
+        @Test
+        void changeNumberOfGuestsFailWhenNotSitTest() {
+            OrderTable orderTable = createOrderTable("1번");
+            orderTable = orderTableService.create(orderTable);
+            orderTable.setNumberOfGuests(4);
+
+            UUID orderTableId = orderTable.getId();
+            OrderTable changeOrderTable = orderTable;
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, changeOrderTable))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     @Nested
