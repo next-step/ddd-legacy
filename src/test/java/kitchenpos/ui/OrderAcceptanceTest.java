@@ -36,7 +36,7 @@ import static kitchenpos.acceptacne.steps.ProductSteps.createProductStep;
 import static kitchenpos.fixture.MenuFixture.NAME_반반치킨;
 import static kitchenpos.fixture.MenuFixture.PRICE_38000;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
-import static kitchenpos.fixture.MenuGroupFixture.NAME_추천메뉴;
+import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
 import static kitchenpos.fixture.OrderFixture.ORDER_배달주소;
@@ -399,7 +399,7 @@ class OrderAcceptanceTest {
     }
 
     private static MenuGroup createMenuGroup() {
-        MenuGroup menuGroup = menuGroupCreateRequest(NAME_추천메뉴);
+        MenuGroup menuGroup = menuGroupCreateRequest(이름_추천메뉴);
         return createMenuGroupStep(menuGroup).as(MenuGroup.class);
     }
 

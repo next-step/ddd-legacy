@@ -4,6 +4,7 @@ import kitchenpos.ApplicationMockTest;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -12,8 +13,8 @@ import org.mockito.Mock;
 
 import java.util.List;
 
-import static kitchenpos.fixture.MenuGroupFixture.NAME_추천메뉴;
-import static kitchenpos.fixture.MenuGroupFixture.NAME_한마리메뉴;
+import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
+import static kitchenpos.fixture.MenuGroupFixture.이름_한마리메뉴;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupResponse;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,47 +32,67 @@ class MenuGroupServiceTest {
     @InjectMocks
     private MenuGroupService menuGroupService;
 
-    @DisplayName("메뉴그룹을 등록한다")
-    @Test
-    void creatMenuGroup() {
-        // given
-        MenuGroup request = menuGroupCreateRequest(NAME_추천메뉴);
-        when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(menuGroupResponse(NAME_추천메뉴));
+    @DisplayName("메뉴그룹 등록")
+    @Nested
+    class MenuGroupCreate {
+        @DisplayName("[성공]")
+        @Nested
+        class Success {
+            @DisplayName("메뉴그룹을 등록한다")
+            @Test
+            void creatMenuGroup() {
+                // given
+                MenuGroup request = menuGroupCreateRequest(이름_추천메뉴);
+                when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(menuGroupResponse(이름_추천메뉴));
 
-        // when
-        MenuGroup result = menuGroupService.create(request);
+                // when
+                MenuGroup result = menuGroupService.create(request);
 
-        // then
-        assertAll(
-                () -> assertThat(result.getId()).isNotNull(),
-                () -> assertThat(result.getName()).isEqualTo(NAME_추천메뉴)
-        );
+                // then
+                assertAll(
+                        () -> assertThat(result.getId()).isNotNull(),
+                        () -> assertThat(result.getName()).isEqualTo(이름_추천메뉴)
+                );
+            }
+        }
+
+        @DisplayName("[실패]")
+        @Nested
+        class Fail {
+            @DisplayName("이름은 공백일 수 없다.")
+            @NullAndEmptySource
+            @ParameterizedTest
+            void creatMenuGroup_nullOrEmptyNameException(String name) {
+                // given
+                MenuGroup request = menuGroupCreateRequest(name);
+
+                // when
+                // then
+                assertThatThrownBy(() -> menuGroupService.create(request))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+        }
     }
 
-    @DisplayName("메뉴그룹을 등록할 때, 이름이 공백이면 예외가 발생한다.")
-    @NullAndEmptySource
-    @ParameterizedTest
-    void creatMenuGroup_nullOrEmptyNameException(String name) {
-        // given
-        MenuGroup request = menuGroupCreateRequest(name);
+    @DisplayName("메뉴그룹 목록")
+    @Nested
+    class MenuGroupList {
+        @DisplayName("[성공]")
+        @Nested
+        class Success {
+            @DisplayName("메뉴그룹 목록을 볼 수 있다")
+            @Test
+            void getMenuGroups() {
+                // given
+                List<MenuGroup> 메뉴그룹_목록 = List.of(menuGroupResponse(이름_추천메뉴), menuGroupResponse(이름_한마리메뉴));
+                when(menuGroupRepository.findAll()).thenReturn(메뉴그룹_목록);
 
-        // when
-        // then
-        assertThatThrownBy(() -> menuGroupService.create(request))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
+                // when
+                List<MenuGroup> result = menuGroupService.findAll();
 
-    @DisplayName("메뉴그룹 목록을 볼 수 있다")
-    @Test
-    void getMenuGroups() {
-        // given
-        List<MenuGroup> menuGroups = List.of(menuGroupResponse(NAME_추천메뉴), menuGroupResponse(NAME_한마리메뉴));
-        when(menuGroupRepository.findAll()).thenReturn(menuGroups);
-
-        // when
-        List<MenuGroup> result = menuGroupService.findAll();
-
-        // then
-        assertThat(result).extracting("name").containsExactly(NAME_추천메뉴, NAME_한마리메뉴);
+                // then
+                assertThat(result).extracting("name").containsExactly(이름_추천메뉴, 이름_한마리메뉴);
+            }
+        }
     }
 }

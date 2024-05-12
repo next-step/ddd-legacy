@@ -29,7 +29,7 @@ import static kitchenpos.fixture.MenuFixture.PRICE_34000;
 import static kitchenpos.fixture.MenuFixture.PRICE_38000;
 import static kitchenpos.fixture.MenuFixture.menuChangePriceRequest;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
-import static kitchenpos.fixture.MenuGroupFixture.NAME_추천메뉴;
+import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
 import static kitchenpos.fixture.ProductFixture.NAME_양념치킨;
@@ -51,7 +51,7 @@ class MenuAcceptanceTest {
 
     @BeforeEach
     void setUp() {
-        MenuGroup menuGroup = createMenuGroupStep(menuGroupCreateRequest(NAME_추천메뉴)).as(MenuGroup.class);
+        MenuGroup menuGroup = createMenuGroupStep(menuGroupCreateRequest(이름_추천메뉴)).as(MenuGroup.class);
         PRODUCT_양념치킨 = createProduct(NAME_양념치킨, PRICE_20000);
         PRODUCT_후라이드치킨 = createProduct(NAME_후라이드치킨, PRICE_18000);
         양념치킨_1개 = menuProductResponse(PRODUCT_양념치킨, 1);
