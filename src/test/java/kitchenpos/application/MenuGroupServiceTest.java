@@ -9,6 +9,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -37,48 +38,68 @@ class MenuGroupServiceTest {
 		menuGroup.setName("점심 특선");
 	}
 
-	@ParameterizedTest
-	@DisplayName("메뉴 그룹의 이름이 null이거나 비어있으면 IllegalArgumentException이 발생한다")
-	@NullAndEmptySource
-	void createMenuGroupWithEmptyOrNullName(String name) {
-		// given
-		MenuGroup menuGroup = new MenuGroup();
-		menuGroup.setName(name);
+	@Nested
+	class create {
 
-		// then
-		assertThatExceptionOfType(IllegalArgumentException.class)
-			.isThrownBy(() ->
-				// when
-				menuGroupService.create(menuGroup)
-			);
+		@ParameterizedTest
+		@DisplayName("메뉴 그룹의 이름이 null이거나 비어있으면 IllegalArgumentException이 발생한다")
+		@NullAndEmptySource
+		void createMenuGroupWithEmptyOrNullName(String name) {
+			// given
+			MenuGroup menuGroup = new MenuGroup();
+			menuGroup.setName(name);
+
+			// then
+			assertThatExceptionOfType(IllegalArgumentException.class)
+				.isThrownBy(() ->
+					// when
+					menuGroupService.create(menuGroup)
+				);
+		}
+
+		@Test
+		@DisplayName("메뉴 그룹의 이름이 비어있지 않으면 정상적으로 저장된다")
+		void createMenuGroupWithValidName() {
+			// given
+			when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(menuGroup);
+
+			// when
+			MenuGroup created = menuGroupService.create(menuGroup);
+
+			// then
+			assertThat(created).isNotNull();
+			assertThat(created.getName()).isEqualTo("점심 특선");
+			assertThat(created.getId()).isNotNull();
+		}
 	}
 
-	@Test
-	@DisplayName("메뉴 그룹의 이름이 비어있지 않으면 정상적으로 저장된다")
-	void createMenuGroupWithValidName() {
-		// given
-		when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(menuGroup);
+	@Nested
+	class findAll {
+		@Test
+		@DisplayName("메뉴 그룹이 저장되어 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹이 조회된다")
+		void findAllMenuGroupsWhenNotEmpty() {
+			// given
+			when(menuGroupRepository.findAll()).thenReturn(Collections.singletonList(menuGroup));
 
-		// when
-		MenuGroup created = menuGroupService.create(menuGroup);
+			// when
+			List<MenuGroup> foundMenuGroups = menuGroupService.findAll();
 
-		// then
-		assertThat(created).isNotNull();
-		assertThat(created.getName()).isEqualTo("점심 특선");
-		assertThat(created.getId()).isNotNull();
-	}
+			// then
+			assertThat(foundMenuGroups).isNotEmpty();
+			assertThat(foundMenuGroups.get(0).getName()).isEqualTo("점심 특선");
+		}
 
-	@Test
-	@DisplayName("모든 메뉴 그룹을 정상적으로 조회하면 목록이 비어있지 않다")
-	void findAllMenuGroups() {
-		// given
-		when(menuGroupRepository.findAll()).thenReturn(Collections.singletonList(menuGroup));
+		@Test
+		@DisplayName("메뉴 그룹이 비어 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹이 조회되지 않는다")
+		void findAllMenuGroupsWhenEmpty() {
+			// given
+			when(menuGroupRepository.findAll()).thenReturn(Collections.emptyList());
 
-		// when
-		List<MenuGroup> foundMenuGroups = menuGroupService.findAll();
+			// when
+			List<MenuGroup> foundMenuGroups = menuGroupService.findAll();
 
-		// then
-		assertThat(foundMenuGroups).isNotEmpty();
-		assertThat(foundMenuGroups.get(0).getName()).isEqualTo("점심 특선");
+			// then
+			assertThat(foundMenuGroups).isEmpty();
+		}
 	}
 }
