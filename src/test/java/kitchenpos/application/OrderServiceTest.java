@@ -4,7 +4,6 @@ import kitchenpos.application.testFixture.OrderFixture;
 import kitchenpos.application.testFixture.OrderTableFixture;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @DisplayName("주문(Order) 서비스 테스트")
 @ExtendWith(MockitoExtension.class)
@@ -57,8 +58,47 @@ class OrderServiceTest {
     void create() {
     }
 
-    @Test
-    void accept() {
+    @Nested
+    @DisplayName("'주문 승낙 완료'(ACCEPTED) 처리시")
+    class Accept {
+
+        @Test
+        @DisplayName("배달 주문일 경우, 배달 라이더에게 배달을 요청하고 주문의 상태는 '수락'(ACCEPTED)로 변경된다.")
+        void notServedTest() {
+            // given
+            var order = OrderFixture.newOneDelivery(WAITING);
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+            // when & then
+            var actual = orderService.accept(UUID.randomUUID());
+
+            // then
+            verify(kitchenridersClient, times(1)).requestDelivery(any(), any(), any());
+            assertThat(actual.getStatus()).isEqualTo(ACCEPTED);
+        }
+
+        @Test
+        @DisplayName("[예외] '대기중'(WAITING)가 아니면 예외가 발생한다.")
+        void notWaitingExceptionTest() {
+            // given
+            var order = OrderFixture.newOneTakeOut(SERVED);
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+            // when & then
+            assertThatThrownBy(() -> orderService.accept(UUID.randomUUID()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] 존재하지 않는 주문일 경우 예외가 발생한다.")
+        void notFoundOrderExceptionTest() {
+            // given
+            given(orderRepository.findById(any())).willReturn(Optional.empty());
+
+            // when & then
+            assertThatThrownBy(() -> orderService.accept(UUID.randomUUID()))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @Nested
@@ -76,18 +116,18 @@ class OrderServiceTest {
             var actual = orderService.serve(UUID.randomUUID());
 
             // then
-            Assertions.assertThat(actual.getStatus()).isEqualTo(SERVED);
+            assertThat(actual.getStatus()).isEqualTo(SERVED);
         }
 
         @Test
         @DisplayName("[예외] '주문 수락 완료'(ACCEPTED)가 아니면 예외가 발생한다.")
-        void notServedTest() {
+        void notAcceptedTest() {
             // given
             var order = OrderFixture.newOneTakeOut(WAITING);
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // when & then
-            Assertions.assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
@@ -98,7 +138,7 @@ class OrderServiceTest {
             given(orderRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
-            Assertions.assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
         }
     }
@@ -126,7 +166,7 @@ class OrderServiceTest {
             var actual = orderService.startDelivery(UUID.randomUUID());
 
             // then
-            Assertions.assertThat(actual.getStatus()).isEqualTo(DELIVERING);
+            assertThat(actual.getStatus()).isEqualTo(DELIVERING);
         }
 
         @Test
@@ -137,7 +177,7 @@ class OrderServiceTest {
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // when & then
-            Assertions.assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
@@ -149,7 +189,7 @@ class OrderServiceTest {
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // when & then
-            Assertions.assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
@@ -160,7 +200,7 @@ class OrderServiceTest {
             given(orderRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
-            Assertions.assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
         }
     }
@@ -191,7 +231,7 @@ class OrderServiceTest {
             given(orderRepository.findById(any())).willReturn(Optional.of(order));
 
             // when & then
-            Assertions.assertThatThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
@@ -202,7 +242,7 @@ class OrderServiceTest {
             given(orderRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
-            Assertions.assertThatThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
         }
     }
