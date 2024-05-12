@@ -61,8 +61,46 @@ class OrderServiceTest {
     void accept() {
     }
 
-    @Test
-    void serve() {
+    @Nested
+    @DisplayName("'서빙완료'(SERVED) 처리시")
+    class Serve {
+
+        @Test
+        @DisplayName("'서빙완료'(SERVED)로 주문 상태가 변경 된다.")
+        void servedTest() {
+            // given
+            var order = OrderFixture.newOneTakeOut(ACCEPTED);
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+            // when
+            var actual = orderService.serve(UUID.randomUUID());
+
+            // then
+            Assertions.assertThat(actual.getStatus()).isEqualTo(SERVED);
+        }
+
+        @Test
+        @DisplayName("[예외] '주문 수락 완료'(ACCEPTED)가 아니면 예외가 발생한다.")
+        void notServedTest() {
+            // given
+            var order = OrderFixture.newOneTakeOut(WAITING);
+            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @Test
+        @DisplayName("[예외] 존재하지 않는 주문일 경우 예외가 발생한다.")
+        void notFoundOrderExceptionTest() {
+            // given
+            given(orderRepository.findById(any())).willReturn(Optional.empty());
+
+            // when & then
+            Assertions.assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
     }
 
     @Nested
