@@ -379,6 +379,46 @@ class OrderServiceTest {
 
     @Nested
     class serveTest {
+        @DisplayName("주문을 손님에게 제공한다.")
+        @Test
+        void serveSuccessTest() {
+            Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+            product = productRepository.save(product);
+            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            menu = menuRepository.save(menu);
+            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            Order order = createOrder(null, null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
+            order = orderService.create(order);
+
+            order = orderService.accept(order.getId());
+            order = orderService.serve(order.getId());
+
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
+        }
+
+        @DisplayName("수락상태가 아닌 경우에 예외가 발생한다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "ACCEPTED")
+        void serveFailWhenOrderStatusIsNotAcceptedTest(OrderStatus orderStatus) {
+            Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+            product = productRepository.save(product);
+            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            menu = menuRepository.save(menu);
+            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, orderStatus, null, LocalDateTime.now());
+            order = orderRepository.save(order);
+
+            UUID orderId = order.getId();
+
+            assertThatThrownBy(() -> orderService.serve(orderId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     @Nested
