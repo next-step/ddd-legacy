@@ -150,4 +150,78 @@ internal class OrderTableServiceTest {
             result.isOccupied shouldBe false
         }
     }
+
+    @Nested
+    inner class `손님 수 변경 테스트` {
+        @DisplayName("손님 수를 음수로 변경하려고 하면, IllegalArgumentException 예외 처리를 한다.")
+        @Test
+        fun test1() {
+            // given
+            val orderTableId = UUID.randomUUID()
+            val request = OrderTable().apply {
+                this.numberOfGuests = -1
+            }
+
+            // when & then
+            shouldThrowExactly<IllegalArgumentException> {
+                orderTableService.changeNumberOfGuests(orderTableId, request)
+            }
+        }
+
+        @DisplayName("존재하지 않는 id 라면, NoSuchElementException 예외 처리를 한다.")
+        @Test
+        fun test2() {
+            // given
+            val orderTableId = UUID.randomUUID()
+            val request = OrderTable().apply {
+                this.numberOfGuests = 4
+            }
+
+            every { orderTableRepository.findById(any()) } returns Optional.empty()
+
+            // when & then
+            shouldThrowExactly<NoSuchElementException> {
+                orderTableService.changeNumberOfGuests(orderTableId, request)
+            }
+        }
+
+        @DisplayName("해당 테이블이 점유 중이지 않다면, IllegalStateException 예외 처리를 한다.")
+        @Test
+        fun test3() {
+            // given
+            val orderTableId = UUID.randomUUID()
+            val request = OrderTable().apply {
+                this.numberOfGuests = 4
+                this.isOccupied = false
+            }
+
+            every { orderTableRepository.findById(any()) } returns Optional.of(request)
+            every { orderRepository.existsByOrderTableAndStatusNot(any(), any()) } returns false
+
+            // when & then
+            shouldThrowExactly<IllegalStateException> {
+                orderTableService.changeNumberOfGuests(orderTableId, request)
+            }
+        }
+
+        @DisplayName("정상 요청이라면, 손님 수를 변경한다.")
+        @Test
+        fun test4() {
+            // given
+            val orderTableId = UUID.randomUUID()
+            val request = OrderTable().apply {
+                this.numberOfGuests = 4
+                this.isOccupied = true
+            }
+
+            every { orderTableRepository.findById(any()) } returns Optional.of(request)
+            every { orderRepository.existsByOrderTableAndStatusNot(any(), any()) } returns false
+
+            // when
+            val result = orderTableService.changeNumberOfGuests(orderTableId, request)
+
+            // then
+            result.numberOfGuests shouldBe request.numberOfGuests
+        }
+    }
 }
