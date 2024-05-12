@@ -106,7 +106,7 @@ class OrderServiceTest {
 	@Nested
 	class create {
 		@Test
-		@DisplayName("주문 생성 시 주문 타입이 null이면 IllegalArgumentException이 발생한다")
+		@DisplayName("주문 생성 시 주문 타입이 null이면 주문 생성을 할 수 없다")
 		void createOrderWithNullType() {
 			// given
 			validOrder.setType(null);
@@ -121,7 +121,7 @@ class OrderServiceTest {
 
 		@ParameterizedTest
 		@NullAndEmptySource
-		@DisplayName("주문 생성 시 주문 항목이 null이거나 비어있으면 IllegalArgumentException이 발생한다")
+		@DisplayName("주문 생성 시 주문 항목이 null이거나 비어있으면 주문 생성을 할 수 없다")
 		void createOrderWithNullOrEmptyLineItems(List<OrderLineItem> lineItems) {
 			// given
 			validOrder.setOrderLineItems(lineItems);
@@ -135,7 +135,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 생성 시 요청된 항목 수와 실제 메뉴 수가 일치하지 않으면 IllegalArgumentException이 발생한다")
+		@DisplayName("주문 생성 시 요청된 항목 수와 실제 메뉴 수가 일치하지 않으면 주문 생성을 할 수 없다")
 		void createOrderWithMismatchedMenusAndRequests() {
 			// given
 			validOrder.setOrderLineItems(Arrays.asList(new OrderLineItem(), new OrderLineItem()));
@@ -150,7 +150,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 생성 시 요청된 항목의 수량이 음수이면 IllegalArgumentException이 발생한다")
+		@DisplayName("주문 생성 시 요청된 항목의 수량이 음수이면 주문 생성을 할 수 없다")
 		void createOrderWithNegativeQuantity() {
 			// given
 			OrderLineItem item = new OrderLineItem();
@@ -166,7 +166,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 생성 시 메뉴 ID에 해당하는 메뉴가 존재하지 않으면 NoSuchElementException이 발생한다")
+		@DisplayName("주문 생성 시 메뉴 ID에 해당하는 메뉴가 존재하지 않으면 주문 생성을 할 수 없다")
 		void createOrderWithNonExistentMenu() {
 			// given
 			when(menuRepository.findById(any())).thenReturn(Optional.empty());
@@ -180,7 +180,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 생성 시 메뉴가 표시되지 않았을 경우 IllegalStateException이 발생한다")
+		@DisplayName("주문 생성 시 메뉴가 표시되지 않았을 경우 주문 생성을 할 수 없다")
 		void createOrderWithHiddenMenu() {
 			// given
 			validMenu.setDisplayed(false);
@@ -194,7 +194,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 생성 시 요청된 가격과 메뉴의 가격이 다르면 IllegalArgumentException이 발생한다")
+		@DisplayName("주문 생성 시 요청된 가격과 메뉴의 가격이 다르면 주문 생성을 할 수 없다")
 		void createOrderWithMismatchedPrice() {
 			// given
 			validOrder.getOrderLineItems().get(0).setPrice(new BigDecimal("10.00"));
@@ -209,7 +209,7 @@ class OrderServiceTest {
 
 		@ParameterizedTest
 		@NullAndEmptySource
-		@DisplayName("배달 주문 생성 시 배달 주소가 null이거나 비어있으면 IllegalArgumentException이 발생한다")
+		@DisplayName("배달 주문 생성 시 배달 주소가 null이거나 비어있으면 주문 생성을 할 수 없다")
 		void createDeliveryOrderWithNullOrEmptyAddress(String address) {
 			// given
 			validOrder.setType(OrderType.DELIVERY);
@@ -224,7 +224,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("매장 내 식사 주문 생성 시 주문 테이블 ID에 해당하는 테이블이 존재하지 않으면 NoSuchElementException이 발생한다")
+		@DisplayName("매장 내 식사 주문 생성 시 주문 테이블 ID에 해당하는 테이블이 존재하지 않으면 주문 생성을 할 수 없다")
 		void createEatInOrderWithNonExistentTable() {
 			// given
 			validOrder.setType(OrderType.EAT_IN);
@@ -239,7 +239,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("매장 내 식사 주문 생성 시 주문 테이블이 사용 중이 아니면 IllegalStateException이 발생한다")
+		@DisplayName("매장 내 식사 주문 생성 시 주문 테이블이 사용 중이 아니면 주문 생성을 할 수 없다")
 		void createEatInOrderWithNonOccupiedTable() {
 			// given
 			validOrder.setType(OrderType.EAT_IN);
@@ -254,7 +254,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("매장 내 식사 주문 생성 시 주문 테이블이 사용 중이면 주문이 정상적으로 생성된다")
+		@DisplayName("매장 내 식사 주문 생성 시 주문 테이블이 사용 중이면 주문 생성을 할 수 있다")
 		void createEatInOrderSuccessfully() {
 			// given
 			validOrder.setType(OrderType.EAT_IN);
@@ -275,7 +275,7 @@ class OrderServiceTest {
 
 	class accept {
 		@Test
-		@DisplayName("주문 수락 시 주문 ID에 해당하는 주문이 존재하지 않으면 NoSuchElementException이 발생한다")
+		@DisplayName("주문 수락 시 주문 ID에 해당하는 주문이 존재하지 않으면 주문 수락을 할 수 없다")
 		void acceptNonExistentOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -290,7 +290,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 수락 시 주문 상태가 WAITING이 아니면 IllegalStateException이 발생한다")
+		@DisplayName("주문 수락 시 주문 상태가 WAITING이 아니면 주문 수락을 할 수 없다")
 		void acceptNonWaitingOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -306,7 +306,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("배달 주문 수락 시 KitchenridersClient를 통해 배달이 요청되고 주문 상태가 ACCEPTED로 변경된다")
+		@DisplayName("배달 주문 수락 시 주문 수락을 할 수 있다")
 		void acceptDeliveryOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -327,7 +327,7 @@ class OrderServiceTest {
 	@Nested
 	class serve {
 		@Test
-		@DisplayName("주문 서빙 시 주문 ID에 해당하는 주문이 존재하지 않으면 NoSuchElementException이 발생한다")
+		@DisplayName("주문 서빙 시 주문 ID에 해당하는 주문이 존재하지 않으면 주문 서빙을 할 수 없다")
 		void serveNonExistentOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -342,7 +342,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 서빙 시 주문 상태가 ACCEPTED가 아니면 IllegalStateException이 발생한다")
+		@DisplayName("주문 서빙 시 주문 상태가 ACCEPTED가 아니면 주문 서빙을 할 수 없다")
 		void serveNonAcceptedOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -376,7 +376,7 @@ class OrderServiceTest {
 	@Nested
 	class startDelivery {
 		@Test
-		@DisplayName("배달 시작 처리 시 주문 ID에 해당하는 주문이 존재하지 않으면 NoSuchElementException이 발생한다")
+		@DisplayName("배달 시작 처리 시 주문 ID에 해당하는 주문이 존재하지 않으면 배달 시작 처리를 할 수 없다")
 		void startDeliveryNonExistentOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -392,7 +392,7 @@ class OrderServiceTest {
 
 		@ParameterizedTest
 		@EnumSource(value = OrderType.class, names = {"TAKEOUT", "EAT_IN"})
-		@DisplayName("배달 시작 처리 시 주문 타입이 배달이 아니면 IllegalStateException이 발생한다")
+		@DisplayName("배달 시작 처리 시 주문 타입이 배달이 아니면 배달 시작 처리를 할 수 없다")
 		void startDeliveryOnNonDeliveryOrder(OrderType orderType) {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -410,7 +410,7 @@ class OrderServiceTest {
 
 		@ParameterizedTest
 		@EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = {"SERVED"})
-		@DisplayName("배달 시작 처리 시 주문 타입이 배달이고, 주문 상태가 SERVED가 아니면 IllegalStateException이 발생한다")
+		@DisplayName("배달 시작 처리 시 주문 타입이 배달이고, 주문 상태가 SERVED가 아니면 배달 시작 처리를 할 수 없다")
 		void startDeliveryNotServedOrder(OrderStatus nonServedStatus) {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -446,7 +446,7 @@ class OrderServiceTest {
 	@Nested
 	class completeDelivery {
 		@Test
-		@DisplayName("배달 완료 처리 시 주문 ID에 해당하는 주문이 존재하지 않으면 NoSuchElementException이 발생한다")
+		@DisplayName("배달 완료 처리 시 주문 ID에 해당하는 주문이 존재하지 않으면 배달 완료 처리를 할 수 없다")
 		void completeDeliveryNonExistentOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -462,7 +462,7 @@ class OrderServiceTest {
 
 		@ParameterizedTest
 		@EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
-		@DisplayName("배달 완료 처리 시 주문 상태가 DELIVERING이 아니면 IllegalStateException이 발생한다")
+		@DisplayName("배달 완료 처리 시 주문 상태가 DELIVERING이 아니면 배달 완료 처리를 할 수 없다")
 		void completeDeliveryNotDeliveringOrder(OrderStatus orderStatus) {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -496,7 +496,7 @@ class OrderServiceTest {
 
 	class complete {
 		@Test
-		@DisplayName("주문 완료 처리 시 주문 ID에 해당하는 주문이 존재하지 않으면 NoSuchElementException이 발생한다")
+		@DisplayName("주문 완료 처리 시 주문 ID에 해당하는 주문이 존재하지 않으면 주문 완료 처리를 할 수 없다")
 		void completeNonExistentOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -511,7 +511,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("배달 주문 완료 처리 시 주문 상태가 DELIVERED가 아니면 IllegalStateException이 발생한다")
+		@DisplayName("배달 주문 완료 처리 시 주문 상태가 DELIVERED가 아니면 주문 완료 처리를 할 수 없다")
 		void completeNonDeliveredOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -545,7 +545,7 @@ class OrderServiceTest {
 
 		@ParameterizedTest
 		@MethodSource("provideExceptionCasesForTakeOutAndEatInOrderTypes")
-		@DisplayName("포장 또는 매장 식사 주문 완료 처리 시 주문 상태가 SERVED가 아니면 IllegalStateException이 발생한다")
+		@DisplayName("포장 또는 매장 식사 주문 완료 처리 시 주문 상태가 SERVED가 아니면 주문 완료 처리를 할 수 없다")
 		void completeIfOrderNotServedOnCompletion(OrderType type, OrderStatus status) {
 			// given
 			UUID orderId = UUID.randomUUID();
@@ -594,7 +594,7 @@ class OrderServiceTest {
 
 		@Test
 		@DisplayName("매장 식사 주문 완료 처리 시 주문 상태가 SERVED이고 해당 주문 테이블의 주문이 미완료 상태인 경우 주문 상태가 COMPLETED로 변경된다")
-		void completeServedEatInOrderWithActiveTable() {
+		void completeServedEatInOrderWhenNotCompleted() {
 			// given
 			UUID orderId = UUID.randomUUID();
 			validOrder.setType(OrderType.EAT_IN);
@@ -635,7 +635,7 @@ class OrderServiceTest {
 	@Nested
 	class findAll {
 		@Test
-		@DisplayName("주문 데이터가 비어있을 때 모든 주문을 조회하면 주문 목록이 반환되지 않는다")
+		@DisplayName("주문 데이터가 비어있을 때 모든 주문을 조회하면 주문 목록을 조회할 수 없다")
 		void findAllOrdersWhenEmpty() {
 			// given
 			when(orderRepository.findAll()).thenReturn(Collections.emptyList());
@@ -648,7 +648,7 @@ class OrderServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 데이터 저장 시 모든 주문을 조회하면 정상적으로 주문 목록이 반환된다")
+		@DisplayName("주문 데이터가 비어있지 않을 때 모든 주문을 조회하면 주문 목록을 조회할 수 있다")
 		void findAllOrdersWhenNotEmpty() {
 			// given
 			when(orderRepository.findAll()).thenReturn(Collections.singletonList(validOrder));

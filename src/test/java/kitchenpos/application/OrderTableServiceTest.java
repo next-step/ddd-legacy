@@ -41,7 +41,7 @@ class OrderTableServiceTest {
 	class create {
 		@ParameterizedTest
 		@NullAndEmptySource
-		@DisplayName("주문 테이블 생성 시 이름이 비어있거나 null일 때 IllegalArgumentException이 발생한다")
+		@DisplayName("주문 테이블 생성 시 이름이 비어있거나 null일 때 주문 테이블 생성을 할 수 없다")
 		void createWithNullOrEmptyName(String name) {
 			// given
 			OrderTable table = new OrderTable();
@@ -56,7 +56,7 @@ class OrderTableServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 테이블이 정상적으로 저장되는 경우")
+		@DisplayName("주문 테이블을 저장할 수 있다")
 		void createSuccessfully() {
 			// given
 			OrderTable requestTable = new OrderTable();
@@ -75,7 +75,7 @@ class OrderTableServiceTest {
 	@Nested
 	class sit {
 		@Test
-		@DisplayName("주문 테이블을 사용 중 상태로 변경 시 존재하지 않는 주문 테이블 ID로 요청하면 NoSuchElementException이 발생한다")
+		@DisplayName("주문 테이블을 사용 중 상태로 변경 시 존재하지 않는 주문 테이블 ID로 요청하면 주문 테이블을 사용 중 상태로 변경할 수 없다")
 		void sitWithNonExistentTable() {
 			// given
 			UUID nonExistentId = UUID.randomUUID();
@@ -90,7 +90,7 @@ class OrderTableServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 테이블을 사용 중 상태로 변경 시 존재하는 테이블 ID로 요청하면 테이블 상태가 사용 중으로 정상적으로 변경된다")
+		@DisplayName("주문 테이블을 사용 중 상태로 변경 시 존재하는 테이블 ID로 요청하면 주문 테이블을 사용 중 상태로 변경할 수 있다")
 		void sitSuccessfully() {
 			// given
 			UUID existingId = UUID.randomUUID();
@@ -109,7 +109,7 @@ class OrderTableServiceTest {
 	@Nested
 	class clear {
 		@Test
-		@DisplayName("주문 테이블을 사용 가능 상태로 변경 시 존재하지 않는 테이블 ID로 요청하면 NoSuchElementException이 발생한다")
+		@DisplayName("주문 테이블을 사용 가능 상태로 변경 시 존재하지 않는 테이블 ID로 요청하면 주문 테이블을 사용 가능 상태로 변경할 수 없다")
 		void clearWithNonExistentTable() {
 			// given
 			UUID nonExistentId = UUID.randomUUID();
@@ -124,7 +124,7 @@ class OrderTableServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 테이블을 사용 가능 상태로 변경 시 완료되지 않은 주문이 존재하는 경우 IllegalStateException이 발생한다")
+		@DisplayName("주문 테이블을 사용 가능 상태로 변경 시 완료되지 않은 주문이 존재하는 경우 주문 테이블을 사용 가능 상태로 변경할 수 없다")
 		void clearWithIncompleteOrders() {
 			// given
 			UUID existingId = UUID.randomUUID();
@@ -143,7 +143,7 @@ class OrderTableServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 테이블을 정리할 때 주문 상태가 모두 완료되었으면 테이블 상태가 사용 가능으로 정상적으로 변경된다")
+		@DisplayName("주문 테이블을 사용 가능 상태로 변경 시 주문이 모두 완료되었으면 주문 테이블을 사용 가능 상태로 변경할 수 있다")
 		void clearSuccessfully() {
 			// given
 			UUID existingId = UUID.randomUUID();
@@ -164,7 +164,7 @@ class OrderTableServiceTest {
 	@Nested
 	class changeNumberOfGuests {
 		@Test
-		@DisplayName("손님 수 변경 시 입력된 수가 0보다 작으면 IllegalArgumentException이 발생한다")
+		@DisplayName("손님 수 변경 시 입력된 수가 0보다 작으면 손님 수 변경을 할 수 없다")
 		void changeNumberOfGuestsNegative() {
 			// given
 			UUID tableId = UUID.randomUUID();
@@ -180,7 +180,7 @@ class OrderTableServiceTest {
 		}
 
 		@Test
-		@DisplayName("손님 수 변경 시 존재하지 않는 테이블 ID로 요청하면 NoSuchElementException이 발생한다")
+		@DisplayName("손님 수 변경 시 존재하지 않는 테이블 ID로 요청하면 손님 수 변경을 할 수 없다")
 		void changeNumberOfGuestsNonExistentTable() {
 			// given
 			UUID nonExistentId = UUID.randomUUID();
@@ -197,7 +197,7 @@ class OrderTableServiceTest {
 		}
 
 		@Test
-		@DisplayName("손님 수 변경 시 테이블이 사용 중이 아니면 IllegalStateException이 발생한다")
+		@DisplayName("손님 수 변경 시 테이블이 사용 중이 아니면 손님 수 변경을 할 수 없다")
 		void changeNumberOfGuestsTableNotOccupied() {
 			// given
 			UUID existingId = UUID.randomUUID();
@@ -217,7 +217,7 @@ class OrderTableServiceTest {
 		}
 
 		@Test
-		@DisplayName("손님 수 변경 시 테이블이 사용 중이고 요청된 손님 수가 유효하면 손님 수가 정상적으로 변경된다")
+		@DisplayName("손님 수 변경 시 주문 테이블이 사용 중이고 요청된 손님 수가 유효하면 손님 수 변경을 할 수 있다")
 		void changeNumberOfGuestsSuccessfully() {
 			// given
 			UUID existingId = UUID.randomUUID();
@@ -243,7 +243,7 @@ class OrderTableServiceTest {
 	@Nested
 	class findAll {
 		@Test
-		@DisplayName("주문 테이블 데이터가 저장되어 있지 않을 때 모든 주문 테이블을 조회하면 주문 테이블이 조회 되지 않는다")
+		@DisplayName("주문 테이블 데이터가 비어 있을 때 모든 주문 테이블을 조회하면 주문 테이블을 조회할 수 없다")
 		void findAllWhenEmpty() {
 			// given
 			when(orderTableRepository.findAll()).thenReturn(Collections.emptyList());
@@ -256,7 +256,7 @@ class OrderTableServiceTest {
 		}
 
 		@Test
-		@DisplayName("주문 테이블 데이터가 저장되어 있을 때 모든 주문 테이블을 조회하면 정상적으로 모든 주문 테이블이 조회된다")
+		@DisplayName("주문 테이블 데이터가 비어 있지 않을 때 모든 주문 테이블을 조회하면 모든 주문 테이블을 조회할 수 있다")
 		void findAllWhenNotEmpty() {
 			// given
 			List<OrderTable> expectedTables = Arrays.asList(new OrderTable(), new OrderTable());

@@ -423,7 +423,7 @@ class MenuServiceTest {
 	@Nested
 	class findAll {
 		@Test
-		@DisplayName("메뉴 데이터가 저장되어 있지 않은 경우 모든 메뉴 조회가 불가능하다")
+		@DisplayName("메뉴 데이터가 비어 있는 경우 모든 메뉴 조회를 할 수 없다")
 		void findAllMenusWhenNotEmpty() {
 			// given
 			when(menuRepository.findAll()).thenReturn(Collections.emptyList());
@@ -436,7 +436,7 @@ class MenuServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 데이터가 저장되어 있는 경우 모든 메뉴 조회가 가능하다")
+		@DisplayName("메뉴 데이터가 비어 있지 않는 경우 모든 메뉴 조회를 할 수 있다")
 		void findAllMenusWhenEmpty() {
 			// given
 			when(menuRepository.findAll()).thenReturn(List.of(validMenu));

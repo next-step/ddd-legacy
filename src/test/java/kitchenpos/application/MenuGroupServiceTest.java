@@ -76,7 +76,20 @@ class MenuGroupServiceTest {
 	@Nested
 	class findAll {
 		@Test
-		@DisplayName("메뉴 그룹이 저장되어 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹을 조회할 수 있다")
+		@DisplayName("메뉴 그룹이 비어 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹을 조회할 수 없다")
+		void findAllMenuGroupsWhenEmpty() {
+			// given
+			when(menuGroupRepository.findAll()).thenReturn(Collections.emptyList());
+
+			// when
+			List<MenuGroup> foundMenuGroups = menuGroupService.findAll();
+
+			// then
+			assertThat(foundMenuGroups).isEmpty();
+		}
+
+		@Test
+		@DisplayName("메뉴 그룹이 비어 있지 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹을 조회할 수 있다")
 		void findAllMenuGroupsWhenNotEmpty() {
 			// given
 			when(menuGroupRepository.findAll()).thenReturn(Collections.singletonList(menuGroup));
@@ -87,19 +100,6 @@ class MenuGroupServiceTest {
 			// then
 			assertThat(foundMenuGroups).isNotEmpty();
 			assertThat(foundMenuGroups.get(0).getName()).isEqualTo("점심 특선");
-		}
-
-		@Test
-		@DisplayName("메뉴 그룹이 비어 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹이 조회할 수 없다")
-		void findAllMenuGroupsWhenEmpty() {
-			// given
-			when(menuGroupRepository.findAll()).thenReturn(Collections.emptyList());
-
-			// when
-			List<MenuGroup> foundMenuGroups = menuGroupService.findAll();
-
-			// then
-			assertThat(foundMenuGroups).isEmpty();
 		}
 	}
 }

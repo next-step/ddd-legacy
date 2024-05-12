@@ -53,7 +53,7 @@ class ProductServiceTest {
 	@Nested
 	class create {
 		@Test
-		@DisplayName("상품 생성 시 가격이 null이면 IllegalArgumentException이 발생한다")
+		@DisplayName("상품 생성 시 가격이 null이면 상품 생성을 할 수 없다")
 		void createProductWithNullPrice() {
 			// given
 			product.setPrice(null);
@@ -67,7 +67,7 @@ class ProductServiceTest {
 		}
 
 		@Test
-		@DisplayName("상품 생성 시 가격이 0 미만이면 IllegalArgumentException이 발생한다")
+		@DisplayName("상품 생성 시 가격이 0 미만이면 상품 생성을 할 수 없다")
 		void createProductWithNegativePrice() {
 			// given
 			product.setPrice(BigDecimal.valueOf(-1));
@@ -81,7 +81,7 @@ class ProductServiceTest {
 		}
 
 		@Test
-		@DisplayName("상품 생성 시 상품명이 null이면 IllegalArgumentException이 발생한다")
+		@DisplayName("상품 생성 시 상품명이 null이면 상품 생성을 할 수 없다")
 		void createProductWithNullName() {
 			// given
 			product.setName(null);
@@ -95,7 +95,7 @@ class ProductServiceTest {
 		}
 
 		@Test
-		@DisplayName("상품명에 비속어가 포함되어 있으면 생성 시 IllegalArgumentException이 발생한다")
+		@DisplayName("상품 생성 시 상품명에 비속어가 포함되어 있으면 상품 생성을 할 수 없다")
 		void createProductWithProfaneName() {
 			// given
 			when(purgomalumClient.containsProfanity("Profane")).thenReturn(true);
@@ -110,7 +110,7 @@ class ProductServiceTest {
 		}
 
 		@Test
-		@DisplayName("상품이 정상적으로 등록되면 생성된 상품 정보를 확인할 수 있다")
+		@DisplayName("상품 생성을 할 수 있다")
 		void createProductSuccessfully() {
 			// given
 			when(productRepository.save(any(Product.class))).thenReturn(product);
@@ -128,7 +128,7 @@ class ProductServiceTest {
 	@Nested
 	class changePrice {
 		@Test
-		@DisplayName("상품 가격 변경 시 가격이 null이면 IllegalArgumentException이 발생한다")
+		@DisplayName("상품 가격 변경 시 가격이 null이면 상품 가격 변경을 할 수 없다")
 		void changePriceWithNullPrice() {
 			// given
 			product.setPrice(null);
@@ -142,7 +142,7 @@ class ProductServiceTest {
 		}
 
 		@Test
-		@DisplayName("상품 가격 변경 시 가격이 0 미만이면 IllegalArgumentException이 발생한다")
+		@DisplayName("상품 가격 변경 시 가격이 0 미만이면 상품 가격 변경을 할 수 없다")
 		void changePriceWithNegativePrice() {
 			// given
 			product.setPrice(BigDecimal.valueOf(-1));
@@ -156,7 +156,7 @@ class ProductServiceTest {
 		}
 
 		@Test
-		@DisplayName("상품 조회가 실패하면 NoSuchElementException이 발생한다")
+		@DisplayName("상품 가격 변경 시 상품 조회가 실패하면 상품 가격 변경을 할 수 없다")
 		void changePriceWithNonExistentProduct() {
 			// given
 			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.empty());
@@ -170,7 +170,7 @@ class ProductServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴에 해당 상품이 없으면 상품의 가격을 변경할 수 있다")
+		@DisplayName("상품 가격 변경 시 해당 상품이 메뉴에 등록되어 있지 않으면 상품의 가격을 변경할 수 있다")
 		void changePriceWithoutMenus() {
 			// given
 			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
@@ -185,7 +185,7 @@ class ProductServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 가격이 상품 가격 합계보다 높을 때 메뉴를 비표시로 변경한다")
+		@DisplayName("상품 가격 변경 시 메뉴 가격이 상품 가격 합계보다 높을 때 해당 상품의 메뉴가 비노출 처리된다")
 		void changePriceMenuPriceHigher() {
 			// given
 			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
@@ -200,7 +200,7 @@ class ProductServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 가격이 상품 가격 합계와 같을 때 메뉴는 표시된다")
+		@DisplayName("상품 가격 변경 시 메뉴 가격이 상품 가격 합계와 같을 때 해당 상품의 메뉴가 노출 처리된다")
 		void changePriceMenuPriceEqual() {
 			// given
 			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
@@ -218,7 +218,7 @@ class ProductServiceTest {
 	@Nested
 	class findAll {
 		@Test
-		@DisplayName("상품 데이터가 저장되어 있지 않을 때 모든 상품을 조회하면 상품 목록이 비어있다")
+		@DisplayName("상품 데이터가 비어 있을 때 모든 상품을 조회하면 모든 상품을 조회할 수 없다")
 		void findAllProductsWhenEmpty() {
 			// given
 			when(productRepository.findAll()).thenReturn(Collections.emptyList());
@@ -231,7 +231,7 @@ class ProductServiceTest {
 		}
 
 		@Test
-		@DisplayName("상품 데이터가 저장되어 있을 때 모든 상품을 조회하면 상품 목록이 정상적으로 조회된다")
+		@DisplayName("상품 데이터가 비어 있지 않을 때 모든 상품을 조회하면 모든 상품을 조회할 수 있다")
 		void findAllProductsWhenNotEmpty() {
 			// given
 			when(productRepository.findAll()).thenReturn(Collections.singletonList(product));
