@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -42,12 +43,13 @@ class ProductServiceTest {
                 .isThrownBy(() -> service.create(request));
     }
 
-    @Test
+    @ParameterizedTest
     @DisplayName("상품의 이름은 null 일 수 없다")
-    void nullName() {
+    @NullSource
+    void nullName(String name) {
         Product request = new Product();
         request.setPrice(BigDecimal.ZERO);
-        request.setName(null);
+        request.setName(name);
 
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> service.create(request));
