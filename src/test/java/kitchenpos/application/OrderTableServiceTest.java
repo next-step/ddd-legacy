@@ -40,6 +40,8 @@ class OrderTableServiceTest {
     @InjectMocks
     OrderTableService orderTableService;
 
+
+
     @DisplayName("주문테이블을 등록한다.")
     @Test
     void createOrderTable() {
