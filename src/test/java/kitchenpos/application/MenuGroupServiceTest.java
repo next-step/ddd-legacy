@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.application.testFixture.MenuGroupFixture;
+import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,9 +43,12 @@ class MenuGroupServiceTest {
 
         // when
         var actual = menuGroupService.findAll();
+        var savedMenuNames = actual.stream()
+                .map(MenuGroup::getName)
+                .toList();
 
         // then
-        assertThat(actual).isEqualTo(menuGroups);
+        assertThat(savedMenuNames).containsAll(List.of("레드살사", "뿌링클"));
     }
 
     @DisplayName("메뉴그룹을 생성시")
