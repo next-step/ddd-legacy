@@ -42,7 +42,7 @@ class MenuGroupServiceTest {
 	class create {
 
 		@ParameterizedTest
-		@DisplayName("메뉴 그룹의 이름이 null이거나 비어있으면 IllegalArgumentException이 발생한다")
+		@DisplayName("메뉴 그룹의 이름이 null이거나 비어있으면 메뉴 그룹을 생성할 수 없다")
 		@NullAndEmptySource
 		void createMenuGroupWithEmptyOrNullName(String name) {
 			// given
@@ -58,7 +58,7 @@ class MenuGroupServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 그룹의 이름이 비어있지 않으면 정상적으로 저장된다")
+		@DisplayName("메뉴 그룹의 이름이 비어있지 않으면 메뉴 그룹을 생성할 수 있다")
 		void createMenuGroupWithValidName() {
 			// given
 			when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(menuGroup);
@@ -76,7 +76,7 @@ class MenuGroupServiceTest {
 	@Nested
 	class findAll {
 		@Test
-		@DisplayName("메뉴 그룹이 저장되어 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹이 조회된다")
+		@DisplayName("메뉴 그룹이 저장되어 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹을 조회할 수 있다")
 		void findAllMenuGroupsWhenNotEmpty() {
 			// given
 			when(menuGroupRepository.findAll()).thenReturn(Collections.singletonList(menuGroup));
@@ -90,7 +90,7 @@ class MenuGroupServiceTest {
 		}
 
 		@Test
-		@DisplayName("메뉴 그룹이 비어 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹이 조회되지 않는다")
+		@DisplayName("메뉴 그룹이 비어 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹이 조회할 수 없다")
 		void findAllMenuGroupsWhenEmpty() {
 			// given
 			when(menuGroupRepository.findAll()).thenReturn(Collections.emptyList());
