@@ -3,15 +3,16 @@ package kitchenpos.application
 import kitchenpos.domain.MenuGroup
 import kitchenpos.domain.MenuGroupRepository
 import org.assertj.core.api.Assertions
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
-import utils.BaseMockTest
 
+@DisplayName("메뉴 그룹 서비스")
 @ExtendWith(MockitoExtension::class)
-class MenuGroupServiceMockTest : BaseMockTest() {
+class MenuGroupServiceMockTest {
 
     @Mock
     private lateinit var menuGroupRepository: MenuGroupRepository
