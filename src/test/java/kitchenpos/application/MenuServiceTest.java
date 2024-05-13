@@ -229,6 +229,9 @@ class MenuServiceTest {
 
     @Test
     void findAll() {
+        when(menuRepository.findAll()).thenReturn(List.of(new Menu()));
+
+        assertThat(menuService.findAll()).hasSize(1);
     }
 
     static Stream<Arguments> nullAndNegativePrice() {
