@@ -38,14 +38,14 @@ internal class ProductServiceTest {
         @Test
         fun test1() {
             // given
-            val request = Product().apply {
-                this.id = UUID.randomUUID()
-                this.name = "테스트 상품"
-            }
+            val 가격_정보가_없는_요청 = getProduct(
+                name = "가격 정보가 없는 상품",
+                price = null,
+            )
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
-                productService.create(request)
+                productService.create(가격_정보가_없는_요청)
             }
         }
 
@@ -53,14 +53,13 @@ internal class ProductServiceTest {
         @Test
         fun test2() {
             // given
-            val request = Product().apply {
-                this.id = UUID.randomUUID()
-                this.price = BigDecimal.valueOf(1000L)
-            }
+            val 이름_정보가_없는_요청 = getProduct(
+                name = null,
+            )
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
-                productService.create(request)
+                productService.create(이름_정보가_없는_요청)
             }
         }
 
@@ -68,17 +67,15 @@ internal class ProductServiceTest {
         @Test
         fun test3() {
             // given
-            val request = Product().apply {
-                this.id = UUID.randomUUID()
-                this.price = BigDecimal.valueOf(1000L)
-                this.name = "욕설"
-            }
+            val 욕설이_포함된_상품 = getProduct(
+                name = "욕설이 포함된 상품",
+            )
 
             every { purgomalumClient.containsProfanity(any()) } returns true
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
-                productService.create(request)
+                productService.create(욕설이_포함된_상품)
             }
         }
 
@@ -86,15 +83,14 @@ internal class ProductServiceTest {
         @Test
         fun test4() {
             // given
-            val request = Product().apply {
-                this.id = UUID.randomUUID()
-                this.price = BigDecimal.valueOf(-1)
-                this.name = "테스트 상품"
-            }
+            val 가격이_음수인_요청 = getProduct(
+                name = "가격이 음수인 상품",
+                price = BigDecimal.valueOf(-1),
+            )
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
-                productService.create(request)
+                productService.create(가격이_음수인_요청)
             }
         }
 
@@ -103,22 +99,21 @@ internal class ProductServiceTest {
         @ValueSource(strings = ["", " ", "테스트 상품"])
         fun test5(name: String) {
             // given
-            val request = Product().apply {
-                this.id = UUID.randomUUID()
-                this.price = BigDecimal.valueOf(1000L)
-                this.name = name
-            }
+            val 정상_요청 = getProduct(
+                name = name,
+                price = BigDecimal.valueOf(1000L),
+            )
 
             every { purgomalumClient.containsProfanity(any()) } returns false
-            every { productRepository.save(any()) } returns request
+            every { productRepository.save(any()) } returns 정상_요청
 
             // when
-            val result = productService.create(request)
+            val result = productService.create(정상_요청)
 
             // then
-            result.id shouldBe request.id
-            result.name shouldBe request.name
-            result.price shouldBe request.price
+            result.id shouldBe 정상_요청.id
+            result.name shouldBe 정상_요청.name
+            result.price shouldBe 정상_요청.price
         }
     }
 
@@ -129,13 +124,14 @@ internal class ProductServiceTest {
         fun test1() {
             // given
             val productId = UUID.randomUUID()
-            val request = Product().apply {
-                this.name = "테스트 상품"
-            }
+            val 가격_정보가_없는_요청 = getProduct(
+                productId = productId,
+                name = "가격 정보가 없는 상품",
+            )
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
-                productService.changePrice(productId, request)
+                productService.changePrice(productId, 가격_정보가_없는_요청)
             }
         }
 
@@ -144,14 +140,15 @@ internal class ProductServiceTest {
         fun test2() {
             // given
             val productId = UUID.randomUUID()
-            val request = Product().apply {
-                this.name = "테스트 상품"
-                this.price = BigDecimal.valueOf(-1L)
-            }
+            val 가격이_음수인_요청 = getProduct(
+                productId = productId,
+                name = "가격이 음수인 상품",
+                price =  BigDecimal.valueOf(-1L)
+            )
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
-                productService.changePrice(productId, request)
+                productService.changePrice(productId, 가격이_음수인_요청)
             }
         }
 
@@ -160,16 +157,16 @@ internal class ProductServiceTest {
         fun test3() {
             // given
             val productId = UUID.randomUUID()
-            val request = Product().apply {
-                this.name = "테스트 상품"
-                this.price = BigDecimal.valueOf(1000L)
-            }
+            val 존재_하지_않는_상품_요청 = getProduct(
+                productId = UUID.randomUUID(),
+                name = "존재하지 않는 상품",
+            )
 
             every { productRepository.findById(any()) } throws NoSuchElementException()
 
             // when & then
             shouldThrowExactly<NoSuchElementException> {
-                productService.changePrice(productId, request)
+                productService.changePrice(productId, 존재_하지_않는_상품_요청)
             }
         }
 
@@ -178,36 +175,37 @@ internal class ProductServiceTest {
         fun test4() {
             // given
             val productId = UUID.randomUUID()
-            val request = Product().apply {
-                this.name = "테스트 상품"
-                this.price = BigDecimal.valueOf(1000L)
-            }
+            val 메뉴에_속해_있는_상품 = getProduct(
+                productId = productId,
+                name = "메뉴에 속해 있는 상품",
+                price = BigDecimal.valueOf(1000L)
+            )
 
-            val foundProduct = Product().apply {
-                this.id = productId
-                this.name = request.name
-                this.price = request.price
-            }
+            val 찾아온_상품 = getProduct(
+                productId = 메뉴에_속해_있는_상품.id,
+                name = 메뉴에_속해_있는_상품.name,
+                price = 메뉴에_속해_있는_상품.price
+            )
 
             val menu = Menu().apply {
-                this.price = request.price + BigDecimal.ONE
+                this.price = 메뉴에_속해_있는_상품.price + BigDecimal.ONE
                 this.menuProducts = listOf(MenuProduct().apply {
                     this.seq = 1L
                     this.productId = productId
-                    this.product = foundProduct
+                    this.product = 찾아온_상품
                     this.quantity = 1
                 })
                 this.isDisplayed = true
             }
 
-            every { productRepository.findById(any()) } returns Optional.of(foundProduct)
+            every { productRepository.findById(any()) } returns Optional.of(찾아온_상품)
             every { menuRepository.findAllByProductId(productId) } returns listOf(menu)
 
             // when
-            val result = productService.changePrice(productId, request)
+            val result = productService.changePrice(productId, 메뉴에_속해_있는_상품)
 
             // then
-            result.price shouldBe request.price
+            result.price shouldBe 메뉴에_속해_있는_상품.price
             menu.isDisplayed shouldBe false
         }
 
@@ -248,5 +246,15 @@ internal class ProductServiceTest {
             result.price shouldBe request.price
             menu.isDisplayed shouldBe true
         }
+    }
+
+    private fun getProduct(
+        productId: UUID = UUID.randomUUID(),
+        name: String? = "상품 이름",
+        price: BigDecimal? = BigDecimal.valueOf(1000L),
+    ) = Product().apply {
+        this.id = productId
+        this.name = name
+        this.price = price
     }
 }
