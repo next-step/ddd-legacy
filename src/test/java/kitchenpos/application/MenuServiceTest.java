@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
@@ -215,8 +216,58 @@ class MenuServiceTest {
 
     }
 
+    @ParameterizedTest
+    @DisplayName("메뉴 가격 수정시 가격은 null 이거나 음수일 수 없다")
+    @MethodSource("nullAndNegativePrice")
+    void cannotChangeNullAndNegativePrice(BigDecimal price) {
+        Menu request = new Menu();
+        request.setPrice(price);
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() ->  menuService.changePrice(UUID.randomUUID(), request));
+    }
+
     @Test
-    void changePrice() {
+    @DisplayName("메뉴상품들의 가격의 합보다 큰 가격으로 수정할 수 없다")
+    void bigPrice() {
+        Menu request = new Menu();
+        request.setPrice(new BigDecimal("100"));
+
+        Product product = new Product();
+        product.setPrice(BigDecimal.TEN);
+
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setQuantity(1);
+        menuProduct.setProduct(product);
+
+        Menu menu = new Menu();
+        menu.setMenuProducts(List.of(menuProduct));
+
+        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> menuService.changePrice(UUID.randomUUID(), request));
+    }
+
+    @Test
+    @DisplayName("정상 수정")
+    void succeedChangePrice() {
+        Menu request = new Menu();
+        request.setPrice(BigDecimal.ZERO);
+
+        Product product = new Product();
+        product.setPrice(BigDecimal.TEN);
+
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setQuantity(1);
+        menuProduct.setProduct(product);
+
+        Menu menu = new Menu();
+        menu.setMenuProducts(List.of(menuProduct));
+
+        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+
+        assertThat(menuService.changePrice(UUID.randomUUID(), request).getPrice()).isEqualTo(BigDecimal.ZERO);
     }
 
     @Test
