@@ -165,6 +165,9 @@ class ProductServiceTest {
 
     @Test
     void findAll() {
+        when(productRepository.findAll()).thenReturn(List.of(new Product()));
+
+        assertThat(service.findAll()).hasSize(1);
     }
 
     static Stream<Arguments> nullAndNegativePrice() {
