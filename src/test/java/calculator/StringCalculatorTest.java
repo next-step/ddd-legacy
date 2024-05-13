@@ -41,10 +41,11 @@ class StringCalculatorTest {
         assertThat(calculator.add(text)).isEqualTo(1000);
     }
 
-    @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
-    @Test
+    @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 IllegalArgumentException 예외 처리를 한다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"-1", "-1:3", "5:-6"})
     void negative() {
-        assertThatExceptionOfType(RuntimeException.class)
+        assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> calculator.add("-1"));
     }
 

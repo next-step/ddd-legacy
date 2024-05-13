@@ -54,13 +54,6 @@ public class StringCalculator {
             .map(Integer::parseInt)
             .toList();
 
-        numbers.stream()
-            .filter(number -> number < 0)
-            .findAny()
-            .ifPresent(number -> {
-                throw new RuntimeException(String.format("음수는 지원하지 않습니다. : %d", number));
-            });
-
         return numbers.stream()
             .reduce(Math::addExact)
             .orElse(0);
