@@ -17,7 +17,7 @@ public class MenuGroupFixture {
         return menuGroup;
     }
 
-    public static MenuGroup createMenuGroupWithId(UUID id, String name) {
+    public static MenuGroup createMenuGroup(UUID id, String name) {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(id);
         menuGroup.setName(name);

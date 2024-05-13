@@ -144,7 +144,7 @@ class ProductServiceTest {
             product = productService.create(product);
 
             MenuProduct menuProduct = createMenuProduct(product, 1);
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "치킨 메뉴");
+            MenuGroup menuGroup = createMenuGroupWithId("치킨 메뉴");
             menuGroup = menuGroupRepository.save(menuGroup);
             Menu menu = createMenu(menuGroup, "후라이드 치킨 세트", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);

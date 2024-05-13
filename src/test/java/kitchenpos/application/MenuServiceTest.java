@@ -54,7 +54,7 @@ class MenuServiceTest {
         @DisplayName("메뉴를 생성할 수 있다.")
         @Test
         void createSuccessTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -71,7 +71,7 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴의 가격이 존재하지 않은 경우 예외가 발생한다.")
         void createFailWhenPriceIsNullTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -87,7 +87,7 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴의 가격이 0보다 작은 경우 예외가 발생한다.")
         void createFailWhenPriceIsNegativeTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -104,7 +104,7 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴 상품이 존재하지 않은 경우 예외가 발생한다.")
         void createFailWhenMenuProductIsEmptyTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, Collections.emptyList());
@@ -116,7 +116,7 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴 상품에서 상품이 존재하지 않은 경우 예외가 발생한다.")
         void createFailWhenProductIsEmptyTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             MenuProduct menuProduct = createMenuProduct(UUID.randomUUID(), 1);
@@ -130,7 +130,7 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴 상품의 수량이 0보다 작은 경우 예외가 발생한다.")
         void createFailWhenQuantityIsNegativeTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -147,7 +147,7 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴의 가격이 상품의 가격의 합보다 큰 경우 예외가 발생한다.")
         void createFailWhenPriceIsGreaterThanSumOfProductPriceTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -165,7 +165,7 @@ class MenuServiceTest {
         @Test
         void createFailWhenNameContainsProfanityTest() {
             given(purgomalumClient.containsProfanity("시발 후라이드치킨")).willReturn(true);
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -182,7 +182,7 @@ class MenuServiceTest {
         @DisplayName("이름이 존재하지 않은 경우에 예외가 발생한다.")
         @Test
         void createFailWhenNameIsNullTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -203,7 +203,7 @@ class MenuServiceTest {
         @DisplayName("메뉴의 가격을 변경할 수 있다.")
         @Test
         void changePriceSuccessTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -224,7 +224,7 @@ class MenuServiceTest {
         @DisplayName("변경할 가격이 0보다 작으면 예외가 발생한다.")
         @Test
         void changePriceFailWhenPriceIsNegativeTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -246,7 +246,7 @@ class MenuServiceTest {
         @DisplayName("변경할 가격이 존재하지 않으면 예외가 발생한다.")
         @Test
         void changePriceFailWhenPriceIsNullTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -278,7 +278,7 @@ class MenuServiceTest {
         @DisplayName("메뉴의 가격이 전체 상품의 가격보다 크면 예외가 발생한다.")
         @Test
         void changePriceFailWhenPriceIsGreaterThanSumOfProductPriceTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -303,7 +303,7 @@ class MenuServiceTest {
         @DisplayName("메뉴를 노출 시킬 수 있다.")
         @Test
         void displaySuccessTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -333,7 +333,7 @@ class MenuServiceTest {
         @DisplayName("메뉴의 가격이 상품들의 총합보다 크면 예외가 발생한다.")
         @Test
         void displayFailWhenPriceIsGreaterThanSumOfProductPriceTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -359,7 +359,7 @@ class MenuServiceTest {
         @DisplayName("메뉴를 비노출 시킬 수 있다.")
         @Test
         void hideSuccessTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
@@ -392,7 +392,7 @@ class MenuServiceTest {
         @DisplayName("모든 메뉴를 조회할 수 있다.")
         @Test
         void findAllSuccessTest() {
-            MenuGroup menuGroup = createMenuGroupWithId(UUID.randomUUID(), "메뉴 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
             Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
