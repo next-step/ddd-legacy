@@ -6,8 +6,6 @@ import io.mockk.every
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
 import io.mockk.junit5.MockKExtension
-import io.mockk.justRun
-import io.mockk.mockk
 import io.mockk.verify
 import kitchenpos.domain.*
 import kitchenpos.infra.PurgomalumClient
@@ -55,8 +53,8 @@ internal class MenuServiceTest {
         @Test
         fun test2() {
             // given
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(-1L)
+            val request = Menu().apply {
+                this.price = BigDecimal.valueOf(-1L)
             }
 
             // when & then
@@ -69,9 +67,9 @@ internal class MenuServiceTest {
         @Test
         fun test3() {
             // given
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.menuGroupId } returns UUID.randomUUID()
+            val request = Menu().apply {
+                this.price = BigDecimal.ONE
+                this.menuGroupId = UUID.randomUUID()
             }
 
             every { menuGroupRepository.findById(any()) } throws NoSuchElementException()
@@ -86,13 +84,13 @@ internal class MenuServiceTest {
         @Test
         fun test4() {
             // given
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.menuGroupId } returns UUID.randomUUID()
-                every { it.menuProducts } returns null
+            val request = Menu().apply {
+                this.price = BigDecimal.ONE
+                this.menuGroupId = UUID.randomUUID()
+                this.menuProducts = null
             }
 
-            every { menuGroupRepository.findById(any()) } returns Optional.of(mockk())
+            every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -104,13 +102,13 @@ internal class MenuServiceTest {
         @Test
         fun test5() {
             // given
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.menuGroupId } returns UUID.randomUUID()
-                every { it.menuProducts } returns listOf()
+            val request = Menu().apply {
+                this.price = BigDecimal.ONE
+                this.menuGroupId = UUID.randomUUID()
+                this.menuProducts = listOf()
             }
 
-            every { menuGroupRepository.findById(any()) } returns Optional.of(mockk())
+            every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -122,16 +120,17 @@ internal class MenuServiceTest {
         @Test
         fun test6() {
             // given
-            val menuProduct = mockk<MenuProduct>().also {
-                every { it.productId } returns UUID.randomUUID()
-            }
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.menuGroupId } returns UUID.randomUUID()
-                every { it.menuProducts } returns listOf(menuProduct)
+            val menuProduct = MenuProduct().apply {
+                this.productId = UUID.randomUUID()
             }
 
-            every { menuGroupRepository.findById(any()) } returns Optional.of(mockk())
+            val request = Menu().apply {
+                this.price = BigDecimal.ONE
+                this.menuGroupId = UUID.randomUUID()
+                this.menuProducts = listOf(menuProduct)
+            }
+
+            every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
             every { productRepository.findAllByIdIn(any()) } returns listOf()
 
             // when & then
@@ -144,17 +143,19 @@ internal class MenuServiceTest {
         @Test
         fun test7() {
             // given
-            val menuProduct = mockk<MenuProduct>().also {
-                every { it.productId } returns UUID.randomUUID()
-                every { it.quantity } returns -1
+            val menuProduct = MenuProduct().apply {
+                this.productId = UUID.randomUUID()
+                this.quantity = -1
             }
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.menuGroupId } returns UUID.randomUUID()
-                every { it.menuProducts } returns listOf(menuProduct)
+
+            val request = Menu().apply {
+                this.price = BigDecimal.ONE
+                this.menuGroupId = UUID.randomUUID()
+                this.menuProducts = listOf(menuProduct)
             }
-            every { menuGroupRepository.findById(any()) } returns Optional.of(mockk())
-            every { productRepository.findAllByIdIn(any()) } returns listOf(mockk())
+
+            every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
+            every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -166,17 +167,19 @@ internal class MenuServiceTest {
         @Test
         fun test8() {
             // given
-            val menuProduct = mockk<MenuProduct>().also {
-                every { it.productId } returns UUID.randomUUID()
-                every { it.quantity } returns 1
+            val menuProduct = MenuProduct().apply {
+                this.productId = UUID.randomUUID()
+                this.quantity = 1
             }
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.menuGroupId } returns UUID.randomUUID()
-                every { it.menuProducts } returns listOf(menuProduct)
+
+            val request = Menu().apply {
+                this.price = BigDecimal.ONE
+                this.menuGroupId = UUID.randomUUID()
+                this.menuProducts = listOf(menuProduct)
             }
-            every { menuGroupRepository.findById(any()) } returns Optional.of(mockk())
-            every { productRepository.findAllByIdIn(any()) } returns listOf(mockk())
+
+            every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
+            every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
             every { productRepository.findById(any()) } throws NoSuchElementException()
 
             // when & then
@@ -189,21 +192,23 @@ internal class MenuServiceTest {
         @Test
         fun test9() {
             // given
-            val menuProduct = mockk<MenuProduct>().also {
-                every { it.productId } returns UUID.randomUUID()
-                every { it.quantity } returns 1
+            val menuProduct = MenuProduct().apply {
+                this.productId = UUID.randomUUID()
+                this.quantity = 1
             }
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.menuGroupId } returns UUID.randomUUID()
-                every { it.menuProducts } returns listOf(menuProduct)
+
+            val request = Menu().apply {
+                this.price = BigDecimal.ONE
+                this.menuGroupId = UUID.randomUUID()
+                this.menuProducts = listOf(menuProduct)
+                this.name = null
             }
-            every { menuGroupRepository.findById(any()) } returns Optional.of(mockk())
-            every { productRepository.findAllByIdIn(any()) } returns listOf(mockk())
-            every { productRepository.findById(any()) } returns Optional.of(mockk<Product>().also {
-                every { it.price } returns BigDecimal.ONE
+
+            every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
+            every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
+            every { productRepository.findById(any()) } returns Optional.of(Product().apply {
+                this.price = BigDecimal.TWO
             })
-            every { request.price.compareTo(any()) } returns 1
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -215,22 +220,23 @@ internal class MenuServiceTest {
         @Test
         fun test10() {
             // given
-            val menuProduct = mockk<MenuProduct>().also {
-                every { it.productId } returns UUID.randomUUID()
-                every { it.quantity } returns 1
+            val menuProduct = MenuProduct().apply {
+                this.productId = UUID.randomUUID()
+                this.quantity = 1
             }
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.menuGroupId } returns UUID.randomUUID()
-                every { it.menuProducts } returns listOf(menuProduct)
-                every { it.name } returns null
+
+            val request = Menu().apply {
+                this.price = BigDecimal.ONE
+                this.menuGroupId = UUID.randomUUID()
+                this.menuProducts = listOf(menuProduct)
+                this.name = null
             }
-            every { menuGroupRepository.findById(any()) } returns Optional.of(mockk())
-            every { productRepository.findAllByIdIn(any()) } returns listOf(mockk())
-            every { productRepository.findById(any()) } returns Optional.of(mockk<Product>().also {
-                every { it.price } returns BigDecimal.ONE
+
+            every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
+            every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
+            every { productRepository.findById(any()) } returns Optional.of(Product().apply {
+                this.price = BigDecimal.TWO
             })
-            every { request.price.compareTo(any()) } returns 0
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -242,22 +248,23 @@ internal class MenuServiceTest {
         @Test
         fun test11() {
             // given
-            val menuProduct = mockk<MenuProduct>().also {
-                every { it.productId } returns UUID.randomUUID()
-                every { it.quantity } returns 1
+            val menuProduct = MenuProduct().apply {
+                this.productId = UUID.randomUUID()
+                this.quantity = 1
             }
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.menuGroupId } returns UUID.randomUUID()
-                every { it.menuProducts } returns listOf(menuProduct)
-                every { it.name } returns "욕설"
+
+            val request = Menu().apply {
+                this.price = BigDecimal.ONE
+                this.menuGroupId = UUID.randomUUID()
+                this.menuProducts = listOf(menuProduct)
+                this.name = "욕설"
             }
-            every { menuGroupRepository.findById(any()) } returns Optional.of(mockk())
-            every { productRepository.findAllByIdIn(any()) } returns listOf(mockk())
-            every { productRepository.findById(any()) } returns Optional.of(mockk<Product>().also {
-                every { it.price } returns BigDecimal.ONE
+
+            every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
+            every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
+            every { productRepository.findById(any()) } returns Optional.of(Product().apply {
+                this.price = BigDecimal.TWO
             })
-            every { request.price.compareTo(any()) } returns 0
             every { purgomalumClient.containsProfanity(any()) } returns true
 
             // when & then
@@ -270,25 +277,27 @@ internal class MenuServiceTest {
         @Test
         fun test12() {
             // given
-            val menuProduct = mockk<MenuProduct>().also {
-                every { it.productId } returns UUID.randomUUID()
-                every { it.quantity } returns 1
+            val menuProduct = MenuProduct().apply {
+                this.productId = UUID.randomUUID()
+                this.quantity = 1
             }
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.menuGroupId } returns UUID.randomUUID()
-                every { it.menuProducts } returns listOf(menuProduct)
-                every { it.name } returns "테스트 메뉴"
-                every { it.isDisplayed } returns true
-                every { it.id } returns UUID.randomUUID()
-                every { it.menuGroup } returns mockk()
+
+            val request = Menu().apply {
+                this.price = BigDecimal.ONE
+                this.menuGroupId = UUID.randomUUID()
+                this.menuProducts = listOf(menuProduct)
+                this.name = "정상 메뉴"
+                this.isDisplayed = true
+                this.id = UUID.randomUUID()
+                this.menuGroup = MenuGroup()
             }
-            every { menuGroupRepository.findById(any()) } returns Optional.of(mockk())
-            every { productRepository.findAllByIdIn(any()) } returns listOf(mockk())
-            every { productRepository.findById(any()) } returns Optional.of(mockk<Product>().also {
-                every { it.price } returns BigDecimal.ONE
+
+            every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
+            every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
+            every { productRepository.findById(any()) } returns Optional.of(Product().apply {
+                this.price = BigDecimal.TWO
             })
-            every { request.price.compareTo(any()) } returns 0
+
             every { purgomalumClient.containsProfanity(any()) } returns false
             every { menuRepository.save(any()) } returns request
 
@@ -313,8 +322,8 @@ internal class MenuServiceTest {
         fun test1() {
             // given
             val menuId = UUID.randomUUID()
-            val request = mockk<Menu>().also {
-                every { it.price } returns null
+            val request = Menu().apply {
+                this.price = null
             }
 
             // when & then
@@ -328,8 +337,8 @@ internal class MenuServiceTest {
         fun test2() {
             // given
             val menuId = UUID.randomUUID()
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(-1L)
+            val request = Menu().apply {
+                this.price = BigDecimal.valueOf(-1L)
             }
 
             // when & then
@@ -343,8 +352,8 @@ internal class MenuServiceTest {
         fun test3() {
             // given
             val menuId = UUID.randomUUID()
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
+            val request = Menu().apply {
+                this.price = BigDecimal.valueOf(1000L)
             }
 
             every { menuRepository.findById(any()) } returns Optional.empty()
@@ -360,14 +369,14 @@ internal class MenuServiceTest {
         fun test4() {
             // given
             val menuId = UUID.randomUUID()
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.id } returns menuId
-                every { it.menuProducts } returns listOf(mockk<MenuProduct>().also {
-                    every { it.product } returns mockk<Product>().also {
-                        every { it.price } returns BigDecimal.valueOf(999L)
+            val request = Menu().apply {
+                this.price = BigDecimal.valueOf(1000L)
+                this.id = menuId
+                this.menuProducts = listOf(MenuProduct().apply {
+                    this.product = Product().apply {
+                        this.price = BigDecimal.valueOf(999L)
                     }
-                    every { it.quantity } returns 1
+                    this.quantity = 1
                 })
             }
 
@@ -384,16 +393,15 @@ internal class MenuServiceTest {
         fun test5() {
             // given
             val menuId = UUID.randomUUID()
-            val request = mockk<Menu>().also {
-                every { it.price } returns BigDecimal.valueOf(1000L)
-                every { it.id } returns menuId
-                every { it.menuProducts } returns listOf(mockk<MenuProduct>().also {
-                    every { it.product } returns mockk<Product>().also {
-                        every { it.price } returns BigDecimal.valueOf(1001L)
+            val request = Menu().apply {
+                this.price = BigDecimal.valueOf(1000L)
+                this.id = menuId
+                this.menuProducts = listOf(MenuProduct().apply {
+                    this.product = Product().apply {
+                        this.price = BigDecimal.valueOf(1001L)
                     }
-                    every { it.quantity } returns 1
+                    this.quantity = 1
                 })
-                justRun { it.price = BigDecimal.valueOf(1000L) }
             }
 
             every { menuRepository.findById(any()) } returns Optional.of(request)
@@ -427,14 +435,15 @@ internal class MenuServiceTest {
         fun test2() {
             // given
             val menuId = UUID.randomUUID()
-            val menu = mockk<Menu>().also {
-                every { it.menuProducts } returns listOf(mockk<MenuProduct>().also {
-                    every { it.product } returns mockk<Product>().also {
-                        every { it.price } returns BigDecimal(1000L)
+            val menu = Menu().apply {
+                this.price = BigDecimal.valueOf(1001L)
+                this.id = menuId
+                this.menuProducts = listOf(MenuProduct().apply {
+                    this.product = Product().apply {
+                        this.price = BigDecimal.valueOf(1000L)
                     }
-                    every { it.quantity } returns 1
+                    this.quantity = 1
                 })
-                every { it.price } returns BigDecimal(1001L)
             }
 
             every { menuRepository.findById(any()) } returns Optional.of(menu)
