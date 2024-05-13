@@ -423,6 +423,66 @@ class OrderServiceTest {
 
     @Nested
     class startDeliveryTest {
+        @DisplayName("배달하기 타입인 경우 주문 상태가 서빙 상태인 경우에 배달을 시작할 수 있다.")
+        @Test
+        void startDeliverySuccessTest() {
+            Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+            product = productRepository.save(product);
+            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            menu = menuRepository.save(menu);
+            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, OrderStatus.SERVED, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
+            order = orderRepository.save(order);
+
+            order = orderService.startDelivery(order.getId());
+
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        }
+
+        @DisplayName("배달하기 타입이 아닌 경우 예외가 발생한다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderType.class, mode = EnumSource.Mode.EXCLUDE, names = "DELIVERY")
+        void startDeliveryWhenNotDeliveryTest() {
+            Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+            product = productRepository.save(product);
+            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            menu = menuRepository.save(menu);
+            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            Order order = createOrder(null, null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
+            order = orderService.create(order);
+
+            UUID orderId = order.getId();
+
+            assertThatThrownBy(() -> orderService.startDelivery(orderId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+
+        @DisplayName("serve 상태가 아닌 경우 예외가 발생한다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "SERVED")
+        void startDeliveryWhenNotServedTest(OrderStatus orderStatus) {
+            Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+            product = productRepository.save(product);
+            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            menu = menuRepository.save(menu);
+            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, orderStatus, null, LocalDateTime.now());
+            order = orderRepository.save(order);
+
+            UUID orderId = order.getId();
+
+            assertThatThrownBy(() -> orderService.startDelivery(orderId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     @Nested
