@@ -312,7 +312,12 @@ class MenuServiceTest {
     }
 
     @Test
+    @DisplayName("메뉴는 언제든지 비노출할 수 있다")
     void hide() {
+        when(menuRepository.findById(any())).thenReturn(Optional.of(new Menu()));
+
+        Menu hide = menuService.hide(UUID.randomUUID());
+        assertThat(hide.isDisplayed()).isFalse();
     }
 
     @Test
