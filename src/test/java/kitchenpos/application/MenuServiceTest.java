@@ -271,7 +271,44 @@ class MenuServiceTest {
     }
 
     @Test
-    void display() {
+    @DisplayName("메뉴상품의 가격의 합보다 가격이 크다면 노출시킬 수 없다")
+    void cannotDisplayBigPrice() {
+        Product product = new Product();
+        product.setPrice(BigDecimal.TEN);
+
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setQuantity(1);
+        menuProduct.setProduct(product);
+
+        Menu menu = new Menu();
+        menu.setMenuProducts(List.of(menuProduct));
+        menu.setPrice(new BigDecimal("100"));
+
+        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> menuService.display(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("메뉴상품의 가격의 합보다 가격이 작거나 같다면 노출시킬 수 있다")
+    void canDisplay() {
+        Product product = new Product();
+        product.setPrice(BigDecimal.TEN);
+
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setQuantity(1);
+        menuProduct.setProduct(product);
+
+        Menu menu = new Menu();
+        menu.setMenuProducts(List.of(menuProduct));
+        menu.setPrice(BigDecimal.TEN);
+
+        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+
+        Menu displayed = menuService.display(UUID.randomUUID());
+
+        assertThat(displayed.isDisplayed()).isTrue();
     }
 
     @Test
