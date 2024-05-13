@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.*;
+import kitchenpos.utils.PurgomalumTestClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -38,7 +39,7 @@ class MenuServiceMockTest {
     @Mock
     private ProductRepository productRepository;
     @Mock
-    private BadWordClient badWordTestClient;
+    private PurgomalumTestClient purgomalumTestClient;
     @InjectMocks
     private MenuService menuService;
 
@@ -74,7 +75,7 @@ class MenuServiceMockTest {
                 Product product = 상품_DB.get(productId);
                 when(productRepository.findById(productId)).thenReturn(Optional.of(product));
             }
-            when(badWordTestClient.containsProfanity(any())).thenReturn(false);
+            when(purgomalumTestClient.containsProfanity(any())).thenReturn(false);
             when(menuRepository.save(any())).thenReturn(메뉴A);
 
             //when
@@ -84,7 +85,7 @@ class MenuServiceMockTest {
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(any());
             then(productRepository).should(times(3)).findById(any());
-            then(badWordTestClient).should(times(1)).containsProfanity(any());
+            then(purgomalumTestClient).should(times(1)).containsProfanity(any());
             then(menuRepository).should(times(1)).save(any());
         }
 
@@ -121,7 +122,7 @@ class MenuServiceMockTest {
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(any());
             then(productRepository).should(times(3)).findById(any());
-            then(badWordTestClient).should(never()).containsProfanity(any());
+            then(purgomalumTestClient).should(never()).containsProfanity(any());
             then(menuRepository).should(never()).save(any());
         }
 
@@ -139,7 +140,7 @@ class MenuServiceMockTest {
                 Product product = 상품_DB.get(productId);
                 when(productRepository.findById(productId)).thenReturn(Optional.of(product));
             }
-            when(badWordTestClient.containsProfanity(any())).thenReturn(true);
+            when(purgomalumTestClient.containsProfanity(any())).thenReturn(true);
 
             //when
             //then
@@ -148,7 +149,7 @@ class MenuServiceMockTest {
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(any());
             then(productRepository).should(times(3)).findById(any());
-            then(badWordTestClient).should(times(1)).containsProfanity(any());
+            then(purgomalumTestClient).should(times(1)).containsProfanity(any());
             then(menuRepository).should(never()).save(any());
         }
 
@@ -174,7 +175,7 @@ class MenuServiceMockTest {
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(any());
             then(productRepository).should(times(3)).findById(any());
-            then(badWordTestClient).should(never()).containsProfanity(any());
+            then(purgomalumTestClient).should(never()).containsProfanity(any());
             then(menuRepository).should(never()).save(any());
         }
 
@@ -194,7 +195,7 @@ class MenuServiceMockTest {
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(any());
-            then(badWordTestClient).should(never()).containsProfanity(any());
+            then(purgomalumTestClient).should(never()).containsProfanity(any());
             then(menuRepository).should(never()).save(any());
         }
 
@@ -211,7 +212,7 @@ class MenuServiceMockTest {
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(never()).findAllByIdIn(any());
-            then(badWordTestClient).should(never()).containsProfanity(any());
+            then(purgomalumTestClient).should(never()).containsProfanity(any());
             then(menuRepository).should(never()).save(any());
         }
 
@@ -232,7 +233,7 @@ class MenuServiceMockTest {
             assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(menu));
             then(menuGroupRepository).should(times(1)).findById(any());
             then(productRepository).should(times(1)).findAllByIdIn(any());
-            then(badWordTestClient).should(never()).containsProfanity(any());
+            then(purgomalumTestClient).should(never()).containsProfanity(any());
             then(menuRepository).should(never()).save(any());
         }
     }
