@@ -18,9 +18,16 @@ docker compose -p kitchenpos up -d
 - [ ] 모든 제품을 조회할 수 있다
 ### - orders 주문
 - [ ] 주문을 생성할 수 있다
-- [ ] 주문을 수용할 수 있다.
+  - [ ] 주문은 주문 타입과 주문 상태를 갖는다.
+- [ ] 주문을 수용(accept)할 수 있다.
+- [ ] 주문을 서브(server)할 수 있다.
+- [ ] 주문 배달시작(start-delivery) 할 수 있다
+- [ ] 주문 배달완료(complete-delivery) 할 수 있다
+- [ ] 주문 완료(complete)할 수 있다
+- [ ] 모든 주문을 조회할 수 있다
 ### - menus 메뉴
-    - [ ] 
+- [ ]
+
 
 ## 용어 사전
 
