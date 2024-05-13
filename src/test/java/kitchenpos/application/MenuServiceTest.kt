@@ -2,6 +2,9 @@ package kitchenpos.application
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
+import io.mockk.every
 import io.mockk.mockk
 import kitchenpos.domain.FakeMenuGroupRepository
 import kitchenpos.domain.FakeMenuRepository
@@ -28,6 +31,25 @@ private val Int.pcs: Long get() = this.toLong()
 
 class MenuServiceTest : BehaviorSpec({
     given("메뉴를 생성할 때") {
+        `when`("입력 값이 정상이면") {
+            val newMenu =
+                buildMenu {
+                    name = "메뉴"
+                    price = 1000.won
+                    groupName("추천 메뉴")
+                    products { item("치킨1", 16000.won, 1.pcs) }
+                }.persistMenuGroup().persistProducts()
+            every { purgomalumClient.containsProfanity("메뉴") } returns false
+
+            then("정상적으로 생성된다.") {
+                with(menuService.create(newMenu)) {
+                    this.id shouldNotBe null
+                    this.name shouldBe "메뉴"
+                    this.price shouldBe 1000.won
+                }
+            }
+        }
+
         `when`("메뉴 가격이 null이면") {
             val newMenu =
                 buildMenu {

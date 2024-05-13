@@ -25,10 +25,10 @@ private fun createOrderTable(name: String? = "테이블") =
 
 class OrderTableServiceTest : BehaviorSpec({
     given("주문 테이블을 생성할 때") {
-        `when`("주문 테이블의 이름이 정상적이면") {
+        `when`("입력 값이 정상이면") {
             val newTable = createOrderTable()
 
-            then("정상적으로 생성된다.") {
+            then("주문 테이블이 생성된다.") {
                 with(orderTableService.create(newTable)) {
                     id shouldNotBe null
                     name shouldBe "테이블"

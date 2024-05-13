@@ -3,6 +3,7 @@ package kitchenpos.application
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
 import kitchenpos.domain.FakeMenuRepository
 import kitchenpos.domain.FakeOrderRepository
@@ -39,6 +40,23 @@ private val Int.pcs: Long get() = this.toLong()
 
 class OrderServiceTest : BehaviorSpec({
     given("주문할 때") {
+        `when`("입력 값이 정상이면") {
+            val newOrder =
+                buildOrder {
+                    orderType(TAKEOUT)
+                    requestMenu {
+                        item("메뉴", 1000.won, 1.pcs)
+                    }
+                }.persistMenu()
+
+            then("주문이 생성된다.") {
+                with(orderService.create(newOrder)) {
+                    id shouldNotBe null
+                    status shouldBe WAITING
+                }
+            }
+        }
+
         `when`("주문 타입이 존재하지 않으면") {
             val newOrder = buildOrder { type = null }
 

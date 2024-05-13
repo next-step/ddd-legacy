@@ -43,6 +43,7 @@ data class Products(val items: MutableList<MenuProduct> = mutableListOf()) {
                         this.name = name
                         this.price = price
                     }
+                this.productId = this.product.id
                 this.quantity = quantity
                 this.seq = newSeq
             }
