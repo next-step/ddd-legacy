@@ -61,10 +61,4 @@ public class StringCalculator {
             .reduce(Math::addExact)
             .orElse(0);
     }
-
-//    private List<Integer> getNumbers(final String expression) {
-//        return Stream.of(expression.split(delimiter))
-//            .map(Integer::parseInt)
-//            .toList();
-//    }
 }
