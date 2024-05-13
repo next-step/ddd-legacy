@@ -487,6 +487,45 @@ class OrderServiceTest {
 
     @Nested
     class completeDeliveryTest {
+        @DisplayName("배달 중 상태인 경우에 배달을 완료할 수 있다.")
+        @Test
+        void completeDeliverySuccessTest() {
+            Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+            product = productRepository.save(product);
+            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            menu = menuRepository.save(menu);
+            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, OrderStatus.DELIVERING, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
+            order = orderRepository.save(order);
+
+            order = orderService.completeDelivery(order.getId());
+
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+        }
+
+        @DisplayName("배달 중 상태가 아닌 경우 예외가 발생한다.")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "DELIVERING")
+        void completeDeliveryFailWhenOrderStatusIsNotDeliveringTest(OrderStatus orderStatus) {
+            Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+            product = productRepository.save(product);
+            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            menu = menuRepository.save(menu);
+            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, orderStatus, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
+            order = orderRepository.save(order);
+
+            UUID orderId = order.getId();
+
+            assertThatThrownBy(() -> orderService.completeDelivery(orderId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
     @Nested
