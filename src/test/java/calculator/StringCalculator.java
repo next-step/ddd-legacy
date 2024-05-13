@@ -21,6 +21,10 @@ public class StringCalculator {
             return 0;
         }
 
+        if (input.matches(NUMBER_PATTERN)) {
+            return Integer.parseInt(input);
+        }
+
         final var matcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         String delimiter;
