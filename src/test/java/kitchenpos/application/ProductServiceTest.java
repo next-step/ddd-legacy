@@ -1,11 +1,11 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.ServiceTestFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -40,14 +39,9 @@ class ProductServiceTest {
 	@InjectMocks
 	private ProductService productService;
 
-	private Product product;
-
 	@BeforeEach
 	void setUp() {
-		product = new Product();
-		product.setId(UUID.randomUUID());
-		product.setName("양념치킨");
-		product.setPrice(BigDecimal.TEN);
+		ServiceTestFixture.initializeMenuAndProducts();
 	}
 
 	@Nested
@@ -56,13 +50,13 @@ class ProductServiceTest {
 		@DisplayName("상품 생성 시 가격이 null이면 상품 생성을 할 수 없다")
 		void createProductWithNullPrice() {
 			// given
-			product.setPrice(null);
+			VALID_PRODUCT.setPrice(null);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() ->
 					// when
-					productService.create(product)
+					productService.create(VALID_PRODUCT)
 				);
 		}
 
@@ -70,13 +64,13 @@ class ProductServiceTest {
 		@DisplayName("상품 생성 시 가격이 0 미만이면 상품 생성을 할 수 없다")
 		void createProductWithNegativePrice() {
 			// given
-			product.setPrice(BigDecimal.valueOf(-1));
+			VALID_PRODUCT.setPrice(BigDecimal.valueOf(-1));
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() ->
 					// when
-					productService.create(product)
+					productService.create(VALID_PRODUCT)
 				);
 		}
 
@@ -84,13 +78,13 @@ class ProductServiceTest {
 		@DisplayName("상품 생성 시 상품명이 null이면 상품 생성을 할 수 없다")
 		void createProductWithNullName() {
 			// given
-			product.setName(null);
+			VALID_PRODUCT.setName(null);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() ->
 					// when
-					productService.create(product)
+					productService.create(VALID_PRODUCT)
 				);
 		}
 
@@ -98,14 +92,14 @@ class ProductServiceTest {
 		@DisplayName("상품 생성 시 상품명에 비속어가 포함되어 있으면 상품 생성을 할 수 없다")
 		void createProductWithProfaneName() {
 			// given
-			when(purgomalumClient.containsProfanity("Profane")).thenReturn(true);
-			product.setName("Profane");
+			when(purgomalumClient.containsProfanity("비속어")).thenReturn(true);
+			VALID_PRODUCT.setName("비속어");
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() ->
 					// when
-					productService.create(product)
+					productService.create(VALID_PRODUCT)
 				);
 		}
 
@@ -113,15 +107,15 @@ class ProductServiceTest {
 		@DisplayName("상품 생성을 할 수 있다")
 		void createProductSuccessfully() {
 			// given
-			when(productRepository.save(any(Product.class))).thenReturn(product);
+			when(productRepository.save(any(Product.class))).thenReturn(VALID_PRODUCT);
 
 			// when
-			Product created = productService.create(product);
+			Product created = productService.create(VALID_PRODUCT);
 
 			// then
 			assertThat(created).isNotNull();
-			assertThat(created.getName()).isEqualTo(product.getName());
-			assertThat(created.getPrice()).isEqualTo(product.getPrice());
+			assertThat(created.getName()).isEqualTo(VALID_PRODUCT.getName());
+			assertThat(created.getPrice()).isEqualTo(VALID_PRODUCT.getPrice());
 		}
 	}
 
@@ -131,13 +125,13 @@ class ProductServiceTest {
 		@DisplayName("상품 가격 변경 시 가격이 null이면 상품 가격 변경을 할 수 없다")
 		void changePriceWithNullPrice() {
 			// given
-			product.setPrice(null);
+			VALID_PRODUCT.setPrice(null);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() ->
 					// when
-					productService.changePrice(UUID.randomUUID(), product)
+					productService.changePrice(UUID.randomUUID(), VALID_PRODUCT)
 				);
 		}
 
@@ -145,13 +139,13 @@ class ProductServiceTest {
 		@DisplayName("상품 가격 변경 시 가격이 0 미만이면 상품 가격 변경을 할 수 없다")
 		void changePriceWithNegativePrice() {
 			// given
-			product.setPrice(BigDecimal.valueOf(-1));
+			VALID_PRODUCT.setPrice(BigDecimal.valueOf(-1));
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() ->
 					// when
-					productService.changePrice(UUID.randomUUID(), product)
+					productService.changePrice(UUID.randomUUID(), VALID_PRODUCT)
 				);
 		}
 
@@ -165,7 +159,7 @@ class ProductServiceTest {
 			assertThatExceptionOfType(NoSuchElementException.class)
 				.isThrownBy(() ->
 					// when
-					productService.changePrice(UUID.randomUUID(), product)
+					productService.changePrice(UUID.randomUUID(), VALID_PRODUCT)
 				);
 		}
 
@@ -173,27 +167,27 @@ class ProductServiceTest {
 		@DisplayName("상품 가격 변경 시 해당 상품이 메뉴에 등록되어 있지 않으면 상품의 가격을 변경할 수 있다")
 		void changePriceWithoutMenus() {
 			// given
-			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
-			when(menuRepository.findAllByProductId(any(UUID.class))).thenReturn(Collections.emptyList());
+			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(VALID_PRODUCT));
+			when(menuRepository.findAllByProductId(VALID_PRODUCT.getId())).thenReturn(Collections.emptyList());
 
 			// when
-			Product updated = productService.changePrice(product.getId(), product);
+			Product updated = productService.changePrice(VALID_PRODUCT.getId(), VALID_PRODUCT);
 
 			// then
 			assertThat(updated).isNotNull();
-			assertThat(updated.getPrice()).isEqualTo(BigDecimal.TEN);
+			assertThat(updated.getPrice()).isEqualTo(VALID_PRODUCT.getPrice());
 		}
 
 		@Test
 		@DisplayName("상품 가격 변경 시 메뉴 가격이 상품 가격 합계보다 높을 때 해당 상품의 메뉴가 비노출 처리된다")
 		void changePriceMenuPriceHigher() {
 			// given
-			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
-			Menu menu = createTestMenu(product, BigDecimal.valueOf(20));
+			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(VALID_PRODUCT));
+			Menu menu = createMenuWithPrice(BigDecimal.valueOf(20));
 			when(menuRepository.findAllByProductId(any(UUID.class))).thenReturn(Collections.singletonList(menu));
 
 			// when
-			productService.changePrice(product.getId(), product);
+			productService.changePrice(VALID_PRODUCT.getId(), VALID_PRODUCT);
 
 			// then
 			assertThat(menu.isDisplayed()).isFalse();
@@ -203,12 +197,12 @@ class ProductServiceTest {
 		@DisplayName("상품 가격 변경 시 메뉴 가격이 상품 가격 합계와 같을 때 해당 상품의 메뉴가 노출 처리된다")
 		void changePriceMenuPriceEqual() {
 			// given
-			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(product));
-			Menu menu = createTestMenu(product, BigDecimal.TEN);
+			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(VALID_PRODUCT));
+			Menu menu = createMenuWithPrice(BigDecimal.TEN);
 			when(menuRepository.findAllByProductId(any(UUID.class))).thenReturn(Collections.singletonList(menu));
 
 			// when
-			productService.changePrice(product.getId(), product);
+			productService.changePrice(VALID_PRODUCT.getId(), VALID_PRODUCT);
 
 			// then
 			assertThat(menu.isDisplayed()).isTrue();
@@ -234,26 +228,15 @@ class ProductServiceTest {
 		@DisplayName("상품 데이터가 비어 있지 않을 때 모든 상품을 조회하면 모든 상품을 조회할 수 있다")
 		void findAllProductsWhenNotEmpty() {
 			// given
-			when(productRepository.findAll()).thenReturn(Collections.singletonList(product));
+			when(productRepository.findAll()).thenReturn(Collections.singletonList(VALID_PRODUCT));
 
 			// when
 			var products = productService.findAll();
 
 			// then
 			assertThat(products).isNotEmpty();
-			assertThat(products.getFirst()).isEqualTo(product);
+			assertThat(products.getFirst()).isEqualTo(VALID_PRODUCT);
 		}
 	}
 
-	private Menu createTestMenu(Product product, BigDecimal price) {
-		MenuProduct menuProduct = new MenuProduct();
-		menuProduct.setProduct(product);
-		menuProduct.setQuantity(1);
-
-		Menu menu = new Menu();
-		menu.setPrice(price);
-		menu.setMenuProducts(List.of(menuProduct));
-		menu.setDisplayed(true);
-		return menu;
-	}
 }

@@ -1,11 +1,11 @@
 package kitchenpos.application;
 
+import static kitchenpos.application.ServiceTestFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.*;
 import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -28,14 +28,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
 import kitchenpos.infra.KitchenridersClient;
@@ -57,50 +54,14 @@ class OrderServiceTest {
 	@InjectMocks
 	private OrderService orderService;
 
-	private Order validOrder;
-	private Menu validMenu;
-	private OrderTable validOrderTable;
-
 	@BeforeEach
 	void setUp() {
-		UUID validMenuGroupId = UUID.randomUUID();
-		MenuGroup validMenuGroup = new MenuGroup();
-		validMenuGroup.setId(validMenuGroupId);
-		validMenuGroup.setName("점심특선");
+		ServiceTestFixture.initializeMenuAndOrder();
 
-		UUID validMenuId = UUID.randomUUID();
-		validMenu = new Menu();
-		validMenu.setId(validMenuId);
-		validMenu.setName("갈비탕");
-		validMenu.setPrice(new BigDecimal("15.00"));
-		validMenu.setMenuGroup(validMenuGroup);
-		validMenu.setDisplayed(true);
-
-		OrderLineItem validOrderLineItem = new OrderLineItem();
-		validOrderLineItem.setMenu(validMenu);
-		validOrderLineItem.setMenuId(validMenuId);
-		validOrderLineItem.setQuantity(1);
-		validOrderLineItem.setPrice(validMenu.getPrice());
-
-		validOrderTable = new OrderTable();
-		UUID validOrderTableId = UUID.randomUUID();
-		validOrderTable.setId(validOrderTableId);
-		validOrderTable.setName("1번 테이블");
-		validOrderTable.setOccupied(true);
-
-		validOrder = new Order();
-		UUID validOrderId = UUID.randomUUID();
-		validOrder.setId(validOrderId);
-		validOrder.setType(OrderType.EAT_IN);
-		validOrder.setOrderLineItems(List.of(validOrderLineItem));
-		validOrder.setOrderDateTime(LocalDateTime.now());
-		validOrder.setOrderTable(validOrderTable);
-		validOrder.setOrderTableId(validOrderTableId);
-
-		lenient().when(menuRepository.findById(validMenuId)).thenReturn(Optional.of(validMenu));
-		lenient().when(menuRepository.findAllByIdIn(List.of(validMenuId))).thenReturn(List.of(validMenu));
-		lenient().when(orderTableRepository.findById(validOrderTableId)).thenReturn(Optional.of(validOrderTable));
-		lenient().when(orderRepository.findById(validOrderId)).thenReturn(Optional.of(validOrder));
+		lenient().when(menuRepository.findById(VALID_MENU_ID)).thenReturn(Optional.of(VALID_MENU));
+		lenient().when(menuRepository.findAllByIdIn(List.of(VALID_MENU_ID))).thenReturn(List.of(VALID_MENU));
+		lenient().when(orderTableRepository.findById(VALID_ORDER_TABLE_ID)).thenReturn(Optional.of(VALID_ORDER_TABLE));
+		lenient().when(orderRepository.findById(VALID_ORDER_ID)).thenReturn(Optional.of(VALID_ORDER));
 	}
 
 	@Nested
@@ -109,13 +70,13 @@ class OrderServiceTest {
 		@DisplayName("주문 생성 시 주문 타입이 null이면 주문 생성을 할 수 없다")
 		void createOrderWithNullType() {
 			// given
-			validOrder.setType(null);
+			VALID_ORDER.setType(null);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					orderService.create(validOrder);
+					orderService.create(VALID_ORDER);
 				});
 		}
 
@@ -124,13 +85,13 @@ class OrderServiceTest {
 		@DisplayName("주문 생성 시 주문 항목이 null이거나 비어있으면 주문 생성을 할 수 없다")
 		void createOrderWithNullOrEmptyLineItems(List<OrderLineItem> lineItems) {
 			// given
-			validOrder.setOrderLineItems(lineItems);
+			VALID_ORDER.setOrderLineItems(lineItems);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					orderService.create(validOrder);
+					orderService.create(VALID_ORDER);
 				});
 		}
 
@@ -138,14 +99,14 @@ class OrderServiceTest {
 		@DisplayName("주문 생성 시 요청된 항목 수와 실제 메뉴 수가 일치하지 않으면 주문 생성을 할 수 없다")
 		void createOrderWithMismatchedMenusAndRequests() {
 			// given
-			validOrder.setOrderLineItems(Arrays.asList(new OrderLineItem(), new OrderLineItem()));
-			when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(validMenu));
+			VALID_ORDER.setOrderLineItems(Arrays.asList(new OrderLineItem(), new OrderLineItem()));
+			when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.singletonList(VALID_MENU));
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					orderService.create(validOrder);
+					orderService.create(VALID_ORDER);
 				});
 		}
 
@@ -155,13 +116,13 @@ class OrderServiceTest {
 			// given
 			OrderLineItem item = new OrderLineItem();
 			item.setQuantity(-1);
-			validOrder.setOrderLineItems(Collections.singletonList(item));
+			VALID_ORDER.setOrderLineItems(Collections.singletonList(item));
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					orderService.create(validOrder);
+					orderService.create(VALID_ORDER);
 				});
 		}
 
@@ -175,7 +136,7 @@ class OrderServiceTest {
 			assertThatExceptionOfType(NoSuchElementException.class)
 				.isThrownBy(() -> {
 					// when
-					orderService.create(validOrder);
+					orderService.create(VALID_ORDER);
 				});
 		}
 
@@ -183,13 +144,13 @@ class OrderServiceTest {
 		@DisplayName("주문 생성 시 메뉴가 표시되지 않았을 경우 주문 생성을 할 수 없다")
 		void createOrderWithHiddenMenu() {
 			// given
-			validMenu.setDisplayed(false);
+			VALID_MENU.setDisplayed(false);
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
 				.isThrownBy(() -> {
 					// when
-					orderService.create(validOrder);
+					orderService.create(VALID_ORDER);
 				});
 		}
 
@@ -197,13 +158,13 @@ class OrderServiceTest {
 		@DisplayName("주문 생성 시 요청된 가격과 메뉴의 가격이 다르면 주문 생성을 할 수 없다")
 		void createOrderWithMismatchedPrice() {
 			// given
-			validOrder.getOrderLineItems().get(0).setPrice(new BigDecimal("10.00"));
+			VALID_ORDER.getOrderLineItems().get(0).setPrice(new BigDecimal("10.00"));
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					orderService.create(validOrder);
+					orderService.create(VALID_ORDER);
 				});
 		}
 
@@ -212,14 +173,14 @@ class OrderServiceTest {
 		@DisplayName("배달 주문 생성 시 배달 주소가 null이거나 비어있으면 주문 생성을 할 수 없다")
 		void createDeliveryOrderWithNullOrEmptyAddress(String address) {
 			// given
-			validOrder.setType(OrderType.DELIVERY);
-			validOrder.setDeliveryAddress(address);
+			VALID_ORDER.setType(OrderType.DELIVERY);
+			VALID_ORDER.setDeliveryAddress(address);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					orderService.create(validOrder);
+					orderService.create(VALID_ORDER);
 				});
 		}
 
@@ -227,14 +188,14 @@ class OrderServiceTest {
 		@DisplayName("매장 내 식사 주문 생성 시 주문 테이블 ID에 해당하는 테이블이 존재하지 않으면 주문 생성을 할 수 없다")
 		void createEatInOrderWithNonExistentTable() {
 			// given
-			validOrder.setType(OrderType.EAT_IN);
+			VALID_ORDER.setType(OrderType.EAT_IN);
 			when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
 
 			// then
 			assertThatExceptionOfType(NoSuchElementException.class)
 				.isThrownBy(() -> {
 					// when
-					orderService.create(validOrder);
+					orderService.create(VALID_ORDER);
 				});
 		}
 
@@ -242,14 +203,14 @@ class OrderServiceTest {
 		@DisplayName("매장 내 식사 주문 생성 시 주문 테이블이 사용 중이 아니면 주문 생성을 할 수 없다")
 		void createEatInOrderWithNonOccupiedTable() {
 			// given
-			validOrder.setType(OrderType.EAT_IN);
-			validOrderTable.setOccupied(false);
+			VALID_ORDER.setType(OrderType.EAT_IN);
+			VALID_ORDER_TABLE.setOccupied(false);
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
 				.isThrownBy(() -> {
 					// when
-					orderService.create(validOrder);
+					orderService.create(VALID_ORDER);
 				});
 		}
 
@@ -257,18 +218,18 @@ class OrderServiceTest {
 		@DisplayName("매장 내 식사 주문 생성 시 주문 테이블이 사용 중이면 주문 생성을 할 수 있다")
 		void createEatInOrderSuccessfully() {
 			// given
-			validOrder.setType(OrderType.EAT_IN);
-			validOrderTable.setOccupied(true);
+			VALID_ORDER.setType(OrderType.EAT_IN);
+			VALID_ORDER_TABLE.setOccupied(true);
 
-			when(orderRepository.save(any(Order.class))).thenReturn(validOrder);
+			when(orderRepository.save(any(Order.class))).thenReturn(VALID_ORDER);
 
 			// when
-			Order result = orderService.create(validOrder);
+			Order result = orderService.create(VALID_ORDER);
 
 			// then
 			assertThat(result).isNotNull();
-			assertThat(result).isEqualTo(validOrder);
-			assertThat(result.getOrderTable()).isEqualTo(validOrderTable);
+			assertThat(result).isEqualTo(VALID_ORDER);
+			assertThat(result.getOrderTable()).isEqualTo(VALID_ORDER_TABLE);
 		}
 
 	}
@@ -294,8 +255,8 @@ class OrderServiceTest {
 		void acceptNonWaitingOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setStatus(OrderStatus.ACCEPTED);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setStatus(OrderStatus.ACCEPTED);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
@@ -310,16 +271,16 @@ class OrderServiceTest {
 		void acceptDeliveryOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setType(OrderType.DELIVERY);
-			validOrder.setStatus(OrderStatus.WAITING);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setType(OrderType.DELIVERY);
+			VALID_ORDER.setStatus(OrderStatus.WAITING);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// when
 			Order acceptedOrder = orderService.accept(orderId);
 
 			// then
 			verify(kitchenridersClient).requestDelivery(eq(orderId), any(BigDecimal.class),
-				eq(validOrder.getDeliveryAddress()));
+				eq(VALID_ORDER.getDeliveryAddress()));
 			assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
 		}
 	}
@@ -346,8 +307,8 @@ class OrderServiceTest {
 		void serveNonAcceptedOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setStatus(OrderStatus.WAITING);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setStatus(OrderStatus.WAITING);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
@@ -362,8 +323,8 @@ class OrderServiceTest {
 		void serveAcceptedOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setStatus(OrderStatus.ACCEPTED);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setStatus(OrderStatus.ACCEPTED);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// when
 			Order servedOrder = orderService.serve(orderId);
@@ -396,9 +357,9 @@ class OrderServiceTest {
 		void startDeliveryOnNonDeliveryOrder(OrderType orderType) {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setType(orderType);
-			validOrder.setStatus(OrderStatus.SERVED);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setType(orderType);
+			VALID_ORDER.setStatus(OrderStatus.SERVED);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
@@ -414,9 +375,9 @@ class OrderServiceTest {
 		void startDeliveryNotServedOrder(OrderStatus nonServedStatus) {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setType(OrderType.DELIVERY);
-			validOrder.setStatus(nonServedStatus);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setType(OrderType.DELIVERY);
+			VALID_ORDER.setStatus(nonServedStatus);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
@@ -431,9 +392,9 @@ class OrderServiceTest {
 		void startDeliveryServedOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setType(OrderType.DELIVERY);
-			validOrder.setStatus(OrderStatus.SERVED);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setType(OrderType.DELIVERY);
+			VALID_ORDER.setStatus(OrderStatus.SERVED);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// when
 			Order deliveringOrder = orderService.startDelivery(orderId);
@@ -466,8 +427,8 @@ class OrderServiceTest {
 		void completeDeliveryNotDeliveringOrder(OrderStatus orderStatus) {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setStatus(orderStatus);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setStatus(orderStatus);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
@@ -482,8 +443,8 @@ class OrderServiceTest {
 		void completeDeliveryDeliveringOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setStatus(OrderStatus.DELIVERING);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setStatus(OrderStatus.DELIVERING);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// when
 			Order deliveredOrder = orderService.completeDelivery(orderId);
@@ -495,6 +456,21 @@ class OrderServiceTest {
 	}
 
 	class complete {
+		static Stream<Arguments> provideExceptionCasesForTakeOutAndEatInOrderTypes() {
+			return Stream.of(
+				arguments(OrderType.TAKEOUT, OrderStatus.WAITING),
+				arguments(OrderType.TAKEOUT, OrderStatus.ACCEPTED),
+				arguments(OrderType.TAKEOUT, OrderStatus.DELIVERING),
+				arguments(OrderType.TAKEOUT, OrderStatus.DELIVERED),
+				arguments(OrderType.TAKEOUT, OrderStatus.COMPLETED),
+				arguments(OrderType.EAT_IN, OrderStatus.WAITING),
+				arguments(OrderType.EAT_IN, OrderStatus.ACCEPTED),
+				arguments(OrderType.EAT_IN, OrderStatus.DELIVERING),
+				arguments(OrderType.EAT_IN, OrderStatus.DELIVERED),
+				arguments(OrderType.EAT_IN, OrderStatus.COMPLETED)
+			);
+		}
+
 		@Test
 		@DisplayName("주문 완료 처리 시 주문 ID에 해당하는 주문이 존재하지 않으면 주문 완료 처리를 할 수 없다")
 		void completeNonExistentOrder() {
@@ -515,9 +491,9 @@ class OrderServiceTest {
 		void completeNonDeliveredOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setType(OrderType.DELIVERY);
-			validOrder.setStatus(OrderStatus.DELIVERING);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setType(OrderType.DELIVERY);
+			VALID_ORDER.setStatus(OrderStatus.DELIVERING);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
@@ -532,9 +508,9 @@ class OrderServiceTest {
 		void completeDeliveredOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setType(OrderType.DELIVERY);
-			validOrder.setStatus(OrderStatus.DELIVERED);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setType(OrderType.DELIVERY);
+			VALID_ORDER.setStatus(OrderStatus.DELIVERED);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// when
 			Order completedOrder = orderService.complete(orderId);
@@ -549,9 +525,9 @@ class OrderServiceTest {
 		void completeIfOrderNotServedOnCompletion(OrderType type, OrderStatus status) {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setType(type);
-			validOrder.setStatus(status);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setType(type);
+			VALID_ORDER.setStatus(status);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
@@ -561,29 +537,14 @@ class OrderServiceTest {
 				});
 		}
 
-		static Stream<Arguments> provideExceptionCasesForTakeOutAndEatInOrderTypes() {
-			return Stream.of(
-				arguments(OrderType.TAKEOUT, OrderStatus.WAITING),
-				arguments(OrderType.TAKEOUT, OrderStatus.ACCEPTED),
-				arguments(OrderType.TAKEOUT, OrderStatus.DELIVERING),
-				arguments(OrderType.TAKEOUT, OrderStatus.DELIVERED),
-				arguments(OrderType.TAKEOUT, OrderStatus.COMPLETED),
-				arguments(OrderType.EAT_IN, OrderStatus.WAITING),
-				arguments(OrderType.EAT_IN, OrderStatus.ACCEPTED),
-				arguments(OrderType.EAT_IN, OrderStatus.DELIVERING),
-				arguments(OrderType.EAT_IN, OrderStatus.DELIVERED),
-				arguments(OrderType.EAT_IN, OrderStatus.COMPLETED)
-			);
-		}
-
 		@Test
 		@DisplayName("포장 주문 완료 처리 시 주문 상태가 SERVED일 경우 주문 상태가 COMPLETED로 변경된다")
 		void completeServedTakeoutOrder() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setType(OrderType.TAKEOUT);
-			validOrder.setStatus(OrderStatus.SERVED);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
+			VALID_ORDER.setType(OrderType.TAKEOUT);
+			VALID_ORDER.setStatus(OrderStatus.SERVED);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
 
 			// when
 			Order completedOrder = orderService.complete(orderId);
@@ -597,10 +558,10 @@ class OrderServiceTest {
 		void completeServedEatInOrderWhenNotCompleted() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setType(OrderType.EAT_IN);
-			validOrder.setStatus(OrderStatus.SERVED);
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
-			when(orderRepository.existsByOrderTableAndStatusNot(validOrderTable, OrderStatus.COMPLETED)).thenReturn(
+			VALID_ORDER.setType(OrderType.EAT_IN);
+			VALID_ORDER.setStatus(OrderStatus.SERVED);
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
+			when(orderRepository.existsByOrderTableAndStatusNot(VALID_ORDER_TABLE, OrderStatus.COMPLETED)).thenReturn(
 				true);
 
 			// when
@@ -615,11 +576,11 @@ class OrderServiceTest {
 		void completeServedEatInOrderWithNoActiveTable() {
 			// given
 			UUID orderId = UUID.randomUUID();
-			validOrder.setType(OrderType.EAT_IN);
-			validOrder.setStatus(OrderStatus.SERVED);
+			VALID_ORDER.setType(OrderType.EAT_IN);
+			VALID_ORDER.setStatus(OrderStatus.SERVED);
 
-			when(orderRepository.findById(orderId)).thenReturn(Optional.of(validOrder));
-			when(orderRepository.existsByOrderTableAndStatusNot(validOrderTable, OrderStatus.COMPLETED)).thenReturn(
+			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
+			when(orderRepository.existsByOrderTableAndStatusNot(VALID_ORDER_TABLE, OrderStatus.COMPLETED)).thenReturn(
 				false);
 
 			// when
@@ -627,8 +588,8 @@ class OrderServiceTest {
 
 			// then
 			assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-			assertThat(validOrderTable.getNumberOfGuests()).isZero();
-			assertThat(validOrderTable.isOccupied()).isFalse();
+			assertThat(VALID_ORDER_TABLE.getNumberOfGuests()).isZero();
+			assertThat(VALID_ORDER_TABLE.isOccupied()).isFalse();
 		}
 	}
 
@@ -651,14 +612,14 @@ class OrderServiceTest {
 		@DisplayName("주문 데이터가 비어있지 않을 때 모든 주문을 조회하면 주문 목록을 조회할 수 있다")
 		void findAllOrdersWhenNotEmpty() {
 			// given
-			when(orderRepository.findAll()).thenReturn(Collections.singletonList(validOrder));
+			when(orderRepository.findAll()).thenReturn(Collections.singletonList(VALID_ORDER));
 
 			// when
 			List<Order> orders = orderService.findAll();
 
 			// then
 			assertThat(orders).isNotEmpty();
-			assertThat(orders).contains(validOrder);
+			assertThat(orders).contains(VALID_ORDER);
 		}
 	}
 }
