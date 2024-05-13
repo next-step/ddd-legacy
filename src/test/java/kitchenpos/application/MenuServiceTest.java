@@ -188,9 +188,14 @@ class MenuServiceTest {
 
             // when
             when(menuRepository.save(any())).thenReturn(request);
-            menuService.create(request);
+            Menu result = menuService.create(request);
 
             // then
+            Assertions.assertThat(result.getId()).isNotNull();
+            Assertions.assertThat(result.getName()).isEqualTo(request.getName());
+            Assertions.assertThat(result.getPrice()).isEqualTo(request.getPrice());
+            Assertions.assertThat(result.getMenuGroup()).isEqualTo(request.getMenuGroup());
+
             verify(menuRepository, times(1)).save(any());
         }
     }

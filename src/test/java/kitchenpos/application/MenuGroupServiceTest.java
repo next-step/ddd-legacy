@@ -49,9 +49,11 @@ class MenuGroupServiceTest {
 
             // when
             when(menuGroupRepository.save(any())).thenReturn(request);
-            menuGroupService.create(request);
+            MenuGroup result = menuGroupService.create(request);
 
             // then
+            Assertions.assertThat(result.getId()).isNotNull();
+            Assertions.assertThat(result.getName()).isEqualTo(request.getName());
             verify(menuGroupRepository, times(1)).save(any());
         }
     }

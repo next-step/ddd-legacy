@@ -60,9 +60,14 @@ class OrderTableServiceTest {
 
             // when
             when(orderTableRepository.save(any())).thenReturn(request);
-            orderTableService.create(request);
+            OrderTable result = orderTableService.create(request);
 
             // then
+            Assertions.assertThat(result.getId()).isNotNull();
+            Assertions.assertThat(result.getName()).isEqualTo(request.getName());
+            Assertions.assertThat(result.getNumberOfGuests()).isZero();
+            Assertions.assertThat(result.isOccupied()).isFalse();
+
             verify(orderTableRepository, times(1)).save(any());
         }
     }

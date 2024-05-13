@@ -95,9 +95,13 @@ class ProductServiceTest {
 
             // when
             when(productRepository.save(any())).thenReturn(request);
-            productService.create(request);
+            Product result = productService.create(request);
 
             // then
+            Assertions.assertThat(result.getId()).isNotNull();
+            Assertions.assertThat(result.getName()).isEqualTo(request.getName());
+            Assertions.assertThat(result.getPrice()).isEqualTo(request.getPrice());
+
             verify(productRepository, times(1)).save(any());
         }
     }
@@ -157,8 +161,12 @@ class ProductServiceTest {
             given(productRepository.findById(any())).willReturn(Optional.of(request));
             given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
 
-            // when & then
-            productService.changePrice(request.getId(), request);
+            // when
+            Product result = productService.changePrice(request.getId(), request);
+
+            // then
+            Assertions.assertThat(result.getId()).isNotNull();
+            Assertions.assertThat(result.getPrice()).isEqualTo(request.getPrice());
         }
     }
 }
