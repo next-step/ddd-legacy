@@ -392,8 +392,10 @@ stateDiagram-v2
   - [x] @Nested로 가독성 올리기
   - [x] 한글 변수 사용 및 요구사항에 맞게 가독성 체크하기
     - [x] `@DisplayNameGeneration`에 대해 알아보기. 알아봤습니다. 언더바를 지워서 사용할 수 있군요.
-  - [ ] `@TestConfiguration` 알아보기
-
-
+  - [x] `@TestConfiguration` 알아보기
+    - 테스트를 할 때, 실제 애플리케이션 컨텍스트가 아닌 테스트용 configuration을 사용할 수 있음.
   #### 추가로 생각해 보고 싶은것
-    - [ ] `@MockBean` 적용해보기
+    - [x] `@MockBean` 적용해보기
+      - TestConfiguration 설정 후 모든 인수테스트에 @MockBean 을 달아줘야 합니다.
+      - 적용해보고 서로 장단점을 느껴보았습니다.
+    - [x] `RestAssured` : MockMvc없이 직접 HTTP 요청을 보내고 응답을 검증할 수 있습니다.
