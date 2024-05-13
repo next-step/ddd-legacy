@@ -530,6 +530,168 @@ class OrderServiceTest {
 
     @Nested
     class completeTest {
+        @Nested
+        class EatInTest {
+            @DisplayName("먹고가기 주문을 완료할 수 있다.")
+            @Test
+            void completeEatInTest() {
+                OrderTable orderTable = createOrderTableWithId("1번", true);
+                orderTable = orderTableRepository.save(orderTable);
+                Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+                product = productRepository.save(product);
+                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                menuGroup = menuGroupRepository.save(menuGroup);
+                MenuProduct menuProduct = createMenuProduct(product, 1);
+                Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                menu = menuRepository.save(menu);
+                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now());
+                order = orderRepository.save(order);
+
+                order = orderService.complete(order.getId());
+
+                assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+                assertThat(order.getOrderTable().getNumberOfGuests()).isZero();
+                assertThat(order.getOrderTable().isOccupied()).isFalse();
+            }
+
+            @DisplayName("serve 상태가 아닌 경우 예외가 발생한다.")
+            @ParameterizedTest
+            @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "SERVED")
+            void completeEatInFailWhenOrderStatusIsNotServedTest(OrderStatus orderStatus) {
+                OrderTable orderTable = createOrderTableWithId("1번", true);
+                orderTable = orderTableRepository.save(orderTable);
+                Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+                product = productRepository.save(product);
+                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                menuGroup = menuGroupRepository.save(menuGroup);
+                MenuProduct menuProduct = createMenuProduct(product, 1);
+                Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                menu = menuRepository.save(menu);
+                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, orderStatus, null, LocalDateTime.now());
+                order = orderRepository.save(order);
+
+                UUID orderId = order.getId();
+
+                assertThatThrownBy(() -> orderService.complete(orderId))
+                        .isInstanceOf(IllegalStateException.class);
+            }
+
+            @DisplayName("완료된 주문이 없는 경우 테이블을 치우지 않는다.")
+            @Test
+            void completeEatInFailWhenNotExistOrderTest() {
+                OrderTable orderTable = createOrderTableWithId("1번", true, 2);
+                orderTable = orderTableRepository.save(orderTable);
+                Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+                product = productRepository.save(product);
+                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                menuGroup = menuGroupRepository.save(menuGroup);
+                MenuProduct menuProduct = createMenuProduct(product, 1);
+                Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                menu = menuRepository.save(menu);
+                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now());
+                order = orderRepository.save(order);
+                Order order2 = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now());
+                order = orderRepository.save(order2);
+
+                UUID orderId = order.getId();
+
+                order = orderService.complete(orderId);
+
+                assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+                assertThat(order2.getStatus()).isEqualTo(OrderStatus.SERVED);
+                assertThat(order.getOrderTable().getNumberOfGuests()).isEqualTo(2);
+                assertThat(order.getOrderTable().isOccupied()).isTrue();
+            }
+        }
+
+        @Nested
+        class TakeOutTest {
+            @DisplayName("포장하기 주문을 완료할 수 있다.")
+            @Test
+            void completeTakeOutTest() {
+                Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+                product = productRepository.save(product);
+                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                menuGroup = menuGroupRepository.save(menuGroup);
+                MenuProduct menuProduct = createMenuProduct(product, 1);
+                Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                menu = menuRepository.save(menu);
+                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, OrderStatus.SERVED, null, LocalDateTime.now());
+                order = orderRepository.save(order);
+
+                order = orderService.complete(order.getId());
+
+                assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            }
+
+            @DisplayName("serve 상태가 아닌 경우 예외가 발생한다.")
+            @ParameterizedTest
+            @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "SERVED")
+            void completeTakeOutFailWhenOrderStatusIsNotServedTest(OrderStatus orderStatus) {
+                Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+                product = productRepository.save(product);
+                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                menuGroup = menuGroupRepository.save(menuGroup);
+                MenuProduct menuProduct = createMenuProduct(product, 1);
+                Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                menu = menuRepository.save(menu);
+                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, orderStatus, null, LocalDateTime.now());
+                order = orderRepository.save(order);
+
+                UUID orderId = order.getId();
+
+                assertThatThrownBy(() -> orderService.complete(orderId))
+                        .isInstanceOf(IllegalStateException.class);
+            }
+        }
+
+        @Nested
+        class DeliveryTest {
+            @DisplayName("배달하기 주문을 완료할 수 있다.")
+            @Test
+            void completeDeliveryTest() {
+                Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+                product = productRepository.save(product);
+                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                menuGroup = menuGroupRepository.save(menuGroup);
+                MenuProduct menuProduct = createMenuProduct(product, 1);
+                Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                menu = menuRepository.save(menu);
+                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, OrderStatus.DELIVERED, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
+                order = orderRepository.save(order);
+
+                order = orderService.complete(order.getId());
+
+                assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            }
+
+            @DisplayName("DELIVERED 상태가 아닌 경우 예외가 발생한다.")
+            @ParameterizedTest
+            @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "DELIVERED")
+            void completeDeliveryFailWhenOrderStatusIsNotDeliveredTest(OrderStatus orderStatus) {
+                Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+                product = productRepository.save(product);
+                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                menuGroup = menuGroupRepository.save(menuGroup);
+                MenuProduct menuProduct = createMenuProduct(product, 1);
+                Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                menu = menuRepository.save(menu);
+                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, orderStatus, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
+                order = orderRepository.save(order);
+
+                UUID orderId = order.getId();
+
+                assertThatThrownBy(() -> orderService.complete(orderId))
+                        .isInstanceOf(IllegalStateException.class);
+            }
+        }
     }
 
     @Nested

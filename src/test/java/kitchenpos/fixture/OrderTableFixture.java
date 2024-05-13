@@ -28,4 +28,13 @@ public class OrderTableFixture {
         orderTable.setOccupied(isOccupied);
         return orderTable;
     }
+
+    public static OrderTable createOrderTableWithId(String name, boolean isOccupied, int numberOfGuest) {
+        final OrderTable orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName(name);
+        orderTable.setOccupied(isOccupied);
+        orderTable.setNumberOfGuests(numberOfGuest);
+        return orderTable;
+    }
 }
