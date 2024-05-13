@@ -9,9 +9,11 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import static kitchenpos.fixture.ProductFixture.메뉴_상품_생성;
+import static kitchenpos.fixture.ProductFixture.*;
 
 public class MenuFixture {
+    public static final MenuGroup 메뉴_그룹A = 메뉴_그룹_생성("메뉴그룹A");
+    public static final Menu 메뉴A = 메뉴_생성("메뉴A", BigDecimal.valueOf(10_000), false, 메뉴_그룹A.getId(), List.of(상품A, 상품B, 상품C));
 
     public static Menu 메뉴_생성(String name, BigDecimal price, boolean displayed, UUID menuGroupId, List<Product> products) {
         Menu menu = new Menu();
