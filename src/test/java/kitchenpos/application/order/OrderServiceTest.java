@@ -35,8 +35,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @DisplayName("Application: 주문 서비스 테스트")
@@ -183,10 +186,10 @@ class OrderServiceTest {
                 Order createdOrder = orderService.create(delivery_order);
 
                 //then
-                Assertions.assertEquals(OrderType.DELIVERY, createdOrder.getType());
-                Assertions.assertEquals(OrderStatus.WAITING, createdOrder.getStatus());
-                Assertions.assertEquals(delivery_order.getOrderDateTime(), createdOrder.getOrderDateTime());
-                Assertions.assertEquals(delivery_order.getOrderLineItems(), createdOrder.getOrderLineItems());
+                assertEquals(OrderType.DELIVERY, createdOrder.getType());
+                assertEquals(OrderStatus.WAITING, createdOrder.getStatus());
+                assertEquals(delivery_order.getOrderDateTime(), createdOrder.getOrderDateTime());
+                assertEquals(delivery_order.getOrderLineItems(), createdOrder.getOrderLineItems());
             }
 
             @ParameterizedTest(name = "배달 주소가 {0} 인 경우")
@@ -235,10 +238,10 @@ class OrderServiceTest {
                 Order createdOrder = orderService.create(eat_in_order);
 
                 //then
-                Assertions.assertEquals(OrderType.EAT_IN, createdOrder.getType());
-                Assertions.assertEquals(OrderStatus.WAITING, createdOrder.getStatus());
-                Assertions.assertEquals(eat_in_order.getOrderTable(), createdOrder.getOrderTable());
-                Assertions.assertEquals(takeout_order.getOrderLineItems(), createdOrder.getOrderLineItems());
+                assertEquals(OrderType.EAT_IN, createdOrder.getType());
+                assertEquals(OrderStatus.WAITING, createdOrder.getStatus());
+                assertEquals(eat_in_order.getOrderTable(), createdOrder.getOrderTable());
+                assertEquals(takeout_order.getOrderLineItems(), createdOrder.getOrderLineItems());
             }
 
             @Test
@@ -299,10 +302,10 @@ class OrderServiceTest {
                 Order createdOrder = orderService.create(takeout_order);
 
                 //then
-                Assertions.assertEquals(OrderType.TAKEOUT, createdOrder.getType());
-                Assertions.assertEquals(OrderStatus.WAITING, createdOrder.getStatus());
-                Assertions.assertEquals(takeout_order.getOrderDateTime(), createdOrder.getOrderDateTime());
-                Assertions.assertEquals(takeout_order.getOrderLineItems(), createdOrder.getOrderLineItems());
+                assertEquals(OrderType.TAKEOUT, createdOrder.getType());
+                assertEquals(OrderStatus.WAITING, createdOrder.getStatus());
+                assertEquals(takeout_order.getOrderDateTime(), createdOrder.getOrderDateTime());
+                assertEquals(takeout_order.getOrderLineItems(), createdOrder.getOrderLineItems());
             }
         }
 
@@ -313,11 +316,126 @@ class OrderServiceTest {
     @DisplayName("주문을 승인 할 수 있다.")
     class accept {
 
+        @Test
+        @DisplayName("주문이 존재 하지 않는 경우 예외가 발생 한다.")
+        void case_1() {
+            //when
+            UUID orderId = UUID.randomUUID();
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.empty());
+            //then
+            Assertions.assertThrows(NoSuchElementException.class, () -> orderService.accept(orderId));
+        }
+
+        @Test
+        @DisplayName("주문 상태가 대기 상태가 아닌 경우 예외가 발생 한다.")
+        void case_2() {
+            //given
+            UUID orderId = UUID.randomUUID();
+            Order order = delivery_order;
+            ReflectionTestUtils.setField(order, "status", OrderStatus.ACCEPTED);
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+
+            //then
+            Assertions.assertThrows(IllegalStateException.class, () -> orderService.accept(orderId));
+        }
+
+        @Test
+        @DisplayName("배달 주문의 경우 배달 요청을 할 수 있다.")
+        void case_3() {
+            //given
+            Order order = delivery_order;
+            BigDecimal sum = BigDecimal.ZERO;
+            for (final OrderLineItem orderLineItem : order.getOrderLineItems()) {
+                sum = orderLineItem.getMenu()
+                        .getPrice()
+                        .multiply(BigDecimal.valueOf(orderLineItem.getQuantity()));
+            }
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+
+            Order accept = orderService.accept(order.getId());
+
+            //then
+            verify(kitchenridersClient).requestDelivery(order.getId(), sum, order.getDeliveryAddress());
+            assertEquals(OrderStatus.ACCEPTED, accept.getStatus());
+            assertEquals(OrderType.DELIVERY, accept.getType());
+        }
+
+        @Test
+        @DisplayName("주문 상태를 승인으로 변경 할 수 있다.")
+        void case_4() {
+            //given
+            UUID orderId = UUID.randomUUID();
+            Order order = delivery_order;
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+
+            Order accept = orderService.accept(orderId);
+
+            //then
+            assertEquals(OrderStatus.ACCEPTED, accept.getStatus());
+        }
     }
 
     @Nested
     @DisplayName("주문을 제공 할 수 있다.")
     class serve {
+
+        @Test
+        @DisplayName("주문을 서빙할 수 있다.")
+        void case_1() {
+            //given
+            UUID orderId = UUID.randomUUID();
+            Order order = eat_in_order;
+            ReflectionTestUtils.setField(order, "status", OrderStatus.ACCEPTED);
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+
+            Order serve = orderService.serve(orderId);
+
+            //then
+            assertEquals(OrderStatus.SERVED, serve.getStatus());
+        }
+
+        @Test
+        @DisplayName("주문이 없을 경우 예외가 발생한다.")
+        void case_2() {
+            //given
+            UUID orderId = UUID.randomUUID();
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.empty());
+
+            //then
+            Assertions.assertThrows(NoSuchElementException.class, () -> orderService.serve(orderId));
+        }
+
+        @Test
+        @DisplayName("주문 상태가 승인 상태가 아닌 경우 예외가 발생한다.")
+        void case_3() {
+            //given
+            UUID orderId = UUID.randomUUID();
+            Order order = eat_in_order;
+            ReflectionTestUtils.setField(order, "status", OrderStatus.SERVED);
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+
+            //then
+            Assertions.assertThrows(IllegalStateException.class, () -> orderService.serve(orderId));
+        }
+
     }
 
     @Nested
@@ -326,16 +444,249 @@ class OrderServiceTest {
         @Nested
         @DisplayName("배달을 시작 할 수 있다.")
         class start {
+            @Test
+            @DisplayName("배달을 시작 할 수 있다.")
+            void case_1() {
+                //given
+                UUID orderId = UUID.randomUUID();
+                Order order = delivery_order;
+                ReflectionTestUtils.setField(order, "status", OrderStatus.SERVED);
+
+                //when
+                when(orderRepository.findById(any(UUID.class)))
+                        .thenReturn(Optional.of(order));
+
+                Order start = orderService.startDelivery(orderId);
+
+                //then
+                assertEquals(OrderStatus.DELIVERING, start.getStatus());
+            }
+
+            @Test
+            @DisplayName("주문이 없을 경우 예외가 발생한다.")
+            void case_2() {
+                //given
+                UUID orderId = UUID.randomUUID();
+
+                //when
+                when(orderRepository.findById(any(UUID.class)))
+                        .thenReturn(Optional.empty());
+
+                //then
+                Assertions.assertThrows(NoSuchElementException.class, () -> orderService.startDelivery(orderId));
+            }
+
+            @Test
+            @DisplayName("주문 타입이 배달이 아닌 경우 예외가 발생한다.")
+            void case_3() {
+                //given
+                UUID orderId = UUID.randomUUID();
+                Order order = eat_in_order;
+
+                //when
+                when(orderRepository.findById(any(UUID.class)))
+                        .thenReturn(Optional.of(order));
+
+                //then
+                Assertions.assertThrows(IllegalStateException.class, () -> orderService.startDelivery(orderId));
+            }
+
+            @Test
+            @DisplayName("주문 상태가 서빙 상태가 아닌 경우 예외가 발생한다.")
+            void case_4() {
+                //given
+                UUID orderId = UUID.randomUUID();
+                Order order = delivery_order;
+
+                //when
+                when(orderRepository.findById(any(UUID.class)))
+                        .thenReturn(Optional.of(order));
+
+                //then
+                Assertions.assertThrows(IllegalStateException.class, () -> orderService.startDelivery(orderId));
+            }
         }
 
         @Nested
         @DisplayName("배달을 완료 할 수 있다.")
         class complete {
+            @Test
+            @DisplayName("배달을 완료 할 수 있다.")
+            void case_1() {
+                //given
+                UUID orderId = UUID.randomUUID();
+                Order order = delivery_order;
+                ReflectionTestUtils.setField(order, "status", OrderStatus.DELIVERING);
+
+                //when
+                when(orderRepository.findById(any(UUID.class)))
+                        .thenReturn(Optional.of(order));
+
+                Order complete = orderService.completeDelivery(orderId);
+
+                //then
+                assertEquals(OrderStatus.DELIVERED, complete.getStatus());
+            }
+
+            @Test
+            @DisplayName("주문이 없을 경우 예외가 발생한다.")
+            void case_2() {
+                //given
+                UUID orderId = UUID.randomUUID();
+
+                //when
+                when(orderRepository.findById(any(UUID.class)))
+                        .thenReturn(Optional.empty());
+
+                //then
+                Assertions.assertThrows(NoSuchElementException.class, () -> orderService.completeDelivery(orderId));
+            }
+
+            @Test
+            @DisplayName("주문 상태가 배달 중이 아닌 경우 예외가 발생한다.")
+            void case_3() {
+                //given
+                UUID orderId = UUID.randomUUID();
+                Order order = delivery_order;
+
+                //when
+                when(orderRepository.findById(any(UUID.class)))
+                        .thenReturn(Optional.of(order));
+
+                //then
+                Assertions.assertThrows(IllegalStateException.class, () -> orderService.completeDelivery(orderId));
+            }
+
         }
     }
 
     @Nested
     @DisplayName("주문을 완료 할 수 있다.")
     class complete {
+        @Test
+        @DisplayName("배달 주문을 완료 할 수 있다.")
+        void case_1() {
+            //given
+            UUID orderId = UUID.randomUUID();
+            Order order = delivery_order;
+            ReflectionTestUtils.setField(order, "status", OrderStatus.DELIVERED);
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+
+            Order complete = orderService.complete(orderId);
+
+            //then
+            assertEquals(OrderStatus.COMPLETED, complete.getStatus());
+            assertEquals(OrderType.DELIVERY, complete.getType());
+        }
+
+        @Test
+        @DisplayName("포장 주문을 완료 할 수 있다.")
+        void case_2() {
+            //given
+            UUID orderId = UUID.randomUUID();
+            Order order = takeout_order;
+            ReflectionTestUtils.setField(order, "status", OrderStatus.SERVED);
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+
+            Order complete = orderService.complete(orderId);
+
+            //then
+            assertEquals(OrderStatus.COMPLETED, complete.getStatus());
+            assertEquals(OrderType.TAKEOUT, complete.getType());
+        }
+
+        @Test
+        @DisplayName("매장 주문을 완료 할 수 있다.")
+        void case_3() {
+            //given
+            UUID orderId = UUID.randomUUID();
+            Order order = eat_in_order;
+            ReflectionTestUtils.setField(order, "status", OrderStatus.SERVED);
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+
+            Order complete = orderService.complete(orderId);
+
+            //then
+            assertEquals(OrderStatus.COMPLETED, complete.getStatus());
+            assertEquals(OrderType.EAT_IN, complete.getType());
+        }
+
+        @Test
+        @DisplayName("주문이 없을 경우 예외가 발생한다.")
+        void case_4() {
+            //given
+            UUID orderId = UUID.randomUUID();
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.empty());
+
+            //then
+            Assertions.assertThrows(NoSuchElementException.class, () -> orderService.complete(orderId));
+        }
+
+        @Test
+        @DisplayName("주문 타입이 배달일때 상태가 배달중이 아닌 경우 예외가 발생한다.")
+        void case_5() {
+            //given
+            UUID orderId = UUID.randomUUID();
+            Order order = delivery_order;
+            ReflectionTestUtils.setField(order, "status", OrderStatus.WAITING);
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+
+            //then
+            Assertions.assertThrows(IllegalStateException.class, () -> orderService.complete(orderId));
+        }
+
+        @Test
+        @DisplayName("주문 타입이 포장 또는 매장일때 상태가 서빙이 아닌 경우 예외가 발생한다.")
+        void case_6() {
+            //given
+            UUID orderId = UUID.randomUUID();
+            Order order = takeout_order;
+            ReflectionTestUtils.setField(order, "status", OrderStatus.WAITING);
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+
+            //then
+            Assertions.assertThrows(IllegalStateException.class, () -> orderService.complete(orderId));
+        }
+
+        @Test
+        @DisplayName("주문 타입이 매장 식사일 때 주문테이블이 비어있지 않은 경우 테이블을 초기화 한다.")
+        void case_7() {
+            //given
+            UUID orderId = UUID.randomUUID();
+            Order order = eat_in_order;
+            ReflectionTestUtils.setField(order, "status", OrderStatus.SERVED);
+
+            //when
+            when(orderRepository.findById(any(UUID.class)))
+                    .thenReturn(Optional.of(order));
+            when(orderRepository.existsByOrderTableAndStatusNot(any(OrderTable.class), any()))
+                    .thenReturn(false);
+
+            Order complete = orderService.complete(orderId);
+            OrderTable orderTable = complete.getOrderTable();
+            //then
+            assertEquals(OrderStatus.COMPLETED, complete.getStatus());
+            assertEquals(OrderType.EAT_IN, complete.getType());
+            assertEquals(0, orderTable.getNumberOfGuests());
+            assertFalse(orderTable.isOccupied());
+        }
     }
 }
