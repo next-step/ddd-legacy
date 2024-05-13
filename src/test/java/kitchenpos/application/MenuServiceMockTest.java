@@ -1,6 +1,12 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Product;
+import kitchenpos.utils.MenuGroupTestRepository;
+import kitchenpos.utils.MenuTestRepository;
+import kitchenpos.utils.ProductTestRepository;
 import kitchenpos.utils.PurgomalumTestClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,11 +39,11 @@ class MenuServiceMockTest {
     private static List<Product> 상품_목록;
 
     @Mock
-    private MenuRepository menuRepository;
+    private MenuTestRepository menuRepository;
     @Mock
-    private MenuGroupRepository menuGroupRepository;
+    private MenuGroupTestRepository menuGroupRepository;
     @Mock
-    private ProductRepository productRepository;
+    private ProductTestRepository productRepository;
     @Mock
     private PurgomalumTestClient purgomalumTestClient;
     @InjectMocks
