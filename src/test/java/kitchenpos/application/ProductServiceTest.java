@@ -68,6 +68,7 @@ class ProductServiceTest {
 
     @Test
     public void changePrice() {
+
         //given
         Product request = new Product();
         request.setId(UUID.randomUUID());
@@ -89,6 +90,7 @@ class ProductServiceTest {
 
     @Test
     public void findAll() {
+
         //given
         Product product1 = new Product();
         product1.setId(UUID.randomUUID());

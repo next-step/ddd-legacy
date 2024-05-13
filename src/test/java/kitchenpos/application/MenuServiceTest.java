@@ -180,6 +180,7 @@ class MenuServiceTest {
         //when
         List<Menu> response = menuService.findAll();
 
+        //then
         assertEquals(2, response.size());
         assertEquals(Arrays.asList(menu1, menu2), response);
     }

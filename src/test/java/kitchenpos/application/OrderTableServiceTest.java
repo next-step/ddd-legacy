@@ -34,6 +34,8 @@ class OrderTableServiceTest {
 
     @Test
     void create() {
+
+        //given
         OrderTable request = new OrderTable();
         request.setName("9번");
 
@@ -46,8 +48,10 @@ class OrderTableServiceTest {
         given(orderTableRepository.save(any(OrderTable.class)))
                 .willReturn(orderTable);
 
+        //when
         OrderTable response = orderTableService.create(request);
 
+        //then
         assertEquals(orderTable.getId(), response.getId());
         assertEquals(orderTable.getNumberOfGuests(), response.getNumberOfGuests());
         assertEquals(orderTable.getName(), response.getName());
@@ -57,24 +61,36 @@ class OrderTableServiceTest {
 
     @Test
     void sit() {
+
+        //given
         UUID request = UUID.randomUUID();
         given(orderTableRepository.findById(request))
                 .willReturn(Optional.ofNullable(new OrderTable()));
 
+
+        //when
         OrderTable response = orderTableService.sit(request);
 
+
+        //then
         assertEquals(true, response.isOccupied());
 
     }
 
     @Test
     void clear() {
+
+        //given
         UUID request = UUID.randomUUID();
         given(orderTableRepository.findById(request))
                 .willReturn(Optional.ofNullable(new OrderTable()));
 
+
+        //when
         OrderTable response = orderTableService.clear(request);
 
+
+        //then
         assertEquals(false, response.isOccupied());
         assertEquals(0, response.getNumberOfGuests());
     }
@@ -82,6 +98,8 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests() {
 
+
+        //given
         OrderTable request = new OrderTable();
         request.setId(UUID.randomUUID());
         request.setNumberOfGuests(10);
@@ -94,15 +112,21 @@ class OrderTableServiceTest {
         given(orderTableRepository.findById(request.getId()))
                 .willReturn(Optional.of(orderTable));
 
+
+        //when
         OrderTable response = orderTableService.changeNumberOfGuests(
                 request.getId(), request);
 
+
+        //then
         assertEquals(request.getNumberOfGuests(), response.getNumberOfGuests());
 
     }
 
     @Test
     void findAll() {
+
+        //given
         OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName("1번");
@@ -118,8 +142,12 @@ class OrderTableServiceTest {
         given(orderTableRepository.findAll())
                 .willReturn(Arrays.asList(orderTable, orderTable2));
 
+
+        //when
         List<OrderTable> response = orderTableService.findAll();
 
+
+        //then
         assertThat(response.size()).isEqualTo(2);
 
     }

@@ -90,6 +90,8 @@ class OrderServiceTest {
 
     @Test
     void accept() {
+
+        //given
         UUID request = UUID.randomUUID();
         Order order = new Order();
         order.setStatus(OrderStatus.WAITING);
@@ -97,14 +99,18 @@ class OrderServiceTest {
         given(orderRepository.findById(request))
                 .willReturn(Optional.of(order));
 
+        //when
         Order response = orderService.accept(request);
 
+        //then
         assertEquals(OrderStatus.ACCEPTED, response.getStatus());
 
     }
 
     @Test
     void serve() {
+
+        //given
         UUID request = UUID.randomUUID();
         Order order = new Order();
         order.setStatus(OrderStatus.ACCEPTED);
@@ -112,13 +118,17 @@ class OrderServiceTest {
         given(orderRepository.findById(request))
                 .willReturn(Optional.of(order));
 
+        //when
         Order response = orderService.serve(request);
 
+        //then
         assertEquals(OrderStatus.SERVED, response.getStatus());
     }
 
     @Test
     void startDelivery() {
+
+        //given
         UUID request = UUID.randomUUID();
         Order order = new Order();
         order.setType(OrderType.DELIVERY);
@@ -127,14 +137,19 @@ class OrderServiceTest {
         given(orderRepository.findById(request))
                 .willReturn(Optional.of(order));
 
+        //when
         Order response = orderService.startDelivery(request);
 
+
+        //then
         assertEquals(OrderStatus.DELIVERING, response.getStatus());
 
     }
 
     @Test
     void completeDelivery() {
+
+        //given
         UUID request = UUID.randomUUID();
         Order order = new Order();
         order.setStatus(OrderStatus.DELIVERING);
@@ -142,8 +157,12 @@ class OrderServiceTest {
         given(orderRepository.findById(request))
                 .willReturn(Optional.of(order));
 
+
+        //when
         Order response = orderService.completeDelivery(request);
 
+
+        //then
         assertEquals(OrderStatus.DELIVERED, response.getStatus());
 
     }
@@ -151,6 +170,7 @@ class OrderServiceTest {
     @Test
     void complete() {
 
+        //given
         UUID request= UUID.randomUUID();
 
         OrderTable orderTable = new OrderTable();
@@ -162,8 +182,11 @@ class OrderServiceTest {
         given(orderRepository.findById(request))
                 .willReturn(Optional.of(order));
 
+
+        //when
         Order response = orderService.complete(request);
 
+        //then
         assertEquals(OrderStatus.COMPLETED, response.getStatus());
         assertEquals(0, response.getOrderTable().getNumberOfGuests());
         assertEquals(false, response.getOrderTable().isOccupied());
