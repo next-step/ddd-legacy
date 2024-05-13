@@ -1,8 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.MenuRepository;
-import kitchenpos.domain.Product;
-import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
@@ -84,8 +86,81 @@ class ProductServiceTest {
         assertThat(savedProduct.getName()).isEqualTo("상품 이름");
     }
 
+    @ParameterizedTest
+    @DisplayName("상품 가격 수정시에 가격은 null 이나 음수 일 수 없다")
+    @MethodSource("nullAndNegativePrice")
+    void cannotChangeNullAndNegativePrice(BigDecimal price) {
+        Product request = new Product();
+        request.setPrice(price);
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> service.changePrice(UUID.randomUUID(), request));
+    }
+
     @Test
-    void changePrice() {
+    @DisplayName("없는 상품")
+    void notExistsProduct() {
+        Product request = new Product();
+        request.setPrice(BigDecimal.ZERO);
+
+        assertThatThrownBy(() -> service.changePrice(UUID.randomUUID(), request))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("가격 정상 수정 메뉴 비노출")
+    void succeedChangePrice() {
+        Product request = new Product();
+        request.setPrice(BigDecimal.ZERO);
+
+        Product product = new Product();
+        product.setPrice(BigDecimal.TEN);
+
+        when(productRepository.findById(any())).thenReturn(Optional.of(product));
+
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(1);
+
+        Menu menu = new Menu();
+        menu.setDisplayed(true);
+        menu.setPrice(BigDecimal.TEN);
+        menu.setMenuProducts(List.of(menuProduct));
+
+        when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
+
+        Product changedProduct = service.changePrice(UUID.randomUUID(), request);
+
+        assertThat(changedProduct.getPrice()).isEqualTo(BigDecimal.ZERO);
+        assertThat(menu.isDisplayed()).isFalse();
+    }
+
+    @Test
+    @DisplayName("가격 정상 수정 메뉴 노출")
+    void succeedChangePrice2() {
+        Product request = new Product();
+        request.setPrice(BigDecimal.TEN);
+
+        Product product = new Product();
+        product.setPrice(BigDecimal.TEN);
+
+        when(productRepository.findById(any())).thenReturn(Optional.of(product));
+
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(1);
+
+        Menu menu = new Menu();
+        menu.setDisplayed(true);
+        menu.setPrice(BigDecimal.TEN);
+        menu.setMenuProducts(List.of(menuProduct));
+
+        when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
+
+        Product changedProduct = service.changePrice(UUID.randomUUID(), request);
+
+        assertThat(changedProduct.getPrice()).isEqualTo(BigDecimal.TEN);
+        assertThat(menu.isDisplayed()).isTrue();
     }
 
     @Test
