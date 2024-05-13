@@ -26,7 +26,7 @@ class OrderServiceMockTest {
     private lateinit var orderRepository: OrderRepository
 
     @Mock
-    private lateinit var menuRepository: MenuRepository
+    private lateinit var menuRepository: JpaMenuRepository
 
     @Mock
     private lateinit var orderTableRepository: OrderTableRepository

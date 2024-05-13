@@ -22,7 +22,7 @@ class ProductServiceMockTest {
     private lateinit var productRepository: ProductRepository
 
     @Mock
-    private lateinit var menuRepository: MenuRepository
+    private lateinit var menuRepository: JpaMenuRepository
 
     @Mock
     private lateinit var purgomalumClient: PurgomalumClient

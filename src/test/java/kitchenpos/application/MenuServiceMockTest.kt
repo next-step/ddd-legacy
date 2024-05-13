@@ -3,14 +3,16 @@ package kitchenpos.application
 import kitchenpos.domain.*
 import kitchenpos.infra.PurgomalumClient
 import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertAll
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.InjectMocks
-import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
+import utils.FakeMenuRepository
 import utils.spec.MenuGroupSpec
 import utils.spec.MenuProductSpec
 import utils.spec.MenuSpec
@@ -21,23 +23,15 @@ import java.util.*
 @DisplayName("메뉴 서비스")
 @ExtendWith(MockitoExtension::class)
 class MenuServiceMockTest {
-    @Mock
-    private lateinit var menuRepository: MenuRepository
+    private val menuGroupRepository = mock(MenuGroupRepository::class.java)
+    private val productRepository = mock(ProductRepository::class.java)
+    private val purgomalumClient = mock(PurgomalumClient::class.java)
 
-    @Mock
-    private lateinit var menuGroupRepository: MenuGroupRepository
+    private val menuService: MenuService =
+        MenuService(FakeMenuRepository, menuGroupRepository, productRepository, purgomalumClient)
 
-    @Mock
-    private lateinit var productRepository: ProductRepository
-
-    @Mock
-    private lateinit var purgomalumClient: PurgomalumClient
-
-    @InjectMocks
-    private lateinit var menuService: MenuService
-
-    @InjectMocks
-    private lateinit var productService: ProductService
+    private val productService: ProductService =
+        ProductService(productRepository, FakeMenuRepository, purgomalumClient)
 
     @Nested
     @DisplayName("메뉴 생성")
@@ -68,8 +62,12 @@ class MenuServiceMockTest {
                 .thenReturn(false)
 
             //when & then
-            Assertions.assertThatCode { menuService.create(request) }
-                .doesNotThrowAnyException()
+            val result = menuService.create(request)
+            assertAll(
+                { assertThat(result.id).isNotNull() },
+                { assertThat(result.price).isEqualTo(request.price) },
+                { assertThat(result.price).isEqualTo(request.price) }
+            )
         }
 
         @Test
@@ -284,10 +282,7 @@ class MenuServiceMockTest {
         fun `정상적인 메뉴의 가격 변경 성공`() {
             val product = ProductSpec.of(BigDecimal.valueOf(9000))
             val menuProduct = MenuProductSpec.of(product, 2)
-            val menu = MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(8000))
-
-            `when`(menuRepository.findById(menu.id))
-                .thenReturn(Optional.of(menu))
+            val menu = FakeMenuRepository.save(MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(8000)))
 
             val request = Menu()
             request.price = BigDecimal.valueOf(13000)
@@ -303,10 +298,7 @@ class MenuServiceMockTest {
         fun `메뉴 가격이 (메뉴상품 가격 * 메뉴상품 재고 수)의 합보다 클 경우 실패`() {
             val product = ProductSpec.of(BigDecimal.valueOf(9000))
             val menuProduct = MenuProductSpec.of(product, 2)
-            val menu = MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(8000))
-
-            `when`(menuRepository.findById(menu.id))
-                .thenReturn(Optional.of(menu))
+            val menu = FakeMenuRepository.save(MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(8000)))
 
             val request = Menu()
             request.price = BigDecimal.valueOf(45000)
@@ -325,10 +317,7 @@ class MenuServiceMockTest {
         fun `정상적인 전시상태 활성화 성공`() {
             val product = ProductSpec.of(BigDecimal.valueOf(9000))
             val menuProduct = MenuProductSpec.of(product, 2)
-            val menu = MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(8000), false)
-
-            `when`(menuRepository.findById(menu.id))
-                .thenReturn(Optional.of(menu))
+            val menu = FakeMenuRepository.save(MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(8000), false))
 
             //when
             val result = menuService.display(menu.id)
@@ -341,10 +330,7 @@ class MenuServiceMockTest {
         fun `메뉴 가격이 (메뉴상품 가격 * 메뉴상품 재고 수)의 합보다 클 경우 실패`() {
             val product = ProductSpec.of(BigDecimal.valueOf(9000))
             val menuProduct = MenuProductSpec.of(product, 2)
-            val menu = MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(35000), false)
-
-            `when`(menuRepository.findById(menu.id))
-                .thenReturn(Optional.of(menu))
+            val menu = FakeMenuRepository.save(MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(35000), false))
 
             //when & then
             Assertions.assertThatExceptionOfType(IllegalStateException::class.java)
@@ -358,13 +344,10 @@ class MenuServiceMockTest {
 
         val product = ProductSpec.of(requestPrice)
         val menuProduct = MenuProductSpec.of(product, 2)
-        val menu = MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(15000), true)
+        val menu = FakeMenuRepository.save(MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(15000), true))
 
         `when`(productRepository.findById(product.id))
             .thenReturn(Optional.of(product))
-
-        `when`(menuRepository.findAllByProductId(product.id))
-            .thenReturn(listOf(menu))
 
         //when
         val request = Product()
@@ -372,7 +355,7 @@ class MenuServiceMockTest {
 
         productService.changePrice(product.id, request)
 
-        Assertions.assertThat(menu.isDisplayed).isFalse()
+        assertThat(menu.isDisplayed).isFalse()
     }
 }
 
