@@ -1,27 +1,61 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
-import org.junit.jupiter.api.Disabled;
+import kitchenpos.domain.OrderType;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
+import kitchenpos.fixture.MenuGroupFixture;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.createMenu;
+import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
+import static kitchenpos.fixture.OrderFixture.createOrderWithId;
+import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
 import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
+import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
+@Transactional
 class OrderTableServiceTest {
     @Autowired
     private OrderTableService orderTableService;
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
+    private MenuGroupRepository menuGroupRepository;
+
+    @Autowired
+    private MenuRepository menuRepository;
 
     @Nested
     class createTest {
@@ -52,7 +86,7 @@ class OrderTableServiceTest {
     class sitTest {
         @DisplayName("좌석에 착석 할 수 있다.")
         @Test
-        void sitTest() {
+        void sitSuccessTest() {
             OrderTable orderTable = createOrderTable("1번");
             orderTable = orderTableService.create(orderTable);
 
@@ -74,7 +108,7 @@ class OrderTableServiceTest {
     class clearTest {
         @DisplayName("좌석을 비울 수 있다.")
         @Test
-        void clearTest() {
+        void clearSuccessTest() {
             OrderTable orderTable = createOrderTable("1번");
             orderTable = orderTableService.create(orderTable);
             orderTable = orderTableService.sit(orderTable.getId());
@@ -85,16 +119,25 @@ class OrderTableServiceTest {
             assertThat(orderTable.getNumberOfGuests()).isZero();
         }
 
-        @Disabled("TODO: Order Fixtures를 생성하여 완료된 주문을 생성하고 테스트를 진행해야 합니다.")
         @DisplayName("좌석에 완료된 주문이 없는 경우 예외가 발생한다.")
-        @Test
-        void clearFailWhenNotExistCompletedOrderTest() {
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "COMPLETED")
+        void clearFailWhenNotExistCompletedOrderTest(OrderStatus orderStatus) {
             OrderTable orderTable = createOrderTable("1번");
             orderTable = orderTableService.create(orderTable);
             orderTable = orderTableService.sit(orderTable.getId());
 
-            // TODO: Order Fixtures를 생성하여 완료되지 않은 주문을 생성해야 합니다.
-
+            Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
+            product = productRepository.save(product);
+            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            menuGroup = menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = createMenuProduct(product, 1);
+            Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            menu = menuRepository.save(menu);
+            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, orderStatus, null, LocalDateTime.now());
+            orderRepository.save(order);
+            
             UUID orderTableId = orderTable.getId();
 
             assertThatThrownBy(() -> orderTableService.clear(orderTableId))

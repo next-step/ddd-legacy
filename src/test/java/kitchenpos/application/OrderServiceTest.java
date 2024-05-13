@@ -24,6 +24,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -44,6 +46,7 @@ import static org.mockito.Mockito.verify;
 
 
 @SpringBootTest
+@Transactional
 class OrderServiceTest {
 
     @Autowired
@@ -51,9 +54,9 @@ class OrderServiceTest {
 
     @Autowired
     private OrderRepository orderRepository;
+
     @Autowired
     private MenuRepository menuRepository;
-
 
     @Autowired
     private ProductRepository productRepository;
@@ -64,7 +67,7 @@ class OrderServiceTest {
     @Autowired
     private OrderTableRepository orderTableRepository;
 
-    @Autowired
+    @MockBean
     private KitchenridersClient kitchenridersClient;
 
     @Nested
@@ -90,7 +93,7 @@ class OrderServiceTest {
         @NullAndEmptySource
         @ParameterizedTest
         void createFailWhenNotExistOrderLineItemsTest(List<OrderLineItem> orderLineItems) {
-            Order order = createOrder(null, null, orderLineItems, null, null, null);
+            Order order = createOrder(null, null, orderLineItems, OrderType.EAT_IN, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -445,7 +448,7 @@ class OrderServiceTest {
         @DisplayName("배달하기 타입이 아닌 경우 예외가 발생한다.")
         @ParameterizedTest
         @EnumSource(value = OrderType.class, mode = EnumSource.Mode.EXCLUDE, names = "DELIVERY")
-        void startDeliveryWhenNotDeliveryTest() {
+        void startDeliveryWhenNotDeliveryTest(OrderType orderType) {
             Product product = createProduct("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
             MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
@@ -454,8 +457,8 @@ class OrderServiceTest {
             Menu menu = createMenu(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
-            Order order = createOrder(null, null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
-            order = orderService.create(order);
+            Order order = createOrderWithId(null, List.of(orderLineItem), orderType, OrderStatus.SERVED, null, LocalDateTime.now());
+            orderRepository.save(order);
 
             UUID orderId = order.getId();
 
