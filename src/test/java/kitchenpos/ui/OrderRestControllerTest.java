@@ -21,19 +21,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Class Description
- *
- * @author SungTae Kim
- * @version 1.0
- * @class OrderRestControllerTest
- * @modification <pre>
- * since	    author	        description
- * ---------	------------	---------------------
- * 2024-05-13      SungTae Kim	    최초 작성
- * </pre>
- * @copyRight COPYRIGHT © OSSTEM IMPLANT CO., LTD. ALL RIGHTS RESERVED.\n
- */
 @WebMvcTest(OrderRestController.class)
 class OrderRestControllerTest {
 
