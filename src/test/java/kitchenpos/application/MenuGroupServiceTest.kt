@@ -31,14 +31,11 @@ internal class MenuGroupServiceTest {
         @NullAndEmptySource
         fun test1(name: String?) {
             // given
-            val request = MenuGroup().apply {
-                this.id = UUID.randomUUID()
-                this.name = name
-            }
+            val nullOrEmpty_메뉴_그룹 = createMenuGroup(name)
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
-                menuGroupService.create(request)
+                menuGroupService.create(nullOrEmpty_메뉴_그룹)
             }
         }
 
@@ -46,19 +43,21 @@ internal class MenuGroupServiceTest {
         @Test
         fun test2() {
             // given
-            val request = MenuGroup().apply {
-                this.id = UUID.randomUUID()
-                this.name = "테스트 그룹"
-            }
+            val 정상_메뉴_그룹 = createMenuGroup("정상 메뉴 그룹")
 
-            every { menuGroupRepository.save(any()) } returns request
+            every { menuGroupRepository.save(any()) } returns 정상_메뉴_그룹
 
             // when
-            val result = menuGroupService.create(request)
+            val result = menuGroupService.create(정상_메뉴_그룹)
 
             // then
-            result.id shouldBe request.id
-            result.name shouldBe request.name
+            result.id shouldBe 정상_메뉴_그룹.id
+            result.name shouldBe 정상_메뉴_그룹.name
+        }
+
+        private fun createMenuGroup(name: String?) = MenuGroup().apply {
+            this.id = UUID.randomUUID()
+            this.name = name
         }
     }
 }
