@@ -22,387 +22,358 @@ import org.springframework.http.HttpStatus;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static kitchenpos.acceptacne.steps.MenuGroupSteps.createMenuGroupStep;
-import static kitchenpos.acceptacne.steps.MenuSteps.createMenuStep;
-import static kitchenpos.acceptacne.steps.OrderSteps.acceptOrderStep;
-import static kitchenpos.acceptacne.steps.OrderSteps.completeDeliveryOrderStep;
-import static kitchenpos.acceptacne.steps.OrderSteps.completeOrderStep;
-import static kitchenpos.acceptacne.steps.OrderSteps.createOrderStep;
-import static kitchenpos.acceptacne.steps.OrderSteps.serveOrderStep;
-import static kitchenpos.acceptacne.steps.OrderSteps.startDeliveryOrderStep;
-import static kitchenpos.acceptacne.steps.OrderTableSteps.createOrderTableStep;
-import static kitchenpos.acceptacne.steps.OrderTableSteps.sitOrderTableStep;
-import static kitchenpos.acceptacne.steps.ProductSteps.createProductStep;
-import static kitchenpos.fixture.MenuFixture.이름_반반치킨;
-import static kitchenpos.fixture.MenuFixture.가격_38000;
+import static kitchenpos.acceptacne.steps.MenuGroupSteps.메뉴그룹을_등록한다;
+import static kitchenpos.acceptacne.steps.MenuSteps.메뉴_등록한다;
+import static kitchenpos.acceptacne.steps.OrderSteps.배달을_시작한다;
+import static kitchenpos.acceptacne.steps.OrderSteps.배달을_완료한다;
+import static kitchenpos.acceptacne.steps.OrderSteps.주문을_등록한다;
+import static kitchenpos.acceptacne.steps.OrderSteps.주문을_수락한다;
+import static kitchenpos.acceptacne.steps.OrderSteps.주문을_완료한다;
+import static kitchenpos.acceptacne.steps.OrderSteps.주문의_제조를_완료한다;
+import static kitchenpos.acceptacne.steps.OrderTableSteps.주문테이블에_앉는다;
+import static kitchenpos.acceptacne.steps.OrderTableSteps.주문테이블을_등록한다;
+import static kitchenpos.acceptacne.steps.ProductSteps.상품을_등록한다;
 import static kitchenpos.fixture.MenuFixture.menuCreateRequest;
-import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
+import static kitchenpos.fixture.MenuFixture.가격_38000;
+import static kitchenpos.fixture.MenuFixture.이름_반반치킨;
 import static kitchenpos.fixture.MenuGroupFixture.menuGroupCreateRequest;
+import static kitchenpos.fixture.MenuGroupFixture.이름_추천메뉴;
 import static kitchenpos.fixture.MenuProductFixture.menuProductResponse;
 import static kitchenpos.fixture.OrderFixture.orderDeliveryCreateRequest;
 import static kitchenpos.fixture.OrderFixture.orderEatInCreateRequest;
 import static kitchenpos.fixture.OrderFixture.orderTakeOutCreateRequest;
 import static kitchenpos.fixture.OrderFixture.배달주소;
 import static kitchenpos.fixture.OrderLineItemFixture.orderLineItemCreate;
-import static kitchenpos.fixture.OrderTableFixture.이름_1번;
 import static kitchenpos.fixture.OrderTableFixture.orderTableCreateRequest;
+import static kitchenpos.fixture.OrderTableFixture.이름_1번;
+import static kitchenpos.fixture.ProductFixture.productCreateRequest;
+import static kitchenpos.fixture.ProductFixture.가격_18000;
+import static kitchenpos.fixture.ProductFixture.가격_20000;
 import static kitchenpos.fixture.ProductFixture.이름_양념치킨;
 import static kitchenpos.fixture.ProductFixture.이름_후라이드치킨;
-import static kitchenpos.fixture.ProductFixture.가격_20000;
-import static kitchenpos.fixture.ProductFixture.가격_18000;
-import static kitchenpos.fixture.ProductFixture.productCreateRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("주문 인수테스트")
 @AcceptanceTest
 class OrderAcceptanceTest {
-    private UUID ORDER_TABLE_ID;
-    private Order ORDER_매장주문;
-    private Order ORDER_배달주문;
-    private Order ORDER_포장주문;
+    private UUID 주문테이블Id;
+    private Order 매장주문;
+    private Order 배달주문;
+    private Order 포장주문;
+
     @BeforeEach
     void setUp() {
-        MenuGroup menuGroup = createMenuGroup();
+        MenuGroup 추천메뉴그룹 = 메뉴그룹을_등록한다(menuGroupCreateRequest(이름_추천메뉴)).as(MenuGroup.class);
         MenuProduct menuProduct_양념치킨 = createMenuProduct(이름_양념치킨, 가격_20000, 1);
         MenuProduct menuProduct_후라이드 = createMenuProduct(이름_후라이드치킨, 가격_18000, 1);
-        Menu menu = createMenu(가격_38000, menuGroup, menuProduct_양념치킨, menuProduct_후라이드);
+        Menu menu = createMenu(가격_38000, 추천메뉴그룹, menuProduct_양념치킨, menuProduct_후라이드);
         OrderTable orderTable = createOrderTable();
         OrderLineItem ORDER_ITEM_주문메뉴항목 = orderLineItemCreate(menu, 가격_38000, 1);
-        ORDER_TABLE_ID = orderTable.getId();
-        ORDER_매장주문 = orderEatInCreateRequest(ORDER_TABLE_ID, ORDER_ITEM_주문메뉴항목);
-        ORDER_배달주문 = orderDeliveryCreateRequest(배달주소, ORDER_ITEM_주문메뉴항목);
-        ORDER_포장주문 = orderTakeOutCreateRequest(ORDER_ITEM_주문메뉴항목);
+        주문테이블Id = orderTable.getId();
+        매장주문 = orderEatInCreateRequest(주문테이블Id, ORDER_ITEM_주문메뉴항목);
+        배달주문 = orderDeliveryCreateRequest(배달주소, ORDER_ITEM_주문메뉴항목);
+        포장주문 = orderTakeOutCreateRequest(ORDER_ITEM_주문메뉴항목);
     }
 
     @Nested
     @DisplayName("주문 등록 테스트")
     class OrderCreate {
-        @DisplayName("매장주문이 들어왔습니다.")
+        @DisplayName("[성공] 매장주문이 들어왔습니다.")
         @Test
         void createEetInOrder() {
             // given
-            sitOrderTableStep(ORDER_TABLE_ID);
+            주문테이블에_앉는다(주문테이블Id);
 
             // when
-            ExtractableResponse<Response> response = createOrderStep(ORDER_매장주문);
+            ExtractableResponse<Response> 매장주문_등록_응답 = 주문을_등록한다(매장주문);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.EAT_IN.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.WAITING.name()),
-                    () -> assertThat(response.jsonPath().getString("orderDateTime")).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("deliveryAddress")).isNull(),
-                    () -> assertThat(response.jsonPath().getObject("orderTable.id", UUID.class)).isEqualTo(ORDER_TABLE_ID),
-                    () -> assertThat(response.jsonPath().getInt("orderTable.numberOfGuests")).isZero(),
-                    () -> assertThat(response.jsonPath().getBoolean("orderTable.occupied")).isTrue(),
-                    () -> assertThat(response.jsonPath().getList("orderLineItems.menu.id")).hasSizeGreaterThanOrEqualTo(1),
-                    () -> assertThat(response.jsonPath().getList("orderLineItems.quantity")).containsExactly(1),
-                    () -> assertThat(response.jsonPath().getList("orderLineItems.menu.price")).containsExactly(가격_38000.floatValue()),
-                    () -> assertThat(response.jsonPath().getList("orderLineItems.menu.displayed")).containsExactly(true)
-            );
+            매장주문_등록_검증(매장주문_등록_응답);
         }
 
-        @DisplayName("배달주문이 들어왔습니다.")
+        @DisplayName("[성공] 배달주문이 들어왔습니다.")
         @Test
         void createDeliveryOrder() {
             // given
             // when
-            ExtractableResponse<Response> response = createOrderStep(ORDER_배달주문);
+            ExtractableResponse<Response> 배달주문_등록_응답 = 주문을_등록한다(배달주문);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.DELIVERY.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.WAITING.name()),
-                    () -> assertThat(response.jsonPath().getString("orderDateTime")).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("deliveryAddress")).isEqualTo(배달주소),
-                    () -> assertThat(response.jsonPath().getObject("orderTable", OrderTable.class)).isNull()
-            );
+            배달주문_등록_검증(배달주문_등록_응답);
         }
 
-        @DisplayName("포장주문이 들어왔습니다.")
+        @DisplayName("[성공] 포장주문이 들어왔습니다.")
         @Test
         void createTakeOutOrder() {
             // given
             // when
-            ExtractableResponse<Response> response = createOrderStep(ORDER_포장주문);
+            ExtractableResponse<Response> 포장주문_등록_응답 = 주문을_등록한다(포장주문);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.TAKEOUT.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.WAITING.name()),
-                    () -> assertThat(response.jsonPath().getString("orderDateTime")).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("deliveryAddress")).isNull(),
-                    () -> assertThat(response.jsonPath().getObject("orderTable", OrderTable.class)).isNull()
-            );
+            포장주문_등록_검증(포장주문_등록_응답);
         }
     }
-    
+
     @Nested
     @DisplayName("주문수락 테스트")
     class AcceptOrder {
-        @DisplayName("매장주문을 수락합니다.")
+        @DisplayName("[성공] 매장주문을 수락합니다.")
         @Test
         void acceptEetInOrder() {
             // given
-            sitOrderTableStep(ORDER_TABLE_ID);
-            UUID orderId = createOrderId(ORDER_매장주문);
+            주문테이블에_앉는다(주문테이블Id);
+            UUID 매장주문Id = 주문을_등록_후_해당_Id를_반환한다(매장주문);
 
             // when
-            ExtractableResponse<Response> response = acceptOrderStep(orderId);
+            ExtractableResponse<Response> 매장주문_수락_응답 = 주문을_수락한다(매장주문Id);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.EAT_IN.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.ACCEPTED.name())
-            );
+            주문별_상태_검증(매장주문_수락_응답, OrderType.EAT_IN, OrderStatus.ACCEPTED);
         }
 
-        @DisplayName("배달주문을 수락합니다.")
+        @DisplayName("[성공] 배달주문을 수락합니다.")
         @Test
         void acceptDeliveryOrder() {
             // given
-            UUID orderId = createOrderId(ORDER_배달주문);
+            UUID 배달주문Id = 주문을_등록_후_해당_Id를_반환한다(배달주문);
 
             // when
-            ExtractableResponse<Response> response = acceptOrderStep(orderId);
+            ExtractableResponse<Response> 배달주문_수락_응답 = 주문을_수락한다(배달주문Id);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.DELIVERY.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.ACCEPTED.name())
-            );
+            주문별_상태_검증(배달주문_수락_응답, OrderType.DELIVERY, OrderStatus.ACCEPTED);
         }
 
 
-        @DisplayName("매장주문을 수락합니다.")
+        @DisplayName("[성공] 매장주문을 수락합니다.")
         @Test
         void acceptTakeOutOrder() {
             // given
-            UUID orderId = createOrderId(ORDER_포장주문);
+            UUID 포장주문Id = 주문을_등록_후_해당_Id를_반환한다(포장주문);
 
             // when
-            ExtractableResponse<Response> response = acceptOrderStep(orderId);
+            ExtractableResponse<Response> 포장주문_수락_응답 = 주문을_수락한다(포장주문Id);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.TAKEOUT.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.ACCEPTED.name())
-            );
+            주문별_상태_검증(포장주문_수락_응답, OrderType.TAKEOUT, OrderStatus.ACCEPTED);
         }
     }
 
     @Nested
     @DisplayName("제조완료 테스트")
     class ServedOrder {
-        @DisplayName("매장 주문의 제조를 완료합니다.")
+        @DisplayName("[성공] 매장 주문의 제조를 완료합니다.")
         @Test
         void serveEetInOrder() {
             // given
-            sitOrderTableStep(ORDER_TABLE_ID);
-            UUID orderId = createOrderId(ORDER_매장주문);
-            acceptOrderStep(orderId);
+            주문테이블에_앉는다(주문테이블Id);
+            UUID 매장주문Id = 주문을_등록_후_해당_Id를_반환한다(매장주문);
+            주문을_수락한다(매장주문Id);
 
             // when
-            ExtractableResponse<Response> response = serveOrderStep(orderId);
+            ExtractableResponse<Response> 매장주문_제조완료_응답 = 주문의_제조를_완료한다(매장주문Id);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.EAT_IN.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.SERVED.name())
-            );
+            주문별_상태_검증(매장주문_제조완료_응답, OrderType.EAT_IN, OrderStatus.SERVED);
         }
 
-        @DisplayName("배달주문의 제조를 완료합니다.")
+        @DisplayName("[성공] 배달주문의 제조를 완료합니다.")
         @Test
         void serveDeliveryOrder() {
             // given
-            UUID orderId = createOrderId(ORDER_배달주문);
-            acceptOrderStep(orderId);
+            UUID orderId = 주문을_등록_후_해당_Id를_반환한다(배달주문);
+            주문을_수락한다(orderId);
 
             // when
-            ExtractableResponse<Response> response = serveOrderStep(orderId);
+            ExtractableResponse<Response> 배달주문_제조완료_응답 = 주문의_제조를_완료한다(orderId);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.DELIVERY.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.SERVED.name())
-            );
+            주문별_상태_검증(배달주문_제조완료_응답, OrderType.DELIVERY, OrderStatus.SERVED);
         }
 
-        @DisplayName("포장주문의 제조를 완료합니다.")
+        @DisplayName("[성공] 포장주문의 제조를 완료합니다.")
         @Test
         void serveTakeOutOrder() {
             // given
-            UUID orderId = createOrderId(ORDER_포장주문);
-            acceptOrderStep(orderId);
+            UUID 포장주문Id = 주문을_등록_후_해당_Id를_반환한다(포장주문);
+            주문을_수락한다(포장주문Id);
 
             // when
-            ExtractableResponse<Response> response = serveOrderStep(orderId);
+            ExtractableResponse<Response> 포장주문_제조완료_응답 = 주문의_제조를_완료한다(포장주문Id);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.TAKEOUT.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.SERVED.name())
-            );
+            주문별_상태_검증(포장주문_제조완료_응답, OrderType.TAKEOUT, OrderStatus.SERVED);
         }
     }
 
     @Nested
     @DisplayName("배달 테스트")
     class DeliveryOrder {
-        @DisplayName("배달을 시작합니다.")
+        @DisplayName("[성공] 배달을 시작합니다.")
         @Test
         void startDelivery_DeliveryOrder() {
             // given
-            UUID orderId = createOrderId(ORDER_배달주문);
-            acceptOrderStep(orderId);
-            serveOrderStep(orderId);
+            UUID 배달주문Id = 주문을_등록_후_해당_Id를_반환한다(배달주문);
+            주문을_수락한다(배달주문Id);
+            주문의_제조를_완료한다(배달주문Id);
 
             // when
-            ExtractableResponse<Response> response = startDeliveryOrderStep(orderId);
+            ExtractableResponse<Response> 배달주문_배달시작_응답 = 배달을_시작한다(배달주문Id);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.DELIVERY.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.DELIVERING.name())
-            );
+            주문별_상태_검증(배달주문_배달시작_응답, OrderType.DELIVERY, OrderStatus.DELIVERING);
         }
 
-        @DisplayName("배달이 완료됩니다.")
+        @DisplayName("[성공] 배달이 완료됩니다.")
         @Test
         void completeDelivery_DeliveryOrder() {
             // given
-            UUID orderId = createOrderId(ORDER_배달주문);
-            acceptOrderStep(orderId);
-            serveOrderStep(orderId);
-            startDeliveryOrderStep(orderId);
+            UUID 배달주문Id = 주문을_등록_후_해당_Id를_반환한다(배달주문);
+            주문을_수락한다(배달주문Id);
+            주문의_제조를_완료한다(배달주문Id);
+            배달을_시작한다(배달주문Id);
 
             // when
-            ExtractableResponse<Response> response = completeDeliveryOrderStep(orderId);
+            ExtractableResponse<Response> 배달주문_배달완료_응답 = 배달을_완료한다(배달주문Id);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.DELIVERY.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.DELIVERED.name())
-            );
+            주문별_상태_검증(배달주문_배달완료_응답, OrderType.DELIVERY, OrderStatus.DELIVERED);
         }
     }
 
     @Nested
     @DisplayName("주문종료 테스트")
     class CompleteOrder {
-        @DisplayName("매장주문을 종료합니다.")
+        @DisplayName("[성공] 매장주문을 종료합니다.")
         @Test
         void completeEetInOrder() {
             // given
-            sitOrderTableStep(ORDER_TABLE_ID);
-            UUID orderId = createOrderId(ORDER_매장주문);
-            acceptOrderStep(orderId);
-            serveOrderStep(orderId);
+            주문테이블에_앉는다(주문테이블Id);
+            UUID 매장주문Id = 주문을_등록_후_해당_Id를_반환한다(매장주문);
+            주문을_수락한다(매장주문Id);
+            주문의_제조를_완료한다(매장주문Id);
 
             // when
-            ExtractableResponse<Response> response = completeOrderStep(orderId);
+            ExtractableResponse<Response> 매장주문_완료_응답 = 주문을_완료한다(매장주문Id);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.EAT_IN.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.COMPLETED.name()),
-                    () -> assertThat(response.jsonPath().getInt("orderTable.numberOfGuests")).isZero(),
-                    () -> assertThat(response.jsonPath().getBoolean("orderTable.occupied")).isFalse()
-            );
+            매장주문_완료_검증(매장주문_완료_응답);
         }
 
-        @DisplayName("배달주문을 종료합니다.")
+        @DisplayName("[성공] 배달주문을 종료합니다.")
         @Test
         void completeDeliveryOrder() {
             // given
-            UUID orderId = createOrderId(ORDER_배달주문);
-            acceptOrderStep(orderId);
-            serveOrderStep(orderId);
-            startDeliveryOrderStep(orderId);
-            completeDeliveryOrderStep(orderId);
+            UUID 배달주문Id = 주문을_등록_후_해당_Id를_반환한다(배달주문);
+            주문을_수락한다(배달주문Id);
+            주문의_제조를_완료한다(배달주문Id);
+            배달을_시작한다(배달주문Id);
+            배달을_완료한다(배달주문Id);
 
             // when
-            ExtractableResponse<Response> response = completeOrderStep(orderId);
+            ExtractableResponse<Response> response = 주문을_완료한다(배달주문Id);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.DELIVERY.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.COMPLETED.name())
-            );
+            주문별_상태_검증(response, OrderType.DELIVERY, OrderStatus.COMPLETED);
         }
 
-        @DisplayName("포장주문을 종료합니다.")
+        @DisplayName("[성공] 포장주문을 종료합니다.")
         @Test
         void completeTakeOutOrder() {
             // given
-            UUID orderId = createOrderId(ORDER_포장주문);
-            acceptOrderStep(orderId);
-            serveOrderStep(orderId);
+            UUID 포장주문Id = 주문을_등록_후_해당_Id를_반환한다(포장주문);
+            주문을_수락한다(포장주문Id);
+            주문의_제조를_완료한다(포장주문Id);
 
             // when
-            ExtractableResponse<Response> response = completeOrderStep(orderId);
+            ExtractableResponse<Response> 포장주문_완료_응답 = 주문을_완료한다(포장주문Id);
 
             // then
-            assertAll(
-                    () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
-                    () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
-                    () -> assertThat(response.jsonPath().getString("type")).isEqualTo(OrderType.TAKEOUT.name()),
-                    () -> assertThat(response.jsonPath().getString("status")).isEqualTo(OrderStatus.COMPLETED.name())
-            );
+            주문별_상태_검증(포장주문_완료_응답, OrderType.TAKEOUT, OrderStatus.COMPLETED);
         }
     }
 
     private static OrderTable createOrderTable() {
         OrderTable orderTable = orderTableCreateRequest(이름_1번);
-        return createOrderTableStep(orderTable).as(OrderTable.class);
+        return 주문테이블을_등록한다(orderTable).as(OrderTable.class);
     }
 
     private static Menu createMenu(BigDecimal price, MenuGroup menuGroup, MenuProduct... menuProducts) {
         Menu menu = menuCreateRequest(이름_반반치킨, price, menuGroup.getId(), true, menuProducts);
-        return createMenuStep(menu).as(Menu.class);
+        return 메뉴_등록한다(menu).as(Menu.class);
     }
 
     @NotNull
     private static MenuProduct createMenuProduct(String name, BigDecimal price, long quantity) {
         Product product = productCreateRequest(name, price);
-        Product productResponse = createProductStep(product).as(Product.class);
+        Product productResponse = 상품을_등록한다(product).as(Product.class);
         return menuProductResponse(productResponse, quantity);
     }
 
-    private static MenuGroup createMenuGroup() {
-        MenuGroup menuGroup = menuGroupCreateRequest(이름_추천메뉴);
-        return createMenuGroupStep(menuGroup).as(MenuGroup.class);
+    private static UUID 주문을_등록_후_해당_Id를_반환한다(Order request) {
+        return 주문을_등록한다(request).as(Order.class).getId();
     }
 
-    private static UUID createOrderId(Order request) {
-        return createOrderStep(request).as(Order.class).getId();
+    private static void 포장주문_등록_검증(ExtractableResponse<Response> 포장주문_응답) {
+        assertAll(
+                () -> assertThat(포장주문_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(포장주문_응답.jsonPath().getObject("id", UUID.class)).isNotNull(),
+                () -> assertThat(포장주문_응답.jsonPath().getString("type")).isEqualTo(OrderType.TAKEOUT.name()),
+                () -> assertThat(포장주문_응답.jsonPath().getString("status")).isEqualTo(OrderStatus.WAITING.name()),
+                () -> assertThat(포장주문_응답.jsonPath().getString("orderDateTime")).isNotNull(),
+                () -> assertThat(포장주문_응답.jsonPath().getString("deliveryAddress")).isNull(),
+                () -> assertThat(포장주문_응답.jsonPath().getObject("orderTable", OrderTable.class)).isNull()
+        );
+    }
+
+    private static void 배달주문_등록_검증(ExtractableResponse<Response> 배달주문_응답) {
+        assertAll(
+                () -> assertThat(배달주문_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(배달주문_응답.jsonPath().getObject("id", UUID.class)).isNotNull(),
+                () -> assertThat(배달주문_응답.jsonPath().getString("type")).isEqualTo(OrderType.DELIVERY.name()),
+                () -> assertThat(배달주문_응답.jsonPath().getString("status")).isEqualTo(OrderStatus.WAITING.name()),
+                () -> assertThat(배달주문_응답.jsonPath().getString("orderDateTime")).isNotNull(),
+                () -> assertThat(배달주문_응답.jsonPath().getString("deliveryAddress")).isEqualTo(배달주소),
+                () -> assertThat(배달주문_응답.jsonPath().getObject("orderTable", OrderTable.class)).isNull()
+        );
+    }
+
+    private void 매장주문_등록_검증(ExtractableResponse<Response> 매장주문_등록_검증) {
+        assertAll(
+                () -> assertThat(매장주문_등록_검증.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getObject("id", UUID.class)).isNotNull(),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getString("type")).isEqualTo(OrderType.EAT_IN.name()),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getString("status")).isEqualTo(OrderStatus.WAITING.name()),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getString("orderDateTime")).isNotNull(),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getString("deliveryAddress")).isNull(),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getObject("orderTable.id", UUID.class)).isEqualTo(주문테이블Id),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getInt("orderTable.numberOfGuests")).isZero(),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getBoolean("orderTable.occupied")).isTrue(),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getList("orderLineItems.menu.id")).hasSizeGreaterThanOrEqualTo(1),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getList("orderLineItems.quantity")).containsExactly(1),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getList("orderLineItems.menu.price")).containsExactly(가격_38000.floatValue()),
+                () -> assertThat(매장주문_등록_검증.jsonPath().getList("orderLineItems.menu.displayed")).containsExactly(true)
+        );
+    }
+
+    private static void 주문별_상태_검증(ExtractableResponse<Response> response, OrderType type, OrderStatus status) {
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
+                () -> assertThat(response.jsonPath().getString("type")).isEqualTo(type.name()),
+                () -> assertThat(response.jsonPath().getString("status")).isEqualTo(status.name())
+        );
+    }
+
+    private static void 매장주문_완료_검증(ExtractableResponse<Response> 매장주문_완료_응답) {
+        assertAll(
+                () -> assertThat(매장주문_완료_응답.statusCode()).isEqualTo(HttpStatus.OK.value()),
+                () -> assertThat(매장주문_완료_응답.jsonPath().getObject("id", UUID.class)).isNotNull(),
+                () -> assertThat(매장주문_완료_응답.jsonPath().getString("type")).isEqualTo(OrderType.EAT_IN.name()),
+                () -> assertThat(매장주문_완료_응답.jsonPath().getString("status")).isEqualTo(OrderStatus.COMPLETED.name()),
+                () -> assertThat(매장주문_완료_응답.jsonPath().getInt("orderTable.numberOfGuests")).isZero(),
+                () -> assertThat(매장주문_완료_응답.jsonPath().getBoolean("orderTable.occupied")).isFalse()
+        );
     }
 }

@@ -8,11 +8,11 @@ import kitchenpos.domain.MenuGroup;
 public class MenuGroupSteps {
     private static final String URI = "/api/menu-groups";
 
-    public static ExtractableResponse<Response> createMenuGroupStep(MenuGroup params) {
+    public static ExtractableResponse<Response> 메뉴그룹을_등록한다(MenuGroup params) {
         return RestAssuredUtils.post(params, URI);
     }
 
-    public static ExtractableResponse<Response> getMenuGroupsStep() {
+    public static ExtractableResponse<Response> 메뉴그룹_목록을_보여준다() {
         return RestAssuredUtils.get(URI);
     }
 }
