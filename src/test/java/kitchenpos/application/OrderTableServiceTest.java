@@ -42,213 +42,202 @@ class OrderTableServiceTest {
     OrderTableService orderTableService;
 
 
-    @DisplayName("주문 테이블 등록")
+    @DisplayName("주문테이블을 등록한다.")
     @Nested
     class OrderTableCreate {
-        @DisplayName("[성공]")
-        @Nested
-        class Success {
-            @DisplayName("주문테이블을 등록한다.")
-            @Test
-            void createOrderTable() {
-                // given
-                OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 0, false);
-                when(orderTableRepository.save(any())).thenReturn(ORDER_TABLE_1번);
-                OrderTable request = orderTableCreateRequest(이름_1번);
+        @DisplayName("[성공] 등록")
+        @Test
+        void success() {
+            // given
+            OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 0, false);
+            when(orderTableRepository.save(any())).thenReturn(ORDER_TABLE_1번);
+            OrderTable request = orderTableCreateRequest(이름_1번);
 
-                // when
-                OrderTable result = orderTableService.create(request);
+            // when
+            OrderTable result = orderTableService.create(request);
 
-                // then
-                assertAll(
-                        () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
-                        () -> assertThat(result.getName()).isEqualTo(이름_1번),
-                        () -> assertThat(result.getNumberOfGuests()).isZero(),
-                        () -> assertThat(result.isOccupied()).isFalse()
-                );
-            }
+            // then
+            assertAll(
+                    () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
+                    () -> assertThat(result.getName()).isEqualTo(이름_1번),
+                    () -> assertThat(result.getNumberOfGuests()).isZero(),
+                    () -> assertThat(result.isOccupied()).isFalse()
+            );
         }
 
-        @DisplayName("[실패]")
-        @Nested
-        class Fail {
-            @DisplayName("이름은 필수로 입력해야 한다.")
-            @NullAndEmptySource
-            @ParameterizedTest
-            void createOrderTable_NullOrEmptyNameException(String name) {
-                // given
-                OrderTable request = orderTableCreateRequest(name);
+        @DisplayName("[실패] 이름은 필수로 입력해야 한다.")
+        @NullAndEmptySource
+        @ParameterizedTest
+        void fail(String name) {
+            // given
+            OrderTable request = orderTableCreateRequest(name);
 
-                // when
-                // then
-                assertThatThrownBy(() -> orderTableService.create(request))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
+            // when
+            // then
+            assertThatThrownBy(() -> orderTableService.create(request))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
-    @DisplayName("주문 테이블 사용여부")
+    @DisplayName("고객이 주문 테이블에 앉는다.")
     @Nested
     class OrderTableOccupied {
-        @DisplayName("[성공]")
-        @Nested
-        class Success {
+        @DisplayName("[성공] 태이블 사용 중")
+        @Test
+        void success() {
+            // given
+            OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 0, false);
+            when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
 
-            @DisplayName("고객이 주문 테이블에 앉는다.")
-            @Test
-            void sitOrderTable() {
-                // given
-                OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 0, false);
-                when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
+            // when
+            OrderTable result = orderTableService.sit(ORDER_TABLE_1번.getId());
 
-                // when
-                OrderTable result = orderTableService.sit(ORDER_TABLE_1번.getId());
-
-                // then
-                assertAll(
-                        () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
-                        () -> assertThat(result.getName()).isEqualTo(이름_1번),
-                        () -> assertThat(result.getNumberOfGuests()).isZero(),
-                        () -> assertThat(result.isOccupied()).isTrue()
-                );
-            }
-
-            @DisplayName("해당 주문 테이블이 초기화 된다.")
-            @Test
-            void clearOrderTable() {
-                // given
-                OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
-                when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
-                when(orderRepository.existsByOrderTableAndStatusNot(ORDER_TABLE_1번, OrderStatus.COMPLETED)).thenReturn(false);
-
-                // when
-                OrderTable result = orderTableService.clear(ORDER_TABLE_1번.getId());
-
-                // then
-                assertAll(
-                        () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
-                        () -> assertThat(result.getName()).isEqualTo(이름_1번),
-                        () -> assertThat(result.getNumberOfGuests()).isZero(),
-                        () -> assertThat(result.isOccupied()).isFalse()
-                );
-            }
+            // then
+            assertAll(
+                    () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
+                    () -> assertThat(result.getName()).isEqualTo(이름_1번),
+                    () -> assertThat(result.getNumberOfGuests()).isZero(),
+                    () -> assertThat(result.isOccupied()).isTrue()
+            );
         }
 
-        @DisplayName("[실패]")
-        @Nested
-        class Fail {
-            @DisplayName("주문 테이블이 미리 등록되어 있는지 체크한다.")
-            @Test
-            void exists() {
-                // given
-                UUID orderTableId = UUID.randomUUID();
-                when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
+        @DisplayName("[실패] 주문 테이블이 미리 등록되어 있는지 체크한다.")
+        @Test
+        void fail1() {
+            // given
+            UUID orderTableId = UUID.randomUUID();
+            when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
 
-                // when
-                // then
-                assertAll(
-                        () -> assertThatThrownBy(() -> orderTableService.sit(orderTableId))
-                                .isInstanceOf(NoSuchElementException.class),
-                        () -> assertThatThrownBy(() -> orderTableService.clear(orderTableId))
-                                .isInstanceOf(NoSuchElementException.class)
-                );
-            }
-
-            @DisplayName("`주문`의 주문상태가 **주문종료**이어야 한다.")
-            @Test
-            void orderStatus() {
-                // given
-                OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
-                when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
-                when(orderRepository.existsByOrderTableAndStatusNot(ORDER_TABLE_1번, OrderStatus.COMPLETED)).thenReturn(true);
-                UUID orderTableId = ORDER_TABLE_1번.getId();
-
-                // when
-                // then
-                assertThatThrownBy(() -> orderTableService.clear(orderTableId))
-                        .isInstanceOf(IllegalStateException.class);
-            }
+            // when
+            // then
+            assertThatThrownBy(() -> orderTableService.sit(orderTableId))
+                    .isInstanceOf(NoSuchElementException.class);
         }
     }
 
-    @DisplayName("주문테이블 인원 변경")
+    @DisplayName("해당 주문 테이블이 초기화 된다.")
+    @Nested
+    class OrderTableClear {
+        @DisplayName("[성공] 테이블 초기화")
+        @Test
+        void success() {
+            // given
+            OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
+            when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
+            when(orderRepository.existsByOrderTableAndStatusNot(ORDER_TABLE_1번, OrderStatus.COMPLETED)).thenReturn(false);
+
+            // when
+            OrderTable result = orderTableService.clear(ORDER_TABLE_1번.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
+                    () -> assertThat(result.getName()).isEqualTo(이름_1번),
+                    () -> assertThat(result.getNumberOfGuests()).isZero(),
+                    () -> assertThat(result.isOccupied()).isFalse()
+            );
+        }
+
+        @DisplayName("[실패] 주문 테이블이 미리 등록되어 있는지 체크한다.")
+        @Test
+        void fail1() {
+            // given
+            UUID orderTableId = UUID.randomUUID();
+            when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
+
+            // when
+            // then
+            assertThatThrownBy(() -> orderTableService.clear(orderTableId))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @DisplayName("[실패] `주문`의 주문상태가 **주문종료**이어야 한다.")
+        @Test
+        void fail2() {
+            // given
+            OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
+            when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
+            when(orderRepository.existsByOrderTableAndStatusNot(ORDER_TABLE_1번, OrderStatus.COMPLETED)).thenReturn(true);
+            UUID orderTableId = ORDER_TABLE_1번.getId();
+
+            // when
+            // then
+            assertThatThrownBy(() -> orderTableService.clear(orderTableId))
+                    .isInstanceOf(IllegalStateException.class);
+        }
+    }
+
+
+    @DisplayName("해당 주문 테이블 고객의 수를 변경한다.")
     @Nested
     class OrderTableNumberChange {
-        @DisplayName("[성공]")
-        @Nested
-        class Success {
-            @DisplayName("해당 주문 테이블 고객의 수를 변경한다.")
-            @Test
-            void changeNumberOfGuestsOrderTable() {
-                // given
-                OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
-                when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
-                OrderTable request = changeNumberOfGuestsRequest(4);
+        @DisplayName("[성공] 인원 변경")
+        @Test
+        void success() {
+            // given
+            OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
+            when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
+            OrderTable request = changeNumberOfGuestsRequest(4);
 
-                // when
-                OrderTable result = orderTableService.changeNumberOfGuests(ORDER_TABLE_1번.getId(), request);
+            // when
+            OrderTable result = orderTableService.changeNumberOfGuests(ORDER_TABLE_1번.getId(), request);
 
-                // then
-                assertAll(
-                        () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
-                        () -> assertThat(result.getName()).isEqualTo(이름_1번),
-                        () -> assertThat(result.getNumberOfGuests()).isEqualTo(4),
-                        () -> assertThat(result.isOccupied()).isTrue()
-                );
-            }
+            // then
+            assertAll(
+                    () -> assertThat(result.getId()).isEqualTo(ORDER_TABLE_1번.getId()),
+                    () -> assertThat(result.getName()).isEqualTo(이름_1번),
+                    () -> assertThat(result.getNumberOfGuests()).isEqualTo(4),
+                    () -> assertThat(result.isOccupied()).isTrue()
+            );
         }
 
-        @DisplayName("[실패]")
-        @Nested
-        class Fail {
-            @DisplayName("주문 테이블이 미리 등록되어 있는지 체크한다.")
-            @Test
-            void exists() {
-                // given
-                OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
-                UUID orderTableId = ORDER_TABLE_1번.getId();
-                when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
-                OrderTable request = changeNumberOfGuestsRequest(4);
+        @DisplayName("[실패] 주문 테이블이 미리 등록되어 있는지 체크한다.")
+        @Test
+        void fail1() {
+            // given
+            OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
+            UUID orderTableId = ORDER_TABLE_1번.getId();
+            when(orderTableRepository.findById(any())).thenReturn(Optional.empty());
+            OrderTable request = changeNumberOfGuestsRequest(4);
 
-                // when
-                // then
-                assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
-                        .isInstanceOf(NoSuchElementException.class);
-            }
+            // when
+            // then
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
 
-            @DisplayName("주문 테이블은 사용여부가 사용중이어야 한다.")
-            @Test
-            void occupied() {
-                // given
-                OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, false);
-                UUID orderTableId = ORDER_TABLE_1번.getId();
-                when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
-                OrderTable request = changeNumberOfGuestsRequest(4);
+        @DisplayName("[실패] 주문 테이블은 사용여부가 사용중이어야 한다.")
+        @Test
+        void fail2() {
+            // given
+            OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, false);
+            UUID orderTableId = ORDER_TABLE_1번.getId();
+            when(orderTableRepository.findById(any())).thenReturn(Optional.of(ORDER_TABLE_1번));
+            OrderTable request = changeNumberOfGuestsRequest(4);
 
-                // when
-                // then
-                assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
-                        .isInstanceOf(IllegalStateException.class);
-            }
+            // when
+            // then
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
+                    .isInstanceOf(IllegalStateException.class);
+        }
 
-            @DisplayName("고객의 수는 `0`명 이상이다.")
-            @ValueSource(ints = {-1, -111, -99999})
-            @ParameterizedTest
-            void changeNumberOfGuestsOrderTable_negativeException(int numberOfGuests) {
-                // given
-                OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
-                UUID orderTableId = ORDER_TABLE_1번.getId();
-                OrderTable request = changeNumberOfGuestsRequest(numberOfGuests);
+        @DisplayName("[실패] 고객의 수는 `0`명 이상이다.")
+        @ValueSource(ints = {-1, -111, -99999})
+        @ParameterizedTest
+        void fail3(int numberOfGuests) {
+            // given
+            OrderTable ORDER_TABLE_1번 = orderTableResponse(이름_1번, 2, true);
+            UUID orderTableId = ORDER_TABLE_1번.getId();
+            OrderTable request = changeNumberOfGuestsRequest(numberOfGuests);
 
-                // when
-                // then
-                assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
-                        .isInstanceOf(IllegalArgumentException.class);
-            }
+            // when
+            // then
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
-    @DisplayName("해당 주문테이블목록을 볼 수 있다.")
+    @DisplayName("[성공] 해당 주문테이블목록을 볼 수 있다.")
     @Test
     void getOrderTables() {
         // given
