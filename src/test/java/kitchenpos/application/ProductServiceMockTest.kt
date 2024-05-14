@@ -9,26 +9,23 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
+import utils.FakeProductRepository
+import utils.spec.ProductSpec
 import java.math.BigDecimal
 import java.util.*
 
 @DisplayName("상품 서비스")
 @ExtendWith(MockitoExtension::class)
 class ProductServiceMockTest {
+    private val menuRepository: MenuRepository = mock(MenuRepository::class.java)
 
-    @Mock
-    private lateinit var productRepository: JpaProductRepository
+    private val purgomalumClient: PurgomalumClient = mock(PurgomalumClient::class.java)
 
-    @Mock
-    private lateinit var menuRepository: JpaMenuRepository
-
-    @Mock
-    private lateinit var purgomalumClient: PurgomalumClient
-
-    @InjectMocks
-    private lateinit var productService: ProductService
+    private val productService: ProductService =
+        ProductService(FakeProductRepository, menuRepository, purgomalumClient)
 
     @DisplayName("상품 생성")
     @Nested
@@ -106,7 +103,9 @@ class ProductServiceMockTest {
         @Test
         fun `상품 가격 변경 요청 - 메뉴의 가격이 메뉴상품의 가격 * 재고 합이 보다 큰 경우 메뉴는 전시 종료`() {
             //given
-            val productId = UUID.randomUUID()
+            val product = FakeProductRepository.save(ProductSpec.of(BigDecimal.valueOf(15000)))
+
+            val productId = product.id
             val request = Product()
             request.price = BigDecimal.valueOf(15000)
 
@@ -120,8 +119,6 @@ class ProductServiceMockTest {
             menu.price = BigDecimal.valueOf(35000)
             menu.menuProducts = listOf(menuProduct)
 
-            `when`(productRepository.findById(productId))
-                .thenReturn(Optional.ofNullable(Product()))
             `when`(menuRepository.findAllByProductId(productId))
                 .thenReturn(listOf(menu))
 
