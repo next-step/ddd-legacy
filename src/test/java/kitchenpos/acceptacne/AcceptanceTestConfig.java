@@ -1,7 +1,7 @@
 package kitchenpos.acceptacne;
 
 import kitchenpos.infra.PurgomalumClient;
-import kitchenpos.infra.PurgomalumFakeClient;
+import kitchenpos.infra.FakePurgomalumClient;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
@@ -9,6 +9,6 @@ import org.springframework.context.annotation.Bean;
 public class AcceptanceTestConfig {
     @Bean
     public PurgomalumClient purgomalumClient() {
-        return new PurgomalumFakeClient();
+        return new FakePurgomalumClient();
     }
 }

@@ -2,7 +2,7 @@ package kitchenpos.infra;
 
 import java.util.List;
 
-public class PurgomalumFakeClient implements PurgomalumClient {
+public class FakePurgomalumClient implements PurgomalumClient {
     List<String> profanityList = List.of("욕설", "비속어", "나쁜말");
 
     @Override

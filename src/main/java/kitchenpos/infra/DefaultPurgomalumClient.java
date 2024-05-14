@@ -8,10 +8,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 
 @Component
-public class PurgomalumClientImpl implements PurgomalumClient {
+public class DefaultPurgomalumClient implements PurgomalumClient {
     private final RestTemplate restTemplate;
 
-    public PurgomalumClientImpl(final RestTemplateBuilder restTemplateBuilder) {
+    public DefaultPurgomalumClient(final RestTemplateBuilder restTemplateBuilder) {
         this.restTemplate = restTemplateBuilder.build();
     }
 
