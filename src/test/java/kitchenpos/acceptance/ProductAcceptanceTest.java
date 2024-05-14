@@ -18,7 +18,7 @@ import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @AcceptanceTest
-public class ProductAcceptance {
+class ProductAcceptanceTest {
     @LocalServerPort
     int port;
 
