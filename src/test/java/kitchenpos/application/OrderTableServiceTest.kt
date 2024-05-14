@@ -58,7 +58,7 @@ class OrderTableServiceTest : BehaviorSpec({
         }
     }
 
-    given("주문 테이블에 손님이 않을 떄") {
+    given("주문 테이블에 손님이 앉을 때") {
         `when`("주문 테이블이 존재하면") {
             val newTable = createOrderTable().let { orderTableService.create(it) }
 

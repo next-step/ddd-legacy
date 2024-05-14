@@ -44,7 +44,7 @@ class MenuGroupServiceMockTest : BehaviorSpec({
         }
     }
 
-    given("메뉴 그룹을 조회할 떄") {
+    given("메뉴 그룹을 조회할 때") {
         `when`("메뉴 그룹이 존재하지 않으면") {
             menuGroupRepository.clear()
 

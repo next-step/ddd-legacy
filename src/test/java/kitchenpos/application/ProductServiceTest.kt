@@ -86,7 +86,7 @@ class ProductServiceTest : BehaviorSpec({
         }
     }
 
-    given("가격을 변경할 떄") {
+    given("가격을 변경할 때") {
         `when`("메뉴 가격이 null이면") {
             val newProduct = "후라이드 치킨" costs null
 

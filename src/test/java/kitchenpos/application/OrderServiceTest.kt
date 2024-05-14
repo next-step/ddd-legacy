@@ -81,7 +81,7 @@ class OrderServiceTest : BehaviorSpec({
             }
         }
 
-        `when`("매장 주문이 아닐떄 수량이 0보다 작은경우") {
+        `when`("매장 주문이 아닐때 수량이 0보다 작은경우") {
             val newOrder =
                 buildOrder {
                     orderType(TAKEOUT)
@@ -312,7 +312,7 @@ class OrderServiceTest : BehaviorSpec({
         }
     }
 
-    given("배달이 완료되었을 떄") {
+    given("배달이 완료되었을 때") {
         `when`("정상 입력 값이 주어지면") {
             val newOrder =
                 buildOrder {
