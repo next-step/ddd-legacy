@@ -7,28 +7,57 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
-
-	private List<String> delimiterList = new ArrayList<>(List.of(",", ":"));
+	private static final Pattern PATTERN = Pattern.compile("//(.)\n(.*)");
+	private static final int CUSTOM_DELIMITER_GROUP = 1;
+	private static final int TARGET_GROUP = 2;
 
 	public int add(String text) {
 		if (text == null || text.isEmpty()) {
 			return 0;
 		}
 		String target = text;
-		Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
-		if (m.find()) {
-			String customDelimiter = m.group(1);
-			delimiterList.add(customDelimiter);
-			target = m.group(2);
+		Delimiters delimiters = new Delimiters();
+		Matcher matcher = PATTERN.matcher(text);
+		if (matcher.find()) {
+			String customDelimiter = matcher.group(CUSTOM_DELIMITER_GROUP);
+			delimiters.add(customDelimiter);
+			target = matcher.group(TARGET_GROUP);
 		}
-		String regex = String.join("|", delimiterList);
-		return Arrays.stream(target.split(regex)).mapToInt(StringCalculator::parseToInt).sum();
+		String regex = String.join("|", delimiters.getDelimiters());
+		return Arrays.stream(target.split(regex))
+			.mapToInt(this::parseToPositiveNumber)
+			.sum();
 	}
 
-	static int parseToInt(String text) {
+	private int parseToPositiveNumber(String text) {
+		return new PositiveNumber(text).getNumber();
+	}
+}
+
+class Delimiters {
+	private static final List<String> DEFAULT_DELIMITERS = List.of(",", ":");
+	private final List<String> delimiters = new ArrayList<>(DEFAULT_DELIMITERS);
+
+	public List<String> getDelimiters() {
+		return delimiters;
+	}
+
+	public void add(String customDelimiter) {
+		delimiters.add(customDelimiter);
+	}
+}
+
+class PositiveNumber {
+	private final int number;
+
+	public PositiveNumber(String text) {
 		if (Integer.parseInt(text) < 0) {
 			throw new RuntimeException();
 		}
-		return Integer.parseInt(text);
+		number = Integer.parseInt(text);
+	}
+
+	public int getNumber() {
+		return number;
 	}
 }
