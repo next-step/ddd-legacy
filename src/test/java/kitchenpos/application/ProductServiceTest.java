@@ -1,29 +1,39 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
+import java.util.UUID;
+import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.TestConstructor;
-import org.springframework.test.context.TestConstructor.AutowireMode;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@TestConstructor(autowireMode = AutowireMode.ALL)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
-    private final ProductService productService;
+    @Mock
+    private ProductRepository productRepository;
 
-    @MockBean
+    @Mock
+    private MenuRepository menuRepository;
+
+    @Mock
     private PurgomalumClient purgomalumClient;
 
-    public ProductServiceTest(ProductService productService) {
-        this.productService = productService;
+    private ProductService productService;
+
+    @BeforeEach
+    void setUp() {
+        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
     @Test
@@ -31,9 +41,26 @@ class ProductServiceTest {
         Product product = new Product();
         product.setPrice(BigDecimal.valueOf(20_000L));
         product.setName("후라이드");
-
         given(purgomalumClient.containsProfanity(any())).willReturn(false);
+
+        Product response = new Product();
+        response.setId(UUID.randomUUID());
+        response.setPrice(BigDecimal.valueOf(20_000L));
+        response.setName("후라이드");
+        given(productRepository.save(any())).willReturn(response);
+
         Product actual = productService.create(product);
         assertThat(actual.getId()).isNotNull();
+    }
+
+    @Test
+    void 상품가격이_올바르지않으면_예외가_발생한다() {
+        Product product = new Product();
+        product.setPrice(BigDecimal.valueOf(-10_000L));
+        product.setName("후라이드");
+
+        // given(purgomalumClient.containsProfanity(any())).willReturn(false);
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> productService.create(product));
     }
 }
