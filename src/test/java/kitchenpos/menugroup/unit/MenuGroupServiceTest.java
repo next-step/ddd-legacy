@@ -35,7 +35,7 @@ public class MenuGroupServiceTest {
     }
 
     @Nested
-    class 이름검증 {
+    class 등록 {
 
         @Test
         @DisplayName("[성공] 메뉴 그룹의 이름을 A로 입력하면 생성된다.")
