@@ -2,7 +2,7 @@ package kitchenpos.domain
 
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.data.repository.Repository
-import java.util.*
+import java.util.Optional
 
 @NoRepositoryBean
 interface BaseRepository<T, ID> : Repository<T, ID> {

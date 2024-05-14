@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import kitchenpos.domain.FakeMenuRepository
 import kitchenpos.domain.FakeProductRepository
+import kitchenpos.domain.Menu
 import kitchenpos.domain.Product
 import kitchenpos.infra.PurgomalumClient
 import java.math.BigDecimal
@@ -19,7 +20,12 @@ private val purgomalumClient = mockk<PurgomalumClient>()
 
 private val productService = ProductService(productRepository, menuRepository, purgomalumClient)
 
+private fun Menu.persistAll() = this.persistProducts().also { menuRepository.save(this) }
+
+private fun Menu.persistProducts() = this.also { this.menuProducts.forEach { productRepository.save(it.product) } }
+
 private val Int.won: BigDecimal get() = this.toBigDecimal()
+private val Int.pcs: Long get() = this.toLong()
 
 private infix fun String?.costs(amount: BigDecimal?): Product {
     return Product().apply {
@@ -113,6 +119,28 @@ class ProductServiceTest : BehaviorSpec({
             then("예외가 발생한다.") {
                 shouldThrow<NoSuchElementException> {
                     productService.changePrice(newProduct.id, newProduct)
+                }
+            }
+        }
+
+        `when`("메뉴의 가격이 메뉴에 속한 상품 금액의 합보다 크면") {
+            val newMenu =
+                buildMenu {
+                    name = null
+                    price = 1000.won
+                    isDisplayed = true
+                    groupName("추천 메뉴")
+                    products { item("치킨1", 16000.won, 1.pcs) }
+                }.persistAll()
+
+            val menuId = newMenu.id
+            val productId = newMenu.menuProducts.first().productId
+            val changedProduct = "치킨1" costs 100.won
+
+            then("메뉴가 숨겨진다.") {
+                productService.changePrice(productId, changedProduct)
+                with(menuRepository.findById(menuId)?.get()) {
+                    this?.isDisplayed shouldBe false
                 }
             }
         }
