@@ -26,7 +26,7 @@ class MenuGroupServiceTest extends SetupTest{
         super.setUp();
     }
 
-    @DisplayName("메뉴 카테고리를 생성한다.")
+    @DisplayName("메뉴 카테고리를 추가한다.")
     @Test
     void createMenuGroup(){
         //given

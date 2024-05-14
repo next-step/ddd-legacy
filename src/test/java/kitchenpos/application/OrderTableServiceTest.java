@@ -19,6 +19,7 @@ import kitchenpos.helper.OrderTestHelper;
 import kitchenpos.helper.ProductTestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -131,23 +132,27 @@ class OrderTableServiceTest extends SetupTest{
         assertThat(clearOrderTable.getNumberOfGuests()).isSameAs(0);
     }
 
-    @DisplayName("등록되지 않은 주문테이블을 치우려고 할 경우 NoSuchElementException 예외가 발생한다.")
-    @Test
-    void clearNoOrderTable(){
-        OrderTable 없는주문테이블 = new OrderTable();
-        없는주문테이블.setId(UUID.randomUUID());
+    @Nested
+    @DisplayName("치우려는 주문테이블이 ")
+    class clearOrderExceptionTestCase{
+        @DisplayName("만약에 등록되어 있지 않는 경우 NoSuchElementException 예외가 발생한다.")
+        @Test
+        void clearNoOrderTable(){
+            OrderTable 없는주문테이블 = new OrderTable();
+            없는주문테이블.setId(UUID.randomUUID());
 
-        assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> orderTableService.clear(없는주문테이블.getId()));
-    }
+            assertThatExceptionOfType(NoSuchElementException.class)
+                    .isThrownBy(() -> orderTableService.clear(없는주문테이블.getId()));
+        }
 
-    @DisplayName("아직 주문이 완료되지 않은 주문테이블을 치우려고 할 경우 IllegalStateException 예외가 발생한다.")
-    @Test
-    void clearOrderTableOfNoCompletedOrder(){
-        OrderTable 대기중_주문테이블 = 대기중_주문.getOrderTable();
+        @DisplayName("만약에 주문완료 상태가 아닌 경우 IllegalStateException 예외가 발생한다.")
+        @Test
+        void clearOrderTableOfNoCompletedOrder(){
+            OrderTable 대기중_주문테이블 = 대기중_주문.getOrderTable();
 
-        assertThatExceptionOfType(IllegalStateException.class)
-                .isThrownBy(() -> orderTableService.clear(대기중_주문테이블.getId()));
+            assertThatExceptionOfType(IllegalStateException.class)
+                    .isThrownBy(() -> orderTableService.clear(대기중_주문테이블.getId()));
+        }
     }
 
     @DisplayName("특정 주문테이블의 사용인원수를 변경하다.")

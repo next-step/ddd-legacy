@@ -12,6 +12,7 @@ import kitchenpos.helper.MenuTestHelper;
 import kitchenpos.helper.ProductTestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -99,6 +100,35 @@ class ProductServiceTest extends SetupTest{
         assertThat(changeProduct.getPrice()).isSameAs(requestProduct.getPrice());
     }
 
+    @Nested
+    @DisplayName("가격을 변경하려는 음식이 ")
+    class changePriceExceptionTestCase{
+        @DisplayName("만약에 변경할 가격이 없거나 음수인 경우 IllegalArgumentException 예외가 발생한다.")
+        @ParameterizedTest
+        @ValueSource(ints = {0, -1000})
+        void changeNoPriceOrMinusPriceOfProcduct(int price){
+            //given
+            Product requestProduct = new Product();
+            requestProduct.setPrice((price == 0 ? null : BigDecimal.valueOf(price)));
+
+            //when && then
+            assertThatExceptionOfType(IllegalArgumentException.class)
+                    .isThrownBy(() -> productService.changePrice(미니꿔바로우.getId(), requestProduct));
+        }
+
+        @DisplayName("만약에 등록되어 있지 않는 경우 NoSuchElementException 예외가 발생한다.")
+        @Test
+        void changePriceOfNoProcduct(){
+            //given
+            Product requestProduct = new Product();
+            requestProduct.setPrice(BigDecimal.valueOf(5000));
+
+            //when && then
+            assertThatExceptionOfType(NoSuchElementException.class)
+                    .isThrownBy(() -> productService.changePrice(UUID.randomUUID(), requestProduct));
+        }
+    }
+
     @DisplayName("음식의 가격 변경으로 기존에 등록된 메뉴의 가격이 단일 메뉴들의 총 금액보다 비싸진 경우 메뉴 노출 상태를 판매중단으로 바꾼다.")
     @Test
     void changePriceOfProcduct2(){
@@ -113,30 +143,5 @@ class ProductServiceTest extends SetupTest{
         menus.forEach(a -> {
             assertThat(a.isDisplayed()).isSameAs(false);
         });
-    }
-
-    @DisplayName("가격이 없거나 음수로 가격변경을 요청하는 경우 IllegalArgumentException 예외가 발생한다.")
-    @ParameterizedTest
-    @ValueSource(ints = {0, -1000})
-    void changeNoPriceOrMinusPriceOfProcduct(int price){
-        //given
-        Product requestProduct = new Product();
-        requestProduct.setPrice((price == 0 ? null : BigDecimal.valueOf(price)));
-
-        //when && then
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> productService.changePrice(미니꿔바로우.getId(), requestProduct));
-    }
-
-    @DisplayName("등록되어있지 않은 음식에 대한 가격변경을 요청하는 경우 NoSuchElementException 예외가 발생한다.")
-    @Test
-    void changePriceOfNoProcduct(){
-        //given
-        Product requestProduct = new Product();
-        requestProduct.setPrice(BigDecimal.valueOf(5000));
-
-        //when && then
-        assertThatExceptionOfType(NoSuchElementException.class)
-                .isThrownBy(() -> productService.changePrice(UUID.randomUUID(), requestProduct));
     }
 }
