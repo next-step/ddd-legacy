@@ -12,6 +12,14 @@ public class MenuGroupFixture {
         return 메뉴그룹;
     }
 
+    public static final MenuGroup B_메뉴그룹 = B_메뉴그룹_생성();
+    private static MenuGroup B_메뉴그룹_생성() {
+        var 메뉴그룹 = new MenuGroup();
+        메뉴그룹.setName("B");
+
+        return 메뉴그룹;
+    }
+
     public static final MenuGroup 이름미존재_메뉴그룹 = 이름미존재_메뉴그룹_생성();
     private static MenuGroup 이름미존재_메뉴그룹_생성() {
         return new MenuGroup();

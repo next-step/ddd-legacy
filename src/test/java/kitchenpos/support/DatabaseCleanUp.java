@@ -1,4 +1,4 @@
-package support;
+package kitchenpos.support;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.Entity;
@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -19,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
  * </pre>
  */
 @Component
-@ActiveProfiles("test")
 public class DatabaseCleanUp {
 
     @PersistenceContext
