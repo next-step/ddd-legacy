@@ -13,6 +13,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import utils.FakeMenuRepository
+import utils.FakeProductRepository
 import utils.spec.MenuGroupSpec
 import utils.spec.MenuProductSpec
 import utils.spec.MenuSpec
@@ -24,14 +25,13 @@ import java.util.*
 @ExtendWith(MockitoExtension::class)
 class MenuServiceMockTest {
     private val menuGroupRepository = mock(MenuGroupRepository::class.java)
-    private val productRepository = mock(ProductRepository::class.java)
     private val purgomalumClient = mock(PurgomalumClient::class.java)
 
     private val menuService: MenuService =
-        MenuService(FakeMenuRepository, menuGroupRepository, productRepository, purgomalumClient)
+        MenuService(FakeMenuRepository, menuGroupRepository, FakeProductRepository, purgomalumClient)
 
     private val productService: ProductService =
-        ProductService(productRepository, FakeMenuRepository, purgomalumClient)
+        ProductService(FakeProductRepository, FakeMenuRepository, purgomalumClient)
 
     @Nested
     @DisplayName("메뉴 생성")
@@ -39,7 +39,7 @@ class MenuServiceMockTest {
         @Test
         fun `메뉴 생성 요청 - 정상적인 메뉴 생성 성공`() {
             val menuGroup = MenuGroupSpec.of()
-            val product = ProductSpec.of(BigDecimal.valueOf(9000))
+            val product = FakeProductRepository.save(ProductSpec.of(BigDecimal.valueOf(9000)))
             val menuProduct = MenuProductSpec.of(product, 2)
 
             val request = Menu()
@@ -51,13 +51,6 @@ class MenuServiceMockTest {
 
             `when`(menuGroupRepository.findById(menuGroup.id))
                 .thenReturn(Optional.of(menuGroup))
-
-            `when`(productRepository.findAllByIdIn(listOf(product.id)))
-                .thenReturn(listOf(product))
-
-            `when`(productRepository.findById(product.id))
-                .thenReturn(Optional.of(product))
-
             `when`(purgomalumClient.containsProfanity(request.name))
                 .thenReturn(false)
 
@@ -107,7 +100,7 @@ class MenuServiceMockTest {
         @Test
         fun `메뉴 생성 요청 - 메뉴의 이름이 없을 경우 실패`() {
             val menuGroup = MenuGroupSpec.of()
-            val product = ProductSpec.of(BigDecimal.valueOf(9000))
+            val product = FakeProductRepository.save(ProductSpec.of(BigDecimal.valueOf(9000)))
             val menuProduct = MenuProductSpec.of(product, 2)
 
             val request = Menu()
@@ -119,12 +112,6 @@ class MenuServiceMockTest {
             `when`(menuGroupRepository.findById(menuGroup.id))
                 .thenReturn(Optional.of(menuGroup))
 
-            `when`(productRepository.findAllByIdIn(listOf(product.id)))
-                .thenReturn(listOf(product))
-
-            `when`(productRepository.findById(product.id))
-                .thenReturn(Optional.of(product))
-
             //when & then
             Assertions.assertThatExceptionOfType(IllegalArgumentException::class.java)
                 .isThrownBy { menuService.create(request) }
@@ -133,7 +120,7 @@ class MenuServiceMockTest {
         @Test
         fun `메뉴 생성 요청 - 메뉴명에 욕설 및 비속어 포함 시 실패`() {
             val menuGroup = MenuGroupSpec.of()
-            val product = ProductSpec.of(BigDecimal.valueOf(9000))
+            val product = FakeProductRepository.save(ProductSpec.of(BigDecimal.valueOf(9000)))
             val menuProduct = MenuProductSpec.of(product, 2)
 
             val request = Menu()
@@ -145,12 +132,6 @@ class MenuServiceMockTest {
 
             `when`(menuGroupRepository.findById(menuGroup.id))
                 .thenReturn(Optional.of(menuGroup))
-
-            `when`(productRepository.findAllByIdIn(listOf(product.id)))
-                .thenReturn(listOf(product))
-
-            `when`(productRepository.findById(product.id))
-                .thenReturn(Optional.of(product))
 
             `when`(purgomalumClient.containsProfanity(request.name))
                 .thenReturn(true)
@@ -202,7 +183,7 @@ class MenuServiceMockTest {
         @Test
         fun `메뉴 생성 요청 - 메뉴 가격이 (메뉴상품 가격 * 메뉴상품 재고 수)의 합보다 클 경우 실패`() {
             val menuGroup = MenuGroupSpec.of()
-            val product = ProductSpec.of(BigDecimal.valueOf(9000))
+            val product = FakeProductRepository.save(ProductSpec.of(BigDecimal.valueOf(9000)))
             val menuProduct = MenuProductSpec.of(product, 2)
 
             val request = Menu()
@@ -215,12 +196,6 @@ class MenuServiceMockTest {
             `when`(menuGroupRepository.findById(menuGroup.id))
                 .thenReturn(Optional.of(menuGroup))
 
-            `when`(productRepository.findAllByIdIn(listOf(product.id)))
-                .thenReturn(listOf(product))
-
-            `when`(productRepository.findById(product.id))
-                .thenReturn(Optional.of(product))
-
             //when & then
             Assertions.assertThatExceptionOfType(IllegalArgumentException::class.java)
                 .isThrownBy { menuService.create(request) }
@@ -229,7 +204,7 @@ class MenuServiceMockTest {
         @Test
         fun `메뉴 생성 요청 - 메뉴상품의 재고량이 0보다 작을 경우 실패`() {
             val menuGroup = MenuGroupSpec.of()
-            val product = ProductSpec.of(BigDecimal.valueOf(9000))
+            val product = FakeProductRepository.save(ProductSpec.of(BigDecimal.valueOf(9000)))
             val menuProduct = MenuProductSpec.of(product, -7)
 
             val request = Menu()
@@ -241,9 +216,6 @@ class MenuServiceMockTest {
 
             `when`(menuGroupRepository.findById(menuGroup.id))
                 .thenReturn(Optional.of(menuGroup))
-
-            `when`(productRepository.findAllByIdIn(listOf(product.id)))
-                .thenReturn(listOf(product))
 
             //when & then
             Assertions.assertThatExceptionOfType(IllegalArgumentException::class.java)
@@ -265,9 +237,6 @@ class MenuServiceMockTest {
 
             `when`(menuGroupRepository.findById(menuGroup.id))
                 .thenReturn(Optional.of(menuGroup))
-
-            `when`(productRepository.findAllByIdIn(listOf(product.id)))
-                .thenReturn(emptyList())
 
             //when & then
             Assertions.assertThatExceptionOfType(IllegalArgumentException::class.java)
@@ -342,12 +311,9 @@ class MenuServiceMockTest {
     fun `상품의 가격이 변경될 경우 - 메뉴 가격이 (메뉴상품 가격 * 메뉴상품 재고 수)의 합보다 큰 메뉴는 전시 상태 종료됨`() {
         val requestPrice = BigDecimal.valueOf(5000)
 
-        val product = ProductSpec.of(requestPrice)
+        val product = FakeProductRepository.save(ProductSpec.of(requestPrice))
         val menuProduct = MenuProductSpec.of(product, 2)
         val menu = FakeMenuRepository.save(MenuSpec.of(listOf(menuProduct), BigDecimal.valueOf(15000), true))
-
-        `when`(productRepository.findById(product.id))
-            .thenReturn(Optional.of(product))
 
         //when
         val request = Product()

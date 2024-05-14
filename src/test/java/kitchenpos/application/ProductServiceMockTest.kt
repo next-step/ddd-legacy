@@ -19,7 +19,7 @@ import java.util.*
 class ProductServiceMockTest {
 
     @Mock
-    private lateinit var productRepository: ProductRepository
+    private lateinit var productRepository: JpaProductRepository
 
     @Mock
     private lateinit var menuRepository: JpaMenuRepository
