@@ -38,9 +38,7 @@ class ProductServiceTest {
 
     @Test
     void 상품을_등록할_수_있다() {
-        Product product = new Product();
-        product.setPrice(BigDecimal.valueOf(20_000L));
-        product.setName("후라이드");
+        Product product = createProductRequest(20_000L);
         given(purgomalumClient.containsProfanity(any())).willReturn(false);
 
         Product response = new Product();
@@ -55,12 +53,24 @@ class ProductServiceTest {
 
     @Test
     void 상품가격이_올바르지않으면_예외가_발생한다() {
-        Product product = new Product();
-        product.setPrice(BigDecimal.valueOf(-10_000L));
-        product.setName("후라이드");
+        Product product = createProductRequest(-10_000L);
 
-        // given(purgomalumClient.containsProfanity(any())).willReturn(false);
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> productService.create(product));
+    }
+
+    private static Product createProductRequest() {
+        return createProductRequest(20_000L);
+    }
+
+    private static Product createProductRequest(final long price) {
+        return createProductRequest("후라이드", price);
+    }
+
+    private static Product createProductRequest(final String name, final long price) {
+        Product product = new Product();
+        product.setPrice(BigDecimal.valueOf(price));
+        product.setName(name);
+        return product;
     }
 }
