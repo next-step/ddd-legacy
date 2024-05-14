@@ -7,6 +7,8 @@ import static org.mockito.BDDMockito.given;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import kitchenpos.InMemoryMenuRepository;
+import kitchenpos.InMemoryProductRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -20,10 +22,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
-    @Mock
     private ProductRepository productRepository;
 
-    @Mock
     private MenuRepository menuRepository;
 
     @Mock
@@ -33,20 +33,15 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
+        productRepository = new InMemoryProductRepository();
+        menuRepository = new InMemoryMenuRepository();
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
     @Test
     void 상품을_등록할_수_있다() {
-        Product product = createProductRequest(20_000L);
+        Product product = createProductRequest("후라이드", 20_000L);
         given(purgomalumClient.containsProfanity(any())).willReturn(false);
-
-        Product response = new Product();
-        response.setId(UUID.randomUUID());
-        response.setPrice(BigDecimal.valueOf(20_000L));
-        response.setName("후라이드");
-        given(productRepository.save(any())).willReturn(response);
-
         Product actual = productService.create(product);
         assertThat(actual.getId()).isNotNull();
     }
@@ -54,7 +49,6 @@ class ProductServiceTest {
     @Test
     void 상품가격이_올바르지않으면_예외가_발생한다() {
         Product product = createProductRequest(-10_000L);
-
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> productService.create(product));
     }
@@ -69,6 +63,14 @@ class ProductServiceTest {
 
     private static Product createProductRequest(final String name, final long price) {
         Product product = new Product();
+        product.setPrice(BigDecimal.valueOf(price));
+        product.setName(name);
+        return product;
+    }
+
+    private static Product createProduct(final String name, final long price) {
+        Product product = new Product();
+        product.setId(UUID.randomUUID());
         product.setPrice(BigDecimal.valueOf(price));
         product.setName(name);
         return product;
