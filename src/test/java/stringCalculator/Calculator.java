@@ -7,14 +7,14 @@ import java.util.*;
 
 public class Calculator {
 
-    final String word;
-    final String[] delimiters;
-    final CustomDelimiterCondition customCondition;
+    private final String word;
+    private final String[] delimiters;
+    private final CustomDelimiterCondition customCondition;
 
     public Calculator(String word, String[] delimiters, CustomDelimiterCondition customCondition){
-       this.word = word;
-       this.delimiters = delimiters;
-       this.customCondition = customCondition;
+        this.word = word;
+        this.delimiters = delimiters;
+        this.customCondition = customCondition;
     }
 
     protected String findCustomDelimiter(String word, String startChar, String endChar) {
