@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static kitchenpos.fixture.MenuFixture.createMenu;
@@ -153,9 +154,10 @@ class ProductServiceTest {
             assertThat(menu.isDisplayed()).isTrue();
 
             productService.changePrice(product.getId(), product);
-            menu = menuRepository.findById(menu.getId()).get();
+            Optional<Menu> findMenu = menuRepository.findById(menu.getId());
 
-            assertThat(menu.isDisplayed()).isFalse();
+            assertThat(findMenu).isPresent();
+            assertThat(findMenu.get().isDisplayed()).isFalse();
         }
     }
 
