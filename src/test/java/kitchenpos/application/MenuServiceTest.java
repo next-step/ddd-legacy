@@ -27,6 +27,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import fixture.MenuFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -67,7 +68,7 @@ class MenuServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		VALID_MENU = ServiceTestFixture.createValidMenu();
+		VALID_MENU = MenuFixture.createValidMenu();
 		VALID_MENU_ID = VALID_MENU.getId();
 		VALID_MENU_GROUP = VALID_MENU.getMenuGroup();
 		VALID_MENU_PRODUCT = VALID_MENU.getMenuProducts().get(0);
@@ -246,7 +247,7 @@ class MenuServiceTest {
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.changePrice(VALID_MENU_ID, ServiceTestFixture.createValidMenuWithPrice(price));
+					menuService.changePrice(VALID_MENU_ID, MenuFixture.createValidMenuWithPrice(price));
 				});
 		}
 
@@ -262,7 +263,7 @@ class MenuServiceTest {
 				.isThrownBy(() -> {
 					// when
 					menuService.changePrice(nonexistentMenuId,
-						ServiceTestFixture.createValidMenuWithPrice(new BigDecimal("10.00")));
+						MenuFixture.createValidMenuWithPrice(new BigDecimal("10.00")));
 				});
 		}
 
@@ -277,7 +278,7 @@ class MenuServiceTest {
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.changePrice(VALID_MENU_ID, ServiceTestFixture.createValidMenuWithPrice(price));
+					menuService.changePrice(VALID_MENU_ID, MenuFixture.createValidMenuWithPrice(price));
 				});
 		}
 
@@ -286,7 +287,7 @@ class MenuServiceTest {
 		@DisplayName("메뉴 가격 변경 시 변경 가격이 상품 가격 총합보다 작거나 같을 때 메뉴 가격을 변경할 수 있다")
 		void changePriceWithValidPrice(BigDecimal price) {
 			// given
-			Menu requestMenu = ServiceTestFixture.createValidMenuWithPrice(price);
+			Menu requestMenu = MenuFixture.createValidMenuWithPrice(price);
 
 			when(menuRepository.findById(VALID_MENU_ID)).thenReturn(Optional.of(VALID_MENU));
 			lenient().when(menuRepository.save(requestMenu)).thenAnswer(invocation -> invocation.getArgument(0));

@@ -1,6 +1,5 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.ServiceTestFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -19,6 +18,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import fixture.MenuFixture;
+import fixture.ProductFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
@@ -43,7 +44,7 @@ class ProductServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		VALID_PRODUCT = createValidProduct();
+		VALID_PRODUCT = ProductFixture.createValidProduct();
 	}
 
 	@Nested
@@ -185,7 +186,7 @@ class ProductServiceTest {
 		void changePriceMenuPriceHigher() {
 			// given
 			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(VALID_PRODUCT));
-			Menu menu = createValidMenuWithPrice(BigDecimal.valueOf(20));
+			Menu menu = MenuFixture.createValidMenuWithPrice(BigDecimal.valueOf(20));
 			when(menuRepository.findAllByProductId(any(UUID.class))).thenReturn(Collections.singletonList(menu));
 
 			// when
@@ -200,7 +201,7 @@ class ProductServiceTest {
 		void changePriceMenuPriceEqual() {
 			// given
 			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(VALID_PRODUCT));
-			Menu menu = createValidMenuWithPrice(BigDecimal.TEN);
+			Menu menu = MenuFixture.createValidMenuWithPrice(BigDecimal.TEN);
 			when(menuRepository.findAllByProductId(any(UUID.class))).thenReturn(Collections.singletonList(menu));
 
 			// when

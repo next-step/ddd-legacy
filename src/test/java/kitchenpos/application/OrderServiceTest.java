@@ -27,6 +27,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import fixture.MenuFixture;
+import fixture.OrderFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
@@ -63,8 +65,8 @@ class OrderServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		VALID_MENU = ServiceTestFixture.createValidMenu();
-		VALID_ORDER = ServiceTestFixture.createValidOrder(VALID_MENU);
+		VALID_MENU = MenuFixture.createValidMenu();
+		VALID_ORDER = OrderFixture.createValidOrder(VALID_MENU);
 		VALID_ORDER_TABLE = VALID_ORDER.getOrderTable();
 
 		lenient().when(menuRepository.findById(VALID_MENU.getId())).thenReturn(Optional.of(VALID_MENU));
