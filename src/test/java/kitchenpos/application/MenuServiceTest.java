@@ -102,10 +102,6 @@ class MenuServiceTest {
         menu.setPrice(BigDecimal.valueOf(40000));
         menu.setMenuProducts(Arrays.asList(menuProduct));
 
-
-        given(menuRepository.findById(any()))
-                .willReturn(Optional.of(menu));
-
         //when
         Menu response = menuService.changePrice(request.getId(), request);
 
