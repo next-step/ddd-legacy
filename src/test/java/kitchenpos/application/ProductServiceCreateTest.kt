@@ -5,39 +5,28 @@ import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
-import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.slot
 import java.math.BigDecimal
 import java.util.UUID
-import kitchenpos.domain.MenuRepository
 import kitchenpos.domain.Product
-import kitchenpos.domain.ProductRepository
 import kitchenpos.infra.PurgomalumClient
+import kitchenpos.testsupport.FakeMenuRepository
+import kitchenpos.testsupport.FakeProductRepository
 
 class ProductServiceCreateTest : ShouldSpec({
-    val productRepository = mockk<ProductRepository>()
-    val menuRepository = mockk<MenuRepository>()
-    val purgomalumClient = mockk<PurgomalumClient>()
-    val service = ProductService(
-        productRepository,
-        menuRepository,
-        purgomalumClient
-    )
-
-    val productSlot = slot<Product>()
+    lateinit var purgomalumClient: PurgomalumClient
+    lateinit var service: ProductService
 
     beforeTest {
-        clearMocks(
-            productRepository,
-            menuRepository,
+        purgomalumClient = mockk {
+            every { containsProfanity(any()) } returns false
+        }
+        service = ProductService(
+            FakeProductRepository(),
+            FakeMenuRepository(),
             purgomalumClient
         )
-
-        every { productRepository.save(capture(productSlot)) } answers { productSlot.captured }
-        every { purgomalumClient.containsProfanity(any()) } returns false
-//        menuRepository
     }
 
     context("상품 생성") {
@@ -112,9 +101,9 @@ class ProductServiceCreateTest : ShouldSpec({
             price: BigDecimal? = 1000.toBigDecimal()
         ): Product {
             return Product().apply {
-                setId(id)
-                setName(name)
-                setPrice(price)
+                this.id = id
+                this.name = name
+                this.price = price
             }
         }
     }
