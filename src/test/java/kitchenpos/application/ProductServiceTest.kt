@@ -1,7 +1,9 @@
 package kitchenpos.application
 
+import kitchenpos.domain.MenuRepository
 import kitchenpos.domain.Product
 import kitchenpos.infra.PurgomalumClient
+import kitchenpos.utils.generateUUIDFrom
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -17,6 +19,9 @@ import java.math.BigDecimal
 class ProductServiceTest {
     @MockBean
     private lateinit var purgomalumCloneable: PurgomalumClient
+
+    @Autowired
+    private lateinit var menuRepository: MenuRepository
 
     @Autowired
     private lateinit var sut: ProductService
@@ -94,5 +99,53 @@ class ProductServiceTest {
 
         // then
         assertThat(createdProduct.id).isNotNull()
+    }
+
+    @DisplayName("변경하려는 가격은 음수일 수 없다.")
+    @Test
+    fun change_price_test1() {
+        // given
+        val productId = generateUUIDFrom(uuidWithoutDash = "3b52824434f7406bbb7e690912f66b10")
+        val request = Product()
+        request.price = BigDecimal.valueOf(-1000)
+
+        // when
+        // then
+        assertThrows<IllegalArgumentException> { sut.changePrice(productId, request) }
+    }
+
+    @DisplayName("등록된 상품의 가격을 수정할 수 있다.")
+    @Test
+    fun change_price_test2() {
+        // given
+        val productId = generateUUIDFrom(uuidWithoutDash = "3b52824434f7406bbb7e690912f66b10")
+        val targetPrice = BigDecimal.valueOf(17_000)
+        val request = Product()
+        request.price = targetPrice
+
+        // when
+        val changedProduct = sut.changePrice(productId, request)
+
+        // then
+        assertThat(changedProduct.price).isEqualTo(targetPrice)
+    }
+
+    @DisplayName("해당 상품으로 구성된 메뉴의 가격이 수정된 상품의 가격 총합보다 크면 메뉴를 비노출한다.")
+    @Test
+    fun change_price_test3() {
+        // given
+        val productId = generateUUIDFrom(uuidWithoutDash = "3b52824434f7406bbb7e690912f66b10")
+        val targetPrice = BigDecimal.valueOf(13_000)
+        val request = Product()
+        request.price = targetPrice
+
+        // when
+        val changedProduct = sut.changePrice(productId, request)
+
+        // then
+        val menu =
+            menuRepository.findAllByProductId(productId)
+                .first { menu -> menu.price > changedProduct.price }
+        assertThat(menu.isDisplayed).isFalse()
     }
 }
