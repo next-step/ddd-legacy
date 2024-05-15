@@ -70,13 +70,13 @@ class OrderServiceTest {
             assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
         }
 
-        @DisplayName("매장 식사 주문은 주문 테이블 정보가 없으면 주문 생성이 불가능하다")
+        @DisplayName("매장식사 주문은 주문 테이블 정보가 없으면 주문 생성이 불가능하다")
         @Test
-        void createEatInOrderFailWhenOrderTableTest() {
+        void createEatInOrderFailWhenOrderTableIsEmptyTest() {
 
             Order order = new OrderBuilder()
                     .withOrderType(OrderType.EAT_IN)
-                    .withOrderTable(new OrderTableBuilder().anOrderTable().build())
+                    .withOrderTable(new OrderTableBuilder().emptyTable().build())
                     .build();
 
             assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
