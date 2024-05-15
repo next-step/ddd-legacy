@@ -13,6 +13,7 @@ import kitchenpos.domain.Product
 import kitchenpos.infra.PurgomalumClient
 import kitchenpos.testsupport.FakeMenuRepository
 import kitchenpos.testsupport.FakeProductRepository
+import kitchenpos.testsupport.ProductFixtures.createProduct
 
 class ProductServiceCreateTest : ShouldSpec({
     lateinit var purgomalumClient: PurgomalumClient
@@ -93,18 +94,4 @@ class ProductServiceCreateTest : ShouldSpec({
             exception.shouldBeTypeOf<IllegalArgumentException>()
         }
     }
-}) {
-    companion object {
-        private fun createProduct(
-            id: UUID? = UUID.randomUUID(),
-            name: String? = "test-product-name",
-            price: BigDecimal? = 1000.toBigDecimal()
-        ): Product {
-            return Product().apply {
-                this.id = id
-                this.name = name
-                this.price = price
-            }
-        }
-    }
-}
+})
