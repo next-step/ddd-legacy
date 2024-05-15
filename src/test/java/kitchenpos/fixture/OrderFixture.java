@@ -35,6 +35,21 @@ public class OrderFixture {
         return order;
     }
 
+    public static Order createOrder(UUID orderTableId,
+                                    List<OrderLineItem> orderLineItems,
+                                    OrderType type,
+                                    OrderStatus status,
+                                    String deliveryAddress) {
+        Order order = new Order();
+        order.setOrderTableId(orderTableId);
+        order.setOrderLineItems(orderLineItems);
+        order.setType(type);
+        order.setStatus(status);
+        order.setDeliveryAddress(deliveryAddress);
+
+        return order;
+    }
+
     public static Order createOrderWithId(OrderTable orderTable,
                                           List<OrderLineItem> orderLineItems,
                                           OrderType type,

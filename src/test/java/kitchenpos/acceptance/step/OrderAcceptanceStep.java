@@ -3,9 +3,12 @@ package kitchenpos.acceptance.step;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import kitchenpos.domain.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class OrderAcceptanceStep {
 
@@ -22,6 +25,8 @@ public class OrderAcceptanceStep {
                     .extract()
                     .response();
         // @formatter:on
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         return response;
     }
@@ -40,6 +45,8 @@ public class OrderAcceptanceStep {
                     .response();
         // @formatter:on
 
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
         return response;
     }
 
@@ -56,6 +63,8 @@ public class OrderAcceptanceStep {
                     .extract()
                     .response();
         // @formatter:on
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         return response;
     }
@@ -74,6 +83,8 @@ public class OrderAcceptanceStep {
                     .response();
         // @formatter:on
 
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
         return response;
     }
 
@@ -90,6 +101,8 @@ public class OrderAcceptanceStep {
                     .extract()
                     .response();
         // @formatter:on
+
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         return response;
     }
@@ -108,6 +121,8 @@ public class OrderAcceptanceStep {
                     .response();
         // @formatter:on
 
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+
         return response;
     }
 
@@ -124,6 +139,8 @@ public class OrderAcceptanceStep {
                     .response();
         // @formatter:on
 
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        
         return response;
     }
 }
