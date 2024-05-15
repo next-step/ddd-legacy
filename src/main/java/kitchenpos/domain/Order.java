@@ -130,11 +130,13 @@ public class Order {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Order order)) return false;
-        return Objects.equals(id, order.id) && type == order.type && status == order.status && Objects.equals(orderDateTime, order.orderDateTime) && Objects.equals(orderLineItems, order.orderLineItems) && Objects.equals(deliveryAddress, order.deliveryAddress) && Objects.equals(orderTable, order.orderTable) && Objects.equals(orderTableId, order.orderTableId);
+        return Objects.equals(id, order.id)
+               && Objects.equals(orderLineItems, order.orderLineItems)
+               && Objects.equals(orderTableId, order.orderTableId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, status, orderDateTime, orderLineItems, deliveryAddress, orderTable, orderTableId);
+        return Objects.hash(id, orderLineItems, orderTableId);
     }
 }
