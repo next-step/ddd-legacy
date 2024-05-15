@@ -19,7 +19,7 @@ class ProductAcceptanceTest(
                                 """
                                 {
                                     "name": "후라이드 치킨",
-                                    "price": 16000,
+                                    "price": 16000
                                 }
                                 """.trimIndent(),
                             )

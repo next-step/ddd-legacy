@@ -15,6 +15,7 @@ object MenuFixtures {
             this.menuGroup = makeMenuGroupOne()
             this.isDisplayed = true
             this.menuProducts = listOf(makeMenuProductOne())
+            this.menuGroupId = this.menuGroup.id
         }
     }
 }

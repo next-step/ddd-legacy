@@ -9,6 +9,7 @@ object MenuProductFixtures {
             this.seq = 1
             this.product = makeProductOne()
             this.quantity = 1L
+            this.productId = this.product.id
         }
     }
 }

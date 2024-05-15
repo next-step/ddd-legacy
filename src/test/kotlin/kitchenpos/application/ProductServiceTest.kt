@@ -9,7 +9,7 @@ import io.mockk.mockk
 import kitchenpos.domain.MenuRepository
 import kitchenpos.domain.Product
 import kitchenpos.domain.ProductRepository
-import kitchenpos.infra.PurgomalumClient
+import kitchenpos.infra.DefaultPurgomalumClient
 import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
 import java.util.*
@@ -19,8 +19,8 @@ class ProductServiceTest : DescribeSpec() {
         describe("ProductService 클래스의") {
             val productRepository = mockk<ProductRepository>()
             val menuRepository = mockk<MenuRepository>()
-            val purgomalumClient = mockk<PurgomalumClient>()
-            val productService = ProductService(productRepository, menuRepository, purgomalumClient)
+            val defaultPurgomalumClient = mockk<DefaultPurgomalumClient>()
+            val productService = ProductService(productRepository, menuRepository, defaultPurgomalumClient)
 
             describe("create 메서드는") {
                 context("정상적인 상품 요청이 주어졌을 때") {
@@ -32,7 +32,7 @@ class ProductServiceTest : DescribeSpec() {
                             }
 
                         every { productRepository.save(any()) } returns product
-                        every { purgomalumClient.containsProfanity(any()) } returns false
+                        every { defaultPurgomalumClient.containsProfanity(any()) } returns false
 
                         val result = productService.create(product)
 
@@ -49,7 +49,7 @@ class ProductServiceTest : DescribeSpec() {
                                 this.price = BigDecimal(1000)
                             }
 
-                        every { purgomalumClient.containsProfanity(any()) } returns true
+                        every { defaultPurgomalumClient.containsProfanity(any()) } returns true
 
                         assertThrows<IllegalArgumentException> {
                             productService.create(product)
