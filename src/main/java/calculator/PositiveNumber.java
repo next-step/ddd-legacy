@@ -24,7 +24,7 @@ public class PositiveNumber {
     }
 
     private boolean isNumeric(String inputNumber){
-        return inputNumber.matches("NUMERIC_PATTERN");
+        return inputNumber.matches(NUMERIC_PATTERN);
     }
 
     private boolean isPositive(String inputNumber){
