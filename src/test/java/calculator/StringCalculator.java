@@ -1,17 +1,8 @@
 package calculator;
 
-import java.util.regex.Pattern;
-import java.util.stream.Stream;
+import java.util.Arrays;
 
-public class StringCalculator {
-
-    private static final String ANY_WORD_WITHOUT_NUMBER_AND_SPACE_PATTERN = "[^0-9\\s]";
-    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(
-        String.format("^//%s\n(.*)", ANY_WORD_WITHOUT_NUMBER_AND_SPACE_PATTERN)
-    );
-
-    private static final String NUMBER_PATTERN = "[1-9][d]*";
-    private static final String DEFAULT_DELIMITER = ",|:";
+class StringCalculator {
 
     StringCalculator() {
     }
@@ -21,40 +12,10 @@ public class StringCalculator {
             return 0;
         }
 
-        if (input.matches(NUMBER_PATTERN)) {
-            return Integer.parseInt(input);
-        }
-
-        final var matcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
-
-        String delimiter;
-        String expression;
-
-        if (matcher.matches()) {
-            delimiter = matcher.group(0)
-                .substring(2, 3);
-            expression = matcher.group(1);
-        } else {
-            delimiter = DEFAULT_DELIMITER;
-            expression = input;
-        }
-
-        final var expressionPattern = String.format(
-            "^%s[(%s)%s]*$",
-            NUMBER_PATTERN,
-            delimiter,
-            NUMBER_PATTERN
-        );
-
-        if (!expression.matches(expressionPattern)) {
-            throw new IllegalArgumentException("입력을 해석할 수 없습니다.");
-        }
-
-        final var numbers = Stream.of(expression.split(delimiter))
-            .map(Integer::parseInt)
-            .toList();
+        final var numbers = StringExpressionTokenizer.tokenize(input);
 
         return numbers.stream()
+            .mapToInt(Integer::parseInt)
             .reduce(Math::addExact)
             .orElse(0);
     }
