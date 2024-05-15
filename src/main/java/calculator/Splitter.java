@@ -12,6 +12,9 @@ public class Splitter {
 	private static final int TARGET_GROUP = 2;
 	private static final String REGEX_JOIN_DELIMITER = "|";
 
+	private Splitter() {
+	}
+
 	public static String[] splitText(String text) {
 		List<String> delimiters = new ArrayList<>(DEFAULT_DELIMITERS);
 		Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
