@@ -31,7 +31,7 @@ internal class MenuGroupServiceTest {
         @NullAndEmptySource
         fun test1(name: String?) {
             // given
-            val nullOrEmpty_메뉴_그룹 = createMenuGroup(name)
+            val nullOrEmpty_메뉴_그룹 = createMenuGroupRequest(name = name)
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -43,7 +43,7 @@ internal class MenuGroupServiceTest {
         @Test
         fun test2() {
             // given
-            val 정상_메뉴_그룹 = createMenuGroup("정상 메뉴 그룹")
+            val 정상_메뉴_그룹 = createMenuGroup(name = "정상 메뉴 그룹")
 
             every { menuGroupRepository.save(any()) } returns 정상_메뉴_그룹
 
@@ -55,8 +55,16 @@ internal class MenuGroupServiceTest {
             result.name shouldBe 정상_메뉴_그룹.name
         }
 
-        private fun createMenuGroup(name: String?) = MenuGroup().apply {
-            this.id = UUID.randomUUID()
+        private fun createMenuGroupRequest(
+            id: UUID = UUID.randomUUID(),
+            name: String? = "메뉴 그룹 이름",
+        ) = createMenuGroup(id, name)
+
+        private fun createMenuGroup(
+            id: UUID = UUID.randomUUID(),
+            name: String?,
+        ) = MenuGroup().apply {
+            this.id = id
             this.name = name
         }
     }
