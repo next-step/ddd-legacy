@@ -17,6 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import java.math.BigDecimal
 import java.util.*
+import kotlin.collections.List
 
 @ExtendWith(MockKExtension::class)
 internal class ProductServiceTest {
@@ -39,8 +40,7 @@ internal class ProductServiceTest {
         @Test
         fun test1() {
             // given
-            val 가격_정보가_없는_요청 = getProduct(
-                name = "가격 정보가 없는 상품",
+            val 가격_정보가_없는_요청 = createProductRequest(
                 price = null,
             )
 
@@ -54,7 +54,7 @@ internal class ProductServiceTest {
         @Test
         fun test2() {
             // given
-            val 이름_정보가_없는_요청 = getProduct(
+            val 이름_정보가_없는_요청 = createProductRequest(
                 name = null,
             )
 
@@ -68,7 +68,7 @@ internal class ProductServiceTest {
         @Test
         fun test3() {
             // given
-            val 욕설이_포함된_상품 = getProduct(
+            val 욕설이_포함된_상품 = createProductRequest(
                 name = "욕설이 포함된 상품",
             )
 
@@ -84,8 +84,7 @@ internal class ProductServiceTest {
         @Test
         fun test4() {
             // given
-            val 가격이_음수인_요청 = getProduct(
-                name = "가격이 음수인 상품",
+            val 가격이_음수인_요청 = createProductRequest(
                 price = BigDecimal.valueOf(-1),
             )
 
@@ -100,13 +99,16 @@ internal class ProductServiceTest {
         @ValueSource(strings = ["", " ", "테스트 상품"])
         fun test5(name: String) {
             // given
-            val 정상_요청 = getProduct(
-                name = name,
-                price = BigDecimal.valueOf(1000L),
+            val 정상_요청 = createProductRequest()
+
+            val 정상_저장_응답 = createProduct(
+                productId = 정상_요청.id,
+                name = 정상_요청.name,
+                price = 정상_요청.price,
             )
 
             every { purgomalumClient.containsProfanity(any()) } returns false
-            every { productRepository.save(any()) } returns 정상_요청
+            every { productRepository.save(any()) } returns 정상_저장_응답
 
             // when
             val result = productService.create(정상_요청)
@@ -127,9 +129,8 @@ internal class ProductServiceTest {
         fun test1() {
             // given
             val productId = UUID.randomUUID()
-            val 가격_정보가_없는_요청 = getProduct(
-                productId = productId,
-                name = "가격 정보가 없는 상품",
+            val 가격_정보가_없는_요청 = createProductRequest(
+                price = null,
             )
 
             // when & then
@@ -143,9 +144,7 @@ internal class ProductServiceTest {
         fun test2() {
             // given
             val productId = UUID.randomUUID()
-            val 가격이_음수인_요청 = getProduct(
-                productId = productId,
-                name = "가격이 음수인 상품",
+            val 가격이_음수인_요청 = createProduct(
                 price = BigDecimal.valueOf(-1L)
             )
 
@@ -160,10 +159,7 @@ internal class ProductServiceTest {
         fun test3() {
             // given
             val productId = UUID.randomUUID()
-            val 존재_하지_않는_상품_요청 = getProduct(
-                productId = UUID.randomUUID(),
-                name = "존재하지 않는 상품",
-            )
+            val 존재_하지_않는_상품_요청 = createProductRequest()
 
             every { productRepository.findById(any()) } throws NoSuchElementException()
 
@@ -178,37 +174,28 @@ internal class ProductServiceTest {
         fun test4() {
             // given
             val productId = UUID.randomUUID()
-            val 메뉴에_속해_있는_상품 = getProduct(
+            val 메뉴에_속해_있는_상품_요청 = createProductRequest()
+
+            val 찾아온_상품 = createProduct(
                 productId = productId,
-                name = "메뉴에 속해 있는 상품",
-                price = BigDecimal.valueOf(1000L)
+                name = 메뉴에_속해_있는_상품_요청.name,
+                price = 메뉴에_속해_있는_상품_요청.price
             )
 
-            val 찾아온_상품 = getProduct(
-                productId = 메뉴에_속해_있는_상품.id,
-                name = 메뉴에_속해_있는_상품.name,
-                price = 메뉴에_속해_있는_상품.price
+            val menu = createMenu(
+                price = 메뉴에_속해_있는_상품_요청.price + BigDecimal.ONE,
+                menuProducts = listOf(createMenuProduct(product = 찾아온_상품, quantity = 1L)),
+                isDisplayed = true,
             )
-
-            val menu = Menu().apply {
-                this.price = 메뉴에_속해_있는_상품.price + BigDecimal.ONE
-                this.menuProducts = listOf(MenuProduct().apply {
-                    this.seq = 1L
-                    this.productId = productId
-                    this.product = 찾아온_상품
-                    this.quantity = 1
-                })
-                this.isDisplayed = true
-            }
 
             every { productRepository.findById(any()) } returns Optional.of(찾아온_상품)
             every { menuRepository.findAllByProductId(productId) } returns listOf(menu)
 
             // when
-            val result = productService.changePrice(productId, 메뉴에_속해_있는_상품)
+            val result = productService.changePrice(productId, 메뉴에_속해_있는_상품_요청)
 
             // then
-            result.price shouldBe 메뉴에_속해_있는_상품.price
+            result.price shouldBe 메뉴에_속해_있는_상품_요청.price
             menu.isDisplayed shouldBe false
         }
 
@@ -217,10 +204,12 @@ internal class ProductServiceTest {
         fun test5() {
             // given
             val productId = UUID.randomUUID()
-            val request = Product().apply {
-                this.name = "테스트 상품"
-                this.price = BigDecimal.valueOf(1000L)
-            }
+            val request = createProductRequest(
+                productId = productId,
+                name = "요청 상품",
+                price =  BigDecimal.valueOf(1000L)
+            )
+
 
             val foundProduct = Product().apply {
                 this.id = productId
@@ -228,16 +217,11 @@ internal class ProductServiceTest {
                 this.price = request.price
             }
 
-            val menu = Menu().apply {
-                this.price = request.price - BigDecimal.ONE
-                this.menuProducts = listOf(MenuProduct().apply {
-                    this.seq = 1L
-                    this.productId = productId
-                    this.product = foundProduct
-                    this.quantity = 1
-                })
-                this.isDisplayed = true
-            }
+            val menu = createMenu(
+                price = request.price - BigDecimal.ONE,
+                menuProducts = listOf(createMenuProduct(product = foundProduct, quantity = 1)),
+                isDisplayed = true
+            )
 
             every { productRepository.findById(any()) } returns Optional.of(foundProduct)
             every { menuRepository.findAllByProductId(productId) } returns listOf(menu)
@@ -251,7 +235,17 @@ internal class ProductServiceTest {
         }
     }
 
-    private fun getProduct(
+    private fun createProductRequest(
+        productId: UUID = UUID.randomUUID(),
+        name: String? = "상품 이름",
+        price: BigDecimal? = BigDecimal.valueOf(1000L),
+    ) = createProduct(
+        productId = productId,
+        name = name,
+        price = price,
+    )
+
+    private fun createProduct(
         productId: UUID = UUID.randomUUID(),
         name: String? = "상품 이름",
         price: BigDecimal? = BigDecimal.valueOf(1000L),
@@ -259,5 +253,26 @@ internal class ProductServiceTest {
         this.id = productId
         this.name = name
         this.price = price
+    }
+
+    private fun createMenuProduct(
+        seq: Long = 1L,
+        product: Product = Product(),
+        quantity: Long = 1,
+    ) = MenuProduct().apply {
+        this.seq = seq
+        this.productId = product.id
+        this.product = product
+        this.quantity = quantity
+    }
+
+    private fun createMenu(
+        price: BigDecimal? = BigDecimal.valueOf(1000L),
+        menuProducts: List<MenuProduct>,
+        isDisplayed: Boolean = true,
+    ) = Menu().apply {
+        this.price = price
+        this.menuProducts = menuProducts
+        this.isDisplayed = isDisplayed
     }
 }
