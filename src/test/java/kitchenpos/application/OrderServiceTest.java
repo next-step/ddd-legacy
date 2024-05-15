@@ -464,6 +464,9 @@ class OrderServiceTest {
 
     @Test
     void findAll() {
+        when(orderRepository.findAll()).thenReturn(List.of(new Order()));
+
+        assertThat(orderService.findAll()).isNotEmpty();
     }
 
     static Stream<Arguments> completableOrder() {
