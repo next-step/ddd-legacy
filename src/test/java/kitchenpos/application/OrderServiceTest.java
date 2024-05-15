@@ -287,9 +287,29 @@ class OrderServiceTest {
         assertThat(accepted.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
     }
 
+    @Test
+    @DisplayName("주문이 제공되기 위해서는 주문이 수락상태여야 한다")
+    void requiresAccept() {
+        final var order = new Order();
+        order.setStatus(OrderStatus.WAITING);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.serve(UUID.randomUUID()));
+    }
 
     @Test
+    @DisplayName("정상 제공")
     void serve() {
+        final var order = new Order();
+        order.setStatus(OrderStatus.ACCEPTED);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        Order served = orderService.serve(UUID.randomUUID());
+
+        assertThat(served.getStatus()).isEqualTo(OrderStatus.SERVED);
     }
 
     @Test
