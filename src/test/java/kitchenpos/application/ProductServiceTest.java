@@ -39,9 +39,11 @@ class ProductServiceTest {
 	@InjectMocks
 	private ProductService productService;
 
+	private Product VALID_PRODUCT;
+
 	@BeforeEach
 	void setUp() {
-		ServiceTestFixture.initializeMenuAndProducts();
+		VALID_PRODUCT = createValidProduct();
 	}
 
 	@Nested
@@ -183,7 +185,7 @@ class ProductServiceTest {
 		void changePriceMenuPriceHigher() {
 			// given
 			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(VALID_PRODUCT));
-			Menu menu = createMenuWithPrice(BigDecimal.valueOf(20));
+			Menu menu = createValidMenuWithPrice(BigDecimal.valueOf(20));
 			when(menuRepository.findAllByProductId(any(UUID.class))).thenReturn(Collections.singletonList(menu));
 
 			// when
@@ -198,7 +200,7 @@ class ProductServiceTest {
 		void changePriceMenuPriceEqual() {
 			// given
 			when(productRepository.findById(any(UUID.class))).thenReturn(Optional.of(VALID_PRODUCT));
-			Menu menu = createMenuWithPrice(BigDecimal.TEN);
+			Menu menu = createValidMenuWithPrice(BigDecimal.TEN);
 			when(menuRepository.findAllByProductId(any(UUID.class))).thenReturn(Collections.singletonList(menu));
 
 			// when

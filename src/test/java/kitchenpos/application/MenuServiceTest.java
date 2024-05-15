@@ -1,6 +1,5 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.ServiceTestFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -29,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
@@ -53,9 +53,26 @@ class MenuServiceTest {
 	@InjectMocks
 	private MenuService menuService;
 
+	private UUID VALID_MENU_ID;
+
+	private Menu VALID_MENU;
+
+	private MenuGroup VALID_MENU_GROUP;
+
+	private MenuProduct VALID_MENU_PRODUCT;
+
+	private UUID VALID_PRODUCT_ID;
+
+	private Product VALID_PRODUCT;
+
 	@BeforeEach
 	void setUp() {
-		ServiceTestFixture.initializeMenuAndProducts();
+		VALID_MENU = ServiceTestFixture.createValidMenu();
+		VALID_MENU_ID = VALID_MENU.getId();
+		VALID_MENU_GROUP = VALID_MENU.getMenuGroup();
+		VALID_MENU_PRODUCT = VALID_MENU.getMenuProducts().get(0);
+		VALID_PRODUCT_ID = VALID_MENU.getMenuProducts().get(0).getProductId();
+		VALID_PRODUCT = VALID_MENU.getMenuProducts().get(0).getProduct();
 
 		lenient().when(menuGroupRepository.findById(VALID_MENU_GROUP.getId()))
 			.thenReturn(Optional.of(VALID_MENU_GROUP));
@@ -229,7 +246,7 @@ class MenuServiceTest {
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.changePrice(VALID_MENU_ID, ServiceTestFixture.createMenuWithPrice(price));
+					menuService.changePrice(VALID_MENU_ID, ServiceTestFixture.createValidMenuWithPrice(price));
 				});
 		}
 
@@ -245,7 +262,7 @@ class MenuServiceTest {
 				.isThrownBy(() -> {
 					// when
 					menuService.changePrice(nonexistentMenuId,
-						ServiceTestFixture.createMenuWithPrice(new BigDecimal("10.00")));
+						ServiceTestFixture.createValidMenuWithPrice(new BigDecimal("10.00")));
 				});
 		}
 
@@ -260,7 +277,7 @@ class MenuServiceTest {
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.changePrice(VALID_MENU_ID, ServiceTestFixture.createMenuWithPrice(price));
+					menuService.changePrice(VALID_MENU_ID, ServiceTestFixture.createValidMenuWithPrice(price));
 				});
 		}
 
@@ -269,7 +286,7 @@ class MenuServiceTest {
 		@DisplayName("메뉴 가격 변경 시 변경 가격이 상품 가격 총합보다 작거나 같을 때 메뉴 가격을 변경할 수 있다")
 		void changePriceWithValidPrice(BigDecimal price) {
 			// given
-			Menu requestMenu = ServiceTestFixture.createMenuWithPrice(price);
+			Menu requestMenu = ServiceTestFixture.createValidMenuWithPrice(price);
 
 			when(menuRepository.findById(VALID_MENU_ID)).thenReturn(Optional.of(VALID_MENU));
 			lenient().when(menuRepository.save(requestMenu)).thenAnswer(invocation -> invocation.getArgument(0));

@@ -1,6 +1,5 @@
 package kitchenpos.application;
 
-import static kitchenpos.application.ServiceTestFixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.*;
 import static org.mockito.Mockito.*;
@@ -28,11 +27,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
 import kitchenpos.infra.KitchenridersClient;
@@ -54,14 +55,23 @@ class OrderServiceTest {
 	@InjectMocks
 	private OrderService orderService;
 
+	private Menu VALID_MENU;
+
+	private Order VALID_ORDER;
+
+	private OrderTable VALID_ORDER_TABLE;
+
 	@BeforeEach
 	void setUp() {
-		ServiceTestFixture.initializeMenuAndOrder();
+		VALID_MENU = ServiceTestFixture.createValidMenu();
+		VALID_ORDER = ServiceTestFixture.createValidOrder(VALID_MENU);
+		VALID_ORDER_TABLE = VALID_ORDER.getOrderTable();
 
-		lenient().when(menuRepository.findById(VALID_MENU_ID)).thenReturn(Optional.of(VALID_MENU));
-		lenient().when(menuRepository.findAllByIdIn(List.of(VALID_MENU_ID))).thenReturn(List.of(VALID_MENU));
-		lenient().when(orderTableRepository.findById(VALID_ORDER_TABLE_ID)).thenReturn(Optional.of(VALID_ORDER_TABLE));
-		lenient().when(orderRepository.findById(VALID_ORDER_ID)).thenReturn(Optional.of(VALID_ORDER));
+		lenient().when(menuRepository.findById(VALID_MENU.getId())).thenReturn(Optional.of(VALID_MENU));
+		lenient().when(menuRepository.findAllByIdIn(List.of(VALID_MENU.getId()))).thenReturn(List.of(VALID_MENU));
+		lenient().when(orderTableRepository.findById(VALID_ORDER.getOrderTableId()))
+			.thenReturn(Optional.of(VALID_ORDER_TABLE));
+		lenient().when(orderRepository.findById(VALID_ORDER.getId())).thenReturn(Optional.of(VALID_ORDER));
 	}
 
 	@Nested
@@ -229,7 +239,7 @@ class OrderServiceTest {
 			// then
 			assertThat(result).isNotNull();
 			assertThat(result).isEqualTo(VALID_ORDER);
-			assertThat(result.getOrderTable()).isEqualTo(VALID_ORDER_TABLE);
+			assertThat(result.getOrderTable()).isEqualTo(VALID_ORDER.getOrderTable());
 		}
 
 	}
@@ -561,8 +571,8 @@ class OrderServiceTest {
 			VALID_ORDER.setType(OrderType.EAT_IN);
 			VALID_ORDER.setStatus(OrderStatus.SERVED);
 			when(orderRepository.findById(orderId)).thenReturn(Optional.of(VALID_ORDER));
-			when(orderRepository.existsByOrderTableAndStatusNot(VALID_ORDER_TABLE, OrderStatus.COMPLETED)).thenReturn(
-				true);
+			when(orderRepository.existsByOrderTableAndStatusNot(VALID_ORDER_TABLE, OrderStatus.COMPLETED))
+				.thenReturn(true);
 
 			// when
 			Order completedOrder = orderService.complete(orderId);
