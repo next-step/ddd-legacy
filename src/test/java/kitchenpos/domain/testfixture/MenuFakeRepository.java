@@ -4,30 +4,28 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 public class MenuFakeRepository implements MenuRepository {
 
-    Map<UUID, Menu> instancePocket;
+    InstancePocket<UUID, Menu> instancePocket;
 
     public MenuFakeRepository() {
-        this.instancePocket = new HashMap<>();
+        this.instancePocket = new InstancePocket<>();
     }
 
     public Menu save(Menu menu) {
-        instancePocket.put(menu.getId(), menu);
-        return menu;
+        return instancePocket.save(menu);
     }
 
     public List<Menu> findAllByIdIn(List<UUID> ids) {
-        return instancePocket.values()
-                .stream()
-                .filter(menu -> ids.contains(menu.getId()))
-                .toList();
+        return instancePocket.findAllByIdIn(ids);
     }
 
     public List<Menu> findAllByProductId(UUID id) {
-        return instancePocket.values()
+        return instancePocket.findAll()
                 .stream()
                 .filter(menu -> hasProduct(id, menu))
                 .toList();
@@ -44,12 +42,10 @@ public class MenuFakeRepository implements MenuRepository {
     }
 
     public Optional<Menu> findById(UUID id) {
-        return Optional.ofNullable(instancePocket.get(id));
+        return instancePocket.findById(id);
     }
 
     public List<Menu> findAll() {
-        return instancePocket.values()
-                .stream()
-                .toList();
+        return instancePocket.findAll();
     }
 }
