@@ -1,9 +1,11 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.*;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.FakePurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,9 +20,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 import static kitchenpos.MoneyConstants.*;
+import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.ProductFixture.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -38,6 +40,7 @@ public class ProductServiceTest {
 
     private ProductService productService;
 
+    final private static String FAIL_PREFIX = "[실패] ";
 
     @BeforeEach
     void setUp() {
@@ -109,9 +112,6 @@ public class ProductServiceTest {
     @DisplayName("상품 가격 변경 테스트")
     class ChangePrice {
 
-        final private static String FAIL_PREFIX = "[실패] ";
-        final private static String 메뉴명 = "메뉴명";
-
         @ParameterizedTest
         @ValueSource(longs = {오천원, 빵원})
         @DisplayName("상품 가격은 변경할 수 있다.")
@@ -175,26 +175,6 @@ public class ProductServiceTest {
             productService.changePrice(product.getId(), product);
 
             assertEquals(menu.isDisplayed(), false);
-        }
-
-        private Menu createMenu(Product product) {
-            return createMenu(메뉴명, 오천원, product);
-        }
-
-        private Menu createMenu(final long price, final Product product) {
-            return createMenu(메뉴명, price, product);
-        }
-
-        private static @NotNull Menu createMenu(final String name, final long price, final Product product) {
-            Menu menu = new Menu();
-            menu.setMenuGroupId(UUID.randomUUID());
-            menu.setName(name);
-            menu.setPrice(BigDecimal.valueOf(price));
-            menu.setDisplayed(true);
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menu.setMenuProducts(List.of(menuProduct));
-            return menu;
         }
     }
 
