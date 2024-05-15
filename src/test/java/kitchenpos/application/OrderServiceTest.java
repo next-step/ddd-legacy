@@ -352,7 +352,28 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("배달이 완료되기 위해서는 주문이 배달중이어야 한다")
+    void requiresOrderDelivering() {
+        final var order = new Order();
+        order.setStatus(OrderStatus.SERVED);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("정상 배달 완료")
     void completeDelivery() {
+        final var order = new Order();
+        order.setStatus(OrderStatus.DELIVERING);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        Order completed = orderService.completeDelivery(UUID.randomUUID());
+
+        assertThat(completed.getStatus()).isEqualTo(OrderStatus.DELIVERED);
     }
 
     @Test
