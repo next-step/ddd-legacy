@@ -1,5 +1,6 @@
 package kitchenpos.application
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -111,9 +112,11 @@ internal class ProductServiceTest {
             val result = productService.create(정상_요청)
 
             // then
-            result.id shouldBe 정상_요청.id
-            result.name shouldBe 정상_요청.name
-            result.price shouldBe 정상_요청.price
+            assertSoftly {
+                result.id shouldBe 정상_요청.id
+                result.name shouldBe 정상_요청.name
+                result.price shouldBe 정상_요청.price
+            }
         }
     }
 
@@ -143,7 +146,7 @@ internal class ProductServiceTest {
             val 가격이_음수인_요청 = getProduct(
                 productId = productId,
                 name = "가격이 음수인 상품",
-                price =  BigDecimal.valueOf(-1L)
+                price = BigDecimal.valueOf(-1L)
             )
 
             // when & then

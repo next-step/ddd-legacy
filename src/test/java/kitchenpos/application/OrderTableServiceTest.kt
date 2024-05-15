@@ -1,5 +1,6 @@
 package kitchenpos.application
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -56,10 +57,12 @@ internal class OrderTableServiceTest {
             val result = orderTableService.create(정상_요청)
 
             // then
-            result.id shouldNotBe null
-            result.name shouldBe 정상_요청.name
-            result.numberOfGuests shouldBe 0
-            result.isOccupied shouldBe false
+            assertSoftly {
+                result.id shouldNotBe null
+                result.name shouldBe 정상_요청.name
+                result.numberOfGuests shouldBe 0
+                result.isOccupied shouldBe false
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package kitchenpos.application
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -386,15 +387,17 @@ internal class OrderServiceTest {
             val result = orderService.create(request)
 
             // then
-            result.type shouldBe request.type
-            result.status shouldBe OrderStatus.WAITING
-            result.id shouldNotBe null
-            result.orderDateTime shouldNotBe null
-            result.orderLineItems shouldNotBe null
-            result.orderLineItems[0].menuId shouldBe request.orderLineItems[0].menuId
-            result.orderLineItems[0].quantity shouldBe request.orderLineItems[0].quantity
-            result.orderLineItems[0].price shouldBe request.orderLineItems[0].price
-            result.orderTable.isOccupied shouldBe orderTable.isOccupied
+            assertSoftly {
+                result.type shouldBe request.type
+                result.status shouldBe OrderStatus.WAITING
+                result.id shouldNotBe null
+                result.orderDateTime shouldNotBe null
+                result.orderLineItems shouldNotBe null
+                result.orderLineItems[0].menuId shouldBe request.orderLineItems[0].menuId
+                result.orderLineItems[0].quantity shouldBe request.orderLineItems[0].quantity
+                result.orderLineItems[0].price shouldBe request.orderLineItems[0].price
+                result.orderTable.isOccupied shouldBe orderTable.isOccupied
+            }
         }
 
         @DisplayName("주문 유형이 포장일 때, 정상 요청이라면 주문이 생성된다.")
@@ -429,14 +432,16 @@ internal class OrderServiceTest {
             val result = orderService.create(request)
 
             // then
-            result.type shouldBe request.type
-            result.status shouldBe OrderStatus.WAITING
-            result.id shouldNotBe null
-            result.orderDateTime shouldNotBe null
-            result.orderLineItems shouldNotBe null
-            result.orderLineItems[0].menuId shouldBe request.orderLineItems[0].menuId
-            result.orderLineItems[0].quantity shouldBe request.orderLineItems[0].quantity
-            result.orderLineItems[0].price shouldBe request.orderLineItems[0].price
+            assertSoftly {
+                result.type shouldBe request.type
+                result.status shouldBe OrderStatus.WAITING
+                result.id shouldNotBe null
+                result.orderDateTime shouldNotBe null
+                result.orderLineItems shouldNotBe null
+                result.orderLineItems[0].menuId shouldBe request.orderLineItems[0].menuId
+                result.orderLineItems[0].quantity shouldBe request.orderLineItems[0].quantity
+                result.orderLineItems[0].price shouldBe request.orderLineItems[0].price
+            }
         }
     }
 
@@ -785,9 +790,11 @@ internal class OrderServiceTest {
             val result = orderService.complete(orderId)
 
             // then
-            result.status shouldBe OrderStatus.COMPLETED
-            result.orderTable.isOccupied shouldBe false
-            result.orderTable.numberOfGuests shouldBe 0
+            assertSoftly {
+                result.status shouldBe OrderStatus.COMPLETED
+                result.orderTable.isOccupied shouldBe false
+                result.orderTable.numberOfGuests shouldBe 0
+            }
         }
 
         @DisplayName("주문 유형이 배달 또는 포장이고, 정상 요청이면, 주문 완료 처리가 된다.")

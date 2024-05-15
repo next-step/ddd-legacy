@@ -1,5 +1,6 @@
 package kitchenpos.application
 
+import io.kotest.assertions.assertSoftly
 import io.kotest.assertions.throwables.shouldThrowExactly
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -305,13 +306,15 @@ internal class MenuServiceTest {
             val result = menuService.create(request)
 
             // then
-            verify(exactly = 1) { menuRepository.save(any()) }
-            result.id shouldBe request.id
-            result.name shouldBe request.name
-            result.price shouldBe request.price
-            result.menuGroup shouldBe request.menuGroup
-            result.isDisplayed shouldBe request.isDisplayed
-            result.menuProducts shouldBe request.menuProducts
+            assertSoftly {
+                verify(exactly = 1) { menuRepository.save(any()) }
+                result.id shouldBe request.id
+                result.name shouldBe request.name
+                result.price shouldBe request.price
+                result.menuGroup shouldBe request.menuGroup
+                result.isDisplayed shouldBe request.isDisplayed
+                result.menuProducts shouldBe request.menuProducts
+            }
         }
     }
 
