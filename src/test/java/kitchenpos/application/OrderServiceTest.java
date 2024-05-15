@@ -2,16 +2,13 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -20,7 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -240,8 +237,56 @@ class OrderServiceTest {
     }
 
     @Test
-    void accept() {
+    @DisplayName("주문을 수락하기 위해서는 주문이 대기중이어야 한다")
+    void requiresWaitingToAccept() {
+        final var order = new Order();
+        order.setStatus(OrderStatus.COMPLETED);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.accept(UUID.randomUUID()));
     }
+
+    @Test
+    @DisplayName("수락시 배달 주문은 배달 대해사에 배달을 요청한다")
+    void acceptDeliveryOrderRequestDelivery() {
+        final var order = new Order();
+        order.setType(OrderType.DELIVERY);
+        order.setDeliveryAddress("서울시");
+        order.setStatus(OrderStatus.WAITING);
+
+        final var menu = new Menu();
+        menu.setPrice(BigDecimal.TEN);
+
+        final var orderLineItem = new OrderLineItem();
+        orderLineItem.setQuantity(1);
+        orderLineItem.setMenu(menu);
+
+        order.setOrderLineItems(List.of(orderLineItem));
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        Order accepted = orderService.accept(UUID.randomUUID());
+
+        verify(kitchenridersClient, times(1)).requestDelivery(any(UUID.class), any(BigDecimal.class), any(String.class));
+        assertThat(accepted.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @Test
+    @DisplayName("정상 주문 수락")
+    void accept() {
+        final var order = new Order();
+        order.setType(OrderType.EAT_IN);
+        order.setStatus(OrderStatus.WAITING);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        Order accepted = orderService.accept(UUID.randomUUID());
+
+        assertThat(accepted.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
 
     @Test
     void serve() {
