@@ -240,7 +240,7 @@ class MenuServiceTest {
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.changePrice(validMenu.getId(), MenuFixture.createValidMenuWithPrice(price));
+					menuService.changePrice(validMenu.getId(), MenuFixture.create(price));
 				});
 		}
 
@@ -256,7 +256,7 @@ class MenuServiceTest {
 				.isThrownBy(() -> {
 					// when
 					menuService.changePrice(nonexistentMenuId,
-						MenuFixture.createValidMenuWithPrice(new BigDecimal("10.00")));
+						MenuFixture.create(new BigDecimal("10.00")));
 				});
 		}
 
@@ -271,7 +271,7 @@ class MenuServiceTest {
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.changePrice(validMenu.getId(), MenuFixture.createValidMenuWithPrice(price));
+					menuService.changePrice(validMenu.getId(), MenuFixture.create(price));
 				});
 		}
 
@@ -280,7 +280,7 @@ class MenuServiceTest {
 		@DisplayName("메뉴 가격 변경 시 변경 가격이 상품 가격 총합보다 작거나 같을 때 메뉴 가격을 변경할 수 있다")
 		void changePriceWithValidPrice(BigDecimal price) {
 			// given
-			Menu requestMenu = MenuFixture.createValidMenuWithPrice(price);
+			Menu requestMenu = MenuFixture.create(price);
 
 			when(menuRepository.findById(validMenu.getId())).thenReturn(Optional.of(validMenu));
 			lenient().when(menuRepository.save(requestMenu)).thenAnswer(invocation -> invocation.getArgument(0));

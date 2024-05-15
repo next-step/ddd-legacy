@@ -16,9 +16,8 @@ public class MenuFixture {
 	private static final BigDecimal VALID_MENU_PRICE = new BigDecimal("17.98");
 
 	public static MenuGroup createValidMenuGroup() {
-		UUID menuGroupId = UUID.randomUUID();
 		MenuGroup validMenuGroup = new MenuGroup();
-		validMenuGroup.setId(menuGroupId);
+		validMenuGroup.setId(UUID.randomUUID());
 		validMenuGroup.setName(VALID_MENU_GROUP_NAME);
 		return validMenuGroup;
 	}
@@ -48,7 +47,7 @@ public class MenuFixture {
 		return menu;
 	}
 
-	public static Menu createValidMenuWithPrice(BigDecimal price) {
+	public static Menu create(BigDecimal price) {
 		Menu validMenu = createValidMenu();
 		validMenu.setPrice(price);
 		return validMenu;
