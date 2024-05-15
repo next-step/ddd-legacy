@@ -79,10 +79,9 @@ class ProductServiceTest {
 		@DisplayName("상품 생성 시 상품명에 비속어가 포함되어 있으면 상품 생성을 할 수 없다")
 		void createProductWithProfaneName() {
 			// given
-			String productNameWithProfanity = "비속어";
-			Product productWithProfanity = ProductFixture.create(productNameWithProfanity, BigDecimal.TEN);
+			Product productWithProfanity = ProductFixture.create(PRODUCT_NAME_WITH_PROFANITY, BigDecimal.TEN);
 
-			when(purgomalumClient.containsProfanity(productNameWithProfanity)).thenReturn(true);
+			when(purgomalumClient.containsProfanity(PRODUCT_NAME_WITH_PROFANITY)).thenReturn(true);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
@@ -170,7 +169,7 @@ class ProductServiceTest {
 
 			when(productRepository.findById(productWithPriceLowerThanMenuPrice.getId()))
 				.thenReturn(Optional.of(productWithPriceLowerThanMenuPrice));
-			Menu menu = MenuFixture.create(VALID_PRODUCT_PRICE.add(BigDecimal.TEN));
+			Menu menu = MenuFixture.createWithPrice(VALID_PRODUCT_PRICE.add(BigDecimal.TEN));
 			when(menuRepository.findAllByProductId(productWithPriceLowerThanMenuPrice.getId()))
 				.thenReturn(Collections.singletonList(menu));
 
@@ -188,7 +187,7 @@ class ProductServiceTest {
 			Product validProduct = ProductFixture.create(VALID_PRODUCT_NAME, VALID_PRODUCT_PRICE);
 
 			when(productRepository.findById(validProduct.getId())).thenReturn(Optional.of(validProduct));
-			Menu menu = MenuFixture.create(BigDecimal.TEN);
+			Menu menu = MenuFixture.createWithPrice(BigDecimal.TEN);
 			when(menuRepository.findAllByProductId(validProduct.getId())).thenReturn(Collections.singletonList(menu));
 
 			// when

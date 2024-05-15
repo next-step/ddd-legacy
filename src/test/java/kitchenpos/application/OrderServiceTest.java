@@ -65,7 +65,7 @@ class OrderServiceTest {
 
 	@BeforeEach
 	void setUp() {
-		validMenu = MenuFixture.createValidMenu();
+		validMenu = MenuFixture.createValid();
 		validOrder = OrderFixture.createValidOrder(validMenu);
 		validOrderTable = validOrder.getOrderTable();
 

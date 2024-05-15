@@ -14,6 +14,7 @@ import kitchenpos.domain.Product;
 public class MenuFixture {
 	private static final String VALID_MENU_GROUP_NAME = "점심특선";
 	private static final String VALID_MENU_NAME = "버거세트";
+	public static final String MENU_NAME_WITH_PROFANITY = "비속어가 포함된 메뉴명";
 	private static final int VALID_MENU_PRODUCT_QUANTITY = 2;
 	private static final BigDecimal VALID_MENU_PRICE = new BigDecimal("17.98");
 
@@ -34,23 +35,48 @@ public class MenuFixture {
 		return menuProduct;
 	}
 
-	public static Menu createValidMenu() {
-		MenuGroup menuGroup = createValidMenuGroup();
-
+	public static Menu create(
+		MenuGroup menuGroup,
+		String name,
+		BigDecimal price,
+		List<MenuProduct> menuProducts,
+		boolean displayed) {
 		Menu menu = new Menu();
 		menu.setMenuGroupId(menuGroup.getId());
 		menu.setMenuGroup(menuGroup);
 		menu.setId(UUID.randomUUID());
-		menu.setName(VALID_MENU_NAME);
-		menu.setPrice(VALID_MENU_PRICE);
-		menu.setMenuProducts(
-			List.of(createValidMenuProduct(VALID_MENU_PRODUCT_QUANTITY)));
-		menu.setDisplayed(true);
+		menu.setName(name);
+		menu.setPrice(price);
+		menu.setMenuProducts(menuProducts);
+		menu.setDisplayed(displayed);
 		return menu;
 	}
 
-	public static Menu create(BigDecimal price) {
-		Menu validMenu = createValidMenu();
+	public static Menu createValid() {
+		return create(
+			createValidMenuGroup(),
+			VALID_MENU_NAME,
+			VALID_MENU_PRICE,
+			List.of(createValidMenuProduct(VALID_MENU_PRODUCT_QUANTITY)),
+			true
+		);
+	}
+
+	public static Menu createWithNameAndPrice(String name, BigDecimal price) {
+		Menu validMenu = createValid();
+		validMenu.setName(name);
+		validMenu.setPrice(price);
+		return validMenu;
+	}
+
+	public static Menu createWithName(String name) {
+		Menu validMenu = createValid();
+		validMenu.setName(name);
+		return validMenu;
+	}
+
+	public static Menu createWithPrice(BigDecimal price) {
+		Menu validMenu = createValid();
 		validMenu.setPrice(price);
 		return validMenu;
 	}
