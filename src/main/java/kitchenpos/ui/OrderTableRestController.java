@@ -1,4 +1,4 @@
-package kitchenpos.integration;
+package kitchenpos.ui;
 
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.OrderTable;
