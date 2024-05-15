@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.infra.FakePurgomalumClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,8 +30,7 @@ public class ProductServiceTest {
     private ProductRepository productRepository;
     @Mock
     private MenuRepository menuRepository;
-    @Mock
-    private PurgomalumClient purgomalumClient;
+    private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
 
     private ProductService productService;
 
