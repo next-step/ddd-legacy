@@ -33,7 +33,7 @@ public class MenuGroupServiceTest {
         assertThat(created).isNotNull();
     }
 
-    @DisplayName("메뉴 그룹의 이름은 공백과 null을 허용하지 않는다")
+    @DisplayName("메뉴 그룹의 이름은 1글자 이상만 허용된다")
     @ParameterizedTest
     @NullAndEmptySource
     void createMenuGroupWithInvalidNameTest(String name) {
