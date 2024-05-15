@@ -313,7 +313,42 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("배달을 시작하기 위해서는 배달 주문이여야 한다")
+    void requiresOrderTypeDelivery() {
+        final var order = new Order();
+        order.setType(OrderType.EAT_IN);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.startDelivery(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("배달은 시작하기 위해서는 주문이 제공된 상태여야 한다")
+    void requiresOrderServed() {
+        final var order = new Order();
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.ACCEPTED);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.startDelivery(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("정상 배달 시작")
     void startDelivery() {
+        final var order = new Order();
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.SERVED);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        Order started = orderService.startDelivery(UUID.randomUUID());
+
+        assertThat(started.getStatus()).isEqualTo(OrderStatus.DELIVERING);
     }
 
     @Test
