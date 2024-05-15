@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
-import kitchenpos.application.testFixture.MenuFixture;
-import kitchenpos.application.testFixture.ProductFixture;
+import kitchenpos.application.testfixture.MenuFixture;
+import kitchenpos.application.testfixture.ProductFixture;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;

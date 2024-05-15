@@ -1,9 +1,9 @@
 package kitchenpos.application;
 
-import kitchenpos.application.testFixture.MenuFixture;
-import kitchenpos.application.testFixture.OrderFixture;
-import kitchenpos.application.testFixture.OrderLineItemFixture;
-import kitchenpos.application.testFixture.OrderTableFixture;
+import kitchenpos.application.testfixture.MenuFixture;
+import kitchenpos.application.testfixture.OrderFixture;
+import kitchenpos.application.testfixture.OrderLineItemFixture;
+import kitchenpos.application.testfixture.OrderTableFixture;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
 import org.assertj.core.api.SoftAssertions;

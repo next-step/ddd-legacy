@@ -1,4 +1,4 @@
-package kitchenpos.application.testFixture;
+package kitchenpos.application.testfixture;
 
 import kitchenpos.domain.OrderTable;
 

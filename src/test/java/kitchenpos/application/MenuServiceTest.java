@@ -1,12 +1,12 @@
 package kitchenpos.application;
 
-import kitchenpos.application.testFixture.MenuFixture;
-import kitchenpos.application.testFixture.MenuGroupFixture;
-import kitchenpos.application.testFixture.ProductFixture;
+import kitchenpos.application.testfixture.MenuFixture;
+import kitchenpos.application.testfixture.MenuGroupFixture;
+import kitchenpos.application.testfixture.ProductFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.testfixture.MenuFakeRepository;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,8 +32,7 @@ import static org.mockito.BDDMockito.given;
 @DisplayName("메뉴(Menu) 서비스 테스트")
 class MenuServiceTest {
 
-    @Mock
-    private MenuRepository menuRepository;
+    private MenuFakeRepository menuRepository;
 
     @Mock
     private MenuGroupRepository menuGroupRepository;
@@ -48,6 +47,7 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
+        menuRepository = new MenuFakeRepository();
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
 
@@ -69,7 +69,6 @@ class MenuServiceTest {
                     .willReturn(List.of(product));
             given(productRepository.findById(any())).willReturn(Optional.of(product));
             given(purgomalumClient.containsProfanity(any())).willReturn(false);
-            given(menuRepository.save(any())).willReturn(menu);
 
             // when
             var actual = menuService.create(menu);
@@ -228,7 +227,6 @@ class MenuServiceTest {
             // given
             var id = UUID.randomUUID();
             var updatedMenu = MenuFixture.newOne();
-            given(menuRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> menuService.changePrice(id, updatedMenu))

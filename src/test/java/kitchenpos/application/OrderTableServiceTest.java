@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.application.testFixture.OrderTableFixture;
+import kitchenpos.application.testfixture.OrderTableFixture;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.application.testFixture.MenuGroupFixture;
+import kitchenpos.application.testfixture.MenuGroupFixture;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.BeforeEach;
