@@ -4,7 +4,12 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.testfixture.InMemoryMenuRepository;
+import kitchenpos.testfixture.InMemoryOrderRepository;
+import kitchenpos.testfixture.InMemoryOrderTableRepository;
+import kitchenpos.testfixture.OrderTableTestFixture;
 import org.aspectj.weaver.ast.Or;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,37 +27,33 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
 
-    @Mock
-    private OrderTableRepository orderTableRepository;
+    private OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
 
-    @Mock
-    private OrderRepository orderRepository;
+    private OrderRepository orderRepository = new InMemoryOrderRepository();
 
     @InjectMocks
     private OrderTableService orderTableService;
+
+    @BeforeEach
+    void setUp(){
+        orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+    }
 
 
     @Test
     void create() {
 
         //given
-        OrderTable request = new OrderTable();
-        request.setName("9번");
+        OrderTable request = OrderTableTestFixture.createOrderTableRequest();
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName("9번");
-        orderTable.setNumberOfGuests(0);
-        orderTable.setOccupied(false);
-
-        given(orderTableRepository.save(any(OrderTable.class)))
-                .willReturn(orderTable);
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(),request.getName(), request.isOccupied(), request.getNumberOfGuests());
 
         //when
         OrderTable response = orderTableService.create(request);
 
         //then
-        assertEquals(orderTable.getId(), response.getId());
+        assertThat(response.getId()).isNotNull();
         assertEquals(orderTable.getNumberOfGuests(), response.getNumberOfGuests());
         assertEquals(orderTable.getName(), response.getName());
 
@@ -63,14 +64,12 @@ class OrderTableServiceTest {
     void sit() {
 
         //given
-        UUID request = UUID.randomUUID();
-        given(orderTableRepository.findById(request))
-                .willReturn(Optional.ofNullable(new OrderTable()));
-
+        OrderTable request = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(), "2번", false, 10);
+        orderTableRepository.save(request);
 
         //when
-        OrderTable response = orderTableService.sit(request);
-
+        OrderTable response = orderTableService.sit(request.getId());
 
         //then
         assertEquals(true, response.isOccupied());
@@ -81,14 +80,12 @@ class OrderTableServiceTest {
     void clear() {
 
         //given
-        UUID request = UUID.randomUUID();
-        given(orderTableRepository.findById(request))
-                .willReturn(Optional.ofNullable(new OrderTable()));
-
+        OrderTable request = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(), "2번", true, 10);
+        orderTableRepository.save(request);
 
         //when
-        OrderTable response = orderTableService.clear(request);
-
+        OrderTable response = orderTableService.clear(request.getId());
 
         //then
         assertEquals(false, response.isOccupied());
@@ -100,18 +97,12 @@ class OrderTableServiceTest {
 
 
         //given
-        OrderTable request = new OrderTable();
-        request.setId(UUID.randomUUID());
-        request.setNumberOfGuests(10);
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(), "3번", true, 10);
+        orderTableRepository.save(orderTable);
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(request.getId());
-        orderTable.setNumberOfGuests(request.getNumberOfGuests());
-        orderTable.setOccupied(true);
-
-        given(orderTableRepository.findById(request.getId()))
-                .willReturn(Optional.of(orderTable));
-
+        OrderTable request = orderTable;
+        request.setNumberOfGuests(5);
 
         //when
         OrderTable response = orderTableService.changeNumberOfGuests(
@@ -127,28 +118,28 @@ class OrderTableServiceTest {
     void findAll() {
 
         //given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName("1번");
-        orderTable.setOccupied(false);
-        orderTable.setNumberOfGuests(0);
-
-        OrderTable orderTable2 = new OrderTable();
-        orderTable2.setId(UUID.randomUUID());
-        orderTable2.setName("2번");
-        orderTable2.setOccupied(true);
-        orderTable2.setNumberOfGuests(2);
-
-        given(orderTableRepository.findAll())
-                .willReturn(Arrays.asList(orderTable, orderTable2));
-
+        OrderTable orderTable1 = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(), "1번", false, 0
+        );
+        OrderTable orderTable2 =  OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(), "2번", true, 2
+        );
+        orderTableRepository.save(orderTable1);
+        orderTableRepository.save(orderTable2);
 
         //when
         List<OrderTable> response = orderTableService.findAll();
 
-
         //then
         assertThat(response.size()).isEqualTo(2);
+        assertThat(response
+                .stream()
+                .anyMatch(res ->res.getName().contains(orderTable1.getName())))
+                .isTrue();
+        assertThat(response
+                .stream()
+                .anyMatch(res ->res.getName().contains(orderTable2.getName())))
+                .isTrue();
 
     }
 }
