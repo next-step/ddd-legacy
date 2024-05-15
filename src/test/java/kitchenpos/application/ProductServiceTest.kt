@@ -12,7 +12,7 @@ class ProductServiceTest(
 ) {
     @DisplayName("등록된 상품 목록을 조회할 수 있다.")
     @Test
-    fun find_all_test() {
+    fun find_all_products_test() {
         // when
         val products = sut.findAll()
 

@@ -17,7 +17,7 @@ class MenuGroupServiceTest(
 ) {
     @DisplayName("메뉴그룹 생성시 'name' 은 필수다 - ('name' 있을시)")
     @Test
-    fun menu_group_create_test1() {
+    fun create_menu_group_test1() {
         // given
         val request = MenuGroup()
         request.name = "한마리 치킨"
@@ -31,7 +31,7 @@ class MenuGroupServiceTest(
 
     @DisplayName("메뉴그룹 생성시 'name' 은 필수다 - ('name' 없을때)")
     @Test
-    fun menu_group_create_test2() {
+    fun create_menu_group_test2() {
         // given
         val request = MenuGroup()
 
@@ -42,7 +42,7 @@ class MenuGroupServiceTest(
 
     @DisplayName("등록된 메뉴그룹 목록을 조회할 수 있다")
     @Test
-    fun menu_group_find_all_test() {
+    fun find_all_menu_group_test() {
         // given
         // when
         val menuGroups = sut.findAll()
