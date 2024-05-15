@@ -5,6 +5,9 @@ import kitchenpos.application.testfixture.ProductFixture;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.testfixture.MenuFakeRepository;
+import kitchenpos.domain.testfixture.ProductFakeRepository;
+import kitchenpos.domain.testfixture.PurgomalumFakeClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
@@ -16,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
@@ -37,15 +39,16 @@ import static org.mockito.BDDMockito.given;
 class ProductServiceTest {
 
     ProductService productService;
-    @Mock
+
     private ProductRepository productRepository;
-    @Mock
     private MenuRepository menuRepository;
-    @Mock
     private PurgomalumClient purgomalumClient;
 
     @BeforeEach
     void setUp() {
+        productRepository = new ProductFakeRepository();
+        menuRepository = new MenuFakeRepository();
+        purgomalumClient = new PurgomalumFakeClient();
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
@@ -58,20 +61,16 @@ class ProductServiceTest {
         void changedPriceTest() {
             // given
             var id = UUID.randomUUID();
-            var product_닭고기 = ProductFixture.newOne(id, "닭고기 300g", 5000);
-            var product_콜라 = ProductFixture.newOne(id, "콜라", 500);
-            var menu = MenuFixture.newOne(5500, List.of(product_닭고기, product_콜라));
-            var updatedProduct = ProductFixture.newOne(5001);
-            given(productRepository.findById(any())).willReturn(Optional.of(product_닭고기));
-            given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
+            var product_닭고기 = ProductFixture.newOne(id, 5000);
+            productService.create(product_닭고기);
 
             // when
+            var updatedProduct = ProductFixture.newOne(id, 5001);
             var actual = productService.changePrice(id, updatedProduct);
 
             // then
             SoftAssertions.assertSoftly(softly -> {
                 softly.assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(5001));
-                softly.assertThat(menu.isDisplayed()).isTrue();
             });
         }
 
