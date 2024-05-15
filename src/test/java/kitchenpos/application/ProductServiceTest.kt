@@ -19,7 +19,7 @@ import java.math.BigDecimal
 @SpringBootTest
 class ProductServiceTest {
     @MockBean
-    private lateinit var purgomalumCloneable: PurgomalumClient
+    private lateinit var purgomalumClient: PurgomalumClient
 
     @Autowired
     private lateinit var menuRepository: MenuRepository
@@ -82,7 +82,7 @@ class ProductServiceTest {
             val request = Product()
             request.price = BigDecimal.valueOf(1000)
             request.name = slang
-            given(purgomalumCloneable.containsProfanity(slang)).willReturn(true)
+            given(purgomalumClient.containsProfanity(slang)).willReturn(true)
 
             // when
             // then
@@ -96,7 +96,7 @@ class ProductServiceTest {
             val request = Product()
             request.price = BigDecimal.valueOf(1000)
             request.name = "후라이드 치킨"
-            given(purgomalumCloneable.containsProfanity(any())).willReturn(false)
+            given(purgomalumClient.containsProfanity(any())).willReturn(false)
 
             // when
             val createdProduct = sut.create(request)
