@@ -95,7 +95,7 @@ class ProductServiceTest {
 		@DisplayName("상품 생성을 할 수 있다")
 		void createProductSuccessfully() {
 			// given
-			Product validProduct = ProductFixture.create(VALID_PRODUCT_NAME, VALID_PRODUCT_PRICE);
+			Product validProduct = ProductFixture.createValid();
 			when(productRepository.save(any(Product.class))).thenReturn(validProduct);
 
 			// when
@@ -130,7 +130,7 @@ class ProductServiceTest {
 		@DisplayName("상품 가격 변경 시 상품 조회가 실패하면 상품 가격 변경을 할 수 없다")
 		void changePriceWithNonExistentProduct() {
 			// given
-			Product nonExistentProduct = ProductFixture.create(VALID_PRODUCT_NAME, VALID_PRODUCT_PRICE);
+			Product nonExistentProduct = ProductFixture.createValid();
 			when(productRepository.findById(nonExistentProduct.getId())).thenReturn(Optional.empty());
 
 			// then
@@ -145,7 +145,7 @@ class ProductServiceTest {
 		@DisplayName("상품 가격 변경 시 해당 상품이 메뉴에 등록되어 있지 않으면 상품의 가격을 변경할 수 있다")
 		void changePriceWithoutMenus() {
 			// given
-			Product productNotRegisteredInMenu = ProductFixture.create(VALID_PRODUCT_NAME, VALID_PRODUCT_PRICE);
+			Product productNotRegisteredInMenu = ProductFixture.createValid();
 
 			when(productRepository.findById(productNotRegisteredInMenu.getId())).thenReturn(
 				Optional.of(productNotRegisteredInMenu));
@@ -165,7 +165,7 @@ class ProductServiceTest {
 		@DisplayName("상품 가격 변경 시 상품들의 가격 합계가 메뉴가 가격보다 낮을 때 해당 상품의 메뉴가 비노출 처리된다")
 		void changePriceMenuPriceHigher() {
 			// given
-			Product productWithPriceLowerThanMenuPrice = ProductFixture.create(VALID_PRODUCT_NAME, VALID_PRODUCT_PRICE);
+			Product productWithPriceLowerThanMenuPrice = ProductFixture.createValid();
 
 			when(productRepository.findById(productWithPriceLowerThanMenuPrice.getId()))
 				.thenReturn(Optional.of(productWithPriceLowerThanMenuPrice));
@@ -184,7 +184,7 @@ class ProductServiceTest {
 		@DisplayName("상품 가격 변경 시 메뉴 가격이 상품 가격 합계와 같을 때 해당 상품의 메뉴가 노출 처리된다")
 		void changePriceMenuPriceEqual() {
 			// given
-			Product validProduct = ProductFixture.create(VALID_PRODUCT_NAME, VALID_PRODUCT_PRICE);
+			Product validProduct = ProductFixture.createValid();
 
 			when(productRepository.findById(validProduct.getId())).thenReturn(Optional.of(validProduct));
 			Menu menu = MenuFixture.createWithPrice(BigDecimal.TEN);
@@ -217,7 +217,7 @@ class ProductServiceTest {
 		@DisplayName("상품 데이터가 비어 있지 않을 때 모든 상품을 조회하면 모든 상품을 조회할 수 있다")
 		void findAllProductsWhenNotEmpty() {
 			// given
-			Product validProduct = ProductFixture.create(VALID_PRODUCT_NAME, VALID_PRODUCT_PRICE);
+			Product validProduct = ProductFixture.createValid();
 			Product anotherProduct = ProductFixture.create("불고기버거", BigDecimal.TEN);
 
 			when(productRepository.findAll()).thenReturn(List.of(validProduct, anotherProduct));

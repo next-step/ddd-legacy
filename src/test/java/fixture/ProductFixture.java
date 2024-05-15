@@ -19,4 +19,8 @@ public class ProductFixture {
 		product.setPrice(price);
 		return product;
 	}
+
+	public static Product createValid() {
+		return create(VALID_PRODUCT_NAME, VALID_PRODUCT_PRICE);
+	}
 }
