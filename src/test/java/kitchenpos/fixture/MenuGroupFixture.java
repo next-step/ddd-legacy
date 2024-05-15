@@ -24,4 +24,11 @@ public class MenuGroupFixture {
 
         return menuGroup;
     }
+
+    public static MenuGroup createMenuGroup(String name) {
+        final MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName(name);
+
+        return menuGroup;
+    }
 }

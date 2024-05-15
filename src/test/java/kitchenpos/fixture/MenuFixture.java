@@ -13,8 +13,8 @@ public class MenuFixture {
 
     }
 
-    public static Menu createMenu(UUID menuGroupId, String name, BigDecimal price,
-                                  boolean displayed, List<MenuProduct> menuProducts) {
+    public static Menu createMenuWithId(UUID menuGroupId, String name, BigDecimal price,
+                                        boolean displayed, List<MenuProduct> menuProducts) {
         final Menu menu = new Menu();
         menu.setMenuGroupId(menuGroupId);
         menu.setName(name);
@@ -24,34 +24,34 @@ public class MenuFixture {
         return menu;
     }
 
-    public static Menu createMenu(MenuGroup menuGroup, String name, BigDecimal price,
-                                  boolean displayed, List<MenuProduct> menuProducts) {
+    public static Menu createMenuWithId(UUID menuGroupId, BigDecimal price,
+                                        boolean displayed, List<MenuProduct> menuProducts) {
+        final Menu menu = new Menu();
+        menu.setMenuGroupId(menuGroupId);
+        menu.setPrice(price);
+        menu.setDisplayed(displayed);
+        menu.setMenuProducts(menuProducts);
+        return menu;
+    }
+
+    public static Menu createMenuWithId(UUID menuGroupId, String name,
+                                        boolean displayed, List<MenuProduct> menuProducts) {
+        final Menu menu = new Menu();
+        menu.setMenuGroupId(menuGroupId);
+        menu.setName(name);
+        menu.setDisplayed(displayed);
+        menu.setMenuProducts(menuProducts);
+        return menu;
+    }
+
+    public static Menu createMenuWithId(MenuGroup menuGroup, String name, BigDecimal price,
+                                        boolean displayed, List<MenuProduct> menuProducts) {
         final Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setMenuGroupId(menuGroup.getId());
         menu.setMenuGroup(menuGroup);
         menu.setName(name);
         menu.setPrice(price);
-        menu.setDisplayed(displayed);
-        menu.setMenuProducts(menuProducts);
-        return menu;
-    }
-
-    public static Menu createMenu(UUID menuGroupId, BigDecimal price,
-                                  boolean displayed, List<MenuProduct> menuProducts) {
-        final Menu menu = new Menu();
-        menu.setMenuGroupId(menuGroupId);
-        menu.setPrice(price);
-        menu.setDisplayed(displayed);
-        menu.setMenuProducts(menuProducts);
-        return menu;
-    }
-
-    public static Menu createMenu(UUID menuGroupId, String name,
-                                  boolean displayed, List<MenuProduct> menuProducts) {
-        final Menu menu = new Menu();
-        menu.setMenuGroupId(menuGroupId);
-        menu.setName(name);
         menu.setDisplayed(displayed);
         menu.setMenuProducts(menuProducts);
         return menu;

@@ -1,4 +1,4 @@
-package kitchenpos.ui;
+package kitchenpos.integration;
 
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.OrderTable;
@@ -28,7 +28,7 @@ public class OrderTableRestController {
     public ResponseEntity<OrderTable> create(@RequestBody final OrderTable request) {
         final OrderTable response = orderTableService.create(request);
         return ResponseEntity.created(URI.create("/api/order-tables/" + response.getId()))
-            .body(response);
+                .body(response);
     }
 
     @PutMapping("/{orderTableId}/sit")
@@ -43,8 +43,8 @@ public class OrderTableRestController {
 
     @PutMapping("/{orderTableId}/number-of-guests")
     public ResponseEntity<OrderTable> changeNumberOfGuests(
-        @PathVariable final UUID orderTableId,
-        @RequestBody final OrderTable request
+            @PathVariable final UUID orderTableId,
+            @RequestBody final OrderTable request
     ) {
         return ResponseEntity.ok(orderTableService.changeNumberOfGuests(orderTableId, request));
     }

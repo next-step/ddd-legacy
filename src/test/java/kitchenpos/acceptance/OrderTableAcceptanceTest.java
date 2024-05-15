@@ -2,8 +2,8 @@ package kitchenpos.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import kitchenpos.acceptance.config.AcceptanceTest;
 import kitchenpos.acceptance.step.OrderTableAcceptanceStep;
+import kitchenpos.config.AcceptanceTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

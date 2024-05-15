@@ -7,6 +7,7 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fixture.MenuFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -22,10 +23,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
-import static kitchenpos.fixture.MenuFixture.createMenu;
+import static kitchenpos.fixture.MenuFixture.createMenuWithId;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupWithId;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
-import static kitchenpos.fixture.ProductFixture.createProduct;
+import static kitchenpos.fixture.ProductFixture.createProductWithId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -57,12 +58,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
             Menu createdMenu = menuService.create(menu);
 
             assertThat(createdMenu.getId()).isNotNull();
@@ -74,11 +75,11 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup.getId(), "후라이드치킨", true, List.of(menuProduct));
 
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -90,12 +91,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(-16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(-16000L), true, List.of(menuProduct));
 
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -107,7 +108,7 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, Collections.emptyList());
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, Collections.emptyList());
 
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -121,7 +122,7 @@ class MenuServiceTest {
 
             MenuProduct menuProduct = createMenuProduct(UUID.randomUUID(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
 
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -133,12 +134,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), -1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
 
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -150,12 +151,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(32000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(32000L), true, List.of(menuProduct));
 
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -168,12 +169,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "시발 후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "시발 후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
 
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -185,12 +186,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), BigDecimal.valueOf(16000L), true, List.of(menuProduct));
 
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -206,12 +207,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
             menu = menuService.create(menu);
 
             BigDecimal changedPrice = BigDecimal.valueOf(15000L);
@@ -227,12 +228,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
             menu = menuService.create(menu);
 
             UUID menuId = menu.getId();
@@ -249,12 +250,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
             menu = menuService.create(menu);
 
             UUID menuId = menu.getId();
@@ -269,7 +270,7 @@ class MenuServiceTest {
         @Test
         void changePriceFailWhenMenuNotFoundTest() {
             UUID menuId = UUID.randomUUID();
-            Menu menu = createMenu(UUID.randomUUID(), "후라이드치킨", BigDecimal.valueOf(16000L), true, Collections.emptyList());
+            Menu menu = MenuFixture.createMenuWithId(UUID.randomUUID(), "후라이드치킨", BigDecimal.valueOf(16000L), true, Collections.emptyList());
 
             assertThatThrownBy(() -> menuService.changePrice(menuId, menu))
                     .isInstanceOf(NoSuchElementException.class);
@@ -281,12 +282,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
             menu = menuService.create(menu);
 
             UUID menuId = menu.getId();
@@ -306,12 +307,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), false, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), false, List.of(menuProduct));
             menu = menuService.create(menu);
 
             UUID menuId = menu.getId();
@@ -336,12 +337,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), false, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), false, List.of(menuProduct));
             menu = menuService.create(menu);
 
             menu.setPrice(BigDecimal.valueOf(32000L));
@@ -362,12 +363,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
             menu = menuService.create(menu);
 
             UUID menuId = menu.getId();
@@ -395,12 +396,12 @@ class MenuServiceTest {
             MenuGroup menuGroup = createMenuGroupWithId("메뉴 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
 
-            Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000L));
+            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000L));
             product = productRepository.save(product);
 
             MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
 
-            Menu menu = createMenu(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
+            Menu menu = MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000L), true, List.of(menuProduct));
             menu = menuService.create(menu);
 
             List<Menu> menus = menuService.findAll();

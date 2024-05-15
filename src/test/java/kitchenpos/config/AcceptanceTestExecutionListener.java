@@ -1,4 +1,4 @@
-package kitchenpos.acceptance.config;
+package kitchenpos.config;
 
 import org.jetbrains.annotations.NotNull;
 import org.springframework.jdbc.core.JdbcTemplate;

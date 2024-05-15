@@ -3,8 +3,8 @@ package kitchenpos.acceptance;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import kitchenpos.acceptance.config.AcceptanceTest;
 import kitchenpos.acceptance.step.MenuGroupAcceptanceStep;
+import kitchenpos.config.AcceptanceTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,7 @@ class MenuGroupAcceptanceTest {
     void setUp() {
         RestAssured.port = port;
     }
-    
+
     @DisplayName("메뉴 그룹을 생성 하고 조회할 수 있다.")
     @Test
     void menuGroupCreateAndFindAllAcceptance() {

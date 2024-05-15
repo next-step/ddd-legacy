@@ -2,8 +2,8 @@ package kitchenpos.acceptance;
 
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import kitchenpos.acceptance.config.AcceptanceTest;
 import kitchenpos.acceptance.step.ProductAcceptanceStep;
+import kitchenpos.config.AcceptanceTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.UUID;
 
-import static kitchenpos.fixture.ProductFixture.createProduct;
+import static kitchenpos.fixture.ProductFixture.createProductWithId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @AcceptanceTest
@@ -29,7 +29,7 @@ class ProductAcceptanceTest {
     @DisplayName("상품을 생성하고 관리하고 조회할 수 있다.")
     @Test
     void productCreateAndManageAndFindAll() {
-        Response 후라이드_치킨 = ProductAcceptanceStep.create(createProduct("후라이드 치킨", BigDecimal.valueOf(16000)));
+        Response 후라이드_치킨 = ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
         String productId = 후라이드_치킨.getBody().jsonPath().getString("id");
 
         Response findAll = ProductAcceptanceStep.findAll();
@@ -37,7 +37,7 @@ class ProductAcceptanceTest {
         assertThat(findAll.getBody().jsonPath().getList("id")).contains(productId);
         assertThat(findAll.getBody().jsonPath().getList("price", BigDecimal.class)).contains(BigDecimal.valueOf(16000).setScale(1, RoundingMode.HALF_UP));
 
-        ProductAcceptanceStep.changePrice(UUID.fromString(productId), createProduct("후라이드 치킨", BigDecimal.valueOf(17000)));
+        ProductAcceptanceStep.changePrice(UUID.fromString(productId), createProductWithId("후라이드 치킨", BigDecimal.valueOf(17000)));
 
         findAll = ProductAcceptanceStep.findAll();
 
