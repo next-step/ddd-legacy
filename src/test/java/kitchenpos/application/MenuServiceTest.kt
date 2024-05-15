@@ -42,7 +42,7 @@ internal class MenuServiceTest {
         @Test
         fun test1() {
             // given
-            val request = Menu()
+            val request = createMenuRequest(price = null,)
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -54,9 +54,8 @@ internal class MenuServiceTest {
         @Test
         fun test2() {
             // given
-            val request = Menu().apply {
-                this.price = BigDecimal.valueOf(-1L)
-            }
+            val request = createMenuRequest(price = BigDecimal.valueOf(-1L),)
+
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -68,12 +67,9 @@ internal class MenuServiceTest {
         @Test
         fun test3() {
             // given
-            val request = Menu().apply {
-                this.price = BigDecimal.ONE
-                this.menuGroupId = UUID.randomUUID()
-            }
+            val request = createMenuRequest()
 
-            every { menuGroupRepository.findById(any()) } throws NoSuchElementException()
+            every { menuGroupRepository.findById(any()) } returns Optional.empty()
 
             // when & then
             shouldThrowExactly<NoSuchElementException> {
@@ -85,11 +81,8 @@ internal class MenuServiceTest {
         @Test
         fun test4() {
             // given
-            val request = Menu().apply {
-                this.price = BigDecimal.ONE
-                this.menuGroupId = UUID.randomUUID()
-                this.menuProducts = null
-            }
+            val request = createMenuRequest(menuProducts = null,)
+
 
             every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
 
@@ -103,11 +96,8 @@ internal class MenuServiceTest {
         @Test
         fun test5() {
             // given
-            val request = Menu().apply {
-                this.price = BigDecimal.ONE
-                this.menuGroupId = UUID.randomUUID()
-                this.menuProducts = listOf()
-            }
+            val request = createMenuRequest(menuProducts = emptyList(),)
+
 
             every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
 
@@ -121,15 +111,14 @@ internal class MenuServiceTest {
         @Test
         fun test6() {
             // given
-            val menuProduct = MenuProduct().apply {
-                this.productId = UUID.randomUUID()
-            }
-
-            val request = Menu().apply {
-                this.price = BigDecimal.ONE
-                this.menuGroupId = UUID.randomUUID()
-                this.menuProducts = listOf(menuProduct)
-            }
+            val request = createMenuRequest(
+                menuProducts = listOf(
+                    createMenuProduct(
+                        product = createProduct(id = UUID.randomUUID()),
+                        quantity = 1,
+                    ),
+                ),
+            )
 
             every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
             every { productRepository.findAllByIdIn(any()) } returns listOf()
@@ -144,47 +133,20 @@ internal class MenuServiceTest {
         @Test
         fun test7() {
             // given
-            val menuProduct = MenuProduct().apply {
-                this.productId = UUID.randomUUID()
-                this.quantity = -1
-            }
-
-            val request = Menu().apply {
-                this.price = BigDecimal.ONE
-                this.menuGroupId = UUID.randomUUID()
-                this.menuProducts = listOf(menuProduct)
-            }
+            val request = createMenuRequest(
+                menuProducts = listOf(
+                    createMenuProduct(
+                        product = createProduct(id = UUID.randomUUID()),
+                        quantity = -1,
+                    ),
+                ),
+            )
 
             every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
             every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
-                menuService.create(request)
-            }
-        }
-
-        @DisplayName("요청 내부의 상품이 존재하지 않는 상품이라면, NoSuchElementException 예외 처리")
-        @Test
-        fun test8() {
-            // given
-            val menuProduct = MenuProduct().apply {
-                this.productId = UUID.randomUUID()
-                this.quantity = 1
-            }
-
-            val request = Menu().apply {
-                this.price = BigDecimal.ONE
-                this.menuGroupId = UUID.randomUUID()
-                this.menuProducts = listOf(menuProduct)
-            }
-
-            every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
-            every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
-            every { productRepository.findById(any()) } throws NoSuchElementException()
-
-            // when & then
-            shouldThrowExactly<NoSuchElementException> {
                 menuService.create(request)
             }
         }
@@ -193,26 +155,14 @@ internal class MenuServiceTest {
         @Test
         fun test9() {
             // given
-            val menuProduct = MenuProduct().apply {
-                this.productId = UUID.randomUUID()
-                this.quantity = 1
-            }
-
-            val request = Menu().apply {
-                this.price = BigDecimal.ONE
-                this.menuGroupId = UUID.randomUUID()
-                this.menuProducts = listOf(menuProduct)
-                this.name = null
-            }
+            val request = createMenuRequest()
 
             every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
             every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
-            every { productRepository.findById(any()) } returns Optional.of(Product().apply {
-                this.price = BigDecimal.TWO
-            })
+            every { productRepository.findById(any()) } returns Optional.empty()
 
             // when & then
-            shouldThrowExactly<IllegalArgumentException> {
+            shouldThrowExactly<NoSuchElementException> {
                 menuService.create(request)
             }
         }
@@ -221,17 +171,7 @@ internal class MenuServiceTest {
         @Test
         fun test10() {
             // given
-            val menuProduct = MenuProduct().apply {
-                this.productId = UUID.randomUUID()
-                this.quantity = 1
-            }
-
-            val request = Menu().apply {
-                this.price = BigDecimal.ONE
-                this.menuGroupId = UUID.randomUUID()
-                this.menuProducts = listOf(menuProduct)
-                this.name = null
-            }
+            val request = createMenuRequest(name = null,)
 
             every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
             every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
@@ -249,17 +189,7 @@ internal class MenuServiceTest {
         @Test
         fun test11() {
             // given
-            val menuProduct = MenuProduct().apply {
-                this.productId = UUID.randomUUID()
-                this.quantity = 1
-            }
-
-            val request = Menu().apply {
-                this.price = BigDecimal.ONE
-                this.menuGroupId = UUID.randomUUID()
-                this.menuProducts = listOf(menuProduct)
-                this.name = "욕설"
-            }
+            val request = createMenuRequest(name = "욕설",)
 
             every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
             every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
@@ -278,20 +208,17 @@ internal class MenuServiceTest {
         @Test
         fun test12() {
             // given
-            val menuProduct = MenuProduct().apply {
-                this.productId = UUID.randomUUID()
-                this.quantity = 1
-            }
-
-            val request = Menu().apply {
-                this.price = BigDecimal.ONE
-                this.menuGroupId = UUID.randomUUID()
-                this.menuProducts = listOf(menuProduct)
-                this.name = "정상 메뉴"
-                this.isDisplayed = true
-                this.id = UUID.randomUUID()
-                this.menuGroup = MenuGroup()
-            }
+            val request = createMenuRequest(
+                name = "메뉴 이름",
+                isDisplayed = true,
+                price = BigDecimal.ONE,
+                menuProducts = listOf(
+                    createMenuProduct(
+                        product = createProduct(id = UUID.randomUUID()),
+                        quantity = 1,
+                    ),
+                ),
+            )
 
             every { menuGroupRepository.findById(any()) } returns Optional.of(MenuGroup())
             every { productRepository.findAllByIdIn(any()) } returns listOf(Product())
@@ -325,9 +252,7 @@ internal class MenuServiceTest {
         fun test1() {
             // given
             val menuId = UUID.randomUUID()
-            val request = Menu().apply {
-                this.price = null
-            }
+            val request = createMenuRequest(price = null)
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -340,9 +265,7 @@ internal class MenuServiceTest {
         fun test2() {
             // given
             val menuId = UUID.randomUUID()
-            val request = Menu().apply {
-                this.price = BigDecimal.valueOf(-1L)
-            }
+            val request = createMenuRequest(price = BigDecimal.valueOf(-1L))
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -355,9 +278,7 @@ internal class MenuServiceTest {
         fun test3() {
             // given
             val menuId = UUID.randomUUID()
-            val request = Menu().apply {
-                this.price = BigDecimal.valueOf(1000L)
-            }
+            val request = createMenuRequest(price = BigDecimal.valueOf(1000L))
 
             every { menuRepository.findById(any()) } returns Optional.empty()
 
@@ -372,16 +293,14 @@ internal class MenuServiceTest {
         fun test4() {
             // given
             val menuId = UUID.randomUUID()
-            val request = Menu().apply {
-                this.price = BigDecimal.valueOf(1000L)
-                this.id = menuId
-                this.menuProducts = listOf(MenuProduct().apply {
-                    this.product = Product().apply {
-                        this.price = BigDecimal.valueOf(999L)
-                    }
-                    this.quantity = 1
-                })
-            }
+            val request = createMenuRequest(
+                price = BigDecimal.valueOf(1001L),
+                menuProducts = listOf(
+                    createMenuProduct(
+                        product = createProduct(price = BigDecimal.valueOf(1000L)), quantity = 1
+                    )
+                ),
+            )
 
             every { menuRepository.findById(any()) } returns Optional.of(request)
 
@@ -396,18 +315,32 @@ internal class MenuServiceTest {
         fun test5() {
             // given
             val menuId = UUID.randomUUID()
-            val request = Menu().apply {
-                this.price = BigDecimal.valueOf(1000L)
-                this.id = menuId
-                this.menuProducts = listOf(MenuProduct().apply {
-                    this.product = Product().apply {
-                        this.price = BigDecimal.valueOf(1001L)
-                    }
-                    this.quantity = 1
-                })
-            }
+            val request = createMenuRequest(
+                price = BigDecimal.valueOf(1000L),
+                menuProducts = listOf(
+                    createMenuProduct(
+                        product = createProduct(price = BigDecimal.valueOf(1001L)), quantity = 1
+                    )
+                ),
+            )
 
-            every { menuRepository.findById(any()) } returns Optional.of(request)
+            val 찾아온_메뉴 = createMenu(
+                id = menuId,
+                price = request.price,
+                menuProducts = request.menuProducts,
+                isDisplayed = request.isDisplayed
+            )
+
+            createMenuRequest(
+                price = BigDecimal.valueOf(1000L),
+                menuProducts = listOf(
+                    createMenuProduct(
+                        product = createProduct(price = BigDecimal.valueOf(1001L)), quantity = 1
+                    )
+                ),
+            )
+
+            every { menuRepository.findById(any()) } returns Optional.of(찾아온_메뉴)
 
             // when
             val result = menuService.changePrice(menuId, request)
@@ -438,16 +371,14 @@ internal class MenuServiceTest {
         fun test2() {
             // given
             val menuId = UUID.randomUUID()
-            val menu = Menu().apply {
-                this.price = BigDecimal.valueOf(1001L)
-                this.id = menuId
-                this.menuProducts = listOf(MenuProduct().apply {
-                    this.product = Product().apply {
-                        this.price = BigDecimal.valueOf(1000L)
-                    }
-                    this.quantity = 1
-                })
-            }
+            val menu = createMenu(
+                id = menuId, price = BigDecimal.valueOf(1001L), menuProducts = listOf(
+                    createMenuProduct(
+                        product = createProduct(price = BigDecimal.valueOf(1000L)),
+                        quantity = 1,
+                    )
+                ), isDisplayed = false
+            )
 
             every { menuRepository.findById(any()) } returns Optional.of(menu)
 
@@ -462,16 +393,14 @@ internal class MenuServiceTest {
         fun test3() {
             // given
             val menuId = UUID.randomUUID()
-            val menu = Menu().apply {
-                this.menuProducts = listOf(MenuProduct().apply {
-                    this.product = Product().apply {
-                        this.price = BigDecimal.valueOf(1000L)
-                    }
-                    this.quantity = 1
-                })
-                this.price = BigDecimal.valueOf(999L)
-                this.isDisplayed = false
-            }
+            val menu = createMenu(
+                id = menuId, price = BigDecimal.valueOf(999L), menuProducts = listOf(
+                    createMenuProduct(
+                        product = createProduct(price = BigDecimal.valueOf(1000L)),
+                        quantity = 1,
+                    )
+                ), isDisplayed = false
+            )
 
             every { menuRepository.findById(any()) } returns Optional.of(menu)
 
@@ -505,11 +434,12 @@ internal class MenuServiceTest {
         fun test2(initDisplayed: Boolean) {
             // given
             val menuId = UUID.randomUUID()
-            val menu = Menu().apply {
-                this.isDisplayed = initDisplayed
-            }
 
-            every { menuRepository.findById(any()) } returns Optional.of(menu)
+            val 찾아온_메뉴 = createMenu(
+                id = menuId,
+            )
+
+            every { menuRepository.findById(any()) } returns Optional.of(찾아온_메뉴)
 
             // when
             val result = menuService.hide(menuId)
@@ -517,5 +447,56 @@ internal class MenuServiceTest {
             // then
             result.isDisplayed shouldBe false
         }
+    }
+
+    private fun createMenuRequest(
+        id: UUID = UUID.randomUUID(),
+        isDisplayed: Boolean = true,
+        price: BigDecimal? = BigDecimal.valueOf(1000L),
+        menuProducts: List<MenuProduct>? = listOf(createMenuProduct()),
+        menuGroup: MenuGroup? = MenuGroup(),
+        name: String? = "메뉴 이름",
+    ) = createMenu(
+        id = id,
+        isDisplayed = isDisplayed,
+        price = price,
+        menuProducts = menuProducts,
+        menuGroup = menuGroup,
+        name = name,
+    )
+
+    private fun createMenuProduct(
+        seq: Long = 1L,
+        product: Product = Product(),
+        quantity: Long = 1,
+    ) = MenuProduct().apply {
+        this.seq = seq
+        this.productId = product.id
+        this.product = product
+        this.quantity = quantity
+    }
+
+    private fun createMenu(
+        id: UUID = UUID.randomUUID(),
+        price: BigDecimal? = BigDecimal.valueOf(1000L),
+        menuProducts: List<MenuProduct>? = listOf(createMenuProduct()),
+        isDisplayed: Boolean = true,
+        menuGroup: MenuGroup? = MenuGroup(),
+        name: String? = "메뉴 이름",
+    ) = Menu().apply {
+        this.id = id
+        this.price = price
+        this.menuProducts = menuProducts
+        this.isDisplayed = isDisplayed
+        this.name = name
+        this.menuGroup = menuGroup
+    }
+
+    private fun createProduct(
+        id: UUID = UUID.randomUUID(),
+        price: BigDecimal = BigDecimal.valueOf(1000L),
+    ) = Product().apply {
+        this.id = id
+        this.price = price
     }
 }
