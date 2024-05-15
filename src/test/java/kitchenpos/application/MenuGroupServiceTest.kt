@@ -39,4 +39,15 @@ class MenuGroupServiceTest(
         // then
         assertThrows<IllegalArgumentException> { sut.create(request) }
     }
+
+    @DisplayName("등록된 메뉴그룹 목록을 조회할 수 있다")
+    @Test
+    fun menu_group_find_all_test() {
+        // given
+        // when
+        val menuGroups = sut.findAll()
+
+        // then
+        assertThat(menuGroups.size).isEqualTo(4)
+    }
 }
