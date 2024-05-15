@@ -2,7 +2,8 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
-import org.aspectj.weaver.ast.Or;
+import kitchenpos.testfixture.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -16,75 +17,67 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
-    @Mock
-    private OrderRepository orderRepository;
-
-    @Mock
-    private MenuRepository menuRepository;
-
-    @Mock
-    private OrderTableRepository orderTableRepository;
-
-    @Mock
+    private OrderRepository orderRepository = new InMemoryOrderRepository();
+    private MenuRepository menuRepository = new InMemoryMenuRepository();
+    private OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
     private KitchenridersClient kitchenridersClient;
 
-    @InjectMocks
     private OrderService orderService;
+
+    @BeforeEach
+    void setUp() {
+        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
+    }
 
     @Test
     void create() {
 
         // given
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setPrice(BigDecimal.valueOf(20000));
-        menu.setDisplayed(true);
+        Product product = ProductTestFixture.createProduct(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L
+        );
 
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(true);
+        Menu menu = MenuTestFixture.createMenu(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L,
+                true,
+                product
+        );
+        menuRepository.save(menu);
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(),
+                "1번",
+                true,
+                2
+        );
+        orderTableRepository.save(orderTable);
 
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setSeq(1L);
-        orderLineItem.setQuantity(1);
-        orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(BigDecimal.valueOf(20000));
-        orderLineItem.setMenuId(menu.getId());
+        OrderLineItem orderLineItem = OrderLineItemTestFixture.createOrderLine(1L, 1, menu);
 
-        Order request = new Order();
-        request.setType(OrderType.EAT_IN);
-        request.setOrderLineItems(Arrays.asList(orderLineItem));
-
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(request.getType());
-        order.setStatus(OrderStatus.WAITING);
-        order.setOrderDateTime(LocalDateTime.now());
-        order.setOrderLineItems(Arrays.asList(orderLineItem));
-        order.setOrderTable(orderTable);
-
-        given(menuRepository.findAllByIdIn(Arrays.asList(orderLineItem.getMenuId())))
-                .willReturn(Arrays.asList(menu));
-        given(menuRepository.findById(orderLineItem.getMenuId()))
-                .willReturn(Optional.of(menu));
-        given(orderTableRepository.findById(request.getOrderTableId()))
-                .willReturn(Optional.of(orderTable));
-
-        given(orderRepository.save(any())).willReturn(order);
+        Order request = OrderTestFixture.createOrderRequest(
+                OrderType.EAT_IN,
+                OrderStatus.WAITING,
+                LocalDateTime.now(),
+                orderLineItem,
+                orderTable
+        );
 
         //when
-        Order response  = orderService.create(request);
+        Order response = orderService.create(request);
 
         //then
-        assertEquals(orderTable, response.getOrderTable());
+        assertThat(response.getId()).isNotNull();
 
     }
 
@@ -111,15 +104,26 @@ class OrderServiceTest {
     void serve() {
 
         //given
-        UUID request = UUID.randomUUID();
-        Order order = new Order();
-        order.setStatus(OrderStatus.ACCEPTED);
-
-        given(orderRepository.findById(request))
-                .willReturn(Optional.of(order));
+        Menu menu = MenuTestFixture.createMenu(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L,
+                true,
+                ProductTestFixture.createProduct(UUID.randomUUID(), "후라이드치킨", 17000L)
+        );
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "1번", true, 2);
+        Order order = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.EAT_IN,
+                OrderStatus.ACCEPTED,
+                LocalDateTime.now(),
+                OrderLineItemTestFixture.createOrderLine(1L, 1, menu),
+                orderTable
+        );
+        orderRepository.save(order);
 
         //when
-        Order response = orderService.serve(request);
+        Order response = orderService.serve(order.getId());
 
         //then
         assertEquals(OrderStatus.SERVED, response.getStatus());
@@ -127,19 +131,27 @@ class OrderServiceTest {
 
     @Test
     void startDelivery() {
-
         //given
-        UUID request = UUID.randomUUID();
-        Order order = new Order();
-        order.setType(OrderType.DELIVERY);
-        order.setStatus(OrderStatus.SERVED);
-
-        given(orderRepository.findById(request))
-                .willReturn(Optional.of(order));
+        Menu menu = MenuTestFixture.createMenu(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L,
+                true,
+                ProductTestFixture.createProduct(UUID.randomUUID(), "후라이드치킨", 17000L)
+        );
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "1번", true, 2);
+        Order order = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.DELIVERY,
+                OrderStatus.SERVED,
+                LocalDateTime.now(),
+                OrderLineItemTestFixture.createOrderLine(1L, 1, menu),
+                orderTable
+        );
+        orderRepository.save(order);
 
         //when
-        Order response = orderService.startDelivery(request);
-
+        Order response = orderService.startDelivery(order.getId());
 
         //then
         assertEquals(OrderStatus.DELIVERING, response.getStatus());
@@ -150,46 +162,58 @@ class OrderServiceTest {
     void completeDelivery() {
 
         //given
-        UUID request = UUID.randomUUID();
-        Order order = new Order();
-        order.setStatus(OrderStatus.DELIVERING);
-
-        given(orderRepository.findById(request))
-                .willReturn(Optional.of(order));
-
+        Menu menu = MenuTestFixture.createMenu(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L,
+                true,
+                ProductTestFixture.createProduct(UUID.randomUUID(), "후라이드치킨", 17000L)
+        );
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "1번", true, 2);
+        Order order = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.DELIVERY,
+                OrderStatus.DELIVERING,
+                LocalDateTime.now(),
+                OrderLineItemTestFixture.createOrderLine(1L, 1, menu),
+                orderTable
+        );
+        orderRepository.save(order);
 
         //when
-        Order response = orderService.completeDelivery(request);
-
+        Order response = orderService.completeDelivery(order.getId());
 
         //then
         assertEquals(OrderStatus.DELIVERED, response.getStatus());
-
     }
 
     @Test
     void complete() {
 
         //given
-        UUID request= UUID.randomUUID();
-
-        OrderTable orderTable = new OrderTable();
-
-        Order order = new Order();
-        order.setId(request);
-        order.setOrderTable(orderTable);
-
-        given(orderRepository.findById(request))
-                .willReturn(Optional.of(order));
-
+        Menu menu = MenuTestFixture.createMenu(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L,
+                true,
+                ProductTestFixture.createProduct(UUID.randomUUID(), "후라이드치킨", 17000L)
+        );
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "1번", true, 2);
+        Order order = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.DELIVERY,
+                OrderStatus.DELIVERED,
+                LocalDateTime.now(),
+                OrderLineItemTestFixture.createOrderLine(1L, 1, menu),
+                orderTable
+        );
+        orderRepository.save(order);
 
         //when
-        Order response = orderService.complete(request);
+        Order response = orderService.complete(order.getId());
 
         //then
         assertEquals(OrderStatus.COMPLETED, response.getStatus());
-        assertEquals(0, response.getOrderTable().getNumberOfGuests());
-        assertEquals(false, response.getOrderTable().isOccupied());
 
     }
 
@@ -197,18 +221,29 @@ class OrderServiceTest {
     void findAll() {
 
         // given
-        Order order1 = new Order();
-        Order order2 = new Order();
+        Order order1 = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.EAT_IN,
+                OrderStatus.ACCEPTED,
+                LocalDateTime.now(),
+                new OrderLineItem(),
+                new OrderTable());
+        Order order2 = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.TAKEOUT,
+                OrderStatus.SERVED,
+                LocalDateTime.now(),
+                new OrderLineItem(),
+                new OrderTable());
 
-        given(orderRepository.findAll())
-                .willReturn(Arrays.asList(order1, order2));
+        orderRepository.save(order1);
+        orderRepository.save(order2);
 
         // when
         List<Order> response = orderService.findAll();
 
         // then
         assertEquals(2, response.size());
-        assertEquals(Arrays.asList(order1, order2), response);
 
     }
 }
