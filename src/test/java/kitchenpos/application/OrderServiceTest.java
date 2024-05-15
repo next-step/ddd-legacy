@@ -1,23 +1,9 @@
 package kitchenpos.application;
 
-import fixtures.MenuBuilder;
-import fixtures.MenuGroupBuilder;
-import fixtures.OrderBuilder;
-import fixtures.OrderLineItemBuilder;
-import fixtures.OrderTableBuilder;
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.MenuRepository;
+import fixtures.*;
+import kitchenpos.domain.*;
 import kitchenpos.domain.Order;
-import kitchenpos.domain.OrderLineItem;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.domain.OrderType;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +13,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -35,138 +22,345 @@ class OrderServiceTest {
     @Autowired
     private OrderService orderService;
     @Autowired
+    private OrderRepository orderRepository;
+    @Autowired
     private MenuGroupRepository menuGroupRepository;
     @Autowired
     private MenuRepository menuRepository;
     @Autowired
     private OrderTableRepository orderTableRepository;
+    private OrderSteps orderSteps;
 
 
-    @DisplayName("주문이 생성된다")
-    @ParameterizedTest
-    @EnumSource(value = OrderType.class)
-    void createOrderTest(OrderType orderType) {
+    @BeforeEach
+    void setUp() {
+        orderSteps = new OrderSteps(menuGroupRepository, menuRepository, orderTableRepository);
+    }
 
-        assertDoesNotThrow(() -> createOrder(orderType));
+    @Nested
+    @DisplayName("주문이 생성될 때")
+    class OrderCreateTest {
+
+        @DisplayName("주문 상태는 대기(WAITING)다")
+        @Test
+        void createOrderStatusIsWaitingTest() {
+
+            Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
+
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
+        }
+
+        @DisplayName("주문의 타입은 배달, 포장, 매장 식사여야 한다")
+        @ParameterizedTest
+        @EnumSource(value = OrderType.class)
+        void createOrderTest(OrderType orderType) {
+
+            assertDoesNotThrow(() -> createOrder(orderType, OrderStatus.WAITING));
+        }
+
+        @DisplayName("배달 주문은 주소 정보가 없으면 주문 생성이 불가능하다")
+        @Test
+        void createDeliveryOrderFailWhenAddressIsNullTest() {
+
+            Order order = new OrderBuilder()
+                    .withOrderType(OrderType.DELIVERY)
+                    .withDeliveryAddress(null)
+                    .build();
+
+            assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
+        }
+
+        @DisplayName("매장 식사 주문은 주문 테이블 정보가 없으면 주문 생성이 불가능하다")
+        @Test
+        void createEatInOrderFailWhenOrderTableTest() {
+
+            Order order = new OrderBuilder()
+                    .withOrderType(OrderType.EAT_IN)
+                    .withOrderTable(new OrderTableBuilder().anOrderTable().build())
+                    .build();
+
+            assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
+        }
+
+        @DisplayName("매장 식사 주문은 주문 수량이 0보다 작으면 주문 생성이 불가능하다")
+        @Test
+        void createEatInOrderFailWhenQuantityIsLessThanZeroTest() {
+
+            Order order = new OrderBuilder()
+                    .withOrderType(OrderType.EAT_IN)
+                    .withOrderLineItems(List.of(new OrderLineItemBuilder().withQuantity(-1).build()))
+                    .build();
+
+            assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
+        }
+
+        @DisplayName("주문에 메뉴가 없으면 주문 생성이 불가능하다")
+        @Test
+        void createdOrderHasAtLeastOneMenuTest() {
+
+            Order order = new OrderBuilder()
+                    .withOrderType(OrderType.EAT_IN)
+                    .withOrderLineItems(List.of())
+                    .build();
+
+            assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
+        }
+
+        @DisplayName("주문한 메뉴가 등록된 메뉴가 아니면 주문 생성이 불가능하다")
+        @Test
+        void createOrderMenuShouldRegisteredMenuTest() {
+
+                Order order = new OrderBuilder()
+                        .withOrderType(OrderType.EAT_IN)
+                        .withOrderLineItems(List.of(new OrderLineItemBuilder().build()))
+                        .build();
+
+                assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
+        }
+
+        @DisplayName("감추기 된 메뉴는 주문 생성이 불가능하다")
+        @Test
+        void createOrderMenuShouldDisplayedMenuTest() {
+
+            // given
+            Menu menu  = orderSteps.메뉴그룹에_소속될_메뉴를_생성한다(orderSteps.메뉴그룹_생성한다());
+
+            // when
+            menu.setDisplayed(false);
+            menuRepository.save(menu);
+
+            // then
+            Order order = orderSteps.주문을_생성한다(menu, OrderType.EAT_IN);
+            assertThrows(IllegalStateException.class, () -> orderService.create(order));
+        }
+
+        @DisplayName("주문한 메뉴의 가격은 0보다 작으면 주문 생성이 불가능 하다")
+        @Test
+        void createOrderShouldHasPositivePriceTest() {
+
+            // given
+            Menu menu  = orderSteps.메뉴그룹에_소속될_메뉴를_생성한다(orderSteps.메뉴그룹_생성한다());
+
+            // when
+            menu.setPrice(BigDecimal.valueOf(-1));
+            menuRepository.save(menu);
+
+            // then
+            Order order = orderSteps.주문을_생성한다(menu, OrderType.EAT_IN);
+            assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
+        }
+    }
+
+    @Nested
+    @DisplayName("주문이 승인(ACCEPTED)될 때")
+    class OrderAcceptTest {
+
+        @DisplayName("주문의 상태는 대기(WAITING)에서 승인(ACCEPTED)로 변경된다")
+        @Test
+        void acceptOrderTest() {
+
+
+            Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
+
+            Order accept = orderService.accept(order.getId());
+
+            assertThat(accept.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        }
+
+        @DisplayName("주문의 상태가 대기(WAITING)이 아니면 주문 승인이 불가능하다")
+        @Test
+        void acceptOrderFailWhenOrderStatusIsNotWaitingTest() {
+
+            Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
+
+            order.setStatus(OrderStatus.ACCEPTED);
+            orderRepository.save(order);
+
+            assertThrows(IllegalStateException.class, () -> orderService.accept(order.getId()));
+        }
     }
 
 
-    @DisplayName("배달 주문은 주소 정보가 없으면 예외가 발생한다")
-    @Test
-    void createDeliveryOrderFailWhenAddressIsNullTest() {
+    @DisplayName("주문이 제공(SERVED)될 때")
+    @Nested
+    class OrderServedTest {
 
-        Order order = new OrderBuilder()
-                .withOrderType(OrderType.DELIVERY)
-                .withDeliveryAddress(null)
-                .build();
+        @DisplayName("승인(ACCEPTED)에서 제공(SERVED)로 변경된다")
+        @Test
+        void acceptedOrderCanBeServedTest() {
 
-        assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
+            // given
+            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            order.setStatus(OrderStatus.ACCEPTED);
+            orderRepository.save(order);
+
+            // when
+            order = orderService.serve(order.getId());
+
+            // then
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.SERVED);
+        }
+
+        @DisplayName("주문이 승인(ACCEPTED)이 아니면 제공(SERVED)로 변경할 수 없다")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, names = {"WAITING", "DELIVERING", "DELIVERED", "COMPLETED"})
+        void waitingOrderShouldNotBeServedTest(OrderStatus orderStatus) {
+
+            // given
+            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+
+            // when
+            order.setStatus(orderStatus);
+            orderRepository.save(order);
+
+            // then
+            assertThatThrownBy(() -> orderService.serve(order.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
-    @DisplayName("매장 식사 주문은 주문 테이블 정보가 있어야 한다")
-    @Test
-    void createEatInOrderFailWhenOrderTableTest() {
+    @DisplayName("주문이 배달 중(DELIVERING)될 때")
+    @Nested
+    class OrderDeliveringTest {
 
-        Order order = new OrderBuilder()
-                .withOrderType(OrderType.EAT_IN)
-                .withOrderTable(null)
-                .build();
+        @DisplayName("제공(SERVED)에서 배달 중(DELIVERING)로 변경된다")
+        @Test
+        void servedOrderCanBeDeliveringTest() {
 
-        assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
+            // given
+            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            order.setStatus(OrderStatus.SERVED);
+            orderRepository.save(order);
+
+            // when
+            order = orderService.startDelivery(order.getId());
+
+            // then
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+        }
+
+        @DisplayName("주문의 유형은 배달이다")
+        @Test
+        void servedOrderShouldNotBeDeliveringTest() {
+            // given
+            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            order.setStatus(OrderStatus.SERVED);
+            orderRepository.save(order);
+
+            // when
+            Order delivery = orderService.startDelivery(order.getId());
+
+            // then
+            assertThat(delivery.getType()).isEqualTo(OrderType.DELIVERY);
+        }
     }
 
+    @DisplayName("주문이 배달 완료(DELIVERED)될 때")
+    @Nested
+    class OrderDeliveredTest {
 
-    @DisplayName("매장 식사 주문은 수량이 0보다 커야 한다")
-    @Test
-    void createEatInOrderFailWhenQuantityIsLessThanZeroTest() {
+        @DisplayName("배달 중(DELIVERING)에서 배달 완료(DELIVERED)로 변경된다")
+        @Test
+        void deliveringOrderCanBeDeliveredTest() {
 
-        Order created = createOrder(OrderType.EAT_IN);
+            // given
+            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            order.setStatus(OrderStatus.DELIVERING);
+            orderRepository.save(order);
 
-        assertThat(created.getOrderLineItems()).hasSizeGreaterThan(0);
-    }
+            // when
+            order = orderService.completeDelivery(order.getId());
 
+            // then
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+        }
 
-    @DisplayName("주문이 생성되면 주문의 초기 상태는 WAITING이다")
-    @ParameterizedTest
-    @EnumSource(value = OrderType.class)
-    void createOrderStatusTest(OrderType orderType) {
+        @DisplayName("주문의 상태가 배달 중(DELIVERING)이 아니면 배달 완료(DELIVERED)가 불가능하다")
+        @ParameterizedTest
+        @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "COMPLETED"})
+        void deliveringOrderShouldNotBeDeliveredTest(OrderStatus orderStatus) {
+            // given
+            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
 
-        Order created = createOrder(orderType);
+            // when
+            order.setStatus(orderStatus);
+            orderRepository.save(order);
 
-        assertThat(created.getStatus()).isEqualTo(OrderStatus.WAITING);
-    }
-
-
-    @DisplayName("주문은 메뉴를 최소 1개 갖는다")
-    @Test
-    void createdOrderHasAtLeastOneMenuTest() {
-
-        Order order = createOrder(OrderType.TAKEOUT);
-
-        assertThat(order.getOrderLineItems()).hasSizeGreaterThan(0);
-    }
-
-
-    @DisplayName("주문이 접수되면 OrderStatus가 ACCEPTED로 변경된다")
-    @Test
-    void acceptTest() {
-
-        Order created = createOrder(OrderType.TAKEOUT);
-        Order acceptedOrder = orderService.accept(created.getId());
-
-        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
-    }
-
-    @DisplayName("주문이 서빙되면 OrderStatus가 SERVED로 변경된다")
-    @Test
-    void serveTest() {
-
-        Order created = createOrder(OrderType.TAKEOUT);
-        Order acceptedOrder = orderService.accept(created.getId());
-        Order servedOrder = orderService.serve(acceptedOrder.getId());
-
-        assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
-    }
-
-    @DisplayName("주문이 배달 시작되면 OrderStatus가 DELIVERING로 변경된다")
-    @Test
-    void startDeliverTest() {
-
-        Order created = createOrder(OrderType.DELIVERY);
-        Order acceptedOrder = orderService.accept(created.getId());
-        Order servedOrder = orderService.serve(acceptedOrder.getId());
-        Order deliveredOrder = orderService.startDelivery(servedOrder.getId());
-
-        assertThat(deliveredOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
-    }
-
-    @DisplayName("주문이 배달 완료되면 OrderStatus가 DELIVERED로 변경된다")
-    @Test
-    void completedDeliverTest() {
-
-        Order created = createOrder(OrderType.DELIVERY);
-        Order acceptedOrder = orderService.accept(created.getId());
-        Order servedOrder = orderService.serve(acceptedOrder.getId());
-        Order deliveredOrder = orderService.startDelivery(servedOrder.getId());
-        Order completedOrder = orderService.completeDelivery(deliveredOrder.getId());
-
-        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
-    }
-
-    @DisplayName("주문이 완료되면 OrderStatus가 COMPLETED로 변경된다")
-    @Test
-    void completeTest() {
-
-        Order created = createOrder(OrderType.TAKEOUT);
-        Order acceptedOrder = orderService.accept(created.getId());
-        Order servedOrder = orderService.serve(acceptedOrder.getId());
-        Order completedOrder = orderService.complete(servedOrder.getId());
-
-        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            // then
+            assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+        }
     }
 
 
-    private Order createOrder(OrderType orderType) {
+    @DisplayName("주문이 완료(COMPLETED)될 때")
+    @Nested
+    class OrderCompletedTest {
+
+        @Test
+        @DisplayName("배달 주문은 배달 완료(DELIVERED) 상태에서 완료(COMPLETED)로 변경된다")
+        void completedOrderCanBeCompletedTest() {
+            // given
+            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            order.setStatus(OrderStatus.DELIVERED);
+            orderRepository.save(order);
+
+            // when
+            order = orderService.complete(order.getId());
+
+            // then
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        }
+
+        @Test
+        @DisplayName("테이크아웃 주문은 제공(SERVED) 상태에서 완료(COMPLETED)로 변경된다")
+        void servedTakeOutOrderCanBeCompletedTest() {
+            // given
+            Order order = createOrder(OrderType.TAKEOUT, OrderStatus.WAITING);
+            order.setStatus(OrderStatus.SERVED);
+            orderRepository.save(order);
+
+            // when
+            order = orderService.complete(order.getId());
+
+            // then
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        }
+
+        @Test
+        @DisplayName("매장 내 식사 주문은 제공(SERVED) 상태에서 완료(COMPLETED)로 변경된다")
+        void servedEatInOrderCanBeCompletedTest() {
+            // given
+            Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
+            order.setStatus(OrderStatus.SERVED);
+            orderRepository.save(order);
+
+            // when
+            order = orderService.complete(order.getId());
+
+            // then
+            assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        }
+
+        @Test
+        @DisplayName("매장 내 식사 주문이 완료되면 테이블이 비어있어야 한다")
+        void orderTableShouldUnOccupiedWhenOrderCompletedTest() {
+
+            // given
+            Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
+            order.setStatus(OrderStatus.SERVED);
+            orderRepository.save(order);
+
+            // when
+            order = orderService.complete(order.getId());
+
+            // then
+            assertThat(order.getOrderTable().isOccupied()).isFalse();
+            assertThat(order.getOrderTable().getNumberOfGuests()).isZero();
+        }
+    }
+
+    private Order createOrder(OrderType orderType, OrderStatus orderStatus) {
 
         MenuGroup menuGroup = menuGroupRepository.save(new MenuGroupBuilder().withName("한 마리 메뉴").build());
 
@@ -185,6 +379,7 @@ class OrderServiceTest {
                 .build());
 
         Order order = new OrderBuilder()
+                .withOrderStatus(orderStatus)
                 .withOrderType(orderType)
                 .withOrderLineItems(List.of(orderLineItem))
                 .withOrderTable(orderTable)
