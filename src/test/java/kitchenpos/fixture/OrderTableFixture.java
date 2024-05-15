@@ -8,6 +8,14 @@ public class OrderTableFixture {
     private OrderTableFixture() {
     }
 
+    public static OrderTable createOrderTable(UUID id, String name, int numberOfGuests) {
+        final OrderTable orderTable = new OrderTable();
+        orderTable.setId(id);
+        orderTable.setName(name);
+        orderTable.setNumberOfGuests(numberOfGuests);
+        return orderTable;
+    }
+
     public static OrderTable createOrderTable(String name) {
         final OrderTable orderTable = new OrderTable();
         orderTable.setName(name);

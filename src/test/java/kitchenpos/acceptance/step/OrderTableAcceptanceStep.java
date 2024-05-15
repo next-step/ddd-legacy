@@ -10,7 +10,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class OrderTableRestControllerStep {
+public class OrderTableAcceptanceStep {
 
     public static Response create(OrderTable orderTable) {
         // @formatter:off
