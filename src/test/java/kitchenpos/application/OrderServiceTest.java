@@ -6,6 +6,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -15,6 +17,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -377,10 +380,109 @@ class OrderServiceTest {
     }
 
     @Test
-    void complete() {
+    @DisplayName("배달 주문은 배달된 상태여야 주문 완료가 가능하다")
+    void requiresOrderDelivered() {
+        final var order = new Order();
+        order.setType(OrderType.DELIVERY);
+        order.setStatus(OrderStatus.DELIVERING);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.complete(UUID.randomUUID()));
+    }
+
+    @ParameterizedTest
+    @DisplayName("배달 주문을 제외한 주문은 제공된 상태여야 주문 완료가 가능하다")
+    @MethodSource("orderTypeTakeOutAndEatIn")
+    void requiresTakeOutAndEatInOrderServed(final OrderType type) {
+        final var order = new Order();
+        order.setType(type);
+        order.setStatus(OrderStatus.ACCEPTED);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        assertThatIllegalStateException()
+                .isThrownBy(() -> orderService.complete(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("매장 주문이 완료시 테이블에 모든 주문이 완료되었다면 치워야 한다")
+    void eatInOrderTableClean() {
+        final var order = new Order();
+        order.setType(OrderType.EAT_IN);
+        order.setStatus(OrderStatus.SERVED);
+
+        final var orderTable = new OrderTable();
+        orderTable.setOccupied(true);
+        orderTable.setNumberOfGuests(1);
+        order.setOrderTable(orderTable);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(false);
+
+        Order completed = orderService.complete(UUID.randomUUID());
+
+        assertThat(completed.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(orderTable.getNumberOfGuests()).isZero();
+        assertThat(orderTable.isOccupied()).isFalse();
+    }
+
+    @Test
+    @DisplayName("매장 주문이 완료시 테이블에 다른 주문이 남아 있다면 치우지 않는다")
+    void eatInOrderTableCleanNot() {
+        final var order = new Order();
+        order.setType(OrderType.EAT_IN);
+        order.setStatus(OrderStatus.SERVED);
+
+        final var orderTable = new OrderTable();
+        orderTable.setOccupied(true);
+        orderTable.setNumberOfGuests(1);
+        order.setOrderTable(orderTable);
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+        when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(true);
+
+        Order completed = orderService.complete(UUID.randomUUID());
+
+        assertThat(completed.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        assertThat(orderTable.getNumberOfGuests()).isNotZero();
+        assertThat(orderTable.isOccupied()).isTrue();
+    }
+
+    @ParameterizedTest
+    @DisplayName("정상 주문 완료")
+    @MethodSource("completableOrder")
+    void complete(final Order order) {
+
+        when(orderRepository.findById(any())).thenReturn(Optional.of(order));
+
+        Order completed = orderService.complete(UUID.randomUUID());
+
+        assertThat(completed.getStatus()).isEqualTo(OrderStatus.COMPLETED);
     }
 
     @Test
     void findAll() {
+    }
+
+    static Stream<Arguments> completableOrder() {
+        return Stream.of(
+                Arguments.of(new Order() {{
+                    setType(OrderType.TAKEOUT);
+                    setStatus(OrderStatus.SERVED);
+                }}),
+                Arguments.of(new Order() {{
+                    setType(OrderType.DELIVERY);
+                    setStatus(OrderStatus.DELIVERED);
+                }})
+        );
+    }
+
+    static Stream<Arguments> orderTypeTakeOutAndEatIn() {
+        return Stream.of(
+                Arguments.of(OrderType.TAKEOUT),
+                Arguments.of(OrderType.EAT_IN)
+        );
     }
 }
