@@ -19,7 +19,40 @@ public class MenuFixture {
         menu.setMenuGroupId(menuGroup.getId());
         menu.setMenuProducts(menuProducts);
         menu.setDisplayed(true);
+        return menu;
+    }
 
+    public static Menu createMenu(String menuName, MenuGroup menuGroup, BigDecimal menuPrice, boolean displayed, MenuProduct... menuProducts) {
+        Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName(menuName);
+        menu.setPrice(menuPrice);
+        menu.setMenuProducts(List.of(menuProducts));
+        menu.setDisplayed(displayed);
+        menu.setMenuGroup(menuGroup);
+        menu.setMenuGroupId(menuGroup.getId());
+        return menu;
+    }
+
+    public static Menu 커플_강정_후라이드_메뉴(MenuGroup menuGroup, MenuProduct... menuProducts) {
+        Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName("커플 강정 + 후라이드");
+        menu.setPrice(BigDecimal.valueOf(20000));
+        menu.setMenuProducts(List.of(menuProducts));
+        menu.setDisplayed(true);
+        menu.setMenuGroup(menuGroup);
+        menu.setMenuGroupId(menuGroup.getId());
+        return menu;
+    }
+
+    public static Menu withoutMenuGroup(String menuName, boolean displayed, BigDecimal menuPrice, MenuProduct... menuProducts) {
+        Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName(menuName);
+        menu.setPrice(menuPrice);
+        menu.setMenuProducts(List.of(menuProducts));
+        menu.setDisplayed(displayed);
         return menu;
     }
 }
