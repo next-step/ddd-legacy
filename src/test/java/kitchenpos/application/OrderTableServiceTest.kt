@@ -37,7 +37,7 @@ internal class OrderTableServiceTest {
         @NullAndEmptySource
         fun test1(name: String?) {
             // given
-            val nullOrEmpty_테이블 = getOrderTable(name = name)
+            val nullOrEmpty_테이블 = createOrderTableRequest(name = name)
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -49,9 +49,15 @@ internal class OrderTableServiceTest {
         @Test
         fun test2() {
             // given
-            val 정상_요청 = getOrderTable(name = "정상 테이블")
+            val 정상_요청 = createOrderTableRequest(name = "정상 테이블")
 
-            every { orderTableRepository.save(any()) } returns 정상_요청
+            val 저장한_테이블 = createOrderTable(
+                name = 정상_요청.name,
+                numberOfGuests = 0,
+                isOccupied = false,
+            )
+
+            every { orderTableRepository.save(any()) } returns 저장한_테이블
 
             // when
             val result = orderTableService.create(정상_요청)
@@ -87,12 +93,16 @@ internal class OrderTableServiceTest {
         fun test2() {
             // given
             val orderTableId = UUID.randomUUID()
-            val 정상_앉기_요청 = getOrderTable(
-                id = orderTableId,
+            val 앉으려는_테이블 = createOrderTableRequest(
                 isOccupied = false,
             )
 
-            every { orderTableRepository.findById(any()) } returns Optional.of(정상_앉기_요청)
+            val 찾아온_테이블 = createOrderTable(
+                id = orderTableId,
+                isOccupied = 앉으려는_테이블.isOccupied
+            )
+
+            every { orderTableRepository.findById(any()) } returns Optional.of(찾아온_테이블)
 
             // when
             val result = orderTableService.sit(orderTableId)
@@ -123,11 +133,10 @@ internal class OrderTableServiceTest {
         fun test2() {
             // given
             val orderTableId = UUID.randomUUID()
-            val 중복된_테이블 = getOrderTable(
-                id = orderTableId,
-            )
 
-            every { orderTableRepository.findById(any()) } returns Optional.of(중복된_테이블)
+            val 찾아온_테이블 = createOrderTable(id = orderTableId)
+
+            every { orderTableRepository.findById(any()) } returns Optional.of(찾아온_테이블)
             every { orderRepository.existsByOrderTableAndStatusNot(any(), any()) } returns true
 
             // when & then
@@ -141,11 +150,12 @@ internal class OrderTableServiceTest {
         fun test3() {
             // given
             val orderTableId = UUID.randomUUID()
-            val 정상_테이블_요청 = getOrderTable(
+
+            val 찾아온_테이블 = createOrderTable(
                 id = orderTableId
             )
 
-            every { orderTableRepository.findById(any()) } returns Optional.of(정상_테이블_요청)
+            every { orderTableRepository.findById(any()) } returns Optional.of(찾아온_테이블)
             every { orderRepository.existsByOrderTableAndStatusNot(any(), any()) } returns false
 
             // when
@@ -164,9 +174,8 @@ internal class OrderTableServiceTest {
         fun test1() {
             // given
             val orderTableId = UUID.randomUUID()
-            val 손님_수_음수_요청 = getOrderTable(
-                id = orderTableId,
-                numberOfGuest = -1,
+            val 손님_수_음수_요청 = createOrderTableRequest(
+                numberOfGuests = -1,
             )
 
             // when & then
@@ -180,9 +189,8 @@ internal class OrderTableServiceTest {
         fun test2() {
             // given
             val orderTableId = UUID.randomUUID()
-            val 존재_하지_않는_테이블 = getOrderTable(
-                id = UUID.randomUUID(),
-                numberOfGuest = 4,
+            val 존재_하지_않는_테이블 = createOrderTableRequest(
+                numberOfGuests = 4,
             )
 
             every { orderTableRepository.findById(any()) } returns Optional.empty()
@@ -198,18 +206,21 @@ internal class OrderTableServiceTest {
         fun test3() {
             // given
             val orderTableId = UUID.randomUUID()
-            val 점유_중_이지_않은_테이블 = getOrderTable(
-                id = orderTableId,
-                numberOfGuest = 4,
+            val 점유_중_이지_않은_테이블_요청 = createOrderTableRequest(
                 isOccupied = false,
             )
 
-            every { orderTableRepository.findById(any()) } returns Optional.of(점유_중_이지_않은_테이블)
+            val 찾아온_테이블 = createOrderTable(
+                id = orderTableId,
+                isOccupied = 점유_중_이지_않은_테이블_요청.isOccupied,
+            )
+
+            every { orderTableRepository.findById(any()) } returns Optional.of(찾아온_테이블)
             every { orderRepository.existsByOrderTableAndStatusNot(any(), any()) } returns false
 
             // when & then
             shouldThrowExactly<IllegalStateException> {
-                orderTableService.changeNumberOfGuests(orderTableId, 점유_중_이지_않은_테이블)
+                orderTableService.changeNumberOfGuests(orderTableId, 점유_중_이지_않은_테이블_요청)
             }
         }
 
@@ -218,32 +229,45 @@ internal class OrderTableServiceTest {
         fun test4() {
             // given
             val orderTableId = UUID.randomUUID()
-            val 정상_테이블 = getOrderTable(
-                id = orderTableId,
-                numberOfGuest = 4,
+            val 손님_수_변경_요청 = createOrderTableRequest(
+                numberOfGuests = 4,
                 isOccupied = true,
             )
 
-            every { orderTableRepository.findById(any()) } returns Optional.of(정상_테이블)
+            val 찾아온_테이블 = createOrderTable(
+                id = orderTableId,
+                numberOfGuests = 손님_수_변경_요청.numberOfGuests,
+                isOccupied = 손님_수_변경_요청.isOccupied
+            )
+
+            every { orderTableRepository.findById(any()) } returns Optional.of(찾아온_테이블)
             every { orderRepository.existsByOrderTableAndStatusNot(any(), any()) } returns false
 
             // when
-            val result = orderTableService.changeNumberOfGuests(orderTableId, 정상_테이블)
+            val result = orderTableService.changeNumberOfGuests(orderTableId, 손님_수_변경_요청)
 
             // then
-            result.numberOfGuests shouldBe 정상_테이블.numberOfGuests
+            result.numberOfGuests shouldBe 손님_수_변경_요청.numberOfGuests
         }
     }
 
-    private fun getOrderTable(
+    private fun createOrderTableRequest(
+        id: UUID = UUID.randomUUID(),
+        name: String? = "정상 테이블 요청",
+        numberOfGuests: Int = 4,
+        isOccupied: Boolean = true,
+    ) = createOrderTable(id = id, name = name, numberOfGuests = numberOfGuests, isOccupied = isOccupied)
+
+
+    private fun createOrderTable(
         id: UUID = UUID.randomUUID(),
         name: String? = "정상 테이블",
-        numberOfGuest: Int = 0,
-        isOccupied: Boolean = false,
+        numberOfGuests: Int = 4,
+        isOccupied: Boolean = true,
     ) = OrderTable().apply {
         this.id = id
         this.name = name
-        this.numberOfGuests = numberOfGuest
+        this.numberOfGuests = numberOfGuests
         this.isOccupied = isOccupied
     }
 }
