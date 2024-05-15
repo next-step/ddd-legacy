@@ -90,22 +90,19 @@ class OrderTableServiceTest {
     }
 
 
-    @DisplayName("주문 테이블에 손님 수를 변경할 때 occupied된 테이블이 아니라면 예외가 발생한다")
+    @DisplayName("주문테이블에 손님이 비어있다면 인원 수 변경은 불가능하다")
     @Test
     void changeNumberOfGuestsFailTest() {
 
-            // given
-
+        // given
         OrderTable createdOrderTable = createdOrderTable(new OrderTableBuilder()
                     .with("1번")
+                    .withOccupied(false)
                     .build());
 
-            // when
-            createdOrderTable.setNumberOfGuests(4);
-
-            // then
-            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(createdOrderTable.getId(), createdOrderTable))
-                    .isInstanceOf(IllegalStateException.class);
+        // then
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(createdOrderTable.getId(), createdOrderTable))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     private OrderTable createdOrderTable(OrderTable orderTable) {
