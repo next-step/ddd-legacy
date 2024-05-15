@@ -10,6 +10,13 @@ public class ProductFixture {
 
     }
 
+    public static Product createProduct(String name, BigDecimal price) {
+        final Product product = new Product();
+        product.setName(name);
+        product.setPrice(price);
+        return product;
+    }
+
     public static Product createProductWithId(String name, BigDecimal price) {
         final Product product = new Product();
         product.setId(UUID.randomUUID());
