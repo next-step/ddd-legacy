@@ -45,9 +45,9 @@ internal class OrderServiceTest {
         @Test
         fun test1() {
             // given
-            val request = Order().apply {
-                this.type = null
-            }
+            val request = createOrderRequest(
+                type = null
+            )
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -59,10 +59,10 @@ internal class OrderServiceTest {
         @Test
         fun test2() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.DELIVERY
-                this.orderLineItems = null
-            }
+            val request = createOrderRequest(
+                type = OrderType.DELIVERY,
+                orderLineItems = null
+            )
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -74,10 +74,10 @@ internal class OrderServiceTest {
         @Test
         fun test3() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.DELIVERY
-                this.orderLineItems = emptyList()
-            }
+            val request = createOrderRequest(
+                type = OrderType.DELIVERY,
+                orderLineItems = emptyList()
+            )
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -89,12 +89,10 @@ internal class OrderServiceTest {
         @Test
         fun test4() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.DELIVERY
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                })
-            }
+            val request = createOrderRequest(
+                type = OrderType.DELIVERY,
+                orderLineItems = listOf(createOrderLineItem())
+            )
 
             every { menuRepository.findAllByIdIn(any()) } returns listOf(Menu(), Menu())
 
@@ -108,15 +106,14 @@ internal class OrderServiceTest {
         @Test
         fun test5() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.DELIVERY
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = -1
-                })
-            }
+            val request = createOrderRequest(
+                type = OrderType.DELIVERY,
+                orderLineItems = listOf(createOrderLineItem(quantity = -1))
+            )
 
-            every { menuRepository.findAllByIdIn(any()) } returns listOf(Menu())
+            val menu = createMenu()
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -128,15 +125,14 @@ internal class OrderServiceTest {
         @Test
         fun test6() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.TAKEOUT
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = -1
-                })
-            }
+            val request = createOrderRequest(
+                type = OrderType.TAKEOUT,
+                orderLineItems = listOf(createOrderLineItem(quantity = -1))
+            )
 
-            every { menuRepository.findAllByIdIn(any()) } returns listOf(Menu())
+            val menu = createMenu()
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
 
             // when & then
             shouldThrowExactly<IllegalArgumentException> {
@@ -148,15 +144,13 @@ internal class OrderServiceTest {
         @Test
         fun test7() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.EAT_IN
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = 1
-                })
-            }
+            val request = createOrderRequest(
+                type = OrderType.EAT_IN,
+            )
 
-            every { menuRepository.findAllByIdIn(any()) } returns listOf(Menu())
+            val menu = createMenu()
+
+            every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
             every { menuRepository.findById(any()) } returns Optional.empty()
 
             // when & then
@@ -169,17 +163,13 @@ internal class OrderServiceTest {
         @Test
         fun test8() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.EAT_IN
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = 1
-                })
-            }
+            val request = createOrderRequest(
+                type = OrderType.EAT_IN,
+            )
 
-            val menu = Menu().apply {
-                this.isDisplayed = false
-            }
+            val menu = createMenu(
+                isDisplayed = false,
+            )
 
             every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
             every { menuRepository.findById(any()) } returns Optional.of(menu)
@@ -194,19 +184,18 @@ internal class OrderServiceTest {
         @Test
         fun test9() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.EAT_IN
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = 1
-                    this.price = BigDecimal.ONE
-                })
-            }
+            val request = createOrderRequest(
+                orderLineItems = listOf(
+                    createOrderLineItem(
+                        quantity = 1,
+                        price = BigDecimal.ONE,
+                    )
+                ),
+            )
 
-            val menu = Menu().apply {
-                this.isDisplayed = true
-                this.price = BigDecimal.TWO
-            }
+            val menu = createMenu(
+                price = BigDecimal.TWO
+            )
 
             every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
             every { menuRepository.findById(any()) } returns Optional.of(menu)
@@ -221,20 +210,14 @@ internal class OrderServiceTest {
         @Test
         fun test10() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.DELIVERY
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = 1
-                    this.price = BigDecimal.ONE
-                })
-                this.deliveryAddress = null
-            }
+            val request = createOrderRequest(
+                type = OrderType.DELIVERY,
+                deliveryAddress = null
+            )
 
-            val menu = Menu().apply {
-                this.isDisplayed = true
-                this.price = BigDecimal.ONE
-            }
+            val menu = createMenu(
+                price = BigDecimal.ONE
+            )
 
             every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
             every { menuRepository.findById(any()) } returns Optional.of(menu)
@@ -249,29 +232,35 @@ internal class OrderServiceTest {
         @Test
         fun test11() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.DELIVERY
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = 1
-                    this.price = BigDecimal.ONE
-                })
-                this.deliveryAddress = "주소"
-            }
+            val orderTable = createOrderTable(isOccupied = false)
 
-            val menu = Menu().apply {
-                this.isDisplayed = true
-                this.price = BigDecimal.ONE
-            }
+            val request = createOrderRequest(
+                type = OrderType.DELIVERY,
+                orderLineItems = listOf(
+                    createOrderLineItem(
+                        quantity = 1,
+                        price = BigDecimal.ONE,
+                    )
+                ),
+                orderTable = orderTable,
+                deliveryAddress = "주소"
+            )
+
+            val menu = createMenu(
+                price = BigDecimal.ONE
+            )
+
+            val 찾아온_주문 = createOrder(
+                status = OrderStatus.WAITING,
+                type = request.type,
+                orderTable = orderTable,
+                orderLineItems = request.orderLineItems,
+                deliveryAddress = request.deliveryAddress
+            )
 
             every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
             every { menuRepository.findById(any()) } returns Optional.of(menu)
-            every { orderRepository.save(any()) } returns request.apply {
-                this.status = OrderStatus.WAITING
-                this.id = UUID.randomUUID()
-                this.orderDateTime = LocalDateTime.now()
-                this.orderLineItems = request.orderLineItems
-            }
+            every { orderRepository.save(any()) } returns 찾아온_주문
 
             // when
             val result = orderService.create(request)
@@ -292,21 +281,19 @@ internal class OrderServiceTest {
         @Test
         fun test12() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.EAT_IN
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = 1
-                    this.price = BigDecimal.ONE
-                })
-                this.deliveryAddress = null
-                this.orderTableId = null
-            }
+            val request = createOrderRequest(
+                type = OrderType.EAT_IN,
+                orderLineItems = listOf(
+                    createOrderLineItem(
+                        quantity = 1,
+                        price = BigDecimal.ONE,
+                    )
+                ),
+            )
 
-            val menu = Menu().apply {
-                this.isDisplayed = true
-                this.price = BigDecimal.ONE
-            }
+            val menu = createMenu(
+                price = BigDecimal.ONE
+            )
 
             every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
             every { menuRepository.findById(any()) } returns Optional.of(menu)
@@ -322,27 +309,26 @@ internal class OrderServiceTest {
         @Test
         fun test13() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.EAT_IN
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = 1
-                    this.price = BigDecimal.ONE
-                })
-                this.deliveryAddress = null
-                this.orderTableId = null
-            }
+            val orderTable = createOrderTable(isOccupied = false)
 
-            val menu = Menu().apply {
-                this.isDisplayed = true
-                this.price = BigDecimal.ONE
-            }
+            val request = createOrderRequest(
+                type = OrderType.EAT_IN,
+                orderLineItems = listOf(
+                    createOrderLineItem(
+                        quantity = 1,
+                        price = BigDecimal.ONE,
+                    )
+                ),
+                orderTable = orderTable
+            )
+
+            val menu = createMenu(
+                price = BigDecimal.ONE
+            )
 
             every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
             every { menuRepository.findById(any()) } returns Optional.of(menu)
-            every { orderTableRepository.findById(any()) } returns Optional.of(OrderTable().apply {
-                this.isOccupied = false
-            })
+            every { orderTableRepository.findById(any()) } returns Optional.of(orderTable)
 
             // when & then
             shouldThrowExactly<IllegalStateException> {
@@ -354,34 +340,34 @@ internal class OrderServiceTest {
         @Test
         fun test14() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.EAT_IN
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = 1
-                    this.price = BigDecimal.ONE
-                })
-            }
+            val orderTable = createOrderTable(isOccupied = true)
 
-            val menu = Menu().apply {
-                this.isDisplayed = true
-                this.price = BigDecimal.ONE
-            }
+            val request = createOrderRequest(
+                type = OrderType.EAT_IN,
+                orderLineItems = listOf(
+                    createOrderLineItem(
+                        quantity = 1,
+                        price = BigDecimal.ONE,
+                    )
+                ),
+                orderTable = orderTable
+            )
 
-            val orderTable = OrderTable().apply {
-                this.isOccupied = true
-            }
+            val menu = createMenu(
+                price = BigDecimal.ONE
+            )
+
+            val 찾아온_주문 = createOrder(
+                type = request.type,
+                status = OrderStatus.WAITING,
+                orderTable = request.orderTable,
+                orderLineItems = request.orderLineItems,
+            )
 
             every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
             every { menuRepository.findById(any()) } returns Optional.of(menu)
             every { orderTableRepository.findById(any()) } returns Optional.of(orderTable)
-            every { orderRepository.save(any()) } returns request.apply {
-                this.status = OrderStatus.WAITING
-                this.id = UUID.randomUUID()
-                this.orderDateTime = LocalDateTime.now()
-                this.orderLineItems = request.orderLineItems
-                this.orderTable = orderTable
-            }
+            every { orderRepository.save(any()) } returns 찾아온_주문
 
             // when
             val result = orderService.create(request)
@@ -404,29 +390,29 @@ internal class OrderServiceTest {
         @Test
         fun test15() {
             // given
-            val request = Order().apply {
-                this.type = OrderType.TAKEOUT
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menuId = UUID.randomUUID()
-                    this.quantity = 1
-                    this.price = BigDecimal.ONE
-                })
-            }
+            val menu = createMenu(
+                price = BigDecimal.ONE
+            )
 
-            val menu = Menu().apply {
-                this.isDisplayed = true
-                this.price = BigDecimal.ONE
-            }
+            val request = createOrderRequest(
+                type = OrderType.TAKEOUT,
+                orderLineItems = listOf(
+                    createOrderLineItem(
+                        quantity = 1,
+                        price = BigDecimal.ONE,
+                    )
+                )
+            )
 
+            val 찾아온_주문 = createOrder(
+                status = OrderStatus.WAITING,
+                orderTable = request.orderTable,
+                orderLineItems = request.orderLineItems,
+            )
 
             every { menuRepository.findAllByIdIn(any()) } returns listOf(menu)
             every { menuRepository.findById(any()) } returns Optional.of(menu)
-            every { orderRepository.save(any()) } returns request.apply {
-                this.status = OrderStatus.WAITING
-                this.id = UUID.randomUUID()
-                this.orderDateTime = LocalDateTime.now()
-                this.orderLineItems = request.orderLineItems
-            }
+            every { orderRepository.save(any()) } returns 찾아온_주문
 
             // when
             val result = orderService.create(request)
@@ -467,9 +453,11 @@ internal class OrderServiceTest {
         fun test2(orderStatus: OrderStatus) {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.status = orderStatus
-            }
+
+            val order = createOrder(
+                id = orderId,
+                status = orderStatus,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -484,16 +472,12 @@ internal class OrderServiceTest {
         fun test3() {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.status = OrderStatus.WAITING
-                this.type = OrderType.DELIVERY
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menu = Menu().apply {
-                        this.price = BigDecimal.ONE
-                    }
-                    this.quantity = 1
-                })
-            }
+
+            val order = createOrder(
+                id = orderId,
+                status = OrderStatus.WAITING,
+                type = OrderType.DELIVERY,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
             justRun { kitchenridersClient.requestDelivery(any(), any(), any()) }
@@ -512,16 +496,11 @@ internal class OrderServiceTest {
         fun test4(type: OrderType) {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.status = OrderStatus.WAITING
-                this.type = type
-                this.orderLineItems = listOf(OrderLineItem().apply {
-                    this.menu = Menu().apply {
-                        this.price = BigDecimal.ONE
-                    }
-                    this.quantity = 1
-                })
-            }
+            val order = createOrder(
+                id = orderId,
+                status = OrderStatus.WAITING,
+                type = type,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -555,9 +534,11 @@ internal class OrderServiceTest {
         fun test2(status: OrderStatus) {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.status = status
-            }
+
+            val order = createOrder(
+                id = orderId,
+                status = status,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -572,9 +553,10 @@ internal class OrderServiceTest {
         fun test3() {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.status = OrderStatus.ACCEPTED
-            }
+            val order = createOrder(
+                id = orderId,
+                status = OrderStatus.ACCEPTED,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -608,9 +590,11 @@ internal class OrderServiceTest {
         fun test2(type: OrderType) {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.type = type
-            }
+
+            val order = createOrder(
+                id = orderId,
+                type = type,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -626,10 +610,17 @@ internal class OrderServiceTest {
         fun test3(status: OrderStatus) {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.type = OrderType.DELIVERY
-                this.status = status
-            }
+            val order = createOrder(
+                id = orderId,
+                status = status,
+                type = OrderType.DELIVERY,
+                orderLineItems = listOf(
+                    createOrderLineItem(
+                        menu = createMenu(price = BigDecimal.ONE),
+                        quantity = 1,
+                    )
+                ),
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -644,10 +635,18 @@ internal class OrderServiceTest {
         fun test4() {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.type = OrderType.DELIVERY
-                this.status = OrderStatus.SERVED
-            }
+
+            val order = createOrder(
+                id = orderId,
+                status = OrderStatus.SERVED,
+                type = OrderType.DELIVERY,
+                orderLineItems = listOf(
+                    createOrderLineItem(
+                        menu = createMenu(price = BigDecimal.ONE),
+                        quantity = 1,
+                    )
+                ),
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -681,9 +680,12 @@ internal class OrderServiceTest {
         fun test2(status: OrderStatus) {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.status = status
-            }
+
+            val order = createOrder(
+                id = orderId,
+                status = status,
+                type = OrderType.DELIVERY,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -698,9 +700,11 @@ internal class OrderServiceTest {
         fun test3() {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.status = OrderStatus.DELIVERING
-            }
+            val order = createOrder(
+                id = orderId,
+                status = OrderStatus.DELIVERING,
+                type = OrderType.DELIVERY,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -734,10 +738,12 @@ internal class OrderServiceTest {
         fun test2(status: OrderStatus) {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.type = OrderType.DELIVERY
-                this.status = status
-            }
+
+            val order = createOrder(
+                id = orderId,
+                status = status,
+                type = OrderType.DELIVERY,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -750,16 +756,21 @@ internal class OrderServiceTest {
         @DisplayName("주문 유형이 포장 또는 매장 내 식사인데, 주문 상태가 서빙 상태가 아니라면, IllegalStateException 예외 처리를 한다.")
         @ParameterizedTest
         @CsvSource(
-            "TAKEOUT, WAITING", "TAKEOUT, ACCEPTED", "TAKEOUT, COMPLETED",
-            "EAT_IN, WAITING", "EAT_IN, ACCEPTED", "EAT_IN, COMPLETED"
+            "TAKEOUT, WAITING",
+            "TAKEOUT, ACCEPTED",
+            "TAKEOUT, COMPLETED",
+            "EAT_IN, WAITING",
+            "EAT_IN, ACCEPTED",
+            "EAT_IN, COMPLETED"
         )
         fun test3(type: OrderType, status: OrderStatus) {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.type = type
-                this.status = status
-            }
+            val order = createOrder(
+                id = orderId,
+                status = status,
+                type = type,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -774,14 +785,14 @@ internal class OrderServiceTest {
         fun test4() {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.type = OrderType.EAT_IN
-                this.status = OrderStatus.SERVED
-                this.orderTable = OrderTable().apply {
-                    this.isOccupied = true
-                    this.numberOfGuests = 4
-                }
-            }
+            val order = createOrder(
+                id = orderId,
+                status = OrderStatus.SERVED,
+                type = OrderType.EAT_IN,
+                orderTable = createOrderTable(
+                    numberOfGuests = 4, isOccupied = true
+                ),
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
             every { orderRepository.existsByOrderTableAndStatusNot(any(), any()) } returns false
@@ -803,10 +814,12 @@ internal class OrderServiceTest {
         fun test5(type: OrderType, status: OrderStatus) {
             // given
             val orderId = UUID.randomUUID()
-            val order = Order().apply {
-                this.type = type
-                this.status = status
-            }
+
+            val order = createOrder(
+                id = orderId,
+                status = status,
+                type = type,
+            )
 
             every { orderRepository.findById(any()) } returns Optional.of(order)
 
@@ -816,5 +829,74 @@ internal class OrderServiceTest {
             // then
             result.status shouldBe OrderStatus.COMPLETED
         }
+    }
+
+    private fun createOrderRequest(
+        id: UUID = UUID.randomUUID(),
+        status: OrderStatus = OrderStatus.WAITING,
+        type: OrderType? = OrderType.TAKEOUT,
+        orderTable: OrderTable = createOrderTable(),
+        orderLineItems: List<OrderLineItem>? = listOf(createOrderLineItem()),
+        deliveryAddress: String? = null,
+    ) = createOrder(
+        id = id,
+        status = status,
+        type = type,
+        orderTable = orderTable,
+        orderLineItems = orderLineItems,
+        deliveryAddress = deliveryAddress,
+    )
+
+    private fun createOrder(
+        id: UUID = UUID.randomUUID(),
+        status: OrderStatus = OrderStatus.WAITING,
+        type: OrderType? = OrderType.TAKEOUT,
+        orderTable: OrderTable = createOrderTable(),
+        orderLineItems: List<OrderLineItem>? = listOf(createOrderLineItem()),
+        orderDateTime: LocalDateTime = LocalDateTime.now(),
+        deliveryAddress: String? = null,
+    ) = Order().apply {
+        this.id = id
+        this.type = type
+        this.status = status
+        this.orderTable = orderTable
+        this.orderLineItems = orderLineItems
+        this.orderDateTime = orderDateTime
+        this.deliveryAddress = deliveryAddress
+    }
+
+    private fun createOrderTable(
+        id: UUID = UUID.randomUUID(),
+        name: String = "테이블명",
+        numberOfGuests: Int = 4,
+        isOccupied: Boolean = true,
+    ) = OrderTable().apply {
+        this.id = id
+        this.name = name
+        this.numberOfGuests = numberOfGuests
+        this.isOccupied = isOccupied
+    }
+
+    private fun createOrderLineItem(
+        menu: Menu = createMenu(),
+        quantity: Long = 1,
+        seq: Long = 1,
+        price: BigDecimal = BigDecimal.valueOf(1000L),
+    ) = OrderLineItem().apply {
+        this.menuId = menu.id
+        this.menu = menu
+        this.quantity = quantity
+        this.seq = seq
+        this.price = price
+    }
+
+    private fun createMenu(
+        id: UUID = UUID.randomUUID(),
+        price: BigDecimal = BigDecimal.valueOf(1000L),
+        isDisplayed: Boolean = true,
+    ) = Menu().apply {
+        this.id = id
+        this.price = price
+        this.isDisplayed = isDisplayed
     }
 }
