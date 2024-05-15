@@ -25,7 +25,7 @@ public class MenuFixture {
 		return validMenuGroup;
 	}
 
-	public static MenuProduct createValidMenuProduct(int quantity) {
+	public static MenuProduct createValidMenuProductWithQuantity(int quantity) {
 		Product validProduct = ProductFixture.create(VALID_PRODUCT_NAME, VALID_PRODUCT_PRICE);
 
 		MenuProduct menuProduct = new MenuProduct();
@@ -57,7 +57,7 @@ public class MenuFixture {
 			createValidMenuGroup(),
 			VALID_MENU_NAME,
 			VALID_MENU_PRICE,
-			List.of(createValidMenuProduct(VALID_MENU_PRODUCT_QUANTITY)),
+			List.of(createValidMenuProductWithQuantity(VALID_MENU_PRODUCT_QUANTITY)),
 			true
 		);
 	}
@@ -66,12 +66,6 @@ public class MenuFixture {
 		Menu validMenu = createValid();
 		validMenu.setName(name);
 		validMenu.setPrice(price);
-		return validMenu;
-	}
-
-	public static Menu createWithName(String name) {
-		Menu validMenu = createValid();
-		validMenu.setName(name);
 		return validMenu;
 	}
 
