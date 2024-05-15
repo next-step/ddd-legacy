@@ -5,7 +5,6 @@ import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import fixture.MenuFixture;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 
@@ -29,13 +29,11 @@ class MenuGroupServiceTest {
 	@InjectMocks
 	private MenuGroupService menuGroupService;
 
-	private MenuGroup menuGroup;
+	private MenuGroup validMenuGroup;
 
 	@BeforeEach
 	void setUp() {
-		menuGroup = new MenuGroup();
-		menuGroup.setId(UUID.randomUUID());
-		menuGroup.setName("점심 특선");
+		validMenuGroup = MenuFixture.createValidMenuGroup();
 	}
 
 	@Nested
@@ -61,14 +59,14 @@ class MenuGroupServiceTest {
 		@DisplayName("메뉴 그룹의 이름이 비어있지 않으면 메뉴 그룹을 생성할 수 있다")
 		void createMenuGroupWithValidName() {
 			// given
-			when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(menuGroup);
+			when(menuGroupRepository.save(any(MenuGroup.class))).thenReturn(validMenuGroup);
 
 			// when
-			MenuGroup created = menuGroupService.create(menuGroup);
+			MenuGroup created = menuGroupService.create(validMenuGroup);
 
 			// then
 			assertThat(created).isNotNull();
-			assertThat(created.getName()).isEqualTo(menuGroup.getName());
+			assertThat(created.getName()).isEqualTo(validMenuGroup.getName());
 			assertThat(created.getId()).isNotNull();
 		}
 	}
@@ -92,14 +90,14 @@ class MenuGroupServiceTest {
 		@DisplayName("메뉴 그룹이 비어 있지 있을 때 모든 메뉴 그룹 조회 시 메뉴 그룹을 조회할 수 있다")
 		void findAllMenuGroupsWhenNotEmpty() {
 			// given
-			when(menuGroupRepository.findAll()).thenReturn(Collections.singletonList(menuGroup));
+			when(menuGroupRepository.findAll()).thenReturn(Collections.singletonList(validMenuGroup));
 
 			// when
 			List<MenuGroup> foundMenuGroups = menuGroupService.findAll();
 
 			// then
 			assertThat(foundMenuGroups).isNotEmpty();
-			assertThat(foundMenuGroups.get(0).getName()).isEqualTo(menuGroup.getName());
+			assertThat(foundMenuGroups.get(0).getName()).isEqualTo(validMenuGroup.getName());
 		}
 	}
 }

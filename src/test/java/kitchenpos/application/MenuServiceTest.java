@@ -29,7 +29,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import fixture.MenuFixture;
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
@@ -54,31 +53,25 @@ class MenuServiceTest {
 	@InjectMocks
 	private MenuService menuService;
 
-	private UUID VALID_MENU_ID;
+	private Menu validMenu;
 
-	private Menu VALID_MENU;
+	private MenuProduct validMenuProduct;
 
-	private MenuGroup VALID_MENU_GROUP;
+	private UUID validProductId;
 
-	private MenuProduct VALID_MENU_PRODUCT;
-
-	private UUID VALID_PRODUCT_ID;
-
-	private Product VALID_PRODUCT;
+	private Product validProduct;
 
 	@BeforeEach
 	void setUp() {
-		VALID_MENU = MenuFixture.createValidMenu();
-		VALID_MENU_ID = VALID_MENU.getId();
-		VALID_MENU_GROUP = VALID_MENU.getMenuGroup();
-		VALID_MENU_PRODUCT = VALID_MENU.getMenuProducts().get(0);
-		VALID_PRODUCT_ID = VALID_MENU.getMenuProducts().get(0).getProductId();
-		VALID_PRODUCT = VALID_MENU.getMenuProducts().get(0).getProduct();
+		validMenu = MenuFixture.createValidMenu();
+		validMenuProduct = validMenu.getMenuProducts().get(0);
+		validProductId = validMenu.getMenuProducts().get(0).getProductId();
+		validProduct = validMenu.getMenuProducts().get(0).getProduct();
 
-		lenient().when(menuGroupRepository.findById(VALID_MENU_GROUP.getId()))
-			.thenReturn(Optional.of(VALID_MENU_GROUP));
-		lenient().when(productRepository.findAllByIdIn(List.of(VALID_PRODUCT_ID))).thenReturn(List.of(VALID_PRODUCT));
-		lenient().when(productRepository.findById(VALID_PRODUCT.getId())).thenReturn(Optional.of(VALID_PRODUCT));
+		lenient().when(menuGroupRepository.findById(validMenu.getMenuGroup().getId()))
+			.thenReturn(Optional.of(validMenu.getMenuGroup()));
+		lenient().when(productRepository.findAllByIdIn(List.of(validProductId))).thenReturn(List.of(validProduct));
+		lenient().when(productRepository.findById(validProductId)).thenReturn(Optional.of(validProduct));
 
 		lenient().when(purgomalumClient.containsProfanity(anyString())).thenAnswer(invocation -> {
 			String argument = invocation.getArgument(0);
@@ -103,13 +96,13 @@ class MenuServiceTest {
 		@DisplayName("메뉴 생성 시 가격이 null이거나 0미만이면 메뉴를 생성할 수 없다")
 		void createMenuWithInvalidPrice(BigDecimal price) {
 			// given
-			VALID_MENU.setPrice(price);
+			validMenu.setPrice(price);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.create(VALID_MENU);
+					menuService.create(validMenu);
 				});
 		}
 
@@ -123,7 +116,7 @@ class MenuServiceTest {
 			assertThatExceptionOfType(NoSuchElementException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.create(VALID_MENU);
+					menuService.create(validMenu);
 				});
 		}
 
@@ -132,13 +125,13 @@ class MenuServiceTest {
 		@DisplayName("메뉴 생성 시 메뉴 상품 목록이 null이거나 비어있으면 메뉴를 생성할 수 없다")
 		void createMenuWithNoMenuProducts(List<MenuProduct> menuProducts) {
 			// given
-			VALID_MENU.setMenuProducts(menuProducts);
+			validMenu.setMenuProducts(menuProducts);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.create(VALID_MENU);
+					menuService.create(validMenu);
 				});
 		}
 
@@ -146,14 +139,14 @@ class MenuServiceTest {
 		@DisplayName("메뉴 생성 시 제공된 상품 ID의 수와 상품 목록의 수가 일치하지 않으면 메뉴를 생성할 수 없다")
 		void createMenuWithMismatchedProducts() {
 			// given
-			when(productRepository.findAllByIdIn(List.of(VALID_PRODUCT_ID))).thenReturn(
-				List.of(VALID_PRODUCT, new Product()));
+			when(productRepository.findAllByIdIn(List.of(validProductId))).thenReturn(
+				List.of(validProduct, new Product()));
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.create(VALID_MENU);
+					menuService.create(validMenu);
 				});
 		}
 
@@ -161,13 +154,13 @@ class MenuServiceTest {
 		@DisplayName("메뉴 생성 시 상품의 수량이 음수인 경우 메뉴를 생성할 수 없다")
 		void createMenuWithNegativeQuantity() {
 			// given
-			VALID_MENU_PRODUCT.setQuantity(-1);
+			validMenuProduct.setQuantity(-1);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.create(VALID_MENU);
+					menuService.create(validMenu);
 				});
 		}
 
@@ -175,13 +168,13 @@ class MenuServiceTest {
 		@DisplayName("메뉴 생성 시 상품 ID로 상품을 조회하지 못하는 경우 메뉴를 생성할 수 없다")
 		void createMenuWithInvalidProductId() {
 			// given
-			when(productRepository.findById(VALID_PRODUCT_ID)).thenReturn(Optional.empty());
+			when(productRepository.findById(validProductId)).thenReturn(Optional.empty());
 
 			// then
 			assertThatExceptionOfType(NoSuchElementException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.create(VALID_MENU);
+					menuService.create(validMenu);
 				});
 		}
 
@@ -189,14 +182,14 @@ class MenuServiceTest {
 		@DisplayName("메뉴 생성 시 메뉴 가격이 상품 가격 총합보다 클 때 메뉴를 생성할 수 없다")
 		void createMenuWithExcessivePrice() {
 			// given
-			BigDecimal excessivePrice = VALID_PRODUCT.getPrice().multiply(new BigDecimal("10"));
-			VALID_MENU.setPrice(excessivePrice);
+			BigDecimal excessivePrice = validProduct.getPrice().multiply(new BigDecimal("10"));
+			validMenu.setPrice(excessivePrice);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.create(VALID_MENU);
+					menuService.create(validMenu);
 				});
 		}
 
@@ -205,14 +198,14 @@ class MenuServiceTest {
 		@DisplayName("메뉴 생성 시 이름 null 이거나 비속어가 포함되어 있으면 메뉴를 생성할 수 없다")
 		void createMenuWithInvalidProductNames(BigDecimal price, String name) {
 			// given
-			VALID_MENU.setPrice(price);
-			VALID_MENU.setName(name);
+			validMenu.setPrice(price);
+			validMenu.setName(name);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.create(VALID_MENU);
+					menuService.create(validMenu);
 				});
 		}
 
@@ -221,12 +214,12 @@ class MenuServiceTest {
 		@DisplayName("메뉴를 정상적으로 생성할 수 있다")
 		void createMenuWithValidProductPricesAndNames(BigDecimal price) {
 			// given
-			VALID_MENU.setPrice(price);
+			validMenu.setPrice(price);
 
-			when(menuRepository.save(any(Menu.class))).thenReturn(VALID_MENU);
+			when(menuRepository.save(any(Menu.class))).thenReturn(validMenu);
 
 			// when
-			Menu result = menuService.create(VALID_MENU);
+			Menu result = menuService.create(validMenu);
 
 			// then
 			assertThat(result).isNotNull();
@@ -241,13 +234,13 @@ class MenuServiceTest {
 		@DisplayName("메뉴 가격 변경 시 가격이 null이거나 0미만인 경우 메뉴 가격을 변경할 수 없다")
 		void changePriceWithInvalidPrice(BigDecimal price) {
 			// given
-			lenient().when(menuRepository.findById(VALID_MENU_ID)).thenReturn(Optional.of(VALID_MENU));
+			lenient().when(menuRepository.findById(validMenu.getId())).thenReturn(Optional.of(validMenu));
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.changePrice(VALID_MENU_ID, MenuFixture.createValidMenuWithPrice(price));
+					menuService.changePrice(validMenu.getId(), MenuFixture.createValidMenuWithPrice(price));
 				});
 		}
 
@@ -272,13 +265,13 @@ class MenuServiceTest {
 		@DisplayName("메뉴 가격 변경 시 변경 가격이 상품 가격 총합보다 클 때 메뉴 가격을 변경할 수 없다")
 		void changePriceWithExcessivePrice(BigDecimal price) {
 			// given
-			when(menuRepository.findById(VALID_MENU_ID)).thenReturn(Optional.of(VALID_MENU));
+			when(menuRepository.findById(validMenu.getId())).thenReturn(Optional.of(validMenu));
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.changePrice(VALID_MENU_ID, MenuFixture.createValidMenuWithPrice(price));
+					menuService.changePrice(validMenu.getId(), MenuFixture.createValidMenuWithPrice(price));
 				});
 		}
 
@@ -289,11 +282,11 @@ class MenuServiceTest {
 			// given
 			Menu requestMenu = MenuFixture.createValidMenuWithPrice(price);
 
-			when(menuRepository.findById(VALID_MENU_ID)).thenReturn(Optional.of(VALID_MENU));
+			when(menuRepository.findById(validMenu.getId())).thenReturn(Optional.of(validMenu));
 			lenient().when(menuRepository.save(requestMenu)).thenAnswer(invocation -> invocation.getArgument(0));
 
 			// when
-			Menu updatedMenu = menuService.changePrice(VALID_MENU_ID, requestMenu);
+			Menu updatedMenu = menuService.changePrice(validMenu.getId(), requestMenu);
 
 			// then
 			assertThat(updatedMenu.getPrice()).isEqualTo(price);
@@ -322,14 +315,14 @@ class MenuServiceTest {
 		@DisplayName("메뉴 노출 시 메뉴 가격이 상품 가격 총합보다 크면 메뉴 노출을 할 수 없다")
 		void displayMenuWithExcessivePrice(BigDecimal price) {
 			// given
-			VALID_MENU.setPrice(price);
-			when(menuRepository.findById(VALID_MENU_ID)).thenReturn(Optional.of(VALID_MENU));
+			validMenu.setPrice(price);
+			when(menuRepository.findById(validMenu.getId())).thenReturn(Optional.of(validMenu));
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
 				.isThrownBy(() -> {
 					// when
-					menuService.display(VALID_MENU_ID);
+					menuService.display(validMenu.getId());
 				});
 		}
 
@@ -338,12 +331,12 @@ class MenuServiceTest {
 		@DisplayName("메뉴 노출 시 메뉴 가격이 상품 가격 총합과 같거나 작으면 메뉴를 노출을 할 수 있다")
 		void displayMenuSuccessfully(BigDecimal price) {
 			// given
-			VALID_MENU.setPrice(price);
-			when(menuRepository.findById(VALID_MENU_ID)).thenReturn(Optional.of(VALID_MENU));
+			validMenu.setPrice(price);
+			when(menuRepository.findById(validMenu.getId())).thenReturn(Optional.of(validMenu));
 			lenient().when(menuRepository.save(any(Menu.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 			// when
-			Menu displayedMenu = menuService.display(VALID_MENU_ID);
+			Menu displayedMenu = menuService.display(validMenu.getId());
 
 			// then
 			assertThat(displayedMenu.isDisplayed()).isTrue();
@@ -371,11 +364,11 @@ class MenuServiceTest {
 		@DisplayName("메뉴 숨김 처리를 할 수 있다")
 		void hideMenuSuccessfully() {
 			// given
-			lenient().when(menuRepository.findById(VALID_MENU_ID)).thenReturn(Optional.of(VALID_MENU));
-			lenient().when(menuRepository.save(VALID_MENU)).thenReturn(VALID_MENU);
+			lenient().when(menuRepository.findById(validMenu.getId())).thenReturn(Optional.of(validMenu));
+			lenient().when(menuRepository.save(validMenu)).thenReturn(validMenu);
 
 			// when
-			Menu hiddenMenu = menuService.hide(VALID_MENU_ID);
+			Menu hiddenMenu = menuService.hide(validMenu.getId());
 
 			// then
 			assertThat(hiddenMenu.isDisplayed()).isFalse();
@@ -401,13 +394,13 @@ class MenuServiceTest {
 		@DisplayName("메뉴 데이터가 비어 있지 않는 경우 모든 메뉴 조회를 할 수 있다")
 		void findAllMenusWhenEmpty() {
 			// given
-			when(menuRepository.findAll()).thenReturn(List.of(VALID_MENU));
+			when(menuRepository.findAll()).thenReturn(List.of(validMenu));
 
 			// when
 			List<Menu> menus = menuService.findAll();
 
 			// then
-			assertThat(menus).containsExactly(VALID_MENU);
+			assertThat(menus).containsExactly(validMenu);
 		}
 	}
 }

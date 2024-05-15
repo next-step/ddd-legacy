@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import fixture.OrderFixture;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
@@ -37,6 +38,13 @@ class OrderTableServiceTest {
 	@InjectMocks
 	private OrderTableService orderTableService;
 
+	private OrderTable validOrderTable;
+
+	@BeforeEach
+	void setUp() {
+		validOrderTable = OrderFixture.createValidOrderTable();
+	}
+
 	@Nested
 	class create {
 		@ParameterizedTest
@@ -44,31 +52,28 @@ class OrderTableServiceTest {
 		@DisplayName("주문 테이블 생성 시 이름이 비어있거나 null일 때 주문 테이블 생성을 할 수 없다")
 		void createWithNullOrEmptyName(String name) {
 			// given
-			OrderTable table = new OrderTable();
-			table.setName(name);
+			validOrderTable.setName(name);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					orderTableService.create(table);
+					orderTableService.create(validOrderTable);
 				});
 		}
 
 		@Test
 		@DisplayName("주문 테이블을 저장할 수 있다")
-		void createSuccessfully() {
+		void createOrderTableSuccessfully() {
 			// given
-			OrderTable requestTable = new OrderTable();
-			requestTable.setName("테이블13");
-			when(orderTableRepository.save(any())).thenReturn(requestTable);
+			when(orderTableRepository.save(any(OrderTable.class))).thenReturn(validOrderTable);
 
 			// when
-			OrderTable savedTable = orderTableService.create(requestTable);
+			OrderTable savedTable = orderTableService.create(validOrderTable);
 
 			// then
 			assertThat(savedTable).isNotNull();
-			assertThat(savedTable.getName()).isEqualTo("테이블13");
+			assertThat(savedTable.getName()).isEqualTo(validOrderTable.getName());
 		}
 	}
 
@@ -78,14 +83,13 @@ class OrderTableServiceTest {
 		@DisplayName("주문 테이블을 사용 중 상태로 변경 시 존재하지 않는 주문 테이블 ID로 요청하면 주문 테이블을 사용 중 상태로 변경할 수 없다")
 		void sitWithNonExistentTable() {
 			// given
-			UUID nonExistentId = UUID.randomUUID();
-			when(orderTableRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+			when(orderTableRepository.findById(validOrderTable.getId())).thenReturn(Optional.empty());
 
 			// then
 			assertThatExceptionOfType(NoSuchElementException.class)
 				.isThrownBy(() -> {
 					// when
-					orderTableService.sit(nonExistentId);
+					orderTableService.sit(validOrderTable.getId());
 				});
 		}
 
@@ -93,13 +97,10 @@ class OrderTableServiceTest {
 		@DisplayName("주문 테이블을 사용 중 상태로 변경 시 존재하는 테이블 ID로 요청하면 주문 테이블을 사용 중 상태로 변경할 수 있다")
 		void sitSuccessfully() {
 			// given
-			UUID existingId = UUID.randomUUID();
-			OrderTable existingTable = new OrderTable();
-			existingTable.setId(existingId);
-			when(orderTableRepository.findById(existingId)).thenReturn(Optional.of(existingTable));
+			when(orderTableRepository.findById(validOrderTable.getId())).thenReturn(Optional.of(validOrderTable));
 
 			// when
-			OrderTable occupiedTable = orderTableService.sit(existingId);
+			OrderTable occupiedTable = orderTableService.sit(validOrderTable.getId());
 
 			// then
 			assertThat(occupiedTable.isOccupied()).isTrue();
@@ -112,14 +113,13 @@ class OrderTableServiceTest {
 		@DisplayName("주문 테이블을 사용 가능 상태로 변경 시 존재하지 않는 테이블 ID로 요청하면 주문 테이블을 사용 가능 상태로 변경할 수 없다")
 		void clearWithNonExistentTable() {
 			// given
-			UUID nonExistentId = UUID.randomUUID();
-			when(orderTableRepository.findById(nonExistentId)).thenReturn(Optional.empty());
+			when(orderTableRepository.findById(validOrderTable.getId())).thenReturn(Optional.empty());
 
 			// then
 			assertThatExceptionOfType(NoSuchElementException.class)
 				.isThrownBy(() -> {
 					// when
-					orderTableService.clear(nonExistentId);
+					orderTableService.clear(validOrderTable.getId());
 				});
 		}
 
@@ -127,18 +127,15 @@ class OrderTableServiceTest {
 		@DisplayName("주문 테이블을 사용 가능 상태로 변경 시 완료되지 않은 주문이 존재하는 경우 주문 테이블을 사용 가능 상태로 변경할 수 없다")
 		void clearWithIncompleteOrders() {
 			// given
-			UUID existingId = UUID.randomUUID();
-			OrderTable tableWithOrders = new OrderTable();
-			tableWithOrders.setId(existingId);
-			when(orderTableRepository.findById(existingId)).thenReturn(Optional.of(tableWithOrders));
-			when(orderRepository.existsByOrderTableAndStatusNot(tableWithOrders, OrderStatus.COMPLETED)).thenReturn(
-				true);
+			when(orderTableRepository.findById(validOrderTable.getId())).thenReturn(Optional.of(validOrderTable));
+			when(orderRepository.existsByOrderTableAndStatusNot(validOrderTable, OrderStatus.COMPLETED))
+				.thenReturn(true);
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
 				.isThrownBy(() -> {
 					// when
-					orderTableService.clear(existingId);
+					orderTableService.clear(validOrderTable.getId());
 				});
 		}
 
@@ -146,14 +143,12 @@ class OrderTableServiceTest {
 		@DisplayName("주문 테이블을 사용 가능 상태로 변경 시 주문이 모두 완료되었으면 주문 테이블을 사용 가능 상태로 변경할 수 있다")
 		void clearSuccessfully() {
 			// given
-			UUID existingId = UUID.randomUUID();
-			OrderTable table = new OrderTable();
-			table.setId(existingId);
-			when(orderTableRepository.findById(existingId)).thenReturn(Optional.of(table));
-			when(orderRepository.existsByOrderTableAndStatusNot(table, OrderStatus.COMPLETED)).thenReturn(false);
+			when(orderTableRepository.findById(validOrderTable.getId())).thenReturn(Optional.of(validOrderTable));
+			when(orderRepository.existsByOrderTableAndStatusNot(validOrderTable, OrderStatus.COMPLETED))
+				.thenReturn(false);
 
 			// when
-			OrderTable clearedTable = orderTableService.clear(existingId);
+			OrderTable clearedTable = orderTableService.clear(validOrderTable.getId());
 
 			// then
 			assertThat(clearedTable.isOccupied()).isFalse();
@@ -167,15 +162,13 @@ class OrderTableServiceTest {
 		@DisplayName("손님 수 변경 시 입력된 수가 0보다 작으면 손님 수 변경을 할 수 없다")
 		void changeNumberOfGuestsNegative() {
 			// given
-			UUID tableId = UUID.randomUUID();
-			OrderTable requestTable = new OrderTable();
-			requestTable.setNumberOfGuests(-1);
+			validOrderTable.setNumberOfGuests(-1);
 
 			// then
 			assertThatExceptionOfType(IllegalArgumentException.class)
 				.isThrownBy(() -> {
 					// when
-					orderTableService.changeNumberOfGuests(tableId, requestTable);
+					orderTableService.changeNumberOfGuests(validOrderTable.getId(), validOrderTable);
 				});
 		}
 
@@ -183,16 +176,15 @@ class OrderTableServiceTest {
 		@DisplayName("손님 수 변경 시 존재하지 않는 테이블 ID로 요청하면 손님 수 변경을 할 수 없다")
 		void changeNumberOfGuestsNonExistentTable() {
 			// given
-			UUID nonExistentId = UUID.randomUUID();
-			when(orderTableRepository.findById(nonExistentId)).thenReturn(Optional.empty());
-			OrderTable requestTable = new OrderTable();
-			requestTable.setNumberOfGuests(5);
+			validOrderTable.setNumberOfGuests(5);
+
+			when(orderTableRepository.findById(validOrderTable.getId())).thenReturn(Optional.empty());
 
 			// then
 			assertThatExceptionOfType(NoSuchElementException.class)
 				.isThrownBy(() -> {
 					// when
-					orderTableService.changeNumberOfGuests(nonExistentId, requestTable);
+					orderTableService.changeNumberOfGuests(validOrderTable.getId(), validOrderTable);
 				});
 		}
 
@@ -200,19 +192,20 @@ class OrderTableServiceTest {
 		@DisplayName("손님 수 변경 시 테이블이 사용 중이 아니면 손님 수 변경을 할 수 없다")
 		void changeNumberOfGuestsTableNotOccupied() {
 			// given
-			UUID existingId = UUID.randomUUID();
-			OrderTable existingTable = new OrderTable();
-			existingTable.setId(existingId);
-			existingTable.setOccupied(false);
-			when(orderTableRepository.findById(existingId)).thenReturn(Optional.of(existingTable));
-			OrderTable requestTable = new OrderTable();
-			requestTable.setNumberOfGuests(5);
+			validOrderTable.setOccupied(false);
+			validOrderTable.setNumberOfGuests(3);
+
+			OrderTable requestOrderTable = new OrderTable();
+			requestOrderTable.setId(validOrderTable.getId());
+			requestOrderTable.setNumberOfGuests(5);
+
+			when(orderTableRepository.findById(requestOrderTable.getId())).thenReturn(Optional.of(validOrderTable));
 
 			// then
 			assertThatExceptionOfType(IllegalStateException.class)
 				.isThrownBy(() -> {
 					// when
-					orderTableService.changeNumberOfGuests(existingId, requestTable);
+					orderTableService.changeNumberOfGuests(requestOrderTable.getId(), requestOrderTable);
 				});
 		}
 
@@ -220,23 +213,21 @@ class OrderTableServiceTest {
 		@DisplayName("손님 수 변경 시 주문 테이블이 사용 중이고 요청된 손님 수가 유효하면 손님 수 변경을 할 수 있다")
 		void changeNumberOfGuestsSuccessfully() {
 			// given
-			UUID existingId = UUID.randomUUID();
+			validOrderTable.setOccupied(true);
+			validOrderTable.setNumberOfGuests(3);
 
-			OrderTable existingTable = new OrderTable();
-			existingTable.setId(existingId);
-			existingTable.setOccupied(true);
-			existingTable.setNumberOfGuests(3);
+			OrderTable requestOrderTable = new OrderTable();
+			requestOrderTable.setId(validOrderTable.getId());
+			requestOrderTable.setNumberOfGuests(5);
 
-			when(orderTableRepository.findById(existingId)).thenReturn(Optional.of(existingTable));
-
-			OrderTable requestTable = new OrderTable();
-			requestTable.setNumberOfGuests(5);
+			when(orderTableRepository.findById(requestOrderTable.getId())).thenReturn(Optional.of(validOrderTable));
 
 			// when
-			OrderTable updatedTable = orderTableService.changeNumberOfGuests(existingId, requestTable);
+			OrderTable updatedOrderTable = orderTableService.changeNumberOfGuests(requestOrderTable.getId(),
+				requestOrderTable);
 
 			// then
-			assertThat(updatedTable.getNumberOfGuests()).isEqualTo(5);
+			assertThat(updatedOrderTable.getNumberOfGuests()).isEqualTo(5);
 		}
 	}
 

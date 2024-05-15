@@ -29,7 +29,7 @@ public class OrderFixture {
 		OrderTable validOrderTable = new OrderTable();
 		validOrderTable.setId(orderTableId);
 		validOrderTable.setName(VALID_ORDER_TABLE_NAME);
-		validOrderTable.setOccupied(true);
+		validOrderTable.setOccupied(false);
 		return validOrderTable;
 	}
 
