@@ -1,5 +1,7 @@
 package fixture;
 
+import static fixture.ProductFixture.*;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +25,7 @@ public class MenuFixture {
 	}
 
 	public static MenuProduct createValidMenuProduct(int quantity) {
-		Product validProduct = ProductFixture.createValidProduct();
+		Product validProduct = ProductFixture.create(VALID_PRODUCT_NAME, VALID_PRODUCT_PRICE);
 
 		MenuProduct menuProduct = new MenuProduct();
 		menuProduct.setProduct(validProduct);
