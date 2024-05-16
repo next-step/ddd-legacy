@@ -6,6 +6,7 @@ import kitchenpos.domain.MenuProduct;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class MenuFixture {
@@ -13,35 +14,16 @@ public class MenuFixture {
 
     }
 
-    public static Menu createMenuWithId(UUID menuGroupId, String name, BigDecimal price,
-                                        boolean displayed, List<MenuProduct> menuProducts) {
+    public static Menu createMenu(MenuGroup menuGroup, String name, BigDecimal price,
+                                  boolean displayed, List<MenuProduct> menuProducts) {
         final Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuGroup(menuGroup);
+        if (Objects.nonNull(menuGroup)) {
+            menu.setMenuGroupId(menuGroup.getId());
+        }
+        menu.setMenuGroupId(menuGroup.getId());
         menu.setName(name);
         menu.setPrice(price);
-        menu.setDisplayed(displayed);
-        menu.setMenuProducts(menuProducts);
-        return menu;
-    }
-
-    public static Menu createMenuWithId(UUID menuGroupId, BigDecimal price,
-                                        boolean displayed, List<MenuProduct> menuProducts) {
-        final Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setMenuGroupId(menuGroupId);
-        menu.setPrice(price);
-        menu.setDisplayed(displayed);
-        menu.setMenuProducts(menuProducts);
-        return menu;
-    }
-
-    public static Menu createMenuWithId(UUID menuGroupId, String name,
-                                        boolean displayed, List<MenuProduct> menuProducts) {
-        final Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setMenuGroupId(menuGroupId);
-        menu.setName(name);
         menu.setDisplayed(displayed);
         menu.setMenuProducts(menuProducts);
         return menu;

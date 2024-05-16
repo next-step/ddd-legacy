@@ -21,7 +21,9 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuFixture.createMenuWithId;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupWithId;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
@@ -58,22 +60,24 @@ class MenuRestControllerTest {
         MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
         Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
         MenuProduct menuProduct = createMenuProduct(product, 1);
+        Menu menu = createMenu(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct));
 
         MvcResult result = mockMvc.perform(post("/api/menus")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)))))
+                        .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        Menu menu = MockMvcUtil.readValue(objectMapper, result, Menu.class);
-
+        Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        List<UUID> menuProductIds = menuResponse.getMenuProducts().stream().map(it -> it.getProduct().getId()).toList();
+        
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(result.getResponse().getHeader("Location")).isEqualTo("/api/menus/" + menu.getId()),
-                () -> assertThat(menu.getName()).isEqualTo("후라이드치킨"),
-                () -> assertThat(menu.getPrice()).isEqualTo(BigDecimal.valueOf(16000)),
-                () -> assertThat(menu.getMenuGroup().getId()).isEqualTo(menuGroup.getId()),
-                () -> assertThat(menu.getMenuProducts()).hasSize(1),
-                () -> assertThat(menu.getMenuProducts().stream().map(it -> it.getProduct().getId())).contains(product.getId())
+                () -> assertThat(result.getResponse().getHeader("Location")).isEqualTo("/api/menus/" + menuResponse.getId()),
+                () -> assertThat(menuResponse.getName()).isEqualTo("후라이드치킨"),
+                () -> assertThat(menuResponse.getPrice()).isEqualTo(BigDecimal.valueOf(16000)),
+                () -> assertThat(menuResponse.getMenuGroup().getId()).isEqualTo(menuGroup.getId()),
+                () -> assertThat(menuResponse.getMenuProducts()).hasSize(1),
+                () -> assertThat(menuProductIds).contains(product.getId())
         );
     }
 
@@ -92,11 +96,11 @@ class MenuRestControllerTest {
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        Menu updatedMenu = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(updatedMenu.getPrice()).isEqualTo(BigDecimal.valueOf(15000))
+                () -> assertThat(menuResponse.getPrice()).isEqualTo(BigDecimal.valueOf(15000))
         );
     }
 
@@ -113,11 +117,11 @@ class MenuRestControllerTest {
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        Menu updatedMenu = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(updatedMenu.isDisplayed()).isTrue()
+                () -> assertThat(menuResponse.isDisplayed()).isTrue()
         );
     }
 
@@ -134,11 +138,11 @@ class MenuRestControllerTest {
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        Menu updatedMenu = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
-                () -> assertThat(updatedMenu.isDisplayed()).isFalse()
+                () -> assertThat(menuResponse.isDisplayed()).isFalse()
         );
     }
 
@@ -155,11 +159,12 @@ class MenuRestControllerTest {
                 .andReturn();
 
         List<Menu> menus = MockMvcUtil.readListValue(objectMapper, result, Menu.class);
+        List<UUID> menuIds = menus.stream().map(Menu::getId).toList();
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(menus).hasSize(1),
-                () -> assertThat(menus.stream().map(Menu::getId)).contains(menu.getId())
+                () -> assertThat(menuIds).contains(menu.getId())
         );
     }
 }

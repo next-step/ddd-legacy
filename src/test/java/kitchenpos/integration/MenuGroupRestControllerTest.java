@@ -17,6 +17,7 @@ import java.util.UUID;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupWithId;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -34,12 +35,13 @@ class MenuGroupRestControllerTest {
 
     @Test
     void create() throws Exception {
+        MenuGroup menuGroup = createMenuGroup("추천메뉴");
         MvcResult result = mockMvc.perform(post("/api/menu-groups")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(createMenuGroup("추천메뉴"))))
+                        .content(objectMapper.writeValueAsString(menuGroup)))
                 .andReturn();
 
-        MenuGroup menuGroup = MockMvcUtil.readValue(objectMapper, result, MenuGroup.class);
+        menuGroup = MockMvcUtil.readValue(objectMapper, result, MenuGroup.class);
 
         assertThat(result.getResponse().getHeader("Location")).isEqualTo("/api/menu-groups/" + menuGroup.getId());
         assertThat(menuGroup.getName()).isEqualTo("추천메뉴");
@@ -56,8 +58,10 @@ class MenuGroupRestControllerTest {
 
         List<MenuGroup> menuGroups = MockMvcUtil.readListValue(objectMapper, result, MenuGroup.class);
         List<UUID> menuGroupIds = menuGroups.stream().map(MenuGroup::getId).toList();
-        
-        assertThat(menuGroups).hasSize(2);
-        assertThat(menuGroupIds).contains(menuGroup1.getId(), menuGroup2.getId());
+
+        assertAll(
+                () -> assertThat(menuGroups).hasSize(2),
+                () -> assertThat(menuGroupIds).contains(menuGroup1.getId(), menuGroup2.getId())
+        );
     }
 }

@@ -18,8 +18,8 @@ public class MockMvcUtil {
 
     public static <T> List<T> readListValue(ObjectMapper objectMapper, MvcResult result, Class<T> valueType) throws Exception {
         JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, valueType);
+        
         return objectMapper.readValue(result.getResponse().getContentAsString(StandardCharsets.UTF_8), javaType);
-
     }
 }
 

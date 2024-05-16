@@ -6,7 +6,6 @@ import kitchenpos.acceptance.step.MenuAcceptanceStep;
 import kitchenpos.acceptance.step.MenuGroupAcceptanceStep;
 import kitchenpos.acceptance.step.ProductAcceptanceStep;
 import kitchenpos.config.AcceptanceTest;
-import kitchenpos.fixture.MenuFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +18,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.createMenu;
+import static kitchenpos.fixture.MenuFixture.createMenuWithId;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.ProductFixture.createProductWithId;
@@ -28,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class MenuAcceptanceTest {
     @MockBean
     PurgomalumClient purgomalumClient;
-    
+
     @LocalServerPort
     int port;
 
@@ -42,43 +43,36 @@ class MenuAcceptanceTest {
     void menuCreateAndManageAndFindAll() {
         Response 추천메뉴 = MenuGroupAcceptanceStep.create(createMenuGroup(null, "추천메뉴"));
 
-        assertThat(추천메뉴.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-
         Response 후라이드_치킨 = ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
 
-        assertThat(후라이드_치킨.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+        UUID menuGroupId = 추천메뉴.getBody().jsonPath().getUUID("id");
 
-        String menuGroupId = 추천메뉴.getBody().jsonPath().getString("id");
-        Response 후라이드_치킨_메뉴 = MenuAcceptanceStep.create(MenuFixture.createMenuWithId(UUID.fromString(menuGroupId), "후라이드 치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(UUID.fromString(후라이드_치킨.getBody().jsonPath().getString("id")), 1))));
+        Response 후라이드_치킨_메뉴 = MenuAcceptanceStep.create(createMenu(createMenuGroup(menuGroupId), "후라이드 치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(UUID.fromString(후라이드_치킨.getBody().jsonPath().getString("id")), 1))));
         String 후라이드_치킨_메뉴Id = 후라이드_치킨_메뉴.getBody().jsonPath().getString("id");
 
         assertThat(후라이드_치킨_메뉴.statusCode()).isEqualTo(HttpStatus.CREATED.value());
 
         Response findAll = MenuAcceptanceStep.findAll();
-        assertThat(findAll.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(findAll.getBody().jsonPath().getList("name")).contains("후라이드 치킨");
         assertThat(findAll.getBody().jsonPath().getList("id")).contains(후라이드_치킨_메뉴Id);
 
-        Response 변경된_후라이드_치킨_메뉴 = MenuAcceptanceStep.changePrice(UUID.fromString(후라이드_치킨_메뉴Id), MenuFixture.createMenuWithId(UUID.fromString(menuGroupId), "후라이드 치킨", BigDecimal.valueOf(15000), true, List.of(createMenuProduct(UUID.fromString(후라이드_치킨.getBody().jsonPath().getString("id")), 1))));
+        Response 변경된_후라이드_치킨_메뉴 = MenuAcceptanceStep.changePrice(UUID.fromString(후라이드_치킨_메뉴Id), createMenuWithId(createMenuGroup(menuGroupId), "후라이드 치킨", BigDecimal.valueOf(15000), true, List.of(createMenuProduct(UUID.fromString(후라이드_치킨.getBody().jsonPath().getString("id")), 1))));
         assertThat(변경된_후라이드_치킨_메뉴.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(변경된_후라이드_치킨_메뉴.getBody().jsonPath().getObject("price", BigDecimal.class)).isEqualTo(BigDecimal.valueOf(15000));
 
         findAll = MenuAcceptanceStep.findAll();
-        assertThat(findAll.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(findAll.getBody().jsonPath().getList("name")).contains("후라이드 치킨");
         assertThat(findAll.getBody().jsonPath().getList("id")).contains(후라이드_치킨_메뉴Id);
 
-        Response 숨김_후라이드_치킨_메뉴 = MenuAcceptanceStep.hide(UUID.fromString(후라이드_치킨_메뉴Id), MenuFixture.createMenuWithId(UUID.fromString(menuGroupId), "후라이드 치킨", BigDecimal.valueOf(15000), false, List.of(createMenuProduct(UUID.fromString(후라이드_치킨.getBody().jsonPath().getString("id")), 1))));
+        Response 숨김_후라이드_치킨_메뉴 = MenuAcceptanceStep.hide(UUID.fromString(후라이드_치킨_메뉴Id), createMenuWithId(createMenuGroup(menuGroupId), "후라이드 치킨", BigDecimal.valueOf(15000), false, List.of(createMenuProduct(UUID.fromString(후라이드_치킨.getBody().jsonPath().getString("id")), 1))));
         assertThat(숨김_후라이드_치킨_메뉴.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(숨김_후라이드_치킨_메뉴.getBody().jsonPath().getBoolean("displayed")).isFalse();
 
         findAll = MenuAcceptanceStep.findAll();
-        assertThat(findAll.statusCode()).isEqualTo(HttpStatus.OK.value());
         assertThat(findAll.getBody().jsonPath().getList("name")).contains("후라이드 치킨");
         assertThat(findAll.getBody().jsonPath().getList("id")).contains(후라이드_치킨_메뉴Id);
 
-        Response 노출_후라이드_치킨_메뉴 = MenuAcceptanceStep.display(UUID.fromString(후라이드_치킨_메뉴Id), MenuFixture.createMenuWithId(UUID.fromString(menuGroupId), "후라이드 치킨", BigDecimal.valueOf(15000), true, List.of(createMenuProduct(UUID.fromString(후라이드_치킨.getBody().jsonPath().getString("id")), 1))));
-        assertThat(노출_후라이드_치킨_메뉴.statusCode()).isEqualTo(HttpStatus.OK.value());
+        Response 노출_후라이드_치킨_메뉴 = MenuAcceptanceStep.display(UUID.fromString(후라이드_치킨_메뉴Id), createMenuWithId(createMenuGroup(menuGroupId), "후라이드 치킨", BigDecimal.valueOf(15000), true, List.of(createMenuProduct(UUID.fromString(후라이드_치킨.getBody().jsonPath().getString("id")), 1))));
         assertThat(노출_후라이드_치킨_메뉴.getBody().jsonPath().getBoolean("displayed")).isTrue();
     }
 }

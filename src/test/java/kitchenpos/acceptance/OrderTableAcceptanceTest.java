@@ -1,6 +1,7 @@
 package kitchenpos.acceptance;
 
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import kitchenpos.acceptance.step.OrderTableAcceptanceStep;
 import kitchenpos.config.AcceptanceTest;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import java.util.UUID;
 
 import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @AcceptanceTest
 class OrderTableAcceptanceTest {
@@ -34,19 +36,30 @@ class OrderTableAcceptanceTest {
         // 테이블 조회
         Response orderTables = OrderTableAcceptanceStep.findAll();
 
+        JsonPath responseBody = orderTables.getBody().jsonPath();
+
+        assertThat(responseBody.getList("id")).contains(oneTableId.toString());
+
         // 테이블 착석
         OrderTableAcceptanceStep.sit(oneTableId);
+
+        // 손님수 변경
+        OrderTableAcceptanceStep.changeNumberOfGuests(oneTableId, createOrderTable(oneTableId, oneTableName, 4));
 
         // 테이블 조회
         orderTables = OrderTableAcceptanceStep.findAll();
 
-        // 손님수 변경
-        OrderTableAcceptanceStep.changeNumberOfGuests(oneTableId, createOrderTable(oneTableId, oneTableName, 4));
+        responseBody = orderTables.getBody().jsonPath();
+
+        assertThat(responseBody.getList("occupied")).contains(true);
+        assertThat(responseBody.getList("numberOfGuests")).contains(4);
 
         // 테이블 비우기
         OrderTableAcceptanceStep.clear(oneTableId);
 
         // 테이블 조회
         orderTables = OrderTableAcceptanceStep.findAll();
+        responseBody = orderTables.getBody().jsonPath();
+        assertThat(responseBody.getList("occupied")).contains(false);
     }
 }
