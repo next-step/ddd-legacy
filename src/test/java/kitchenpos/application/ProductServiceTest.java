@@ -5,34 +5,24 @@ import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.testfixture.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.TestConstructor;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-@ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
-    private ProductRepository productRepository =  new InMemoryProductRepository();
+    private ProductRepository productRepository = new InMemoryProductRepository();
     private MenuRepository menuRepository = new InMemoryMenuRepository();
     private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
 
     private ProductService productService;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
@@ -58,11 +48,13 @@ class ProductServiceTest {
 
         //given
         UUID productId = UUID.randomUUID();
-        Product product = ProductTestFixture.createProduct(productId, "양념치킨",22000L);
+        Product product = ProductTestFixture.createProduct(productId, "양념치킨", 22000L);
         productRepository.save(product);
 
         UUID menuId = UUID.randomUUID();
-        final Menu menu = MenuTestFixture.createMenu(menuId, "양념치킨", 22000L, true, product);
+        Menu menu = MenuTestFixture.createMenu(menuId, "양념치킨", 22000L, true, product);
+        MenuProduct menuProduct = MenuProductTestFixture.createMenuProductRequest(1L, 1L, product);
+        menu.setMenuProducts(List.of(menuProduct));
         menuRepository.save(menu);
         Product request = ProductTestFixture.createProductRequest(23000L);
 
@@ -76,6 +68,15 @@ class ProductServiceTest {
         Menu response = menuRepository.findById(menuId).get();
         assertThat(response.isDisplayed()).isTrue();
 
+    }
+
+    @Test
+    public void canNotHaveProfanity() {
+        //given
+        Product request = ProductTestFixture.createProductRequest("비속어치킨", 20000L);
+
+        //when
+        assertThrows(IllegalArgumentException.class, () -> productService.create(request));
     }
 
     @Test
