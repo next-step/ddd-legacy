@@ -16,10 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static kitchenpos.fixture.application.MenuFixture.*;
@@ -39,6 +36,8 @@ class MenuServiceTest {
     private MenuProduct 후라이드_치킨_메뉴상품;
     private MenuProduct 강정_치킨_메뉴상품;
     private MenuGroup 커플메뉴_메뉴그룹;
+    private Menu 커플_강정_후라이드_메뉴;
+    private UUID 커플_강정_후라이드_메뉴ID;
 
     @Mock
     private MenuRepository menuRepository;
@@ -62,6 +61,8 @@ class MenuServiceTest {
         강정_치킨_상품 = createProduct("강정 치킨", BigDecimal.valueOf(15000));
         후라이드_치킨_메뉴상품 = createMenuProduct(후라이드_치킨_상품, 1);
         강정_치킨_메뉴상품 = createMenuProduct(강정_치킨_상품, 1);
+        커플_강정_후라이드_메뉴 = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
+        커플_강정_후라이드_메뉴ID = 커플_강정_후라이드_메뉴.getId();
     }
 
     @Nested
@@ -84,15 +85,14 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴를 등록한다")
         void menuCreate() {
-            Menu request = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
             stubMenu();
-            when(menuRepository.save(any())).thenReturn(request);
+            when(menuRepository.save(any())).thenReturn(커플_강정_후라이드_메뉴);
 
-            Menu result = menuService.create(request);
+            Menu result = menuService.create(커플_강정_후라이드_메뉴);
 
             assertAll(() -> {
-                assertThat(result.getName()).isEqualTo(request.getName());
-                assertThat(result.getPrice()).isEqualTo(request.getPrice());
+                assertThat(result.getName()).isEqualTo(커플_강정_후라이드_메뉴.getName());
+                assertThat(result.getPrice()).isEqualTo(커플_강정_후라이드_메뉴.getPrice());
                 assertThat(result.getMenuProducts()).containsExactly(후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
                 assertThat(result.isDisplayed()).isTrue();
                 assertThat(result.getMenuGroup()).isEqualTo(커플메뉴_메뉴그룹);
@@ -136,11 +136,10 @@ class MenuServiceTest {
         @DisplayName("메뉴 상품이 상품으로 등록되어 있지 않으면 IllegalArgumentException.class를 반환한다.")
         void menuProductIsAlreadyRegisterProduct() {
             // given
-            Menu request = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
             stubMenuGroupAndProduct();
 
             // when & then
-            assertThatThrownBy(() -> menuService.create(request))
+            assertThatThrownBy(() -> menuService.create(커플_강정_후라이드_메뉴))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -201,15 +200,14 @@ class MenuServiceTest {
         @DisplayName("메뉴 가격을 수정한다.")
         void menuChangePrice() {
             // given
-            Menu menu = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
-            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+            when(menuRepository.findById(any())).thenReturn(Optional.of(커플_강정_후라이드_메뉴));
 
             // when
             Menu request = changePriceMenu(BigDecimal.valueOf(10000));
-            Menu result = menuService.changePrice(menu.getId(), request);
+            Menu result = menuService.changePrice(커플_강정_후라이드_메뉴ID, request);
 
             // then
-            assertThat(result.getId()).isEqualTo(menu.getId());
+            assertThat(result.getId()).isEqualTo(커플_강정_후라이드_메뉴ID);
             assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(10000));
             assertThat(result.isDisplayed()).isTrue();
         }
@@ -219,35 +217,35 @@ class MenuServiceTest {
         @NullSource
         @MethodSource("lessThanZero")
         void priceIsNotNullAndLessThanZero(BigDecimal price) {
-            Menu menu = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
             Menu request = changePriceMenu(price);
 
-            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
+            assertThatThrownBy(() -> menuService.changePrice(커플_강정_후라이드_메뉴ID, request))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         @DisplayName("메뉴가 존재 하지 않으면 NoSuchElementException을 반환한다.")
         void menuNotRegisteredThrownException() {
-            Menu menu = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
+            // given
             when(menuRepository.findById(any())).thenReturn(Optional.empty());
 
+            // when & then
             Menu request = changePriceMenu(BigDecimal.valueOf(10000));
-            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
+            assertThatThrownBy(() -> menuService.changePrice(커플_강정_후라이드_메뉴ID, request))
                     .isInstanceOf(NoSuchElementException.class);
         }
 
         @Test
         @DisplayName("변경하려는 메뉴의 가격은 메뉴 상품의 가격의 합보다 클 수 없다.")
         void priceIsGreaterThanMenuProductQuantityPrice() {
-            Menu menu = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
-            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-
+            // given
+            when(menuRepository.findById(any())).thenReturn(Optional.of(커플_강정_후라이드_메뉴));
             Menu request = changePriceMenu(BigDecimal.valueOf(50000));
 
-            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
+            // when & then
+            assertThatThrownBy(() -> menuService.changePrice(커플_강정_후라이드_메뉴ID, request))
                     .isInstanceOf(IllegalArgumentException.class);
-            assertThat(menu.getPrice()).isLessThan(request.getPrice());
+            assertThat(커플_강정_후라이드_메뉴.getPrice()).isLessThan(request.getPrice());
         }
 
         private static Stream<BigDecimal> lessThanZero() {
