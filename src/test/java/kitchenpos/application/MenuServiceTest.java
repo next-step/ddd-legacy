@@ -256,6 +256,66 @@ class MenuServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("전시")
+    class MenuDisplay {
+
+        @Test
+        @DisplayName("메뉴를 전시한다.")
+        void displayMenu() {
+            when(menuRepository.findById(any())).thenReturn(Optional.of(커플_강정_후라이드_메뉴));
+
+            Menu result = menuService.display(커플_강정_후라이드_메뉴ID);
+
+            assertThat(result.getId()).isEqualTo(커플_강정_후라이드_메뉴ID);
+            assertThat(result.isDisplayed()).isTrue();
+        }
+
+        @Test
+        @DisplayName("메뉴를 전시하지 않는다.")
+        void hideMenu() {
+            when(menuRepository.findById(any())).thenReturn(Optional.of(커플_강정_후라이드_메뉴));
+
+            Menu result = menuService.hide(커플_강정_후라이드_메뉴ID);
+
+            assertThat(result.getId()).isEqualTo(커플_강정_후라이드_메뉴ID);
+            assertThat(result.isDisplayed()).isFalse();
+        }
+
+        @Test
+        @DisplayName("전시하려는 메뉴의 가격은 메뉴 상품의 가격의 합보다 클 수 없다.")
+        void priceIsGreaterThanMenuProductQuantityPrice() {
+            Menu request = createMenu("커플_후라이드_메뉴", 커플메뉴_메뉴그룹, BigDecimal.valueOf(20000), false, 후라이드_치킨_메뉴상품);
+            when(menuRepository.findById(any())).thenReturn(Optional.of(request));
+
+            assertThatThrownBy(() -> menuService.display(request.getId()))
+                    .isInstanceOf(IllegalStateException.class);
+            assertThat(request.isDisplayed()).isFalse();
+        }
+
+        @Test
+        @DisplayName("메뉴가 미리 등록되어 있어야 한다.")
+        void menuIsRegisterd() {
+            when(menuRepository.findById(any())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> menuService.display(커플_강정_후라이드_메뉴ID))
+                    .isInstanceOf(NoSuchElementException.class);
+            assertThatThrownBy(() -> menuService.hide(커플_강정_후라이드_메뉴ID))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+    }
+
+    @Test
+    @DisplayName("목록 - 메뉴의 목록을 볼 수 있다.")
+    void menus() {
+        List<Menu> menus = List.of(커플_강정_후라이드_메뉴);
+        when(menuRepository.findAll()).thenReturn(menus);
+
+        List<Menu> result = menuService.findAll();
+
+        assertThat(result).containsOnly(커플_강정_후라이드_메뉴);
+    }
+
     private void stubMenuGroupAndProduct() {
         when(menuGroupRepository.findById(any())).thenReturn(Optional.of(new MenuGroup()));
         when(productRepository.findAllByIdIn(any())).thenReturn(List.of(후라이드_치킨_상품));
