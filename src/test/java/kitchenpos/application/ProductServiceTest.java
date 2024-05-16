@@ -98,7 +98,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("없는 상품")
+    @DisplayName("상품 가격 수정시 상품이 존재해야 한다")
     void notExistsProduct() {
         Product request = new Product();
         request.setPrice(BigDecimal.ZERO);
