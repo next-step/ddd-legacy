@@ -55,4 +55,10 @@ public class MenuFixture {
         menu.setDisplayed(displayed);
         return menu;
     }
+
+    public static Menu changePriceMenu(BigDecimal price) {
+        Menu menu = new Menu();
+        menu.setPrice(price);
+        return menu;
+    }
 }

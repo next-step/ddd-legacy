@@ -193,6 +193,71 @@ class MenuServiceTest {
 
     }
 
+    @Nested
+    @DisplayName("수정")
+    class MenuModify {
+
+        @Test
+        @DisplayName("메뉴 가격을 수정한다.")
+        void menuChangePrice() {
+            // given
+            Menu menu = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
+            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+
+            // when
+            Menu request = changePriceMenu(BigDecimal.valueOf(10000));
+            Menu result = menuService.changePrice(menu.getId(), request);
+
+            // then
+            assertThat(result.getId()).isEqualTo(menu.getId());
+            assertThat(result.getPrice()).isEqualTo(BigDecimal.valueOf(10000));
+            assertThat(result.isDisplayed()).isTrue();
+        }
+
+        @ParameterizedTest
+        @DisplayName("변경하려는 가격은 null 이거나 0보다 작으면 IllegalArgumentException을 반환한다.")
+        @NullSource
+        @MethodSource("lessThanZero")
+        void priceIsNotNullAndLessThanZero(BigDecimal price) {
+            Menu menu = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
+            Menu request = changePriceMenu(price);
+
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("메뉴가 존재 하지 않으면 NoSuchElementException을 반환한다.")
+        void menuNotRegisteredThrownException() {
+            Menu menu = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
+            when(menuRepository.findById(any())).thenReturn(Optional.empty());
+
+            Menu request = changePriceMenu(BigDecimal.valueOf(10000));
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Test
+        @DisplayName("변경하려는 메뉴의 가격은 메뉴 상품의 가격의 합보다 클 수 없다.")
+        void priceIsGreaterThanMenuProductQuantityPrice() {
+            Menu menu = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
+            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+
+            Menu request = changePriceMenu(BigDecimal.valueOf(50000));
+
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
+                    .isInstanceOf(IllegalArgumentException.class);
+            assertThat(menu.getPrice()).isLessThan(request.getPrice());
+        }
+
+        private static Stream<BigDecimal> lessThanZero() {
+            return Stream.of(
+                    BigDecimal.valueOf(-10),
+                    BigDecimal.valueOf(-10000)
+            );
+        }
+    }
+
     private void stubMenuGroupAndProduct() {
         when(menuGroupRepository.findById(any())).thenReturn(Optional.of(new MenuGroup()));
         when(productRepository.findAllByIdIn(any())).thenReturn(List.of(후라이드_치킨_상품));
