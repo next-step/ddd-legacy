@@ -7,7 +7,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 
-@Component
 public interface PurgomalumClient {
     public boolean containsProfanity(final String text);
 }
