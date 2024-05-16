@@ -28,7 +28,7 @@ class MenuGroupAcceptanceTest {
         MenuGroup 한마리메뉴_등록_요청 = 메뉴그룹_등록_요청(이름_한마리메뉴);
 
         // then
-        ExtractableResponse<Response> 한마리메뉴_등록_응답 = 메뉴그룹을_등록한다(한마리메뉴_등록_요청);
+        var 한마리메뉴_등록_응답 = 메뉴그룹을_등록한다(한마리메뉴_등록_요청);
 
         // then
         메뉴그룹_등록_검증(한마리메뉴_등록_응답);
@@ -42,7 +42,7 @@ class MenuGroupAcceptanceTest {
         UUID ID_추천메뉴 = 메뉴그룹을_등록하고_해당_ID를_반환한다(이름_추천메뉴);
 
         // when
-        ExtractableResponse<Response> 메뉴그룹_목록_응답 = 메뉴그룹_목록을_보여준다();
+        var 메뉴그룹_목록_응답 = 메뉴그룹_목록을_보여준다();
 
         // then
         메뉴그룹_목록_검증(ID_한마리메뉴, ID_추천메뉴, 메뉴그룹_목록_응답);

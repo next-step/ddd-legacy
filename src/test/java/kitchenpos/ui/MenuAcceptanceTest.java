@@ -66,7 +66,7 @@ class MenuAcceptanceTest {
         Menu 순살치킨_메뉴_요청 = 메뉴_등록_요청(이름_순살치킨, 가격_38000, ID_추천메뉴, true, 양념치킨_1개, 후라이드치킨_1개);
 
         // when
-        ExtractableResponse<Response> 순살치킨_메뉴_응답 = 메뉴_등록한다(순살치킨_메뉴_요청);
+        var 순살치킨_메뉴_응답 = 메뉴_등록한다(순살치킨_메뉴_요청);
 
         // then
         메뉴_등록_검증(순살치킨_메뉴_응답);
@@ -80,7 +80,7 @@ class MenuAcceptanceTest {
         Menu 메뉴_가격_수정_요청 = 메뉴의_가격_수정을_요청(가격_34000);
 
         // when
-        ExtractableResponse<Response> 메뉴_가격_수정_응답 = 메뉴의_가격을_수정한다(메뉴Id, 메뉴_가격_수정_요청);
+        var 메뉴_가격_수정_응답 = 메뉴의_가격을_수정한다(메뉴Id, 메뉴_가격_수정_요청);
 
         // then
         메뉴의_가격_수정_검증(메뉴_가격_수정_응답);
@@ -94,7 +94,7 @@ class MenuAcceptanceTest {
         메뉴를_숨긴다(메뉴Id);
 
         // when
-        ExtractableResponse<Response> 노출된_메뉴_응답 = 메뉴를_노출한다(메뉴Id);
+        var 노출된_메뉴_응답 = 메뉴를_노출한다(메뉴Id);
 
         // then
         메뉴_노출_검증(노출된_메뉴_응답);
@@ -107,7 +107,7 @@ class MenuAcceptanceTest {
         UUID menuId = 메뉴를_등록하고_해당_ID를_반환한다(이름_순살치킨, 가격_38000, 양념치킨_1개, 후라이드치킨_1개);
 
         // when
-        ExtractableResponse<Response> 숨긴_메뉴_응답 = 메뉴를_숨긴다(menuId);
+        var 숨긴_메뉴_응답 = 메뉴를_숨긴다(menuId);
 
         // then
         숨긴_메뉴_검증(숨긴_메뉴_응답);
@@ -121,7 +121,7 @@ class MenuAcceptanceTest {
         UUID 반반치킨_MENU_ID = 메뉴를_등록하고_해당_ID를_반환한다(이름_반반치킨, 가격_19000, 양념치킨_1개, 후라이드치킨_1개);
 
         // when
-        ExtractableResponse<Response> 메뉴_목록_응답 = 메뉴의_목록을_조회한다();
+        var 메뉴_목록_응답 = 메뉴의_목록을_조회한다();
 
         // then
         메뉴_목록_검증(순살치킨_MENU_ID, 반반치킨_MENU_ID, 메뉴_목록_응답);

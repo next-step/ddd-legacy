@@ -33,7 +33,7 @@ class ProductAcceptanceTest {
         Product 양념치킨_등록_요청 = 상품의_등록을_요청(이름_양념치킨, 가격_20000);
 
         // when
-        ExtractableResponse<Response> 양념치킨_등록_응답 = 상품을_등록한다(양념치킨_등록_요청);
+        var 양념치킨_등록_응답 = 상품을_등록한다(양념치킨_등록_요청);
 
         // then
         상품_등록_검증(양념치킨_등록_응답);
@@ -47,7 +47,7 @@ class ProductAcceptanceTest {
         Product 양념치킨_가격_수정_요청 = 상품의_가격_수정_요청(가격_18000);
 
         // when
-        ExtractableResponse<Response> 양념치킨_가격_수정_응답 = 상품의_가격을_수정한다(productId, 양념치킨_가격_수정_요청);
+        var 양념치킨_가격_수정_응답 = 상품의_가격을_수정한다(productId, 양념치킨_가격_수정_요청);
 
         //then
         상품의_가격_수정_검증(양념치킨_가격_수정_응답);
@@ -61,7 +61,7 @@ class ProductAcceptanceTest {
         UUID 후라이드치킨Id = 상품을_등록하고_상품Id를_반환한다(이름_후라이드치킨, 가격_18000);
 
         // when
-        ExtractableResponse<Response> 상품_목록_응답 = 상품의_목록을_보여준다();
+        var 상품_목록_응답 = 상품의_목록을_보여준다();
 
         //then
         상품_목록_검증(양념치킨Id, 후라이드치킨Id, 상품_목록_응답);

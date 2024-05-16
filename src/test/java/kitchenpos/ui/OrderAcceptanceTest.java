@@ -86,7 +86,7 @@ class OrderAcceptanceTest {
             주문테이블에_앉는다(주문테이블Id);
 
             // when
-            ExtractableResponse<Response> 매장주문_등록_응답 = 주문을_등록한다(매장주문);
+            var 매장주문_등록_응답 = 주문을_등록한다(매장주문);
 
             // then
             매장주문_등록_검증(매장주문_등록_응답);
@@ -97,7 +97,7 @@ class OrderAcceptanceTest {
         void createDeliveryOrder() {
             // given
             // when
-            ExtractableResponse<Response> 배달주문_등록_응답 = 주문을_등록한다(배달주문);
+            var 배달주문_등록_응답 = 주문을_등록한다(배달주문);
 
             // then
             배달주문_등록_검증(배달주문_등록_응답);
@@ -108,7 +108,7 @@ class OrderAcceptanceTest {
         void createTakeOutOrder() {
             // given
             // when
-            ExtractableResponse<Response> 포장주문_등록_응답 = 주문을_등록한다(포장주문);
+            var 포장주문_등록_응답 = 주문을_등록한다(포장주문);
 
             // then
             포장주문_등록_검증(포장주문_등록_응답);
@@ -126,7 +126,7 @@ class OrderAcceptanceTest {
             UUID 매장주문Id = 주문을_등록_후_해당_Id를_반환한다(매장주문);
 
             // when
-            ExtractableResponse<Response> 매장주문_수락_응답 = 주문을_수락한다(매장주문Id);
+            var 매장주문_수락_응답 = 주문을_수락한다(매장주문Id);
 
             // then
             주문별_상태_검증(매장주문_수락_응답, OrderType.EAT_IN, OrderStatus.ACCEPTED);
@@ -139,7 +139,7 @@ class OrderAcceptanceTest {
             UUID 배달주문Id = 주문을_등록_후_해당_Id를_반환한다(배달주문);
 
             // when
-            ExtractableResponse<Response> 배달주문_수락_응답 = 주문을_수락한다(배달주문Id);
+            var 배달주문_수락_응답 = 주문을_수락한다(배달주문Id);
 
             // then
             주문별_상태_검증(배달주문_수락_응답, OrderType.DELIVERY, OrderStatus.ACCEPTED);
@@ -153,7 +153,7 @@ class OrderAcceptanceTest {
             UUID 포장주문Id = 주문을_등록_후_해당_Id를_반환한다(포장주문);
 
             // when
-            ExtractableResponse<Response> 포장주문_수락_응답 = 주문을_수락한다(포장주문Id);
+            var 포장주문_수락_응답 = 주문을_수락한다(포장주문Id);
 
             // then
             주문별_상태_검증(포장주문_수락_응답, OrderType.TAKEOUT, OrderStatus.ACCEPTED);
@@ -172,7 +172,7 @@ class OrderAcceptanceTest {
             주문을_수락한다(매장주문Id);
 
             // when
-            ExtractableResponse<Response> 매장주문_제조완료_응답 = 주문의_제조를_완료한다(매장주문Id);
+            var 매장주문_제조완료_응답 = 주문의_제조를_완료한다(매장주문Id);
 
             // then
             주문별_상태_검증(매장주문_제조완료_응답, OrderType.EAT_IN, OrderStatus.SERVED);
@@ -186,7 +186,7 @@ class OrderAcceptanceTest {
             주문을_수락한다(orderId);
 
             // when
-            ExtractableResponse<Response> 배달주문_제조완료_응답 = 주문의_제조를_완료한다(orderId);
+            var 배달주문_제조완료_응답 = 주문의_제조를_완료한다(orderId);
 
             // then
             주문별_상태_검증(배달주문_제조완료_응답, OrderType.DELIVERY, OrderStatus.SERVED);
@@ -200,7 +200,7 @@ class OrderAcceptanceTest {
             주문을_수락한다(포장주문Id);
 
             // when
-            ExtractableResponse<Response> 포장주문_제조완료_응답 = 주문의_제조를_완료한다(포장주문Id);
+            var 포장주문_제조완료_응답 = 주문의_제조를_완료한다(포장주문Id);
 
             // then
             주문별_상태_검증(포장주문_제조완료_응답, OrderType.TAKEOUT, OrderStatus.SERVED);
@@ -219,7 +219,7 @@ class OrderAcceptanceTest {
             주문의_제조를_완료한다(배달주문Id);
 
             // when
-            ExtractableResponse<Response> 배달주문_배달시작_응답 = 배달을_시작한다(배달주문Id);
+            var 배달주문_배달시작_응답 = 배달을_시작한다(배달주문Id);
 
             // then
             주문별_상태_검증(배달주문_배달시작_응답, OrderType.DELIVERY, OrderStatus.DELIVERING);
@@ -235,7 +235,7 @@ class OrderAcceptanceTest {
             배달을_시작한다(배달주문Id);
 
             // when
-            ExtractableResponse<Response> 배달주문_배달완료_응답 = 배달을_완료한다(배달주문Id);
+            var 배달주문_배달완료_응답 = 배달을_완료한다(배달주문Id);
 
             // then
             주문별_상태_검증(배달주문_배달완료_응답, OrderType.DELIVERY, OrderStatus.DELIVERED);
@@ -255,7 +255,7 @@ class OrderAcceptanceTest {
             주문의_제조를_완료한다(매장주문Id);
 
             // when
-            ExtractableResponse<Response> 매장주문_완료_응답 = 주문을_완료한다(매장주문Id);
+            var 매장주문_완료_응답 = 주문을_완료한다(매장주문Id);
 
             // then
             매장주문_완료_검증(매장주문_완료_응답);
@@ -272,7 +272,7 @@ class OrderAcceptanceTest {
             배달을_완료한다(배달주문Id);
 
             // when
-            ExtractableResponse<Response> response = 주문을_완료한다(배달주문Id);
+            var response = 주문을_완료한다(배달주문Id);
 
             // then
             주문별_상태_검증(response, OrderType.DELIVERY, OrderStatus.COMPLETED);
@@ -287,7 +287,7 @@ class OrderAcceptanceTest {
             주문의_제조를_완료한다(포장주문Id);
 
             // when
-            ExtractableResponse<Response> 포장주문_완료_응답 = 주문을_완료한다(포장주문Id);
+            var 포장주문_완료_응답 = 주문을_완료한다(포장주문Id);
 
             // then
             주문별_상태_검증(포장주문_완료_응답, OrderType.TAKEOUT, OrderStatus.COMPLETED);

@@ -32,7 +32,7 @@ class OrderTableAcceptanceTest {
         OrderTable 주문테이블_1번_등록_요청 = 주문테이블_등록_요청(이름_1번);
 
         // when
-        ExtractableResponse<Response> 주문테이블_1번_등록_응답 = 주문테이블을_등록한다(주문테이블_1번_등록_요청);
+        var 주문테이블_1번_등록_응답 = 주문테이블을_등록한다(주문테이블_1번_등록_요청);
 
         // then
         주문테이블_등록_검증(주문테이블_1번_등록_응답);
@@ -45,7 +45,7 @@ class OrderTableAcceptanceTest {
         UUID 주문테이블Id = 주문테이블을_등록하고_Id를_반환한다(이름_1번);
 
         // when
-        ExtractableResponse<Response> 주문테이블_응답 = 주문테이블에_앉는다(주문테이블Id);
+        var 주문테이블_응답 = 주문테이블에_앉는다(주문테이블Id);
 
         // then
         주문테이블에_앉는_검증(주문테이블Id, 주문테이블_응답);
@@ -61,7 +61,7 @@ class OrderTableAcceptanceTest {
         주문테이블의_인원을_변경한다(주문테이블Id, 인원변경_요청);
 
         // when
-        ExtractableResponse<Response> 주문테이블_초기화_응답 = 주문테이블을_초기화한다(주문테이블Id);
+        var 주문테이블_초기화_응답 = 주문테이블을_초기화한다(주문테이블Id);
 
         // then
         주문테이블_초기화_검증(주문테이블Id, 주문테이블_초기화_응답);
@@ -76,7 +76,7 @@ class OrderTableAcceptanceTest {
         OrderTable 인원변경_요청 = 주문테이블의_인원변경을_요청(4);
 
         // when
-        ExtractableResponse<Response> 주문테이블_인원변경_응답 = 주문테이블의_인원을_변경한다(주문테이블Id, 인원변경_요청);
+        var 주문테이블_인원변경_응답 = 주문테이블의_인원을_변경한다(주문테이블Id, 인원변경_요청);
 
         // then
         주문테이블_인원변경_검증(주문테이블Id, 주문테이블_인원변경_응답);
@@ -90,7 +90,7 @@ class OrderTableAcceptanceTest {
         UUID ORDER_TABLE_2번_ID = 주문테이블을_등록하고_Id를_반환한다(NAME_2번);
 
         // when
-        ExtractableResponse<Response> response = getOrderTablesStep();
+        var response = getOrderTablesStep();
 
         // then
         assertAll(
