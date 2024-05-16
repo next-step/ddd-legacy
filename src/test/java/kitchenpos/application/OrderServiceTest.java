@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.config.ServiceTest;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -24,9 +25,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -46,8 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.Mockito.verify;
 
 
-@SpringBootTest
-@Transactional
+@ServiceTest
 class OrderServiceTest {
 
     @Autowired
@@ -323,7 +321,7 @@ class OrderServiceTest {
     class acceptTest {
         @DisplayName("주문을 수락할 수 있다.")
         @Test
-        void acceptTest() {
+        void acceptSuccessTest() {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
             MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
@@ -600,19 +598,22 @@ class OrderServiceTest {
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-                Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now());
-                order = orderRepository.save(order);
-                final Order order2 = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now());
-                order = orderRepository.save(order2);
+                final Order order1 = orderRepository.save(
+                        createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now())
+                );
+                final Order order2 = orderRepository.save(
+                        createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now())
+                );
 
-                final UUID orderId = order.getId();
+                final Order completedOrder = orderService.complete(order1.getId());
 
-                order = orderService.complete(orderId);
+                assertAll(
+                        () -> assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                        () -> assertThat(order2.getStatus()).isEqualTo(OrderStatus.SERVED),
+                        () -> assertThat(completedOrder.getOrderTable().getNumberOfGuests()).isEqualTo(2),
+                        () -> assertThat(completedOrder.getOrderTable().isOccupied()).isTrue()
 
-                assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-                assertThat(order2.getStatus()).isEqualTo(OrderStatus.SERVED);
-                assertThat(order.getOrderTable().getNumberOfGuests()).isEqualTo(2);
-                assertThat(order.getOrderTable().isOccupied()).isTrue();
+                );
             }
         }
 

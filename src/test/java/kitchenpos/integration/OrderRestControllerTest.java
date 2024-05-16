@@ -386,7 +386,7 @@ class OrderRestControllerTest {
     class findAllTest {
         @DisplayName("주문을 전체 조회 한다.")
         @Test
-        void findAllTest() throws Exception {
+        void findAllSuccessTest() throws Exception {
             final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
             final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
             final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));

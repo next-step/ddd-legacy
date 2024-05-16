@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.config.ServiceTest;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -22,8 +23,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,8 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-@SpringBootTest
-@Transactional
+@ServiceTest
 class OrderTableServiceTest {
     @Autowired
     private OrderTableService orderTableService;
@@ -181,9 +179,8 @@ class OrderTableServiceTest {
             orderTable.setNumberOfGuests(4);
 
             final UUID orderTableId = orderTable.getId();
-            final OrderTable changeOrderTable = orderTable;
 
-            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, changeOrderTable))
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, orderTable))
                     .isInstanceOf(IllegalStateException.class);
         }
     }
