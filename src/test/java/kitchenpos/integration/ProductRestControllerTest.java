@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static kitchenpos.fixture.ProductFixture.createProductWithId;
@@ -43,7 +44,8 @@ class ProductRestControllerTest {
     void create() throws Exception {
         final MvcResult result = mockMvc.perform(post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createProduct("후라이드 치킨", BigDecimal.valueOf(16000)))))
+                        .content(objectMapper.writeValueAsString(createProduct("후라이드 치킨",
+                                BigDecimal.valueOf(16000)))))
                 .andReturn();
 
         final Product product = MockMvcUtil.readValue(objectMapper, result, Product.class);
@@ -59,7 +61,8 @@ class ProductRestControllerTest {
 
     @Test
     void changePrice() throws Exception {
-        final Product changedProduct = productRepository.save(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final Product changedProduct = productRepository.save(createProductWithId("후라이드 치킨",
+                BigDecimal.valueOf(16000)));
         changedProduct.setPrice(BigDecimal.valueOf(15000));
 
         final MvcResult result = mockMvc.perform(put("/api/products/" + changedProduct.getId() + "/price")
@@ -77,20 +80,23 @@ class ProductRestControllerTest {
 
     @Test
     void findAll() throws Exception {
-        final Product product1 = productRepository.save(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
-        final Product product2 = productRepository.save(createProductWithId("양념 치킨", BigDecimal.valueOf(16000)));
+        final Product product1 = productRepository.save(createProductWithId("후라이드 치킨",
+                BigDecimal.valueOf(16000)));
+        final Product product2 = productRepository.save(createProductWithId("양념 치킨",
+                BigDecimal.valueOf(16000)));
 
-        // when
         final MvcResult result = mockMvc.perform(get("/api/products"))
                 .andReturn();
 
         final List<Product> products = MockMvcUtil.readListValue(objectMapper, result, Product.class);
+        final List<UUID> productIds = products.stream()
+                .map(Product::getId)
+                .toList();
 
-        // then
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(products).hasSize(2),
-                () -> assertThat(products.stream().map(Product::getId)).contains(product1.getId(), product2.getId())
+                () -> assertThat(productIds).contains(product1.getId(), product2.getId())
         );
     }
 }

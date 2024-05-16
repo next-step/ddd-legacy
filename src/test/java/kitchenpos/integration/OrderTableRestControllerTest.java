@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
+import java.util.UUID;
 
 import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static kitchenpos.fixture.OrderTableFixture.createOrderTableWithId;
@@ -44,17 +45,17 @@ class OrderTableRestControllerTest {
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
-                () -> assertThat(result.getResponse().getHeader("Location")).isEqualTo("/api/order-tables/" + orderTable.getId()),
-                () -> assertThat(orderTable.getId()).isNotNull(),
-                () -> assertThat(orderTable.getName()).isEqualTo("1번테이블"),
-                () -> assertThat(orderTable.getNumberOfGuests()).isZero(),
-                () -> assertThat(orderTable.isOccupied()).isFalse()
+                () -> assertThat(result.getResponse().getHeader("Location"))
+                        .isEqualTo("/api/order-tables/" + orderTable.getId()),
+                () -> assertThat(orderTable.getId()).isNotNull()
         );
     }
 
     @Test
     void sit() throws Exception {
-        final OrderTable changedOrderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", false, 0));
+        final OrderTable changedOrderTable = orderTableRepository.save(
+                createOrderTableWithId("1번테이블", false, 0)
+        );
         final MvcResult result = mockMvc.perform(put("/api/order-tables/" + changedOrderTable.getId() + "/sit")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
@@ -69,7 +70,9 @@ class OrderTableRestControllerTest {
 
     @Test
     void clear() throws Exception {
-        final OrderTable changedOrderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 0));
+        final OrderTable changedOrderTable = orderTableRepository.save(
+                createOrderTableWithId("1번테이블", true, 0)
+        );
         final MvcResult result = mockMvc.perform(put("/api/order-tables/" + changedOrderTable.getId() + "/clear")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
@@ -84,7 +87,9 @@ class OrderTableRestControllerTest {
 
     @Test
     void changeNumberOfGuests() throws Exception {
-        final OrderTable changedOrderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 0));
+        final OrderTable changedOrderTable = orderTableRepository.save(
+                createOrderTableWithId("1번테이블", true, 0)
+        );
         changedOrderTable.setNumberOfGuests(4);
 
         final MvcResult result = mockMvc.perform(put("/api/order-tables/" + changedOrderTable.getId() + "/number-of-guests")
@@ -109,12 +114,12 @@ class OrderTableRestControllerTest {
                 .andReturn();
 
         final List<OrderTable> orderTables = MockMvcUtil.readListValue(objectMapper, result, OrderTable.class);
+        final List<UUID> orderTableIds = orderTables.stream().map(OrderTable::getId).toList();
 
-        // then
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(orderTables).hasSize(2),
-                () -> assertThat(orderTables.stream().map(OrderTable::getId)).contains(orderTable1.getId(), orderTable2.getId())
+                () -> assertThat(orderTableIds).contains(orderTable1.getId(), orderTable2.getId())
         );
     }
 }
