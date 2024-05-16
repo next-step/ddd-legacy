@@ -89,7 +89,7 @@ class OrderAcceptanceTest {
             var 매장주문_등록_응답 = 주문을_등록한다(매장주문);
 
             // then
-            매장주문_등록_검증(매장주문_등록_응답);
+            매장주문이_등록되었는지_검증한다(매장주문_등록_응답);
         }
 
         @DisplayName("[성공] 배달주문이 들어왔습니다.")
@@ -100,7 +100,7 @@ class OrderAcceptanceTest {
             var 배달주문_등록_응답 = 주문을_등록한다(배달주문);
 
             // then
-            배달주문_등록_검증(배달주문_등록_응답);
+            배달주문이_등록되었는지_검증한다(배달주문_등록_응답);
         }
 
         @DisplayName("[성공] 포장주문이 들어왔습니다.")
@@ -111,7 +111,7 @@ class OrderAcceptanceTest {
             var 포장주문_등록_응답 = 주문을_등록한다(포장주문);
 
             // then
-            포장주문_등록_검증(포장주문_등록_응답);
+            포장주문이_등록되었는지_검증한다(포장주문_등록_응답);
         }
     }
 
@@ -129,7 +129,7 @@ class OrderAcceptanceTest {
             var 매장주문_수락_응답 = 주문을_수락한다(매장주문Id);
 
             // then
-            주문별_상태_검증(매장주문_수락_응답, OrderType.EAT_IN, OrderStatus.ACCEPTED);
+            주문의_종류와_상태를_검증한다(매장주문_수락_응답, OrderType.EAT_IN, OrderStatus.ACCEPTED);
         }
 
         @DisplayName("[성공] 배달주문을 수락합니다.")
@@ -142,7 +142,7 @@ class OrderAcceptanceTest {
             var 배달주문_수락_응답 = 주문을_수락한다(배달주문Id);
 
             // then
-            주문별_상태_검증(배달주문_수락_응답, OrderType.DELIVERY, OrderStatus.ACCEPTED);
+            주문의_종류와_상태를_검증한다(배달주문_수락_응답, OrderType.DELIVERY, OrderStatus.ACCEPTED);
         }
 
 
@@ -156,7 +156,7 @@ class OrderAcceptanceTest {
             var 포장주문_수락_응답 = 주문을_수락한다(포장주문Id);
 
             // then
-            주문별_상태_검증(포장주문_수락_응답, OrderType.TAKEOUT, OrderStatus.ACCEPTED);
+            주문의_종류와_상태를_검증한다(포장주문_수락_응답, OrderType.TAKEOUT, OrderStatus.ACCEPTED);
         }
     }
 
@@ -175,7 +175,7 @@ class OrderAcceptanceTest {
             var 매장주문_제조완료_응답 = 주문의_제조를_완료한다(매장주문Id);
 
             // then
-            주문별_상태_검증(매장주문_제조완료_응답, OrderType.EAT_IN, OrderStatus.SERVED);
+            주문의_종류와_상태를_검증한다(매장주문_제조완료_응답, OrderType.EAT_IN, OrderStatus.SERVED);
         }
 
         @DisplayName("[성공] 배달주문의 제조를 완료합니다.")
@@ -189,7 +189,7 @@ class OrderAcceptanceTest {
             var 배달주문_제조완료_응답 = 주문의_제조를_완료한다(orderId);
 
             // then
-            주문별_상태_검증(배달주문_제조완료_응답, OrderType.DELIVERY, OrderStatus.SERVED);
+            주문의_종류와_상태를_검증한다(배달주문_제조완료_응답, OrderType.DELIVERY, OrderStatus.SERVED);
         }
 
         @DisplayName("[성공] 포장주문의 제조를 완료합니다.")
@@ -203,7 +203,7 @@ class OrderAcceptanceTest {
             var 포장주문_제조완료_응답 = 주문의_제조를_완료한다(포장주문Id);
 
             // then
-            주문별_상태_검증(포장주문_제조완료_응답, OrderType.TAKEOUT, OrderStatus.SERVED);
+            주문의_종류와_상태를_검증한다(포장주문_제조완료_응답, OrderType.TAKEOUT, OrderStatus.SERVED);
         }
     }
 
@@ -222,7 +222,7 @@ class OrderAcceptanceTest {
             var 배달주문_배달시작_응답 = 배달을_시작한다(배달주문Id);
 
             // then
-            주문별_상태_검증(배달주문_배달시작_응답, OrderType.DELIVERY, OrderStatus.DELIVERING);
+            주문의_종류와_상태를_검증한다(배달주문_배달시작_응답, OrderType.DELIVERY, OrderStatus.DELIVERING);
         }
 
         @DisplayName("[성공] 배달이 완료됩니다.")
@@ -238,7 +238,7 @@ class OrderAcceptanceTest {
             var 배달주문_배달완료_응답 = 배달을_완료한다(배달주문Id);
 
             // then
-            주문별_상태_검증(배달주문_배달완료_응답, OrderType.DELIVERY, OrderStatus.DELIVERED);
+            주문의_종류와_상태를_검증한다(배달주문_배달완료_응답, OrderType.DELIVERY, OrderStatus.DELIVERED);
         }
     }
 
@@ -258,7 +258,7 @@ class OrderAcceptanceTest {
             var 매장주문_완료_응답 = 주문을_완료한다(매장주문Id);
 
             // then
-            매장주문_완료_검증(매장주문_완료_응답);
+            매장주문의_상태가_주문완료인지_검증한다(매장주문_완료_응답);
         }
 
         @DisplayName("[성공] 배달주문을 종료합니다.")
@@ -275,7 +275,7 @@ class OrderAcceptanceTest {
             var response = 주문을_완료한다(배달주문Id);
 
             // then
-            주문별_상태_검증(response, OrderType.DELIVERY, OrderStatus.COMPLETED);
+            주문의_종류와_상태를_검증한다(response, OrderType.DELIVERY, OrderStatus.COMPLETED);
         }
 
         @DisplayName("[성공] 포장주문을 종료합니다.")
@@ -290,7 +290,7 @@ class OrderAcceptanceTest {
             var 포장주문_완료_응답 = 주문을_완료한다(포장주문Id);
 
             // then
-            주문별_상태_검증(포장주문_완료_응답, OrderType.TAKEOUT, OrderStatus.COMPLETED);
+            주문의_종류와_상태를_검증한다(포장주문_완료_응답, OrderType.TAKEOUT, OrderStatus.COMPLETED);
         }
     }
 
@@ -315,7 +315,7 @@ class OrderAcceptanceTest {
         return 주문을_등록한다(request).as(Order.class).getId();
     }
 
-    private static void 포장주문_등록_검증(ExtractableResponse<Response> 포장주문_응답) {
+    private static void 포장주문이_등록되었는지_검증한다(ExtractableResponse<Response> 포장주문_응답) {
         assertAll(
                 () -> assertThat(포장주문_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(포장주문_응답.jsonPath().getObject("id", UUID.class)).isNotNull(),
@@ -327,7 +327,7 @@ class OrderAcceptanceTest {
         );
     }
 
-    private static void 배달주문_등록_검증(ExtractableResponse<Response> 배달주문_응답) {
+    private static void 배달주문이_등록되었는지_검증한다(ExtractableResponse<Response> 배달주문_응답) {
         assertAll(
                 () -> assertThat(배달주문_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(배달주문_응답.jsonPath().getObject("id", UUID.class)).isNotNull(),
@@ -339,7 +339,7 @@ class OrderAcceptanceTest {
         );
     }
 
-    private void 매장주문_등록_검증(ExtractableResponse<Response> 매장주문_등록_검증) {
+    private void 매장주문이_등록되었는지_검증한다(ExtractableResponse<Response> 매장주문_등록_검증) {
         assertAll(
                 () -> assertThat(매장주문_등록_검증.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(매장주문_등록_검증.jsonPath().getObject("id", UUID.class)).isNotNull(),
@@ -357,7 +357,7 @@ class OrderAcceptanceTest {
         );
     }
 
-    private static void 주문별_상태_검증(ExtractableResponse<Response> response, OrderType type, OrderStatus status) {
+    private static void 주문의_종류와_상태를_검증한다(ExtractableResponse<Response> response, OrderType type, OrderStatus status) {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isNotNull(),
@@ -366,7 +366,7 @@ class OrderAcceptanceTest {
         );
     }
 
-    private static void 매장주문_완료_검증(ExtractableResponse<Response> 매장주문_완료_응답) {
+    private static void 매장주문의_상태가_주문완료인지_검증한다(ExtractableResponse<Response> 매장주문_완료_응답) {
         assertAll(
                 () -> assertThat(매장주문_완료_응답.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(매장주문_완료_응답.jsonPath().getObject("id", UUID.class)).isNotNull(),

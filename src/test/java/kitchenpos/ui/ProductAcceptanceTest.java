@@ -36,7 +36,7 @@ class ProductAcceptanceTest {
         var 양념치킨_등록_응답 = 상품을_등록한다(양념치킨_등록_요청);
 
         // then
-        상품_등록_검증(양념치킨_등록_응답);
+        상품의_등록을_검증한다(양념치킨_등록_응답);
     }
 
     @DisplayName("[성공] 상품의 가격을 수정한다.")
@@ -50,7 +50,7 @@ class ProductAcceptanceTest {
         var 양념치킨_가격_수정_응답 = 상품의_가격을_수정한다(productId, 양념치킨_가격_수정_요청);
 
         //then
-        상품의_가격_수정_검증(양념치킨_가격_수정_응답);
+        상품의_가격이_수정되었는지_검증한다(양념치킨_가격_수정_응답);
     }
 
     @DisplayName("[성공] 상품 목록을 볼 수 있다.")
@@ -64,7 +64,7 @@ class ProductAcceptanceTest {
         var 상품_목록_응답 = 상품의_목록을_보여준다();
 
         //then
-        상품_목록_검증(양념치킨Id, 후라이드치킨Id, 상품_목록_응답);
+        상품_목록을_검증한다(양념치킨Id, 후라이드치킨Id, 상품_목록_응답);
     }
 
     private static Product 상품의_가격_수정_요청(BigDecimal price) {
@@ -79,7 +79,7 @@ class ProductAcceptanceTest {
         return 상품을_등록한다(상품의_등록을_요청(name, price)).as(Product.class).getId();
     }
 
-    private static void 상품_등록_검증(ExtractableResponse<Response> response) {
+    private static void 상품의_등록을_검증한다(ExtractableResponse<Response> response) {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(response.jsonPath().getString("id")).isNotNull(),
@@ -88,7 +88,7 @@ class ProductAcceptanceTest {
         );
     }
 
-    private static void 상품의_가격_수정_검증(ExtractableResponse<Response> response) {
+    private static void 상품의_가격이_수정되었는지_검증한다(ExtractableResponse<Response> response) {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getString("name")).isEqualTo(이름_양념치킨),
@@ -96,7 +96,7 @@ class ProductAcceptanceTest {
         );
     }
 
-    private static void 상품_목록_검증(UUID 양념치킨Id, UUID 후라이드치킨Id, ExtractableResponse<Response> response) {
+    private static void 상품_목록을_검증한다(UUID 양념치킨Id, UUID 후라이드치킨Id, ExtractableResponse<Response> response) {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getList("id", UUID.class))

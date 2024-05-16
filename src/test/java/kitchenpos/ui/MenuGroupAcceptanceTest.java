@@ -31,7 +31,7 @@ class MenuGroupAcceptanceTest {
         var 한마리메뉴_등록_응답 = 메뉴그룹을_등록한다(한마리메뉴_등록_요청);
 
         // then
-        메뉴그룹_등록_검증(한마리메뉴_등록_응답);
+        메뉴그룹이_등록되었는지_검증한다(한마리메뉴_등록_응답);
     }
 
     @DisplayName("[성공] 메뉴그룹의 목록을 보여준다.")
@@ -45,10 +45,10 @@ class MenuGroupAcceptanceTest {
         var 메뉴그룹_목록_응답 = 메뉴그룹_목록을_보여준다();
 
         // then
-        메뉴그룹_목록_검증(ID_한마리메뉴, ID_추천메뉴, 메뉴그룹_목록_응답);
+        메뉴그룹_목록을_검증한다(ID_한마리메뉴, ID_추천메뉴, 메뉴그룹_목록_응답);
     }
 
-    private static void 메뉴그룹_목록_검증(UUID ID_한마리메뉴, UUID ID_추천메뉴, ExtractableResponse<Response> 메뉴그룹_목록_응답) {
+    private static void 메뉴그룹_목록을_검증한다(UUID ID_한마리메뉴, UUID ID_추천메뉴, ExtractableResponse<Response> 메뉴그룹_목록_응답) {
         assertAll(
                 () -> assertThat(메뉴그룹_목록_응답.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(메뉴그룹_목록_응답.jsonPath().getList("id", UUID.class))
@@ -58,7 +58,7 @@ class MenuGroupAcceptanceTest {
         );
     }
 
-    private static void 메뉴그룹_등록_검증(ExtractableResponse<Response> 한마리메뉴_등록_응답) {
+    private static void 메뉴그룹이_등록되었는지_검증한다(ExtractableResponse<Response> 한마리메뉴_등록_응답) {
         assertAll(
                 () -> assertThat(한마리메뉴_등록_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(한마리메뉴_등록_응답.jsonPath().getString("id")).isNotEmpty(),

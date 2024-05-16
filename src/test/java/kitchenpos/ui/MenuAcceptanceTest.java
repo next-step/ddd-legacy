@@ -69,7 +69,7 @@ class MenuAcceptanceTest {
         var 순살치킨_메뉴_응답 = 메뉴_등록한다(순살치킨_메뉴_요청);
 
         // then
-        메뉴_등록_검증(순살치킨_메뉴_응답);
+        메뉴가_등록되었는지_검증한다(순살치킨_메뉴_응답);
     }
 
     @DisplayName("[성공] 메뉴의 가격은 수정된다.")
@@ -83,7 +83,7 @@ class MenuAcceptanceTest {
         var 메뉴_가격_수정_응답 = 메뉴의_가격을_수정한다(메뉴Id, 메뉴_가격_수정_요청);
 
         // then
-        메뉴의_가격_수정_검증(메뉴_가격_수정_응답);
+        메뉴의_가격이_수정되었는지_검증한다(메뉴_가격_수정_응답);
     }
 
     @DisplayName("[성공] 메뉴가 노출된다.")
@@ -97,7 +97,7 @@ class MenuAcceptanceTest {
         var 노출된_메뉴_응답 = 메뉴를_노출한다(메뉴Id);
 
         // then
-        메뉴_노출_검증(노출된_메뉴_응답);
+        메뉴가_노출되었는지_검증한다(노출된_메뉴_응답);
     }
 
     @DisplayName("[성공] 메뉴를 보이지 않게 한다.")
@@ -110,7 +110,7 @@ class MenuAcceptanceTest {
         var 숨긴_메뉴_응답 = 메뉴를_숨긴다(menuId);
 
         // then
-        숨긴_메뉴_검증(숨긴_메뉴_응답);
+        메뉴가_숨겨졌는지_검증한다(숨긴_메뉴_응답);
     }
 
     @DisplayName("[성공] 메뉴의 목록을 볼 수 있다.")
@@ -124,7 +124,7 @@ class MenuAcceptanceTest {
         var 메뉴_목록_응답 = 메뉴의_목록을_조회한다();
 
         // then
-        메뉴_목록_검증(순살치킨_MENU_ID, 반반치킨_MENU_ID, 메뉴_목록_응답);
+        메뉴의_목록을_검증한다(순살치킨_MENU_ID, 반반치킨_MENU_ID, 메뉴_목록_응답);
     }
 
     private UUID 메뉴를_등록하고_해당_ID를_반환한다(String name, BigDecimal price, MenuProduct... menuProducts) {
@@ -140,7 +140,7 @@ class MenuAcceptanceTest {
         return menuChangePriceRequest(price);
     }
 
-    private void 메뉴_등록_검증(ExtractableResponse<Response> 순살치킨_메뉴_응답) {
+    private void 메뉴가_등록되었는지_검증한다(ExtractableResponse<Response> 순살치킨_메뉴_응답) {
         assertAll(
                 () -> assertThat(순살치킨_메뉴_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(순살치킨_메뉴_응답.jsonPath().getObject("id", UUID.class)).isNotNull(),
@@ -154,7 +154,7 @@ class MenuAcceptanceTest {
         );
     }
 
-    private static void 메뉴의_가격_수정_검증(ExtractableResponse<Response> 메뉴_가격_수정_응답) {
+    private static void 메뉴의_가격이_수정되었는지_검증한다(ExtractableResponse<Response> 메뉴_가격_수정_응답) {
         assertAll(
                 () -> assertThat(메뉴_가격_수정_응답.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(메뉴_가격_수정_응답.jsonPath().getObject("price", BigDecimal.class)).isEqualTo(가격_34000),
@@ -165,21 +165,21 @@ class MenuAcceptanceTest {
         );
     }
 
-    private static void 메뉴_노출_검증(ExtractableResponse<Response> 노출된_메뉴_응답) {
+    private static void 메뉴가_노출되었는지_검증한다(ExtractableResponse<Response> 노출된_메뉴_응답) {
         assertAll(
                 () -> assertThat(노출된_메뉴_응답.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(노출된_메뉴_응답.jsonPath().getBoolean("displayed")).isTrue()
         );
     }
 
-    private static void 숨긴_메뉴_검증(ExtractableResponse<Response> 숨긴_메뉴_응답) {
+    private static void 메뉴가_숨겨졌는지_검증한다(ExtractableResponse<Response> 숨긴_메뉴_응답) {
         assertAll(
                 () -> assertThat(숨긴_메뉴_응답.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(숨긴_메뉴_응답.jsonPath().getBoolean("displayed")).isFalse()
         );
     }
 
-    private static void 메뉴_목록_검증(UUID 순살치킨_MENU_ID, UUID 반반치킨_MENU_ID, ExtractableResponse<Response> 메뉴_목록_응답) {
+    private static void 메뉴의_목록을_검증한다(UUID 순살치킨_MENU_ID, UUID 반반치킨_MENU_ID, ExtractableResponse<Response> 메뉴_목록_응답) {
         assertAll(
                 () -> assertThat(메뉴_목록_응답.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(메뉴_목록_응답.jsonPath().getList("id", UUID.class))

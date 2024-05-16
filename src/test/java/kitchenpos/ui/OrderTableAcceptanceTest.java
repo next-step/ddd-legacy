@@ -35,7 +35,7 @@ class OrderTableAcceptanceTest {
         var 주문테이블_1번_등록_응답 = 주문테이블을_등록한다(주문테이블_1번_등록_요청);
 
         // then
-        주문테이블_등록_검증(주문테이블_1번_등록_응답);
+        주문테이블이_등록되었는지_검증한다(주문테이블_1번_등록_응답);
     }
 
     @DisplayName("[성공] 주문테이블에 앉는다.")
@@ -48,7 +48,7 @@ class OrderTableAcceptanceTest {
         var 주문테이블_응답 = 주문테이블에_앉는다(주문테이블Id);
 
         // then
-        주문테이블에_앉는_검증(주문테이블Id, 주문테이블_응답);
+        주문테이블에_앉았는지_검증한다(주문테이블Id, 주문테이블_응답);
     }
 
     @DisplayName("[성공] 주문테이블을 초기화한다.")
@@ -64,7 +64,7 @@ class OrderTableAcceptanceTest {
         var 주문테이블_초기화_응답 = 주문테이블을_초기화한다(주문테이블Id);
 
         // then
-        주문테이블_초기화_검증(주문테이블Id, 주문테이블_초기화_응답);
+        주문테이블이_초기화되었는지_검증한다(주문테이블Id, 주문테이블_초기화_응답);
     }
 
     @DisplayName("[성공] 주문테이블의 인원을 변경한다.")
@@ -79,7 +79,7 @@ class OrderTableAcceptanceTest {
         var 주문테이블_인원변경_응답 = 주문테이블의_인원을_변경한다(주문테이블Id, 인원변경_요청);
 
         // then
-        주문테이블_인원변경_검증(주문테이블Id, 주문테이블_인원변경_응답);
+        주문테이블의_인원변경을_검증한다(주문테이블Id, 주문테이블_인원변경_응답);
     }
 
     @DisplayName("[성공] 주문테이블의 목록을 볼 수 있다.")
@@ -93,6 +93,10 @@ class OrderTableAcceptanceTest {
         var response = getOrderTablesStep();
 
         // then
+        주문테이블의_목록을_검증한다(ORDER_TABLE_1번_ID, ORDER_TABLE_2번_ID, response);
+    }
+
+    private static void 주문테이블의_목록을_검증한다(UUID ORDER_TABLE_1번_ID, UUID ORDER_TABLE_2번_ID, ExtractableResponse<Response> response) {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getList("id", UUID.class))
@@ -102,7 +106,7 @@ class OrderTableAcceptanceTest {
         );
     }
 
-    private static void 주문테이블_등록_검증(ExtractableResponse<Response> 주문테이블_1번_등록_응답) {
+    private static void 주문테이블이_등록되었는지_검증한다(ExtractableResponse<Response> 주문테이블_1번_등록_응답) {
         assertAll(
                 () -> assertThat(주문테이블_1번_등록_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(주문테이블_1번_등록_응답.jsonPath().getObject("id", UUID.class)).isNotNull(),
@@ -112,7 +116,7 @@ class OrderTableAcceptanceTest {
         );
     }
 
-    private static void 주문테이블에_앉는_검증(UUID 주문테이블Id, ExtractableResponse<Response> 주문테이블_응답) {
+    private static void 주문테이블에_앉았는지_검증한다(UUID 주문테이블Id, ExtractableResponse<Response> 주문테이블_응답) {
         assertAll(
                 () -> assertThat(주문테이블_응답.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(주문테이블_응답.jsonPath().getObject("id", UUID.class)).isEqualTo(주문테이블Id),
@@ -122,7 +126,7 @@ class OrderTableAcceptanceTest {
         );
     }
 
-    private static void 주문테이블_초기화_검증(UUID 주문테이블Id, ExtractableResponse<Response> response) {
+    private static void 주문테이블이_초기화되었는지_검증한다(UUID 주문테이블Id, ExtractableResponse<Response> response) {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isEqualTo(주문테이블Id),
@@ -132,7 +136,7 @@ class OrderTableAcceptanceTest {
         );
     }
 
-    private static void 주문테이블_인원변경_검증(UUID 주문테이블Id, ExtractableResponse<Response> response) {
+    private static void 주문테이블의_인원변경을_검증한다(UUID 주문테이블Id, ExtractableResponse<Response> response) {
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value()),
                 () -> assertThat(response.jsonPath().getObject("id", UUID.class)).isEqualTo(주문테이블Id),
