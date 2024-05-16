@@ -17,7 +17,6 @@ import java.math.RoundingMode;
 import java.util.UUID;
 
 import static kitchenpos.fixture.ProductFixture.createProduct;
-import static kitchenpos.fixture.ProductFixture.createProductWithId;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @AcceptanceTest
@@ -38,13 +37,15 @@ class ProductAcceptanceTest {
     void productCreateAndManageAndFindAll() {
         // 상품 생성
         final Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000));
-        final Response friedChickenProductResponse = ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final Response friedChickenProductResponse = ProductAcceptanceStep.create(
+                createProduct("후라이드 치킨", BigDecimal.valueOf(16000))
+        );
         final UUID productId = friedChickenProductResponse.getBody().jsonPath().getUUID("id");
         product.setId(productId);
 
         // 상품 조회
         Response findResponse = ProductAcceptanceStep.findAll();
-        assertThat(findResponse.getBody().jsonPath().getList("id")).contains(productId.toString());
+        assertThat(findResponse.getBody().jsonPath().getList("id", UUID.class)).contains(productId);
 
         // 가격 변경
         final BigDecimal changePrice = BigDecimal.valueOf(17000).setScale(1, RoundingMode.HALF_UP);
@@ -54,7 +55,7 @@ class ProductAcceptanceTest {
         // 상품 조회
         findResponse = ProductAcceptanceStep.findAll();
 
-        assertThat(findResponse.getBody().jsonPath().getList("id")).contains(productId.toString());
+        assertThat(findResponse.getBody().jsonPath().getList("id", UUID.class)).contains(productId);
         assertThat(findResponse.getBody().jsonPath().getList("price", BigDecimal.class)).contains(changePrice);
     }
 }

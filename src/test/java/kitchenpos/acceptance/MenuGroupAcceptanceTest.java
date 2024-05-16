@@ -30,11 +30,11 @@ class MenuGroupAcceptanceTest {
     void menuGroupCreateAndFindAllAcceptance() {
         // 메뉴 그룹 생성
         final Response recommendMenuGroupResponse = MenuGroupAcceptanceStep.create(createMenuGroup("추천메뉴"));
-        final UUID recommendMenuGroupId = UUID.fromString(recommendMenuGroupResponse.asString());
+        final UUID recommendMenuGroupId = recommendMenuGroupResponse.getBody().jsonPath().getUUID("id");
 
         // 메뉴 그룹 전체 목록 조회
         final Response findAllResponse = MenuGroupAcceptanceStep.findAll();
-        
-        assertThat(findAllResponse.getBody().jsonPath().getList("id")).contains(recommendMenuGroupId);
+
+        assertThat(findAllResponse.getBody().jsonPath().getList("id", UUID.class)).contains(recommendMenuGroupId);
     }
 }
