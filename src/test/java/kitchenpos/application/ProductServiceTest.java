@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
@@ -120,7 +121,7 @@ public class ProductServiceTest {
         menu.setPrice(BigDecimal.valueOf(1500));
         menu.setDisplayed(true);
 
-        when(productRepository.findById(any())).thenReturn(java.util.Optional.of(existingProduct));
+        when(productRepository.findById(any())).thenReturn(Optional.of(existingProduct));
         when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
 
         productService.changePrice(existingProduct.getId(), request);
@@ -145,7 +146,7 @@ public class ProductServiceTest {
         request.setName("상품 이름");
         request.setPrice(BigDecimal.valueOf(1000));
 
-        when(productRepository.findById(any())).thenReturn(java.util.Optional.empty());
+        when(productRepository.findById(any())).thenReturn(Optional.empty());
 
         assertThrows(NoSuchElementException.class,
             () -> productService.changePrice(UUID.randomUUID(), request));
@@ -172,7 +173,7 @@ public class ProductServiceTest {
         menu.setPrice(BigDecimal.valueOf(1500));
         menu.setDisplayed(true);
 
-        when(productRepository.findById(any())).thenReturn(java.util.Optional.of(existingProduct));
+        when(productRepository.findById(any())).thenReturn(Optional.of(existingProduct));
         when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
 
         productService.changePrice(existingProduct.getId(), request);

@@ -10,6 +10,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
@@ -84,7 +85,7 @@ class OrderTableServiceTest {
         orderTable.setOccupied(false);
 
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(
-            java.util.Optional.of(orderTable));
+            Optional.of(orderTable));
 
         // when
         OrderTable sittingOrderTable = orderTableService.sit(orderTable.getId());
@@ -106,7 +107,7 @@ class OrderTableServiceTest {
         orderTable.setOccupied(true);
 
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(
-            java.util.Optional.of(orderTable));
+            Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(orderTable,
             OrderStatus.COMPLETED)).thenReturn(false);
 
@@ -131,7 +132,7 @@ class OrderTableServiceTest {
         orderTable.setOccupied(true);
 
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(
-            java.util.Optional.of(orderTable));
+            Optional.of(orderTable));
         when(orderRepository.existsByOrderTableAndStatusNot(orderTable,
             OrderStatus.COMPLETED)).thenReturn(true);
 
@@ -153,7 +154,7 @@ class OrderTableServiceTest {
         request.setNumberOfGuests(4);
 
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(
-            java.util.Optional.of(orderTable));
+            Optional.of(orderTable));
 
         // when
         OrderTable changedOrderTable = orderTableService.changeNumberOfGuests(orderTable.getId(),
@@ -180,7 +181,7 @@ class OrderTableServiceTest {
         request.setNumberOfGuests(4);
 
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(
-            java.util.Optional.of(orderTable));
+            Optional.of(orderTable));
 
         // when & then
         assertThatThrownBy(
