@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -41,9 +42,11 @@ class MenuGroupServiceTest {
         var menuGroup = menuGroupService.create(validMenuGroup);
 
         // then
-        assertThat(menuGroup).isNotNull();
-        assertThat(menuGroup.getName()).isEqualTo(validMenuGroup.getName());
-        assertThat(menuGroup.getId()).isNotNull();
+        assertAll(
+            () -> assertThat(menuGroup).isNotNull(),
+            () -> assertThat(menuGroup.getName()).isEqualTo(validMenuGroup.getName()),
+            () -> assertThat(menuGroup.getId()).isNotNull()
+        );
     }
 
     @DisplayName("`메뉴 그룹`의 이름은 비어있을 수 없다.")
