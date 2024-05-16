@@ -28,7 +28,7 @@ public class OrderTableRestController {
     public ResponseEntity<OrderTable> create(@RequestBody final OrderTable request) {
         final OrderTable response = orderTableService.create(request);
         return ResponseEntity.created(URI.create("/api/order-tables/" + response.getId()))
-                .body(response);
+            .body(response);
     }
 
     @PutMapping("/{orderTableId}/sit")
