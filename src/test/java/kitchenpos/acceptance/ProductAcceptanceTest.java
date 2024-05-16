@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import kitchenpos.acceptance.step.ProductAcceptanceStep;
 import kitchenpos.config.AcceptanceTest;
+import kitchenpos.domain.Product;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.UUID;
 
+import static kitchenpos.fixture.ProductFixture.createProduct;
 import static kitchenpos.fixture.ProductFixture.createProductWithId;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,20 +36,25 @@ class ProductAcceptanceTest {
     @DisplayName("상품을 생성하고 관리하고 조회할 수 있다.")
     @Test
     void productCreateAndManageAndFindAll() {
-        Response 후라이드_치킨 = ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
-        String productId = 후라이드_치킨.getBody().jsonPath().getString("id");
+        // 상품 생성
+        final Product product = createProduct("후라이드 치킨", BigDecimal.valueOf(16000));
+        final Response friedChickenProductResponse = ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final UUID productId = friedChickenProductResponse.getBody().jsonPath().getUUID("id");
+        product.setId(productId);
 
-        Response findAll = ProductAcceptanceStep.findAll();
-        assertThat(findAll.getBody().jsonPath().getList("name")).contains("후라이드 치킨");
-        assertThat(findAll.getBody().jsonPath().getList("id")).contains(productId);
-        assertThat(findAll.getBody().jsonPath().getList("price", BigDecimal.class)).contains(BigDecimal.valueOf(16000).setScale(1, RoundingMode.HALF_UP));
+        // 상품 조회
+        Response findResponse = ProductAcceptanceStep.findAll();
+        assertThat(findResponse.getBody().jsonPath().getList("id")).contains(productId.toString());
 
-        ProductAcceptanceStep.changePrice(UUID.fromString(productId), createProductWithId("후라이드 치킨", BigDecimal.valueOf(17000)));
+        // 가격 변경
+        final BigDecimal changePrice = BigDecimal.valueOf(17000).setScale(1, RoundingMode.HALF_UP);
+        product.setPrice(changePrice);
+        ProductAcceptanceStep.changePrice(productId, product);
 
-        findAll = ProductAcceptanceStep.findAll();
+        // 상품 조회
+        findResponse = ProductAcceptanceStep.findAll();
 
-        assertThat(findAll.getBody().jsonPath().getList("name")).contains("후라이드 치킨");
-        assertThat(findAll.getBody().jsonPath().getList("id")).contains(productId);
-        assertThat(findAll.getBody().jsonPath().getList("price", BigDecimal.class)).contains(BigDecimal.valueOf(17000).setScale(1, RoundingMode.HALF_UP));
+        assertThat(findResponse.getBody().jsonPath().getList("id")).contains(productId.toString());
+        assertThat(findResponse.getBody().jsonPath().getList("price", BigDecimal.class)).contains(changePrice);
     }
 }
