@@ -42,18 +42,18 @@ public class ProductServiceTest {
     @DisplayName("`상품`을 생성할 수 있다.")
     @Test
     void createProductWithValidInput() {
-        Product given = new Product();
-        given.setName("상품 이름");
-        given.setPrice(BigDecimal.valueOf(1000));
+        Product validProduct = new Product();
+        validProduct.setName("상품 이름");
+        validProduct.setPrice(BigDecimal.valueOf(1000));
 
         when(purgomalumClient.containsProfanity(any())).thenReturn(false);
         when(productRepository.save(any())).then(invocation -> invocation.getArgument(0));
 
-        var product = productService.create(given);
+        var product = productService.create(validProduct);
 
         assertThat(product).isNotNull();
-        assertThat(product.getName()).isEqualTo(given.getName());
-        assertThat(product.getPrice()).isEqualTo(given.getPrice());
+        assertThat(product.getName()).isEqualTo(validProduct.getName());
+        assertThat(product.getPrice()).isEqualTo(validProduct.getPrice());
         assertThat(product.getId()).isNotNull();
     }
 

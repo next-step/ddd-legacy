@@ -32,17 +32,17 @@ class MenuGroupServiceTest {
     @Test
     void createMenuGroupWithValidInput() {
         // given
-        MenuGroup given = new MenuGroup();
-        given.setName("메뉴 그룹 이름");
+        MenuGroup validMenuGroup = new MenuGroup();
+        validMenuGroup.setName("메뉴 그룹 이름");
 
         // when
         when(menuGroupRepository.save(any())).then(invocation -> invocation.getArgument(0));
 
-        var menuGroup = menuGroupService.create(given);
+        var menuGroup = menuGroupService.create(validMenuGroup);
 
         // then
         assertThat(menuGroup).isNotNull();
-        assertThat(menuGroup.getName()).isEqualTo(given.getName());
+        assertThat(menuGroup.getName()).isEqualTo(validMenuGroup.getName());
         assertThat(menuGroup.getId()).isNotNull();
     }
 
@@ -50,11 +50,11 @@ class MenuGroupServiceTest {
     @Test
     void createMenuGroupWithEmptyName() {
         // given
-        MenuGroup given = new MenuGroup();
-        given.setName("");
+        MenuGroup invalidMenuGroup = new MenuGroup();
+        invalidMenuGroup.setName("");
 
         // when & then
-        assertThatThrownBy(() -> menuGroupService.create(given))
+        assertThatThrownBy(() -> menuGroupService.create(invalidMenuGroup))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
@@ -62,11 +62,11 @@ class MenuGroupServiceTest {
     @Test
     void createMenuGroupWithNullName() {
         // given
-        MenuGroup given = new MenuGroup();
-        given.setName(null);
+        MenuGroup invalidMenuGroup = new MenuGroup();
+        invalidMenuGroup.setName(null);
 
         // when & then
-        assertThatThrownBy(() -> menuGroupService.create(given))
+        assertThatThrownBy(() -> menuGroupService.create(invalidMenuGroup))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
