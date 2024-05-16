@@ -48,4 +48,23 @@ class MenuGroupServiceTest {
         // then
         assertThat(savedGroup.getId()).isNotNull();
     }
+
+    @Test
+    @DisplayName("모든 메뉴 그룹을 조회한다.")
+    void findAll() {
+        // given
+        MenuGroup menuGroup1 = new MenuGroup();
+        menuGroup1.setName("메뉴그룹1");
+        MenuGroup savedGroup1 = menuGroupService.create(menuGroup1);
+
+        MenuGroup menuGroup2 = new MenuGroup();
+        menuGroup2.setName("메뉴그룹2");
+        MenuGroup savedGroup2 = menuGroupService.create(menuGroup2);
+
+        // when
+        Iterable<MenuGroup> menuGroups = menuGroupService.findAll();
+
+        // then
+        assertThat(menuGroups).containsExactlyInAnyOrder(savedGroup1, savedGroup2);
+    }
 }
