@@ -77,12 +77,37 @@ class MenuGroupServiceTest {
     @Test
     void findAllMenuGroups() {
         // given
-        when(menuGroupRepository.findAll()).thenReturn(List.of(new MenuGroup()));
+        MenuGroup expectedMenuGroup = new MenuGroup();
+        expectedMenuGroup.setName("Test Menu Group");
+
+        List<MenuGroup> expectedMenuGroups = List.of(expectedMenuGroup);
+        when(menuGroupRepository.findAll()).thenReturn(expectedMenuGroups);
 
         // when
         var menuGroups = menuGroupService.findAll();
 
         // then
-        assertThat(menuGroups).isNotEmpty();
+        assertAll(
+            () -> assertThat(menuGroups).isNotNull(),
+            () -> assertThat(menuGroups).isNotEmpty(),
+            () -> assertThat(menuGroups).hasSize(expectedMenuGroups.size()),
+            () -> assertThat(menuGroups.getFirst()).isEqualTo(expectedMenuGroup)
+        );
+    }
+
+    @DisplayName("`메뉴 그룹`을 조회할 때 메뉴 그룹이 없으면 빈 리스트를 반환한다.")
+    @Test
+    void findAllMenuGroupsWithEmptyMenuGroups() {
+        // given
+        when(menuGroupRepository.findAll()).thenReturn(List.of());
+
+        // when
+        var menuGroups = menuGroupService.findAll();
+
+        // then
+        assertAll(
+            () -> assertThat(menuGroups).isNotNull(),
+            () -> assertThat(menuGroups).isEmpty()
+        );
     }
 }
