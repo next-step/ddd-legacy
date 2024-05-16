@@ -82,7 +82,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrder(null, null, List.of(orderLineItem), null, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
@@ -108,7 +108,7 @@ class OrderServiceTest {
             menuGroup = menuGroupRepository.save(menuGroup);
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu notExistMenu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), notExistMenu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(notExistMenu, BigDecimal.valueOf(16000), 1);
             Order order = createOrder(null, null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
@@ -125,7 +125,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), false, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrder(null, null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
@@ -142,7 +142,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(17000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(17000), 1);
             Order order = createOrder(null, null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
@@ -164,7 +164,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrder(null, orderTable, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
                 order = orderService.create(order);
@@ -185,7 +185,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrder(null, notExistOrderTable, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
                 assertThatThrownBy(() -> orderService.create(order))
@@ -204,7 +204,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrder(null, orderTable, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
                 assertThatThrownBy(() -> orderService.create(order))
@@ -225,7 +225,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrder(null, null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
 
                 order = orderService.create(order);
@@ -245,7 +245,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, -1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), -1);
                 Order order = createOrder(null, null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
 
                 assertThatThrownBy(() -> orderService.create(order))
@@ -266,7 +266,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrder(null, null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
 
                 order = orderService.create(order);
@@ -286,7 +286,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, -1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), -1);
                 Order order = createOrder(null, null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
 
                 assertThatThrownBy(() -> orderService.create(order))
@@ -304,7 +304,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrder(null, null, List.of(orderLineItem), OrderType.DELIVERY, null, deliveryAddress);
 
                 assertThatThrownBy(() -> orderService.create(order))
@@ -325,7 +325,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrder(null, null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
             order = orderService.create(order);
 
@@ -345,7 +345,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, orderStatus, null, LocalDateTime.now());
             order = orderRepository.save(order);
 
@@ -368,7 +368,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrder(null, null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
                 order = orderService.create(order);
 
@@ -392,7 +392,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrder(null, null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
             order = orderService.create(order);
 
@@ -413,7 +413,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, orderStatus, null, LocalDateTime.now());
             order = orderRepository.save(order);
 
@@ -436,7 +436,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, OrderStatus.SERVED, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
             order = orderRepository.save(order);
 
@@ -456,7 +456,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), orderType, OrderStatus.SERVED, null, LocalDateTime.now());
             orderRepository.save(order);
 
@@ -477,7 +477,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, orderStatus, null, LocalDateTime.now());
             order = orderRepository.save(order);
 
@@ -500,7 +500,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, OrderStatus.DELIVERING, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
             order = orderRepository.save(order);
 
@@ -520,7 +520,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, orderStatus, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
             order = orderRepository.save(order);
 
@@ -547,7 +547,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now());
                 order = orderRepository.save(order);
 
@@ -571,7 +571,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, orderStatus, null, LocalDateTime.now());
                 order = orderRepository.save(order);
 
@@ -593,7 +593,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now());
                 order = orderRepository.save(order);
                 Order order2 = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now());
@@ -622,7 +622,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, OrderStatus.SERVED, null, LocalDateTime.now());
                 order = orderRepository.save(order);
 
@@ -642,7 +642,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, orderStatus, null, LocalDateTime.now());
                 order = orderRepository.save(order);
 
@@ -665,7 +665,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, OrderStatus.DELIVERED, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
                 order = orderRepository.save(order);
 
@@ -685,7 +685,7 @@ class OrderServiceTest {
                 MenuProduct menuProduct = createMenuProduct(product, 1);
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
-                OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+                OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, orderStatus, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
                 order = orderRepository.save(order);
 
@@ -709,7 +709,7 @@ class OrderServiceTest {
             MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(BigDecimal.valueOf(16000), menu, 1);
+            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, OrderStatus.ACCEPTED, null, LocalDateTime.now());
             order = orderRepository.save(order);
 

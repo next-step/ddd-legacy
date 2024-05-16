@@ -4,6 +4,7 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.OrderLineItem;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.UUID;
 
 public class OrderLineItemFixture {
@@ -21,13 +22,15 @@ public class OrderLineItemFixture {
         return orderLineTime;
     }
 
-    public static OrderLineItem createOrderLineItem(BigDecimal price,
-                                                    Menu menu,
+    public static OrderLineItem createOrderLineItem(Menu menu,
+                                                    BigDecimal price,
                                                     long quantity) {
         OrderLineItem orderLineTime = new OrderLineItem();
-        orderLineTime.setPrice(price);
         orderLineTime.setMenu(menu);
-        orderLineTime.setMenuId(menu.getId());
+        if (Objects.nonNull(menu)) {
+            orderLineTime.setMenuId(menu.getId());
+        }
+        orderLineTime.setPrice(price);
         orderLineTime.setQuantity(quantity);
 
         return orderLineTime;

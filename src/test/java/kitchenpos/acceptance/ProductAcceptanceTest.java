@@ -4,9 +4,11 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import kitchenpos.acceptance.step.ProductAcceptanceStep;
 import kitchenpos.config.AcceptanceTest;
+import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.math.BigDecimal;
@@ -18,6 +20,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @AcceptanceTest
 class ProductAcceptanceTest {
+    @MockBean
+    PurgomalumClient purgomalumClient;
+
     @LocalServerPort
     int port;
 

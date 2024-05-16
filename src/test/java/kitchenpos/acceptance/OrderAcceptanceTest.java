@@ -11,9 +11,11 @@ import kitchenpos.config.AcceptanceTest;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderType;
 import kitchenpos.fixture.MenuFixture;
+import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.math.BigDecimal;
@@ -29,6 +31,9 @@ import static kitchenpos.fixture.ProductFixture.createProductWithId;
 
 @AcceptanceTest
 class OrderAcceptanceTest {
+    @MockBean
+    PurgomalumClient purgomalumClient;
+
     @LocalServerPort
     int port;
 
@@ -39,7 +44,7 @@ class OrderAcceptanceTest {
 
     @DisplayName("먹고가기 유형의 시나리오")
     @Test
-    void EatInOrderTest() {
+    void orderWhenEatInTest() {
         // 상품 생성
         ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
         // 추천메뉴 생성

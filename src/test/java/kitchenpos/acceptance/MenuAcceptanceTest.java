@@ -7,9 +7,11 @@ import kitchenpos.acceptance.step.MenuGroupAcceptanceStep;
 import kitchenpos.acceptance.step.ProductAcceptanceStep;
 import kitchenpos.config.AcceptanceTest;
 import kitchenpos.fixture.MenuFixture;
+import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
@@ -24,6 +26,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @AcceptanceTest
 class MenuAcceptanceTest {
+    @MockBean
+    PurgomalumClient purgomalumClient;
+    
     @LocalServerPort
     int port;
 

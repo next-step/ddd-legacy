@@ -16,6 +16,7 @@ public class MenuFixture {
     public static Menu createMenuWithId(UUID menuGroupId, String name, BigDecimal price,
                                         boolean displayed, List<MenuProduct> menuProducts) {
         final Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
         menu.setMenuGroupId(menuGroupId);
         menu.setName(name);
         menu.setPrice(price);
@@ -27,6 +28,7 @@ public class MenuFixture {
     public static Menu createMenuWithId(UUID menuGroupId, BigDecimal price,
                                         boolean displayed, List<MenuProduct> menuProducts) {
         final Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
         menu.setMenuGroupId(menuGroupId);
         menu.setPrice(price);
         menu.setDisplayed(displayed);
@@ -37,6 +39,7 @@ public class MenuFixture {
     public static Menu createMenuWithId(UUID menuGroupId, String name,
                                         boolean displayed, List<MenuProduct> menuProducts) {
         final Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
         menu.setMenuGroupId(menuGroupId);
         menu.setName(name);
         menu.setDisplayed(displayed);

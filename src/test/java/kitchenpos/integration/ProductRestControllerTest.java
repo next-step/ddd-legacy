@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.config.IntegrationTest;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.util.MockMvcUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +30,9 @@ class ProductRestControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    PurgomalumClient purgomalumClient;
 
     @Autowired
     private ObjectMapper objectMapper;

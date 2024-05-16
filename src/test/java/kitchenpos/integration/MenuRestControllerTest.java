@@ -9,10 +9,11 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.fixture.MenuFixture;
+import kitchenpos.infra.PurgomalumClient;
 import kitchenpos.util.MockMvcUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static kitchenpos.fixture.MenuFixture.createMenuWithId;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupWithId;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.ProductFixture.createProductWithId;
@@ -28,6 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 @IntegrationTest
 class MenuRestControllerTest {
@@ -37,6 +40,9 @@ class MenuRestControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    PurgomalumClient purgomalumClient;
 
     @Autowired
     private MenuGroupRepository menuGroupRepository;
@@ -51,11 +57,11 @@ class MenuRestControllerTest {
     void createTest() throws Exception {
         MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
         Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        MenuProduct menuProduct = createMenuProduct(product, 1);
 
         MvcResult result = mockMvc.perform(post("/api/menus")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)))))
+                        .content(objectMapper.writeValueAsString(createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)))))
                 .andReturn();
 
         Menu menu = MockMvcUtil.readValue(objectMapper, result, Menu.class);
@@ -75,13 +81,13 @@ class MenuRestControllerTest {
     void changePriceTest() throws Exception {
         MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
         Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        MenuProduct menuProduct = createMenuProduct(product, 1);
 
-        Menu menu = menuRepository.save(MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
+        Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
 
         menu.setPrice(BigDecimal.valueOf(15000));
 
-        MvcResult result = mockMvc.perform(post("/api/menus/" + menu.getId() + "/price")
+        MvcResult result = mockMvc.perform(put("/api/menus/" + menu.getId() + "/price")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
@@ -98,11 +104,11 @@ class MenuRestControllerTest {
     void displayTest() throws Exception {
         MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
         Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        MenuProduct menuProduct = createMenuProduct(product, 1);
 
-        Menu menu = menuRepository.save(MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000), false, List.of(menuProduct)));
+        Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), false, List.of(menuProduct)));
 
-        MvcResult result = mockMvc.perform(post("/api/menus/" + menu.getId() + "/display")
+        MvcResult result = mockMvc.perform(put("/api/menus/" + menu.getId() + "/display")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
@@ -119,11 +125,11 @@ class MenuRestControllerTest {
     void hideTest() throws Exception {
         MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
         Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        MenuProduct menuProduct = createMenuProduct(product, 1);
 
-        Menu menu = menuRepository.save(MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
+        Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
 
-        MvcResult result = mockMvc.perform(post("/api/menus/" + menu.getId() + "/hide")
+        MvcResult result = mockMvc.perform(put("/api/menus/" + menu.getId() + "/hide")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
@@ -140,9 +146,9 @@ class MenuRestControllerTest {
     void findAllTest() throws Exception {
         MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
         Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-        MenuProduct menuProduct = createMenuProduct(product.getId(), 1);
+        MenuProduct menuProduct = createMenuProduct(product, 1);
 
-        Menu menu = menuRepository.save(MenuFixture.createMenuWithId(menuGroup.getId(), "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
+        Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
 
         MvcResult result = mockMvc.perform(get("/api/menus")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
