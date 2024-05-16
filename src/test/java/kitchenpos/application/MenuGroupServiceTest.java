@@ -6,21 +6,15 @@ import kitchenpos.testfixture.InMemoryMenuGroupRepository;
 import kitchenpos.testfixture.MenuGroupTestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(MockitoExtension.class)
+
 class MenuGroupServiceTest {
 
     private MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
@@ -42,6 +36,16 @@ class MenuGroupServiceTest {
 
         //then
         assertEquals(request.getName(), response.getName());
+    }
+
+    @Test
+    public void canNotEmptyName(){
+        //given
+        MenuGroup request = MenuGroupTestFixture.createMenuGroupRequest("");
+
+        //when then
+        assertThrows(IllegalArgumentException.class, () -> menuGroupService.create(request));
+
     }
 
     @Test
