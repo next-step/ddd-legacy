@@ -15,8 +15,6 @@ import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.fixture.MenuFixture;
-import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,6 +31,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.createMenuWithId;
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupWithId;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.OrderFixture.createOrder;
 import static kitchenpos.fixture.OrderFixture.createOrderWithId;
@@ -74,15 +74,17 @@ class OrderServiceTest {
         @DisplayName("주문 유형이 없는 경우 예외가 발생한다.")
         @Test
         void createFailWhenNotExistTypeTest() {
-            Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
-            product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
-            menuGroup = menuGroupRepository.save(menuGroup);
+            final Product product = productRepository.save(
+                    createProductWithId("떡볶이", BigDecimal.valueOf(16000))
+            );
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천 그룹"));
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000),
+                    true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-            final Order order = createOrder(null, List.of(orderLineItem), null, null, null);
+            final Order order = createOrder(null, List.of(orderLineItem),
+                    null, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -92,7 +94,8 @@ class OrderServiceTest {
         @NullAndEmptySource
         @ParameterizedTest
         void createFailWhenNotExistOrderLineItemsTest(final List<OrderLineItem> orderLineItems) {
-            final Order order = createOrder(null, orderLineItems, OrderType.EAT_IN, null, null);
+            final Order order = createOrder(null, orderLineItems, OrderType.EAT_IN,
+                    null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -103,10 +106,10 @@ class OrderServiceTest {
         void createFailWhenNotExistMenuTest() {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            final Menu notExistMenu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            final Menu notExistMenu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             final OrderLineItem orderLineItem = createOrderLineItem(notExistMenu, BigDecimal.valueOf(16000), 1);
             final Order order = createOrder(null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
@@ -119,10 +122,10 @@ class OrderServiceTest {
         void createFailWhenNotDisplayedMenuTest() {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), false, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), false, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             final Order order = createOrder(null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
@@ -136,10 +139,10 @@ class OrderServiceTest {
         void createFailWhenDifferentPriceTest() {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(17000), 1);
             final Order order = createOrder(null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
@@ -158,10 +161,10 @@ class OrderServiceTest {
                 orderTable = orderTableRepository.save(orderTable);
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
 
@@ -184,10 +187,10 @@ class OrderServiceTest {
                 final OrderTable notExistOrderTable = createOrderTableWithId("1번", true);
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 final Order order = createOrder(notExistOrderTable, List.of(orderLineItem), OrderType.EAT_IN, null, null);
@@ -203,10 +206,10 @@ class OrderServiceTest {
                 orderTable = orderTableRepository.save(orderTable);
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 final Order order = createOrder(orderTable, List.of(orderLineItem), OrderType.EAT_IN, null, null);
@@ -224,10 +227,10 @@ class OrderServiceTest {
             void createSuccessTest() {
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrder(null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
@@ -244,10 +247,10 @@ class OrderServiceTest {
             void createFailWhenQuantityIsLessThanZeroTest() {
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), -1);
                 final Order order = createOrder(null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
@@ -265,10 +268,10 @@ class OrderServiceTest {
             void createSuccessTest() {
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrder(null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
@@ -285,10 +288,10 @@ class OrderServiceTest {
             void createFailWhenQuantityIsLessThanZeroTest() {
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), -1);
                 final Order order = createOrder(null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
@@ -303,10 +306,10 @@ class OrderServiceTest {
             void createFailWhenNotExistDeliveryAddressTest(final String deliveryAddress) {
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 final Order order = createOrder(null, List.of(orderLineItem), OrderType.DELIVERY, null, deliveryAddress);
@@ -324,10 +327,10 @@ class OrderServiceTest {
         void acceptSuccessTest() {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrder(null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
@@ -344,10 +347,10 @@ class OrderServiceTest {
         void acceptFailWhenOrderStatusIsNotWaitingTest(final OrderStatus orderStatus) {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, orderStatus, null, LocalDateTime.now());
@@ -367,10 +370,10 @@ class OrderServiceTest {
             void acceptTest() {
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrder(null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
@@ -391,10 +394,10 @@ class OrderServiceTest {
         void serveSuccessTest() {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrder(null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
@@ -412,10 +415,10 @@ class OrderServiceTest {
         void serveFailWhenOrderStatusIsNotAcceptedTest(final OrderStatus orderStatus) {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, orderStatus, null, LocalDateTime.now());
@@ -435,10 +438,10 @@ class OrderServiceTest {
         void startDeliverySuccessTest() {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, OrderStatus.SERVED, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
@@ -455,10 +458,10 @@ class OrderServiceTest {
         void startDeliveryWhenNotDeliveryTest(final OrderType orderType) {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             final Order order = createOrderWithId(null, List.of(orderLineItem), orderType, OrderStatus.SERVED, null, LocalDateTime.now());
@@ -476,10 +479,10 @@ class OrderServiceTest {
         void startDeliveryWhenNotServedTest(final OrderStatus orderStatus) {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, orderStatus, null, LocalDateTime.now());
@@ -499,10 +502,10 @@ class OrderServiceTest {
         void completeDeliverySuccessTest() {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, OrderStatus.DELIVERING, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
@@ -519,10 +522,10 @@ class OrderServiceTest {
         void completeDeliveryFailWhenOrderStatusIsNotDeliveringTest(final OrderStatus orderStatus) {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, orderStatus, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
@@ -546,10 +549,10 @@ class OrderServiceTest {
                 orderTable = orderTableRepository.save(orderTable);
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now());
@@ -570,10 +573,10 @@ class OrderServiceTest {
                 orderTable = orderTableRepository.save(orderTable);
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, orderStatus, null, LocalDateTime.now());
@@ -592,10 +595,10 @@ class OrderServiceTest {
                 orderTable = orderTableRepository.save(orderTable);
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 final Order order1 = orderRepository.save(
@@ -624,10 +627,10 @@ class OrderServiceTest {
             void completeTakeOutTest() {
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, OrderStatus.SERVED, null, LocalDateTime.now());
@@ -644,10 +647,10 @@ class OrderServiceTest {
             void completeTakeOutFailWhenOrderStatusIsNotServedTest(final OrderStatus orderStatus) {
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, orderStatus, null, LocalDateTime.now());
@@ -667,10 +670,10 @@ class OrderServiceTest {
             void completeDeliveryTest() {
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, OrderStatus.DELIVERED, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
@@ -687,10 +690,10 @@ class OrderServiceTest {
             void completeDeliveryFailWhenOrderStatusIsNotDeliveredTest(final OrderStatus orderStatus) {
                 Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
                 product = productRepository.save(product);
-                MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+                MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
                 menuGroup = menuGroupRepository.save(menuGroup);
                 final MenuProduct menuProduct = createMenuProduct(product, 1);
-                Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+                Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
                 Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.DELIVERY, orderStatus, "서울 강남구 테헤란로 411, 성담빌딩 13층", LocalDateTime.now());
@@ -711,10 +714,10 @@ class OrderServiceTest {
         void findAllSuccessTest() {
             Product product = createProductWithId("떡볶이", BigDecimal.valueOf(16000));
             product = productRepository.save(product);
-            MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
+            MenuGroup menuGroup = createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
             final MenuProduct menuProduct = createMenuProduct(product, 1);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
             Order order = createOrderWithId(null, List.of(orderLineItem), OrderType.TAKEOUT, OrderStatus.ACCEPTED, null, LocalDateTime.now());
