@@ -5,24 +5,16 @@ import kitchenpos.infra.KitchenridersClient;
 import kitchenpos.testfixture.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
     private OrderRepository orderRepository = new InMemoryOrderRepository();
@@ -85,19 +77,44 @@ class OrderServiceTest {
     void accept() {
 
         //given
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "2번", true, 2);
+        orderTableRepository.save(orderTable);
         UUID request = UUID.randomUUID();
-        Order order = new Order();
-        order.setStatus(OrderStatus.WAITING);
-
-        given(orderRepository.findById(request))
-                .willReturn(Optional.of(order));
-
+        Order order = OrderTestFixture.createOrder(request, OrderType.EAT_IN, OrderStatus.WAITING, LocalDateTime.now(), new OrderLineItem(), orderTable);
+        orderRepository.save(order);
         //when
         Order response = orderService.accept(request);
 
         //then
         assertEquals(OrderStatus.ACCEPTED, response.getStatus());
 
+    }
+
+    @Test
+    void canNotAcceptWhenDoNotHaveOrder(){
+        //given
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "2번", true, 2);
+        orderTableRepository.save(orderTable);
+        UUID request = UUID.randomUUID();
+        Order order = OrderTestFixture.createOrder(request, OrderType.EAT_IN, OrderStatus.WAITING, LocalDateTime.now(), new OrderLineItem(), orderTable);
+
+
+        //when then
+        assertThrows(NoSuchElementException.class, () -> orderService.accept(request));
+    }
+
+    @Test
+    void canNotAcceptWhenNotWaiting(){
+        //given
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "2번", true, 2);
+        orderTableRepository.save(orderTable);
+        UUID request = UUID.randomUUID();
+        Order order = OrderTestFixture.createOrder(request, OrderType.EAT_IN, OrderStatus.WAITING, LocalDateTime.now(), new OrderLineItem(), orderTable);
+
+
+
+        //when then
+        assertThrows(NoSuchElementException.class, () -> orderService.accept(request));
     }
 
     @Test
@@ -130,6 +147,31 @@ class OrderServiceTest {
     }
 
     @Test
+    void canNotServedWhenNotAccepted(){
+        //given
+        Menu menu = MenuTestFixture.createMenu(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L,
+                true,
+                ProductTestFixture.createProduct(UUID.randomUUID(), "후라이드치킨", 17000L)
+        );
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "1번", true, 2);
+        Order order = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.DELIVERY,
+                OrderStatus.WAITING,
+                LocalDateTime.now(),
+                OrderLineItemTestFixture.createOrderLine(1L, 1, menu),
+                orderTable
+        );
+        orderRepository.save(order);
+
+        //when then
+        assertThrows(IllegalStateException.class, () -> orderService.serve(order.getId()));
+    }
+
+    @Test
     void startDelivery() {
         //given
         Menu menu = MenuTestFixture.createMenu(
@@ -157,6 +199,32 @@ class OrderServiceTest {
         assertEquals(OrderStatus.DELIVERING, response.getStatus());
 
     }
+
+    @Test
+    void canNotStartDeliveryWhenNotServed(){
+        //given
+        Menu menu = MenuTestFixture.createMenu(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L,
+                true,
+                ProductTestFixture.createProduct(UUID.randomUUID(), "후라이드치킨", 17000L)
+        );
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "1번", true, 2);
+        Order order = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.DELIVERY,
+                OrderStatus.ACCEPTED,
+                LocalDateTime.now(),
+                OrderLineItemTestFixture.createOrderLine(1L, 1, menu),
+                orderTable
+        );
+        orderRepository.save(order);
+
+        //when then
+        assertThrows(IllegalStateException.class, () -> orderService.startDelivery(order.getId()));
+    }
+
 
     @Test
     void completeDelivery() {
@@ -188,6 +256,31 @@ class OrderServiceTest {
     }
 
     @Test
+    void canNotCompleteDeliveryWhenNotDelivering(){
+        //given
+        Menu menu = MenuTestFixture.createMenu(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L,
+                true,
+                ProductTestFixture.createProduct(UUID.randomUUID(), "후라이드치킨", 17000L)
+        );
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "1번", true, 2);
+        Order order = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.DELIVERY,
+                OrderStatus.ACCEPTED,
+                LocalDateTime.now(),
+                OrderLineItemTestFixture.createOrderLine(1L, 1, menu),
+                orderTable
+        );
+        orderRepository.save(order);
+
+        //when then
+        assertThrows(IllegalStateException.class, () -> orderService.completeDelivery(order.getId()));
+    }
+
+    @Test
     void complete() {
 
         //given
@@ -215,6 +308,51 @@ class OrderServiceTest {
         //then
         assertEquals(OrderStatus.COMPLETED, response.getStatus());
 
+    }
+    @Test
+    void canNotCompleteWhenNotDelivered(){
+        //given
+        Menu menu = MenuTestFixture.createMenu(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L,
+                true,
+                ProductTestFixture.createProduct(UUID.randomUUID(), "후라이드치킨", 17000L)
+        );
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "1번", true, 2);
+        Order order = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.DELIVERY,
+                OrderStatus.SERVED,
+                LocalDateTime.now(),
+                OrderLineItemTestFixture.createOrderLine(1L, 1, menu),
+                orderTable
+        );
+        orderRepository.save(order);
+        assertThrows(IllegalStateException.class, () -> orderService.complete(order.getId()));
+    }
+
+    @Test
+    void canNotCompleteWhenNotServed(){
+        //given
+        Menu menu = MenuTestFixture.createMenu(
+                UUID.randomUUID(),
+                "후라이드치킨",
+                17000L,
+                true,
+                ProductTestFixture.createProduct(UUID.randomUUID(), "후라이드치킨", 17000L)
+        );
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable(UUID.randomUUID(), "1번", true, 2);
+        Order order = OrderTestFixture.createOrder(
+                UUID.randomUUID(),
+                OrderType.TAKEOUT,
+                OrderStatus.WAITING,
+                LocalDateTime.now(),
+                OrderLineItemTestFixture.createOrderLine(1L, 1, menu),
+                orderTable
+        );
+        orderRepository.save(order);
+        assertThrows(IllegalStateException.class, () -> orderService.complete(order.getId()));
     }
 
     @Test
