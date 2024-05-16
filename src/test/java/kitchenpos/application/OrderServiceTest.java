@@ -84,7 +84,7 @@ class OrderServiceTest {
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-            final Order order = createOrder(null, null, List.of(orderLineItem), null, null, null);
+            final Order order = createOrder(null, List.of(orderLineItem), null, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -94,7 +94,7 @@ class OrderServiceTest {
         @NullAndEmptySource
         @ParameterizedTest
         void createFailWhenNotExistOrderLineItemsTest(final List<OrderLineItem> orderLineItems) {
-            final Order order = createOrder(null, null, orderLineItems, OrderType.EAT_IN, null, null);
+            final Order order = createOrder(null, orderLineItems, OrderType.EAT_IN, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -110,7 +110,7 @@ class OrderServiceTest {
             final MenuProduct menuProduct = createMenuProduct(product, 1);
             final Menu notExistMenu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             final OrderLineItem orderLineItem = createOrderLineItem(notExistMenu, BigDecimal.valueOf(16000), 1);
-            final Order order = createOrder(null, null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
+            final Order order = createOrder(null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -127,7 +127,7 @@ class OrderServiceTest {
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), false, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-            final Order order = createOrder(null, null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
+            final Order order = createOrder(null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalStateException.class);
@@ -144,7 +144,7 @@ class OrderServiceTest {
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(17000), 1);
-            final Order order = createOrder(null, null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
+            final Order order = createOrder(null, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -192,7 +192,7 @@ class OrderServiceTest {
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-                final Order order = createOrder(null, notExistOrderTable, List.of(orderLineItem), OrderType.EAT_IN, null, null);
+                final Order order = createOrder(notExistOrderTable, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
                 assertThatThrownBy(() -> orderService.create(order))
                         .isInstanceOf(NoSuchElementException.class);
@@ -211,7 +211,7 @@ class OrderServiceTest {
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-                final Order order = createOrder(null, orderTable, List.of(orderLineItem), OrderType.EAT_IN, null, null);
+                final Order order = createOrder(orderTable, List.of(orderLineItem), OrderType.EAT_IN, null, null);
 
                 assertThatThrownBy(() -> orderService.create(order))
                         .isInstanceOf(IllegalStateException.class);
@@ -232,7 +232,7 @@ class OrderServiceTest {
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-                Order order = createOrder(null, null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
+                Order order = createOrder(null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
 
                 order = orderService.create(order);
 
@@ -252,7 +252,7 @@ class OrderServiceTest {
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), -1);
-                final Order order = createOrder(null, null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
+                final Order order = createOrder(null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
 
                 assertThatThrownBy(() -> orderService.create(order))
                         .isInstanceOf(IllegalArgumentException.class);
@@ -273,7 +273,7 @@ class OrderServiceTest {
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-                Order order = createOrder(null, null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
+                Order order = createOrder(null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
 
                 order = orderService.create(order);
 
@@ -293,7 +293,7 @@ class OrderServiceTest {
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), -1);
-                final Order order = createOrder(null, null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
+                final Order order = createOrder(null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
 
                 assertThatThrownBy(() -> orderService.create(order))
                         .isInstanceOf(IllegalArgumentException.class);
@@ -311,7 +311,7 @@ class OrderServiceTest {
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-                final Order order = createOrder(null, null, List.of(orderLineItem), OrderType.DELIVERY, null, deliveryAddress);
+                final Order order = createOrder(null, List.of(orderLineItem), OrderType.DELIVERY, null, deliveryAddress);
 
                 assertThatThrownBy(() -> orderService.create(order))
                         .isInstanceOf(IllegalArgumentException.class);
@@ -332,7 +332,7 @@ class OrderServiceTest {
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-            Order order = createOrder(null, null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
+            Order order = createOrder(null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
             order = orderService.create(order);
 
             order = orderService.accept(order.getId());
@@ -375,7 +375,7 @@ class OrderServiceTest {
                 Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
                 menu = menuRepository.save(menu);
                 final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-                Order order = createOrder(null, null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
+                Order order = createOrder(null, List.of(orderLineItem), OrderType.DELIVERY, null, "서울 강남구 테헤란로 411, 성담빌딩 13층");
                 order = orderService.create(order);
 
                 order = orderService.accept(order.getId());
@@ -399,7 +399,7 @@ class OrderServiceTest {
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-            Order order = createOrder(null, null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
+            Order order = createOrder(null, List.of(orderLineItem), OrderType.TAKEOUT, null, null);
             order = orderService.create(order);
 
             order = orderService.accept(order.getId());

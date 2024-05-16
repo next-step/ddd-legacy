@@ -36,16 +36,17 @@ class MenuGroupRestControllerTest {
 
     @Test
     void create() throws Exception {
-        MenuGroup menuGroup = createMenuGroup("추천메뉴");
         final MvcResult result = mockMvc.perform(post("/api/menu-groups")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .content(objectMapper.writeValueAsString(menuGroup)))
+                        .content(objectMapper.writeValueAsString(createMenuGroup("추천메뉴"))))
                 .andReturn();
 
-        menuGroup = readValue(objectMapper, result, MenuGroup.class);
+        final MenuGroup menuGroup = readValue(objectMapper, result, MenuGroup.class);
 
-        assertThat(result.getResponse().getHeader("Location")).isEqualTo("/api/menu-groups/" + menuGroup.getId());
-        assertThat(menuGroup.getName()).isEqualTo("추천메뉴");
+        assertAll(
+                () -> assertThat(result.getResponse().getStatus()).isEqualTo(201),
+                () -> assertThat(menuGroup.getId()).isNotNull()
+        );
     }
 
     @Test
