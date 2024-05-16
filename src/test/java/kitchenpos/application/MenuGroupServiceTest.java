@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -13,8 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupWithId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 @Transactional
@@ -22,12 +26,15 @@ class MenuGroupServiceTest {
     @Autowired
     private MenuGroupService menuGroupService;
 
+    @Autowired
+    private MenuGroupRepository menuGroupRepository;
+
     @Nested
     class createTest {
         @DisplayName("메뉴 그룹을 생성할 수 있다.")
         @Test
         void createSuccessTest() {
-            MenuGroup menuGroup = createMenuGroup("메뉴 그룹");
+            final MenuGroup menuGroup = createMenuGroup("메뉴 그룹");
 
             final MenuGroup createdMenuGroup = menuGroupService.create(menuGroup);
 
@@ -38,7 +45,7 @@ class MenuGroupServiceTest {
         @NullAndEmptySource
         @ParameterizedTest
         void createExceptionByNullAndEmptyTest(final String name) {
-            MenuGroup menuGroup = createMenuGroup(name);
+            final MenuGroup menuGroup = createMenuGroup(name);
 
             assertThatThrownBy(() -> menuGroupService.create(menuGroup))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -50,23 +57,17 @@ class MenuGroupServiceTest {
         @DisplayName("메뉴그룹을 전체 조회할 수 있다.")
         @Test
         void findAllSuccessTest() {
-            MenuGroup menuGroup = createMenuGroup("메뉴 그룹");
+            final MenuGroup createdMenuGroup = menuGroupRepository.save(createMenuGroupWithId("메뉴 그룹"));
 
-            MenuGroup createdMenuGroup = menuGroupService.create(menuGroup);
-            List<MenuGroup> menuGroups = menuGroupService.findAll();
-            List<UUID> menuGroupIds = menuGroups.stream()
+            final List<MenuGroup> menuGroups = menuGroupService.findAll();
+            final List<UUID> menuGroupIds = menuGroups.stream()
                     .map(MenuGroup::getId)
                     .toList();
 
-            assertThat(menuGroups).hasSize(1);
-            assertThat(menuGroupIds).contains(createdMenuGroup.getId());
+            assertAll(
+                    () -> assertThat(menuGroups).hasSize(1),
+                    () -> assertThat(menuGroupIds).contains(createdMenuGroup.getId())
+            );
         }
-    }
-
-    private MenuGroup createMenuGroup(String name) {
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(name);
-
-        return menuGroup;
     }
 }

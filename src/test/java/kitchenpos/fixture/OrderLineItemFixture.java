@@ -11,21 +11,21 @@ public class OrderLineItemFixture {
     private OrderLineItemFixture() {
     }
 
-    public static OrderLineItem createOrderLineItem(UUID menuId,
-                                                    BigDecimal price,
-                                                    long quantity) {
-        OrderLineItem orderLineTime = new OrderLineItem();
+    public static OrderLineItem createOrderLineItem(final UUID menuId,
+                                                    final BigDecimal price,
+                                                    final long quantity) {
+        final OrderLineItem orderLineTime = new OrderLineItem();
         orderLineTime.setMenuId(menuId);
         orderLineTime.setPrice(price);
         orderLineTime.setQuantity(quantity);
 
         return orderLineTime;
     }
-
-    public static OrderLineItem createOrderLineItem(Menu menu,
-                                                    BigDecimal price,
-                                                    long quantity) {
-        OrderLineItem orderLineTime = new OrderLineItem();
+    
+    public static OrderLineItem createOrderLineItem(final Menu menu,
+                                                    final BigDecimal price,
+                                                    final long quantity) {
+        final OrderLineItem orderLineTime = new OrderLineItem();
         orderLineTime.setMenu(menu);
         if (Objects.nonNull(menu)) {
             orderLineTime.setMenuId(menu.getId());

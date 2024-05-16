@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @IntegrationTest
 class ProductRestControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -42,12 +41,12 @@ class ProductRestControllerTest {
 
     @Test
     void create() throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/products")
+        final MvcResult result = mockMvc.perform(post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createProduct("후라이드 치킨", BigDecimal.valueOf(16000)))))
                 .andReturn();
 
-        Product product = MockMvcUtil.readValue(objectMapper, result, Product.class);
+        final Product product = MockMvcUtil.readValue(objectMapper, result, Product.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
@@ -60,15 +59,15 @@ class ProductRestControllerTest {
 
     @Test
     void changePrice() throws Exception {
-        Product changedProduct = productRepository.save(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final Product changedProduct = productRepository.save(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
         changedProduct.setPrice(BigDecimal.valueOf(15000));
 
-        MvcResult result = mockMvc.perform(put("/api/products/" + changedProduct.getId() + "/price")
+        final MvcResult result = mockMvc.perform(put("/api/products/" + changedProduct.getId() + "/price")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(changedProduct)))
                 .andReturn();
 
-        Product product = MockMvcUtil.readValue(objectMapper, result, Product.class);
+        final Product product = MockMvcUtil.readValue(objectMapper, result, Product.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -78,14 +77,14 @@ class ProductRestControllerTest {
 
     @Test
     void findAll() throws Exception {
-        Product product1 = productRepository.save(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
-        Product product2 = productRepository.save(createProductWithId("양념 치킨", BigDecimal.valueOf(16000)));
+        final Product product1 = productRepository.save(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final Product product2 = productRepository.save(createProductWithId("양념 치킨", BigDecimal.valueOf(16000)));
 
         // when
-        MvcResult result = mockMvc.perform(get("/api/products"))
+        final MvcResult result = mockMvc.perform(get("/api/products"))
                 .andReturn();
 
-        List<Product> products = MockMvcUtil.readListValue(objectMapper, result, Product.class);
+        final List<Product> products = MockMvcUtil.readListValue(objectMapper, result, Product.class);
 
         // then
         assertAll(

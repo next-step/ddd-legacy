@@ -13,9 +13,9 @@ public class MenuFixture {
     private MenuFixture() {
 
     }
-
-    public static Menu createMenu(MenuGroup menuGroup, String name, BigDecimal price,
-                                  boolean displayed, List<MenuProduct> menuProducts) {
+    
+    public static Menu createMenu(final MenuGroup menuGroup, final String name, final BigDecimal price,
+                                  final boolean displayed, final List<MenuProduct> menuProducts) {
         final Menu menu = new Menu();
         menu.setMenuGroup(menuGroup);
         if (Objects.nonNull(menuGroup)) {
@@ -29,8 +29,8 @@ public class MenuFixture {
         return menu;
     }
 
-    public static Menu createMenuWithId(MenuGroup menuGroup, String name, BigDecimal price,
-                                        boolean displayed, List<MenuProduct> menuProducts) {
+    public static Menu createMenuWithId(final MenuGroup menuGroup, final String name, final BigDecimal price,
+                                        final boolean displayed, final List<MenuProduct> menuProducts) {
         final Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setMenuGroupId(menuGroup.getId());

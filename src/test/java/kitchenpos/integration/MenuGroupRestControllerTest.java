@@ -36,7 +36,7 @@ class MenuGroupRestControllerTest {
     @Test
     void create() throws Exception {
         MenuGroup menuGroup = createMenuGroup("추천메뉴");
-        MvcResult result = mockMvc.perform(post("/api/menu-groups")
+        final MvcResult result = mockMvc.perform(post("/api/menu-groups")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menuGroup)))
                 .andReturn();
@@ -49,15 +49,15 @@ class MenuGroupRestControllerTest {
 
     @Test
     void findAll() throws Exception {
-        MenuGroup menuGroup1 = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-        MenuGroup menuGroup2 = menuGroupRepository.save(createMenuGroupWithId("세트메뉴"));
+        final MenuGroup menuGroup1 = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+        final MenuGroup menuGroup2 = menuGroupRepository.save(createMenuGroupWithId("세트메뉴"));
 
-        MvcResult result = mockMvc.perform(get("/api/menu-groups")
+        final MvcResult result = mockMvc.perform(get("/api/menu-groups")
                         .content(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
 
-        List<MenuGroup> menuGroups = MockMvcUtil.readListValue(objectMapper, result, MenuGroup.class);
-        List<UUID> menuGroupIds = menuGroups.stream().map(MenuGroup::getId).toList();
+        final List<MenuGroup> menuGroups = MockMvcUtil.readListValue(objectMapper, result, MenuGroup.class);
+        final List<UUID> menuGroupIds = menuGroups.stream().map(MenuGroup::getId).toList();
 
         assertAll(
                 () -> assertThat(menuGroups).hasSize(2),

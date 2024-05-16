@@ -12,13 +12,13 @@ public class MockMvcUtil {
     private MockMvcUtil() {
     }
 
-    public static <T> T readValue(ObjectMapper objectMapper, MvcResult result, Class<T> valueType) throws Exception {
+    public static <T> T readValue(final ObjectMapper objectMapper, final MvcResult result, final Class<T> valueType) throws Exception {
         return objectMapper.readValue(result.getResponse().getContentAsString(StandardCharsets.UTF_8), valueType);
     }
 
-    public static <T> List<T> readListValue(ObjectMapper objectMapper, MvcResult result, Class<T> valueType) throws Exception {
-        JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, valueType);
-        
+    public static <T> List<T> readListValue(final ObjectMapper objectMapper, final MvcResult result, final Class<T> valueType) throws Exception {
+        final JavaType javaType = objectMapper.getTypeFactory().constructCollectionType(List.class, valueType);
+
         return objectMapper.readValue(result.getResponse().getContentAsString(StandardCharsets.UTF_8), javaType);
     }
 }

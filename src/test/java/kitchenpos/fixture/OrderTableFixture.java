@@ -8,7 +8,7 @@ public class OrderTableFixture {
     private OrderTableFixture() {
     }
 
-    public static OrderTable createOrderTable(UUID id, String name, int numberOfGuests) {
+    public static OrderTable createOrderTable(final UUID id, final String name, final int numberOfGuests) {
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(id);
         orderTable.setName(name);
@@ -16,20 +16,20 @@ public class OrderTableFixture {
         return orderTable;
     }
 
-    public static OrderTable createOrderTable(String name) {
+    public static OrderTable createOrderTable(final String name) {
         final OrderTable orderTable = new OrderTable();
         orderTable.setName(name);
         return orderTable;
     }
 
-    public static OrderTable createOrderTableWithId(String name) {
+    public static OrderTable createOrderTableWithId(final String name) {
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(name);
         return orderTable;
     }
-
-    public static OrderTable createOrderTableWithId(String name, boolean isOccupied) {
+    
+    public static OrderTable createOrderTableWithId(final String name, final boolean isOccupied) {
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(name);
@@ -37,7 +37,7 @@ public class OrderTableFixture {
         return orderTable;
     }
 
-    public static OrderTable createOrderTableWithId(String name, boolean isOccupied, int numberOfGuest) {
+    public static OrderTable createOrderTableWithId(final String name, final boolean isOccupied, final int numberOfGuest) {
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(name);

@@ -36,7 +36,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @IntegrationTest
 class MenuRestControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -57,19 +56,19 @@ class MenuRestControllerTest {
 
     @Test
     void createTest() throws Exception {
-        MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-        Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-        MenuProduct menuProduct = createMenuProduct(product, 1);
-        Menu menu = createMenu(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+        final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+        final MenuProduct menuProduct = createMenuProduct(product, 1);
+        final Menu menu = createMenu(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct));
 
-        MvcResult result = mockMvc.perform(post("/api/menus")
+        final MvcResult result = mockMvc.perform(post("/api/menus")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
-        List<UUID> menuProductIds = menuResponse.getMenuProducts().stream().map(it -> it.getProduct().getId()).toList();
-        
+        final Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        final List<UUID> menuProductIds = menuResponse.getMenuProducts().stream().map(it -> it.getProduct().getId()).toList();
+
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
                 () -> assertThat(result.getResponse().getHeader("Location")).isEqualTo("/api/menus/" + menuResponse.getId()),
@@ -83,20 +82,20 @@ class MenuRestControllerTest {
 
     @Test
     void changePriceTest() throws Exception {
-        MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-        Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-        MenuProduct menuProduct = createMenuProduct(product, 1);
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+        final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+        final MenuProduct menuProduct = createMenuProduct(product, 1);
 
-        Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
+        final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
 
         menu.setPrice(BigDecimal.valueOf(15000));
 
-        MvcResult result = mockMvc.perform(put("/api/menus/" + menu.getId() + "/price")
+        final MvcResult result = mockMvc.perform(put("/api/menus/" + menu.getId() + "/price")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        final Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -106,18 +105,18 @@ class MenuRestControllerTest {
 
     @Test
     void displayTest() throws Exception {
-        MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-        Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-        MenuProduct menuProduct = createMenuProduct(product, 1);
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+        final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+        final MenuProduct menuProduct = createMenuProduct(product, 1);
 
-        Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), false, List.of(menuProduct)));
+        final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), false, List.of(menuProduct)));
 
-        MvcResult result = mockMvc.perform(put("/api/menus/" + menu.getId() + "/display")
+        final MvcResult result = mockMvc.perform(put("/api/menus/" + menu.getId() + "/display")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        final Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -127,18 +126,18 @@ class MenuRestControllerTest {
 
     @Test
     void hideTest() throws Exception {
-        MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-        Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-        MenuProduct menuProduct = createMenuProduct(product, 1);
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+        final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+        final MenuProduct menuProduct = createMenuProduct(product, 1);
 
-        Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
+        final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
 
-        MvcResult result = mockMvc.perform(put("/api/menus/" + menu.getId() + "/hide")
+        final MvcResult result = mockMvc.perform(put("/api/menus/" + menu.getId() + "/hide")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        final Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -148,18 +147,18 @@ class MenuRestControllerTest {
 
     @Test
     void findAllTest() throws Exception {
-        MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-        Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-        MenuProduct menuProduct = createMenuProduct(product, 1);
+        final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+        final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+        final MenuProduct menuProduct = createMenuProduct(product, 1);
 
-        Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
+        final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(menuProduct)));
 
-        MvcResult result = mockMvc.perform(get("/api/menus")
+        final MvcResult result = mockMvc.perform(get("/api/menus")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
 
-        List<Menu> menus = MockMvcUtil.readListValue(objectMapper, result, Menu.class);
-        List<UUID> menuIds = menus.stream().map(Menu::getId).toList();
+        final List<Menu> menus = MockMvcUtil.readListValue(objectMapper, result, Menu.class);
+        final List<UUID> menuIds = menus.stream().map(Menu::getId).toList();
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),

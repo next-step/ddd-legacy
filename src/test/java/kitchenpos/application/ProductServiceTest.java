@@ -51,7 +51,7 @@ class ProductServiceTest {
         @DisplayName("메뉴를 생성할 수 있다.")
         @Test
         void createSuccessTest() {
-            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000));
+            final Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000));
 
             final Product createdProduct = productService.create(product);
 
@@ -61,7 +61,7 @@ class ProductServiceTest {
         @DisplayName("메뉴 가격이 존재하지 않은 경우에 예외가 발생한다.")
         @Test
         void createFailWhenPriceIsNullTest() {
-            Product product = createProductWithId("후라이드 치킨", null);
+            final Product product = createProductWithId("후라이드 치킨", null);
 
             assertThatThrownBy(() -> productService.create(product))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -70,8 +70,8 @@ class ProductServiceTest {
         @DisplayName("메뉴 가격이 0 미만인 경우에 예외가 발생한다.")
         @Test
         void createFailWhenPriceIsLessThanZeroTest() {
-            Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(-1));
-
+            final Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(-1));
+            
             assertThatThrownBy(() -> productService.create(product))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -79,8 +79,8 @@ class ProductServiceTest {
         @DisplayName("메뉴의 이름이 존재하지 않은 경우에 예외가 발생한다.")
         @ParameterizedTest
         @NullSource
-        void createFailWhenNameIsNullTest(String name) {
-            Product product = createProductWithId(name, BigDecimal.valueOf(16000));
+        void createFailWhenNameIsNullTest(final String name) {
+            final Product product = createProductWithId(name, BigDecimal.valueOf(16000));
 
             assertThatThrownBy(() -> productService.create(product))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -90,7 +90,7 @@ class ProductServiceTest {
         @Test
         void createFailWhenNameContainsProfanityTest() {
             given(purgomalumClient.containsProfanity("시발 후라이드 치킨")).willReturn(true);
-            Product product = createProductWithId("시발 후라이드 치킨", BigDecimal.valueOf(16000));
+            final Product product = createProductWithId("시발 후라이드 치킨", BigDecimal.valueOf(16000));
 
             assertThatThrownBy(() -> productService.create(product))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -116,9 +116,9 @@ class ProductServiceTest {
             Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000));
             product = productService.create(product);
 
-            UUID productId = product.getId();
+            final UUID productId = product.getId();
             product.setPrice(null);
-            Product changeProduct = product;
+            final Product changeProduct = product;
 
             assertThatThrownBy(() -> productService.changePrice(productId, changeProduct))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -130,9 +130,9 @@ class ProductServiceTest {
             Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000));
             product = productService.create(product);
 
-            UUID productId = product.getId();
+            final UUID productId = product.getId();
             product.setPrice(BigDecimal.valueOf(-16000));
-            Product changeProduct = product;
+            final Product changeProduct = product;
 
             assertThatThrownBy(() -> productService.changePrice(productId, changeProduct))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -144,7 +144,7 @@ class ProductServiceTest {
             Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000));
             product = productService.create(product);
 
-            MenuProduct menuProduct = createMenuProduct(product, 1);
+            final MenuProduct menuProduct = createMenuProduct(product, 1);
             MenuGroup menuGroup = createMenuGroupWithId("치킨 메뉴");
             menuGroup = menuGroupRepository.save(menuGroup);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "후라이드 치킨 세트", BigDecimal.valueOf(16000), true, List.of(menuProduct));
@@ -154,7 +154,7 @@ class ProductServiceTest {
             assertThat(menu.isDisplayed()).isTrue();
 
             productService.changePrice(product.getId(), product);
-            Optional<Menu> findMenu = menuRepository.findById(menu.getId());
+            final Optional<Menu> findMenu = menuRepository.findById(menu.getId());
 
             assertThat(findMenu).isPresent();
             assertThat(findMenu.get().isDisplayed()).isFalse();
@@ -173,7 +173,7 @@ class ProductServiceTest {
             seasonedChickenProduct = productService.create(seasonedChickenProduct);
 
             final List<Product> products = productService.findAll();
-            List<UUID> productIds = products.stream()
+            final List<UUID> productIds = products.stream()
                     .map(Product::getId)
                     .toList();
 

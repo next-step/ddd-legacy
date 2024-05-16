@@ -15,13 +15,13 @@ public class OrderFixture {
     private OrderFixture() {
     }
 
-    public static Order createOrder(UUID id,
-                                    OrderTable orderTable,
-                                    List<OrderLineItem> orderLineItems,
-                                    OrderType type,
-                                    OrderStatus status,
-                                    String deliveryAddress) {
-        Order order = new Order();
+    public static Order createOrder(final UUID id,
+                                    final OrderTable orderTable,
+                                    final List<OrderLineItem> orderLineItems,
+                                    final OrderType type,
+                                    final OrderStatus status,
+                                    final String deliveryAddress) {
+        final Order order = new Order();
         order.setId(id);
         order.setOrderTable(orderTable);
         if (Objects.nonNull(orderTable)) {
@@ -35,13 +35,16 @@ public class OrderFixture {
         return order;
     }
 
-    public static Order createOrder(UUID orderTableId,
-                                    List<OrderLineItem> orderLineItems,
-                                    OrderType type,
-                                    OrderStatus status,
-                                    String deliveryAddress) {
-        Order order = new Order();
-        order.setOrderTableId(orderTableId);
+    public static Order createOrder(final OrderTable orderTable,
+                                    final List<OrderLineItem> orderLineItems,
+                                    final OrderType type,
+                                    final OrderStatus status,
+                                    final String deliveryAddress) {
+        final Order order = new Order();
+        order.setOrderTable(orderTable);
+        if (Objects.nonNull(orderTable)) {
+            order.setOrderTableId(orderTable.getId());
+        }
         order.setOrderLineItems(orderLineItems);
         order.setType(type);
         order.setStatus(status);
@@ -50,13 +53,13 @@ public class OrderFixture {
         return order;
     }
 
-    public static Order createOrderWithId(OrderTable orderTable,
-                                          List<OrderLineItem> orderLineItems,
-                                          OrderType type,
-                                          OrderStatus status,
-                                          String deliveryAddress,
-                                          LocalDateTime orderDateTime) {
-        Order order = new Order();
+    public static Order createOrderWithId(final OrderTable orderTable,
+                                          final List<OrderLineItem> orderLineItems,
+                                          final OrderType type,
+                                          final OrderStatus status,
+                                          final String deliveryAddress,
+                                          final LocalDateTime orderDateTime) {
+        final Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setOrderTable(orderTable);
         order.setOrderLineItems(orderLineItems);

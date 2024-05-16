@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 @IntegrationTest
 class OrderTableRestControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -36,12 +35,12 @@ class OrderTableRestControllerTest {
 
     @Test
     void create() throws Exception {
-        MvcResult result = mockMvc.perform(post("/api/order-tables")
+        final MvcResult result = mockMvc.perform(post("/api/order-tables")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(createOrderTable("1번테이블"))))
                 .andReturn();
 
-        OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
+        final OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
@@ -55,12 +54,12 @@ class OrderTableRestControllerTest {
 
     @Test
     void sit() throws Exception {
-        OrderTable changedOrderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", false, 0));
-        MvcResult result = mockMvc.perform(put("/api/order-tables/" + changedOrderTable.getId() + "/sit")
+        final OrderTable changedOrderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", false, 0));
+        final MvcResult result = mockMvc.perform(put("/api/order-tables/" + changedOrderTable.getId() + "/sit")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
 
-        OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
+        final OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -70,12 +69,12 @@ class OrderTableRestControllerTest {
 
     @Test
     void clear() throws Exception {
-        OrderTable changedOrderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 0));
-        MvcResult result = mockMvc.perform(put("/api/order-tables/" + changedOrderTable.getId() + "/clear")
+        final OrderTable changedOrderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 0));
+        final MvcResult result = mockMvc.perform(put("/api/order-tables/" + changedOrderTable.getId() + "/clear")
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
 
-        OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
+        final OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -85,15 +84,15 @@ class OrderTableRestControllerTest {
 
     @Test
     void changeNumberOfGuests() throws Exception {
-        OrderTable changedOrderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 0));
+        final OrderTable changedOrderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 0));
         changedOrderTable.setNumberOfGuests(4);
 
-        MvcResult result = mockMvc.perform(put("/api/order-tables/" + changedOrderTable.getId() + "/number-of-guests")
+        final MvcResult result = mockMvc.perform(put("/api/order-tables/" + changedOrderTable.getId() + "/number-of-guests")
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .content(objectMapper.writeValueAsString(changedOrderTable)))
                 .andReturn();
 
-        OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
+        final OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -103,13 +102,13 @@ class OrderTableRestControllerTest {
 
     @Test
     void findAll() throws Exception {
-        OrderTable orderTable1 = orderTableRepository.save(createOrderTableWithId("1번테이블"));
-        OrderTable orderTable2 = orderTableRepository.save(createOrderTableWithId("2번테이블"));
+        final OrderTable orderTable1 = orderTableRepository.save(createOrderTableWithId("1번테이블"));
+        final OrderTable orderTable2 = orderTableRepository.save(createOrderTableWithId("2번테이블"));
 
-        MvcResult result = mockMvc.perform(get("/api/order-tables"))
+        final MvcResult result = mockMvc.perform(get("/api/order-tables"))
                 .andReturn();
 
-        List<OrderTable> orderTables = MockMvcUtil.readListValue(objectMapper, result, OrderTable.class);
+        final List<OrderTable> orderTables = MockMvcUtil.readListValue(objectMapper, result, OrderTable.class);
 
         // then
         assertAll(

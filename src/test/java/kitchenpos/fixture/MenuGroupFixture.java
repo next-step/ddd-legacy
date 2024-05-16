@@ -9,29 +9,29 @@ public class MenuGroupFixture {
 
     }
 
-    public static MenuGroup createMenuGroup(UUID id, String name) {
+    public static MenuGroup createMenuGroup(final UUID id, final String name) {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(id);
         menuGroup.setName(name);
 
         return menuGroup;
     }
-
-    public static MenuGroup createMenuGroup(UUID id) {
+    
+    public static MenuGroup createMenuGroup(final UUID id) {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(id);
 
         return menuGroup;
     }
 
-    public static MenuGroup createMenuGroup(String name) {
+    public static MenuGroup createMenuGroup(final String name) {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName(name);
 
         return menuGroup;
     }
 
-    public static MenuGroup createMenuGroupWithId(String name) {
+    public static MenuGroup createMenuGroupWithId(final String name) {
         final MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
         menuGroup.setName(name);

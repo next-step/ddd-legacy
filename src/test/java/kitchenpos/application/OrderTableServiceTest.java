@@ -38,6 +38,7 @@ import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static kitchenpos.fixture.ProductFixture.createProductWithId;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
 @Transactional
@@ -62,20 +63,20 @@ class OrderTableServiceTest {
         @DisplayName("주문 테이블을 생성한다.")
         @Test
         void createSuccessTest() {
-            OrderTable orderTable = createOrderTable("1번");
+            final OrderTable orderTable = orderTableService.create(createOrderTable("1번"));
 
-            orderTable = orderTableService.create(orderTable);
-
-            assertThat(orderTable.getId()).isNotNull();
-            assertThat(orderTable.getNumberOfGuests()).isZero();
-            assertThat(orderTable.isOccupied()).isFalse();
+            assertAll(
+                    () -> assertThat(orderTable.getId()).isNotNull(),
+                    () -> assertThat(orderTable.getNumberOfGuests()).isZero(),
+                    () -> assertThat(orderTable.isOccupied()).isFalse()
+            );
         }
 
         @DisplayName("이름이 빈값이거나 null인 경우 예외가 발생한다.")
         @ParameterizedTest
         @NullAndEmptySource
-        void createFailWhenNameIsNullAndEmptyTest(String name) {
-            OrderTable orderTable = createOrderTable(name);
+        void createFailWhenNameIsNullAndEmptyTest(final String name) {
+            final OrderTable orderTable = createOrderTable(name);
 
             assertThatThrownBy((() -> orderTableService.create(orderTable)))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -98,7 +99,7 @@ class OrderTableServiceTest {
         @DisplayName("존재하지 않은 주문 테이블의 경우 예외가 발생한다.")
         @Test
         void sitFailWhenNotExistOrderTableTest() {
-            UUID notExistOrderTableId = UUID.randomUUID();
+            final UUID notExistOrderTableId = UUID.randomUUID();
             assertThatThrownBy(() -> orderTableService.sit(notExistOrderTableId))
                     .isInstanceOf(NoSuchElementException.class);
         }
@@ -122,7 +123,7 @@ class OrderTableServiceTest {
         @DisplayName("좌석에 완료된 주문이 없는 경우 예외가 발생한다.")
         @ParameterizedTest
         @EnumSource(value = OrderStatus.class, mode = EnumSource.Mode.EXCLUDE, names = "COMPLETED")
-        void clearFailWhenNotExistCompletedOrderTest(OrderStatus orderStatus) {
+        void clearFailWhenNotExistCompletedOrderTest(final OrderStatus orderStatus) {
             OrderTable orderTable = createOrderTable("1번");
             orderTable = orderTableService.create(orderTable);
             orderTable = orderTableService.sit(orderTable.getId());
@@ -131,14 +132,14 @@ class OrderTableServiceTest {
             product = productRepository.save(product);
             MenuGroup menuGroup = MenuGroupFixture.createMenuGroupWithId("추천 그룹");
             menuGroup = menuGroupRepository.save(menuGroup);
-            MenuProduct menuProduct = createMenuProduct(product, 1);
+            final MenuProduct menuProduct = createMenuProduct(product, 1);
             Menu menu = MenuFixture.createMenuWithId(menuGroup, "떡볶이", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
-            OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
-            Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, orderStatus, null, LocalDateTime.now());
+            final OrderLineItem orderLineItem = createOrderLineItem(menu, BigDecimal.valueOf(16000), 1);
+            final Order order = createOrderWithId(orderTable, List.of(orderLineItem), OrderType.EAT_IN, orderStatus, null, LocalDateTime.now());
             orderRepository.save(order);
 
-            UUID orderTableId = orderTable.getId();
+            final UUID orderTableId = orderTable.getId();
 
             assertThatThrownBy(() -> orderTableService.clear(orderTableId))
                     .isInstanceOf(IllegalStateException.class);
@@ -150,8 +151,7 @@ class OrderTableServiceTest {
         @DisplayName("손님 수를 변경할 수 있다.")
         @Test
         void changeNumberOfGuestsSuccessTest() {
-            OrderTable orderTable = createOrderTable("1번");
-            orderTable = orderTableService.create(orderTable);
+            OrderTable orderTable = orderTableService.create(createOrderTable("1번"));
             orderTableService.sit(orderTable.getId());
             orderTable.setNumberOfGuests(4);
             orderTable = orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable);
@@ -162,26 +162,27 @@ class OrderTableServiceTest {
         @DisplayName("손님 수가 0보다 작으면 예외가 발생한다.")
         @Test
         void changeNumberOfGuestsFailWhenNumberOfGuestsIsLessThanZeroTest() {
-            OrderTable orderTable = createOrderTable("1번");
-            orderTable = orderTableService.create(orderTable);
+            final OrderTable orderTable = orderTableService.create(createOrderTable("1번"));
             orderTableService.sit(orderTable.getId());
             orderTable.setNumberOfGuests(-1);
 
-            UUID orderTableId = orderTable.getId();
-            OrderTable changeOrderTable = orderTable;
-            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, changeOrderTable))
-                    .isInstanceOf(IllegalArgumentException.class);
+            final UUID orderTableId = orderTable.getId();
+
+            assertAll(
+                    () -> assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, orderTable))
+                            .isInstanceOf(IllegalArgumentException.class)
+            );
         }
 
         @DisplayName("착석하지 않은 경우 예외가 발생한다.")
         @Test
         void changeNumberOfGuestsFailWhenNotSitTest() {
-            OrderTable orderTable = createOrderTable("1번");
-            orderTable = orderTableService.create(orderTable);
+            final OrderTable orderTable = orderTableService.create(createOrderTable("1번"));
             orderTable.setNumberOfGuests(4);
 
-            UUID orderTableId = orderTable.getId();
-            OrderTable changeOrderTable = orderTable;
+            final UUID orderTableId = orderTable.getId();
+            final OrderTable changeOrderTable = orderTable;
+
             assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, changeOrderTable))
                     .isInstanceOf(IllegalStateException.class);
         }
@@ -192,16 +193,17 @@ class OrderTableServiceTest {
         @DisplayName("주문 테이블 목록을 조회한다.")
         @Test
         void findAllSuccessTest() {
-            OrderTable orderTable = createOrderTable("1번");
-            orderTable = orderTableService.create(orderTable);
+            final OrderTable orderTable = orderTableService.create(createOrderTable("1번"));
 
-            List<OrderTable> orderTables = orderTableService.findAll();
-            List<UUID> orderTableIds = orderTables.stream()
+            final List<OrderTable> orderTables = orderTableService.findAll();
+            final List<UUID> orderTableIds = orderTables.stream()
                     .map(OrderTable::getId)
                     .toList();
 
-            assertThat(orderTableService.findAll()).hasSize(1);
-            assertThat(orderTableIds).contains(orderTable.getId());
+            assertAll(
+                    () -> assertThat(orderTables).hasSize(1),
+                    () -> assertThat(orderTableIds).contains(orderTable.getId())
+            );
         }
     }
 }

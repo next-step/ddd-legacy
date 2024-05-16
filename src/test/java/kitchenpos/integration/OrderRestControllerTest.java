@@ -71,16 +71,16 @@ class OrderRestControllerTest {
         @DisplayName("먹고가기 주문인 경우 생성한다.")
         @Test
         void createWhenEatInTest() throws Exception {
-            OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
-            MvcResult result = mockMvc.perform(post("/api/orders")
+            final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final MvcResult result = mockMvc.perform(post("/api/orders")
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(createOrder(orderTable.getId(), List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.EAT_IN, null, null))))
                     .andReturn();
 
-            Order order = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order order = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
@@ -90,19 +90,19 @@ class OrderRestControllerTest {
                     () -> assertThat(order.getOrderDateTime()).isNotNull()
             );
         }
-
+        
         @DisplayName("포장하기 주문인 경우 생성한다.")
         @Test
         void createWhenTakeOutTest() throws Exception {
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
-            MvcResult result = mockMvc.perform(post("/api/orders")
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final MvcResult result = mockMvc.perform(post("/api/orders")
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(createOrder(null, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.TAKEOUT, null, null))))
                     .andReturn();
 
-            Order order = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order order = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
@@ -116,15 +116,15 @@ class OrderRestControllerTest {
         @DisplayName("배달하기인 경우 생성한다.")
         @Test
         void createWhenDeliveryTest() throws Exception {
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
-            MvcResult result = mockMvc.perform(post("/api/orders")
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final MvcResult result = mockMvc.perform(post("/api/orders")
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(objectMapper.writeValueAsString(createOrder(null, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, null, "서울시 송파구 위례성대로 2"))))
                     .andReturn();
 
-            Order order = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order order = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
@@ -141,17 +141,17 @@ class OrderRestControllerTest {
         @DisplayName("먹고가기 주문을 접수한다.")
         @Test
         void acceptSuccessWhenEatInTest() throws Exception {
-            OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.EAT_IN, OrderStatus.WAITING, null, LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.EAT_IN, OrderStatus.WAITING, null, LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/accept"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/accept"))
                     .andReturn();
 
-            Order acceptedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order acceptedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -162,16 +162,16 @@ class OrderRestControllerTest {
         @DisplayName("포장하기 주문을 접수한다.")
         @Test
         void acceptSuccessWhenTakeoutTest() throws Exception {
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(null, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.TAKEOUT, OrderStatus.WAITING, null, LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(null, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.TAKEOUT, OrderStatus.WAITING, null, LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/accept"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/accept"))
                     .andReturn();
 
-            Order acceptedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order acceptedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -182,17 +182,17 @@ class OrderRestControllerTest {
         @DisplayName("배달하기 주문을 접수한다.")
         @Test
         void acceptSuccessWhenDeliveryTest() throws Exception {
-            OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, OrderStatus.WAITING, "서울시 송파구 위례성대로 2", LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, OrderStatus.WAITING, "서울시 송파구 위례성대로 2", LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/accept"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/accept"))
                     .andReturn();
 
-            Order acceptedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order acceptedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -207,17 +207,17 @@ class OrderRestControllerTest {
         @DisplayName("먹고가기인 경우 서빙한다.")
         @Test
         void serveSuccessWhenEatInTest() throws Exception {
-            OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.EAT_IN, OrderStatus.ACCEPTED, null, LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.EAT_IN, OrderStatus.ACCEPTED, null, LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/serve"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/serve"))
                     .andReturn();
 
-            Order servedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order servedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -228,16 +228,16 @@ class OrderRestControllerTest {
         @DisplayName("포장하기인 경우 서빙한다.")
         @Test
         void serveSuccessWhenTakeoutTest() throws Exception {
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(null, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.TAKEOUT, OrderStatus.ACCEPTED, null, LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(null, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.TAKEOUT, OrderStatus.ACCEPTED, null, LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/serve"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/serve"))
                     .andReturn();
 
-            Order servedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order servedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -248,17 +248,17 @@ class OrderRestControllerTest {
         @DisplayName("배달하기인 경우 서빙한다.")
         @Test
         void serveSuccessWhenDeliveryTest() throws Exception {
-            OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, OrderStatus.ACCEPTED, "서울시 송파구 위례성대로 2", LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, OrderStatus.ACCEPTED, "서울시 송파구 위례성대로 2", LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/serve"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/serve"))
                     .andReturn();
 
-            Order servedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order servedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -272,17 +272,17 @@ class OrderRestControllerTest {
         @DisplayName("배달하기인 경우 배달 시작을 한다.")
         @Test
         void startDeliverySuccessWhenDeliveryTest() throws Exception {
-            OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, OrderStatus.SERVED, "서울시 송파구 위례성대로 2", LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, OrderStatus.SERVED, "서울시 송파구 위례성대로 2", LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/start-delivery"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/start-delivery"))
                     .andReturn();
 
-            Order startedDeliveryOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order startedDeliveryOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -296,17 +296,17 @@ class OrderRestControllerTest {
         @DisplayName("배달하기인 경우 배달 종료를 한다.")
         @Test
         void completeDeliverySuccessWhenDeliveryTest() throws Exception {
-            OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, OrderStatus.DELIVERING, "서울시 송파구 위례성대로 2", LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, OrderStatus.DELIVERING, "서울시 송파구 위례성대로 2", LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete-delivery"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete-delivery"))
                     .andReturn();
 
-            Order completedDeliveryOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order completedDeliveryOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -320,17 +320,17 @@ class OrderRestControllerTest {
         @DisplayName("먹고가기인 경우 주문 완료한다.")
         @Test
         void completeSuccessWhenEatInTest() throws Exception {
-            OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.EAT_IN, OrderStatus.SERVED, null, LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete"))
                     .andReturn();
 
-            Order completedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order completedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -341,16 +341,16 @@ class OrderRestControllerTest {
         @DisplayName("포장하기인 경우 주문 완료한다.")
         @Test
         void completeSuccessWhenTakeoutTest() throws Exception {
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(null, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.TAKEOUT, OrderStatus.SERVED, null, LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(null, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.TAKEOUT, OrderStatus.SERVED, null, LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete"))
                     .andReturn();
 
-            Order completedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order completedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -361,17 +361,17 @@ class OrderRestControllerTest {
         @DisplayName("배달하기인 경우 주문 완료한다.")
         @Test
         void completeSuccessWhenDeliveryTest() throws Exception {
-            OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
-            Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, OrderStatus.DELIVERED, "서울시 송파구 위례성대로 2", LocalDateTime.now()));
+            final Order order = orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, OrderStatus.DELIVERED, "서울시 송파구 위례성대로 2", LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete"))
+            final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete"))
                     .andReturn();
 
-            Order completedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order completedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -386,17 +386,17 @@ class OrderRestControllerTest {
         @DisplayName("주문을 전체 조회 한다.")
         @Test
         void findAllTest() throws Exception {
-            OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
-            Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
-            MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
-            Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
+            final OrderTable orderTable = orderTableRepository.save(createOrderTableWithId("1번테이블", true, 4));
+            final Product product = productRepository.save(createProductWithId("후라이드치킨", BigDecimal.valueOf(16000)));
+            final MenuGroup menuGroup = menuGroupRepository.save(createMenuGroupWithId("추천메뉴"));
+            final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
 
             orderRepository.save(createOrderWithId(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.EAT_IN, OrderStatus.WAITING, null, LocalDateTime.now()));
 
-            MvcResult result = mockMvc.perform(get("/api/orders"))
+            final MvcResult result = mockMvc.perform(get("/api/orders"))
                     .andReturn();
 
-            List<Order> orders = MockMvcUtil.readListValue(objectMapper, result, Order.class);
+            final List<Order> orders = MockMvcUtil.readListValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
