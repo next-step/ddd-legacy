@@ -1,10 +1,10 @@
 package kitchenpos.application;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -71,7 +71,8 @@ class OrderTableServiceTest {
         orderTable.setName("");
 
         // when & then
-        assertThrows(IllegalArgumentException.class, () -> orderTableService.create(orderTable));
+        assertThatThrownBy(() -> orderTableService.create(orderTable))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("사용자는 `주문 테이블`에 손님을 앉힐 수 있다.")
@@ -135,8 +136,8 @@ class OrderTableServiceTest {
             OrderStatus.COMPLETED)).thenReturn(true);
 
         // when & then
-        assertThrows(IllegalStateException.class,
-            () -> orderTableService.clear(orderTable.getId()));
+        assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
+            .isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("사용자는 `주문 테이블`의 손님 수를 변경할 수 있다.")
@@ -182,8 +183,9 @@ class OrderTableServiceTest {
             java.util.Optional.of(orderTable));
 
         // when & then
-        assertThrows(IllegalStateException.class,
-            () -> orderTableService.changeNumberOfGuests(orderTable.getId(), request));
+        assertThatThrownBy(
+            () -> orderTableService.changeNumberOfGuests(orderTable.getId(), request)
+        ).isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("`주문 테이블`의 손님 수를 변경할 때 손님 수가 음수이면 예외가 발생한다.")
@@ -194,8 +196,8 @@ class OrderTableServiceTest {
         request.setNumberOfGuests(-1);
 
         // when & then
-        assertThrows(IllegalArgumentException.class,
-            () -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), request));
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), request))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName("`주문 테이블`을 조회할 수 있다")
@@ -220,8 +222,10 @@ class OrderTableServiceTest {
             () -> assertEquals(1, orderTables.size()),
             () -> assertEquals(orderTable.getId(), orderTables.get(0).getId()),
             () -> assertEquals(orderTable.getName(), orderTables.get(0).getName()),
-            () -> assertEquals(orderTable.getNumberOfGuests(),
-                orderTables.get(0).getNumberOfGuests()),
+            () -> assertEquals(
+                orderTable.getNumberOfGuests(),
+                orderTables.get(0).getNumberOfGuests()
+            ),
             () -> assertEquals(orderTable.isOccupied(), orderTables.get(0).isOccupied())
         );
     }
