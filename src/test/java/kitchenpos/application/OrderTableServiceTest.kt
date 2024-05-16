@@ -40,7 +40,7 @@ class OrderTableServiceTest {
             assertThat(createdTable.id).isNotNull()
         }
 
-        @DisplayName("최초 테이블의 상태는 다음과 같이 등록된다.")
+        @DisplayName("최초 테이블의 상태는 다음과 같이 등록된다. (손님 0명 / 빈자리)")
         @Test
         fun case_2() {
             // given
@@ -59,7 +59,7 @@ class OrderTableServiceTest {
         }
     }
 
-    @DisplayName("손님이 테이블에 앉으면 테이블의 상태는 다음과 같이 변경된다.")
+    @DisplayName("손님이 테이블에 앉으면 테이블의 상태는 다음과 같이 변경된다. (1번 테이블 / 손님 0명 / 사용중)")
     @Test
     fun case_3() {
         // given
