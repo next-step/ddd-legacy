@@ -47,7 +47,8 @@ public class MenuFixture {
 		String name,
 		BigDecimal price,
 		List<MenuProduct> menuProducts,
-		boolean displayed) {
+		boolean displayed
+	) {
 		Menu menu = new Menu();
 		menu.setMenuGroupId(menuGroup.getId());
 		menu.setMenuGroup(menuGroup);
@@ -59,26 +60,21 @@ public class MenuFixture {
 		return menu;
 	}
 
-	public static Menu createValid() {
+	public static Menu createWithNameAndPrice(String name, BigDecimal price) {
 		return create(
 			createValidMenuGroup(),
-			VALID_MENU_NAME,
-			VALID_MENU_PRICE,
+			name,
+			price,
 			List.of(createValidMenuProductWithQuantity(VALID_MENU_PRODUCT_QUANTITY)),
 			true
 		);
 	}
 
-	public static Menu createWithNameAndPrice(String name, BigDecimal price) {
-		Menu validMenu = createValid();
-		validMenu.setName(name);
-		validMenu.setPrice(price);
-		return validMenu;
+	public static Menu createWithPrice(BigDecimal price) {
+		return createWithNameAndPrice(VALID_MENU_NAME, price);
 	}
 
-	public static Menu createWithPrice(BigDecimal price) {
-		Menu validMenu = createValid();
-		validMenu.setPrice(price);
-		return validMenu;
+	public static Menu createValid() {
+		return createWithPrice(VALID_MENU_PRICE);
 	}
 }
