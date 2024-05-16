@@ -9,12 +9,13 @@ import org.springframework.http.MediaType;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class OrderTableAcceptanceStep {
 
-    public static Response create(OrderTable orderTable) {
+    public static Response create(final OrderTable orderTable) {
         // @formatter:off
-        Response response = RestAssured
+        final Response response = RestAssured
                 .given()
                     .log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -26,16 +27,20 @@ public class OrderTableAcceptanceStep {
                     .response();
         // @formatter:on
 
-        UUID orderTableId = response.getBody().jsonPath().getUUID("id");
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value());
-        assertThat(response.header("Location")).isEqualTo("/api/order-tables/" + orderTableId);
+        final UUID orderTableId = response.getBody().jsonPath().getUUID("id");
+
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
+                () -> assertThat(response.header("Location")).isEqualTo("/api/order-tables/" + orderTableId),
+                () -> assertThat(orderTableId).isNotNull()
+        );
 
         return response;
     }
 
-    public static Response sit(UUID orderTableId) {
+    public static Response sit(final UUID orderTableId) {
         // @formatter:off
-        Response response = RestAssured
+        final Response response = RestAssured
                 .given()
                     .log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -47,14 +52,16 @@ public class OrderTableAcceptanceStep {
                     .response();
         // @formatter:on
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+        );
 
         return response;
     }
 
-    public static Response clear(UUID orderTableId) {
+    public static Response clear(final UUID orderTableId) {
         // @formatter:off
-        Response response = RestAssured
+        final Response response = RestAssured
                 .given()
                     .log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -66,14 +73,16 @@ public class OrderTableAcceptanceStep {
                     .response();
         // @formatter:on
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+        );
 
         return response;
     }
 
-    public static Response changeNumberOfGuests(UUID orderTableId, OrderTable orderTable) {
+    public static Response changeNumberOfGuests(final UUID orderTableId, final OrderTable orderTable) {
         // @formatter:off
-        Response response = RestAssured
+        final Response response = RestAssured
                 .given()
                     .log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -86,14 +95,16 @@ public class OrderTableAcceptanceStep {
                     .response();
         // @formatter:on
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+        );
 
         return response;
     }
 
     public static Response findAll() {
         // @formatter:off
-        Response response = RestAssured
+        final Response response = RestAssured
                 .given()
                 .log().all()
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -104,7 +115,9 @@ public class OrderTableAcceptanceStep {
                 .response();
         // @formatter:on
 
-        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertAll(
+                () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value())
+        );
 
         return response;
     }

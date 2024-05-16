@@ -14,9 +14,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class MenuAcceptanceStep {
 
-    public static Response create(Menu menu) {
+    public static Response create(final Menu menu) {
         // @formatter:off
-        Response response =  RestAssured
+        final Response response =  RestAssured
                 .given()
                     .log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -28,7 +28,7 @@ public class MenuAcceptanceStep {
                     .response();
         // @formatter:on
 
-        UUID menuId = response.getBody().jsonPath().getUUID("id");
+        final UUID menuId = response.getBody().jsonPath().getUUID("id");
 
         assertAll(
                 () -> assertThat(response.statusCode()).isEqualTo(HttpStatus.CREATED.value()),
@@ -39,9 +39,9 @@ public class MenuAcceptanceStep {
         return response;
     }
 
-    public static Response changePrice(UUID menuId, Menu menu) {
+    public static Response changePrice(final UUID menuId, final Menu menu) {
         // @formatter:off
-        Response response =  RestAssured
+        final Response response =  RestAssured
                 .given()
                     .log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -63,9 +63,9 @@ public class MenuAcceptanceStep {
         return response;
     }
 
-    public static Response display(UUID menuId, Menu menu) {
+    public static Response display(final UUID menuId, final Menu menu) {
         // @formatter:off
-        Response response = RestAssured
+        final Response response = RestAssured
                 .given()
                     .log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -86,9 +86,9 @@ public class MenuAcceptanceStep {
         return response;
     }
 
-    public static Response hide(UUID menuId, Menu menu) {
+    public static Response hide(final UUID menuId, final Menu menu) {
         // @formatter:off
-        Response response =  RestAssured
+        final Response response =  RestAssured
                 .given()
                     .log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -111,7 +111,7 @@ public class MenuAcceptanceStep {
 
     public static Response findAll() {
         // @formatter:off
-        Response response = RestAssured
+        final Response response = RestAssured
                 .given()
                     .log().all()
                 .when()
