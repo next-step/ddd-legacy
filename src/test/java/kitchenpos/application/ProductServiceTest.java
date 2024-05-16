@@ -139,6 +139,21 @@ class ProductServiceTest {
         assertThat(menu.isDisplayed()).isFalse();
     }
 
+    @Test
+    void findAll() {
+        // given
+        Product product1 = createProduct();
+        Product savedProduct1 = productRepository.save(product1);
+        Product product2 = createProduct();
+        Product savedProduct2 = productRepository.save(product2);
+
+        // when
+        List<Product> products = productService.findAll();
+
+        // then
+        assertThat(products).containsExactlyInAnyOrder(savedProduct1, savedProduct2);
+    }
+
     private static @NotNull Product createProductRequest(String name, BigDecimal price) {
         Product product = new Product();
         product.setName(name);
