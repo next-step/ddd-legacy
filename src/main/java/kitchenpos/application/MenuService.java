@@ -20,7 +20,7 @@ public class MenuService {
     private final PurgomalumClient purgomalumClient;
 
     public MenuService(
-        final JpaMenuRepository menuRepository,
+        final MenuRepository menuRepository,
         final MenuGroupRepository menuGroupRepository,
         final ProductRepository productRepository,
         final PurgomalumClient purgomalumClient

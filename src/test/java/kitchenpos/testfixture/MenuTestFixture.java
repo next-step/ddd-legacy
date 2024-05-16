@@ -10,6 +10,15 @@ import java.util.UUID;
 
 public class MenuTestFixture {
 
+    public static Menu createMenuRequest(String name, long price, boolean displayed, Product product) {
+        Menu menu = new Menu();
+        menu.setName(name);
+        menu.setPrice(BigDecimal.valueOf(price));
+        menu.setDisplayed(displayed);
+
+        return menu;
+    }
+
     public static Menu createMenu(UUID menuId, String name, long price, boolean displayed, Product product) {
 
         Menu menu = new Menu();
@@ -18,9 +27,6 @@ public class MenuTestFixture {
         menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(price));
         menu.setDisplayed(displayed);
-
-        MenuProduct menuProduct = MenuProductTestFixture.createMenuProductRequest(1L, 1L, product);
-        menu.setMenuProducts(List.of(menuProduct));
 
         return menu;
     }
