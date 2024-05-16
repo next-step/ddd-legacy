@@ -26,9 +26,8 @@ class MenuGroupServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     @DisplayName("이름이 null이거나 빈 문자열일 경우 메뉴 그룹 생성 시 IllegalArgumentException이 발생한다.")
-    void create_fail_for_null_or_empty_name(String input) {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName(input);
+    void create_fail_for_null_or_empty_name(String name) {
+        MenuGroup menuGroup = createMenuGroupRequest(name);
 
         assertThatThrownBy(() -> menuGroupService.create(menuGroup))
                 .isInstanceOf(IllegalArgumentException.class);
@@ -37,15 +36,8 @@ class MenuGroupServiceTest {
     @Test
     @DisplayName("메뉴 그룹을 생성한다.")
     void create_success() {
-        // given
-        MenuGroup menuGroup = new MenuGroup();
-        String name = "메뉴그룹 이름";
-        menuGroup.setName(name);
-
-        // when
+        MenuGroup menuGroup = createMenuGroupRequest("메뉴그룹");
         MenuGroup savedGroup = menuGroupService.create(menuGroup);
-
-        // then
         assertThat(savedGroup.getId()).isNotNull();
     }
 
@@ -53,18 +45,21 @@ class MenuGroupServiceTest {
     @DisplayName("모든 메뉴 그룹을 조회한다.")
     void findAll() {
         // given
-        MenuGroup menuGroup1 = new MenuGroup();
-        menuGroup1.setName("메뉴그룹1");
-        MenuGroup savedGroup1 = menuGroupService.create(menuGroup1);
-
-        MenuGroup menuGroup2 = new MenuGroup();
-        menuGroup2.setName("메뉴그룹2");
-        MenuGroup savedGroup2 = menuGroupService.create(menuGroup2);
+        MenuGroup menuGroupRequest1 = createMenuGroupRequest("메뉴그룹1");
+        MenuGroup menuGroupRequest2 = createMenuGroupRequest("메뉴그룹2");
+        MenuGroup savedMenuGroup1 = menuGroupService.create(menuGroupRequest1);
+        MenuGroup savedMenuGroup2 = menuGroupService.create(menuGroupRequest2);
 
         // when
         Iterable<MenuGroup> menuGroups = menuGroupService.findAll();
 
         // then
-        assertThat(menuGroups).containsExactlyInAnyOrder(savedGroup1, savedGroup2);
+        assertThat(menuGroups).containsExactlyInAnyOrder(savedMenuGroup1, savedMenuGroup2);
+    }
+
+    private MenuGroup createMenuGroupRequest(String name) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName(name);
+        return menuGroup;
     }
 }
