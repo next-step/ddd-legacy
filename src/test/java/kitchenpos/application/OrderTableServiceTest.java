@@ -1,30 +1,24 @@
 package kitchenpos.application;
 
 import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.testfixture.InMemoryMenuRepository;
 import kitchenpos.testfixture.InMemoryOrderRepository;
 import kitchenpos.testfixture.InMemoryOrderTableRepository;
 import kitchenpos.testfixture.OrderTableTestFixture;
-import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@ExtendWith(MockitoExtension.class)
+
 class OrderTableServiceTest {
 
     private OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
@@ -61,6 +55,15 @@ class OrderTableServiceTest {
     }
 
     @Test
+    void canNotEmptyName(){
+        //given
+        OrderTable request = OrderTableTestFixture.createOrderTableRequest("", true, 99);
+
+        //when then
+        assertThrows(IllegalArgumentException.class, () -> orderTableService.create(request));
+    }
+
+    @Test
     void sit() {
 
         //given
@@ -77,6 +80,16 @@ class OrderTableServiceTest {
     }
 
     @Test
+    void mustHaveOrderTableWhenSit(){
+        //given
+        OrderTable request = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(), "2번", false, 10);
+
+        //when then
+        assertThrows(NoSuchElementException.class, () -> orderTableService.sit(request.getId()));
+    }
+
+    @Test
     void clear() {
 
         //given
@@ -90,6 +103,16 @@ class OrderTableServiceTest {
         //then
         assertEquals(false, response.isOccupied());
         assertEquals(0, response.getNumberOfGuests());
+    }
+
+    @Test
+    void mustHaveOrderTableWhenClear(){
+        //given
+        OrderTable request = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(), "2번", true, 10);
+
+        //when then
+        assertThrows(NoSuchElementException.class, () -> orderTableService.clear(request.getId()));
     }
 
     @Test
@@ -111,6 +134,39 @@ class OrderTableServiceTest {
 
         //then
         assertEquals(request.getNumberOfGuests(), response.getNumberOfGuests());
+
+    }
+
+    @Test
+    void canNotNumberOfGuestsUnderZero(){
+        //given
+        OrderTable request = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(), "2번", true, -20);
+
+        //when then
+        assertThrows(IllegalArgumentException.class, () -> orderTableService.changeNumberOfGuests(request.getId(), request));
+
+    }
+
+    @Test
+    void mustHaveOrderTableWhenChangeNumberOfGuests(){
+        //given
+        OrderTable request = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(), "2번", true, 10);
+
+        //when then
+        assertThrows(NoSuchElementException.class, () -> orderTableService.changeNumberOfGuests(request.getId(), request));
+    }
+
+    @Test
+    void mustSitWhenChangeNumberOfGuests(){
+        //given
+        OrderTable request = OrderTableTestFixture.createOrderTable(
+                UUID.randomUUID(), "2번", false, 10);
+        orderTableRepository.save(request);
+
+        //when then
+        assertThrows(IllegalStateException.class, () -> orderTableService.changeNumberOfGuests(request.getId(), request));
 
     }
 
