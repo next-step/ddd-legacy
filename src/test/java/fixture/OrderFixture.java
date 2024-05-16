@@ -7,6 +7,7 @@ import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
 
@@ -15,38 +16,54 @@ public class OrderFixture {
 
 	private static final int VALID_ORDER_LINE_ITEM_QUANTITY = 1;
 
-	public static OrderLineItem createOrderLineItem(Menu menu) {
-		OrderLineItem validOrderLineItem = new OrderLineItem();
-		validOrderLineItem.setMenu(menu);
-		validOrderLineItem.setMenuId(menu.getId());
-		validOrderLineItem.setQuantity(VALID_ORDER_LINE_ITEM_QUANTITY);
-		validOrderLineItem.setPrice(menu.getPrice());
-		return validOrderLineItem;
-	}
-
 	public static OrderTable createOrderTable(String name, boolean occupied, int numberOfGuests) {
-		OrderTable validOrderTable = new OrderTable();
-		validOrderTable.setId(UUID.randomUUID());
-		validOrderTable.setName(name);
-		validOrderTable.setOccupied(occupied);
-		validOrderTable.setNumberOfGuests(numberOfGuests);
-		return validOrderTable;
+		OrderTable orderTable = new OrderTable();
+		orderTable.setId(UUID.randomUUID());
+		orderTable.setName(name);
+		orderTable.setOccupied(occupied);
+		orderTable.setNumberOfGuests(numberOfGuests);
+		return orderTable;
 	}
 
 	public static OrderTable createValidOrderTable() {
 		return createOrderTable(VALID_ORDER_TABLE_NAME, false, 0);
 	}
 
-	public static Order createValidOrder(Menu menu) {
-		OrderTable validOrderTable = createValidOrderTable();
+	public static OrderLineItem createOrderLineItem(Menu menu, int quantity) {
+		OrderLineItem orderLineItem = new OrderLineItem();
+		orderLineItem.setMenu(menu);
+		orderLineItem.setMenuId(menu.getId());
+		orderLineItem.setQuantity(quantity);
+		orderLineItem.setPrice(menu.getPrice());
+		return orderLineItem;
+	}
 
-		Order validOrder = new Order();
-		validOrder.setId(UUID.randomUUID());
-		validOrder.setType(OrderType.EAT_IN);
-		validOrder.setOrderLineItems(List.of(createOrderLineItem(menu)));
-		validOrder.setOrderDateTime(LocalDateTime.now());
-		validOrder.setOrderTable(validOrderTable);
-		validOrder.setOrderTableId(validOrderTable.getId());
-		return validOrder;
+	public static OrderLineItem createValidOrderLineItem() {
+		return createOrderLineItem(MenuFixture.createValid(), VALID_ORDER_LINE_ITEM_QUANTITY);
+	}
+
+	public static Order create(
+		List<OrderLineItem> orderLineItems,
+		OrderTable orderTable,
+		OrderType type,
+		OrderStatus orderStatus) {
+		Order order = new Order();
+		order.setId(UUID.randomUUID());
+		order.setOrderLineItems(orderLineItems);
+		order.setOrderDateTime(LocalDateTime.now());
+		order.setOrderTable(orderTable);
+		order.setOrderTableId(orderTable.getId());
+		order.setType(type);
+		order.setStatus(orderStatus);
+		return order;
+	}
+
+	public static Order createValid() {
+		return create(List.of(createValidOrderLineItem()), createValidOrderTable(), OrderType.EAT_IN,
+			OrderStatus.WAITING);
+	}
+
+	public static Order createValidWithTypeAndStatus(OrderType orderType, OrderStatus orderStatus) {
+		return create(List.of(createValidOrderLineItem()), createValidOrderTable(), orderType, orderStatus);
 	}
 }
