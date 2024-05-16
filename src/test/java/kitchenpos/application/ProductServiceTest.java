@@ -108,7 +108,7 @@ class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("가격 정상 수정 메뉴 비노출")
+    @DisplayName("가격은 정상 수정 되었으나 메뉴 상품 가격의 합이 메뉴의 가겨보다 커져 메뉴 비노출")
     void succeedChangePrice() {
         Product request = new Product();
         request.setPrice(BigDecimal.ZERO);
