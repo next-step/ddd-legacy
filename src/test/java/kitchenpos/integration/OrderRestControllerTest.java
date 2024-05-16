@@ -14,7 +14,6 @@ import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.util.MockMvcUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,6 +35,8 @@ import static kitchenpos.fixture.OrderFixture.createOrderWithId;
 import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
 import static kitchenpos.fixture.OrderTableFixture.createOrderTableWithId;
 import static kitchenpos.fixture.ProductFixture.createProductWithId;
+import static kitchenpos.util.MockMvcUtil.readListValue;
+import static kitchenpos.util.MockMvcUtil.readValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -77,10 +78,10 @@ class OrderRestControllerTest {
             final Menu menu = menuRepository.save(createMenuWithId(menuGroup, "후라이드치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(product, 1))));
             final MvcResult result = mockMvc.perform(post("/api/orders")
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
-                            .content(objectMapper.writeValueAsString(createOrder(orderTable.getId(), List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.EAT_IN, null, null))))
+                            .content(objectMapper.writeValueAsString(createOrder(orderTable, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.EAT_IN, null, null))))
                     .andReturn();
 
-            final Order order = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order order = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
@@ -90,7 +91,7 @@ class OrderRestControllerTest {
                     () -> assertThat(order.getOrderDateTime()).isNotNull()
             );
         }
-        
+
         @DisplayName("포장하기 주문인 경우 생성한다.")
         @Test
         void createWhenTakeOutTest() throws Exception {
@@ -102,7 +103,7 @@ class OrderRestControllerTest {
                             .content(objectMapper.writeValueAsString(createOrder(null, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.TAKEOUT, null, null))))
                     .andReturn();
 
-            final Order order = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order order = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
@@ -124,7 +125,7 @@ class OrderRestControllerTest {
                             .content(objectMapper.writeValueAsString(createOrder(null, List.of(createOrderLineItem(menu, BigDecimal.valueOf(16000), 1)), OrderType.DELIVERY, null, "서울시 송파구 위례성대로 2"))))
                     .andReturn();
 
-            final Order order = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order order = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
@@ -151,7 +152,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/accept"))
                     .andReturn();
 
-            final Order acceptedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order acceptedOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -171,7 +172,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/accept"))
                     .andReturn();
 
-            final Order acceptedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order acceptedOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -192,7 +193,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/accept"))
                     .andReturn();
 
-            final Order acceptedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order acceptedOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -217,7 +218,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/serve"))
                     .andReturn();
 
-            final Order servedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order servedOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -237,7 +238,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/serve"))
                     .andReturn();
 
-            final Order servedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order servedOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -258,7 +259,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/serve"))
                     .andReturn();
 
-            final Order servedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order servedOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -282,7 +283,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/start-delivery"))
                     .andReturn();
 
-            final Order startedDeliveryOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order startedDeliveryOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -306,7 +307,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete-delivery"))
                     .andReturn();
 
-            final Order completedDeliveryOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order completedDeliveryOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -330,7 +331,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete"))
                     .andReturn();
 
-            final Order completedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order completedOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -350,7 +351,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete"))
                     .andReturn();
 
-            final Order completedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order completedOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -371,7 +372,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(put("/api/orders/" + order.getId() + "/complete"))
                     .andReturn();
 
-            final Order completedOrder = MockMvcUtil.readValue(objectMapper, result, Order.class);
+            final Order completedOrder = readValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -396,7 +397,7 @@ class OrderRestControllerTest {
             final MvcResult result = mockMvc.perform(get("/api/orders"))
                     .andReturn();
 
-            final List<Order> orders = MockMvcUtil.readListValue(objectMapper, result, Order.class);
+            final List<Order> orders = readListValue(objectMapper, result, Order.class);
 
             assertAll(
                     () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),

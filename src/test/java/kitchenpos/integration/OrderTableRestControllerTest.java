@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.config.IntegrationTest;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.util.MockMvcUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,8 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.OrderTableFixture.createOrderTable;
 import static kitchenpos.fixture.OrderTableFixture.createOrderTableWithId;
+import static kitchenpos.util.MockMvcUtil.readListValue;
+import static kitchenpos.util.MockMvcUtil.readValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -41,7 +42,7 @@ class OrderTableRestControllerTest {
                         .content(objectMapper.writeValueAsString(createOrderTable("1번테이블"))))
                 .andReturn();
 
-        final OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
+        final OrderTable orderTable = readValue(objectMapper, result, OrderTable.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
@@ -60,7 +61,7 @@ class OrderTableRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
 
-        final OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
+        final OrderTable orderTable = readValue(objectMapper, result, OrderTable.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -77,7 +78,7 @@ class OrderTableRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
 
-        final OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
+        final OrderTable orderTable = readValue(objectMapper, result, OrderTable.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -97,7 +98,7 @@ class OrderTableRestControllerTest {
                         .content(objectMapper.writeValueAsString(changedOrderTable)))
                 .andReturn();
 
-        final OrderTable orderTable = MockMvcUtil.readValue(objectMapper, result, OrderTable.class);
+        final OrderTable orderTable = readValue(objectMapper, result, OrderTable.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -113,7 +114,7 @@ class OrderTableRestControllerTest {
         final MvcResult result = mockMvc.perform(get("/api/order-tables"))
                 .andReturn();
 
-        final List<OrderTable> orderTables = MockMvcUtil.readListValue(objectMapper, result, OrderTable.class);
+        final List<OrderTable> orderTables = readListValue(objectMapper, result, OrderTable.class);
         final List<UUID> orderTableIds = orderTables.stream().map(OrderTable::getId).toList();
 
         assertAll(

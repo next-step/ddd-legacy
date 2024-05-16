@@ -63,14 +63,13 @@ public class MenuAcceptanceStep {
         return response;
     }
 
-    public static Response display(final UUID menuId, final Menu menu) {
+    public static Response display(final UUID menuId) {
         // @formatter:off
         final Response response = RestAssured
                 .given()
                     .log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .pathParam("menuId", menuId)
-                    .body(menu)
                 .when()
                     .put("/api/menus/{menuId}/display")
                     .then()
@@ -86,14 +85,13 @@ public class MenuAcceptanceStep {
         return response;
     }
 
-    public static Response hide(final UUID menuId, final Menu menu) {
+    public static Response hide(final UUID menuId) {
         // @formatter:off
         final Response response =  RestAssured
                 .given()
                     .log().all()
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .pathParam("menuId", menuId)
-                    .body(menu)
                 .when()
                     .put("/api/menus/{menuId}/hide")
                 .then()

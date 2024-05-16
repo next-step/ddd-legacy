@@ -16,6 +16,12 @@ public class OrderTableFixture {
         return orderTable;
     }
 
+    public static OrderTable createOrderTable(final UUID id) {
+        final OrderTable orderTable = new OrderTable();
+        orderTable.setId(id);
+        return orderTable;
+    }
+
     public static OrderTable createOrderTable(final String name) {
         final OrderTable orderTable = new OrderTable();
         orderTable.setName(name);
@@ -28,7 +34,7 @@ public class OrderTableFixture {
         orderTable.setName(name);
         return orderTable;
     }
-    
+
     public static OrderTable createOrderTableWithId(final String name, final boolean isOccupied) {
         final OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());

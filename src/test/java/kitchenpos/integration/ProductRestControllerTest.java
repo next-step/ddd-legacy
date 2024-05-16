@@ -5,7 +5,6 @@ import kitchenpos.config.IntegrationTest;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import kitchenpos.util.MockMvcUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,6 +19,8 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static kitchenpos.fixture.ProductFixture.createProductWithId;
+import static kitchenpos.util.MockMvcUtil.readListValue;
+import static kitchenpos.util.MockMvcUtil.readValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -48,7 +49,7 @@ class ProductRestControllerTest {
                                 BigDecimal.valueOf(16000)))))
                 .andReturn();
 
-        final Product product = MockMvcUtil.readValue(objectMapper, result, Product.class);
+        final Product product = readValue(objectMapper, result, Product.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.CREATED.value()),
@@ -70,7 +71,7 @@ class ProductRestControllerTest {
                         .content(objectMapper.writeValueAsString(changedProduct)))
                 .andReturn();
 
-        final Product product = MockMvcUtil.readValue(objectMapper, result, Product.class);
+        final Product product = readValue(objectMapper, result, Product.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -88,7 +89,7 @@ class ProductRestControllerTest {
         final MvcResult result = mockMvc.perform(get("/api/products"))
                 .andReturn();
 
-        final List<Product> products = MockMvcUtil.readListValue(objectMapper, result, Product.class);
+        final List<Product> products = readListValue(objectMapper, result, Product.class);
         final List<UUID> productIds = products.stream()
                 .map(Product::getId)
                 .toList();

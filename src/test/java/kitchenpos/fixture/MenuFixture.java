@@ -13,7 +13,7 @@ public class MenuFixture {
     private MenuFixture() {
 
     }
-    
+
     public static Menu createMenu(final MenuGroup menuGroup, final String name, final BigDecimal price,
                                   final boolean displayed, final List<MenuProduct> menuProducts) {
         final Menu menu = new Menu();

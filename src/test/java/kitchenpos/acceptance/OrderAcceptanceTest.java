@@ -11,7 +11,6 @@ import kitchenpos.config.AcceptanceTest;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderType;
-import kitchenpos.fixture.MenuFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.OrderFixture.createOrder;
@@ -47,17 +47,21 @@ class OrderAcceptanceTest {
     @Test
     void orderWhenEatInTest() {
         // 상품 생성
-        ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final Response productCreateResponse = ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final UUID productId = productCreateResponse.getBody().jsonPath().getUUID("id");
+
         // 추천메뉴 생성
-        Response 추천메뉴 = MenuGroupAcceptanceStep.create(createMenuGroup(null, "추천메뉴"));
-        UUID recommendMenuGroupId = UUID.fromString(추천메뉴.getBody().jsonPath().getString("id"));
-        MenuGroup menuGroup = createMenuGroup(recommendMenuGroupId);
+        final Response 추천메뉴 = MenuGroupAcceptanceStep.create(createMenuGroup(null, "추천메뉴"));
+        final UUID recommendMenuGroupId = UUID.fromString(추천메뉴.getBody().jsonPath().getString("id"));
+        final MenuGroup menuGroup = createMenuGroup(recommendMenuGroupId);
+
         // 메뉴 생성
-        Response friedChickenMenu = MenuAcceptanceStep.create(MenuFixture.createMenu(menuGroup, "후라이드 치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(UUID.fromString(ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000))).getBody().jsonPath().getString("id")), 1))));
-        UUID friedChickenMenuId = friedChickenMenu.getBody().jsonPath().getUUID("id");
+        final Response friedChickenMenu = MenuAcceptanceStep.create(createMenu(menuGroup, "후라이드 치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(productId, 1))));
+        final UUID friedChickenMenuId = friedChickenMenu.getBody().jsonPath().getUUID("id");
+
         // 주문테이블 생성
-        Response oneTable = OrderTableAcceptanceStep.create(createOrderTable("1번테이블"));
-        UUID oneTableId = oneTable.getBody().jsonPath().getUUID("id");
+        final Response oneTable = OrderTableAcceptanceStep.create(createOrderTable("1번테이블"));
+        final UUID oneTableId = oneTable.getBody().jsonPath().getUUID("id");
 
         // 주문 테이블 착석
         OrderTableAcceptanceStep.sit(oneTableId);
@@ -66,9 +70,9 @@ class OrderAcceptanceTest {
         OrderTableAcceptanceStep.changeNumberOfGuests(oneTableId, createOrderTable(oneTableId, "1번테이블", 4));
 
         // 먹고가기 주문 생성
-        OrderLineItem orderLineItem = createOrderLineItem(friedChickenMenuId, BigDecimal.valueOf(16000), 1);
-        Response order = OrderAcceptanceStep.create(createOrder(oneTableId, List.of(orderLineItem), OrderType.EAT_IN, null, null));
-        UUID orderId = order.getBody().jsonPath().getUUID("id");
+        final OrderLineItem orderLineItem = createOrderLineItem(friedChickenMenuId, BigDecimal.valueOf(16000), 1);
+        final Response order = OrderAcceptanceStep.create(createOrder(createOrderTable(oneTableId), List.of(orderLineItem), OrderType.EAT_IN, null, null));
+        final UUID orderId = order.getBody().jsonPath().getUUID("id");
 
         // 주문 조회
         Response orders = OrderAcceptanceStep.findAll();
@@ -95,21 +99,23 @@ class OrderAcceptanceTest {
     @Test
     void takeOutOrderTest() {
         // 상품 생성
-        ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final Response productCreateResponse = ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final UUID productId = productCreateResponse.getBody().jsonPath().getUUID("id");
+
         // 추천메뉴 생성
-        Response 추천메뉴 = MenuGroupAcceptanceStep.create(createMenuGroup(null, "추천메뉴"));
-        UUID recommendMenuGroupId = UUID.fromString(추천메뉴.getBody().jsonPath().getString("id"));
-        MenuGroup menuGroup = createMenuGroup(recommendMenuGroupId);
+        final Response 추천메뉴 = MenuGroupAcceptanceStep.create(createMenuGroup(null, "추천메뉴"));
+        final UUID recommendMenuGroupId = UUID.fromString(추천메뉴.getBody().jsonPath().getString("id"));
+        final MenuGroup menuGroup = createMenuGroup(recommendMenuGroupId);
         // 메뉴 생성
-        Response friedChickenMenu = MenuAcceptanceStep.create(MenuFixture.createMenu(menuGroup, "후라이드 치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(UUID.fromString(ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000))).getBody().jsonPath().getString("id")), 1))));
-        UUID friedChickenMenuId = friedChickenMenu.getBody().jsonPath().getUUID("id");
+        final Response friedChickenMenu = MenuAcceptanceStep.create(createMenu(menuGroup, "후라이드 치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(productId, 1))));
+        final UUID friedChickenMenuId = friedChickenMenu.getBody().jsonPath().getUUID("id");
         // 주문테이블 생성
-        Response oneTable = OrderTableAcceptanceStep.create(createOrderTable("1번테이블"));
-        UUID oneTableId = oneTable.getBody().jsonPath().getUUID("id");
+        final Response oneTable = OrderTableAcceptanceStep.create(createOrderTable("1번테이블"));
+        final UUID oneTableId = oneTable.getBody().jsonPath().getUUID("id");
         // 먹고가기 주문 생성
-        OrderLineItem orderLineItem = createOrderLineItem(friedChickenMenuId, BigDecimal.valueOf(16000), 1);
-        Response order = OrderAcceptanceStep.create(createOrder(oneTableId, List.of(orderLineItem), OrderType.TAKEOUT, null, null));
-        UUID orderId = order.getBody().jsonPath().getUUID("id");
+        final OrderLineItem orderLineItem = createOrderLineItem(friedChickenMenuId, BigDecimal.valueOf(16000), 1);
+        final Response order = OrderAcceptanceStep.create(createOrder(createOrderTable(oneTableId), List.of(orderLineItem), OrderType.TAKEOUT, null, null));
+        final UUID orderId = order.getBody().jsonPath().getUUID("id");
 
         // 주문 조회
         Response orders = OrderAcceptanceStep.findAll();
@@ -136,21 +142,25 @@ class OrderAcceptanceTest {
     @Test
     void deliveryOrderTest() {
         // 상품 생성
-        ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final Response productCreateResponse = ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000)));
+        final UUID productId = productCreateResponse.getBody().jsonPath().getUUID("id");
         // 추천메뉴 생성
-        Response 추천메뉴 = MenuGroupAcceptanceStep.create(createMenuGroup(null, "추천메뉴"));
-        UUID recommendMenuGroupId = UUID.fromString(추천메뉴.getBody().jsonPath().getString("id"));
-        MenuGroup menuGroup = createMenuGroup(recommendMenuGroupId);
+        final Response 추천메뉴 = MenuGroupAcceptanceStep.create(createMenuGroup(null, "추천메뉴"));
+        final UUID recommendMenuGroupId = UUID.fromString(추천메뉴.getBody().jsonPath().getString("id"));
+        final MenuGroup menuGroup = createMenuGroup(recommendMenuGroupId);
+
         // 메뉴 생성
-        Response friedChickenMenu = MenuAcceptanceStep.create(MenuFixture.createMenu(menuGroup, "후라이드 치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(UUID.fromString(ProductAcceptanceStep.create(createProductWithId("후라이드 치킨", BigDecimal.valueOf(16000))).getBody().jsonPath().getString("id")), 1))));
-        UUID friedChickenMenuId = friedChickenMenu.getBody().jsonPath().getUUID("id");
+        final Response friedChickenMenu = MenuAcceptanceStep.create(createMenu(menuGroup, "후라이드 치킨", BigDecimal.valueOf(16000), true, List.of(createMenuProduct(productId, 1))));
+        final UUID friedChickenMenuId = friedChickenMenu.getBody().jsonPath().getUUID("id");
+
         // 주문테이블 생성
-        Response oneTable = OrderTableAcceptanceStep.create(createOrderTable("1번테이블"));
-        UUID oneTableId = oneTable.getBody().jsonPath().getUUID("id");
+        final Response oneTable = OrderTableAcceptanceStep.create(createOrderTable("1번테이블"));
+        final UUID oneTableId = oneTable.getBody().jsonPath().getUUID("id");
+
         // 먹고가기 주문 생성
-        OrderLineItem orderLineItem = createOrderLineItem(friedChickenMenuId, BigDecimal.valueOf(16000), 1);
-        Response order = OrderAcceptanceStep.create(createOrder(oneTableId, List.of(orderLineItem), OrderType.DELIVERY, null, "서울시 송파구 위례성대로 2"));
-        UUID orderId = order.getBody().jsonPath().getUUID("id");
+        final OrderLineItem orderLineItem = createOrderLineItem(friedChickenMenuId, BigDecimal.valueOf(16000), 1);
+        final Response order = OrderAcceptanceStep.create(createOrder(createOrderTable(oneTableId), List.of(orderLineItem), OrderType.DELIVERY, null, "서울시 송파구 위례성대로 2"));
+        final UUID orderId = order.getBody().jsonPath().getUUID("id");
 
         // 주문 조회
         Response orders = OrderAcceptanceStep.findAll();

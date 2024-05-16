@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.config.IntegrationTest;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.util.MockMvcUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -16,6 +15,8 @@ import java.util.UUID;
 
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupWithId;
+import static kitchenpos.util.MockMvcUtil.readListValue;
+import static kitchenpos.util.MockMvcUtil.readValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -41,7 +42,7 @@ class MenuGroupRestControllerTest {
                         .content(objectMapper.writeValueAsString(menuGroup)))
                 .andReturn();
 
-        menuGroup = MockMvcUtil.readValue(objectMapper, result, MenuGroup.class);
+        menuGroup = readValue(objectMapper, result, MenuGroup.class);
 
         assertThat(result.getResponse().getHeader("Location")).isEqualTo("/api/menu-groups/" + menuGroup.getId());
         assertThat(menuGroup.getName()).isEqualTo("추천메뉴");
@@ -56,8 +57,10 @@ class MenuGroupRestControllerTest {
                         .content(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
 
-        final List<MenuGroup> menuGroups = MockMvcUtil.readListValue(objectMapper, result, MenuGroup.class);
-        final List<UUID> menuGroupIds = menuGroups.stream().map(MenuGroup::getId).toList();
+        final List<MenuGroup> menuGroups = readListValue(objectMapper, result, MenuGroup.class);
+        final List<UUID> menuGroupIds = menuGroups.stream()
+                .map(MenuGroup::getId)
+                .toList();
 
         assertAll(
                 () -> assertThat(menuGroups).hasSize(2),

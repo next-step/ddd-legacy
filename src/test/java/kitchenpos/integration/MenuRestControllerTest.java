@@ -10,7 +10,6 @@ import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
-import kitchenpos.util.MockMvcUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,6 +27,8 @@ import static kitchenpos.fixture.MenuFixture.createMenuWithId;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupWithId;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.ProductFixture.createProductWithId;
+import static kitchenpos.util.MockMvcUtil.readListValue;
+import static kitchenpos.util.MockMvcUtil.readValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -66,7 +67,7 @@ class MenuRestControllerTest {
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        final Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        final Menu menuResponse = readValue(objectMapper, result, Menu.class);
         final List<UUID> menuProductIds = menuResponse.getMenuProducts().stream().map(it -> it.getProduct().getId()).toList();
 
         assertAll(
@@ -95,7 +96,7 @@ class MenuRestControllerTest {
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        final Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        final Menu menuResponse = readValue(objectMapper, result, Menu.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -116,7 +117,7 @@ class MenuRestControllerTest {
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        final Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        final Menu menuResponse = readValue(objectMapper, result, Menu.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -137,7 +138,7 @@ class MenuRestControllerTest {
                         .content(objectMapper.writeValueAsString(menu)))
                 .andReturn();
 
-        final Menu menuResponse = MockMvcUtil.readValue(objectMapper, result, Menu.class);
+        final Menu menuResponse = readValue(objectMapper, result, Menu.class);
 
         assertAll(
                 () -> assertThat(result.getResponse().getStatus()).isEqualTo(HttpStatus.OK.value()),
@@ -157,7 +158,7 @@ class MenuRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andReturn();
 
-        final List<Menu> menus = MockMvcUtil.readListValue(objectMapper, result, Menu.class);
+        final List<Menu> menus = readListValue(objectMapper, result, Menu.class);
         final List<UUID> menuIds = menus.stream().map(Menu::getId).toList();
 
         assertAll(

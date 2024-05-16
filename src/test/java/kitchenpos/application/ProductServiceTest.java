@@ -6,7 +6,6 @@ import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
-import kitchenpos.fixture.MenuFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kitchenpos.fixture.MenuFixture.createMenuWithId;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroupWithId;
 import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.ProductFixture.createProductWithId;
@@ -71,7 +71,7 @@ class ProductServiceTest {
         @Test
         void createFailWhenPriceIsLessThanZeroTest() {
             final Product product = createProductWithId("후라이드 치킨", BigDecimal.valueOf(-1));
-            
+
             assertThatThrownBy(() -> productService.create(product))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -147,7 +147,7 @@ class ProductServiceTest {
             final MenuProduct menuProduct = createMenuProduct(product, 1);
             MenuGroup menuGroup = createMenuGroupWithId("치킨 메뉴");
             menuGroup = menuGroupRepository.save(menuGroup);
-            Menu menu = MenuFixture.createMenuWithId(menuGroup, "후라이드 치킨 세트", BigDecimal.valueOf(16000), true, List.of(menuProduct));
+            Menu menu = createMenuWithId(menuGroup, "후라이드 치킨 세트", BigDecimal.valueOf(16000), true, List.of(menuProduct));
             menu = menuRepository.save(menu);
             product.setPrice(BigDecimal.valueOf(15000));
 
