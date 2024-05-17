@@ -2,6 +2,7 @@ package kitchenpos.application;
 
 import kitchenpos.application.testfixture.MenuFixture;
 import kitchenpos.application.testfixture.ProductFixture;
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
@@ -60,13 +61,12 @@ class ProductServiceTest {
         @Test
         void changedPriceTest() {
             // given
-            var id = UUID.randomUUID();
-            var product_닭고기 = ProductFixture.newOne(id, 5000);
-            productService.create(product_닭고기);
+            var product = ProductFixture.newOne(5000);
+            var savedProduct = productService.create(product);
 
             // when
-            var updatedProduct = ProductFixture.newOne(id, 5001);
-            var actual = productService.changePrice(id, updatedProduct);
+            var updatedProduct = ProductFixture.newOne(5001);
+            var actual = productService.changePrice(savedProduct.getId(), updatedProduct);
 
             // then
             SoftAssertions.assertSoftly(softly -> {
@@ -96,7 +96,6 @@ class ProductServiceTest {
             // given
             var id = UUID.randomUUID();
             var updatedProduct = ProductFixture.newOne(4999);
-            given(productRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> productService.changePrice(id, updatedProduct))
@@ -107,22 +106,21 @@ class ProductServiceTest {
         @Test
         void productPriceExceptionTest() {
             // given
-            var product_닭고기_id = UUID.randomUUID();
-            var product_닭고기 = ProductFixture.newOne(product_닭고기_id, "닭고기 300g", 5000);
-            var product_콜라_id = UUID.randomUUID();
-            var product_콜라 = ProductFixture.newOne(product_콜라_id, "콜라", 500);
+            var 닭고기 = ProductFixture.newOne("닭고기 300g", 5000);
+            var product_닭고기 = productService.create(닭고기);
+            var product_콜라 = ProductFixture.newOne(UUID.randomUUID(), "콜라", 500);
             var menu = MenuFixture.newOne(5500, List.of(product_닭고기, product_콜라));
             var updatedProduct = ProductFixture.newOne(4999);
-            given(productRepository.findById(any())).willReturn(Optional.of(product_닭고기));
-            given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
+            var savedMenu = menuRepository.save(menu);
 
             // when
-            var actual = productService.changePrice(product_닭고기_id, updatedProduct);
+            var actualProduct = productService.changePrice(product_닭고기.getId(), updatedProduct);
 
             // then
+            var actualMenu = menuRepository.findById(savedMenu.getId());
             SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(4999));
-                softly.assertThat(menu.isDisplayed()).isFalse();
+                softly.assertThat(actualProduct.getPrice()).isEqualTo(BigDecimal.valueOf(4999));
+                softly.assertThat(actualMenu.get().isDisplayed()).isFalse();
             });
         }
     }
@@ -131,15 +129,18 @@ class ProductServiceTest {
     @Test
     void findAllTest() {
         // given
-        var product_닭고기 = ProductFixture.newOne(UUID.randomUUID(), "닭고기 300g", 5000);
-        var product_콜라 = ProductFixture.newOne(UUID.randomUUID(), "콜라", 500);
-        given(productRepository.findAll()).willReturn(List.of(product_닭고기, product_콜라));
+        var product_닭고기 = ProductFixture.newOne("닭고기 300g", 5000);
+        var product_콜라 = ProductFixture.newOne("콜라", 500);
+        List.of(product_닭고기, product_콜라).forEach(x-> productService.create(x));
 
         // when
         var actual = productService.findAll();
 
         // then
-        Assertions.assertThat(actual).containsAll(List.of(product_닭고기, product_콜라));
+        SoftAssertions.assertSoftly(softly -> {
+            softly.assertThat(actual.get(0).getName()).isEqualTo("닭고기 300g");
+            softly.assertThat(actual.get(1).getName()).isEqualTo("콜라");
+        });
     }
 
     @Nested
@@ -151,8 +152,6 @@ class ProductServiceTest {
         void createTest() {
             // given
             var product = ProductFixture.newOne(UUID.randomUUID());
-            given(purgomalumClient.containsProfanity(any())).willReturn(false);
-            given(productRepository.save(any())).willReturn(product);
 
             // when
             var actual = productService.create(product);
@@ -192,8 +191,7 @@ class ProductServiceTest {
         @Test
         void createProductWithProfanityTest() {
             // given
-            var product = ProductFixture.newOne();
-            given(purgomalumClient.containsProfanity(any())).willReturn(true);
+            var product = ProductFixture.newOne("비속어를 포함한 상품 제목");
 
             // when & then
             assertThatThrownBy(() -> productService.create(product))

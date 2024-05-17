@@ -29,6 +29,15 @@ public record ProductFixture() {
         return product;
     }
 
+
+    public static Product newOne(String productName, int productPrice) {
+        var product = new Product();
+        product.setId(null);
+        product.setName(productName);
+        product.setPrice(BigDecimal.valueOf(productPrice));
+        return product;
+    }
+
     public static Product newOne(UUID id, int productPrice) {
         var product = new Product();
         product.setId(id);
