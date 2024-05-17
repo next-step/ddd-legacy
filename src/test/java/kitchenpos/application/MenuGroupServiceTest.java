@@ -42,13 +42,13 @@ public class MenuGroupServiceTest {
         assertAll(
                 "메뉴 그룹 Assertions",
                 () -> assertNotNull(actual),
-                () -> assertEquals(actual.getName(), response.getName())
+                () -> assertEquals(response.getName(), actual.getName())
         );
     }
 
     @ParameterizedTest
     @NullAndEmptySource
-    @DisplayName("메뉴 그룹의 이름은 필수로 입력해야한다.")
+    @DisplayName("[실패] 메뉴 그룹의 이름은 필수로 입력해야한다.")
     void name(final String input) {
         MenuGroup menuGroup = createMenuGroup(input);
 
