@@ -1,15 +1,15 @@
 package kitchenpos.domain;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 public class InMemoryProductRepository implements ProductRepository {
 
-    Map<UUID, Product> map = new HashMap<>();
+    private final Map<UUID, Product> map = new LinkedHashMap<>();
 
     @Override
     public Product save(Product entity) {
@@ -24,14 +24,13 @@ public class InMemoryProductRepository implements ProductRepository {
 
     @Override
     public List<Product> findAll() {
-        return map.values().stream().toList();
+        return new ArrayList<>(map.values());
     }
 
     @Override
     public List<Product> findAllByIdIn(List<UUID> ids) {
-        return ids.stream()
-                .map(map::get)
-                .filter(Objects::nonNull)
+        return map.values().stream()
+                .filter(product -> ids.contains(product.getId()))
                 .toList();
     }
 }

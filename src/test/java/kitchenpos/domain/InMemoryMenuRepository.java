@@ -1,7 +1,7 @@
 package kitchenpos.domain;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class InMemoryMenuRepository implements MenuRepository {
 
-    Map<UUID, Menu> map = new HashMap<>();
+    private final Map<UUID, Menu> map = new LinkedHashMap<>();
 
     @Override
     public Menu save(Menu entity) {
