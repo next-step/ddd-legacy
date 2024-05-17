@@ -60,7 +60,7 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("주문 서비스 테스트")
 @ApplicationMockTest
-public class OrderServiceTest {
+public class OrderServiceMockTest {
     @Mock
     private OrderRepository orderRepository;
     @Mock

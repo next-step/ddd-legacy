@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("메뉴 서비스 테스트")
 @ApplicationMockTest
-class MenuServiceTest {
+class MenuServiceMockTest {
     @Mock
     private MenuGroupRepository menuGroupRepository;
     @Mock

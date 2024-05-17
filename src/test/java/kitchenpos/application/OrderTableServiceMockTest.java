@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("주문테이블 서비스 테스트")
 @ApplicationMockTest
-class OrderTableServiceTest {
+class OrderTableServiceMockTest {
     @Mock
     OrderTableRepository orderTableRepository;
     @Mock

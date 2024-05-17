@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("메뉴그룹 서비스 테스트")
 @ApplicationMockTest
-class MenuGroupServiceTest {
+class MenuGroupServiceMockTest {
     @Mock
     private MenuGroupRepository menuGroupRepository;
 

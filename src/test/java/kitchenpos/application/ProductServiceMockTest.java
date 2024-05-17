@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("상품 서비스 테스트")
 @ApplicationMockTest
-class ProductServiceTest {
+class ProductServiceMockTest {
     private UUID ID_양념치킨;
     private Product 상품_양념치킨;
     private Product 상품_후라이드치킨;
