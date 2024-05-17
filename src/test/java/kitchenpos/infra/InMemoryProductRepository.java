@@ -22,7 +22,7 @@ public class InMemoryProductRepository implements ProductRepository {
 
     @Override
     public List<Product> findAll() {
-        return products.values().stream().toList();
+        return new ArrayList<>(products.values());
     }
 
     @Override

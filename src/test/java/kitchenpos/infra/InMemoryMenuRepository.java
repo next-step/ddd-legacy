@@ -22,7 +22,7 @@ public class InMemoryMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAll() {
-        return menus.values().stream().toList();
+        return new ArrayList<>(menus.values());
     }
 
     @Override
