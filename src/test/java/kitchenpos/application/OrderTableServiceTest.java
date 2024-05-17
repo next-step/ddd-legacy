@@ -1,8 +1,13 @@
 package kitchenpos.application;
 
+import kitchenpos.application.testfixture.OrderFixture;
 import kitchenpos.application.testfixture.OrderTableFixture;
+import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.testfixture.OrderFakeRepository;
+import kitchenpos.domain.testfixture.OrderTableFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +24,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static kitchenpos.domain.OrderStatus.WAITING;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.SoftAssertions.assertSoftly;
@@ -26,19 +32,18 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @DisplayName("주문테이블(OrderTable) 서비스 테스트")
-@ExtendWith(MockitoExtension.class)
 class OrderTableServiceTest {
 
-    @Mock
     private OrderTableRepository orderTableRepository;
 
-    @Mock
     private OrderRepository orderRepository;
 
     private OrderTableService orderTableService;
 
     @BeforeEach
     void setUp() {
+        orderTableRepository = new OrderTableFakeRepository();
+        orderRepository = new OrderFakeRepository();
         orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 
@@ -50,16 +55,20 @@ class OrderTableServiceTest {
         @DisplayName("손님 수가 변경된다.")
         void changedGuestNumberTest() {
             // given
-            var id = UUID.randomUUID();
-            var originalOrderTable = OrderTableFixture.newOne(id, "1번 테이블", 4, true);
-            var updatedOrderTable = OrderTableFixture.newOne(id, 2);
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(originalOrderTable));
+            var orderTable = given_for_손님수_변경();
 
             // when
-            var actual = orderTableService.changeNumberOfGuests(id, updatedOrderTable);
+            var updatedOrderTable = OrderTableFixture.newOne(orderTable.getId(), 2);
+            var actual = orderTableService.changeNumberOfGuests(orderTable.getId(), updatedOrderTable);
 
             // then
             assertThat(actual.getNumberOfGuests()).isEqualTo(2);
+        }
+
+        private OrderTable given_for_손님수_변경() {
+            var id = UUID.randomUUID();
+            var originalOrderTable = OrderTableFixture.newOne(id, "1번 테이블", 4, true);
+            return orderTableRepository.save(originalOrderTable);
         }
 
         @Test
@@ -80,7 +89,6 @@ class OrderTableServiceTest {
             // given
             var id = UUID.randomUUID();
             var updatedOrderTable = OrderTableFixture.newOne(id, 4);
-            given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
             // when & then
             assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(id, updatedOrderTable))
@@ -91,13 +99,11 @@ class OrderTableServiceTest {
         @DisplayName("[예외] '미사용' 중인 주문 테이블일 경우 예외가 발생한다.")
         void notOccupiedOrderTableExceptionTest() {
             // given
-            var id = UUID.randomUUID();
-            var originalOrderTable = OrderTableFixture.newOne(id, "1번 테이블", 4, false);
-            var updatedOrderTable = OrderTableFixture.newOne(id, 4);
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(originalOrderTable));
+            var order = orderTableRepository.save(OrderTableFixture.newOne("1번 테이블", 4, false));
 
             // when & then
-            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(id, updatedOrderTable))
+            var updatedOrderTable = OrderTableFixture.newOne(4);
+            assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(order.getId(), updatedOrderTable))
                     .isInstanceOf(IllegalStateException.class);
         }
     }
@@ -108,7 +114,8 @@ class OrderTableServiceTest {
         // given
         var orderTable1 = OrderTableFixture.newOne("1번 테이블");
         var orderTable2 = OrderTableFixture.newOne("2번 테이블");
-        given(orderTableRepository.findAll()).willReturn(List.of(orderTable1, orderTable2));
+        List.of(orderTable1, orderTable2)
+                .forEach(orderTable -> orderTableRepository.save(orderTable));
 
         // when
         var actual = orderTableService.findAll();
@@ -124,12 +131,8 @@ class OrderTableServiceTest {
         @DisplayName("손님 수 0명, '미사용중' 상태로 주문 테이블이 생성된다.")
         @Test
         void createTest() {
-            // given
-            var orderTable = OrderTableFixture.newOne("1번 테이블");
-            given(orderTableRepository.save(any())).willReturn(orderTable);
-
             // when
-            var actual = orderTableService.create(orderTable);
+            var actual = orderTableService.create(OrderTableFixture.newOne("1번 테이블"));
 
             // then
             assertSoftly(softly -> {
@@ -162,7 +165,7 @@ class OrderTableServiceTest {
         void sitTest() {
             // given
             var orderTable = OrderTableFixture.newOne("1번 테이블");
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+            orderTableRepository.save(orderTable);
 
             // when
             var actual = orderTableService.sit(orderTable.getId());
@@ -188,13 +191,10 @@ class OrderTableServiceTest {
         @Test
         void sitTest() {
             // given
-            var id = UUID.randomUUID();
-            var orderTable = OrderTableFixture.newOne(id, "1번 테이블", 4, true);
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
-            given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
+            var orderTable = orderTableRepository.save(OrderTableFixture.newOne("1번 테이블", 4, true));
 
             // when
-            var actual = orderTableService.clear(id);
+            var actual = orderTableService.clear(orderTable.getId());
 
             // then
             assertSoftly(softly -> {
@@ -215,13 +215,11 @@ class OrderTableServiceTest {
         @Test
         void notCompletedExceptionTest() {
             // given
-            var id = UUID.randomUUID();
-            var orderTable = OrderTableFixture.newOne("1번 테이블");
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
-            given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
+            var orderTable = orderTableRepository.save(OrderTableFixture.newOne("1번 테이블"));
+            orderRepository.save(OrderFixture.newOneEatIn(orderTable, WAITING));
 
             // when & then
-            assertThatThrownBy(() -> orderTableService.clear(id))
+            assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
     }

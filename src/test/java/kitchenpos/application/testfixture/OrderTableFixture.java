@@ -14,6 +14,14 @@ public record OrderTableFixture() {
         orderTable.setOccupied(false);
         return orderTable;
     }
+    public static OrderTable newOne(int numberOfGuest) {
+        var orderTable = new OrderTable();
+        orderTable.setId(UUID.randomUUID());
+        orderTable.setName("1번 테이블");
+        orderTable.setNumberOfGuests(numberOfGuest);
+        orderTable.setOccupied(true);
+        return orderTable;
+    }
 
     public static OrderTable newOne(UUID id, int numberOfGuest) {
         var orderTable = new OrderTable();
