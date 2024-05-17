@@ -11,6 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
+import java.util.NoSuchElementException;
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -44,6 +47,23 @@ class OrderTableServiceTest {
         OrderTable request = OrderTableRequestBuilder.builder().build();
         OrderTable response = orderTableService.create(request);
         assertThat(response.getId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("테이블이 존재하지 않는데 테이블 점유 시도할 시 NoSuchElementException이 발생한다.")
+    void sit_fail_for_not_existing_table() {
+        assertThatThrownBy(() -> orderTableService.sit(UUID.randomUUID()))
+            .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("테이블을 점유한다.")
+    void sit_success() {
+        OrderTable request = OrderTableRequestBuilder.builder().build();
+        OrderTable orderTable = orderTableService.create(request);
+
+        OrderTable response = orderTableService.sit(orderTable.getId());
+        assertThat(response.isOccupied()).isTrue();
     }
 }
 
