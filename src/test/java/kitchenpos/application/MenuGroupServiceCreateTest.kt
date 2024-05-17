@@ -67,7 +67,7 @@ class MenuGroupServiceCreateTest : ShouldSpec({
     companion object {
         private fun createRequest(
             id: UUID? = UUID.randomUUID(),
-            name: String? = "test-menu-gruop-name"
+            name: String? = "test-menu-group-name"
         ): MenuGroup {
             return MenuGroup().apply {
                 this.id = id
