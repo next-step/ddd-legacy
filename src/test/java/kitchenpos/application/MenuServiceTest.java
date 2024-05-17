@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.NullSource;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -52,7 +53,7 @@ class MenuServiceTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    @DisplayName("메뉴 그룹이 null이거나 비어있다면 메뉴 생성 시 IllegalArgument가 발생한다.")
+    @DisplayName("메뉴 상품이 null이거나 비어있다면 메뉴 생성 시 IllegalArgument가 발생한다.")
     void create_fail_for_null_or_empty_menu_product_requests(List<MenuProduct> menuProductRequests) {
         Menu request = new Menu();
         request.setMenuProducts(menuProductRequests);
@@ -85,7 +86,7 @@ class MenuServiceTest {
     }
 
     @Test
-    @DisplayName("메뉴 가격이 메뉴상품의 가격 총합보다 같거나 크다면 IllegalArgumentException이 발생한다.")
+    @DisplayName("메뉴 가격이 메뉴상품의 가격 총합보다 같거나 크다면 메뉴 생성 시 IllegalArgumentException이 발생한다.")
     void create_fail_for_higher_menu_price_than_menu_product_price_sum() {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setName("메뉴 그룹");
@@ -164,5 +165,78 @@ class MenuServiceTest {
         Menu menu = menuService.create(request);
 
         assertThat(menu.getId()).isNotNull();
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @DisplayName("가격이 null이라면 메뉴 가격 변경 시 IllegalArgument가 발생한다.")
+    void changePrice_fail_for_null_price(BigDecimal price) {
+        Menu request = new Menu();
+        request.setPrice(price);
+
+        assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), request))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("가격이 음수라면 메뉴 가격 변경 시 IllegalArgument가 발생한다.")
+    void changePrice_fail_for_negative_price() {
+        Menu request = new Menu();
+        request.setPrice(BigDecimal.valueOf(-1));
+
+        assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), request))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴 가격이 메뉴상품의 가격 총합보다 같거나 크다면 가격 변경 시 IllegalArgumentException이 발생한다.")
+    void changePrice_fail_for_higher_menu_price_than_menu_product_price_sum() {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName("메뉴 그룹");
+        MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);;
+
+        Product product = new Product("후라이드치킨", BigDecimal.valueOf(16_000L));
+        Product savedProduct = productRepository.save(product);
+
+        Menu menuRequest = new Menu();
+        menuRequest.setMenuGroupId(savedMenuGroup.getId());
+        menuRequest.setPrice(BigDecimal.valueOf(16_000L));
+        menuRequest.setName("치킨 세트A");
+        menuRequest.setMenuProducts(List.of(new MenuProduct(savedProduct, 1L)));
+
+        Menu savedMenu = menuService.create(menuRequest);
+
+        Menu changePriceRequest = new Menu();
+        changePriceRequest.setPrice(BigDecimal.valueOf(17_000L));
+
+        assertThatThrownBy(() -> menuService.changePrice(savedMenu.getId(), changePriceRequest))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴 가격을 변경한다.")
+    void changePrice_success() {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName("메뉴 그룹");
+        MenuGroup savedMenuGroup = menuGroupRepository.save(menuGroup);;
+
+        Product product = new Product("후라이드치킨", BigDecimal.valueOf(16_000L));
+        Product savedProduct = productRepository.save(product);
+
+        Menu menuRequest = new Menu();
+        menuRequest.setMenuGroupId(savedMenuGroup.getId());
+        menuRequest.setPrice(BigDecimal.valueOf(16_000L));
+        menuRequest.setName("치킨 세트A");
+        menuRequest.setMenuProducts(List.of(new MenuProduct(savedProduct, 1L)));
+
+        Menu savedMenu = menuService.create(menuRequest);
+
+        Menu changePriceRequest = new Menu();
+        changePriceRequest.setPrice(BigDecimal.valueOf(16_000L));
+
+        menuService.changePrice(savedMenu.getId(), changePriceRequest);
+
+        Menu changedMenu = menuRepository.findById(savedMenu.getId()).orElseThrow();
+        assertThat(changedMenu.getPrice()).isEqualTo(BigDecimal.valueOf(changePriceRequest.getPrice().longValue()));
     }
 }
