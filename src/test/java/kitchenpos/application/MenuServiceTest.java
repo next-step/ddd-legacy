@@ -43,6 +43,7 @@ import static kitchenpos.fixture.ProductFixture.이름_양념치킨;
 import static kitchenpos.fixture.ProductFixture.이름_후라이드치킨;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -345,7 +346,7 @@ class MenuServiceTest {
 
             // when
             // then
-            assertThatIllegalArgumentException()
+            assertThatIllegalStateException()
                     .isThrownBy(() -> menuService.display(ID_순살치킨));
         }
     }
