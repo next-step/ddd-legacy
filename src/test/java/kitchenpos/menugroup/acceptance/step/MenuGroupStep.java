@@ -9,7 +9,7 @@ public class MenuGroupStep {
 
     private static final String MENU_GROUP_BASE_URL = "/api/menu-groups";
 
-    public static ExtractableResponse<Response> 메뉴_그룹을_생성한다(MenuGroup request) {
+    public static ExtractableResponse<Response> 메뉴_그룹을_등록한다(MenuGroup request) {
         return RestAssuredClient.post(MENU_GROUP_BASE_URL, request);
     }
 

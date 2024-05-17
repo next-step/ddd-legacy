@@ -53,4 +53,26 @@ public class RestAssuredClient {
                 .extract();
     }
 
+    /**
+     * <pre>
+     * PUT HTTP 요청을 보낼 때 사용
+     * </pre>
+     *
+     * @param path REST API PATH
+     * @param requestBody 요청객체
+     * @return {@link ExtractableResponse}
+     */
+    public static <T> ExtractableResponse<Response> put(String path, T requestBody) {
+        return RestAssured
+                .given()
+                .log().all()
+                .body(requestBody)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .when()
+                .put(path)
+                .then()
+                .log().all()
+                .extract();
+    }
+
 }
