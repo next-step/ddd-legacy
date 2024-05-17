@@ -1,6 +1,4 @@
-package kitchenpos.application;
-
-import kitchenpos.infra.PurgomalumClient;
+package kitchenpos.infra;
 
 public class FakePurgomalumClient implements PurgomalumClient {
 

@@ -1,13 +1,9 @@
-package kitchenpos.application;
-
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
-import kitchenpos.domain.MenuProduct;
+package kitchenpos.domain;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-class MenuRequestBuilder {
+public class MenuRequestBuilder {
 
     public static final BigDecimal DEFAULT_PRICE = BigDecimal.valueOf(10_000L);
     public static final String DEFAULT_NAME = "메뉴 이름";
