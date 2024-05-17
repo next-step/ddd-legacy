@@ -7,6 +7,9 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.domain.testfixture.MenuFakeRepository;
+import kitchenpos.domain.testfixture.MenuGroupFakeRepository;
+import kitchenpos.domain.testfixture.ProductFakeRepository;
+import kitchenpos.domain.testfixture.PurgomalumFakeClient;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,19 +36,19 @@ class MenuServiceTest {
 
     private MenuFakeRepository menuRepository;
 
-    @Mock
     private MenuGroupRepository menuGroupRepository;
 
-    @Mock
     private ProductRepository productRepository;
 
-    @Mock
     private PurgomalumClient purgomalumClient;
 
     private MenuService menuService;
 
     @BeforeEach
     void setUp() {
+        menuGroupRepository = new MenuGroupFakeRepository();
+        productRepository = new ProductFakeRepository();
+        purgomalumClient = new PurgomalumFakeClient();
         menuRepository = new MenuFakeRepository();
         menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
     }
@@ -60,14 +63,8 @@ class MenuServiceTest {
             // given
             var id = UUID.randomUUID();
             var menu = MenuFixture.newOne(id);
-
-            given(menuGroupRepository.findById(any()))
-                    .willReturn(Optional.of(MenuGroupFixture.newOne()));
-            var product = ProductFixture.newOne();
-            given(productRepository.findAllByIdIn(any()))
-                    .willReturn(List.of(product));
-            given(productRepository.findById(any())).willReturn(Optional.of(product));
-            given(purgomalumClient.containsProfanity(any())).willReturn(false);
+            menuGroupRepository.save(MenuGroupFixture.newOne());
+            productRepository.save(ProductFixture.newOne());
 
             // when
             var actual = menuService.create(menu);
@@ -95,10 +92,6 @@ class MenuServiceTest {
         @DisplayName("[예외] 존재하지 않는 메뉴 그룹이면 예외가 발생한다.")
         @Test
         void notFoundMenuGroupExceptionTest() {
-            // given
-            given(menuGroupRepository.findById(any()))
-                    .willReturn(Optional.empty());
-
             // then
             var menu = MenuFixture.newOne();
             assertThatThrownBy(() -> menuService.create(menu))
@@ -109,16 +102,11 @@ class MenuServiceTest {
         @Test
         void notFoundProductExceptionTest() {
             // given
-            var id = UUID.randomUUID();
-            given(menuGroupRepository.findById(any()))
-                    .willReturn(Optional.of(MenuGroupFixture.newOne()));
-            given(productRepository.findAllByIdIn(any()))
-                    .willReturn(Collections.EMPTY_LIST);
+            menuGroupRepository.save(MenuGroupFixture.newOne());
+            var product = ProductFixture.newOne();
 
             // when & then
-            var product = ProductFixture.newOne(id);
-            var menu = MenuFixture.newOne(product);
-            assertThatThrownBy(() -> menuService.create(menu))
+            assertThatThrownBy(() -> menuService.create(MenuFixture.newOne(product)))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -126,16 +114,12 @@ class MenuServiceTest {
         @Test
         void productTotalPriceExceptionTest() {
             // given
-            var product = ProductFixture.newOne(5000);
-            var menu = MenuFixture.newOne(5001, List.of(product));
-
-            given(menuGroupRepository.findById(any()))
-                    .willReturn(Optional.of(MenuGroupFixture.newOne()));
-            given(productRepository.findAllByIdIn(any()))
-                    .willReturn(List.of(product));
-            given(productRepository.findById(any())).willReturn(Optional.of(product));
+            menuGroupRepository.save(MenuGroupFixture.newOne());
+            productRepository.save(ProductFixture.newOne(5000));
 
             // when & then
+            var product = ProductFixture.newOne(5000);
+            var menu = MenuFixture.newOne(5001, List.of(product));
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -144,16 +128,11 @@ class MenuServiceTest {
         @Test
         void menuNameNullExceptionTest() {
             // given
-            var menu = MenuFixture.newOne((String) null);
-
-            given(menuGroupRepository.findById(any()))
-                    .willReturn(Optional.of(MenuGroupFixture.newOne()));
-            var product = ProductFixture.newOne();
-            given(productRepository.findAllByIdIn(any()))
-                    .willReturn(List.of(product));
-            given(productRepository.findById(any())).willReturn(Optional.of(product));
+            menuGroupRepository.save(MenuGroupFixture.newOne());
+            productRepository.save(ProductFixture.newOne());
 
             // when & then
+            var menu = MenuFixture.newOne((String) null);
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -162,18 +141,11 @@ class MenuServiceTest {
         @Test
         void menuNameProfanityExceptionTest() {
             // given
-            var menu = MenuFixture.newOne("비속어를 포함한 메뉴명");
-
-            given(menuGroupRepository.findById(any()))
-                    .willReturn(Optional.of(MenuGroupFixture.newOne()));
-            var product = ProductFixture.newOne();
-            given(productRepository.findAllByIdIn(any()))
-                    .willReturn(List.of(product));
-            given(productRepository.findById(any())).willReturn(Optional.of(product));
-
-            given(purgomalumClient.containsProfanity(any())).willReturn(true);
+            menuGroupRepository.save(MenuGroupFixture.newOne());
+            productRepository.save(ProductFixture.newOne());
 
             // when & then
+            var menu = MenuFixture.newOne("비속어를 포함한 메뉴명");
             assertThatThrownBy(() -> menuService.create(menu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
@@ -187,15 +159,12 @@ class MenuServiceTest {
         @Test
         void changePriceTest() {
             // given
-            var id = UUID.randomUUID();
             var product = ProductFixture.newOne(5000);
-            var originalMenu = MenuFixture.newOne(5000, List.of(product));
+            var menu = menuRepository.save(MenuFixture.newOne(5000, List.of(product)));
             var updatedMenu = MenuFixture.newOne(4999, List.of(product));
 
-            given(menuRepository.findById(any())).willReturn(Optional.of(originalMenu));
-
             // when
-            var actual = menuService.changePrice(id, updatedMenu);
+            var actual = menuService.changePrice(menu.getId(), updatedMenu);
 
             // when & then
             assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(4999));
@@ -236,15 +205,13 @@ class MenuServiceTest {
         @Test
         void productTotalPriceExceptionTest() {
             // given
-            var id = UUID.randomUUID();
             var product = ProductFixture.newOne(5000);
-            var originalMenu = MenuFixture.newOne(5000, List.of(product));
+            var menu = menuRepository.save(MenuFixture.newOne(5000, List.of(product)));
             var updatedMenu = MenuFixture.newOne(5001, List.of(product));
 
-            given(menuRepository.findById(any())).willReturn(Optional.of(originalMenu));
 
             // when & then
-            assertThatThrownBy(() -> menuService.changePrice(id, updatedMenu))
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), updatedMenu))
                     .isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -257,14 +224,11 @@ class MenuServiceTest {
         @Test
         void displayedTest() {
             // given
-            var id = UUID.randomUUID();
             var product = ProductFixture.newOne(5000);
-            var originalMenu = MenuFixture.newOne(5000, List.of(product));
-
-            given(menuRepository.findById(any())).willReturn(Optional.of(originalMenu));
+            var menu = menuRepository.save(MenuFixture.newOne(5000, List.of(product)));
 
             // when
-            var actual = menuService.display(id);
+            var actual = menuService.display(menu.getId());
 
             // then
             assertThat(actual.isDisplayed()).isTrue();
@@ -273,9 +237,6 @@ class MenuServiceTest {
         @DisplayName("[예외] 메뉴가 존재하지 않을 경우 예외 발생한다.")
         @Test
         void notFoundMenuExceptionTest() {
-            // given
-            given(menuRepository.findById(any())).willReturn(Optional.empty());
-
             // when & then
             assertThatThrownBy(() -> menuService.display(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
@@ -285,14 +246,11 @@ class MenuServiceTest {
         @Test
         void productTotalPriceExceptionTest() {
             // given
-            var id = UUID.randomUUID();
             var product = ProductFixture.newOne(5000);
-            var menu = MenuFixture.newOne(5001, List.of(product));
-
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            var menu = menuRepository.save(MenuFixture.newOne(5001, List.of(product)));
 
             // when & then
-            assertThatThrownBy(() -> menuService.display(id))
+            assertThatThrownBy(() -> menuService.display(menu.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
     }
@@ -305,13 +263,10 @@ class MenuServiceTest {
         @Test
         void displayedTest() {
             // given
-            var id = UUID.randomUUID();
-            var menu = MenuFixture.newOne();
-
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            var menu = menuRepository.save(MenuFixture.newOne());
 
             // when
-            var actual = menuService.hide(id);
+            var actual = menuService.hide(menu.getId());
 
             // then
             assertThat(actual.isDisplayed()).isFalse();
@@ -320,9 +275,6 @@ class MenuServiceTest {
         @DisplayName("[예외] 메뉴가 존재하지 않을 경우 예외 발생한다.")
         @Test
         void notFoundMenuExceptionTest() {
-            // given
-            given(menuRepository.findById(any())).willReturn(Optional.empty());
-
             // when & then
             assertThatThrownBy(() -> menuService.hide(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
@@ -334,7 +286,7 @@ class MenuServiceTest {
     void findAll() {
         // given
         var menu = MenuFixture.newOne();
-        given(menuRepository.findAll()).willReturn(List.of(menu));
+        menuRepository.save(menu);
 
         // when
         var actual = menuService.findAll();
