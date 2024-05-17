@@ -11,6 +11,8 @@ import org.junit.jupiter.params.provider.NullSource;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -175,6 +177,36 @@ class MenuServiceTest {
 
         Menu changedMenu = menuRepository.findById(savedMenu.getId()).orElseThrow();
         assertThat(changedMenu.getPrice()).isEqualTo(BigDecimal.valueOf(request.getPrice().longValue()));
+    }
+
+    @Test
+    @DisplayName("메뉴가 존재하지 않으면 메뉴 표시 시 NoSuchElementException이 발생한다.")
+    void display_fail_for_not_existing_menu() {
+        assertThatThrownBy(() -> menuService.display(UUID.randomUUID()))
+            .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴 가격이 메뉴상품 가격의 총합보다 크다면 메뉴 표시 시 IllegalStateException이 발생한다")
+    void display_fail_for_higher_menu_price_than_menu_product_price_sum() {
+        Menu savedMenu = createAndSaveMenu();
+        savedMenu.setDisplayed(false);
+        savedMenu.setPrice(savedMenu.getPrice().add(BigDecimal.ONE));
+
+        assertThatThrownBy(() -> menuService.display(savedMenu.getId()))
+            .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴를 표시한다.")
+    void display_success() {
+        Menu savedMenu = createAndSaveMenu();
+        savedMenu.setDisplayed(false);
+
+        menuService.display(savedMenu.getId());
+
+        Menu displayedMenu = menuRepository.findById(savedMenu.getId()).orElseThrow();
+        assertThat(displayedMenu.isDisplayed()).isTrue();
     }
 
     private MenuRequestBuilder menuRequestBuilder() {
