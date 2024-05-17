@@ -19,7 +19,15 @@ public record OrderFixture() {
         order.setOrderLineItems(List.of(OrderLineItemFixture.newOne()));
         order.setDeliveryAddress("");
         order.setOrderTable(orderTable);
+        order.setOrderTableId(getOrderTableId(orderTable));
         return order;
+    }
+
+    private static UUID getOrderTableId(OrderTable orderTable) {
+        if (orderTable == null) {
+            return null;
+        }
+        return orderTable.getId();
     }
 
     public static Order newOneEatIn(OrderTable orderTable, List<OrderLineItem> orderLineItems) {
@@ -31,6 +39,7 @@ public record OrderFixture() {
         order.setOrderLineItems(orderLineItems);
         order.setDeliveryAddress("");
         order.setOrderTable(orderTable);
+        order.setOrderTableId(getOrderTableId(orderTable));
         return order;
     }
 
@@ -43,6 +52,7 @@ public record OrderFixture() {
         order.setOrderLineItems(List.of(OrderLineItemFixture.newOne()));
         order.setDeliveryAddress("");
         order.setOrderTable(orderTable);
+        order.setOrderTableId(getOrderTableId(orderTable));
         return order;
     }
 

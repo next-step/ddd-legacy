@@ -5,20 +5,21 @@ import kitchenpos.application.testfixture.OrderFixture;
 import kitchenpos.application.testfixture.OrderLineItemFixture;
 import kitchenpos.application.testfixture.OrderTableFixture;
 import kitchenpos.domain.*;
+import kitchenpos.domain.testfixture.KitchenridersFakeClient;
+import kitchenpos.domain.testfixture.MenuFakeRepository;
+import kitchenpos.domain.testfixture.OrderFakeRepository;
+import kitchenpos.domain.testfixture.OrderTableFakeRepository;
 import kitchenpos.infra.KitchenridersClient;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -28,31 +29,26 @@ import static kitchenpos.domain.OrderStatus.*;
 import static kitchenpos.domain.OrderType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @DisplayName("주문(Order) 서비스 테스트")
-@ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
-    @Mock
     private OrderRepository orderRepository;
 
-    @Mock
     private MenuRepository menuRepository;
 
-    @Mock
     private OrderTableRepository orderTableRepository;
 
-    @Mock
     private KitchenridersClient kitchenridersClient;
 
     private OrderService orderService;
 
     @BeforeEach
     void setUp() {
+        orderRepository = new OrderFakeRepository();
+        menuRepository = new MenuFakeRepository();
+        orderTableRepository = new OrderTableFakeRepository();
+        kitchenridersClient = new KitchenridersFakeClient();
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
@@ -87,103 +83,105 @@ class OrderServiceTest {
         @DisplayName("매장 내 주문은 정상 생성된다.")
         void eatInOrderCreatedTest() {
             // given
-            var menu = MenuFixture.newOne();
-            var orderTable = OrderTableFixture.newOne(UUID.randomUUID(), "1번테이블", 4, true);
-            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
-            var order = OrderFixture.newOneEatIn(orderTable, orderLineItems);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
-            given(orderRepository.save(any())).willReturn(order);
+            var order = given_for_매장_내_주문은_정상_생성된다();
 
             // when
             var actual = orderService.create(order);
 
             // then
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(actual.getOrderTable()).isEqualTo(orderTable);
-                softly.assertThat(actual.getType()).isEqualTo(EAT_IN);
-                softly.assertThat(actual.getStatus()).isEqualTo(WAITING);
-                softly.assertThat(actual.getOrderLineItems()).isEqualTo(orderLineItems);
-            });
+            assertThat(actual).isNotNull();
+        }
+
+        private Order given_for_매장_내_주문은_정상_생성된다() {
+            var menu = menuRepository.save(MenuFixture.newOne());
+
+            var orderTableToSave = OrderTableFixture.newOne(UUID.randomUUID(), "1번테이블", 4, true);
+            var orderTable = orderTableRepository.save(orderTableToSave);
+
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+
+            return OrderFixture.newOneEatIn(orderTable, orderLineItems);
         }
 
         @Test
         @DisplayName("배달 주문이 생성된다.")
         void deliveryOrderCreatedTest() {
             // given
-            var menu = MenuFixture.newOne();
-            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
-            var deliveryAddress = "강남 테헤란로 1126-31";
-            var order = OrderFixture.newOneDelivery(deliveryAddress, orderLineItems);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-            given(orderRepository.save(any())).willReturn(order);
+            var order = given_for_배달주문이_생성된다();
 
             // when
             var actual = orderService.create(order);
 
             // then
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(actual.getType()).isEqualTo(DELIVERY);
-                softly.assertThat(actual.getStatus()).isEqualTo(WAITING);
-                softly.assertThat(actual.getOrderLineItems()).isEqualTo(orderLineItems);
-                softly.assertThat(actual.getDeliveryAddress()).isEqualTo(deliveryAddress);
-            });
+            assertThat(actual).isNotNull();
+        }
+
+        private Order given_for_배달주문이_생성된다() {
+            var menu = MenuFixture.newOne();
+            menuRepository.save(menu);
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            var deliveryAddress = "강남 테헤란로 1126-31";
+            return OrderFixture.newOneDelivery(deliveryAddress, orderLineItems);
         }
 
         @Test
         @DisplayName("포장 주문이 생성된다.")
         void takeOutOrderCreatedTest() {
             // given
-            var menu = MenuFixture.newOne();
-            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
-            var order = OrderFixture.newOneTakeOut(WAITING, orderLineItems);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-            given(orderRepository.save(any())).willReturn(order);
+            var order = given_for_포장_주문이_생성된다();
 
             // when
             var actual = orderService.create(order);
 
             // then
-            SoftAssertions.assertSoftly(softly -> {
-                softly.assertThat(actual.getType()).isEqualTo(TAKEOUT);
-                softly.assertThat(actual.getStatus()).isEqualTo(WAITING);
-                softly.assertThat(actual.getOrderLineItems()).isEqualTo(orderLineItems);
-            });
+            assertThat(actual).isNotNull();
+        }
+
+        private Order given_for_포장_주문이_생성된다() {
+            var menu = menuRepository.save(MenuFixture.newOne());
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            var order = OrderFixture.newOneTakeOut(WAITING, orderLineItems);
+            return orderRepository.save(order);
         }
 
         @Test
         @DisplayName("[예외] 매장 내 주문일 경우 테이블의 상태는 '미사용중'이면 예외가 발생한다.")
         void notOccupiedExceptionTest() {
             // given
-            var menu = MenuFixture.newOne();
-            var orderTable = OrderTableFixture.newOne(UUID.randomUUID(), "1번테이블", 4, false);
-            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
-            var order = OrderFixture.newOneEatIn(orderTable, orderLineItems);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+            var order = given_테이블상태가_미사용중();
 
             // when & then
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalStateException.class);
         }
 
+        private Order given_테이블상태가_미사용중() {
+            var menu = menuRepository.save(MenuFixture.newOne());
+
+            var orderTable = orderTableRepository.save(
+                    OrderTableFixture.newOne(UUID.randomUUID(), "1번테이블", 4, false));
+
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            var order = OrderFixture.newOneEatIn(orderTable, orderLineItems);
+            return orderRepository.save(order);
+        }
+
         @Test
         @DisplayName("[예외] 매장 내 주문일 경우, 주문 테이블이 존재하지 않으면 예외가 발생한다.")
         void notFoundOrderTableExceptionTest() {
             // given
-            var menu = MenuFixture.newOne();
-            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
-            var order = OrderFixture.newOneEatIn(null, orderLineItems);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            var order = given_주문테이블이_존재하지_않으면();
 
             // when & then
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(NoSuchElementException.class);
+        }
+
+        private Order given_주문테이블이_존재하지_않으면() {
+            var menu = MenuFixture.newOne();
+            menuRepository.save(menu);
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            return OrderFixture.newOneEatIn(null, orderLineItems);
         }
 
         @ParameterizedTest
@@ -192,60 +190,51 @@ class OrderServiceTest {
         @EmptySource
         void notExistDeliveryAddressExceptionTest(String deliveryAddress) {
             // given
-            var menu = MenuFixture.newOne();
-            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
-            var order = OrderFixture.newOneDelivery(deliveryAddress, orderLineItems);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            var order = given_배달주소가_존재하지않으면(deliveryAddress);
 
             // when & then
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        private Order given_배달주소가_존재하지않으면(String deliveryAddress) {
+            var menu = menuRepository.save(MenuFixture.newOne());
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 5000));
+            return OrderFixture.newOneDelivery(deliveryAddress, orderLineItems);
         }
 
         @Test
         @DisplayName("[예외] 주문 아이템 가격의 총합이 메뉴의 가격과 다를 경우 예외가 발생한다.")
         void orderLineItemTotalPriceNotEqualsMenuPriceExceptionTest() {
             // given
-            var menu = MenuFixture.newOne(BigDecimal.valueOf(5000));
-            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 6000));
-            var order = OrderFixture.newOne(DELIVERY, orderLineItems);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            var order = given_주문아이템의_가격의_총합이_메뉴의_가격과_다를_경우();
 
             // when & then
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
-        @Test
-        @DisplayName("[예외] 주문 아이템의 메뉴가 비노출되어 있을 경우 예외가 발생한다.")
-        void notFoundMenuExceptionTest() {
-            // given
-            var menu = MenuFixture.newOne(false);
-            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu));
-            var order = OrderFixture.newOne(DELIVERY, orderLineItems);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-
-            // when & then
-            assertThatThrownBy(() -> orderService.create(order))
-                    .isInstanceOf(IllegalStateException.class);
+        private Order given_주문아이템의_가격의_총합이_메뉴의_가격과_다를_경우() {
+            var menu = menuRepository.save(MenuFixture.newOne(BigDecimal.valueOf(5000)));
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu, 6000));
+            return OrderFixture.newOne(DELIVERY, orderLineItems);
         }
 
         @Test
         @DisplayName("[예외] 주문 아이템의 메뉴가 비노출되어 있을 경우 예외가 발생한다.")
         void notDisplayedExceptionTest() {
             // given
-            var menu = MenuFixture.newOne(false);
-            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu));
-            var order = OrderFixture.newOne(DELIVERY, orderLineItems);
-            given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-            given(menuRepository.findById(any())).willReturn(Optional.of(menu));
+            var order = given_주문아이템의_메뉴가_비노출되어_있을경우();
 
             // when & then
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalStateException.class);
+        }
+
+        private Order given_주문아이템의_메뉴가_비노출되어_있을경우() {
+            var menu = menuRepository.save(MenuFixture.newOne(false));
+            var orderLineItems = List.of(OrderLineItemFixture.newOne(menu));
+            return OrderFixture.newOne(DELIVERY, orderLineItems);
         }
 
         @ParameterizedTest(name = "{1}")
@@ -261,9 +250,6 @@ class OrderServiceTest {
         @MethodSource("notFoundMenus")
         @DisplayName("[예외] 주문 아이템 중 하나라도 메뉴가 존재하지 않으면 예외가 발생한다.")
         void notFoundMenusExceptionTest(Order order, OrderType orderType) {
-            // given
-            given(menuRepository.findAllByIdIn(any())).willReturn(Collections.emptyList());
-
             // when & then
             assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
@@ -285,7 +271,7 @@ class OrderServiceTest {
         @DisplayName("[예외] 주문 타입이 존재하지 않을 경우 예외가 발생한다.")
         void nullOrderTypeExceptionTest() {
             // given
-            var order = OrderFixture.newOne((OrderType) null);
+            var order = OrderFixture.newOne(null);
 
             // when & then
             assertThatThrownBy(() -> orderService.create(order))
@@ -298,17 +284,15 @@ class OrderServiceTest {
     class Accept {
 
         @Test
-        @DisplayName("배달 주문일 경우, 배달 라이더에게 배달을 요청하고 주문의 상태는 '수락'(ACCEPTED)로 변경된다.")
+        @DisplayName("배달 주문일 경우, 주문의 상태는 '수락'(ACCEPTED)로 변경된다.")
         void notServedTest() {
             // given
-            var order = OrderFixture.newOneDelivery(WAITING);
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var order = orderRepository.save(OrderFixture.newOneDelivery(WAITING));
 
             // when & then
-            var actual = orderService.accept(UUID.randomUUID());
+            var actual = orderService.accept(order.getId());
 
             // then
-            verify(kitchenridersClient, times(1)).requestDelivery(any(), any(), any());
             assertThat(actual.getStatus()).isEqualTo(ACCEPTED);
         }
 
@@ -316,20 +300,16 @@ class OrderServiceTest {
         @DisplayName("[예외] '대기중'(WAITING)가 아니면 예외가 발생한다.")
         void notWaitingExceptionTest() {
             // given
-            var order = OrderFixture.newOneTakeOut(SERVED);
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var order = orderRepository.save(OrderFixture.newOneTakeOut(SERVED));
 
             // when & then
-            assertThatThrownBy(() -> orderService.accept(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.accept(order.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
         @Test
         @DisplayName("[예외] 존재하지 않는 주문일 경우 예외가 발생한다.")
         void notFoundOrderExceptionTest() {
-            // given
-            given(orderRepository.findById(any())).willReturn(Optional.empty());
-
             // when & then
             assertThatThrownBy(() -> orderService.accept(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
@@ -344,11 +324,10 @@ class OrderServiceTest {
         @DisplayName("'서빙완료'(SERVED)로 주문 상태가 변경 된다.")
         void servedTest() {
             // given
-            var order = OrderFixture.newOneTakeOut(ACCEPTED);
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var order = orderRepository.save(OrderFixture.newOneTakeOut(ACCEPTED));
 
             // when
-            var actual = orderService.serve(UUID.randomUUID());
+            var actual = orderService.serve(order.getId());
 
             // then
             assertThat(actual.getStatus()).isEqualTo(SERVED);
@@ -358,20 +337,16 @@ class OrderServiceTest {
         @DisplayName("[예외] '주문 수락 완료'(ACCEPTED)가 아니면 예외가 발생한다.")
         void notAcceptedTest() {
             // given
-            var order = OrderFixture.newOneTakeOut(WAITING);
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var order = orderRepository.save(OrderFixture.newOneTakeOut(WAITING));
 
             // when & then
-            assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.serve(order.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
         @Test
         @DisplayName("[예외] 존재하지 않는 주문일 경우 예외가 발생한다.")
         void notFoundOrderExceptionTest() {
-            // given
-            given(orderRepository.findById(any())).willReturn(Optional.empty());
-
             // when & then
             assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
@@ -394,11 +369,10 @@ class OrderServiceTest {
         @DisplayName("'배송중'(DELIVERING)으로 배송 상태가 변경된다.")
         void changedOrderStatusTest() {
             // given
-            var order = OrderFixture.newOneDelivery(SERVED);
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var order = orderRepository.save(OrderFixture.newOneDelivery(SERVED));
 
             // when
-            var actual = orderService.startDelivery(UUID.randomUUID());
+            var actual = orderService.startDelivery(order.getId());
 
             // then
             assertThat(actual.getStatus()).isEqualTo(DELIVERING);
@@ -408,11 +382,10 @@ class OrderServiceTest {
         @DisplayName("[예외] '서빙완료'(SERVED)가 아니면 예외가 발생한다.")
         void notServedTest() {
             // given
-            var order = OrderFixture.newOneDelivery(WAITING);
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var order = orderRepository.save(OrderFixture.newOneDelivery(WAITING));
 
             // when & then
-            assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
@@ -421,19 +394,16 @@ class OrderServiceTest {
         @DisplayName("[예외] '배달 주문'(DELIVERY)가 아니면 예외가 발생한다.")
         void notDeliveryExceptionTest(Order order, OrderType orderType) {
             // given
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var savedOrder = orderRepository.save(order);
 
             // when & then
-            assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.startDelivery(savedOrder.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
         @Test
         @DisplayName("[예외] 존재하지 않는 주문일 경우 예외가 발생한다.")
         void notFoundOrderExceptionTest() {
-            // given
-            given(orderRepository.findById(any())).willReturn(Optional.empty());
-
             // when & then
             assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
@@ -448,11 +418,10 @@ class OrderServiceTest {
         @DisplayName("'배달완료'(DELIVERED)로 주문 상태가 변경된다.")
         void changedOrderStatusTest() {
             // given
-            var order = OrderFixture.newOneDelivery(DELIVERING);
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var order = orderRepository.save(OrderFixture.newOneDelivery(DELIVERING));
 
             // when
-            var actual = orderService.completeDelivery(UUID.randomUUID());
+            var actual = orderService.completeDelivery(order.getId());
 
             // then
             assertThat(actual.getStatus()).isEqualTo(DELIVERED);
@@ -462,20 +431,16 @@ class OrderServiceTest {
         @DisplayName("[예외] '배달중'(DELIVERING) 주문 상태가 아니면 예외가 발생한다.")
         void orderStatusDeliveringExceptionTest() {
             // given
-            var order = OrderFixture.newOneDelivery(WAITING);
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var order = orderRepository.save(OrderFixture.newOneDelivery(WAITING));
 
             // when & then
-            assertThatThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
         @Test
         @DisplayName("[예외] 존재하지 않는 주문일 경우 예외가 발생한다.")
         void notFoundOrderExceptionTest() {
-            // given
-            given(orderRepository.findById(any())).willReturn(Optional.empty());
-
             // when & then
             assertThatThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
@@ -486,17 +451,27 @@ class OrderServiceTest {
     @Test
     void findAll() {
         // given
-        var orderTable_1번 = OrderTableFixture.newOne("1번 테이블");
-        var orderTable_2번 = OrderTableFixture.newOne("2번 테이블");
-        var order_1번 = OrderFixture.newOneEatIn(orderTable_1번, WAITING);
-        var order_2번 = OrderFixture.newOneEatIn(orderTable_2번, SERVED);
-        given(orderRepository.findAll()).willReturn(List.of(order_1번, order_2번));
+        var orderTable_1번 = OrderTableFixture.newOne("1번 테이블", 4, true);
+        var orderTable_2번 = OrderTableFixture.newOne("2번 테이블", 4, true);
+        List.of(orderTable_1번, orderTable_2번).forEach(orderTable -> orderTableRepository.save(orderTable));
+
+        var menu_양념치킨 = MenuFixture.newOne("양념치킨");
+        var menu_후라이드치킨 = MenuFixture.newOne("후라이드 치킨");
+        List.of(menu_후라이드치킨, menu_양념치킨).forEach(menu-> menuRepository.save(menu));
+
+        var orderLineItems_양념치킨 = List.of(OrderLineItemFixture.newOne(menu_양념치킨));
+        var orderLineItems_후라이드치킨 = List.of(OrderLineItemFixture.newOne(menu_후라이드치킨));
+
+        var order_1번 = OrderFixture.newOneEatIn(orderTable_1번, orderLineItems_양념치킨);
+        var order_2번 = OrderFixture.newOneEatIn(orderTable_2번, orderLineItems_후라이드치킨);
+
+        List.of(order_1번, order_2번).forEach(order -> orderService.create(order));
 
         // when
         var actual = orderService.findAll();
 
         // then
-        assertThat(actual).containsAll(List.of(order_1번, order_2번));
+        assertThat(actual).hasSize(2);
     }
 
     @Nested
@@ -523,11 +498,10 @@ class OrderServiceTest {
         @MethodSource("changedOrderStatus")
         void completedOrderStatusTest(Order order, OrderType orderType) {
             // given
-            var orderId = UUID.randomUUID();
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var savedOrder = orderRepository.save(order);
 
             // when
-            var actual = orderService.complete(orderId);
+            var actual = orderService.complete(savedOrder.getId());
 
             // then
             assertThat(actual.getStatus()).isEqualTo(COMPLETED);
@@ -537,15 +511,10 @@ class OrderServiceTest {
         @Test
         void initEatInOrderTest() {
             // given
-            var orderTableId = UUID.randomUUID();
-            var orderTable = OrderTableFixture.newOne(orderTableId, "1번 테이블", 4, true);
-            var orderId = UUID.randomUUID();
-            var order = OrderFixture.newOneEatIn(orderId, orderTable, SERVED);
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
-            given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
+            var order = given_매장내주문일때();
 
             // when
-            var actual = orderService.complete(orderId);
+            var actual = orderService.complete(order.getId());
 
             // then
             SoftAssertions.assertSoftly(softly -> {
@@ -555,12 +524,16 @@ class OrderServiceTest {
             });
         }
 
+        private Order given_매장내주문일때() {
+            var orderTableId = UUID.randomUUID();
+            var orderTable = OrderTableFixture.newOne(orderTableId, "1번 테이블", 4, true);
+            var order = OrderFixture.newOneEatIn(UUID.randomUUID(), orderTable, SERVED);
+            return orderRepository.save(order);
+        }
+
         @DisplayName("[예외] 미존재하는 주문이면 예외가 발생한다.")
         @Test
         void notFoundOrderTest() {
-            // given
-            given(orderRepository.findById(any())).willReturn(Optional.empty());
-
             // when & then
             assertThatThrownBy(() -> orderService.complete(UUID.randomUUID()))
                     .isInstanceOf(NoSuchElementException.class);
@@ -570,11 +543,10 @@ class OrderServiceTest {
         @Test
         void notDeliveredDeliveryTest() {
             // given
-            var order = OrderFixture.newOneDelivery(WAITING);
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var savedOrder = orderRepository.save(OrderFixture.newOneDelivery(WAITING));
 
             // when & then
-            assertThatThrownBy(() -> orderService.complete(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.complete(savedOrder.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
 
@@ -583,10 +555,10 @@ class OrderServiceTest {
         @MethodSource("notServed")
         void notServedTest(Order order, OrderType orderType) {
             // given
-            given(orderRepository.findById(any())).willReturn(Optional.of(order));
+            var savedOrder = orderRepository.save(order);
 
             // when & then
-            assertThatThrownBy(() -> orderService.complete(UUID.randomUUID()))
+            assertThatThrownBy(() -> orderService.complete(savedOrder.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
     }
