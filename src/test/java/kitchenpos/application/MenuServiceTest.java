@@ -1,6 +1,5 @@
 package kitchenpos.application;
 
-import kitchenpos.ApplicationMockTest;
 import kitchenpos.domain.InMemoryMenuGroupRepository;
 import kitchenpos.domain.InMemoryMenuRepository;
 import kitchenpos.domain.InMemoryProductRepository;
@@ -48,7 +47,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("메뉴 서비스 테스트")
-@ApplicationMockTest
 class MenuServiceTest {
     private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
     private final MenuRepository menuRepository = new InMemoryMenuRepository();

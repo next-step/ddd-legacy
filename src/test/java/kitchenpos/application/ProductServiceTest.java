@@ -1,6 +1,5 @@
 package kitchenpos.application;
 
-import kitchenpos.ApplicationMockTest;
 import kitchenpos.domain.InMemoryMenuRepository;
 import kitchenpos.domain.InMemoryProductRepository;
 import kitchenpos.domain.Menu;
@@ -37,7 +36,6 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DisplayName("상품 서비스 테스트")
-@ApplicationMockTest
 class ProductServiceTest {
     private final ProductRepository productRepository = new InMemoryProductRepository();
     private final MenuRepository menuRepository = new InMemoryMenuRepository();
