@@ -38,7 +38,7 @@ public class MenuGroupServiceTest {
     class 등록 {
 
         @Test
-        @DisplayName("[성공] 메뉴 그룹의 이름을 A로 입력하면 생성된다.")
+        @DisplayName("[성공] 메뉴 그룹의 이름을 A로 입력하면 등록된다.")
         void 메뉴그룹_이름_A() {
             // given
             given(menuGroupRepository.save(any())).willReturn(A_메뉴그룹);
@@ -53,18 +53,25 @@ public class MenuGroupServiceTest {
             );
         }
 
-        @Test
-        @DisplayName("[실패] 메뉴 그룹의 이름을 입력하지 않으면 생성이 되지 않는다.")
-        void 메뉴그룹_이름_null() {
-            assertThatThrownBy(() -> menuGroupService.create(이름미존재_메뉴그룹))
-                    .isInstanceOf(IllegalArgumentException.class);
-        }
+        @Nested
+        class 이름검증 {
 
-        @Test
-        @DisplayName("[실패] 메뉴 그룹의 이름이 빈문자열이면 생성이 되지 않는다.")
-        void 메뉴그룹_이름_빈문자열() {
-            assertThatThrownBy(() -> menuGroupService.create(빈문자이름_메뉴그룹))
-                    .isInstanceOf(IllegalArgumentException.class);
+            @Test
+            @DisplayName("[실패] 메뉴 그룹의 이름을 입력하지 않으면 등록이 되지 않는다.")
+            void 메뉴그룹_이름_null() {
+                // when & then
+                assertThatThrownBy(() -> menuGroupService.create(이름미존재_메뉴그룹))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
+            @Test
+            @DisplayName("[실패] 메뉴 그룹의 이름이 빈문자열이면 등록이 되지 않는다.")
+            void 메뉴그룹_이름_빈문자열() {
+                // when & then
+                assertThatThrownBy(() -> menuGroupService.create(빈문자이름_메뉴그룹))
+                        .isInstanceOf(IllegalArgumentException.class);
+            }
+
         }
 
     }
