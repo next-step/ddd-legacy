@@ -36,7 +36,6 @@ import static org.mockito.BDDMockito.given;
 
 @DisplayName("상품(product) 서비스 테스트")
 @Nested
-@ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
 
     ProductService productService;
@@ -137,10 +136,7 @@ class ProductServiceTest {
         var actual = productService.findAll();
 
         // then
-        SoftAssertions.assertSoftly(softly -> {
-            softly.assertThat(actual.get(0).getName()).isEqualTo("닭고기 300g");
-            softly.assertThat(actual.get(1).getName()).isEqualTo("콜라");
-        });
+        Assertions.assertThat(actual.stream().map(x-> x.getName())).containsAll(List.of("닭고기 300g", "콜라"));
     }
 
     @Nested

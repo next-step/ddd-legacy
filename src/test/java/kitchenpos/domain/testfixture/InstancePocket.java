@@ -17,6 +17,11 @@ public class InstancePocket<K, T> {
         return instance;
     }
 
+    public List<T> saveAll(List<T> instances) {
+        instances.forEach(this::save);
+        return instances;
+    }
+
     private <T> Object getId(T instance) {
         var idField = Arrays.stream(instance.getClass().getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Id.class))

@@ -3,6 +3,7 @@ package kitchenpos.application;
 import kitchenpos.application.testfixture.MenuGroupFixture;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.testfixture.MenuGroupFakeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -19,16 +20,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("메뉴 그룹(MenuGroup) 서비스 테스트")
-@SpringBootTest
 class MenuGroupServiceTest {
 
-    @Autowired
     private MenuGroupRepository menuGroupRepository;
 
     private MenuGroupService menuGroupService;
 
     @BeforeEach
     void setUp() {
+        menuGroupRepository = new MenuGroupFakeRepository();
         menuGroupService = new MenuGroupService(menuGroupRepository);
     }
 

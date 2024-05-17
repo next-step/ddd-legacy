@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public class MenuFakeRepository implements MenuRepository {
 
-    InstancePocket<UUID, Menu> instancePocket;
+    private final InstancePocket<UUID, Menu> instancePocket;
 
     public MenuFakeRepository() {
         this.instancePocket = new InstancePocket<>();
