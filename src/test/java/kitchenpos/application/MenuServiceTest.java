@@ -209,6 +209,24 @@ class MenuServiceTest {
         assertThat(displayedMenu.isDisplayed()).isTrue();
     }
 
+    @Test
+    @DisplayName("메뉴가 존재하지 않으면 메뉴 숨김 시 NoSuchElementException이 발생한다.")
+    void hide_fail_for_not_existing_menu() {
+        assertThatThrownBy(() -> menuService.hide(UUID.randomUUID()))
+            .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("메뉴를 숨긴다.")
+    void hide_success() {
+        Menu savedMenu = createAndSaveMenu();
+
+        menuService.hide(savedMenu.getId());
+
+        Menu hiddenMenu = menuRepository.findById(savedMenu.getId()).orElseThrow();
+        assertThat(hiddenMenu.isDisplayed()).isFalse();
+    }
+
     private MenuRequestBuilder menuRequestBuilder() {
         MenuGroup savedMenuGroup = createAndSaveMenuGroup();
         Product savedProduct = createAndSaveProduct();
