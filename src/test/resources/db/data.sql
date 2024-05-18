@@ -1,3 +1,16 @@
+
+-- truncate all data
+SET REFERENTIAL_INTEGRITY FALSE; -- 모든 제약 조건 비활성화
+truncate table product;
+truncate table menu_group;
+truncate table menu;
+truncate table menu_product;
+truncate table order_table;
+truncate table orders;
+truncate table order_line_item;
+SET REFERENTIAL_INTEGRITY TRUE; -- 모든 제약 조건 활성화
+
+-- init data
 insert into product (id, name, price)
 values (x'3b52824434f7406bbb7e690912f66b10', '후라이드', 16000);
 insert into product (id, name, price)
