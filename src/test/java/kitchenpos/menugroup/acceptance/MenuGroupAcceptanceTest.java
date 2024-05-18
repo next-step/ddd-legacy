@@ -36,8 +36,8 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     /**
      * <pre>
      * given 2개의 메뉴 그룹을 등록하고
-     * when 메뉴 그룹 목록을 조회하면
-     * then 등록한 2개의 메뉴 그룹을 찾을 수 있다.
+     * when  메뉴 그룹 목록을 조회하면
+     * then  등록한 2개의 메뉴 그룹을 찾을 수 있다.
      * </pre>
      */
     @Test
