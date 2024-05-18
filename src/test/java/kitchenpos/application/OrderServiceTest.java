@@ -224,6 +224,38 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
+    @Test
+    @DisplayName("주문한 것을 전달한다")
+    void serve_success() {
+        Order order = orderService.create(takeoutRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.ACCEPTED);
+        orderRepository.save(order);
+
+        Order servedOrder = orderService.serve(order.getId());
+
+        assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+    }
+
+    @Test
+    void serve_fail_for_not_existing_order() {
+        assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"SERVED", "WAITING", "DELIVERING", "DELIVERED", "COMPLETED"})
+    @DisplayName("주문 상태가 접수 상태가 아닐 경우 주문 전달 시 IllegalStateException이 발생한다")
+    void serve_fail_for_status_is_not_accepted(String statusName) {
+        Order order = orderService.create(takeoutRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.valueOf(statusName));
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.serve(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
     private OrderRequestBuilder eatInOrderRequestBuilder() {
         OrderTable savedOrderTable = createAndSaveOrderTable(true);
         OrderLineItem orderLineItem = createOrderLineItemRequest();
