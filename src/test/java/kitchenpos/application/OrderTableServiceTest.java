@@ -103,5 +103,65 @@ class OrderTableServiceTest {
         assertThat(response.getNumberOfGuests()).isEqualTo(0);
         assertThat(response.isOccupied()).isFalse();
     }
+
+    @Test
+    @DisplayName("손님 수를 변경한다")
+    void changeNumberOfGuests_success() {
+        OrderTable createRequest = OrderTableRequestBuilder.builder().build();
+        OrderTable orderTable = orderTableService.create(createRequest);
+        orderTableRepository.save(orderTable);
+
+        orderTableService.sit(orderTable.getId());
+
+        OrderTable request = OrderTableRequestBuilder.builder()
+                .withNumberOfGuests(4)
+                .build();
+
+        OrderTable response = orderTableService.changeNumberOfGuests(orderTable.getId(), request);
+        assertThat(response.getNumberOfGuests()).isEqualTo(4);
+    }
+
+    @Test
+    @DisplayName("손님 수를 변경할 때 음수를 입력하면 IllegalArgumentException이 발생한다.")
+    void changeNumberOfGuests_fail_for_negative_numberOfGuests() {
+        OrderTable createRequest = OrderTableRequestBuilder.builder().build();
+        OrderTable orderTable = orderTableService.create(createRequest);
+        orderTableRepository.save(orderTable);
+
+        orderTableService.sit(orderTable.getId());
+
+        OrderTable request = OrderTableRequestBuilder.builder()
+                .withNumberOfGuests(-1)
+                .build();
+
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("손님 수를 변경할 때 테이블이 존재하지 않으면 NoSuchElementException이 발생한다.")
+    void changeNumberOfGuests_fail_for_not_existing_order_table() {
+        OrderTable requestForChange = OrderTableRequestBuilder.builder()
+                .withNumberOfGuests(4)
+                .build();
+
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), requestForChange))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("손님 수를 변경할 때 테이블이 비어있으면 IllegalStateException이 발생한다.")
+    void changeNumberOfGuests_fail_for_not_occupied() {
+        OrderTable createRequest = OrderTableRequestBuilder.builder().withOccupied(false).build();
+        OrderTable orderTable = orderTableService.create(createRequest);
+        orderTableRepository.save(orderTable);
+
+        OrderTable requestForChange = OrderTableRequestBuilder.builder()
+                .withNumberOfGuests(4)
+                .build();
+
+        assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), requestForChange))
+                .isInstanceOf(IllegalStateException.class);
+    }
 }
 
