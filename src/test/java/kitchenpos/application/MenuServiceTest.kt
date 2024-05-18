@@ -2,7 +2,7 @@ package kitchenpos.application
 
 import kitchenpos.domain.Menu
 import kitchenpos.domain.MenuProduct
-import kitchenpos.domain.MenuRepository
+import kitchenpos.domain.ProductRepository
 import kitchenpos.infra.PurgomalumClient
 import kitchenpos.utils.generateUUIDFrom
 import org.assertj.core.api.Assertions.assertThat
@@ -26,7 +26,7 @@ class MenuServiceTest {
     private lateinit var purgomalumClient: PurgomalumClient
 
     @Autowired
-    private lateinit var menuRepository: MenuRepository
+    private lateinit var productRepository: ProductRepository
 
     @Autowired
     private lateinit var sut: MenuService
@@ -34,6 +34,7 @@ class MenuServiceTest {
     companion object {
         private val NOT_EXISTING_MENU_GROUP_ID = generateUUIDFrom("f1860abc2ea1411bbd4abaa44f0d1111")
         private val EXISTING_MENU_GROUP_ID = generateUUIDFrom("f1860abc2ea1411bbd4abaa44f0d5580")
+        private val EXISTING_MENU_ID = generateUUIDFrom("b9c670b04ef5409083496868df1c7d62")
         private val EXISTING_PRODUCT_ID_1 = generateUUIDFrom("3b52824434f7406bbb7e690912f66b10")
         private val EXISTING_PRODUCT_ID_2 = generateUUIDFrom("c5ee925c3dbb4941b825021446f24446")
     }
@@ -235,6 +236,47 @@ class MenuServiceTest {
             // when
             // then
             assertThrows<IllegalArgumentException> { sut.create(request) }
+        }
+    }
+
+    @DisplayName("메뉴는 노출상태를 변경 가능하다.")
+    @Nested
+    inner class ChangeDisplayOption {
+        @DisplayName("메뉴를 숨길 수 있다.")
+        @Test
+        fun case_12() {
+            // given
+
+            // when
+            val hiddenMenu = sut.hide(EXISTING_MENU_ID)
+
+            // then
+            assertThat(hiddenMenu.isDisplayed).isFalse()
+        }
+
+        @DisplayName("메뉴를 노출할 수 있다.")
+        @Test
+        fun case_13() {
+            // given
+
+            // when
+            val displayedMenu = sut.display(EXISTING_MENU_ID)
+
+            // then
+            assertThat(displayedMenu.isDisplayed).isTrue()
+        }
+
+        @DisplayName("메뉴의 가격이 `메뉴 구성 상품` 가격 총합보다 크면 노출할 수 없다")
+        @Test
+        fun case_14() {
+            // given
+            val product = productRepository.findById(generateUUIDFrom("0ac16db71b024a87b9c1e7d8f226c48d")).get()
+            product.price -= BigDecimal.valueOf(4000)
+            productRepository.saveAndFlush(product)
+
+            // when
+            // then
+            assertThrows<IllegalStateException> { sut.display(EXISTING_MENU_ID) }
         }
     }
 
