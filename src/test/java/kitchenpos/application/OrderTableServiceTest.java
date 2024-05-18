@@ -18,7 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
-import static kitchenpos.fixture.OrderTableFixture.*;
+import static kitchenpos.fixture.OrderTableFixture.createTable;
+import static kitchenpos.fixture.OrderTableFixture.두명;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -129,7 +130,7 @@ public class OrderTableServiceTest {
 
     @Nested
     @DisplayName("손님수 변경")
-    class changeGuests{
+    class changeGuests {
         @ParameterizedTest
         @ValueSource(ints = {두명, 0})
         @DisplayName("손님수를 변경할 수 있다.")
@@ -183,7 +184,6 @@ public class OrderTableServiceTest {
                     () -> assertThrows(IllegalStateException.class,
                             () -> orderTableService.changeNumberOfGuests(orderTable.getId(), orderTable))
             );
-
         }
     }
 

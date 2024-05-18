@@ -3,7 +3,6 @@ package kitchenpos.application;
 
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,6 +12,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -55,9 +55,5 @@ public class MenuGroupServiceTest {
         assertThrows(IllegalArgumentException.class, () -> menuGroupService.create(menuGroup));
     }
 
-    private static @NotNull MenuGroup createMenuGroup(String name) {
-        final var menuGroup = new MenuGroup();
-        menuGroup.setName(name);
-        return menuGroup;
-    }
+
 }

@@ -58,7 +58,6 @@ public class ProductServiceTest {
             var product = createProduct(상품명, price);
             var response = createProduct(상품명, price);
 
-            given(purgomalumClient.containsProfanity(any())).willReturn(false);
             given(productRepository.save(any())).willReturn(response);
 
             Product actual = productService.create(product);
@@ -66,8 +65,8 @@ public class ProductServiceTest {
             assertAll(
                     "상품 정보 그룹 Assertions",
                     () -> assertNotNull(actual.getId()),
-                    () -> assertEquals(actual.getName(), response.getName()),
-                    () -> assertEquals(actual.getPrice(), response.getPrice())
+                    () -> assertEquals(response.getName(), actual.getName()),
+                    () -> assertEquals(response.getPrice(), actual.getPrice())
             );
         }
 

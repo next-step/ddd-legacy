@@ -16,6 +16,10 @@ public class ProductFixture {
         return createProduct(null, 만원);
     }
 
+    public static Product createProduct() {
+        return createProduct(상품명, 만원);
+    }
+
     public static Product createProduct(long price) {
         return createProduct(상품명, price);
     }
