@@ -1,9 +1,12 @@
-package kitchenpos;
+package kitchenpos.config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 
@@ -13,7 +16,7 @@ public class InMemoryProductRepository implements ProductRepository {
 
     @Override
     public Product save(Product entity) {
-        products.put(UUID.randomUUID(), entity);
+        products.put(entity.getId(), entity);
         return entity;
     }
 
@@ -24,11 +27,14 @@ public class InMemoryProductRepository implements ProductRepository {
 
     @Override
     public List<Product> findAll() {
-        return null;
+        return new ArrayList<>(products.values());
     }
 
     @Override
     public List<Product> findAllByIdIn(List<UUID> ids) {
-        return null;
+        return ids.stream()
+                .map(products::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 }
