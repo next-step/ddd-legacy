@@ -73,6 +73,7 @@ public class MenuService {
             final MenuProduct menuProduct = new MenuProduct();
             menuProduct.setProduct(product);
             menuProduct.setQuantity(quantity);
+            menuProduct.setProductId(product.getId());
             menuProducts.add(menuProduct);
         }
         if (price.compareTo(sum) > 0) {
