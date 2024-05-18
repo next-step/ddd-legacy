@@ -61,4 +61,10 @@ public class MenuFixture {
         menu.setPrice(price);
         return menu;
     }
+
+    public static Menu 전시_메뉴(boolean displayed) {
+        Menu menu = new Menu();
+        menu.setDisplayed(displayed);
+        return menu;
+    }
 }
