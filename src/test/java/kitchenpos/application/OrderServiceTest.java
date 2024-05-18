@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -188,6 +190,38 @@ class OrderServiceTest {
         Order response = orderService.create(request);
 
         assertThat(response.getId()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("주문을 접수한다")
+    void accept_success() {
+        Order order = orderService.create(takeoutRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        orderRepository.save(order);
+
+        Order acceptedOrder = orderService.accept(order.getId());
+
+        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+    }
+
+    @Test
+    @DisplayName("해당하는 주문 ID가 없을 경우 주문 접수 시 NoSuchElementException이 발생한다")
+    void accept_fail_for_not_existing_order() {
+        assertThatThrownBy(() -> orderService.accept(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"ACCEPTED", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    @DisplayName("주문 상태가 대기 상태가 아닐 경우 주문 접수 시 IllegalStateException이 발생한다")
+    void accept_fail_for_status_is_not_waiting(String statusName) {
+        Order order = orderService.create(takeoutRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.valueOf(statusName));
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.accept(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
     }
 
     private OrderRequestBuilder eatInOrderRequestBuilder() {
