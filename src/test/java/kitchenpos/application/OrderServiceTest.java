@@ -238,6 +238,7 @@ class OrderServiceTest {
     }
 
     @Test
+    @DisplayName("해당하는 주문 ID가 없을 경우 주문 전달 시 NoSuchElementException이 발생한다")
     void serve_fail_for_not_existing_order() {
         assertThatThrownBy(() -> orderService.serve(UUID.randomUUID()))
                 .isInstanceOf(NoSuchElementException.class);
@@ -253,6 +254,95 @@ class OrderServiceTest {
         orderRepository.save(order);
 
         assertThatThrownBy(() -> orderService.serve(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("배달을 시작한다")
+    void startDelivery_success() {
+        Order order = orderService.create(deliveryOrderRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.SERVED);
+        orderRepository.save(order);
+
+        Order startedDeliveryOrder = orderService.startDelivery(order.getId());
+
+        assertThat(startedDeliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+    }
+    @Test
+    @DisplayName("해당하는 주문 ID가 없을 경우 배달 시작 시 NoSuchElementException이 발생한다")
+    void startDelivery_fail_for_not_existing_order() {
+        assertThatThrownBy(() -> orderService.startDelivery(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @Test
+    @DisplayName("포장주문일 경우 배달 시작 시 IllegalStateException이 발생한다")
+    void startDelivery_fail_for_takeout_order() {
+        Order order = orderService.create(takeoutRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.SERVED);
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("매장주문일 경우 배달 시작 시 IllegalStateException이 발생한다")
+    void startDelivery_fail_for_eatin_order() {
+        Order order = orderService.create(eatInOrderRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.SERVED);
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    @DisplayName("주문 상태가 전달 상태가 아닐 경우 배달 시작 시 IllegalStateException이 발생한다")
+    void startDelivery_fail_for_status_is_not_served(String statusName) {
+        Order order = orderService.create(deliveryOrderRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.valueOf(statusName));
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("배달을 완료한다")
+    void completeDelivery_success() {
+        Order order = orderService.create(deliveryOrderRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.DELIVERING);
+        orderRepository.save(order);
+
+        Order completedDeliveryOrder = orderService.completeDelivery(order.getId());
+
+        assertThat(completedDeliveryOrder.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+    }
+
+    @Test
+    @DisplayName("해당하는 주문 ID가 없을 경우 배달 완료 시 NoSuchElementException이 발생한다")
+    void completeDelivery_fail_for_not_existing_order() {
+        assertThatThrownBy(() -> orderService.completeDelivery(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
+    @DisplayName("주문 상태가 배달 중 상태가 아닐 경우 배달 완료 시 IllegalStateException이 발생한다")
+    void completeDelivery_fail_for_status_is_not_delivering(String statusName) {
+        Order order = orderService.create(deliveryOrderRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.valueOf(statusName));
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
