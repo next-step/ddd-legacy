@@ -9,6 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
@@ -343,6 +344,92 @@ class OrderServiceTest {
         orderRepository.save(order);
 
         assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @Test
+    @DisplayName("배달주문을 완료한다")
+    void complete_success_for_delivery_order() {
+        Order order = orderService.create(deliveryOrderRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.DELIVERED);
+        orderRepository.save(order);
+
+        Order completedOrder = orderService.complete(order.getId());
+        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("포장주문을 완료한다")
+    void complete_success_for_takeout_order() {
+        Order order = orderService.create(takeoutRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.SERVED);
+        orderRepository.save(order);
+
+        Order completedOrder = orderService.complete(order.getId());
+        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @Test
+    @DisplayName("매장주문을 완료한다")
+    void complete_success_for_eatin_order() {
+        Order order = orderService.create(eatInOrderRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.SERVED);
+        orderRepository.save(order);
+
+        Order completedOrder = orderService.complete(order.getId());
+        assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+
+        OrderTable orderTable = orderTableRepository.findById(order.getOrderTable().getId()).orElseThrow();
+        assertThat(orderTable.isOccupied()).isFalse();
+        assertThat(orderTable.getNumberOfGuests()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("해당하는 주문 ID가 없을 경우 주문 완료 시 NoSuchElementException이 발생한다")
+    void complete_fail_for_not_existing_order() {
+        assertThatThrownBy(() -> orderService.complete(UUID.randomUUID()))
+                .isInstanceOf(NoSuchElementException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"WAITING", "ACCEPTED", "SERVED", "DELIVERING", "COMPLETED"})
+    @DisplayName("배달주문인데 상태가 배달 완료 상태가 아닐 경우 주문 완료 시 IllegalStateException이 발생한다")
+    void complete_fail_for_status_is_not_delivered_but_delivery_order(String statusName) {
+        Order order = orderService.create(deliveryOrderRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.valueOf(statusName));
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.complete(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    @DisplayName("포장주문인데 상태가 서빙 상태가 아닐 경우 주문 완료 시 IllegalStateException이 발생한다")
+    void complete_fail_for_status_is_not_served_but_not_takeout_order(String statusName) {
+        Order order = orderService.create(takeoutRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.valueOf(statusName));
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.complete(order.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"WAITING", "ACCEPTED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    @DisplayName("매장주문인데 상태가 서빙 상태가 아닐 경우 주문 완료 시 IllegalStateException이 발생한다")
+    void complete_fail_for_status_is_not_served_but_not_eatin_order(String statusName) {
+        Order order = orderService.create(eatInOrderRequestBuilder().build());
+        order.setId(UUID.randomUUID());
+        order.setStatus(OrderStatus.valueOf(statusName));
+        orderRepository.save(order);
+
+        assertThatThrownBy(() -> orderService.complete(order.getId()))
                 .isInstanceOf(IllegalStateException.class);
     }
 
