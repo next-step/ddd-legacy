@@ -12,10 +12,12 @@ import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.jdbc.Sql
 import java.math.BigDecimal
 import java.util.NoSuchElementException
 
 @SpringBootTest
+@Sql("classpath:db/data.sql")
 class MenuServiceTest {
     @MockBean
     private lateinit var purgomalumClient: PurgomalumClient
@@ -33,7 +35,7 @@ class MenuServiceTest {
         val products = sut.findAll()
 
         // then
-        assertThat(products.size).isGreaterThan(0)
+        assertThat(products.size).isEqualTo(6)
     }
 
     @DisplayName("메뉴를 등록할 수 있다.")

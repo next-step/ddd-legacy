@@ -5,18 +5,17 @@ import kitchenpos.domain.Product
 import kitchenpos.infra.PurgomalumClient
 import kitchenpos.utils.generateUUIDFrom
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.*
 import org.mockito.BDDMockito.any
 import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.jdbc.Sql
 import java.math.BigDecimal
 
 @SpringBootTest
+@Sql("classpath:db/data.sql")
 class ProductServiceTest {
     @MockBean
     private lateinit var purgomalumClient: PurgomalumClient
@@ -34,7 +33,7 @@ class ProductServiceTest {
         val products = sut.findAll()
 
         // then
-        assertThat(products.size).isGreaterThan(0)
+        assertThat(products.size).isEqualTo(6)
     }
 
     @DisplayName("상품 등록이 가능하다.")

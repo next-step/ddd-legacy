@@ -13,9 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.context.TestConstructor
+import org.springframework.test.context.jdbc.Sql
 
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @SpringBootTest
+@Sql("classpath:db/data.sql")
 class OrderTableServiceTest {
     @MockBean
     private lateinit var orderRepository: OrderRepository
@@ -156,7 +158,7 @@ class OrderTableServiceTest {
         val tables = sut.findAll()
 
         // then
-        assertThat(tables.size).isGreaterThan(0)
+        assertThat(tables.size).isEqualTo(8)
     }
 
     private fun createTable(): OrderTable {

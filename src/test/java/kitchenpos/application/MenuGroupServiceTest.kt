@@ -9,9 +9,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
+import org.springframework.test.context.jdbc.Sql
 
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 @SpringBootTest
+@Sql("classpath:db/data.sql")
 class MenuGroupServiceTest(
     private val sut: MenuGroupService,
     private val menuGroupRepository: MenuGroupRepository,
@@ -53,6 +55,6 @@ class MenuGroupServiceTest(
         val menuGroups = sut.findAll()
 
         // then
-        assertThat(menuGroups.size).isGreaterThan(0)
+        assertThat(menuGroups.size).isEqualTo(4)
     }
 }
