@@ -15,8 +15,10 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     private static final String MENU_GROUP_NAME_KEY = "name";
 
     /**
+     * <pre>
      * when 메뉴 그룹을 등록하면
      * then 메뉴 그룹 목록 조회 시 등록한 메뉴 그룹을 찾을 수 있다.
+     * </pre>
      */
     @Test
     @DisplayName("등록")
@@ -32,9 +34,11 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     }
 
     /**
+     * <pre>
      * given 2개의 메뉴 그룹을 등록하고
      * when 메뉴 그룹 목록을 조회하면
      * then 등록한 2개의 메뉴 그룹을 찾을 수 있다.
+     * </pre>
      */
     @Test
     @DisplayName("목록조회")

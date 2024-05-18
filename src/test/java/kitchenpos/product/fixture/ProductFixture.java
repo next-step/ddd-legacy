@@ -12,7 +12,6 @@ public class ProductFixture {
     public static final Product B_제품 = 제품을_생성하다("B", 랜덤한_0원이상_5만원이하의_금액을_생성하다());
     public static final Product 이름미존재_제품 = 제품을_생성하다(null, 랜덤한_0원이상_5만원이하의_금액을_생성하다());
     public static final Product 욕설이름_제품 = 제품을_생성하다("D", 랜덤한_0원이상_5만원이하의_금액을_생성하다());
-    public static final Product 가격_0원_제품 = 제품을_생성하다("E", BigDecimal.ZERO);
     public static final Product 가격미존재_제품 = 제품을_생성하다("F", null);
     public static final Product 가격이_마이너스인_제품 = 제품을_생성하다("G", 랜덤한_0원미만_금액을_생성하다());
 
