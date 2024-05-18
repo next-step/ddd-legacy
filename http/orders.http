@@ -14,6 +14,27 @@ Content-Type: application/json
   ]
 }
 
+### 같은 메뉴를 중복해서 넣을 수 없다.
+POST {{host}}/api/orders
+Content-Type: application/json
+
+{
+  "type": "EAT_IN",
+  "orderTableId": "8d710043-29b6-420e-8452-233f5a035520",
+  "orderLineItems": [
+    {
+      "menuId": "f59b1e1c-b145-440a-aa6f-6095a0e2d63b",
+      "price": 16000,
+      "quantity": 3
+    },
+    {
+      "menuId": "f59b1e1c-b145-440a-aa6f-6095a0e2d63b",
+      "price": 16000,
+      "quantity": 3
+    }
+  ]
+}
+
 ### 매장식사 수락
 PUT {{host}}/api/orders/83eeb314-d59a-462e-8797-224387907300/accept
 
