@@ -280,6 +280,34 @@ class MenuServiceTest {
         }
     }
 
+    @DisplayName("메뉴는 가격 수정이 가능하다.")
+    @Nested
+    inner class ChangePrice {
+        @DisplayName("메뉴의 가격은 `0원` 보다 작을 수 없다.")
+        @Test
+        fun case_15() {
+            // given
+            val request = Menu()
+            request.price = BigDecimal.valueOf(-1000)
+
+            // when
+            // then
+            assertThrows<IllegalArgumentException> { sut.changePrice(EXISTING_MENU_ID, request) }
+        }
+
+        @DisplayName("메뉴의 가격은 `메뉴 구성 상품` 가격의 총합보다 클 수 없다.")
+        @Test
+        fun case_16() {
+            // given
+            val request = Menu()
+            request.price = BigDecimal.valueOf(100_000)
+
+            // when
+            // then
+            assertThrows<IllegalArgumentException> { sut.changePrice(EXISTING_MENU_ID, request) }
+        }
+    }
+
     private fun generateMenuProduct(
         productId: UUID,
         quantity: Long = 1L,
