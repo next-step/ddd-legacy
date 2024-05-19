@@ -1,7 +1,5 @@
 package calculator;
 
-import java.util.Arrays;
-
 class StringCalculator {
 
     StringCalculator() {
@@ -12,7 +10,7 @@ class StringCalculator {
             return 0;
         }
 
-        final var numbers = StringExpressionTokenizer.tokenize(input);
+        final var numbers = NumberExtractor.extract(input);
 
         return numbers.stream()
             .mapToInt(Integer::parseInt)

@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-public class StringExpressionTokenizerTest {
+public class NumberExtractorTest {
 
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
     @ParameterizedTest
     @ValueSource(strings = {"1", "1234"})
     void oneNumber(final String text) {
-        List<String> result = StringExpressionTokenizer.tokenize(text);
+        List<String> result = NumberExtractor.extract(text);
         assertThat(result).isEqualTo(List.of(text));
     }
 
@@ -24,7 +24,7 @@ public class StringExpressionTokenizerTest {
     @ParameterizedTest
     @ValueSource(strings = {"1,999"})
     void twoNumbers(final String text) {
-        List<String> result = StringExpressionTokenizer.tokenize(text);
+        List<String> result = NumberExtractor.extract(text);
         assertThat(result).isEqualTo(List.of("1", "999"));
     }
 
@@ -33,7 +33,7 @@ public class StringExpressionTokenizerTest {
     @ValueSource(strings = {"-1", "-1:3", "5:-6"})
     void negative(final String test) {
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> StringExpressionTokenizer.tokenize(test));
+            .isThrownBy(() -> NumberExtractor.extract(test));
     }
 
 
@@ -44,21 +44,21 @@ public class StringExpressionTokenizerTest {
         @Test
         void outOfFormat() {
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> StringExpressionTokenizer.tokenize("1abb3"));
+                .isThrownBy(() -> NumberExtractor.extract("1abb3"));
         }
 
         @DisplayName(value = "구분자 외 다른 문자를 사용한 경우 IllegalArgumentException 예외 처리를 한다.")
         @Test
         void unreadableDelimiter() {
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> StringExpressionTokenizer.tokenize("//+\n1-3"));
+                .isThrownBy(() -> NumberExtractor.extract("//+\n1-3"));
         }
 
         @DisplayName(value = "커스텀 구분자를 누락한 경우 IllegalArgumentException 예외 처리를 한다.")
         @Test
         void notFoundDelimiter() {
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> StringExpressionTokenizer.tokenize("//\n1"));
+                .isThrownBy(() -> NumberExtractor.extract("//\n1"));
         }
     }
 
@@ -69,7 +69,7 @@ public class StringExpressionTokenizerTest {
         @ParameterizedTest
         @ValueSource(strings = {"1,2:3"})
         void colons(final String text) {
-            assertThat(StringExpressionTokenizer.tokenize(text))
+            assertThat(NumberExtractor.extract(text))
                 .isEqualTo(List.of("1", "2", "3"));
         }
 
@@ -77,7 +77,7 @@ public class StringExpressionTokenizerTest {
         @ParameterizedTest
         @ValueSource(strings = {"//;\n1;2;3"})
         void customDelimiter(final String text) {
-            assertThat(StringExpressionTokenizer.tokenize(text))
+            assertThat(NumberExtractor.extract(text))
                 .isEqualTo(List.of("1", "2", "3"));
         }
     }

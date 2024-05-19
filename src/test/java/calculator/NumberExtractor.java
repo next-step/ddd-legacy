@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class StringExpressionTokenizer {
+public class NumberExtractor {
 
     private static final String ANY_WORD_WITHOUT_NUMBER_AND_SPACE_PATTERN = "[^0-9\\s]";
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(
@@ -13,7 +13,7 @@ public class StringExpressionTokenizer {
     private static final String NUMBER_PATTERN = "[1-9][d]*";
     private static final String DEFAULT_DELIMITER = ",|:";
 
-    public static List<String> tokenize(final String input) {
+    public static List<String> extract(final String input) {
         if (input.matches(NUMBER_PATTERN)) {
             return List.of(input);
         }
