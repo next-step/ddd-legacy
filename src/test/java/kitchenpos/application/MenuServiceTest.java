@@ -112,7 +112,7 @@ class MenuServiceTest {
     void menuDisplayTest() {
 
         // given
-        Menu menu = menuProductSteps.숨겨진_메뉴를_생성한다();
+        Menu menu = menuProductSteps.감추기된_메뉴를_생성한다();
 
         // when
         Menu displayed = menuService.display(menu.getId());

@@ -1,21 +1,36 @@
 package kitchenpos.application;
 
-import fixtures.*;
-import kitchenpos.domain.*;
+import fixtures.MenuProductSteps;
+import fixtures.OrderBuilder;
+import fixtures.OrderLineItemBuilder;
+import fixtures.OrderSteps;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
-import org.junit.jupiter.api.*;
+import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
+import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.OrderType;
+import kitchenpos.domain.ProductRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class OrderServiceTest {
@@ -39,7 +54,7 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        orderSteps = new OrderSteps(orderTableRepository);
+        orderSteps = new OrderSteps(orderRepository, orderTableRepository);
         menuProductSteps = new MenuProductSteps(menuGroupRepository, menuRepository, productRepository);
     }
 
@@ -51,7 +66,7 @@ class OrderServiceTest {
         @Test
         void createOrderStatusIsWaitingTest() {
 
-            Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
+            Order order = createOrder(OrderType.EAT_IN);
 
             assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
         }
@@ -61,7 +76,7 @@ class OrderServiceTest {
         @EnumSource(value = OrderType.class)
         void createOrderTest(OrderType orderType) {
 
-            assertDoesNotThrow(() -> createOrder(orderType, OrderStatus.WAITING));
+            assertDoesNotThrow(() -> createOrder(orderType));
         }
 
 
@@ -70,7 +85,12 @@ class OrderServiceTest {
         @NullSource()
         void createOrderFailedWhenOrderTypeIsNullTest(OrderType orderType) {
 
-            assertThatThrownBy(() -> createOrder(orderType, OrderStatus.WAITING))
+            Order order = new OrderBuilder()
+                    .withOrderType(orderType)
+                    .withDeliveryAddress(null)
+                    .build();
+
+            assertThatThrownBy(() -> orderService.create(order))
                     .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -126,12 +146,12 @@ class OrderServiceTest {
         @Test
         void createOrderMenuShouldRegisteredMenuTest() {
 
-                Order order = new OrderBuilder()
-                        .withOrderType(OrderType.EAT_IN)
-                        .withOrderLineItems(List.of(new OrderLineItemBuilder().build()))
-                        .build();
+            Order order = new OrderBuilder()
+                    .withOrderType(OrderType.EAT_IN)
+                    .withOrderLineItems(List.of(new OrderLineItemBuilder().build()))
+                    .build();
 
-                assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
+            assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
         }
 
         @DisplayName("감추기 된 메뉴는 주문 생성이 불가능하다")
@@ -139,28 +159,23 @@ class OrderServiceTest {
         void createOrderMenuShouldDisplayedMenuTest() {
 
             // given
-            Menu menu  = menuProductSteps.노출된_메뉴를_생성한다();
+            Menu menu = menuProductSteps.감추기된_메뉴를_생성한다();
 
             // when
-            menu.setDisplayed(false);
-            menuRepository.save(menu);
-
             // then
             Order order = orderSteps.주문을_생성한다(menu, OrderType.EAT_IN);
             assertThrows(IllegalStateException.class, () -> orderService.create(order));
         }
 
-        @DisplayName("주문한 메뉴의 가격은 0보다 작으면 주문 생성이 불가능 하다")
+        @DisplayName("주문한 메뉴의 가격이 0보다 작으면 주문 생성이 불가능 하다")
         @Test
         void createOrderShouldHasPositivePriceTest() {
 
             // given
-            Menu menu  = menuProductSteps.노출된_메뉴를_생성한다();
+            MenuGroup menuGroup = menuProductSteps.메뉴그룹_생성한다();
+            Menu menu = menuProductSteps.메뉴를_생성한다("치킨", -1, menuGroup, true, null);
 
             // when
-            menu.setPrice(BigDecimal.valueOf(-1));
-            menuRepository.save(menu);
-
             // then
             Order order = orderSteps.주문을_생성한다(menu, OrderType.EAT_IN);
             assertThrows(IllegalArgumentException.class, () -> orderService.create(order));
@@ -175,8 +190,8 @@ class OrderServiceTest {
         @Test
         void acceptOrderTest() {
 
-
-            Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
+            Menu menu = menuProductSteps.메뉴를_생성한다();
+            Order order = orderSteps.주문한다(menu, OrderType.EAT_IN);
 
             Order accept = orderService.accept(order.getId());
 
@@ -187,7 +202,7 @@ class OrderServiceTest {
         @Test
         void acceptOrderFailWhenOrderStatusIsNotWaitingTest() {
 
-            Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
+            Order order = createOrder(OrderType.EAT_IN);
 
             order.setStatus(OrderStatus.ACCEPTED);
             orderRepository.save(order);
@@ -206,7 +221,7 @@ class OrderServiceTest {
         void acceptedOrderCanBeServedTest() {
 
             // given
-            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            Order order = createOrder(OrderType.DELIVERY);
             order.setStatus(OrderStatus.ACCEPTED);
             orderRepository.save(order);
 
@@ -223,7 +238,7 @@ class OrderServiceTest {
         void waitingOrderShouldNotBeServedTest(OrderStatus orderStatus) {
 
             // given
-            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            Order order = createOrder(OrderType.DELIVERY);
 
             // when
             order.setStatus(orderStatus);
@@ -244,7 +259,7 @@ class OrderServiceTest {
         void servedOrderCanBeDeliveringTest() {
 
             // given
-            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            Order order = createOrder(OrderType.DELIVERY);
             order.setStatus(OrderStatus.SERVED);
             orderRepository.save(order);
 
@@ -259,7 +274,7 @@ class OrderServiceTest {
         @Test
         void servedOrderShouldNotBeDeliveringTest() {
             // given
-            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            Order order = createOrder(OrderType.DELIVERY);
             order.setStatus(OrderStatus.SERVED);
             orderRepository.save(order);
 
@@ -280,7 +295,7 @@ class OrderServiceTest {
         void deliveringOrderCanBeDeliveredTest() {
 
             // given
-            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            Order order = createOrder(OrderType.DELIVERY);
             order.setStatus(OrderStatus.DELIVERING);
             orderRepository.save(order);
 
@@ -296,14 +311,14 @@ class OrderServiceTest {
         @EnumSource(value = OrderStatus.class, names = {"WAITING", "ACCEPTED", "SERVED", "COMPLETED"})
         void deliveringOrderShouldNotBeDeliveredTest(OrderStatus orderStatus) {
             // given
-            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            Order ordered = createOrder(OrderType.DELIVERY);
 
             // when
-            order.setStatus(orderStatus);
-            orderRepository.save(order);
+            ordered.setStatus(orderStatus);
+            orderRepository.save(ordered);
 
             // then
-            assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
+            assertThatThrownBy(() -> orderService.completeDelivery(ordered.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
     }
@@ -317,45 +332,45 @@ class OrderServiceTest {
         @DisplayName("배달 주문은 배달 완료(DELIVERED) 상태에서 완료(COMPLETED)로 변경된다")
         void completedOrderCanBeCompletedTest() {
             // given
-            Order order = createOrder(OrderType.DELIVERY, OrderStatus.WAITING);
-            order.setStatus(OrderStatus.DELIVERED);
-            orderRepository.save(order);
+            Order ordered = createOrder(OrderType.DELIVERY);
+            ordered.setStatus(OrderStatus.DELIVERED);
+            orderRepository.save(ordered);
 
             // when
-            order = orderService.complete(order.getId());
+            ordered = orderService.complete(ordered.getId());
 
             // then
-            assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            assertThat(ordered.getStatus()).isEqualTo(OrderStatus.COMPLETED);
         }
 
         @Test
         @DisplayName("테이크아웃 주문은 제공(SERVED) 상태에서 완료(COMPLETED)로 변경된다")
         void servedTakeOutOrderCanBeCompletedTest() {
             // given
-            Order order = createOrder(OrderType.TAKEOUT, OrderStatus.WAITING);
-            order.setStatus(OrderStatus.SERVED);
-            orderRepository.save(order);
+            Order ordered = createOrder(OrderType.TAKEOUT);
+            ordered.setStatus(OrderStatus.SERVED);
+            orderRepository.save(ordered);
 
             // when
-            order = orderService.complete(order.getId());
+            ordered = orderService.complete(ordered.getId());
 
             // then
-            assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            assertThat(ordered.getStatus()).isEqualTo(OrderStatus.COMPLETED);
         }
 
         @Test
         @DisplayName("매장 내 식사 주문은 제공(SERVED) 상태에서 완료(COMPLETED)로 변경된다")
         void servedEatInOrderCanBeCompletedTest() {
             // given
-            Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
-            order.setStatus(OrderStatus.SERVED);
-            orderRepository.save(order);
+            Order ordered = createOrder(OrderType.EAT_IN);
+            ordered.setStatus(OrderStatus.SERVED);
+            orderRepository.save(ordered);
 
             // when
-            order = orderService.complete(order.getId());
+            ordered = orderService.complete(ordered.getId());
 
             // then
-            assertThat(order.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            assertThat(ordered.getStatus()).isEqualTo(OrderStatus.COMPLETED);
         }
 
         @Test
@@ -363,45 +378,22 @@ class OrderServiceTest {
         void orderTableShouldUnOccupiedWhenOrderCompletedTest() {
 
             // given
-            Order order = createOrder(OrderType.EAT_IN, OrderStatus.WAITING);
-            order.setStatus(OrderStatus.SERVED);
-            orderRepository.save(order);
+            Order ordered = createOrder(OrderType.EAT_IN);
+            ordered.setStatus(OrderStatus.SERVED);
+            orderRepository.save(ordered);
 
             // when
-            order = orderService.complete(order.getId());
+            ordered = orderService.complete(ordered.getId());
 
             // then
-            assertThat(order.getOrderTable().isOccupied()).isFalse();
-            assertThat(order.getOrderTable().getNumberOfGuests()).isZero();
+            assertThat(ordered.getOrderTable().isOccupied()).isFalse();
+            assertThat(ordered.getOrderTable().getNumberOfGuests()).isZero();
         }
     }
 
-    private Order createOrder(OrderType orderType, OrderStatus orderStatus) {
-
-        MenuGroup menuGroup = menuGroupRepository.save(new MenuGroupBuilder().withName("한 마리 메뉴").build());
-
-        Menu chicken = menuRepository.save(new MenuBuilder()
-                .withMenuGroup(menuGroup)
-                .with("치킨", BigDecimal.valueOf(10_000))
-                .build());
-
-        OrderLineItem orderLineItem = new OrderLineItemBuilder()
-                .withMenu(chicken)
-                .withPrice(BigDecimal.valueOf(10_000))
-                .build();
-
-        OrderTable orderTable = orderTableRepository.save(new OrderTableBuilder()
-                .anOrderTable()
-                .build());
-
-        Order order = new OrderBuilder()
-                .withOrderStatus(orderStatus)
-                .withOrderType(orderType)
-                .withOrderLineItems(List.of(orderLineItem))
-                .withOrderTable(orderTable)
-                .build();
-
-        return orderService.create(order);
+    private Order createOrder(OrderType orderType) {
+        Menu menu = menuProductSteps.메뉴를_생성한다();
+        return orderSteps.주문한다(menu, orderType);
     }
 
 }

@@ -33,12 +33,12 @@ public class MenuProductSteps {
         return menuGroupRepository.save(new MenuGroupBuilder().withName("한 마리 메뉴").build());
     }
 
-    public Menu 숨겨진_메뉴를_생성한다() {
+    public Menu 감추기된_메뉴를_생성한다() {
         final MenuGroup menuGroup = 메뉴그룹_생성한다();
-        return 숨겨진_메뉴를_생성한다(menuGroup);
+        return 감추기된_메뉴를_생성한다(menuGroup);
     }
 
-    public Menu 숨겨진_메뉴를_생성한다(MenuGroup menuGroup) {
+    public Menu 감추기된_메뉴를_생성한다(MenuGroup menuGroup) {
         final MenuProduct menuProduct = 메뉴상품을_생성한다();
         return 메뉴를_생성한다("치킨", 10_000, menuGroup, false, List.of(menuProduct));
     }
@@ -90,5 +90,11 @@ public class MenuProductSteps {
                         .withMenuProducts(menuProducts)
                         .build()
         );
+    }
+
+    public Menu 메뉴를_생성한다(
+    ) {
+        final MenuGroup menuGroup = 메뉴그룹_생성한다();
+        return 메뉴를_생성한다("치킨", 10000, menuGroup, true, List.of());
     }
 }
