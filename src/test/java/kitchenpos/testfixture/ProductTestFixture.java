@@ -22,9 +22,9 @@ public class ProductTestFixture {
         return product;
     }
 
-    public static Product createProduct(UUID id, String name, long price) {
+    public static Product createProduct(String name, long price) {
         Product product = new Product();
-        product.setId(id);
+        product.setId(UUID.randomUUID());
         product.setName(name);
         product.setPrice(BigDecimal.valueOf(price));
         return product;

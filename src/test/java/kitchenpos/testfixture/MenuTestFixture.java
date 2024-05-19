@@ -10,23 +10,25 @@ import java.util.UUID;
 
 public class MenuTestFixture {
 
-    public static Menu createMenuRequest(String name, long price, boolean displayed, Product product) {
+    public static Menu createMenuRequest(String name, long price, boolean displayed, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(price));
         menu.setDisplayed(displayed);
+        menu.setMenuProducts(menuProducts);
 
         return menu;
     }
 
-    public static Menu createMenu(UUID menuId, String name, long price, boolean displayed, Product product) {
+    public static Menu createMenu(String name, long price, boolean displayed, List<MenuProduct> menuProducts) {
 
         Menu menu = new Menu();
         ;
-        menu.setId(menuId);
+        menu.setId(UUID.randomUUID());
         menu.setName(name);
         menu.setPrice(BigDecimal.valueOf(price));
         menu.setDisplayed(displayed);
+        menu.setMenuProducts(menuProducts);
 
         return menu;
     }

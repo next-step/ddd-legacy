@@ -8,26 +8,48 @@ import java.util.UUID;
 
 public class OrderTestFixture {
 
-    public static Order createOrderRequest(OrderType type, OrderStatus status, LocalDateTime orderDateTime, OrderLineItem orderLineItem, OrderTable orderTable){
+    public static Order createOrderRequest(OrderType type, OrderStatus status, LocalDateTime orderDateTime, List<OrderLineItem> orderLineItems){
         Order order = new Order();
         order.setType(type);
         order.setStatus(status);
         order.setOrderDateTime(orderDateTime);
-        order.setOrderLineItems(List.of(orderLineItem));
+        order.setOrderLineItems(orderLineItems);
+
+        return order;
+    }
+
+    public static Order createOrderRequest(OrderType type, OrderStatus status, LocalDateTime orderDateTime, List<OrderLineItem> orderLineItems, OrderTable orderTable){
+        Order order = new Order();
+        order.setType(type);
+        order.setStatus(status);
+        order.setOrderDateTime(orderDateTime);
+        order.setOrderLineItems(orderLineItems);
         order.setOrderTable(orderTable);
         order.setOrderTableId(orderTable.getId());
 
         return order;
     }
 
-    public static Order createOrder(UUID id, OrderType type, OrderStatus status, LocalDateTime orderDateTime, OrderLineItem orderLineItem, OrderTable orderTable){
+    public static Order createOrder(OrderType type, OrderStatus status, LocalDateTime orderDateTime, List<OrderLineItem> orderLineItems){
         Order order = new Order();
-        order.setId(id);
+        order.setId(UUID.randomUUID());
         order.setType(type);
         order.setStatus(status);
         order.setOrderDateTime(orderDateTime);
-        order.setOrderLineItems(List.of(orderLineItem));
+        order.setOrderLineItems(orderLineItems);
+
+        return order;
+    }
+
+    public static Order createOrder(OrderType type, OrderStatus status, LocalDateTime orderDateTime, List<OrderLineItem> orderLineItems, OrderTable orderTable){
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(type);
+        order.setStatus(status);
+        order.setOrderDateTime(orderDateTime);
+        order.setOrderLineItems(orderLineItems);
         order.setOrderTable(orderTable);
+        order.setOrderTableId(orderTable.getId());
 
         return order;
     }

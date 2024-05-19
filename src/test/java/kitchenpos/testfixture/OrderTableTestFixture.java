@@ -19,9 +19,9 @@ public class OrderTableTestFixture {
         return orderTable;
     }
 
-    public static OrderTable createOrderTable(UUID id, String name, boolean isOccupied, int guests){
+    public static OrderTable createOrderTable(String name, boolean isOccupied, int guests){
         OrderTable orderTable = new OrderTable();
-        orderTable.setId(id);
+        orderTable.setId(UUID.randomUUID());
         orderTable.setName(name);
         orderTable.setOccupied(isOccupied);
         orderTable.setNumberOfGuests(guests);

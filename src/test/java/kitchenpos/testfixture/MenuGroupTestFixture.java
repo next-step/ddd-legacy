@@ -18,9 +18,9 @@ public class MenuGroupTestFixture {
 
     }
 
-    public static MenuGroup createMenuGroup(UUID id, String name) {
+    public static MenuGroup createMenuGroup(String name) {
         MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(id);
+        menuGroup.setId(UUID.randomUUID());
         menuGroup.setName(name);
 
         return menuGroup;
