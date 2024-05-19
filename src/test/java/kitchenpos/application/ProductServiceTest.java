@@ -1,14 +1,12 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
@@ -24,18 +22,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class ProductServiceTest {
 
-    @Mock
-    private ProductRepository productRepository;
-    @Mock
-    private PurgomalumClient purgomalumClient;
-    @Mock
-    private MenuRepository menuRepository;
+    private final MenuRepository menuRepository = new InMemoryMenuRepository();
+    private final ProductRepository productRepository = new InMemoryProductRepository();
+    private final PurgomalumClient purgomalumClient = new FakePurgomalumClient();
 
     private ProductService productService;
 
@@ -47,7 +41,9 @@ public class ProductServiceTest {
     @DisplayName("모든 `상품`를 조회할 수 있다.")
     @Test
     void findAllProducts() {
-        when(productRepository.findAll()).thenReturn(List.of(new Product(), new Product()));
+        productRepository.save(
+            ProductFixture.createProduct("HOT 후라이드 치킨", BigDecimal.valueOf(21_000L)));
+        productRepository.save(ProductFixture.createProduct("양념 치킨", BigDecimal.valueOf(22_000L)));
 
         assertThat(productService.findAll()).hasSize(2);
     }
@@ -60,15 +56,14 @@ public class ProductServiceTest {
         void createProductWithValidInput() {
             Product validProduct = ProductFixture.createProduct();
 
-            when(purgomalumClient.containsProfanity(any())).thenReturn(false);
-            when(productRepository.save(any())).then(invocation -> invocation.getArgument(0));
-
             var product = productService.create(validProduct);
 
-            assertThat(product).isNotNull();
-            assertThat(product.getName()).isEqualTo(validProduct.getName());
-            assertThat(product.getPrice()).isEqualTo(validProduct.getPrice());
-            assertThat(product.getId()).isNotNull();
+            assertAll(
+                () -> assertThat(product).isNotNull(),
+                () -> assertThat(product.getId()).isNotNull(),
+                () -> assertThat(product.getName()).isEqualTo(validProduct.getName()),
+                () -> assertThat(product.getPrice()).isEqualTo(validProduct.getPrice())
+            );
         }
 
         @DisplayName("`상품`의 가격은 0 이상이어야 한다")
@@ -103,9 +98,7 @@ public class ProductServiceTest {
         @Test
         void createProductWithProfanityInName() {
             Product request = ProductFixture.createProduct();
-            request.setName("대충 나쁜 단어");
-
-            when(purgomalumClient.containsProfanity(any())).thenReturn(true);
+            request.setName("대충 나쁜 말");
 
             assertThrows(IllegalArgumentException.class, () -> productService.create(request));
         }
@@ -128,11 +121,13 @@ public class ProductServiceTest {
             request.setName(existingProduct.getName());
             request.setPrice(menu.getPrice().add(BigDecimal.valueOf(1000)));
 
-            when(productRepository.findById(any())).thenReturn(Optional.of(existingProduct));
-            when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
+            productRepository.save(existingProduct);
+            menuRepository.save(menu);
 
+            // when
             productService.changePrice(existingProduct.getId(), request);
 
+            // then
             assertThat(existingProduct.getPrice()).isEqualTo(request.getPrice());
             assertThat(menu.isDisplayed()).isTrue();
         }
@@ -153,8 +148,6 @@ public class ProductServiceTest {
             request.setName("상품 이름");
             request.setPrice(BigDecimal.valueOf(1000));
 
-            when(productRepository.findById(any())).thenReturn(Optional.empty());
-
             assertThrows(NoSuchElementException.class,
                 () -> productService.changePrice(UUID.randomUUID(), request));
         }
@@ -173,8 +166,8 @@ public class ProductServiceTest {
             request.setName(existingProduct.getName());
             request.setPrice(existingProduct.getPrice().subtract(BigDecimal.valueOf(1000)));
 
-            when(productRepository.findById(any())).thenReturn(Optional.of(existingProduct));
-            when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
+            productRepository.save(existingProduct);
+            menuRepository.save(menu);
 
             productService.changePrice(existingProduct.getId(), request);
 

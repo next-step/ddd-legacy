@@ -1,13 +1,13 @@
 package kitchenpos.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,14 +33,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
 
-    @Mock
-    private MenuRepository menuRepository;
+    private final MenuRepository menuRepository = new InMemoryMenuRepository();
+    private final ProductRepository productRepository = new InMemoryProductRepository();
+    private final PurgomalumClient purgomalumClient = new FakePurgomalumClient();
+
     @Mock
     private MenuGroupRepository menuGroupRepository;
-    @Mock
-    private ProductRepository productRepository;
-    @Mock
-    private PurgomalumClient purgomalumClient;
 
     private MenuService menuService;
 
@@ -66,10 +64,10 @@ class MenuServiceTest {
         MenuProductFixture.createMenuProduct(product);
         menu.setMenuProducts(List.of(menuProduct));
 
-        when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+        menuRepository.save(menu);
 
         // when
-        Menu result = menuService.hide(UUID.randomUUID());
+        Menu result = menuService.hide(menu.getId());
 
         // then
         assertAll(
@@ -82,8 +80,6 @@ class MenuServiceTest {
     @Test
     void findAllMenus() {
         // given
-        when(menuRepository.findAll()).thenReturn(Collections.emptyList());
-
         // when
         List<Menu> menus = menuService.findAll();
 
@@ -116,10 +112,7 @@ class MenuServiceTest {
             validRequest.setDisplayed(true);
 
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(any())).thenReturn(List.of(product));
-            when(productRepository.findById(any())).thenReturn(Optional.of(product));
-            when(purgomalumClient.containsProfanity(any())).thenReturn(false);
-            when(menuRepository.save(any())).then(invocation -> invocation.getArgument(0));
+            productRepository.save(product);
 
             // when
             Menu result = menuService.create(validRequest);
@@ -174,8 +167,6 @@ class MenuServiceTest {
             invalidMenuRequest.setDisplayed(true);
 
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(any())).thenReturn(List.of(product));
-            when(productRepository.findById(any())).thenReturn(Optional.of(product));
 
             // when & then
             assertThrows(IllegalArgumentException.class,
@@ -200,9 +191,6 @@ class MenuServiceTest {
             request.setDisplayed(true);
 
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(any())).thenReturn(List.of(product));
-            when(productRepository.findById(any())).thenReturn(Optional.of(product));
-            when(purgomalumClient.containsProfanity(any())).thenReturn(true);
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> menuService.create(request));
@@ -267,7 +255,6 @@ class MenuServiceTest {
             request.setDisplayed(true);
 
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(any())).thenReturn(Collections.emptyList());
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> menuService.create(request));
@@ -293,7 +280,6 @@ class MenuServiceTest {
             request.setDisplayed(true);
 
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(any())).thenReturn(List.of(product));
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> menuService.create(request));
@@ -318,8 +304,6 @@ class MenuServiceTest {
             request.setDisplayed(true);
 
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(menuGroup));
-            when(productRepository.findAllByIdIn(any())).thenReturn(List.of(product));
-            when(productRepository.findById(any())).thenReturn(Optional.of(product));
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> menuService.create(request));
@@ -341,7 +325,7 @@ class MenuServiceTest {
             menu.setMenuProducts(List.of(menuProduct));
             menu.setDisplayed(false);
 
-            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+            menuRepository.save(menu);
 
             // when
             Menu result = menuService.display(menu.getId());
@@ -365,10 +349,10 @@ class MenuServiceTest {
             menu.setMenuProducts(List.of(menuProduct));
             menu.setPrice(product.getPrice().add(BigDecimal.valueOf(1000)));
 
-            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+            menuRepository.save(menu);
 
             // when & then
-            assertThrows(IllegalStateException.class, () -> menuService.display(UUID.randomUUID()));
+            assertThrows(IllegalStateException.class, () -> menuService.display(menu.getId()));
         }
     }
 
@@ -386,13 +370,14 @@ class MenuServiceTest {
             Menu menu = MenuFixture.createMenu();
             menu.setMenuProducts(List.of(menuProduct));
 
-            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
-
             Menu request = new Menu();
             request.setPrice(BigDecimal.valueOf(2000));
 
+            menuRepository.save(menu);
+            productRepository.save(product);
+
             // when
-            Menu result = menuService.changePrice(product.getId(), request);
+            Menu result = menuService.changePrice(menu.getId(), request);
 
             // then
             assertAll(
@@ -435,19 +420,20 @@ class MenuServiceTest {
             menuProduct.setProduct(product);
             menuProduct.setQuantity(1);
 
-            Menu menu = new Menu();
+            Menu menu = MenuFixture.createMenu();
             menu.setMenuProducts(List.of(menuProduct));
             menu.setPrice(product.getPrice().add(BigDecimal.valueOf(1000)));
             menu.setDisplayed(true);
 
-            when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
+            menuRepository.save(menu);
+            productRepository.save(product);
 
             Menu request = new Menu();
             request.setPrice(product.getPrice().add(BigDecimal.valueOf(1000)));
 
             // when & then
-            assertThrows(IllegalArgumentException.class,
-                () -> menuService.changePrice(product.getId(), request));
+            assertThatThrownBy(() -> menuService.changePrice(menu.getId(), request))
+                .isInstanceOf(IllegalArgumentException.class);
         }
     }
 
