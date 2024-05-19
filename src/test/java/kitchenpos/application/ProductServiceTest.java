@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static kitchenpos.fixture.application.MenuFixture.createMenu;
 import static kitchenpos.fixture.application.MenuGroupFixture.createMenuGroup;
@@ -57,6 +59,12 @@ class ProductServiceTest {
     @DisplayName("상품 등록")
     @Nested
     class ProductCreate {
+        private static Stream<BigDecimal> nullOrNegativePrice() {
+            return Stream.of(
+                    null,
+                    BigDecimal.valueOf(-1)
+            );
+        }
 
         @ParameterizedTest
         @DisplayName("상품을 등록한다")
@@ -112,8 +120,8 @@ class ProductServiceTest {
         }
 
         @ParameterizedTest
-        @DisplayName("상품의 가격은 null 이면 예외가 발생한다")
-        @NullSource
+        @DisplayName("상품의 가격은 null 이거나 음수이면 IllegalArgumentException이 발생한다")
+        @MethodSource("nullOrNegativePrice")
         void createProductPriceIsNotNull(BigDecimal price) {
             Product product = createProduct(price);
 
