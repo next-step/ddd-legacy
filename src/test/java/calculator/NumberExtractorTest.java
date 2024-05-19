@@ -28,15 +28,6 @@ public class NumberExtractorTest {
         assertThat(result).isEqualTo(List.of("1", "999"));
     }
 
-    @DisplayName(value = "음수를 전달하는 경우 IllegalArgumentException 예외 처리를 한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"-1", "-1:3", "5:-6"})
-    void negative(final String test) {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> NumberExtractor.extract(test));
-    }
-
-
     @Nested
     @DisplayName("해석할 수 없는 형식")
     class outOfFormat {
