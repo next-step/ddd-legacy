@@ -40,21 +40,25 @@ class MenuServiceTest {
     private MenuProduct menuProduct;
     private MenuGroup menuGroup;
 
+    private TestContainers testContainers;
+
     @BeforeEach
     void setUp() {
-        TestContainers testContainers = new TestContainers();
+        testContainers = new TestContainers();
         menuService = new MenuService(testContainers.menuRepository, testContainers.menuGroupRepository, testContainers.productRepository, purgomalumClient);
 
         product = new ProductBuilder()
                 .with("치킨", BigDecimal.valueOf(10_000))
                 .build();
-        product = testContainers.productRepository.save(product);
 
         menuProduct = new MenuProductBuilder()
                 .withProduct(product)
                 .withQuantity(1)
                 .build();
-        menuGroup = testContainers.menuGroupRepository.save(new MenuGroupBuilder().withName("한 마리 메뉴").build());
+
+        menuGroup = new MenuGroupBuilder()
+                .withName("치킨류")
+                .build();
     }
 
     @DisplayName("메뉴를 등록할 때")
@@ -63,6 +67,9 @@ class MenuServiceTest {
         @DisplayName("이름, 가격, 표시 여부를 갖는다")
         @Test
         void createMenuTest() {
+
+            testContainers.productRepository.save(product);
+            testContainers.menuGroupRepository.save(menuGroup);
 
             Menu menu = menuService.create(new MenuBuilder()
                     .with("치킨", BigDecimal.valueOf(10_000))
@@ -80,6 +87,9 @@ class MenuServiceTest {
         @Test
         void menuNameWithBlankTest() {
 
+            testContainers.productRepository.save(product);
+            testContainers.menuGroupRepository.save(menuGroup);
+
             assertThrows(IllegalArgumentException.class, () -> menuService.create(new MenuBuilder()
                     .with(null, BigDecimal.valueOf(10_000))
                     .withMenuGroup(menuGroup)
@@ -91,6 +101,9 @@ class MenuServiceTest {
         @Test
         void menuPriceWithZeroTest() {
 
+            testContainers.productRepository.save(product);
+            testContainers.menuGroupRepository.save(menuGroup);
+
             assertThrows(IllegalArgumentException.class, () -> menuService.create(new MenuBuilder()
                     .with("치킨", BigDecimal.valueOf(-1))
                     .withMenuGroup(menuGroup)
@@ -101,6 +114,9 @@ class MenuServiceTest {
         @DisplayName("메뉴그룹에 소속되지 않으면 등록이 불가능하다")
         @Test
         void menuGroupNullTest() {
+
+            testContainers.productRepository.save(product);
+            testContainers.menuGroupRepository.save(menuGroup);
 
             assertThrows(NoSuchElementException.class, () -> menuService.create(new MenuBuilder()
                     .with("치킨", BigDecimal.valueOf(10_000))
@@ -115,10 +131,13 @@ class MenuServiceTest {
     void menuHideTest() {
 
         // given
-        Menu menu = menuService.create(new MenuBuilder()
+        testContainers.productRepository.save(product);
+        testContainers.menuGroupRepository.save(menuGroup);
+        Menu menu = testContainers.menuRepository.save(new MenuBuilder()
                 .with("치킨", BigDecimal.valueOf(10_000))
                 .withMenuGroup(menuGroup)
                 .withMenuProducts(List.of(menuProduct))
+                .withDisplayed(true)
                 .build());
 
         // when
@@ -133,7 +152,9 @@ class MenuServiceTest {
     void menuDisplayTest() {
 
         // given
-        Menu menu = menuService.create(new MenuBuilder()
+        testContainers.productRepository.save(product);
+        testContainers.menuGroupRepository.save(menuGroup);
+        Menu menu = testContainers.menuRepository.save(new MenuBuilder()
                 .with("치킨", BigDecimal.valueOf(10_000))
                 .withMenuGroup(menuGroup)
                 .withMenuProducts(List.of(menuProduct))
@@ -147,15 +168,39 @@ class MenuServiceTest {
         assertTrue(displayed.isDisplayed());
     }
 
+
+    @DisplayName("메뉴의 가격이 메뉴상품의 가격보다 높으면 보이기 처리가 불가능하다")
+    @Test
+    void menuDisplayFailTest() {
+
+        // given
+        testContainers.productRepository.save(product);
+        testContainers.menuGroupRepository.save(menuGroup);
+        Menu menu = testContainers.menuRepository.save(new MenuBuilder()
+                .with("치킨", BigDecimal.valueOf(999999999))
+                .withMenuGroup(menuGroup)
+                .withMenuProducts(List.of(menuProduct))
+                .withDisplayed(true)
+                .build());
+
+        // when
+        // then
+        assertThatThrownBy(() -> menuService.display(menu.getId()))
+                .isInstanceOf(IllegalStateException.class);
+    }
+
     @DisplayName("메뉴의 가격을 변경할 때 메뉴상품의 가격보다 크면 변경이 불가능하다")
     @Test
     void changePriceTest() {
 
         // given
-        Menu menu = menuService.create(new MenuBuilder()
+        testContainers.productRepository.save(product);
+        testContainers.menuGroupRepository.save(menuGroup);
+        Menu menu = testContainers.menuRepository.save(new MenuBuilder()
                 .with("치킨", BigDecimal.valueOf(10_000))
                 .withMenuGroup(menuGroup)
                 .withMenuProducts(List.of(menuProduct))
+                .withDisplayed(true)
                 .build());
 
         // when

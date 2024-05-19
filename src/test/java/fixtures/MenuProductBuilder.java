@@ -25,6 +25,7 @@ public class MenuProductBuilder {
 
     public MenuProduct build() {
         MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setSeq(1L);
         menuProduct.setProduct(product);
         menuProduct.setQuantity(quantity);
         menuProduct.setProductId(productId);
