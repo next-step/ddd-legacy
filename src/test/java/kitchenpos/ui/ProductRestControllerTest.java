@@ -3,6 +3,7 @@ package kitchenpos.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.Product;
+import kitchenpos.testfixture.ProductTestFixture;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,7 +13,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -37,14 +37,8 @@ class ProductRestControllerTest {
     void create() throws Exception {
 
         //given
-        Product request = new Product();
-        request.setName("후라이드치킨");
-        request.setPrice(BigDecimal.valueOf(17000));
-
-        Product response = new Product();
-        response.setId(UUID.randomUUID());
-        response.setName(request.getName());
-        response.setPrice(request.getPrice());
+        Product request = ProductTestFixture.createProductRequest("후라이드치킨", 17000L);
+        Product response = ProductTestFixture.createProduct("후라이드치킨", 17000L);
 
         given(productService.create(any()))
                 .willReturn(response);
@@ -59,33 +53,26 @@ class ProductRestControllerTest {
                 .andExpect(jsonPath("$.name").value(response.getName()))
                 .andExpect(jsonPath("$.price").value(response.getPrice()));
 
-
     }
 
     @Test
     void changePrice() throws Exception {
 
         //given
-        UUID productId = UUID.randomUUID();
-        Product request = new Product();
-        request.setId(productId);
-        request.setPrice(BigDecimal.valueOf(18000));
-
-        Product response = new Product();
-        response.setId(productId);
-        response.setPrice(BigDecimal.valueOf(18000));
+        Product product = ProductTestFixture.createProduct("후라이드치킨", 18000L);
+        Product response = ProductTestFixture.createProduct("후라이드치킨", 17000L);
 
         given(productService.changePrice(any(), any()))
                 .willReturn(response);
+        product.setPrice(BigDecimal.valueOf(17000));
 
         //when then
-        mockMvc.perform(put("/api/products/{productId}/price", productId)
+        mockMvc.perform(put("/api/products/{productId}/price", product.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(product)))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.price").value(response.getPrice()));
-
 
     }
 
@@ -93,14 +80,8 @@ class ProductRestControllerTest {
     void findAll() throws Exception {
 
         //given
-        Product product1 = new Product();
-        product1.setId(UUID.randomUUID());
-        product1.setPrice(BigDecimal.valueOf(17000));
-        product1.setName("후라이드치킨");
-        Product product2 = new Product();
-        product2.setId(UUID.randomUUID());
-        product2.setPrice(BigDecimal.valueOf(18000));
-        product2.setName("양념치킨");
+        Product product1 = ProductTestFixture.createProduct("후라이드치킨", 17000L);
+        Product product2 = ProductTestFixture.createProduct("후라이드치킨", 18000L);
 
         given(productService.findAll())
                 .willReturn(Arrays.asList(product1, product2));
@@ -116,5 +97,6 @@ class ProductRestControllerTest {
                 .andExpect(jsonPath("$[1].id").value(product2.getId().toString()))
                 .andExpect(jsonPath("$[1].name").value(product2.getName()))
                 .andExpect(jsonPath("$[1].price").value(product2.getPrice()));
+
     }
 }

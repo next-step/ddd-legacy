@@ -3,6 +3,7 @@ package kitchenpos.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
+import kitchenpos.testfixture.MenuGroupTestFixture;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -11,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -36,13 +36,8 @@ class MenuGroupRestControllerTest {
     @Test
     void create() throws Exception {
         //given
-        MenuGroup request = new MenuGroup();
-        request.setName("menu-group");
-
-        MenuGroup response = new MenuGroup();
-        response.setName(request.getName());
-        response.setId(UUID.randomUUID());
-
+        MenuGroup request = MenuGroupTestFixture.createMenuGroupRequest("menu-group");
+        MenuGroup response = MenuGroupTestFixture.createMenuGroup("menu-group");
         given(menuGroupService.create(any()))
                 .willReturn(response);
 
@@ -55,18 +50,14 @@ class MenuGroupRestControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(response.getId().toString()))
                 .andExpect(jsonPath("$.name").value(response.getName()));
+
     }
 
     @Test
     void findAll() throws Exception {
         //given
-        MenuGroup menuGroup1 = new MenuGroup();
-        menuGroup1.setId(UUID.randomUUID());
-        menuGroup1.setName("mg1");
-
-        MenuGroup menuGroup2 = new MenuGroup();
-        menuGroup2.setId(UUID.randomUUID());
-        menuGroup2.setName("mg2");
+        MenuGroup menuGroup1 = MenuGroupTestFixture.createMenuGroup("mg1");
+        MenuGroup menuGroup2 = MenuGroupTestFixture.createMenuGroup("mg2");
 
         given(menuGroupService.findAll())
                 .willReturn(Arrays.asList(menuGroup1, menuGroup2));

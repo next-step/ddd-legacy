@@ -1,12 +1,9 @@
 package kitchenpos.ui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kitchenpos.application.OrderService;
 import kitchenpos.application.OrderTableService;
-import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderType;
-import org.aspectj.weaver.ast.Or;
+import kitchenpos.testfixture.OrderTableTestFixture;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -15,7 +12,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
-import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -40,12 +36,8 @@ class OrderTableRestControllerTest {
     void create() throws Exception {
 
         //given
-        OrderTable request = new OrderTable();
-        request.setName("9번");
-
-        OrderTable response = new OrderTable();
-        response.setId(UUID.randomUUID());
-        response.setName(request.getName());
+        OrderTable request = OrderTableTestFixture.createOrderTableRequest("1번", false, 0);
+        OrderTable response = OrderTableTestFixture.createOrderTable("1번", false, 0);
 
         given(orderTableService.create(any()))
                 .willReturn(response);
@@ -59,27 +51,23 @@ class OrderTableRestControllerTest {
                 .andExpect(jsonPath("$.id").value(response.getId().toString()))
                 .andExpect(jsonPath("$.name").value(response.getName()));
 
-
     }
 
     @Test
     void sit() throws Exception {
 
         //given
-        UUID orderTableId = UUID.randomUUID();
-        OrderTable response = new OrderTable();
-        response.setId(orderTableId);
-        response.setOccupied(true);
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable("1번", false, 0);
+        OrderTable response = OrderTableTestFixture.createOrderTable("1번", true, 10);
 
         given(orderTableService.sit(any()))
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(put("/api/order-tables/{orderTableId}/sit", orderTableId)
+        mockMvc.perform(put("/api/order-tables/{orderTableId}/sit", orderTable.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(response.getId().toString()))
                 .andExpect(jsonPath("$.occupied").value(response.isOccupied()));
-
 
     }
 
@@ -87,54 +75,46 @@ class OrderTableRestControllerTest {
     void clear() throws Exception {
 
         //given
-        UUID orderTableId = UUID.randomUUID();
-        OrderTable response = new OrderTable();
-        response.setId(orderTableId);
-        response.setOccupied(false);
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable("1번", true, 10);
+        OrderTable response = OrderTableTestFixture.createOrderTable("1번", false, 0);
 
         given(orderTableService.clear(any()))
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(put("/api/order-tables/{orderTableId}/clear", orderTableId)
+        mockMvc.perform(put("/api/order-tables/{orderTableId}/clear", orderTable.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(response.getId().toString()))
                 .andExpect(jsonPath("$.occupied").value(response.isOccupied()));
+
     }
 
     @Test
     void changeNumberOfGuests() throws Exception {
+
         //given
-        UUID orderTableId = UUID.randomUUID();
-        OrderTable request = new OrderTable();
-        request.setId(orderTableId);
-        request.setNumberOfGuests(4);
-        OrderTable response = new OrderTable();
-        response.setId(orderTableId);
-        response.setOccupied(true);
-        response.setNumberOfGuests(4);
+        OrderTable orderTable = OrderTableTestFixture.createOrderTable("1번", true, 10);
+        OrderTable response = OrderTableTestFixture.createOrderTable("1번", true, 5);;
 
         given(orderTableService.changeNumberOfGuests(any(), any()))
                 .willReturn(response);
+        orderTable.setNumberOfGuests(5);
 
         //when then
-        mockMvc.perform(put("/api/order-tables/{orderTableId}/number-of-guests", orderTableId)
+        mockMvc.perform(put("/api/order-tables/{orderTableId}/number-of-guests", orderTable.getId())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(orderTable)))
                 .andDo(print())
                 .andExpect(jsonPath("$.numberOfGuests").value(response.getNumberOfGuests()));
+
     }
 
     @Test
     void findAll() throws Exception {
 
         //given
-        OrderTable orderTable1 = new OrderTable();
-        orderTable1.setId(UUID.randomUUID());
-        orderTable1.setName("1번");
-        OrderTable orderTable2 = new OrderTable();
-        orderTable2.setId(UUID.randomUUID());
-        orderTable2.setName("4번");
+        OrderTable orderTable1 = OrderTableTestFixture.createOrderTable("1번", true, 10);
+        OrderTable orderTable2 = OrderTableTestFixture.createOrderTable("4번", false, 0);
 
         given(orderTableService.findAll())
                 .willReturn(Arrays.asList(orderTable1, orderTable2));
@@ -148,5 +128,6 @@ class OrderTableRestControllerTest {
                 .andExpect(jsonPath("$[0].name").value(orderTable1.getName()))
                 .andExpect(jsonPath("$[1].id").value(orderTable2.getId().toString()))
                 .andExpect(jsonPath("$[1].name").value(orderTable2.getName()));
+
     }
 }

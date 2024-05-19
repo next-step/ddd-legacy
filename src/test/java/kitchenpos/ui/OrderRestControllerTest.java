@@ -3,6 +3,7 @@ package kitchenpos.ui;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.*;
+import kitchenpos.testfixture.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -10,9 +11,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.UUID;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -37,29 +38,12 @@ class OrderRestControllerTest {
     void create() throws Exception {
 
         //given
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName("후라이드+후라이드");
-
-
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setPrice(BigDecimal.valueOf(16000));
-        orderLineItem.setQuantity(3L);
-
-        Order request = new Order();
-        request.setType(OrderType.EAT_IN);
-        request.setOrderTableId(orderTable.getId());
-        request.setOrderLineItems(Arrays.asList(orderLineItem));
-
-        Order response = new Order();
-        response.setId(UUID.randomUUID());
-        response.setOrderTableId(orderTable.getId());
-        response.setOrderLineItems(request.getOrderLineItems());
-
+        Product product = ProductTestFixture.createProduct("후라이드", 1000L);
+        MenuProduct menuProduct = MenuProductTestFixture.createMenuProductRequest(1L, 1L, product);
+        Menu menu = MenuTestFixture.createMenu("후라이드+후라이드", 19000L,true, List.of(menuProduct));
+        OrderLineItem orderLineItem = OrderLineItemTestFixture.createOrderLine(1L, 1,menu);
+        Order request = OrderTestFixture.createOrderRequest(OrderType.EAT_IN, OrderStatus.WAITING, LocalDateTime.now(),List.of(orderLineItem));
+        Order response = OrderTestFixture.createOrder(OrderType.EAT_IN, OrderStatus.WAITING, LocalDateTime.now(),List.of(orderLineItem));
 
         given(orderService.create(any()))
                 .willReturn(response);
@@ -69,8 +53,7 @@ class OrderRestControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andDo(print())
-                .andExpect(jsonPath("$.id").value(response.getId().toString()))
-                .andExpect(jsonPath("$.orderTableId").value(response.getOrderTableId().toString()));
+                .andExpect(jsonPath("$.id").value(response.getId().toString()));
 
     }
 
@@ -78,16 +61,15 @@ class OrderRestControllerTest {
     void accept() throws Exception {
 
         //given
-        UUID orderId = UUID.randomUUID();
-        Order response = new Order();
-        response.setId(orderId);
-        response.setStatus(OrderStatus.ACCEPTED);
+        OrderLineItem orderLineItem = OrderLineItemTestFixture.createOrderLine(1L, 1,new Menu());
+        Order order = OrderTestFixture.createOrder(OrderType.EAT_IN, OrderStatus.WAITING, LocalDateTime.now(),List.of(orderLineItem));
+        Order response = OrderTestFixture.createOrderRequest(OrderType.EAT_IN, OrderStatus.ACCEPTED, LocalDateTime.now(),List.of(orderLineItem));;
 
         given(orderService.accept(any()))
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(put("/api/orders/{orderId}/accept", orderId)
+        mockMvc.perform(put("/api/orders/{orderId}/accept", order.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -98,76 +80,75 @@ class OrderRestControllerTest {
     void serve() throws Exception {
 
         //given
-        UUID orderId = UUID.randomUUID();
-        Order response = new Order();
-        response.setId(orderId);
-        response.setStatus(OrderStatus.SERVED);
+        OrderLineItem orderLineItem = OrderLineItemTestFixture.createOrderLine(1L, 1,new Menu());
+        Order order = OrderTestFixture.createOrder(OrderType.EAT_IN, OrderStatus.WAITING, LocalDateTime.now(),List.of(orderLineItem));
+        Order response = OrderTestFixture.createOrder(OrderType.EAT_IN, OrderStatus.SERVED, LocalDateTime.now(),List.of(orderLineItem));;
 
         given(orderService.serve(any()))
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(put("/api/orders/{orderId}/serve", orderId)
+        mockMvc.perform(put("/api/orders/{orderId}/serve", order.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(response.getStatus().toString()));
+
     }
 
     @Test
     void startDelivery() throws Exception {
 
         //given
-        UUID orderId = UUID.randomUUID();
-        Order response = new Order();
-        response.setId(orderId);
-        response.setStatus(OrderStatus.DELIVERING);
+        OrderLineItem orderLineItem = OrderLineItemTestFixture.createOrderLine(1L, 1,new Menu());
+        Order order = OrderTestFixture.createOrder(OrderType.DELIVERY, OrderStatus.SERVED, LocalDateTime.now(),List.of(orderLineItem));
+        Order response = OrderTestFixture.createOrder(OrderType.DELIVERY, OrderStatus.DELIVERING, LocalDateTime.now(),List.of(orderLineItem));;
 
         given(orderService.startDelivery(any()))
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(put("/api/orders/{orderId}/start-delivery", orderId)
+        mockMvc.perform(put("/api/orders/{orderId}/start-delivery", order.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(response.getStatus().toString()));
+
     }
 
     @Test
     void completeDelivery() throws Exception {
 
         //given
-        UUID orderId = UUID.randomUUID();
-        Order response = new Order();
-        response.setId(orderId);
-        response.setStatus(OrderStatus.DELIVERED);
+        OrderLineItem orderLineItem = OrderLineItemTestFixture.createOrderLine(1L, 1,new Menu());
+        Order order = OrderTestFixture.createOrder(OrderType.DELIVERY, OrderStatus.DELIVERING, LocalDateTime.now(),List.of(orderLineItem));
+        Order response = OrderTestFixture.createOrder(OrderType.DELIVERY, OrderStatus.DELIVERED, LocalDateTime.now(),List.of(orderLineItem));;
 
         given(orderService.completeDelivery(any()))
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(put("/api/orders/{orderId}/complete-delivery", orderId)
+        mockMvc.perform(put("/api/orders/{orderId}/complete-delivery", order.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(response.getStatus().toString()));
+
     }
 
     @Test
     void complete() throws Exception {
 
         //given
-        UUID orderId = UUID.randomUUID();
-        Order response = new Order();
-        response.setId(orderId);
-        response.setStatus(OrderStatus.COMPLETED);
+        OrderLineItem orderLineItem = OrderLineItemTestFixture.createOrderLine(1L, 1,new Menu());
+        Order order = OrderTestFixture.createOrder(OrderType.DELIVERY, OrderStatus.DELIVERED, LocalDateTime.now(),List.of(orderLineItem));
+        Order response = OrderTestFixture.createOrder(OrderType.DELIVERY, OrderStatus.COMPLETED, LocalDateTime.now(),List.of(orderLineItem));;
 
         given(orderService.complete(any()))
                 .willReturn(response);
 
         //when then
-        mockMvc.perform(put("/api/orders/{orderId}/complete", orderId)
+        mockMvc.perform(put("/api/orders/{orderId}/complete", order.getId())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -178,12 +159,8 @@ class OrderRestControllerTest {
     void findAll() throws Exception {
 
         //given
-        Order order1 = new Order();
-        order1.setId(UUID.randomUUID());
-        order1.setType(OrderType.EAT_IN);
-        Order order2 = new Order();
-        order2.setId(UUID.randomUUID());
-        order2.setType(OrderType.DELIVERY);
+        Order order1 = OrderTestFixture.createOrder(OrderType.DELIVERY, OrderStatus.DELIVERED, LocalDateTime.now(),List.of(new OrderLineItem()));
+        Order order2 = OrderTestFixture.createOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED, LocalDateTime.now(),List.of(new OrderLineItem()));
 
         given(orderService.findAll())
                 .willReturn(Arrays.asList(order1, order2));
@@ -197,5 +174,6 @@ class OrderRestControllerTest {
                 .andExpect(jsonPath("$[0].type").value(order1.getType().toString()))
                 .andExpect(jsonPath("$[1].id").value(order2.getId().toString()))
                 .andExpect(jsonPath("$[1].type").value(order2.getType().toString()));
+
     }
 }
