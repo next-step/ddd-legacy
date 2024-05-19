@@ -70,8 +70,8 @@ class MenuServiceTest {
     class MenuCreate {
         private static Stream<BigDecimal> lessThanZero() {
             return Stream.of(
-                    BigDecimal.valueOf(-10),
-                    BigDecimal.valueOf(-10000)
+                    BigDecimal.valueOf(-1),
+                    BigDecimal.valueOf(-10)
             );
         }
 
@@ -250,8 +250,8 @@ class MenuServiceTest {
 
         private static Stream<BigDecimal> lessThanZero() {
             return Stream.of(
-                    BigDecimal.valueOf(-10),
-                    BigDecimal.valueOf(-10000)
+                    BigDecimal.valueOf(-1),
+                    BigDecimal.valueOf(-10)
             );
         }
     }
