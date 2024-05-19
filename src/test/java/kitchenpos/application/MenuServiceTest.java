@@ -4,10 +4,19 @@ import fixtures.MenuBuilder;
 import fixtures.MenuGroupBuilder;
 import fixtures.MenuProductBuilder;
 import fixtures.ProductBuilder;
-import kitchenpos.domain.*;
-import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import fixtures.TestContainers;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.Product;
+import kitchenpos.infra.PurgomalumClient;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -15,18 +24,17 @@ import java.util.NoSuchElementException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
 
-    @Autowired
     private MenuService menuService;
-
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
-    @Autowired
-    private ProductRepository productRepository;
+    @Mock
+    private PurgomalumClient purgomalumClient;
 
     private Product product;
     private MenuProduct menuProduct;
@@ -34,17 +42,19 @@ class MenuServiceTest {
 
     @BeforeEach
     void setUp() {
+        TestContainers testContainers = new TestContainers();
+        menuService = new MenuService(testContainers.menuRepository, testContainers.menuGroupRepository, testContainers.productRepository, purgomalumClient);
+
         product = new ProductBuilder()
                 .with("치킨", BigDecimal.valueOf(10_000))
                 .build();
-        product = productRepository.save(product);
+        product = testContainers.productRepository.save(product);
 
         menuProduct = new MenuProductBuilder()
                 .withProduct(product)
                 .withQuantity(1)
                 .build();
-
-        menuGroup = menuGroupRepository.save(new MenuGroupBuilder().withName("한 마리 메뉴").build());
+        menuGroup = testContainers.menuGroupRepository.save(new MenuGroupBuilder().withName("한 마리 메뉴").build());
     }
 
     @DisplayName("메뉴를 등록할 때")
@@ -127,8 +137,8 @@ class MenuServiceTest {
                 .with("치킨", BigDecimal.valueOf(10_000))
                 .withMenuGroup(menuGroup)
                 .withMenuProducts(List.of(menuProduct))
+                .withDisplayed(true)
                 .build());
-        menuService.hide(menu.getId());
 
         // when
         Menu displayed = menuService.display(menu.getId());
