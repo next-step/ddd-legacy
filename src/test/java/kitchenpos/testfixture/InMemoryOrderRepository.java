@@ -28,6 +28,23 @@ public class InMemoryOrderRepository implements OrderRepository {
 
     @Override
     public boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status) {
-        return false;
+        List<Order> exists = orders.values()
+                .stream()
+                .filter(order -> order.getOrderTableId().equals(orderTable.getId()))
+                .toList();
+
+        if(exists.isEmpty()){
+            return false;
+        }
+
+        boolean isMatched = exists
+                .stream()
+                .anyMatch(order -> order.getStatus().equals(status));
+
+        if(isMatched){
+            return false;
+        }
+
+        return true;
     }
 }
