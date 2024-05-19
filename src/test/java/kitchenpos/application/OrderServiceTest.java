@@ -87,7 +87,7 @@ class OrderServiceTest {
 
             Order order = new OrderBuilder()
                     .withOrderType(OrderType.EAT_IN)
-                    .withOrderTable(new OrderTableBuilder().emptyTable().build())
+                    .withOrderTable(new OrderTable())
                     .build();
 
             assertThrows(IllegalArgumentException.class, () -> orderService.create(order));

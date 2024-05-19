@@ -15,9 +15,6 @@ public class OrderTableBuilder {
         return new OrderTableBuilder();
     }
 
-    public OrderTableBuilder emptyTable() {
-        return new OrderTableBuilder();
-    }
 
     public OrderTableBuilder with(String name) {
         this.name = name;
