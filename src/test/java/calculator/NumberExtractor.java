@@ -64,7 +64,7 @@ public class NumberExtractor {
         );
 
         if (!expression.matches(expressionPattern)) {
-            throw new IllegalArgumentException("입력을 해석할 수 없습니다.");
+            throw new IllegalArgumentException("형식에 맞지 않는 입력입니다. (입력 형식 예시 - //*\n1*2*3 or 1:2,3)");
         }
     }
 }

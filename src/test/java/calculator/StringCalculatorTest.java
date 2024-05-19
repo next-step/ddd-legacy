@@ -49,21 +49,24 @@ class StringCalculatorTest {
         @Test
         void outOfFormat() {
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> StringCalculator.add("1abb3"));
+                .isThrownBy(() -> StringCalculator.add("1abb3"))
+                .withMessage("형식에 맞지 않는 입력입니다. (입력 형식 예시 - //*\n1*2*3 or 1:2,3)");
         }
 
         @DisplayName(value = "구분자 외 다른 문자를 사용한 경우 IllegalArgumentException 예외 처리를 한다.")
         @Test
         void unreadableDelimiter() {
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> StringCalculator.add("//+\n1-3"));
+                .isThrownBy(() -> StringCalculator.add("//+\n1^3"))
+                .withMessage("형식에 맞지 않는 입력입니다. (입력 형식 예시 - //*\n1*2*3 or 1:2,3)");
         }
 
         @DisplayName(value = "커스텀 구분자를 누락한 경우 IllegalArgumentException 예외 처리를 한다.")
         @Test
         void notFoundDelimiter() {
             assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> StringCalculator.add("//\n1"));
+                .isThrownBy(() -> StringCalculator.add("//\n1"))
+                .withMessage("형식에 맞지 않는 입력입니다. (입력 형식 예시 - //*\n1*2*3 or 1:2,3)");
         }
     }
 
