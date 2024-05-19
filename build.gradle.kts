@@ -20,6 +20,8 @@ repositories {
     mavenCentral()
 }
 
+val restAssuredVersion = "5.4.0"
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
@@ -32,6 +34,7 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.mysql:mysql-connector-j")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.rest-assured:rest-assured:$restAssuredVersion")
 }
 
 tasks.withType<KotlinCompile> {

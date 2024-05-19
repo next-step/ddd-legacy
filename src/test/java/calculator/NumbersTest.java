@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class NumbersTest {
 
-    @DisplayName("입력받은 숫자들의 합을 반환한다.")
+    @DisplayName("Numbers 는 Numbers 의 총합을 제공한다.")
     @Test
     void sumTest() {
         // given

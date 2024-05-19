@@ -1,14 +1,13 @@
 package calculator;
 
-import calculator.exception.IllegalNumberException;
+import calculator.exception.InvalidNumberFormatException;
+import calculator.exception.NegativeNumberException;
 
 import java.util.Objects;
 
 public class Number {
     private static final int ZERO = 0;
     static final Number ZERO_NUMBER = new Number(ZERO);
-    static final String PARSING_INTEGER_EXCEPTION = "숫자로 변환할 수 없는 문자열 입니다.";
-    static final String NEGATIVE_NUMBER_EXCEPTION = "음수는 유효하지 않은 숫자입니다.";
 
     private final int value;
 
@@ -34,7 +33,7 @@ public class Number {
 
     private static void validateNumber(final int value) {
         if (value < ZERO) {
-            throw new IllegalNumberException(NEGATIVE_NUMBER_EXCEPTION, String.valueOf(value));
+            throw new NegativeNumberException(value);
         }
     }
 
@@ -42,7 +41,7 @@ public class Number {
         try {
             return Integer.parseInt(value);
         } catch (NumberFormatException e) {
-            throw new IllegalNumberException(PARSING_INTEGER_EXCEPTION, value);
+            throw new InvalidNumberFormatException(value);
         }
     }
 
