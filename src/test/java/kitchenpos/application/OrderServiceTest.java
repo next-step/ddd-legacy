@@ -6,6 +6,7 @@ import kitchenpos.domain.Order;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -56,6 +57,16 @@ class OrderServiceTest {
         void createOrderTest(OrderType orderType) {
 
             assertDoesNotThrow(() -> createOrder(orderType, OrderStatus.WAITING));
+        }
+
+
+        @DisplayName("주문의 타입이 없으면 주문 생성이 불가능하다")
+        @ParameterizedTest
+        @NullSource()
+        void createOrderFailedWhenOrderTypeIsNullTest(OrderType orderType) {
+
+            assertThatThrownBy(() -> createOrder(orderType, OrderStatus.WAITING))
+                    .isInstanceOf(IllegalArgumentException.class);
         }
 
         @DisplayName("배달 주문은 주소 정보가 없으면 주문 생성이 불가능하다")
