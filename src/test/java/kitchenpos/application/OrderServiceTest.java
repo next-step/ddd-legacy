@@ -19,6 +19,8 @@ import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.OrderLineItemFixture;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,6 +43,7 @@ class OrderServiceTest {
     private KitchenridersClient kitchenridersClient;
 
     private OrderService orderService;
+
 
     @BeforeEach
     void setUp() {
@@ -98,14 +101,9 @@ class OrderServiceTest {
         @Test
         void createOrderWithoutMenus() {
             // given
-            final Menu menu = new Menu();
-            menu.setId(UUID.randomUUID());
-            menu.setName("BHC HOT후라이드");
-            menu.setPrice(BigDecimal.valueOf(21_000L));
-            menu.setDisplayed(true);
+            final Menu menu = MenuFixture.createMenu();
 
-            final OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenuId(menu.getId());
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
             final Order order = new Order();
             order.setType(OrderType.EAT_IN);
@@ -123,15 +121,9 @@ class OrderServiceTest {
         @Test
         void createEatInOrder() {
             // given
-            final Menu menu = new Menu();
-            menu.setId(UUID.randomUUID());
-            menu.setName("BHC HOT후라이드");
-            menu.setPrice(BigDecimal.valueOf(21_000L));
-            menu.setDisplayed(true);
+            final Menu menu = MenuFixture.createMenu();
 
-            final OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenuId(menu.getId());
-            orderLineItem.setQuantity(1L);
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
             orderLineItem.setPrice(menu.getPrice());
 
             final Order order = new Order();
@@ -158,16 +150,10 @@ class OrderServiceTest {
         @Test
         void createOrderWithNegativeQuantity() {
             // given
-            final Menu menu = new Menu();
-            menu.setId(UUID.randomUUID());
-            menu.setName("BHC HOT후라이드");
-            menu.setPrice(BigDecimal.valueOf(21_000L));
-            menu.setDisplayed(true);
+            final Menu menu = MenuFixture.createMenu();
 
-            final OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenuId(menu.getId());
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
             orderLineItem.setQuantity(-1L);
-            orderLineItem.setPrice(menu.getPrice());
 
             final Order order = new Order();
             order.setOrderLineItems(List.of(orderLineItem));
@@ -184,16 +170,9 @@ class OrderServiceTest {
         @Test
         void createEatInOrderWithoutOrderTable() {
             // given
-            final Menu menu = new Menu();
-            menu.setId(UUID.randomUUID());
-            menu.setName("BHC HOT후라이드");
-            menu.setPrice(BigDecimal.valueOf(21_000L));
-            menu.setDisplayed(true);
+            final Menu menu = MenuFixture.createMenu();
 
-            final OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenuId(menu.getId());
-            orderLineItem.setQuantity(1L);
-            orderLineItem.setPrice(menu.getPrice());
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
             final Order order = new Order();
             order.setOrderLineItems(List.of(orderLineItem));
@@ -216,16 +195,9 @@ class OrderServiceTest {
         @Test
         void createDeliveryOrder() {
             // given
-            final Menu menu = new Menu();
-            menu.setId(UUID.randomUUID());
-            menu.setName("BHC HOT후라이드");
-            menu.setPrice(BigDecimal.valueOf(21_000L));
-            menu.setDisplayed(true);
+            final Menu menu = MenuFixture.createMenu();
 
-            final OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenuId(menu.getId());
-            orderLineItem.setQuantity(1L);
-            orderLineItem.setPrice(menu.getPrice());
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
             final Order order = new Order();
             order.setOrderLineItems(List.of(orderLineItem));
@@ -247,16 +219,9 @@ class OrderServiceTest {
         @Test
         void createDeliveryOrderWithoutDeliveryAddress() {
             // given
-            final Menu menu = new Menu();
-            menu.setId(UUID.randomUUID());
-            menu.setName("BHC HOT후라이드");
-            menu.setPrice(BigDecimal.valueOf(21_000L));
-            menu.setDisplayed(true);
+            final Menu menu = MenuFixture.createMenu();
 
-            final OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenuId(menu.getId());
-            orderLineItem.setQuantity(1L);
-            orderLineItem.setPrice(menu.getPrice());
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
             final Order order = new Order();
             order.setOrderLineItems(List.of(orderLineItem));
@@ -280,10 +245,7 @@ class OrderServiceTest {
             menu.setPrice(BigDecimal.valueOf(21_000L));
             menu.setDisplayed(false);
 
-            final OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenuId(menu.getId());
-            orderLineItem.setQuantity(1L);
-            orderLineItem.setPrice(menu.getPrice());
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
             final Order order = new Order();
             order.setOrderLineItems(List.of(orderLineItem));
@@ -301,15 +263,9 @@ class OrderServiceTest {
         @Test
         void createOrderWithDifferentPriceMenu() {
             // given
-            final Menu menu = new Menu();
-            menu.setId(UUID.randomUUID());
-            menu.setName("BHC HOT후라이드");
-            menu.setPrice(BigDecimal.valueOf(21_000L));
-            menu.setDisplayed(true);
+            final Menu menu = MenuFixture.createMenu();
 
-            final OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenuId(menu.getId());
-            orderLineItem.setQuantity(1L);
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
             orderLineItem.setPrice(BigDecimal.valueOf(20_000L));
 
             final Order order = new Order();
@@ -365,17 +321,9 @@ class OrderServiceTest {
         @Test
         void acceptDeliveryOrder() {
             // given
-            final Menu menu = new Menu();
-            menu.setId(UUID.randomUUID());
-            menu.setName("BHC HOT후라이드");
-            menu.setPrice(BigDecimal.valueOf(21_000L));
-            menu.setDisplayed(true);
+            final Menu menu = MenuFixture.createMenu();
 
-            final OrderLineItem orderLineItem = new OrderLineItem();
-            orderLineItem.setMenuId(menu.getId());
-            orderLineItem.setMenu(menu);
-            orderLineItem.setQuantity(1L);
-            orderLineItem.setPrice(menu.getPrice());
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
             final Order order = new Order();
             order.setId(UUID.randomUUID());

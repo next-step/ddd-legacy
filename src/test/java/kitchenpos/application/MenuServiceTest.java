@@ -18,6 +18,9 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.MenuProductFixture;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,18 +58,13 @@ class MenuServiceTest {
     @Test
     void hideMenu() {
         // given
-        Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setPrice(BigDecimal.valueOf(2000));
+        Product product = ProductFixture.createProduct();
 
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(1);
+        MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product);
 
-        Menu menu = new Menu();
+        Menu menu = MenuFixture.createMenu();
+        MenuProductFixture.createMenuProduct(product);
         menu.setMenuProducts(List.of(menuProduct));
-        menu.setPrice(BigDecimal.valueOf(1500));
-        menu.setDisplayed(true);
 
         when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
@@ -106,17 +104,13 @@ class MenuServiceTest {
             MenuGroup menuGroup = new MenuGroup();
             menuGroup.setId(UUID.randomUUID());
 
-            Product product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setPrice(BigDecimal.valueOf(1000));
+            Product product = ProductFixture.createProduct();
 
-            MenuProduct menuProductRequest = new MenuProduct();
-            menuProductRequest.setProductId(product.getId());
-            menuProductRequest.setQuantity(1);
+            MenuProduct menuProductRequest = MenuProductFixture.createMenuProduct(product);
 
             Menu validRequest = new Menu();
             validRequest.setName("메뉴 이름");
-            validRequest.setPrice(BigDecimal.valueOf(1000));
+            validRequest.setPrice(product.getPrice());
             validRequest.setMenuGroupId(menuGroup.getId());
             validRequest.setMenuProducts(List.of(menuProductRequest));
             validRequest.setDisplayed(true);
@@ -168,17 +162,13 @@ class MenuServiceTest {
             MenuGroup menuGroup = new MenuGroup();
             menuGroup.setId(UUID.randomUUID());
 
-            Product product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setPrice(BigDecimal.valueOf(1000));
+            Product product = ProductFixture.createProduct();
 
-            MenuProduct menuProductRequest = new MenuProduct();
-            menuProductRequest.setProductId(product.getId());
-            menuProductRequest.setQuantity(1);
+            MenuProduct menuProductRequest = MenuProductFixture.createMenuProduct(product);
 
             Menu invalidMenuRequest = new Menu();
             invalidMenuRequest.setName(null);
-            invalidMenuRequest.setPrice(BigDecimal.valueOf(1000));
+            invalidMenuRequest.setPrice(product.getPrice());
             invalidMenuRequest.setMenuGroupId(menuGroup.getId());
             invalidMenuRequest.setMenuProducts(List.of(menuProductRequest));
             invalidMenuRequest.setDisplayed(true);
@@ -198,17 +188,13 @@ class MenuServiceTest {
             MenuGroup menuGroup = new MenuGroup();
             menuGroup.setId(UUID.randomUUID());
 
-            Product product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setPrice(BigDecimal.valueOf(1000));
+            Product product = ProductFixture.createProduct();
 
-            MenuProduct menuProductRequest = new MenuProduct();
-            menuProductRequest.setProductId(product.getId());
-            menuProductRequest.setQuantity(1);
+            MenuProduct menuProductRequest = MenuProductFixture.createMenuProduct(product);
 
             Menu request = new Menu();
             request.setName("대충 나쁜 말");
-            request.setPrice(BigDecimal.valueOf(1000));
+            request.setPrice(product.getPrice());
             request.setMenuGroupId(menuGroup.getId());
             request.setMenuProducts(List.of(menuProductRequest));
             request.setDisplayed(true);
@@ -269,17 +255,13 @@ class MenuServiceTest {
             MenuGroup menuGroup = new MenuGroup();
             menuGroup.setId(UUID.randomUUID());
 
-            Product product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setPrice(BigDecimal.valueOf(1000));
+            Product product = ProductFixture.createProduct();
 
-            MenuProduct menuProductRequest = new MenuProduct();
-            menuProductRequest.setProductId(product.getId());
-            menuProductRequest.setQuantity(1);
+            MenuProduct menuProductRequest = MenuProductFixture.createMenuProduct(product);
 
             Menu request = new Menu();
             request.setName("메뉴 이름");
-            request.setPrice(BigDecimal.valueOf(1000));
+            request.setPrice(product.getPrice());
             request.setMenuGroupId(menuGroup.getId());
             request.setMenuProducts(List.of(menuProductRequest));
             request.setDisplayed(true);
@@ -298,17 +280,14 @@ class MenuServiceTest {
             MenuGroup menuGroup = new MenuGroup();
             menuGroup.setId(UUID.randomUUID());
 
-            Product product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setPrice(BigDecimal.valueOf(1000));
+            Product product = ProductFixture.createProduct();
 
-            MenuProduct menuProductRequest = new MenuProduct();
-            menuProductRequest.setProductId(product.getId());
+            MenuProduct menuProductRequest = MenuProductFixture.createMenuProduct(product);
             menuProductRequest.setQuantity(-1);
 
             Menu request = new Menu();
             request.setName("메뉴 이름");
-            request.setPrice(BigDecimal.valueOf(1000));
+            request.setPrice(product.getPrice());
             request.setMenuGroupId(menuGroup.getId());
             request.setMenuProducts(List.of(menuProductRequest));
             request.setDisplayed(true);
@@ -327,17 +306,13 @@ class MenuServiceTest {
             MenuGroup menuGroup = new MenuGroup();
             menuGroup.setId(UUID.randomUUID());
 
-            Product product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setPrice(BigDecimal.valueOf(1000));
+            Product product = ProductFixture.createProduct();
 
-            MenuProduct menuProductRequest = new MenuProduct();
-            menuProductRequest.setProductId(product.getId());
-            menuProductRequest.setQuantity(1);
+            MenuProduct menuProductRequest = MenuProductFixture.createMenuProduct(product);
 
             Menu request = new Menu();
             request.setName("메뉴 이름");
-            request.setPrice(BigDecimal.valueOf(2000));
+            request.setPrice(product.getPrice().add(BigDecimal.valueOf(1000)));
             request.setMenuGroupId(menuGroup.getId());
             request.setMenuProducts(List.of(menuProductRequest));
             request.setDisplayed(true);
@@ -358,23 +333,18 @@ class MenuServiceTest {
         @Test
         void displayMenu() {
             // give
-            Product product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setPrice(BigDecimal.valueOf(2000));
+            Product product = ProductFixture.createProduct();
 
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product);
 
-            Menu menu = new Menu();
+            Menu menu = MenuFixture.createMenu();
             menu.setMenuProducts(List.of(menuProduct));
-            menu.setPrice(BigDecimal.valueOf(1500));
             menu.setDisplayed(false);
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
             // when
-            Menu result = menuService.display(UUID.randomUUID());
+            Menu result = menuService.display(menu.getId());
 
             // then
             assertAll(
@@ -387,18 +357,13 @@ class MenuServiceTest {
         @Test
         void displayMenuWithInvalidPrice() {
             // given
-            Product product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setPrice(BigDecimal.valueOf(2000));
+            Product product = ProductFixture.createProduct();
 
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product);
 
-            Menu menu = new Menu();
+            Menu menu = MenuFixture.createMenu();
             menu.setMenuProducts(List.of(menuProduct));
-            menu.setPrice(BigDecimal.valueOf(3000));
-            menu.setDisplayed(false);
+            menu.setPrice(product.getPrice().add(BigDecimal.valueOf(1000)));
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
@@ -414,18 +379,12 @@ class MenuServiceTest {
         @Test
         void changePriceWithValidInput() {
             // given
-            Product product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setPrice(BigDecimal.valueOf(2000));
+            Product product = ProductFixture.createProduct();
 
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product);
 
-            Menu menu = new Menu();
+            Menu menu = MenuFixture.createMenu();
             menu.setMenuProducts(List.of(menuProduct));
-            menu.setPrice(BigDecimal.valueOf(1500));
-            menu.setDisplayed(true);
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
@@ -470,9 +429,7 @@ class MenuServiceTest {
         @Test
         void changePriceWithInvalidPrice() {
             // given
-            Product product = new Product();
-            product.setId(UUID.randomUUID());
-            product.setPrice(BigDecimal.valueOf(2000));
+            Product product = ProductFixture.createProduct();
 
             MenuProduct menuProduct = new MenuProduct();
             menuProduct.setProduct(product);
@@ -480,13 +437,13 @@ class MenuServiceTest {
 
             Menu menu = new Menu();
             menu.setMenuProducts(List.of(menuProduct));
-            menu.setPrice(BigDecimal.valueOf(1500));
+            menu.setPrice(product.getPrice().add(BigDecimal.valueOf(1000)));
             menu.setDisplayed(true);
 
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
 
             Menu request = new Menu();
-            request.setPrice(BigDecimal.valueOf(3000));
+            request.setPrice(product.getPrice().add(BigDecimal.valueOf(1000)));
 
             // when & then
             assertThrows(IllegalArgumentException.class,

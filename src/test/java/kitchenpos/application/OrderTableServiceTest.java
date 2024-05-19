@@ -16,6 +16,7 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.fixture.OrderTableFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,8 +43,8 @@ class OrderTableServiceTest {
     @Test
     void create() {
         // given
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setName("테이블");
+        final OrderTable request = new OrderTable();
+        request.setName("테이블");
 
         when(orderTableRepository.save(any())).then(invocation -> {
             OrderTable savedOrderTable = invocation.getArgument(0);
@@ -52,13 +53,13 @@ class OrderTableServiceTest {
         });
 
         // when
-        OrderTable createdOrderTable = orderTableService.create(orderTable);
+        OrderTable createdOrderTable = orderTableService.create(request);
 
         // then
         assertAll(
             () -> assertNotNull(createdOrderTable),
             () -> assertNotNull(createdOrderTable.getId()),
-            () -> assertEquals(orderTable.getName(), createdOrderTable.getName()),
+            () -> assertEquals(request.getName(), createdOrderTable.getName()),
             () -> assertEquals(0, createdOrderTable.getNumberOfGuests()),
             () -> assertFalse(createdOrderTable.isOccupied())
         );
@@ -80,9 +81,7 @@ class OrderTableServiceTest {
     @Test
     void sit() {
         // given
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setOccupied(false);
+        final OrderTable orderTable = OrderTableFixture.createOrderTable();
 
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(
             Optional.of(orderTable));
@@ -102,8 +101,7 @@ class OrderTableServiceTest {
     @Test
     void clear() {
         // given
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
+        final OrderTable orderTable = OrderTableFixture.createOrderTable();
         orderTable.setOccupied(true);
 
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(
@@ -127,8 +125,7 @@ class OrderTableServiceTest {
     @Test
     void clearWithNotCompletedOrder() {
         // given
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
+        final OrderTable orderTable = OrderTableFixture.createOrderTable();
         orderTable.setOccupied(true);
 
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(
@@ -145,9 +142,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests() {
         // given
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setNumberOfGuests(0);
+        final OrderTable orderTable = OrderTableFixture.createOrderTable();
         orderTable.setOccupied(true);
 
         final OrderTable request = new OrderTable();
@@ -172,10 +167,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuestsWithEmptyOrder() {
         // given
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setNumberOfGuests(0);
-        orderTable.setOccupied(false);
+        final OrderTable orderTable = OrderTableFixture.createOrderTable();
 
         final OrderTable request = new OrderTable();
         request.setNumberOfGuests(4);
@@ -205,11 +197,7 @@ class OrderTableServiceTest {
     @Test
     void findAll() {
         // given
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName("테이블");
-        orderTable.setNumberOfGuests(0);
-        orderTable.setOccupied(false);
+        final OrderTable orderTable = OrderTableFixture.createOrderTable();
 
         when(orderTableRepository.findAll()).thenReturn(List.of(orderTable));
 

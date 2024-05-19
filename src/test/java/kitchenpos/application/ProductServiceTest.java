@@ -15,6 +15,9 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.MenuProductFixture;
+import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -55,9 +58,7 @@ public class ProductServiceTest {
         @DisplayName("`상품`을 생성할 수 있다.")
         @Test
         void createProductWithValidInput() {
-            Product validProduct = new Product();
-            validProduct.setName("상품 이름");
-            validProduct.setPrice(BigDecimal.valueOf(1000));
+            Product validProduct = ProductFixture.createProduct();
 
             when(purgomalumClient.containsProfanity(any())).thenReturn(false);
             when(productRepository.save(any())).then(invocation -> invocation.getArgument(0));
@@ -73,18 +74,17 @@ public class ProductServiceTest {
         @DisplayName("`상품`의 가격은 0 이상이어야 한다")
         @Test
         void createProductWithNegativePrice() {
-            Product request = new Product();
-            request.setName("상품 이름");
-            request.setPrice(BigDecimal.valueOf(-1000));
+            Product invalidRequest = ProductFixture.createProduct();
+            invalidRequest.setPrice(BigDecimal.valueOf(-1000));
 
-            assertThrows(IllegalArgumentException.class, () -> productService.create(request));
+            assertThrows(IllegalArgumentException.class,
+                () -> productService.create(invalidRequest));
         }
 
         @DisplayName("`상품`의 가격은 null이 아니어야 한다")
         @Test
         void createProductWithNullPrice() {
-            Product request = new Product();
-            request.setName("상품 이름");
+            Product request = ProductFixture.createProduct();
             request.setPrice(null);
 
             assertThrows(IllegalArgumentException.class, () -> productService.create(request));
@@ -93,9 +93,8 @@ public class ProductServiceTest {
         @DisplayName("`상품`의 이름은 null이 아니어야 한다")
         @Test
         void createProductWithNullName() {
-            Product request = new Product();
+            Product request = ProductFixture.createProduct();
             request.setName(null);
-            request.setPrice(BigDecimal.valueOf(1000));
 
             assertThrows(IllegalArgumentException.class, () -> productService.create(request));
         }
@@ -103,9 +102,8 @@ public class ProductServiceTest {
         @DisplayName("`상품`의 이름에 욕설이 포함되어 있으면 생성할 수 없다")
         @Test
         void createProductWithProfanityInName() {
-            Product request = new Product();
+            Product request = ProductFixture.createProduct();
             request.setName("대충 나쁜 단어");
-            request.setPrice(BigDecimal.valueOf(1000));
 
             when(purgomalumClient.containsProfanity(any())).thenReturn(true);
 
@@ -119,23 +117,16 @@ public class ProductServiceTest {
         @DisplayName("`상품`의 가격을 변경할 수 있다")
         @Test
         void changeProductPriceWithValidInput() {
-            Product request = new Product();
-            request.setName("상품 이름");
-            request.setPrice(BigDecimal.valueOf(2000));
+            Product existingProduct = ProductFixture.createProduct();
 
-            Product existingProduct = new Product();
-            existingProduct.setId(UUID.randomUUID());
-            existingProduct.setName("상품 이름");
-            existingProduct.setPrice(BigDecimal.valueOf(3000));
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(existingProduct);
 
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(existingProduct);
-            menuProduct.setQuantity(1);
-
-            Menu menu = new Menu();
+            Menu menu = MenuFixture.createMenu();
             menu.setMenuProducts(List.of(menuProduct));
-            menu.setPrice(BigDecimal.valueOf(1500));
-            menu.setDisplayed(true);
+
+            Product request = new Product();
+            request.setName(existingProduct.getName());
+            request.setPrice(menu.getPrice().add(BigDecimal.valueOf(1000)));
 
             when(productRepository.findById(any())).thenReturn(Optional.of(existingProduct));
             when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
@@ -171,23 +162,16 @@ public class ProductServiceTest {
         @DisplayName("'상품'의 가격이 변경되어, '상품'이 포함된 기존 '메뉴' 가격보다 높으면 숨김 처리 된다.")
         @Test
         void changeProductPriceWithHigherPriceThanMenu() {
-            Product request = new Product();
-            request.setName("상품 이름");
-            request.setPrice(BigDecimal.valueOf(1000));
+            Product existingProduct = ProductFixture.createProduct();
 
-            Product existingProduct = new Product();
-            existingProduct.setId(UUID.randomUUID());
-            existingProduct.setName("상품 이름");
-            existingProduct.setPrice(BigDecimal.valueOf(2000));
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(existingProduct);
 
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(existingProduct);
-            menuProduct.setQuantity(1);
-
-            Menu menu = new Menu();
+            Menu menu = MenuFixture.createMenu();
             menu.setMenuProducts(List.of(menuProduct));
-            menu.setPrice(BigDecimal.valueOf(1500));
-            menu.setDisplayed(true);
+
+            Product request = new Product();
+            request.setName(existingProduct.getName());
+            request.setPrice(existingProduct.getPrice().subtract(BigDecimal.valueOf(1000)));
 
             when(productRepository.findById(any())).thenReturn(Optional.of(existingProduct));
             when(menuRepository.findAllByProductId(any())).thenReturn(List.of(menu));
