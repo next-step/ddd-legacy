@@ -10,7 +10,7 @@ public class NumberExtractor {
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(
         String.format("^//%s\n(.*)", ANY_WORD_WITHOUT_NUMBER_AND_SPACE_PATTERN)
     );
-    private static final Pattern NUMBER_PATTERN = Pattern.compile("[1-9][d]*");
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("[-]?[1-9][d]*");
     private static final String EXPRESSION_REGEX_FORMAT = "^%s[(%s)%s]*$";
     private static final String DEFAULT_DELIMITER = ",|:";
     private static final int CUSTOM_DELIMITER_GROUP = 0;
