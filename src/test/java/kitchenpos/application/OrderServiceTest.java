@@ -4,6 +4,7 @@ import fixtures.MenuProductSteps;
 import fixtures.OrderBuilder;
 import fixtures.OrderLineItemBuilder;
 import fixtures.OrderSteps;
+import fixtures.TestContainers;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -15,13 +16,17 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -32,21 +37,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
 
-    @Autowired
     private OrderService orderService;
-    @Autowired
+
+    @Mock
+    private KitchenridersClient kitchenridersClient;
     private OrderRepository orderRepository;
-    @Autowired
-    private MenuGroupRepository menuGroupRepository;
-    @Autowired
-    private MenuRepository menuRepository;
-    @Autowired
-    private OrderTableRepository orderTableRepository;
-    @Autowired
-    private ProductRepository productRepository;
 
     private OrderSteps orderSteps;
     private MenuProductSteps menuProductSteps;
@@ -54,6 +52,15 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
+        TestContainers testContainers = new TestContainers();
+
+        orderRepository = testContainers.orderRepository;
+        OrderTableRepository orderTableRepository = testContainers.orderTableRepository;
+        ProductRepository productRepository = testContainers.productRepository;
+        MenuRepository menuRepository = testContainers.menuRepository;
+        MenuGroupRepository menuGroupRepository = testContainers.menuGroupRepository;
+
+        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
         orderSteps = new OrderSteps(orderRepository, orderTableRepository);
         menuProductSteps = new MenuProductSteps(menuGroupRepository, menuRepository, productRepository);
     }
