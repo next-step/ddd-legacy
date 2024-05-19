@@ -57,8 +57,8 @@ class MenuServiceTest {
     @BeforeEach
     void setUp() {
         커플메뉴_메뉴그룹 = createMenuGroup("커플 메뉴");
-        후라이드_치킨_상품 = createProduct("후라이드 치킨", BigDecimal.valueOf(12000));
-        강정_치킨_상품 = createProduct("강정 치킨", BigDecimal.valueOf(15000));
+        후라이드_치킨_상품 = createProduct("후라이드 치킨", BigDecimal.valueOf(12_000));
+        강정_치킨_상품 = createProduct("강정 치킨", BigDecimal.valueOf(15_000));
         후라이드_치킨_메뉴상품 = createMenuProduct(후라이드_치킨_상품, 1);
         강정_치킨_메뉴상품 = createMenuProduct(강정_치킨_상품, 1);
         커플_강정_후라이드_메뉴 = 커플_강정_후라이드_메뉴(커플메뉴_메뉴그룹, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
@@ -114,7 +114,7 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴는 하나 이상의 메뉴 그룹에 속해 있지 않으면 NoSuchElementException을 반환한다.")
         void menuBelongToMenuGroup() {
-            Menu request = withoutMenuGroup("커플 강정 + 후라이드", true, BigDecimal.valueOf(12000), 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
+            Menu request = withoutMenuGroup("커플 강정 + 후라이드", true, BigDecimal.valueOf(12_000), 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
 
             assertThat(request.getMenuGroup()).isNull();
             assertThatThrownBy(() -> menuService.create(request))
@@ -125,7 +125,7 @@ class MenuServiceTest {
         @DisplayName("메뉴 상품이 없거나 null이라면 IllegalArgumentException을 반환한다.")
         @MethodSource("menuProductIsNullAndEmpty")
         void menuProductIsNullOrEmpty(List<MenuProduct> menuProducts) {
-            Menu request = createMenu("커플 강정 + 후라이드", 커플메뉴_메뉴그룹, menuProducts, BigDecimal.valueOf(12000));
+            Menu request = createMenu("커플 강정 + 후라이드", 커플메뉴_메뉴그룹, menuProducts, BigDecimal.valueOf(12_000));
             when(menuGroupRepository.findById(any())).thenReturn(Optional.of(커플메뉴_메뉴그룹));
 
             assertThatThrownBy(() -> menuService.create(request))
@@ -148,7 +148,7 @@ class MenuServiceTest {
         @DisplayName("메뉴에 등록하려하는 메뉴 상품의 수량은 음수가 될 수 없다.")
         void menuProductQuantityIsNotLessThanZero(long quantity) {
             // given
-            Menu request = createMenu("커플 강정 + 후라이드", 커플메뉴_메뉴그룹, BigDecimal.valueOf(20000), true, createMenuProduct(후라이드_치킨_상품, quantity));
+            Menu request = createMenu("커플 강정 + 후라이드", 커플메뉴_메뉴그룹, BigDecimal.valueOf(20_000), true, createMenuProduct(후라이드_치킨_상품, quantity));
             stubMenuGroupAndProduct();
 
             // when & then
@@ -159,7 +159,7 @@ class MenuServiceTest {
         @Test
         @DisplayName("메뉴의 가격은 메뉴 상품의 가격의 합보다 클 수 없다.")
         void menuPriceIsGreaterThanMenuProductQuantityPrice() {
-            Menu request = createMenu("커플 강정 + 후라이드", 커플메뉴_메뉴그룹, BigDecimal.valueOf(30000), true, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
+            Menu request = createMenu("커플 강정 + 후라이드", 커플메뉴_메뉴그룹, BigDecimal.valueOf(30_000), true, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
             stubMenu();
 
             assertThatThrownBy(() -> menuService.create(request))
@@ -170,7 +170,7 @@ class MenuServiceTest {
         @NullSource
         @DisplayName("메뉴의 이름은 null이 될 수 없다.")
         void menuNameCannotBeNull(String name) {
-            Menu request = createMenu(name, 커플메뉴_메뉴그룹, BigDecimal.valueOf(20000), true, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
+            Menu request = createMenu(name, 커플메뉴_메뉴그룹, BigDecimal.valueOf(20_000), true, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
             stubMenu();
 
             assertThatThrownBy(() -> menuService.create(request))
@@ -181,7 +181,7 @@ class MenuServiceTest {
         @ValueSource(strings = {"비속어1", "비속어2"})
         @DisplayName("메뉴의 이름은 비속어가 될 수 없다.")
         void menuNameCannotProfanity(String name) {
-            Menu request = createMenu(name, 커플메뉴_메뉴그룹, BigDecimal.valueOf(20000), true, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
+            Menu request = createMenu(name, 커플메뉴_메뉴그룹, BigDecimal.valueOf(20_000), true, 후라이드_치킨_메뉴상품, 강정_치킨_메뉴상품);
             stubMenu();
 
             when(purgomalumClient.containsProfanity(name)).thenReturn(true);
@@ -230,7 +230,7 @@ class MenuServiceTest {
             when(menuRepository.findById(any())).thenReturn(Optional.empty());
 
             // when & then
-            Menu request = changePriceMenu(BigDecimal.valueOf(10000));
+            Menu request = changePriceMenu(BigDecimal.valueOf(10_000));
             assertThatThrownBy(() -> menuService.changePrice(커플_강정_후라이드_메뉴ID, request))
                     .isInstanceOf(NoSuchElementException.class);
         }
@@ -240,7 +240,7 @@ class MenuServiceTest {
         void priceIsGreaterThanMenuProductQuantityPrice() {
             // given
             when(menuRepository.findById(any())).thenReturn(Optional.of(커플_강정_후라이드_메뉴));
-            Menu request = changePriceMenu(BigDecimal.valueOf(50000));
+            Menu request = changePriceMenu(BigDecimal.valueOf(50_000));
 
             // when & then
             assertThatThrownBy(() -> menuService.changePrice(커플_강정_후라이드_메뉴ID, request))
@@ -285,7 +285,7 @@ class MenuServiceTest {
         @Test
         @DisplayName("전시하려는 메뉴의 가격은 메뉴 상품의 가격의 합보다 클 수 없다.")
         void priceIsGreaterThanMenuProductQuantityPrice() {
-            Menu request = createMenu("커플_후라이드_메뉴", 커플메뉴_메뉴그룹, BigDecimal.valueOf(20000), false, 후라이드_치킨_메뉴상품);
+            Menu request = createMenu("커플_후라이드_메뉴", 커플메뉴_메뉴그룹, BigDecimal.valueOf(20_000), false, 후라이드_치킨_메뉴상품);
             when(menuRepository.findById(any())).thenReturn(Optional.of(request));
 
             assertThatThrownBy(() -> menuService.display(request.getId()))

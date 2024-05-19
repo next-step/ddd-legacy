@@ -38,7 +38,7 @@ public class MenuFixture {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setName("커플 강정 + 후라이드");
-        menu.setPrice(BigDecimal.valueOf(20000));
+        menu.setPrice(BigDecimal.valueOf(20_000));
         menu.setMenuProducts(List.of(menuProducts));
         menu.setDisplayed(true);
         menu.setMenuGroup(menuGroup);

@@ -74,8 +74,8 @@ class OrderServiceTest {
 
     @BeforeEach
     void setUp() {
-        후라이드_치킨_상품 = createProduct("후라이드 치킨", BigDecimal.valueOf(12000));
-        강정_치킨_상품 = createProduct("강정 치킨", BigDecimal.valueOf(15000));
+        후라이드_치킨_상품 = createProduct("후라이드 치킨", BigDecimal.valueOf(12_000));
+        강정_치킨_상품 = createProduct("강정 치킨", BigDecimal.valueOf(15_000));
         커플메뉴_메뉴그룹 = createMenuGroup("커플 메뉴");
         후라이드_치킨_메뉴상품 = createMenuProduct(후라이드_치킨_상품, 1);
         강정_치킨_메뉴상품 = createMenuProduct(강정_치킨_상품, 1);
@@ -164,7 +164,7 @@ class OrderServiceTest {
             void fail6() {
                 when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(커플_강정_후라이드_메뉴));
                 when(menuRepository.findById(any())).thenReturn(Optional.of(커플_강정_후라이드_메뉴));
-                Order request = OrderFixture.createOrderRequest(OrderType.EAT_IN, OrderStatus.WAITING, List.of(createOrderLineItem(5000)));
+                Order request = OrderFixture.createOrderRequest(OrderType.EAT_IN, OrderStatus.WAITING, List.of(createOrderLineItem(50_00)));
 
                 assertThatThrownBy(() -> orderService.create(request))
                         .isInstanceOf(IllegalArgumentException.class);

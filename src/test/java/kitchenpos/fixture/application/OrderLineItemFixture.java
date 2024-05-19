@@ -32,7 +32,7 @@ public class OrderLineItemFixture {
         OrderLineItem orderLineItem = new OrderLineItem();
         orderLineItem.setMenuId(menuId);
         orderLineItem.setMenu(menu);
-        orderLineItem.setPrice(BigDecimal.valueOf(20000));
+        orderLineItem.setPrice(BigDecimal.valueOf(20_000));
         orderLineItem.setQuantity(1);
         return orderLineItem;
     }

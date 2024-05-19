@@ -10,7 +10,7 @@ public class ProductFixture {
     public static Product createProduct(String name) {
         Product product = new Product();
         product.setId(UUID.randomUUID());
-        product.setPrice(BigDecimal.valueOf(10000));
+        product.setPrice(BigDecimal.valueOf(10_000));
         product.setName(name);
         return product;
     }

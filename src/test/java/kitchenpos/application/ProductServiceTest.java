@@ -50,8 +50,8 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
-        강정치킨 = createProduct("강정치킨", BigDecimal.valueOf(12000));
-        후라이드치킨 = createProduct("후라이드치킨", BigDecimal.valueOf(11000));
+        강정치킨 = createProduct("강정치킨", BigDecimal.valueOf(12_000));
+        후라이드치킨 = createProduct("후라이드치킨", BigDecimal.valueOf(11_000));
     }
 
     @DisplayName("상품 등록")
@@ -63,7 +63,7 @@ class ProductServiceTest {
         @ValueSource(strings = {"", " ", "강정치킨"})
         void create(String name) {
             // given
-            Product product = createProduct(name, BigDecimal.valueOf(18000));
+            Product product = createProduct(name, BigDecimal.valueOf(18_000));
             given(productRepository.save(any())).willReturn(product);
 
             // when
@@ -132,7 +132,7 @@ class ProductServiceTest {
         void changePrice() {
             when(productRepository.findById(any())).thenReturn(Optional.of(강정치킨));
 
-            Product request = changeProduct(BigDecimal.valueOf(10000));
+            Product request = changeProduct(BigDecimal.valueOf(10_000));
             Product result = productService.changePrice(강정치킨.getId(), request);
 
             assertThat(result.getPrice()).isEqualTo(request.getPrice());
@@ -151,7 +151,7 @@ class ProductServiceTest {
 
         @ParameterizedTest
         @DisplayName("변경하려는 상품의 가격이 0보다 작으면 예외가 발생한다")
-        @ValueSource(ints = {-1, -20000})
+        @ValueSource(ints = {-1, -20_000})
         void changePriceIsLowerThanZero(int price) {
             Product request = changeProduct(BigDecimal.valueOf(price));
 
@@ -164,8 +164,8 @@ class ProductServiceTest {
         @DisplayName("메뉴의 가격이 메뉴에 등록되어 있는 상품의 합(가격 * 수량)보다 크다면 메뉴는 전시되지 않는다")
         void changeProductPriceThenNotDisplayed() {
             // given
-            BigDecimal 변경하려는_가격 = BigDecimal.valueOf(8000);
-            Product 강정치킨 = createProduct("강정치킨", BigDecimal.valueOf(12000));
+            BigDecimal 변경하려는_가격 = BigDecimal.valueOf(8_000);
+            Product 강정치킨 = createProduct("강정치킨", BigDecimal.valueOf(12_000));
             List<Menu> menus = createMenus(강정치킨);
 
             when(productRepository.findById(any())).thenReturn(Optional.of(강정치킨));
@@ -194,7 +194,7 @@ class ProductServiceTest {
     private List<Menu> createMenus(Product product) {
         MenuGroup menuGroup = createMenuGroup("1+1 메뉴");
         MenuProduct menuProduct = createMenuProduct(product, 2);
-        Menu menu = createMenu("강정치킨 + 강정치킨", menuGroup, List.of(menuProduct), BigDecimal.valueOf(18000));
+        Menu menu = createMenu("강정치킨 + 강정치킨", menuGroup, List.of(menuProduct), BigDecimal.valueOf(18_000));
         return List.of(menu);
     }
 }
