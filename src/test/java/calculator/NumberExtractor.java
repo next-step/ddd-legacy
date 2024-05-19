@@ -10,11 +10,16 @@ public class NumberExtractor {
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(
         String.format("^//%s\n(.*)", ANY_WORD_WITHOUT_NUMBER_AND_SPACE_PATTERN)
     );
-    private static final String NUMBER_PATTERN = "[1-9][d]*";
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("[1-9][d]*");
+    private static final String EXPRESSION_REGEX_FORMAT = "^%s[(%s)%s]*$";
     private static final String DEFAULT_DELIMITER = ",|:";
+    private static final int CUSTOM_DELIMITER_GROUP = 0;
+    private static final int CUSTOM_DELIMITER_START_OFFSET = 2;
+    private static final int CUSTOM_DELIMITER_END_OFFSET = 3;
+    private static final int EXPRESSION_GROUP = 1;
 
     public static List<String> extract(final String input) {
-        if (input.matches(NUMBER_PATTERN)) {
+        if (NUMBER_PATTERN.matcher(input).matches()) {
             return List.of(input);
         }
 
@@ -30,7 +35,8 @@ public class NumberExtractor {
         final var matcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         if (matcher.matches()) {
-            return matcher.group(0).substring(2, 3);
+            return matcher.group(CUSTOM_DELIMITER_GROUP)
+                .substring(CUSTOM_DELIMITER_START_OFFSET, CUSTOM_DELIMITER_END_OFFSET);
         }
 
         return DEFAULT_DELIMITER;
@@ -40,7 +46,7 @@ public class NumberExtractor {
         final var matcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         if (matcher.matches()) {
-            return matcher.group(1);
+            return matcher.group(EXPRESSION_GROUP);
         }
 
         return input;
@@ -51,7 +57,7 @@ public class NumberExtractor {
         final  String expression
     ) {
         final var expressionPattern = String.format(
-            "^%s[(%s)%s]*$",
+            EXPRESSION_REGEX_FORMAT,
             NUMBER_PATTERN,
             delimiter,
             NUMBER_PATTERN
