@@ -18,25 +18,15 @@ public class NumberExtractor {
             return List.of(input);
         }
 
-        final String delimiter = setDelimiter(input);
-        final String expression = setExpression(input);
+        final String delimiter = selectDelimiter(input);
+        final String expression = selectExpression(input);
 
         validateExpression(delimiter, expression);
 
         return Arrays.asList(expression.split(delimiter));
     }
 
-    private static String setExpression(final String input) {
-        final var matcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
-
-        if (matcher.matches()) {
-            return matcher.group(1);
-        }
-
-        return input;
-    }
-
-    private static String setDelimiter(final String input) {
+    private static String selectDelimiter(final String input) {
         final var matcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
 
         if (matcher.matches()) {
@@ -44,6 +34,16 @@ public class NumberExtractor {
         }
 
         return DEFAULT_DELIMITER;
+    }
+
+    private static String selectExpression(final String input) {
+        final var matcher = CUSTOM_DELIMITER_PATTERN.matcher(input);
+
+        if (matcher.matches()) {
+            return matcher.group(1);
+        }
+
+        return input;
     }
 
     private static void validateExpression(
