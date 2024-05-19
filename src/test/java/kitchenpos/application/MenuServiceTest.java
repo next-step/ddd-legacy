@@ -2,7 +2,7 @@ package kitchenpos.application;
 
 import fixtures.MenuBuilder;
 import fixtures.MenuGroupBuilder;
-import fixtures.MenuProductBuilder;
+import fixtures.MenuProductSteps;
 import fixtures.ProductBuilder;
 import fixtures.TestContainers;
 import kitchenpos.domain.Menu;
@@ -35,30 +35,13 @@ class MenuServiceTest {
     private MenuService menuService;
     @Mock
     private PurgomalumClient purgomalumClient;
-
-    private Product product;
-    private MenuProduct menuProduct;
-    private MenuGroup menuGroup;
-
-    private TestContainers testContainers;
+    private MenuProductSteps menuProductSteps;
 
     @BeforeEach
     void setUp() {
-        testContainers = new TestContainers();
+        TestContainers testContainers = new TestContainers();
+        menuProductSteps = new MenuProductSteps(testContainers.menuGroupRepository, testContainers.menuRepository, testContainers.productRepository);
         menuService = new MenuService(testContainers.menuRepository, testContainers.menuGroupRepository, testContainers.productRepository, purgomalumClient);
-
-        product = new ProductBuilder()
-                .with("치킨", BigDecimal.valueOf(10_000))
-                .build();
-
-        menuProduct = new MenuProductBuilder()
-                .withProduct(product)
-                .withQuantity(1)
-                .build();
-
-        menuGroup = new MenuGroupBuilder()
-                .withName("치킨류")
-                .build();
     }
 
     @DisplayName("메뉴를 등록할 때")
@@ -68,14 +51,11 @@ class MenuServiceTest {
         @Test
         void createMenuTest() {
 
-            testContainers.productRepository.save(product);
-            testContainers.menuGroupRepository.save(menuGroup);
+            // given
+            MenuGroup menuGroup = menuProductSteps.메뉴그룹_생성한다();
+            MenuProduct menuProduct = menuProductSteps.메뉴상품을_생성한다();
 
-            Menu menu = menuService.create(new MenuBuilder()
-                    .with("치킨", BigDecimal.valueOf(10_000))
-                    .withMenuGroup(menuGroup)
-                    .withMenuProducts(List.of(menuProduct))
-                    .build());
+            Menu menu = menuService.create(new MenuBuilder().with("치킨", BigDecimal.valueOf(10_000)).withMenuGroup(menuGroup).withMenuProducts(List.of(menuProduct)).build());
 
             assertNotNull(menu.getName());
             assertThat(menu.getPrice()).isEqualTo(BigDecimal.valueOf(10_000));
@@ -87,42 +67,29 @@ class MenuServiceTest {
         @Test
         void menuNameWithBlankTest() {
 
-            testContainers.productRepository.save(product);
-            testContainers.menuGroupRepository.save(menuGroup);
+            MenuGroup menuGroup = menuProductSteps.메뉴그룹_생성한다();
+            MenuProduct menuProduct = menuProductSteps.메뉴상품을_생성한다();
 
-            assertThrows(IllegalArgumentException.class, () -> menuService.create(new MenuBuilder()
-                    .with(null, BigDecimal.valueOf(10_000))
-                    .withMenuGroup(menuGroup)
-                    .withMenuProducts(List.of(menuProduct))
-                    .build()));
+            assertThrows(IllegalArgumentException.class, () -> menuService.create(new MenuBuilder().with(null, BigDecimal.valueOf(10_000)).withMenuGroup(menuGroup).withMenuProducts(List.of(menuProduct)).build()));
         }
 
         @DisplayName("메뉴의 가격이 0보다 작으면 등록이 불가능하다")
         @Test
         void menuPriceWithZeroTest() {
 
-            testContainers.productRepository.save(product);
-            testContainers.menuGroupRepository.save(menuGroup);
+            MenuGroup menuGroup = menuProductSteps.메뉴그룹_생성한다();
+            MenuProduct menuProduct = menuProductSteps.메뉴상품을_생성한다();
 
-            assertThrows(IllegalArgumentException.class, () -> menuService.create(new MenuBuilder()
-                    .with("치킨", BigDecimal.valueOf(-1))
-                    .withMenuGroup(menuGroup)
-                    .withMenuProducts(List.of(menuProduct))
-                    .build()));
+            assertThrows(IllegalArgumentException.class, () -> menuService.create(new MenuBuilder().with("치킨", BigDecimal.valueOf(-1)).withMenuGroup(menuGroup).withMenuProducts(List.of(menuProduct)).build()));
         }
 
         @DisplayName("메뉴그룹에 소속되지 않으면 등록이 불가능하다")
         @Test
         void menuGroupNullTest() {
 
-            testContainers.productRepository.save(product);
-            testContainers.menuGroupRepository.save(menuGroup);
+            MenuProduct menuProduct = menuProductSteps.메뉴상품을_생성한다();
 
-            assertThrows(NoSuchElementException.class, () -> menuService.create(new MenuBuilder()
-                    .with("치킨", BigDecimal.valueOf(10_000))
-                    .withMenuProducts(List.of(menuProduct))
-                    .withMenuGroup(new MenuGroupBuilder().withName("메뉴그룹 없음").build())
-                    .build()));
+            assertThrows(NoSuchElementException.class, () -> menuService.create(new MenuBuilder().with("치킨", BigDecimal.valueOf(10_000)).withMenuProducts(List.of(menuProduct)).withMenuGroup(new MenuGroupBuilder().withName("메뉴그룹 없음").build()).build()));
         }
     }
 
@@ -131,14 +98,7 @@ class MenuServiceTest {
     void menuHideTest() {
 
         // given
-        testContainers.productRepository.save(product);
-        testContainers.menuGroupRepository.save(menuGroup);
-        Menu menu = testContainers.menuRepository.save(new MenuBuilder()
-                .with("치킨", BigDecimal.valueOf(10_000))
-                .withMenuGroup(menuGroup)
-                .withMenuProducts(List.of(menuProduct))
-                .withDisplayed(true)
-                .build());
+        Menu menu = menuProductSteps.노출된_메뉴를_생성한다();
 
         // when
         Menu hiddenMenu = menuService.hide(menu.getId());
@@ -152,14 +112,7 @@ class MenuServiceTest {
     void menuDisplayTest() {
 
         // given
-        testContainers.productRepository.save(product);
-        testContainers.menuGroupRepository.save(menuGroup);
-        Menu menu = testContainers.menuRepository.save(new MenuBuilder()
-                .with("치킨", BigDecimal.valueOf(10_000))
-                .withMenuGroup(menuGroup)
-                .withMenuProducts(List.of(menuProduct))
-                .withDisplayed(true)
-                .build());
+        Menu menu = menuProductSteps.숨겨진_메뉴를_생성한다();
 
         // when
         Menu displayed = menuService.display(menu.getId());
@@ -173,42 +126,33 @@ class MenuServiceTest {
     @Test
     void menuDisplayFailTest() {
 
+        MenuGroup menuGroup = menuProductSteps.메뉴그룹_생성한다();
+
         // given
-        testContainers.productRepository.save(product);
-        testContainers.menuGroupRepository.save(menuGroup);
-        Menu menu = testContainers.menuRepository.save(new MenuBuilder()
-                .with("치킨", BigDecimal.valueOf(999999999))
-                .withMenuGroup(menuGroup)
-                .withMenuProducts(List.of(menuProduct))
-                .withDisplayed(true)
-                .build());
+        Product product = menuProductSteps.상품을_생성한다(new ProductBuilder().with("치킨", BigDecimal.valueOf(100)).build());
+        MenuProduct menuProduct1 = menuProductSteps.메뉴상품을_생성한다(product);
+        Menu menu = menuProductSteps.메뉴를_생성한다("치킨", 10_000, menuGroup, true, List.of(menuProduct1));
 
         // when
         // then
-        assertThatThrownBy(() -> menuService.display(menu.getId()))
-                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(() -> menuService.display(menu.getId())).isInstanceOf(IllegalStateException.class);
     }
 
     @DisplayName("메뉴의 가격을 변경할 때 메뉴상품의 가격보다 크면 변경이 불가능하다")
     @Test
     void changePriceTest() {
 
+
         // given
-        testContainers.productRepository.save(product);
-        testContainers.menuGroupRepository.save(menuGroup);
-        Menu menu = testContainers.menuRepository.save(new MenuBuilder()
-                .with("치킨", BigDecimal.valueOf(10_000))
-                .withMenuGroup(menuGroup)
-                .withMenuProducts(List.of(menuProduct))
-                .withDisplayed(true)
-                .build());
+        MenuGroup menuGroup = menuProductSteps.메뉴그룹_생성한다();
+        Product product = menuProductSteps.상품을_생성한다(new ProductBuilder().with("치킨", BigDecimal.valueOf(100)).build());
+        MenuProduct menuProduct1 = menuProductSteps.메뉴상품을_생성한다(product);
+
+        Menu menu = menuProductSteps.메뉴를_생성한다("치킨", 10_000, menuGroup, true, List.of(menuProduct1));
 
         // when
-        menu.setPrice(BigDecimal.valueOf(20_000));
-
         // then
-        assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> menuService.changePrice(menu.getId(), menu)).isInstanceOf(IllegalArgumentException.class);
     }
 
 }

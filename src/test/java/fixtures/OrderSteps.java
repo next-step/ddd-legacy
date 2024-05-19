@@ -16,28 +16,10 @@ import java.util.List;
 
 public class OrderSteps {
 
-    private MenuGroupRepository menuGroupRepository;
-
-    private MenuRepository menuRepository;
-
     private OrderTableRepository orderTableRepository;
 
-    public OrderSteps(MenuGroupRepository menuGroupRepository, MenuRepository menuRepository, OrderTableRepository orderTableRepository) {
-        this.menuGroupRepository = menuGroupRepository;
-        this.menuRepository = menuRepository;
+    public OrderSteps(OrderTableRepository orderTableRepository) {
         this.orderTableRepository = orderTableRepository;
-    }
-
-    public MenuGroup 메뉴그룹_생성한다() {
-        return menuGroupRepository.save(new MenuGroupBuilder().withName("한 마리 메뉴").build());
-    }
-
-
-    public Menu 메뉴그룹에_소속될_메뉴를_생성한다(MenuGroup menuGroup) {
-        return menuRepository.save(new MenuBuilder()
-                .withMenuGroup(menuGroup)
-                .with("치킨", BigDecimal.valueOf(10_000))
-                .build());
     }
 
 

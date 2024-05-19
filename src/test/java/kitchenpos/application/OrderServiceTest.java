@@ -30,12 +30,17 @@ class OrderServiceTest {
     private MenuRepository menuRepository;
     @Autowired
     private OrderTableRepository orderTableRepository;
+    @Autowired
+    private ProductRepository productRepository;
+
     private OrderSteps orderSteps;
+    private MenuProductSteps menuProductSteps;
 
 
     @BeforeEach
     void setUp() {
-        orderSteps = new OrderSteps(menuGroupRepository, menuRepository, orderTableRepository);
+        orderSteps = new OrderSteps(orderTableRepository);
+        menuProductSteps = new MenuProductSteps(menuGroupRepository, menuRepository, productRepository);
     }
 
     @Nested
@@ -134,7 +139,7 @@ class OrderServiceTest {
         void createOrderMenuShouldDisplayedMenuTest() {
 
             // given
-            Menu menu  = orderSteps.메뉴그룹에_소속될_메뉴를_생성한다(orderSteps.메뉴그룹_생성한다());
+            Menu menu  = menuProductSteps.노출된_메뉴를_생성한다();
 
             // when
             menu.setDisplayed(false);
@@ -150,7 +155,7 @@ class OrderServiceTest {
         void createOrderShouldHasPositivePriceTest() {
 
             // given
-            Menu menu  = orderSteps.메뉴그룹에_소속될_메뉴를_생성한다(orderSteps.메뉴그룹_생성한다());
+            Menu menu  = menuProductSteps.노출된_메뉴를_생성한다();
 
             // when
             menu.setPrice(BigDecimal.valueOf(-1));
