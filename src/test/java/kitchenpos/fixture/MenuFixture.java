@@ -28,6 +28,10 @@ public class MenuFixture {
         return createMenu(price, createProduct());
     }
 
+    public static Menu createMenu(final String name, final Long price) {
+        return createMenu(name, price, createMenuGroup(), createProduct());
+    }
+
     public static Menu createMenu(Product product, MenuGroup menuGroup) {
         return createMenu(메뉴명, 오천원, menuGroup, product);
     }

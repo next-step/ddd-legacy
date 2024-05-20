@@ -4,6 +4,7 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.fixture.OrderTableFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -61,7 +62,7 @@ public class OrderTableServiceTest {
         @NullAndEmptySource
         @DisplayName("[실패] 테이블 이름은 필수로 입력해야한다.")
         void fail1(final String input) {
-            final var orderTable = createTable(input);
+            final var orderTable = OrderTableFixture.createEmptyTable(input);
 
             assertThrows(IllegalArgumentException.class, () -> orderTableService.create(orderTable));
         }
