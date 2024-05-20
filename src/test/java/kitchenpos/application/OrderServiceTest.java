@@ -470,4 +470,47 @@ public class OrderServiceTest {
             assertThrows(NoSuchElementException.class, () -> orderService.startDelivery(order.getId()));
         }
     }
+
+    @Nested
+    @DisplayName("배달 완료")
+    class Delivered {
+        @Test
+        @DisplayName("배달완료상태가 되는 경우 배달 중 에서 배달 완료(DELIVERED) 로 변경된다.")
+        void success() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createDeliveryOrder("배달장소", menu);
+            order.setStatus(OrderStatus.DELIVERING);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            Order actual = orderService.completeDelivery(order.getId());
+
+            assertAll(
+                    "배달완료 Assertions",
+                    () -> assertNotNull(actual),
+                    () -> assertEquals(OrderStatus.DELIVERED, actual.getStatus())
+            );
+        }
+
+        @Test
+        @DisplayName("접수된적 없는 주문인 경우 처리할 수 없다.")
+        void fail1() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createDeliveryOrder("배달장소", menu);
+
+            assertThrows(NoSuchElementException.class, () -> orderService.completeDelivery(order.getId()));
+        }
+
+        @Test
+        @DisplayName("주문상태가 배달 중이 아니면 배달완료로 처리할 수 없다.")
+        void fail2() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createDeliveryOrder("배달장소", menu);
+            order.setStatus(OrderStatus.SERVED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            assertThrows(IllegalStateException.class, () -> orderService.completeDelivery(order.getId()));
+        }
+    }
 }
