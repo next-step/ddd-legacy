@@ -18,7 +18,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static kitchenpos.MoneyConstants.만원;
@@ -26,6 +28,7 @@ import static kitchenpos.MoneyConstants.오천원;
 import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuFixture.createMenuWithoutName;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
+import static kitchenpos.fixture.MenuProductFixture.createMenuProduct;
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -124,7 +127,7 @@ class MenuServiceTest {
         void nameFail2(final String input) {
             final var product = createProduct(만원);
             final var menuGroup = createMenuGroup();
-            final var menu = createMenu(input, 만원, product, menuGroup);
+            final var menu = createMenu(input, 만원, menuGroup, product);
 
             given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menuGroup));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
@@ -156,13 +159,50 @@ class MenuServiceTest {
 
         @Test
         @DisplayName("상품정보는 하나 이상 입력이 가능하다.")
-        void menuProduct() {
+        void menuProductFail1() {
             final var product1 = createProduct(만원);
             final var product2 = createProduct(만원);
             final var menuGroup = createMenuGroup();
             final var menu = createMenu("메뉴명", 만원, menuGroup, product1, product2);
 
-            assertEquals(2, menu.getMenuProducts().size());
+            given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(any())).willReturn(List.of(product1, product2));
+            given(productRepository.findById(product1.getId())).willReturn(Optional.of(product1));
+            given(productRepository.findById(product2.getId())).willReturn(Optional.of(product2));
+            given(menuRepository.save(any())).willReturn(menu);
+
+            Menu actual = menuService.create(menu);
+
+            assertEquals(2, actual.getMenuProducts().size());
+        }
+
+        @Test
+        @DisplayName("등록되어있지 않은 상품정보를 입력하는 경우 메뉴를 등록할 수 없다.")
+        void menuProductFail2() {
+            final var product1 = createProduct(만원);
+            final var product2 = createProduct(만원);
+            final var menuGroup = createMenuGroup();
+            final var menu = createMenu("메뉴명", 만원, menuGroup, product1);
+
+            given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(any())).willReturn(List.of(product2));
+
+            assertThrows(NoSuchElementException.class, () -> menuService.create(menu));
+        }
+
+        @ParameterizedTest
+        @ValueSource(longs = {-1L, -100L})
+        @DisplayName("상품정보의 수량이 0개보다 작은 경우 메뉴를 등록할 수 없다.")
+        void menuProductFail3(final long input) {
+            final var product = createProduct(만원);
+            final var menuGroup = createMenuGroup();
+            final var menuProduct = createMenuProduct(product, input);
+            final var menu = createMenu("메뉴명", 만원, menuGroup, List.of(menuProduct));
+
+            given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
+
+            assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
         }
     }
 }

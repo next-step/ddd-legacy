@@ -29,37 +29,36 @@ public class MenuFixture {
     }
 
     public static Menu createMenu(Product product, MenuGroup menuGroup) {
-        return createMenu(메뉴명, 오천원, product, menuGroup);
+        return createMenu(메뉴명, 오천원, menuGroup, product);
     }
 
     public static Menu createMenu(final Long price, final Product product) {
-        return createMenu(메뉴명, price, product, createMenuGroup());
+        return createMenu(메뉴명, price, createMenuGroup(), product);
     }
 
     public static Menu createMenuWithoutName(String name, Product product, MenuGroup menuGroup) {
-        return createMenu(name, 오천원, product, menuGroup);
+        return createMenu(name, 오천원, menuGroup, product);
     }
 
     public static Menu createMenu(final Long price, final Product product, final MenuGroup menuGroup) {
-        return createMenu(메뉴명, price, product, menuGroup);
-    }
-
-    public static @NotNull Menu createMenu(final String name, final Long price, final Product product, final MenuGroup menuGroup) {
-        return createMenu(name, price, menuGroup, product);
+        return createMenu(메뉴명, price, menuGroup, product);
     }
 
     public static @NotNull Menu createMenu(final String name, final Long price, final MenuGroup menuGroup, final Product... product) {
+        final List<MenuProduct> menuProducts = new ArrayList<>();
+        for (Product prod : product) {
+            menuProducts.add(createMenuProduct(prod));
+        }
+        return createMenu(name, price, menuGroup, menuProducts);
+    }
+
+    public static @NotNull Menu createMenu(String name, Long price, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setMenuGroupId(UUID.randomUUID());
         menu.setName(name);
         menu.setPrice(price == null ? null : BigDecimal.valueOf(price));
         menu.setDisplayed(true);
         menu.setMenuGroup(menuGroup);
-
-        final List<MenuProduct> menuProducts = new ArrayList<>();
-        for (Product prod : product) {
-            menuProducts.add(createMenuProduct(prod));
-        }
         menu.setMenuProducts(menuProducts);
         return menu;
     }
