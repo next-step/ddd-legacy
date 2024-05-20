@@ -1,8 +1,11 @@
 package calculator;
 
 
+import java.util.regex.Pattern;
+
 public class PositiveNumber {
     private static final String NUMERIC_PATTERN = "[0-9]+";
+    private static final Pattern NUMERIC = Pattern.compile(NUMERIC_PATTERN);
     private int inputNumber;
 
     public PositiveNumber(String inputNumber){
@@ -24,7 +27,7 @@ public class PositiveNumber {
     }
 
     private boolean isNumeric(String inputNumber){
-        return inputNumber.matches("NUMERIC_PATTERN");
+        return NUMERIC.matcher(inputNumber).matches();
     }
 
     private boolean isPositive(String inputNumber){
