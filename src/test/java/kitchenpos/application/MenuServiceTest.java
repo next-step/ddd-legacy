@@ -77,12 +77,10 @@ class MenuServiceTest {
         @ParameterizedTest
         @NullSource
         @DisplayName("금액 정보는 필수로 입력해야한다.")
-        void priceFail1(final BigDecimal input) {
+        void priceFail1(final Long input) {
             final var product = createProduct(만원);
             final var menuGroup = createMenuGroup();
-            final var menu = createMenu(product, menuGroup);
-
-            given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menuGroup));
+            final var menu = createMenu(input, product, menuGroup);
 
             Assertions.assertThatExceptionOfType(IllegalArgumentException.class)
                     .isThrownBy(() -> menuService.create(menu));

@@ -21,42 +21,42 @@ public class MenuFixture {
     final private static String 메뉴명 = "메뉴명";
 
     public static Menu createMenu(Product product) {
-        return createMenu(메뉴명, 오천원, product);
+        return createMenu(오천원, product);
     }
 
-    public static Menu createMenu(final long price) {
-        return createMenu(메뉴명, price, createProduct());
+    public static Menu createMenu(final Long price) {
+        return createMenu(price, createProduct());
     }
 
     public static Menu createMenu(Product product, MenuGroup menuGroup) {
         return createMenu(메뉴명, 오천원, product, menuGroup);
     }
 
-    public static Menu createMenu(final long price, final Product product) {
-        return createMenu(메뉴명, price, product);
+    public static Menu createMenu(final Long price, final Product product) {
+        return createMenu(메뉴명, price, product, createMenuGroup());
     }
 
     public static Menu createMenuWithoutName(String name, Product product, MenuGroup menuGroup) {
         return createMenu(name, 오천원, product, menuGroup);
     }
 
-    public static Menu createMenu(final long price, final Product product, final MenuGroup menuGroup) {
+    public static Menu createMenu(final Long price, final Product product, final MenuGroup menuGroup) {
         return createMenu(메뉴명, price, product, menuGroup);
     }
 
-    public static Menu createMenu(final String name, final long price, final Product product) {
-        return createMenu(name, price, product, createMenuGroup());
-    }
-
-    public static @NotNull Menu createMenu(final String name, final long price, final Product product, final MenuGroup menuGroup) {
+    public static @NotNull Menu createMenu(final String name, final Long price, final Product product, final MenuGroup menuGroup) {
         return createMenu(name, price, menuGroup, product);
     }
 
-    public static @NotNull Menu createMenu(final String name, final long price, final MenuGroup menuGroup, final Product... product) {
+    public static @NotNull Menu createMenu(final String name, final Long price, final MenuGroup menuGroup, final Product... product) {
         Menu menu = new Menu();
         menu.setMenuGroupId(UUID.randomUUID());
         menu.setName(name);
-        menu.setPrice(BigDecimal.valueOf(price));
+        if (price == null) {
+            menu.setPrice(null);
+        } else {
+            menu.setPrice(BigDecimal.valueOf(price));
+        }
         menu.setDisplayed(true);
         menu.setMenuGroup(menuGroup);
 
