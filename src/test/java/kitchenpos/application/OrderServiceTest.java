@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -512,5 +513,85 @@ public class OrderServiceTest {
 
             assertThrows(IllegalStateException.class, () -> orderService.completeDelivery(order.getId()));
         }
+    }
+
+    @Nested
+    @DisplayName("주문 처리 완료")
+    class Completed {
+        @Test
+        @DisplayName("완료 상태가 되면 주문 처리 완료(COMPLETED) 가 된다.")
+        void success() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(OrderType.TAKEOUT, menu);
+            order.setStatus(OrderStatus.SERVED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            Order actual = orderService.complete(order.getId());
+
+            assertAll(
+                    "주문완료 Assertions",
+                    () -> assertNotNull(actual),
+                    () -> assertEquals(OrderStatus.COMPLETED, actual.getStatus())
+            );
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = OrderType.class, names = {"EAT_IN"})
+        @DisplayName("메징식사인 경우 주문상태가 완료가 되면 주문테이블의 손님 수와 착석여부 상태를 빈 좌석으로 정리한다. (손님 수 0명, 미착석 상태로 변경)")
+        void success2(OrderType orderType) {
+            final var menu = createMenu("치킨", 만원);
+            final var orderTable = createSittingTable(2);
+            final var order = createEatInOrder(orderTable, menu);
+            order.setStatus(OrderStatus.SERVED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            Order actual = orderService.complete(order.getId());
+
+            assertAll(
+                    "매장 주문완료 상태 Assertions",
+                    () -> assertNotNull(actual),
+                    () -> assertEquals(OrderStatus.COMPLETED, actual.getStatus()),
+                    () -> assertEquals(0, order.getOrderTable().getNumberOfGuests()),
+                    () -> assertFalse(order.getOrderTable().isOccupied())
+            );
+        }
+
+        @Test
+        @DisplayName("접수된적 없는 주문인 경우 처리할 수 없다.")
+        void fail1() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(OrderType.TAKEOUT, menu);
+
+            assertThrows(NoSuchElementException.class, () -> orderService.complete(order.getId()));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = OrderType.class, names = {"DELIVERY"})
+        @DisplayName("배달주문인데 배달 완료 상태가 아니면 처리할 수 없다.")
+        void fail2(OrderType orderType) {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(orderType, menu);
+            order.setStatus(OrderStatus.DELIVERING);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            assertThrows(IllegalStateException.class, () -> orderService.complete(order.getId()));
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = OrderType.class, names = {"TAKEOUT", "EAT_IN"})
+        @DisplayName("포장주문이거나 매장식사인 경우 음식 제공 완료 상태가 아니면 처리할 수 없다.")
+        void fail3(OrderType orderType) {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(orderType, menu);
+            order.setStatus(OrderStatus.ACCEPTED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            assertThrows(IllegalStateException.class, () -> orderService.complete(order.getId()));
+        }
+
     }
 }
