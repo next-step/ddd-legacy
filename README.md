@@ -145,6 +145,10 @@ docker compose -p kitchenpos up -d
 - 전체 조회
     - [ ] 접수되었던 모든 주문 정보를 조회할 수 있다.
 
+## TODO 
+- [ ] repository fake 객체로 리팩토링
+
+
 ## 용어 사전
 
 | 한글명 | 영문명 | 설명 |
