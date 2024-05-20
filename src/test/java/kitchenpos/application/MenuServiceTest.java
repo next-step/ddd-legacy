@@ -70,6 +70,24 @@ class MenuServiceTest {
         }
 
         @Test
+        @DisplayName("메뉴가격은 0이상만 가능하다.")
+        void canNotPriceNullOrMinus() {
+            //given
+            Menu request = MenuTestFixture.createMenuRequest("후라이드치킨", -1000L, true, List.of(menuProduct));
+            request.setMenuGroup(menuGroup);
+            request.setMenuGroupId(menuGroup.getId());
+
+            //when then
+            assertThatThrownBy(() -> menuService.create(request))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+
+            request.setPrice(null);
+            assertThatThrownBy(() -> menuService.create(request))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+
+        }
+
+        @Test
         @DisplayName("유효한 메뉴그룹이 없으면 메뉴를 생성할 수 없다.")
         void canNotCreateWhenNoMenuGroup() {
             //given
@@ -87,6 +105,24 @@ class MenuServiceTest {
         void canNotCreateWhenNoMenuProduct() {
             //given
             Menu request = MenuTestFixture.createMenuRequest("후라이드치킨", 18000L, true, null);
+            Menu request2 = MenuTestFixture.createMenuRequest("후라이드치킨", 18000L, true, List.of(new MenuProduct()));
+            request.setMenuGroup(menuGroup);
+            request.setMenuGroupId(menuGroup.getId());
+            request2.setMenuGroup(menuGroup);
+            request2.setMenuGroupId(menuGroup.getId());
+
+            //when then
+            assertThatThrownBy(() -> menuService.create(request))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> menuService.create(request2))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("메뉴상품에는 상품이 중복되어 올 수 없다.")
+        void canNotDuplicateProductInMenuProduct() {
+            //given
+            Menu request = MenuTestFixture.createMenuRequest("후라이드치킨", 18000L, true, List.of(menuProduct, menuProduct));
             request.setMenuGroup(menuGroup);
             request.setMenuGroupId(menuGroup.getId());
 
@@ -95,6 +131,7 @@ class MenuServiceTest {
                     .isExactlyInstanceOf(IllegalArgumentException.class);
         }
 
+
         @Test
         @DisplayName("메뉴상품에는 유효한 상품만 있어야 한다.")
         void onlyValidProductInMenuProduct() {
@@ -102,7 +139,7 @@ class MenuServiceTest {
             //given
             Product product2 = ProductTestFixture.createProduct("없는치킨", 18000L);
             MenuProduct menuProduct2 = MenuProductTestFixture.createMenuProductRequest(1L, 1L, product2);
-            Menu request = MenuTestFixture.createMenuRequest("후라이드치킨", 18000L, true, List.of(menuProduct, menuProduct2));
+            Menu request = MenuTestFixture.createMenuRequest("후라이드치킨", 18000L, true, List.of(menuProduct, menuProduct, menuProduct2));
             request.setMenuGroup(menuGroup);
             request.setMenuGroupId(menuGroup.getId());
 

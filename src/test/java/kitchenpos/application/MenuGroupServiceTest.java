@@ -49,9 +49,12 @@ class MenuGroupServiceTest {
         void canNotEmptyName() {
             //given
             MenuGroup request = MenuGroupTestFixture.createMenuGroupRequest("");
+            MenuGroup request2 = MenuGroupTestFixture.createMenuGroupRequest(null);
 
             //when then
             assertThatThrownBy(() -> menuGroupService.create(request))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> menuGroupService.create(request2))
                     .isExactlyInstanceOf(IllegalArgumentException.class);
         }
     }

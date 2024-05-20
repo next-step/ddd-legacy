@@ -38,12 +38,12 @@ class OrderServiceTest {
     @Nested
     @DisplayName("주문 생성")
     class create {
-        Product product;
-        MenuProduct menuProduct;
-        Menu menu;
-        OrderLineItem orderLineItem;
+        private Product product;
+        private MenuProduct menuProduct;
+        private Menu menu;
+        private OrderLineItem orderLineItem;
 
-        OrderTable orderTable;
+        private OrderTable orderTable;
 
         @BeforeEach
         void setUp() {
@@ -121,6 +121,10 @@ class OrderServiceTest {
                     orderTable);
 
             //when then
+            assertThatThrownBy(() -> orderService.create(request))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+
+            request.setOrderLineItems(null);
             assertThatThrownBy(() -> orderService.create(request))
                     .isExactlyInstanceOf(IllegalArgumentException.class);
         }
@@ -251,11 +255,11 @@ class OrderServiceTest {
     @DisplayName("주문 수락")
     class accept {
 
-        Product product;
-        MenuProduct menuProduct;
-        Menu menu;
-        OrderLineItem orderLineItem;
-        OrderTable orderTable;
+        private Product product;
+        private MenuProduct menuProduct;
+        private Menu menu;
+        private OrderLineItem orderLineItem;
+        private OrderTable orderTable;
 
         @BeforeEach
         void setUp() {
@@ -327,11 +331,11 @@ class OrderServiceTest {
     @DisplayName("주문 서빙")
     class serve {
 
-        Product product;
-        MenuProduct menuProduct;
-        Menu menu;
-        OrderLineItem orderLineItem;
-        OrderTable orderTable;
+        private Product product;
+        private MenuProduct menuProduct;
+        private Menu menu;
+        private OrderLineItem orderLineItem;
+        private OrderTable orderTable;
 
         @BeforeEach
         void setUp() {
@@ -402,10 +406,10 @@ class OrderServiceTest {
     @DisplayName("배달 시작")
     class startDelivery {
 
-        Product product;
-        MenuProduct menuProduct;
-        Menu menu;
-        OrderLineItem orderLineItem;
+        private Product product;
+        private MenuProduct menuProduct;
+        private Menu menu;
+        private OrderLineItem orderLineItem;
 
         @BeforeEach
         void setUp() {
@@ -487,10 +491,10 @@ class OrderServiceTest {
     @DisplayName("배달 완료")
     class completeDelivery {
 
-        Product product;
-        MenuProduct menuProduct;
-        Menu menu;
-        OrderLineItem orderLineItem;
+        private Product product;
+        private MenuProduct menuProduct;
+        private Menu menu;
+        private OrderLineItem orderLineItem;
 
         @BeforeEach
         void setUp() {
@@ -556,11 +560,11 @@ class OrderServiceTest {
     @DisplayName("주문 완료")
     class complete {
 
-        Product product;
-        MenuProduct menuProduct;
-        Menu menu;
-        OrderLineItem orderLineItem;
-        OrderTable orderTable;
+        private Product product;
+        private MenuProduct menuProduct;
+        private Menu menu;
+        private OrderLineItem orderLineItem;
+        private OrderTable orderTable;
 
         @BeforeEach
         void setUp() {
