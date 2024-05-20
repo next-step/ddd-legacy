@@ -18,14 +18,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static kitchenpos.MoneyConstants.만원;
 import static kitchenpos.MoneyConstants.오천원;
-import static kitchenpos.fixture.MenuFixture.*;
+import static kitchenpos.fixture.MenuFixture.createMenu;
+import static kitchenpos.fixture.MenuFixture.createMenuWithoutName;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
 import static kitchenpos.fixture.ProductFixture.createProduct;
 import static org.junit.jupiter.api.Assertions.*;
@@ -142,11 +141,7 @@ class MenuServiceTest {
             final var menu = new Menu();
             menu.setMenuGroup(menuGroup);
             menu.setPrice(BigDecimal.valueOf(만원));
-            try {
-                menu.setMenuProducts(List.of(input));
-            } catch (NullPointerException e) {
-                // null인 경우 List.of exception skip
-            }
+            menu.setMenuProducts(input == null ? null : List.of(input));
 
             given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menuGroup));
 
