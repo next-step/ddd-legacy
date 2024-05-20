@@ -3,11 +3,12 @@ package kitchenpos.fixture;
 import kitchenpos.domain.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static kitchenpos.fixture.OrderLineItemFixture.createOrderLineItem;
 
 public class OrderFixture {
 
@@ -34,12 +35,19 @@ public class OrderFixture {
         return createOrder(orderType, orderTable, null, orderLineItems);
     }
 
+    public static @NotNull Order createEatInOrder(OrderType orderType, OrderTable orderTable, List<OrderLineItem> orderLineItems) {
+        return createOrder(orderType, orderTable, null, orderLineItems);
+    }
+
     public static @NotNull Order createDeliveryOrder(OrderType orderType, String deliveryAddress, Menu... menu) {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (Menu m : menu) {
             OrderLineItem orderLineItem = createOrderLineItem(m);
             orderLineItems.add(orderLineItem);
         }
+        return createOrder(orderType, null, deliveryAddress, orderLineItems);
+    }
+    public static @NotNull Order createDeliveryOrder(OrderType orderType, String deliveryAddress, List<OrderLineItem> orderLineItems) {
         return createOrder(orderType, null, deliveryAddress, orderLineItems);
     }
 
@@ -52,7 +60,7 @@ public class OrderFixture {
         if (orderType == OrderType.DELIVERY) {
             order.setDeliveryAddress(deliveryAddress);
         }
-        if (orderType == OrderType.EAT_IN) {
+        if ((orderType == OrderType.EAT_IN) && orderTable != null) {
             order.setOrderTableId(orderTable.getId());
             order.setOrderTable(orderTable);
         }
@@ -60,14 +68,4 @@ public class OrderFixture {
         return order;
     }
 
-
-    private static @NotNull OrderLineItem createOrderLineItem(Menu menu) {
-        final var orderLineItem = new OrderLineItem();
-        orderLineItem.setSeq(1L);
-        orderLineItem.setMenuId(menu.getId());
-        orderLineItem.setMenu(menu);
-        orderLineItem.setQuantity(1L);
-        orderLineItem.setPrice(menu.getPrice().multiply(BigDecimal.valueOf(orderLineItem.getQuantity())));
-        return orderLineItem;
-    }
 }
