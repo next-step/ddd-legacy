@@ -138,12 +138,12 @@ class MenuServiceTest {
         @ParameterizedTest(name = "[{index}]: {arguments}")
         @MethodSource("localParameters")
         @DisplayName("메뉴를 구성하는 상품정보를 필수로 입력해야한다.")
-        void productFail(final MenuProduct input) {
+        void productFail(final List<MenuProduct> input) {
             final var menuGroup = createMenuGroup();
             final var menu = new Menu();
             menu.setMenuGroup(menuGroup);
             menu.setPrice(BigDecimal.valueOf(만원));
-            menu.setMenuProducts(input == null ? null : List.of(input));
+            menu.setMenuProducts(input);
 
             given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menuGroup));
 
@@ -152,7 +152,7 @@ class MenuServiceTest {
         static Stream<Arguments> localParameters() {
             return Stream.of(
                     Arguments.of((String) null),
-                    Arguments.of(new MenuProduct())
+                    Arguments.of(List.of(new MenuProduct()))
             );
         }
 
