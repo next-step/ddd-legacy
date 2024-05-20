@@ -71,7 +71,7 @@ class MenuServiceTest {
             assertAll(
                     "메뉴 등록정보 그룹 Assertions",
                     () -> assertNotNull(actual.getId()),
-                    () -> assertEquals(menu.getId(), actual.getId())
+                    () -> assertEquals(response.getId(), actual.getId())
             );
         }
 
@@ -274,6 +274,64 @@ class MenuServiceTest {
             given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
 
             assertThrows(IllegalArgumentException.class, () -> menuService.changePrice(menu.getId(), menu));
+        }
+    }
+
+    @Nested
+    @DisplayName("메뉴 노출여부 변경")
+    class changingDisplay {
+        @Test
+        @DisplayName("메뉴는 노출되도록 변경할 수 있다.")
+        void success() {
+            final var product = createProduct(만원);
+            final var menu = createMenu(만원, product);
+            menu.setDisplayed(false);
+
+            given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+            Menu display = menuService.display(menu.getId());
+
+            assertTrue(display.isDisplayed());
+        }
+
+        @Test
+        @DisplayName("메뉴는 숨길 수 있다.")
+        void success2() {
+            final var menu = createMenu(만원);
+
+            given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+            assertTrue(menu.isDisplayed());
+            Menu display = menuService.hide(menu.getId());
+
+            assertFalse(display.isDisplayed());
+        }
+
+        @Test
+        @DisplayName("등록된적 없는 메뉴는 노출되도록 변경할 수 없다.")
+        void fail1() {
+            final var menu = createMenu(만원);
+
+            assertThrows(NoSuchElementException.class, () -> menuService.display(menu.getId()));
+        }
+
+        @Test
+        @DisplayName("등록된적 없는 메뉴는 노출되도록 변경할 수 없다.")
+        void fail2() {
+            final var menu = createMenu(만원);
+
+            assertThrows(NoSuchElementException.class, () -> menuService.hide(menu.getId()));
+        }
+
+        @Test
+        @DisplayName("노출하려는 메뉴의 금액이 상품정보의 총 합계 금액보다 높은 경우 변경할 수 없다.")
+        void fail3() {
+            final var product = createProduct(오천원);
+            final var menu = createMenu(만원, product);
+
+            given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+            assertThrows(IllegalStateException.class, () -> menuService.display(menu.getId()));
         }
     }
 }

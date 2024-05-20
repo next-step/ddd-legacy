@@ -54,10 +54,11 @@ public class MenuFixture {
 
     public static @NotNull Menu createMenu(String name, Long price, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
-        menu.setMenuGroupId(UUID.randomUUID());
+        menu.setId(UUID.randomUUID());
         menu.setName(name);
         menu.setPrice(price == null ? null : BigDecimal.valueOf(price));
         menu.setDisplayed(true);
+        menu.setMenuGroupId(menuGroup.getId());
         menu.setMenuGroup(menuGroup);
         menu.setMenuProducts(menuProducts);
         return menu;
