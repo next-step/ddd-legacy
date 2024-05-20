@@ -61,6 +61,11 @@ class OrderTableServiceTest {
             //when then
             assertThatThrownBy(() -> orderTableService.create(request))
                     .isExactlyInstanceOf(IllegalArgumentException.class);
+
+            request.setName(null);
+            assertThatThrownBy(() -> orderTableService.create(request))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+
         }
     }
 
@@ -147,7 +152,7 @@ class OrderTableServiceTest {
     @DisplayName("손님 수 변경")
     class NumberOfGuests {
 
-        OrderTable orderTable;
+        private OrderTable orderTable;
 
         @BeforeEach
         void setUp(){

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -51,6 +52,32 @@ class ProductServiceTest {
         }
 
         @Test
+        @DisplayName("상품의 가격은 0 이상이어야 한다.")
+        void canNotPriceNullOrMinus() {
+            //given
+            Product request = ProductTestFixture.createProductRequest("후라이드치킨", -10L);
+            Product request2 = ProductTestFixture.createProductRequest("후라이드치킨", 20000L);
+            request2.setPrice(null);
+
+            //when
+            assertThatThrownBy(() -> productService.create(request))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+            assertThatThrownBy(() -> productService.create(request2))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("상품의 이름에 비속어를 넣을 수 없다.")
+        void canNotNameNull() {
+            //given
+            Product request = ProductTestFixture.createProductRequest(null, 20000L);
+
+            //when
+            assertThatThrownBy(() -> productService.create(request))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
         @DisplayName("상품의 이름에 비속어를 넣을 수 없다.")
         void failBecauseOfProfanity() {
             //given
@@ -66,8 +93,8 @@ class ProductServiceTest {
     @DisplayName("상품 가격 수정 ")
     class changePrice {
 
-        Product product;
-        Menu menu;
+        private Product product;
+        private Menu menu;
 
         @BeforeEach
         void setUp() {
@@ -99,10 +126,28 @@ class ProductServiceTest {
         }
 
         @Test
+        @DisplayName("0이상의 가격만 수정 가능하다.")
+        void canNotChangePriceNullOrMinus() {
+            //given
+            Product request = ProductTestFixture.createProduct("후라이드치킨", 18000L);
+            productRepository.save(request);
+            request.setPrice(null);
+
+            //when then
+            assertThatThrownBy(() -> productService.changePrice(request.getId(), request))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+
+            request.setPrice(BigDecimal.valueOf(-1000));
+            assertThatThrownBy(() -> productService.changePrice(request.getId(), request))
+                    .isExactlyInstanceOf(IllegalArgumentException.class);
+
+        }
+
+        @Test
         @DisplayName("상품 가격을 수정했지만 메뉴보다 금액이 낮아서 메뉴가 숨겨진다.")
         void changePriceAndMenuHide() {
             //given
-            Product request = ProductTestFixture.createProductRequest(18000L);
+            Product request = ProductTestFixture.createProduct("후라이드치킨", 18000L);
 
             //when
             productService.changePrice(product.getId(), request);
