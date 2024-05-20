@@ -23,8 +23,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static kitchenpos.MoneyConstants.만원;
-import static kitchenpos.MoneyConstants.오천원;
+import static kitchenpos.MoneyConstants.*;
 import static kitchenpos.fixture.MenuFixture.createMenu;
 import static kitchenpos.fixture.MenuFixture.createMenuWithoutName;
 import static kitchenpos.fixture.MenuGroupFixture.createMenuGroup;
@@ -201,6 +200,22 @@ class MenuServiceTest {
 
             given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menuGroup));
             given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
+
+            assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
+        }
+
+        @Test
+        @DisplayName("상품정보의 총 합계 금액보다 메뉴의 가격이 비싼 경우 등록할 수 없다.")
+        void menuProductFail4() {
+            final var product1 = createProduct(오천원);
+            final var product2 = createProduct(오천원);
+            final var menuGroup = createMenuGroup();
+            final var menu = createMenu("메뉴명", 이만원, menuGroup, product1, product2);
+
+            given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menuGroup));
+            given(productRepository.findAllByIdIn(any())).willReturn(List.of(product1, product2));
+            given(productRepository.findById(product1.getId())).willReturn(Optional.of(product1));
+            given(productRepository.findById(product2.getId())).willReturn(Optional.of(product2));
 
             assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
         }
