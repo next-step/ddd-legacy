@@ -52,11 +52,7 @@ public class MenuFixture {
         Menu menu = new Menu();
         menu.setMenuGroupId(UUID.randomUUID());
         menu.setName(name);
-        if (price == null) {
-            menu.setPrice(null);
-        } else {
-            menu.setPrice(BigDecimal.valueOf(price));
-        }
+        menu.setPrice(price == null ? null : BigDecimal.valueOf(price));
         menu.setDisplayed(true);
         menu.setMenuGroup(menuGroup);
 
