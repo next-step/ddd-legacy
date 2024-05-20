@@ -164,16 +164,16 @@ public class ProductServiceTest {
         @Test
         @DisplayName(FAIL_PREFIX + "금액 변경으로 인해 해당 상품이 포함된 메뉴의 가격이 메뉴 구성 전체 상품의 총 금액보다 비싸지는 경우 메뉴가 숨겨진다.")
         void undisplayed() {
-            final var product = createProduct(오천원);
-            final var menu = createMenu(오천원, product);
+            final var product = createProduct(만원);
+            final var menu = createMenu(만원, product);
 
-            given(productRepository.findById(product.getId())).willReturn(Optional.ofNullable(product));
+            given(productRepository.findById(product.getId())).willReturn(Optional.of(product));
             given(menuRepository.findAllByProductId(product.getId())).willReturn(List.of(menu));
 
-            product.setPrice(BigDecimal.valueOf(만원));
+            product.setPrice(BigDecimal.valueOf(오천원));
             productService.changePrice(product.getId(), product);
 
-            assertEquals(menu.isDisplayed(), false);
+            assertFalse(menu.isDisplayed());
         }
     }
 
