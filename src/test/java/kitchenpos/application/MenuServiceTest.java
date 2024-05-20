@@ -10,8 +10,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
@@ -21,7 +20,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import static kitchenpos.MoneyConstants.*;
 import static kitchenpos.fixture.MenuFixture.createMenu;
@@ -135,8 +133,8 @@ class MenuServiceTest {
             assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
         }
 
-        @ParameterizedTest(name = "[{index}]: {arguments}")
-        @MethodSource("localParameters")
+        @ParameterizedTest
+        @NullAndEmptySource
         @DisplayName("메뉴를 구성하는 상품정보를 필수로 입력해야한다.")
         void productFail(final List<MenuProduct> input) {
             final var menuGroup = createMenuGroup();
@@ -148,12 +146,6 @@ class MenuServiceTest {
             given(menuGroupRepository.findById(menu.getMenuGroupId())).willReturn(Optional.of(menuGroup));
 
             assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
-        }
-        static Stream<Arguments> localParameters() {
-            return Stream.of(
-                    Arguments.of((String) null),
-                    Arguments.of(List.of(new MenuProduct()))
-            );
         }
 
         @Test
