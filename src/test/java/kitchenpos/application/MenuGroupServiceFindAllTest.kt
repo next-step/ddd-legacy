@@ -8,7 +8,7 @@ import kitchenpos.domain.MenuGroupRepository
 import kitchenpos.testsupport.FakeMenuGroupRepository
 import kitchenpos.testsupport.MenuGroupFixtures.createMenuGroup
 
-class MenuGroupFindAllServiceTest : ShouldSpec({
+class MenuGroupServiceFindAllTest : ShouldSpec({
     lateinit var menuGroupRepository: MenuGroupRepository
     lateinit var service: MenuGroupService
 

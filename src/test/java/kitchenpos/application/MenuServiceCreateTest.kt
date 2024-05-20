@@ -22,7 +22,7 @@ import kitchenpos.testsupport.FakeProductRepository
 import kitchenpos.testsupport.MenuGroupFixtures.createMenuGroup
 import kitchenpos.testsupport.ProductFixtures.createProduct
 
-class MenuCreateServiceTest : ShouldSpec({
+class MenuServiceCreateTest : ShouldSpec({
     lateinit var menuRepository: MenuRepository
     lateinit var menuGroupRepository: MenuGroupRepository
     lateinit var productRepository: ProductRepository
@@ -40,15 +40,13 @@ class MenuCreateServiceTest : ShouldSpec({
             every { containsProfanity(any()) } returns false
         }
 
-        createMenuGroup().also {
-            savedMenuGroup = it
-            menuGroupRepository.save(it)
-        }
+        savedMenuGroup = menuGroupRepository.save(
+            createMenuGroup()
+        )
 
-        createProduct().also {
-            savedProduct = it
-            productRepository.save(it)
-        }
+        savedProduct = productRepository.save(
+            createProduct()
+        )
 
         service = MenuService(
             menuRepository,

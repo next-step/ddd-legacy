@@ -8,9 +8,9 @@ import kitchenpos.domain.Product
 
 object MenuFixtures {
     fun createMenu(
-        price: BigDecimal = 1000.toBigDecimal(),
-        isDisplayed: Boolean = true,
-        product: Product
+        product: Product,
+        price: BigDecimal = product.price,
+        isDisplayed: Boolean = true
     ): Menu {
         return Menu().apply {
             this.id = UUID.randomUUID()
