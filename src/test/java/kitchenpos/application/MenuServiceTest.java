@@ -220,4 +220,60 @@ class MenuServiceTest {
             assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
         }
     }
+
+    @Nested
+    @DisplayName("메뉴 금액변경")
+    class changeMenuPrice {
+        @Test
+        @DisplayName("메뉴는 금액을 변경할 수 있다.")
+        void success() {
+            final var menu = createMenu(오천원);
+            menu.setPrice(BigDecimal.valueOf(만원));
+
+            given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+            Menu actual = menuService.changePrice(menu.getId(), menu);
+            assertEquals(BigDecimal.valueOf(만원), actual.getPrice());
+        }
+
+        @ParameterizedTest
+        @NullSource
+        @DisplayName("변경할 금액 정보가 없는 경우 변경이 불가하다.")
+        void priceFail1(final BigDecimal input) {
+            final var menu = createMenu(오천원);
+            menu.setPrice(input);
+
+            assertThrows(IllegalArgumentException.class, () -> menuService.changePrice(menu.getId(), menu));
+        }
+
+        @ParameterizedTest
+        @ValueSource(longs = {-1L, -10_000L})
+        @DisplayName("0원보다 작은 금액을 입력하는 경우 변경이 불가하다.")
+        void priceFail2(final long input) {
+            final var menu = createMenu(오천원);
+            menu.setPrice(BigDecimal.valueOf(input));
+
+            assertThrows(IllegalArgumentException.class, () -> menuService.changePrice(menu.getId(), menu));
+        }
+
+        @Test
+        @DisplayName("변경하려고 하는 메뉴 정보가 없는 경우 변경이 불가하다.")
+        void notFound() {
+            final var menu = createMenu(오천원);
+
+            assertThrows(NoSuchElementException.class, () -> menuService.changePrice(menu.getId(), menu));
+        }
+
+        @Test
+        @DisplayName("변경금액이 메뉴 상품의 총 합계 금액보다 비싼 경우 변경할 수 없다.")
+        void priceFail3() {
+            final var product = createProduct(오천원);
+            final var menu = createMenu(오천원, product);
+            menu.setPrice(BigDecimal.valueOf(만원));
+
+            given(menuRepository.findById(menu.getId())).willReturn(Optional.of(menu));
+
+            assertThrows(IllegalArgumentException.class, () -> menuService.changePrice(menu.getId(), menu));
+        }
+    }
 }
