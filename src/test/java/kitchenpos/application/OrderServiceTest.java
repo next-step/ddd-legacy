@@ -312,4 +312,63 @@ public class OrderServiceTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("주문 수락")
+    class Accepted {
+        @Test
+        @DisplayName("주문수락이 완료된 경우 주문상태가 대기중 에서 수락(ACCEPTED) 상태로 변경된다.")
+        void success() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(OrderType.TAKEOUT, menu);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            Order actual = orderService.accept(order.getId());
+
+            assertAll(
+                    "주문 수락 완료 Assertions",
+                    () -> assertNotNull(actual),
+                    () -> assertEquals(OrderStatus.ACCEPTED, actual.getStatus())
+            );
+        }
+
+        @Test
+        @DisplayName("배달주문인 경우 배달라이더에게 배달 요청이 완료되어야 수락된다.")
+        void success2() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createDeliveryOrder(OrderType.DELIVERY, "배달주소",  menu);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            Order actual = orderService.accept(order.getId());
+
+            assertAll(
+                    "배달주문 수락 완료 Assertions",
+                    () -> assertNotNull(actual),
+                    () -> assertEquals(OrderStatus.ACCEPTED, actual.getStatus())
+            );
+        }
+
+        @Test
+        @DisplayName("접수된적 없는 주문인 경우 수락이 불가능하다.")
+        void fail1() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(OrderType.TAKEOUT, menu);
+
+            assertThrows(NoSuchElementException.class, () -> orderService.accept(order.getId()));
+        }
+
+        @Test
+        @DisplayName("주문상태가 대기중이 아닌 경우 처리가 불가능하다.")
+        void fail2() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(OrderType.TAKEOUT, menu);
+            order.setStatus(OrderStatus.ACCEPTED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            assertThrows(IllegalStateException.class, () -> orderService.accept(order.getId()));
+        }
+    }
 }
