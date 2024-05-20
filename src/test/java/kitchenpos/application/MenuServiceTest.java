@@ -135,7 +135,7 @@ class MenuServiceTest {
             assertThrows(IllegalArgumentException.class, () -> menuService.create(menu));
         }
 
-        @ParameterizedTest(name = "{index}: {0}")
+        @ParameterizedTest(name = "[{index}]: {arguments}")
         @MethodSource("localParameters")
         @DisplayName("메뉴를 구성하는 상품정보를 필수로 입력해야한다.")
         void productFail(final MenuProduct input) {

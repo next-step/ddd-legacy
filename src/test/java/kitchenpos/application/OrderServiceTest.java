@@ -9,16 +9,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.*;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static kitchenpos.MoneyConstants.만원;
 import static kitchenpos.MoneyConstants.이만원;
@@ -518,12 +516,17 @@ public class OrderServiceTest {
     @Nested
     @DisplayName("주문 처리 완료")
     class Completed {
-        @Test
+        @ParameterizedTest
+        @MethodSource("localParameters")
         @DisplayName("완료 상태가 되면 주문 처리 완료(COMPLETED) 가 된다.")
-        void success() {
+        void success(OrderType orderType, OrderStatus orderStatus) {
             final var menu = createMenu("치킨", 만원);
-            final var order = createOrder(OrderType.TAKEOUT, menu);
-            order.setStatus(OrderStatus.SERVED);
+            final var orderTable = createSittingTable(2);
+            var order = createOrder(orderType, menu);
+            if (orderType == OrderType.EAT_IN) {
+                order = createEatInOrder(orderTable, menu);
+            }
+            order.setStatus(orderStatus);
 
             given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
@@ -533,6 +536,13 @@ public class OrderServiceTest {
                     "주문완료 Assertions",
                     () -> assertNotNull(actual),
                     () -> assertEquals(OrderStatus.COMPLETED, actual.getStatus())
+            );
+        }
+        static Stream<Arguments> localParameters() {
+            return Stream.of(
+                    Arguments.of(OrderType.DELIVERY, OrderStatus.DELIVERED),
+                    Arguments.of(OrderType.TAKEOUT, OrderStatus.SERVED),
+                    Arguments.of(OrderType.EAT_IN, OrderStatus.SERVED)
             );
         }
 

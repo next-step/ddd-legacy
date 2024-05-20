@@ -159,6 +159,7 @@ docker compose -p kitchenpos up -d
 ## TODO
 
 - [ ] repository fake 객체로 리팩토링
+- [ ] controller ATDD 작성
 
 ## 용어 사전
 
