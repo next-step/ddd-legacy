@@ -83,22 +83,29 @@ public class OrderTableServiceTest {
     @DisplayName("테이블 착석여부 변경")
     class changeOccupied {
         @Test
-        @DisplayName("테이블의 착석여부를 변경할 수 있다.")
-        void success() {
+        @DisplayName("테이블의 착석여부를 미착석에서 착성중으로 변경할 수 있다.")
+        void success1() {
             final var orderTable = createTable();
             final var tableId = orderTable.getId();
-            final var isOccupied = orderTable.isOccupied();
 
             given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
-            assertAll(
-                    () -> assertFalse(isOccupied),
-                    () -> orderTableService.sit(tableId),
-                    () -> assertTrue(isOccupied),
-                    () -> orderTableService.clear(tableId),
-                    () -> assertFalse(isOccupied),
-                    () -> assertEquals(0, orderTable.getNumberOfGuests())
-            );
+            assertFalse(orderTable.isOccupied());
+            OrderTable sitting = orderTableService.sit(tableId);
+            assertTrue(sitting.isOccupied());
+        }
+
+        @Test
+        @DisplayName("테이블의 착석여부를 착성중에서 미착석 상태로 변경할 수 있다.")
+        void success2() {
+            final var orderTable = createTable("테이블", true, 1);
+            final var tableId = orderTable.getId();
+
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+            assertTrue(orderTable.isOccupied());
+            OrderTable cleared = orderTableService.clear(tableId);
+            assertFalse(cleared.isOccupied());
+            assertEquals(0, orderTable.getNumberOfGuests());
         }
 
         @Test

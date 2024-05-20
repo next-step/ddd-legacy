@@ -15,9 +15,15 @@ public class OrderTableFixture {
     }
 
     public static @NotNull OrderTable createTable(String 테이블이름) {
+        return createTable(테이블이름, false, 0);
+    }
+
+    public static @NotNull OrderTable createTable(String 테이블이름, boolean occupied, int numberOfGuests) {
         final var orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName(테이블이름);
+        orderTable.setOccupied(occupied);
+        orderTable.setNumberOfGuests(numberOfGuests);
         return orderTable;
     }
 }
