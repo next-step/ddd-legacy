@@ -4,14 +4,10 @@ import io.kotest.assertions.throwables.shouldThrowAny
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeTypeOf
-import io.mockk.every
 import io.mockk.mockk
 import java.math.BigDecimal
 import kitchenpos.domain.Menu
-import kitchenpos.domain.MenuGroupRepository
 import kitchenpos.domain.MenuRepository
-import kitchenpos.domain.ProductRepository
-import kitchenpos.infra.PurgomalumClient
 import kitchenpos.testsupport.FakeMenuGroupRepository
 import kitchenpos.testsupport.FakeMenuRepository
 import kitchenpos.testsupport.FakeProductRepository
@@ -20,21 +16,12 @@ import kitchenpos.testsupport.ProductFixtures
 
 class MenuServiceChangePriceTest : ShouldSpec({
     lateinit var menuRepository: MenuRepository
-    lateinit var menuGroupRepository: MenuGroupRepository
-    lateinit var productRepository: ProductRepository
-    lateinit var purgomalumClient: PurgomalumClient
     lateinit var service: MenuService
 
     lateinit var savedMenu: Menu
 
     beforeTest {
         menuRepository = FakeMenuRepository()
-        menuGroupRepository = FakeMenuGroupRepository()
-        productRepository = FakeProductRepository()
-        purgomalumClient = mockk {
-            every { containsProfanity(any()) } returns false
-        }
-
 
         savedMenu = menuRepository.save(
             MenuFixtures.createMenu(
@@ -44,9 +31,9 @@ class MenuServiceChangePriceTest : ShouldSpec({
 
         service = MenuService(
             menuRepository,
-            menuGroupRepository,
-            productRepository,
-            purgomalumClient,
+            FakeMenuGroupRepository(),
+            FakeProductRepository(),
+            mockk()
         )
     }
 
@@ -114,7 +101,7 @@ class MenuServiceChangePriceTest : ShouldSpec({
 }) {
     companion object {
         private fun createRequest(
-            price: BigDecimal = 1000.toBigDecimal()
+            price: BigDecimal
         ): Menu {
             return Menu().apply {
                 this.price = price

@@ -110,7 +110,7 @@ class ProductServiceChangePriceTest : ShouldSpec({
 }) {
     companion object {
         private fun createRequest(
-            price: BigDecimal = 1000.toBigDecimal()
+            price: BigDecimal
         ): Product {
             return createProduct(
                 price = price
