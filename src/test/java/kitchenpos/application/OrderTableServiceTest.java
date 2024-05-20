@@ -163,17 +163,16 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuestsWithEmptyOrder() {
         // given
-        final OrderTable orderTable = OrderTableFixture.createOrderTable();
+        final OrderTable emptyOrderTable = OrderTableFixture.createOrderTable(false);
 
-        final OrderTable request = new OrderTable();
-        request.setNumberOfGuests(4);
+        final OrderTable request = OrderTableFixture.createChangeNumberOfGuestsRequest(4);
 
-        when(orderTableRepository.findById(orderTable.getId())).thenReturn(
-            Optional.of(orderTable));
+        when(orderTableRepository.findById(emptyOrderTable.getId())).
+            thenReturn(Optional.of(emptyOrderTable));
 
         // when & then
         assertThatThrownBy(
-            () -> orderTableService.changeNumberOfGuests(orderTable.getId(), request)
+            () -> orderTableService.changeNumberOfGuests(emptyOrderTable.getId(), request)
         ).isInstanceOf(IllegalStateException.class);
     }
 
@@ -181,7 +180,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuestsWithNegativeNumberOfGuests() {
         // given
-        final OrderTable request = OrderTableFixture.createOrderTable(-1);
+        final OrderTable request = OrderTableFixture.createChangeNumberOfGuestsRequest(-1);
 
         // when & then
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), request))

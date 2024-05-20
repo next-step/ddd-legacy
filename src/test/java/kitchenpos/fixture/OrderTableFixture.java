@@ -35,4 +35,11 @@ public class OrderTableFixture {
         orderTable.setOccupied(false);
         return orderTable;
     }
+
+
+    public static OrderTable createChangeNumberOfGuestsRequest(int numberOfGuests) {
+        final OrderTable orderTable = new OrderTable();
+        orderTable.setNumberOfGuests(numberOfGuests);
+        return orderTable;
+    }
 }
