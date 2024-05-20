@@ -146,9 +146,9 @@ public class OrderServiceTest {
             void success() {
                 final var menu = createMenu("치킨", 만원);
                 final var orderTable = createSittingTable(2);
-                final var order = createEatInOrder(OrderType.EAT_IN, orderTable, menu);
+                final var order = createEatInOrder(orderTable, menu);
 
-                final var response = createEatInOrder(OrderType.EAT_IN, orderTable, menu);
+                final var response = createEatInOrder(orderTable, menu);
 
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -196,7 +196,7 @@ public class OrderServiceTest {
             @DisplayName("등록된 테이블정보가 아닌 경우 접수가 불가하다.")
             void fail1(OrderTable input) {
                 final var menu = createMenu("치킨", 만원);
-                final var order = createEatInOrder(OrderType.EAT_IN, input, menu);
+                final var order = createEatInOrder(input, menu);
 
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -209,9 +209,9 @@ public class OrderServiceTest {
             void fail2() {
                 final var menu = createMenu("치킨", 만원);
                 final var orderTable = createEmptyTable("손님 미착석 테이블");
-                final var order = createEatInOrder(OrderType.EAT_IN, orderTable, menu);
+                final var order = createEatInOrder(orderTable, menu);
 
-                final var response = createEatInOrder(OrderType.EAT_IN, orderTable, menu);
+                final var response = createEatInOrder(orderTable, menu);
 
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -228,9 +228,9 @@ public class OrderServiceTest {
             @DisplayName("배달 주문을 접수받을 수 있다.")
             void success() {
                 final var menu = createMenu("치킨", 만원);
-                final var order = createDeliveryOrder(OrderType.DELIVERY, "배달주소", menu);
+                final var order = createDeliveryOrder("배달주소", menu);
 
-                final var response = createDeliveryOrder(OrderType.DELIVERY, "배달주소", menu);
+                final var response = createDeliveryOrder("배달주소", menu);
 
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -250,9 +250,9 @@ public class OrderServiceTest {
             @DisplayName("배달 주소 정보는 필수로 입력해야한다.")
             void fail1(String input) {
                 final var menu = createMenu("치킨", 만원);
-                final var order = createDeliveryOrder(OrderType.DELIVERY, input, menu);
+                final var order = createDeliveryOrder(input, menu);
 
-                final var response = createDeliveryOrder(OrderType.DELIVERY, input, menu);
+                final var response = createDeliveryOrder(input, menu);
 
                 given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
                 given(menuRepository.findById(any())).willReturn(Optional.of(menu));
@@ -337,7 +337,7 @@ public class OrderServiceTest {
         @DisplayName("배달주문인 경우 배달라이더에게 배달 요청이 완료되어야 수락된다.")
         void success2() {
             final var menu = createMenu("치킨", 만원);
-            final var order = createDeliveryOrder(OrderType.DELIVERY, "배달주소",  menu);
+            final var order = createDeliveryOrder("배달주소",  menu);
 
             given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
@@ -369,6 +369,105 @@ public class OrderServiceTest {
             given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
 
             assertThrows(IllegalStateException.class, () -> orderService.accept(order.getId()));
+        }
+    }
+
+    @Nested
+    @DisplayName("음식 제공 완료")
+    class Served {
+        @Test
+        @DisplayName("처리가 되는경우 주문상태가 수락에서 에서 음식제공 완료(SERVED) 로 변경된다.")
+        void success() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(OrderType.TAKEOUT, menu);
+            order.setStatus(OrderStatus.ACCEPTED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            Order actual = orderService.serve(order.getId());
+
+            assertAll(
+                    "주문 수락 완료 Assertions",
+                    () -> assertNotNull(actual),
+                    () -> assertEquals(OrderStatus.SERVED, actual.getStatus())
+            );
+        }
+
+        @Test
+        @DisplayName("접수된적 없는 주문인 경우 처리할 수 없다.")
+        void fail1() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(OrderType.TAKEOUT, menu);
+            order.setStatus(OrderStatus.ACCEPTED);
+
+            assertThrows(NoSuchElementException.class, () -> orderService.accept(order.getId()));
+        }
+
+        @Test
+        @DisplayName("주문상태가 수락상태가 아닌 경우 처리할 수 없다.")
+        void fail2() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(OrderType.TAKEOUT, menu);
+            order.setStatus(OrderStatus.SERVED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            assertThrows(IllegalStateException.class, () -> orderService.accept(order.getId()));
+        }
+    }
+
+    @Nested
+    @DisplayName("배달 중")
+    class Delivering {
+        @Test
+        @DisplayName("배달이 시작되면 주문 상태는 음식 제공에서 배달중(DELIVERING) 으로 변경된다.")
+        void success() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createDeliveryOrder("배달장소", menu);
+            order.setStatus(OrderStatus.SERVED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            Order actual = orderService.startDelivery(order.getId());
+
+            assertAll(
+                    "배달중 Assertions",
+                    () -> assertNotNull(actual),
+                    () -> assertEquals(OrderStatus.DELIVERING, actual.getStatus())
+            );
+        }
+
+        @Test
+        @DisplayName("배달주문(DELIVERY)이 아닌 경우 배달을 시작할 수 없다.")
+        void fail1() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createOrder(OrderType.TAKEOUT, menu);
+            order.setStatus(OrderStatus.SERVED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            assertThrows(IllegalStateException.class, () -> orderService.startDelivery(order.getId()));
+        }
+
+        @Test
+        @DisplayName("음식이 아직 제공되지 않은 경우(SERVED) 배달을 시작할 수 없다.")
+        void fail2() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createDeliveryOrder("배달장소", menu);
+            order.setStatus(OrderStatus.ACCEPTED);
+
+            given(orderRepository.findById(order.getId())).willReturn(Optional.of(order));
+
+            assertThrows(IllegalStateException.class, () -> orderService.startDelivery(order.getId()));
+        }
+
+        @Test
+        @DisplayName("접수된적 없는 주문인 경우 배달을 시작할 수 없다.")
+        void fail3() {
+            final var menu = createMenu("치킨", 만원);
+            final var order = createDeliveryOrder("배달장소", menu);
+
+            assertThrows(NoSuchElementException.class, () -> orderService.startDelivery(order.getId()));
         }
     }
 }

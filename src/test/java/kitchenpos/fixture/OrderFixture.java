@@ -26,26 +26,26 @@ public class OrderFixture {
         return createOrder(orderType, null, null, orderLineItems);
     }
 
-    public static @NotNull Order createEatInOrder(OrderType orderType, OrderTable orderTable, Menu... menu) {
+    public static @NotNull Order createEatInOrder(OrderTable orderTable, Menu... menu) {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (Menu m : menu) {
             OrderLineItem orderLineItem = createOrderLineItem(m);
             orderLineItems.add(orderLineItem);
         }
-        return createOrder(orderType, orderTable, null, orderLineItems);
+        return createOrder(OrderType.EAT_IN, orderTable, null, orderLineItems);
     }
 
     public static @NotNull Order createEatInOrder(OrderType orderType, OrderTable orderTable, List<OrderLineItem> orderLineItems) {
         return createOrder(orderType, orderTable, null, orderLineItems);
     }
 
-    public static @NotNull Order createDeliveryOrder(OrderType orderType, String deliveryAddress, Menu... menu) {
+    public static @NotNull Order createDeliveryOrder(String deliveryAddress, Menu... menu) {
         List<OrderLineItem> orderLineItems = new ArrayList<>();
         for (Menu m : menu) {
             OrderLineItem orderLineItem = createOrderLineItem(m);
             orderLineItems.add(orderLineItem);
         }
-        return createOrder(orderType, null, deliveryAddress, orderLineItems);
+        return createOrder(OrderType.DELIVERY, null, deliveryAddress, orderLineItems);
     }
     public static @NotNull Order createDeliveryOrder(OrderType orderType, String deliveryAddress, List<OrderLineItem> orderLineItems) {
         return createOrder(orderType, null, deliveryAddress, orderLineItems);
