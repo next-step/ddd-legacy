@@ -269,8 +269,7 @@ class MenuServiceTest {
 
             Product product = ProductFixture.createProduct();
 
-            MenuProduct menuProductRequest = MenuProductFixture.createMenuProduct(product);
-            menuProductRequest.setQuantity(-1);
+            MenuProduct menuProductRequest = MenuProductFixture.createMenuProduct(product, -1L);
 
             Menu request = new Menu();
             request.setName("메뉴 이름");
@@ -321,9 +320,7 @@ class MenuServiceTest {
 
             MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product);
 
-            Menu menu = MenuFixture.createMenu();
-            menu.setMenuProducts(List.of(menuProduct));
-            menu.setDisplayed(false);
+            Menu menu = MenuFixture.createMenu(false, List.of(menuProduct));
 
             menuRepository.save(menu);
 
@@ -345,9 +342,10 @@ class MenuServiceTest {
 
             MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product);
 
-            Menu menu = MenuFixture.createMenu();
-            menu.setMenuProducts(List.of(menuProduct));
-            menu.setPrice(product.getPrice().add(BigDecimal.valueOf(1000)));
+            Menu menu = MenuFixture.createMenu(
+                product.getPrice().add(BigDecimal.valueOf(1000)),
+                List.of(menuProduct)
+            );
 
             menuRepository.save(menu);
 
@@ -367,8 +365,7 @@ class MenuServiceTest {
 
             MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product);
 
-            Menu menu = MenuFixture.createMenu();
-            menu.setMenuProducts(List.of(menuProduct));
+            Menu menu = MenuFixture.createMenu(List.of(menuProduct));
 
             Menu request = new Menu();
             request.setPrice(BigDecimal.valueOf(2000));
@@ -420,10 +417,10 @@ class MenuServiceTest {
             menuProduct.setProduct(product);
             menuProduct.setQuantity(1);
 
-            Menu menu = MenuFixture.createMenu();
-            menu.setMenuProducts(List.of(menuProduct));
-            menu.setPrice(product.getPrice().add(BigDecimal.valueOf(1000)));
-            menu.setDisplayed(true);
+            Menu menu = MenuFixture.createMenu(
+                product.getPrice().add(BigDecimal.valueOf(1000)),
+                List.of(menuProduct)
+            );
 
             menuRepository.save(menu);
             productRepository.save(product);

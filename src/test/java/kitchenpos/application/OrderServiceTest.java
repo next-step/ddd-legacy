@@ -20,7 +20,9 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
 import kitchenpos.fixture.MenuFixture;
+import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderLineItemFixture;
+import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -78,10 +80,10 @@ class OrderServiceTest {
         @Test
         void createOrderWithoutType() {
             // given
-            final Order order = new Order();
+            final Order invalidRequest = new Order();
 
             // when & then
-            assertThatThrownBy(() -> orderService.create(order))
+            assertThatThrownBy(() -> orderService.create(invalidRequest))
                 .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -89,11 +91,11 @@ class OrderServiceTest {
         @Test
         void createOrderWithoutOrderLineItems() {
             // given
-            final Order order = new Order();
-            order.setType(OrderType.EAT_IN);
+            final Order invalidRequest = new Order();
+            invalidRequest.setType(OrderType.EAT_IN);
 
             // when & then
-            assertThatThrownBy(() -> orderService.create(order))
+            assertThatThrownBy(() -> orderService.create(invalidRequest))
                 .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -105,15 +107,15 @@ class OrderServiceTest {
 
             final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
-            final Order order = new Order();
-            order.setType(OrderType.EAT_IN);
-            order.setOrderLineItems(List.of(orderLineItem));
+            final Order invalidRequest = new Order();
+            invalidRequest.setType(OrderType.EAT_IN);
+            invalidRequest.setOrderLineItems(List.of(orderLineItem));
 
             // when
             when(menuRepository.findAllByIdIn(any())).thenReturn(Collections.emptyList());
 
             // then
-            assertThatThrownBy(() -> orderService.create(order))
+            assertThatThrownBy(() -> orderService.create(invalidRequest))
                 .isInstanceOf(IllegalArgumentException.class);
         }
 
@@ -124,23 +126,18 @@ class OrderServiceTest {
             final Menu menu = MenuFixture.createMenu();
 
             final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
-            orderLineItem.setPrice(menu.getPrice());
 
-            final Order order = new Order();
-            order.setOrderLineItems(List.of(orderLineItem));
-            order.setType(OrderType.EAT_IN);
+            final Order validRequest = OrderFixture.createEatInOrderRequest(List.of(orderLineItem));
 
-            final OrderTable orderTable = new OrderTable();
-            orderTable.setId(UUID.randomUUID());
-            orderTable.setOccupied(true);
+            final OrderTable orderTable = OrderTableFixture.createOrderTable(true);
 
             when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
             when(orderTableRepository.findById(any())).thenReturn(Optional.of(orderTable));
-            when(orderRepository.save(any())).thenReturn(order);
+            when(orderRepository.save(any())).thenReturn(validRequest);
 
             // when
-            final Order createdOrder = orderService.create(order);
+            final Order createdOrder = orderService.create(validRequest);
 
             // then
             assertThat(createdOrder).isNotNull();
@@ -152,12 +149,9 @@ class OrderServiceTest {
             // given
             final Menu menu = MenuFixture.createMenu();
 
-            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
-            orderLineItem.setQuantity(-1L);
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu, -1L);
 
-            final Order order = new Order();
-            order.setOrderLineItems(List.of(orderLineItem));
-            order.setType(OrderType.DELIVERY);
+            final Order order = OrderFixture.createDeliveryOrderRequest(List.of(orderLineItem));
 
             when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
 
@@ -174,9 +168,7 @@ class OrderServiceTest {
 
             final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
-            final Order order = new Order();
-            order.setOrderLineItems(List.of(orderLineItem));
-            order.setType(OrderType.EAT_IN);
+            final Order order = OrderFixture.createEatInOrderRequest(List.of(orderLineItem));
 
             final OrderTable orderTable = new OrderTable();
             orderTable.setId(UUID.randomUUID());
@@ -199,10 +191,7 @@ class OrderServiceTest {
 
             final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
-            final Order order = new Order();
-            order.setOrderLineItems(List.of(orderLineItem));
-            order.setType(OrderType.DELIVERY);
-            order.setDeliveryAddress("서울시 강남구");
+            final Order order = OrderFixture.createDeliveryOrderRequest(List.of(orderLineItem));
 
             when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -223,9 +212,7 @@ class OrderServiceTest {
 
             final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
-            final Order order = new Order();
-            order.setOrderLineItems(List.of(orderLineItem));
-            order.setType(OrderType.DELIVERY);
+            final Order order = OrderFixture.createDeliveryOrderRequest(List.of(orderLineItem), "");
 
             when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -239,17 +226,11 @@ class OrderServiceTest {
         @Test
         void createOrderWithNotDisplayedMenu() {
             // given
-            final Menu menu = new Menu();
-            menu.setId(UUID.randomUUID());
-            menu.setName("BHC HOT후라이드");
-            menu.setPrice(BigDecimal.valueOf(21_000L));
-            menu.setDisplayed(false);
+            final Menu menu = MenuFixture.createMenu(false);
 
             final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
-            final Order order = new Order();
-            order.setOrderLineItems(List.of(orderLineItem));
-            order.setType(OrderType.DELIVERY);
+            final Order order = OrderFixture.createDeliveryOrderRequest(List.of(orderLineItem));
 
             when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -265,12 +246,12 @@ class OrderServiceTest {
             // given
             final Menu menu = MenuFixture.createMenu();
 
-            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
-            orderLineItem.setPrice(BigDecimal.valueOf(20_000L));
+            final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(
+                menu,
+                BigDecimal.valueOf(20_000L)
+            );
 
-            final Order order = new Order();
-            order.setOrderLineItems(List.of(orderLineItem));
-            order.setType(OrderType.DELIVERY);
+            final Order order = OrderFixture.createDeliveryOrderRequest(List.of(orderLineItem));
 
             when(menuRepository.findAllByIdIn(any())).thenReturn(List.of(menu));
             when(menuRepository.findById(any())).thenReturn(Optional.of(menu));
@@ -288,9 +269,7 @@ class OrderServiceTest {
         @Test
         void acceptOrder() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.WAITING);
+            final Order order = OrderFixture.createOrder(OrderStatus.WAITING);
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -306,9 +285,7 @@ class OrderServiceTest {
         @Test
         void acceptOrderWithNotWaitingStatus() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.ACCEPTED);
+            final Order order = OrderFixture.createOrder(OrderStatus.ACCEPTED);
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -325,11 +302,11 @@ class OrderServiceTest {
 
             final OrderLineItem orderLineItem = OrderLineItemFixture.createOrderLineItem(menu);
 
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setOrderLineItems(List.of(orderLineItem));
-            order.setType(OrderType.DELIVERY);
-            order.setStatus(OrderStatus.WAITING);
+            final Order order = OrderFixture.createOrder(
+                OrderStatus.WAITING,
+                OrderType.DELIVERY,
+                List.of(orderLineItem)
+            );
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -349,9 +326,7 @@ class OrderServiceTest {
         @Test
         void serveOrder() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.ACCEPTED);
+            final Order order = OrderFixture.createOrder(OrderStatus.ACCEPTED);
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -367,9 +342,7 @@ class OrderServiceTest {
         @Test
         void serveOrderWithNotAcceptedStatus() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.WAITING);
+            final Order order = OrderFixture.createOrder(OrderStatus.WAITING);
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -386,10 +359,11 @@ class OrderServiceTest {
         @Test
         void startDeliveryOrder() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.SERVED);
-            order.setType(OrderType.DELIVERY);
+            final Order order = OrderFixture.createOrder(
+                OrderStatus.SERVED,
+                OrderType.DELIVERY,
+                Collections.emptyList()
+            );
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -405,10 +379,11 @@ class OrderServiceTest {
         @Test
         void startDeliveryOrderWithNotDeliveryType() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.ACCEPTED);
-            order.setType(OrderType.TAKEOUT);
+            final Order order = OrderFixture.createOrder(
+                OrderStatus.SERVED,
+                OrderType.TAKEOUT,
+                Collections.emptyList()
+            );
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -421,10 +396,11 @@ class OrderServiceTest {
         @Test
         void startDeliveryOrderWithNotServedStatus() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.WAITING);
-            order.setType(OrderType.DELIVERY);
+            final Order order = OrderFixture.createOrder(
+                OrderStatus.WAITING,
+                OrderType.DELIVERY,
+                Collections.emptyList()
+            );
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -441,10 +417,11 @@ class OrderServiceTest {
         @Test
         void completeDeliveryOrder() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.DELIVERING);
-            order.setType(OrderType.DELIVERY);
+            final Order order = OrderFixture.createOrder(
+                OrderStatus.DELIVERING,
+                OrderType.DELIVERY,
+                Collections.emptyList()
+            );
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -460,10 +437,11 @@ class OrderServiceTest {
         @Test
         void completeDeliveryOrderWithNotServedStatus() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.WAITING);
-            order.setType(OrderType.DELIVERY);
+            final Order order = OrderFixture.createOrder(
+                OrderStatus.WAITING,
+                OrderType.DELIVERY,
+                Collections.emptyList()
+            );
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -476,10 +454,11 @@ class OrderServiceTest {
         @Test
         void completeDeliveryOrderWithDeliveryType() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.DELIVERED);
-            order.setType(OrderType.DELIVERY);
+            final Order order = OrderFixture.createOrder(
+                OrderStatus.DELIVERED,
+                OrderType.DELIVERY,
+                Collections.emptyList()
+            );
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -495,10 +474,11 @@ class OrderServiceTest {
         @Test
         void completeDeliveryOrderWithoutDeliveredStatus() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.DELIVERING);
-            order.setType(OrderType.DELIVERY);
+            final Order order = OrderFixture.createOrder(
+                OrderStatus.DELIVERING,
+                OrderType.DELIVERY,
+                Collections.emptyList()
+            );
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -515,11 +495,11 @@ class OrderServiceTest {
         @Test
         void completeEatInOrder() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.SERVED);
-            order.setType(OrderType.EAT_IN);
-            order.setOrderTable(new OrderTable());
+            final Order order = OrderFixture.createOrder(
+                OrderStatus.SERVED,
+                OrderType.EAT_IN,
+                new OrderTable()
+            );
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
             when(orderRepository.existsByOrderTableAndStatusNot(any(), any())).thenReturn(false);
@@ -536,10 +516,11 @@ class OrderServiceTest {
         @Test
         void completeEatInOrderWithoutOrderTable() {
             // given
-            final Order order = new Order();
-            order.setId(UUID.randomUUID());
-            order.setStatus(OrderStatus.WAITING);
-            order.setType(OrderType.EAT_IN);
+            final Order order = OrderFixture.createOrder(
+                OrderStatus.WAITING,
+                OrderType.EAT_IN,
+                Collections.emptyList()
+            );
 
             when(orderRepository.findById(any())).thenReturn(Optional.of(order));
 
@@ -548,5 +529,4 @@ class OrderServiceTest {
                 .isInstanceOf(IllegalStateException.class);
         }
     }
-
 }

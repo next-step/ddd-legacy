@@ -69,8 +69,7 @@ class OrderTableServiceTest {
     @Test
     void createWithEmptyName() {
         // given
-        final OrderTable orderTable = new OrderTable();
-        orderTable.setName("");
+        final OrderTable orderTable = OrderTableFixture.createOrderTable("");
 
         // when & then
         assertThatThrownBy(() -> orderTableService.create(orderTable))
@@ -101,8 +100,7 @@ class OrderTableServiceTest {
     @Test
     void clear() {
         // given
-        final OrderTable orderTable = OrderTableFixture.createOrderTable();
-        orderTable.setOccupied(true);
+        final OrderTable orderTable = OrderTableFixture.createOrderTable(true);
 
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(
             Optional.of(orderTable));
@@ -125,8 +123,7 @@ class OrderTableServiceTest {
     @Test
     void clearWithNotCompletedOrder() {
         // given
-        final OrderTable orderTable = OrderTableFixture.createOrderTable();
-        orderTable.setOccupied(true);
+        final OrderTable orderTable = OrderTableFixture.createOrderTable(true);
 
         when(orderTableRepository.findById(orderTable.getId())).thenReturn(
             Optional.of(orderTable));
@@ -142,8 +139,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuests() {
         // given
-        final OrderTable orderTable = OrderTableFixture.createOrderTable();
-        orderTable.setOccupied(true);
+        final OrderTable orderTable = OrderTableFixture.createOrderTable(true);
 
         final OrderTable request = new OrderTable();
         request.setNumberOfGuests(4);
@@ -185,8 +181,7 @@ class OrderTableServiceTest {
     @Test
     void changeNumberOfGuestsWithNegativeNumberOfGuests() {
         // given
-        final OrderTable request = new OrderTable();
-        request.setNumberOfGuests(-1);
+        final OrderTable request = OrderTableFixture.createOrderTable(-1);
 
         // when & then
         assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), request))
