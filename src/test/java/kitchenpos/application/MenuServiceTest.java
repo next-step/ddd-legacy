@@ -21,11 +21,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
 
-    MenuRepository menuRepository;
-    MenuGroupRepository menuGroupRepository;
-    ProductRepository productRepository;
-    PurgomalumClient purgomalumClient;
-    MenuService menuService;
+    private MenuRepository menuRepository;
+    private MenuGroupRepository menuGroupRepository;
+    private ProductRepository productRepository;
+    private PurgomalumClient purgomalumClient;
+    private MenuService menuService;
 
     @BeforeEach
     void setUp() {
@@ -40,9 +40,9 @@ class MenuServiceTest {
     @DisplayName("메뉴 생성")
     class create {
 
-        MenuGroup menuGroup;
-        Product product;
-        MenuProduct menuProduct;
+        private MenuGroup menuGroup;
+        private Product product;
+        private MenuProduct menuProduct;
 
         @BeforeEach
         void setUp() {
@@ -159,10 +159,10 @@ class MenuServiceTest {
     @DisplayName("메뉴가격 변경")
     class changePrice {
 
-        MenuGroup menuGroup;
-        Product product;
-        MenuProduct menuProduct;
-        Menu menu;
+        private MenuGroup menuGroup;
+        private Product product;
+        private MenuProduct menuProduct;
+        private Menu menu;
 
         @BeforeEach
         void setUp() {
@@ -216,9 +216,9 @@ class MenuServiceTest {
     @DisplayName("메뉴 표시하기")
     class display {
 
-        MenuGroup menuGroup;
-        Product product;
-        MenuProduct menuProduct;
+        private MenuGroup menuGroup;
+        private Product product;
+        private MenuProduct menuProduct;
 
         @BeforeEach
         void setUp() {
@@ -271,9 +271,9 @@ class MenuServiceTest {
     @DisplayName("메뉴 숨기기")
     class hide {
 
-        MenuGroup menuGroup;
-        Product product;
-        MenuProduct menuProduct;
+        private MenuGroup menuGroup;
+        private Product product;
+        private MenuProduct menuProduct;
 
         @BeforeEach
         void setUp() {
