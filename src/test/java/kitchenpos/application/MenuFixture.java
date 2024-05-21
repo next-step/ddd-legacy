@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static kitchenpos.application.MenuGroupFixture.createMenuGroupRequest;
+import static kitchenpos.application.ProductFixture.createProductRequest;
 
 public class MenuFixture{
 
@@ -126,14 +127,9 @@ public class MenuFixture{
         return request;
     }
 
-    public static Product createProductRequest() {
-        final Product request = new Product();
-        request.setName("후라이드");
-        request.setPrice(BigDecimal.valueOf(16_000L));
-        return request;
-    }
 
-    public static Menu createMenu(UUID menuId, long price, boolean displayed, Product product) {
+
+    public static Menu createMenu(final UUID menuId, final long price, final boolean displayed, final Product product) {
         final Menu menu = new Menu();
         menu.setId(menuId);
         menu.setPrice(BigDecimal.valueOf(price));
@@ -143,5 +139,31 @@ public class MenuFixture{
         menuProduct.setProduct(product);
         menu.setMenuProducts(List.of(menuProduct));
         return menu;
+    }
+
+    public static Menu createMenuRequest(final MenuGroup menuGroup) {
+        final Menu request = new Menu();
+        request.setMenuGroupId(menuGroup.getId());
+        request.setMenuGroup(menuGroup);
+        request.setPrice(BigDecimal.valueOf(16_000L));
+        return request;
+
+    }
+
+    public static Menu createMenuRequest(final MenuGroup menuGroup, final MenuProduct menuProduct) {
+        final Menu request = new Menu();
+        request.setMenuGroupId(menuGroup.getId());
+        request.setMenuGroup(menuGroup);
+        request.setPrice(BigDecimal.valueOf(16_000L));
+        request.setMenuProducts(List.of(menuProduct));
+        return request;
+    }
+
+    public static Menu createMenuRequestExceptMenuProduct(final MenuGroup menuGroup) {
+        final Menu request = new Menu();
+        request.setMenuGroupId(menuGroup.getId());
+        request.setMenuGroup(menuGroup);
+        request.setPrice(BigDecimal.valueOf(16_000L));
+        return request;
     }
 }

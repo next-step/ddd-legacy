@@ -12,7 +12,10 @@ import org.mockito.InjectMocks;
 import java.util.NoSuchElementException;
 
 import static kitchenpos.application.MenuFixture.createMenuRequest;
+import static kitchenpos.application.MenuFixture.createMenuRequestExceptMenuProduct;
 import static kitchenpos.application.MenuGroupFixture.createMenuGroupRequest;
+import static kitchenpos.application.MenuProductFixture.createMenuProductRequest;
+import static kitchenpos.application.ProductFixture.createProductRequest;
 import static org.assertj.core.api.Assertions.*;
 
 class MenuServiceTest {
@@ -55,6 +58,27 @@ class MenuServiceTest {
         assertThatExceptionOfType(NoSuchElementException.class).isThrownBy(() -> menuService.create(request));
 
     }
+
+    @DisplayName("추가할 메뉴의 메뉴상품이 없으면 예외가 발생한다.")
+    @Test
+    void create3(){
+        // given
+        final MenuGroup requestMenuGroup = createMenuGroupRequest("한마리메뉴");
+        MenuGroup actualMenuGroup = menuGroupRepository.save(requestMenuGroup);
+
+        final Product productRequest = createProductRequest("후라이드", 16_000L);
+
+        final MenuProduct menuProduct = createMenuProductRequest(productRequest);
+
+        //final Menu request = createMenuRequest(actualMenuGroup, menuProduct);
+        final Menu request = createMenuRequestExceptMenuProduct(actualMenuGroup);
+        final Menu actualMenu = menuRepository.save(request);
+
+
+        //when, then
+        assertThatIllegalArgumentException().isThrownBy(() -> menuService.create(request));
+    }
+
 
 
 

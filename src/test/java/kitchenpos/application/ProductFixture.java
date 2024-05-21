@@ -13,7 +13,9 @@ public class ProductFixture {
     }
 
     public static Product createProductRequest() {
-        return createProductRequest(20_000L);
+        final Product request = new Product();
+        request.setName("후라이드");
+        return createProductRequest(request.getName(), 16_000L);
     }
 
     public static Product createProductRequest(final long price) {
@@ -27,6 +29,7 @@ public class ProductFixture {
         product.setPrice(BigDecimal.valueOf(price));
         return product;
     }
+
 
     public static Product createProduct(final String name, final long price){
         final Product product = new Product();
