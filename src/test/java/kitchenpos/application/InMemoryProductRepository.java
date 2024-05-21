@@ -27,6 +27,6 @@ public class InMemoryProductRepository implements ProductRepository {
 
     @Override
     public List<Product> findAllByIdIn(List<UUID> ids) {
-        return null;
+        return products.values().stream().filter(product -> ids.contains(product.getId())).toList();
     }
 }

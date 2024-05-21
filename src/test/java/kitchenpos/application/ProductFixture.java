@@ -27,21 +27,16 @@ public class ProductFixture {
         product.setId(UUID.randomUUID());
         product.setName(name);
         product.setPrice(BigDecimal.valueOf(price));
-        return product;
+        return createProductRequest(product.getId(), name, price);
     }
 
-
-    public static Product createProduct(final String name, final long price){
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        return createProduct(product.getId(), name, price);
-    }
-
-    public static Product createProduct(final UUID id, final String name, final long price) {
+    public static Product createProductRequest(final UUID id, final String name, final long price) {
         final Product product = new Product();
         product.setId(id);
         product.setName(name);
         product.setPrice(BigDecimal.valueOf(price));
         return product;
     }
+
+
 }

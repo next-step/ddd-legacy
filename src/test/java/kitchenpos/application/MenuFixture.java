@@ -15,14 +15,21 @@ import static kitchenpos.application.ProductFixture.createProductRequest;
 
 public class MenuFixture{
 
+    public static Menu createMenuRequest(final long price, final List<MenuProduct> menuProducts) {
+        final Menu request = new Menu();
+        request.setId(UUID.randomUUID());
+        request.setName("후라이드");
+        request.setPrice(BigDecimal.valueOf(price));
+        request.setMenuProducts(menuProducts);
+        request.setDisplayed(Display.HIDDEN.getValue());
+        return request;
+    }
 
-
-
-    public static Menu createMenuRequest(final long price, UUID menuGroupId) {
+    public static Menu createMenuRequest(final long price, MenuGroup menuGroup) {
         final Menu request = new Menu();
         request.setName("후라이드");
         request.setPrice(BigDecimal.valueOf(price));
-        request.setMenuGroupId(menuGroupId);
+        request.setMenuGroupId(menuGroup.getId());
         return request;
     }
 
@@ -164,6 +171,26 @@ public class MenuFixture{
         request.setMenuGroupId(menuGroup.getId());
         request.setMenuGroup(menuGroup);
         request.setPrice(BigDecimal.valueOf(16_000L));
+        return request;
+    }
+
+    public static Menu createMenuRequest(final MenuGroup menuGroup, final List<MenuProduct> menuProducts) {
+        final Menu request = new Menu();
+        request.setName("후라이드");
+        request.setMenuGroupId(menuGroup.getId());
+        request.setMenuGroup(menuGroup);
+        request.setPrice(BigDecimal.valueOf(16_000L));
+        request.setMenuProducts(menuProducts);
+        return request;
+    }
+
+    public static Menu createMenuRequest(final String name, final MenuGroup menuGroup, final List<MenuProduct> menuProducts) {
+        final Menu request = new Menu();
+        request.setName(name);
+        request.setMenuGroupId(menuGroup.getId());
+        request.setMenuGroup(menuGroup);
+        request.setPrice(BigDecimal.valueOf(16_000L));
+        request.setMenuProducts(menuProducts);
         return request;
     }
 }

@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import static kitchenpos.application.MenuFixture.createMenu;
-import static kitchenpos.application.ProductFixture.createProduct;
 import static kitchenpos.application.ProductFixture.createProductRequest;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,7 +69,7 @@ class ProductServiceTest {
     void changePrice(){
         //given
         final UUID productId = UUID.randomUUID();
-        final Product product = createProduct(productId, "후라이드", 20_000L);
+        final Product product = createProductRequest(productId, "후라이드", 20_000L);
         productRepository.save(product);
 
         final var menuId = UUID.randomUUID();
@@ -89,8 +88,8 @@ class ProductServiceTest {
 
     @Test
     void 상품의_목록을_조회할_수_있다(){
-        productRepository.save(createProduct("후라이드",15000L));
-        productRepository.save(createProduct("양념치킨",17000L));
+        productRepository.save(createProductRequest("후라이드",15000L));
+        productRepository.save(createProductRequest("양념치킨",17000L));
         final List<Product> actual = productService.findAll();
         assertThat(actual).hasSize(2);
 

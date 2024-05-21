@@ -21,12 +21,12 @@ public class InMemoryMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAll() {
-        return null;
+        return menus.values().stream().toList();
     }
 
     @Override
     public List<Menu> findAllByIdIn(List<UUID> ids) {
-        return null;
+        return menus.values().stream().filter(menu -> ids.contains(menu.getId())).toList();
     }
 
     @Override
