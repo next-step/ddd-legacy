@@ -18,8 +18,8 @@ class MenuGroupServiceTest {
 
   @BeforeEach
   public void init() {
-    MenuGroupFakeRepository menuGroupFakeRepository = new MenuGroupFakeRepository();
-    menuGroupService = new MenuGroupService(menuGroupFakeRepository);
+    InMemoryMenuGroupRepository inMemoryMenuGroupRepository = new InMemoryMenuGroupRepository();
+    menuGroupService = new MenuGroupService(inMemoryMenuGroupRepository);
   }
 
   @DisplayName("메뉴그룹을 등록할 수 있다.")

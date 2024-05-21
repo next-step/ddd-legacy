@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 
-public class MenuGroupFakeRepository implements MenuGroupRepository {
+public class InMemoryMenuGroupRepository implements MenuGroupRepository {
   private final Map<UUID, MenuGroup> maps = new ConcurrentHashMap<>();
 
   @Override
