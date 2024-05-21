@@ -18,6 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static kitchenpos.application.MenuFixture.createMenu;
+import static kitchenpos.application.ProductFixture.createProduct;
+import static kitchenpos.application.ProductFixture.createProductRequest;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -93,50 +96,4 @@ class ProductServiceTest {
 
     }
 
-    @NotNull
-    private static Menu createMenu(UUID menuId, long price, boolean displayed, Product product) {
-        final Menu menu = new Menu();
-        menu.setId(menuId);
-        menu.setPrice(BigDecimal.valueOf(price));
-        menu.setDisplayed(displayed);
-        final MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProductId(product.getId());
-        menuProduct.setProduct(product);
-        menu.setMenuProducts(List.of(menuProduct));
-        return menu;
-    }
-
-    private static Product createProductRequest(final String name) {
-        return createProductRequest(name,20_000L);
-    }
-
-    private static Product createProductRequest() {
-        return createProductRequest(20_000L);
-    }
-
-    private static Product createProductRequest(final long price) {
-        return createProductRequest("후라이드", price);
-    }
-
-    private static Product createProductRequest(final String name, final long price) {
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName(name);
-        product.setPrice(BigDecimal.valueOf(price));
-        return product;
-    }
-
-    private static Product createProduct(final String name, final long price){
-        final Product product = new Product();
-        product.setId(UUID.randomUUID());
-        return createProduct(product.getId(), name, price);
-    }
-
-    private static Product createProduct(final UUID id, final String name, final long price) {
-        final Product product = new Product();
-        product.setId(id);
-        product.setName(name);
-        product.setPrice(BigDecimal.valueOf(price));
-        return product;
-    }
 }

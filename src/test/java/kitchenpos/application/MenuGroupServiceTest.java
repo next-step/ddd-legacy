@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.application.MenuGroupFixture.createMenuGroupRequest;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -73,19 +74,6 @@ class MenuGroupServiceTest {
         //then
         assertThat(actuals).hasSize(2);
 
-    }
-
-    private static MenuGroup createMenuGroupRequest() {
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setName("한마리메뉴");
-        return createMenuGroupRequest(menuGroup.getName());
-    }
-
-    private static MenuGroup createMenuGroupRequest(final String name) {
-        final MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName(name);
-        return menuGroup;
     }
 
 
