@@ -159,7 +159,7 @@ class OrderTableServiceTest {
         );
     }
 
-    @DisplayName("`주문 테이블`의 손님 수를 변경할 때 음식이 없으면 예외가 발생한다.")
+    @DisplayName("`주문 테이블`이 착석 상태가 아니라면 손님 수를 변경할 수 없다.")
     @Test
     void changeNumberOfGuestsWithEmptyOrder() {
         // given
