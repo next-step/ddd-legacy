@@ -1,9 +1,10 @@
-package kitchenpos.application;
+package kitchenpos.application.menu_group;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.List;
+import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
