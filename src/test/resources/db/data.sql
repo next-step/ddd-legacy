@@ -40,7 +40,7 @@ values (x'e1254913860846aab23aa07c1dcbc648', true, '양념치킨', 16000, x'cbc7
 insert into menu (id, displayed, name, price, menu_group_id)
 values (x'191fa247b5f34b51b175e65db523f754', true, '반반치킨', 16000, x'cbc75faefeb04bb18be2cb8ce5d8fded');
 insert into menu (id, displayed, name, price, menu_group_id)
-values (x'33e558df7d934622b50efcc4282cd184', true, '통구이', 16000, x'cbc75faefeb04bb18be2cb8ce5d8fded');
+values (x'33e558df7d934622b50efcc4282cd184', false, '통구이', 16000, x'cbc75faefeb04bb18be2cb8ce5d8fded');
 insert into menu (id, displayed, name, price, menu_group_id)
 values (x'b9c670b04ef5409083496868df1c7d62', true, '간장치킨', 17000, x'cbc75faefeb04bb18be2cb8ce5d8fded');
 insert into menu (id, displayed, name, price, menu_group_id)
