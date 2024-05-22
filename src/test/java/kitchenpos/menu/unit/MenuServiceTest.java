@@ -2,6 +2,7 @@ package kitchenpos.menu.unit;
 
 import kitchenpos.application.MenuService;
 import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
@@ -12,6 +13,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.NoSuchElementException;
+import java.util.Optional;
+
+import static kitchenpos.menu.fixture.MenuFixture.A_메뉴;
+import static kitchenpos.menu.fixture.MenuFixture.가격마이너스_메뉴;
+import static kitchenpos.menu.fixture.MenuFixture.가격미존재_메뉴;
+import static kitchenpos.menu.fixture.MenuFixture.마이너스_수량의_제품을_가진_메뉴;
+import static kitchenpos.menu.fixture.MenuFixture.메뉴가격이_제품목록의_가격합계보다_높은메뉴;
+import static kitchenpos.menu.fixture.MenuFixture.빈_제품목록_메뉴;
+import static kitchenpos.menu.fixture.MenuFixture.이름미존재_메뉴;
+import static kitchenpos.menu.fixture.MenuFixture.제품목록미존재_메뉴;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 public class MenuServiceTest {
@@ -40,7 +60,29 @@ public class MenuServiceTest {
         @Test
         @DisplayName("[성공] 메뉴를 등록한다.")
         void create() {
+            // given
+            var 메뉴그룹 = A_메뉴.getMenuGroup();
+            given(menuGroupRepository.findById(any())).willReturn(Optional.ofNullable(메뉴그룹));
 
+            var 제품목록 = A_메뉴.getMenuProducts().stream()
+                    .map(MenuProduct::getProduct)
+                    .toList();
+            given(productRepository.findAllByIdIn(any())).willReturn(제품목록);
+            for (var 제품 : 제품목록) {
+                given(productRepository.findById(제품.getId())).willReturn(Optional.of(제품));
+            }
+
+            given(purgomalumClient.containsProfanity(any())).willReturn(false);
+            given(menuRepository.save(any())).willReturn(A_메뉴);
+
+            // when
+            var saved = menuService.create(A_메뉴);
+
+            // then
+            assertAll(
+                    () -> then(menuRepository).should(times(1)).save(any()),
+                    () -> assertThat(saved.getName()).isEqualTo(A_메뉴.getName())
+            );
         }
 
         @Nested
@@ -49,19 +91,37 @@ public class MenuServiceTest {
             @Test
             @DisplayName("[실패] 메뉴의 가격을 입력하지 않으면 메뉴는 등록이 되지 않는다.")
             void 메뉴_가격_null() {
-
+                // when & then
+                assertThatThrownBy(() -> menuService.create(가격미존재_메뉴))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
             @DisplayName("[실패] 메뉴의 가격이 0원보다 낮으면 메뉴는 등록이 되지 않는다.")
             void 메뉴_가격_마이너스() {
-
+                // when & then
+                assertThatThrownBy(() -> menuService.create(가격마이너스_메뉴))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
-            @DisplayName("[실패] 메뉴의 가격이 상품 목록의 가격 합계보다 높으면 메뉴는 등록이 되지 않는다.")
-            void 메뉴_가격_상품_목록의_가격_합계보다_높음() {
+            @DisplayName("[실패] 메뉴의 가격이 제품 목록의 가격 합계보다 높으면 메뉴는 등록이 되지 않는다.")
+            void 메뉴_가격_제품_목록의_가격_합계보다_높음() {
+                // given
+                var 메뉴그룹 = 메뉴가격이_제품목록의_가격합계보다_높은메뉴.getMenuGroup();
+                given(menuGroupRepository.findById(any())).willReturn(Optional.ofNullable(메뉴그룹));
 
+                var 제품목록 = 메뉴가격이_제품목록의_가격합계보다_높은메뉴.getMenuProducts().stream()
+                        .map(MenuProduct::getProduct)
+                        .toList();
+                given(productRepository.findAllByIdIn(any())).willReturn(제품목록);
+                for (var 제품 : 제품목록) {
+                    given(productRepository.findById(제품.getId())).willReturn(Optional.of(제품));
+                }
+
+                // when & then
+                assertThatThrownBy(() -> menuService.create(메뉴가격이_제품목록의_가격합계보다_높은메뉴))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
         }
@@ -72,36 +132,76 @@ public class MenuServiceTest {
             @Test
             @DisplayName("[실패] 등록하려는 메뉴가 등록되지 않은 메뉴그룹에 포함될 경우 메뉴는 등록이 되지 않는다.")
             void 메뉴그룹_미등록() {
+                // given
+                given(menuGroupRepository.findById(any())).willReturn(Optional.empty());
 
+                // when & then
+                assertThatThrownBy(() -> menuService.create(A_메뉴))
+                        .isInstanceOf(NoSuchElementException.class);
             }
 
         }
 
         @Nested
-        class 상품목록검증 {
+        class 제품목록검증 {
 
             @Test
-            @DisplayName("[실패] 메뉴에 포함되어 있는 상품 목록이 존재하지 않으면 메뉴는 등록되지 않는다.")
-            void 상품목록_null() {
+            @DisplayName("[실패] 메뉴에 포함되어 있는 제품 목록이 존재하지 않으면 메뉴는 등록되지 않는다.")
+            void 제품목록_null() {
+                // given
+                var 메뉴그룹 = 제품목록미존재_메뉴.getMenuGroup();
+                given(menuGroupRepository.findById(any())).willReturn(Optional.ofNullable(메뉴그룹));
 
+                // when & then
+                assertThatThrownBy(() -> menuService.create(제품목록미존재_메뉴))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
-            @DisplayName("[실패] 메뉴에 포함되어 있는 상품 목록이 비어있을 경우 메뉴는 등록되지 않는다.")
-            void 상품목록_empty() {
+            @DisplayName("[실패] 메뉴에 포함되어 있는 제품 목록이 비어있을 경우 메뉴는 등록되지 않는다.")
+            void 제품목록_empty() {
+                // given
+                var 메뉴그룹 = 빈_제품목록_메뉴.getMenuGroup();
+                given(menuGroupRepository.findById(any())).willReturn(Optional.ofNullable(메뉴그룹));
 
+                // when & then
+                assertThatThrownBy(() -> menuService.create(빈_제품목록_메뉴))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
-            @DisplayName("[실패] 메뉴에 포함되어 있는 상품 목록 중 등록되지 않은 상품이 포함되어 있을 경우 메뉴는 등록되지 않는다.")
-            void 상품목록_미등록_상품포함() {
+            @DisplayName("[실패] 메뉴에 포함되어 있는 제품 목록 중 등록되지 않은 제품이 포함되어 있을 경우 메뉴는 등록되지 않는다.")
+            void 제품목록_미등록_제품포함() {
+                // given
+                var 메뉴그룹 = A_메뉴.getMenuGroup();
+                given(menuGroupRepository.findById(any())).willReturn(Optional.ofNullable(메뉴그룹));
 
+                var 제품목록 = A_메뉴.getMenuProducts().stream()
+                        .map(MenuProduct::getProduct)
+                        .toList();
+                given(productRepository.findAllByIdIn(any())).willReturn(제품목록);
+                given(productRepository.findById(any())).willReturn(Optional.empty());
+
+                // when & then
+                assertThatThrownBy(() -> menuService.create(A_메뉴))
+                        .isInstanceOf(NoSuchElementException.class);
             }
 
             @Test
-            @DisplayName("[실패] 메뉴에 포함되어 있는 상품 목록 중 0개 미만의 수량을 가진 상품이 포함되어 있을 경우 메뉴는 등록되지 않는다.")
-            void 상품목록_0개미만수량인_상품포함() {
+            @DisplayName("[실패] 메뉴에 포함되어 있는 제품 목록 중 0개 미만의 수량을 가진 제품이 포함되어 있을 경우 메뉴는 등록되지 않는다.")
+            void 제품목록_0개미만수량인_제품포함() {
+                // given
+                var 메뉴그룹 = 마이너스_수량의_제품을_가진_메뉴.getMenuGroup();
+                given(menuGroupRepository.findById(any())).willReturn(Optional.ofNullable(메뉴그룹));
 
+                var 제품목록 = 마이너스_수량의_제품을_가진_메뉴.getMenuProducts().stream()
+                        .map(MenuProduct::getProduct)
+                        .toList();
+                given(productRepository.findAllByIdIn(any())).willReturn(제품목록);
+
+                // when & then
+                assertThatThrownBy(() -> menuService.create(마이너스_수량의_제품을_가진_메뉴))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
         }
@@ -112,12 +212,45 @@ public class MenuServiceTest {
             @Test
             @DisplayName("[실패] 메뉴의 이름을 입력하지 않으면 등록이 되지 않는다.")
             void 메뉴_이름_null() {
+                // given
+                var 메뉴그룹 = 이름미존재_메뉴.getMenuGroup();
+                given(menuGroupRepository.findById(any())).willReturn(Optional.ofNullable(메뉴그룹));
+
+                var 제품목록 = 이름미존재_메뉴.getMenuProducts().stream()
+                        .map(MenuProduct::getProduct)
+                        .toList();
+                given(productRepository.findAllByIdIn(any())).willReturn(제품목록);
+                for (var 제품 : 제품목록) {
+                    given(productRepository.findById(제품.getId())).willReturn(Optional.of(제품));
+                }
+
+                // when & then
+                assertThatThrownBy(() -> menuService.create(이름미존재_메뉴))
+                        .isInstanceOf(IllegalArgumentException.class);
 
             }
 
             @Test
             @DisplayName("[실패] 메뉴의 이름에 부적절한 단어(욕설 등)가 포함되면 등록이 되지 않는다.")
             void 메뉴_이름_욕설() {
+                // given
+                var 욕설이름_메뉴 = A_메뉴;
+                var 메뉴그룹 = 욕설이름_메뉴.getMenuGroup();
+                given(menuGroupRepository.findById(any())).willReturn(Optional.ofNullable(메뉴그룹));
+
+                var 제품목록 = 욕설이름_메뉴.getMenuProducts().stream()
+                        .map(MenuProduct::getProduct)
+                        .toList();
+                given(productRepository.findAllByIdIn(any())).willReturn(제품목록);
+                for (var 제품 : 제품목록) {
+                    given(productRepository.findById(제품.getId())).willReturn(Optional.of(제품));
+                }
+
+                given(purgomalumClient.containsProfanity(any())).willReturn(true);
+
+                // when & then
+                assertThatThrownBy(() -> menuService.create(욕설이름_메뉴))
+                        .isInstanceOf(IllegalArgumentException.class);
 
             }
 
@@ -151,8 +284,8 @@ public class MenuServiceTest {
             }
 
             @Test
-            @DisplayName("[실패] 변경할 메뉴의 가격이 상품 목록의 가격 합계보다 높으면 메뉴는 등록이 되지 않는다.")
-            void 메뉴_가격_상품_목록의_가격_합계보다_높음() {
+            @DisplayName("[실패] 변경할 메뉴의 가격이 제품 목록의 가격 합계보다 높으면 메뉴는 등록이 되지 않는다.")
+            void 메뉴_가격_제품_목록의_가격_합계보다_높음() {
 
             }
         }
@@ -194,8 +327,8 @@ public class MenuServiceTest {
         class 가격검증 {
 
             @Test
-            @DisplayName("[실패] 메뉴의 가격이 상품 목록의 가격 합계보다 높으면 메뉴는 숨김해제 처리가 되지 않는다.")
-            void 메뉴_가격_상품_목록의_가격_합계보다_높음() {
+            @DisplayName("[실패] 메뉴의 가격이 제품 목록의 가격 합계보다 높으면 메뉴는 숨김해제 처리가 되지 않는다.")
+            void 메뉴_가격_제품_목록의_가격_합계보다_높음() {
 
             }
 
