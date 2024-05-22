@@ -1,7 +1,6 @@
 package kitchenpos.application
 
 import kitchenpos.domain.MenuGroup
-import kitchenpos.domain.MenuGroupRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -16,7 +15,6 @@ import org.springframework.test.context.jdbc.Sql
 @Sql("classpath:db/data.sql")
 class MenuGroupServiceTest(
     private val sut: MenuGroupService,
-    private val menuGroupRepository: MenuGroupRepository,
 ) {
     @DisplayName("메뉴 그룹 등록이 가능하다.")
     @Nested
@@ -25,8 +23,10 @@ class MenuGroupServiceTest(
         @Test
         fun create_menu_group_test1() {
             // given
-            val request = MenuGroup()
-            request.name = "한마리 치킨"
+            val request =
+                MenuGroup().apply {
+                    this.name = "한마리 치킨"
+                }
 
             // when
             val createdMenuGroup = sut.create(request)

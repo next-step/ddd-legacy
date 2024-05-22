@@ -2,8 +2,9 @@ package kitchenpos.application
 
 import kitchenpos.domain.MenuRepository
 import kitchenpos.domain.Product
+import kitchenpos.fixture.EXISTING_PRODUCT_ID_1
+import kitchenpos.fixture.initProduct
 import kitchenpos.infra.PurgomalumClient
-import kitchenpos.utils.generateUUIDFrom
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.mockito.BDDMockito.any
@@ -54,8 +55,8 @@ class ProductServiceTest {
         @Test
         fun create_product_test2() {
             // given
-            val request = Product()
-            request.price = BigDecimal.valueOf(-1000)
+            val price = BigDecimal.valueOf(-1000)
+            val request = initProduct(price = price)
             // when
             // then
             assertThrows<IllegalArgumentException> { sut.create(request) }
@@ -65,8 +66,7 @@ class ProductServiceTest {
         @Test
         fun create_product_test3() {
             // given
-            val request = Product()
-            request.price = BigDecimal.valueOf(1000)
+            val request = initProduct(name = null)
 
             // when
             // then
@@ -78,9 +78,8 @@ class ProductServiceTest {
         fun create_product_test4() {
             // given
             val slang = "비속어"
-            val request = Product()
-            request.price = BigDecimal.valueOf(1000)
-            request.name = slang
+            val price = BigDecimal.valueOf(1000)
+            val request = initProduct(name = slang, price = price)
             given(purgomalumClient.containsProfanity(slang)).willReturn(true)
 
             // when
@@ -92,9 +91,7 @@ class ProductServiceTest {
         @Test
         fun create_product_test5() {
             // given
-            val request = Product()
-            request.price = BigDecimal.valueOf(1000)
-            request.name = "후라이드 치킨"
+            val request = initProduct()
             given(purgomalumClient.containsProfanity(any())).willReturn(false)
 
             // when
@@ -112,9 +109,9 @@ class ProductServiceTest {
         @Test
         fun change_price_test1() {
             // given
-            val productId = generateUUIDFrom(uuidWithoutDash = "3b52824434f7406bbb7e690912f66b10")
-            val request = Product()
-            request.price = BigDecimal.valueOf(-1000)
+            val productId = EXISTING_PRODUCT_ID_1
+            val targetPrice = BigDecimal.valueOf(-1000)
+            val request = initProduct(price = targetPrice)
 
             // when
             // then
@@ -125,10 +122,9 @@ class ProductServiceTest {
         @Test
         fun change_price_test2() {
             // given
-            val productId = generateUUIDFrom(uuidWithoutDash = "3b52824434f7406bbb7e690912f66b10")
+            val productId = EXISTING_PRODUCT_ID_1
             val targetPrice = BigDecimal.valueOf(17_000)
-            val request = Product()
-            request.price = targetPrice
+            val request = initProduct(price = targetPrice)
 
             // when
             val changedProduct = sut.changePrice(productId, request)
@@ -141,10 +137,9 @@ class ProductServiceTest {
         @Test
         fun change_price_test3() {
             // given
-            val productId = generateUUIDFrom(uuidWithoutDash = "3b52824434f7406bbb7e690912f66b10")
+            val productId = EXISTING_PRODUCT_ID_1
             val targetPrice = BigDecimal.valueOf(13_000)
-            val request = Product()
-            request.price = targetPrice
+            val request = initProduct(price = targetPrice)
 
             // when
             val changedProduct = sut.changePrice(productId, request)

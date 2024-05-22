@@ -1,8 +1,8 @@
 package kitchenpos.application
 
 import kitchenpos.domain.Menu
-import kitchenpos.domain.MenuProduct
 import kitchenpos.domain.ProductRepository
+import kitchenpos.fixture.*
 import kitchenpos.infra.PurgomalumClient
 import kitchenpos.utils.generateUUIDFrom
 import org.assertj.core.api.Assertions.assertThat
@@ -30,14 +30,6 @@ class MenuServiceTest {
 
     @Autowired
     private lateinit var sut: MenuService
-
-    companion object {
-        private val NOT_EXISTING_MENU_GROUP_ID = generateUUIDFrom("f1860abc2ea1411bbd4abaa44f0d1111")
-        private val EXISTING_MENU_GROUP_ID = generateUUIDFrom("f1860abc2ea1411bbd4abaa44f0d5580")
-        private val EXISTING_MENU_ID = generateUUIDFrom("b9c670b04ef5409083496868df1c7d62")
-        private val EXISTING_PRODUCT_ID_1 = generateUUIDFrom("3b52824434f7406bbb7e690912f66b10")
-        private val EXISTING_PRODUCT_ID_2 = generateUUIDFrom("c5ee925c3dbb4941b825021446f24446")
-    }
 
     @DisplayName("등록된 상품 목록을 조회할 수 있다.")
     @Test
@@ -68,9 +60,7 @@ class MenuServiceTest {
         @Test
         fun case_2() {
             // given
-            val request = Menu()
-            request.price = BigDecimal.valueOf(16_000)
-            request.menuGroupId = NOT_EXISTING_MENU_GROUP_ID
+            val request = initMenu(menuGroupId = NOT_EXISTING_MENU_GROUP_ID)
 
             // when
             // then
@@ -81,10 +71,7 @@ class MenuServiceTest {
         @Test
         fun case_3() {
             // given
-            val request = Menu()
-            request.price = BigDecimal.valueOf(16_000)
-            request.menuGroupId = EXISTING_MENU_GROUP_ID
-            request.menuProducts = null
+            val request = initMenu(menuGroupId = EXISTING_MENU_GROUP_ID)
 
             // when
             // then
@@ -95,10 +82,7 @@ class MenuServiceTest {
         @Test
         fun case_4() {
             // given
-            val request = Menu()
-            request.price = BigDecimal.valueOf(16_000)
-            request.menuGroupId = EXISTING_MENU_GROUP_ID
-            request.menuProducts = null
+            val request = initMenu(menuProducts = emptyList())
 
             // when
             // then
@@ -109,13 +93,8 @@ class MenuServiceTest {
         @Test
         fun case_5() {
             // given
-            val menuProduct = generateMenuProduct(productId = EXISTING_PRODUCT_ID_1)
-
-            val request = Menu()
-            request.price = BigDecimal.valueOf(16_000)
-            request.menuGroupId = EXISTING_MENU_GROUP_ID
-            request.menuProducts = listOf(menuProduct)
-            request.name = "후라이드 치킨"
+            val menuProduct = initMenuProduct()
+            val request = initMenu(menuProducts = listOf(menuProduct))
 
             // when
             val createdMenu = sut.create(request)
@@ -130,15 +109,11 @@ class MenuServiceTest {
             // given
             val menuProducts =
                 listOf(
-                    generateMenuProduct(productId = EXISTING_PRODUCT_ID_1),
-                    generateMenuProduct(productId = UUID.randomUUID()),
+                    initMenuProduct(productId = EXISTING_PRODUCT_ID_1),
+                    initMenuProduct(productId = UUID.randomUUID()),
                 )
 
-            val request = Menu()
-            request.price = BigDecimal.valueOf(16_000)
-            request.menuGroupId = EXISTING_MENU_GROUP_ID
-            request.menuProducts = menuProducts
-            request.name = "후라이드 치킨"
+            val request = initMenu(menuProducts = menuProducts)
 
             // when
             // then
@@ -151,15 +126,11 @@ class MenuServiceTest {
             // given
             val menuProducts =
                 listOf(
-                    generateMenuProduct(productId = EXISTING_PRODUCT_ID_1),
-                    generateMenuProduct(productId = EXISTING_PRODUCT_ID_2),
+                    initMenuProduct(productId = EXISTING_PRODUCT_ID_1),
+                    initMenuProduct(productId = EXISTING_PRODUCT_ID_2),
                 )
 
-            val request = Menu()
-            request.price = BigDecimal.valueOf(16_000)
-            request.menuGroupId = EXISTING_MENU_GROUP_ID
-            request.menuProducts = menuProducts
-            request.name = "후라이드 치킨"
+            val request = initMenu(menuProducts = menuProducts)
 
             // when
             val createdMenu = sut.create(request)
@@ -173,13 +144,9 @@ class MenuServiceTest {
         fun case_8() {
             // given
             val menuProducts =
-                listOf(generateMenuProduct(productId = EXISTING_PRODUCT_ID_1, quantity = -1))
+                listOf(initMenuProduct(productId = EXISTING_PRODUCT_ID_1, quantity = -1))
 
-            val request = Menu()
-            request.price = BigDecimal.valueOf(16_000)
-            request.menuGroupId = EXISTING_MENU_GROUP_ID
-            request.menuProducts = menuProducts
-            request.name = "후라이드 치킨"
+            val request = initMenu(menuProducts = menuProducts)
 
             // when
             // then
@@ -190,13 +157,8 @@ class MenuServiceTest {
         @Test
         fun case_9() {
             // given
-            val menuProducts = listOf(generateMenuProduct(productId = EXISTING_PRODUCT_ID_1))
-
-            val request = Menu()
-            request.price = BigDecimal.valueOf(17_000)
-            request.menuGroupId = EXISTING_MENU_GROUP_ID
-            request.menuProducts = menuProducts
-            request.name = "후라이드 치킨"
+            val menuProducts = listOf(initMenuProduct(productId = EXISTING_PRODUCT_ID_1))
+            val request = initMenu(menuProducts = menuProducts, price = BigDecimal.valueOf(17_000))
 
             // when
             // then
@@ -208,13 +170,9 @@ class MenuServiceTest {
         fun case_10() {
             // given
             given(purgomalumClient.containsProfanity(anyString())).willReturn(true)
-            val menuProducts = listOf(generateMenuProduct(productId = EXISTING_PRODUCT_ID_1))
+            val menuProducts = listOf(initMenuProduct(productId = EXISTING_PRODUCT_ID_1))
 
-            val request = Menu()
-            request.price = BigDecimal.valueOf(17_000)
-            request.menuGroupId = EXISTING_MENU_GROUP_ID
-            request.menuProducts = menuProducts
-            request.name = "비속어 치킨"
+            val request = initMenu(name = "비속어 치킨", menuProducts = menuProducts)
 
             // when
             // then
@@ -226,12 +184,7 @@ class MenuServiceTest {
         fun case_11() {
             // given
             given(purgomalumClient.containsProfanity(anyString())).willReturn(false)
-            val menuProducts = listOf(generateMenuProduct(productId = EXISTING_PRODUCT_ID_1))
-
-            val request = Menu()
-            request.price = BigDecimal.valueOf(17_000)
-            request.menuGroupId = EXISTING_MENU_GROUP_ID
-            request.menuProducts = menuProducts
+            val request = initMenu(menuProducts = emptyList())
 
             // when
             // then
@@ -306,15 +259,5 @@ class MenuServiceTest {
             // then
             assertThrows<IllegalArgumentException> { sut.changePrice(EXISTING_MENU_ID, request) }
         }
-    }
-
-    private fun generateMenuProduct(
-        productId: UUID,
-        quantity: Long = 1L,
-    ): MenuProduct {
-        val menuProduct = MenuProduct()
-        menuProduct.productId = productId
-        menuProduct.quantity = quantity
-        return menuProduct
     }
 }

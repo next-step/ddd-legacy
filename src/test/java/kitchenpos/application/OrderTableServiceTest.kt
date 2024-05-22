@@ -2,6 +2,7 @@ package kitchenpos.application
 
 import kitchenpos.domain.OrderRepository
 import kitchenpos.domain.OrderTable
+import kitchenpos.fixture.initOrderTable
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -32,8 +33,7 @@ class OrderTableServiceTest {
         @Test
         fun case_1() {
             // given
-            val request = OrderTable()
-            request.name = "1번 테이블"
+            val request = initOrderTable()
 
             // when
             val createdTable = sut.create(request)
@@ -46,8 +46,7 @@ class OrderTableServiceTest {
         @Test
         fun case_2() {
             // given
-            val request = OrderTable()
-            request.name = "1번 테이블"
+            val request = initOrderTable()
 
             // when
             val createdTable = sut.create(request)
@@ -86,8 +85,7 @@ class OrderTableServiceTest {
         fun case_4() {
             // given
             val tableId = createTable().id
-            val request = OrderTable()
-            request.numberOfGuests = 3
+            val request = initOrderTable(id = tableId, numberOfGuests = 3)
 
             // when
             // then
@@ -99,8 +97,7 @@ class OrderTableServiceTest {
         fun case_5() {
             // given
             val tableId = createTable().id
-            val request = OrderTable()
-            request.numberOfGuests = -1
+            val request = initOrderTable(id = tableId, numberOfGuests = -1)
 
             // when
             // then
@@ -112,8 +109,7 @@ class OrderTableServiceTest {
         fun case_6() {
             // given
             val tableId = createTable().id
-            val request = OrderTable()
-            request.numberOfGuests = 3
+            val request = initOrderTable(id = tableId, numberOfGuests = 3)
 
             // when
             sut.sit(tableId)
@@ -162,8 +158,7 @@ class OrderTableServiceTest {
     }
 
     private fun createTable(): OrderTable {
-        val request = OrderTable()
-        request.name = "00번 테이블"
+        val request = initOrderTable()
         return sut.create(request)
     }
 

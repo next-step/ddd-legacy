@@ -1,8 +1,9 @@
 package kitchenpos.application
 
-import kitchenpos.domain.*
+import kitchenpos.domain.Order
+import kitchenpos.domain.OrderStatus
+import kitchenpos.fixture.*
 import kitchenpos.infra.KitchenridersClient
-import kitchenpos.utils.generateUUIDFrom
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -19,15 +20,6 @@ import java.math.BigDecimal
 @SpringBootTest
 @Sql("classpath:db/data.sql")
 class OrderServiceTest {
-    @Autowired
-    private lateinit var orderRepository: OrderRepository
-
-    @Autowired
-    private lateinit var menuRepository: MenuRepository
-
-    @Autowired
-    private lateinit var orderTableRepository: OrderTableRepository
-
     @MockBean
     private lateinit var kitchenridersClient: KitchenridersClient
 
@@ -36,12 +28,6 @@ class OrderServiceTest {
 
     @Autowired
     private lateinit var sut: OrderService
-
-    companion object {
-        private val EXISTING_ORDER_TABLE_ID = generateUUIDFrom("8d71004329b6420e8452233f5a035520")
-        private val EXISTING_MENU_ID = generateUUIDFrom("b9c670b04ef5409083496868df1c7d62")
-        private val NON_DISPLAYED_MENU_ID = generateUUIDFrom("33e558df7d934622b50efcc4282cd184")
-    }
 
     @DisplayName("주문 생성 (공통)")
     @Nested
@@ -61,8 +47,7 @@ class OrderServiceTest {
         @Test
         fun case_2() {
             // given
-            val request = Order()
-            request.type = OrderType.EAT_IN
+            val request = initTakeoutOrder(orderLineItems = emptyList())
 
             // when
             // then
@@ -73,17 +58,8 @@ class OrderServiceTest {
         @Test
         fun case_3() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = -1
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.TAKEOUT
-                    this.orderLineItems = listOf(orderLineItem)
-                }
+            val orderLineItem = initOrderLineItem(quantity = -1)
+            val request = initTakeoutOrder(orderLineItems = listOf(orderLineItem))
 
             // when
             // then
@@ -94,18 +70,8 @@ class OrderServiceTest {
         @Test
         fun case_4() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(16_000) // should be 17_000
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.TAKEOUT
-                    this.orderLineItems = listOf(orderLineItem)
-                }
+            val orderLineItem = initOrderLineItem(price = BigDecimal.valueOf(16_000))
+            val request = initTakeoutOrder(orderLineItems = listOf(orderLineItem))
 
             // when
             // then
@@ -116,17 +82,8 @@ class OrderServiceTest {
         @Test
         fun case_5() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = NON_DISPLAYED_MENU_ID
-                    this.quantity = 1
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.TAKEOUT
-                    this.orderLineItems = listOf(orderLineItem)
-                }
+            val orderLineItem = initOrderLineItem(menuId = NON_DISPLAYED_MENU_ID)
+            val request = initTakeoutOrder(orderLineItems = listOf(orderLineItem))
 
             // when
             // then
@@ -137,18 +94,7 @@ class OrderServiceTest {
         @Test
         fun case_6() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.TAKEOUT
-                    this.orderLineItems = listOf(orderLineItem)
-                }
+            val request = initTakeoutOrder()
 
             // when
             val createdOrder = sut.create(request)
@@ -167,19 +113,7 @@ class OrderServiceTest {
         @Test
         fun case_1() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.EAT_IN
-                    this.orderLineItems = listOf(orderLineItem)
-                    this.orderTableId = EXISTING_ORDER_TABLE_ID
-                }
+            val request = initEatInOrder()
 
             // when
             // then
@@ -191,21 +125,7 @@ class OrderServiceTest {
         fun case_2() {
             // given
             val occupiedOrderTable = orderTableService.sit(EXISTING_ORDER_TABLE_ID)
-
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.EAT_IN
-                    this.orderLineItems = listOf(orderLineItem)
-                    this.orderTableId = occupiedOrderTable.id
-                }
-
+            val request = initEatInOrder(orderTableId = occupiedOrderTable.id)
             val waitingOrder = sut.create(request)
 
             // when
@@ -220,21 +140,7 @@ class OrderServiceTest {
         fun case_3() {
             // given
             val occupiedOrderTable = orderTableService.sit(EXISTING_ORDER_TABLE_ID)
-
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.EAT_IN
-                    this.orderLineItems = listOf(orderLineItem)
-                    this.orderTableId = occupiedOrderTable.id
-                }
-
+            val request = initEatInOrder(orderTableId = occupiedOrderTable.id)
             val waitingOrder = sut.create(request)
             val acceptedOrder = sut.accept(waitingOrder.id)
 
@@ -250,21 +156,7 @@ class OrderServiceTest {
         fun case_4() {
             // given
             val occupiedOrderTable = orderTableService.sit(EXISTING_ORDER_TABLE_ID)
-
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.EAT_IN
-                    this.orderLineItems = listOf(orderLineItem)
-                    this.orderTableId = occupiedOrderTable.id
-                }
-
+            val request = initEatInOrder(orderTableId = occupiedOrderTable.id)
             val waitingOrder = sut.create(request)
             val acceptedOrder = sut.accept(waitingOrder.id)
             val servedOrder = sut.serve(acceptedOrder.id)
@@ -284,18 +176,7 @@ class OrderServiceTest {
         @Test
         fun case_1() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.DELIVERY
-                    this.orderLineItems = listOf(orderLineItem)
-                }
+            val request = initDeliveryOrder(deliveryAddress = "")
 
             // when
             // then
@@ -306,19 +187,7 @@ class OrderServiceTest {
         @Test
         fun case_2() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.DELIVERY
-                    this.deliveryAddress = "nextstep 사무실"
-                    this.orderLineItems = listOf(orderLineItem)
-                }
+            val request = initDeliveryOrder()
 
             // when
             val createdOrder = sut.create(request)
@@ -331,23 +200,10 @@ class OrderServiceTest {
         @Test
         fun case_3() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.DELIVERY
-                    this.deliveryAddress = "nextstep 사무실"
-                    this.orderLineItems = listOf(orderLineItem)
-                }
-
             given(kitchenridersClient.requestDelivery(any(), any(), any()))
                 .willAnswer { println("*** 라이더 호출 성공 ***") }
 
+            val request = initDeliveryOrder()
             val createdOrder = sut.create(request)
 
             // when
@@ -361,23 +217,10 @@ class OrderServiceTest {
         @Test
         fun case_4() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.DELIVERY
-                    this.deliveryAddress = "nextstep 사무실"
-                    this.orderLineItems = listOf(orderLineItem)
-                }
-
             given(kitchenridersClient.requestDelivery(any(), any(), any()))
                 .willAnswer { println("*** 라이더 호출 성공 ***") }
 
+            val request = initDeliveryOrder()
             val createdOrder = sut.create(request)
             val acceptedOrder = sut.accept(createdOrder.id)
 
@@ -392,23 +235,10 @@ class OrderServiceTest {
         @Test
         fun case_5() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.DELIVERY
-                    this.deliveryAddress = "nextstep 사무실"
-                    this.orderLineItems = listOf(orderLineItem)
-                }
-
             given(kitchenridersClient.requestDelivery(any(), any(), any()))
                 .willAnswer { println("*** 라이더 호출 성공 ***") }
 
+            val request = initDeliveryOrder()
             val createdOrder = sut.create(request)
             val acceptedOrder = sut.accept(createdOrder.id)
             val servedOrder = sut.serve(acceptedOrder.id)
@@ -424,23 +254,10 @@ class OrderServiceTest {
         @Test
         fun case_6() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.DELIVERY
-                    this.deliveryAddress = "nextstep 사무실"
-                    this.orderLineItems = listOf(orderLineItem)
-                }
-
             given(kitchenridersClient.requestDelivery(any(), any(), any()))
                 .willAnswer { println("*** 라이더 호출 성공 ***") }
 
+            val request = initDeliveryOrder()
             val createdOrder = sut.create(request)
             val acceptedOrder = sut.accept(createdOrder.id)
             val servedOrder = sut.serve(acceptedOrder.id)
@@ -458,23 +275,9 @@ class OrderServiceTest {
         @Test
         fun case_7() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.DELIVERY
-                    this.deliveryAddress = "nextstep 사무실"
-                    this.orderLineItems = listOf(orderLineItem)
-                }
-
             given(kitchenridersClient.requestDelivery(any(), any(), any()))
                 .willAnswer { println("*** 라이더 호출 성공 ***") }
-
+            val request = initDeliveryOrder()
             val createdOrder = sut.create(request)
             val acceptedOrder = sut.accept(createdOrder.id)
             val servedOrder = sut.serve(acceptedOrder.id)
@@ -496,18 +299,7 @@ class OrderServiceTest {
         @Test
         fun case_1() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.TAKEOUT
-                    this.orderLineItems = listOf(orderLineItem)
-                }
+            val request = initTakeoutOrder()
 
             // when
             val createdOrder = sut.create(request)
@@ -520,19 +312,7 @@ class OrderServiceTest {
         @Test
         fun case_2() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.TAKEOUT
-                    this.orderLineItems = listOf(orderLineItem)
-                }
-
+            val request = initTakeoutOrder()
             val createdOrder = sut.create(request)
 
             // when
@@ -546,19 +326,7 @@ class OrderServiceTest {
         @Test
         fun case_3() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.TAKEOUT
-                    this.orderLineItems = listOf(orderLineItem)
-                }
-
+            val request = initTakeoutOrder()
             val createdOrder = sut.create(request)
             val acceptedOrder = sut.accept(createdOrder.id)
 
@@ -573,19 +341,7 @@ class OrderServiceTest {
         @Test
         fun case_4() {
             // given
-            val orderLineItem =
-                OrderLineItem().apply {
-                    this.menuId = EXISTING_MENU_ID
-                    this.quantity = 1
-                    this.price = BigDecimal.valueOf(17_000)
-                }
-
-            val request =
-                Order().apply {
-                    this.type = OrderType.TAKEOUT
-                    this.orderLineItems = listOf(orderLineItem)
-                }
-
+            val request = initTakeoutOrder()
             val createdOrder = sut.create(request)
             val acceptedOrder = sut.accept(createdOrder.id)
             val servedOrder = sut.serve(acceptedOrder.id)
