@@ -241,7 +241,7 @@ class MenuServiceTest {
         fun case_15() {
             // given
             val request = Menu()
-            request.price = BigDecimal.valueOf(-1000)
+            request.price = BigDecimal.valueOf(-1)
 
             // when
             // then
