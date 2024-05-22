@@ -1,4 +1,4 @@
-name: kitchenpos
+version: "3.7"
 services:
   db:
     image: mysql:8.0.30
