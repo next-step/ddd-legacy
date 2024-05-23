@@ -10,11 +10,13 @@ object MenuFixtures {
     fun createMenu(
         product: Product,
         price: BigDecimal = product.price,
-        isDisplayed: Boolean = true
+        isDisplayed: Boolean = true,
+        name: String? = "test-menu-name"
     ): Menu {
         return Menu().apply {
             this.id = UUID.randomUUID()
             this.price = price
+            this.name = name
             this.isDisplayed = isDisplayed
             this.menuProducts = listOf(
                 MenuProduct().apply {
