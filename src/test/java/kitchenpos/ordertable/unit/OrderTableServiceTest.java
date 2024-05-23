@@ -11,7 +11,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
+
 import static kitchenpos.ordertable.fixture.OrderTableFixture.A_테이블;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.비어있는_테이블;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.빈문자이름_테이블;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.이름미존재_테이블;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -88,7 +93,14 @@ public class OrderTableServiceTest {
         @Test
         @DisplayName("[성공] 테이블에 앉는다.")
         void sit() {
+            // given
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(비어있는_테이블));
 
+            // when
+            var target = orderTableService.sit(UUID.randomUUID());
+
+            // then
+            assertThat(target.isOccupied()).isTrue();
         }
 
         @Nested
@@ -97,7 +109,12 @@ public class OrderTableServiceTest {
             @Test
             @DisplayName("[실패] 등록되지않은 테이블인 경우 앉을 수 없다.")
             void 테이블_미등록() {
+                // given
+                given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
+                // when & then
+                assertThatThrownBy(() -> orderTableService.sit(UUID.randomUUID()))
+                        .isInstanceOf(NoSuchElementException.class);
             }
 
         }

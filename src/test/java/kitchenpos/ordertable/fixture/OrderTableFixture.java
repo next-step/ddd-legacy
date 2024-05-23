@@ -12,6 +12,8 @@ public class OrderTableFixture {
 
     public static final OrderTable 빈문자이름_테이블 = 테이블을_생성한다("");
 
+    public static final OrderTable 비어있는_테이블 = 테이블을_생성한다("C");
+
     private static OrderTable 테이블을_생성한다(String name) {
         return 테이블을_생성한다(name, 0, false);
     }

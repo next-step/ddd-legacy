@@ -5,6 +5,8 @@ import io.restassured.response.Response;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.support.RestAssuredClient;
 
+import java.util.UUID;
+
 public class OrderTableStep {
 
     private static final String ORDER_TABLE_BASE_URL = "/api/order-tables";
@@ -15,6 +17,11 @@ public class OrderTableStep {
 
     public static ExtractableResponse<Response> 테이블_목록을_조회한다() {
         return RestAssuredClient.get(ORDER_TABLE_BASE_URL);
+    }
+
+    public static ExtractableResponse<Response> 테이블에_앉다(UUID id) {
+        var url = String.format("%s/%s/sit", ORDER_TABLE_BASE_URL, id);
+        return RestAssuredClient.put(url);
     }
 
 }

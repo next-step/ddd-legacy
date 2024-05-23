@@ -1,17 +1,22 @@
 package kitchenpos.ordertable.acceptance;
 
+import io.restassured.common.mapper.TypeRef;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.support.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블_목록을_조회한다;
+import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블에_앉다;
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블을_등록한다;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.A_테이블;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.B_테이블;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class OrderTableAcceptanceTest extends AcceptanceTest {
 
@@ -70,7 +75,21 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("점유")
     void sit() {
+        // given
+        var 등록된_테이블_아이디 = 테이블을_등록한다(A_테이블).jsonPath().getUUID(ORDER_TABLE_ID_KEY);
 
+        // when
+        테이블에_앉다(등록된_테이블_아이디).as(OrderTable.class);
+
+        // then
+        var 테이블_목록 = 테이블_목록을_조회한다().as(new TypeRef<List<OrderTable>>() {});
+        var 테이블_optional = 테이블_목록.stream().filter(orderTable -> Objects.equals(orderTable.getId(), 등록된_테이블_아이디))
+                .findFirst();
+
+        assertAll(
+                () -> assertThat(테이블_optional.isPresent()).isTrue(),
+                () -> assertThat(테이블_optional.get().isOccupied()).isTrue()
+        );
     }
 
     /**
