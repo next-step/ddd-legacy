@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class EatInOrderServiceTest {
+public class DeliveryOrderServiceTest {
 
     private OrderService orderService;
 
@@ -24,11 +24,13 @@ public class EatInOrderServiceTest {
     private MenuRepository menuRepository;
     @Mock
     private OrderTableRepository orderTableRepository;
+    @Mock
+    private KitchenridersClient kitchenridersClient;
 
     @BeforeEach
     void setUp() {
         this.orderService = new OrderService(
-                orderRepository, menuRepository, orderTableRepository, null
+                orderRepository, menuRepository, orderTableRepository, kitchenridersClient
         );
     }
 
@@ -36,7 +38,7 @@ public class EatInOrderServiceTest {
     class 등록 {
 
         @Test
-        @DisplayName("[성공] 매장 주문을 등록한다.")
+        @DisplayName("[성공] 배달 주문을 등록한다.")
         void create() {
 
         }
@@ -78,6 +80,12 @@ public class EatInOrderServiceTest {
         class 주문항목검증 {
 
             @Test
+            @DisplayName("[실패] 수량이 마이너스인 주문 항목이 존재할 경우 등록하지 못한다.")
+            void 주문항목_수량마이너스() {
+
+            }
+
+            @Test
             @DisplayName("[실패] 주문 항목이 미등록된 메뉴일 경우 등록하지 못한다.")
             void 주문항목_미등록메뉴() {
 
@@ -98,17 +106,17 @@ public class EatInOrderServiceTest {
         }
 
         @Nested
-        class 테이블검증 {
+        class 배달주소검증 {
 
             @Test
-            @DisplayName("[실패] 등록하지 않은 테이블에서 주문할 경우 등록하지 못한다.")
-            void 테이블_미등록() {
+            @DisplayName("[실패] 배달주소를 입력하지 않으면 등록이 되지 않는다.")
+            void 배달주소_null() {
 
             }
 
             @Test
-            @DisplayName("[실패] 앉아있지 않은 테이블에서 주문할 경우 등록하지 못한다.")
-            void 테이블_notOccupied() {
+            @DisplayName("[실패] 배달주소가 빈문자열이면 등록이 되지 않는다.")
+            void 배달주소_빈문자열() {
 
             }
 
@@ -183,6 +191,83 @@ public class EatInOrderServiceTest {
     }
 
     @Nested
+    class 배달시작 {
+
+        @Test
+        @DisplayName("[성공] 주문 건에 대해 배달을 시작한다.")
+        void startDelivery() {
+
+        }
+
+        @Nested
+        class 주문등록여부검증 {
+
+            @Test
+            @DisplayName("[실패] 주문이 등록되어 있지 않으면 배달을 시작할 수 없다.")
+            void 주문_미등록() {
+
+            }
+
+        }
+
+        @Nested
+        class 유형검증 {
+
+            @Test
+            @DisplayName("[실패] 주문유형이 배달주문이 아닐 경우 배달을 시작할 수 없다.")
+            void 주문유형_not배달주문() {
+
+            }
+
+        }
+
+        @Nested
+        class 상태검증 {
+
+            @Test
+            @DisplayName("[실패] 주문 상태가 전달 상태가 아니면 배달을 시작할 수 없다.")
+            void 상태_not전달() {
+
+            }
+
+        }
+
+    }
+
+    @Nested
+    class 배달완료 {
+
+        @Test
+        @DisplayName("[성공] 주문 건에 대해 배달을 완료한다.")
+        void completeDelivery() {
+
+        }
+
+        @Nested
+        class 주문등록여부검증 {
+
+            @Test
+            @DisplayName("[실패] 주문이 등록되어 있지 않으면 배달을 완료할 수 없다.")
+            void 주문_미등록() {
+
+            }
+
+        }
+
+        @Nested
+        class 상태검증 {
+
+            @Test
+            @DisplayName("[실패] 주문 상태가 배달 중 상태가 아니면 배달을 완료할 수 없다.")
+            void 상태_not배달중() {
+
+            }
+
+        }
+
+    }
+
+    @Nested
     class 완료 {
 
         @Test
@@ -206,19 +291,8 @@ public class EatInOrderServiceTest {
         class 상태검증 {
 
             @Test
-            @DisplayName("[실패] 주문 상태가 전달 상태가 아니면 완료할 수 없다.")
-            void 상태_not전달() {
-
-            }
-
-        }
-
-        @Nested
-        class 테이블검증 {
-
-            @Test
-            @DisplayName("[성공] 식사를 다 마친 테이블이 아닌 경우 정리할 수 없다.")
-            void 테이블_notComplete() {
+            @DisplayName("[실패] 주문 상태가 배달완료 상태가 아니면 완료할 수 없다.")
+            void 상태_not배달완료() {
 
             }
 

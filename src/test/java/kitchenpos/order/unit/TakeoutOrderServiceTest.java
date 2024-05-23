@@ -24,13 +24,11 @@ public class TakeoutOrderServiceTest {
     private MenuRepository menuRepository;
     @Mock
     private OrderTableRepository orderTableRepository;
-    @Mock
-    private KitchenridersClient kitchenridersClient;
 
     @BeforeEach
     void setUp() {
         this.orderService = new OrderService(
-                orderRepository, menuRepository, orderTableRepository, kitchenridersClient
+                orderRepository, menuRepository, orderTableRepository, null
         );
     }
 
