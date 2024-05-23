@@ -5,7 +5,7 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.Product;
 import kitchenpos.support.AcceptanceTest;
-import kitchenpos.support.AssertUtils;
+import kitchenpos.support.util.assertion.AssertUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

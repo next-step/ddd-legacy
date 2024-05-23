@@ -1,4 +1,4 @@
-package kitchenpos.support;
+package kitchenpos.support.util.assertion;
 
 import java.math.BigDecimal;
 

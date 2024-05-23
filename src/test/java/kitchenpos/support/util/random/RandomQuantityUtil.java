@@ -1,4 +1,4 @@
-package kitchenpos.support;
+package kitchenpos.support.util.random;
 
 public class RandomQuantityUtil {
 

@@ -13,9 +13,9 @@ import static kitchenpos.menugroup.fixture.MenuGroupFixture.C_메뉴그룹;
 import static kitchenpos.product.fixture.ProductFixture.H_제품;
 import static kitchenpos.product.fixture.ProductFixture.I_제품;
 import static kitchenpos.product.fixture.ProductFixture.uuid가_존재하는_가격이_마이너스인_제품;
-import static kitchenpos.support.RandomPriceUtil.랜덤한_1000원이상_3000원이하의_금액을_생성한다;
-import static kitchenpos.support.RandomQuantityUtil.랜덤한_5개_이하의_수량을_생성한다;
-import static kitchenpos.support.RandomQuantityUtil.랜덤한_마이너스_5개_이하의_수량을_생성한다;
+import static kitchenpos.support.util.random.RandomPriceUtil.랜덤한_1000원이상_3000원이하의_금액을_생성한다;
+import static kitchenpos.support.util.random.RandomQuantityUtil.랜덤한_5개_이하의_수량을_생성한다;
+import static kitchenpos.support.util.random.RandomQuantityUtil.랜덤한_마이너스_5개_이하의_수량을_생성한다;
 
 
 public class MenuFixture {

@@ -6,7 +6,7 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 import kitchenpos.support.AcceptanceTest;
-import kitchenpos.support.AssertUtils;
+import kitchenpos.support.util.assertion.AssertUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ import static kitchenpos.menugroup.fixture.MenuGroupFixture.A_메뉴그룹;
 import static kitchenpos.product.acceptance.step.ProductStep.제품을_등록한다;
 import static kitchenpos.product.fixture.ProductFixture.A_제품;
 import static kitchenpos.product.fixture.ProductFixture.B_제품;
-import static kitchenpos.support.RandomQuantityUtil.랜덤한_5개_이하의_수량을_생성한다;
+import static kitchenpos.support.util.random.RandomQuantityUtil.랜덤한_5개_이하의_수량을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 

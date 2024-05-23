@@ -5,8 +5,8 @@ import kitchenpos.domain.Product;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static kitchenpos.support.RandomPriceUtil.랜덤한_1000원이상_3000원이하의_금액을_생성한다;
-import static kitchenpos.support.RandomPriceUtil.랜덤한_마이너스_1000원이하_금액을_생성한다;
+import static kitchenpos.support.util.random.RandomPriceUtil.랜덤한_1000원이상_3000원이하의_금액을_생성한다;
+import static kitchenpos.support.util.random.RandomPriceUtil.랜덤한_마이너스_1000원이하_금액을_생성한다;
 
 public class ProductFixture {
 

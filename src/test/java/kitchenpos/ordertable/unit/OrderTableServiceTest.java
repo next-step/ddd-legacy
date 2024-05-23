@@ -3,6 +3,7 @@ package kitchenpos.ordertable.unit;
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
+import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,10 +18,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static kitchenpos.ordertable.fixture.OrderTableFixture.A_테이블;
-import static kitchenpos.ordertable.fixture.OrderTableFixture.비어있는_테이블;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.비어있는_테이블_C;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.비어있는_테이블_D;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.빈문자이름_테이블;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.이름미존재_테이블;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.점유하고있는_테이블;
+import static kitchenpos.support.util.random.RandomNumberOfGuestsUtil.랜덤한_1명이상_6명이하_인원을_생성한다;
+import static kitchenpos.support.util.random.RandomNumberOfGuestsUtil.랜덤한_마이너스_6명_이하의_인원을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -96,7 +100,7 @@ public class OrderTableServiceTest {
         @DisplayName("[성공] 테이블에 앉는다.")
         void sit() {
             // given
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(비어있는_테이블));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(비어있는_테이블_C));
 
             // when
             var target = orderTableService.sit(UUID.randomUUID());
@@ -179,21 +183,38 @@ public class OrderTableServiceTest {
     }
 
     @Nested
-    class 손님_수_변경 {
+    class 손님_인원수_변경 {
 
         @Test
-        @DisplayName("[성공] 손님 수를 변경한다.")
+        @DisplayName("[성공] 손님 인원수를 변경한다.")
         void changeNumberOfGuests() {
+            // given
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하고있는_테이블));
 
+            // when
+            var 수정할_내용 = new OrderTable();
+            var 수정할_인원수 = 점유하고있는_테이블.getNumberOfGuests() + 1;
+            수정할_내용.setNumberOfGuests(수정할_인원수);
+
+            var 수정된_테이블 = orderTableService.changeNumberOfGuests(UUID.randomUUID(), 수정할_내용);
+
+            // then
+            assertThat(수정된_테이블.getNumberOfGuests()).isEqualTo(수정할_인원수);
         }
 
         @Nested
         class 손님수검증 {
 
             @Test
-            @DisplayName("[실패] 손님의 수가 0명 미만인 경우 변경할 수 없다.")
+            @DisplayName("[실패] 손님의 인원수가 0명 미만인 경우 변경할 수 없다.")
             void 음수_손님수() {
+                // when & then
+                var 수정할_내용 = new OrderTable();
+                var 수정할_인원수 = 랜덤한_마이너스_6명_이하의_인원을_생성한다();
+                수정할_내용.setNumberOfGuests(수정할_인원수);
 
+                assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 수정할_내용))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
         }
@@ -202,9 +223,17 @@ public class OrderTableServiceTest {
         class 테이블등록여부검증 {
 
             @Test
-            @DisplayName("[실패] 등록되지않은 테이블인 경우 손님 수를 변경할 수 없다.")
+            @DisplayName("[실패] 등록되지않은 테이블인 경우 손님의 인원수를 변경할 수 없다.")
             void 테이블_미등록() {
+                // given
+                given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
+                // when & then
+                var 수정할_내용 = new OrderTable();
+                수정할_내용.setNumberOfGuests(랜덤한_1명이상_6명이하_인원을_생성한다());
+
+                assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 수정할_내용))
+                        .isInstanceOf(NoSuchElementException.class);
             }
 
         }
@@ -213,9 +242,17 @@ public class OrderTableServiceTest {
         class 테이블점유상태검증 {
 
             @Test
-            @DisplayName("[실패] 빈 테이블인 경우 손님 수를 변경할 수 없다.")
+            @DisplayName("[실패] 빈 테이블인 경우 손님의 인원수를 변경할 수 없다.")
             void 비어있는_테이블() {
+                // given
+                given(orderTableRepository.findById(any())).willReturn(Optional.of(비어있는_테이블_D));
 
+                // when & then
+                var 수정할_내용 = new OrderTable();
+                수정할_내용.setNumberOfGuests(랜덤한_1명이상_6명이하_인원을_생성한다());
+
+                assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 수정할_내용))
+                        .isInstanceOf(IllegalStateException.class);
             }
 
         }

@@ -29,4 +29,9 @@ public class OrderTableStep {
         return RestAssuredClient.put(url);
     }
 
+    public static ExtractableResponse<Response> 테이블_인원수를_변경한다(OrderTable request) {
+        var url = String.format("%s/%s/number-of-guests", ORDER_TABLE_BASE_URL, request.getId());
+        return RestAssuredClient.put(url, request);
+    }
+
 }

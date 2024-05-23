@@ -1,4 +1,4 @@
-package kitchenpos.support;
+package kitchenpos.support.util.random;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

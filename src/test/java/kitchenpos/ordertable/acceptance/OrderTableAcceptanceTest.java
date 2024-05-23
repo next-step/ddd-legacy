@@ -11,11 +11,13 @@ import java.util.Objects;
 import java.util.UUID;
 
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블_목록을_조회한다;
+import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블_인원수를_변경한다;
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블에_앉다;
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블을_등록한다;
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블을_정리하다;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.A_테이블;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.B_테이블;
+import static kitchenpos.support.util.random.RandomNumberOfGuestsUtil.랜덤한_1명이상_6명이하_인원을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -127,14 +129,33 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
      * <pre>
      * given 테이블을 등록하고
      * given 해당 테이블에 손님이 않아
-     * when  테이블에 앉은 손님 수를 변경하면
-     * then  테이블 목록 조회 시 해당 테이블에 앉아 있는 손님 수는 변경한 손님 수와 동일하다.
+     * when  테이블에 앉은 손님의 인원수를 변경하면
+     * then  테이블 목록 조회 시 해당 테이블에 앉아 있는 인원수는 변경한 인원수와 동일하다.
      * </pre>
      */
     @Test
-    @DisplayName("손님 수 변경")
+    @DisplayName("손님 인원수 변경")
     void changeNumberOfGuests() {
+        // given
+        var targetId = 테이블을_등록한다(B_테이블).jsonPath().getUUID(ORDER_TABLE_ID_KEY);
+        테이블에_앉다(targetId);
 
+        // when
+        var 수정할_내용 = new OrderTable();
+        수정할_내용.setId(targetId);
+        var 인원수 = 랜덤한_1명이상_6명이하_인원을_생성한다();
+        수정할_내용.setNumberOfGuests(인원수);
+        var target = 테이블_인원수를_변경한다(수정할_내용);
+
+        // then
+        var 테이블_목록 = 테이블_목록을_조회한다().as(new TypeRef<List<OrderTable>>() {});
+        var 테이블_optional = 테이블_목록.stream().filter(orderTable -> Objects.equals(orderTable.getId(), targetId))
+                .findFirst();
+
+        assertAll(
+                () -> assertThat(테이블_optional.isPresent()).isTrue(),
+                () -> assertThat(테이블_optional.get().getNumberOfGuests()).isEqualTo(인원수)
+        );
     }
 
 }
