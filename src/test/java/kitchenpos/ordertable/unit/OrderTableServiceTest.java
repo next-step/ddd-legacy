@@ -11,6 +11,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static kitchenpos.ordertable.fixture.OrderTableFixture.A_테이블;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.빈문자이름_테이블;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.이름미존재_테이블;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.times;
+
 @ExtendWith(MockitoExtension.class)
 public class OrderTableServiceTest {
 
@@ -35,7 +46,17 @@ public class OrderTableServiceTest {
         @Test
         @DisplayName("[성공] 테이블을 등록한다.")
         void create() {
+            // given
+            given(orderTableRepository.save(any())).willReturn(A_테이블);
 
+            // when
+            var saved = orderTableService.create(A_테이블);
+
+            // then
+            assertAll(
+                    () -> then(orderTableRepository).should(times(1)).save(any()),
+                    () -> assertThat(saved.getName()).isEqualTo(A_테이블.getName())
+            );
         }
 
         @Nested
@@ -44,13 +65,17 @@ public class OrderTableServiceTest {
             @Test
             @DisplayName("[실패] 테이블의 이름을 입력하지 않으면 등록이 되지 않는다.")
             void 테이블_이름_null() {
-
+                // when & then
+                assertThatThrownBy(() -> orderTableService.create(이름미존재_테이블))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
             @DisplayName("[실패] 메뉴 그룹의 이름이 빈문자열이면 등록이 되지 않는다.")
             void 테이블_이름_빈문자열() {
-
+                // when & then
+                assertThatThrownBy(() -> orderTableService.create(빈문자이름_테이블))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
         }

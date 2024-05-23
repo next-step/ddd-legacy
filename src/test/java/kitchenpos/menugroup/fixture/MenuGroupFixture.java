@@ -14,18 +14,16 @@ public class MenuGroupFixture {
 
     public static final MenuGroup 빈문자이름_메뉴그룹 = 메뉴그룹을_생성한다("");
 
-    public static final MenuGroup C_메뉴그룹 = uuid가_존재하는_메뉴그룹을_생성한다("C");
+    public static final MenuGroup C_메뉴그룹 = 메뉴그룹을_생성한다(UUID.randomUUID(), "C");
 
     private static MenuGroup 메뉴그룹을_생성한다(String name) {
-        var 메뉴그룹 = new MenuGroup();
-        메뉴그룹.setName(name);
-
-        return 메뉴그룹;
+        return 메뉴그룹을_생성한다(null, name);
     }
 
-    private static MenuGroup uuid가_존재하는_메뉴그룹을_생성한다(String name) {
-        var 메뉴그룹 = 메뉴그룹을_생성한다(name);
-        메뉴그룹.setId(UUID.randomUUID());
+    private static MenuGroup 메뉴그룹을_생성한다(UUID id, String name) {
+        var 메뉴그룹 = new MenuGroup();
+        메뉴그룹.setId(id);
+        메뉴그룹.setName(name);
 
         return 메뉴그룹;
     }
