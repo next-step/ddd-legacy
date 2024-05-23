@@ -34,6 +34,7 @@ object OrderFixtures {
             }
             this.deliveryAddress = deliveryAddress
             this.orderTableId = orderTable?.id
+            this.orderTable = orderTable
         }
     }
 }
