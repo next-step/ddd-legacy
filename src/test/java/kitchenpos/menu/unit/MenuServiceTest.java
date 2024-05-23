@@ -27,6 +27,8 @@ import static kitchenpos.menu.fixture.MenuFixture.가격미존재_메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.마이너스_수량의_제품을_가진_메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.메뉴가격이_제품목록의_가격합계보다_높은메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.빈_제품목록_메뉴;
+import static kitchenpos.menu.fixture.MenuFixture.숨김처리_되어있는_메뉴;
+import static kitchenpos.menu.fixture.MenuFixture.숨김해제처리_되어있는_메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.이름미존재_메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.제품목록미존재_메뉴;
 import static kitchenpos.support.RandomPriceUtil.랜덤한_1000원이상_3000원이하의_금액을_생성한다;
@@ -348,7 +350,14 @@ public class MenuServiceTest {
         @Test
         @DisplayName("[성공] 메뉴를 숨김해제 처리를 한다.")
         void display() {
+            // given
+            given(menuRepository.findById(any())).willReturn(Optional.of(숨김처리_되어있는_메뉴));
 
+            // when
+            var 숨김해제처리한_메뉴 = menuService.display(UUID.randomUUID());
+
+            // then
+            assertThat(숨김해제처리한_메뉴.isDisplayed()).isTrue();
         }
 
         @Nested
@@ -357,7 +366,12 @@ public class MenuServiceTest {
             @Test
             @DisplayName("[실패] 등록되지않은 메뉴 아이디인 경우 메뉴를 숨김해제 처리가 되지 않는다.")
             void 메뉴_미등록() {
+                // given
+                given(menuRepository.findById(any())).willReturn(Optional.empty());
 
+                // when & then
+                assertThatThrownBy(() -> menuService.display(UUID.randomUUID()))
+                        .isInstanceOf(NoSuchElementException.class);
             }
 
         }
@@ -368,7 +382,12 @@ public class MenuServiceTest {
             @Test
             @DisplayName("[실패] 메뉴의 가격이 제품 목록의 가격 합계보다 높으면 메뉴는 숨김해제 처리가 되지 않는다.")
             void 메뉴_가격_제품_목록의_가격_합계보다_높음() {
+                // given
+                given(menuRepository.findById(any())).willReturn(Optional.of(메뉴가격이_제품목록의_가격합계보다_높은메뉴));
 
+                // when & then
+                assertThatThrownBy(() -> menuService.display(UUID.randomUUID()))
+                        .isInstanceOf(IllegalStateException.class);
             }
 
         }
@@ -381,7 +400,14 @@ public class MenuServiceTest {
         @Test
         @DisplayName("[성공] 메뉴를 숨김처리를 한다.")
         void hide() {
+            // given
+            given(menuRepository.findById(any())).willReturn(Optional.of(숨김해제처리_되어있는_메뉴));
 
+            // when
+            var 숨김처리한_메뉴 = menuService.hide(UUID.randomUUID());
+
+            // then
+            assertThat(숨김처리한_메뉴.isDisplayed()).isFalse();
         }
 
         @Nested
@@ -390,7 +416,12 @@ public class MenuServiceTest {
             @Test
             @DisplayName("[실패] 등록되지않은 메뉴 아이디인 경우 메뉴를 숨김해제 처리가 되지 않는다.")
             void 메뉴_미등록() {
+                // given
+                given(menuRepository.findById(any())).willReturn(Optional.empty());
 
+                // when & then
+                assertThatThrownBy(() -> menuService.hide(UUID.randomUUID()))
+                        .isInstanceOf(NoSuchElementException.class);
             }
 
         }

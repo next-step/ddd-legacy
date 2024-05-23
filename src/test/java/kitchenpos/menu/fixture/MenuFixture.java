@@ -8,7 +8,6 @@ import kitchenpos.domain.Product;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import static kitchenpos.menugroup.fixture.MenuGroupFixture.C_메뉴그룹;
 import static kitchenpos.product.fixture.ProductFixture.H_제품;
@@ -57,7 +56,7 @@ public class MenuFixture {
                         "D",
                         제품_가격합계보다_높은_금액을_생성한다(제품_목록),
                         C_메뉴그룹,
-                        true,
+                        false,
                         제품_목록
     );
 
@@ -91,6 +90,22 @@ public class MenuFixture {
                         C_메뉴그룹,
                         true,
                         제품_목록
+    );
+
+    public static final Menu 숨김처리_되어있는_메뉴 = 메뉴를_생성한다(
+            "H",
+            제품_가격합계보다_낮은_금액을_생성한다(제품_목록),
+            C_메뉴그룹,
+            false,
+            제품_목록
+    );
+
+    public static final Menu 숨김해제처리_되어있는_메뉴 = 메뉴를_생성한다(
+            "I",
+            제품_가격합계보다_낮은_금액을_생성한다(제품_목록),
+            C_메뉴그룹,
+            true,
+            제품_목록
     );
 
     public static Menu 메뉴를_생성한다(
