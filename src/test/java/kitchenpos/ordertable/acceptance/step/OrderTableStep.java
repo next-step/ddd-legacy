@@ -24,4 +24,9 @@ public class OrderTableStep {
         return RestAssuredClient.put(url);
     }
 
+    public static ExtractableResponse<Response> 테이블을_정리하다(UUID id) {
+        var url = String.format("%s/%s/clear", ORDER_TABLE_BASE_URL, id);
+        return RestAssuredClient.put(url);
+    }
+
 }

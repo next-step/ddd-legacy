@@ -14,6 +14,8 @@ public class OrderTableFixture {
 
     public static final OrderTable 비어있는_테이블 = 테이블을_생성한다("C");
 
+    public static final OrderTable 점유하고있는_테이블 = 테이블을_생성한다("D", 2, true);
+
     private static OrderTable 테이블을_생성한다(String name) {
         return 테이블을_생성한다(name, 0, false);
     }

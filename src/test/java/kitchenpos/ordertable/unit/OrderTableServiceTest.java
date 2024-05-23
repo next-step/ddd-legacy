@@ -2,6 +2,7 @@ package kitchenpos.ordertable.unit;
 
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTableRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,6 +20,7 @@ import static kitchenpos.ordertable.fixture.OrderTableFixture.A_테이블;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.비어있는_테이블;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.빈문자이름_테이블;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.이름미존재_테이블;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.점유하고있는_테이블;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -127,7 +129,18 @@ public class OrderTableServiceTest {
         @Test
         @DisplayName("[성공] 테이블을 정리한다.")
         void clear() {
+            // given
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하고있는_테이블));
+            given(orderRepository.existsByOrderTableAndStatusNot(점유하고있는_테이블, OrderStatus.COMPLETED)).willReturn(false);
 
+            // when
+            var target = orderTableService.clear(UUID.randomUUID());
+
+            // then
+            assertAll(
+                    () -> assertThat(target.isOccupied()).isFalse(),
+                    () -> assertThat(target.getNumberOfGuests()).isEqualTo(0)
+            );
         }
 
         @Nested
@@ -136,7 +149,12 @@ public class OrderTableServiceTest {
             @Test
             @DisplayName("[실패] 등록되지않은 테이블인 경우 정리할 수 없다.")
             void 테이블_미등록() {
+                // given
+                given(orderTableRepository.findById(any())).willReturn(Optional.empty());
 
+                // when & then
+                assertThatThrownBy(() -> orderTableService.clear(UUID.randomUUID()))
+                        .isInstanceOf(NoSuchElementException.class);
             }
 
         }
@@ -147,7 +165,13 @@ public class OrderTableServiceTest {
             @Test
             @DisplayName("[실패] 해당 테이블의 완료되지 않은 상태의 주문이 존재하는 경우 정리할 수 없다.")
             void 미완료상태_주문_존재() {
+                // given
+                given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하고있는_테이블));
+                given(orderRepository.existsByOrderTableAndStatusNot(점유하고있는_테이블, OrderStatus.COMPLETED)).willReturn(true);
 
+                // when & then
+                assertThatThrownBy(() -> orderTableService.clear(UUID.randomUUID()))
+                        .isInstanceOf(IllegalStateException.class);
             }
 
         }
@@ -159,7 +183,7 @@ public class OrderTableServiceTest {
 
         @Test
         @DisplayName("[성공] 손님 수를 변경한다.")
-        void clear() {
+        void changeNumberOfGuests() {
 
         }
 
