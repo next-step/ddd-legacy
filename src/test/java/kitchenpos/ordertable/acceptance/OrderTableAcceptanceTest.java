@@ -1,10 +1,21 @@
 package kitchenpos.ordertable.acceptance;
 
+import kitchenpos.domain.OrderTable;
 import kitchenpos.support.AcceptanceTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
+import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블_목록을_조회한다;
+import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블을_등록한다;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.A_테이블;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.B_테이블;
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class OrderTableAcceptanceTest extends AcceptanceTest {
+
+    private static final String ORDER_TABLE_ID_KEY = "id";
 
     /**
      * <pre>
@@ -16,7 +27,14 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("등록")
     void create() {
+        // when
+        var 등록된_테이블 = 테이블을_등록한다(A_테이블).as(OrderTable.class);
 
+        // then
+        var 테이블_아이디_목록 = 테이블_목록을_조회한다()
+                .jsonPath()
+                .getList(ORDER_TABLE_ID_KEY, UUID.class);
+        assertThat(테이블_아이디_목록).containsExactly(등록된_테이블.getId());
     }
 
     /**
@@ -29,7 +47,17 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @Test
     @DisplayName("목록조회")
     void findAll() {
+        // given
+        var 등록된_테이블_A = 테이블을_등록한다(A_테이블).as(OrderTable.class);
+        var 등록된_테이블_B = 테이블을_등록한다(B_테이블).as(OrderTable.class);
 
+        // when
+        var 테이블_아이디_목록 = 테이블_목록을_조회한다()
+                .jsonPath()
+                .getList(ORDER_TABLE_ID_KEY, UUID.class);
+
+        // then
+        assertThat(테이블_아이디_목록).containsExactly(등록된_테이블_A.getId(), 등록된_테이블_B.getId());
     }
 
     /**

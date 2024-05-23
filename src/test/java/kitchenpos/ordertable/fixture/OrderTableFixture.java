@@ -6,6 +6,8 @@ public class OrderTableFixture {
 
     public static final OrderTable A_테이블 = 테이블을_생성한다("A");
 
+    public static final OrderTable B_테이블 = 테이블을_생성한다("B");
+
     public static final OrderTable 이름미존재_테이블 = 테이블을_생성한다(null);
 
     public static final OrderTable 빈문자이름_테이블 = 테이블을_생성한다("");
