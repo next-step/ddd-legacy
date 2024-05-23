@@ -1,11 +1,13 @@
 package kitchenpos.menu.unit;
 
 import kitchenpos.application.MenuService;
+import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.support.AssertUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -14,8 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static kitchenpos.menu.fixture.MenuFixture.A_메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.가격마이너스_메뉴;
@@ -25,6 +29,8 @@ import static kitchenpos.menu.fixture.MenuFixture.메뉴가격이_제품목록�
 import static kitchenpos.menu.fixture.MenuFixture.빈_제품목록_메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.이름미존재_메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.제품목록미존재_메뉴;
+import static kitchenpos.support.RandomPriceUtil.랜덤한_1000원이상_3000원이하의_금액을_생성한다;
+import static kitchenpos.support.RandomPriceUtil.랜덤한_마이너스_1000원이하_금액을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -264,7 +270,17 @@ public class MenuServiceTest {
         @Test
         @DisplayName("[성공] 메뉴의 가격을 수정한다.")
         void changePrice() {
+            // given
+            given(menuRepository.findById(any())).willReturn(Optional.of(A_메뉴));
 
+            // when
+            var 수정할_내용 = new Menu();
+            var price = A_메뉴.getPrice().subtract(new BigDecimal(100));
+            수정할_내용.setPrice(price);
+            var updated = menuService.changePrice(UUID.randomUUID(), 수정할_내용);
+
+            // then
+            AssertUtils.가격이_동등한가(updated.getPrice(), price);
         }
 
         @Nested
@@ -274,19 +290,35 @@ public class MenuServiceTest {
             @Test
             @DisplayName("[실패] 변경할 메뉴의 가격을 입력하지 않으면 메뉴 가격은 수정되지 않는다.")
             void 메뉴_가격_null() {
-
+                // when & then
+                var 수정할_내용 = new Menu();
+                assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), 수정할_내용))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
             @DisplayName("[실패] 변경할 메뉴의 가격이 0원보다 낮으면 메뉴 가격은 수정되지 않는다.")
             void 메뉴_가격_마이너스() {
+                // when & then
+                var 수정할_내용 = new Menu();
+                수정할_내용.setPrice(랜덤한_마이너스_1000원이하_금액을_생성한다());
 
+                assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), 수정할_내용))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
 
             @Test
             @DisplayName("[실패] 변경할 메뉴의 가격이 제품 목록의 가격 합계보다 높으면 메뉴는 등록이 되지 않는다.")
             void 메뉴_가격_제품_목록의_가격_합계보다_높음() {
+                // given
+                given(menuRepository.findById(any())).willReturn(Optional.of(A_메뉴));
 
+                // when & then
+                var 수정할_내용 = new Menu();
+                var price = A_메뉴.getPrice().add(new BigDecimal(1000));
+                수정할_내용.setPrice(price);
+                assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), 수정할_내용))
+                        .isInstanceOf(IllegalArgumentException.class);
             }
         }
 
@@ -296,7 +328,14 @@ public class MenuServiceTest {
             @Test
             @DisplayName("[실패] 등록되지않은 메뉴 아이디인 경우 메뉴 가격이 수정되지 않는다.")
             void 메뉴_미등록() {
+                // given
+                given(menuRepository.findById(any())).willReturn(Optional.empty());
 
+                // when & then
+                var 수정할_내용 = new Menu();
+                수정할_내용.setPrice(랜덤한_1000원이상_3000원이하의_금액을_생성한다());
+                assertThatThrownBy(() -> menuService.changePrice(UUID.randomUUID(), 수정할_내용))
+                        .isInstanceOf(NoSuchElementException.class);
             }
 
         }

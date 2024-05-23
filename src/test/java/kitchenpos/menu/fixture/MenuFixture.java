@@ -8,6 +8,7 @@ import kitchenpos.domain.Product;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static kitchenpos.menugroup.fixture.MenuGroupFixture.C_메뉴그룹;
 import static kitchenpos.product.fixture.ProductFixture.H_제품;
