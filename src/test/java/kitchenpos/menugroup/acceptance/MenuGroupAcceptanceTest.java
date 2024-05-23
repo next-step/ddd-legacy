@@ -1,8 +1,11 @@
 package kitchenpos.menugroup.acceptance;
 
+import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import kitchenpos.support.AcceptanceTest;
+
+import java.util.UUID;
 
 import static kitchenpos.menugroup.acceptance.step.MenuGroupStep.메뉴_그룹_목록을_조회한다;
 import static kitchenpos.menugroup.acceptance.step.MenuGroupStep.메뉴_그룹을_등록한다;
@@ -12,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MenuGroupAcceptanceTest extends AcceptanceTest {
 
-    private static final String MENU_GROUP_NAME_KEY = "name";
+    private static final String MENU_GROUP_ID_KEY = "id";
 
     /**
      * <pre>
@@ -24,13 +27,13 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     @DisplayName("등록")
     void create() {
         // when
-        메뉴_그룹을_등록한다(A_메뉴그룹);
+        var 등록된_메뉴그룹 = 메뉴_그룹을_등록한다(A_메뉴그룹).as(MenuGroup.class);
 
         // then
-        var 메뉴_그룹_이름_목록 = 메뉴_그룹_목록을_조회한다()
+        var 메뉴_그룹_아이디_목록 = 메뉴_그룹_목록을_조회한다()
                 .jsonPath()
-                .getList(MENU_GROUP_NAME_KEY, String.class);
-        assertThat(메뉴_그룹_이름_목록).containsExactly(A_메뉴그룹.getName());
+                .getList(MENU_GROUP_ID_KEY, UUID.class);
+        assertThat(메뉴_그룹_아이디_목록).containsExactly(등록된_메뉴그룹.getId());
     }
 
     /**
@@ -44,16 +47,16 @@ public class MenuGroupAcceptanceTest extends AcceptanceTest {
     @DisplayName("목록조회")
     void findAll() {
         // given
-        메뉴_그룹을_등록한다(A_메뉴그룹);
-        메뉴_그룹을_등록한다(B_메뉴그룹);
+        var 등록된_메뉴그룹_A = 메뉴_그룹을_등록한다(A_메뉴그룹).as(MenuGroup.class);
+        var 등록된_메뉴그룹_B = 메뉴_그룹을_등록한다(B_메뉴그룹).as(MenuGroup.class);
 
         // when
-        var 메뉴_그룹_이름_목록 = 메뉴_그룹_목록을_조회한다()
+        var 메뉴_그룹_아이디_목록 = 메뉴_그룹_목록을_조회한다()
                 .jsonPath()
-                .getList(MENU_GROUP_NAME_KEY, String.class);
+                .getList(MENU_GROUP_ID_KEY, UUID.class);
 
         // then
-        assertThat(메뉴_그룹_이름_목록).containsExactly(A_메뉴그룹.getName(), B_메뉴그룹.getName());
+        assertThat(메뉴_그룹_아이디_목록).containsExactly(등록된_메뉴그룹_A.getId(), 등록된_메뉴그룹_B.getId());
     }
 
 }

@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static kitchenpos.product.acceptance.step.ProductStep.제품_가격을_수정한다;
 import static kitchenpos.product.acceptance.step.ProductStep.제품_목록을_조회한다;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 public class ProductAcceptanceTest extends AcceptanceTest {
 
-    private static final String PRODUCT_NAME_KEY = "name";
+    private static final String PRODUCT_ID_KEY = "id";
 
     /**
      * <pre>
@@ -34,13 +35,13 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     @DisplayName("등록")
     void create() {
         // when
-        제품을_등록한다(A_제품);
+        var 등록된_제품 = 제품을_등록한다(A_제품).as(Product.class);
 
         // then
-        var 제품_이름_목록 = 제품_목록을_조회한다()
+        var 제품_아이디_목록 = 제품_목록을_조회한다()
                 .jsonPath()
-                .getList(PRODUCT_NAME_KEY, String.class);
-        assertThat(제품_이름_목록).containsExactly(A_제품.getName());
+                .getList(PRODUCT_ID_KEY, UUID.class);
+        assertThat(제품_아이디_목록).containsExactly(등록된_제품.getId());
     }
 
     /**
@@ -54,16 +55,16 @@ public class ProductAcceptanceTest extends AcceptanceTest {
     @DisplayName("목록조회")
     void findAll() {
         // given
-        제품을_등록한다(A_제품);
-        제품을_등록한다(B_제품);
+        var 등록된_제품_A = 제품을_등록한다(A_제품).as(Product.class);
+        var 등록된_제품_B = 제품을_등록한다(B_제품).as(Product.class);
 
         // when
-        var 제품_이름_목록 = 제품_목록을_조회한다()
+        var 제품_아이디_목록 = 제품_목록을_조회한다()
                 .jsonPath()
-                .getList(PRODUCT_NAME_KEY, String.class);
+                .getList(PRODUCT_ID_KEY, UUID.class);
 
         // then
-        assertThat(제품_이름_목록).containsExactly(A_제품.getName(), B_제품.getName());
+        assertThat(제품_아이디_목록).containsExactly(등록된_제품_A.getId(), 등록된_제품_B.getId());
     }
 
     @Nested
