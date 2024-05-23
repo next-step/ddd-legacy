@@ -2,8 +2,10 @@ package kitchenpos.product.unit;
 
 import kitchenpos.application.ProductService;
 import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.support.AssertUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -12,11 +14,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
+
+import static kitchenpos.menu.fixture.MenuFixture.A_메뉴;
 import static kitchenpos.product.fixture.ProductFixture.A_제품;
+import static kitchenpos.product.fixture.ProductFixture.H_제품;
+import static kitchenpos.product.fixture.ProductFixture.I_제품;
 import static kitchenpos.product.fixture.ProductFixture.가격미존재_제품;
 import static kitchenpos.product.fixture.ProductFixture.가격이_마이너스인_제품;
 import static kitchenpos.product.fixture.ProductFixture.욕설이름_제품;
 import static kitchenpos.product.fixture.ProductFixture.이름미존재_제품;
+import static kitchenpos.support.RandomPriceUtil.랜덤한_1000원이상_3000원이하의_금액을_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -117,7 +129,18 @@ public class ProductServiceTest {
         @Test
         @DisplayName("[성공] 제품의 가격을 수정한다.")
         void changePrice() {
+            // given
+            given(productRepository.findById(any())).willReturn(Optional.of(H_제품));
+            given(menuRepository.findAllByProductId(any())).willReturn(List.of(A_메뉴));
 
+            // when
+            var 수정할_내용 = new Product();
+            var price = H_제품.getPrice().add(new BigDecimal(1000));
+            수정할_내용.setPrice(price);
+            var updated = productService.changePrice(UUID.randomUUID(), 수정할_내용);
+
+            // then
+            AssertUtils.가격이_동등한가(updated.getPrice(), price);
         }
 
         @Nested
@@ -126,7 +149,15 @@ public class ProductServiceTest {
             @Test
             @DisplayName("[실패] 등록되지않은 제품 아이디인 경우 제품 가격이 수정되지 않는다.")
             void 제품_미등록() {
+                // given
+                given(productRepository.findById(any())).willReturn(Optional.empty());
 
+                // when & then
+                var 수정할_내용 = new Product();
+                수정할_내용.setPrice(랜덤한_1000원이상_3000원이하의_금액을_생성한다());
+
+                assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), 수정할_내용))
+                        .isInstanceOf(NoSuchElementException.class);
             }
 
         }
@@ -137,7 +168,19 @@ public class ProductServiceTest {
             @Test
             @DisplayName("[성공] 메뉴의 가격이 변경된 제품 목록의 가격 합계보다 높으면 메뉴는 숨김 처리된다.")
             void 메뉴_가격_제품_목록의_가격_합계보다_높음() {
+                // given
+                given(productRepository.findById(any())).willReturn(Optional.of(I_제품));
+                given(menuRepository.findAllByProductId(any())).willReturn(List.of(A_메뉴));
 
+                var 수정할_내용 = new Product();
+                var price = new BigDecimal(100);
+                수정할_내용.setPrice(price);
+                var updated = productService.changePrice(UUID.randomUUID(), 수정할_내용);
+
+                assertAll(
+                        () -> AssertUtils.가격이_동등한가(updated.getPrice(), price),
+                        () -> assertThat(A_메뉴.isDisplayed()).isFalse()
+                );
             }
 
         }

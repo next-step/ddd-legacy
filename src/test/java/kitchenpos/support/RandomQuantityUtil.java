@@ -12,7 +12,7 @@ public class RandomQuantityUtil {
 
     public static Long 랜덤_수량을_생성한다(int min, int max) {
         var random = Math.random();
-        var value = (random * max) + min;
+        var value = (random * (max - min + 1)) + min;
 
         return Double.valueOf(value).longValue();
     }

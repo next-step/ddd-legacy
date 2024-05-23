@@ -19,7 +19,7 @@ public class RandomPriceUtil {
 
     public static BigDecimal 랜덤_가격을_생성한다(int min, int max) {
         var random = Math.random();
-        var value = (random * max) + min;
+        var value = (random * (max - min + 1)) + min;
 
         return new BigDecimal(value).setScale(0, RoundingMode.HALF_DOWN);
     }
