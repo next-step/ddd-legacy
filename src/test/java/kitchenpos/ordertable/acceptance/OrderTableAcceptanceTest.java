@@ -128,7 +128,7 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     /**
      * <pre>
      * given 테이블을 등록하고
-     * given 해당 테이블에 손님이 않아
+     * given 해당 테이블에 손님이 앉아
      * when  테이블에 앉은 손님의 인원수를 변경하면
      * then  테이블 목록 조회 시 해당 테이블에 앉아 있는 인원수는 변경한 인원수와 동일하다.
      * </pre>
