@@ -1,6 +1,8 @@
 package kitchenpos.product.acceptance;
 
 import io.restassured.common.mapper.TypeRef;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.Product;
 import kitchenpos.support.AcceptanceTest;
 import kitchenpos.support.AssertUtils;
@@ -13,6 +15,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import static kitchenpos.menu.acceptance.step.MenuStep.메뉴_목록을_조회한다;
+import static kitchenpos.menu.acceptance.step.MenuStep.메뉴를_등록한다;
+import static kitchenpos.menu.fixture.MenuFixture.메뉴를_생성한다;
+import static kitchenpos.menu.fixture.MenuFixture.제품_가격합계보다_낮은_금액을_생성한다;
+import static kitchenpos.menu.fixture.MenuFixture.제품을_생성한다;
+import static kitchenpos.menugroup.acceptance.step.MenuGroupStep.메뉴_그룹을_등록한다;
+import static kitchenpos.menugroup.fixture.MenuGroupFixture.A_메뉴그룹;
 import static kitchenpos.product.acceptance.step.ProductStep.제품_가격을_수정한다;
 import static kitchenpos.product.acceptance.step.ProductStep.제품_목록을_조회한다;
 import static kitchenpos.product.acceptance.step.ProductStep.제품을_등록한다;
@@ -107,18 +116,42 @@ public class ProductAcceptanceTest extends AcceptanceTest {
          * when  하나의 제품 가격을 10,000원 인하한다.
          * then  제품 목록 조회 시 해당 제품이 조회된다.
          * then  제품의 가격은 10,000원 인하된 가격이다.
-         * then  해당 제품은 숨김해제 상태이다.
+         * then  해당 메뉴는 숨김해제 상태이다.
          * </pre>
          */
         @Test
         @DisplayName("메뉴에 포함된 제품(제품가격합계 >= 메뉴가격)")
         void included_인하_display() {
             // given
+            var 메뉴그룹 = 메뉴_그룹을_생성한다();
+
+            var targetProduct = 제품을_등록한다(A_제품).as(Product.class);
+
+            var 메뉴_제품_목록 = List.of(제품을_생성한다(1L, targetProduct, 2L));
+            var 메뉴_가격 = 제품_가격합계보다_낮은_금액을_생성한다(메뉴_제품_목록);
+            var 등록하고자_하는_메뉴 = 메뉴를_생성한다("A", 메뉴_가격, 메뉴그룹, true, 메뉴_제품_목록);
+            var targetMenu = 메뉴를_등록한다(등록하고자_하는_메뉴).as(Menu.class);
 
             // when
+            var 수정할_내용 = new Product();
+            수정할_내용.setId(targetProduct.getId());
+            수정할_내용.setPrice(targetProduct.getPrice().subtract(new BigDecimal(50)));
+            제품_가격을_수정한다(수정할_내용);
 
             // then
+            var 제품_목록 = 제품_목록을_조회한다().as(new TypeRef<List<Product>>() {});
+            var 제품_optional = 제품_목록.stream().filter(product -> Objects.equals(product.getId(), targetProduct.getId()))
+                    .findFirst();
+            var 메뉴_목록 = 메뉴_목록을_조회한다().as(new TypeRef<List<Menu>>() {});
+            var 메뉴_optional = 메뉴_목록.stream().filter(menu -> Objects.equals(menu.getId(), targetMenu.getId()))
+                    .findFirst();
 
+            assertAll(
+                    () -> assertThat(제품_optional.isPresent()).isTrue(),
+                    () -> AssertUtils.가격이_동등한가(제품_optional.get().getPrice(), 수정할_내용.getPrice()),
+                    () -> assertThat(메뉴_optional.isPresent()).isTrue(),
+                    () -> assertThat(메뉴_optional.get().isDisplayed()).isTrue()
+            );
         }
 
         /**
@@ -134,11 +167,40 @@ public class ProductAcceptanceTest extends AcceptanceTest {
         @DisplayName("메뉴에 포함된 제품(제품가격합계 < 메뉴가격)")
         void included_인하_hide() {
             // given
+            var 메뉴그룹 = 메뉴_그룹을_생성한다();
+
+            var targetProduct = 제품을_등록한다(A_제품).as(Product.class);
+
+            var 메뉴_제품_목록 = List.of(제품을_생성한다(1L, targetProduct, 2L));
+            var 메뉴_가격 = 제품_가격합계보다_낮은_금액을_생성한다(메뉴_제품_목록);
+            var 등록하고자_하는_메뉴 = 메뉴를_생성한다("A", 메뉴_가격, 메뉴그룹, true, 메뉴_제품_목록);
+            var targetMenu = 메뉴를_등록한다(등록하고자_하는_메뉴).as(Menu.class);
 
             // when
+            var 수정할_내용 = new Product();
+            수정할_내용.setId(targetProduct.getId());
+            수정할_내용.setPrice(new BigDecimal(100));
+            제품_가격을_수정한다(수정할_내용);
 
             // then
+            var 제품_목록 = 제품_목록을_조회한다().as(new TypeRef<List<Product>>() {});
+            var 제품_optional = 제품_목록.stream().filter(product -> Objects.equals(product.getId(), targetProduct.getId()))
+                    .findFirst();
+            var 메뉴_목록 = 메뉴_목록을_조회한다().as(new TypeRef<List<Menu>>() {});
+            var 메뉴_optional = 메뉴_목록.stream().filter(menu -> Objects.equals(menu.getId(), targetMenu.getId()))
+                    .findFirst();
 
+            assertAll(
+                    () -> assertThat(제품_optional.isPresent()).isTrue(),
+                    () -> AssertUtils.가격이_동등한가(제품_optional.get().getPrice(), 수정할_내용.getPrice()),
+                    () -> assertThat(메뉴_optional.isPresent()).isTrue(),
+                    () -> assertThat(메뉴_optional.get().isDisplayed()).isFalse()
+            );
+
+        }
+
+        private static MenuGroup 메뉴_그룹을_생성한다() {
+            return 메뉴_그룹을_등록한다(A_메뉴그룹).as(MenuGroup.class);
         }
 
     }
