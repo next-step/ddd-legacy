@@ -83,6 +83,7 @@ public class MenuServiceTest {
             given(productRepository.findById(any())).willReturn(Optional.of(토마토_파스타));
 
             given(purgomalumClient.containsProfanity(any())).willReturn(false);
+
             given(menuRepository.save(any())).willReturn(토마토_파스타_단품_메뉴);
 
             // when

@@ -64,6 +64,7 @@ public class ProductServiceTest {
         void create() {
             // given
             given(purgomalumClient.containsProfanity(any())).willReturn(false);
+
             given(productRepository.save(any())).willReturn(김치찜);
 
             // when
