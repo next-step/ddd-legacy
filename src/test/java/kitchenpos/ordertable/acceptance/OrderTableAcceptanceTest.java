@@ -15,9 +15,11 @@ import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블_인
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블에_앉다;
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블을_등록한다;
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블을_정리하다;
-import static kitchenpos.ordertable.fixture.OrderTableFixture.A_테이블;
-import static kitchenpos.ordertable.fixture.OrderTableFixture.B_테이블;
-import static kitchenpos.support.util.random.RandomNumberOfGuestsUtil.랜덤한_1명이상_6명이하_인원을_생성한다;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.점유하고있는_테이블_1;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.점유하지_않고_있는_테이블_1;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.점유하지_않고_있는_테이블_2;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.테이블_1;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.테이블_2;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -36,7 +38,7 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @DisplayName("등록")
     void create() {
         // when
-        var 등록된_테이블 = 테이블을_등록한다(A_테이블).as(OrderTable.class);
+        var 등록된_테이블 = 테이블을_등록한다(테이블_1).as(OrderTable.class);
 
         // then
         var 테이블_아이디_목록 = 테이블_목록을_조회한다()
@@ -56,8 +58,8 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @DisplayName("목록조회")
     void findAll() {
         // given
-        var 등록된_테이블_A = 테이블을_등록한다(A_테이블).as(OrderTable.class);
-        var 등록된_테이블_B = 테이블을_등록한다(B_테이블).as(OrderTable.class);
+        var 등록된_테이블_A = 테이블을_등록한다(테이블_1).as(OrderTable.class);
+        var 등록된_테이블_B = 테이블을_등록한다(테이블_2).as(OrderTable.class);
 
         // when
         var 테이블_아이디_목록 = 테이블_목록을_조회한다()
@@ -79,7 +81,7 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @DisplayName("점유")
     void sit() {
         // given
-        var targetId = 테이블을_등록한다(A_테이블).jsonPath().getUUID(ORDER_TABLE_ID_KEY);
+        var targetId = 테이블을_등록한다(점유하지_않고_있는_테이블_1).jsonPath().getUUID(ORDER_TABLE_ID_KEY);
 
         // when
         테이블에_앉다(targetId);
@@ -107,7 +109,7 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @DisplayName("정리")
     void clear() {
         // given
-        var targetId = 테이블을_등록한다(A_테이블).jsonPath().getUUID(ORDER_TABLE_ID_KEY);
+        var targetId = 테이블을_등록한다(점유하고있는_테이블_1).jsonPath().getUUID(ORDER_TABLE_ID_KEY);
         테이블에_앉다(targetId);
 
         // when
@@ -137,15 +139,17 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
     @DisplayName("손님 인원수 변경")
     void changeNumberOfGuests() {
         // given
-        var targetId = 테이블을_등록한다(B_테이블).jsonPath().getUUID(ORDER_TABLE_ID_KEY);
+        var targetId = 테이블을_등록한다(점유하지_않고_있는_테이블_2).jsonPath().getUUID(ORDER_TABLE_ID_KEY);
         테이블에_앉다(targetId);
 
         // when
+        var 수정할_인원수 = 6;
+
         var 수정할_내용 = new OrderTable();
         수정할_내용.setId(targetId);
-        var 인원수 = 랜덤한_1명이상_6명이하_인원을_생성한다();
-        수정할_내용.setNumberOfGuests(인원수);
-        var target = 테이블_인원수를_변경한다(수정할_내용);
+        수정할_내용.setNumberOfGuests(수정할_인원수);
+
+        테이블_인원수를_변경한다(수정할_내용);
 
         // then
         var 테이블_목록 = 테이블_목록을_조회한다().as(new TypeRef<List<OrderTable>>() {});
@@ -154,7 +158,7 @@ public class OrderTableAcceptanceTest extends AcceptanceTest {
 
         assertAll(
                 () -> assertThat(테이블_optional.isPresent()).isTrue(),
-                () -> assertThat(테이블_optional.get().getNumberOfGuests()).isEqualTo(인원수)
+                () -> assertThat(테이블_optional.get().getNumberOfGuests()).isEqualTo(수정할_인원수)
         );
     }
 

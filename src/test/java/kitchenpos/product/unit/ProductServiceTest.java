@@ -20,15 +20,15 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.menu.fixture.MenuFixture.A_메뉴;
-import static kitchenpos.product.fixture.ProductFixture.A_제품;
-import static kitchenpos.product.fixture.ProductFixture.H_제품;
-import static kitchenpos.product.fixture.ProductFixture.I_제품;
+import static kitchenpos.menu.fixture.MenuFixture.봉골레_파스타_세트_메뉴;
+import static kitchenpos.menu.fixture.MenuFixture.토마토_파스타_단품_메뉴;
 import static kitchenpos.product.fixture.ProductFixture.가격미존재_제품;
 import static kitchenpos.product.fixture.ProductFixture.가격이_마이너스인_제품;
+import static kitchenpos.product.fixture.ProductFixture.김치찜;
+import static kitchenpos.product.fixture.ProductFixture.수제_마늘빵;
 import static kitchenpos.product.fixture.ProductFixture.욕설이름_제품;
 import static kitchenpos.product.fixture.ProductFixture.이름미존재_제품;
-import static kitchenpos.support.util.random.RandomPriceUtil.랜덤한_1000원이상_3000원이하의_금액을_생성한다;
+import static kitchenpos.product.fixture.ProductFixture.토마토_파스타;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -64,15 +64,15 @@ public class ProductServiceTest {
         void create() {
             // given
             given(purgomalumClient.containsProfanity(any())).willReturn(false);
-            given(productRepository.save(any())).willReturn(A_제품);
+            given(productRepository.save(any())).willReturn(김치찜);
 
             // when
-            var saved = productService.create(A_제품);
+            var saved = productService.create(김치찜);
 
             // then
             assertAll(
                     () -> then(productRepository).should(times(1)).save(any()),
-                    () -> assertThat(saved.getName()).isEqualTo(A_제품.getName())
+                    () -> assertThat(saved.getName()).isEqualTo(김치찜.getName())
             );
         }
 
@@ -130,17 +130,19 @@ public class ProductServiceTest {
         @DisplayName("[성공] 제품의 가격을 수정한다.")
         void changePrice() {
             // given
-            given(productRepository.findById(any())).willReturn(Optional.of(H_제품));
-            given(menuRepository.findAllByProductId(any())).willReturn(List.of(A_메뉴));
+            given(productRepository.findById(any())).willReturn(Optional.of(수제_마늘빵));
+            given(menuRepository.findAllByProductId(any())).willReturn(List.of(봉골레_파스타_세트_메뉴));
 
             // when
+            var 수정_가격 = new BigDecimal(1_500);
+
             var 수정할_내용 = new Product();
-            var price = H_제품.getPrice().add(new BigDecimal(1000));
-            수정할_내용.setPrice(price);
+            수정할_내용.setPrice(수정_가격);
+
             var updated = productService.changePrice(UUID.randomUUID(), 수정할_내용);
 
             // then
-            AssertUtils.가격이_동등한가(updated.getPrice(), price);
+            AssertUtils.가격이_동등한가(updated.getPrice(), 수정_가격);
         }
 
         @Nested
@@ -154,7 +156,7 @@ public class ProductServiceTest {
 
                 // when & then
                 var 수정할_내용 = new Product();
-                수정할_내용.setPrice(랜덤한_1000원이상_3000원이하의_금액을_생성한다());
+                수정할_내용.setPrice(new BigDecimal(5_000));
 
                 assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), 수정할_내용))
                         .isInstanceOf(NoSuchElementException.class);
@@ -169,17 +171,19 @@ public class ProductServiceTest {
             @DisplayName("[성공] 메뉴의 가격이 변경된 제품 목록의 가격 합계보다 높으면 메뉴는 숨김 처리된다.")
             void 메뉴_가격_제품_목록의_가격_합계보다_높음() {
                 // given
-                given(productRepository.findById(any())).willReturn(Optional.of(I_제품));
-                given(menuRepository.findAllByProductId(any())).willReturn(List.of(A_메뉴));
+                given(productRepository.findById(any())).willReturn(Optional.of(토마토_파스타));
+                given(menuRepository.findAllByProductId(any())).willReturn(List.of(토마토_파스타_단품_메뉴));
+
+                var 수정_가격 = new BigDecimal(10_500);
 
                 var 수정할_내용 = new Product();
-                var price = new BigDecimal(100);
-                수정할_내용.setPrice(price);
+                수정할_내용.setPrice(수정_가격);
+
                 var updated = productService.changePrice(UUID.randomUUID(), 수정할_내용);
 
                 assertAll(
-                        () -> AssertUtils.가격이_동등한가(updated.getPrice(), price),
-                        () -> assertThat(A_메뉴.isDisplayed()).isFalse()
+                        () -> AssertUtils.가격이_동등한가(updated.getPrice(), 수정_가격),
+                        () -> assertThat(토마토_파스타_단품_메뉴.isDisplayed()).isFalse()
                 );
             }
 

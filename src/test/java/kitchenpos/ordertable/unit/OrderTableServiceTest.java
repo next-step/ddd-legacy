@@ -17,14 +17,13 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-import static kitchenpos.ordertable.fixture.OrderTableFixture.A_테이블;
-import static kitchenpos.ordertable.fixture.OrderTableFixture.비어있는_테이블_C;
-import static kitchenpos.ordertable.fixture.OrderTableFixture.비어있는_테이블_D;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.빈문자이름_테이블;
 import static kitchenpos.ordertable.fixture.OrderTableFixture.이름미존재_테이블;
-import static kitchenpos.ordertable.fixture.OrderTableFixture.점유하고있는_테이블;
-import static kitchenpos.support.util.random.RandomNumberOfGuestsUtil.랜덤한_1명이상_6명이하_인원을_생성한다;
-import static kitchenpos.support.util.random.RandomNumberOfGuestsUtil.랜덤한_마이너스_6명_이하의_인원을_생성한다;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.점유하고있는_테이블_1;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.점유하고있는_테이블_2;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.점유하지_않고_있는_테이블_1;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.점유하지_않고_있는_테이블_2;
+import static kitchenpos.ordertable.fixture.OrderTableFixture.테이블_1;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -58,15 +57,15 @@ public class OrderTableServiceTest {
         @DisplayName("[성공] 테이블을 등록한다.")
         void create() {
             // given
-            given(orderTableRepository.save(any())).willReturn(A_테이블);
+            given(orderTableRepository.save(any())).willReturn(테이블_1);
 
             // when
-            var saved = orderTableService.create(A_테이블);
+            var saved = orderTableService.create(테이블_1);
 
             // then
             assertAll(
                     () -> then(orderTableRepository).should(times(1)).save(any()),
-                    () -> assertThat(saved.getName()).isEqualTo(A_테이블.getName())
+                    () -> assertThat(saved.getName()).isEqualTo(테이블_1.getName())
             );
         }
 
@@ -100,7 +99,7 @@ public class OrderTableServiceTest {
         @DisplayName("[성공] 테이블에 앉는다.")
         void sit() {
             // given
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(비어있는_테이블_C));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하지_않고_있는_테이블_1));
 
             // when
             var target = orderTableService.sit(UUID.randomUUID());
@@ -134,8 +133,8 @@ public class OrderTableServiceTest {
         @DisplayName("[성공] 테이블을 정리한다.")
         void clear() {
             // given
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하고있는_테이블));
-            given(orderRepository.existsByOrderTableAndStatusNot(점유하고있는_테이블, OrderStatus.COMPLETED)).willReturn(false);
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하고있는_테이블_2));
+            given(orderRepository.existsByOrderTableAndStatusNot(점유하고있는_테이블_2, OrderStatus.COMPLETED)).willReturn(false);
 
             // when
             var target = orderTableService.clear(UUID.randomUUID());
@@ -170,8 +169,8 @@ public class OrderTableServiceTest {
             @DisplayName("[실패] 해당 테이블의 완료되지 않은 상태의 주문이 존재하는 경우 정리할 수 없다.")
             void 미완료상태_주문_존재() {
                 // given
-                given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하고있는_테이블));
-                given(orderRepository.existsByOrderTableAndStatusNot(점유하고있는_테이블, OrderStatus.COMPLETED)).willReturn(true);
+                given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하고있는_테이블_2));
+                given(orderRepository.existsByOrderTableAndStatusNot(점유하고있는_테이블_2, OrderStatus.COMPLETED)).willReturn(true);
 
                 // when & then
                 assertThatThrownBy(() -> orderTableService.clear(UUID.randomUUID()))
@@ -189,11 +188,12 @@ public class OrderTableServiceTest {
         @DisplayName("[성공] 손님 인원수를 변경한다.")
         void changeNumberOfGuests() {
             // given
-            given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하고있는_테이블));
+            given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하고있는_테이블_1));
 
             // when
+            var 수정할_인원수 = 점유하고있는_테이블_1.getNumberOfGuests() + 1;
+
             var 수정할_내용 = new OrderTable();
-            var 수정할_인원수 = 점유하고있는_테이블.getNumberOfGuests() + 1;
             수정할_내용.setNumberOfGuests(수정할_인원수);
 
             var 수정된_테이블 = orderTableService.changeNumberOfGuests(UUID.randomUUID(), 수정할_내용);
@@ -210,8 +210,7 @@ public class OrderTableServiceTest {
             void 음수_손님수() {
                 // when & then
                 var 수정할_내용 = new OrderTable();
-                var 수정할_인원수 = 랜덤한_마이너스_6명_이하의_인원을_생성한다();
-                수정할_내용.setNumberOfGuests(수정할_인원수);
+                수정할_내용.setNumberOfGuests(-1);
 
                 assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 수정할_내용))
                         .isInstanceOf(IllegalArgumentException.class);
@@ -230,7 +229,7 @@ public class OrderTableServiceTest {
 
                 // when & then
                 var 수정할_내용 = new OrderTable();
-                수정할_내용.setNumberOfGuests(랜덤한_1명이상_6명이하_인원을_생성한다());
+                수정할_내용.setNumberOfGuests(2);
 
                 assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 수정할_내용))
                         .isInstanceOf(NoSuchElementException.class);
@@ -245,11 +244,11 @@ public class OrderTableServiceTest {
             @DisplayName("[실패] 빈 테이블인 경우 손님의 인원수를 변경할 수 없다.")
             void 비어있는_테이블() {
                 // given
-                given(orderTableRepository.findById(any())).willReturn(Optional.of(비어있는_테이블_D));
+                given(orderTableRepository.findById(any())).willReturn(Optional.of(점유하지_않고_있는_테이블_2));
 
                 // when & then
                 var 수정할_내용 = new OrderTable();
-                수정할_내용.setNumberOfGuests(랜덤한_1명이상_6명이하_인원을_생성한다());
+                수정할_내용.setNumberOfGuests(5);
 
                 assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), 수정할_내용))
                         .isInstanceOf(IllegalStateException.class);

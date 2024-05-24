@@ -10,9 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static kitchenpos.menugroup.fixture.MenuGroupFixture.A_메뉴그룹;
 import static kitchenpos.menugroup.fixture.MenuGroupFixture.빈문자이름_메뉴그룹;
 import static kitchenpos.menugroup.fixture.MenuGroupFixture.이름미존재_메뉴그룹;
+import static kitchenpos.menugroup.fixture.MenuGroupFixture.한식;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -38,18 +38,18 @@ public class MenuGroupServiceTest {
     class 등록 {
 
         @Test
-        @DisplayName("[성공] 메뉴 그룹의 이름을 A로 입력하면 등록된다.")
-        void 메뉴그룹_이름_A() {
+        @DisplayName("[성공] 메뉴 그룹을 등록한다.")
+        void create() {
             // given
-            given(menuGroupRepository.save(any())).willReturn(A_메뉴그룹);
+            given(menuGroupRepository.save(any())).willReturn(한식);
 
             // when
-            var saved = menuGroupService.create(A_메뉴그룹);
+            var saved = menuGroupService.create(한식);
 
             // then
             assertAll(
                     () -> then(menuGroupRepository).should(times(1)).save(any()),
-                    () -> assertThat(saved.getName()).isEqualTo(A_메뉴그룹.getName())
+                    () -> assertThat(saved.getName()).isEqualTo(한식.getName())
             );
         }
 
