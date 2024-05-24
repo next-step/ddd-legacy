@@ -7,10 +7,20 @@ import static org.mockito.BDDMockito.*;
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.application.OrderTableService;
+import kitchenpos.application.fixture.MenuFixture;
+import kitchenpos.application.fixture.OrderFixture;
 import kitchenpos.application.fixture.OrderTableFixture;
+import kitchenpos.application.menu.InMemoryMenuRepository;
+import kitchenpos.application.order.InMemoryOrderRepository;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.OrderType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,13 +35,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class OrderTableServiceTest {
 
   private OrderTableService orderTableService;
-  @Mock
+
   private OrderRepository orderRepository;
+
+  private MenuRepository menuRepository;
 
   @BeforeEach
   public void init() {
+    this.menuRepository = new InMemoryMenuRepository();
+    this.orderRepository = new InMemoryOrderRepository();
     OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
-    orderTableService = new OrderTableService(orderTableRepository, orderRepository);
+    this.orderTableService = new OrderTableService(orderTableRepository, this.orderRepository);
   }
 
   @DisplayName("주문테이블을 등록할 수 있다.")
@@ -116,12 +130,17 @@ public class OrderTableServiceTest {
   @DisplayName("진행중인 주문이 있을 경우 IllegalStateException 예외 처리를 한다.")
   @Test
   public void failClear() {
-    OrderTable request = OrderTableFixture.create("오더테이블");
+    OrderTable request = OrderTableFixture.create("오더테이블", true);
     OrderTable orderTable = orderTableService.create(request);
     orderTable = orderTableService.sit(orderTable.getId());
     UUID orderTableId = orderTable.getId();
-    given(orderRepository.existsByOrderTableAndStatusNot(any(), any()))
-        .willReturn(true);
+
+    Menu menu = MenuFixture.createDefaultMenu();
+    menuRepository.save(menu);
+    OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(menu, 3L, 200L);
+    Order order = OrderFixture.create(OrderType.EAT_IN, List.of(orderLineItem),"주소", orderTable);
+    order = orderRepository.save(order);
+    order.setStatus(OrderStatus.WAITING);
 
     assertThatExceptionOfType(IllegalStateException.class)
         .isThrownBy(() -> orderTableService.clear(orderTableId));

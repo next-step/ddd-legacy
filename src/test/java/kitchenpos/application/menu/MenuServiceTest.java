@@ -99,7 +99,7 @@ class MenuServiceTest {
   @DisplayName("등록되지 않은 메뉴그룹을 포함할 경우 NoSuchElementException 예외 처리를 한다.")
   @Test
   public void invalidMenuGroup() {
-    MenuGroup menuGroup = MenuGroupFixture.createFake("메뉴그룹");
+    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
 
     Product product = ProductFixture.create("상품", 200L);
     product = productService.create(product);
@@ -132,7 +132,7 @@ class MenuServiceTest {
     menuGroup = menuGroupService.create(menuGroup);
 
     Product product1 = ProductFixture.create("상품", 200L);
-    Product product2 = ProductFixture.createFake("상품", 200L);
+    Product product2 = ProductFixture.create("상품", 200L);
     product1 = productService.create(product1);
 
     MenuProduct menuProduct1 = MenuFixture.createMenuProduct(product1, 1L, 1L);
