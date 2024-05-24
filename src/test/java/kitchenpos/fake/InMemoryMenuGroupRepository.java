@@ -1,4 +1,4 @@
-package kitchenpos.config;
+package kitchenpos.fake;
 
 import java.util.ArrayList;
 import java.util.HashMap;

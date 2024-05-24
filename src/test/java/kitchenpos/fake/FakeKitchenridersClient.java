@@ -1,4 +1,4 @@
-package kitchenpos.config;
+package kitchenpos.fake;
 
 import java.math.BigDecimal;
 import java.util.UUID;

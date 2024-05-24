@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
 import java.util.List;
-import kitchenpos.config.FakePurgomalumClient;
-import kitchenpos.config.InMemoryMenuGroupRepository;
-import kitchenpos.config.InMemoryMenuRepository;
-import kitchenpos.config.InMemoryProductRepository;
+import kitchenpos.fake.FakePurgomalumClient;
+import kitchenpos.fake.InMemoryMenuGroupRepository;
+import kitchenpos.fake.InMemoryMenuRepository;
+import kitchenpos.fake.InMemoryProductRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
