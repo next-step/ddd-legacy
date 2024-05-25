@@ -6,13 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import kitchenpos.fake.FakeKitchenridersClient;
-import kitchenpos.fake.FakePurgomalumClient;
-import kitchenpos.fake.InMemoryMenuGroupRepository;
-import kitchenpos.fake.InMemoryMenuRepository;
-import kitchenpos.fake.InMemoryOrderRepository;
-import kitchenpos.fake.InMemoryOrderTableRepository;
-import kitchenpos.fake.InMemoryProductRepository;
+import java.util.List;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -23,6 +17,13 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fake.FakeKitchenridersClient;
+import kitchenpos.fake.FakePurgomalumClient;
+import kitchenpos.fake.InMemoryMenuGroupRepository;
+import kitchenpos.fake.InMemoryMenuRepository;
+import kitchenpos.fake.InMemoryOrderRepository;
+import kitchenpos.fake.InMemoryOrderTableRepository;
+import kitchenpos.fake.InMemoryProductRepository;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.OrderFixture;
@@ -131,14 +132,14 @@ class OrderTableServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    private void createAndCompleteOrder(OrderTable orderTable){
+    private void createAndCompleteOrder(OrderTable orderTable) {
         Order order = createOrder(orderTable);
         orderService.accept(order.getId());
         orderService.serve(order.getId());
         orderService.complete(order.getId());
     }
 
-    private Order createOrder(OrderTable orderTable){
+    private Order createOrder(OrderTable orderTable) {
         Order eatInRequest = OrderFixture.createEatInRequest(orderTable,
                 OrderFixture.createOrderLineItem(createFriedMenu(), 2));
         return orderService.create(eatInRequest);
@@ -182,5 +183,15 @@ class OrderTableServiceTest {
 
         assertThatIllegalArgumentException().isThrownBy(
                 () -> orderTableService.changeNumberOfGuests(saved.getId(), changeRequest));
+    }
+
+    @Test
+    void 모든_테이블_목록을_볼_수_있다() {
+        orderTableService.create(OrderTableFixture.createRequest("1번테이블"));
+        orderTableService.create(OrderTableFixture.createRequest("2번테이블"));
+
+        List<OrderTable> actual = orderTableService.findAll();
+
+        assertThat(actual).hasSize(2);
     }
 }
