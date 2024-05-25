@@ -26,11 +26,11 @@ import static kitchenpos.menu.fixture.MenuFixture.김치찜_1인_메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.봉골레_파스타_세트_메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.토마토_파스타_단품_메뉴;
 import static kitchenpos.menu.fixture.MenuFixture.피클_메뉴_숨김;
-import static kitchenpos.order.fixture.DeliveryOrderFixture.대기중인_김치찜_1인_메뉴_1개_주문;
-import static kitchenpos.order.fixture.DeliveryOrderFixture.배달원에게_전달한_김치찜_1인_메뉴_1개_주문;
-import static kitchenpos.order.fixture.DeliveryOrderFixture.배달이_끝난_김치찜_1인_메뉴_1개_주문;
+import static kitchenpos.order.fixture.DeliveryOrderFixture.대기중인_메뉴_배달주문;
+import static kitchenpos.order.fixture.DeliveryOrderFixture.배달원에게_전달한_메뉴_배달주문;
+import static kitchenpos.order.fixture.DeliveryOrderFixture.배달이_끝난_메뉴_배달주문;
 import static kitchenpos.order.fixture.DeliveryOrderFixture.배달주소미존재_배달주문;
-import static kitchenpos.order.fixture.DeliveryOrderFixture.배달중인_김치찜_1인_메뉴_1개_주문;
+import static kitchenpos.order.fixture.DeliveryOrderFixture.배달중인_메뉴_배달주문;
 import static kitchenpos.order.fixture.DeliveryOrderFixture.봉골레_세트_1개_토마토_단품_1개_배달주문;
 import static kitchenpos.order.fixture.DeliveryOrderFixture.봉골레_세트_메뉴_1개_배달주문;
 import static kitchenpos.order.fixture.DeliveryOrderFixture.봉골레_세트_메뉴_마이너스_1개_배달주문;
@@ -38,7 +38,7 @@ import static kitchenpos.order.fixture.DeliveryOrderFixture.빈_주문항목_배
 import static kitchenpos.order.fixture.DeliveryOrderFixture.빈문자배달주소_배달주문;
 import static kitchenpos.order.fixture.DeliveryOrderFixture.숨김처리된_메뉴_1개_배달주문;
 import static kitchenpos.order.fixture.DeliveryOrderFixture.주문_항목_가격_메뉴_가격_불일치_배달주문;
-import static kitchenpos.order.fixture.DeliveryOrderFixture.주문수락한_김치찜_1인_메뉴_1개_주문;
+import static kitchenpos.order.fixture.DeliveryOrderFixture.주문수락한_메뉴_배달주문;
 import static kitchenpos.order.fixture.DeliveryOrderFixture.주문항목미존재_배달주문;
 import static kitchenpos.order.fixture.DeliveryOrderFixture.타입미존재_배달주문;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,6 +84,7 @@ public class DeliveryOrderServiceTest {
             // when
             var saved = orderService.create(봉골레_세트_메뉴_1개_배달주문);
 
+            // then
             assertAll(
                     () -> then(orderRepository).should(times(1)).save(any()),
                     () -> assertThat(saved.getDeliveryAddress()).isEqualTo(봉골레_세트_메뉴_1개_배달주문.getDeliveryAddress())
@@ -226,7 +227,7 @@ public class DeliveryOrderServiceTest {
         void accept() {
             // given
             given(orderRepository.findById(any()))
-                    .willReturn(Optional.of(대기중인_김치찜_1인_메뉴_1개_주문));
+                    .willReturn(Optional.of(대기중인_메뉴_배달주문));
 
             doNothing().when(kitchenridersClient).requestDelivery(any(), any(), any());
 
@@ -281,7 +282,7 @@ public class DeliveryOrderServiceTest {
         void serve() {
             // given
             given(orderRepository.findById(any()))
-                    .willReturn(Optional.of(주문수락한_김치찜_1인_메뉴_1개_주문));
+                    .willReturn(Optional.of(주문수락한_메뉴_배달주문));
 
             // when
             var updated = orderService.serve(UUID.randomUUID());
@@ -334,7 +335,7 @@ public class DeliveryOrderServiceTest {
         void startDelivery() {
             // given
             given(orderRepository.findById(any()))
-                    .willReturn(Optional.of(배달원에게_전달한_김치찜_1인_메뉴_1개_주문));
+                    .willReturn(Optional.of(배달원에게_전달한_메뉴_배달주문));
 
             // when
             var updated = orderService.startDelivery(UUID.randomUUID());
@@ -413,7 +414,7 @@ public class DeliveryOrderServiceTest {
         void completeDelivery() {
             // given
             given(orderRepository.findById(any()))
-                    .willReturn(Optional.of(배달중인_김치찜_1인_메뉴_1개_주문));
+                    .willReturn(Optional.of(배달중인_메뉴_배달주문));
 
             // when
             var updated = orderService.completeDelivery(UUID.randomUUID());
@@ -466,7 +467,7 @@ public class DeliveryOrderServiceTest {
         void complete() {
             // given
             given(orderRepository.findById(any()))
-                    .willReturn(Optional.of(배달이_끝난_김치찜_1인_메뉴_1개_주문));
+                    .willReturn(Optional.of(배달이_끝난_메뉴_배달주문));
 
             // when
             var updated = orderService.complete(UUID.randomUUID());

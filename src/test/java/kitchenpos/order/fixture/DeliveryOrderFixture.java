@@ -5,7 +5,6 @@ import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderType;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,31 +69,31 @@ public class DeliveryOrderFixture {
             ""
     );
 
-    public static final Order 대기중인_김치찜_1인_메뉴_1개_주문 = 주문을_생성한다(
+    public static final Order 대기중인_메뉴_배달주문 = 주문을_생성한다(
             OrderStatus.WAITING,
             List.of(김치찜_1인_메뉴_1개_주문),
             "서울 금천구"
     );
 
-    public static final Order 주문수락한_김치찜_1인_메뉴_1개_주문 = 주문을_생성한다(
+    public static final Order 주문수락한_메뉴_배달주문 = 주문을_생성한다(
             OrderStatus.ACCEPTED,
             List.of(김치찜_1인_메뉴_1개_주문),
             "서울 금천구"
     );
 
-    public static final Order 배달원에게_전달한_김치찜_1인_메뉴_1개_주문 = 주문을_생성한다(
+    public static final Order 배달원에게_전달한_메뉴_배달주문 = 주문을_생성한다(
             OrderStatus.SERVED,
             List.of(김치찜_1인_메뉴_1개_주문),
             "서울 금천구"
     );
 
-    public static final Order 배달중인_김치찜_1인_메뉴_1개_주문 = 주문을_생성한다(
+    public static final Order 배달중인_메뉴_배달주문 = 주문을_생성한다(
             OrderStatus.DELIVERING,
             List.of(김치찜_1인_메뉴_1개_주문),
             "서울 금천구"
     );
 
-    public static final Order 배달이_끝난_김치찜_1인_메뉴_1개_주문 = 주문을_생성한다(
+    public static final Order 배달이_끝난_메뉴_배달주문 = 주문을_생성한다(
             OrderStatus.DELIVERED,
             List.of(김치찜_1인_메뉴_1개_주문),
             "서울 금천구"

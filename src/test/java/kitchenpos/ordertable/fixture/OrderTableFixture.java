@@ -16,6 +16,8 @@ public class OrderTableFixture {
 
     public static final OrderTable 점유하고있는_테이블_2 = 테이블을_생성한다("2", 3, true);
 
+    public static final OrderTable 점유하고있는_테이블_3 = 테이블을_생성한다("3", 4, true);
+
     public static final OrderTable 점유하지_않고_있는_테이블_1 = 테이블을_생성한다("1");
 
     public static final OrderTable 점유하지_않고_있는_테이블_2 = 테이블을_생성한다("2");
