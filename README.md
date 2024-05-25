@@ -68,7 +68,7 @@ docker compose -p kitchenpos up -d
     - [ ] 매장식사 주문의 경우 테이블을 정리하고 테이블 식사 손님의 수를 0으로 변경 한다.
   - [ ] 모든 주문 목록을 보여준다.
   - [ ] 주문에 대한 상태를 관리한다.
-    - [ ] 배달: 대기(`WAITING`) > 수락(`ACCEPTED`) > 배달 중(`DELIVERING`) > 배달 완료(`DELIVERED`) > 완료(`COMPLETED`)
+    - [ ] 배달: 대기(`WAITING`) > 수락(`ACCEPTED`) > 전달(`SERVED`) > 배달 중(`DELIVERING`) > 배달 완료(`DELIVERED`) > 완료(`COMPLETED`)
     - [ ] 테이크아웃: 대기(`WAITING`) > 수락(`ACCEPTED`) > 전달(`SERVED`) > 완료(`COMPLETED`)
     - [ ] 매장식사: 대기(`WAITING`) > 수락(`ACCEPTED`) > 전달(`SERVED`) > 완료(`COMPLETED`)
 - 제품
