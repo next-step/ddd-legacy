@@ -6,7 +6,6 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 import kitchenpos.menugroup.fixture.MenuGroupFixture;
-import kitchenpos.product.acceptance.step.ProductStep;
 import kitchenpos.product.fixture.ProductFixture;
 import kitchenpos.support.AcceptanceTest;
 import kitchenpos.support.util.assertion.AssertUtils;
@@ -25,6 +24,7 @@ import static kitchenpos.menu.acceptance.step.MenuStep.메뉴를_등록한다;
 import static kitchenpos.menu.acceptance.step.MenuStep.메뉴를_숨김처리_한다;
 import static kitchenpos.menu.acceptance.step.MenuStep.메뉴를_숨김해제처리_한다;
 import static kitchenpos.menugroup.acceptance.step.MenuGroupStep.메뉴_그룹을_등록한다;
+import static kitchenpos.product.acceptance.step.ProductStep.제품을_등록한다;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
@@ -42,12 +42,12 @@ public class MenuAcceptanceTest extends AcceptanceTest {
         한식_그룹 = 메뉴_그룹을_등록한다(MenuGroupFixture.한식).as(MenuGroup.class);
         양식_그룹 = 메뉴_그룹을_등록한다(MenuGroupFixture.양식).as(MenuGroup.class);
 
-        김치찜 = 제품을_등록한다(ProductFixture.김치찜);
-        공기밥 = 제품을_등록한다(ProductFixture.공기밥);
-        봉골레_파스타 = 제품을_등록한다(ProductFixture.봉골레_파스타);
-        토마토_파스타 = 제품을_등록한다(ProductFixture.토마토_파스타);
-        수제_마늘빵 = 제품을_등록한다(ProductFixture.수제_마늘빵);
-        피클 = 제품을_등록한다(ProductFixture.피클);
+        김치찜 = 제품을_등록한다(ProductFixture.김치찜).as(Product.class);
+        공기밥 = 제품을_등록한다(ProductFixture.공기밥).as(Product.class);
+        봉골레_파스타 = 제품을_등록한다(ProductFixture.봉골레_파스타).as(Product.class);
+        토마토_파스타 = 제품을_등록한다(ProductFixture.토마토_파스타).as(Product.class);
+        수제_마늘빵 = 제품을_등록한다(ProductFixture.수제_마늘빵).as(Product.class);
+        피클 = 제품을_등록한다(ProductFixture.피클).as(Product.class);
     }
 
     /**
@@ -257,10 +257,6 @@ public class MenuAcceptanceTest extends AcceptanceTest {
                 () -> assertThat(메뉴_optional.isPresent()).isTrue(),
                 () -> AssertUtils.가격이_동등한가(메뉴_optional.get().getPrice(), 수정_가격)
         );
-    }
-
-    private Product 제품을_등록한다(Product 등록하고자_하는_제품) {
-        return ProductStep.제품을_등록한다(등록하고자_하는_제품).as(Product.class);
     }
 
     private MenuProduct 메뉴_제품을_생성한다(Product product, Long quantity) {
