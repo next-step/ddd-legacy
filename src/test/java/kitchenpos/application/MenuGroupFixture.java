@@ -14,6 +14,13 @@ public class MenuGroupFixture {
         return createMenuGroupRequest(menuGroup.getName());
     }
 
+    public static MenuGroup createMenuGroupRequest(final UUID menuGroupId) {
+        final MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName("한마리메뉴");
+        menuGroup.setId(menuGroupId);
+        return menuGroup;
+    }
+
     public static MenuGroup createMenuGroupRequest(final String name) {
         final MenuGroup requestMenuGroup = new MenuGroup();
         requestMenuGroup.setId(UUID.randomUUID());

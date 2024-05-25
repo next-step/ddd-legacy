@@ -56,14 +56,104 @@ public class MenuFixture{
         return createMenuRequest(products, request.getId());
     }
 
+    public static Menu createMenuRequest(final String name, final BigDecimal price, final MenuGroup menuGroup) {
+        final Menu request = new Menu();
+        request.setName(name);
+        request.setPrice(price);
+        request.setMenuGroupId(menuGroup.getId());
+        request.setId(UUID.randomUUID());
+        request.setMenuGroup(menuGroup);
+        return createMenuRequest(request.getName(), request.getPrice(), request.getMenuGroupId(), request.getId(), request.getMenuGroup());
+
+    }
+
+    public static Menu createMenuRequest(final String name, final BigDecimal price, final MenuGroup menuGroup, final Product product) {
+        final Menu request = new Menu();
+        request.setName(name);
+        request.setPrice(price);
+        request.setMenuGroupId(menuGroup.getId());
+        request.setId(UUID.randomUUID());
+        request.setMenuGroup(menuGroup);
+        request.setMenuProducts(
+                Stream.of(product).map(productRequest -> {
+                    final MenuProduct menuProduct = new MenuProduct();
+                    menuProduct.setProduct(productRequest);
+                    menuProduct.setQuantity(1L);
+                    menuProduct.setProductId(productRequest.getId());
+                    menuProduct.setSeq(1L);
+                    return menuProduct;
+                }).toList());
+
+        request.setDisplayed(true);
+        return request;
+
+    }
+
+
+    public static Menu createMenuRequest(final String name, final BigDecimal price, final UUID menuGroupId, final UUID menuId, final MenuGroup menuGroup) {
+        final Menu request = new Menu();
+
+        request.setName(name);
+        request.setPrice(price);
+        request.setMenuGroupId(menuGroupId);
+        request.setDisplayed(true);
+        request.setMenuGroup(menuGroup);
+        Product productRequest = createProductRequest();
+
+        request.setMenuProducts(
+                Stream.of(productRequest).map(product -> {
+                    final MenuProduct menuProduct = new MenuProduct();
+                    menuProduct.setProduct(productRequest);
+                    menuProduct.setQuantity(1L);
+                    return menuProduct;
+                }).toList()
+        );
+        request.setMenuGroupId(menuGroupId);
+        request.setId(menuId);
+
+        return createMenuRequest(
+                request.getName(), request.getPrice(), request.isDisplayed(),
+                request.getMenuProducts(), request.getMenuGroupId(), request.getId(),
+                request.getMenuGroup(), request.getId());
+
+    }
+
 
     public static Menu createMenuRequest(final String name, final BigDecimal price) {
         final Menu request = new Menu();
         request.setName(name);
         request.setPrice(price);
         request.setMenuGroupId(UUID.randomUUID());
+        request.setId(UUID.randomUUID());
+        return createMenuRequest(request.getName(), request.getPrice(), request.getMenuGroupId(), request.getId());
 
-        return createMenuRequest(request.getName(), request.getPrice(), request.getMenuGroupId());
+    }
+
+    public static Menu createMenuRequest(final String name, final BigDecimal price, final UUID menuGroupId, final UUID menuId) {
+        final Menu request = new Menu();
+
+        request.setName(name);
+        request.setPrice(price);
+        request.setMenuGroupId(menuGroupId);
+        request.setDisplayed(true);
+        request.setMenuGroup(createMenuGroupRequest(menuGroupId));
+        Product productRequest = createProductRequest();
+
+        request.setMenuProducts(
+                Stream.of(productRequest).map(product -> {
+                    final MenuProduct menuProduct = new MenuProduct();
+                    menuProduct.setProduct(productRequest);
+                    menuProduct.setQuantity(1L);
+                    return menuProduct;
+                }).toList()
+        );
+        request.setMenuGroupId(menuGroupId);
+        request.setId(menuId);
+
+        return createMenuRequest(
+                request.getName(), request.getPrice(), request.isDisplayed(),
+                request.getMenuProducts(), request.getMenuGroupId(), request.getId(),
+                request.getMenuGroup(), request.getId());
 
     }
 
@@ -111,11 +201,12 @@ public class MenuFixture{
                 }).toList()
         );
         request.setMenuGroupId(menuGroupId);
+        request.setId(UUID.randomUUID());
 
         return createMenuRequest(
                 request.getName(), request.getPrice(), request.isDisplayed(),
                 request.getMenuProducts(), request.getMenuGroupId(), request.getId(),
-                request.getMenuGroup());
+                request.getMenuGroup(), request.getId());
     }
 
     public static Menu createMenuRequest(
@@ -129,6 +220,22 @@ public class MenuFixture{
         request.setMenuGroup(menuGroup);
         request.setMenuGroupId(menuGroupId);
         request.setId(id);
+        request.setMenuProducts(menuProducts);
+
+        return request;
+    }
+
+    public static Menu createMenuRequest(
+            final String name, final BigDecimal price, final boolean displayed
+            , final List<MenuProduct> menuProducts, final UUID menuGroupId,
+            final UUID id, final MenuGroup menuGroup, final UUID menuId) {
+        final Menu request = new Menu();
+        request.setName(name);
+        request.setPrice(price);
+        request.setDisplayed(displayed);
+        request.setMenuGroup(menuGroup);
+        request.setMenuGroupId(menuGroupId);
+        request.setId(menuId);
         request.setMenuProducts(menuProducts);
 
         return request;
