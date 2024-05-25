@@ -267,7 +267,7 @@ public class EatInOrderServiceTest {
             @EnumSource(value = OrderStatus.class, names = {"ACCEPTED", "SERVED", "COMPLETED"})
             void 상태_not대기중(OrderStatus status) {
                 // given
-                var 주문 = 상태검증을_위한_배달주문을_생성한다(status);
+                var 주문 = 상태검증을_위한_매장주문을_생성한다(status);
                 given(orderRepository.findById(any())).willReturn(Optional.of(주문));
 
                 // when & then
@@ -320,7 +320,7 @@ public class EatInOrderServiceTest {
             @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "COMPLETED"})
             void 상태_not수락(OrderStatus status) {
                 // given
-                var 주문 = 상태검증을_위한_배달주문을_생성한다(status);
+                var 주문 = 상태검증을_위한_매장주문을_생성한다(status);
                 given(orderRepository.findById(any())).willReturn(Optional.of(주문));
 
                 // when & then
@@ -379,7 +379,7 @@ public class EatInOrderServiceTest {
             @EnumSource(value = OrderStatus.class, names = {"WAITING", "SERVED", "COMPLETED"})
             void 상태_not전달(OrderStatus status) {
                 // given
-                var 주문 = 상태검증을_위한_배달주문을_생성한다(status);
+                var 주문 = 상태검증을_위한_매장주문을_생성한다(status);
                 given(orderRepository.findById(any())).willReturn(Optional.of(주문));
 
                 // when & then
@@ -416,7 +416,7 @@ public class EatInOrderServiceTest {
 
     }
 
-    private Order 상태검증을_위한_배달주문을_생성한다(OrderStatus status) {
+    private Order 상태검증을_위한_매장주문을_생성한다(OrderStatus status) {
         var 주문 = new Order();
         주문.setType(OrderType.EAT_IN);
         주문.setStatus(status);

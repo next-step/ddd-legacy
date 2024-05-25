@@ -147,7 +147,6 @@ public class DeliveryOrderServiceTest {
                 // when & then
                 assertThatThrownBy(() -> orderService.create(봉골레_세트_메뉴_마이너스_1개_배달주문))
                         .isInstanceOf(IllegalArgumentException.class);
-
             }
 
             @Test
