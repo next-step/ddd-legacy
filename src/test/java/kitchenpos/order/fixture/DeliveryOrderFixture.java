@@ -8,7 +8,6 @@ import kitchenpos.domain.OrderType;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 import static kitchenpos.order.fixture.OrderLineItemFixture.김치찜_1인_메뉴_1개_주문;
 import static kitchenpos.order.fixture.OrderLineItemFixture.봉골레_파스타_세트_메뉴_1개_주문;
@@ -105,7 +104,7 @@ public class DeliveryOrderFixture {
             List<OrderLineItem> orderLineItems,
             String deliveryAddress
     ) {
-        return 주문을_생성한다(null, OrderType.DELIVERY, null, orderLineItems, deliveryAddress);
+        return 주문을_생성한다(OrderType.DELIVERY, null, orderLineItems, deliveryAddress);
     }
 
     private static Order 주문을_생성한다(
@@ -113,7 +112,7 @@ public class DeliveryOrderFixture {
             List<OrderLineItem> orderLineItems,
             String deliveryAddress
     ) {
-        return 주문을_생성한다(null, type, null, orderLineItems, deliveryAddress);
+        return 주문을_생성한다(type, null, orderLineItems, deliveryAddress);
     }
 
     private static Order 주문을_생성한다(
@@ -121,30 +120,18 @@ public class DeliveryOrderFixture {
             List<OrderLineItem> orderLineItems,
             String deliveryAddress
     ) {
-        return 주문을_생성한다(null, OrderType.DELIVERY, status, orderLineItems, deliveryAddress);
+        return 주문을_생성한다(OrderType.DELIVERY, status, orderLineItems, deliveryAddress);
     }
 
     private static Order 주문을_생성한다(
-            OrderType type,
-            OrderStatus status,
-            List<OrderLineItem> orderLineItems,
-            String deliveryAddress
-    ) {
-        return 주문을_생성한다(null, type, status, orderLineItems, deliveryAddress);
-    }
-
-    private static Order 주문을_생성한다(
-            UUID id,
             OrderType type,
             OrderStatus status,
             List<OrderLineItem> orderLineItems,
             String deliveryAddress
     ) {
         var 주문 = new Order();
-        주문.setId(id);
         주문.setType(type);
         주문.setStatus(status);
-        주문.setOrderDateTime(LocalDateTime.now());
         주문.setOrderLineItems(orderLineItems);
         주문.setDeliveryAddress(deliveryAddress);
 

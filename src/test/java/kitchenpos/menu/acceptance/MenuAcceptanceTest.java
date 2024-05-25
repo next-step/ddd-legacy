@@ -38,7 +38,7 @@ public class MenuAcceptanceTest extends AcceptanceTest {
     private Product 김치찜, 공기밥, 봉골레_파스타, 토마토_파스타, 수제_마늘빵, 피클;
 
     @BeforeEach
-    void dataLoad() {
+    void dataload() {
         한식_그룹 = 메뉴_그룹을_등록한다(MenuGroupFixture.한식).as(MenuGroup.class);
         양식_그룹 = 메뉴_그룹을_등록한다(MenuGroupFixture.양식).as(MenuGroup.class);
 
