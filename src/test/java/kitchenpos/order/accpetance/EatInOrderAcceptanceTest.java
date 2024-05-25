@@ -30,6 +30,7 @@ import static kitchenpos.order.accpetance.step.OrderStep.주문_목록을_조회
 import static kitchenpos.order.accpetance.step.OrderStep.주문을_등록한다;
 import static kitchenpos.order.accpetance.step.OrderStep.주문을_수락한다;
 import static kitchenpos.order.accpetance.step.OrderStep.주문을_완료한다;
+import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블_인원수를_변경한다;
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블에_앉다;
 import static kitchenpos.ordertable.acceptance.step.OrderTableStep.테이블을_등록한다;
 import static kitchenpos.product.acceptance.step.ProductStep.제품을_등록한다;
@@ -51,6 +52,12 @@ public class EatInOrderAcceptanceTest extends AcceptanceTest {
 
         테이블_1 = 테이블을_등록한다(OrderTableFixture.테이블_1).as(OrderTable.class);
         테이블에_앉다(테이블_1.getId());
+
+        var 인원수_변경_내용 = new OrderTable();
+        인원수_변경_내용.setId(테이블_1.getId());
+        인원수_변경_내용.setNumberOfGuests(4);
+
+        테이블_인원수를_변경한다(인원수_변경_내용);
     }
 
     /**
