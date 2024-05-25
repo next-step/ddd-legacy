@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static kitchenpos.order.fixture.OrderLineItemFixture.김치찜_1인_메뉴_1개_주문;
 import static kitchenpos.order.fixture.OrderLineItemFixture.봉골레_파스타_세트_메뉴_1개_주문;
 import static kitchenpos.order.fixture.OrderLineItemFixture.봉골레_파스타_세트_메뉴_마이너스_1개_주문;
 import static kitchenpos.order.fixture.OrderLineItemFixture.숨김처리된_메뉴_1개_주문;
@@ -68,6 +69,36 @@ public class DeliveryOrderFixture {
     public static final Order 빈문자배달주소_배달주문 = 주문을_생성한다(
             List.of(토마토_파스타_단품_메뉴_1개_주문),
             ""
+    );
+
+    public static final Order 대기중인_김치찜_1인_메뉴_1개_주문 = 주문을_생성한다(
+            OrderStatus.WAITING,
+            List.of(김치찜_1인_메뉴_1개_주문),
+            "서울 금천구"
+    );
+
+    public static final Order 주문수락한_김치찜_1인_메뉴_1개_주문 = 주문을_생성한다(
+            OrderStatus.ACCEPTED,
+            List.of(김치찜_1인_메뉴_1개_주문),
+            "서울 금천구"
+    );
+
+    public static final Order 배달원에게_전달한_김치찜_1인_메뉴_1개_주문 = 주문을_생성한다(
+            OrderStatus.SERVED,
+            List.of(김치찜_1인_메뉴_1개_주문),
+            "서울 금천구"
+    );
+
+    public static final Order 배달중인_김치찜_1인_메뉴_1개_주문 = 주문을_생성한다(
+            OrderStatus.DELIVERING,
+            List.of(김치찜_1인_메뉴_1개_주문),
+            "서울 금천구"
+    );
+
+    public static final Order 배달이_끝난_김치찜_1인_메뉴_1개_주문 = 주문을_생성한다(
+            OrderStatus.DELIVERED,
+            List.of(김치찜_1인_메뉴_1개_주문),
+            "서울 금천구"
     );
 
     private static Order 주문을_생성한다(
