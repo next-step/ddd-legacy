@@ -1,27 +1,33 @@
 package stringcalculator;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+public class NonNegativeInteger {
+    private static final int INTEGER_ZERO = 0;
+    private static final String NEGATIVE_ERROR_MESSAGE = "Negative integer found: ";
+    private static final String NON_INTEGER_ERROR_MESSAGE = "Non integer found: ";
+    private int integer;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-public class NonNegativeIntegerTest {
-
-    @ParameterizedTest
-    @ValueSource(strings = {"0", "1"})
-    @DisplayName("음이 아닌 정수에 대한 초기화 작업 테스트")
-    void testValidInputs(String input) {
-        NonNegativeInteger nonNegativeInteger = NonNegativeInteger.of(input);
-        assertEquals(nonNegativeInteger.getInteger(), Integer.parseInt(input));
+    private NonNegativeInteger(int integer) {
+        this.integer = integer;
     }
 
+    public static NonNegativeInteger of(String token) {
+        try {
+            int integer = Integer.parseInt(token);
+            if (integer < INTEGER_ZERO) {
+                throw new RuntimeException(NEGATIVE_ERROR_MESSAGE + integer);
+            }
+            return new NonNegativeInteger(integer);
+        } catch (NumberFormatException e) {
+            throw new RuntimeException(NON_INTEGER_ERROR_MESSAGE + token);
+        }
+    }
 
-    @ParameterizedTest
-    @ValueSource(strings = {"-100", "-1", ""})
-    @DisplayName("허용되지 않은 정수에 대한 초기화 작업 테스트")
-    void testInValidInputs(String input) {
-        assertThrows(RuntimeException.class, () -> NonNegativeInteger.of(input));
+    public NonNegativeInteger add(NonNegativeInteger nonNegativeInteger) {
+        this.integer += nonNegativeInteger.getInteger();
+        return this;
+    }
+
+    public int getInteger() {
+        return integer;
     }
 }
