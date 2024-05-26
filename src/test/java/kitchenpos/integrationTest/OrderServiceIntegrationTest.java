@@ -210,10 +210,17 @@ public class OrderServiceIntegrationTest {
         @Test
         void 주문을_완료할_수_있다() {
             Order order = createDefaultOrder(OrderType.EAT_IN, OrderStatus.SERVED);
+            OrderTable orderTable = orderTableRepository.save(OrderTableFixture.create("테이블1", 4, true));
+            order.setOrderTable(orderTable);
+            order.setOrderTableId(orderTable.getId());
             orderRepository.save(order);
 
             Order completedOrder = orderService.complete(order.getId());
             assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+            // 매장 주문은 완료시 테이블이 비어있어야 한다.
+            assertThat(completedOrder.getOrderTable().isOccupied()).isFalse();
+            assertThat(completedOrder.getOrderTable().getNumberOfGuests()).isZero();
+
         }
 
         @Test
