@@ -66,9 +66,12 @@ class ProductServiceTest {
 
       final Product actual = productService.create(product);
 
-      assertThat(actual.getId()).isEqualTo(fakeUuidBuilder.createRandomUUID());
-      assertThat(actual.getName()).isEqualTo(HANGANG_RAMEN);
-      assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(TWENTY_THOUSANDS));
+      assertAll(
+              () -> assertThat(actual.getId()).isEqualTo(fakeUuidBuilder.createRandomUUID("SIMON")),
+              () ->       assertThat(actual.getName()).isEqualTo(HANGANG_RAMEN),
+              () ->       assertThat(actual.getPrice()).isEqualTo(BigDecimal.valueOf(TWENTY_THOUSANDS))
+      );
+
     }
 
 

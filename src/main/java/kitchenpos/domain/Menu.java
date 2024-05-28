@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
+import kitchenpos.common.UuidBuilder;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -53,7 +54,9 @@ public class Menu {
 
     public Menu() {
     }
-
+    public Menu(UuidBuilder uuidBuilder) {
+        this.id = uuidBuilder.createFixedUUID();
+    }
     public UUID getId() {
         return id;
     }

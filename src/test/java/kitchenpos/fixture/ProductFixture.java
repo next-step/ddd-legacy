@@ -8,6 +8,16 @@ import java.math.BigDecimal;
 
 public class ProductFixture {
 
+  public static Product createProduct(final String name, final long price, final UuidBuilder uuidBuilder) {
+    final UuidBuilder fakeUuidBuilder = uuidBuilder;
+    final Product product = new Product(fakeUuidBuilder);
+
+    product.setPrice(BigDecimal.valueOf(price));
+    product.setName(name);
+
+    return product;
+  }
+
   public static Product createProduct(final String name, final long price) {
     final UuidBuilder fakeUuidBuilder = new FakeUuidBuilder();
     final Product product = new Product(fakeUuidBuilder);

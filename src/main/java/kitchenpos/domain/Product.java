@@ -23,7 +23,7 @@ public class Product {
     private BigDecimal price;
 
     public Product(UuidBuilder uuidBuilder) {
-        id = uuidBuilder.createRandomUUID();
+        id = uuidBuilder.createRandomUUID("SIMON");
     }
     public Product() {
     }

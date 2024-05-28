@@ -3,5 +3,7 @@ package kitchenpos.common;
 import java.util.UUID;
 
 public interface UuidBuilder {
-  public UUID createRandomUUID();
+  UUID createRandomUUID(String name);
+
+  UUID createFixedUUID();
 }
