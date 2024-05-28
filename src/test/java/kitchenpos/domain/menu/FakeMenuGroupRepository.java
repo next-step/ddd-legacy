@@ -13,7 +13,8 @@ public class FakeMenuGroupRepository implements MenuGroupRepository {
 
   @Override
   public MenuGroup save(MenuGroup menuGroup) {
-    return menuGroups.put(menuGroup.getId(), menuGroup);
+    menuGroups.put(menuGroup.getId(), menuGroup);
+    return menuGroup;
   }
 
   @Override
