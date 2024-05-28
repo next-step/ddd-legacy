@@ -14,4 +14,8 @@ public class ProductFixture {
         product.setPrice(price);
         return product;
     }
+
+    public static Product 후라이드치킨_16000원_상품() {
+        return ProductFixture.create("후라이드 치킨", BigDecimal.valueOf(16000));
+    }
 }

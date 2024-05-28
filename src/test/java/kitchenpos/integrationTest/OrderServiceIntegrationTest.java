@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -30,15 +31,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceIntegrationTest {
     private OrderService orderService;
-
     private MenuGroupRepository menuGroupRepository;
-
     private MenuRepository menuRepository;
-
     private OrderTableRepository orderTableRepository;
-
     private OrderRepository orderRepository;
-
     @Mock
     private KitchenridersClient kitchenridersClient;
 
@@ -52,11 +48,11 @@ public class OrderServiceIntegrationTest {
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
-    private Order createDefaultOrder(OrderType orderType, OrderStatus orderStatus) {
+    private Order createDefaultEatInOrder(OrderStatus orderStatus) {
         MenuGroup menuGroup = MenuGroupFixture.create("치킨");
         menuGroupRepository.save(menuGroup);
 
-        Product product = ProductFixture.create("후라이드 치킨", BigDecimal.valueOf(16000));
+        Product product = ProductFixture.후라이드치킨_16000원_상품();
         MenuProduct menuProduct = MenuProductFixture.create(product, 1, product.getId());
 
         Menu menu = MenuFixture.create("후라이드 치킨", BigDecimal.valueOf(16000), true, menuGroup, List.of(menuProduct));
@@ -64,28 +60,63 @@ public class OrderServiceIntegrationTest {
 
         OrderLineItem orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
 
-        OrderTable orderTable = orderType == OrderType.EAT_IN ? OrderTableFixture.create("테이블1", 4, true) : null;
+        OrderTable orderTable = OrderTableFixture.create("테이블1", 4, true);
+        UUID orderTableId = orderTableRepository.save(orderTable).getId();
+        orderTable.setId(orderTableId);
 
-        if (orderTable != null) {
-            UUID orderTableId = orderTableRepository.save(orderTable).getId();
-            orderTable.setId(orderTableId);
-        }
-
-        return OrderFixture.create(orderType, orderStatus, LocalDateTime.now(), List.of(orderLineItem),
-                orderType == OrderType.DELIVERY ? "서울시 강남구" : null, orderTable);
+        return OrderFixture.create(OrderType.EAT_IN, orderStatus, LocalDateTime.now(), List.of(orderLineItem), null, orderTable);
     }
 
+    private Order createDefaultTakeOutOrder(OrderStatus orderStatus) {
+        MenuGroup menuGroup = MenuGroupFixture.create("치킨");
+        menuGroupRepository.save(menuGroup);
+
+        Product product = ProductFixture.후라이드치킨_16000원_상품();
+        MenuProduct menuProduct = MenuProductFixture.create(product, 1, product.getId());
+
+        Menu menu = MenuFixture.create("후라이드 치킨", BigDecimal.valueOf(16000), true, menuGroup, List.of(menuProduct));
+        menuRepository.save(menu);
+
+        OrderLineItem orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
+
+        return OrderFixture.create(OrderType.TAKEOUT, orderStatus, LocalDateTime.now(), List.of(orderLineItem), null, null);
+    }
+
+    private Order createDefaultDeliveryOrder(OrderStatus orderStatus) {
+        MenuGroup menuGroup = MenuGroupFixture.create("치킨");
+        menuGroupRepository.save(menuGroup);
+
+        Product product = ProductFixture.후라이드치킨_16000원_상품();
+        MenuProduct menuProduct = MenuProductFixture.create(product, 1, product.getId());
+
+        Menu menu = MenuFixture.create("후라이드 치킨", BigDecimal.valueOf(16000), true, menuGroup, List.of(menuProduct));
+        menuRepository.save(menu);
+
+        OrderLineItem orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
+
+        return OrderFixture.create(OrderType.DELIVERY, orderStatus, LocalDateTime.now(), List.of(orderLineItem), "서울시 강남구", null);
+    }
+
+    private Stream<Order> getDefaultOrders(OrderStatus orderStatus) {
+        Order o1 = createDefaultEatInOrder(orderStatus);
+        orderRepository.save(o1);
+        Order o2 = createDefaultTakeOutOrder(orderStatus);
+        orderRepository.save(o2);
+        Order o3 = createDefaultDeliveryOrder(orderStatus);
+        orderRepository.save(o3);
+
+        return Stream.of(o1, o2, o3);
+    }
 
     @Nested
     class CommonExceptionTests {
-        @ParameterizedTest
-        @EnumSource(OrderType.class)
-        void 주문을_승인할_수_있다(OrderType orderType) {
-            Order order = createDefaultOrder(orderType, OrderStatus.WAITING);
-            orderRepository.save(order);
-
-            Order acceptedOrder = orderService.accept(order.getId());
-            assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+        @Test
+        void 주문을_승인할_수_있다() {
+            getDefaultOrders(OrderStatus.WAITING)
+                    .forEach(o -> {
+                        Order acceptedOrder = orderService.accept(o.getId());
+                        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+                    });
         }
 
         @Test
@@ -94,14 +125,13 @@ public class OrderServiceIntegrationTest {
                     .isInstanceOf(NoSuchElementException.class);
         }
 
-        @ParameterizedTest
-        @EnumSource(OrderType.class)
-        void 주문을_서빙할_수_있다(OrderType orderType) {
-            Order order = createDefaultOrder(orderType, OrderStatus.ACCEPTED);
-            orderRepository.save(order);
-
-            Order servedOrder = orderService.serve(order.getId());
-            assertThat(servedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+        @Test
+        void 주문을_서빙할_수_있다() {
+            getDefaultOrders(OrderStatus.ACCEPTED)
+                    .forEach(order -> {
+                        Order acceptedOrder = orderService.serve(order.getId());
+                        assertThat(acceptedOrder.getStatus()).isEqualTo(OrderStatus.SERVED);
+                    });
         }
 
         @Test
@@ -110,13 +140,14 @@ public class OrderServiceIntegrationTest {
                     .isInstanceOf(NoSuchElementException.class);
         }
 
+
         @ParameterizedTest
         @EnumSource(OrderType.class)
         void 메뉴가_표시되지_않으면_주문_생성_실패(OrderType orderType) {
             MenuGroup menuGroup = MenuGroupFixture.create("치킨");
             menuGroupRepository.save(menuGroup);
 
-            Product product = ProductFixture.create("후라이드 치킨", BigDecimal.valueOf(16000));
+            Product product = ProductFixture.후라이드치킨_16000원_상품();
             MenuProduct menuProduct = MenuProductFixture.create(product, 1, product.getId());
 
             Menu menu = MenuFixture.create("후라이드 치킨", BigDecimal.valueOf(16000), false, menuGroup, List.of(menuProduct));
@@ -132,25 +163,24 @@ public class OrderServiceIntegrationTest {
         }
 
 
-        @ParameterizedTest
-        @EnumSource(OrderType.class)
-        void 가격이_일치하지_않는_메뉴로_주문_생성_실패(OrderType orderType) {
-            Order order = createDefaultOrder(orderType, OrderStatus.WAITING);
-            order.getOrderLineItems().get(0).setPrice(BigDecimal.valueOf(9999));
-
-            assertThatThrownBy(() -> orderService.create(order))
-                    .isInstanceOf(IllegalArgumentException.class);
+        @Test
+        void 가격이_일치하지_않는_메뉴로_주문_생성_실패() {
+            getDefaultOrders(OrderStatus.WAITING)
+                    .forEach(order -> {
+                        order.getOrderLineItems().get(0).setPrice(BigDecimal.valueOf(9999));
+                        assertThatThrownBy(() -> orderService.create(order))
+                                .isInstanceOf(IllegalArgumentException.class);
+                    });
         }
 
-        @ParameterizedTest
-        @EnumSource(OrderType.class)
-        void 잘못된_메뉴로_주문_생성_실패(OrderType orderType) {
-            Order order = createDefaultOrder(orderType, OrderStatus.WAITING);
-            order.getOrderLineItems().get(0).setMenuId(UUID.randomUUID());
-            order.getOrderLineItems().get(0).setPrice(BigDecimal.valueOf(9999));
-
-            assertThatThrownBy(() -> orderService.create(order))
-                    .isInstanceOf(IllegalArgumentException.class);
+        @Test
+        void 잘못된_메뉴로_주문_생성_실패() {
+            getDefaultOrders(OrderStatus.WAITING)
+                    .forEach(order -> {
+                        order.getOrderLineItems().get(0).setMenuId(UUID.randomUUID());
+                        assertThatThrownBy(() -> orderService.create(order))
+                                .isInstanceOf(IllegalArgumentException.class);
+                    });
         }
     }
 
@@ -158,7 +188,7 @@ public class OrderServiceIntegrationTest {
     class TakeOutOrders {
         @Test
         void 주문을_생성할_수_있다() {
-            Order order = createDefaultOrder(OrderType.TAKEOUT, OrderStatus.WAITING);
+            Order order = createDefaultTakeOutOrder(OrderStatus.WAITING);
             Order createdOrder = orderService.create(order);
 
             assertThat(createdOrder.getId()).isNotNull();
@@ -172,7 +202,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 주문을_완료할_수_있다() {
-            Order order = createDefaultOrder(OrderType.TAKEOUT, OrderStatus.SERVED);
+            Order order = createDefaultTakeOutOrder(OrderStatus.SERVED);
             orderRepository.save(order);
 
             Order completedOrder = orderService.complete(order.getId());
@@ -181,7 +211,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 서빙_상태가_아닌_주문_완료_실패() {
-            Order order = createDefaultOrder(OrderType.TAKEOUT, OrderStatus.ACCEPTED);
+            Order order = createDefaultTakeOutOrder(OrderStatus.ACCEPTED);
             orderRepository.save(order);
 
             assertThatThrownBy(() -> orderService.complete(order.getId()))
@@ -194,7 +224,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 주문을_생성할_수_있다() {
-            Order order = createDefaultOrder(OrderType.EAT_IN, OrderStatus.WAITING);
+            Order order = createDefaultEatInOrder(OrderStatus.WAITING);
             Order createdOrder = orderService.create(order);
 
             assertThat(createdOrder.getId()).isNotNull();
@@ -209,7 +239,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 주문을_완료할_수_있다() {
-            Order order = createDefaultOrder(OrderType.EAT_IN, OrderStatus.SERVED);
+            Order order = createDefaultEatInOrder(OrderStatus.SERVED);
             OrderTable orderTable = orderTableRepository.save(OrderTableFixture.create("테이블1", 4, true));
             order.setOrderTable(orderTable);
             order.setOrderTableId(orderTable.getId());
@@ -225,7 +255,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 서빙_상태가_아닌_주문_완료_실패() {
-            Order order = createDefaultOrder(OrderType.EAT_IN, OrderStatus.ACCEPTED);
+            Order order = createDefaultEatInOrder(OrderStatus.ACCEPTED);
             orderRepository.save(order);
 
             assertThatThrownBy(() -> orderService.complete(order.getId()))
@@ -234,7 +264,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 매장_주문은_메뉴의_수가_음수가_될_수_있음() {
-            Order order = createDefaultOrder(OrderType.EAT_IN, OrderStatus.WAITING);
+            Order order = createDefaultEatInOrder(OrderStatus.WAITING);
             order.getOrderLineItems().get(0).setQuantity(-1);
 
             Order createOrder = orderService.create(order);
@@ -246,7 +276,7 @@ public class OrderServiceIntegrationTest {
     class DeliveryOrders {
         @Test
         void 주문을_생성할_수_있다() {
-            Order order = createDefaultOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            Order order = createDefaultDeliveryOrder(OrderStatus.WAITING);
             Order createdOrder = orderService.create(order);
 
             assertThat(createdOrder.getId()).isNotNull();
@@ -261,7 +291,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 잘못된_배달_주소로_주문_생성_실패() {
-            Order order = createDefaultOrder(OrderType.DELIVERY, OrderStatus.WAITING);
+            Order order = createDefaultDeliveryOrder(OrderStatus.WAITING);
             order.setDeliveryAddress(null);
 
             assertThatThrownBy(() -> orderService.create(order))
@@ -270,7 +300,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 배달_주문을_시작할_수_있다() {
-            Order order = createDefaultOrder(OrderType.DELIVERY, OrderStatus.SERVED);
+            Order order = createDefaultDeliveryOrder(OrderStatus.SERVED);
             orderRepository.save(order);
 
             Order deliveringOrder = orderService.startDelivery(order.getId());
@@ -279,7 +309,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 배달_상태가_아닌_주문_실패() {
-            Order order = createDefaultOrder(OrderType.EAT_IN, OrderStatus.SERVED);
+            Order order = createDefaultDeliveryOrder(OrderStatus.WAITING);
             orderRepository.save(order);
 
             assertThatThrownBy(() -> orderService.startDelivery(order.getId()))
@@ -288,7 +318,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 배달을_완료할_수_있다() {
-            Order order = createDefaultOrder(OrderType.DELIVERY, OrderStatus.DELIVERING);
+            Order order = createDefaultDeliveryOrder(OrderStatus.DELIVERING);
             orderRepository.save(order);
 
             Order deliveredOrder = orderService.completeDelivery(order.getId());
@@ -297,7 +327,7 @@ public class OrderServiceIntegrationTest {
 
         @Test
         void 배달_완료_상태가_아닌_주문_완료_실패() {
-            Order order = createDefaultOrder(OrderType.DELIVERY, OrderStatus.ACCEPTED);
+            Order order = createDefaultDeliveryOrder(OrderStatus.ACCEPTED);
             orderRepository.save(order);
 
             assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
