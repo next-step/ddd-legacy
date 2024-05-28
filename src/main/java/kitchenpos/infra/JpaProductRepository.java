@@ -1,6 +1,8 @@
-package kitchenpos.domain;
+package kitchenpos.infra;
 
 import jakarta.annotation.Nonnull;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
