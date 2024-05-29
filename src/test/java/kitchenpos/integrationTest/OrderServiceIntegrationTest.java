@@ -3,19 +3,18 @@ package kitchenpos.integrationTest;
 import kitchenpos.application.OrderService;
 import kitchenpos.domain.*;
 import kitchenpos.fixtures.*;
-import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.infra.FakeRidersClient;
+import kitchenpos.infra.RidersClient;
 import kitchenpos.repository.InMemoryMenuGroupRepository;
 import kitchenpos.repository.InMemoryMenuRepository;
 import kitchenpos.repository.InMemoryOrderRepository;
 import kitchenpos.repository.InMemoryOrderTableRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,17 +25,17 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 
-@ExtendWith(MockitoExtension.class)
 public class OrderServiceIntegrationTest {
     private OrderService orderService;
     private MenuGroupRepository menuGroupRepository;
     private MenuRepository menuRepository;
     private OrderTableRepository orderTableRepository;
     private OrderRepository orderRepository;
-    @Mock
-    private KitchenridersClient kitchenridersClient;
+
+    private RidersClient kitchenridersClient;
 
 
     @BeforeEach
@@ -45,20 +44,21 @@ public class OrderServiceIntegrationTest {
         menuGroupRepository = new InMemoryMenuGroupRepository();
         orderTableRepository = new InMemoryOrderTableRepository();
         orderRepository = new InMemoryOrderRepository();
+        kitchenridersClient = new FakeRidersClient();
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
     }
 
     private Order createDefaultEatInOrder(OrderStatus orderStatus) {
-        MenuGroup menuGroup = MenuGroupFixture.create("치킨");
+        MenuGroup menuGroup = MenuGroupFixture.치킨_메뉴그룹();
         menuGroupRepository.save(menuGroup);
 
         Product product = ProductFixture.후라이드치킨_16000원_상품();
         MenuProduct menuProduct = MenuProductFixture.create(product, 1, product.getId());
 
-        Menu menu = MenuFixture.create("후라이드 치킨", BigDecimal.valueOf(16000), true, menuGroup, List.of(menuProduct));
+        Menu menu = MenuFixture.create("후라이드 치킨 단품", BigDecimal.valueOf(16000), true, menuGroup, List.of(menuProduct));
         menuRepository.save(menu);
 
-        OrderLineItem orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
+        OrderLineItem orderLineItem = OrderLineItemFixture.단일메뉴_주문품목(menu);
 
         OrderTable orderTable = OrderTableFixture.create("테이블1", 4, true);
         UUID orderTableId = orderTableRepository.save(orderTable).getId();
@@ -68,31 +68,31 @@ public class OrderServiceIntegrationTest {
     }
 
     private Order createDefaultTakeOutOrder(OrderStatus orderStatus) {
-        MenuGroup menuGroup = MenuGroupFixture.create("치킨");
+        MenuGroup menuGroup = MenuGroupFixture.치킨_메뉴그룹();
         menuGroupRepository.save(menuGroup);
 
         Product product = ProductFixture.후라이드치킨_16000원_상품();
         MenuProduct menuProduct = MenuProductFixture.create(product, 1, product.getId());
 
-        Menu menu = MenuFixture.create("후라이드 치킨", BigDecimal.valueOf(16000), true, menuGroup, List.of(menuProduct));
+        Menu menu = MenuFixture.create("후라이드 치킨 단품", BigDecimal.valueOf(16000), true, menuGroup, List.of(menuProduct));
         menuRepository.save(menu);
 
-        OrderLineItem orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
+        OrderLineItem orderLineItem = OrderLineItemFixture.단일메뉴_주문품목(menu);
 
         return OrderFixture.create(OrderType.TAKEOUT, orderStatus, LocalDateTime.now(), List.of(orderLineItem), null, null);
     }
 
     private Order createDefaultDeliveryOrder(OrderStatus orderStatus) {
-        MenuGroup menuGroup = MenuGroupFixture.create("치킨");
+        MenuGroup menuGroup = MenuGroupFixture.치킨_메뉴그룹();
         menuGroupRepository.save(menuGroup);
 
         Product product = ProductFixture.후라이드치킨_16000원_상품();
         MenuProduct menuProduct = MenuProductFixture.create(product, 1, product.getId());
 
-        Menu menu = MenuFixture.create("후라이드 치킨", BigDecimal.valueOf(16000), true, menuGroup, List.of(menuProduct));
+        Menu menu = MenuFixture.create("후라이드 치킨 단품", BigDecimal.valueOf(16000), true, menuGroup, List.of(menuProduct));
         menuRepository.save(menu);
 
-        OrderLineItem orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
+        OrderLineItem orderLineItem = OrderLineItemFixture.단일메뉴_주문품목(menu);
 
         return OrderFixture.create(OrderType.DELIVERY, orderStatus, LocalDateTime.now(), List.of(orderLineItem), "서울시 강남구", null);
     }
@@ -109,7 +109,8 @@ public class OrderServiceIntegrationTest {
     }
 
     @Nested
-    class CommonExceptionTests {
+    @DisplayName("주문 타입 공통 테스트")
+    class CommonOrderTests {
         @Test
         void 주문을_승인할_수_있다() {
             getDefaultOrders(OrderStatus.WAITING)
@@ -144,16 +145,16 @@ public class OrderServiceIntegrationTest {
         @ParameterizedTest
         @EnumSource(OrderType.class)
         void 메뉴가_표시되지_않으면_주문_생성_실패(OrderType orderType) {
-            MenuGroup menuGroup = MenuGroupFixture.create("치킨");
+            MenuGroup menuGroup = MenuGroupFixture.치킨_메뉴그룹();
             menuGroupRepository.save(menuGroup);
 
             Product product = ProductFixture.후라이드치킨_16000원_상품();
             MenuProduct menuProduct = MenuProductFixture.create(product, 1, product.getId());
 
-            Menu menu = MenuFixture.create("후라이드 치킨", BigDecimal.valueOf(16000), false, menuGroup, List.of(menuProduct));
+            Menu menu = MenuFixture.create("후라이드 치킨 단품", BigDecimal.valueOf(16000), false, menuGroup, List.of(menuProduct));
             menuRepository.save(menu);
 
-            OrderLineItem orderLineItem = OrderLineItemFixture.create(menu, menu.getPrice(), 1);
+            OrderLineItem orderLineItem = OrderLineItemFixture.단일메뉴_주문품목(menu);
 
             Order order = OrderFixture.create(orderType, OrderStatus.WAITING, LocalDateTime.now(), List.of(orderLineItem),
                     null, null);
@@ -184,6 +185,7 @@ public class OrderServiceIntegrationTest {
         }
     }
 
+    @DisplayName("포장 주문")
     @Nested
     class TakeOutOrders {
         @Test
@@ -191,13 +193,15 @@ public class OrderServiceIntegrationTest {
             Order order = createDefaultTakeOutOrder(OrderStatus.WAITING);
             Order createdOrder = orderService.create(order);
 
-            assertThat(createdOrder.getId()).isNotNull();
-            assertThat(createdOrder.getStatus()).isEqualTo(OrderStatus.WAITING);
-            assertThat(createdOrder.getOrderLineItems()).hasSize(1);
-            // 포장 주문은 테이블이 없으므로 null
-            assertThat(createdOrder.getOrderTable()).isNull();
-            // 포장 주문은 주소가 없으므로 null
-            assertThat(createdOrder.getDeliveryAddress()).isNull();
+            assertAll(
+                    () -> assertThat(createdOrder.getId()).isNotNull(),
+                    () -> assertThat(createdOrder.getStatus()).isEqualTo(OrderStatus.WAITING),
+                    () -> assertThat(createdOrder.getOrderLineItems()).hasSize(1),
+                    // 포장 주문은 테이블이 없으므로 null
+                    () -> assertThat(createdOrder.getOrderTable()).isNull(),
+                    // 포장 주문은 주소가 없으므로 null
+                    () -> assertThat(createdOrder.getDeliveryAddress()).isNull()
+            );
         }
 
         @Test
@@ -219,6 +223,7 @@ public class OrderServiceIntegrationTest {
         }
     }
 
+    @DisplayName("매장식사 주문")
     @Nested
     class EatInOrders {
 
@@ -227,14 +232,17 @@ public class OrderServiceIntegrationTest {
             Order order = createDefaultEatInOrder(OrderStatus.WAITING);
             Order createdOrder = orderService.create(order);
 
-            assertThat(createdOrder.getId()).isNotNull();
-            assertThat(createdOrder.getStatus()).isEqualTo(OrderStatus.WAITING);
-            assertThat(createdOrder.getOrderLineItems()).hasSize(1);
-            // 매장 주문은 테이블이 있다.
-            assertThat(createdOrder.getOrderTable()).isNotNull();
-            assertThat(createdOrder.getOrderTableId()).isNotNull();
-            // 매장 주문은 주소가 없다.
-            assertThat(createdOrder.getDeliveryAddress()).isNull();
+
+            assertAll(
+                    () -> assertThat(createdOrder.getId()).isNotNull(),
+                    () -> assertThat(createdOrder.getStatus()).isEqualTo(OrderStatus.WAITING),
+                    () -> assertThat(createdOrder.getOrderLineItems()).hasSize(1),
+                    // 매장 주문은 테이블이 있다.
+                    () -> assertThat(createdOrder.getOrderTable()).isNotNull(),
+                    () -> assertThat(createdOrder.getOrderTableId()).isNotNull(),
+                    // 매장 주문은 주소가 없다.
+                    () -> assertThat(createdOrder.getDeliveryAddress()).isNull()
+            );
         }
 
         @Test
@@ -246,11 +254,13 @@ public class OrderServiceIntegrationTest {
             orderRepository.save(order);
 
             Order completedOrder = orderService.complete(order.getId());
-            assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-            // 매장 주문은 완료시 테이블이 비어있어야 한다.
-            assertThat(completedOrder.getOrderTable().isOccupied()).isFalse();
-            assertThat(completedOrder.getOrderTable().getNumberOfGuests()).isZero();
-
+            assertAll(
+                    () -> assertThat(completedOrder.getId()).isNotNull(),
+                    () -> assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED),
+                    // 매장 주문은 완료시 테이블이 비어있어야 한다.
+                    () -> assertThat(completedOrder.getOrderTable().isOccupied()).isFalse(),
+                    () -> assertThat(completedOrder.getOrderTable().getNumberOfGuests()).isZero()
+            );
         }
 
         @Test
@@ -272,6 +282,7 @@ public class OrderServiceIntegrationTest {
         }
     }
 
+    @DisplayName("배달 주문")
     @Nested
     class DeliveryOrders {
         @Test
@@ -279,13 +290,15 @@ public class OrderServiceIntegrationTest {
             Order order = createDefaultDeliveryOrder(OrderStatus.WAITING);
             Order createdOrder = orderService.create(order);
 
-            assertThat(createdOrder.getId()).isNotNull();
-            assertThat(createdOrder.getStatus()).isEqualTo(OrderStatus.WAITING);
-            assertThat(createdOrder.getOrderLineItems()).hasSize(1);
-            // 배달 주문은 테이블이 없다.
-            assertThat(createdOrder.getOrderTable()).isNull();
-            // 배달 주문은 주소가 있다.
-            assertThat(createdOrder.getDeliveryAddress()).isNotNull();
+            assertAll(
+                    () -> assertThat(createdOrder.getId()).isNotNull(),
+                    () -> assertThat(createdOrder.getStatus()).isEqualTo(OrderStatus.WAITING),
+                    () -> assertThat(createdOrder.getOrderLineItems()).hasSize(1),
+                    // 배달 주문은 테이블이 없다.
+                    () -> assertThat(createdOrder.getOrderTable()).isNull(),
+                    // 배달 주문은 주소가 있다.
+                    () -> assertThat(createdOrder.getDeliveryAddress()).isNotNull()
+            );
         }
 
 
@@ -333,6 +346,5 @@ public class OrderServiceIntegrationTest {
             assertThatThrownBy(() -> orderService.completeDelivery(order.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
-
     }
 }

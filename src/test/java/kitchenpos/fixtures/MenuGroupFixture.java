@@ -12,4 +12,8 @@ public class MenuGroupFixture {
         menuGroup.setName(name);
         return menuGroup;
     }
+
+    public static MenuGroup 치킨_메뉴그룹() {
+        return create("치킨");
+    }
 }

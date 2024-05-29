@@ -17,4 +17,8 @@ public class OrderLineItemFixture {
         orderLineItem.setQuantity(quantity);
         return orderLineItem;
     }
+
+    public static OrderLineItem 단일메뉴_주문품목(Menu menu) {
+        return create(menu, menu.getPrice(), 1);
+    }
 }
