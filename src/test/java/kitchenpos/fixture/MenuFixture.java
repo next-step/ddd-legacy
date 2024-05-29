@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class MenuFixture {
+
   public static Menu createMenu(final String name, final long price, final MenuGroup menuGroup, final Product product, final int quantity) {
     Menu menu = new Menu(new FakeUuidBuilder());
     menu.setName(name);
