@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.List;
 import kitchenpos.application.MenuGroupService;
+import kitchenpos.application.fixture.MenuGroupFixture;
 import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,35 +26,30 @@ class MenuGroupServiceTest {
   @DisplayName("메뉴그룹을 등록할 수 있다.")
   @Test
   public void register() {
-    MenuGroup request = new MenuGroup();
-    request.setName("메뉴그룹");
-    MenuGroup menuGroup = menuGroupService.create(request);
+    MenuGroup menuGroup = MenuGroupFixture.normal();
+    menuGroup = menuGroupService.create(menuGroup);
     assertThat(menuGroup).isNotNull();
   }
 
-  @DisplayName("메뉴그룹명이 1자 미만일 경우 IllegalArgumentException 예외 처리를 한다.")
+  @DisplayName("메뉴그룹명은 1자 이상이어야한다.")
   @NullAndEmptySource
   @ParameterizedTest
   public void InvalidateMenuGroupName(String name) {
-    MenuGroup request = new MenuGroup();
-    request.setName(name);
+    MenuGroup menuGroup = MenuGroupFixture.create(name);
     assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> menuGroupService.create(request));
+        .isThrownBy(() -> menuGroupService.create(menuGroup));
   }
 
   @DisplayName("등록된 메뉴그룹 전체를 조회할 수 있다.")
   @Test
   public void InvalidateMenuGroupName() {
-    MenuGroup menuGroup1 = new MenuGroup();
-    menuGroup1.setName("그룹1");
-    MenuGroup menuGroup2 = new MenuGroup();
-    menuGroup2.setName("그룹2");
-
-    menuGroupService.create(menuGroup1);
-    menuGroupService.create(menuGroup2);
+    int saveSize = 5;
+    List<MenuGroup> requestList = MenuGroupFixture.createList(saveSize);
+    for (MenuGroup request : requestList) {
+      menuGroupService.create(request);
+    }
     List<MenuGroup> menuGroups = menuGroupService.findAll();
-
-    assertThat(menuGroups).hasSize(2);
+    assertThat(menuGroups).hasSize(saveSize);
   }
 
 }
