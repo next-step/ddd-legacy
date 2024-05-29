@@ -33,8 +33,8 @@ public class FakeOrderRepository implements OrderRepository {
   public boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status) {
     return orders.values()
             .stream()
-            .anyMatch(order -> order.getOrderTable().getId().equals(orderTable)
-                    && order.getStatus().equals(status));
+            .anyMatch(order -> order.getOrderTable().getId().equals(orderTable.getId())
+                    && !order.getStatus().equals(status));
 
   }
 }

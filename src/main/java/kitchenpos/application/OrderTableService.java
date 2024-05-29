@@ -48,6 +48,7 @@ public class OrderTableService {
     public OrderTable clear(final UUID orderTableId) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
+        boolean abc = orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED);
         if (orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)) {
             throw new IllegalStateException();
         }

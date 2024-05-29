@@ -10,6 +10,7 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
 import kitchenpos.infra.DefaultKitchenridersClient;
+import kitchenpos.infra.KitchenridersClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,13 +27,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final OrderTableRepository orderTableRepository;
-    private final DefaultKitchenridersClient defaultKitchenridersClient;
+    private final KitchenridersClient defaultKitchenridersClient;
 
     public OrderService(
         final OrderRepository orderRepository,
         final MenuRepository menuRepository,
         final OrderTableRepository orderTableRepository,
-        final DefaultKitchenridersClient defaultKitchenridersClient
+        final KitchenridersClient defaultKitchenridersClient
     ) {
         this.orderRepository = orderRepository;
         this.menuRepository = menuRepository;
