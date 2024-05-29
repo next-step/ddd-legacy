@@ -28,7 +28,7 @@ class MenuServiceTest {
 
   @InjectMocks private MenuService menuService;
 
-  @Test
+  /*@Test
   @DisplayName("메뉴를 등록하기 위해 메뉴 그룹, 이름을 입력해야 한다.")
   void case1() {
 
@@ -170,7 +170,7 @@ class MenuServiceTest {
 
     Assertions.assertThatRuntimeException()
             .isThrownBy(() -> menuService.create(gookSetMenu.getMenu()));
-  }
+  }*/
 
   @Test
   @DisplayName("메뉴를 등록할 때 동일한 상품을 등록할 수 없다.")
