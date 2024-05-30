@@ -14,7 +14,9 @@ public class StringCalculator {
         List<NonNegativeInteger> nonNegativeIntegers = parser.getIntegerTokens(text);
 
         return nonNegativeIntegers.stream()
-                .mapToInt(NonNegativeInteger::getInteger)
-                .sum();
+                .reduce(NonNegativeInteger::add)
+                .orElseThrow(() -> new IllegalStateException("The list of NonNegativeIntegers cannot be empty"))
+                .getInteger();
+
     }
 }
