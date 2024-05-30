@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class FakeOrderRepository implements OrderRepository {
+
   private final HashMap<UUID, Order> orders = new HashMap<>();
 
   @Override
@@ -25,16 +26,19 @@ public class FakeOrderRepository implements OrderRepository {
   @Override
   public List<Order> findAll() {
     return orders.values()
-            .stream()
-            .toList();
+        .stream()
+        .toList();
   }
 
   @Override
   public boolean existsByOrderTableAndStatusNot(OrderTable orderTable, OrderStatus status) {
     return orders.values()
-            .stream()
-            .anyMatch(order -> order.getOrderTable().getId().equals(orderTable.getId())
-                    && !order.getStatus().equals(status));
+        .stream()
+        .filter(
+            order -> order.getType() == OrderType.EAT_IN
+        )
+        .anyMatch(order -> order.getOrderTable().getId().equals(orderTable.getId())
+            && !order.getStatus().equals(status));
 
   }
 }
