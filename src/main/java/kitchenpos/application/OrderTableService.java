@@ -37,9 +37,16 @@ public class OrderTableService {
     }
 
     @Transactional
-    public OrderTable sit(final UUID orderTableId) {
+    public OrderTable sit(final UUID orderTableId, int numberOfGuests) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
+        if (numberOfGuests < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (orderTable.isOccupied()) {
+            throw new IllegalStateException();
+        }
+        orderTable.setNumberOfGuests(numberOfGuests);
         orderTable.setOccupied(true);
         return orderTable;
     }
