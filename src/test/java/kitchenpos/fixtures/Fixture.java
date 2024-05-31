@@ -46,6 +46,7 @@ public class Fixture {
         menu.setMenuGroupId(UUID.randomUUID());
         menu.setMenuGroup(Fixture.fixtureMenuGroup());
         menu.setMenuProducts(Fixture.fixtureMenuProducts());
+        menu.setDisplayed(true);
         return menu;
     }
 
