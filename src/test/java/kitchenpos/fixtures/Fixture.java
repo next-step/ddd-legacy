@@ -66,7 +66,7 @@ public class Fixture {
         orderLineItem.setMenu(menu);
         orderLineItem.setMenuId(menu.getMenuGroupId());
         orderLineItem.setQuantity(1);
-        orderLineItem.setPrice(BigDecimal.valueOf(30_000L));
+        orderLineItem.setPrice(BigDecimal.valueOf(28_000L));
         return orderLineItem;
     }
 
