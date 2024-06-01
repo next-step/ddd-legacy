@@ -3,7 +3,7 @@ package kitchenpos.application;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
-import kitchenpos.fixtures.Fixture;
+import kitchenpos.fixtures.FixtureOrder;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName(value = "주문테이블을 생성하기 위해 이름을 입력해야 한다.")
     void case1() {
-        final OrderTable orderTable = Fixture.fixtureOrderTable();
+        final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
 
         BDDMockito.given(orderTableRepository.save(any())).willReturn(orderTable);
 
@@ -38,7 +38,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName(value = "주문테이블의 자리가 비어있도록 생성된다.")
     void case2() {
-        final OrderTable orderTable = Fixture.fixtureOrderTable();
+        final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
 
         BDDMockito.given(orderTableRepository.save(any())).willReturn(orderTable);
 
@@ -49,7 +49,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName(value = "주문테이블을 사용하기 위해 주문테이블이 존재해야 한다.")
     void case3() {
-        final OrderTable orderTable = Fixture.fixtureOrderTable();
+        final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
 
         BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
@@ -60,7 +60,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName(value = "주문테이블의 자리를 고객이 앉도록 설정한다.")
     void case4() {
-        final OrderTable orderTable = Fixture.fixtureOrderTable();
+        final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
 
         BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
@@ -71,7 +71,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName(value = "주문테이블에 앉은 인원을 입력하기 위해 주문테이블이 존재해야 한다.")
     void case5() {
-        final OrderTable orderTable = Fixture.fixtureOrderTable();
+        final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
 
         BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
@@ -82,7 +82,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName(value = "주문테이블에 앉은 인원을 입력하기 위해 1명 이상은 있어야 한다.")
     void case6() {
-        final OrderTable orderTable = Fixture.fixtureOrderTable();
+        final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
 
         BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
@@ -93,7 +93,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName(value = "주문테이블에 앉은 인원을 입력하기 위해 자리가 비어있어야 한다.")
     void case7() {
-        final OrderTable orderTable = Fixture.fixtureOrderTable();
+        final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
         orderTable.setOccupied(true);
 
         BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
@@ -105,7 +105,7 @@ class OrderTableServiceTest {
     @Test
     @DisplayName(value = "주문테이블을 청소하기 위해 주문테이블이 존재해야 한다, 주문테이블을 청소하기 위해 주문이 {완료} 되어야 한다.")
     void case8() {
-        final OrderTable orderTable = Fixture.fixtureOrderTable();
+        final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
         orderTable.setOccupied(true);
         orderTable.setNumberOfGuests(5);
 
