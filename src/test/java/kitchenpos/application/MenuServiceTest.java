@@ -67,15 +67,25 @@ class MenuServiceTest {
         .isThrownBy(() -> menuService.create(menu));
   }
 
-  @ParameterizedTest
-  @NullSource
-  @ValueSource(longs = {-1})
-  @DisplayName("메뉴를 등록하기 위해 금액을 입력하지 않았거나 또는 0원 밑으로 입력할 수 없다.")
-  void case3(Long value) {
+  @Test
+  @DisplayName("메뉴를 등록하기 위해 금액을 입력하지 않았다.")
+  void case3() {
     final Menu menu = FixtureMenu.fixtureMenu();
 
     menu.setName("닭다리");
-    menu.setPrice(value == null ? null : BigDecimal.valueOf(value));
+    menu.setPrice(null);
+
+    Assertions.assertThatIllegalArgumentException()
+            .isThrownBy(() -> menuService.create(menu));
+  }
+
+  @Test
+  @DisplayName("메뉴를 등록하기 위해 금액은 음수로 입력할 수 없다.")
+  void case4() {
+    final Menu menu = FixtureMenu.fixtureMenu();
+
+    menu.setName("닭다리");
+    menu.setPrice(BigDecimal.valueOf(-1));
 
     Assertions.assertThatIllegalArgumentException()
             .isThrownBy(() -> menuService.create(menu));
@@ -84,7 +94,7 @@ class MenuServiceTest {
   @ParameterizedTest
   @ValueSource(ints = {-1})
   @DisplayName("메뉴를 등록하기 위해 상품이 있어야하고, 수량을 0개 밑으로 입력할 수 없다.")
-  void case4(Integer value) {
+  void case5(Integer value) {
     final Menu menu = FixtureMenu.fixtureMenu();
     final Product product = FixtureProduct.fixtureProduct();
     final MenuGroup menuGroup = FixtureMenu.fixtureMenuGroup();
@@ -102,7 +112,7 @@ class MenuServiceTest {
 
   @Test
   @DisplayName("메뉴를 등록하기 위해 해당 상품 정보가 상품에 존재해야 한다.")
-  void case5() {
+  void case6() {
     final Menu menu = FixtureMenu.fixtureMenu();
     final Product product = FixtureProduct.fixtureProduct();
     final MenuGroup menuGroup = FixtureMenu.fixtureMenuGroup();
