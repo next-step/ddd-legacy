@@ -6,10 +6,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import kitchenpos.domain.*;
 import kitchenpos.fixtures.*;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.menu.InMemoryMenuGroupRepository;
+import kitchenpos.infra.menu.InMemoryMenuRepository;
+import kitchenpos.infra.product.InMemoryProductRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -18,19 +20,25 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class MenuServiceTest {
-  @Mock private MenuRepository menuRepository;
-  @Mock private MenuGroupRepository menuGroupRepository;
-  @Mock private ProductRepository productRepository;
+
+  private final MenuRepository menuRepository = new InMemoryMenuRepository();
+  private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+  private final ProductRepository productRepository = new InMemoryProductRepository();
+  private final MenuService menuService;
   @Mock private PurgomalumClient purgomalumClient;
 
-  @InjectMocks private MenuService menuService;
-
+  public MenuServiceTest() {
+    this.menuService = new MenuService(
+            menuRepository,
+            menuGroupRepository,
+            productRepository,
+            purgomalumClient);
+  }
 
   @Nested
   @DisplayName("메뉴 등록")

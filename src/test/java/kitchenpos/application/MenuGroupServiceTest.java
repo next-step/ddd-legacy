@@ -1,25 +1,27 @@
 package kitchenpos.application;
 
+import static org.mockito.BDDMockito.*;
+
+import java.util.List;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.fixtures.FixtureMenu;
-import kitchenpos.fixtures.FixtureOrder;
+import kitchenpos.infra.menu.InMemoryMenuGroupRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-
-import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MenuGroupServiceTest {
-  @Mock private MenuGroupRepository menuGroupRepository;
-  @InjectMocks private MenuGroupService menuGroupService;
+
+  private final MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+  private final MenuGroupService menuGroupService;
+
+  public MenuGroupServiceTest() {
+    this.menuGroupService = new MenuGroupService(menuGroupRepository);
+  }
 
   @Test
   @DisplayName("메뉴 그룹을 등록하기 위해 메뉴 그룹 이름 입력해야 한다.")

@@ -7,32 +7,34 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.fixtures.FixtureMenu;
-import kitchenpos.fixtures.FixtureOrder;
 import kitchenpos.fixtures.FixtureProduct;
 import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.menu.InMemoryMenuRepository;
+import kitchenpos.infra.product.InMemoryProductRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
-  @Mock private ProductRepository productRepository;
-  @Mock private MenuRepository menuRepository;
+  private final ProductRepository productRepository = new InMemoryProductRepository();
+  private final MenuRepository menuRepository = new InMemoryMenuRepository();
+  private final ProductService productService;
   @Mock private PurgomalumClient purgomalumClient;
 
-  @InjectMocks private ProductService productService;
+  public ProductServiceTest() {
+    this.productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+  }
 
   @Nested
   @DisplayName("상품 등록")
@@ -57,12 +59,11 @@ class ProductServiceTest {
       Mockito.when(purgomalumClient.containsProfanity(product.getName())).thenReturn(true);
 
       Assertions.assertThatIllegalArgumentException()
-              .isThrownBy(
-                      () -> {
-                        productService.create(product);
-                      });
+          .isThrownBy(
+              () -> {
+                productService.create(product);
+              });
     }
-
   }
 
   @Nested
@@ -73,7 +74,8 @@ class ProductServiceTest {
     void test_case_3() {
       final Product expected = FixtureProduct.fixtureProduct();
       given(productRepository.findById(any())).willReturn(Optional.of(expected));
-      given(menuRepository.findAllByProductId(any())).willReturn(List.of(FixtureMenu.fixtureMenu()));
+      given(menuRepository.findAllByProductId(any()))
+          .willReturn(List.of(FixtureMenu.fixtureMenu()));
 
       expected.setPrice(BigDecimal.valueOf(10000L));
       final Product actual = productService.changePrice(UUID.randomUUID(), expected);
@@ -88,7 +90,7 @@ class ProductServiceTest {
 
       expected.setPrice(BigDecimal.valueOf(-1));
       Assertions.assertThatIllegalArgumentException()
-              .isThrownBy(() -> productService.changePrice(expected.getId(), expected));
+          .isThrownBy(() -> productService.changePrice(expected.getId(), expected));
     }
 
     @Test
@@ -107,7 +109,6 @@ class ProductServiceTest {
     }
   }
 
-
   @Nested
   @DisplayName("상품 전체 조회")
   class Nested3 {
@@ -121,6 +122,5 @@ class ProductServiceTest {
 
       Assertions.assertThat(actual.size()).isEqualTo(expected.size());
     }
-
   }
 }
