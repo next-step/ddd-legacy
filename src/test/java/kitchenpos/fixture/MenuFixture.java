@@ -55,19 +55,4 @@ public class MenuFixture {
         menu.setMenuProducts(List.of(menuProduct));
         return menu;
     }
-
-    public static Menu createSeasoned2(MenuGroup menuGroup, Product product){
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setName("양념1+1");
-        menu.setPrice(BigDecimal.valueOf(35_000L));
-        menu.setMenuGroupId(menuGroup.getId());
-        menu.setDisplayed(true);
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(2);
-        menuProduct.setProductId(product.getId());
-        menu.setMenuProducts(List.of(menuProduct));
-        return menu;
-    }
 }
