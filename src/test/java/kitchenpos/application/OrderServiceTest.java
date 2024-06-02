@@ -1,10 +1,7 @@
 package kitchenpos.application;
 
-import static org.mockito.ArgumentMatchers.any;
-
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import kitchenpos.domain.*;
 import kitchenpos.fixtures.FixtureOrder;
 import kitchenpos.infra.KitchenridersClient;
@@ -12,11 +9,11 @@ import kitchenpos.infra.menu.InMemoryMenuRepository;
 import kitchenpos.infra.order.InMemoryOrderRepository;
 import kitchenpos.infra.order.InMemoryOrderTableRepository;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -26,10 +23,11 @@ class OrderServiceTest {
   private final OrderRepository orderRepository = new InMemoryOrderRepository();
   private final MenuRepository menuRepository = new InMemoryMenuRepository();
   private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
-  private final OrderService orderService;
+  private OrderService orderService;
   @Mock private KitchenridersClient kitchenridersClient;
 
-  public OrderServiceTest() {
+  @BeforeEach
+  void before() {
     this.orderService =
         new OrderService(
             orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
@@ -48,13 +46,11 @@ class OrderServiceTest {
       final Order order = FixtureOrder.fixtureOrder();
       final Menu menu = order.getOrderLineItems().get(0).getMenu();
       final OrderTable orderTable = order.getOrderTable();
-
       order.setType(OrderType.DELIVERY);
-      BDDMockito.given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-      BDDMockito.given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-      BDDMockito.given(orderTableRepository.findById(any()))
-          .willReturn(Optional.ofNullable(orderTable));
-      BDDMockito.given(orderRepository.save(any())).willReturn(order);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
 
       final Order actual = orderService.create(order);
       Assertions.assertThat(actual).isNotNull();
@@ -66,14 +62,12 @@ class OrderServiceTest {
       final Order order = FixtureOrder.fixtureOrder();
       final Menu menu = order.getOrderLineItems().get(0).getMenu();
       final OrderTable orderTable = order.getOrderTable();
-
       menu.setDisplayed(false);
       order.setType(OrderType.DELIVERY);
-      BDDMockito.given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-      BDDMockito.given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-      BDDMockito.given(orderTableRepository.findById(any()))
-          .willReturn(Optional.ofNullable(orderTable));
-      BDDMockito.given(orderRepository.save(any())).willReturn(order);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
 
       Assertions.assertThatIllegalStateException().isThrownBy(() -> orderService.create(order));
     }
@@ -87,11 +81,10 @@ class OrderServiceTest {
 
       menu.setPrice(BigDecimal.valueOf(20_000L));
       order.setType(OrderType.DELIVERY);
-      BDDMockito.given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-      BDDMockito.given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-      BDDMockito.given(orderTableRepository.findById(any()))
-          .willReturn(Optional.ofNullable(orderTable));
-      BDDMockito.given(orderRepository.save(any())).willReturn(order);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
 
       Assertions.assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
     }
@@ -105,11 +98,10 @@ class OrderServiceTest {
 
       order.setDeliveryAddress(null);
       order.setType(OrderType.DELIVERY);
-      BDDMockito.given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-      BDDMockito.given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-      BDDMockito.given(orderTableRepository.findById(any()))
-          .willReturn(Optional.ofNullable(orderTable));
-      BDDMockito.given(orderRepository.save(any())).willReturn(order);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
 
       Assertions.assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
     }
@@ -124,10 +116,10 @@ class OrderServiceTest {
       orderTable.setOccupied(true);
       orderTable.setNumberOfGuests(10);
       order.setType(OrderType.EAT_IN);
-      BDDMockito.given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-      BDDMockito.given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-      BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
-      BDDMockito.given(orderRepository.save(any())).willReturn(order);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
 
       final Order actual = orderService.create(order);
       Assertions.assertThat(actual.getOrderTable().getNumberOfGuests())
@@ -149,10 +141,10 @@ class OrderServiceTest {
       orderTable.setNumberOfGuests(10);
       order.setStatus(OrderStatus.WAITING);
       order.setType(OrderType.DELIVERY);
-      BDDMockito.given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu));
-      BDDMockito.given(menuRepository.findById(any())).willReturn(Optional.of(menu));
-      BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
-      BDDMockito.given(orderRepository.save(any())).willReturn(order);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
 
       final Order actual = orderService.create(order);
       Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
@@ -172,7 +164,9 @@ class OrderServiceTest {
       orderTable.setNumberOfGuests(10);
       order.setStatus(OrderStatus.WAITING);
       order.setType(OrderType.DELIVERY);
-      BDDMockito.given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
 
       final Order actual = orderService.accept(order.getId());
       Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
@@ -189,7 +183,9 @@ class OrderServiceTest {
       orderTable.setNumberOfGuests(10);
       order.setStatus(OrderStatus.ACCEPTED);
       order.setType(OrderType.DELIVERY);
-      BDDMockito.given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
 
       final Order actual = orderService.serve(order.getId());
       Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.SERVED);
@@ -207,7 +203,9 @@ class OrderServiceTest {
       orderTable.setNumberOfGuests(10);
       order.setStatus(OrderStatus.SERVED);
       order.setType(OrderType.DELIVERY);
-      BDDMockito.given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
 
       final Order actual = orderService.startDelivery(order.getId());
       Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERING);
@@ -224,7 +222,9 @@ class OrderServiceTest {
       orderTable.setNumberOfGuests(10);
       order.setStatus(OrderStatus.DELIVERING);
       order.setType(OrderType.DELIVERY);
-      BDDMockito.given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
 
       final Order actual = orderService.completeDelivery(order.getId());
       Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERED);
@@ -242,7 +242,9 @@ class OrderServiceTest {
       orderTable.setNumberOfGuests(10);
       order.setStatus(OrderStatus.DELIVERED);
       order.setType(OrderType.DELIVERY);
-      BDDMockito.given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
 
       final Order actual = orderService.complete(order.getId());
       Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
@@ -264,7 +266,9 @@ class OrderServiceTest {
       orderTable.setNumberOfGuests(10);
       order.setStatus(OrderStatus.SERVED);
       order.setType(OrderType.TAKEOUT);
-      BDDMockito.given(orderRepository.findById(any())).willReturn(Optional.of(order));
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
 
       final Order actual = orderService.complete(order.getId());
       Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
@@ -280,9 +284,11 @@ class OrderServiceTest {
       orderTable.setNumberOfGuests(10);
       order.setStatus(OrderStatus.SERVED);
       order.setType(OrderType.EAT_IN);
-      BDDMockito.given(orderRepository.findById(any())).willReturn(Optional.of(order));
-      BDDMockito.given(orderRepository.existsByOrderTableAndStatusNot(any(), any()))
-          .willReturn(false);
+
+      orderRepository.save(order);
+      order.setId(orderTable.getId());
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
 
       final Order actual = orderService.complete(order.getId());
       Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
@@ -297,8 +303,10 @@ class OrderServiceTest {
     @DisplayName("주문을 전체 조회 할 수 있다.")
     @Test
     void case18() {
-      final List<Order> orders = List.of(FixtureOrder.fixtureOrder());
-      BDDMockito.given(orderRepository.findAll()).willReturn(orders);
+      orderRepository.save(FixtureOrder.fixtureOrder());
+      List<Order> all = orderRepository.findAll();
+
+      Assertions.assertThat(all.size()).isNotZero();
     }
   }
 }

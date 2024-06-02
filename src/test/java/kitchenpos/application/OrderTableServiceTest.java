@@ -1,8 +1,5 @@
 package kitchenpos.application;
 
-import static org.mockito.ArgumentMatchers.any;
-
-import java.util.Optional;
 import kitchenpos.domain.*;
 import kitchenpos.fixtures.FixtureOrder;
 import kitchenpos.infra.order.InMemoryOrderRepository;
@@ -12,7 +9,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,8 +29,7 @@ class OrderTableServiceTest {
     @DisplayName(value = "주문테이블을 생성하기 위해 이름을 입력해야 한다.")
     void case1() {
       final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
-
-      BDDMockito.given(orderTableRepository.save(any())).willReturn(orderTable);
+      orderTableRepository.save(orderTable);
 
       final OrderTable actual = orderTableService.create(orderTable);
       Assertions.assertThat(actual).isNotNull();
@@ -44,8 +39,7 @@ class OrderTableServiceTest {
     @DisplayName(value = "주문테이블의 자리가 비어있도록 생성된다.")
     void case2() {
       final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
-
-      BDDMockito.given(orderTableRepository.save(any())).willReturn(orderTable);
+      orderTableRepository.save(orderTable);
 
       final OrderTable actual = orderTableService.create(orderTable);
       Assertions.assertThat(actual.isOccupied()).isFalse();
@@ -55,8 +49,7 @@ class OrderTableServiceTest {
     @DisplayName(value = "주문테이블을 사용하기 위해 주문테이블이 존재해야 한다.")
     void case3() {
       final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
-
-      BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+      orderTableRepository.save(orderTable);
 
       final OrderTable actual = orderTableService.sit(orderTable.getId(), 3);
       Assertions.assertThat(actual.isOccupied()).isTrue();
@@ -70,8 +63,7 @@ class OrderTableServiceTest {
     @DisplayName(value = "주문테이블의 자리를 고객이 앉도록 설정한다.")
     void case4() {
       final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
-
-      BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+      orderTableRepository.save(orderTable);
 
       final OrderTable actual = orderTableService.sit(orderTable.getId(), 3);
       Assertions.assertThat(actual.isOccupied()).isTrue();
@@ -81,8 +73,7 @@ class OrderTableServiceTest {
     @DisplayName(value = "주문테이블에 앉은 인원을 입력하기 위해 주문테이블이 존재해야 한다.")
     void case5() {
       final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
-
-      BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+      orderTableRepository.save(orderTable);
 
       final OrderTable actual = orderTableService.sit(orderTable.getId(), 3);
       Assertions.assertThat(actual).isNotNull();
@@ -92,8 +83,7 @@ class OrderTableServiceTest {
     @DisplayName(value = "주문테이블에 앉은 인원을 입력하기 위해 1명 이상은 있어야 한다.")
     void case6() {
       final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
-
-      BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+      orderTableRepository.save(orderTable);
 
       final OrderTable actual = orderTableService.sit(orderTable.getId(), 3);
       Assertions.assertThat(actual).isNotNull();
@@ -104,8 +94,7 @@ class OrderTableServiceTest {
     void case7() {
       final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
       orderTable.setOccupied(true);
-
-      BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
+      orderTableRepository.save(orderTable);
 
       Assertions.assertThatIllegalStateException()
           .isThrownBy(() -> orderTableService.sit(orderTable.getId(), 3));
@@ -118,13 +107,17 @@ class OrderTableServiceTest {
     @Test
     @DisplayName(value = "주문테이블을 청소하기 위해 주문테이블이 존재해야 한다, 주문테이블을 청소하기 위해 주문이 {완료} 되어야 한다.")
     void case8() {
-      final OrderTable orderTable = FixtureOrder.fixtureOrderTable();
+      final Order order = FixtureOrder.fixtureOrder();
+      order.setStatus(OrderStatus.SERVED);
+
+      final OrderTable orderTable = order.getOrderTable();
       orderTable.setOccupied(true);
       orderTable.setNumberOfGuests(5);
 
-      BDDMockito.given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
-      BDDMockito.given(orderRepository.existsByOrderTableAndStatusNot(any(), any()))
-          .willReturn(false);
+      order.setId(orderTable.getId());
+
+      orderTableRepository.save(orderTable);
+      orderRepository.save(order);
 
       final OrderTable clear = orderTableService.clear(orderTable.getId());
       Assertions.assertThat(clear.isOccupied()).isFalse();
