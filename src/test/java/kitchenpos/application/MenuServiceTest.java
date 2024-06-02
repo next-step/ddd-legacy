@@ -7,16 +7,16 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
-import kitchenpos.fake.FakePurgomalumClient;
-import kitchenpos.fake.InMemoryMenuGroupRepository;
-import kitchenpos.fake.InMemoryMenuRepository;
-import kitchenpos.fake.InMemoryProductRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fake.FakePurgomalumClient;
+import kitchenpos.fake.InMemoryMenuGroupRepository;
+import kitchenpos.fake.InMemoryMenuRepository;
+import kitchenpos.fake.InMemoryProductRepository;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.ProductFixture;
@@ -26,10 +26,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 @DisplayName("MenuService")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class MenuServiceTest {

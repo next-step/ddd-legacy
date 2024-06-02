@@ -6,13 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import kitchenpos.fake.FakeKitchenridersClient;
-import kitchenpos.fake.FakePurgomalumClient;
-import kitchenpos.fake.InMemoryMenuGroupRepository;
-import kitchenpos.fake.InMemoryMenuRepository;
-import kitchenpos.fake.InMemoryOrderRepository;
-import kitchenpos.fake.InMemoryOrderTableRepository;
-import kitchenpos.fake.InMemoryProductRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -24,6 +17,13 @@ import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
+import kitchenpos.fake.FakeKitchenridersClient;
+import kitchenpos.fake.FakePurgomalumClient;
+import kitchenpos.fake.InMemoryMenuGroupRepository;
+import kitchenpos.fake.InMemoryMenuRepository;
+import kitchenpos.fake.InMemoryOrderRepository;
+import kitchenpos.fake.InMemoryOrderTableRepository;
+import kitchenpos.fake.InMemoryProductRepository;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.OrderFixture;
@@ -37,10 +37,7 @@ import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 @DisplayName("OrderService")
 @DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 class OrderServiceTest {
