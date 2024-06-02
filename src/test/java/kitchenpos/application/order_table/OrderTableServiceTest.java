@@ -30,6 +30,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderTableServiceTest {
@@ -51,7 +52,7 @@ public class OrderTableServiceTest {
   @DisplayName("주문테이블을 등록할 수 있다.")
   @Test
   public void register() {
-    OrderTable request = OrderTableFixture.create("오더테이블");
+    OrderTable request = OrderTableFixture.normal();
     OrderTable orderTable = orderTableService.create(request);
     assertThat(orderTable).isNotNull();
     assertThat(orderTable.isOccupied()).isFalse();
@@ -59,7 +60,7 @@ public class OrderTableServiceTest {
   }
 
 
-  @DisplayName("주문테이블명이 1자 미만일 경우 IllegalArgumentException 예외 처리를 한다.")
+  @DisplayName("주문테이블명은 1자 이상이어야한다.")
   @NullAndEmptySource
   @ParameterizedTest
   public void invalidName(String name) {
@@ -71,7 +72,7 @@ public class OrderTableServiceTest {
   @DisplayName("주문테이블을 사용처리할 수 있다.")
   @Test
   public void occupy() {
-    OrderTable request = OrderTableFixture.create("오더테이블");
+    OrderTable request = OrderTableFixture.normal();
     OrderTable orderTable = orderTableService.create(request);
     orderTable = orderTableService.sit(orderTable.getId());
     assertThat(orderTable.isOccupied()).isTrue();
@@ -81,35 +82,33 @@ public class OrderTableServiceTest {
   @ValueSource(ints = {3,5,7})
   @ParameterizedTest
   public void changeNumberOfGuests(int numberOfGuests) {
-    OrderTable request = OrderTableFixture.create("오더테이블");
+    OrderTable request = OrderTableFixture.create("주문테이블", true);
     OrderTable orderTable = orderTableService.create(request);
-    orderTable = orderTableService.sit(orderTable.getId());
+    ReflectionTestUtils.setField(orderTable, "occupied", true);
     OrderTable request2 = OrderTableFixture.create("오더테이블", numberOfGuests);
     orderTable = orderTableService.changeNumberOfGuests(orderTable.getId(), request2);
     assertThat(orderTable.getNumberOfGuests()).isEqualTo(numberOfGuests);
   }
 
-  @DisplayName("주문테이블 인원이 0명 미만일 경우 IllegalArgumentException 예외 처리를 한다.")
+  @DisplayName("변경할 인원은 0명 이상이어야한다.")
   @ValueSource(ints = {-3,-5,-7})
   @ParameterizedTest
   public void invalidNumberOfGuestsChange(int numberOfGuests) {
-    OrderTable request = OrderTableFixture.create("오더테이블");
+    OrderTable request = OrderTableFixture.create("오더테이블", true);
     OrderTable orderTable = orderTableService.create(request);
     UUID orderTableId = orderTable.getId();
-    orderTable = orderTableService.sit(orderTable.getId());
     OrderTable request2 = OrderTableFixture.create("오더테이블", numberOfGuests);
     assertThatExceptionOfType(IllegalArgumentException.class)
         .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTableId, request2));
   }
 
-  @DisplayName("주문테이블이 미사용중일 경우 IllegalArgumentException 예외 처리를 한다.")
-  @ValueSource(ints = {-3,-5,-7})
-  @ParameterizedTest
-  public void unoccupiedTable(int numberOfGuests) {
+  @DisplayName("주문테이블은 사용중이어야한다.")
+  @Test
+  public void unoccupiedTable() {
     OrderTable request = OrderTableFixture.create("오더테이블");
     OrderTable orderTable = orderTableService.create(request);
-    OrderTable request2 = OrderTableFixture.create("오더테이블", numberOfGuests);
-    assertThatExceptionOfType(IllegalArgumentException.class)
+    OrderTable request2 = OrderTableFixture.create("오더테이블", 3);
+    assertThatExceptionOfType(IllegalStateException.class)
         .isThrownBy(() -> orderTableService.changeNumberOfGuests(orderTable.getId(), request2));
   }
 
@@ -118,16 +117,12 @@ public class OrderTableServiceTest {
   public void clear() {
     OrderTable request = OrderTableFixture.create("오더테이블");
     OrderTable orderTable = orderTableService.create(request);
-    orderTable = orderTableService.sit(orderTable.getId());
-    OrderTable request2 = OrderTableFixture.create("오더테이블", 3);
-    orderTable = orderTableService.changeNumberOfGuests(orderTable.getId(), request2);
-
     orderTable = orderTableService.clear(orderTable.getId());
     assertThat(orderTable.isOccupied()).isFalse();
     assertThat(orderTable.getNumberOfGuests()).isEqualTo(0);
   }
 
-  @DisplayName("진행중인 주문이 있을 경우 IllegalStateException 예외 처리를 한다.")
+  @DisplayName("진행중인 주문이 없을 경우 초기화할 수 있다.")
   @Test
   public void failClear() {
     OrderTable request = OrderTableFixture.create("오더테이블", true);
@@ -138,9 +133,8 @@ public class OrderTableServiceTest {
     Menu menu = MenuFixture.createDefaultMenu();
     menuRepository.save(menu);
     OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(menu, 3L, 200L);
-    Order order = OrderFixture.create(OrderType.EAT_IN, List.of(orderLineItem),"주소", orderTable);
+    Order order = OrderFixture.create(OrderType.EAT_IN, OrderStatus.WAITING, List.of(orderLineItem),"주소", orderTable);
     order = orderRepository.save(order);
-    order.setStatus(OrderStatus.WAITING);
 
     assertThatExceptionOfType(IllegalStateException.class)
         .isThrownBy(() -> orderTableService.clear(orderTableId));
