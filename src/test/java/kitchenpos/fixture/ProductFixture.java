@@ -34,12 +34,4 @@ public class ProductFixture {
         product.setName("후라이드");
         return product;
     }
-
-    public static Product createSeasoned() {
-        Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setPrice(BigDecimal.valueOf(25_000L));
-        product.setName("양념");
-        return product;
-    }
 }

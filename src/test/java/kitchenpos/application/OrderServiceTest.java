@@ -30,7 +30,6 @@ import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.KitchenridersClient;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -56,25 +55,10 @@ class OrderServiceTest {
 
     private OrderService orderService;
 
-    private OrderTableService orderTableService;
-
-    private Menu friedMenu;
-
-    private Menu seasonedMenu;
-
     @BeforeEach
     void setUp() {
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository,
                 kitchenridersClient);
-        orderTableService = new OrderTableService(orderTableRepository, orderRepository);
-
-        MenuGroup chickenMenuGroup = menuGroupRepository.save(MenuGroupFixture.createChicken());
-        Product friedProduct = productRepository.save(ProductFixture.createFired());
-        Product seasonedProduct = productRepository.save(ProductFixture.createSeasoned());
-        friedMenu = menuRepository.save(
-                MenuFixture.createFried2(chickenMenuGroup, friedProduct));
-        seasonedMenu = menuRepository.save(
-                MenuFixture.createFried2(chickenMenuGroup, seasonedProduct));
     }
 
 
@@ -82,7 +66,7 @@ class OrderServiceTest {
     void 주문_하나에_여러_메뉴를_주문할_수_있다() {
         Order createRequest = OrderFixture.createTakeOutRequest(
                 createFriedOrderLineItem(),
-                createSeasonedOrderLineItem());
+                createFriedOrderLineItem());
 
         Order actual = orderService.create(createRequest);
 
@@ -91,9 +75,10 @@ class OrderServiceTest {
 
     @Test
     void 노출되지_않은_메뉴를_주문하면_예외를_던진다() {
+        Menu friedMenu = createFriedMenu();
         friedMenu.setDisplayed(false);
         Order createRequest = OrderFixture.createTakeOutRequest(
-                createFriedOrderLineItem());
+                createOrderLineItem(friedMenu));
 
         assertThatThrownBy(() -> orderService.create(createRequest)).isInstanceOf(
                 IllegalStateException.class);
@@ -464,19 +449,27 @@ class OrderServiceTest {
     }
 
     private OrderLineItem createFriedOrderLineItem() {
-        return OrderFixture.createOrderLineItem(friedMenu, 2);
+        return createOrderLineItem(createFriedMenu());
     }
 
-    private OrderLineItem createSeasonedOrderLineItem() {
-        return OrderFixture.createOrderLineItem(seasonedMenu, 1);
+    private Menu createFriedMenu() {
+        MenuGroup chickenMenuGroup = menuGroupRepository.save(MenuGroupFixture.createChicken());
+        Product friedProduct = productRepository.save(ProductFixture.createFired());
+        return menuRepository.save(
+                MenuFixture.createFried2(chickenMenuGroup, friedProduct));
+    }
+
+    private OrderLineItem createOrderLineItem(Menu menu) {
+        return OrderFixture.createOrderLineItem(menu, 2);
     }
 
     private OrderTable createOccupiedTable() {
         OrderTable orderTable = createTable();
-        return orderTableService.sit(orderTable.getId());
+        orderTable.setOccupied(true);
+        return orderTable;
     }
 
     private OrderTable createTable() {
-        return orderTableService.create(OrderTableFixture.createRequest("1번 테이블"));
+        return orderTableRepository.save(OrderTableFixture.createNumber1Table());
     }
 }
