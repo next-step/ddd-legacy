@@ -5,6 +5,7 @@ import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderType;
 
@@ -55,8 +56,9 @@ public class OrderFixture {
         Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(OrderType.EAT_IN);
-        order.setOrderTableId(orderTable.getId());
+        order.setOrderTable(orderTable);
         order.setOrderLineItems(List.of(createOrderLineItem(menu, 2)));
+        order.setStatus(OrderStatus.WAITING);
         return order;
     }
 }
