@@ -1,5 +1,5 @@
 package kitchenpos.infra;
 
-public interface PurgomalumClient {
+public interface BadWordsValidator {
     boolean containsProfanity(String text);
 }

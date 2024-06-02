@@ -6,7 +6,7 @@ import kitchenpos.domain.*;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.ProductFixture;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.BadWordsValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -45,11 +45,11 @@ class ProductServiceTest {
   private MenuRepository menuRepository;
 
   @Mock
-  private PurgomalumClient purgomalumClient;
+  private BadWordsValidator badWordsValidator;
 
   @BeforeEach
   void setUp() {
-    productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+    productService = new ProductService(productRepository, menuRepository, badWordsValidator);
     fakeUuidBuilder = new FakeUuidBuilder();
   }
 
@@ -61,7 +61,7 @@ class ProductServiceTest {
     void createProduct() {
       final Product product = ProductFixture.createProduct(HANGANG_RAMEN, TWENTY_THOUSANDS);
 
-      given(purgomalumClient.containsProfanity(any())).willReturn(false);
+      given(badWordsValidator.containsProfanity(any())).willReturn(false);
       given(productRepository.save(any())).willReturn(product);
 
       final Product actual = productService.create(product);
@@ -81,7 +81,7 @@ class ProductServiceTest {
     void failToCreateProductWithProfanityAndEmptyProductName(final String name) {
       final Product product = ProductFixture.createProduct(name, TWENTY_THOUSANDS);
 
-      given(purgomalumClient.containsProfanity(any())).willReturn(true);
+      given(badWordsValidator.containsProfanity(any())).willReturn(true);
 
       assertThatIllegalArgumentException()
               .isThrownBy(() -> productService.create(product));

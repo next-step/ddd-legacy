@@ -29,9 +29,9 @@ import kitchenpos.domain.product.FakeProductRepository;
 import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.DefaultKitchenridersClient;
-import kitchenpos.infra.FakePurgomalumClient;
+import kitchenpos.infra.FakeBadWordsValidator;
 import kitchenpos.infra.KitchenridersClient;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.BadWordsValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -43,7 +43,7 @@ class OrderServiceTest {
   private MenuRepository menuRepository;
   private MenuService menuService;
   private ProductRepository productRepository;
-  private PurgomalumClient purgomalumClient;
+  private BadWordsValidator badWordsValidator;
   private FakeUuidBuilder fakeUuidBuilder;
   private OrderService orderService;
   private OrderRepository orderRepository;
@@ -58,7 +58,7 @@ class OrderServiceTest {
   void setUp() {
     menuRepository = new FakeMenuRepository();
     menuGroupRepository = new FakeMenuGroupRepository();
-    purgomalumClient = new FakePurgomalumClient();
+    badWordsValidator = new FakeBadWordsValidator();
     productRepository = new FakeProductRepository();
     fakeUuidBuilder = new FakeUuidBuilder();
     orderRepository = new FakeOrderRepository();
@@ -66,7 +66,7 @@ class OrderServiceTest {
     kitchenridersClient = new DefaultKitchenridersClient();
 
     menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
-        purgomalumClient);
+        badWordsValidator);
 
     udon = productRepository.save(
         ProductFixture.udon);

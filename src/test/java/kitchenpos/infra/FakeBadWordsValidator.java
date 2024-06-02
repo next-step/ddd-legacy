@@ -1,6 +1,6 @@
 package kitchenpos.infra;
 
-public class FakePurgomalumClient implements PurgomalumClient {
+public class FakeBadWordsValidator implements BadWordsValidator {
   @Override
   public boolean containsProfanity(String text) {
     if (text.equals("badwords"))

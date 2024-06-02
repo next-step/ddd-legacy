@@ -9,8 +9,8 @@ import kitchenpos.domain.product.FakeProductRepository;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.ProductFixture;
-import kitchenpos.infra.FakePurgomalumClient;
-import kitchenpos.infra.PurgomalumClient;
+import kitchenpos.infra.FakeBadWordsValidator;
+import kitchenpos.infra.BadWordsValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -39,7 +39,7 @@ class MenuServiceTest {
   private MenuRepository menuRepository;
   private MenuService menuService;
   private ProductRepository productRepository;
-  private PurgomalumClient purgomalumClient;
+  private BadWordsValidator badWordsValidator;
   private FakeUuidBuilder fakeUuidBuilder;
 
   private Product udon;
@@ -50,11 +50,12 @@ class MenuServiceTest {
   void setUp() {
     menuRepository = new FakeMenuRepository();
     menuGroupRepository = new FakeMenuGroupRepository();
-    purgomalumClient = new FakePurgomalumClient();
+    badWordsValidator = new FakeBadWordsValidator();
     productRepository = new FakeProductRepository();
     fakeUuidBuilder = new FakeUuidBuilder();
 
-    menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, purgomalumClient);
+    menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+        badWordsValidator);
 
     udon = productRepository.save(ProductFixture.createProduct(UDON, TWENTY_THOUSANDS, fakeUuidBuilder));
     ramen = productRepository.save(ProductFixture.createProduct(RAMEN, TEN_THOUSAND, fakeUuidBuilder));
