@@ -1,7 +1,7 @@
 package kitchenpos.application.menu;
 
 import kitchenpos.application.MenuService;
-import kitchenpos.application.product.FakeUuidBuilder;
+import kitchenpos.domain.common.FakeUuidBuilder;
 import kitchenpos.domain.*;
 import kitchenpos.domain.menu.FakeMenuGroupRepository;
 import kitchenpos.domain.menu.FakeMenuRepository;

@@ -11,7 +11,7 @@ import java.util.UUID;
 import kitchenpos.application.MenuService;
 import kitchenpos.application.OrderService;
 import kitchenpos.application.OrderTableService;
-import kitchenpos.application.product.FakeUuidBuilder;
+import kitchenpos.domain.common.FakeUuidBuilder;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;

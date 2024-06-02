@@ -1,4 +1,4 @@
-package kitchenpos.application.product;
+package kitchenpos.domain.common;
 
 import kitchenpos.common.UuidBuilder;
 

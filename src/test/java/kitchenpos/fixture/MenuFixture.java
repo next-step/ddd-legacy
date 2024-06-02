@@ -3,7 +3,7 @@ package kitchenpos.fixture;
 import static kitchenpos.fixture.ProductFixture.TWENTY_THOUSANDS;
 import static kitchenpos.fixture.ProductFixture.TWO_UDONS;
 
-import kitchenpos.application.product.FakeUuidBuilder;
+import kitchenpos.domain.common.FakeUuidBuilder;
 import kitchenpos.common.UuidBuilder;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;

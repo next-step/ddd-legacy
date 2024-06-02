@@ -1,6 +1,6 @@
 package kitchenpos.fixture;
 
-import kitchenpos.application.product.FakeUuidBuilder;
+import kitchenpos.domain.common.FakeUuidBuilder;
 import kitchenpos.common.UuidBuilder;
 import kitchenpos.domain.Product;
 
