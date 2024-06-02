@@ -13,12 +13,11 @@ import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderRepository;
+import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.fake.FakeKitchenridersClient;
-import kitchenpos.fake.FakePurgomalumClient;
 import kitchenpos.fake.InMemoryMenuGroupRepository;
 import kitchenpos.fake.InMemoryMenuRepository;
 import kitchenpos.fake.InMemoryOrderRepository;
@@ -29,8 +28,6 @@ import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.fixture.ProductFixture;
-import kitchenpos.infra.KitchenridersClient;
-import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -51,28 +48,10 @@ class OrderTableServiceTest {
 
     private OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
 
-    private KitchenridersClient kitchenridersClient = new FakeKitchenridersClient();
-
-    private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
-
-    private MenuService menuService;
-
-    private MenuGroupService menuGroupService;
-
-    private ProductService productService;
-
-    private OrderService orderService;
-
     private OrderTableService orderTableService;
 
     @BeforeEach
     void setUp() {
-        menuGroupService = new MenuGroupService(menuGroupRepository);
-        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
-        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
-                purgomalumClient);
-        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository,
-                kitchenridersClient);
         orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 
@@ -110,7 +89,7 @@ class OrderTableServiceTest {
         OrderTable createRequset = OrderTableFixture.createRequest("1번테이블");
         OrderTable saved = orderTableService.create(createRequset);
         orderTableService.sit(saved.getId());
-        createAndCompleteOrder(saved);
+        createCompleteOrder(saved);
 
         OrderTable actual = orderTableService.clear(saved.getId());
 
@@ -129,24 +108,17 @@ class OrderTableServiceTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    private void createAndCompleteOrder(OrderTable orderTable) {
+    private void createCompleteOrder(OrderTable orderTable) {
         Order order = createOrder(orderTable);
-        orderService.accept(order.getId());
-        orderService.serve(order.getId());
-        orderService.complete(order.getId());
+        order.setStatus(OrderStatus.COMPLETED);
     }
 
     private Order createOrder(OrderTable orderTable) {
-        Order eatInRequest = OrderFixture.createEatInRequest(orderTable,
-                OrderFixture.createOrderLineItem(createFriedMenu(), 2));
-        return orderService.create(eatInRequest);
-    }
-
-    private Menu createFriedMenu() {
-        MenuGroup menuGroup = menuGroupService.create(MenuGroupFixture.createRequest("치킨"));
-        Product fried = productService.create(ProductFixture.createRequest("후라이드", 20_000L));
-        return menuService.create(
-                MenuFixture.createRequest("후라이드1+1", 30_000L, menuGroup, fried, 2));
+        MenuGroup chickenMenuGroup = menuGroupRepository.save(MenuGroupFixture.createChicken());
+        Product friedProduct = productRepository.save(ProductFixture.createFired());
+        Menu friedMenu = menuRepository.save(
+                MenuFixture.createFried2(chickenMenuGroup, friedProduct));
+        return orderRepository.save(OrderFixture.createEatInOrder(orderTable, friedMenu));
     }
 
     @Test

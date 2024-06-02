@@ -1,6 +1,7 @@
 package kitchenpos.fixture;
 
 import java.util.List;
+import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.Order;
 import kitchenpos.domain.OrderLineItem;
@@ -17,10 +18,11 @@ public class OrderFixture {
         return order;
     }
 
-    public static Order createEatInRequest(final OrderTable orderTable, OrderLineItem... orderLineItem) {
+    public static Order createEatInRequest(final OrderTable orderTable,
+            OrderLineItem... orderLineItem) {
         Order order = new Order();
         order.setType(OrderType.EAT_IN);
-        if(orderTable != null) {
+        if (orderTable != null) {
             order.setOrderTableId(orderTable.getId());
         }
         order.setOrderLineItems(List.of(orderLineItem));
@@ -28,10 +30,11 @@ public class OrderFixture {
         return order;
     }
 
-    public static Order createDeliveryRequest(final String deliveryAddress, OrderLineItem... orderLineItem) {
+    public static Order createDeliveryRequest(final String deliveryAddress,
+            OrderLineItem... orderLineItem) {
         Order order = new Order();
         order.setType(OrderType.DELIVERY);
-        if(deliveryAddress != null){
+        if (deliveryAddress != null) {
             order.setDeliveryAddress(deliveryAddress);
         }
         order.setOrderLineItems(List.of(orderLineItem));
@@ -46,5 +49,14 @@ public class OrderFixture {
         orderLineItem.setMenuId(menu.getId());
         orderLineItem.setPrice(menu.getPrice());
         return orderLineItem;
+    }
+
+    public static Order createEatInOrder(OrderTable orderTable, Menu menu) {
+        Order order = new Order();
+        order.setId(UUID.randomUUID());
+        order.setType(OrderType.EAT_IN);
+        order.setOrderTableId(orderTable.getId());
+        order.setOrderLineItems(List.of(createOrderLineItem(menu, 2)));
+        return order;
     }
 }

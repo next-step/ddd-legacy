@@ -40,17 +40,10 @@ class ProductServiceTest {
 
     private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
 
-    private MenuGroupService menuGroupService;
-
-    private MenuService menuService;
-
     private ProductService productService;
 
     @BeforeEach
     void setUp() {
-        menuGroupService = new MenuGroupService(menuGroupRepository);
-        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
-                purgomalumClient);
         productService = new ProductService(productRepository, menuRepository, purgomalumClient);
     }
 
@@ -79,9 +72,8 @@ class ProductServiceTest {
 
     @Test
     void 상품의_가격을_변경한다() {
-        MenuGroup menuGroup = menuGroupService.create(MenuGroupFixture.createRequest("치킨"));
         Product saved = productService.create(ProductFixture.createRequest("후라이드", 20_000L));
-        Menu menu = menuService.create(MenuFixture.createRequest(30_000L, menuGroup, saved, 2));
+        Menu menu = createFriedMenu(saved);
         Product changePriceRequest = ProductFixture.changePriceRequest(15_000L);
 
         Product actualProduct = productService.changePrice(saved.getId(), changePriceRequest);
@@ -95,9 +87,8 @@ class ProductServiceTest {
 
     @Test
     void 상품가격변경시_수정한_상품이_속해있는_메뉴가격이_상품가격x상품갯수의_총합을_넘는다면_해당_메뉴는_손님들에게_숨긴다() {
-        MenuGroup menuGroup = menuGroupService.create(MenuGroupFixture.createRequest("치킨"));
         Product saved = productService.create(ProductFixture.createRequest("후라이드", 20_000L));
-        Menu menu = menuService.create(MenuFixture.createRequest(30_000L, menuGroup, saved, 2));
+        Menu menu = createFriedMenu(saved);
         Product changePriceRequest = ProductFixture.changePriceRequest(10_000L);
 
         Product actualProduct = productService.changePrice(saved.getId(), changePriceRequest);
@@ -107,6 +98,12 @@ class ProductServiceTest {
                 () -> assertThat(actualProduct.getPrice()).isEqualTo(BigDecimal.valueOf(10_000L)),
                 () -> assertThat(actualMenu.isDisplayed()).isFalse()
         );
+    }
+
+    private Menu createFriedMenu(Product product) {
+        MenuGroup chickenMenuGroup = menuGroupRepository.save(MenuGroupFixture.createChicken());
+        return menuRepository.save(
+                MenuFixture.createFried2(chickenMenuGroup, product));
     }
 
     @Test
