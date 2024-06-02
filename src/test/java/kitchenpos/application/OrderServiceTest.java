@@ -11,6 +11,7 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
+import kitchenpos.domain.OrderLineItem;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
@@ -18,7 +19,6 @@ import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
 import kitchenpos.fake.FakeKitchenridersClient;
-import kitchenpos.fake.FakePurgomalumClient;
 import kitchenpos.fake.InMemoryMenuGroupRepository;
 import kitchenpos.fake.InMemoryMenuRepository;
 import kitchenpos.fake.InMemoryOrderRepository;
@@ -30,7 +30,7 @@ import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.OrderTableFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.KitchenridersClient;
-import kitchenpos.infra.PurgomalumClient;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DisplayNameGeneration;
@@ -54,38 +54,35 @@ class OrderServiceTest {
 
     private KitchenridersClient kitchenridersClient = new FakeKitchenridersClient();
 
-    private PurgomalumClient purgomalumClient = new FakePurgomalumClient();
-
-    private MenuService menuService;
-
-    private MenuGroupService menuGroupService;
-
-    private ProductService productService;
-
     private OrderService orderService;
 
     private OrderTableService orderTableService;
 
-    private MenuGroup menuGroup;
+    private Menu friedMenu;
+
+    private Menu seasonedMenu;
 
     @BeforeEach
     void setUp() {
-        menuGroupService = new MenuGroupService(menuGroupRepository);
-        productService = new ProductService(productRepository, menuRepository, purgomalumClient);
-        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
-                purgomalumClient);
         orderService = new OrderService(orderRepository, menuRepository, orderTableRepository,
                 kitchenridersClient);
         orderTableService = new OrderTableService(orderTableRepository, orderRepository);
-        menuGroup = menuGroupService.create(MenuGroupFixture.createRequest("치킨"));
+
+        MenuGroup chickenMenuGroup = menuGroupRepository.save(MenuGroupFixture.createChicken());
+        Product friedProduct = productRepository.save(ProductFixture.createFired());
+        Product seasonedProduct = productRepository.save(ProductFixture.createSeasoned());
+        friedMenu = menuRepository.save(
+                MenuFixture.createFried2(chickenMenuGroup, friedProduct));
+        seasonedMenu = menuRepository.save(
+                MenuFixture.createFried2(chickenMenuGroup, seasonedProduct));
     }
 
 
     @Test
     void 주문_하나에_여러_메뉴를_주문할_수_있다() {
         Order createRequest = OrderFixture.createTakeOutRequest(
-                OrderFixture.createOrderLineItem(createFriedMenu(), 2),
-                OrderFixture.createOrderLineItem(createSeasonedMenu(), 1));
+                createFriedOrderLineItem(),
+                createSeasonedOrderLineItem());
 
         Order actual = orderService.create(createRequest);
 
@@ -94,10 +91,9 @@ class OrderServiceTest {
 
     @Test
     void 노출되지_않은_메뉴를_주문하면_예외를_던진다() {
-        Menu friedMenu = createFriedMenu();
-        menuService.hide(friedMenu.getId());
+        friedMenu.setDisplayed(false);
         Order createRequest = OrderFixture.createTakeOutRequest(
-                OrderFixture.createOrderLineItem(friedMenu, 2));
+                createFriedOrderLineItem());
 
         assertThatThrownBy(() -> orderService.create(createRequest)).isInstanceOf(
                 IllegalStateException.class);
@@ -114,9 +110,9 @@ class OrderServiceTest {
     @Test
     void 모든_주문_목록을_볼_수_있다() {
         Order takeOutRequest = OrderFixture.createTakeOutRequest(
-                OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                createFriedOrderLineItem());
         Order deliveryRequest = OrderFixture.createDeliveryRequest("주소",
-                OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                createFriedOrderLineItem());
         orderService.create(takeOutRequest);
         orderService.create(deliveryRequest);
 
@@ -130,7 +126,7 @@ class OrderServiceTest {
         @Test
         void 배달주문_생성시_주소를_빠뜨리면_예외를_던진다() {
             Order createRequest = OrderFixture.createDeliveryRequest(null,
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
 
             assertThatThrownBy(() -> orderService.create(createRequest)).isInstanceOf(
                     IllegalArgumentException.class);
@@ -139,7 +135,7 @@ class OrderServiceTest {
         @Test
         void 배달주문이_생성되면_주문은_승인을_WAITING하는_상태가_된다() {
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
 
             Order actual = orderService.create(createRequest);
 
@@ -149,7 +145,7 @@ class OrderServiceTest {
         @Test
         void WAITING_상태의_배달주문을_승인한다() {
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             Order actual = orderService.accept(saved.getId());
 
@@ -159,7 +155,7 @@ class OrderServiceTest {
         @Test
         void WAITING_상태가_아닌_배달주문을_승인하면_예외를_던진다() {
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
 
@@ -170,7 +166,7 @@ class OrderServiceTest {
         @Test
         void ACCEPTED_상태의_배달주문을_SERVED_상태로_변경한다() {
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
 
@@ -182,7 +178,7 @@ class OrderServiceTest {
         @Test
         void ACCEPTED_상태가_아닌_배달주문을_SERVED_상태로_변경하면_예외를_던진다() {
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
 
             assertThatThrownBy(() -> orderService.serve(saved.getId())).isInstanceOf(
@@ -192,7 +188,7 @@ class OrderServiceTest {
         @Test
         void SERVED된_배달_주문의_음식을_배달중_상태로_변경한다() {
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
             orderService.serve(saved.getId());
@@ -205,7 +201,7 @@ class OrderServiceTest {
         @Test
         void SERVED_상태가_아닌_배달주문을_배달중_상태로_변경하면_예외를_던진다() {
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
 
             assertThatThrownBy(() -> orderService.startDelivery(saved.getId())).isInstanceOf(
@@ -215,7 +211,7 @@ class OrderServiceTest {
         @Test
         void 배달주문이_아닌_주문을_배달중_상태로_변경하면_예외를_던진다() {
             Order createRequest = OrderFixture.createTakeOutRequest(
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
             orderService.serve(saved.getId());
@@ -227,7 +223,7 @@ class OrderServiceTest {
         @Test
         void 배달중인_배달주문을_배달완료_상태로_변경한다() {
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
             orderService.serve(saved.getId());
@@ -241,7 +237,7 @@ class OrderServiceTest {
         @Test
         void 배달중_상태가_아닌_배달주문을_배달완료_상태로_변경하면_예외를_던진다() {
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(createFriedMenu(), 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
 
             assertThatThrownBy(() -> orderService.completeDelivery(saved.getId())).isInstanceOf(
@@ -250,9 +246,8 @@ class OrderServiceTest {
 
         @Test
         void 배달주문이_아닌_주문을_배달완료_상태로_변경하면_예외를_던진다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createTakeOutRequest(
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
             orderService.serve(saved.getId());
@@ -263,9 +258,8 @@ class OrderServiceTest {
 
         @Test
         void 배달이_완료된_배달주문을_완료상태로_변경한다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
             orderService.serve(saved.getId());
@@ -279,9 +273,8 @@ class OrderServiceTest {
 
         @Test
         void 배달완료_상태가_아닌_주문을_완료상태로_변경하면_예외를_던진다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createDeliveryRequest("주소",
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
 
             assertThatThrownBy(() -> orderService.complete(saved.getId())).isInstanceOf(
@@ -294,9 +287,8 @@ class OrderServiceTest {
 
         @Test
         void 포장주문이_생성되면_주문은_승인을_WAITING하는_상태가_된다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createTakeOutRequest(
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
 
             Order actual = orderService.create(createRequest);
 
@@ -305,9 +297,8 @@ class OrderServiceTest {
 
         @Test
         void WAITING_상태의_포장주문을_승인한다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createTakeOutRequest(
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             Order actual = orderService.accept(saved.getId());
 
@@ -316,9 +307,8 @@ class OrderServiceTest {
 
         @Test
         void WAITING_상태가_아닌_포장주문을_승인하면_예외를_던진다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createTakeOutRequest(
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
 
@@ -328,9 +318,8 @@ class OrderServiceTest {
 
         @Test
         void ACCEPTED_상태의_포장주문을_SERVED_상태로_변경한다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createTakeOutRequest(
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
 
@@ -341,9 +330,8 @@ class OrderServiceTest {
 
         @Test
         void ACCEPTED_상태가_아닌_포장주문을_SERVED_상태로_변경하면_예외를_던진다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createTakeOutRequest(
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
 
             assertThatThrownBy(() -> orderService.serve(saved.getId())).isInstanceOf(
@@ -352,9 +340,8 @@ class OrderServiceTest {
 
         @Test
         void SERVED된_포장주문을_완료상태로_변경한다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createTakeOutRequest(
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
             orderService.serve(saved.getId());
@@ -366,9 +353,8 @@ class OrderServiceTest {
 
         @Test
         void SERVED_상태가_아닌_포장주문을_완료상태로_변경하면_예외를_던진다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createTakeOutRequest(
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
 
             assertThatThrownBy(() -> orderService.complete(saved.getId())).isInstanceOf(
@@ -381,9 +367,8 @@ class OrderServiceTest {
 
         @Test
         void 매장주문_생성시_테이블을_빠뜨리면_예외를_던진다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createEatInRequest(null,
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
 
             assertThatThrownBy(() -> orderService.create(createRequest)).isInstanceOf(
                     NoSuchElementException.class);
@@ -391,9 +376,8 @@ class OrderServiceTest {
 
         @Test
         void 매장주문_생성시_손님이_앉아있지_않은_테이블이면_예외를_던진다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createEatInRequest(createTable(),
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
 
             assertThatThrownBy(() -> orderService.create(createRequest)).isInstanceOf(
                     IllegalStateException.class);
@@ -401,9 +385,8 @@ class OrderServiceTest {
 
         @Test
         void 매장주문이_생성되면_주문은_승인을_WAITING하는_상태가_된다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createEatInRequest(createOccupiedTable(),
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
 
             Order actual = orderService.create(createRequest);
 
@@ -412,9 +395,8 @@ class OrderServiceTest {
 
         @Test
         void WAITING_상태의_매장주문을_승인한다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createEatInRequest(createOccupiedTable(),
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             Order actual = orderService.accept(saved.getId());
 
@@ -423,9 +405,8 @@ class OrderServiceTest {
 
         @Test
         void WAITING_상태가_아닌_매장주문을_승인하면_예외를_던진다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createEatInRequest(createOccupiedTable(),
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
 
@@ -435,9 +416,8 @@ class OrderServiceTest {
 
         @Test
         void ACCEPTED_상태의_매장주문을_SERVED_상태로_변경한다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createEatInRequest(createOccupiedTable(),
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
 
@@ -448,9 +428,8 @@ class OrderServiceTest {
 
         @Test
         void ACCEPTED_상태가_아닌_매장주문을_SERVED_상태로_변경하면_예외를_던진다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createEatInRequest(createOccupiedTable(),
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
 
             assertThatThrownBy(() -> orderService.serve(saved.getId())).isInstanceOf(
@@ -459,10 +438,9 @@ class OrderServiceTest {
 
         @Test
         void SERVED된_매장주문을_완료상태로_변경하면_테이블은_초기값으로_세팅된다() {
-            Menu friedMenu = createFriedMenu();
             OrderTable orderTable = createOccupiedTable();
             Order createRequest = OrderFixture.createEatInRequest(orderTable,
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
             orderService.accept(saved.getId());
             orderService.serve(saved.getId());
@@ -476,9 +454,8 @@ class OrderServiceTest {
 
         @Test
         void SERVED_상태가_아닌_포장주문을_완료상태로_변경하면_예외를_던진다() {
-            Menu friedMenu = createFriedMenu();
             Order createRequest = OrderFixture.createEatInRequest(createOccupiedTable(),
-                    OrderFixture.createOrderLineItem(friedMenu, 2));
+                    createFriedOrderLineItem());
             Order saved = orderService.create(createRequest);
 
             assertThatThrownBy(() -> orderService.complete(saved.getId())).isInstanceOf(
@@ -486,16 +463,12 @@ class OrderServiceTest {
         }
     }
 
-    private Menu createFriedMenu() {
-        Product fried = productService.create(ProductFixture.createRequest("후라이드", 20_000L));
-        return menuService.create(
-                MenuFixture.createRequest("후라이드1+1", 30_000L, menuGroup, fried, 2));
+    private OrderLineItem createFriedOrderLineItem() {
+        return OrderFixture.createOrderLineItem(friedMenu, 2);
     }
 
-    private Menu createSeasonedMenu() {
-        Product seasoned = productService.create(ProductFixture.createRequest("양념", 25_000L));
-        return menuService.create(
-                MenuFixture.createRequest("양념1+1", 35_000L, menuGroup, seasoned, 2));
+    private OrderLineItem createSeasonedOrderLineItem() {
+        return OrderFixture.createOrderLineItem(seasonedMenu, 1);
     }
 
     private OrderTable createOccupiedTable() {

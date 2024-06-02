@@ -2,6 +2,7 @@ package kitchenpos.fixture;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
@@ -37,6 +38,36 @@ public class MenuFixture {
     public static Menu changePriceRequest(Long price){
         Menu menu = new Menu();
         menu.setPrice(BigDecimal.valueOf(price));
+        return menu;
+    }
+
+    public static Menu createFried2(MenuGroup menuGroup, Product product){
+        Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName("후라이드1+1");
+        menu.setPrice(BigDecimal.valueOf(30_000L));
+        menu.setMenuGroupId(menuGroup.getId());
+        menu.setDisplayed(true);
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(2);
+        menuProduct.setProductId(product.getId());
+        menu.setMenuProducts(List.of(menuProduct));
+        return menu;
+    }
+
+    public static Menu createSeasoned2(MenuGroup menuGroup, Product product){
+        Menu menu = new Menu();
+        menu.setId(UUID.randomUUID());
+        menu.setName("양념1+1");
+        menu.setPrice(BigDecimal.valueOf(35_000L));
+        menu.setMenuGroupId(menuGroup.getId());
+        menu.setDisplayed(true);
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(2);
+        menuProduct.setProductId(product.getId());
+        menu.setMenuProducts(List.of(menuProduct));
         return menu;
     }
 }
