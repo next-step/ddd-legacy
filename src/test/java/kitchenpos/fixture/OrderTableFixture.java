@@ -17,7 +17,7 @@ public class OrderTableFixture {
         return orderTable;
     }
 
-    public static OrderTable createNumber1Table(){
+    public static OrderTable createNumber1(){
         OrderTable orderTable = new OrderTable();
         orderTable.setId(UUID.randomUUID());
         orderTable.setName("1번 테이블");

@@ -52,7 +52,7 @@ public class OrderFixture {
         return orderLineItem;
     }
 
-    public static Order createEatInOrder(OrderTable orderTable, Menu menu) {
+    public static Order createEatIn(OrderTable orderTable, Menu menu) {
         Order order = new Order();
         order.setId(UUID.randomUUID());
         order.setType(OrderType.EAT_IN);

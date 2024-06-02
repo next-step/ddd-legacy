@@ -103,7 +103,7 @@ class ProductServiceTest {
     private Menu createFriedMenu(Product product) {
         MenuGroup chickenMenuGroup = menuGroupRepository.save(MenuGroupFixture.createChicken());
         return menuRepository.save(
-                MenuFixture.createFried2(chickenMenuGroup, product));
+                MenuFixture.createFriedOnePlusOne(chickenMenuGroup, product));
     }
 
     @Test

@@ -41,7 +41,7 @@ public class MenuFixture {
         return menu;
     }
 
-    public static Menu createFried2(MenuGroup menuGroup, Product product){
+    public static Menu createFriedOnePlusOne(MenuGroup menuGroup, Product product){
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setName("후라이드1+1");

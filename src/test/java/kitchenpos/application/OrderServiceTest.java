@@ -456,7 +456,7 @@ class OrderServiceTest {
         MenuGroup chickenMenuGroup = menuGroupRepository.save(MenuGroupFixture.createChicken());
         Product friedProduct = productRepository.save(ProductFixture.createFired());
         return menuRepository.save(
-                MenuFixture.createFried2(chickenMenuGroup, friedProduct));
+                MenuFixture.createFriedOnePlusOne(chickenMenuGroup, friedProduct));
     }
 
     private OrderLineItem createOrderLineItem(Menu menu) {
@@ -470,6 +470,6 @@ class OrderServiceTest {
     }
 
     private OrderTable createTable() {
-        return orderTableRepository.save(OrderTableFixture.createNumber1Table());
+        return orderTableRepository.save(OrderTableFixture.createNumber1());
     }
 }

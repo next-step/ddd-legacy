@@ -117,8 +117,8 @@ class OrderTableServiceTest {
         MenuGroup chickenMenuGroup = menuGroupRepository.save(MenuGroupFixture.createChicken());
         Product friedProduct = productRepository.save(ProductFixture.createFired());
         Menu friedMenu = menuRepository.save(
-                MenuFixture.createFried2(chickenMenuGroup, friedProduct));
-        return orderRepository.save(OrderFixture.createEatInOrder(orderTable, friedMenu));
+                MenuFixture.createFriedOnePlusOne(chickenMenuGroup, friedProduct));
+        return orderRepository.save(OrderFixture.createEatIn(orderTable, friedMenu));
     }
 
     @Test
