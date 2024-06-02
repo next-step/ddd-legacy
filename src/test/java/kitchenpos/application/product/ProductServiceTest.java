@@ -1,9 +1,22 @@
 package kitchenpos.application.product;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
 import kitchenpos.application.ProductService;
-import kitchenpos.domain.common.FakeUuidBuilder;
 import kitchenpos.common.UuidBuilder;
-import kitchenpos.domain.*;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroup;
+import kitchenpos.domain.MenuRepository;
+import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
+import kitchenpos.domain.common.FakeUuidBuilder;
 import kitchenpos.fixture.MenuFixture;
 import kitchenpos.fixture.MenuGroupFixture;
 import kitchenpos.fixture.ProductFixture;
@@ -14,20 +27,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {

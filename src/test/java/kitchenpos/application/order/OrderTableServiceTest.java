@@ -42,6 +42,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class OrderTableServiceTest {
@@ -118,7 +119,7 @@ class OrderTableServiceTest {
 
     @DisplayName("주문 테이블의 이름은 비어있을 수 없다.")
     @ParameterizedTest
-    @ValueSource(strings = {""})
+    @EmptySource
     void failToCreateOrderTableWithEmptyString(final String name) {
 
       assertThatIllegalArgumentException().isThrownBy(
