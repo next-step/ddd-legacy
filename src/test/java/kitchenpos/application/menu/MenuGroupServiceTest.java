@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class MenuGroupServiceTest {
 
     @DisplayName("`메뉴 카테고리`의 `메뉴 카테고리 이름`은 비어있을 수 없다.")
     @ParameterizedTest
-    @ValueSource(strings = {""})
+    @NullAndEmptySource
     void createMenuCategoryWithEmptyMenuCategoryName(String menuGroupName) {
       MenuGroup menuGroup = MenuGroupFixture.createMenuGroup(menuGroupName);
 

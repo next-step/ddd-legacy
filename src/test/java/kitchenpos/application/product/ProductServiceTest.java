@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -79,16 +80,28 @@ class ProductServiceTest {
     }
 
 
-    @DisplayName("상품의 이름(Product Name)이 없거나 비속어(Profanity)가 포함될 수 없다.")
+    @DisplayName("상품의 이름(Product Name)이 없을 수 없다.")
     @ParameterizedTest
-    @ValueSource(strings = {"", "badwords"})
-    void failToCreateProductWithProfanityAndEmptyProductName(final String name) {
+    @EmptySource
+    void failToCreateProductWithEmptyProductName(final String name) {
       final Product product = ProductFixture.createProduct(name, TWENTY_THOUSANDS);
 
       given(badWordsValidator.containsProfanity(any())).willReturn(true);
 
       assertThatIllegalArgumentException()
               .isThrownBy(() -> productService.create(product));
+    }
+
+    @DisplayName("비속어(Profanity)가 포함될 수 없다.")
+    @ParameterizedTest
+    @ValueSource(strings = {"badwords"})
+    void failToCreateProductWithProfanityProductName(final String name) {
+      final Product product = ProductFixture.createProduct(name, TWENTY_THOUSANDS);
+
+      given(badWordsValidator.containsProfanity(any())).willReturn(true);
+
+      assertThatIllegalArgumentException()
+          .isThrownBy(() -> productService.create(product));
     }
   }
 
