@@ -2,6 +2,7 @@ package kitchenpos.infra.menu;
 
 import java.util.*;
 import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;
 
 public class InMemoryMenuRepository implements MenuRepository {
@@ -20,7 +21,17 @@ public class InMemoryMenuRepository implements MenuRepository {
 
   @Override
   public List<Menu> findAllByProductId(UUID productId) {
-    return db.values().stream().filter(o -> o.getId().equals(productId)).toList();
+    final List<Menu> findValue = new ArrayList<>();
+    final List<Menu> values = db.values().stream().toList();
+    for (Menu value : values) {
+      for (MenuProduct menuProduct : value.getMenuProducts()) {
+        if (menuProduct.getProductId().equals(productId)) {
+          findValue.add(value);
+        }
+      }
+    }
+
+    return findValue;
   }
 
   @Override
@@ -30,7 +41,8 @@ public class InMemoryMenuRepository implements MenuRepository {
 
   @Override
   public Menu save(Menu menu) {
-    return db.put(menu.getId(), menu);
+    db.put(menu.getId(), menu);
+    return menu;
   }
 
   @Override

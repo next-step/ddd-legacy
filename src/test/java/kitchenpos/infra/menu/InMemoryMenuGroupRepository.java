@@ -15,7 +15,8 @@ public class InMemoryMenuGroupRepository implements MenuGroupRepository {
 
   @Override
   public MenuGroup save(MenuGroup menuGroup) {
-    return db.put(menuGroup.getId(), menuGroup);
+    db.put(menuGroup.getId(), menuGroup);
+    return menuGroup;
   }
 
   @Override

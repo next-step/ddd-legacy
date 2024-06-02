@@ -14,7 +14,8 @@ public class InMemoryOrderTableRepository implements OrderTableRepository {
 
   @Override
   public OrderTable save(OrderTable orderTable) {
-    return db.put(orderTable.getId(), orderTable);
+    db.put(orderTable.getId(), orderTable);
+    return orderTable;
   }
 
   @Override
