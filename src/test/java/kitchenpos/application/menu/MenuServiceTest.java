@@ -2,6 +2,7 @@ package kitchenpos.application.menu;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,168 +26,128 @@ import kitchenpos.domain.ProductRepository;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class MenuServiceTest {
 
   private MenuService menuService;
-  private MenuGroupService menuGroupService;
-  private ProductService productService;
+  private MenuGroupRepository menuGroupRepository;
+  private ProductRepository productRepository;
+
+  private MenuGroup menuGroup;
+  private Product product;
 
   @BeforeEach
   public void init() {
     MenuRepository menuRepository = new InMemoryMenuRepository();
-    ProductRepository productRepository = new InMemoryProductRepository();
-    MenuGroupRepository menuGroupRepository = new InMemoryMenuGroupRepository();
+    this.productRepository = new InMemoryProductRepository();
+    this.menuGroupRepository = new InMemoryMenuGroupRepository();
     PurgomalumClient purgomalumClient = new FakePurgomalumClient();
     menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
         purgomalumClient);
-    menuGroupService = new MenuGroupService(menuGroupRepository);
-    productService = new ProductService(productRepository, menuRepository, purgomalumClient);
+
+    MenuGroup menuGroup = MenuGroupFixture.normal();
+    this.menuGroup = menuGroupRepository.save(menuGroup);
+    Product product = ProductFixture.normal();
+    this.product = productRepository.save(product);
   }
 
   @DisplayName("메뉴를 등록할 수 있다.")
   @Test
   public void register() {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
-
     MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
     Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 100L, true);
     Menu menu = menuService.create(request);
     assertThat(menu).isNotNull();
   }
 
-  @DisplayName("메뉴명이 욕설을 포함했거나 없을 경우 IllegalArgumentException 예외 처리를 한다.")
-  @NullSource
-  @ValueSource(strings = {"욕설", "비속어"})
-  @ParameterizedTest
-  public void invalidMenuName(String name) {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
+  @Nested
+  @DisplayName("메뉴를 등록할 수 없다.")
+  class RegisterFail {
+    @DisplayName("메뉴명은 욕설이 포함될 수 없다.")
+    @NullSource
+    @ValueSource(strings = {"욕설", "비속어"})
+    @ParameterizedTest
+    public void invalidMenuName(String name) {
+      MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
+      Menu request = MenuFixture.createMenu(name, menuGroup, List.of(menuProduct), 100L, true);
+      assertThatExceptionOfType(IllegalArgumentException.class)
+          .isThrownBy(() -> menuService.create(request));
+    }
 
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
+    @DisplayName("메뉴 가격은 0원 이상의 정수여야한다.")
+    @ValueSource(longs = {-1L, -100L})
+    @ParameterizedTest
+    public void invalidMenuPrice(Long price) {
+      MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
+      Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), price, true);
+      assertThatExceptionOfType(IllegalArgumentException.class)
+          .isThrownBy(() -> menuService.create(request));
+    }
 
-    MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
-    Menu request = MenuFixture.createMenu(name, menuGroup, List.of(menuProduct), 100L, true);
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> menuService.create(request));
-  }
+    @DisplayName("메뉴는 등록된 메뉴그룹에 포함되어야한다.")
+    @Test
+    public void invalidMenuGroup() {
+      MenuGroup menuGroup = MenuGroupFixture.normal();
+      MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
+      Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 100L, true);
+      assertThatExceptionOfType(NoSuchElementException.class)
+          .isThrownBy(() -> menuService.create(request));
+    }
 
-  @DisplayName("메뉴 가격이 0원 미만일 경우 IllegalArgumentException 예외 처리를 한다.")
-  @ValueSource(longs = {-1L, -100L})
-  @ParameterizedTest
-  public void invalidMenuPrice(Long price) {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
+    @DisplayName("1개 이상의 메뉴상품을 등록해야한다.")
+    @NullAndEmptySource
+    @ParameterizedTest
+    public void nullAndEmptyMenuProducts(List<MenuProduct> products) {
+      Menu menu = MenuFixture.createMenu("메뉴", menuGroup, products, 100L, true);
+      assertThatExceptionOfType(IllegalArgumentException.class)
+          .isThrownBy(() -> menuService.create(menu));
+    }
 
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
+    @DisplayName("메뉴상품은 등록된 상품을 포함해야한다.")
+    @Test
+    public void invalidMenuProducts() {
+      Product product2 = ProductFixture.normal();
+      MenuProduct menuProduct1 = MenuFixture.createMenuProduct(product, 1L, 1L);
+      MenuProduct menuProduct2 = MenuFixture.createMenuProduct(product2, 1L, 1L);
 
-    MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
-    Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), price, true);
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> menuService.create(request));
-  }
+      Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct1, menuProduct2),
+          100L, true);
 
-  @DisplayName("등록되지 않은 메뉴그룹을 포함할 경우 NoSuchElementException 예외 처리를 한다.")
-  @Test
-  public void invalidMenuGroup() {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
+      assertThatExceptionOfType(IllegalArgumentException.class)
+          .isThrownBy(() -> menuService.create(request));
+    }
 
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
+    @DisplayName("메뉴상품의 수량은 0개 이상이어야한다.")
+    @ValueSource(longs = {-1L, -100L})
+    @ParameterizedTest
+    public void invalidMenuProductQuantity(Long quantity) {
+      MenuProduct menuProduct = MenuFixture.createMenuProduct(product, quantity, 1L);
+      Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 100L, true);
+      assertThatExceptionOfType(IllegalArgumentException.class)
+          .isThrownBy(() -> menuService.create(request));
+    }
 
-    MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
-    Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 100L, true);
-    assertThatExceptionOfType(NoSuchElementException.class)
-        .isThrownBy(() -> menuService.create(request));
-  }
-
-  @DisplayName("메뉴 상품을 등록하지 않은 경우 IllegalArgumentException 예외 처리를 한다.")
-  @Test
-  public void nullAndEmptyMenuProducts() {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Menu request1 = MenuFixture.createMenu("메뉴", menuGroup, List.of(), 100L, true);
-    Menu request2 = MenuFixture.createMenu("메뉴", menuGroup, null, 100L, true);
-
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> menuService.create(request1));
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> menuService.create(request2));
-  }
-
-  @DisplayName("등록된 상품을 포함하지 않은 경우 IllegalArgumentException 예외 처리를 한다.")
-  @Test
-  public void invalidMenuProducts() {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Product product1 = ProductFixture.create("상품", 200L);
-    Product product2 = ProductFixture.create("상품", 200L);
-    product1 = productService.create(product1);
-
-    MenuProduct menuProduct1 = MenuFixture.createMenuProduct(product1, 1L, 1L);
-    MenuProduct menuProduct2 = MenuFixture.createMenuProduct(product2, 1L, 1L);
-
-    Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct1, menuProduct2),
-        100L, true);
-
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> menuService.create(request));
-  }
-
-  @DisplayName("메뉴 상품의 수량이 0개 미만일 경우 IllegalArgumentException 예외 처리를 한다.")
-  @ValueSource(longs = {-1L, -100L})
-  @ParameterizedTest
-  public void invalidMenuProductQuantity(Long quantity) {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
-
-    MenuProduct menuProduct = MenuFixture.createMenuProduct(product, quantity, 1L);
-    Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 100L, true);
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> menuService.create(request));
-  }
-
-  @DisplayName("메뉴 판매 조건을 만족하지 않을 경우 IllegalArgumentException 예외 처리를 한다.")
-  @ValueSource(longs = {300L, 400L})
-  @ParameterizedTest
-  public void invalidMenuSellingCondition(Long price) {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
-
-    MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
-    Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), price, true);
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> menuService.create(request));
+    @DisplayName("메뉴 판매 조건을 만족해야한다.")
+    @ValueSource(longs = {1_100L, 3_000L})
+    @ParameterizedTest
+    public void invalidMenuSellingCondition(Long price) {
+      MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
+      Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), price, true);
+      assertThatExceptionOfType(IllegalArgumentException.class)
+          .isThrownBy(() -> menuService.create(request));
+    }
   }
 
   @DisplayName("메뉴가격을 변경할 수 있다.")
   @ValueSource(longs = {50L, 100L})
   @ParameterizedTest
   public void modifyMenuPrice(Long price) {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
-
     MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
     Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 150L, true);
     Menu menu = menuService.create(request);
@@ -196,16 +157,10 @@ class MenuServiceTest {
     assertThat(change.getPrice()).isEqualTo(new BigDecimal(price));
   }
 
-  @DisplayName("변경할 메뉴 가격이 0원 미만일 경우 IllegalArgumentException 예외 처리를 한다.")
+  @DisplayName("변경할 메뉴 가격은 0원 이상의 정수여야한다.")
   @ValueSource(longs = {-50L, -100L})
   @ParameterizedTest
   public void invalidMenuPriceModification(Long price) {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
-
     MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
     Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 150L, true);
     Menu menu = menuService.create(request);
@@ -215,16 +170,10 @@ class MenuServiceTest {
         .isThrownBy(() -> menuService.changePrice(menu.getId(), change));
   }
 
-  @DisplayName("변경할 메뉴 가격이 메뉴 판매 조건을 만족하지 못할 경우 IllegalArgumentException 예외 처리를 한다.")
-  @ValueSource(longs = {300L, 4000L})
+  @DisplayName("변경할 메뉴 가격이 메뉴 판매 조건을 만족해야한다.")
+  @ValueSource(longs = {3_300L, 4_400L})
   @ParameterizedTest
   public void invalidMenuPriceModificationBecauseMenuSellingCondition(Long price) {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
-
     MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
     Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 150L, true);
     Menu menu = menuService.create(request);
@@ -237,12 +186,6 @@ class MenuServiceTest {
   @DisplayName("메뉴를 공개할 수 있다.")
   @Test
   public void display() {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
-
     MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
     Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 100L, false);
     Menu menu = menuService.create(request);
@@ -254,12 +197,6 @@ class MenuServiceTest {
   @DisplayName("메뉴를 비공개할 수 있다.")
   @Test
   public void hide() {
-    MenuGroup menuGroup = MenuGroupFixture.create("메뉴그룹");
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Product product = ProductFixture.create("상품", 200L);
-    product = productService.create(product);
-
     MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
     Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 100L, true);
     Menu menu = menuService.create(request);
@@ -271,24 +208,15 @@ class MenuServiceTest {
   @DisplayName("등록된 메뉴 전체를 조회할 수 있다.")
   @Test
   public void InvalidateMenuGroupName() {
-    MenuGroup menuGroup1 = MenuGroupFixture.create("메뉴그룹");
-    menuGroup1 = menuGroupService.create(menuGroup1);
-
-    Product product1 = ProductFixture.create("상품", 200L);
-    product1 = productService.create(product1);
-
-    MenuProduct menuProduct1 = MenuFixture.createMenuProduct(product1, 1L, 1L);
-    Menu request1 = MenuFixture.createMenu("메뉴", menuGroup1, List.of(menuProduct1), 100L, true);
+    MenuProduct menuProduct1 = MenuFixture.createMenuProduct(product, 1L, 1L);
+    Menu request1 = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct1), 100L, true);
     Menu menu1 = menuService.create(request1);
 
-    MenuGroup menuGroup2 = MenuGroupFixture.create("메뉴그룹");
-    menuGroup2 = menuGroupService.create(menuGroup2);
-
     Product product2 = ProductFixture.create("상품", 200L);
-    product2 = productService.create(product2);
+    product2 = productRepository.save(product2);
 
     MenuProduct menuProduct2 = MenuFixture.createMenuProduct(product2, 1L, 1L);
-    Menu request2 = MenuFixture.createMenu("메뉴", menuGroup2, List.of(menuProduct2), 100L, true);
+    Menu request2 = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct2), 100L, true);
     Menu menu2 = menuService.create(request2);
 
     List<Menu> menus = menuService.findAll();

@@ -7,27 +7,28 @@ import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
+import org.springframework.test.util.ReflectionTestUtils;
 
 public class MenuFixture {
   public static MenuProduct createMenuProduct(Product product, Long quantity, Long seq) {
     MenuProduct menuProduct = new MenuProduct();
-    menuProduct.setProduct(product);
-    menuProduct.setQuantity(quantity);
-    menuProduct.setProductId(product.getId());
-    menuProduct.setSeq(seq);
+    ReflectionTestUtils.setField(menuProduct, "product", product);
+    ReflectionTestUtils.setField(menuProduct, "quantity", quantity);
+    ReflectionTestUtils.setField(menuProduct, "productId", product.getId());
+    ReflectionTestUtils.setField(menuProduct, "seq", seq);
     return menuProduct;
   }
 
   public static Menu createMenu(String name, MenuGroup menuGroup, List<MenuProduct> menuProducts, Long price, boolean displayed) {
-    Menu request = new Menu();
-    request.setId(UUID.randomUUID());
-    request.setName(name);
-    request.setMenuGroup(menuGroup);
-    request.setMenuProducts(menuProducts);
-    request.setPrice(new BigDecimal(price));
-    request.setDisplayed(displayed);
-    request.setMenuGroupId(menuGroup.getId());
-    return request;
+    Menu menu = new Menu();
+    ReflectionTestUtils.setField(menu, "id", UUID.randomUUID());
+    ReflectionTestUtils.setField(menu, "name", name);
+    ReflectionTestUtils.setField(menu, "menuGroup", menuGroup);
+    ReflectionTestUtils.setField(menu, "menuProducts", menuProducts);
+    ReflectionTestUtils.setField(menu, "price", new BigDecimal(price));
+    ReflectionTestUtils.setField(menu, "displayed", displayed);
+    ReflectionTestUtils.setField(menu, "menuGroupId", menuGroup.getId());
+    return menu;
   }
 
   public static Menu createDefaultMenu(boolean displayed) {

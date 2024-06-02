@@ -1,5 +1,6 @@
 package kitchenpos.application.fixture;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public class ProductFixture {
     Product product = new Product();
     ReflectionTestUtils.setField(product, "id", UUID.randomUUID());
     ReflectionTestUtils.setField(product, "name", name);
-    ReflectionTestUtils.setField(product, "price", price);
+    ReflectionTestUtils.setField(product, "price", new BigDecimal(price));
     return product;
   }
 
