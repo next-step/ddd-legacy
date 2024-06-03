@@ -42,8 +42,7 @@ public class MenuGroupServiceTest {
       assertThatIllegalArgumentException()
               .isThrownBy(() -> menuGroupService.create(menuGroup));
     }
-
-    @DisplayName("`메뉴 카테고리`의 `메뉴 카테고리 이름`을 생성할 수 있다.")
+    @DisplayName("정상적인 이름일 때 메뉴 카테고리를 생성할 수 있다")
     @ParameterizedTest
     @ValueSource(strings = {"one for two", "set for two"})
     void createMenuCategory(String menuGroupName) {
