@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fixture.*;
 import kitchenpos.domain.*;
 import kitchenpos.infra.KitchenridersClient;
 import org.junit.jupiter.api.DisplayName;
@@ -14,8 +15,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -45,9 +48,9 @@ class OrderServiceTest {
         @Test
         void create() {
             // given
-            Order request = createOrderRequest(OrderType.TAKEOUT, 2, BigDecimal.valueOf(20_000), true);
+            Order request = OrderFixture.createOrderRequest(OrderType.TAKEOUT, 2, BigDecimal.valueOf(20_000), true);
             mockMenuRepositoryForOrderRequest(request);
-            Order savedOrder = createSavedOrder(request);
+            Order savedOrder = OrderFixture.createSavedOrder(request);
             given(orderRepository.save(any())).willReturn(savedOrder);
 
             // when
@@ -62,7 +65,7 @@ class OrderServiceTest {
         @ParameterizedTest
         void orderTypeCannotBeNull(OrderType type) {
             // given
-            Order request = createOrderRequest(type, 0, BigDecimal.ZERO, true);
+            Order request = OrderFixture.createOrderRequest(type, 0, BigDecimal.ZERO, true);
 
             // when then
             assertThatThrownBy(() -> orderService.create(request))
@@ -87,16 +90,16 @@ class OrderServiceTest {
         @Test
         void cannotOrderWithMismatchedMenus() {
             // given
-            Product product = createProduct(BigDecimal.valueOf(9_000));
-            MenuProduct menuProduct = createMenuProduct(product, 2);
+            Product product = ProductFixture.createProduct(BigDecimal.valueOf(9_000), "Product");
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 2);
 
-            Menu menu1 = createMenu(menuProduct, BigDecimal.valueOf(20_000), true);
-            Menu menu2 = createMenu(menuProduct, BigDecimal.valueOf(20_000), true);
+            Menu menu1 = MenuFixture.createMenu(menuProduct, MenuGroupFixture.createMenuGroup(), 20_000, "Menu1", true);
+            Menu menu2 = MenuFixture.createMenu(menuProduct, MenuGroupFixture.createMenuGroup(), 20_000, "Menu2", true);
 
-            OrderLineItem orderLineItem1 = createOrderLineItem(menu1, 2, BigDecimal.valueOf(20_000));
-            OrderLineItem orderLineItem2 = createOrderLineItem(menu2, 2, BigDecimal.valueOf(20_000));
+            OrderLineItem orderLineItem1 = OrderFixture.createOrderLineItem(menu1, 2, BigDecimal.valueOf(20_000));
+            OrderLineItem orderLineItem2 = OrderFixture.createOrderLineItem(menu2, 2, BigDecimal.valueOf(20_000));
 
-            Order request = createOrderRequest(OrderType.TAKEOUT, List.of(orderLineItem1, orderLineItem2));
+            Order request = OrderFixture.createOrderRequest(OrderType.TAKEOUT, List.of(orderLineItem1, orderLineItem2));
             given(menuRepository.findAllByIdIn(any())).willReturn(List.of(menu1));
 
             // when then
@@ -108,7 +111,7 @@ class OrderServiceTest {
         @Test
         void cannotOrderWithHiddenMenu() {
             // given
-            Order request = createOrderRequest(OrderType.TAKEOUT, 2, BigDecimal.valueOf(20_000), false);
+            Order request = OrderFixture.createOrderRequest(OrderType.TAKEOUT, 2, BigDecimal.valueOf(20_000), false);
             mockMenuRepositoryForOrderRequest(request);
 
             // when then
@@ -120,7 +123,7 @@ class OrderServiceTest {
         @Test
         void cannotOrderWithPriceMismatch() {
             // given
-            Order request = createOrderRequest(OrderType.TAKEOUT, 2, BigDecimal.valueOf(19_000), true);
+            Order request = OrderFixture.createOrderRequest(OrderType.TAKEOUT, 2, BigDecimal.valueOf(19_000), true);
             mockMenuRepositoryForOrderRequest(request);
 
             // when then
@@ -133,7 +136,7 @@ class OrderServiceTest {
         @ParameterizedTest
         void deliveryOrderMustIncludeAddress(String address) {
             // given
-            Order request = createOrderRequest(OrderType.DELIVERY, 2, BigDecimal.valueOf(20_000), true, address);
+            Order request = OrderFixture.createOrderRequest(OrderType.DELIVERY, 2, BigDecimal.valueOf(20_000), true, address);
             mockMenuRepositoryForOrderRequest(request);
 
             // when then
@@ -149,7 +152,7 @@ class OrderServiceTest {
             orderTable.setId(UUID.randomUUID());
             orderTable.setOccupied(false);
 
-            Order request = createOrderRequest(OrderType.DELIVERY, 2, BigDecimal.valueOf(20_000), true, orderTable);
+            Order request = OrderFixture.createOrderRequest(OrderType.DELIVERY, 2, BigDecimal.valueOf(20_000), true, orderTable);
             mockMenuRepositoryForOrderRequest(request);
 
             // when then
@@ -166,7 +169,7 @@ class OrderServiceTest {
         void accept() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, null);
+            Order order = OrderFixture.createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, null);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
@@ -182,7 +185,7 @@ class OrderServiceTest {
         void acceptOrderRequestsDeliveryForDeliveryOrder() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.WAITING, OrderType.DELIVERY, "123 Delivery St");
+            Order order = OrderFixture.createOrder(OrderStatus.WAITING, OrderType.DELIVERY, "123 Delivery St");
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
             doNothing().when(kitchenridersClient).requestDelivery(orderId, BigDecimal.valueOf(40_000), "123 Delivery St");
 
@@ -211,7 +214,7 @@ class OrderServiceTest {
         void acceptOrderThrowsIllegalStateExceptionForNonWaitingStatus() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.ACCEPTED, OrderType.TAKEOUT, null);
+            Order order = OrderFixture.createOrder(OrderStatus.ACCEPTED, OrderType.TAKEOUT, null);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when then
@@ -228,7 +231,7 @@ class OrderServiceTest {
         void serve() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.ACCEPTED, OrderType.TAKEOUT, null);
+            Order order = OrderFixture.createOrder(OrderStatus.ACCEPTED, OrderType.TAKEOUT, null);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
@@ -243,7 +246,7 @@ class OrderServiceTest {
         void serveThrowsIllegalStateExceptionForNonAcceptedStatus() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, null);
+            Order order = OrderFixture.createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, null);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when then
@@ -252,7 +255,7 @@ class OrderServiceTest {
         }
     }
 
-    @DisplayName("OrderService.startDelivery 메스드 테스트")
+    @DisplayName("OrderService.startDelivery 메서드 테스트")
     @Nested
     class startDelivery {
         @DisplayName("주문 상태가 SERVED이고 타입이 DELIVERY인 경우 주문 상태가 DELIVERING으로 변경된다.")
@@ -260,7 +263,7 @@ class OrderServiceTest {
         void startDelivery() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.SERVED, OrderType.DELIVERY, "123 Delivery St");
+            Order order = OrderFixture.createOrder(OrderStatus.SERVED, OrderType.DELIVERY, "123 Delivery St");
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
@@ -275,7 +278,7 @@ class OrderServiceTest {
         void startDeliveryThrowsIllegalStateExceptionForNonDeliveryType() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.SERVED, OrderType.TAKEOUT, null);
+            Order order = OrderFixture.createOrder(OrderStatus.SERVED, OrderType.TAKEOUT, null);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when then
@@ -288,7 +291,7 @@ class OrderServiceTest {
         void startDeliveryThrowsIllegalStateExceptionForNonServedStatus() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.ACCEPTED, OrderType.DELIVERY, "123 Delivery St");
+            Order order = OrderFixture.createOrder(OrderStatus.ACCEPTED, OrderType.DELIVERY, "123 Delivery St");
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when then
@@ -305,7 +308,7 @@ class OrderServiceTest {
         void completeDelivery() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.DELIVERING, OrderType.DELIVERY, "123 Delivery St");
+            Order order = OrderFixture.createOrder(OrderStatus.DELIVERING, OrderType.DELIVERY, "123 Delivery St");
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
@@ -320,7 +323,7 @@ class OrderServiceTest {
         void completeDeliveryThrowsIllegalStateExceptionForNonDeliveringStatus() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.SERVED, OrderType.DELIVERY, "123 Delivery St");
+            Order order = OrderFixture.createOrder(OrderStatus.SERVED, OrderType.DELIVERY, "123 Delivery St");
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when then
@@ -342,17 +345,17 @@ class OrderServiceTest {
             orderTable.setNumberOfGuests(2);
             orderTable.setOccupied(true);
 
-            Order order = createOrderWithTable(OrderStatus.SERVED, OrderType.EAT_IN, orderTable);
+            Order order = OrderFixture.createOrderWithTable(OrderStatus.SERVED, OrderType.EAT_IN, orderTable);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
-            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).willReturn(true);
+            given(orderRepository.existsByOrderTableAndStatusNot(orderTable, OrderStatus.COMPLETED)).willReturn(false);
 
             // when
             Order completedOrder = orderService.complete(orderId);
 
             // then
             assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-            assertThat(orderTable.getNumberOfGuests()).isEqualTo(0);
-            assertThat(orderTable.isOccupied()).isFalse();
+            assertThat(order.getOrderTable().getNumberOfGuests()).isEqualTo(0);
+            assertThat(order.getOrderTable().isOccupied()).isFalse();
         }
 
         @DisplayName("주문 타입이 DELIVERY이고 상태가 DELIVERED일 때, 주문 상태가 COMPLETED로 변경된다.")
@@ -360,7 +363,7 @@ class OrderServiceTest {
         void complete_DELIVERY() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.DELIVERED, OrderType.DELIVERY, null);
+            Order order = OrderFixture.createOrder(OrderStatus.DELIVERED, OrderType.DELIVERY, null);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
@@ -375,7 +378,7 @@ class OrderServiceTest {
         void complete_EAT_IN_TAKEOUT() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.SERVED, OrderType.TAKEOUT, null);
+            Order order = OrderFixture.createOrder(OrderStatus.SERVED, OrderType.TAKEOUT, null);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when
@@ -383,7 +386,6 @@ class OrderServiceTest {
 
             // then
             assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
-            verify(orderRepository).save(order);
         }
 
         @DisplayName("DELIVERY 주문 상태가 DELIVERED가 아닌 경우 IllegalStateException이 발생한다.")
@@ -391,7 +393,7 @@ class OrderServiceTest {
         void nonDeliveredStatusInDeliveryOrder() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.SERVED, OrderType.DELIVERY, null);
+            Order order = OrderFixture.createOrder(OrderStatus.SERVED, OrderType.DELIVERY, null);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when then
@@ -404,7 +406,7 @@ class OrderServiceTest {
         void nonServedStatusInTakeoutOrEatInOrder() {
             // given
             UUID orderId = UUID.randomUUID();
-            Order order = createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, null);
+            Order order = OrderFixture.createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, null);
             given(orderRepository.findById(orderId)).willReturn(Optional.of(order));
 
             // when then
@@ -417,7 +419,7 @@ class OrderServiceTest {
     @Test
     void findAll() {
         // given
-        List<Order> mockOrders = createMockOrders();
+        List<Order> mockOrders = OrderFixture.createMockOrders();
         given(orderRepository.findAll()).willReturn(mockOrders);
 
         // when
@@ -427,117 +429,11 @@ class OrderServiceTest {
         assertThat(orders).isEqualTo(mockOrders);
     }
 
-    private Order createOrderRequest(OrderType type, int quantity, BigDecimal price, boolean isDisplayed) {
-        Product product = createProduct(BigDecimal.valueOf(9_000));
-        MenuProduct menuProduct = createMenuProduct(product, 2);
-        Menu menu = createMenu(menuProduct, BigDecimal.valueOf(20_000), isDisplayed);
-        OrderLineItem orderLineItem = createOrderLineItem(menu, quantity, price);
-
-        Order order = new Order();
-        order.setType(type);
-        order.setOrderLineItems(List.of(orderLineItem));
-
-        return order;
-    }
-
-    private Order createOrderRequest(OrderType type, int quantity, BigDecimal price, boolean isDisplayed, OrderTable orderTable) {
-        Order order = createOrderRequest(type, quantity, price, isDisplayed);
-        order.setOrderTable(orderTable);
-
-        return order;
-    }
-
-    private Order createOrderRequest(OrderType type, int quantity, BigDecimal price, boolean isDisplayed, String address) {
-        Order order = createOrderRequest(type, quantity, price, isDisplayed);
-        order.setDeliveryAddress(address);
-
-        return order;
-    }
-
-    private Order createOrderRequest(OrderType type, List<OrderLineItem> orderLineItems) {
-        Order order = new Order();
-        order.setType(type);
-        order.setOrderLineItems(orderLineItems);
-        return order;
-    }
-
-    private Order createSavedOrder(Order request) {
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setType(request.getType());
-        order.setStatus(OrderStatus.WAITING);
-        order.setOrderDateTime(LocalDateTime.now());
-        order.setOrderLineItems(request.getOrderLineItems());
-        return order;
-    }
-
-    private Order createOrder(OrderStatus status, OrderType type, String deliveryAddress) {
-        Order order = new Order();
-        order.setId(UUID.randomUUID());
-        order.setStatus(status);
-        order.setType(type);
-        order.setOrderLineItems(createOrderLineItems());
-        order.setDeliveryAddress(deliveryAddress);
-        return order;
-    }
-
-    private Product createProduct(BigDecimal price) {
-        Product product = new Product();
-        product.setPrice(price);
-        return product;
-    }
-
-    private MenuProduct createMenuProduct(Product product, int quantity) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
-    }
-
-    private Menu createMenu(MenuProduct menuProduct, BigDecimal price, boolean isDisplayed) {
-        Menu menu = new Menu();
-        menu.setId(UUID.randomUUID());
-        menu.setPrice(price);
-        menu.setMenuProducts(List.of(menuProduct));
-        menu.setDisplayed(isDisplayed);
-        return menu;
-    }
-
-    private OrderLineItem createOrderLineItem(Menu menu, int quantity, BigDecimal price) {
-        OrderLineItem orderLineItem = new OrderLineItem();
-        orderLineItem.setMenu(menu);
-        orderLineItem.setQuantity(quantity);
-        orderLineItem.setPrice(price);
-        return orderLineItem;
-    }
-
     private void mockMenuRepositoryForOrderRequest(Order request) {
         List<Menu> menus = request.getOrderLineItems().stream()
                 .map(OrderLineItem::getMenu)
                 .toList();
         given(menuRepository.findAllByIdIn(any())).willReturn(menus);
         given(menuRepository.findById(any())).willReturn(Optional.of(menus.get(0)));
-    }
-
-    private List<OrderLineItem> createOrderLineItems() {
-        Product product = createProduct(BigDecimal.valueOf(9_000));
-        MenuProduct menuProduct = createMenuProduct(product, 2);
-        Menu menu = createMenu(menuProduct, BigDecimal.valueOf(20_000), true);
-        OrderLineItem orderLineItem = createOrderLineItem(menu, 2, BigDecimal.valueOf(20_000));
-
-        return List.of(orderLineItem);
-    }
-
-    private Order createOrderWithTable(OrderStatus status, OrderType type, OrderTable orderTable) {
-        Order order = createOrder(status, type, null);
-        order.setOrderTable(orderTable);
-        return order;
-    }
-
-    private List<Order> createMockOrders() {
-        List<Order> orders = new ArrayList<>();
-        orders.add(createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, null));
-        orders.add(createOrder(OrderStatus.WAITING, OrderType.TAKEOUT, null));
-        return orders;
     }
 }

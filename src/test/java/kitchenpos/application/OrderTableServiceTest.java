@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fixture.OrderTableFixture;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
@@ -42,8 +43,8 @@ class OrderTableServiceTest {
         @Test
         void create() {
             // given
-            OrderTable request = createRequest("1호");
-            OrderTable orderTable = createOrderTable("1호", 0, false);
+            OrderTable request = OrderTableFixture.createRequest("1호");
+            OrderTable orderTable = OrderTableFixture.createOrderTable("1호", 0, false);
             given(orderTableRepository.save(any())).willReturn(orderTable);
 
             // when
@@ -58,7 +59,7 @@ class OrderTableServiceTest {
         @ParameterizedTest
         void create_name(final String name) {
             // given
-            OrderTable request = createRequest(name);
+            OrderTable request = OrderTableFixture.createRequest(name);
 
             // when then
             assertThatThrownBy(() -> orderTableService.create(request))
@@ -71,7 +72,7 @@ class OrderTableServiceTest {
     @Test
     void sit() {
         // given
-        OrderTable orderTable = createOrderTable("1호", 0, false);
+        OrderTable orderTable = OrderTableFixture.createOrderTable("1호", 0, false);
         given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
         // when
@@ -89,7 +90,7 @@ class OrderTableServiceTest {
         @Test
         void clear() {
             // given
-            OrderTable orderTable = createOrderTable("1호", 3, true);
+            OrderTable orderTable = OrderTableFixture.createOrderTable("1호", 3, true);
 
             given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
             given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(false);
@@ -106,7 +107,7 @@ class OrderTableServiceTest {
         @Test
         void order_not_finish() {
             // given
-            OrderTable orderTable = createOrderTable("1호", 3, true);
+            OrderTable orderTable = OrderTableFixture.createOrderTable("1호", 3, true);
 
             given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
             given(orderRepository.existsByOrderTableAndStatusNot(any(), any())).willReturn(true);
@@ -115,7 +116,6 @@ class OrderTableServiceTest {
             assertThatThrownBy(() -> orderTableService.clear(orderTable.getId()))
                     .isInstanceOf(IllegalStateException.class);
         }
-
     }
 
     @DisplayName("OrderTableService.changeNumberOfGuests 메서드 테스트")
@@ -126,10 +126,8 @@ class OrderTableServiceTest {
         @Test
         void changeNumberOfGuests() {
             // given
-            OrderTable request = createRequest(4);
-
-            OrderTable orderTable = createOrderTable("1호", 0, true);
-
+            OrderTable request = OrderTableFixture.createRequest(4);
+            OrderTable orderTable = OrderTableFixture.createOrderTable("1호", 0, true);
             given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
             // when
@@ -143,7 +141,7 @@ class OrderTableServiceTest {
         @Test
         void numberOfGuests_ZERO_LESS_UNDER() {
             // given
-            OrderTable request = createRequest(-1);
+            OrderTable request = OrderTableFixture.createRequest(-1);
 
             // when then
             assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), request))
@@ -154,23 +152,21 @@ class OrderTableServiceTest {
         @Test
         void orderTable_Occupied_false() {
             // given
-            OrderTable request = createRequest(4);
-            OrderTable orderTable = createOrderTable("1호", 0, false);
+            OrderTable request = OrderTableFixture.createRequest(4);
+            OrderTable orderTable = OrderTableFixture.createOrderTable("1호", 0, false);
             given(orderTableRepository.findById(any())).willReturn(Optional.of(orderTable));
 
             // when then
             assertThatThrownBy(() -> orderTableService.changeNumberOfGuests(UUID.randomUUID(), request))
                     .isInstanceOf(IllegalStateException.class);
         }
-
-
     }
 
     @DisplayName("주문 테이블 항목들을 조회할 수 있다. ")
     @Test
     void findAll() {
-        OrderTable orderTable1 = createOrderTable("1호", 3, false);
-        OrderTable orderTable2 = createOrderTable("2호", 4, false);
+        OrderTable orderTable1 = OrderTableFixture.createOrderTable("1호", 3, false);
+        OrderTable orderTable2 = OrderTableFixture.createOrderTable("2호", 4, false);
         given(orderTableRepository.findAll()).willReturn(List.of(orderTable1, orderTable2));
 
         List<OrderTable> orderTables = orderTableService.findAll();
@@ -183,25 +179,4 @@ class OrderTableServiceTest {
                 );
     }
 
-    private static OrderTable createRequest(String name) {
-        OrderTable request = new OrderTable();
-        request.setName(name);
-        return request;
-    }
-
-    private static OrderTable createRequest(int numberOfGuests) {
-        OrderTable request = new OrderTable();
-        request.setNumberOfGuests(numberOfGuests);
-        return request;
-    }
-
-
-    private static OrderTable createOrderTable(String name, int numberOfGuests, boolean occupied) {
-        OrderTable orderTable = new OrderTable();
-        orderTable.setId(UUID.randomUUID());
-        orderTable.setName(name);
-        orderTable.setNumberOfGuests(numberOfGuests);
-        orderTable.setOccupied(occupied);
-        return orderTable;
-    }
 }

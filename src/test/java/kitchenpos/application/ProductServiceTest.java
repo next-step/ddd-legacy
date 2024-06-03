@@ -1,8 +1,10 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fixture.MenuFixture;
+import kitchenpos.application.fixture.MenuProductFixture;
+import kitchenpos.application.fixture.ProductFixture;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -15,14 +17,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.assertj.core.groups.Tuple.*;
+import static org.assertj.core.groups.Tuple.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -45,8 +46,8 @@ class ProductServiceTest {
         @Test
         void create() {
             // given
-            Product request = createProductRequest(BigDecimal.valueOf(10_000), "후라이드 치킨");
-            Product product = createProduct(BigDecimal.valueOf(10_000), "후라이드 치킨");
+            Product request = ProductFixture.createProductRequest(BigDecimal.valueOf(10_000), "후라이드 치킨");
+            Product product = ProductFixture.createProduct(BigDecimal.valueOf(10_000), "후라이드 치킨");
             given(productRepository.save(any())).willReturn(product);
 
             // when
@@ -62,7 +63,7 @@ class ProductServiceTest {
         @ParameterizedTest
         void price_NULLorNegative(final BigDecimal price) {
             // given
-            Product request = createProductRequest(price, "후라이드 치킨");
+            Product request = ProductFixture.createProductRequest(price, "후라이드 치킨");
 
             // when then
             assertThatThrownBy(() -> productService.create(request))
@@ -74,7 +75,7 @@ class ProductServiceTest {
         @ParameterizedTest
         void name_NULL(final String name) {
             // given
-            Product request = createProductRequest(BigDecimal.valueOf(10_000), name);
+            Product request = ProductFixture.createProductRequest(BigDecimal.valueOf(10_000), name);
 
             // when then
             assertThatThrownBy(() -> productService.create(request))
@@ -86,7 +87,7 @@ class ProductServiceTest {
         @ParameterizedTest
         void name_Profanity(final String name) {
             // given
-            Product request = createProductRequest(BigDecimal.valueOf(10_000), name);
+            Product request = ProductFixture.createProductRequest(BigDecimal.valueOf(10_000), name);
             given(purgomalumClient.containsProfanity(name)).willReturn(true);
 
             // when then
@@ -101,14 +102,12 @@ class ProductServiceTest {
         @DisplayName("상품의 가격을 변경시킬 수 있다.")
         @Test
         void changePrice() {
-            Product request = new Product();
-            request.setPrice(BigDecimal.valueOf(10_000));
-
-            Product product = createProduct(BigDecimal.valueOf(11_000), "후라이드 치킨");
+            Product request = ProductFixture.createProductRequest(BigDecimal.valueOf(10_000), "후라이드 치킨");
+            Product product = ProductFixture.createProduct(BigDecimal.valueOf(11_000), "후라이드 치킨");
             given(productRepository.findById(any())).willReturn(Optional.of(product));
 
-            MenuProduct menuProduct = createMenuProduct(product, 2L);
-            Menu menu = createMenu(BigDecimal.valueOf(20_000), menuProduct);
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 2L);
+            Menu menu = MenuFixture.createMenuRequest(menuProduct, null, 20_000L, "메뉴", true);
             given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
 
             // when
@@ -122,16 +121,12 @@ class ProductServiceTest {
         @Test
         void changePrice_Display_false() {
             // given
-            Product request = new Product();
-            request.setPrice(BigDecimal.valueOf(9_000));
-
-            Product product = createProduct(BigDecimal.valueOf(11_000), "후라이드 치킨");
+            Product request = ProductFixture.createProductRequest(BigDecimal.valueOf(9_000), "후라이드 치킨");
+            Product product = ProductFixture.createProduct(BigDecimal.valueOf(11_000), "후라이드 치킨");
             given(productRepository.findById(any())).willReturn(Optional.of(product));
 
-            MenuProduct menuProduct = createMenuProduct(product, 2L);
-
-            Menu menu = createMenu(BigDecimal.valueOf(20_000), menuProduct);
-
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 2L);
+            Menu menu = MenuFixture.createMenuRequest(menuProduct, null, 20_000L, "메뉴", true);
             given(menuRepository.findAllByProductId(any())).willReturn(List.of(menu));
 
             // when
@@ -148,8 +143,7 @@ class ProductServiceTest {
         @ParameterizedTest
         void changePrice_NULLorNegative(BigDecimal price) {
             // given
-            Product request = new Product();
-            request.setPrice(price);
+            Product request = ProductFixture.createProductRequest(price, "후라이드 치킨");
 
             // when then
             assertThatThrownBy(() -> productService.changePrice(UUID.randomUUID(), request))
@@ -160,9 +154,9 @@ class ProductServiceTest {
     @DisplayName("상품 목록을 조회할 수 있다.")
     @Test
     void findAll() {
-        Product product1 = createProduct(BigDecimal.valueOf(11_000), "상품1");
-        Product product2 = createProduct(BigDecimal.valueOf(12_000), "상품2");
-        Product product3 = createProduct(BigDecimal.valueOf(13_000), "상품3");
+        Product product1 = ProductFixture.createProduct(BigDecimal.valueOf(11_000), "상품1");
+        Product product2 = ProductFixture.createProduct(BigDecimal.valueOf(12_000), "상품2");
+        Product product3 = ProductFixture.createProduct(BigDecimal.valueOf(13_000), "상품3");
         given(productRepository.findAll()).willReturn(List.of(product1, product2, product3));
 
         List<Product> products = productService.findAll();
@@ -176,34 +170,4 @@ class ProductServiceTest {
                 );
     }
 
-    private static Product createProductRequest(BigDecimal price, String name) {
-        Product request = new Product();
-        request.setPrice(price);
-        request.setName(name);
-        return request;
-    }
-
-    private static Product createProduct(BigDecimal price, String name) {
-        Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setPrice(price);
-        product.setName(name);
-        return product;
-    }
-
-    private static Menu createMenu(BigDecimal price, MenuProduct... menuProducts) {
-        Menu menu = new Menu();
-        menu.setMenuProducts(Arrays.asList(menuProducts));
-        menu.setDisplayed(true);
-        menu.setPrice(price);
-        return menu;
-    }
-
-    private static MenuProduct createMenuProduct(Product product, long quantity) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setProductId(product.getId());
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
-    }
 }

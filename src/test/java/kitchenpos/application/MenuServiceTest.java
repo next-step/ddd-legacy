@@ -1,5 +1,9 @@
 package kitchenpos.application;
 
+import kitchenpos.application.fixture.MenuFixture;
+import kitchenpos.application.fixture.MenuGroupFixture;
+import kitchenpos.application.fixture.MenuProductFixture;
+import kitchenpos.application.fixture.ProductFixture;
 import kitchenpos.domain.*;
 import kitchenpos.infra.PurgomalumClient;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +22,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,9 +53,9 @@ class MenuServiceTest {
             // given
             MenuGroup menuGroup = setupMenuGroupMock();
             Product product = setupProductMock("후라이드", 16_000L);
-            MenuProduct menuProduct = createMenuProduct(product, 2L);
-            Menu request = createMenuRequest(menuProduct, menuGroup, 20_000L, "치킨세트", true);
-            Menu response = createMenu(menuProduct, menuGroup, 20_000L, "치킨세트", true);
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 2L);
+            Menu request = MenuFixture.createMenuRequest(menuProduct, menuGroup, 20_000L, "치킨세트", true);
+            Menu response = MenuFixture.createMenu(menuProduct, menuGroup, 20_000L, "치킨세트", true);
 
             given(menuRepository.save(any())).willReturn(response);
 
@@ -69,7 +72,7 @@ class MenuServiceTest {
         @MethodSource("lessThanZero")
         void create_price_Null_Negative(BigDecimal price) {
             // given
-            Menu request = createMenuRequest(price, "치킨세트", true);
+            Menu request = MenuFixture.createMenuRequest(price, "치킨세트", true);
 
             // when then
             assertThatThrownBy(() -> menuService.create(request))
@@ -87,7 +90,7 @@ class MenuServiceTest {
         @Test
         void menu_not_contain_menuGroup() {
             // given
-            Menu request = createMenuRequest(BigDecimal.valueOf(20_000), "후라이드", true);
+            Menu request = MenuFixture.createMenuRequest(BigDecimal.valueOf(20_000), "후라이드", true);
 
             // when then
             assertThatThrownBy(() -> menuService.create(request))
@@ -99,7 +102,7 @@ class MenuServiceTest {
         void menu_not_product() {
             // given
             MenuGroup menuGroup = setupMenuGroupMock();
-            Menu request = createMenuRequest(menuGroup, BigDecimal.valueOf(20_000), "후라이드", true);
+            Menu request = MenuFixture.createMenuRequest(menuGroup, BigDecimal.valueOf(20_000), "후라이드", true);
 
             // when then
             assertThatThrownBy(() -> menuService.create(request))
@@ -112,8 +115,8 @@ class MenuServiceTest {
             // given
             MenuGroup menuGroup = setupMenuGroupMock();
             Product product = setupProductMock("후라이드", 16_000L);
-            MenuProduct menuProduct = createMenuProduct(product, 0);
-            Menu request = createMenuRequest(menuProduct, menuGroup, 20_000L, "후라이트 세트", true);
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 0);
+            Menu request = MenuFixture.createMenuRequest(menuProduct, menuGroup, 20_000L, "후라이트 세트", true);
 
             // when then
             assertThatThrownBy(() -> menuService.create(request))
@@ -126,8 +129,8 @@ class MenuServiceTest {
             // given
             MenuGroup menuGroup = setupMenuGroupMock();
             Product product = setupProductMock("후라이드", 16_000L);
-            MenuProduct menuProduct = createMenuProduct(product, 1L);
-            Menu request = createMenuRequest(menuProduct, menuGroup, 17_000L, "후라이트 세트", true);
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 1L);
+            Menu request = MenuFixture.createMenuRequest(menuProduct, menuGroup, 17_000L, "후라이트 세트", true);
 
             // when then
             assertThatThrownBy(() -> menuService.create(request))
@@ -142,8 +145,8 @@ class MenuServiceTest {
             // given
             MenuGroup menuGroup = setupMenuGroupMock();
             Product product = setupProductMock("후라이드", 16_000L);
-            MenuProduct menuProduct = createMenuProduct(product, 2L);
-            Menu request = createMenuRequest(menuProduct, menuGroup, 20_000L, name, true);
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 2L);
+            Menu request = MenuFixture.createMenuRequest(menuProduct, menuGroup, 20_000L, name, true);
 
             if (name != null) {
                 given(purgomalumClient.containsProfanity(name)).willReturn(true);
@@ -162,12 +165,12 @@ class MenuServiceTest {
         @Test
         void changePrice() {
             // given
-            Product product = createProduct("후라이드", 10_000L);
-            MenuProduct menuProduct = createMenuProduct(product, 2L);
-            Menu menu = createMenu(menuProduct, null, 20_000L, "치킨세트", true);
+            Product product = ProductFixture.createProduct(10_000L, "후라이드");
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 2L);
+            Menu menu = MenuFixture.createMenu(menuProduct, null, 20_000L, "치킨세트", true);
             given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
-            Menu request = createMenuRequest(BigDecimal.valueOf(10_000L), "치킨세트", true);
+            Menu request = MenuFixture.createMenuRequest(BigDecimal.valueOf(10_000L), "치킨세트", true);
 
             // when
             Menu changedMenu = menuService.changePrice(request.getId(), request);
@@ -180,7 +183,7 @@ class MenuServiceTest {
         @Test
         void changePrice_priceNegative() {
             // given
-            Menu request = createMenuRequest(BigDecimal.valueOf(-1), "치킨세트", true);
+            Menu request = MenuFixture.createMenuRequest(BigDecimal.valueOf(-1), "치킨세트", true);
 
             // when
             assertThatThrownBy(() -> menuService.changePrice(request.getId(), request))
@@ -192,7 +195,7 @@ class MenuServiceTest {
         @ParameterizedTest
         void changePrice_priceNull(BigDecimal price) {
             // given
-            Menu request = createMenuRequest(price, "치킨세트", true);
+            Menu request = MenuFixture.createMenuRequest(price, "치킨세트", true);
 
             // when
             assertThatThrownBy(() -> menuService.changePrice(request.getId(), request))
@@ -203,12 +206,12 @@ class MenuServiceTest {
         @Test
         void changePrice_exceedsTotalProductPrice() {
             // given
-            Product product = createProduct("후라이드", 10_000L);
-            MenuProduct menuProduct = createMenuProduct(product, 2L);
-            Menu menu = createMenu(menuProduct, null, 20_000L, "치킨세트", true);
+            Product product = ProductFixture.createProduct(10_000L, "후라이드");
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 2L);
+            Menu menu = MenuFixture.createMenu(menuProduct, null, 20_000L, "치킨세트", true);
             given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
-            Menu request = createMenuRequest(BigDecimal.valueOf(21_000L), "치킨세트", true);
+            Menu request = MenuFixture.createMenuRequest(BigDecimal.valueOf(21_000L), "치킨세트", true);
 
             // when then
             assertThatThrownBy(() -> menuService.changePrice(request.getId(), request))
@@ -223,9 +226,9 @@ class MenuServiceTest {
         @Test
         void display() {
             // given
-            Product product = createProduct("후라이드", 10_000L);
-            MenuProduct menuProduct = createMenuProduct(product, 2L);
-            Menu menu = createMenu(menuProduct, null, 20_000L, "치킨세트", false);
+            Product product = ProductFixture.createProduct(10_000L, "후라이드");
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 2L);
+            Menu menu = MenuFixture.createMenu(menuProduct, null, 20_000L, "치킨세트", false);
             given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
             // when
@@ -239,9 +242,9 @@ class MenuServiceTest {
         @Test
         void displayExpensiveMenu() {
             // given
-            Product product = createProduct("후라이드", 10_000L);
-            MenuProduct menuProduct = createMenuProduct(product, 2L);
-            Menu menu = createMenu(menuProduct, null, 21_000L, "치킨세트", false);
+            Product product = ProductFixture.createProduct(10_000L, "후라이드");
+            MenuProduct menuProduct = MenuProductFixture.createMenuProduct(product, 2L);
+            Menu menu = MenuFixture.createMenu(menuProduct, null, 21_000L, "치킨세트", false);
             given(menuRepository.findById(any())).willReturn(Optional.of(menu));
 
             // when then
@@ -254,7 +257,7 @@ class MenuServiceTest {
     @DisplayName("메뉴를 비노출 시킬 수 있다.")
     @Test
     void hide() {
-        Menu menu = createMenuRequest(BigDecimal.valueOf(10_000), "치킨세트", true);
+        Menu menu = MenuFixture.createMenuRequest(BigDecimal.valueOf(10_000), "치킨세트", true);
         given(menuRepository.findById(any())).willReturn(Optional.of(menu));
         Menu hiddenMenu = menuService.hide(menu.getId());
         assertThat(hiddenMenu.isDisplayed()).isFalse();
@@ -264,8 +267,8 @@ class MenuServiceTest {
     @Test
     void findAll() {
         // given
-        Menu menu1 = createMenuRequest(BigDecimal.valueOf(10_000), "치킨세트1", true);
-        Menu menu2 = createMenuRequest(BigDecimal.valueOf(10_001), "치킨세트2", true);
+        Menu menu1 = MenuFixture.createMenuRequest(BigDecimal.valueOf(10_000), "치킨세트1", true);
+        Menu menu2 = MenuFixture.createMenuRequest(BigDecimal.valueOf(10_001), "치킨세트2", true);
         given(menuRepository.findAll()).willReturn(List.of(menu1, menu2));
 
         // when
@@ -280,76 +283,14 @@ class MenuServiceTest {
                 );
     }
 
-    private static MenuGroup createMenuGroup() {
-        MenuGroup menuGroup = new MenuGroup();
-        menuGroup.setId(UUID.randomUUID());
-        return menuGroup;
-    }
-
-    private static Product createProduct(final String name, final long price) {
-        Product product = new Product();
-        product.setId(UUID.randomUUID());
-        product.setName(name);
-        product.setPrice(BigDecimal.valueOf(price));
-        return product;
-    }
-
-    private static MenuProduct createMenuProduct(Product product, long quantity) {
-        MenuProduct menuProduct = new MenuProduct();
-        menuProduct.setProduct(product);
-        menuProduct.setProductId(product.getId());
-        menuProduct.setQuantity(quantity);
-        return menuProduct;
-    }
-
-    private static Menu createMenuRequest(MenuGroup menuGroup, BigDecimal price, String name, boolean displayed) {
-        Menu request = new Menu();
-        request.setMenuGroup(menuGroup);
-        request.setPrice(price);
-        request.setName(name);
-        request.setDisplayed(displayed);
-        return request;
-    }
-
-    private static Menu createMenuRequest(BigDecimal price, String name, boolean displayed) {
-        Menu request = new Menu();
-        request.setPrice(price);
-        request.setName(name);
-        request.setDisplayed(displayed);
-        return request;
-    }
-
-    private static Menu createMenuRequest(MenuProduct menuProduct, MenuGroup menuGroup,
-                                          long price, String name, boolean displayed) {
-        Menu request = new Menu();
-        request.setPrice(BigDecimal.valueOf(price));
-        request.setName(name);
-        request.setMenuProducts(List.of(menuProduct));
-        request.setDisplayed(displayed);
-        request.setMenuGroup(menuGroup);
-        return request;
-    }
-
-    private static Menu createMenu(MenuProduct menuProduct, MenuGroup menuGroup,
-                                   long price, String name, boolean displayed) {
-        Menu request = new Menu();
-        request.setId(UUID.randomUUID());
-        request.setPrice(BigDecimal.valueOf(price));
-        request.setName(name);
-        request.setMenuProducts(List.of(menuProduct));
-        request.setDisplayed(displayed);
-        request.setMenuGroup(menuGroup);
-        return request;
-    }
-
     private MenuGroup setupMenuGroupMock() {
-        MenuGroup menuGroup = createMenuGroup();
+        MenuGroup menuGroup = MenuGroupFixture.createMenuGroup();
         given(menuGroupRepository.findById(any())).willReturn(Optional.of(menuGroup));
         return menuGroup;
     }
 
     private Product setupProductMock(String name, long price) {
-        Product product = createProduct(name, price);
+        Product product = ProductFixture.createProduct(price, name);
         given(productRepository.findAllByIdIn(any())).willReturn(List.of(product));
         given(productRepository.findById(any())).willReturn(Optional.of(product));
         return product;
