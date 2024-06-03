@@ -9,9 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import kitchenpos.application.MenuService;
 import kitchenpos.application.OrderService;
-import kitchenpos.domain.common.FakeUuidBuilder;
 import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
@@ -19,13 +17,12 @@ import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
-import kitchenpos.domain.Product;
 import kitchenpos.domain.ProductRepository;
-import kitchenpos.domain.menu.FakeMenuGroupRepository;
-import kitchenpos.domain.menu.FakeMenuRepository;
-import kitchenpos.domain.order.FakeOrderRepository;
-import kitchenpos.domain.order.FakeOrderTableRepository;
-import kitchenpos.domain.product.FakeProductRepository;
+import kitchenpos.infra.menu.FakeMenuGroupRepository;
+import kitchenpos.infra.menu.FakeMenuRepository;
+import kitchenpos.infra.order.FakeOrderRepository;
+import kitchenpos.infra.order.FakeOrderTableRepository;
+import kitchenpos.infra.product.FakeProductRepository;
 import kitchenpos.fixture.OrderFixture;
 import kitchenpos.fixture.ProductFixture;
 import kitchenpos.infra.DefaultKitchenridersClient;
@@ -99,7 +96,7 @@ class OrderServiceTest {
     @DisplayName("메뉴가 생성된 상태이고 전시 되어있어야한다.")
     @Test
     void failToCreateOrderWithHiddenMenu() {
-      Menu hiddenMenu = menuService.hide(udonForTwo.getId());
+      menuService.hide(udonForTwo.getId());
 
       assertThatIllegalStateException()
           .isThrownBy(() -> orderService.create(OrderFixture.EAT_IN_ORDER));

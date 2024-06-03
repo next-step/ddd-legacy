@@ -3,7 +3,7 @@ package kitchenpos.application.menu;
 import kitchenpos.application.MenuGroupService;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
-import kitchenpos.domain.menu.FakeMenuGroupRepository;
+import kitchenpos.infra.menu.FakeMenuGroupRepository;
 import kitchenpos.fixture.MenuGroupFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
