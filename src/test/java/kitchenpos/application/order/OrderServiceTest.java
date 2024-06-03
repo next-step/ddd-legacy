@@ -44,15 +44,11 @@ class OrderServiceTest {
   private MenuService menuService;
   private ProductRepository productRepository;
   private BadWordsValidator badWordsValidator;
-  private FakeUuidBuilder fakeUuidBuilder;
   private OrderService orderService;
   private OrderRepository orderRepository;
   private OrderTableRepository orderTableRepository;
   private KitchenridersClient kitchenridersClient;
-  private Product udon;
-  private Product ramen;
   private Menu udonForTwo;
-  private MenuGroup menuGroup;
 
   @BeforeEach
   void setUp() {
@@ -60,7 +56,6 @@ class OrderServiceTest {
     menuGroupRepository = new FakeMenuGroupRepository();
     badWordsValidator = new FakeBadWordsValidator();
     productRepository = new FakeProductRepository();
-    fakeUuidBuilder = new FakeUuidBuilder();
     orderRepository = new FakeOrderRepository();
     orderTableRepository = new FakeOrderTableRepository();
     kitchenridersClient = new DefaultKitchenridersClient();
@@ -68,9 +63,9 @@ class OrderServiceTest {
     menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
         badWordsValidator);
 
-    udon = productRepository.save(
+    productRepository.save(
         ProductFixture.udon);
-    ramen = productRepository.save(
+    productRepository.save(
         ProductFixture.ramen
     );
 

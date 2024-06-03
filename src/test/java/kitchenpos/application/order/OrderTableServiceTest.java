@@ -64,8 +64,6 @@ class OrderTableServiceTest {
   private FakeUuidBuilder fakeUuidBuilder;
   private OrderTableService orderTableService;
   private OrderService orderService;
-  private Product udon;
-  private Product ramen;
   private MenuGroup menuGroup;
   private Menu menu;
   private KitchenridersClient kitchenridersClient;
@@ -85,9 +83,9 @@ class OrderTableServiceTest {
     menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
         badWordsValidator);
 
-    udon = productRepository.save(
+    Product productUdon = productRepository.save(
         ProductFixture.createProduct(UDON, TWENTY_THOUSANDS, fakeUuidBuilder));
-    ramen = productRepository.save(
+    productRepository.save(
         ProductFixture.createProduct(RAMEN, TEN_THOUSAND, fakeUuidBuilder));
 
     menuGroup = MenuGroupFixture.createMenuGroup(FOR_TWO);
@@ -95,7 +93,7 @@ class OrderTableServiceTest {
 
     orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     menu = menuService.create(
-        MenuFixture.createMenu(TWO_UDONS, TWENTY_THOUSANDS, menuGroup, udon, 2));
+        MenuFixture.createMenu(TWO_UDONS, TWENTY_THOUSANDS, menuGroup, productUdon, 2));
 
     orderService = new OrderService(orderRepository, menuRepository, orderTableRepository,
         kitchenridersClient);
