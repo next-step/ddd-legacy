@@ -1,9 +1,6 @@
 package kitchenpos.application;
 
-import kitchenpos.domain.OrderRepository;
-import kitchenpos.domain.OrderStatus;
-import kitchenpos.domain.OrderTable;
-import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +14,8 @@ public class OrderTableService {
     private final OrderTableRepository orderTableRepository;
     private final OrderRepository orderRepository;
 
-    public OrderTableService(final OrderTableRepository orderTableRepository, final OrderRepository orderRepository) {
+    public OrderTableService(final OrderTableRepository orderTableRepository,
+                             final OrderRepository orderRepository) {
         this.orderTableRepository = orderTableRepository;
         this.orderRepository = orderRepository;
     }
@@ -37,9 +35,16 @@ public class OrderTableService {
     }
 
     @Transactional
-    public OrderTable sit(final UUID orderTableId) {
+    public OrderTable sit(final UUID orderTableId, int numberOfGuests) {
         final OrderTable orderTable = orderTableRepository.findById(orderTableId)
             .orElseThrow(NoSuchElementException::new);
+        if (numberOfGuests < 0) {
+            throw new IllegalArgumentException();
+        }
+        if (orderTable.isOccupied()) {
+            throw new IllegalStateException();
+        }
+        orderTable.setNumberOfGuests(numberOfGuests);
         orderTable.setOccupied(true);
         return orderTable;
     }

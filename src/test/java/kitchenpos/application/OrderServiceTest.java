@@ -1,0 +1,312 @@
+package kitchenpos.application;
+
+import java.math.BigDecimal;
+import java.util.List;
+import kitchenpos.domain.*;
+import kitchenpos.fixtures.FixtureOrder;
+import kitchenpos.infra.KitchenridersClient;
+import kitchenpos.infra.menu.InMemoryMenuRepository;
+import kitchenpos.infra.order.InMemoryOrderRepository;
+import kitchenpos.infra.order.InMemoryOrderTableRepository;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+@ExtendWith(SpringExtension.class)
+class OrderServiceTest {
+
+  private final OrderRepository orderRepository = new InMemoryOrderRepository();
+  private final MenuRepository menuRepository = new InMemoryMenuRepository();
+  private final OrderTableRepository orderTableRepository = new InMemoryOrderTableRepository();
+  private OrderService orderService;
+  @Mock private KitchenridersClient kitchenridersClient;
+
+  @BeforeEach
+  void before() {
+    this.orderService =
+        new OrderService(
+            orderRepository, menuRepository, orderTableRepository, kitchenridersClient);
+  }
+
+  @Nested
+  @DisplayName("주문 생성")
+  class Nested1 {
+    @DisplayName(
+        "주문을 하기 위해 주문 타입을 선택해야 한다."
+            + "주문을 하기 위해 주문 정보를 입력해야 한다. "
+            + "주문 정보를 입력하기 위해 메뉴가 존재해야 하며, 금액과 수량을 입력해야 한다."
+            + "주문을 하기 위해 주문 정보에 메뉴가 한 개 이상 존재해야 한다.")
+    @Test
+    void case2() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final Menu menu = order.getOrderLineItems().get(0).getMenu();
+      final OrderTable orderTable = order.getOrderTable();
+      order.setType(OrderType.DELIVERY);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
+
+      final Order actual = orderService.create(order);
+      Assertions.assertThat(actual).isNotNull();
+    }
+
+    @DisplayName("주문을 하기 위해 해당 메뉴의 상태가 노출돼야 한다.")
+    @Test
+    void case5() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final Menu menu = order.getOrderLineItems().get(0).getMenu();
+      final OrderTable orderTable = order.getOrderTable();
+      menu.setDisplayed(false);
+      order.setType(OrderType.DELIVERY);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
+
+      Assertions.assertThatIllegalStateException().isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("주문을 하기 위해 주문 정보에 금액과 메뉴 금액이 같아야 한다.")
+    @Test
+    void case6() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final Menu menu = order.getOrderLineItems().get(0).getMenu();
+      final OrderTable orderTable = order.getOrderTable();
+
+      menu.setPrice(BigDecimal.valueOf(20_000L));
+      order.setType(OrderType.DELIVERY);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
+
+      Assertions.assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("주문 타입이 배달(DELIVERY)일 경우 주문이 들어와 있어야 하며, 주소지를 입력해야 한다.")
+    @Test
+    void case7() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final Menu menu = order.getOrderLineItems().get(0).getMenu();
+      final OrderTable orderTable = order.getOrderTable();
+
+      order.setDeliveryAddress(null);
+      order.setType(OrderType.DELIVERY);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
+
+      Assertions.assertThatIllegalArgumentException().isThrownBy(() -> orderService.create(order));
+    }
+
+    @DisplayName("주문 타입이 먹고가기(EAT_IN)일 경우 주문테이블에 고객이 앉아있어야 하며 주문 수량은 1개 이상이어야 한다.")
+    @Test
+    void case8() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final Menu menu = order.getOrderLineItems().get(0).getMenu();
+      final OrderTable orderTable = order.getOrderTable();
+
+      orderTable.setOccupied(true);
+      orderTable.setNumberOfGuests(10);
+      order.setType(OrderType.EAT_IN);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
+
+      final Order actual = orderService.create(order);
+      Assertions.assertThat(actual.getOrderTable().getNumberOfGuests())
+          .isEqualTo(orderTable.getNumberOfGuests());
+      Assertions.assertThat(actual.getOrderLineItems().size())
+          .isEqualTo(order.getOrderLineItems().size());
+    }
+
+    @DisplayName(
+        "주문을 할 경우 주문 상태가 대기중(WAITING) 상태가 된다."
+            + "주문을 접수(ACCEPTED)하기 위해 주문이 있어야 하고, 주문 타입이 대기중(WAITING)이여야 한다.")
+    @Test
+    void case9() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final Menu menu = order.getOrderLineItems().get(0).getMenu();
+      final OrderTable orderTable = order.getOrderTable();
+
+      orderTable.setOccupied(true);
+      orderTable.setNumberOfGuests(10);
+      order.setStatus(OrderStatus.WAITING);
+      order.setType(OrderType.DELIVERY);
+
+      orderRepository.save(order);
+      menuRepository.save(menu);
+      orderTableRepository.save(orderTable);
+
+      final Order actual = orderService.create(order);
+      Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.WAITING);
+    }
+  }
+
+  @Nested
+  @DisplayName("배달")
+  class Nested2 {
+    @DisplayName("주문을 접수(ACCEPTED)하기 위해 주문 타입이 배달(DELIVERY)이면 주문 정보와 총 금액, 배달지 주소를 배달기사에게 전달한다.")
+    @Test
+    void case11() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final OrderTable orderTable = order.getOrderTable();
+
+      orderTable.setOccupied(true);
+      orderTable.setNumberOfGuests(10);
+      order.setStatus(OrderStatus.WAITING);
+      order.setType(OrderType.DELIVERY);
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
+
+      final Order actual = orderService.accept(order.getId());
+      Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+      Assertions.assertThat(actual.getDeliveryAddress()).isNotNull();
+    }
+
+    @DisplayName("주문을 전달(SERVED)하기 위해 주문 정보가 있어야 하고, 주문 타입이 접수(ACCEPTED)이여야 한다.")
+    @Test
+    void case12() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final OrderTable orderTable = order.getOrderTable();
+
+      orderTable.setOccupied(true);
+      orderTable.setNumberOfGuests(10);
+      order.setStatus(OrderStatus.ACCEPTED);
+      order.setType(OrderType.DELIVERY);
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
+
+      final Order actual = orderService.serve(order.getId());
+      Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.SERVED);
+      Assertions.assertThat(actual.getDeliveryAddress()).isNotNull();
+    }
+
+    @DisplayName(
+        "주문을 배달중(DELIVERING)하기 위해 주문 정보가 있어야 하고, 주문 타입이 배달(DELIVERY)하고 주문 상태가 전달(SERVED)여야 한다.")
+    @Test
+    void case13() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final OrderTable orderTable = order.getOrderTable();
+
+      orderTable.setOccupied(true);
+      orderTable.setNumberOfGuests(10);
+      order.setStatus(OrderStatus.SERVED);
+      order.setType(OrderType.DELIVERY);
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
+
+      final Order actual = orderService.startDelivery(order.getId());
+      Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERING);
+      Assertions.assertThat(actual.getDeliveryAddress()).isNotNull();
+    }
+
+    @DisplayName("주문을 배달(DELIVERED)하기 위해 주문 정보가 있어야 하고, 주문 타입이 배달중(DELIVERING)여야 한다.")
+    @Test
+    void case14() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final OrderTable orderTable = order.getOrderTable();
+
+      orderTable.setOccupied(true);
+      orderTable.setNumberOfGuests(10);
+      order.setStatus(OrderStatus.DELIVERING);
+      order.setType(OrderType.DELIVERY);
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
+
+      final Order actual = orderService.completeDelivery(order.getId());
+      Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERED);
+      Assertions.assertThat(actual.getDeliveryAddress()).isNotNull();
+    }
+
+    @DisplayName(
+        "주문을 완료(COMPLETED)하기 위해 주문 정보가 있어야 하고, 주문 타입이 배달중(DELIVERING), 그리고 주문 상태는 배달(DELIVERED)이여야 한다.")
+    @Test
+    void case15() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final OrderTable orderTable = order.getOrderTable();
+
+      orderTable.setOccupied(true);
+      orderTable.setNumberOfGuests(10);
+      order.setStatus(OrderStatus.DELIVERED);
+      order.setType(OrderType.DELIVERY);
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
+
+      final Order actual = orderService.complete(order.getId());
+      Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+      Assertions.assertThat(actual.getDeliveryAddress()).isNotNull();
+    }
+  }
+
+  @Nested
+  @DisplayName("주문 가져가기, 먹고가기")
+  class Nested3 {
+    @DisplayName(
+        "주문을 완료(COMPLETED)하기 위해 주문 정보가 있어야 하고, 주문 타입이 가져가기(TAKEOUT) 또는 먹고가기(EAT_IN), 그리고 주문 상태는 전달(SERVED)이여야 한다.")
+    @Test
+    void case16() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final OrderTable orderTable = order.getOrderTable();
+
+      orderTable.setOccupied(true);
+      orderTable.setNumberOfGuests(10);
+      order.setStatus(OrderStatus.SERVED);
+      order.setType(OrderType.TAKEOUT);
+
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
+
+      final Order actual = orderService.complete(order.getId());
+      Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+    }
+
+    @DisplayName("주문을 완료(COMPLETED)하게 되면, 고객이 음식을 먹고 갔기 때문에 주문테이블이 비어있어야 한다.")
+    @Test
+    void case17() {
+      final Order order = FixtureOrder.fixtureOrder();
+      final OrderTable orderTable = order.getOrderTable();
+
+      orderTable.setOccupied(true);
+      orderTable.setNumberOfGuests(10);
+      order.setStatus(OrderStatus.SERVED);
+      order.setType(OrderType.EAT_IN);
+
+      orderRepository.save(order);
+      order.setId(orderTable.getId());
+      orderRepository.save(order);
+      orderTableRepository.save(orderTable);
+
+      final Order actual = orderService.complete(order.getId());
+      Assertions.assertThat(actual.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+      Assertions.assertThat(actual.getOrderTable().getNumberOfGuests()).isZero();
+      Assertions.assertThat(actual.getOrderTable().isOccupied()).isFalse();
+    }
+  }
+
+  @Nested
+  @DisplayName("주문 전체 조회")
+  class Nested4 {
+    @DisplayName("주문을 전체 조회 할 수 있다.")
+    @Test
+    void case18() {
+      orderRepository.save(FixtureOrder.fixtureOrder());
+      List<Order> all = orderRepository.findAll();
+
+      Assertions.assertThat(all.size()).isNotZero();
+    }
+  }
+}
