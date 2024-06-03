@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.params.provider.EnumSource.Mode.INCLUDE;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +34,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class OrderServiceTest {
 
@@ -135,15 +138,21 @@ class OrderServiceTest {
   @DisplayName("주문을 접수(accept)한다.")
   class orderAcceptance {
 
-    @Test
     @DisplayName("주문의 상태를 `접수`로 변경한다.")
-    void changeOrderStatusToAccpetedWhenAccepted() {
+    @ParameterizedTest
+    @EnumSource(mode = INCLUDE, names = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void changeOrderStatusToAccpetedWhenAccepted(OrderStatus orderStatus) {
 
-      Order eatInOrder = orderService.create(OrderFixture.EAT_IN_ORDER);
+      Order actual = orderService.create(OrderFixture.EAT_IN_ORDER);
 
-      orderService.accept(eatInOrder.getId());
+      orderService.accept(actual.getId());
 
-      assertThat(eatInOrder.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+      assertThat(actual.getStatus()).isEqualTo(OrderStatus.ACCEPTED);
+
+      actual.setStatus(orderStatus);
+      orderRepository.save(actual);
+      assertThatIllegalStateException()
+              .isThrownBy(() -> orderService.serve(actual.getId()));
     }
 
   }
@@ -153,8 +162,9 @@ class OrderServiceTest {
   class OrderPass {
 
     @DisplayName("주문의 상태가 `접수`이어야 한다.")
-    @Test
-    void passOrderWithOrderStatusAccepted() {
+    @ParameterizedTest
+    @EnumSource(mode = INCLUDE, names = {"WAITING", "SERVED", "DELIVERING", "DELIVERED", "COMPLETED"})
+    void passOrderWithOrderStatusAccepted(OrderStatus orderStatus) {
       Order actual = orderService.create(OrderFixture.EAT_IN_ORDER);
 
       orderService.accept(actual.getId());
@@ -165,12 +175,11 @@ class OrderServiceTest {
 
       assertThat(actual.getStatus()).isEqualTo(OrderStatus.SERVED);
 
-      actual.setStatus(OrderStatus.DELIVERING);
+      actual.setStatus(orderStatus);
       orderRepository.save(actual);
       assertThatIllegalStateException()
           .isThrownBy(() -> orderService.serve(actual.getId()));
     }
-
   }
 
   @Nested
@@ -178,8 +187,9 @@ class OrderServiceTest {
   class orderDeliveryComplete {
 
     @DisplayName("주문 상태가 `배달중`이어야 한다.")
-    @Test
-    void deliverOrderWithOrderStatusDelivering() {
+    @ParameterizedTest
+    @EnumSource(mode = INCLUDE, names = {"WAITING", "ACCEPTED", "SERVED", "DELIVERED", "COMPLETED"})
+    void deliverOrderWithOrderStatusDelivering(OrderStatus orderStatus) {
       Order actual = orderService.create(OrderFixture.DELIVERY_ORDER);
       orderService.accept(actual.getId());
       orderService.serve(actual.getId());
@@ -191,12 +201,13 @@ class OrderServiceTest {
 
       assertThat(actual.getStatus()).isEqualTo(OrderStatus.DELIVERED);
 
-      actual.setStatus(OrderStatus.SERVED);
+      actual.setStatus(orderStatus);
       orderRepository.save(actual);
 
       assertThatIllegalStateException()
           .isThrownBy(() -> orderService.completeDelivery(actual.getId()));
     }
+
   }
 
   @Nested

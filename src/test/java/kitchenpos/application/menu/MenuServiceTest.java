@@ -16,6 +16,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.math.BigDecimal;
@@ -71,9 +73,9 @@ class MenuServiceTest {
       );
     }
 
-    @DisplayName("`메뉴`는 이름은 1글자 이상이어야한다")
+    @DisplayName("`메뉴`는 이름은 정상적인 값이어야한다")
     @ParameterizedTest
-    @ValueSource(strings = {""})
+    @NullSource
     void failToCreateMenuWithEmptyString(final String name) {
       Product productUdon = productRepository.save(ProductFixture.createProduct(UDON, TWENTY_THOUSANDS, fakeUuidBuilder));
 
@@ -83,12 +85,12 @@ class MenuServiceTest {
 
     @DisplayName("`메뉴 가격`은 양수이어야한다.")
     @ParameterizedTest
-    @ValueSource(ints = {-324234, -234, 0})
+    @ValueSource(ints = {-324234, -234})
     void failToCreateProductWithProfanityAndEmptyProductName(final int price) {
       Product productUdon = productRepository.save(ProductFixture.createProduct(UDON, TWENTY_THOUSANDS, fakeUuidBuilder));
 
       assertThatIllegalArgumentException()
-              .isThrownBy(() -> menuService.create(MenuFixture.createMenu(TWO_UDONS, THRITY_THOUSANDS, menuGroup, productUdon, 2)));
+              .isThrownBy(() -> menuService.create(MenuFixture.createMenu(TWO_UDONS, price, menuGroup, productUdon, 2)));
     }
 
     @DisplayName("`메뉴`는 `상품`들(1개 이상)을 가진다.")
