@@ -51,9 +51,11 @@ public class OrderTableServiceTest {
   @DisplayName("주문테이블을 등록할 수 있다.")
   @Test
   public void register() {
-    OrderTable request = OrderTableFixture.normal();
-    OrderTable orderTable = orderTableService.create(request);
-    assertThat(orderTable).isNotNull();
+    String name = "주문테이블";
+    OrderTable orderTable = OrderTableFixture.create(name);
+    orderTable = orderTableService.create(orderTable);
+    assertThat(orderTable.getId()).isNotNull();
+    assertThat(orderTable.getName()).isEqualTo(name);
     assertThat(orderTable.isOccupied()).isFalse();
     assertThat(orderTable.getNumberOfGuests()).isEqualTo(0);
   }

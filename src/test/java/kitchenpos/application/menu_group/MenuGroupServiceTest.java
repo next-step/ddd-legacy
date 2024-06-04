@@ -27,9 +27,11 @@ class MenuGroupServiceTest {
   @DisplayName("메뉴그룹을 등록할 수 있다.")
   @Test
   public void register() {
-    MenuGroup menuGroup = MenuGroupFixture.normal();
+    String name = "메뉴그룹";
+    MenuGroup menuGroup = MenuGroupFixture.create(name);
     menuGroup = menuGroupService.create(menuGroup);
-    assertThat(menuGroup).isNotNull();
+    assertThat(menuGroup.getId()).isNotNull();
+    assertThat(menuGroup.getName()).isEqualTo(name);
   }
 
   @DisplayName("메뉴그룹명은 1자 이상이어야한다.")

@@ -59,10 +59,15 @@ public class OrderServiceTest {
   @DisplayName("주문을 접수할 수 있다.")
   @Test
   public void register() {
+    OrderType orderType = OrderType.DELIVERY;
+    String deliveryAddress = "주소";
     OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(menu, 3L, 200L);
-    Order order = OrderFixture.create(OrderType.EAT_IN, List.of(orderLineItem),"주소", orderTable);
+    Order order = OrderFixture.create(orderType, List.of(orderLineItem),deliveryAddress, orderTable);
     order = orderService.create(order);
+    assertThat(order.getId()).isNotNull();
+    assertThat(order.getDeliveryAddress()).isEqualTo(deliveryAddress);
     assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
+    assertThat(order.getType()).isEqualTo(orderType);
   }
 
   @DisplayName("주문을 접수할 수 없다.")

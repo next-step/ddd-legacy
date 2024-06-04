@@ -59,10 +59,16 @@ class MenuServiceTest {
   @DisplayName("메뉴를 등록할 수 있다.")
   @Test
   public void register() {
+    String name = "메뉴";
+    Long price = 100L;
+    boolean displayed = true;
     MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
-    Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 100L, true);
+    Menu request = MenuFixture.createMenu(name, menuGroup, List.of(menuProduct), price, true);
     Menu menu = menuService.create(request);
-    assertThat(menu).isNotNull();
+    assertThat(menu.getId()).isNotNull();
+    assertThat(menu.getPrice()).isEqualTo(new BigDecimal(price));
+    assertThat(menu.getName()).isEqualTo(name);
+    assertThat(menu.isDisplayed()).isEqualTo(displayed);
   }
 
   @Nested

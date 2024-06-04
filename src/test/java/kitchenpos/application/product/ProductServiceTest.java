@@ -53,9 +53,13 @@ public class ProductServiceTest {
   @DisplayName("상품을 등록할 수 있다.")
   @Test
   public void register() {
-    Product product = ProductFixture.normal();
+    String name = "상품명";
+    Long price = 500L;
+    Product product = ProductFixture.create(name, price);
     product = productService.create(product);
-    assertThat(product).isNotNull();
+    assertThat(product.getId()).isNotNull();
+    assertThat(product.getName()).isEqualTo(name);
+    assertThat(product.getPrice()).isEqualTo(new BigDecimal(price));
   }
 
   @Nested
