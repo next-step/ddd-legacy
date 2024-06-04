@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.List;
 import kitchenpos.application.MenuGroupService;
+import kitchenpos.application.fake.repository.InMemoryMenuGroupRepository;
 import kitchenpos.application.fixture.MenuGroupFixture;
 import kitchenpos.domain.MenuGroup;
 import org.junit.jupiter.api.BeforeEach;

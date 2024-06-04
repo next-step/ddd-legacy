@@ -1,4 +1,4 @@
-package kitchenpos.application.order;
+package kitchenpos.application.fake.repository;
 
 import java.util.ArrayList;
 import java.util.List;

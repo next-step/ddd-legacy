@@ -1,4 +1,4 @@
-package kitchenpos.application.infra;
+package kitchenpos.application.fake.infra;
 
 import java.util.List;
 import kitchenpos.infra.PurgomalumClient;

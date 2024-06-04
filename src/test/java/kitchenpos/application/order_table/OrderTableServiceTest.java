@@ -2,16 +2,16 @@ package kitchenpos.application.order_table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.BDDMockito.*;
 
 import java.util.List;
 import java.util.UUID;
 import kitchenpos.application.OrderTableService;
+import kitchenpos.application.fake.repository.InMemoryOrderTableRepository;
 import kitchenpos.application.fixture.MenuFixture;
 import kitchenpos.application.fixture.OrderFixture;
 import kitchenpos.application.fixture.OrderTableFixture;
-import kitchenpos.application.menu.InMemoryMenuRepository;
-import kitchenpos.application.order.InMemoryOrderRepository;
+import kitchenpos.application.fake.repository.InMemoryMenuRepository;
+import kitchenpos.application.fake.repository.InMemoryOrderRepository;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Order;
@@ -28,7 +28,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
