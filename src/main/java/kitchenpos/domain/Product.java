@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import kitchenpos.common.UuidBuilder;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -21,9 +22,11 @@ public class Product {
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
+    public Product(UuidBuilder uuidBuilder) {
+        id = uuidBuilder.createRandomUUID("SIMON");
+    }
     public Product() {
     }
-
     public UUID getId() {
         return id;
     }

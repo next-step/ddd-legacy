@@ -9,6 +9,7 @@ import kitchenpos.domain.OrderStatus;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
 import kitchenpos.domain.OrderType;
+import kitchenpos.infra.DefaultKitchenridersClient;
 import kitchenpos.infra.KitchenridersClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,18 +27,18 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MenuRepository menuRepository;
     private final OrderTableRepository orderTableRepository;
-    private final KitchenridersClient kitchenridersClient;
+    private final KitchenridersClient defaultKitchenridersClient;
 
     public OrderService(
         final OrderRepository orderRepository,
         final MenuRepository menuRepository,
         final OrderTableRepository orderTableRepository,
-        final KitchenridersClient kitchenridersClient
+        final KitchenridersClient defaultKitchenridersClient
     ) {
         this.orderRepository = orderRepository;
         this.menuRepository = menuRepository;
         this.orderTableRepository = orderTableRepository;
-        this.kitchenridersClient = kitchenridersClient;
+        this.defaultKitchenridersClient = defaultKitchenridersClient;
     }
 
     @Transactional
@@ -117,7 +118,7 @@ public class OrderService {
                     .getPrice()
                     .multiply(BigDecimal.valueOf(orderLineItem.getQuantity()));
             }
-            kitchenridersClient.requestDelivery(orderId, sum, order.getDeliveryAddress());
+            defaultKitchenridersClient.requestDelivery(orderId, sum, order.getDeliveryAddress());
         }
         order.setStatus(OrderStatus.ACCEPTED);
         return order;
