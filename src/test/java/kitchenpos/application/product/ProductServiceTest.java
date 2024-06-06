@@ -50,21 +50,21 @@ public class ProductServiceTest {
     productService = new ProductService(productRepository, menuRepository, purgomalumClient);
   }
 
-  @DisplayName("상품을 등록할 수 있다.")
-  @Test
-  public void register() {
-    String name = "상품명";
-    Long price = 500L;
-    Product product = ProductFixture.create(name, price);
-    product = productService.create(product);
-    assertThat(product.getId()).isNotNull();
-    assertThat(product.getName()).isEqualTo(name);
-    assertThat(product.getPrice()).isEqualTo(new BigDecimal(price));
-  }
-
   @Nested
-  @DisplayName("상품을 등록할 수 없다.")
-  class RegisterFail {
+  @DisplayName("상품을 등록할 수 있다.")
+  class Register {
+    @DisplayName("성공")
+    @Test
+    public void register() {
+      String name = "상품명";
+      Long price = 500L;
+      Product product = ProductFixture.create(name, price);
+      product = productService.create(product);
+      assertThat(product.getId()).isNotNull();
+      assertThat(product.getName()).isEqualTo(name);
+      assertThat(product.getPrice()).isEqualTo(new BigDecimal(price));
+    }
+
     @DisplayName("상품 가격은 0원 이상의 정수여야 한다.")
     @ValueSource(longs = {-1L, -100L})
     @ParameterizedTest
@@ -84,51 +84,53 @@ public class ProductServiceTest {
     }
   }
 
+  @Nested
   @DisplayName("상품 가격을 변경할 수 있다.")
-  @Test
-  public void modifyPrice() {
-    Product product = ProductFixture.normal();
-    product = productService.create(product);
-    long changePrice = 300L;
-    Product priceChangeRequest = ProductFixture.create(changePrice);
-    product = productService.changePrice(product.getId(), priceChangeRequest);
-    assertThat(product.getPrice()).isEqualTo(new BigDecimal(changePrice));
+  class ChangePrice {
+    @DisplayName("성공")
+    @Test
+    public void modifyPrice() {
+      Product product = ProductFixture.normal();
+      product = productService.create(product);
+      long changePrice = 300L;
+      Product priceChangeRequest = ProductFixture.create(changePrice);
+      product = productService.changePrice(product.getId(), priceChangeRequest);
+      assertThat(product.getPrice()).isEqualTo(new BigDecimal(changePrice));
+    }
+
+    @DisplayName("변경할 상품 가격은 0원 이상의 정수여야 한다.")
+    @ValueSource(longs = {-500L, -1000L})
+    @ParameterizedTest
+    public void invalidPriceModification(Long changePrice) {
+      Product product = ProductFixture.normal();
+      product = productService.create(product);
+      UUID productId = product.getId();
+      Product priceChangeRequest = ProductFixture.create("상품", changePrice);
+      assertThatExceptionOfType(IllegalArgumentException.class)
+          .isThrownBy(() -> productService.changePrice(productId, priceChangeRequest));
+    }
+
+    @DisplayName("상품이 속한 여러 메뉴들이 상품 가격 변경으로 `메뉴 판매 조건`을 만족하지 못할 경우 메뉴를 비공개 처리한다.")
+    @ValueSource(longs = {10L, 50L})
+    @ParameterizedTest
+    public void menuHide(Long price) {
+      MenuGroup menuGroup = MenuGroupFixture.normal();
+      menuGroup = menuGroupService.create(menuGroup);
+
+      Product product = ProductFixture.normal();
+      product = productService.create(product);
+
+      MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
+      Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 100L, true);
+      Menu menu = menuService.create(request);
+
+      UUID productId = product.getId();
+      Product requestProduct = ProductFixture.create("상품", price);
+      productService.changePrice(productId, requestProduct);
+
+      assertThat(menu.isDisplayed()).isFalse();
+    }
   }
-
-  @DisplayName("변경할 상품 가격은 0원 이상의 정수여야 한다.")
-  @ValueSource(longs = {-500L, -1000L})
-  @ParameterizedTest
-  public void invalidPriceModification(Long changePrice) {
-    Product product = ProductFixture.normal();
-    product = productService.create(product);
-    UUID productId = product.getId();
-    Product priceChangeRequest = ProductFixture.create("상품", changePrice);
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> productService.changePrice(productId, priceChangeRequest));
-  }
-
-  @DisplayName("상품이 속한 여러 메뉴들이 상품 가격 변경으로 `메뉴 판매 조건`을 만족하지 못할 경우 메뉴를 비공개 처리한다.")
-  @ValueSource(longs = {10L, 50L})
-  @ParameterizedTest
-  public void menuHide(Long price) {
-    MenuGroup menuGroup = MenuGroupFixture.normal();
-    menuGroup = menuGroupService.create(menuGroup);
-
-    Product product = ProductFixture.normal();
-    product = productService.create(product);
-
-    MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
-    Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 100L, true);
-    Menu menu = menuService.create(request);
-
-    UUID productId = product.getId();
-    Product requestProduct = ProductFixture.create("상품", price);
-    productService.changePrice(productId, requestProduct);
-
-    assertThat(menu.isDisplayed()).isFalse();
-  }
-
-
 
   @DisplayName("등록된 상품 전체를 조회할 수 있다.")
   @Test

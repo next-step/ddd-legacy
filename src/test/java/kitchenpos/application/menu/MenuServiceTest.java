@@ -56,24 +56,23 @@ class MenuServiceTest {
     this.product = productRepository.save(product);
   }
 
-  @DisplayName("메뉴를 등록할 수 있다.")
-  @Test
-  public void register() {
-    String name = "메뉴";
-    Long price = 100L;
-    boolean displayed = true;
-    MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
-    Menu request = MenuFixture.createMenu(name, menuGroup, List.of(menuProduct), price, true);
-    Menu menu = menuService.create(request);
-    assertThat(menu.getId()).isNotNull();
-    assertThat(menu.getPrice()).isEqualTo(new BigDecimal(price));
-    assertThat(menu.getName()).isEqualTo(name);
-    assertThat(menu.isDisplayed()).isEqualTo(displayed);
-  }
-
   @Nested
-  @DisplayName("메뉴를 등록할 수 없다.")
-  class RegisterFail {
+  @DisplayName("메뉴를 등록할 수 있다.")
+  class Register {
+    @DisplayName("성공")
+    @Test
+    public void register() {
+      String name = "메뉴";
+      Long price = 100L;
+      boolean displayed = true;
+      MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
+      Menu request = MenuFixture.createMenu(name, menuGroup, List.of(menuProduct), price, true);
+      Menu menu = menuService.create(request);
+      assertThat(menu.getId()).isNotNull();
+      assertThat(menu.getPrice()).isEqualTo(new BigDecimal(price));
+      assertThat(menu.getName()).isEqualTo(name);
+      assertThat(menu.isDisplayed()).isEqualTo(displayed);
+    }
     @DisplayName("메뉴명은 욕설이 포함될 수 없다.")
     @NullSource
     @ValueSource(strings = {"욕설", "비속어"})
@@ -149,43 +148,47 @@ class MenuServiceTest {
     }
   }
 
+  @Nested
   @DisplayName("메뉴가격을 변경할 수 있다.")
-  @ValueSource(longs = {50L, 100L})
-  @ParameterizedTest
-  public void modifyMenuPrice(Long price) {
-    MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
-    Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 150L, true);
-    Menu menu = menuService.create(request);
+  class ChangePrice {
+    @DisplayName("성공")
+    @ValueSource(longs = {50L, 100L})
+    @ParameterizedTest
+    public void modifyMenuPrice(Long price) {
+      MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
+      Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 150L, true);
+      Menu menu = menuService.create(request);
 
-    Menu change = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), price, true);
-    change = menuService.changePrice(menu.getId(), change);
-    assertThat(change.getPrice()).isEqualTo(new BigDecimal(price));
-  }
+      Menu change = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), price, true);
+      change = menuService.changePrice(menu.getId(), change);
+      assertThat(change.getPrice()).isEqualTo(new BigDecimal(price));
+    }
 
-  @DisplayName("변경할 메뉴 가격은 0원 이상의 정수여야한다.")
-  @ValueSource(longs = {-50L, -100L})
-  @ParameterizedTest
-  public void invalidMenuPriceModification(Long price) {
-    MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
-    Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 150L, true);
-    Menu menu = menuService.create(request);
+    @DisplayName("변경할 메뉴 가격은 0원 이상의 정수여야한다.")
+    @ValueSource(longs = {-50L, -100L})
+    @ParameterizedTest
+    public void invalidMenuPriceModification(Long price) {
+      MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
+      Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 150L, true);
+      Menu menu = menuService.create(request);
 
-    Menu change = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), price, true);
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> menuService.changePrice(menu.getId(), change));
-  }
+      Menu change = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), price, true);
+      assertThatExceptionOfType(IllegalArgumentException.class)
+          .isThrownBy(() -> menuService.changePrice(menu.getId(), change));
+    }
 
-  @DisplayName("변경할 메뉴 가격이 메뉴 판매 조건을 만족해야한다.")
-  @ValueSource(longs = {3_300L, 4_400L})
-  @ParameterizedTest
-  public void invalidMenuPriceModificationBecauseMenuSellingCondition(Long price) {
-    MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
-    Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 150L, true);
-    Menu menu = menuService.create(request);
+    @DisplayName("변경할 메뉴 가격이 메뉴 판매 조건을 만족해야한다.")
+    @ValueSource(longs = {3_300L, 4_400L})
+    @ParameterizedTest
+    public void invalidMenuPriceModificationBecauseMenuSellingCondition(Long price) {
+      MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
+      Menu request = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), 150L, true);
+      Menu menu = menuService.create(request);
 
-    Menu change = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), price, true);
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> menuService.changePrice(menu.getId(), change));
+      Menu change = MenuFixture.createMenu("메뉴", menuGroup, List.of(menuProduct), price, true);
+      assertThatExceptionOfType(IllegalArgumentException.class)
+          .isThrownBy(() -> menuService.changePrice(menu.getId(), change));
+    }
   }
 
   @DisplayName("메뉴를 공개할 수 있다.")
