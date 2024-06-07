@@ -2,6 +2,7 @@ package kitchenpos.application.product;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -59,10 +60,12 @@ public class ProductServiceTest {
       String name = "상품명";
       Long price = 500L;
       Product product = ProductFixture.create(name, price);
-      product = productService.create(product);
-      assertThat(product.getId()).isNotNull();
-      assertThat(product.getName()).isEqualTo(name);
-      assertThat(product.getPrice()).isEqualTo(new BigDecimal(price));
+      Product actual = productService.create(product);
+      assertAll(
+          () -> assertThat(actual.getId()).isNotNull(),
+          () -> assertThat(actual.getName()).isEqualTo(name),
+          () -> assertThat(actual.getPrice()).isEqualTo(new BigDecimal(price))
+      );
     }
 
     @DisplayName("상품 가격은 0원 이상의 정수여야 한다.")

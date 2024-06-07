@@ -2,6 +2,7 @@ package kitchenpos.application.order_table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
 import java.util.UUID;
@@ -56,12 +57,14 @@ public class OrderTableServiceTest {
     @Test
     public void register() {
       String name = "주문테이블";
-      OrderTable orderTable = OrderTableFixture.create(name);
-      orderTable = orderTableService.create(orderTable);
-      assertThat(orderTable.getId()).isNotNull();
-      assertThat(orderTable.getName()).isEqualTo(name);
-      assertThat(orderTable.isOccupied()).isFalse();
-      assertThat(orderTable.getNumberOfGuests()).isEqualTo(0);
+      OrderTable request = OrderTableFixture.create(name);
+      OrderTable orderTable = orderTableService.create(request);
+      assertAll(
+          () -> assertThat(orderTable.getId()).isNotNull(),
+          () -> assertThat(orderTable.getName()).isEqualTo(name),
+          () -> assertThat(orderTable.isOccupied()).isFalse(),
+          () -> assertThat(orderTable.getNumberOfGuests()).isEqualTo(0)
+      );
     }
 
     @DisplayName("주문테이블명은 1자 이상이어야한다.")
@@ -129,9 +132,11 @@ public class OrderTableServiceTest {
     public void clear() {
       OrderTable request = OrderTableFixture.create("오더테이블");
       OrderTable orderTable = orderTableService.create(request);
-      orderTable = orderTableService.clear(orderTable.getId());
-      assertThat(orderTable.isOccupied()).isFalse();
-      assertThat(orderTable.getNumberOfGuests()).isEqualTo(0);
+      OrderTable cleared = orderTableService.clear(orderTable.getId());
+      assertAll(
+          () -> assertThat(cleared.isOccupied()).isFalse(),
+          () -> assertThat(cleared.getNumberOfGuests()).isEqualTo(0)
+      );
     }
 
     @DisplayName("진행중인 주문이 없을 경우 초기화할 수 있다.")

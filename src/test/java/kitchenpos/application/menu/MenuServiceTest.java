@@ -68,10 +68,12 @@ class MenuServiceTest {
       MenuProduct menuProduct = MenuFixture.createMenuProduct(product, 1L, 1L);
       Menu request = MenuFixture.createMenu(name, menuGroup, List.of(menuProduct), price, true);
       Menu menu = menuService.create(request);
-      assertThat(menu.getId()).isNotNull();
-      assertThat(menu.getPrice()).isEqualTo(new BigDecimal(price));
-      assertThat(menu.getName()).isEqualTo(name);
-      assertThat(menu.isDisplayed()).isEqualTo(displayed);
+      assertAll(
+          () -> assertThat(menu.getId()).isNotNull(),
+          () -> assertThat(menu.getPrice()).isEqualTo(new BigDecimal(price)),
+          () -> assertThat(menu.getName()).isEqualTo(name),
+          () -> assertThat(menu.isDisplayed()).isEqualTo(displayed)
+      );
     }
     @DisplayName("메뉴명은 욕설이 포함될 수 없다.")
     @NullSource

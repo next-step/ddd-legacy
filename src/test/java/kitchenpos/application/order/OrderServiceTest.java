@@ -2,6 +2,7 @@ package kitchenpos.application.order;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -65,12 +66,14 @@ public class OrderServiceTest {
       OrderType orderType = OrderType.DELIVERY;
       String deliveryAddress = "주소";
       OrderLineItem orderLineItem = OrderFixture.createOrderLineItem(menu, 3L, 200L);
-      Order order = OrderFixture.create(orderType, List.of(orderLineItem),deliveryAddress, orderTable);
-      order = orderService.create(order);
-      assertThat(order.getId()).isNotNull();
-      assertThat(order.getDeliveryAddress()).isEqualTo(deliveryAddress);
-      assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING);
-      assertThat(order.getType()).isEqualTo(orderType);
+      Order request = OrderFixture.create(orderType, List.of(orderLineItem),deliveryAddress, orderTable);
+      Order order = orderService.create(request);
+      assertAll(
+          () -> assertThat(order.getId()).isNotNull(),
+          () -> assertThat(order.getDeliveryAddress()).isEqualTo(deliveryAddress),
+          () -> assertThat(order.getStatus()).isEqualTo(OrderStatus.WAITING),
+          () -> assertThat(order.getType()).isEqualTo(orderType)
+      );
     }
     @DisplayName("주문 유형은 필수로 선택해야한다.")
     @NullSource

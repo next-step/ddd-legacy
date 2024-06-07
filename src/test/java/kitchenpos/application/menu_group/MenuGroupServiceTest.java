@@ -2,6 +2,7 @@ package kitchenpos.application.menu_group;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.List;
 import kitchenpos.application.MenuGroupService;
@@ -32,10 +33,12 @@ class MenuGroupServiceTest {
     @Test
     public void register() {
       String name = "메뉴그룹";
-      MenuGroup menuGroup = MenuGroupFixture.create(name);
-      menuGroup = menuGroupService.create(menuGroup);
-      assertThat(menuGroup.getId()).isNotNull();
-      assertThat(menuGroup.getName()).isEqualTo(name);
+      MenuGroup request = MenuGroupFixture.create(name);
+      MenuGroup menuGroup = menuGroupService.create(request);
+      assertAll(
+          () -> assertThat(menuGroup.getId()).isNotNull(),
+          () -> assertThat(menuGroup.getName()).isEqualTo(name)
+      );
     }
 
     @DisplayName("메뉴그룹명은 1자 이상이어야한다.")
