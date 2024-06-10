@@ -28,6 +28,13 @@ public class TestFixture {
         return menuProduct;
     }
 
+    public static MenuProduct createMenuProductRequest(Product product, long quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setQuantity(quantity);
+        menuProduct.setProductId(product.getId());
+        return menuProduct;
+    }
+
     public static MenuGroup createMenuGroup() {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
