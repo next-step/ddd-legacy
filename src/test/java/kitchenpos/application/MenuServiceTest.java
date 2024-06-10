@@ -1,5 +1,15 @@
 package kitchenpos.application;
 
+import static kitchenpos.TestFixture.createMenuProductRequest;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -16,17 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
-import static kitchenpos.TestFixture.createMenuProductRequest;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 class MenuServiceTest {
@@ -181,5 +180,134 @@ class MenuServiceTest {
 
         // when then
         assertThrows(NoSuchElementException.class, () -> menuService.create(menuRequest));
+    }
+
+    @DisplayName("메뉴 생성 실패 - 메뉴상품 미존재")
+    @Test
+    void createMenuMenuProductFail() {
+        // given
+        MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+
+        MenuGroup menuGroupRequest = new MenuGroup();
+        menuGroupRequest.setName("TestMenuGroup");
+        MenuGroup menuGroup = menuGroupService.create(menuGroupRequest);
+
+        BigDecimal menuPrice = BigDecimal.valueOf(10);
+        Menu menuRequest = new Menu();
+        menuRequest.setPrice(menuPrice);
+        menuRequest.setName("hello");
+        menuRequest.setMenuGroup(menuGroup);
+        menuRequest.setMenuGroupId(menuGroup.getId());
+        menuRequest.setMenuProducts(List.of());
+        menuRequest.setDisplayed(true);
+
+        // when then
+        assertThrows(IllegalArgumentException.class, () -> menuService.create(menuRequest));
+    }
+
+    @DisplayName("메뉴 생성 실패 - 상품개수 다름")
+    @Test
+    void createMenuProductCount() {
+        // given
+        MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
+
+        Product productRequest = new Product();
+        productRequest.setName("TestProduct");
+        productRequest.setPrice(BigDecimal.valueOf(20));
+        Product product = productService.create(productRequest);
+
+        MenuGroup menuGroupRequest = new MenuGroup();
+        menuGroupRequest.setName("TestMenuGroup");
+        MenuGroup menuGroup = menuGroupService.create(menuGroupRequest);
+
+        BigDecimal menuPrice = BigDecimal.valueOf(10);
+        String menuName = "TestMenu";
+        Menu menuRequest = new Menu();
+        menuRequest.setPrice(menuPrice);
+        menuRequest.setName(menuName);
+        menuRequest.setMenuGroup(menuGroup);
+        menuRequest.setMenuGroupId(menuGroup.getId());
+        MenuProduct menuProduct = createMenuProductRequest(product, 2);
+        MenuProduct dummy = new MenuProduct();
+        dummy.setQuantity(1L);
+        dummy.setProductId(UUID.randomUUID());
+        menuRequest.setMenuProducts(List.of(menuProduct, dummy));
+        menuRequest.setDisplayed(true);
+
+        // when then
+        assertThrows(IllegalArgumentException.class, () -> menuService.create(menuRequest));
+    }
+
+    @DisplayName("메뉴 생성 실패 - 음수 수량")
+    @Test
+    void createMenuProductNegativeQuantity() {
+        // given
+        MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
+
+        Product productRequest = new Product();
+        productRequest.setName("TestProduct");
+        productRequest.setPrice(BigDecimal.valueOf(20));
+        Product product = productService.create(productRequest);
+
+        MenuGroup menuGroupRequest = new MenuGroup();
+        menuGroupRequest.setName("TestMenuGroup");
+        MenuGroup menuGroup = menuGroupService.create(menuGroupRequest);
+
+        BigDecimal menuPrice = BigDecimal.valueOf(10);
+        String menuName = "TestMenu";
+        Menu menuRequest = new Menu();
+        menuRequest.setPrice(menuPrice);
+        menuRequest.setName(menuName);
+        menuRequest.setMenuGroup(menuGroup);
+        menuRequest.setMenuGroupId(menuGroup.getId());
+        MenuProduct menuProduct = createMenuProductRequest(product, -1);
+        MenuProduct dummy = new MenuProduct();
+        dummy.setQuantity(1L);
+        dummy.setProductId(UUID.randomUUID());
+        menuRequest.setMenuProducts(List.of(menuProduct, dummy));
+        menuRequest.setDisplayed(true);
+
+        // when then
+        assertThrows(IllegalArgumentException.class, () -> menuService.create(menuRequest));
+    }
+
+    @DisplayName("메뉴 생성 실패 - 메뉴의 가격이 더 큼")
+    @Test
+    void createMenuFailPriceTooBig() {
+        // given
+        MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
+
+        Product productRequest = new Product();
+        productRequest.setName("TestProduct");
+        productRequest.setPrice(BigDecimal.valueOf(1));
+        Product product = productService.create(productRequest);
+
+        MenuGroup menuGroupRequest = new MenuGroup();
+        menuGroupRequest.setName("TestMenuGroup");
+        MenuGroup menuGroup = menuGroupService.create(menuGroupRequest);
+
+        BigDecimal menuPrice = BigDecimal.valueOf(10);
+        String menuName = "TestMenu";
+        Menu menuRequest = new Menu();
+        menuRequest.setPrice(menuPrice);
+        menuRequest.setName(menuName);
+        menuRequest.setMenuGroup(menuGroup);
+        menuRequest.setMenuGroupId(menuGroup.getId());
+        MenuProduct menuProduct = createMenuProductRequest(product, 1);
+        MenuProduct dummy = new MenuProduct();
+        dummy.setQuantity(1L);
+        dummy.setProductId(UUID.randomUUID());
+        menuRequest.setMenuProducts(List.of(menuProduct, dummy));
+        menuRequest.setDisplayed(true);
+
+        // when then
+        assertThrows(IllegalArgumentException.class, () -> menuService.create(menuRequest));
     }
 }
