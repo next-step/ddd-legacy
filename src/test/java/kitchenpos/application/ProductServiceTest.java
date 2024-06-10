@@ -13,6 +13,7 @@ import kitchenpos.fake.product.TestProductRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -85,4 +86,42 @@ class ProductServiceTest {
     }
 
 
+    @ParameterizedTest
+    @DisplayName("이름은 반드시 있어야 한다")
+    @NullAndEmptySource
+    void create_product_fail_name1(String name) {
+        // given
+        ProductService productService = new ProductService(
+                new TestProductRepository(),
+                new TestMenuRepository(),
+                (n) -> false
+        );
+        BigDecimal price = BigDecimal.valueOf(10L);
+        Product request = new Product();
+        request.setPrice(price);
+        request.setName(name);
+
+        // when, then
+        assertThrows(IllegalArgumentException.class, () -> productService.create(request));
+    }
+
+    @ParameterizedTest
+    @DisplayName("이름에 비속어가 포함되면 안된다")
+    @ValueSource(strings = {"badname"})
+    void create_product_fail_name2(String badName) {
+        // given
+        ProductService productService = new ProductService(
+                new TestProductRepository(),
+                new TestMenuRepository(),
+                (name) -> true
+        );
+        BigDecimal price = BigDecimal.valueOf(10L);
+        String name = badName;
+        Product request = new Product();
+        request.setPrice(price);
+        request.setName(name);
+
+        // when, then
+        assertThrows(IllegalArgumentException.class, () -> productService.create(request));
+    }
 }
