@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
-import static kitchenpos.TestFixture.createMenu;
-import static kitchenpos.TestFixture.createMenuProduct;
+import static kitchenpos.MenuTestFixture.createMenu;
+import static kitchenpos.MenuTestFixture.createMenuProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -9,9 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
-import kitchenpos.TestFixture;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.MenuRepository;

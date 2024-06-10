@@ -1,7 +1,7 @@
 package kitchenpos.application;
 
-import static kitchenpos.TestFixture.createMenuProductRequest;
-import static kitchenpos.TestFixture.getSavedMenu;
+import static kitchenpos.MenuTestFixture.createMenuProductRequest;
+import static kitchenpos.MenuTestFixture.getSavedMenu;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;

@@ -11,7 +11,7 @@ import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
-public class TestFixture {
+public class MenuTestFixture {
     public static Menu createMenu(BigDecimal menuPrice, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
