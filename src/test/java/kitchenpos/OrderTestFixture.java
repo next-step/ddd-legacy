@@ -1,5 +1,6 @@
 package kitchenpos;
 
+import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.OrderTable;
 
 public class OrderTestFixture {
@@ -10,5 +11,9 @@ public class OrderTestFixture {
         OrderTable table = new OrderTable();
         table.setName(name);
         return table;
+    }
+
+    public static OrderTable getSavedOrderTable(OrderTableService orderTableService, String name) {
+        return orderTableService.create(createOrderTableRequest(name));
     }
 }

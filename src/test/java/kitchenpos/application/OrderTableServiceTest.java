@@ -1,12 +1,16 @@
 package kitchenpos.application;
 
 import static kitchenpos.OrderTestFixture.createOrderTableRequest;
+import static kitchenpos.OrderTestFixture.getSavedOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
@@ -21,18 +25,19 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 class OrderTableServiceTest {
     private OrderRepository orderRepository;
     private OrderTableRepository orderTableRepository;
+    private OrderTableService orderTableService;
 
     @BeforeEach
     void setUp() {
         orderRepository = new TestOrderRepository();
         orderTableRepository = new TestOrderTableRepository();
+        orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 
     @DisplayName("OrderTable 생성 성공")
     @Test
     void createOrderTable() {
         // given
-        OrderTableService orderTableService = new OrderTableService(orderTableRepository, orderRepository);
         String tableName = "tableName";
 
         // when
@@ -51,12 +56,25 @@ class OrderTableServiceTest {
     @ParameterizedTest
     @NullAndEmptySource
     void createOrderTableFail(String tableName) {
-        // given
-        OrderTableService orderTableService = new OrderTableService(orderTableRepository, orderRepository);
-
-        // when, then
         assertThrows(IllegalArgumentException.class, () -> orderTableService.create(createOrderTableRequest(tableName)));
     }
 
+    @Test
+    @DisplayName("사용중 상태로 변경할 수 있다")
+    void sitOrderTableTest() {
+        OrderTable original = getSavedOrderTable(orderTableService, "tableName");
+        // when
+        OrderTable updatedOrderTable = orderTableService.sit(original.getId());
+
+        // then
+        assertTrue(updatedOrderTable.isOccupied());
+    }
+
+    @Test
+    @DisplayName("존재하지 않는다면 사용중상태로 변경할 수 없다")
+    void sitOrderTableTestFail() {
+        // when then
+        assertThrows(NoSuchElementException.class, () -> orderTableService.sit(UUID.randomUUID()));
+    }
 
 }
