@@ -1,13 +1,22 @@
 package kitchenpos.application;
 
+import static kitchenpos.TestFixture.createMenu;
+import static kitchenpos.TestFixture.createMenuProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
+import kitchenpos.TestFixture;
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuProduct;
+import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.Product;
+import kitchenpos.domain.ProductRepository;
 import kitchenpos.fake.menu.TestMenuRepository;
 import kitchenpos.fake.product.TestProductRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -124,4 +133,71 @@ class ProductServiceTest {
         // when, then
         assertThrows(IllegalArgumentException.class, () -> productService.create(request));
     }
+
+    @Test
+    @DisplayName("상품의 가격을 변동했을 때 가격변경된 제품을 포함하는 메뉴의 가격이 메뉴에 포함된 제품들의 가격 * 수량의 합계보다 크다면 메뉴를 숨긴다")
+    void create_change_product_price() {
+        // given
+        MenuRepository testMenuRepository = new TestMenuRepository();
+        ProductRepository testProductRepository = new TestProductRepository();
+        ProductService productService = new ProductService(
+                testProductRepository,
+                testMenuRepository,
+                (name) -> false
+        );
+        BigDecimal price = BigDecimal.valueOf(10);
+        String name = "testName";
+        Product request = new Product();
+        request.setPrice(price);
+        request.setName(name);
+        Product product = productService.create(request);
+
+        List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1L));
+        Menu menu = createMenu(BigDecimal.valueOf(5), menuProducts);
+        testMenuRepository.save(menu);
+
+
+
+        // when
+        Product changeProductRequest = new Product();
+        BigDecimal newPrice = BigDecimal.valueOf(1);
+        changeProductRequest.setPrice(newPrice);
+        productService.changePrice(product.getId(), changeProductRequest);
+
+        // then
+        assertAll(
+                () -> assertThat(testProductRepository.findById(product.getId()).get().getPrice()).isEqualTo(newPrice),
+                () -> assertFalse(testMenuRepository.findById(menu.getId()).get().isDisplayed())
+        );
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(longs = {-1L})
+    @DisplayName("가격은 존재하며 0이상이다")
+    void create_change_product_price_fail(Long invalidPrice) {
+        // given
+        MenuRepository testMenuRepository = new TestMenuRepository();
+        ProductRepository testProductRepository = new TestProductRepository();
+        ProductService productService = new ProductService(
+                testProductRepository,
+                testMenuRepository,
+                (name) -> false
+        );
+        BigDecimal price = BigDecimal.valueOf(10);
+        String name = "testName";
+        Product request = new Product();
+        request.setPrice(price);
+        request.setName(name);
+        Product product = productService.create(request);
+
+
+        // when
+        Product changeProductRequest = new Product();
+        BigDecimal newPrice = invalidPrice == null ? null : BigDecimal.valueOf(invalidPrice);
+        changeProductRequest.setPrice(newPrice);
+        assertThrows(IllegalArgumentException.class, () ->productService.changePrice(product.getId(), changeProductRequest));
+    }
+
+
 }
