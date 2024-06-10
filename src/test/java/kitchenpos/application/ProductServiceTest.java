@@ -199,5 +199,25 @@ class ProductServiceTest {
         assertThrows(IllegalArgumentException.class, () ->productService.changePrice(product.getId(), changeProductRequest));
     }
 
+    @Test
+    @DisplayName("모든 제품 조회")
+    void find_all() {
+        ProductService productService = new ProductService(
+                new TestProductRepository(),
+                new TestMenuRepository(),
+                (name) -> false
+        );
+        BigDecimal price = BigDecimal.valueOf(10);
+        String name = "testName";
+        Product request = new Product();
+        request.setPrice(price);
+        request.setName(name);
+        Product product = productService.create(request);
 
+        List<Product> products = productService.findAll();
+        assertAll(
+                () -> assertThat(products.size()).isEqualTo(1),
+                () -> assertThat(products.get(0).getId()).isEqualTo(product.getId())
+        );
+    }
 }
