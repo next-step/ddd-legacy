@@ -9,6 +9,7 @@ import java.util.UUID;
 
 @Table(name = "menu_group")
 @Entity
+
 public class MenuGroup {
     @Column(name = "id", columnDefinition = "binary(16)")
     @Id
@@ -34,5 +35,13 @@ public class MenuGroup {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "MenuGroup{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
     }
 }
