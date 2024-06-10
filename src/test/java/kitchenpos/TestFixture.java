@@ -64,7 +64,6 @@ public class TestFixture {
         menuRequest.setMenuProducts(List.of(menuProduct));
         menuRequest.setDisplayed(displayed);
 
-        // when
         return menuService.create(menuRequest);
     }
 }
