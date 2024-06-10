@@ -1,6 +1,7 @@
 package kitchenpos.application;
 
 import static kitchenpos.TestFixture.createMenuProductRequest;
+import static kitchenpos.TestFixture.getSavedMenu;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,7 +46,8 @@ class MenuServiceTest {
     void createMenu() {
         // given
         MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
-        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
         ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
 
         Product productRequest = new Product();
@@ -73,14 +75,14 @@ class MenuServiceTest {
 
         // then
         assertAll(
-                () -> assertThat(createdMenu.getId()).isNotNull(),
-                () -> assertThat(createdMenu.getPrice()).isEqualTo(menuPrice),
-                () -> assertTrue(createdMenu.isDisplayed()),
-                () -> assertThat(createdMenu.getName()).isEqualTo(menuName),
-                () -> assertThat(createdMenu.getMenuGroup().getId()).isEqualTo(menuGroup.getId()),
-                () -> assertThat(createdMenu.getMenuProducts().size()).isEqualTo(1),
-                () -> assertThat(createdMenu.getMenuProducts().get(0).getQuantity()).isEqualTo(2),
-                () -> assertThat(createdMenu.getMenuProducts().get(0).getProduct().getId()).isEqualTo(product.getId())
+            () -> assertThat(createdMenu.getId()).isNotNull(),
+            () -> assertThat(createdMenu.getPrice()).isEqualTo(menuPrice),
+            () -> assertTrue(createdMenu.isDisplayed()),
+            () -> assertThat(createdMenu.getName()).isEqualTo(menuName),
+            () -> assertThat(createdMenu.getMenuGroup().getId()).isEqualTo(menuGroup.getId()),
+            () -> assertThat(createdMenu.getMenuProducts().size()).isEqualTo(1),
+            () -> assertThat(createdMenu.getMenuProducts().get(0).getQuantity()).isEqualTo(2),
+            () -> assertThat(createdMenu.getMenuProducts().get(0).getProduct().getId()).isEqualTo(product.getId())
         );
     }
 
@@ -91,7 +93,8 @@ class MenuServiceTest {
     void createMenuFailPrice(Long menuPrice) {
         // given
         MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
-        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
         ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
 
         Product productRequest = new Product();
@@ -125,7 +128,8 @@ class MenuServiceTest {
     void createMenuNameFail(String menuName) {
         // given
         MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
-        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> true);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> true);
         ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
 
         Product productRequest = new Product();
@@ -156,7 +160,8 @@ class MenuServiceTest {
     void createMenuMenuGroupFail() {
         // given
         MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
-        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
         ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
 
         Product productRequest = new Product();
@@ -187,7 +192,8 @@ class MenuServiceTest {
     void createMenuMenuProductFail() {
         // given
         MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
-        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
 
         MenuGroup menuGroupRequest = new MenuGroup();
         menuGroupRequest.setName("TestMenuGroup");
@@ -211,7 +217,8 @@ class MenuServiceTest {
     void createMenuProductCount() {
         // given
         MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
-        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
         ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
 
         Product productRequest = new Product();
@@ -246,7 +253,8 @@ class MenuServiceTest {
     void createMenuProductNegativeQuantity() {
         // given
         MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
-        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
         ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
 
         Product productRequest = new Product();
@@ -281,7 +289,8 @@ class MenuServiceTest {
     void createMenuFailPriceTooBig() {
         // given
         MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
-        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
         ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
 
         Product productRequest = new Product();
@@ -309,5 +318,66 @@ class MenuServiceTest {
 
         // when then
         assertThrows(IllegalArgumentException.class, () -> menuService.create(menuRequest));
+    }
+
+    @DisplayName("메뉴의 가격을 변경할 수 있다")
+    @Test
+    void ChangeMenuPrice() {
+        // given
+        MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
+        ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
+        BigDecimal originalPrice = BigDecimal.valueOf(5);
+        Menu savedMenu = getSavedMenu(productService, menuService, menuGroupService, originalPrice, true,
+            BigDecimal.TEN);
+
+        // when
+        BigDecimal newPrice = BigDecimal.valueOf(3);
+        Menu priceChangeRequest = new Menu();
+        priceChangeRequest.setPrice(newPrice);
+        Menu menu = menuService.changePrice(savedMenu.getId(), priceChangeRequest);
+
+        // then
+        assertThat(menu.getPrice()).isEqualTo(newPrice);
+    }
+
+    @DisplayName("존재하지 않는 메뉴의 가격을 변경할 수 없다")
+    @Test
+    void ChangeMenuPriceFailNotExist() {
+        // given
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
+
+        // when
+        BigDecimal newPrice = BigDecimal.valueOf(3);
+        Menu priceChangeRequest = new Menu();
+        priceChangeRequest.setPrice(newPrice);
+
+        // then
+        assertThrows(NoSuchElementException.class, () -> menuService.changePrice(UUID.randomUUID(), priceChangeRequest));
+    }
+
+    @DisplayName("메뉴의 가격을 변경할 수 있다")
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(longs = {-1})
+    void ChangeMenuPriceFailInvalidPrice(Long price) {
+        // given
+        MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
+        ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
+        BigDecimal originalPrice = BigDecimal.valueOf(5);
+        Menu savedMenu = getSavedMenu(productService, menuService, menuGroupService, originalPrice, true,
+            BigDecimal.TEN);
+
+        // when
+        BigDecimal newPrice = price == null ? null : BigDecimal.valueOf(price);
+        Menu priceChangeRequest = new Menu();
+        priceChangeRequest.setPrice(newPrice);
+
+        // then
+        assertThrows(IllegalArgumentException.class, () -> menuService.changePrice(UUID.randomUUID(), priceChangeRequest));
     }
 }

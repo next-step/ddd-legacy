@@ -1,13 +1,15 @@
 package kitchenpos;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
+import kitchenpos.application.MenuGroupService;
+import kitchenpos.application.MenuService;
+import kitchenpos.application.ProductService;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.UUID;
 
 public class TestFixture {
     public static Menu createMenu(BigDecimal menuPrice, List<MenuProduct> menuProducts) {
@@ -40,5 +42,29 @@ public class TestFixture {
         menuGroup.setId(UUID.randomUUID());
         menuGroup.setName("menuGroup");
         return menuGroup;
+    }
+
+    public static Menu getSavedMenu(ProductService productService, MenuService menuService, MenuGroupService menuGroupService, BigDecimal menuPrice, boolean displayed, BigDecimal productPrice) {
+        Product productRequest = new Product();
+        productRequest.setName("TestProduct");
+        productRequest.setPrice(productPrice);
+        Product product = productService.create(productRequest);
+
+        MenuGroup menuGroupRequest = new MenuGroup();
+        menuGroupRequest.setName("TestMenuGroup");
+        MenuGroup menuGroup = menuGroupService.create(menuGroupRequest);
+
+        String menuName = "TestMenu";
+        Menu menuRequest = new Menu();
+        menuRequest.setPrice(menuPrice);
+        menuRequest.setName(menuName);
+        menuRequest.setMenuGroup(menuGroup);
+        menuRequest.setMenuGroupId(menuGroup.getId());
+        MenuProduct menuProduct = createMenuProductRequest(product, 1);
+        menuRequest.setMenuProducts(List.of(menuProduct));
+        menuRequest.setDisplayed(displayed);
+
+        // when
+        return menuService.create(menuRequest);
     }
 }
