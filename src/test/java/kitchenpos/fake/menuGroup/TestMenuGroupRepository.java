@@ -14,7 +14,7 @@ public class TestMenuGroupRepository implements MenuGroupRepository {
 
     @Override
     public Optional<MenuGroup> findById(UUID id) {
-        return Optional.of(menuGroups.get(id));
+        return Optional.ofNullable(menuGroups.get(id));
     }
 
     @Override
