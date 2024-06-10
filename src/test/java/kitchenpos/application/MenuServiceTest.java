@@ -4,6 +4,7 @@ import static kitchenpos.TestFixture.createMenuProductRequest;
 import static kitchenpos.TestFixture.getSavedMenu;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -379,5 +380,80 @@ class MenuServiceTest {
 
         // then
         assertThrows(IllegalArgumentException.class, () -> menuService.changePrice(UUID.randomUUID(), priceChangeRequest));
+    }
+
+    @DisplayName("메뉴를 전시할 수 있다")
+    @Test
+    void displayMenu() {
+        // given
+        MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
+        ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
+        Menu savedMenu = getSavedMenu(productService, menuService, menuGroupService,  BigDecimal.valueOf(5), false,
+            BigDecimal.TEN);
+
+        // when
+        Menu menu = menuService.display(savedMenu.getId());
+
+        // then
+        assertTrue(menu.isDisplayed());
+    }
+
+    @DisplayName("메뉴를 전시할 수 없다")
+    @Test
+    void displayMenuFail() {
+        // given
+        MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
+        ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
+        BigDecimal originalPrice = BigDecimal.valueOf(5);
+        Menu savedMenu = getSavedMenu(productService, menuService, menuGroupService, originalPrice, false,
+            BigDecimal.TEN);
+        savedMenu.setPrice(BigDecimal.valueOf(100));
+
+        // when then
+        assertThrows(IllegalStateException.class, () -> menuService.display(savedMenu.getId()));
+    }
+
+
+    @DisplayName("메뉴를 숨길 수 있다")
+    @Test
+    void hideMenu() {
+        // given
+        MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
+        ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
+        Menu savedMenu = getSavedMenu(productService, menuService, menuGroupService,  BigDecimal.valueOf(5), true,
+            BigDecimal.TEN);
+
+        // when
+        Menu menu = menuService.hide(savedMenu.getId());
+
+        // then
+        assertFalse(menu.isDisplayed());
+    }
+
+    @DisplayName("모든 메뉴를 조회할 수 있다")
+    @Test
+    void findAllMenus() {
+        // given
+        MenuGroupService menuGroupService = new MenuGroupService(menuGroupRepository);
+        MenuService menuService = new MenuService(menuRepository, menuGroupRepository, productRepository,
+            (text) -> false);
+        ProductService productService = new ProductService(productRepository, menuRepository, (text) -> false);
+        Menu savedMenu = getSavedMenu(productService, menuService, menuGroupService,  BigDecimal.valueOf(5), true,
+            BigDecimal.TEN);
+
+        // when
+        List<Menu> menus = menuService.findAll();
+
+        // then
+        assertAll(
+            () -> assertThat(menus.size()).isEqualTo(1),
+            () -> assertThat(menus.get(0).getId()).isEqualTo(savedMenu.getId())
+        );
     }
 }
