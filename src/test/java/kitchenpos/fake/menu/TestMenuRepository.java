@@ -1,13 +1,13 @@
 package kitchenpos.fake.menu;
 
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuRepository;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
-import kitchenpos.domain.Menu;
-import kitchenpos.domain.MenuRepository;
 
 public class TestMenuRepository implements MenuRepository {
     private final ConcurrentHashMap<UUID, Menu> menus = new ConcurrentHashMap<>();
@@ -25,7 +25,7 @@ public class TestMenuRepository implements MenuRepository {
 
     @Override
     public List<Menu> findAllByIdIn(List<UUID> ids) {
-        return new ArrayList<>(menus.values().stream().filter(it -> ids.contains(it)).toList());
+        return new ArrayList<>(menus.values().stream().filter(it -> ids.contains(it.getId())).toList());
     }
 
     @Override
