@@ -1,21 +1,32 @@
 package kitchenpos.application;
 
+import kitchenpos.domain.Menu;
+import kitchenpos.domain.MenuGroupRepository;
+import kitchenpos.domain.MenuRepository;
 import kitchenpos.domain.OrderRepository;
 import kitchenpos.domain.OrderTable;
 import kitchenpos.domain.OrderTableRepository;
+import kitchenpos.domain.ProductRepository;
+import kitchenpos.fake.menu.TestMenuRepository;
+import kitchenpos.fake.menuGroup.TestMenuGroupRepository;
 import kitchenpos.fake.order.TestOrderRepository;
 import kitchenpos.fake.ordertable.TestOrderTableRepository;
+import kitchenpos.fake.product.TestProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import static kitchenpos.MenuTestFixture.getSavedMenu;
 import static kitchenpos.OrderTestFixture.changeOrderTableRequest;
+import static kitchenpos.OrderTestFixture.createEatInOrderRequest;
+import static kitchenpos.OrderTestFixture.createOrderLineItemRequest;
 import static kitchenpos.OrderTestFixture.createOrderTableRequest;
 import static kitchenpos.OrderTestFixture.getSavedOrderTable;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,14 +37,28 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OrderTableServiceTest {
+    private OrderService orderService;
     private OrderRepository orderRepository;
+    private MenuRepository menuRepository;
     private OrderTableRepository orderTableRepository;
+    private MenuGroupRepository menuGroupRepository;
+    private ProductRepository productRepository;
+    private MenuService menuService;
+    private ProductService productService;
+    private MenuGroupService menuGroupService;
     private OrderTableService orderTableService;
 
     @BeforeEach
     void setUp() {
         orderRepository = new TestOrderRepository();
+        menuRepository = new TestMenuRepository();
         orderTableRepository = new TestOrderTableRepository();
+        menuGroupRepository = new TestMenuGroupRepository();
+        productRepository = new TestProductRepository();
+        orderService = new OrderService(orderRepository, menuRepository, orderTableRepository, (orderId, amount, deliveryAddress) -> {});
+        menuService = new MenuService(menuRepository, menuGroupRepository, productRepository, (text) -> false);
+        productService = new ProductService(productRepository, menuRepository, (text) -> false);
+        menuGroupService = new MenuGroupService(menuGroupRepository);
         orderTableService = new OrderTableService(orderTableRepository, orderRepository);
     }
 
@@ -119,5 +144,40 @@ class OrderTableServiceTest {
                 () -> assertThat(all).hasSize(1),
                 () -> assertThat(all.get(0).getId()).isEqualTo(original.getId())
         );
+    }
+
+    @Test
+    @DisplayName("사용중인 테이블을 정리한다")
+    void clearOrderTable() {
+        OrderTable original = getSavedOrderTable(orderTableService, "tableName");
+        orderTableService.sit(original.getId());
+        orderTableService.changeNumberOfGuests(original.getId(), changeOrderTableRequest(2));
+
+
+        OrderTable changed = orderTableService.clear(original.getId());
+
+        assertAll(
+                () -> assertFalse(changed.isOccupied()),
+                () -> assertThat(changed.getNumberOfGuests()).isEqualTo(0)
+        );
+    }
+
+    @Test
+    @DisplayName("테이블이 없다면 정리할 수 없다")
+    void clearOrderTableFail() {
+        assertThrows(NoSuchElementException.class, () -> orderTableService.clear(UUID.randomUUID()));
+    }
+
+    @Test
+    @DisplayName("주문이 완료되지 않은 테이블은 정리할 수 없다")
+    void clearOrderTableFailOrderCompleted() {
+        Menu menu = getSavedMenu(productService, menuService, menuGroupService, BigDecimal.ONE, true, BigDecimal.TEN);
+        menuService.display(menu.getId());
+        OrderTable original = getSavedOrderTable(orderTableService, "tableName");
+        orderTableService.sit(original.getId());
+        orderTableService.changeNumberOfGuests(original.getId(), changeOrderTableRequest(2));
+        orderService.create(createEatInOrderRequest(original.getId(), List.of(createOrderLineItemRequest(menu.getId(), BigDecimal.ONE, 2))));
+
+        assertThrows(IllegalStateException.class, () -> orderTableService.clear(original.getId()));
     }
 }
