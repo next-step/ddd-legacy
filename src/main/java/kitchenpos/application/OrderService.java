@@ -50,6 +50,7 @@ public class OrderService {
         if (Objects.isNull(orderLineItemRequests) || orderLineItemRequests.isEmpty()) {
             throw new IllegalArgumentException();
         }
+
         final List<Menu> menus = menuRepository.findAllByIdIn(
             orderLineItemRequests.stream()
                 .map(OrderLineItem::getMenuId)
