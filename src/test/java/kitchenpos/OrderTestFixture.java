@@ -16,4 +16,10 @@ public class OrderTestFixture {
     public static OrderTable getSavedOrderTable(OrderTableService orderTableService, String name) {
         return orderTableService.create(createOrderTableRequest(name));
     }
+
+    public static OrderTable changeOrderTableRequest(int numberOfGuest) {
+        OrderTable table = new OrderTable();
+        table.setNumberOfGuests(numberOfGuest);
+        return table;
+    }
 }
