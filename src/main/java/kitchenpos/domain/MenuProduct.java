@@ -63,7 +63,7 @@ public class MenuProduct {
     }
 
     public UUID getProductId() {
-        return productId;
+        return this.productId;
     }
 
     public void setProductId(final UUID productId) {
