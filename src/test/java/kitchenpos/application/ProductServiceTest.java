@@ -54,7 +54,6 @@ class ProductServiceTest {
 
     @Test
     @DisplayName("가격은 반드시 존재해야 한다")
-    @ValueSource(longs = {-1L})
     void create_product_fail_price1() {
         // given
         ProductService productService = new ProductService(
