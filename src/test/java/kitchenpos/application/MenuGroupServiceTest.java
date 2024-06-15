@@ -10,7 +10,7 @@ import kitchenpos.fake.menuGroup.TestMenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 class MenuGroupServiceTest {
     @Test
@@ -30,7 +30,7 @@ class MenuGroupServiceTest {
 
     @ParameterizedTest
     @DisplayName("메뉴그룹이름은 존재해야하며 길이가 1 이상이다")
-    @NullSource
+    @NullAndEmptySource
     void create_menu_group_fail(String menuGroupName) {
         MenuGroupService menuGroupService = new MenuGroupService(new TestMenuGroupRepository());
         MenuGroup request = new MenuGroup();
