@@ -1,5 +1,6 @@
 package kitchenpos.application;
 
+import static kitchenpos.MenuTestFixture.createMenuGroupRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,9 +18,8 @@ class MenuGroupServiceTest {
     @DisplayName("메뉴그룹을 생성할 수 있다")
     void create_menu_group() {
         MenuGroupService menuGroupService = new MenuGroupService(new TestMenuGroupRepository());
-        String menuGroupName = "TestMenuGroup";
-        MenuGroup request = new MenuGroup();
-        request.setName(menuGroupName);
+        String menuGroupName = "치킨메뉴그룹";
+        MenuGroup request = createMenuGroupRequest(menuGroupName);
         MenuGroup menuGroup = menuGroupService.create(request);
 
         assertAll(

@@ -12,6 +12,13 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 public class MenuTestFixture {
+    public static MenuGroup createMenuGroupRequest(String name) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setName(name);
+        return menuGroup;
+    }
+
+
     public static Menu createMenu(String menuName, BigDecimal menuPrice, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
