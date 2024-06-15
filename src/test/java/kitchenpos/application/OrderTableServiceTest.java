@@ -126,7 +126,7 @@ class OrderTableServiceTest {
 
     @Test
     @DisplayName("사용중이지 않은 테이블의 손님수는 변경할 수 없다")
-    void changeeNumberOfGuestsNotOccupiedFail() {
+    void changeNumberOfGuestsNotOccupiedFail() {
         OrderTable original = getSavedOrderTable(orderTableService, "tableName");
 
         final int newNumberOfGuests = 3;
