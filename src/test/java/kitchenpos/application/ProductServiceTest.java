@@ -214,7 +214,7 @@ class ProductServiceTest {
         List<Product> products = productService.findAll();
         assertAll(
                 () -> assertThat(products.size()).isEqualTo(1),
-                () -> assertThat(products.get(0).getId()).isEqualTo(product.getId())
+                () -> assertThat(products.getFirst().getId()).isEqualTo(product.getId())
         );
     }
 }

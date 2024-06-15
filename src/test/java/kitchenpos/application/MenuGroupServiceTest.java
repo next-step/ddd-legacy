@@ -1,16 +1,16 @@
 package kitchenpos.application;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.List;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.fake.menuGroup.TestMenuGroupRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class MenuGroupServiceTest {
     @Test
@@ -55,7 +55,7 @@ class MenuGroupServiceTest {
         // then
         assertAll(
                 () -> assertThat(result.size()).isEqualTo(1),
-                () -> assertThat(result.get(0).getName()).isEqualTo(menuGroupName)
+                () -> assertThat(result.getFirst().getName()).isEqualTo(menuGroupName)
         );
     }
 }

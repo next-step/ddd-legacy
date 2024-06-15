@@ -1,5 +1,22 @@
 package kitchenpos.application;
 
+import static kitchenpos.MenuTestFixture.getSavedMenu;
+import static kitchenpos.OrderTestFixture.changeOrderTableRequest;
+import static kitchenpos.OrderTestFixture.createEatInOrderRequest;
+import static kitchenpos.OrderTestFixture.createOrderLineItemRequest;
+import static kitchenpos.OrderTestFixture.createOrderTableRequest;
+import static kitchenpos.OrderTestFixture.getSavedOrderTable;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroupRepository;
 import kitchenpos.domain.MenuRepository;
@@ -17,24 +34,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
-
-import static kitchenpos.MenuTestFixture.getSavedMenu;
-import static kitchenpos.OrderTestFixture.changeOrderTableRequest;
-import static kitchenpos.OrderTestFixture.createEatInOrderRequest;
-import static kitchenpos.OrderTestFixture.createOrderLineItemRequest;
-import static kitchenpos.OrderTestFixture.createOrderTableRequest;
-import static kitchenpos.OrderTestFixture.getSavedOrderTable;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OrderTableServiceTest {
     private OrderService orderService;
@@ -142,7 +141,7 @@ class OrderTableServiceTest {
 
         assertAll(
                 () -> assertThat(all).hasSize(1),
-                () -> assertThat(all.get(0).getId()).isEqualTo(original.getId())
+                () -> assertThat(all.getFirst().getId()).isEqualTo(original.getId())
         );
     }
 
