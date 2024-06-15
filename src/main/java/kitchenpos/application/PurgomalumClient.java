@@ -1,6 +1,6 @@
 package kitchenpos.application;
 
 @FunctionalInterface
-public interface PurgomalumService {
+public interface PurgomalumClient {
     boolean containsProfanity(final String text);
 }
