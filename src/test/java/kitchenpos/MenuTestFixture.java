@@ -18,6 +18,28 @@ public class MenuTestFixture {
         return menuGroup;
     }
 
+    public static Menu createMenuRequest(BigDecimal menuPrice, String menuName, MenuGroup menuGroup, Product product, long quantity) {
+        Menu menuRequest = new Menu();
+        menuRequest.setPrice(menuPrice);
+        menuRequest.setName(menuName);
+        menuRequest.setMenuGroup(menuGroup);
+        menuRequest.setMenuGroupId(menuGroup.getId());
+        MenuProduct menuProduct = createMenuProductRequest(product, quantity);
+        menuRequest.setMenuProducts(List.of(menuProduct));
+        menuRequest.setDisplayed(true);
+        return menuRequest;
+    }
+
+    public static Menu createMenuRequest(BigDecimal menuPrice, String menuName, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+        Menu menuRequest = new Menu();
+        menuRequest.setPrice(menuPrice);
+        menuRequest.setName(menuName);
+        menuRequest.setMenuGroup(menuGroup);
+        menuRequest.setMenuGroupId(menuGroup.getId());
+        menuRequest.setMenuProducts(menuProducts);
+        menuRequest.setDisplayed(true);
+        return menuRequest;
+    }
 
     public static Menu createMenu(String menuName, BigDecimal menuPrice, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
