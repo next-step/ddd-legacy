@@ -12,11 +12,11 @@ import kitchenpos.domain.MenuProduct;
 import kitchenpos.domain.Product;
 
 public class MenuTestFixture {
-    public static Menu createMenu(BigDecimal menuPrice, List<MenuProduct> menuProducts) {
+    public static Menu createMenu(String menuName, BigDecimal menuPrice, List<MenuProduct> menuProducts) {
         Menu menu = new Menu();
         menu.setId(UUID.randomUUID());
         menu.setMenuProducts(menuProducts);
-        MenuGroup menuGroup = createMenuGroup();
+        MenuGroup menuGroup = createMenuGroup(menuName);
         menu.setMenuGroup(menuGroup);
         menu.setDisplayed(true);
         menu.setPrice(menuPrice);
@@ -37,10 +37,10 @@ public class MenuTestFixture {
         return menuProduct;
     }
 
-    public static MenuGroup createMenuGroup() {
+    public static MenuGroup createMenuGroup(String name) {
         MenuGroup menuGroup = new MenuGroup();
         menuGroup.setId(UUID.randomUUID());
-        menuGroup.setName("menuGroup");
+        menuGroup.setName(name);
         return menuGroup;
     }
 

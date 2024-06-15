@@ -150,7 +150,7 @@ class ProductServiceTest {
         Product product = productService.create(request);
 
         List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1L));
-        Menu menu = createMenu(BigDecimal.valueOf(5), menuProducts);
+        Menu menu = createMenu("상품 하나인 메뉴", BigDecimal.valueOf(5), menuProducts);
         testMenuRepository.save(menu);
 
 
