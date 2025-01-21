@@ -14,21 +14,19 @@ class CarTest {
         assertThatIllegalArgumentException().isThrownBy(() -> new Car("nameiscar"));
     }
 
-    @DisplayName("숫자가 4 이상이면 자동차가 움직인다")
-    @ValueSource(ints = {4,5,6,7,8,9})
-    @ParameterizedTest
-    void move(final int condition) {
-        Car car = new Car("bab2");
-        car.move(4);
+    @Test
+    @DisplayName("자동차는 움직인다.")
+    void move() {
+        Car car = new Car("car1");
+        car.move(new ForwardStrategy());
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
-    @DisplayName("숫자가 4 미만이면 자동차가 정지한다")
-    @ValueSource(ints = {0,1,2,3})
-    @ParameterizedTest
-    void stop(final int condition) {
-        Car car = new Car("bab2");
-        car.move(3);
+    @Test
+    @DisplayName("자동차는 정지한다.")
+    void stop() {
+        Car car = new Car("car1");
+        car.move(new StopStrategy());
         assertThat(car.getPosition()).isEqualTo(0);
     }
 }
