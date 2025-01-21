@@ -2,7 +2,10 @@ package racingcar;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 class CarTest {
@@ -12,5 +15,23 @@ class CarTest {
         assertThatIllegalArgumentException().isThrownBy(() -> {
             new Car("123456");
         });
+    }
+
+    @DisplayName("숫자가 4 이상이면 자동차가 움직인다.")
+    @ValueSource(ints = {4, 5, 6, 7, 8, 9})
+    @ParameterizedTest
+    void move(int condition) {
+        Car car = new Car("car");
+        car.move(condition);
+        assertThat(car.getPosition()).isEqualTo(1);
+    }
+
+    @DisplayName("숫자가 4 미만이면 자동차가 움직인다.")
+    @ValueSource(ints = {0, 1, 2, 3})
+    @ParameterizedTest
+    void stop(int condition) {
+        Car car = new Car("car");
+        car.move(condition);
+        assertThat(car.getPosition()).isEqualTo(0);
     }
 }

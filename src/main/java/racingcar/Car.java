@@ -2,6 +2,7 @@ package racingcar;
 
 public class Car {
     private final String name;
+    private int position;
 
     public Car(String name) {
         if (name.length() > 5) {
@@ -9,5 +10,15 @@ public class Car {
         }
 
         this.name = name;
+    }
+
+    public void move(final int randomNumber) {
+        if (randomNumber >= 4) {
+            position++;
+        }
+    }
+
+    public int getPosition() {
+        return position;
     }
 }
