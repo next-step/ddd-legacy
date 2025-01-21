@@ -12,8 +12,8 @@ public class Car {
         this.position = 0;
     }
 
-    public void move(final int condition) {
-        if (condition >= 4) {
+    public void move(final MovingStrategy movingStrategy) {
+        if (movingStrategy.movable()) {
             position++;
         }
     }
