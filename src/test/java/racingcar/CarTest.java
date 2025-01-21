@@ -21,11 +21,11 @@ public class CarTest {
 
     @DisplayName("자동차는 조건이 4이상일 경우 1칸 움직일 수 있다.")
     @ValueSource(ints = {4, 5, 6, 7, 8, 9, 10})
-    @ParameterizedTest
+    @ParameterizedTest(name = "조건이 {0}일 경우 1칸 움직인다.")
     void move(final int condition) {
         final Car car = new Car("woozi");
         car.move(condition);
 
-        assertThat(car.position()).isEqualTo(1);
+        assertThat(car.getPosition()).isEqualTo(1);
     }
 }
