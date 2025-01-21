@@ -13,20 +13,9 @@ class Car(val name: String) {
         move { condition >= 4 }
     }
 
-    fun move(condition: () -> Boolean) {
-        if (condition()) {
+    fun move(movingStrategy: () -> Boolean) {
+        if (movingStrategy()) {
             position++
         }
     }
-
-    fun move(movingStrategy: MovingStrategy) {
-        if (movingStrategy.canMove()) {
-            position++
-        }
-    }
-}
-
-fun interface MovingStrategy {
-
-    fun canMove(): Boolean
 }
