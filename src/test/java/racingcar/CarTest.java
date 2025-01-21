@@ -2,8 +2,6 @@ package racingcar;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -16,21 +14,19 @@ class CarTest {
                 .isThrownBy(() -> new Car("gugbab2"));
     }
 
-    @DisplayName("숫자가 4 이상이면 자동차가 움직인다")
-    @ValueSource(ints = {4,5,6,7,8,9})
-    @ParameterizedTest
-    void move(final int condition) {
+    @Test
+    @DisplayName("자동차는 움직인다.")
+    void move() {
         Car car = new Car("bab2");
-        car.move(4);
+        car.move(new ForwardStrategy());
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
-    @DisplayName("숫자가 4 미만이면 자동차가 정지한다")
-    @ValueSource(ints = {0,1,2,3})
-    @ParameterizedTest
-    void stop(final int condition) {
+    @Test
+    @DisplayName("자동차는 정지한다.")
+    void stop() {
         Car car = new Car("bab2");
-        car.move(3);
+        car.move(new StopStrategy());
         assertThat(car.getPosition()).isEqualTo(0);
     }
 }
