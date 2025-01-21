@@ -1,15 +1,6 @@
 package kitchenpos.domain;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,9 +21,9 @@ public class Menu {
 
     @ManyToOne(optional = false)
     @JoinColumn(
-        name = "menu_group_id",
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_menu_to_menu_group")
+            name = "menu_group_id",
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_menu_to_menu_group")
     )
     private MenuGroup menuGroup;
 
@@ -41,10 +32,10 @@ public class Menu {
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(
-        name = "menu_id",
-        nullable = false,
-        columnDefinition = "binary(16)",
-        foreignKey = @ForeignKey(name = "fk_menu_product_to_menu")
+            name = "menu_id",
+            nullable = false,
+            columnDefinition = "binary(16)",
+            foreignKey = @ForeignKey(name = "fk_menu_product_to_menu")
     )
     private List<MenuProduct> menuProducts;
 
