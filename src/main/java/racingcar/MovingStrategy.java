@@ -1,2 +1,6 @@
-package racingcar;public interface MoveingStrategy {
+package racingcar;
+
+@FunctionalInterface
+public interface MovingStrategy {
+    boolean movable();
 }
