@@ -16,21 +16,19 @@ class CarTest {
             .isThrownBy(() -> new Car("동해물과백두산이"));
     }
 
-    @DisplayName("무작위 값이 4 이상이면 자동차가 움직인다")
-    @ValueSource(ints = {4, 5, 6, 7, 8, 9})
-    @ParameterizedTest
-    void move(final int condition) {
+    @DisplayName("자동차는 움직인다")
+    @Test
+    void move() {
         final var car = new Car("jason");
-        car.move(condition);
+        car.move(new ForwardStrategy());
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
-    @DisplayName("무작위 값이 4 미만이면 자동차는 정지인다")
-    @ValueSource(ints = {0, 1, 2, 3})
-    @ParameterizedTest
-    void stop(final int condition) {
+    @DisplayName("자동차는 정지한다")
+    @Test
+    void stop() {
         final var car = new Car("jason");
-        car.move(condition);
+        car.move(new StopStrategy());
         assertThat(car.getPosition()).isEqualTo(0);
     }
 }
