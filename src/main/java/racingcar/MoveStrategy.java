@@ -2,5 +2,5 @@ package racingcar;
 
 public interface MoveStrategy {
 
-    boolean move(int number);
+    boolean movable(int number);
 }

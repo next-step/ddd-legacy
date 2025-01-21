@@ -9,13 +9,13 @@ class RandomMoveStrategyTest {
 
     @Test
     @DisplayName("자동차는 숫자 조건이 4 이상이면 움직인다.")
-    void move_success() {
+    void movable_success() {
         // given
         int givenNumber = 4;
 
         // when
         MoveStrategy moveStrategy = new RandomMoveStrategy();
-        boolean result = moveStrategy.move(givenNumber);
+        boolean result = moveStrategy.movable(givenNumber);
 
         // then
         assertThat(result).isTrue();
@@ -23,13 +23,13 @@ class RandomMoveStrategyTest {
 
     @Test
     @DisplayName("자동차는 숫자 조건이 4 미만이면 움직이지 않는다.")
-    void move_false() {
+    void movable_false() {
         // given
         int givenNumber = 3;
 
         // when
         MoveStrategy moveStrategy = new RandomMoveStrategy();
-        boolean result = moveStrategy.move(givenNumber);
+        boolean result = moveStrategy.movable(givenNumber);
 
         // then
         assertThat(result).isFalse();
