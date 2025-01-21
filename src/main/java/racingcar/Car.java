@@ -12,4 +12,14 @@ public class Car {
         this.name = name;
     }
 
+    public void move(final int condition) {
+        if (condition >= 4) {
+            this.position++;
+        }
+    }
+
+    public int getPosition() {
+        return this.position;
+    }
+
 }
