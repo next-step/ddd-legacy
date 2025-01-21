@@ -17,20 +17,18 @@ class CarTest {
     }
 
     @DisplayName("숫자가 4 미만일때 정지한다.")
-    @ValueSource(ints = {0, 1, 2, 3})
-    @ParameterizedTest
-    void stop(int condition) {
+    @Test
+    void stop() {
         Car car = new Car("자동차");
-        car.move(condition);
+        car.move(new StopStrategy());
         assertThat(car.getPosition()).isEqualTo(0);
     }
 
     @DisplayName("숫자가 4이상일때 움직인다.")
-    @ValueSource(ints = {4, 5, 6, 7})
-    @ParameterizedTest
-    void move(int condition) {
+    @Test
+    void move() {
         Car car = new Car("자동차");
-        car.move(condition);
+        car.move(new ForwardStrategy());
         assertThat(car.getPosition()).isEqualTo(1);
     }
 }
