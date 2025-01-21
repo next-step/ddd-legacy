@@ -18,21 +18,21 @@ public class CarTest {
                 .isThrownBy(() -> new Car("thisistestcar", 0));
     }
 
-    @DisplayName("랜덤 값이 4 이상인 경우, 자동차 이동")
-    @ValueSource(ints = {4, 5, 6, 7, 8, 9})
-    @ParameterizedTest
-    void move(final int condition) {
+    @DisplayName("자동차 이동")
+    @Test
+    void move() {
         final Car mycar = new Car("mycar", 0);
-        mycar.move(condition);
+//        mycar.move(() -> true);
+        mycar.move(new ForwardStrategy());
         assertThat(mycar.getPosition()).isEqualTo(1);
     }
 
-    @DisplayName("랜덤 값이 4 미만인 경우, 자동차 정지")
-    @ValueSource(ints = {0, 1, 2, 3})
-    @ParameterizedTest
-    void stop(final int condition) {
+    @DisplayName("자동차 정지")
+    @Test
+    void stop() {
         final Car mycar = new Car("mycar", 0);
-        mycar.move(condition);
+//        mycar.move(() -> false);
+        mycar.move(new StopStrategy());
         assertThat(mycar.getPosition()).isEqualTo(0);
     }
 }
