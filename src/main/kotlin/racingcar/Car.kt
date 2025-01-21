@@ -1,11 +1,18 @@
 package racingcar
 
-class Car(name: String) {
+class Car(val name: String) {
 
-    private val _name: String
+    var position: Int = 0
 
     init {
         require(name.length <= 5)
-        this._name = name
+    }
+
+    fun move(condition: Int) {
+        require(condition in (0..9))
+
+        if (condition >= 4) {
+            position++
+        }
     }
 }
