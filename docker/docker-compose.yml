@@ -2,7 +2,7 @@ name: kitchenpos
 services:
   db:
     image: mysql:8.0.30
-    platform: linux/x86_64
+    platform: linux/amd64
     restart: always
     ports:
       - "33306:3306"
