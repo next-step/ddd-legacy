@@ -28,4 +28,14 @@ public class CarTest {
 
         assertThat(car.getPosition()).isEqualTo(1);
     }
+
+    @DisplayName("자동차는 조건이 4미만일 경우 움직이지 않는다.")
+    @ValueSource(ints = {0, 1, 2, 3})
+    @ParameterizedTest(name = "조건이 {0}일 경우 움직이지 않는다.")
+    void stop(final int condition) {
+        final Car car = new Car("woozi");
+        car.move(condition);
+
+        assertThat(car.getPosition()).isEqualTo(0);
+    }
 }
