@@ -12,9 +12,9 @@ public class Car {
         this.name = name;
     }
 
-    public void move(final int condition) {
-        if (condition >= 4) {
-            this.position++;
+    public void move(final MovingStrategy movingStrategy) {
+        if (movingStrategy.isMovable()) {
+            position++;
         }
     }
 
