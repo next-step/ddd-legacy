@@ -30,6 +30,6 @@ public class CalculatorTest {
     @ValueSource(strings = {"1", "22", "333", "1a", "aa"})
     @ParameterizedTest
     void onlyNumberCheck(String input) {
-
+        assertThat(calculator.calculate(input)).isEqualTo(Integer.parseInt(input));
     }
 }
