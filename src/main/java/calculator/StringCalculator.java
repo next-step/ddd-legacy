@@ -8,7 +8,7 @@ public class StringCalculator {
     }
 
     public static StringCalculator of(String str) {
-        return new StringCalculator(new StringValues(str, new DefaultStringValuesValidator()));
+        return new StringCalculator(StringValues.of(str));
     }
 
     public int sum() {

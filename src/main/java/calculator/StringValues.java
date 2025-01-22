@@ -1,18 +1,17 @@
 package calculator;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class StringValues {
-    private static final String DEFAULT_DELIMITER_REGEX = "[,:]";
     private final List<StringValue> values;
 
-    public StringValues(String str, DefaultStringValuesValidator defaultStringValuesValidator) {
-        defaultStringValuesValidator.validation(str, DEFAULT_DELIMITER_REGEX);
-        String[] strings = str.split(DEFAULT_DELIMITER_REGEX);
-        this.values = Stream.of(strings)
-                .map(StringValue::of)
-                .toList();
+    public StringValues(List<StringValue> values) {
+        this.values = values;
+    }
+
+    public static StringValues of(String str) {
+        InputValue inputValue = InputValue.of(str);
+        return new StringValues(inputValue.getNumbers());
     }
 
     public List<Integer> intValues() {
