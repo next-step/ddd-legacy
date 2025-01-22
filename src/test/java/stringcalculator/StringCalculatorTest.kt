@@ -2,7 +2,7 @@ package stringcalculator
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
@@ -47,5 +47,12 @@ class StringCalculatorTest {
     fun threeNumbersWithCustomSeparator(text: String) {
         val res = StringCalculator(text).sum()
         assertEquals(res, 6)
+    }
+
+    @DisplayName("음수를 전달할 경우 RuntimeException 에러가 발생해야 한다")
+    @ValueSource(strings = ["-1,2,3"])
+    @ParameterizedTest
+    fun negative(text: String) {
+        assertThrows<RuntimeException> { StringCalculator(text).sum() }
     }
 }

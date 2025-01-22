@@ -12,9 +12,14 @@ class StringCalculator(
         }
 
         return when {
+            hasNegativeNumber() -> throw IllegalArgumentException()
             hasCustomDelimiter() -> sumWithCustomDelimiter()
             else -> sumWithDefaultDelimiters()
         }
+    }
+
+    private fun hasNegativeNumber() :Boolean{
+        return Pattern.compile("-\\d+").matcher(text).find()
     }
 
     private fun hasCustomDelimiter(): Boolean {
