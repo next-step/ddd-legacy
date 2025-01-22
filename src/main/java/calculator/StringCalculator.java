@@ -3,6 +3,10 @@ package calculator;
 public class StringCalculator {
 
     public int add(String text) {
+        if (text == null || text.isBlank()) {
+            return 0;
+        }
+
         int sum = 0;
         int num = 0;
         String delimiters = ",:";

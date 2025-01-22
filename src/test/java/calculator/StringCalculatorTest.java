@@ -2,6 +2,8 @@ package calculator;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -22,11 +24,11 @@ class StringCalculatorTest {
         assertEquals(3, result);
     }
 
-    @Test
-    @DisplayName("빈 문자열일 경우 0을 반환한다.")
-    void testReturn0WhenEmptyText() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    @DisplayName("입력이 null 또는 빈 문자열일 경우 0을 반환한다.")
+    void testReturn0WhenEmptyText(final String text) {
         // given
-        final String text = "";
         final StringCalculator stringCalculator = new StringCalculator();
 
         // when
