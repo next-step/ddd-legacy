@@ -5,6 +5,8 @@ import java.util.StringTokenizer;
 public class Calculator {
 
     private static final String DEFAULT_DELIMITER = ",:";
+    private static final String NOT_NUMBER_EXCEPTION = "숫자 외의 값을 넣을 수 없습니다.";
+    private static final String NEGATIVE_NUMBER_EXCEPTION = "음수를 넣을 수 없습니다.";
 
     public int calculate(String value) {
         if (value == null || value.isEmpty()) {
@@ -42,9 +44,20 @@ public class Calculator {
         int sum = 0;
         StringTokenizer st = new StringTokenizer(numberString, delimiter);
         while (st.hasMoreElements()) {
-            String token = st.nextToken().trim();
-            sum += Integer.parseInt(token);
+            try {
+                int targetNumber = Integer.parseInt(st.nextToken().trim());
+                validateNegativeNumber(targetNumber);
+                sum += targetNumber;
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(NOT_NUMBER_EXCEPTION);
+            }
         }
         return sum;
+    }
+
+    private void validateNegativeNumber(int targetNumber) {
+        if (targetNumber < 0) {
+            throw new IllegalArgumentException(NEGATIVE_NUMBER_EXCEPTION);
+        }
     }
 }
