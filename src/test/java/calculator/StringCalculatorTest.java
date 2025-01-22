@@ -16,7 +16,7 @@ public class StringCalculatorTest {
         // given
 
         // when
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> new StringCalculator("-1");
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> StringCalculator.of("-1");
 
         // then
         assertThatRuntimeException()

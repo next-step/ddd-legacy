@@ -1,12 +1,14 @@
 package calculator;
 
 public class StringCalculator {
-    private final String value;
+    private final StringValue value;
 
-    public StringCalculator(String value) {
-        if (Integer.parseInt(value) < 0) {
-            throw new RuntimeException("양의 정수를 입력하세요");
-        }
+
+    public StringCalculator(StringValue value) {
         this.value = value;
+    }
+
+    public static StringCalculator of(String value) {
+        return new StringCalculator(new StringValue(value));
     }
 }
