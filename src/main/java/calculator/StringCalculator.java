@@ -5,9 +5,15 @@ public class StringCalculator {
     public int add(String text) {
         int sum = 0;
         int num = 0;
+        String delimiters = ",:";
+
+        if (text.startsWith("//") && "\\n".equals(text.substring(3, 5))) {
+            delimiters += text.charAt(2);
+            text = text.substring(5);
+        }
 
         for (char c : text.toCharArray()) {
-            if (c == ',' || c == ':') {
+            if (delimiters.indexOf(c) >= 0) {
                 sum += num;
                 num = 0;
             } else {
