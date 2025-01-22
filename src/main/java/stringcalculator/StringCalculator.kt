@@ -1,5 +1,7 @@
 package stringcalculator
 
+import java.util.regex.Pattern
+
 class StringCalculator(
     private val text: String?
 ) {
@@ -9,7 +11,30 @@ class StringCalculator(
             return 0
         }
 
-        return text.toInt()
+        return when {
+            hasCustomDelimiter() -> sumWithCustomDelimiter()
+            else -> sumWithDefaultDelimiters()
+        }
     }
 
+    private fun hasCustomDelimiter(): Boolean {
+        return Pattern.compile("//(.)\n(.*)").matcher(text).find()
+    }
+
+    private fun sumWithCustomDelimiter(): Int {
+        val matcher = Pattern.compile("//(.)\n(.*)").matcher(text)
+        matcher.find()
+
+        val customDelimiter: String = matcher.group(1)
+        return matcher.group(2).split(customDelimiter, ",", ":").sumOf { it.toInt() }
+    }
+
+    private fun sumWithDefaultDelimiters(): Int {
+        val splits = text!!.split(",", ":")
+        if (splits.size <= 1) {
+            return text.toInt()
+        }
+
+        return splits.sumOf { it.toInt() }
+    }
 }

@@ -20,8 +20,32 @@ class StringCalculatorTest {
     @DisplayName("숫자 하나를 문자열로 입력했을 경우 해당 숫자를 반환한다")
     @ValueSource(strings = ["0", "99999999"])
     @ParameterizedTest
-    fun number(text: String?) {
+    fun number(text: String) {
         val res = StringCalculator(text).sum()
         assertEquals(text, res.toString())
+    }
+
+    @DisplayName("숫자 두개를 컴마로 구분한 경우 두 숫자의 합을 반환한다")
+    @ValueSource(strings = ["1,2"])
+    @ParameterizedTest
+    fun twoNumbersWithCommaSeparator(text: String) {
+        val res = StringCalculator(text).sum()
+        assertEquals(res, 3)
+    }
+
+    @DisplayName("쉼표 외에 콜론을 구분자로 사용하고 합을 반환한다")
+    @ValueSource(strings = ["1,2:3"])
+    @ParameterizedTest
+    fun threeNumbersWithColonSeparator(text: String) {
+        val res = StringCalculator(text).sum()
+        assertEquals(res, 6)
+    }
+
+    @DisplayName("//와 \n 문자 사이에 커스텀 구분자를 사용할 수 있다")
+    @ValueSource(strings = ["//;\n1;2;3", "//;\n1,2;3"])
+    @ParameterizedTest
+    fun threeNumbersWithCustomSeparator(text: String) {
+        val res = StringCalculator(text).sum()
+        assertEquals(res, 6)
     }
 }
