@@ -11,11 +11,11 @@ class Car(
     }
 
     fun move(condition: Int) {
-        move { condition > 4 }
+        move(ConditionalStrategy(condition))
     }
 
-    fun move(condition: MoveStrategy) {
-        if (condition.movable()) {
+    fun move(moveStrategy: MoveStrategy) {
+        if (moveStrategy.movable()) {
             position++
         }
     }
