@@ -13,10 +13,8 @@ public class StringCalculatorTest {
     @ParameterizedTest
     @ValueSource(strings = {"-1", "a", "Z", ".", "-", ".9", "0.11"})
     void validNumber(String value) {
-        // given
-
         // when
-        ThrowableAssert.ThrowingCallable throwingCallable = () -> StringCalculator.of("-1");
+        ThrowableAssert.ThrowingCallable throwingCallable = () -> StringCalculator.of(value);
 
         // then
         assertThatRuntimeException()
