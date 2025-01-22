@@ -20,8 +20,10 @@ public class StringCalculator {
             if (delimiters.indexOf(c) >= 0) {
                 sum += num;
                 num = 0;
-            } else {
+            } else if (Character.isDigit(c)) {
                 num = num * 10 + (c - '0');
+            } else {
+                throw new RuntimeException("유효하지 않은 문자 : %s".formatted(c));
             }
         }
 
