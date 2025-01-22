@@ -1,5 +1,5 @@
 package calculator;
 
-public interface StringValueValidator {
+public interface PositiveIntegerValidator {
     void validation(String value);
 }

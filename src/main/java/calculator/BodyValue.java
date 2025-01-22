@@ -15,10 +15,10 @@ public class BodyValue {
         }
     }
 
-    public List<StringValue> getNumbers(String delimiter) {
+    public List<PositiveInteger> getPositiveIntegers(String delimiter) {
         String[] strings = body.split("[" + delimiter + "]");
         return Stream.of(strings)
-                .map(StringValue::of)
+                .map(PositiveInteger::of)
                 .toList();
     }
 }

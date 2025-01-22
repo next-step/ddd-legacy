@@ -1,7 +1,6 @@
 package calculator;
 
-public class DefaultStringValueValidator implements StringValueValidator {
-
+public class DefaultPositiveIntegerValidator implements PositiveIntegerValidator {
     @Override
     public void validation(String value) {
         int intValue;

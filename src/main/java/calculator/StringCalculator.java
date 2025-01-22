@@ -1,14 +1,14 @@
 package calculator;
 
 public class StringCalculator {
-    private final StringValues values;
+    private final PositiveIntegers values;
 
-    public StringCalculator(StringValues values) {
+    public StringCalculator(PositiveIntegers values) {
         this.values = values;
     }
 
     public static StringCalculator of(String str) {
-        return new StringCalculator(StringValues.of(str));
+        return new StringCalculator(PositiveIntegers.of(str));
     }
 
     public int sum() {

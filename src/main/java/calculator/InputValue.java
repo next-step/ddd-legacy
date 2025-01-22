@@ -24,7 +24,7 @@ public class InputValue {
         return new InputValue(header, body);
     }
 
-    public List<StringValue> getNumbers() {
-        return body.getNumbers(DEFAULT_DELIMITER + header.getCustomDelimiter());
+    public List<PositiveInteger> getPositiveIntegers() {
+        return body.getPositiveIntegers(DEFAULT_DELIMITER + header.getCustomDelimiter());
     }
 }
