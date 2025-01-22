@@ -1,6 +1,7 @@
 package calculator;
 
 public class StringCalculator {
+    private static final String ZERO = "0";
     private final PositiveIntegers values;
 
     public StringCalculator(PositiveIntegers values) {
@@ -8,6 +9,9 @@ public class StringCalculator {
     }
 
     public static StringCalculator of(String str) {
+        if (str == null || str.isEmpty()) {
+            return new StringCalculator(PositiveIntegers.of(ZERO));
+        }
         return new StringCalculator(PositiveIntegers.of(str));
     }
 
