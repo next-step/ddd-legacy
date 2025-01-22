@@ -15,10 +15,9 @@ class StringCalculatorTest {
     void testAdd() {
         // given
         final String text = "1,2";
-        final StringCalculator stringCalculator = new StringCalculator();
 
         // when
-        final int result = stringCalculator.add(text);
+        final int result = StringCalculator.add(text);
 
         // then
         assertEquals(3, result);
@@ -28,11 +27,8 @@ class StringCalculatorTest {
     @NullAndEmptySource
     @DisplayName("입력이 null 또는 빈 문자열일 경우 0을 반환한다.")
     void testReturn0WhenEmptyText(final String text) {
-        // given
-        final StringCalculator stringCalculator = new StringCalculator();
-
         // when
-        final int result = stringCalculator.add(text);
+        final int result = StringCalculator.add(text);
 
         // then
         assertEquals(0, result);
@@ -43,10 +39,9 @@ class StringCalculatorTest {
     void testCheckDelimiter() {
         // given
         final String text = "1,2:3";
-        final StringCalculator stringCalculator = new StringCalculator();
 
         // when
-        final int result = stringCalculator.add(text);
+        final int result = StringCalculator.add(text);
 
         // then
         assertEquals(6, result);
@@ -57,10 +52,9 @@ class StringCalculatorTest {
     void testCustomDelimiter() {
         // given
         final String text = "//;\\n1;2;3";
-        final StringCalculator stringCalculator = new StringCalculator();
 
         // when
-        final int result = stringCalculator.add(text);
+        final int result = StringCalculator.add(text);
 
         // then
         assertEquals(6, result);
@@ -71,10 +65,9 @@ class StringCalculatorTest {
     void testNegativeNumber() {
         // given
         final String text = "1;2;-3";
-        final StringCalculator stringCalculator = new StringCalculator();
 
         // when & then
-        assertThrows(RuntimeException.class, () -> stringCalculator.add(text));
+        assertThrows(RuntimeException.class, () -> StringCalculator.add(text));
     }
 
     @Test
@@ -82,10 +75,9 @@ class StringCalculatorTest {
     void testNotNumericValue() {
         // given
         final String text = "1;a;3";
-        final StringCalculator stringCalculator = new StringCalculator();
 
         // when & then
-        assertThrows(RuntimeException.class, () -> stringCalculator.add(text));
+        assertThrows(RuntimeException.class, () -> StringCalculator.add(text));
     }
 
 }

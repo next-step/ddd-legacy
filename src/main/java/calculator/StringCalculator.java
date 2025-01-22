@@ -2,7 +2,10 @@ package calculator;
 
 public class StringCalculator {
 
-    public int add(String text) {
+    private StringCalculator() {
+    }
+
+    public static int add(String text) {
         if (text == null || text.isBlank()) {
             return 0;
         }
