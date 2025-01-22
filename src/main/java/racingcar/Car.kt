@@ -1,14 +1,13 @@
 package racingcar
 
-class Car(name: String) {
-    private var name: String = ""
-    private var _position: Int = 0
-
-    val position get() = _position
+class Car(
+    private val name: String = ""
+) {
+    var position: Int = 0
+        private set
 
     init {
         require(name.length <= 5) { "이름은 5글자를 초과할 수 없습니다" }
-        this.name = name
     }
 
     fun move(condition: Int) {
@@ -17,8 +16,7 @@ class Car(name: String) {
 
     fun move(condition: MoveStrategy) {
         if (condition.movable()) {
-            _position++
+            position++
         }
     }
-
 }
