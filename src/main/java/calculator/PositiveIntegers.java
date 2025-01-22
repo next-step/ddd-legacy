@@ -9,9 +9,8 @@ public class PositiveIntegers {
         this.values = values;
     }
 
-    public static PositiveIntegers of(String str) {
-        InputValue inputValue = InputValue.of(str);
-        return new PositiveIntegers(inputValue.getPositiveIntegers());
+    public PositiveIntegers(PositiveInteger positiveInteger) {
+        this.values = List.of(positiveInteger);
     }
 
     public List<Integer> intValues() {

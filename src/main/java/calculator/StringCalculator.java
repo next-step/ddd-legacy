@@ -10,9 +10,10 @@ public class StringCalculator {
 
     public static StringCalculator of(String str) {
         if (str == null || str.isEmpty()) {
-            return new StringCalculator(PositiveIntegers.of(ZERO));
+            return new StringCalculator(new PositiveIntegers(PositiveInteger.of(ZERO)));
         }
-        return new StringCalculator(PositiveIntegers.of(str));
+        InputValue inputValue = InputValue.of(str);
+        return new StringCalculator(new PositiveIntegers(inputValue.getPositiveIntegers()));
     }
 
     public int sum() {
