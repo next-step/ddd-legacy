@@ -1,7 +1,7 @@
 package calculator;
 
 public class StringCalculator {
-    private static final String ZERO = "0";
+    private static final PositiveInteger ZERO = PositiveInteger.of("0");
     private final PositiveIntegers positiveIntegers;
 
     public StringCalculator(PositiveIntegers positiveIntegers) {
@@ -10,7 +10,7 @@ public class StringCalculator {
 
     public static StringCalculator of(String str) {
         if (str == null || str.isEmpty()) {
-            return new StringCalculator(new PositiveIntegers(PositiveInteger.of(ZERO)));
+            return new StringCalculator(new PositiveIntegers(ZERO));
         }
         InputValue inputValue = InputValue.of(str);
         return new StringCalculator(new PositiveIntegers(inputValue.getPositiveIntegers()));
