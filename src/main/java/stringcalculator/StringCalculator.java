@@ -11,11 +11,15 @@ public class StringCalculator {
     private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     public int add(String text) {
-        if (text == null || text.isBlank()) {
+        if (isEmpty(text)) {
             return 0;
         }
         List<Integer> numbers = convertToIntArray(text);
         return sum(numbers);
+    }
+
+    private boolean isEmpty(String text) {
+        return text == null || text.isBlank();
     }
 
     private List<Integer> convertToIntArray(String text) {
@@ -29,14 +33,6 @@ public class StringCalculator {
         return numbers;
     }
 
-    private int validate(String data) {
-        int number = Integer.parseInt(data);
-        if (number < 0) {
-            throw new RuntimeException("음수는 계산할 수 없습니다.");
-        }
-        return number;
-    }
-
     private String[] split(String text) {
         Matcher matcher = CUSTOM_DELIMITER_PATTERN.matcher(text);
         if (matcher.find()) {
@@ -44,6 +40,14 @@ public class StringCalculator {
             return matcher.group(2).split(customDelimiter);
         }
         return text.split(DEFAULT_DELIMITER);
+    }
+
+    private int validate(String data) {
+        int number = Integer.parseInt(data);
+        if (number < 0) {
+            throw new RuntimeException("음수는 계산할 수 없습니다.");
+        }
+        return number;
     }
 
     private int sum(List<Integer> numbers) {
