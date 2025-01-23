@@ -3,6 +3,7 @@ package calculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -46,5 +47,12 @@ class StringCalculatorTest {
     void oneString(final String text) {
         assertThatThrownBy(() -> calculator.add(text))
                 .isInstanceOf(NumberFormatException.class);
+    }
+
+    @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
+    @ParameterizedTest(name = "입력 값: {0}, 기대 값: {1}")
+    @CsvSource(value = {"1,2:3", "2,3:5", "3,4:7", "4,5:9", "5,6:11"}, delimiter = ':')
+    void twoNumbers(final String text, final int expected) {
+        assertThat(calculator.add(text)).isSameAs(expected);
     }
 }
