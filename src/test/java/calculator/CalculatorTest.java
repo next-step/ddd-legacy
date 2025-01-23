@@ -3,12 +3,24 @@ package calculator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 class CalculatorTest {
+
+    private Calculator calculator;
+
+    @BeforeEach
+    void init() {
+        calculator = new Calculator(
+                new TextParser<>(
+                        new TextConverter<>(s -> new PositiveNumber(new Number(s)))
+                )
+        );
+    }
 
     @ParameterizedTest
     @CsvSource({
@@ -20,9 +32,6 @@ class CalculatorTest {
     })
     @DisplayName("쉼표를 구분자로 구분된 문자열을 더할 수 있다.")
     void calculate_by_comma(String value, int expected) {
-        // given
-        Calculator calculator = new Calculator();
-
         // when
         int result = calculator.calculate(value);
 
@@ -37,9 +46,6 @@ class CalculatorTest {
     })
     @DisplayName("콜론을 구분자로 구분된 문자열을 더할 수 있다.")
     void calculate_by_colon(String value, int expected) {
-        // given
-        Calculator calculator = new Calculator();
-
         // when
         int result = calculator.calculate(value);
 
@@ -49,14 +55,11 @@ class CalculatorTest {
 
     @ParameterizedTest
     @CsvSource(value = {
-            "'//;\\n1;2;3', 6",
-            "'//*\\n1*3', 4"
+            "'//;\n1;2;3', 6",
+            "'//*\n1*3', 4"
     }, delimiterString = ",")
     @DisplayName("커스텀 구분자로 구분된 가지는 문자열을 더할 수 있다.")
     void calculate_by_custom_delimiter(String value, int expected) {
-        // given
-        Calculator calculator = new Calculator();
-
         // when
         int result = calculator.calculate(value);
 
@@ -73,9 +76,6 @@ class CalculatorTest {
     })
     @DisplayName("숫자 외의 값이 들어오면 예외를 던진다.")
     void validate_number(String value) {
-        // given
-        Calculator calculator = new Calculator();
-
         // when // then
         assertThatThrownBy(() -> calculator.calculate(value))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -90,9 +90,6 @@ class CalculatorTest {
     })
     @DisplayName("음수가 들어오면 예외를 던진다.")
     void validate_negative_number(String value) {
-        // given
-        Calculator calculator = new Calculator();
-
         // when // then
         assertThatThrownBy(() -> calculator.calculate(value))
                 .isInstanceOf(IllegalArgumentException.class)

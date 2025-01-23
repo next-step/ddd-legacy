@@ -1,63 +1,31 @@
 package calculator;
 
-import java.util.StringTokenizer;
+import java.util.List;
 
 public class Calculator {
+    private static final int DEFAULT_SUM = 0;
+    private static final String BLANK_TEXT_REGEX = "[\"']+";
 
-    private static final String DEFAULT_DELIMITER = ",:";
-    private static final String NOT_NUMBER_EXCEPTION = "숫자 외의 값을 넣을 수 없습니다.";
-    private static final String NEGATIVE_NUMBER_EXCEPTION = "음수를 넣을 수 없습니다.";
+    private final TextParser<PositiveNumber> textParser;
 
-    public int calculate(String value) {
-        if (value == null || value.isEmpty()) {
-            return 0;
-        }
-
-        if (value.matches("[\"']+")) {
-            return 0;
-        }
-
-        String delimiter = parseDelimiter(value);
-        String targetValue = parseTarget(value, delimiter);
-
-        return calculateSum(targetValue, delimiter);
+    public Calculator(TextParser<PositiveNumber> textParser) {
+        this.textParser = textParser;
     }
 
-    private String parseDelimiter(String value) {
-        if (value.startsWith("//")) {
-            int newLineIndex = value.indexOf("\\n");
-            if (newLineIndex != -1) {
-                return value.substring(2, newLineIndex);
-            }
+    public int calculate(String text) {
+        if (text == null || text.isEmpty()) {
+            return DEFAULT_SUM;
         }
-        return DEFAULT_DELIMITER;
+
+        if (text.matches(BLANK_TEXT_REGEX)) {
+            return DEFAULT_SUM;
+        }
+
+        List<PositiveNumber> parseText = textParser.parse(text);
+        return calculateSum(parseText);
     }
 
-    private String parseTarget(String value, String delimiter) {
-        if (delimiter.equals(DEFAULT_DELIMITER)) {
-            return value;
-        }
-        return value.substring(value.indexOf(delimiter) + 3);
-    }
-
-    private int calculateSum(String numberString, String delimiter) {
-        int sum = 0;
-        StringTokenizer st = new StringTokenizer(numberString, delimiter);
-        while (st.hasMoreElements()) {
-            try {
-                int targetNumber = Integer.parseInt(st.nextToken().trim());
-                validateNegativeNumber(targetNumber);
-                sum += targetNumber;
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(NOT_NUMBER_EXCEPTION);
-            }
-        }
-        return sum;
-    }
-
-    private void validateNegativeNumber(int targetNumber) {
-        if (targetNumber < 0) {
-            throw new IllegalArgumentException(NEGATIVE_NUMBER_EXCEPTION);
-        }
+    private int calculateSum(List<PositiveNumber> values) {
+        return values.stream().mapToInt(PositiveNumber::getPrimitiveValue).sum();
     }
 }
