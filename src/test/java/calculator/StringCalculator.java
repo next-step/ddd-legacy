@@ -10,11 +10,10 @@ public class StringCalculator {
         if (Strings.isBlank(text)) {
             return 0;
         }
-        if (text.contains(",")) {
-            return Arrays.stream(text.split(","))
+        if (text.contains(",") || text.contains(":")) {
+            return Arrays.stream(text.split("[,:]+"))
                     .mapToInt(Integer::parseInt)
-                    .reduce(Integer::sum)
-                    .getAsInt();
+                    .sum();
         }
         return Integer.parseInt(text);
     }
