@@ -1,6 +1,6 @@
 package calculator;
 
-public class DelimiterGroup {
+public class InputText {
 
     private String delimiters = ",:";
     private final String numberText;
@@ -9,7 +9,7 @@ public class DelimiterGroup {
     private static final String CUSTOM_DELIMITER_END = "\\n";
 
 
-    public DelimiterGroup(String text) {
+    public InputText(String text) {
         numberText = extractCustomDelimiter(text);
     }
 

@@ -18,9 +18,9 @@ public class StringCalculator {
             return 0;
         }
 
-        DelimiterGroup delimiterGroup = new DelimiterGroup(text);
+        InputText inputText = new InputText(text);
 
-        String[] numbers = numberExtractor.extractNumber(delimiterGroup.getNumberText(), delimiterGroup.getDelimiters());
+        String[] numbers = numberExtractor.extractNumber(inputText.getNumberText(), inputText.getDelimiters());
 
         numberValidator.validateNumbers(numbers);
 
