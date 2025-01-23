@@ -2,20 +2,20 @@ package calculator;
 
 import java.util.List;
 
-public class PositiveIntegers {
+public class PositiveIntegerCalculator {
     private final List<PositiveInteger> values;
 
-    public PositiveIntegers(List<PositiveInteger> values) {
+    public PositiveIntegerCalculator(List<PositiveInteger> values) {
         this.values = values;
     }
 
-    public PositiveIntegers(PositiveInteger positiveInteger) {
+    public PositiveIntegerCalculator(PositiveInteger positiveInteger) {
         this.values = List.of(positiveInteger);
     }
 
-    public List<Integer> intValues() {
+    public int sum() {
         return values.stream()
                 .map(PositiveInteger::toInt)
-                .toList();
+                .reduce(0, Integer::sum);
     }
 }
