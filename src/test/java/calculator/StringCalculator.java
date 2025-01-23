@@ -7,7 +7,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
-    private final String delimiter = ",|:";
+    private final Delimiter delimiter;
+
+    public StringCalculator() {
+        this(new DefaultDelimiter());
+    }
+
+    public StringCalculator(final Delimiter delimiter) {
+        this.delimiter = delimiter;
+    }
 
     public int add(final String text) {
         if (Strings.isBlank(text)) {
@@ -23,12 +31,8 @@ public class StringCalculator {
         final Pattern pattern = Pattern.compile("//(.)\\\\n(.*)");
         final Matcher matcher = pattern.matcher(text);
         if (matcher.find()) {
-            return split(matcher.group(1), matcher.group(2));
+            return matcher.group(2).split(matcher.group(1));
         }
-        return split(delimiter, text);
-    }
-
-    private static String[] split(final String delimiter, final String expression) {
-        return expression.split(delimiter);
+        return delimiter.split(text);
     }
 }
