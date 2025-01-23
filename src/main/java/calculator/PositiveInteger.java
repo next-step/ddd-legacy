@@ -3,8 +3,8 @@ package calculator;
 public class PositiveInteger {
     private final String value;
 
-    public PositiveInteger(String value, PositiveIntegerValidator stringValidator) {
-        stringValidator.validation(value);
+    public PositiveInteger(String value, PositiveIntegerValidator positiveIntegerValidator) {
+        positiveIntegerValidator.validation(value);
         this.value = value;
     }
 
