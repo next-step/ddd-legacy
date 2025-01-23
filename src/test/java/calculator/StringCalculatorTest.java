@@ -62,4 +62,12 @@ class StringCalculatorTest {
     void colons(final String text, final int expected) {
         assertThat(calculator.add(text)).isSameAs(expected);
     }
+
+    @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @ParameterizedTest(name = "입력 값: {0}, 기대 값: {1}")
+    @CsvSource(value = {"//;\n1;2;3|6"}, delimiter = '|')
+    void customDelimiter(final String text, final int expected) {
+        assertThat(calculator.add(text)).isSameAs(expected);
+    }
 }
+
