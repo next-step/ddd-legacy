@@ -25,7 +25,7 @@ public class StringCalculator {
 
         List<Integer> numberList = numbersStrToIntList(numbers);
 
-        validate(numberList);
+        isPositiveNumber(numberList);
 
         return calculateNumbers(numberList);
     }
@@ -47,7 +47,7 @@ public class StringCalculator {
         return result;
     }
 
-    private void validate(List<Integer> numbers) {
+    private void isPositiveNumber(List<Integer> numbers) {
         for(int number : numbers){
             if (number < 0){
                 throw new RuntimeException();
