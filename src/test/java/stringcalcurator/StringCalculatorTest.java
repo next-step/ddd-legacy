@@ -4,7 +4,8 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.*;
 import org.junit.jupiter.params.provider.*;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class StringCalculatorTest {
     private StringCalculator calculator;
@@ -44,7 +45,7 @@ class StringCalculatorTest {
 
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @ParameterizedTest
-    @ValueSource(strings = {"//;\n1;2;3"})
+    @ValueSource(strings = {"//;\n1;2;3", "//&\n1&2&3"})
     void customDelimiter(final String text) {
         assertThat(calculator.add(text)).isSameAs(6);
     }
