@@ -8,17 +8,9 @@ public class Car {
 
     public Car(final String name) {
         if (name.length() > MAX_CAR_NAME_LENGTH) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("자동차 이름의 길이는 5글자를 초과할 수 없습니다.");
         }
         this.name = name;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void move(final int condition) {
-            move(() -> condition >= MIN_MOVE_COUNT);
     }
 
     public void move(final MovingStrategy movingStrategy) {
@@ -26,4 +18,9 @@ public class Car {
             position++;
         }
     }
+
+    public int getPosition() {
+        return position;
+    }
+
 }
