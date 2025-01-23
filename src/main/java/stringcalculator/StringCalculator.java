@@ -7,14 +7,14 @@ import static java.util.stream.Collectors.toList;
 
 public class StringCalculator {
 
-    private static final String SEPARATOR = ",";
+    private static final String SEPARATOR = ",|:";
 
     public int add(String text) {
         if (text == null || text.isBlank()) {
             return 0;
         }
-        List<Integer> datas = convertToIntArray(text);
-        return sum(datas);
+        List<Integer> numbers = convertToIntArray(text);
+        return sum(numbers);
     }
 
     private List<Integer> convertToIntArray(String text) {
@@ -24,8 +24,8 @@ public class StringCalculator {
                 .collect(toList());
     }
 
-    private int sum(List<Integer> datas) {
-        return datas.stream()
+    private int sum(List<Integer> numbers) {
+        return numbers.stream()
                 .mapToInt(Integer::intValue)
                 .sum();
     }
