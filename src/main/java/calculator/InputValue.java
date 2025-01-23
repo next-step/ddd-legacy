@@ -16,6 +16,9 @@ public class InputValue {
         String[] strings = value.split("\n");
         String header = "";
         String body = strings[0];
+        if (strings.length > 2) {
+            throw new RuntimeException("//;\\n1;2;3 와 같은 형식으로 입력해주세요");
+        }
         if (strings.length > 1) {
             header = strings[0];
             body = strings[1];
