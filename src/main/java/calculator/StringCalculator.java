@@ -2,10 +2,10 @@ package calculator;
 
 public class StringCalculator {
     private static final String ZERO = "0";
-    private final PositiveIntegers values;
+    private final PositiveIntegers positiveIntegers;
 
-    public StringCalculator(PositiveIntegers values) {
-        this.values = values;
+    public StringCalculator(PositiveIntegers positiveIntegers) {
+        this.positiveIntegers = positiveIntegers;
     }
 
     public static StringCalculator of(String str) {
@@ -17,7 +17,7 @@ public class StringCalculator {
     }
 
     public int sum() {
-        return this.values.intValues()
+        return this.positiveIntegers.intValues()
                 .stream()
                 .reduce(0, Integer::sum);
     }
