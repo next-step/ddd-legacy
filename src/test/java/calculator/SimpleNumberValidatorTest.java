@@ -7,14 +7,14 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatException;
 
-class NumberValidatorTest {
+class SimpleNumberValidatorTest {
 
-    private NumberValidator numberValidator;
+    private SimpleNumberValidator numberValidator;
 
 
     @BeforeEach
     void setup() {
-        numberValidator = new NumberValidator();
+        numberValidator = new SimpleNumberValidator();
     }
 
 
