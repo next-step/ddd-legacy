@@ -16,8 +16,9 @@ class StringCalculatorTest {
 
     @BeforeEach
     void setup() {
-        NumberExtractor numberExtractor = new NumberExtractor();
-        stringCalculator = new StringCalculator(numberExtractor);
+        NumberExtractor numberExtractor = new SimpleNumberExtractor();
+        NumberValidator numberValidator = new NumberValidator();
+        stringCalculator = new StringCalculator(numberExtractor, numberValidator);
     }
 
     @Test

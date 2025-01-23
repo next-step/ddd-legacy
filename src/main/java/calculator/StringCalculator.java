@@ -5,10 +5,12 @@ import java.util.Arrays;
 public class StringCalculator {
 
     private final NumberExtractor numberExtractor;
+    private final NumberValidator numberValidator;
 
 
-    public StringCalculator(NumberExtractor numberExtractor) {
+    public StringCalculator(NumberExtractor numberExtractor, NumberValidator numberValidator) {
         this.numberExtractor = numberExtractor;
+        this.numberValidator = numberValidator;
     }
 
     public int add(String text) {
@@ -18,14 +20,16 @@ public class StringCalculator {
 
         DelimiterGroup delimiterGroup = new DelimiterGroup(text);
 
-        Integer[] numbers = numberExtractor.extract(delimiterGroup.getNumberText(), delimiterGroup.getDelimiterPattern());
+        String[] numbers = numberExtractor.extractNumber(delimiterGroup.getNumberText(), delimiterGroup.getDelimiters());
+
+        numberValidator.validateNumbers(numbers);
 
         return sum(numbers);
     }
 
-    private int sum(Integer[] numbers) {
+    private int sum(String[] numbers) {
         return Arrays.stream(numbers)
-                .mapToInt(Integer::intValue)
+                .mapToInt(Integer::parseInt)
                 .sum();
     }
 

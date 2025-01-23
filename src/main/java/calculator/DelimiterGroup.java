@@ -28,8 +28,8 @@ public class DelimiterGroup {
                 && CUSTOM_DELIMITER_END.equals(text.substring(3, 5));
     }
 
-    public String getDelimiterPattern() {
-        return String.join("|", delimiters.split(""));
+    public String getDelimiters() {
+        return delimiters;
     }
 
     public String getNumberText() {
