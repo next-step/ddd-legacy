@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
 
 class StringCalculatorTest {
 
@@ -20,7 +20,7 @@ class StringCalculatorTest {
         final int result = StringCalculator.add(text);
 
         // then
-        assertEquals(3, result);
+        assertThat(result).isEqualTo(3);
     }
 
     @ParameterizedTest
@@ -31,7 +31,7 @@ class StringCalculatorTest {
         final int result = StringCalculator.add(text);
 
         // then
-        assertEquals(0, result);
+        assertThat(result).isEqualTo(0);
     }
 
     @Test
@@ -44,7 +44,7 @@ class StringCalculatorTest {
         final int result = StringCalculator.add(text);
 
         // then
-        assertEquals(6, result);
+        assertThat(result).isEqualTo(6);
     }
 
     @Test
@@ -57,7 +57,7 @@ class StringCalculatorTest {
         final int result = StringCalculator.add(text);
 
         // then
-        assertEquals(6, result);
+        assertThat(result).isEqualTo(6);
     }
 
     @Test
@@ -67,7 +67,9 @@ class StringCalculatorTest {
         final String text = "1;2;-3";
 
         // when & then
-        assertThrows(RuntimeException.class, () -> StringCalculator.add(text));
+        assertThatException()
+                .isThrownBy(() -> StringCalculator.add(text))
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -77,7 +79,9 @@ class StringCalculatorTest {
         final String text = "1;a;3";
 
         // when & then
-        assertThrows(RuntimeException.class, () -> StringCalculator.add(text));
+        assertThatException()
+                .isThrownBy(() -> StringCalculator.add(text))
+                .isInstanceOf(RuntimeException.class);
     }
 
 }
