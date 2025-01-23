@@ -13,19 +13,21 @@ public class StringCalculator {
         if (Strings.isBlank(text)) {
             return 0;
         }
-        final Matcher m = Pattern.compile("//(.)\\\\n(.*)").matcher(text);
-        if (m.find()) {
-            String customDelimiter = m.group(1);
-            String[] tokens = m.group(2).split(customDelimiter);
-            return Arrays.stream(tokens)
-                    .mapToInt(Integer::parseInt)
-                    .sum();
+        return Arrays.stream(getStrings(text))
+                .mapToInt(Integer::parseInt)
+                .sum();
+    }
+
+    private String[] getStrings(final String text) {
+        final Pattern pattern = Pattern.compile("//(.)\\\\n(.*)");
+        final Matcher matcher = pattern.matcher(text);
+        if (matcher.find()) {
+            return split(matcher.group(1), matcher.group(2));
         }
-        if (text.contains(",") || text.contains(":")) {
-            return Arrays.stream(text.split(delimiter))
-                    .mapToInt(Integer::parseInt)
-                    .sum();
-        }
-        return Integer.parseInt(text);
+        return split(delimiter, text);
+    }
+
+    private static String[] split(final String delimiter, final String expression) {
+        return expression.split(delimiter);
     }
 }
