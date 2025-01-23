@@ -1,6 +1,7 @@
 package calculator;
 
 public class PositiveInteger {
+    public static final PositiveInteger ZERO = PositiveInteger.of("0");
     private final String value;
 
     public PositiveInteger(String value, PositiveIntegerValidator positiveIntegerValidator) {
