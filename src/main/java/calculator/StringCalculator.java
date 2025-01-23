@@ -7,13 +7,13 @@ public record StringCalculator(
     SumCalculator sumCalculator
 ) {
 
-  public int add(String input) {
-    inputValidator.validate(input);
+    public int add(String input) {
+        inputValidator.validate(input);
 
-    String[] tokens = delimiterParser.parse(input);
+        String[] tokens = delimiterParser.parse(input);
 
-    int[] numbers = numberParser.parse(tokens);
+        int[] numbers = numberParser.parse(tokens);
 
-    return sumCalculator.calculate(numbers);
-  }
+        return sumCalculator.calculate(numbers);
+    }
 }

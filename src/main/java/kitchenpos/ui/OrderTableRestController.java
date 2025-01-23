@@ -1,5 +1,8 @@
 package kitchenpos.ui;
 
+import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 import kitchenpos.application.OrderTableService;
 import kitchenpos.domain.OrderTable;
 import org.springframework.http.ResponseEntity;
@@ -11,13 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.net.URI;
-import java.util.List;
-import java.util.UUID;
-
 @RequestMapping("/api/order-tables")
 @RestController
 public class OrderTableRestController {
+
     private final OrderTableService orderTableService;
 
     public OrderTableRestController(final OrderTableService orderTableService) {

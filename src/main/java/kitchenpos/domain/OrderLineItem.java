@@ -10,13 +10,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
 import java.math.BigDecimal;
 import java.util.UUID;
 
 @Table(name = "order_line_item")
 @Entity
 public class OrderLineItem {
+
     @Column(name = "seq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
