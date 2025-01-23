@@ -7,6 +7,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -98,7 +100,19 @@ class StringCalculatorTest {
     @ParameterizedTest(name = "입력 값: {0}, 기본 구분자 값: {1}, 기대 값: {2}")
     @CsvSource(value = {"1;2;3|;|6", "1o2o3|o|6", "0o0o1|o|1"}, delimiter = '|')
     void changeDefaultDelimiter(final String text, final String delimiter, final int expected) {
-        final StringCalculator stringCalculator = new StringCalculator(new DefaultDelimiter(delimiter));
+        final StringCalculator stringCalculator = new StringCalculator(
+                new TextDelimiters(List.of(new FixedTextDelimiter(delimiter), new DynaminTextDelimiter()))
+        );
+        assertThat(stringCalculator.add(text)).isSameAs(expected);
+    }
+
+    @DisplayName(value = "커스텀 구분자를 //와 \\n 이외에 다른 문자열로 대체할 수 있다.")
+    @ParameterizedTest(name = "입력 값: {0}, 커스텀 구분자 값: {1}, 기대 값: {2}")
+    @CsvSource(value = {"<<;>>1;2;3|<<(.*?)>>(.*)|6", "oovoo1v2v3|oo(.*?)oo(.*)|6", "<<o>>0o0o1|<<(.*?)>>(.*)|1"}, delimiter = '|')
+    void changeCustomDelimiter(final String text, final String dynamicPattern, final int expected) {
+        final StringCalculator stringCalculator = new StringCalculator(
+                new TextDelimiters(List.of(new FixedTextDelimiter(), new DynaminTextDelimiter(dynamicPattern)))
+        );
         assertThat(stringCalculator.add(text)).isSameAs(expected);
     }
 }
