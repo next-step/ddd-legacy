@@ -2,8 +2,8 @@ package calculator;
 
 public class NumberExtractor {
 
-    public Integer[] extract(String numberText, DelimiterGroup delimiterGroup) {
-        String[] splittedString = numberText.split(delimiterGroup.getDelimiterPattern());
+    public Integer[] extract(String numberText, String delimiterPattern) {
+        String[] splittedString = numberText.split(delimiterPattern);
         validateNumbers(splittedString);
 
         Integer[] integerArray = new Integer[splittedString.length];

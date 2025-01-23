@@ -1,19 +1,24 @@
 package calculator;
 
 public class DelimiterGroup {
+
     private String delimiters = ",:";
+    private final String numberText;
 
     private static final String CUSTOM_DELIMITER_START = "//";
     private static final String CUSTOM_DELIMITER_END = "\\n";
 
 
-    public String extractCustomDelimiter(String text) {
+    public DelimiterGroup(String text) {
+        numberText = extractCustomDelimiter(text);
+    }
+
+    private String extractCustomDelimiter(String text) {
         String str = text;
         if (hasCustomDelimiter(text)) {
             delimiters += text.charAt(2);
             str = text.substring(5);
         }
-
         return str;
     }
 
@@ -25,6 +30,10 @@ public class DelimiterGroup {
 
     public String getDelimiterPattern() {
         return String.join("|", delimiters.split(""));
+    }
+
+    public String getNumberText() {
+        return numberText;
     }
 
 }

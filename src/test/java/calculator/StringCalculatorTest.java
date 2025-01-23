@@ -16,9 +16,8 @@ class StringCalculatorTest {
 
     @BeforeEach
     void setup() {
-        DelimiterGroup delimiterGroup = new DelimiterGroup();
         NumberExtractor numberExtractor = new NumberExtractor();
-        stringCalculator = new StringCalculator(delimiterGroup, numberExtractor);
+        stringCalculator = new StringCalculator(numberExtractor);
     }
 
     @Test

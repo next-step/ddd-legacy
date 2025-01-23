@@ -4,12 +4,10 @@ import java.util.Arrays;
 
 public class StringCalculator {
 
-    private final DelimiterGroup delimiterGroup;
     private final NumberExtractor numberExtractor;
 
 
-    public StringCalculator(DelimiterGroup delimiterGroup, NumberExtractor numberExtractor) {
-        this.delimiterGroup = delimiterGroup;
+    public StringCalculator(NumberExtractor numberExtractor) {
         this.numberExtractor = numberExtractor;
     }
 
@@ -18,9 +16,9 @@ public class StringCalculator {
             return 0;
         }
 
-        String numberText = delimiterGroup.extractCustomDelimiter(text);
+        DelimiterGroup delimiterGroup = new DelimiterGroup(text);
 
-        Integer[] numbers = numberExtractor.extract(numberText, delimiterGroup);
+        Integer[] numbers = numberExtractor.extract(delimiterGroup.getNumberText(), delimiterGroup.getDelimiterPattern());
 
         return sum(numbers);
     }
