@@ -10,14 +10,12 @@ public class StringCalculator {
         if (text == null || text.isEmpty()) {
             return 0;
         }
+
         Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
         if (m.find()) {
             String customDelimiter = m.group(1);
             String[] tokens = m.group(2).split(customDelimiter);
-            return Arrays.stream(tokens)
-                    .mapToInt(Integer::parseInt)
-                    .peek(this::checkForNegative)
-                    .sum();
+            return getSum(tokens);
         }
 
         try {
@@ -26,11 +24,15 @@ public class StringCalculator {
             return number;
         } catch (NumberFormatException e) {
             String[] values = text.split("[,:]");
-            return Arrays.stream(values)
-                    .mapToInt(Integer::parseInt)
-                    .peek(this::checkForNegative)
-                    .sum();
+            return getSum(values);
         }
+    }
+
+    private int getSum(String[] tokens) {
+        return Arrays.stream(tokens)
+                .mapToInt(Integer::parseInt)
+                .peek(this::checkForNegative)
+                .sum();
     }
 
     private void checkForNegative(int number) {
