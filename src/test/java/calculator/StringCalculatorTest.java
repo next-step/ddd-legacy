@@ -93,4 +93,12 @@ class StringCalculatorTest {
         assertThatThrownBy(() -> calculator.add(text))
                 .isInstanceOf(RuntimeException.class);
     }
+
+    @DisplayName(value = "기본 구분자를 쉼표(,) 및 콜론(:) 이외에 다른 문자열로 대체할 수 있다.")
+    @ParameterizedTest(name = "입력 값: {0}, 기본 구분자 값: {1}, 기대 값: {2}")
+    @CsvSource(value = {"1;2;3|;|6", "1o2o3|o|6", "0o0o1|o|1"}, delimiter = '|')
+    void changeDefaultDelimiter(final String text, final String delimiter, final int expected) {
+        final StringCalculator stringCalculator = new StringCalculator(new DefaultDelimiter(delimiter));
+        assertThat(stringCalculator.add(text)).isSameAs(expected);
+    }
 }
