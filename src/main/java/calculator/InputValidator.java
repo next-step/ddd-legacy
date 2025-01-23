@@ -1,5 +1,7 @@
 package calculator;
 
+import calculator.exception.ErrorCode;
+
 public record InputValidator() {
 
     public void validate(String input) {
@@ -8,7 +10,7 @@ public record InputValidator() {
         }
 
         if (input.contains("-")) {
-            throw new RuntimeException();
+            throw new RuntimeException(ErrorCode.NEGATIVE_NOT_ALLOWED.toString());
         }
     }
 }
