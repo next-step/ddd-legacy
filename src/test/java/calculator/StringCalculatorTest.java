@@ -65,9 +65,8 @@ class StringCalculatorTest {
 
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @ParameterizedTest(name = "입력 값: {0}, 기대 값: {1}")
-    @CsvSource(value = {"//;\n1;2;3|6"}, delimiter = '|')
+    @CsvSource(value = {"//;\\n1;2;3|6", "//o\\n1o2o3|6", "//o\\n0o0o1|1"}, delimiter = '|')
     void customDelimiter(final String text, final int expected) {
         assertThat(calculator.add(text)).isSameAs(expected);
     }
 }
-
