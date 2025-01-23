@@ -77,4 +77,12 @@ class StringCalculatorTest {
         assertThatThrownBy(() -> calculator.add(text))
                 .isInstanceOf(RuntimeException.class);
     }
+
+    @DisplayName(value = "숫자가 아닌 구분자 하나를 문자열로 입력할 경우 예외를 발생한다.")
+    @ParameterizedTest(name = "입력 값: {0}")
+    @ValueSource(strings = {";", "|", "//;\\n"})
+    void oneDelimiter(final String text) {
+        assertThatThrownBy(() -> calculator.add(text))
+                .isInstanceOf(RuntimeException.class);
+    }
 }

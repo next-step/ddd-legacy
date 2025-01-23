@@ -13,9 +13,10 @@ public class StringCalculator {
         if (Strings.isBlank(text)) {
             return 0;
         }
-        return Arrays.stream(getStrings(text))
-                .mapToInt(Integer::parseInt)
-                .sum();
+        final PositiveInt positiveInt = Arrays.stream(getStrings(text))
+                .map(PositiveInt::new)
+                .reduce(PositiveInt.zero(), PositiveInt::add);
+        return positiveInt.value();
     }
 
     private String[] getStrings(final String text) {
