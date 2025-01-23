@@ -39,7 +39,7 @@ class CarTest {
         assertThat(car.getPosition()).isEqualTo(0);
     }
 
-    @DisplayName("이동조건 전략이 true이면 자동차는 이동한다")
+    @DisplayName("이동조건 전략이 true면 자동차는 이동한다")
     @Test
     void move() {
         final var car = new Car("자동차이름");
@@ -49,7 +49,7 @@ class CarTest {
         assertThat(car.getPosition()).isEqualTo(1);
     }
 
-    @DisplayName("이동조건 전략이 false 자동차는 이동한다")
+    @DisplayName("이동조건 전략이 false면 자동차는 정지한다")
     @Test
     void stop() {
         final var car = new Car("자동차이름");
