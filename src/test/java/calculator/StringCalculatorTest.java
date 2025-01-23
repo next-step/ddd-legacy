@@ -51,8 +51,15 @@ class StringCalculatorTest {
 
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
     @ParameterizedTest(name = "입력 값: {0}, 기대 값: {1}")
-    @CsvSource(value = {"1,2:3", "2,3:5", "3,4:7", "4,5:9", "5,6:11"}, delimiter = ':')
+    @CsvSource(value = {"1,2|3", "2,3|5", "3,4|7", "4,5|9", "5,6|11"}, delimiter = '|')
     void twoNumbers(final String text, final int expected) {
+        assertThat(calculator.add(text)).isSameAs(expected);
+    }
+
+    @DisplayName(value = "구분자를 쉼표(,) 이외에 콜론(:)을 사용할 수 있다.")
+    @ParameterizedTest(name = "입력 값: {0}, 기대 값: {1}")
+    @CsvSource(value = {"1:2|3", "2:3|5", "3:4|7", "4:5|9", "5:6|11"}, delimiter = '|')
+    void colons(final String text, final int expected) {
         assertThat(calculator.add(text)).isSameAs(expected);
     }
 }
