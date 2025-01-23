@@ -69,4 +69,12 @@ class StringCalculatorTest {
     void customDelimiter(final String text, final int expected) {
         assertThat(calculator.add(text)).isSameAs(expected);
     }
+
+    @DisplayName(value = "음수를 전달할 경우 RuntimeException 예외가 발생해야 한다.")
+    @ParameterizedTest(name = "입력 값: {0}")
+    @ValueSource(strings = {"-1,0,1", "1,-2,3", "1,2,-3", "-1,-2,-3"})
+    void negativeNumber(final String text) {
+        assertThatThrownBy(() -> calculator.add(text))
+                .isInstanceOf(RuntimeException.class);
+    }
 }
