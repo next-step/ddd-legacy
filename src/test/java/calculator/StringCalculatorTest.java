@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("문자열 계산기 단위 테스트")
 class StringCalculatorTest {
@@ -37,5 +38,13 @@ class StringCalculatorTest {
     @ValueSource(strings = {"0", "1", "2", "3", "4", "5", "10", "100", "127", "128", Integer.MAX_VALUE + ""})
     void oneNumber(final String text) {
         assertThat(calculator.add(text)).isEqualTo(Integer.parseInt(text));
+    }
+
+    @DisplayName(value = "숫자가 아닌 문자 하나를 문자열로 입력할 경우 예외를 발생한다.")
+    @ParameterizedTest(name = "입력 값: {0}")
+    @ValueSource(strings = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j"})
+    void oneString(final String text) {
+        assertThatThrownBy(() -> calculator.add(text))
+                .isInstanceOf(NumberFormatException.class);
     }
 }
