@@ -26,10 +26,16 @@ class StringCalculatorTest {
         assertThat(calculator.add(text)).isZero();
     }
 
+    /**
+     * isSameAs: 캐싱된 객체가 아니면 false 를 반환
+     * Integer.valueOf 및 parseInt 모두 동일한 현상 발생
+     *
+     * @param text
+     */
     @DisplayName(value = "숫자 하나를 문자열로 입력할 경우 해당 숫자를 반환한다.")
-    @ParameterizedTest
-    @ValueSource(strings = {"1"})
+    @ParameterizedTest(name = "입력 값: {0}")
+    @ValueSource(strings = {"0", "1", "2", "3", "4", "5", "10", "100", "127", "128", Integer.MAX_VALUE + ""})
     void oneNumber(final String text) {
-        assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
+        assertThat(calculator.add(text)).isEqualTo(Integer.parseInt(text));
     }
 }
