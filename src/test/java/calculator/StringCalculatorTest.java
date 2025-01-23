@@ -63,6 +63,14 @@ class StringCalculatorTest {
         assertThat(calculator.add(text)).isSameAs(expected);
     }
 
+    @DisplayName(value = "구분자를 쉼표(,) 및 콜론(:) 이외에 다른 문자열로 사용할 수 없다.")
+    @ParameterizedTest(name = "입력 값: {0}, 기대 값: {1}")
+    @ValueSource(strings = {"1;2", "2;3", "3;4", "4;5", "5;6"})
+    void colons(final String text) {
+        assertThatThrownBy(() -> calculator.add(text))
+                .isInstanceOf(RuntimeException.class);
+    }
+
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
     @ParameterizedTest(name = "입력 값: {0}, 기대 값: {1}")
     @CsvSource(value = {"//;\\n1;2;3|6", "//o\\n1o2o3|6", "//o\\n0o0o1|1"}, delimiter = '|')
