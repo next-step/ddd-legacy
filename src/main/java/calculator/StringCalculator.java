@@ -1,5 +1,7 @@
 package calculator;
 
+import calculator.strategy.TextDelimiters;
+import calculator.vo.PositiveInt;
 import org.apache.logging.log4j.util.Strings;
 
 public class StringCalculator {

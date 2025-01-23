@@ -1,4 +1,4 @@
-package calculator;
+package calculator.vo;
 
 public record PositiveInt(int value) {
 
