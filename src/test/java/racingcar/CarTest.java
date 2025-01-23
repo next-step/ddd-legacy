@@ -23,7 +23,7 @@ class CarTest {
     void move(final int condition) {
         final var car = new Car("자동차이름");
 
-        car.move(condition);
+        car.move(() -> condition >= 4);
 
         assertThat(car.getPosition()).isEqualTo(1);
     }
@@ -34,7 +34,27 @@ class CarTest {
     void stop(final int condition) {
         final var car = new Car("자동차이름");
 
-        car.move(condition);
+        car.move(() -> condition >= 4);
+
+        assertThat(car.getPosition()).isEqualTo(0);
+    }
+
+    @DisplayName("이동조건 전략이 true이면 자동차는 이동한다")
+    @Test
+    void move() {
+        final var car = new Car("자동차이름");
+
+        car.move(new ForwardStrategy());
+
+        assertThat(car.getPosition()).isEqualTo(1);
+    }
+
+    @DisplayName("이동조건 전략이 false 자동차는 이동한다")
+    @Test
+    void stop() {
+        final var car = new Car("자동차이름");
+
+        car.move(new StopStrategy());
 
         assertThat(car.getPosition()).isEqualTo(0);
     }

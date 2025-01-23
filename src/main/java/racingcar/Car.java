@@ -1,6 +1,7 @@
 package racingcar;
 
 public class Car {
+
     private static final int LIMIT_NAME_LENGTH = 5;
     private static final int MINIMUM_MOVABLE_CONDITION = 4;
 
@@ -14,8 +15,8 @@ public class Car {
         this.name = name;
     }
 
-    public void move(final int condition) {
-        if (condition >= MINIMUM_MOVABLE_CONDITION) {
+    public void move(final MovingStrategy movingStrategy) {
+        if (movingStrategy.movable()) {
             position++;
         }
     }
