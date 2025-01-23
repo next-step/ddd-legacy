@@ -1,36 +1,34 @@
 package calculator;
 
+import java.util.Arrays;
+
 public class StringCalculator {
 
-    private StringCalculator() {
+    private final DelimiterGroup delimiterGroup;
+    private final NumberExtractor numberExtractor;
+
+
+    public StringCalculator(DelimiterGroup delimiterGroup, NumberExtractor numberExtractor) {
+        this.delimiterGroup = delimiterGroup;
+        this.numberExtractor = numberExtractor;
     }
 
-    public static int add(String text) {
+    public int add(String text) {
         if (text == null || text.isBlank()) {
             return 0;
         }
 
-        int sum = 0;
-        int num = 0;
-        String delimiters = ",:";
+        String numberText = delimiterGroup.extractCustomDelimiter(text);
 
-        if (text.startsWith("//") && "\\n".equals(text.substring(3, 5))) {
-            delimiters += text.charAt(2);
-            text = text.substring(5);
-        }
+        Integer[] numbers = numberExtractor.extract(numberText, delimiterGroup);
 
-        for (char c : text.toCharArray()) {
-            if (delimiters.indexOf(c) >= 0) {
-                sum += num;
-                num = 0;
-            } else if (Character.isDigit(c)) {
-                num = num * 10 + (c - '0');
-            } else {
-                throw new RuntimeException("유효하지 않은 문자 : %s".formatted(c));
-            }
-        }
+        return sum(numbers);
+    }
 
-        return sum + num;
+    private int sum(Integer[] numbers) {
+        return Arrays.stream(numbers)
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 
 }

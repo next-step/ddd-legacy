@@ -1,5 +1,6 @@
 package calculator;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -10,6 +11,16 @@ import static org.assertj.core.api.Assertions.assertThatException;
 
 class StringCalculatorTest {
 
+    private StringCalculator stringCalculator;
+
+
+    @BeforeEach
+    void setup() {
+        DelimiterGroup delimiterGroup = new DelimiterGroup();
+        NumberExtractor numberExtractor = new NumberExtractor();
+        stringCalculator = new StringCalculator(delimiterGroup, numberExtractor);
+    }
+
     @Test
     @DisplayName("입력된 문자열의 합을 계산한다.")
     void testAdd() {
@@ -17,7 +28,7 @@ class StringCalculatorTest {
         final String text = "1,2";
 
         // when
-        final int result = StringCalculator.add(text);
+        final int result = stringCalculator.add(text);
 
         // then
         assertThat(result).isEqualTo(3);
@@ -28,7 +39,7 @@ class StringCalculatorTest {
     @DisplayName("입력이 null 또는 빈 문자열일 경우 0을 반환한다.")
     void testReturn0WhenEmptyText(final String text) {
         // when
-        final int result = StringCalculator.add(text);
+        final int result = stringCalculator.add(text);
 
         // then
         assertThat(result).isEqualTo(0);
@@ -41,7 +52,7 @@ class StringCalculatorTest {
         final String text = "1,2:3";
 
         // when
-        final int result = StringCalculator.add(text);
+        final int result = stringCalculator.add(text);
 
         // then
         assertThat(result).isEqualTo(6);
@@ -54,7 +65,7 @@ class StringCalculatorTest {
         final String text = "//;\\n1;2;3";
 
         // when
-        final int result = StringCalculator.add(text);
+        final int result = stringCalculator.add(text);
 
         // then
         assertThat(result).isEqualTo(6);
@@ -68,7 +79,7 @@ class StringCalculatorTest {
 
         // when & then
         assertThatException()
-                .isThrownBy(() -> StringCalculator.add(text))
+                .isThrownBy(() -> stringCalculator.add(text))
                 .isInstanceOf(RuntimeException.class);
     }
 
@@ -80,7 +91,7 @@ class StringCalculatorTest {
 
         // when & then
         assertThatException()
-                .isThrownBy(() -> StringCalculator.add(text))
+                .isThrownBy(() -> stringCalculator.add(text))
                 .isInstanceOf(RuntimeException.class);
     }
 
