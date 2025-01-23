@@ -23,7 +23,11 @@ public class StringCalculator {
 
         String[] numbers = text.split(splitFilter);
 
-        return calculateNumbers(validate(numbers));
+        List<Integer> numberList = numbersStrToIntList(numbers);
+
+        validate(numberList);
+
+        return calculateNumbers(numberList);
     }
 
     private int calculateNumbers(List<Integer> numbers) {
@@ -34,16 +38,20 @@ public class StringCalculator {
         return result;
     }
 
-    private List<Integer> validate(String[] numbers){
+    private List<Integer> numbersStrToIntList(String[] numbers){
         List<Integer> result = new ArrayList<>();
         for(String number : numbers){
             int numberInt = Integer.parseInt(number);
-            if(numberInt < 0){
-                throw new RuntimeException();
-            }
             result.add(numberInt);
         }
         return result;
     }
 
+    private void validate(List<Integer> numbers) {
+        for(int number : numbers){
+            if (number < 0){
+                throw new RuntimeException();
+            }
+        }
+    }
 }
