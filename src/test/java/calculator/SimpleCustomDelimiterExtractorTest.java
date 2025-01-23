@@ -6,18 +6,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-import static calculator.CustomDelimiterExtractor.DEFAULT_DELIMITERS;
+import static calculator.SimpleCustomDelimiterExtractor.DEFAULT_DELIMITERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class CustomDelimiterExtractorTest {
+class SimpleCustomDelimiterExtractorTest {
 
-    private CustomDelimiterExtractor customDelimiterExtractor;
+    private SimpleCustomDelimiterExtractor customDelimiterExtractor;
 
 
     @BeforeEach
     void setup() {
-        customDelimiterExtractor = new CustomDelimiterExtractor();
+        customDelimiterExtractor = new SimpleCustomDelimiterExtractor();
     }
 
     @Test

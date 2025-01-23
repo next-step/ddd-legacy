@@ -16,7 +16,7 @@ class StringCalculatorTest {
 
     @BeforeEach
     void setup() {
-        CustomDelimiterExtractor customDelimiterExtractor = new CustomDelimiterExtractor();
+        CustomDelimiterExtractor customDelimiterExtractor = new SimpleCustomDelimiterExtractor();
         NumberExtractor numberExtractor = new SimpleNumberExtractor();
         NumberValidator numberValidator = new SimpleNumberValidator();
         stringCalculator = new StringCalculator(customDelimiterExtractor, numberExtractor, numberValidator);
