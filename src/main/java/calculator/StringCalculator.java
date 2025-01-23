@@ -4,11 +4,13 @@ import java.util.Arrays;
 
 public class StringCalculator {
 
+    private final CustomDelimiterExtractor customDelimiterExtractor;
     private final NumberExtractor numberExtractor;
     private final NumberValidator numberValidator;
 
 
-    public StringCalculator(NumberExtractor numberExtractor, NumberValidator numberValidator) {
+    public StringCalculator(CustomDelimiterExtractor customDelimiterExtractor, NumberExtractor numberExtractor, NumberValidator numberValidator) {
+        this.customDelimiterExtractor = customDelimiterExtractor;
         this.numberExtractor = numberExtractor;
         this.numberValidator = numberValidator;
     }
@@ -18,9 +20,9 @@ public class StringCalculator {
             return 0;
         }
 
-        InputText inputText = new InputText(text);
+        InputText inputText = customDelimiterExtractor.extractDelimiter(text);
 
-        String[] numbers = numberExtractor.extractNumber(inputText.getNumberText(), inputText.getDelimiters());
+        String[] numbers = numberExtractor.extractNumber(inputText.numberText(), inputText.delimiters());
 
         numberValidator.validateNumbers(numbers);
 
