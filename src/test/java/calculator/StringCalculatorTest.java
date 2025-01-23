@@ -4,9 +4,9 @@ import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.*;
+
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -60,18 +60,22 @@ public class StringCalculatorTest {
     }
 
     @DisplayName("커스텀 구분자를 사용하여 숫자 사이에 구분자로 구분된 문자열을 입력하면 숫자의 합을 반환한다.")
-    @Test
-    void testCustomSpliter() {
-        // given
-        String[][] fixtures = {{"//i\n1i2i3", "6"}, {"//-\n3-4-5", "12"}, {"//^\n12^1", "13"}};
+    @ParameterizedTest
+    @MethodSource("customDelimiterStrings")
+    void testCustomSpliter(String value, int expected) {
+        // when
+        StringCalculator stringCalculator = StringCalculator.of(value);
 
-        for (String[] fixture : fixtures) {
-            // when
-            StringCalculator stringCalculator = StringCalculator.of(fixture[0]);
+        // then
+        assertThat(stringCalculator.sum()).isEqualTo(expected);
+    }
 
-            // then
-            assertThat(stringCalculator.sum()).isEqualTo(Integer.parseInt(fixture[1]));
-        }
+    private static Stream<Arguments> customDelimiterStrings() {
+        return Stream.of(
+                Arguments.of("//i\n1i2i3", 6),
+                Arguments.of("//-\n3-4-5", 12),
+                Arguments.of("//^\n12^1", 13)
+        );
     }
 
     @DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")
