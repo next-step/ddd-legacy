@@ -14,13 +14,28 @@ public class StringCalculator {
         if (m.find()) {
             String customDelimiter = m.group(1);
             String[] tokens = m.group(2).split(customDelimiter);
-            return Arrays.stream(tokens).mapToInt(Integer::parseInt).sum();
+            return Arrays.stream(tokens)
+                    .mapToInt(Integer::parseInt)
+                    .peek(this::checkForNegative)
+                    .sum();
         }
+
         try {
-            return Integer.parseInt(text);
+            var number = Integer.parseInt(text);
+            checkForNegative(number);
+            return number;
         } catch (NumberFormatException e) {
             String[] values = text.split("[,:]");
-            return Arrays.stream(values).mapToInt(Integer::parseInt).sum();
+            return Arrays.stream(values)
+                    .mapToInt(Integer::parseInt)
+                    .peek(this::checkForNegative)
+                    .sum();
+        }
+    }
+
+    private void checkForNegative(int number) {
+        if (number < 0) {
+            throw new RuntimeException("Negative numbers not allowed: " + number);
         }
     }
 }
