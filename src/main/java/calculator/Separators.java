@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class Separators {
-    private Set<String> separators;
+    private final Set<String> separators;
 
     private Separators(Set<String> separators) {
         this.separators = separators;
@@ -20,5 +20,9 @@ public class Separators {
         return Stream.of(text.split(regex))
                 .map(Element::of)
                 .toList();
+    }
+
+    public void addSeparator(String separator) {
+        this.separators.add(separator);
     }
 }
