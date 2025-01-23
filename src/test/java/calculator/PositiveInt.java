@@ -4,6 +4,10 @@ public record PositiveInt(int value) {
 
     private static final int MINIMUM_VALUE = 0;
 
+    public static PositiveInt zero() {
+        return new PositiveInt(MINIMUM_VALUE);
+    }
+
     public PositiveInt(final String value) {
         this(Integer.parseInt(value));
     }
@@ -16,9 +20,5 @@ public record PositiveInt(int value) {
 
     public PositiveInt add(PositiveInt other) {
         return new PositiveInt(Math.addExact(value, other.value));
-    }
-
-    public static PositiveInt zero() {
-        return new PositiveInt(MINIMUM_VALUE);
     }
 }

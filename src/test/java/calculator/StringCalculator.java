@@ -13,14 +13,13 @@ public class StringCalculator {
         this.textDelimiters = textDelimiters;
     }
 
-    public int add(final String text) {
+    public PositiveInt calculate(final String text) {
         if (Strings.isBlank(text)) {
-            return 0;
+            return PositiveInt.zero();
         }
-        final PositiveInt positiveInt = textDelimiters.split(text)
+        return textDelimiters.split(text)
                 .stream()
                 .map(PositiveInt::new)
                 .reduce(PositiveInt.zero(), PositiveInt::add);
-        return positiveInt.value();
     }
 }
