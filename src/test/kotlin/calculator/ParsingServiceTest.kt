@@ -8,7 +8,7 @@ class ParsingServiceTest {
     @Test
     fun `기본 구분자와 숫자 파싱`() {
         val input = InputString.of("1,2,3")
-        assertThat(SUT.parse(input)).isEqualTo(
+        assertThat(input.toNonNegativeNumber()).isEqualTo(
             listOf(
                 NonNegativeNumber(1),
                 NonNegativeNumber(2),
@@ -20,16 +20,12 @@ class ParsingServiceTest {
     @Test
     fun `커스텀 구분자와 숫자 파싱`() {
         val input = InputString.of("//;\n1;2;3")
-        assertThat(SUT.parse(input)).isEqualTo(
+        assertThat(input.toNonNegativeNumber()).isEqualTo(
             listOf(
                 NonNegativeNumber(1),
                 NonNegativeNumber(2),
                 NonNegativeNumber(3),
             )
         )
-    }
-
-    companion object {
-        private val SUT = ParsingService()
     }
 }

@@ -1,11 +1,13 @@
 package calculator
 
-class ParsingService {
-
-    fun parse(input: InputString): List<NonNegativeNumber> {
-        val delimiter = Delimiter(input)
-        return input.target
-            .split(delimiter.regex)
-            .map { NonNegativeNumber(it.toInt()) }
-    }
+fun InputString.toNonNegativeNumber(): List<NonNegativeNumber> {
+    val delimiter = Delimiter(src)
+    return target
+        .split(delimiter.regex)
+        .map {
+            runCatching { it.toInt() }
+                .onFailure { throw RuntimeException("") }
+                .getOrNull()!!
+                .let { NonNegativeNumber(it) }
+        }
 }
