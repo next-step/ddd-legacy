@@ -11,4 +11,10 @@ data class NonNegativeNumber(
     }
 }
 
+fun Int.toNonNegativeNumber() = NonNegativeNumber(this)
+
+fun String.toNonNegativeNumber() = this.toInt().toNonNegativeNumber()
+
+fun List<Int>.toNonNegativeNumbers() = map { it.toNonNegativeNumber() }
+
 fun List<NonNegativeNumber>.sum(): Int = this.sumOf { it.value }

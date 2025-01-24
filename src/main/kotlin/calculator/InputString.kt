@@ -17,7 +17,8 @@ data class InputString private constructor(
     }
 
     companion object {
-        private val allowedFormat = Regex("""(//.\n)?(?<target>[0-9]+(.[0-9]+)*)""")
+
+        private val allowedFormat = Regex("""(//.\\n)?(?<target>[0-9]+(.[0-9]+)*)""")
 
         fun of(source: String?): InputString =
             source.takeUnless { it.isNullOrEmpty() }

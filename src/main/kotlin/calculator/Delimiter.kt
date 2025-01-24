@@ -16,6 +16,6 @@ data class Delimiter private constructor(
     companion object {
 
         private val DEFAULT_DELIMITER = Regex("""[,:]""")
-        private val CUSTOM_DELIMITER = Regex("""//(?<delimiter>.)\n.*""")
+        private val CUSTOM_DELIMITER = Regex("""//(?<delimiter>.)\\n.*""")
     }
 }
