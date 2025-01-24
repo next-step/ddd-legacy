@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -60,5 +61,20 @@ class StringCalculatorTest {
     void negative() {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> sut.add("-1"));
+    }
+
+    @DisplayName(value = "커스텀 구분자를 추가하여 덧셈을 수행한다.")
+    @ParameterizedTest
+    @MethodSource("provideCustomDelimiterInputs")
+    void customDelimiter(final String text, final int expected) {
+        assertThat(sut.add(text)).isSameAs(expected);
+    }
+
+    static Object[][] provideCustomDelimiterInputs() {
+        return new Object[][] {
+                {"//;\n1;2;3", 6},
+                {"//v\n4v5v6", 15},
+                {"//#\n7#8#9", 24}
+        };
     }
 }
