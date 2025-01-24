@@ -12,27 +12,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class StringCalculatorInputParserTest {
 
-    private StringCalculatorInputParser parser;
+    private StringCalculatorInputParser sut;
     private StringCalculatorDelimiters delimiters;
 
     @BeforeEach
     void setUp() {
         delimiters = StringCalculatorDelimiters.create();
-        parser = new StringCalculatorInputParser(delimiters);
+        sut = new StringCalculatorInputParser(delimiters);
     }
 
     @DisplayName("기본 구분자로 문자열을 분리해야 한다.")
     @ParameterizedTest
     @MethodSource("provideDefaultDelimiterTestCases")
     void parse_shouldSplitByDefaultDelimiters(String input, String[] expected) {
-        assertThat(parser.parse(input)).containsExactly(expected);
+        assertThat(sut.parse(input)).containsExactly(expected);
     }
 
     @DisplayName("커스텀 구분자로 문자열을 분리해야 한다.")
     @ParameterizedTest
     @MethodSource("provideCustomDelimiterTestCases")
     void parse_shouldSplitByCustomDelimiter(String input, String[] expected) {
-        assertThat(parser.parse(input)).containsExactly(expected);
+        assertThat(sut.parse(input)).containsExactly(expected);
     }
 
     private static Stream<Arguments> provideDefaultDelimiterTestCases() {

@@ -13,48 +13,48 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.*;
 
 class StringCalculatorDelimitersTest {
-    private StringCalculatorDelimiters delimiters;
+    private StringCalculatorDelimiters sut;
     private int initSize;
 
     @BeforeEach
     void setUp() {
-        delimiters = StringCalculatorDelimiters.create();
-        initSize = delimiters.getDelimiters().size();
+        sut = StringCalculatorDelimiters.create();
+        initSize = sut.getDelimiters().size();
     }
 
     @DisplayName("최초 생성시 기본 구분자(, :)가 포함되어 있어야 한다.")
     @Test
     void shouldIncludeDefaultDelimiters() {
-        assertThat(delimiters.getRegex()).contains(",", ":");
+        assertThat(sut.getRegex()).contains(",", ":");
     }
 
     @DisplayName("구분자를 추가할 수 있어야 한다.")
     @Test
     void shouldAddCustomDelimiter() {
-        delimiters.addDelimiter(';');
+        sut.addDelimiter(';');
 
-        assertThat(delimiters.getDelimiters()).contains(';');
+        assertThat(sut.getDelimiters()).contains(';');
     }
 
     @DisplayName("중복된 구분자를 추가하면 무시되어야 한다.")
     @Test
     void shouldNotAddDuplicateDelimiter() {
-        delimiters.addDelimiter(';');
-        delimiters.addDelimiter(';'); // 중복 추가
+        sut.addDelimiter(';');
+        sut.addDelimiter(';'); // 중복 추가
 
-        assertThat(delimiters.getDelimiters()).hasSize(initSize + 1);
+        assertThat(sut.getDelimiters()).hasSize(initSize + 1);
     }
 
     @DisplayName("커스텀 구분자를 입력에서 추출하고 추가할 수 있어야 한다.")
     @ParameterizedTest
     @MethodSource("provideCustomDelimiterInputs")
     void shouldExtractAndAddCustomDelimiter(final String input, final char customDelimiter, final String expectedOutput) {
-        int initSize = delimiters.getDelimiters().size();
+        int initSize = sut.getDelimiters().size();
 
-        String result = delimiters.extractAndAddCustomDelimiter(input);
+        String result = sut.extractAndAddCustomDelimiter(input);
 
-        assertThat(delimiters.getDelimiters()).hasSize(initSize + 1);
-        assertThat(delimiters.getDelimiters()).contains(customDelimiter);
+        assertThat(sut.getDelimiters()).hasSize(initSize + 1);
+        assertThat(sut.getDelimiters()).contains(customDelimiter);
         assertThat(result).isEqualTo(expectedOutput);
     }
 
@@ -70,10 +70,10 @@ class StringCalculatorDelimitersTest {
     @ParameterizedTest
     @MethodSource("provideNonCustomDelimiterInputs")
     void shouldReturnInputWhenNoCustomDelimiter(final String input) {
-        String result = delimiters.extractAndAddCustomDelimiter(input);
+        String result = sut.extractAndAddCustomDelimiter(input);
 
         assertThat(result).isEqualTo(input);
-        assertThat(delimiters.getRegex()).contains(",", ":");
+        assertThat(sut.getRegex()).contains(",", ":");
     }
 
     static Stream<String> provideNonCustomDelimiterInputs() {
@@ -84,9 +84,9 @@ class StringCalculatorDelimitersTest {
     @ParameterizedTest
     @MethodSource("provideInputForRegexSplitting")
     void getRegex_ShouldCorrectlySplitInput(String input, Set<Character> customDelimiters, String[] expectedTokens) {
-        customDelimiters.forEach(delimiters::addDelimiter); // 구분자 추가
+        customDelimiters.forEach(sut::addDelimiter); // 구분자 추가
 
-        String regex = delimiters.getRegex();
+        String regex = sut.getRegex();
         String[] actualTokens = input.split(regex);
 
         assertThat(actualTokens).containsExactly(expectedTokens);
