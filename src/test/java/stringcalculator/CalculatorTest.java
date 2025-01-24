@@ -3,6 +3,7 @@ package stringcalculator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -35,4 +36,20 @@ public class CalculatorTest {
                 () -> Calculator.calculate(DEFAULT_NEGATIVE_VALUE)
         );
     }
+
+    @ParameterizedTest
+    @DisplayName(value = "컴마나 콜론을 붙이면 숫자의 합을 반환한다.")
+    @CsvSource(value = {"1,2,3|6","1:3:5|9"},delimiter = '|')
+    void addValueTest(String calculateForm, int result) {
+        assertThat(Calculator.calculate(calculateForm)).isEqualTo(result);
+    }
+
+    @ParameterizedTest
+    @DisplayName(value = "커스텀 구분자를 사용해서 숫자의 합을 반환한다.")
+    @CsvSource(value = {"//&\\n3&4&5|12","//#\\n1#3#5|9"},delimiter = '|')
+    void customAddValueTest(String calculateForm, int result) {
+        System.out.println(calculateForm);
+        assertThat(Calculator.calculate(calculateForm)).isEqualTo(result);
+    }
+
 }
