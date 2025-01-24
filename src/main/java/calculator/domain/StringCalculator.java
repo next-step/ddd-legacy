@@ -3,7 +3,7 @@ package calculator.domain;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class StringCalculator {
+public class StringCalculator implements AddOperation {
     private final Validator validator;
     private final StringCalculatorInputParser parser;
 
@@ -12,6 +12,7 @@ public class StringCalculator {
         this.parser = parser;
     }
 
+    @Override
     public int add(String input) {
         if (validator.isEmpty(input)) {
             return 0;
