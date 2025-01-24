@@ -29,15 +29,15 @@ class StringCalculatorInputValidatorTest {
     @DisplayName("입력이 null 또는 빈 문자열일 경우 true를 반환해야 한다.")
     @ParameterizedTest
     @NullAndEmptySource
-    void isEmpty_shouldReturnTrueForNullOrEmpty(final String input) {
-        assertThat(sut.isEmpty(input)).isTrue();
+    void isEmpty_shouldReturnTrueForNullOrNullOrBlank(final String input) {
+        assertThat(sut.isNullOrBlankInput(input)).isTrue();
     }
 
     @DisplayName("입력에 텍스트가 포함되어 있으면 false를 반환해야 한다.")
     @ParameterizedTest
     @ValueSource(strings = {"123", "hello", "  a  "})
-    void isEmpty_shouldReturnFalseForNonEmptyStrings(final String input) {
-        assertThat(sut.isEmpty(input)).isFalse();
+    void isEmpty_shouldReturnFalseForNonNullOrBlankStrings(final String input) {
+        assertThat(sut.isNullOrBlankInput(input)).isFalse();
     }
 
     @DisplayName("음수가 포함된 경우 RuntimeException이 발생해야 한다.")

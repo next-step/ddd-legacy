@@ -13,7 +13,7 @@ public final class StringCalculator extends Calculator implements AddOperation {
 
     @Override
     public int add(final String input) {
-        if (validator.isEmpty(input)) {
+        if (validator.isNullOrBlankInput(input)) {
             return 0;
         }
         validator.assertValidInput(input);

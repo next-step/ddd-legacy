@@ -14,7 +14,7 @@ public class StringCalculatorInputValidator {
         this.delimiters = delimiters;
     }
 
-    public boolean isEmpty(final String input) {
+    public boolean isNullOrBlankInput(final String input) {
         return !StringUtils.hasText(input);
     }
 
@@ -28,7 +28,7 @@ public class StringCalculatorInputValidator {
     }
 
     public void assertValidInput(final String input) {
-        if(isEmpty(input)) {
+        if(isNullOrBlankInput(input)) {
             return;
         }
         String processedInput = delimiters.extractAndAddCustomDelimiter(input);
