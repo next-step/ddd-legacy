@@ -1,7 +1,7 @@
 package racingcar
 
 class Car(
-    val name: String
+    val name: String,
 ) {
     var position: Int = 0
 
@@ -9,8 +9,8 @@ class Car(
         require(name.length > 5) { throw IllegalArgumentException() }
     }
 
-    fun move(condition: Int) {
-        if(condition >= 4) {
+    fun move(movingStartegy: MovingStrategy) {
+        if (movingStartegy.movable()) {
             position++
         }
     }
