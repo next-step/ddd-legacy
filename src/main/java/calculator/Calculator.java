@@ -28,8 +28,9 @@ public class Calculator {
         return add(elements);
     }
 
-    private int add(final List<Element> elements) {
+    private int add(final List<Integer> elements) {
         return elements.stream()
+                .map(Element::of)
                 .mapToInt(Element::getElement)
                 .sum();
     }
