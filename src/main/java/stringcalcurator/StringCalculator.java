@@ -1,5 +1,7 @@
 package stringcalcurator;
 
+import io.micrometer.common.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -7,15 +9,17 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
+    private final String DEFAULT_SPLIT_REGEX = "[,:]";
+    private final String CUSTOM_SPLIT_REGEX = "//(.)\n(.*)";
+
     public int add(String text) {
-        if(text == null || text.isEmpty()) {
+
+        if(text == null || StringUtils.isBlank(text)) {
             return 0;
         }
 
-        String splitFilter = "[,:]";
-        String CUSTOM_SPLIT_REGEX = "//(.)\n(.*)";
         Matcher matcher = Pattern.compile(CUSTOM_SPLIT_REGEX).matcher(text);
-
+        String splitFilter = DEFAULT_SPLIT_REGEX;
         if(matcher.find()){
             splitFilter = matcher.group(1);
             text = matcher.group(2);
@@ -23,9 +27,7 @@ public class StringCalculator {
 
         String[] numbers = text.split(splitFilter);
 
-        List<Integer> numberList = numbersStrToIntList(numbers);
-
-        isPositiveNumber(numberList);
+        List<Integer> numberList = StringNumberList.create(numbers).getIntNumbers();
 
         return calculateNumbers(numberList);
     }
@@ -38,20 +40,4 @@ public class StringCalculator {
         return result;
     }
 
-    private List<Integer> numbersStrToIntList(String[] numbers){
-        List<Integer> result = new ArrayList<>();
-        for(String number : numbers){
-            int numberInt = Integer.parseInt(number);
-            result.add(numberInt);
-        }
-        return result;
-    }
-
-    private void isPositiveNumber(List<Integer> numbers) {
-        for(int number : numbers){
-            if (number < 0){
-                throw new RuntimeException();
-            }
-        }
-    }
 }
