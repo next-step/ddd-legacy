@@ -3,6 +3,7 @@ package calculator.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.stream.Stream;
@@ -32,19 +33,19 @@ class InputParserTest {
         assertThat(parser.parse(input)).containsExactly(expected);
     }
 
-    private static Stream<Object[]> provideDefaultDelimiterTestCases() {
+    private static Stream<Arguments> provideDefaultDelimiterTestCases() {
         return Stream.of(
-                new Object[]{"1,2,3", new String[]{"1", "2", "3"}},
-                new Object[]{"4:5:6", new String[]{"4", "5", "6"}},
-                new Object[]{"7,8:9", new String[]{"7", "8", "9"}}
+                Arguments.of("1,2,3", new String[]{"1", "2", "3"}),
+                Arguments.of("4:5:6", new String[]{"4", "5", "6"}),
+                Arguments.of("7,8:9", new String[]{"7", "8", "9"})
         );
     }
 
-    private static Stream<Object[]> provideCustomDelimiterTestCases() {
+    private static Stream<Arguments> provideCustomDelimiterTestCases() {
         return Stream.of(
-                new Object[]{"//;\n1;2;3", new String[]{"1", "2", "3"}},
-                new Object[]{"//#\n4#5#6", new String[]{"4", "5", "6"}},
-                new Object[]{"//@\n7@8@9", new String[]{"7", "8", "9"}}
+                Arguments.of("//;\n1;2;3", new String[]{"1", "2", "3"}),
+                Arguments.of("//#\n4#5#6", new String[]{"4", "5", "6"}),
+                Arguments.of("//@\n7@8@9", new String[]{"7", "8", "9"})
         );
     }
 }
