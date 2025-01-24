@@ -7,30 +7,33 @@ import java.util.regex.Pattern;
 
 public class FixedTextDelimiter implements TextDelimiter {
     private static final String DEFAULT_FIXED_DELIMITER = ",|:";
-    private final String delimiter;
+    private final Pattern pattern;
 
     public FixedTextDelimiter() {
         this(DEFAULT_FIXED_DELIMITER);
     }
 
     public FixedTextDelimiter(final String delimiter) {
-        this.delimiter = delimiter;
+        this(Pattern.compile(delimiter));
+    }
+
+    private FixedTextDelimiter(final Pattern pattern) {
+        this.pattern = pattern;
     }
 
     @Override
     public boolean isSupport(final String text) {
-        final Pattern pattern = Pattern.compile(delimiter);
         final Matcher matcher = pattern.matcher(text);
         return matcher.find();
     }
 
     @Override
     public List<String> split(final String text) {
-        final Pattern pattern = Pattern.compile(text);
         final Matcher matcher = pattern.matcher(text);
         if (!matcher.find()) {
-            throw new RuntimeException("잘못된 호출입니다.");
+            throw new IllegalArgumentException("[고정 구분자 분석기] 잘못된 호출입니다. text: %s".formatted(text));
         }
+        final String delimiter = pattern.pattern();
         return Arrays.stream(text.split(delimiter))
                 .toList();
     }

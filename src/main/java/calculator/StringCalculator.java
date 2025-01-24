@@ -4,6 +4,9 @@ import calculator.strategy.TextDelimiters;
 import calculator.vo.PositiveInt;
 import org.apache.logging.log4j.util.Strings;
 
+import java.util.List;
+import java.util.Optional;
+
 public class StringCalculator {
     private final TextDelimiters textDelimiters;
 
@@ -16,12 +19,23 @@ public class StringCalculator {
     }
 
     public PositiveInt calculate(final String text) {
-        if (Strings.isBlank(text)) {
-            return PositiveInt.zero();
-        }
-        return textDelimiters.split(text)
-                .stream()
+        return Optional.ofNullable(text)
+                .filter(Strings::isNotBlank)
+                .map(this::split)
+                .orElseGet(PositiveInt::zero);
+    }
+
+    private PositiveInt split(final String text) {
+        return Optional.ofNullable(text)
+                .map(textDelimiters::split)
+                .map(this::sum)
+                .orElseGet(PositiveInt::zero);
+    }
+
+    private PositiveInt sum(final List<String> positive) {
+        return positive.stream()
                 .map(PositiveInt::new)
-                .reduce(PositiveInt.zero(), PositiveInt::add);
+                .reduce(PositiveInt::add)
+                .orElseGet(PositiveInt::zero);
     }
 }

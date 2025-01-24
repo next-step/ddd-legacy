@@ -7,7 +7,7 @@ public class TextDelimiters {
     private final List<TextDelimiter> textDelimiters;
 
     public TextDelimiters() {
-        this(List.of(new FixedTextDelimiter(), new DynaminTextDelimiter()));
+        this(List.of(new FixedTextDelimiter(), new DynamicTextDelimiter()));
     }
 
     public TextDelimiters(final List<TextDelimiter> textDelimiters) {

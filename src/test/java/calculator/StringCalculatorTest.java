@@ -1,6 +1,6 @@
 package calculator;
 
-import calculator.strategy.DynaminTextDelimiter;
+import calculator.strategy.DynamicTextDelimiter;
 import calculator.strategy.FixedTextDelimiter;
 import calculator.strategy.TextDelimiters;
 import calculator.vo.PositiveInt;
@@ -74,7 +74,7 @@ class StringCalculatorTest {
     @ValueSource(strings = {"1;2", "2;3", "3;4", "4;5", "5;6"})
     void colons(final String text) {
         assertThatThrownBy(() -> calculator.calculate(text))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName(value = "//와 \\n 문자 사이에 커스텀 구분자를 지정할 수 있다.")
@@ -89,7 +89,7 @@ class StringCalculatorTest {
     @ValueSource(strings = {"-1,0,1", "1,-2,3", "1,2,-3", "-1,-2,-3"})
     void negativeNumber(final String text) {
         assertThatThrownBy(() -> calculator.calculate(text))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName(value = "숫자가 아닌 구분자 하나를 문자열로 입력할 경우 예외를 발생한다.")
@@ -97,7 +97,7 @@ class StringCalculatorTest {
     @ValueSource(strings = {";", "|", "//;\\n"})
     void oneDelimiter(final String text) {
         assertThatThrownBy(() -> calculator.calculate(text))
-                .isInstanceOf(RuntimeException.class);
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @DisplayName(value = "기본 구분자를 쉼표(,) 및 콜론(:) 이외에 다른 문자열로 대체할 수 있다.")
@@ -105,7 +105,7 @@ class StringCalculatorTest {
     @CsvSource(value = {"1;2;3|;|6", "1o2o3|o|6", "0o0o1|o|1"}, delimiter = '|')
     void changeDefaultDelimiter(final String text, final String delimiter, final int expected) {
         final StringCalculator stringCalculator = new StringCalculator(
-                new TextDelimiters(List.of(new FixedTextDelimiter(delimiter), new DynaminTextDelimiter()))
+                new TextDelimiters(List.of(new FixedTextDelimiter(delimiter), new DynamicTextDelimiter()))
         );
         assertThat(stringCalculator.calculate(text)).isEqualTo(new PositiveInt(expected));
     }
@@ -115,7 +115,7 @@ class StringCalculatorTest {
     @CsvSource(value = {"<<;>>1;2;3|<<(.*?)>>(.*)|6", "oovoo1v2v3|oo(.*?)oo(.*)|6", "<<o>>0o0o1|<<(.*?)>>(.*)|1"}, delimiter = '|')
     void changeCustomDelimiter(final String text, final String dynamicPattern, final int expected) {
         final StringCalculator stringCalculator = new StringCalculator(
-                new TextDelimiters(List.of(new FixedTextDelimiter(), new DynaminTextDelimiter(dynamicPattern)))
+                new TextDelimiters(List.of(new FixedTextDelimiter(), new DynamicTextDelimiter(dynamicPattern)))
         );
         assertThat(stringCalculator.calculate(text)).isEqualTo(new PositiveInt(expected));
     }
