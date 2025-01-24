@@ -13,8 +13,6 @@ data class Delimiter private constructor(
             ?: DEFAULT_DELIMITER
     )
 
-    constructor(value: InputString) : this(value.src)
-
     companion object {
 
         private val DEFAULT_DELIMITER = Regex("""[,:]""")
