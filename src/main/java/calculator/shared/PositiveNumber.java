@@ -7,7 +7,7 @@ public class PositiveNumber {
 
     private PositiveNumber(int value) {
         if(value < 0) {
-            throw new IllegalArgumentException("음수는 입력할 수 없습니다.");
+            throw new IllegalArgumentException("잘못된 값입니다. 양수만 입력할 수 있습니다. (입력값: %d)".formatted(value));
         }
         this.value = value;
     }

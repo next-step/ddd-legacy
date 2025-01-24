@@ -18,6 +18,7 @@ public class StringCalculatorInputValidator {
         return !StringUtils.hasText(input);
     }
 
+    @Deprecated(forRemoval = true)
     public void assertPositiveNumbers(final List<Integer> numbers) {
         numbers.stream()
                 .filter(n -> n < 0)
