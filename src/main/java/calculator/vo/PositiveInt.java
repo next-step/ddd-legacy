@@ -14,7 +14,7 @@ public record PositiveInt(int value) {
 
     public PositiveInt {
         if (value < MINIMUM_VALUE) {
-            throw new IllegalArgumentException("음수는 입력할 수 없습니다.");
+            throw new IllegalArgumentException("[양의 정수] 0 이상의 정수만 가능합니다. value: %d".formatted(value));
         }
     }
 
