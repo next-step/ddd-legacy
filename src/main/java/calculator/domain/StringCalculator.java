@@ -4,12 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 public class StringCalculator {
     private final Validator validator;
+    private final InputParser parser;
 
-    public StringCalculator(Validator validator) {
+    public StringCalculator(Validator validator, InputParser parser) {
         this.validator = validator;
+        this.parser = parser;
     }
 
     public int add(String input) {
@@ -17,20 +18,10 @@ public class StringCalculator {
             return 0;
         }
 
-        String[] values = parseInput(input);
+        String[] values = parser.parse(input);
         List<Integer> numbers = convertToNumbers(values);
 
         return sum(numbers);
-    }
-
-    private String[] parseInput(String text) {
-        if (text.startsWith("//")) {
-            String[] tokens = text.split("\n", 2);
-            String customDelimiter = tokens[0].substring(2);
-            return tokens[1].split(customDelimiter);
-        }
-
-        return text.split(",|:");
     }
 
     private List<Integer> convertToNumbers(String[] values) {
