@@ -1,14 +1,19 @@
 package calculator.domain;
 
+import calculator.shared.NumberConvertor;
+import calculator.shared.PositiveNumbers;
+
 import java.util.List;
 
 public final class StringCalculator extends Calculator implements AddOperation {
 
     private final StringCalculatorInputValidator validator;
+    private final NumberConvertor numberConvertor;
 
-    public StringCalculator(StringCalculatorInputValidator validator, InputParser parser) {
+    public StringCalculator(StringCalculatorInputValidator validator, InputParser parser, NumberConvertor numberConvertor) {
         super(parser);
         this.validator = validator;
+        this.numberConvertor = numberConvertor;
     }
 
     @Override
@@ -19,18 +24,9 @@ public final class StringCalculator extends Calculator implements AddOperation {
         validator.assertValidInput(input);
 
         List<String> parsedNumbers = parser.parse(input);
-        List<Integer> numbers = convertToNumbers(parsedNumbers);
+        PositiveNumbers positiveNumbers = numberConvertor.convertToPositiveNumbers(parsedNumbers);
 
-        return sum(numbers);
-    }
-
-    private List<Integer> convertToNumbers(final List<String> values) {
-        List<Integer> numbers = values.stream()
-                .map(Integer::parseInt)
-                .toList();
-
-        validator.assertPositiveNumbers(numbers);
-        return numbers;
+        return positiveNumbers.sum();
     }
 
     private int sum(final List<Integer> numbers) {

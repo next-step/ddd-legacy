@@ -1,6 +1,7 @@
 package calculator;
 
 import calculator.domain.*;
+import calculator.shared.NumberConvertor;
 
 import java.util.List;
 
@@ -20,7 +21,8 @@ public class CalculatorMain {
         StringCalculatorDelimiters delimiters = StringCalculatorDelimiters.create();
         StringCalculatorInputValidator stringCalculatorInputValidator = new StringCalculatorInputValidator(delimiters);
         InputParser parser = new StringCalculatorInputParser(delimiters);
-        StringCalculator calculator = new StringCalculator(stringCalculatorInputValidator, parser);
+        NumberConvertor numberConvertor = new NumberConvertor();
+        StringCalculator calculator = new StringCalculator(stringCalculatorInputValidator, parser, numberConvertor);
 
         System.out.println("🎯 문자열 덧셈 계산기를 실행합니다.");
         System.out.println("입력 형식: 숫자(쉼표, 콜론 구분) 또는 //구분자\\n숫자");
