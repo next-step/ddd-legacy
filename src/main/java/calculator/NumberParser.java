@@ -6,6 +6,8 @@ import calculator.vo.Tokens;
 public record NumberParser() {
 
     public Numbers parse(Tokens tokens) {
-        return Numbers.fromTokens(tokens.token());
+        return Numbers.fromTokens(
+            tokens.token()
+        );
     }
 }

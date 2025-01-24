@@ -11,7 +11,9 @@ public record Numbers(List<Integer> numbers) {
     }
 
     public int sum() {
-        return numbers.stream().mapToInt(Integer::intValue).sum();
+        return numbers.stream()
+            .mapToInt(Integer::intValue)
+            .sum();
     }
 
     @Override

@@ -20,7 +20,9 @@ public record DelimiterParser() {
         if (matcher.matches()) {
             var customDelimiter = matcher.group(CUSTOM_DELIMITER_GROUP);
             var numbers = matcher.group(NUMBERS_GROUP);
-            return new Tokens(numbers.split(Pattern.quote(customDelimiter)));
+            return new Tokens(numbers.split(
+                Pattern.quote(customDelimiter)
+            ));
         }
 
         return new Tokens(input.split(DEFAULT_DELIMITERS));
