@@ -1,4 +1,4 @@
-package calculator.shared;
+package calculator.base;
 
 public class Constants {
 

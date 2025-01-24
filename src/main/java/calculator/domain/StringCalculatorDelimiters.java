@@ -1,6 +1,6 @@
 package calculator.domain;
 
-import calculator.shared.Constants;
+import calculator.base.Constants;
 
 import java.util.HashSet;
 import java.util.List;
