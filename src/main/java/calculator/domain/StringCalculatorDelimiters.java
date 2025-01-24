@@ -28,14 +28,14 @@ public class StringCalculatorDelimiters {
             return input;
         }
 
-        String[] tokens = input.split("\n", 2);
+        String[] tokens = input.split(Constants.LINE_SEPARATOR, 2);
 
         addDelimiter(tokens[0].charAt(2));
         return tokens[1];
     }
 
     private boolean hasCustomDelimiter(final String input) {
-        return input.startsWith("//") && input.contains("\n");
+        return input.startsWith("//") && input.contains(Constants.LINE_SEPARATOR);
     }
 
     public String getRegex() {
@@ -46,5 +46,10 @@ public class StringCalculatorDelimiters {
 
     public Set<Character> getDelimiters() {
         return delimiters;
+    }
+
+    @Override
+    public String toString() {
+        return delimiters.toString();
     }
 }
