@@ -1,20 +1,22 @@
 package calculator.domain;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class StringCalculator extends Calculator implements AddOperation {
 
-    public StringCalculator(StringCalculatorInputValidator stringCalculatorInputValidator, InputParser parser) {
-        super(stringCalculatorInputValidator, parser);
+    private final StringCalculatorInputValidator validator;
+
+    public StringCalculator(StringCalculatorInputValidator validator, InputParser parser) {
+        super(parser);
+        this.validator = validator;
     }
 
     @Override
     public int add(final String input) {
-        if (stringCalculatorInputValidator.isEmpty(input)) {
+        if (validator.isEmpty(input)) {
             return 0;
         }
-        stringCalculatorInputValidator.assertValidInput(input);
+        validator.assertValidInput(input);
 
         List<String> parsedNumbers = parser.parse(input);
         List<Integer> numbers = convertToNumbers(parsedNumbers);
@@ -25,9 +27,9 @@ public final class StringCalculator extends Calculator implements AddOperation {
     private List<Integer> convertToNumbers(final List<String> values) {
         List<Integer> numbers = values.stream()
                 .map(Integer::parseInt)
-                .collect(Collectors.toList());
+                .toList();
 
-        stringCalculatorInputValidator.assertPositiveNumbers(numbers);
+        validator.assertPositiveNumbers(numbers);
         return numbers;
     }
 
