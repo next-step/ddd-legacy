@@ -13,7 +13,7 @@ public class StringCalculator {
 
     public int add(String text) {
 
-        if(text == null || StringUtils.isBlank(text)) {
+        if(StringUtils.isBlank(text)) {
             return 0;
         }
 
