@@ -5,15 +5,16 @@ import java.util.stream.Collectors;
 
 public final class StringCalculator extends Calculator implements AddOperation {
 
-    public StringCalculator(Validator validator, StringCalculatorInputParser parser) {
-        super(validator, parser);
+    public StringCalculator(StringCalculatorInputValidator stringCalculatorInputValidator, InputParser parser) {
+        super(stringCalculatorInputValidator, parser);
     }
 
     @Override
     public int add(final String input) {
-        if (validator.isEmpty(input)) {
+        if (stringCalculatorInputValidator.isEmpty(input)) {
             return 0;
         }
+        stringCalculatorInputValidator.assertValidInput(input);
 
         List<String> parsedNumbers = parser.parse(input);
         List<Integer> numbers = convertToNumbers(parsedNumbers);
@@ -26,7 +27,7 @@ public final class StringCalculator extends Calculator implements AddOperation {
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
 
-        validator.assertPositiveNumbers(numbers);
+        stringCalculatorInputValidator.assertPositiveNumbers(numbers);
         return numbers;
     }
 
