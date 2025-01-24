@@ -1,7 +1,7 @@
 package calculator
 
 data class Delimiter private constructor(
-    val value: Regex
+    val regex: Regex
 ) {
 
     constructor(value: String) : this(
@@ -12,6 +12,8 @@ data class Delimiter private constructor(
             ?.toRegex()
             ?: DEFAULT_DELIMITER
     )
+
+    constructor(value: InputString) : this(value.src)
 
     companion object {
 

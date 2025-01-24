@@ -3,9 +3,9 @@ package calculator
 class ParsingService {
 
     fun parse(input: InputString): List<NonNegativeNumber> {
-        val delimiter = Delimiter(input.value)
+        val delimiter = Delimiter(input)
         return input.target
-            .split(delimiter.value)
+            .split(delimiter.regex)
             .map { NonNegativeNumber(it.toInt()) }
     }
 }

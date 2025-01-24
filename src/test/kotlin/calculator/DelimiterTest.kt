@@ -8,12 +8,12 @@ class DelimiterTest {
     @Test
     fun `기본 구분자로 생성`() {
         val testInput = "1,2,3"
-        assertThat(Delimiter(testInput).value.toString()).isEqualTo("[,:]")
+        assertThat(Delimiter(testInput).regex.toString()).isEqualTo("[,:]")
     }
 
     @Test
     fun `커스텀 구분자로 생성`() {
         val testInput = "//;\n1,2,3"
-        assertThat(Delimiter(testInput).value.toString()).isEqualTo(";")
+        assertThat(Delimiter(testInput).regex.toString()).isEqualTo(";")
     }
 }
