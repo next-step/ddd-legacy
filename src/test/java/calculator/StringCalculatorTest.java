@@ -96,4 +96,16 @@ class StringCalculatorTest {
                 .isInstanceOf(RuntimeException.class);
     }
 
+    @Test
+    @DisplayName("구분자가 없으면 숫자를 그대로 반환한다.")
+    void testOnlyNumericValue() {
+        // given
+        final String text = "1234";
+
+        final int result = stringCalculator.add(text);
+
+        // when & then
+        assertThat(result).isEqualTo(1234);
+    }
+
 }
