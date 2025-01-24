@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
 
 class StringCalculatorTest {
-
     @DisplayName("null or 빈 문자열은 0을 반환한다")
     @NullAndEmptySource
     @ParameterizedTest
