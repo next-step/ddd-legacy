@@ -1,19 +1,21 @@
 package calculator;
 
+import calculator.vo.Numbers;
+import calculator.vo.Tokens;
+
 public record StringCalculator(
     InputValidator inputValidator,
     DelimiterParser delimiterParser,
-    NumberParser numberParser,
-    SumCalculator sumCalculator
+    NumberParser numberParser
 ) {
 
     public int add(String input) {
         inputValidator.validate(input);
 
-        String[] tokens = delimiterParser.parse(input);
+        Tokens tokens = delimiterParser.parse(input);
 
-        int[] numbers = numberParser.parse(tokens);
+        Numbers numbers = numberParser.parse(tokens);
 
-        return sumCalculator.calculate(numbers);
+        return numbers.sum();
     }
 }

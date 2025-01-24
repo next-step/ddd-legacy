@@ -19,8 +19,7 @@ class StringCalculatorTest {
         calculator = new StringCalculator(
             new InputValidator(),
             new DelimiterParser(),
-            new NumberParser(),
-            new SumCalculator()
+            new NumberParser()
         );
     }
 
