@@ -26,9 +26,10 @@ class StringCalculatorTest {
         sut = new StringCalculator(stringCalculatorInputValidator, parser, numberConvertor);
     }
 
-    @DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")
+    @DisplayName(value = "빈 문자열, null 또는 공백 값을 입력할 경우 0을 반환해야 한다.")
     @ParameterizedTest
     @NullAndEmptySource
+    @ValueSource(strings = {" ", "      "}) // 공백 문자열 추가
     void emptyOrNull(final String text) {
         assertThat(sut.add(text)).isZero();
     }
