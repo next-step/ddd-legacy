@@ -14,18 +14,32 @@ public class InputValue {
 
     public static InputValue of(String value) {
         String[] splitStringValues = value.split("\n");
-        String header = "";
-        String body = splitStringValues[0];
-        if (splitStringValues.length > 2) {
-            throw new RuntimeException("//;\\n1;2;3 와 같은 형식으로 입력해주세요");
-        }
-        if (splitStringValues.length > 1) {
-            header = splitStringValues[0];
-            body = splitStringValues[1];
-        }
+        validateSplitStringValuesLength(splitStringValues);
+        String header = getHeaderString(splitStringValues);
+        String body = getBodyString(splitStringValues);
         CustomDelimiterExtractor customDelimiterExtractor = CustomDelimiterExtractor.of(header);
         PositiveIntegerExtractor positiveIntegerExtractor = PositiveIntegerExtractor.of(body, DEFAULT_DELIMITER, customDelimiterExtractor.getCustomDelimiter());
         return new InputValue(customDelimiterExtractor, positiveIntegerExtractor);
+    }
+
+    private static void validateSplitStringValuesLength(String[] splitStringValues) {
+        if (splitStringValues.length > 2) {
+            throw new RuntimeException("//;\\n1;2;3 와 같은 형식으로 입력해주세요");
+        }
+    }
+
+    private static String getHeaderString(String[] splitStringValues) {
+        if (splitStringValues.length > 1) {
+            return splitStringValues[0];
+        }
+        return "";
+    }
+
+    private static String getBodyString(String[] splitStringValues) {
+        if (splitStringValues.length > 1) {
+            return splitStringValues[1];
+        }
+        return splitStringValues[0];
     }
 
     public List<PositiveInteger> getPositiveIntegers() {
