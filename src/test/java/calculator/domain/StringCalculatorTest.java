@@ -12,11 +12,15 @@ import static org.assertj.core.api.Assertions.*;
 class StringCalculatorTest {
     private StringCalculator calculator;
     private Validator validator;
-    private InputParser parser;
+    private StringCalculatorInputParser parser;
+    private StringCalculatorDelimiters delimiters;
 
     @BeforeEach
     void setUp() {
-        calculator = new StringCalculator(new Validator(), new InputParser());
+        validator = new Validator();
+        delimiters = StringCalculatorDelimiters.create();
+        parser = new StringCalculatorInputParser(delimiters);
+        calculator = new StringCalculator(validator, parser);
     }
 
     @DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")

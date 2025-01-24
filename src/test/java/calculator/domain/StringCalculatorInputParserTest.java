@@ -10,13 +10,15 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class InputParserTest {
+class StringCalculatorInputParserTest {
 
-    private InputParser parser;
+    private StringCalculatorInputParser parser;
+    private StringCalculatorDelimiters delimiters;
 
     @BeforeEach
     void setUp() {
-        parser = new InputParser();
+        delimiters = StringCalculatorDelimiters.create();
+        parser = new StringCalculatorInputParser(delimiters);
     }
 
     @DisplayName("기본 구분자로 문자열을 분리해야 한다.")
