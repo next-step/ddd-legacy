@@ -1,5 +1,6 @@
 package calculator.domain;
 
+import calculator.shared.NumberConvertor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,13 +15,15 @@ class StringCalculatorTest {
     private StringCalculatorInputValidator stringCalculatorInputValidator;
     private StringCalculatorInputParser parser;
     private StringCalculatorDelimiters delimiters;
+    private NumberConvertor numberConvertor;
 
     @BeforeEach
     void setUp() {
         delimiters = StringCalculatorDelimiters.create();
         stringCalculatorInputValidator = new StringCalculatorInputValidator(delimiters);
         parser = new StringCalculatorInputParser(delimiters);
-        sut = new StringCalculator(stringCalculatorInputValidator, parser);
+        numberConvertor = new NumberConvertor();
+        sut = new StringCalculator(stringCalculatorInputValidator, parser, numberConvertor);
     }
 
     @DisplayName(value = "빈 문자열 또는 null 값을 입력할 경우 0을 반환해야 한다.")
