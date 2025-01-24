@@ -4,19 +4,19 @@ import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class StringCalculator {
+    private final Validator validator;
+
+    public StringCalculator(Validator validator) {
+        this.validator = validator;
+    }
 
     public int add(String text) {
-        if (StringUtils.isEmpty(text)) {
+        if (validator.isEmpty(text)) {
             return 0;
         }
-
-        //음수 처리
-        if (text.contains("-")) {
-            throw new RuntimeException("음수는 입력할 수 없습니다.");
-        }
-
 
         //커스텀 구분자 처리 (형식: "//;\n1;2;3")
         if (text.startsWith("//")) {
@@ -35,16 +35,17 @@ public class StringCalculator {
     }
 
     private int sum(String[] values) {
-        return Arrays.stream(values)
-                .mapToInt(this::parseNumber)
-                .sum();
+        //validator 추가
+        List<Integer> list = Arrays.stream(values)
+                .map(Integer::parseInt)
+                .toList();
+        validator.assertNoNegativeNumbers(list);
+
+        return list.stream().mapToInt(Integer::intValue).sum();
     }
 
     private int parseNumber(String value) {
         int number = Integer.parseInt(value);
-        if (number < 0) {
-            throw new RuntimeException("음수는 입력할 수 없습니다." + number);
-        }
         return number;
     }
 }
