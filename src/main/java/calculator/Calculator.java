@@ -24,15 +24,8 @@ public class Calculator {
         if (Objects.isNull(elementText) || elementText.isBlank()) {
             return 0;
         }
-        final var elements = separators.separate(elementText);
-        return add(elements);
-    }
-
-    private int add(final List<Integer> elements) {
-        return elements.stream()
-                .map(Element::of)
-                .mapToInt(Element::getElement)
-                .sum();
+        final List<Integer> elements = separators.separate(elementText);
+        return new Elements(elements).sum();
     }
 
     private void addCustomSeparator(final String text) {
@@ -43,7 +36,7 @@ public class Calculator {
         }
     }
 
-    private String extractElementText(String text) {
+    private String extractElementText(final String text) {
         Matcher m = CUSTOM_SEPARATOR_PATTERN.matcher(text);
         if (m.find()) {
             return m.group(2);
