@@ -5,13 +5,13 @@ import java.util.Arrays;
 public class StringCalculator {
 
     private final CustomDelimiterExtractor customDelimiterExtractor;
-    private final NumberExtractor numberExtractor;
+    private final TextSplitter textSplitter;
     private final NumberValidator numberValidator;
 
 
-    public StringCalculator(CustomDelimiterExtractor customDelimiterExtractor, NumberExtractor numberExtractor, NumberValidator numberValidator) {
+    public StringCalculator(CustomDelimiterExtractor customDelimiterExtractor, TextSplitter textSplitter, NumberValidator numberValidator) {
         this.customDelimiterExtractor = customDelimiterExtractor;
-        this.numberExtractor = numberExtractor;
+        this.textSplitter = textSplitter;
         this.numberValidator = numberValidator;
     }
 
@@ -22,7 +22,7 @@ public class StringCalculator {
 
         InputText inputText = customDelimiterExtractor.extractDelimiter(text);
 
-        String[] numbers = numberExtractor.extractNumber(inputText.numberText(), inputText.delimiters());
+        String[] numbers = textSplitter.splitText(inputText);
 
         numberValidator.validateNumbers(numbers);
 
