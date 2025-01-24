@@ -10,7 +10,7 @@ public class Validator {
         return StringUtils.isEmpty(input);
     }
 
-    public void assertNoNegativeNumbers(List<Integer> numbers) {
+    public void assertPositiveNumbers(List<Integer> numbers) {
         numbers.stream()
                 .filter(n -> n < 0)
                 .findAny()
