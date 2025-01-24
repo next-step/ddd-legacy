@@ -7,25 +7,26 @@ public class Car {
     private final CarName carName;
     private final Position position;
 
-    private Car(final CarName carName, final Position position) {
+    public Car(final String name, final int moveNumber) {
+        this(new CarName(name), new Position(moveNumber));
+    }
+
+    public Car(final CarName carName, final Position position) {
         this.carName = carName;
         this.position = position;
     }
 
-    public static Car of(final String name, final int moveNumber) {
-        return new Car(CarName.from(name), Position.from(moveNumber));
-    }
 
     public Car move(final int moveNumber ,final MoveStrategy moveStrategy) {
         return new Car(this.carName, position.move(moveStrategy.movable(moveNumber)));
     }
 
     public String getCarName() {
-        return this.carName.getName();
+        return this.carName.name();
     }
 
     public int getMoveNumber() {
-        return this.position.getNumber();
+        return this.position.number();
     }
 
     @Override
