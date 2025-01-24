@@ -20,9 +20,8 @@ public class StringCalculatorDelimiters {
         return new StringCalculatorDelimiters();
     }
 
-    public StringCalculatorDelimiters addDelimiter(final char delimiter) {
+    public void addDelimiter(final char delimiter) {
         delimiters.add(delimiter);
-        return this;
     }
 
     public String extractAndAddCustomDelimiter(final String input) {
