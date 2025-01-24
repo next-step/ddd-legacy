@@ -3,17 +3,14 @@ package calculator.domain;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class StringCalculator implements AddOperation {
-    private final Validator validator;
-    private final StringCalculatorInputParser parser;
+public final class StringCalculator extends Calculator implements AddOperation {
 
     public StringCalculator(Validator validator, StringCalculatorInputParser parser) {
-        this.validator = validator;
-        this.parser = parser;
+        super(validator, parser);
     }
 
     @Override
-    public int add(String input) {
+    public int add(final String input) {
         if (validator.isEmpty(input)) {
             return 0;
         }
@@ -24,7 +21,7 @@ public class StringCalculator implements AddOperation {
         return sum(numbers);
     }
 
-    private List<Integer> convertToNumbers(List<String> values) {
+    private List<Integer> convertToNumbers(final List<String> values) {
         List<Integer> numbers = values.stream()
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
@@ -33,7 +30,7 @@ public class StringCalculator implements AddOperation {
         return numbers;
     }
 
-    private int sum(List<Integer> numbers) {
+    private int sum(final List<Integer> numbers) {
         return numbers.stream().mapToInt(Integer::intValue).sum();
     }
 }
