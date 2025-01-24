@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 public class StringCalculatorDelimiters {
     private static final List<Character> DEFAULT_DELIMITERS = List.of(',', ':');
+    private static final int SPLIT_LIMIT = 2; // 최대 2개로 split
+    private static final int CUSTOM_DELIMITER_INDEX = 2; // "//;"에서 구분자 위치
 
     private final Set<Character> delimiters = new HashSet<>();
 
@@ -29,10 +31,14 @@ public class StringCalculatorDelimiters {
             return input;
         }
 
-        String[] tokens = input.split(Constants.LINE_SEPARATOR, 2);
+        String[] tokens = input.split(Constants.LINE_SEPARATOR, SPLIT_LIMIT);
 
-        addDelimiter(tokens[0].charAt(2));
-        return tokens[1];
+        final String customDelimiterDefinition = tokens[0]; // "//;"
+        final String numericInput = tokens[1]; // "1;2;3"
+
+        addDelimiter(customDelimiterDefinition.charAt(CUSTOM_DELIMITER_INDEX));
+
+        return numericInput;
     }
 
     private boolean hasCustomDelimiter(final String input) {
