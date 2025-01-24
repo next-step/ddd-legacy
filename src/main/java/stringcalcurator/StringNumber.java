@@ -12,7 +12,7 @@ public class StringNumber {
         return new StringNumber(numStr);
     }
 
-    public StringNumber(int number) {
+    private StringNumber(int number) {
         isPositive(number);
         this.number = number;
     }
@@ -21,10 +21,6 @@ public class StringNumber {
         if(number < 0){
             throw new RuntimeException();
         }
-    }
-
-    public StringNumber add(StringNumber other){
-        return create(this.getNumber() + other.getNumber());
     }
 
     public int getNumber() {
