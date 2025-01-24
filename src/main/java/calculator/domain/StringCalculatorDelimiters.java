@@ -18,12 +18,12 @@ public class StringCalculatorDelimiters {
         return new StringCalculatorDelimiters();
     }
 
-    public StringCalculatorDelimiters addDelimiter(char delimiter) {
+    public StringCalculatorDelimiters addDelimiter(final char delimiter) {
         delimiters.add(delimiter);
         return this;
     }
 
-    public String extractAndAddCustomDelimiter(String input) {
+    public String extractAndAddCustomDelimiter(final String input) {
         if (!hasCustomDelimiter(input)) {
             return input;
         }
@@ -34,7 +34,7 @@ public class StringCalculatorDelimiters {
         return tokens[1];
     }
 
-    private boolean hasCustomDelimiter(String input) {
+    private boolean hasCustomDelimiter(final String input) {
         return input.startsWith("//") && input.contains("\n");
     }
 

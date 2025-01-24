@@ -6,11 +6,11 @@ import java.util.List;
 
 public class Validator {
 
-    public boolean isEmpty(String input) {
+    public boolean isEmpty(final String input) {
         return StringUtils.isEmpty(input);
     }
 
-    public void assertPositiveNumbers(List<Integer> numbers) {
+    public void assertPositiveNumbers(final List<Integer> numbers) {
         numbers.stream()
                 .filter(n -> n < 0)
                 .findAny()
