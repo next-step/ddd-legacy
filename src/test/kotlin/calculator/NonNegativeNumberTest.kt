@@ -14,7 +14,7 @@ class NonNegativeNumberTest {
         val created = NonNegativeNumber(num)
         assertThat(created.value).isEqualTo(num)
     }
-    
+
     @Test
     fun `음수로 생성 불가`() {
         assertThatRuntimeException().isThrownBy { NonNegativeNumber(-1) }

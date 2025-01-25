@@ -6,9 +6,13 @@ value class NonNegativeNumber(
 ) {
 
     init {
-        if (value < 0) {
-            throw RuntimeException("숫자는 음이 아닌 정수이어야 합니다. ($value)")
+        require(value >= LOWER_BOUND) {
+            "숫자($value)는 $LOWER_BOUND 이상이어야 합니다."
         }
+    }
+
+    companion object {
+        const val LOWER_BOUND = 0
     }
 }
 
