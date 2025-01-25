@@ -3,8 +3,6 @@ package stringcalcurator;
 import io.micrometer.common.util.StringUtils;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class StringCalculator {
 
@@ -14,7 +12,7 @@ public class StringCalculator {
             return 0;
         }
 
-        String[] numbers = Separator.removeIfCustomSeparator(text);
+        String[] numbers = Separator.splitNumber(text);
         List<StringNumber> numberList = StringNumberList.create(numbers).getIntNumbers();
 
         return calculateNumbers(numberList);

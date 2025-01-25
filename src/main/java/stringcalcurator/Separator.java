@@ -7,7 +7,7 @@ public class Separator {
     private static final String DEFAULT_SPLIT_REGEX = "[,:]";
     private static final String CUSTOM_SPLIT_REGEX = "//(.)\n(.*)";
 
-    public static String[] removeIfCustomSeparator(String text){
+    public static String[] splitNumber(String text){
         Matcher matcher = Pattern.compile(CUSTOM_SPLIT_REGEX).matcher(text);
         String separator = DEFAULT_SPLIT_REGEX;
         if(matcher.find()){
