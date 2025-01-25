@@ -32,6 +32,7 @@ class InputStringTest {
     @ParameterizedTest
     @ValueSource(strings = ["a", "a,b,c", "a,b:c", "//;\na;b;c"])
     fun `숫자가 아닌 문자를 입력하면 예외 발생`(target: String) {
+        InputString.of(target)
         assertThatRuntimeException().isThrownBy { InputString.of(target) }
     }
 
