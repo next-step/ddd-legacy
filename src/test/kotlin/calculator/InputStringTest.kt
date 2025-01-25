@@ -43,23 +43,23 @@ class InputStringTest {
 
     @ParameterizedTest
     @ArgumentsSource(DefaultDelimiterArgumentsProvider::class)
-    fun `기본 구분자와 숫자 파싱 성공`(target: String, expected: List<NonNegativeNumber>) {
+    fun `기본 구분자와 숫자 파싱 성공`(target: String, expected: List<NonNegativeInt>) {
         val input = InputString.of(target)
-        assertThat(input.toNonNegativeNumbers()).isEqualTo(expected)
+        assertThat(input.toNonNegativeInts()).isEqualTo(expected)
     }
 
     @ParameterizedTest
     @ArgumentsSource(CustomDelimiterArgumentsProvider::class)
-    fun `커스텀 구분자와 숫자 파싱 성공`(target: String, expected: List<NonNegativeNumber>) {
+    fun `커스텀 구분자와 숫자 파싱 성공`(target: String, expected: List<NonNegativeInt>) {
         val input = InputString.of(target)
-        assertThat(input.toNonNegativeNumbers()).isEqualTo(expected)
+        assertThat(input.toNonNegativeInts()).isEqualTo(expected)
     }
 
     @ParameterizedTest
     @ValueSource(strings = ["""//;\n0;2,3""", """//;\n1:0;3"""])
     fun `커스텀 구분자와 기본 구분자를 섞어 사용할 수 없음`(target: String) {
         val input = InputString.of(target)
-        assertThatRuntimeException().isThrownBy { input.toNonNegativeNumbers() }
+        assertThatRuntimeException().isThrownBy { input.toNonNegativeInts() }
     }
 }
 
@@ -87,11 +87,11 @@ class DefaultDelimiterArgumentsProvider : ArgumentsProvider {
         Stream.of(
             Arguments.of(
                 "0,1,2",
-                listOf(0, 1, 2).toNonNegativeNumbers()
+                listOf(0, 1, 2).toNonNegativeInts()
             ),
             Arguments.of(
                 "1,2:3",
-                listOf(1, 2, 3).toNonNegativeNumbers()
+                listOf(1, 2, 3).toNonNegativeInts()
             ),
         )
 }
@@ -102,12 +102,13 @@ class CustomDelimiterArgumentsProvider : ArgumentsProvider {
         Stream.of(
             Arguments.of(
                 """//;\n0;1;2""",
-                listOf(0, 1, 2).toNonNegativeNumbers()
+                listOf(0, 1, 2).toNonNegativeInts()
             ),
             Arguments.of(
                 """//;\n1;20;3""",
-                listOf(1, 20, 3).toNonNegativeNumbers()
+                listOf(1, 20, 3).toNonNegativeInts()
             ),
         )
 }
 
+private fun List<Int>.toNonNegativeInts() = map { NonNegativeInt(it) }

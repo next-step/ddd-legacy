@@ -16,10 +16,10 @@ data class InputString private constructor(
         }
     }
 
-    fun toNonNegativeNumbers(): List<NonNegativeNumber> {
+    fun toNonNegativeInts(): List<NonNegativeInt> {
         val delimiter = Delimiter(src)
         return target.split(delimiter.regex)
-            .map { it.toNonNegativeNumber() }
+            .map { NonNegativeInt(it.toInt()) }
     }
 
     companion object {

@@ -4,6 +4,6 @@ class Calculator {
 
     fun calculate(target: String?): Int =
         InputString.of(target)
-            .toNonNegativeNumbers()
+            .toNonNegativeInts()
             .sum()
 }
