@@ -1,7 +1,7 @@
 package stringcalcurator;
 
 public class StringNumber {
-    private int number;
+    private final int number;
 
     public static StringNumber create(String numStr){
         int number = Integer.parseInt(numStr);

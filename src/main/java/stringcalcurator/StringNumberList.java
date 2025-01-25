@@ -18,11 +18,7 @@ public class StringNumberList {
         this.numbers = numbers;
     }
 
-    public List<Integer> getIntNumbers(){
-        List<Integer> intNumbers = new ArrayList<>(numbers.size());
-        for(StringNumber number : numbers) {
-            intNumbers.add(number.getNumber());
-        }
-        return intNumbers;
+    public List<StringNumber> getIntNumbers(){
+        return numbers;
     }
 }
