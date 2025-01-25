@@ -11,9 +11,15 @@ data class InputString private constructor(
         ?: throw RuntimeException("잘못된 Input String 입니다. ($src)")
 
     init {
-        if (!allowedFormat.matches(src)) {
-            throw RuntimeException("잘못된 Input String 입니다. ($src)")
+        require(allowedFormat.matches(src)) {
+            "잘못된 Input String 입니다. ($src)"
         }
+    }
+
+    fun toNonNegativeNumbers(): List<NonNegativeNumber> {
+        val delimiter = Delimiter(src)
+        return target.split(delimiter.regex)
+            .map { it.toNonNegativeNumber() }
     }
 
     companion object {
