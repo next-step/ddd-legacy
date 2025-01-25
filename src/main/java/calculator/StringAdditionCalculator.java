@@ -3,11 +3,11 @@ package calculator;
 import calculator.exception.InvalidNumberFormatException;
 import calculator.exception.NegativeNumberException;
 
-public class StringCalculator {
+public class StringAdditionCalculator {
 
     private String text;
 
-    public StringCalculator(final String text) {
+    public StringAdditionCalculator(final String text) {
         this.text = text;
     }
 
@@ -16,7 +16,7 @@ public class StringCalculator {
             return 0;
         }
 
-        String[] numbers = Delimiter.split(text);
+        String[] numbers = StringSplitter.split(text);
         int sum = 0;
 
         for (String number : numbers) {

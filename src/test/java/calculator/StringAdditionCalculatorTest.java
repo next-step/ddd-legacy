@@ -6,17 +6,16 @@ import calculator.exception.NegativeNumberException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-class StringCalculatorTest {
+class StringAdditionCalculatorTest {
 
     @DisplayName("구분자를 포함한 문자열의 합을 계산한다.")
     @Test
     void calculator_sum_of_string_with_delimiter () {
         // given
-        StringCalculator calculator1 = new StringCalculator("1,2");
-        StringCalculator calculator2 = new StringCalculator("1,2:3");
+        StringAdditionCalculator calculator1 = new StringAdditionCalculator("1,2");
+        StringAdditionCalculator calculator2 = new StringAdditionCalculator("1,2:3");
 
         // when & then
         assertEquals(3, calculator1.add());
@@ -29,7 +28,7 @@ class StringCalculatorTest {
     @NullAndEmptySource
     void if_input_string_is_empty_or_null_then_return_0(final String input) {
         // given
-        StringCalculator calculator = new StringCalculator(input);
+        StringAdditionCalculator calculator = new StringAdditionCalculator(input);
 
         // when
         int result = calculator.add();
@@ -42,9 +41,9 @@ class StringCalculatorTest {
     @Test
     void calculator_sum_of_string_with_custom_delimiter() {
         // given
-        StringCalculator calculator1 = new StringCalculator("//;\n1;2;3");
-        StringCalculator calculator2 = new StringCalculator("//\\*\n4*5*6");
-        StringCalculator calculator3 = new StringCalculator("//\\.\n10.11.12");
+        StringAdditionCalculator calculator1 = new StringAdditionCalculator("//;\n1;2;3");
+        StringAdditionCalculator calculator2 = new StringAdditionCalculator("//\\*\n4*5*6");
+        StringAdditionCalculator calculator3 = new StringAdditionCalculator("//\\.\n10.11.12");
 
         // when & then
         assertEquals(6, calculator1.add());
@@ -56,8 +55,8 @@ class StringCalculatorTest {
     @Test
     void if_single_number_is_provided_then_return_number() {
         // given
-        StringCalculator calculator1 = new StringCalculator("1");
-        StringCalculator calculator2 = new StringCalculator("0");
+        StringAdditionCalculator calculator1 = new StringAdditionCalculator("1");
+        StringAdditionCalculator calculator2 = new StringAdditionCalculator("0");
 
         // when
         int result1 = calculator1.add();
@@ -72,7 +71,7 @@ class StringCalculatorTest {
     @Test
     void if_non_numeric_value_is_provided_then_throw_exception() {
         // given
-        StringCalculator calculator = new StringCalculator("1,text,3");
+        StringAdditionCalculator calculator = new StringAdditionCalculator("1,text,3");
 
         // when & then
         assertThatThrownBy(calculator::add)
@@ -84,7 +83,7 @@ class StringCalculatorTest {
     @Test
     void if_negative_number_is_provided_then_throw_exception() {
         // given
-        StringCalculator calculator = new StringCalculator("1,-2,3");
+        StringAdditionCalculator calculator = new StringAdditionCalculator("1,-2,3");
 
         // when & then
         assertThatThrownBy(calculator::add)

@@ -1,6 +1,6 @@
 package calculator;
 
-public class Delimiter {
+public class StringSplitter {
 
     private static final String DEFAULT_DELIMITERS = ",|:";
     public static final String CUSTOM_DELIMITER_PREFIX = "//";
