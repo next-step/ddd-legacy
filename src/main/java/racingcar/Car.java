@@ -10,10 +10,6 @@ public class Car {
         this.name = name;
     }
 
-    public int getPosition() {
-        return position;
-    }
-
     public void move(int condition){
         if (condition >= 4) {
             move(() -> condition >= 4);
@@ -25,4 +21,9 @@ public class Car {
             position++;
         }
     }
+
+    public int getPosition() {
+        return position;
+    }
+
 }
