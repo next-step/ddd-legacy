@@ -7,10 +7,7 @@ value class Delimiter private constructor(
 
     constructor(value: String) : this(
         CUSTOM_DELIMITER.find(value)
-            ?.groups
-            ?.get("delimiter")
-            ?.value
-            ?.toRegex()
+            .extractDelimiterRegex()
             ?: DEFAULT_DELIMITER
     )
 
@@ -20,3 +17,10 @@ value class Delimiter private constructor(
         private val CUSTOM_DELIMITER = Regex("""//(?<delimiter>.)\\n.*""")
     }
 }
+
+fun MatchResult?.extractDelimiterRegex(): Regex? =
+    this?.groups
+        ?.get("delimiter")
+        ?.value
+        ?.let { Regex.escape(it) }
+        ?.toRegex()

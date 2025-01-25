@@ -17,7 +17,7 @@ class CalculatorTest {
     }
 
     @ParameterizedTest
-    @CsvSource("""//;\n0;2;3|5""", """//;\n1;0;3|4""", delimiter = '|')
+    @CsvSource("""//;\n0;2;3|5""", """//;\n1;0;3|4""", """//.\n1.0.3|4""", delimiter = '|')
     fun `커스텀 구분자와 숫자 계산 성공`(target: String, expected: Int) {
         assertThat(SUT.calculate(target)).isEqualTo(expected)
     }
