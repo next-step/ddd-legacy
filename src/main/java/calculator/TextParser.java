@@ -10,8 +10,6 @@ public class TextParser<T> {
     private static final int TEXT_INDEX = 2;
     private static final int DELIMITER_INDEX = 1;
 
-    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile(PATTERN_FORMAT);
-
     private final TextConverter<T> textConverter;
 
     public TextParser(TextConverter<T> textConverter) {
@@ -19,7 +17,7 @@ public class TextParser<T> {
     }
 
     public List<T> parse(String text) {
-        Matcher m = CUSTOM_DELIMITER_PATTERN.matcher(text);
+        Matcher m = Pattern.compile(PATTERN_FORMAT).matcher(text);
         if (m.find()) {
             return textConverter.convertToList(m.group(TEXT_INDEX), Pattern.quote(m.group(DELIMITER_INDEX)));
         }
