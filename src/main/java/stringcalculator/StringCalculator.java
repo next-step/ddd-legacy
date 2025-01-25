@@ -5,13 +5,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
+    private static final Pattern CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)");
 
     public int add(String text) {
         if (text == null || text.isEmpty()) {
             return 0;
         }
 
-        Matcher m = Pattern.compile("//(.)\n(.*)").matcher(text);
+        Matcher m = CUSTOM_DELIMITER_PATTERN.matcher(text);
         if (m.find()) {
             String customDelimiter = m.group(1);
             String[] tokens = m.group(2).split(customDelimiter);
