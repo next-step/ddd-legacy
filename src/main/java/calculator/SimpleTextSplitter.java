@@ -1,17 +1,25 @@
 package calculator;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 public class SimpleTextSplitter implements TextSplitter {
 
+    private static final Map<String, Pattern> patternCache = new ConcurrentHashMap<>();
+
+
     @Override
-    public StringNumbers splitText(InputText inputText) {
+    public Numbers splitText(InputText inputText) {
         if (inputText.delimiters().isBlank()) {
-            return new StringNumbers(new String[]{inputText.numberText()});
+            return new Numbers(new String[]{inputText.numberText()});
         }
 
-        Pattern pattern = Pattern.compile("[%s]".formatted(inputText.delimiters()));
-        return new StringNumbers(pattern.split(inputText.numberText()));
+        Pattern pattern = patternCache.computeIfAbsent(
+                inputText.delimiters(),
+                key -> Pattern.compile("[%s]".formatted(key))
+        );
+        return new Numbers(pattern.split(inputText.numberText()));
     }
 
 }
