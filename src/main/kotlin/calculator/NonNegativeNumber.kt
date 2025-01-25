@@ -1,6 +1,7 @@
 package calculator
 
-data class NonNegativeNumber(
+@JvmInline
+value class NonNegativeNumber(
     val value: Int
 ) {
 

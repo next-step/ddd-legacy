@@ -1,6 +1,7 @@
 package calculator
 
-data class Delimiter private constructor(
+@JvmInline
+value class Delimiter private constructor(
     val regex: Regex
 ) {
 
