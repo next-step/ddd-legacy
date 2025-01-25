@@ -7,19 +7,13 @@ public class Separator {
     private static final String DEFAULT_SPLIT_REGEX = "[,:]";
     private static final String CUSTOM_SPLIT_REGEX = "//(.)\n(.*)";
 
-    public static String compileSeparator(String text){
+    public static String[] removeIfCustomSeparator(String text){
         Matcher matcher = Pattern.compile(CUSTOM_SPLIT_REGEX).matcher(text);
+        String separator = DEFAULT_SPLIT_REGEX;
         if(matcher.find()){
-            return matcher.group(1);
+            separator = matcher.group(1);
+            text = matcher.group(2);
         }
-        return DEFAULT_SPLIT_REGEX;
-    }
-
-    public static String removeIfCustomSeparator(String text){
-        Matcher matcher = Pattern.compile(CUSTOM_SPLIT_REGEX).matcher(text);
-        if(matcher.find()){
-            return matcher.group(2);
-        }
-        return text;
+        return text.split(separator);
     }
 }

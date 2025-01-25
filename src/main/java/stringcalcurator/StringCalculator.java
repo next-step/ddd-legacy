@@ -14,8 +14,7 @@ public class StringCalculator {
             return 0;
         }
 
-        String splitFilter = Separator.compileSeparator(text);
-        String[] numbers = Separator.removeIfCustomSeparator(text).split(splitFilter);
+        String[] numbers = Separator.removeIfCustomSeparator(text);
         List<StringNumber> numberList = StringNumberList.create(numbers).getIntNumbers();
 
         return calculateNumbers(numberList);
