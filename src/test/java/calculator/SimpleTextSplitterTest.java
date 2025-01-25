@@ -1,6 +1,7 @@
 package calculator;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,11 +29,10 @@ class SimpleTextSplitterTest {
         final InputText inputText = new InputText(text, delimiters);
 
         // when
-        final String[] result = numberExtractor.splitText(inputText);
+        final StringNumbers result = numberExtractor.splitText(inputText);
 
         // then
-        assertThat(result).hasSize(3)
-                .containsExactly("1", "2", "3");
+        assertThat(result).isEqualTo(new StringNumbers(new String[]{"1", "2", "3"}));
     }
 
     @Test
@@ -44,13 +44,13 @@ class SimpleTextSplitterTest {
         final InputText inputText = new InputText(text, delimiters);
 
         // when
-        final String[] result = numberExtractor.splitText(inputText);
+        final StringNumbers result = numberExtractor.splitText(inputText);
 
         // then
-        assertThat(result).hasSize(3)
-                .containsExactly("1", "2", "3");
+        assertThat(result).isEqualTo(new StringNumbers(new String[]{"1", "2", "3"}));
     }
 
+    @Disabled("스펙 변경 - StringNumbers는 빈문자열을 가질 수 없다.")
     @ParameterizedTest
     @DisplayName("빈문자열은 구분자 상관없이 [\"\"]을 반환한다.")
     @ValueSource(strings = {"", ",;"})
@@ -60,11 +60,10 @@ class SimpleTextSplitterTest {
         final InputText inputText = new InputText(text, delimiters);
 
         // when
-        final String[] result = numberExtractor.splitText(inputText);
+        final StringNumbers result = numberExtractor.splitText(inputText);
 
         // then
-        assertThat(result).hasSize(1)
-                .containsExactly("");
+        assertThat(result).isEqualTo(new StringNumbers(new String[]{""}));
     }
 
     @Test
@@ -76,11 +75,10 @@ class SimpleTextSplitterTest {
         final InputText inputText = new InputText(text, delimiters);
 
         // when
-        final String[] result = numberExtractor.splitText(inputText);
+        final StringNumbers result = numberExtractor.splitText(inputText);
 
         // then
-        assertThat(result).hasSize(1)
-                .containsExactly("1234");
+        assertThat(result).isEqualTo(new StringNumbers(new String[]{"1234"}));
     }
 
 }
