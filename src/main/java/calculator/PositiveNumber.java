@@ -5,18 +5,24 @@ public class PositiveNumber {
     private final int value;
 
 
-    public PositiveNumber(int value) {
-        validatePositive(value);
+    private PositiveNumber(int value) {
         this.value = value;
     }
 
-    public PositiveNumber(String stringValue) {
-        int parsedInt = Integer.parseInt(stringValue);
-        validatePositive(parsedInt);
-        this.value = parsedInt;
+    public static PositiveNumber valueOf(int value) {
+        validatePositive(value);
+
+        if (value < PositiveNumberCache.MAX_VALUE) {
+            return PositiveNumberCache.cache[value];
+        }
+        return new PositiveNumber(value);
     }
 
-    private void validatePositive(int value) {
+    public static PositiveNumber valueOf(String stringValue) {
+        return PositiveNumber.valueOf(Integer.parseInt(stringValue));
+    }
+
+    private static void validatePositive(int value) {
         if (value < 0) {
             throw new IllegalArgumentException("음수는 입력할 수 없습니다.");
         }
@@ -38,6 +44,18 @@ public class PositiveNumber {
     @Override
     public int hashCode() {
         return Integer.hashCode(value);
+    }
+
+    private static final class PositiveNumberCache {
+        static final int MAX_VALUE = 255;
+
+        static final PositiveNumber[] cache = new PositiveNumber[MAX_VALUE + 1];
+
+        static {
+            for (int i = 0; i < cache.length; i++) {
+                cache[i] = new PositiveNumber(i);
+            }
+        }
     }
 
 }

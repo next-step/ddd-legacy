@@ -9,7 +9,7 @@ public class StringNumbers {
 
     public StringNumbers(String[] numbers) {
         this.numbers = Arrays.stream(numbers)
-                .map(PositiveNumber::new)
+                .map(PositiveNumber::valueOf)
                 .toArray(PositiveNumber[]::new);
     }
 
