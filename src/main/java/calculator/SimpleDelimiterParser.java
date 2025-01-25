@@ -1,6 +1,6 @@
 package calculator;
 
-public class SimpleCustomDelimiterExtractor implements CustomDelimiterExtractor {
+public class SimpleDelimiterParser implements DelimiterParser {
 
     public static final String DEFAULT_DELIMITERS = ",:";
     private static final String EMPTY_STRING = "";
@@ -12,7 +12,7 @@ public class SimpleCustomDelimiterExtractor implements CustomDelimiterExtractor 
 
 
     @Override
-    public InputText extractDelimiter(String text) {
+    public InputText parseInputText(String text) {
         if (text == null || text.isBlank()) {
             return new InputText(EMPTY_STRING, DEFAULT_DELIMITERS);
         }

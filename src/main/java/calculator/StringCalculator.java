@@ -2,12 +2,12 @@ package calculator;
 
 public class StringCalculator {
 
-    private final CustomDelimiterExtractor customDelimiterExtractor;
+    private final DelimiterParser delimiterParser;
     private final TextSplitter textSplitter;
 
 
-    public StringCalculator(CustomDelimiterExtractor customDelimiterExtractor, TextSplitter textSplitter) {
-        this.customDelimiterExtractor = customDelimiterExtractor;
+    public StringCalculator(DelimiterParser delimiterParser, TextSplitter textSplitter) {
+        this.delimiterParser = delimiterParser;
         this.textSplitter = textSplitter;
     }
 
@@ -16,7 +16,7 @@ public class StringCalculator {
             return 0;
         }
 
-        InputText inputText = customDelimiterExtractor.extractDelimiter(text);
+        InputText inputText = delimiterParser.parseInputText(text);
 
         StringNumbers numbers = textSplitter.splitText(inputText);
 

@@ -6,18 +6,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-import static calculator.SimpleCustomDelimiterExtractor.DEFAULT_DELIMITERS;
+import static calculator.SimpleDelimiterParser.DEFAULT_DELIMITERS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-class SimpleCustomDelimiterExtractorTest {
+class SimpleDelimiterParserTest {
 
-    private SimpleCustomDelimiterExtractor customDelimiterExtractor;
+    private SimpleDelimiterParser customDelimiterExtractor;
 
 
     @BeforeEach
     void setup() {
-        customDelimiterExtractor = new SimpleCustomDelimiterExtractor();
+        customDelimiterExtractor = new SimpleDelimiterParser();
     }
 
     @Test
@@ -27,7 +27,7 @@ class SimpleCustomDelimiterExtractorTest {
         final String text = "//;\\n1,2:3;4";
 
         // when
-        final InputText inputText = customDelimiterExtractor.extractDelimiter(text);
+        final InputText inputText = customDelimiterExtractor.parseInputText(text);
 
         // then
         assertThat(inputText).isNotNull();
@@ -44,7 +44,7 @@ class SimpleCustomDelimiterExtractorTest {
         final String text = "1,2:3";
 
         // when
-        final InputText inputText = customDelimiterExtractor.extractDelimiter(text);
+        final InputText inputText = customDelimiterExtractor.parseInputText(text);
 
         // then
         assertThat(inputText).isNotNull();
@@ -59,7 +59,7 @@ class SimpleCustomDelimiterExtractorTest {
     @DisplayName("입력이 null 또는 빈 문자열일 경우 numberText는 빈 문자열이 된다.")
     void testNullAndEmptyText(final String text) {
         // when
-        final InputText inputText = customDelimiterExtractor.extractDelimiter(text);
+        final InputText inputText = customDelimiterExtractor.parseInputText(text);
 
         // then
         assertThat(inputText).isNotNull();

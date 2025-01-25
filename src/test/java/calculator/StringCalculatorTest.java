@@ -16,9 +16,9 @@ class StringCalculatorTest {
 
     @BeforeEach
     void setup() {
-        CustomDelimiterExtractor customDelimiterExtractor = new SimpleCustomDelimiterExtractor();
+        DelimiterParser delimiterParser = new SimpleDelimiterParser();
         TextSplitter textSplitter = new SimpleTextSplitter();
-        stringCalculator = new StringCalculator(customDelimiterExtractor, textSplitter);
+        stringCalculator = new StringCalculator(delimiterParser, textSplitter);
     }
 
     @Test
