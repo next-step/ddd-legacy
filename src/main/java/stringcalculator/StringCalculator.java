@@ -1,9 +1,11 @@
 package stringcalculator;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.stream.Collectors.toList;
 
 public class StringCalculator {
 
@@ -14,7 +16,7 @@ public class StringCalculator {
         if (isEmpty(text)) {
             return 0;
         }
-        List<Integer> numbers = convertToIntArray(text);
+        List<ZeroOrPositiveNumber> numbers = convertToNumbers(text);
         return sum(numbers);
     }
 
@@ -22,15 +24,12 @@ public class StringCalculator {
         return text == null || text.isBlank();
     }
 
-    private List<Integer> convertToIntArray(String text) {
+    private List<ZeroOrPositiveNumber> convertToNumbers(String text) {
         String[] textArray = split(text);
 
-        List<Integer> numbers = new ArrayList<Integer>();
-        for (String data : textArray) {
-            int number = validate(data);
-            numbers.add(number);
-        }
-        return numbers;
+        return Arrays.stream(textArray)
+                .map(ZeroOrPositiveNumber::new)
+                .collect(toList());
     }
 
     private String[] split(String text) {
@@ -42,17 +41,8 @@ public class StringCalculator {
         return text.split(DEFAULT_DELIMITER);
     }
 
-    private int validate(String data) {
-        int number = Integer.parseInt(data);
-        if (number < 0) {
-            throw new RuntimeException("음수는 계산할 수 없습니다.");
-        }
-        return number;
-    }
-
-    private int sum(List<Integer> numbers) {
-        return numbers.stream()
-                .mapToInt(Integer::intValue)
-                .sum();
+    private int sum(List<ZeroOrPositiveNumber> numbers) {
+        ZeroOrPositiveNumbers numberList = new ZeroOrPositiveNumbers(numbers);
+        return numberList.sum().getNumber();
     }
 }

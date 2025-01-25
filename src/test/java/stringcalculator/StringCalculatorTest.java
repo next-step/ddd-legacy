@@ -2,13 +2,11 @@ package stringcalculator;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class StringCalculatorTest {
     private StringCalculator calculator;
@@ -29,7 +27,7 @@ class StringCalculatorTest {
     @ParameterizedTest
     @ValueSource(strings = {"1"})
     void oneNumber(final String text) {
-        assertThat(calculator.add(text)).isSameAs(Integer.parseInt(text));
+        assertThat(calculator.add(text)).isSameAs(1);
     }
 
     @DisplayName(value = "숫자 두개를 쉼표(,) 구분자로 입력할 경우 두 숫자의 합을 반환한다.")
@@ -51,13 +49,5 @@ class StringCalculatorTest {
     @ValueSource(strings = {"//;\n1;2;3"})
     void customDelimiter(final String text) {
         assertThat(calculator.add(text)).isSameAs(6);
-    }
-
-    @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
-    @Test
-    void negative() {
-        assertThatThrownBy(() -> calculator.add("-1"))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("음수는 계산할 수 없습니다.");
     }
 }
