@@ -2,6 +2,6 @@ package calculator;
 
 public interface TextSplitter {
 
-    StringNumbers splitText(InputText inputText);
+    Numbers splitText(InputText inputText);
 
 }

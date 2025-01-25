@@ -18,7 +18,7 @@ public class StringCalculator {
 
         InputText inputText = delimiterParser.parseInputText(text);
 
-        StringNumbers numbers = textSplitter.splitText(inputText);
+        Numbers numbers = textSplitter.splitText(inputText);
 
         return numbers.sum();
     }

@@ -2,19 +2,19 @@ package calculator;
 
 import java.util.Arrays;
 
-public class StringNumbers {
+public class Numbers {
 
-    private final PositiveNumber[] numbers;
+    private final PositiveNumber[] positiveNumbers;
 
 
-    public StringNumbers(String[] numbers) {
-        this.numbers = Arrays.stream(numbers)
+    public Numbers(String[] positiveNumbers) {
+        this.positiveNumbers = Arrays.stream(positiveNumbers)
                 .map(PositiveNumber::valueOf)
                 .toArray(PositiveNumber[]::new);
     }
 
     public int sum() {
-        return numbers.length == 0 ? 0 : Arrays.stream(numbers)
+        return positiveNumbers.length == 0 ? 0 : Arrays.stream(positiveNumbers)
                 .mapToInt(PositiveNumber::getValue)
                 .sum();
     }
@@ -27,13 +27,13 @@ public class StringNumbers {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        StringNumbers other = (StringNumbers) o;
-        return Arrays.equals(numbers, other.numbers);
+        Numbers other = (Numbers) o;
+        return Arrays.equals(positiveNumbers, other.positiveNumbers);
     }
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(numbers);
+        return Arrays.hashCode(positiveNumbers);
     }
 
 }

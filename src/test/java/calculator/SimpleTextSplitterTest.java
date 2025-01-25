@@ -29,10 +29,10 @@ class SimpleTextSplitterTest {
         final InputText inputText = new InputText(text, delimiters);
 
         // when
-        final StringNumbers result = numberExtractor.splitText(inputText);
+        final Numbers result = numberExtractor.splitText(inputText);
 
         // then
-        assertThat(result).isEqualTo(new StringNumbers(new String[]{"1", "2", "3"}));
+        assertThat(result).isEqualTo(new Numbers(new String[]{"1", "2", "3"}));
     }
 
     @Test
@@ -44,10 +44,10 @@ class SimpleTextSplitterTest {
         final InputText inputText = new InputText(text, delimiters);
 
         // when
-        final StringNumbers result = numberExtractor.splitText(inputText);
+        final Numbers result = numberExtractor.splitText(inputText);
 
         // then
-        assertThat(result).isEqualTo(new StringNumbers(new String[]{"1", "2", "3"}));
+        assertThat(result).isEqualTo(new Numbers(new String[]{"1", "2", "3"}));
     }
 
     @Disabled("스펙 변경 - StringNumbers는 빈문자열을 가질 수 없다.")
@@ -60,10 +60,10 @@ class SimpleTextSplitterTest {
         final InputText inputText = new InputText(text, delimiters);
 
         // when
-        final StringNumbers result = numberExtractor.splitText(inputText);
+        final Numbers result = numberExtractor.splitText(inputText);
 
         // then
-        assertThat(result).isEqualTo(new StringNumbers(new String[]{""}));
+        assertThat(result).isEqualTo(new Numbers(new String[]{""}));
     }
 
     @Test
@@ -75,10 +75,10 @@ class SimpleTextSplitterTest {
         final InputText inputText = new InputText(text, delimiters);
 
         // when
-        final StringNumbers result = numberExtractor.splitText(inputText);
+        final Numbers result = numberExtractor.splitText(inputText);
 
         // then
-        assertThat(result).isEqualTo(new StringNumbers(new String[]{"1234"}));
+        assertThat(result).isEqualTo(new Numbers(new String[]{"1234"}));
     }
 
 }
