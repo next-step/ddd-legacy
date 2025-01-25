@@ -17,7 +17,6 @@ class StringCalculatorTest {
     @BeforeEach
     void setUp() {
         calculator = new StringCalculator(
-            new InputValidator(),
             new DelimiterParser(),
             new NumberParser()
         );

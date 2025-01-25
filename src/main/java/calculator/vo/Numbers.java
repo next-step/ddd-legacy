@@ -2,17 +2,17 @@ package calculator.vo;
 
 import java.util.List;
 
-public record Numbers(List<Integer> numbers) {
+public record Numbers(List<PositiveNumber> numbers) {
 
     public static Numbers fromTokens(List<String> tokens) {
         return new Numbers(tokens.stream()
-            .map(Integer::parseInt)
+            .map(token -> new PositiveNumber(Integer.parseInt(token)))
             .toList());
     }
 
     public int sum() {
         return numbers.stream()
-            .mapToInt(Integer::intValue)
+            .mapToInt(PositiveNumber::value)
             .sum();
     }
 
