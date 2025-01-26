@@ -3,8 +3,9 @@ package stringcalculator
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.NullAndEmptySource
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -48,10 +49,29 @@ internal class StringCalculatorTest {
     }
 
     @DisplayName(value = "문자열 계산기에 음수를 전달하는 경우 RuntimeException 예외 처리를 한다.")
-    @Test
-    fun negative() {
+    @ParameterizedTest
+    @ValueSource(strings = ["-1", "1:-3", "3,5,7:-29"])
+    fun negative(text: String) {
         assertThatExceptionOfType(RuntimeException::class.java).isThrownBy {
-            sut.add("-1")
+            sut.add(text)
         }
+    }
+
+    @DisplayName(value = "문자열 계산기로 합을 계산한다")
+    @ParameterizedTest
+    @MethodSource("provideSumArguments")
+    fun sum(text: String, result: Int) {
+        assertThat(sut.add(text)).isSameAs(result)
+    }
+
+    companion object {
+        @JvmStatic
+        fun provideSumArguments() = listOf(
+            Arguments.of("0", 0),
+            Arguments.of("1", 1),
+            Arguments.of("1,3,5", 9),
+            Arguments.of("4:15,25", 44),
+            Arguments.of("//;\n1;2;3,4:5", 15),
+        )
     }
 }
