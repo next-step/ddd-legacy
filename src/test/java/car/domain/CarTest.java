@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class CarTest {
 
@@ -13,8 +14,10 @@ class CarTest {
     void 자동차_생성_성공_테스트() {
         final Car car = new Car("goJad", 0);
 
-        assertThat(car.getCarName()).isEqualTo("goJad");
-        assertThat(car.getMoveNumber()).isEqualTo(0);
+        assertAll(
+                () -> assertThat(car.getCarName()).isEqualTo("goJad"),
+                () -> assertThat(car.getMoveNumber()).isEqualTo(0)
+        );
     }
 
     @Test
