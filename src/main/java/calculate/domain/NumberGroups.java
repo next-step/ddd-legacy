@@ -4,26 +4,26 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Numbers {
+public class NumberGroups {
     private static final String DEFAULT_DELIMITER = "[,:]";
     private static final String CUSTOM_DELIMITER = "//(.)\\n(.*)";
     private static final String CUSTOM_DELIMITER_PREFIX = "//";
 
     private final List<Number> numbers;
 
-    public Numbers() {
+    public NumberGroups() {
         this(new ArrayList<>());
     }
 
-    public Numbers(final String sentence) {
+    public NumberGroups(final String sentence) {
         this.numbers = formulas(sentence);
     }
 
-    public Numbers(final int...numbers) {
+    public NumberGroups(final int...numbers) {
         this.numbers = Arrays.stream(numbers).mapToObj(Number::new).toList();
     }
 
-    public Numbers(final List<Number> numbers) {
+    public NumberGroups(final List<Number> numbers) {
         this.numbers = numbers;
     }
 
@@ -66,8 +66,8 @@ public class Numbers {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Numbers numbers1 = (Numbers) o;
-        return Objects.equals(numbers, numbers1.numbers);
+        NumberGroups numberGroups1 = (NumberGroups) o;
+        return Objects.equals(numbers, numberGroups1.numbers);
     }
 
     @Override

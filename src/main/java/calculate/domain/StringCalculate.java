@@ -1,22 +1,22 @@
 package calculate.domain;
 
 public class StringCalculate {
-    private final Numbers numbers;
+    private final NumberGroups numberGroups;
 
     public StringCalculate(final String sentence) {
-        this(new Numbers(sentence));
+        this(new NumberGroups(sentence));
     }
 
-    public StringCalculate(final Numbers numbers) {
-        this.numbers = numbers;
+    public StringCalculate(final NumberGroups numberGroups) {
+        this.numberGroups = numberGroups;
     }
 
     public int sum() {
-        return numbers.sum();
+        return numberGroups.sum();
     }
 
-    public Numbers getNumbers() {
-        return numbers;
+    public NumberGroups getNumbers() {
+        return numberGroups;
     }
 
 }

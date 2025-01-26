@@ -20,7 +20,7 @@ class StringCalculateTest {
     void 문자열_덧셈_계산기_null_입력인_경우_성공_테스트() {
         StringCalculate calculate = new StringCalculate((String) null);
 
-        assertThat(calculate.getNumbers()).isEqualTo(new Numbers(0));
+        assertThat(calculate.getNumbers()).isEqualTo(new NumberGroups(0));
     }
 
     @ParameterizedTest
