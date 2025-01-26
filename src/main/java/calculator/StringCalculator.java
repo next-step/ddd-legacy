@@ -11,17 +11,20 @@ public class StringCalculator {
     public int add(final String text) {
         if (text == null || text.isEmpty()) return 0;
         try {
-            String[] numbers;
-            Matcher m = Pattern.compile(DELIMITER).matcher(text);
-            if (m.find()) {
-                String customDelimiter = m.group(1);
-                numbers = m.group(2).split(Pattern.quote(customDelimiter));
-            } else {
-                numbers = text.split(SEPARATOR);
-            }
+            String[] numbers = parse(text);
             return sumOfNumbers(numbers);
         } catch (Exception e) {
             throw new RuntimeException();
+        }
+    }
+
+    private String[] parse(String text) {
+        Matcher m = Pattern.compile(DELIMITER).matcher(text);
+        if (m.find()) {
+            String customDelimiter = m.group(1);
+            return m.group(2).split(Pattern.quote(customDelimiter));
+        } else {
+            return text.split(SEPARATOR);
         }
     }
 
