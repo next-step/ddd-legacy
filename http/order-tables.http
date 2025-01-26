@@ -3,7 +3,7 @@ POST {{host}}/api/order-tables
 Content-Type: application/json
 
 {
-  "name": "9번"
+    "name": "9번"
 }
 
 ###
@@ -17,7 +17,7 @@ PUT {{host}}/api/order-tables/8d710043-29b6-420e-8452-233f5a035520/number-of-gue
 Content-Type: application/json
 
 {
-  "numberOfGuests": 4
+    "numberOfGuests": 4
 }
 
 ###

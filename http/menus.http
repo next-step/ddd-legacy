@@ -3,16 +3,16 @@ POST {{host}}/api/menus
 Content-Type: application/json
 
 {
-  "name": "후라이드+후라이드",
-  "price": 19000,
-  "menuGroupId": "f1860abc-2ea1-411b-bd4a-baa44f0d5580",
-  "displayed": true,
-  "menuProducts": [
-    {
-      "productId": "3b528244-34f7-406b-bb7e-690912f66b10",
-      "quantity": 2
-    }
-  ]
+    "name": "후라이드+후라이드",
+    "price": 19000,
+    "menuGroupId": "f1860abc-2ea1-411b-bd4a-baa44f0d5580",
+    "displayed": true,
+    "menuProducts": [
+        {
+            "productId": "3b528244-34f7-406b-bb7e-690912f66b10",
+            "quantity": 2
+        }
+    ]
 }
 
 ###
@@ -20,7 +20,7 @@ PUT {{host}}/api/menus/f59b1e1c-b145-440a-aa6f-6095a0e2d63b/price
 Content-Type: application/json
 
 {
-  "price": 15000
+    "price": 15000
 }
 
 ###

@@ -1,4 +1,5 @@
 package calculator;
+
 import calculator.exception.InvalidNumberFormatException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,7 +13,7 @@ class StringAdditionCalculatorTest {
 
     @DisplayName("구분자를 포함한 문자열의 합을 계산한다.")
     @Test
-    void calculator_sum_of_string_with_delimiter () {
+    void calculator_sum_of_string_with_delimiter() {
         // given
         StringAdditionCalculator calculator1 = new StringAdditionCalculator("1,2");
         StringAdditionCalculator calculator2 = new StringAdditionCalculator("1,2:3");
@@ -21,7 +22,7 @@ class StringAdditionCalculatorTest {
         assertEquals(3, calculator1.add());
         assertEquals(6, calculator2.add());
 
-     }
+    }
 
     @DisplayName("만약 빈 문자열 또는 null을 입력할 경우, 0을 반환한다.")
     @ParameterizedTest
@@ -65,7 +66,7 @@ class StringAdditionCalculatorTest {
         // then
         assertEquals(1, result1);
         assertEquals(0, result2);
-     }
+    }
 
     @DisplayName("숫자가 아닌 값이 포함된 문자열을 전달할 경우 예외를 던진다.")
     @Test
@@ -75,8 +76,8 @@ class StringAdditionCalculatorTest {
 
         // when & then
         assertThatThrownBy(calculator::add)
-                .isInstanceOf(InvalidNumberFormatException.class)
-                .hasMessage("Invalid input: Non-numeric value found: text");
+            .isInstanceOf(InvalidNumberFormatException.class)
+            .hasMessage("Invalid input: Non-numeric value found: text");
     }
 
     @DisplayName("음수 값이 포함된 문자열을 전달할 경우 예외를 던진다.")
@@ -87,8 +88,8 @@ class StringAdditionCalculatorTest {
 
         // when & then
         assertThatThrownBy(calculator::add)
-                .isInstanceOf(NegativeNumberException.class)
-                .hasMessage("Negative numbers are not allowed: -2");
+            .isInstanceOf(NegativeNumberException.class)
+            .hasMessage("Negative numbers are not allowed: -2");
     }
 
 }
