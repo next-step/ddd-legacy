@@ -4,6 +4,7 @@ import java.util.Objects;
 
 public class Number {
     private static final String NUMBER_FORMAT_ERROR_MESSAGE = "문자열 계산기에는 음수가 입력될 수 없습니다.";
+
     private final int value;
 
     public Number(final String value) {
