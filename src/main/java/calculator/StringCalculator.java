@@ -1,6 +1,6 @@
 package calculator;
 
-import calculator.vo.Numbers;
+import calculator.vo.PositiveNumbers;
 import calculator.vo.Tokens;
 
 public record StringCalculator(
@@ -11,8 +11,8 @@ public record StringCalculator(
     public int add(String input) {
         Tokens tokens = delimiterParser.parse(input);
 
-        Numbers numbers = numberParser.parse(tokens);
+        PositiveNumbers positiveNumbers = numberParser.parse(tokens);
 
-        return numbers.sum();
+        return positiveNumbers.sum();
     }
 }

@@ -1,12 +1,12 @@
 package calculator;
 
-import calculator.vo.Numbers;
+import calculator.vo.PositiveNumbers;
 import calculator.vo.Tokens;
 
 public record NumberParser() {
 
-    public Numbers parse(Tokens tokens) {
-        return Numbers.fromTokens(
+    public PositiveNumbers parse(Tokens tokens) {
+        return PositiveNumbers.fromTokens(
             tokens.token()
         );
     }
