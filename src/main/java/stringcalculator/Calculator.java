@@ -21,7 +21,7 @@ public class Calculator {
         if (operand.chars().allMatch(Character::isDigit)) {
             return Integer.parseInt(operand);
         }
-        Matcher matcher = Pattern.compile("//(.)\\n(.*)").matcher(operand);
+        Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(operand);
         if (matcher.find()) {
             String customDelimeter = matcher.group(1);
             tokens = Arrays.stream(matcher.group(2).split(customDelimeter)).map(Integer::parseInt).toList();
