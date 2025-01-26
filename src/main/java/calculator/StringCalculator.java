@@ -5,11 +5,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class StringCalculator {
+    private static final String SEPARATOR = ",|:";
+    private static final String DELIMITER = "//(.)\n(.*)";
 
     public int add(final String text) {
         if (text == null || text.isEmpty()) return 0;
         try {
-            String[] numbers = text.split(",|:");
+            String[] numbers;
+            Matcher m = Pattern.compile(DELIMITER).matcher(text);
+            if (m.find()) {
+                String customDelimiter = m.group(1);
+                numbers = m.group(2).split(Pattern.quote(customDelimiter));
+            } else {
+                numbers = text.split(SEPARATOR);
+            }
             return sumOfNumbers(numbers);
         } catch (Exception e) {
             throw new RuntimeException();
