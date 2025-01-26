@@ -20,7 +20,7 @@ class PositiveNumbersTest {
                 )
         );
 
-        assertThat(numbers.sum()).isEqualTo(new ZeroOrPositiveNumber(6));
+        assertThat(numbers.sum()).isEqualTo(6);
     }
 
 }
