@@ -1,9 +1,11 @@
 package calculator;
 
 public class StringCalculator {
-    private final String text;
 
-    public StringCalculator(final String text) {
+    public int add(final String text) {
+        if (text == null || text.isEmpty()) {
+            return 0;
+        }
         try {
             int number = Integer.parseInt(text);
             if (number < 0) {
@@ -13,11 +15,8 @@ public class StringCalculator {
             throw new RuntimeException("숫자를 입력하세요.");
         }
 
-        this.text = text;
+        return Integer.parseInt(text);
     }
 
-    public void add(final String value) {
-        StringCalculator stringCalculator = new StringCalculator(value);
-        stringCalculator.add(value);
-    }
+
 }
