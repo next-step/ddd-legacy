@@ -8,7 +8,7 @@ class StringCalculator() {
         val singleNumber = convertSingleNumber(input)
         singleNumber.map { return@add it }
 
-        val tokens = splitInput(input, listOf(","))
+        val tokens = splitInput(input, listOf(",", ":"))
         val numberTokens = tokens.map { it.toInt() }
 
         return numberTokens.sum()
