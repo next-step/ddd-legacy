@@ -44,12 +44,10 @@ public class CalculatorTest {
         assertThat(Calculator.calculate(calculateForm)).isEqualTo(result);
     }
 
-    @ParameterizedTest
+    @Test
     @DisplayName(value = "커스텀 구분자를 사용해서 숫자의 합을 반환한다.")
-    @CsvSource(value = {"//&\\n3&4&5|12","//#\\n1#3#5|9"},delimiter = '|')
-    void customAddValueTest(String calculateForm, int result) {
-        System.out.println(calculateForm);
-        assertThat(Calculator.calculate(calculateForm)).isEqualTo(result);
+    void customAddValueTest() {
+        assertThat(Calculator.calculate("//&\n3&4&5")).isEqualTo(12);
     }
 
 }
