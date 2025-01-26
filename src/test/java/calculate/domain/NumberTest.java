@@ -3,6 +3,7 @@ package calculate.domain;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class NumberTest {
 
@@ -11,6 +12,13 @@ class NumberTest {
         Number number = new Number("1");
 
         assertThat(number).isEqualTo(new Number(1));
+    }
+
+    @Test
+    void 문자열_number_음수_객체_실패_테스트() {
+        assertThatThrownBy(() -> new Number("-1"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("문자열 계산기에는 음수가 입력될 수 없습니다.");
     }
 
 }

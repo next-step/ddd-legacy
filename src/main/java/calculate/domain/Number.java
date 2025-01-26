@@ -3,14 +3,15 @@ package calculate.domain;
 import java.util.Objects;
 
 public class Number {
+    private static final String NUMBER_FORMAT_ERROR_MESSAGE = "문자열 계산기에는 음수가 입력될 수 없습니다.";
     private final int value;
 
     public Number(final String value) {
-        this.value = makeNumber(value);
+        this.value = isValidate(makeNumber(value));
     }
 
     public Number(final int value) {
-        this.value = value;
+        this.value = isValidate(value);
     }
 
     private int makeNumber(final String value) {
@@ -18,6 +19,13 @@ public class Number {
             return 0;
         }
         return Integer.parseInt(value);
+    }
+
+    private int isValidate(int value) {
+        if(value < 0) {
+            throw new RuntimeException(NUMBER_FORMAT_ERROR_MESSAGE);
+        }
+        return value;
     }
 
     public int getValue() {
