@@ -91,5 +91,5 @@ class StringAdditionCalculatorTest {
             .isInstanceOf(NegativeNumberException.class)
             .hasMessage("Negative numbers are not allowed: -2");
     }
-
 }
+
