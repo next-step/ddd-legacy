@@ -8,7 +8,18 @@ public class StringCalculator {
 
     public int add(final String text) {
         if (text == null || text.isEmpty()) return 0;
-        return validate(text);
+        try {
+            String[] numbers = text.split(",|:");
+            return sumOfNumbers(numbers);
+        } catch (Exception e) {
+            throw new RuntimeException();
+        }
+    }
+
+    private int sumOfNumbers(String[] numbers) {
+        return Arrays.stream(numbers)
+                .mapToInt(this::validate)
+                .sum();
     }
 
     private int validate(String number) {
