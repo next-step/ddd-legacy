@@ -27,12 +27,12 @@ class StringCalculator() {
         return if (matcher.find()) {
             DelimiterInput(
                 input = matcher.group(2),
-                delimiters = listOf(",", ":", matcher.group(1)),
+                delimiters = DEFAULT_DELIMITER + matcher.group(1),
             )
         } else {
             DelimiterInput(
                 input = input,
-                delimiters = listOf(",", ":"),
+                delimiters = DEFAULT_DELIMITER,
             )
         }
     }
@@ -42,6 +42,8 @@ class StringCalculator() {
     }
 
     companion object {
+        private val DEFAULT_DELIMITER = listOf(",", ":")
+
         private data class DelimiterInput(
             val delimiters: List<String>,
             val input: String,
