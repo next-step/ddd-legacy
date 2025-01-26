@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 public class NumberGroups {
     private static final String DEFAULT_DELIMITER = "[,:]";
     private static final String CUSTOM_DELIMITER = "//(.)\\n(.*)";
+    private static final Pattern PATTERN = Pattern.compile(CUSTOM_DELIMITER);
     private static final String CUSTOM_DELIMITER_PREFIX = "//";
 
     private final List<Number> numbers;
@@ -45,7 +46,7 @@ public class NumberGroups {
     }
 
     private List<Number> customDelimiterSplit(final String sentence) {
-        final Matcher m = Pattern.compile(CUSTOM_DELIMITER).matcher(sentence);
+        final Matcher m = PATTERN.matcher(sentence);
         if(m.find()) {
             final String delimiter = m.group(1);
             final String formula = m.group(2);
