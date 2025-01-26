@@ -12,9 +12,8 @@ public class NumberGroups {
                 .toList();
     }
 
-    public int sum() {
+    public Number sum() {
         return numbers.stream()
-                .mapToInt(Number::value)
-                .sum();
+                .reduce(Number.ZERO, Number::add);
     }
 }
