@@ -11,12 +11,7 @@ public class Calculator {
         if (operand == null || operand.isEmpty()) {
             return DEFAULT_RESULT;
         }
-
         validateNegativeNumber(operand);
-
-        if (operand.chars().allMatch(Character::isDigit)) {
-            return Integer.parseInt(operand);
-        }
         return new CalculatorNumbers(operand).sum();
     }
 
