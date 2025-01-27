@@ -13,7 +13,7 @@ public class PositiveNumber {
     public PositiveNumber(final String text) {
 
         if (!isNumeric(text)) {
-            throw new InvalidNumberFormatException("Invalid input: Non-numeric value found: " + number);
+            throw new InvalidNumberFormatException("Invalid input: Non-numeric value found: " + text);
         }
 
         int number = Integer.parseInt(text);

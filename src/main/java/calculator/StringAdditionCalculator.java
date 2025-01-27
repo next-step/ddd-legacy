@@ -31,14 +31,5 @@ public class StringAdditionCalculator {
 
         return sum;
     }
-
-    private boolean isNumeric(final String text) {
-        try {
-            Integer.parseInt(text);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
 }
 
