@@ -4,10 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class CalculatorTest {
 
@@ -27,10 +27,17 @@ public class CalculatorTest {
     }
 
     @DisplayName("문자열이 숫자하나만 들어왔을 경우 숫자를 반환한다.")
-    @ValueSource(strings = {"1", "22", "333", "1a", "aa"})
+    @ValueSource(strings = {"1", "22", "333"})
     @ParameterizedTest
     void onlyNumberCheck(String input) {
         assertThat(calculator.calculate(input)).isEqualTo(Integer.parseInt(input));
+    }
+
+    @DisplayName("문자열이 하나만 들어왔을 경우 숫자가 아니라면 예외를 발생시킨다.")
+    @ValueSource(strings = {"a", "aa", "a1a"})
+    @ParameterizedTest
+    void onlyNumberExceptionCheck(String input) {
+        assertThatThrownBy(() -> calculator.calculate(input)).isInstanceOf(RuntimeException.class);
     }
 
     @DisplayName("숫자 두개를 컴마 구분자자의 합을 반환한다.")
