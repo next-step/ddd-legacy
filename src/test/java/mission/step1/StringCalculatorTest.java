@@ -57,5 +57,17 @@ class StringCalculatorTest {
         assertEquals(123, stringCalculator.toInt("123"));
     }
 
+    @Test
+    @DisplayName("빈 문자열 입력시 0 반환")
+    void emptyStringTest() {
+        assertEquals(0, stringCalculator.hasText(""));
+    }
+
+    @Test
+    @DisplayName("숫자 문자열 입력시 해당 값 반환")
+    void numberStringTest() {
+        assertEquals(123, stringCalculator.hasText("123"));
+    }
+
 
 }

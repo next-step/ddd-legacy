@@ -3,6 +3,8 @@ package mission.step1;
 public class StringCalculator {
 
     public static final String DELIMITER = "[,:]";
+    public static final int EMPTY = 0;
+    private static final String BLANK = "";
 
     public String[] splitWithDelimiter(String expression) {
         return expression.split(DELIMITER);
@@ -23,4 +25,13 @@ public class StringCalculator {
             throw new RuntimeException("음수는 허용되지 않습니다: " + number);
         }
     }
+
+    public int hasText(String expression) {
+        if (expression.trim().equals(BLANK)) {
+            return EMPTY;
+        }
+
+        return toInt(expression);
+    }
+
 }
