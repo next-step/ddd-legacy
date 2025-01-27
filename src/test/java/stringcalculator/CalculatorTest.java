@@ -10,14 +10,11 @@ import static org.assertj.core.api.Assertions.assertThatRuntimeException;
 
 public class CalculatorTest {
 
-    public static final int DEFAULT_VALUE = 0;
-    private static final String DEFAULT_NEGATIVE_VALUE = "-1";
-
     @ParameterizedTest
     @DisplayName(value = "빈문자열이거나 null이면 0 반환한다.")
     @NullAndEmptySource
     void nullAndEmptyValueTest(String operand) {
-        assertThat(Calculator.calculate(operand)).isEqualTo(DEFAULT_VALUE);
+        assertThat(Calculator.calculate(operand)).isEqualTo(0);
     }
 
     @Test
@@ -30,7 +27,7 @@ public class CalculatorTest {
     @DisplayName(value = "음수 입력시 RuntimeException을 던진다.")
     void minusValueTest() {
         assertThatRuntimeException().isThrownBy(
-                () -> Calculator.calculate(DEFAULT_NEGATIVE_VALUE)
+                () -> Calculator.calculate("-1")
         );
     }
 }
