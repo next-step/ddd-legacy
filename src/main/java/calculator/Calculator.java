@@ -1,6 +1,8 @@
 package calculator;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Calculator {
 
@@ -12,18 +14,29 @@ public class Calculator {
                 return 0;
             }
 
-            String[] splitInput = input.split(SEPARATOR);
+            Matcher m = Pattern.compile("//(.)\\\\n(.*)").matcher(input);
 
-            return Arrays.stream(splitInput)
-                    .mapToInt(a -> {
-                        if (a.isEmpty()) {
-                            return 0;
-                        }
-                        return Integer.parseInt(a);
-                    }).sum();
+            if (m.find()) {
+                String customDelimiter = m.group(1);
+                String[] splitInput= m.group(2).split(customDelimiter);
+                return sum(splitInput);
+            } else {
+                String[] splitInput = input.split(SEPARATOR);
+                return sum(splitInput);
+            }
 
         } catch (NumberFormatException e) {
             throw new RuntimeException("숫자의 형태가 아닙니다.", e);
         }
+    }
+
+    private int sum(String[] splitInput) {
+        return Arrays.stream(splitInput)
+                .mapToInt(a -> {
+                    if (a.isEmpty()) {
+                        return 0;
+                    }
+                    return Integer.parseInt(a);
+                }).sum();
     }
 }

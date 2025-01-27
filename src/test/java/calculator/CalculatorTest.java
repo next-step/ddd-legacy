@@ -54,4 +54,11 @@ public class CalculatorTest {
     void pluralSeparateCheck(String input, int expected) {
         assertThat(calculator.calculate(input)).isEqualTo(expected);
     }
+
+    @DisplayName("\"//\"와 \"\\n\" 문자 사이에 커스텀 구분자를 지정할 수 있다.")
+    @CsvSource(value = {"//;\\n1;2;3-6", "//;\\n1;;2;;3-6", "//_\\n1_2_11-14"}, delimiter = '-')
+    @ParameterizedTest
+    void customSeparateCheck(String input, int expected) {
+        assertThat(calculator.calculate(input)).isEqualTo(expected);
+    }
 }
