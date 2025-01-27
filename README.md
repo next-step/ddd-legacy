@@ -37,7 +37,7 @@
       - [ ] 배달(DELIVERY) 상태 일때 
         - [ ] 준비(WAITTING) -> 수락(ACCEPTED) -> 서빙됨(SERVED) -> 배달중(DELIVERING) -> 배달완료(DELIVERD) -> 완료(COMPLETED) 순으로 변경된다.
       - [ ] 포장(TAKEOUT)/매장식사(EAT_IN) 상태 일때 
-        - [ ]준비(WAITTING) -> 수락(ACCEPTED) -> 서빙됨(SERVED) -> 완료(COMPLETED) 순으로 변경된다.
+        - [ ] 준비(WAITTING) -> 수락(ACCEPTED) -> 서빙됨(SERVED) -> 완료(COMPLETED) 순으로 변경된다.
   - [ ] 주문은 생성이 가능하다.
     - [ ] 주문의 타입은 필수로 입력되어야 한다.
       - [ ] 주문 타입이 매장식사(EAT_IN) 일때
