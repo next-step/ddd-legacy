@@ -41,7 +41,7 @@ internal class NumberTokenizerTest {
         assertThat(actual).isEqualTo(listOf(12345))
     }
 
-    @DisplayName("입력된 문자열을 구분자를 통해 구분한다")
+    @DisplayName("입력된 문자열을 구분자를 통해 나눈다")
     @ParameterizedTest
     @MethodSource("provideDelimiterSource")
     fun tokenize(delimiters: List<String>, input: String, answer: List<Int>) {

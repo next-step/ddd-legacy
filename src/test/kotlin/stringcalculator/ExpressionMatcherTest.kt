@@ -35,7 +35,7 @@ internal class ExpressionMatcherTest {
         assertThat(actual).isEqualTo(Expression(listOf(*DEFAULT_DELIMITERS.toTypedArray(), ";"), "1:2,3;4"))
     }
 
-    @DisplayName("커스텀 구분자 이외의 모든 문자열을 입력으로 해석한다")
+    @DisplayName("커스텀 구분자 이외의 모든 문자열을 입력으로 변환한다")
     @Test
     fun useAllInputIfNoDelimiter() {
         // given
