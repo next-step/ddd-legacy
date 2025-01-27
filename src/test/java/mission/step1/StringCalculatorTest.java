@@ -104,4 +104,65 @@ class StringCalculatorTest {
         assertEquals(expected, stringCalculator.add(input));
     }
 
+    @ParameterizedTest
+    @DisplayName("잘못된 커스텀 구분자 형식에 대한 예외 발생")
+    @ValueSource(strings = {
+            "/;\n1;2;3",     // '//' 누락
+            "//;1;2;3",      // '\n' 누락
+            "//\n1;2;3",     // 구분자 누락
+            ";1;2;3"         // 전체 형식 누락
+    })
+    void throwExceptionWhenInvalidFormat(String input) {
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> stringCalculator.splitWithCustomDelimiter(input));
+
+        assertEquals("커스텀 구분자 형식이 올바르지 않습니다", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("정상적인 커스텀 구분자는 예외가 발생하지 않음")
+    void noExceptionWithValidDelimiter() {
+        String input = "//;\n1;2;3";
+
+        assertAll(
+                () -> assertDoesNotThrow(() -> stringCalculator.splitWithCustomDelimiter(input)),
+                () -> assertArrayEquals(
+                        new String[]{"1", "2", "3"},
+                        stringCalculator.splitWithCustomDelimiter(input)
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("커스텀 구분자 테스트")
+    void customDelimiterTest() {
+
+        assertAll(
+                () -> assertDoesNotThrow(() -> stringCalculator.splitWithCustomDelimiter("//;\n1;2;3")),
+
+                () -> assertThrows(RuntimeException.class,
+                        () -> stringCalculator.splitWithCustomDelimiter("//;;\n1;2;3")),
+
+                () -> assertThrows(RuntimeException.class,
+                        () -> stringCalculator.splitWithCustomDelimiter("//;1;2;3")),
+
+                () -> assertThrows(RuntimeException.class,
+                        () -> stringCalculator.splitWithCustomDelimiter("/;1;2;3"))
+        );
+    }
+
+    @ParameterizedTest
+    @DisplayName("구분자가 2글자 이상인 경우 예외 발생")
+    @ValueSource(strings = {
+            "//;;\n1;;2;;3",    // 2글자
+            "//;;;\n1;;;2;;;3",  // 3글자
+            "//####\n1####2",    // 4글자
+            "//@@@@@\n1@@@@@2"   // 5글자
+    })
+    void throwExceptionWhenDelimiterTooLong(String input) {
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> stringCalculator.splitWithCustomDelimiter(input));
+
+        assertEquals("커스텀 구분자의 길이는 2를 넘을 수 없습니다", exception.getMessage());
+    }
 }
