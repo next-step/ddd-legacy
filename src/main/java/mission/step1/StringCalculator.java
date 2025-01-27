@@ -1,5 +1,7 @@
 package mission.step1;
 
+import org.springframework.util.StringUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -7,7 +9,6 @@ public class StringCalculator {
 
     public static final String DELIMITER = "[,:]";
     public static final int ZERO_VALUE = 0;
-    public static final String EMPTY_EXPRESSION = "";
     private static final String CUSTOM_DELIMITER_PATTERN = "//(.*)\n(.*)";
     private static final String PREFIX = "//";
 
@@ -31,16 +32,12 @@ public class StringCalculator {
         }
     }
 
-    public int hasText(String expression) {
-        if (expression.equals(EMPTY_EXPRESSION)) {
-            return ZERO_VALUE;
-        }
-
-        return toInt(expression);
-    }
-
     public int add(String expression) {
         int result = 0;
+
+        if (!StringUtils.hasText(expression)) {
+            return ZERO_VALUE;
+        }
 
         if (isCustomDelimiter(expression)) {
             for (String string : splitWithCustomDelimiter(expression)) {
@@ -50,7 +47,7 @@ public class StringCalculator {
         }
 
         for (String string : splitWithDelimiter(expression)) {
-            result += hasText(string);
+            result += toInt(string);
         }
 
         return result;
