@@ -1,5 +1,7 @@
 package calculator;
 
+import calculator.exception.PositiveNumbers;
+
 import java.util.List;
 
 /**
@@ -20,11 +22,8 @@ public class StringAdditionCalculator {
         }
 
         List<String> numbers = StringSplitter.split(text);
-
-        return numbers.stream()
-            .map(PositiveNumber::new)
-            .mapToInt(PositiveNumber::getValue)
-            .sum();
+        PositiveNumbers positiveNumbers = new PositiveNumbers(numbers);
+        return positiveNumbers.sum();
     }
 }
 
