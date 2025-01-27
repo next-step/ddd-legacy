@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 public class Calculator {
 
     public static final String SEPARATOR = "[,:]";
+    public static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile("//(.)\\\\n(.*)");
 
     public int calculate(String input) {
         try {
@@ -14,7 +15,7 @@ public class Calculator {
                 return 0;
             }
 
-            Matcher m = Pattern.compile("//(.)\\\\n(.*)").matcher(input);
+            Matcher m = CUSTOM_SEPARATOR_PATTERN.matcher(input);
 
             if (m.find()) {
                 String customDelimiter = m.group(1);
