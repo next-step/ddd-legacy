@@ -2,8 +2,8 @@ package mission.step1;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,6 +33,28 @@ class StringCalculatorTest {
                 new String[]{"1", "2", "3"},
                 result
         );
+    }
+
+    @Test
+    @DisplayName("음수 입력시 RuntimeException 발생")
+    void throwExceptionWhenNegativeNumber() {
+        assertThrows(RuntimeException.class,
+                () -> stringCalculator.toInt("-1"),
+                "음수 입력시 예외가 발생해야 합니다");
+    }
+
+    @Test
+    @DisplayName("숫자가 아닌 입력시 RuntimeException 발생")
+    void throwExceptionWhenNotNumber() {
+        assertThrows(RuntimeException.class,
+                () -> stringCalculator.toInt("abc"),
+                "숫자가 아닌 입력시 예외가 발생해야 합니다");
+    }
+
+    @Test
+    @DisplayName("올바른 양수 입력시 해당 숫자 반환")
+    void returnNumberWhenValidInput() {
+        assertEquals(123, stringCalculator.toInt("123"));
     }
 
 
