@@ -31,10 +31,6 @@ public class Calculator {
         }
     }
 
-    private boolean isEmpty(String input) {
-        return input == null || input.isEmpty();
-    }
-
     private int sum(String[] splitInput) {
         return Arrays.stream(splitInput)
                 .mapToInt(a -> {
@@ -47,5 +43,9 @@ public class Calculator {
                     }
                     return number;
                 }).sum();
+    }
+
+    private boolean isEmpty(String input) {
+        return input == null || input.isEmpty();
     }
 }

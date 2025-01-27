@@ -41,7 +41,7 @@ public class CalculatorTest {
         assertThatThrownBy(() -> calculator.calculate(input)).isInstanceOf(RuntimeException.class);
     }
 
-    @DisplayName("숫자 두개를 컴마 구분자자의 합을 반환한다.")
+    @DisplayName("숫자 두개를 컴마 구분자의 합을 반환한다.")
     @CsvSource(value = {"1,1-2", "2,2-4", "3,33-36"}, delimiter = '-')
     @ParameterizedTest
     void separateCommaCheck(String input, int expected) {
