@@ -1,8 +1,10 @@
 package calculator;
 
+import java.util.Arrays;
+
 public class Calculator {
 
-    public static final String SEPARATOR = "[,;]";
+    public static final String SEPARATOR = "[,:]";
 
     public int calculate(String input) {
         try {
@@ -12,9 +14,16 @@ public class Calculator {
 
             String[] splitInput = input.split(SEPARATOR);
 
-            return Integer.parseInt(input);
+            return Arrays.stream(splitInput)
+                    .mapToInt(a -> {
+                        if (a.isEmpty()) {
+                            return 0;
+                        }
+                        return Integer.parseInt(a);
+                    }).sum();
+
         } catch (NumberFormatException e) {
-            throw new RuntimeException("숫자의 형태가 아닙니다.");
+            throw new RuntimeException("숫자의 형태가 아닙니다.", e);
         }
     }
 }
