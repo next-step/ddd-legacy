@@ -1,7 +1,6 @@
 package calculator;
 
-import calculator.exception.InvalidNumberFormatException;
-import calculator.exception.NegativeNumberException;
+import java.util.List;
 
 /**
  * 입력된 문자열을 처리하고 결과를 반환하는 역할
@@ -20,16 +19,12 @@ public class StringAdditionCalculator {
 
         }
 
-        String[] numbers = StringSplitter.split(text);
-        int sum = 0;
+        List<String> numbers = StringSplitter.split(text);
 
-        for (String number : numbers) {
-
-            PositiveNumber positiveNumber = new PositiveNumber(number);
-            sum += positiveNumber.getValue();
-        }
-
-        return sum;
+        return numbers.stream()
+            .map(PositiveNumber::new)
+            .mapToInt(PositiveNumber::getValue)
+            .sum();
     }
 }
 
