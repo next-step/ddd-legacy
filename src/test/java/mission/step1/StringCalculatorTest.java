@@ -109,7 +109,6 @@ class StringCalculatorTest {
     @ValueSource(strings = {
             "/;\n1;2;3",     // '//' 누락
             "//;1;2;3",      // '\n' 누락
-            "//\n1;2;3",     // 구분자 누락
             ";1;2;3"         // 전체 형식 누락
     })
     void throwExceptionWhenInvalidFormat(String input) {
@@ -165,4 +164,16 @@ class StringCalculatorTest {
 
         assertEquals("커스텀 구분자의 길이는 2를 넘을 수 없습니다", exception.getMessage());
     }
+
+    @ParameterizedTest
+    @DisplayName("커스텀 구분자를 사용한 덧셈")
+    @CsvSource({
+            "'//;\n1;2;3', 6",
+            "'//@\n1@2@3', 6",
+            "'//#\n1#2#3', 6"
+    })
+    void addWithCustomDelimiter(String input, int expected) {
+        assertEquals(expected, stringCalculator.add(input));
+    }
+
 }
