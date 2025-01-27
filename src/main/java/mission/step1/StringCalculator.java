@@ -3,8 +3,8 @@ package mission.step1;
 public class StringCalculator {
 
     public static final String DELIMITER = "[,:]";
-    public static final int EMPTY = 0;
-    private static final String BLANK = "";
+    public static final int ZERO_VALUE = 0;
+    public static final String EMPTY_EXPRESSION = "";
 
     public String[] splitWithDelimiter(String expression) {
         return expression.split(DELIMITER);
@@ -27,8 +27,8 @@ public class StringCalculator {
     }
 
     public int hasText(String expression) {
-        if (expression.trim().equals(BLANK)) {
-            return EMPTY;
+        if (expression.equals(EMPTY_EXPRESSION)) {
+            return ZERO_VALUE;
         }
 
         return toInt(expression);

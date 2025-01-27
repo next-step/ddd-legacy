@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import static mission.step1.StringCalculator.EMPTY_EXPRESSION;
+import static mission.step1.StringCalculator.ZERO_VALUE;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -60,7 +62,7 @@ class StringCalculatorTest {
     @Test
     @DisplayName("빈 문자열 입력시 0 반환")
     void emptyStringTest() {
-        assertEquals(0, stringCalculator.hasText(""));
+        assertEquals(ZERO_VALUE, stringCalculator.hasText(EMPTY_EXPRESSION));
     }
 
     @Test
