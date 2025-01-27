@@ -2,9 +2,9 @@ package stringcalculator
 
 import java.util.regex.Pattern
 
-class ExpressionAnalyzer {
+class ExpressionMatcher {
 
-    fun analyze(expressionStr: String): Expression {
+    fun transform(expressionStr: String): Expression {
         val matcher = CUSTOM_DELIMITER_PATTERN.matcher(expressionStr)
 
         return if (matcher.find()) {

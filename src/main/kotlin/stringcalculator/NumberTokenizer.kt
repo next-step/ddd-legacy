@@ -1,6 +1,6 @@
 package stringcalculator
 
-import stringcalculator.ExpressionAnalyzer.Companion.Expression
+import stringcalculator.ExpressionMatcher.Companion.Expression
 
 class NumberTokenizer {
 

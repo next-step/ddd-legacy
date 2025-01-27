@@ -2,13 +2,13 @@ package stringcalculator
 
 class StringCalculator {
 
-    private val expressionAnalyzer = ExpressionAnalyzer()
+    private val expressionMatcher = ExpressionMatcher()
     private val numberTokenizer = NumberTokenizer()
 
     fun calculate(calculatorExpression: String?): Int {
         if (calculatorExpression.isNullOrEmpty()) return DEFAULT_VALUE
 
-        val expression = expressionAnalyzer.analyze(calculatorExpression)
+        val expression = expressionMatcher.transform(calculatorExpression)
         val numbers = numberTokenizer.tokenize(expression)
         validateNegativeValue(numbers)
 
