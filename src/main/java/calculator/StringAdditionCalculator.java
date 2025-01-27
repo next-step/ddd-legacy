@@ -3,9 +3,12 @@ package calculator;
 import calculator.exception.InvalidNumberFormatException;
 import calculator.exception.NegativeNumberException;
 
+/**
+ * 입력된 문자열을 처리하고 결과를 반환하는 역할
+ */
 public class StringAdditionCalculator {
 
-    private String text;
+    private final String text;
 
     public StringAdditionCalculator(final String text) {
         this.text = text;
@@ -14,22 +17,16 @@ public class StringAdditionCalculator {
     public int add() {
         if (text == null || text.isEmpty()) {
             return 0;
+
         }
 
         String[] numbers = StringSplitter.split(text);
         int sum = 0;
 
         for (String number : numbers) {
-            if (!isNumeric(number)) {
-                throw new InvalidNumberFormatException("Invalid input: Non-numeric value found: " + number);
-            }
 
-            int parsedNumber = Integer.parseInt(number);
-
-            if (parsedNumber < 0) {
-                throw new NegativeNumberException("Negative numbers are not allowed: " + number);
-            }
-            sum += parsedNumber;
+            PositiveNumber positiveNumber = new PositiveNumber(number);
+            sum += positiveNumber.getValue();
         }
 
         return sum;
