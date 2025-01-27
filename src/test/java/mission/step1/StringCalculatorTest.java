@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import static mission.step1.StringCalculator.EMPTY_EXPRESSION;
@@ -26,7 +27,6 @@ class StringCalculatorTest {
             "1,2,3",
             "1:2,3"
     })
-
     void splitStringExpression(String input) {
         String[] result = stringCalculator.splitWithDelimiter(input);
 
@@ -71,5 +71,37 @@ class StringCalculatorTest {
         assertEquals(123, stringCalculator.hasText("123"));
     }
 
+    @ParameterizedTest
+    @DisplayName("쉼표 구분자를 사용한 덧셈")
+    @CsvSource({
+            "'1,2', 3",
+            "'1,2,3', 6",
+            "'1,2,3,4', 10"
+    })
+    void addWithCommaDelimiter(String input, int expected) {
+        assertEquals(expected, stringCalculator.add(input));
+    }
+
+    @ParameterizedTest
+    @DisplayName("콜론 구분자를 사용한 덧셈")
+    @CsvSource({
+            "1:2, 3",
+            "1:2:3, 6",
+            "1:2:3:4, 10"
+    })
+    void addWithColonDelimiter(String input, int expected) {
+        assertEquals(expected, stringCalculator.add(input));
+    }
+
+    @ParameterizedTest
+    @DisplayName("혼합 구분자를 사용한 덧셈")
+    @CsvSource({
+            "'1,2:3', 6",
+            "'1:2,3', 6",
+            "'1:2,3:4', 10"
+    })
+    void addWithMixedDelimiters(String input, int expected) {
+        assertEquals(expected, stringCalculator.add(input));
+    }
 
 }

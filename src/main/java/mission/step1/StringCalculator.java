@@ -34,4 +34,12 @@ public class StringCalculator {
         return toInt(expression);
     }
 
+    public int add(String expression) {
+        int result = 0;
+        for (String string : splitWithDelimiter(expression)) {
+            result += hasText(string);
+        }
+        return result;
+    }
+
 }
