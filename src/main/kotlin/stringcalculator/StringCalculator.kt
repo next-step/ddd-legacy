@@ -1,38 +1,18 @@
 package stringcalculator
 
-import java.util.regex.Pattern
+class StringCalculator {
 
-class StringCalculator() {
+    private val expressionAnalyzer = ExpressionAnalyzer()
+    private val numberTokenizer = NumberTokenizer()
 
-    fun add(input: String?): Int {
-        if (input.isNullOrEmpty()) return 0
+    fun calculate(calculatorExpression: String?): Int {
+        if (calculatorExpression.isNullOrEmpty()) return DEFAULT_VALUE
 
-        val (delimiters, restInput) = divideDelimiterAndInput(input)
-        val tokens = splitInput(restInput, delimiters)
-        val numberTokens = tokens.map { it.toInt() }
-        validateNegativeValue(numberTokens)
+        val expression = expressionAnalyzer.analyze(calculatorExpression)
+        val numbers = numberTokenizer.tokenize(expression)
+        validateNegativeValue(numbers)
 
-        return numberTokens.sum()
-    }
-
-    private fun divideDelimiterAndInput(input: String): DelimiterInput {
-        val matcher = Pattern.compile("//(.)\n(.*)").matcher(input)
-
-        return if (matcher.find()) {
-            DelimiterInput(
-                input = matcher.group(2),
-                delimiters = DEFAULT_DELIMITER + matcher.group(1),
-            )
-        } else {
-            DelimiterInput(
-                input = input,
-                delimiters = DEFAULT_DELIMITER,
-            )
-        }
-    }
-
-    private fun splitInput(input: String, delimiters: List<String>): List<String> {
-        return input.split(delimiters.joinToString("|").toRegex())
+        return numbers.sum()
     }
 
     private fun validateNegativeValue(tokens: List<Int>) {
@@ -42,11 +22,6 @@ class StringCalculator() {
     }
 
     companion object {
-        private val DEFAULT_DELIMITER = listOf(",", ":")
-
-        private data class DelimiterInput(
-            val delimiters: List<String>,
-            val input: String,
-        )
+        private const val DEFAULT_VALUE = 0
     }
 }
