@@ -7,8 +7,6 @@ public class Calculator {
     private static final int DEFAULT_RESULT = 0;
     private static final String CUSTOM_REGEX = "//.\\n";
 
-    static CalculatorNumbers calculatorNumbers;
-
     public static int calculate(final String operand) {
         if (operand == null || operand.isEmpty()) {
             return DEFAULT_RESULT;
@@ -19,8 +17,7 @@ public class Calculator {
         if (operand.chars().allMatch(Character::isDigit)) {
             return Integer.parseInt(operand);
         }
-        calculatorNumbers = new CalculatorNumbers(operand);
-        return calculatorNumbers.sum();
+        return new CalculatorNumbers(operand).sum();
     }
 
     private static void validateNegativeNumber(final String operand) {
