@@ -10,11 +10,11 @@ public class Calculator {
     public static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile("//(.)\\\\n(.*)");
 
     public int calculate(String input) {
-        try {
-            if (input == null || input.isEmpty()) {
-                return 0;
-            }
+        if (isEmpty(input)) {
+            return 0;
+        }
 
+        try {
             Matcher m = CUSTOM_SEPARATOR_PATTERN.matcher(input);
 
             if (m.find()) {
@@ -29,6 +29,10 @@ public class Calculator {
         } catch (NumberFormatException e) {
             throw new RuntimeException("숫자의 형태가 아닙니다.", e);
         }
+    }
+
+    private boolean isEmpty(String input) {
+        return input == null || input.isEmpty();
     }
 
     private int sum(String[] splitInput) {
