@@ -12,6 +12,7 @@ class NumberTokenizer {
     }
 
     private fun splitNumberTokens(input: String, delimiters: List<String>): List<String> {
-        return input.split(delimiters.joinToString("|").toRegex())
+        return if (delimiters.isEmpty()) listOf(input)
+        else input.split(delimiters.joinToString("|").toRegex())
     }
 }
