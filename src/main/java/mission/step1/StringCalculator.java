@@ -9,6 +9,7 @@ public class StringCalculator {
     public static final int ZERO_VALUE = 0;
     public static final String EMPTY_EXPRESSION = "";
     private static final String CUSTOM_DELIMITER_PATTERN = "//(.*)\n(.*)";
+    private static final String PREFIX = "//";
 
     public String[] splitWithDelimiter(String expression) {
         return expression.split(DELIMITER);
@@ -40,10 +41,23 @@ public class StringCalculator {
 
     public int add(String expression) {
         int result = 0;
+
+        if (isCustomDelimiter(expression)) {
+            for (String string : splitWithCustomDelimiter(expression)) {
+                result += toInt(string);
+            }
+            return result;
+        }
+
         for (String string : splitWithDelimiter(expression)) {
             result += hasText(string);
         }
+
         return result;
+    }
+
+    private static boolean isCustomDelimiter(String expression) {
+        return expression.startsWith(PREFIX);
     }
 
     public String[] splitWithCustomDelimiter(String expression) {
