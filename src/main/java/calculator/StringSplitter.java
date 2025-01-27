@@ -6,6 +6,10 @@ public class StringSplitter {
     public static final String CUSTOM_DELIMITER_PREFIX = "//";
     public static final String CUSTOM_DELIMITER_SUFFIX = "\n";
 
+    private StringSplitter() {
+        throw new UnsupportedOperationException("StringSplitter is a utility class and cannot be instantiated.");
+    }
+
     public static String[] split(final String inputText) {
 
         // check for custom delimiter
