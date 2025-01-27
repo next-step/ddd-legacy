@@ -18,7 +18,7 @@ public class Calculator {
 
             if (m.find()) {
                 String customDelimiter = m.group(1);
-                String[] splitInput= m.group(2).split(customDelimiter);
+                String[] splitInput = m.group(2).split(customDelimiter);
                 return sum(splitInput);
             } else {
                 String[] splitInput = input.split(SEPARATOR);
@@ -36,7 +36,11 @@ public class Calculator {
                     if (a.isEmpty()) {
                         return 0;
                     }
-                    return Integer.parseInt(a);
+                    int number = Integer.parseInt(a);
+                    if (number < 0) {
+                        throw new RuntimeException("음수는 들어올 수 없습니다.");
+                    }
+                    return number;
                 }).sum();
     }
 }

@@ -61,4 +61,14 @@ public class CalculatorTest {
     void customSeparateCheck(String input, int expected) {
         assertThat(calculator.calculate(input)).isEqualTo(expected);
     }
+
+    @DisplayName("음수를 전달할 경우 RuntimeException 예외가 발생해야 한다.")
+    @CsvSource(value = {"-1,,1=2", "1,-2:3=6", "//;\\n1;;2;;-3=6"}, delimiter = '=')
+    @ParameterizedTest
+    void minusNumberCheck(String input, int expected) {
+        assertThatThrownBy(() -> calculator.calculate(input))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("음수는 들어올 수 없습니다.");
+    }
+
 }
