@@ -11,16 +11,16 @@ class CarTest {
     @Test
     void constructor() {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Car("동해물과백두산이"));
+            .isThrownBy(() -> new Car("동해물과백두산이"));
     }
 
-     @DisplayName("자동차는 움직인다")
-     @Test
-     void move() {
-         final var car = new Car("fancy");
-         car.move(new ForwardStrategy());
-         assertThat(car.getPosition()).isEqualTo(1);
-     }
+    @DisplayName("자동차는 움직인다")
+    @Test
+    void move() {
+        final var car = new Car("fancy");
+        car.move(new ForwardStrategy());
+        assertThat(car.getPosition()).isEqualTo(1);
+    }
 
     @DisplayName("자동차는 정지한다.")
     @Test
