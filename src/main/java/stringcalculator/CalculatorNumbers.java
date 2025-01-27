@@ -7,11 +7,13 @@ import java.util.regex.Pattern;
 
 public class CalculatorNumbers {
     public static final String DEFAULT_DELIMETER = ":|,";
+    private static final String CUSTOM_DELIMETER = "//(.)\n(.*)";
+    private static final Pattern CUSTOM_PATTERN = Pattern.compile(CUSTOM_DELIMETER);
 
     private List<Integer> calculatorNumbers;
 
     public CalculatorNumbers(String operand) {
-        Matcher matcher = Pattern.compile("//(.)\n(.*)").matcher(operand);
+        Matcher matcher = CUSTOM_PATTERN.matcher(operand);
         String delimeter = DEFAULT_DELIMETER;
         if (matcher.find()) {
             delimeter = matcher.group(1);
