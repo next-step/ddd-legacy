@@ -1,13 +1,12 @@
-package stringcalculator
+package stringcalculator.expression
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import stringcalculator.ExpressionMatcher.Companion.Expression
 
 internal class ExpressionMatcherTest {
 
-    private val sut = ExpressionMatcher()
+    private val sut = ExpressionMatcher
 
     @DisplayName("커스텀 구분자가 없을경우 기본 구분자로 쉼표(,)와 콜론(:)을 포함시킨다")
     @Test

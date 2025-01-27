@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import stringcalculator.ExpressionMatcher.Companion.Expression
+import stringcalculator.expression.Expression
 
 internal class NumberTokenizerTest {
 
-    private val sut = NumberTokenizer()
+    private val sut = NumberTokenizer
 
     @DisplayName("숫자로 변환할 수 없을경우 NumberFormatException 예외가 발생한다")
     @Test

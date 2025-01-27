@@ -1,8 +1,8 @@
 package stringcalculator
 
-import stringcalculator.ExpressionMatcher.Companion.Expression
+import stringcalculator.expression.Expression
 
-class NumberTokenizer {
+object NumberTokenizer {
 
     fun tokenize(expression: Expression): List<Int> {
         val numberTokens = splitNumberTokens(expression.input, expression.delimiters)
