@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 
 public class CalculatorNumbers {
     public static final String DEFAULT_DELIMETER = ":|,";
+
     private List<Integer> calculatorNumbers;
 
     public CalculatorNumbers(String operand) {

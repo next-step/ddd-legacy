@@ -6,6 +6,7 @@ public class Calculator {
 
     public static final int DEFAULT_RESULT = 0;
     public static final String CUSTOM_REGEX = "//.\\n";
+
     static CalculatorNumbers calculatorNumbers;
 
     public static int calculate(final String operand) {
