@@ -3,6 +3,7 @@ package calculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -45,5 +46,12 @@ public class CalculatorTest {
     @ParameterizedTest
     void separateCommaCheck(String input) {
         assertThat(calculator.calculate(input)).isEqualTo(Integer.parseInt(input));
+    }
+
+    @DisplayName("구분자를 컴마(,) 이외에 콜론(:)을 사용할 수 있다.")
+    @CsvSource(value = {"1,2:3-6", "2:123-125", "3,11-14"}, delimiter = '-')
+    @ParameterizedTest
+    void pluralSeparateCheck(String input, int expected) {
+        assertThat(calculator.calculate(input)).isEqualTo(expected);
     }
 }
