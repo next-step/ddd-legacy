@@ -1,6 +1,6 @@
 package calculator;
 
-public interface CalculationStrategy {
+public interface CalculateStrategy {
     int calculate(String input);
     boolean canCalculate(String input);
 }

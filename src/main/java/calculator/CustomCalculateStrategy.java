@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CustomCalculator implements CalculationStrategy {
+public class CustomCalculateStrategy implements CalculateStrategy {
     public static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile("//(.)\\\\n(.*)");
 
     @Override

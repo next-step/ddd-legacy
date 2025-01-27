@@ -4,13 +4,13 @@ import java.util.List;
 
 public class Calculator {
 
-    private final List<CalculationStrategy> calculationStrategies;
+    private final List<CalculateStrategy> calculationStrategies;
 
     public Calculator() {
         this.calculationStrategies = List.of(
-                new EmptyCalculator(),
-                new CustomCalculator(),
-                new DefaultCalculator()
+                new EmptyCalculateStrategy(),
+                new CustomCalculateStrategy(),
+                new DefaultCalculateStrategy()
         );
     }
 

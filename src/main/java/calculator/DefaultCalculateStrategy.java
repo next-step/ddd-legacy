@@ -3,7 +3,7 @@ package calculator;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-public class DefaultCalculator implements CalculationStrategy {
+public class DefaultCalculateStrategy implements CalculateStrategy {
     public static final Pattern CUSTOM_SEPARATOR_PATTERN = Pattern.compile("//(.)\\\\n(.*)");
     public static final String SEPARATOR = "[,:]";
 

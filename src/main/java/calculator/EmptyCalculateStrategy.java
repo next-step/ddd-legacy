@@ -1,6 +1,6 @@
 package calculator;
 
-public class EmptyCalculator implements CalculationStrategy {
+public class EmptyCalculateStrategy implements CalculateStrategy {
     @Override
     public int calculate(String input) {
         return 0;
