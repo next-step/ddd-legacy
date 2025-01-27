@@ -176,4 +176,22 @@ class StringCalculatorTest {
         assertEquals(expected, stringCalculator.add(input));
     }
 
+    @Test
+    @DisplayName("구분자 길이가 2 이상일 때 예외 발생")
+    void throwExceptionWhenLengthMoreThanOne() {
+        RuntimeException e = assertThrows(RuntimeException.class,
+                () -> stringCalculator.validateCustomDelimiterLength(";;", 2));
+
+        assertEquals("커스텀 구분자의 길이는 2를 넘을 수 없습니다", e.getMessage());
+    }
+
+    @Test
+    @DisplayName("빈 구분자일 때 예외 발생")
+    void throwExceptionWhenEmpty() {
+        RuntimeException e = assertThrows(RuntimeException.class,
+                () -> stringCalculator.validateCustomDelimiterLength("", 2));
+
+        assertEquals("커스텀 구분자의 길이는 1보다 작을 수 없습니다.", e.getMessage());
+    }
+
 }

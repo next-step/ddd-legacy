@@ -77,5 +77,9 @@ public class StringCalculator {
         if (expression.length() >= length) {
             throw new RuntimeException("커스텀 구분자의 길이는 " + length + "를 넘을 수 없습니다");
         }
+
+        if (expression.isEmpty()) {
+            throw new RuntimeException("커스텀 구분자의 길이는 " + 1 + "보다 작을 수 없습니다.");
+        }
     }
 }
