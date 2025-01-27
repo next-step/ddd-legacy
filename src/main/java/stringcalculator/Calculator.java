@@ -4,8 +4,8 @@ import java.util.regex.Pattern;
 
 public class Calculator {
 
-    public static final int DEFAULT_RESULT = 0;
-    public static final String CUSTOM_REGEX = "//.\\n";
+    private static final int DEFAULT_RESULT = 0;
+    private static final String CUSTOM_REGEX = "//.\\n";
 
     static CalculatorNumbers calculatorNumbers;
 
