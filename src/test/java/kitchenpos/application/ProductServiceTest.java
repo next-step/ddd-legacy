@@ -2,7 +2,11 @@ package kitchenpos.application;
 
 import kitchenpos.domain.*;
 import org.assertj.core.api.ThrowableAssert;
-import org.junit.jupiter.api.*;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
@@ -36,9 +40,7 @@ public class ProductServiceTest {
         @Test
         void it_can_input_name_and_price() {
             // given
-            Product request = new Product();
-            request.setName("후라이드치킨");
-            request.setPrice(new BigDecimal(16000));
+            Product request = createProduct("후라이드치킨", 16000);
 
             // when
             Product product = productService.create(request);
@@ -55,9 +57,7 @@ public class ProductServiceTest {
         @Test
         void it_cannot_use_inappropriate_words() {
             // given
-            Product request = new Product();
-            request.setName("holy shit 맛있는 치킨");
-            request.setPrice(new BigDecimal(16000));
+            Product request = createProduct("holy shit 맛있는 치킨", 16000);
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> productService.create(request);
@@ -71,8 +71,7 @@ public class ProductServiceTest {
         @Test
         void name_must_be_input() {
             // given
-            Product request = new Product();
-            request.setPrice(new BigDecimal(16000));
+            Product request = createProduct(null, 16000);
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> productService.create(request);
@@ -86,9 +85,7 @@ public class ProductServiceTest {
         @Test
         void price_must_be_over_0() {
             // given
-            Product request = new Product();
-            request.setName("JPA 치킨");
-            request.setPrice(new BigDecimal(-1));
+            Product request = createProduct("JPA 치킨", -1);
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> productService.create(request);
@@ -103,6 +100,7 @@ public class ProductServiceTest {
     @Nested
     class ProductChangePriceTest {
 
+
         private static final UUID 후라이드치킨_PRODUCT_UUID = UUID.fromString("3b528244-34f7-406b-bb7e-690912f66b10");
         private static final UUID 후라이드치킨_MENU_UUID = UUID.fromString("f59b1e1c-b145-440a-aa6f-6095a0e2d63b");
         private static final UUID 치킨류_MENU_GROUP_UUID = UUID.fromString("d9bc21ac-cc10-4593-b506-4a40e0170e02");
@@ -114,28 +112,14 @@ public class ProductServiceTest {
 
         @BeforeEach
         void setup() {
-            Product product = new Product();
-            product.setId(후라이드치킨_PRODUCT_UUID);
-            product.setName(후라이드치킨_PRODUCT_NAME);
-            product.setPrice(후라이드치킨_DEFAULT_PRICE);
+            Product product = createProduct(후라이드치킨_PRODUCT_UUID, 후라이드치킨_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
             product = productRepository.save(product);
 
-            MenuGroup menuGroup = new MenuGroup();
-            menuGroup.setId(치킨류_MENU_GROUP_UUID);
-            menuGroup.setName(치킨류_MENU_GROUP_NAME);
+            MenuGroup menuGroup = createMenuGroup(치킨류_MENU_GROUP_UUID, 치킨류_MENU_GROUP_NAME);
             menuGroupRepository.save(menuGroup);
 
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
-
-            Menu menu = new Menu();
-            menu.setId(후라이드치킨_MENU_UUID);
-            menu.setName(후라이드_치킨_MENU_NAME);
-            menu.setPrice(후라이드치킨_MENU_DEFAULT_PRICE);
-            menu.setMenuGroup(menuGroup);
-            menu.setMenuProducts(List.of(menuProduct));
-
+            List<MenuProduct> menuProducts = List.of(createMenuProduct(product, 1));
+            Menu menu = createMenu(후라이드치킨_MENU_UUID, 후라이드_치킨_MENU_NAME, 후라이드치킨_MENU_DEFAULT_PRICE, menuGroup, menuProducts);
             menuRepository.save(menu);
         }
 
@@ -194,6 +178,14 @@ public class ProductServiceTest {
         }
     }
 
+    @NotNull
+    private static MenuProduct createMenuProduct(Product product, int quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProduct(product);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
+
     @DisplayName("상품 목록 조회하기")
     @Nested
     class ProductListTest {
@@ -212,5 +204,34 @@ public class ProductServiceTest {
             // then
             assertThat(products).hasSize(TOTAL_PRODUCT_COUNT);
         }
+    }
+
+    private static Product createProduct(String name, int price) {
+        return createProduct(null, name, new BigDecimal(price));
+    }
+
+    private static Product createProduct(UUID id, String name, BigDecimal price) {
+        Product product = new Product();
+        product.setId(id);
+        product.setName(name);
+        product.setPrice(price);
+        return product;
+    }
+
+    private static MenuGroup createMenuGroup(UUID id, String name) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(id);
+        menuGroup.setName(name);
+        return menuGroup;
+    }
+
+    private static Menu createMenu(UUID id, String name, BigDecimal price, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+        Menu menu = new Menu();
+        menu.setId(id);
+        menu.setName(name);
+        menu.setPrice(price);
+        menu.setMenuGroup(menuGroup);
+        menu.setMenuProducts(menuProducts);
+        return menu;
     }
 }
