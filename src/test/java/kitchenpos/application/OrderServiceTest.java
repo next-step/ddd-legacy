@@ -14,6 +14,7 @@ import org.springframework.test.context.jdbc.SqlGroup;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
@@ -139,7 +140,23 @@ public class OrderServiceTest {
         }
 
         @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-        @DisplayName("매장 식사 주문의 경우 테이블이 사용 중 상태여야 한다")
+        @DisplayName("매장 식사 주문의 경우, 주문 테이블을 반드시 지정해야 한다")
+        @Test
+        void order_table_must_be_specified_for_eat_in_order() {
+            // given
+            List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, 2, 후라이드치킨_MENU_DEFAULT_PRICE));
+            Order request = createOrder(OrderType.EAT_IN, orderLineItems, null, 테이블_1_ORDER_TABLE_UUID, null);
+
+            // when
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.create(request);
+
+            // then
+            assertThatThrownBy(throwingCallable)
+                    .isInstanceOf(NoSuchElementException.class);
+        }
+
+        @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        @DisplayName("매장 식사 주문의 경우, 테이블이 사용 중 상태여야 한다")
         @Test
         void table_must_be_occupied_for_eat_in_order() {
             // given
