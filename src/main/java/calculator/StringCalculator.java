@@ -1,5 +1,7 @@
 package calculator;
 
+import exception.InvalidNumberFormatException;
+import exception.NotPositiveNumberException;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,12 +9,12 @@ import java.util.regex.Pattern;
 public class StringCalculator {
 
     public int add(String text) {
-        int result = 0;
+        if (text == null || text.isBlank()) {
+            return 0;
+        }
 
         String[] numberString = splitNumbers(text);
-        result = Arrays.stream(numberString).mapToInt(Integer::parseInt).sum();
-
-        return result;
+        return Arrays.stream(numberString).mapToInt(this::parseAndValidatePositive).sum();
     }
 
     public String[] splitNumbers(String text) {
@@ -26,5 +28,18 @@ public class StringCalculator {
         }
 
         return text.split(delimiters);
+    }
+
+    public int parseAndValidatePositive(String element) {
+        if (!element.matches("-?\\d+")) {
+            throw new InvalidNumberFormatException("숫자만 입력해주세요.");
+        }
+
+        int intValue = Integer.parseInt(element);
+        if (intValue < 0) {
+            throw new NotPositiveNumberException("양의 숫자만 입력해주세요.");
+        }
+
+        return intValue;
     }
 }
