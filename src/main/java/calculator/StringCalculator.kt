@@ -7,8 +7,10 @@ class StringCalculator(
 ) {
 
     fun add(text: String?): Int {
-        return factory.get(text)
+        return factory
+            .get(text)
             .extract(text ?: "")
-            .sum().value
+            .sum()
+            .value
     }
 }
