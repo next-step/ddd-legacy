@@ -7,15 +7,16 @@ import java.util.regex.Pattern;
 
 public class StringCalculator {
 
-    private static final String DELIMITER = "[,:]";
+    private final ParserStrategy parser;
+
+    public StringCalculator(ParserStrategy parser) {
+        this.parser = parser;
+    }
+
     private static final int ZERO_VALUE = 0;
     private static final String CUSTOM_DELIMITER_PATTERN = "//(.*)\n(.*)";
     private static final String PREFIX = "//";
     private static final Pattern CUSTOM_DELIMITER = Pattern.compile(CUSTOM_DELIMITER_PATTERN);
-
-    public String[] splitWithDelimiter(String expression) {
-        return expression.split(DELIMITER);
-    }
 
     public int add(String expression) {
         int result = 0;
@@ -31,7 +32,7 @@ public class StringCalculator {
             return result;
         }
 
-        for (String string : splitWithDelimiter(expression)) {
+        for (String string : parser.splitWithDelimiter(expression)) {
             result += PositiveNumber.from(string).getValue();
         }
 

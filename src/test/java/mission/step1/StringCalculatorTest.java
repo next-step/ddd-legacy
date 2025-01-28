@@ -15,11 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StringCalculatorTest {
 
+    private ParserStrategy parser;
     private StringCalculator stringCalculator;
 
     @BeforeEach
     void setUp() {
-        stringCalculator = new StringCalculator();
+        parser = new Parser();
+        stringCalculator = new StringCalculator(parser);
     }
 
     @ParameterizedTest
@@ -29,7 +31,7 @@ class StringCalculatorTest {
             "1:2,3"
     })
     void splitStringExpression(String input) {
-        String[] result = stringCalculator.splitWithDelimiter(input);
+        String[] result = parser.splitWithDelimiter(input);
 
         // 모든 케이스에서 결과는 ["1", "2", "3"]이어야 함
         assertArrayEquals(
@@ -225,6 +227,4 @@ class StringCalculatorTest {
         assertThatExceptionOfType(RuntimeException.class)
                 .isThrownBy(() -> stringCalculator.add("-1"));
     }
-
-
 }
