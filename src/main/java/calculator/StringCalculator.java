@@ -32,12 +32,12 @@ public class StringCalculator {
 
     public int parseAndValidatePositive(String element) {
         if (!element.matches("-?\\d+")) {
-            throw new InvalidNumberFormatException("숫자만 입력해주세요.");
+            throw new InvalidNumberFormatException();
         }
 
         int intValue = Integer.parseInt(element);
         if (intValue < 0) {
-            throw new NotPositiveNumberException("양의 숫자만 입력해주세요.");
+            throw new NotPositiveNumberException();
         }
 
         return intValue;

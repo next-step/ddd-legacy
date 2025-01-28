@@ -1,9 +1,11 @@
 package exception;
 
-public class NotPositiveNumberException extends RuntimeException{
+import static exception.ExceptionDetails.NOT_POSITIVE_NUMBER_EXCEPTION;
 
-    public NotPositiveNumberException(final String message) {
-        super(message);
+public class NotPositiveNumberException extends RuntimeException {
+
+    public NotPositiveNumberException() {
+        super(NOT_POSITIVE_NUMBER_EXCEPTION.getMessage());
     }
 
 }

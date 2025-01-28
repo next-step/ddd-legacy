@@ -1,9 +1,11 @@
 package exception;
 
-public class InvalidNumberFormatException extends RuntimeException{
+import static exception.ExceptionDetails.INVALID_NUMBER_FORMAT_EXCEPTION;
 
-    public InvalidNumberFormatException(final String message) {
-        super(message);
+public class InvalidNumberFormatException extends RuntimeException {
+
+    public InvalidNumberFormatException() {
+        super(INVALID_NUMBER_FORMAT_EXCEPTION.getMessage());
     }
 
 }
