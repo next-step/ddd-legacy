@@ -14,7 +14,7 @@ value class Number(
         require(value >= ZERO.value) { "음수는 지원하지 않습니다" }
     }
 
-    fun add(number: Number) = Number(Math.addExact(value, number.value))
+    operator fun plus(number: Number) = Number(Math.addExact(value, number.value))
 
     companion object {
         val ZERO: Number = Number(0)

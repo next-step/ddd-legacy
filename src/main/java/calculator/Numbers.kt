@@ -5,5 +5,5 @@ value class Numbers(
     private val values: List<Number>,
 ) {
 
-    fun sum() = values.fold(Number.ZERO, Number::add)
+    fun sum() = values.fold(Number.ZERO, Number::plus)
 }
