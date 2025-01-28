@@ -42,7 +42,7 @@ class StringCalculatorTest {
     @DisplayName("음수 입력시 RuntimeException 발생")
     void throwExceptionWhenNegativeNumber() {
         assertThrows(RuntimeException.class,
-                () -> stringCalculator.toInt("-1"),
+                () -> PositiveNumber.from("-1"),
                 "음수 입력시 예외가 발생해야 합니다");
     }
 
@@ -50,14 +50,15 @@ class StringCalculatorTest {
     @DisplayName("숫자가 아닌 입력시 RuntimeException 발생")
     void throwExceptionWhenNotNumber() {
         assertThrows(RuntimeException.class,
-                () -> stringCalculator.toInt("abc"),
+                () -> PositiveNumber.from("abc"),
                 "숫자가 아닌 입력시 예외가 발생해야 합니다");
     }
 
     @Test
     @DisplayName("올바른 양수 입력시 해당 숫자 반환")
     void returnNumberWhenValidInput() {
-        assertEquals(123, stringCalculator.toInt("123"));
+        assertEquals(123,
+                PositiveNumber.from("123").getValue());
     }
 
     @ParameterizedTest
