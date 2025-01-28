@@ -1,14 +1,18 @@
 package kitchenpos.application;
 
+import kitchenpos.ClientTestConfiguration;
 import kitchenpos.domain.*;
+import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 
@@ -23,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@Import(ClientTestConfiguration.class)
 public class MenuServiceTest {
     @Autowired
     private MenuService menuService;
@@ -32,6 +37,8 @@ public class MenuServiceTest {
     private MenuGroupRepository menuGroupRepository;
     @Autowired
     private MenuRepository menuRepository;
+    @Autowired
+    private PurgomalumClient mockPurgomalumClient;
 
     @DisplayName("메뉴 등록하기")
     @Nested
@@ -80,8 +87,10 @@ public class MenuServiceTest {
         @Test
         void registration_menu_with_profanity() {
             // given
+            String menuName = "holy shit 후라이드치킨";
             MenuProduct menuProduct = createMenuProduct(후라이드치킨_PRODUCT_UUID, 2);
-            Menu request = createMenu("holy shit 후라이드치킨", 16000, 치킨류_MENU_GROUP_UUID, List.of(menuProduct));
+            Menu request = createMenu(menuName, 16000, 치킨류_MENU_GROUP_UUID, List.of(menuProduct));
+            Mockito.when(mockPurgomalumClient.containsProfanity(menuName)).thenReturn(Boolean.TRUE);
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(request);

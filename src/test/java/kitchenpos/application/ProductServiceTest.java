@@ -1,14 +1,18 @@
 package kitchenpos.application;
 
+import kitchenpos.ClientTestConfiguration;
 import kitchenpos.domain.*;
+import kitchenpos.infra.PurgomalumClient;
 import org.assertj.core.api.ThrowableAssert;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlGroup;
 
@@ -22,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
+@Import(ClientTestConfiguration.class)
 public class ProductServiceTest {
     @Autowired
     private ProductService productService;
@@ -31,6 +36,8 @@ public class ProductServiceTest {
     private MenuRepository menuRepository;
     @Autowired
     private MenuGroupRepository menuGroupRepository;
+    @Autowired
+    private PurgomalumClient mockPurgomalumClient;
 
     @DisplayName("상품 등록하기")
     @Nested
@@ -57,7 +64,9 @@ public class ProductServiceTest {
         @Test
         void it_cannot_use_inappropriate_words() {
             // given
-            Product request = createProduct("holy shit 맛있는 치킨", 16000);
+            String name = "holy shit 맛있는 치킨";
+            Product request = createProduct(name, 16000);
+            Mockito.when(mockPurgomalumClient.containsProfanity(name)).thenReturn(Boolean.TRUE);
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> productService.create(request);
