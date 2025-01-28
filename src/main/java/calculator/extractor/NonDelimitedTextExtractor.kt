@@ -15,7 +15,7 @@ class NonDelimitedTextExtractor : TextDelimiterExtractor {
     }
 
     companion object {
-        private const val REGEX_PATTERN: String = "^[0-9]{1,9}$"
+        private const val REGEX_PATTERN: String = "^[0-9]$"
         private val PATTERN = Pattern.compile(REGEX_PATTERN)
     }
 }
