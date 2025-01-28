@@ -8,11 +8,11 @@ import java.util.regex.Pattern
 class CustomDelimiterTextExtractor : TextDelimiterExtractor {
 
     override fun isSupport(text: String?): Boolean {
-        return text?.let { PATTERN.matcher(it).find() } ?: false
+        return text?.let { TWO_SLASHES_AND_NEWLINE_STRING_BETWEEN_DELIMITER_PATTERN.matcher(it).find() } ?: false
     }
 
     override fun extract(text: String): Numbers {
-        val matcher = PATTERN.matcher(text)
+        val matcher = TWO_SLASHES_AND_NEWLINE_STRING_BETWEEN_DELIMITER_PATTERN.matcher(text)
 
         return if (matcher.find()) {
             val customDelimiter = matcher.group(1)
@@ -28,7 +28,6 @@ class CustomDelimiterTextExtractor : TextDelimiterExtractor {
     }
 
     companion object {
-        private const val REGEX_PATTERN: String = "//(.)\n(.*)"
-        private val PATTERN = Pattern.compile(REGEX_PATTERN)
+        private val TWO_SLASHES_AND_NEWLINE_STRING_BETWEEN_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)")
     }
 }

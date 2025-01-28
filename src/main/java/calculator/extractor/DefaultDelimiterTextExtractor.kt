@@ -7,20 +7,19 @@ import java.util.regex.Pattern
 class DefaultDelimiterTextExtractor : TextDelimiterExtractor {
 
     override fun isSupport(text: String?): Boolean {
-        return text?.let { PATTERN.matcher(it).find() } ?: false
+        return text?.let { COMMA_OR_COLON_AS_A_DELIMITER_PATTERN.matcher(it).find() } ?: false
     }
 
     override fun extract(text: String): Numbers {
         return Numbers(
             text
-                .split(REGEX)
+                .split(COMMA_OR_COLON_AS_A_DELIMITER_PATTERN_REGEX)
                 .map { Number(it) }
         )
     }
 
     companion object {
-        private const val REGEX_PATTERN: String = ",|:"
-        private val PATTERN = Pattern.compile(REGEX_PATTERN)
-        private val REGEX = PATTERN.toRegex()
+        private val COMMA_OR_COLON_AS_A_DELIMITER_PATTERN = Pattern.compile(",|:")
+        private val COMMA_OR_COLON_AS_A_DELIMITER_PATTERN_REGEX = COMMA_OR_COLON_AS_A_DELIMITER_PATTERN.toRegex()
     }
 }
