@@ -45,15 +45,10 @@ public class MenuServiceTest {
 
         @BeforeEach
         void setup() {
-            Product product = new Product();
-            product.setId(후라이드치킨_PRODUCT_UUID);
-            product.setName(후라이드치킨_PRODUCT_NAME);
-            product.setPrice(후라이드치킨_DEFAULT_PRICE);
+            Product product = createProduct(후라이드치킨_PRODUCT_UUID, 후라이드치킨_PRODUCT_NAME, 후라이드치킨_DEFAULT_PRICE);
             productRepository.save(product);
 
-            MenuGroup menuGroup = new MenuGroup();
-            menuGroup.setId(치킨류_MENU_GROUP_UUID);
-            menuGroup.setName(치킨류_MENU_GROUP_NAME);
+            MenuGroup menuGroup = createMenuGroup(치킨류_MENU_GROUP_UUID, 치킨류_MENU_GROUP_NAME);
             menuGroupRepository.save(menuGroup);
         }
 
@@ -62,15 +57,8 @@ public class MenuServiceTest {
         @Test
         void create_menu_successfully() {
             // given
-            Menu request = new Menu();
-            request.setName("후라이드치킨");
-            request.setPrice(new BigDecimal(16000));
-            request.setMenuGroupId(치킨류_MENU_GROUP_UUID);
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(후라이드치킨_PRODUCT_UUID);
-            menuProduct.setQuantity(2);
-            List<MenuProduct> menuProducts = List.of(menuProduct);
-            request.setMenuProducts(menuProducts);
+            List<MenuProduct> menuProducts = List.of(createMenuProduct(후라이드치킨_PRODUCT_UUID, 2));
+            Menu request = createMenu("후라이드치킨", 16000, 치킨류_MENU_GROUP_UUID, menuProducts);
             request.setDisplayed(true);
 
             // when
@@ -92,14 +80,8 @@ public class MenuServiceTest {
         @Test
         void registration_menu_with_profanity() {
             // given
-            Menu request = new Menu();
-            request.setName("holy shit 후라이드치킨");
-            request.setPrice(new BigDecimal(16000));
-            request.setMenuGroupId(치킨류_MENU_GROUP_UUID);
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(후라이드치킨_PRODUCT_UUID);
-            menuProduct.setQuantity(2);
-            request.setMenuProducts(List.of(menuProduct));
+            MenuProduct menuProduct = createMenuProduct(후라이드치킨_PRODUCT_UUID, 2);
+            Menu request = createMenu("holy shit 후라이드치킨", 16000, 치킨류_MENU_GROUP_UUID, List.of(menuProduct));
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(request);
@@ -114,13 +96,8 @@ public class MenuServiceTest {
         @Test
         void name_must_be_input() {
             // given
-            Menu request = new Menu();
-            request.setPrice(new BigDecimal(16000));
-            request.setMenuGroupId(치킨류_MENU_GROUP_UUID);
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(후라이드치킨_PRODUCT_UUID);
-            menuProduct.setQuantity(2);
-            request.setMenuProducts(List.of(menuProduct));
+            MenuProduct menuProduct = createMenuProduct(후라이드치킨_PRODUCT_UUID, 2);
+            Menu request = createMenu(null, 16000, 치킨류_MENU_GROUP_UUID, List.of(menuProduct));
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(request);
@@ -135,11 +112,7 @@ public class MenuServiceTest {
         @Test
         void create_menu_without_products() {
             // given
-            Menu request = new Menu();
-            request.setName("후라이드치킨");
-            request.setPrice(new BigDecimal(16000));
-            request.setMenuGroupId(치킨류_MENU_GROUP_UUID);
-            request.setMenuProducts(Collections.emptyList());
+            Menu request = createMenu("후라이드치킨", 16000, 치킨류_MENU_GROUP_UUID, Collections.emptyList());
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(request);
@@ -154,14 +127,8 @@ public class MenuServiceTest {
         @Test
         void product_quantity_must_be_positive() {
             // given
-            Menu request = new Menu();
-            request.setName("후라이드치킨");
-            request.setPrice(new BigDecimal(16000));
-            request.setMenuGroupId(치킨류_MENU_GROUP_UUID);
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(후라이드치킨_PRODUCT_UUID);
-            menuProduct.setQuantity(-1);
-            request.setMenuProducts(List.of(menuProduct));
+            MenuProduct menuProduct = createMenuProduct(후라이드치킨_PRODUCT_UUID, -1);
+            Menu request = createMenu("후라이드치킨", 16000, 치킨류_MENU_GROUP_UUID, List.of(menuProduct));
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(request);
@@ -176,14 +143,8 @@ public class MenuServiceTest {
         @Test
         void create_menu_with_invalid_price() {
             // given
-            Menu request = new Menu();
-            request.setName("후라이드치킨");
-            request.setPrice(new BigDecimal(-100));
-            request.setMenuGroupId(치킨류_MENU_GROUP_UUID);
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(후라이드치킨_PRODUCT_UUID);
-            menuProduct.setQuantity(1);
-            request.setMenuProducts(List.of(menuProduct));
+            MenuProduct menuProduct = createMenuProduct(후라이드치킨_PRODUCT_UUID, 1);
+            Menu request = createMenu("후라이드치킨", -100, 치킨류_MENU_GROUP_UUID, List.of(menuProduct));
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(request);
@@ -198,14 +159,8 @@ public class MenuServiceTest {
         @Test
         void create_menu_with_price_exceeding_product_total() {
             // given
-            Menu request = new Menu();
-            request.setName("후라이드치킨");
-            request.setPrice(new BigDecimal(50000));
-            request.setMenuGroupId(치킨류_MENU_GROUP_UUID);
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(후라이드치킨_PRODUCT_UUID);
-            menuProduct.setQuantity(1);
-            request.setMenuProducts(List.of(menuProduct));
+            MenuProduct menuProduct = createMenuProduct(후라이드치킨_PRODUCT_UUID, 1);
+            Menu request = createMenu("후라이드치킨", 50000, 치킨류_MENU_GROUP_UUID, List.of(menuProduct));
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> menuService.create(request);
@@ -220,15 +175,8 @@ public class MenuServiceTest {
         @Test
         void create_menu_without_menu_group() {
             // given
-            Menu request = new Menu();
-            request.setName("후라이드치킨");
-            request.setPrice(new BigDecimal(16000));
-            UUID noExistsGroupId = UUID.randomUUID();
-            request.setMenuGroupId(noExistsGroupId);
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProductId(후라이드치킨_PRODUCT_UUID);
-            menuProduct.setQuantity(1);
-            request.setMenuProducts(List.of(menuProduct));
+            MenuProduct menuProduct = createMenuProduct(후라이드치킨_PRODUCT_UUID, 1);
+            Menu request = createMenu("후라이드치킨", 16000, UUID.randomUUID(), List.of(menuProduct));
 
             // when
             Executable executable = () -> menuService.create(request);
@@ -248,26 +196,14 @@ public class MenuServiceTest {
 
         @BeforeEach
         void setup() {
-            Product product = new Product();
-            product.setId(PRODUCT_UUID);
-            product.setName("양념치킨");
-            product.setPrice(new BigDecimal(20000));
+            Product product = createProduct(PRODUCT_UUID, "양념치킨", new BigDecimal(20000));
             productRepository.save(product);
 
-            MenuGroup menuGroup = new MenuGroup();
-            menuGroup.setId(MENU_GROUP_UUID);
-            menuGroup.setName("치킨류");
+            MenuGroup menuGroup = createMenuGroup(MENU_GROUP_UUID, "치킨류");
             menuGroupRepository.save(menuGroup);
 
-            Menu menu = new Menu();
-            menu.setId(MENU_UUID);
-            menu.setName("양념치킨");
-            menu.setPrice(new BigDecimal(20000));
-            menu.setMenuGroup(menuGroup);
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
-            menu.setMenuProducts(List.of(menuProduct));
+            List<MenuProduct> menuProducts = List.of(createMenuProduct(PRODUCT_UUID, product, 1));
+            Menu menu = createMenu(MENU_UUID, "양념치킨", new BigDecimal(20000), MENU_GROUP_UUID, menuGroup, menuProducts);
             menuRepository.save(menu);
         }
 
@@ -329,26 +265,14 @@ public class MenuServiceTest {
 
         @BeforeEach
         void setup() {
-            Product product = new Product();
-            product.setId(PRODUCT_UUID);
-            product.setName("간장치킨");
-            product.setPrice(new BigDecimal(19000));
+            Product product = createProduct(PRODUCT_UUID, "간장치킨", new BigDecimal(19000));
             productRepository.save(product);
 
-            MenuGroup menuGroup = new MenuGroup();
-            menuGroup.setId(MENU_GROUP_UUID);
-            menuGroup.setName("치킨류");
+            MenuGroup menuGroup = createMenuGroup(MENU_GROUP_UUID, "치킨류");
             menuGroupRepository.save(menuGroup);
 
-            Menu menu = new Menu();
-            menu.setId(MENU_UUID);
-            menu.setName("간장치킨");
-            menu.setPrice(new BigDecimal(19000));
-            menu.setMenuGroup(menuGroup);
-            MenuProduct menuProduct = new MenuProduct();
-            menuProduct.setProduct(product);
-            menuProduct.setQuantity(1);
-            menu.setMenuProducts(List.of(menuProduct));
+            List<MenuProduct> menuProducts = List.of(createMenuProduct(PRODUCT_UUID, product, 1));
+            Menu menu = createMenu(MENU_UUID, "간장치킨", new BigDecimal(19000), MENU_GROUP_UUID, menuGroup, menuProducts);
             menuRepository.save(menu);
         }
 
@@ -411,5 +335,47 @@ public class MenuServiceTest {
             // then
             assertThat(menus).hasSize(TOTAL_MENU_COUNT);
         }
+    }
+
+    private static Menu createMenu(String name, int price, UUID menuGroupId, List<MenuProduct> menuProducts) {
+        return createMenu(null, name, new BigDecimal(price), menuGroupId, null, menuProducts);
+    }
+
+    private static Menu createMenu(UUID id, String name, BigDecimal price, UUID menuGroupId, MenuGroup menuGroup, List<MenuProduct> menuProducts) {
+        Menu menu = new Menu();
+        menu.setId(id);
+        menu.setName(name);
+        menu.setPrice(price);
+        menu.setMenuGroupId(menuGroupId);
+        menu.setMenuGroup(menuGroup);
+        menu.setMenuProducts(menuProducts);
+        return menu;
+    }
+
+    private static MenuProduct createMenuProduct(UUID productId, int quantity) {
+        return createMenuProduct(productId, null, quantity);
+    }
+
+    private static MenuProduct createMenuProduct(UUID productId, Product proudct, int quantity) {
+        MenuProduct menuProduct = new MenuProduct();
+        menuProduct.setProductId(productId);
+        menuProduct.setProduct(proudct);
+        menuProduct.setQuantity(quantity);
+        return menuProduct;
+    }
+
+    private static Product createProduct(UUID id, String name, BigDecimal price) {
+        Product product = new Product();
+        product.setId(id);
+        product.setName(name);
+        product.setPrice(price);
+        return product;
+    }
+
+    private static MenuGroup createMenuGroup(UUID id, String name) {
+        MenuGroup menuGroup = new MenuGroup();
+        menuGroup.setId(id);
+        menuGroup.setName(name);
+        return menuGroup;
     }
 }
