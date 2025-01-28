@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.util.UUID;
 
 @Table(name = "menu_group")
@@ -18,6 +17,10 @@ public class MenuGroup {
     private String name;
 
     public MenuGroup() {
+    }
+
+    public MenuGroup(String name) {
+        this.name = name;
     }
 
     public UUID getId() {
