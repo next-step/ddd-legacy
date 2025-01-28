@@ -3,11 +3,11 @@ package calculator.extractor
 import calculator.exception.TextDelimiterExtractorException
 
 class TextDelimiterExtractorFactory(
-    private val factories: List<TextDelimiterExtractor>,
+    private val textDelimiterExtractors: List<TextDelimiterExtractor>,
 ) {
 
     fun get(text: String?): TextDelimiterExtractor {
-        return factories.firstOrNull {
+        return textDelimiterExtractors.firstOrNull {
             it.isSupport(text)
         } ?: throw TextDelimiterExtractorException("Unsupported text format: $text")
     }
