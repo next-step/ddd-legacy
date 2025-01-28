@@ -3,36 +3,26 @@ package stringcaculator
 import java.util.regex.Pattern
 
 class Calculator() {
-    val ZERO = 0
-    val DELIMITERS = arrayOf(",", ":")
-    val CUSTOM_DELIMITER_REGEX = "//(.)\n(.*)"
+    private val ZERO = 0
+    private val DEFAULT_DELIMITERS = arrayOf(",", ":")
+    private val CUSTOM_DELIMITER_PATTERN = Pattern.compile("//(.)\n(.*)")
+    private val DELIMITER_GROUP = 1
+    private val BODY_GROUP = 2
 
 
     fun add(text: String?): Int {
-        var result = ZERO
-
         if (text.isNullOrEmpty()) {
             return ZERO
         }
-        val matcher = Pattern.compile(CUSTOM_DELIMITER_REGEX).matcher(text)
-        val nums = when {
-            matcher.find() -> {
-                val customDelimiter = matcher.group(1)
-                split(matcher.group(2), customDelimiter)
-            }
 
-            else -> {
-                split(text, *DELIMITERS)
-            }
-        }
-
-        nums.map {
-            result += it.num.toInt()
-        }
-        return result
+        val (delimiter, body) = parseInput(text)
+        return Numbers.generateNumbers(body, delimiter).sum()
     }
 
-    private fun split(text: String, vararg delimiters: String): List<Number> {
-        return text.split(*delimiters).map { Number(it) }
+    private fun parseInput(text: String): Pair<Array<String>, String> {
+        val matcher = CUSTOM_DELIMITER_PATTERN.matcher(text)
+        return matcher.takeIf { it.find() }?.let {
+            arrayOf(it.group(DELIMITER_GROUP)) to it.group(BODY_GROUP)
+        } ?: (DEFAULT_DELIMITERS to text)
     }
 }

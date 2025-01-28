@@ -4,31 +4,29 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatExceptionOfType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.NullAndEmptySource
+import org.junit.jupiter.params.provider.ValueSource
 
 
 class CalculatorTest {
     val calculator = Calculator()
 
 
-    @DisplayName("빈 문자열을 입력한 경우 0을 반환한다.")
-    @Test
-    fun 빈문자열_입력() {
-        val result = calculator.add("")
-        assertThat(result).isEqualTo(0)
-    }
-
-    @DisplayName("null을 입력한 경우 0을 반환한다.")
-    @Test
-    fun null_입력() {
-        val result = calculator.add(null)
+    @DisplayName("빈 문자열 또는 null을 입력한 경우 0을 반환한다.")
+    @ParameterizedTest
+    @NullAndEmptySource
+    fun 빈문자열_또는_null_입력(input: String?) {
+        val result = calculator.add(input)
         assertThat(result).isEqualTo(0)
     }
 
     @DisplayName("숫자 하나를 입력한 경우 해당 숫자를 반환한다.")
-    @Test
-    fun 숫자하나입력() {
-        val result = calculator.add("7")
-        assertThat(result).isEqualTo(7)
+    @ParameterizedTest
+    @ValueSource(strings = ["1", "7", "8"])
+    fun 숫자하나입력(input: String) {
+        val result = calculator.add(input)
+        assertThat(result).isEqualTo(input.toInt())
     }
 
     @DisplayName("숫자 사이에 컴마 또는 콜론 구분자 입력할 경우 숫자의 합을 반환한다.")
