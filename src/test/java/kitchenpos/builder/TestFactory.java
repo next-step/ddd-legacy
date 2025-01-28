@@ -32,6 +32,15 @@ public class TestFactory {
                 menuGroup.getId());
     }
 
+    public static Menu createMenu(boolean displayed) {
+        MenuGroup menuGroup = createMenuGroup();
+        Product product = createProduct(BigDecimal.valueOf(5000));
+        MenuProduct menuProduct = new MenuProduct(1, product, product.getId());
+
+        return new Menu("김치찌개", BigDecimal.valueOf(8000), displayed, List.of(menuProduct), menuGroup,
+                menuGroup.getId());
+    }
+
     public static Menu createPureMenu(MenuGroup menuGroup, Product product) {
         MenuProduct menuProduct = new MenuProduct(1, product, product.getId());
         return new Menu("김치찌개", BigDecimal.valueOf(8000), true, List.of(menuProduct), menuGroup,
@@ -55,5 +64,15 @@ public class TestFactory {
     public static Order createDefaultOrder(OrderLineItem orderLineItem, OrderTable orderTable) {
         return new Order(OrderType.DELIVERY, OrderStatus.WAITING, LocalDateTime.now(), List.of(orderLineItem),
                 "주소", orderTable, orderTable.getId());
+    }
+
+    public static Order createOrder(OrderLineItem orderLineItem, OrderTable orderTable, OrderType orderType,
+                                    OrderStatus orderStatus, String address) {
+        return new Order(orderType, orderStatus, LocalDateTime.now(), List.of(orderLineItem),
+                address, orderTable, orderTable.getId());
+    }
+
+    public static OrderLineItem createOrderLineItem(Menu menu) {
+        return new OrderLineItem(menu, 2, menu.getId(), BigDecimal.valueOf(8000));
     }
 }

@@ -2,6 +2,7 @@ package kitchenpos.ui;
 
 import static kitchenpos.builder.TestFactory.createDefaultOrder;
 import static kitchenpos.builder.TestFactory.createMenuGroup;
+import static kitchenpos.builder.TestFactory.createOrderLineItem;
 import static kitchenpos.builder.TestFactory.createOrderTable;
 import static kitchenpos.builder.TestFactory.createProduct;
 import static kitchenpos.builder.TestFactory.createPureMenu;
@@ -13,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.math.BigDecimal;
 import kitchenpos.domain.Menu;
 import kitchenpos.domain.MenuGroup;
 import kitchenpos.domain.MenuGroupRepository;
@@ -186,7 +186,7 @@ class OrderRestControllerTest {
         Product product = createAndSaveProduct();
         Menu menu = createAndSaveMenu(menuGroup, product);
 
-        OrderLineItem orderLineItem = new OrderLineItem(menu, 2, menu.getId(), BigDecimal.valueOf(8000));
+        OrderLineItem orderLineItem = createOrderLineItem(menu);
         OrderTable orderTable = createAndSaveOrderTable();
 
         return createDefaultOrder(orderLineItem, orderTable);
@@ -197,7 +197,7 @@ class OrderRestControllerTest {
         Product product = createAndSaveProduct();
         Menu menu = createAndSaveMenu(menuGroup, product);
 
-        OrderLineItem orderLineItem = new OrderLineItem(menu, 2, menu.getId(), BigDecimal.valueOf(8000));
+        OrderLineItem orderLineItem = createOrderLineItem(menu);
         OrderTable orderTable = createAndSaveOrderTable();
 
         Order order = createDefaultOrder(orderLineItem, orderTable);
