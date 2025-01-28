@@ -19,8 +19,13 @@ public class MenuGroup {
     public MenuGroup() {
     }
 
-    public MenuGroup(String name) {
+    public MenuGroup(String name, UUID id) {
         this.name = name;
+        this.id = id;
+    }
+
+    public MenuGroup(String name) {
+        this(name, UUID.randomUUID());
     }
 
     public UUID getId() {
