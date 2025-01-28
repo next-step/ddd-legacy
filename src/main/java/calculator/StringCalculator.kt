@@ -2,7 +2,7 @@ package calculator
 
 import calculator.extractor.TextDelimiterExtractorFactory
 
-data class StringCalculator(
+class StringCalculator(
     private val factory: TextDelimiterExtractorFactory,
 ) {
 
