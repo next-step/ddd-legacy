@@ -4,7 +4,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-
 import java.util.UUID;
 
 @Table(name = "order_table")
@@ -24,6 +23,17 @@ public class OrderTable {
     private boolean occupied;
 
     public OrderTable() {
+    }
+
+    public OrderTable(UUID id, String name, int numberOfGuests, boolean occupied) {
+        this.id = id;
+        this.name = name;
+        this.numberOfGuests = numberOfGuests;
+        this.occupied = occupied;
+    }
+
+    public OrderTable(String name, int numberOfGuests, boolean occupied) {
+        this(UUID.randomUUID(), name, numberOfGuests, occupied);
     }
 
     public UUID getId() {
