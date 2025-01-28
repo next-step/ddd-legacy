@@ -393,6 +393,22 @@ public class OrderServiceTest {
         }
 
         @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        @DisplayName("포장 주문을 정상적으로 완료한다")
+        @Test
+        void complete_packing_successfully() {
+            // given
+            Order order = createPackingOrder();
+            orderService.accept(order.getId());
+            orderService.serve(order.getId());
+
+            // when
+            Order completedOrder = orderService.complete(order.getId());
+
+            // then
+            assertThat(completedOrder.getStatus()).isEqualTo(OrderStatus.COMPLETED);
+        }
+
+        @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
         @DisplayName("주문 상태가 '배달 완료' 상태인 경우에만 배달 주문을 완료할 수 있다")
         @Test
         void only_delivered_order_can_be_completed_for_delivery() {
@@ -413,6 +429,21 @@ public class OrderServiceTest {
         void only_served_order_can_be_completed_for_eat_in() {
             // given
             Order order = createEeaInOrder();
+
+            // when
+            ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.complete(order.getId());
+
+            // then
+            assertThatIllegalStateException()
+                    .isThrownBy(throwingCallable);
+        }
+
+        @Sql(value = "/delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        @DisplayName("주문 상태가 '제공됨' 상태인 경우에만 포장 주문을 완료할 수 있다")
+        @Test
+        void only_served_order_can_be_completed_for_packing() {
+            // given
+            Order order = createPackingOrder();
 
             // when
             ThrowableAssert.ThrowingCallable throwingCallable = () -> orderService.complete(order.getId());
@@ -455,6 +486,12 @@ public class OrderServiceTest {
 
         List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, 2, 후라이드치킨_MENU_DEFAULT_PRICE));
         Order request = createOrder(OrderType.EAT_IN, orderLineItems, "서울시 강남구", 테이블_1_ORDER_TABLE_UUID, orderTable);
+        return orderService.create(request);
+    }
+
+    private Order createPackingOrder() {
+        List<OrderLineItem> orderLineItems = List.of(createOrderLineItem(후라이드치킨_MENU_UUID, 2, 후라이드치킨_MENU_DEFAULT_PRICE));
+        Order request = createOrder(OrderType.TAKEOUT, orderLineItems, "서울시 강남구");
         return orderService.create(request);
     }
 
